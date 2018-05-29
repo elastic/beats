@@ -7,19 +7,88 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Added
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Known Issue
+
+
+////////////////////////////////////////////////////////////
+
+[[release-notes-6.3.0]]
+=== Beats version 6.3.0
+https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
 - De dot keys of labels and annotations in kubernetes meta processors to prevent collisions. {pull}6203[6203]
-- Rename beat.cpu.*.time metrics to beat.cpu.*.time.ms. {pull}6449[6449]
+- Rename `beat.cpu.*.time metrics` to `beat.cpu.*.time.ms`. {pull}6449[6449]
 - Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
 - Allow override of dynamic template `match_mapping_type` for fields with object_type. {pull}6691[6691]
 - Add `host.name` field to all events, to avoid mapping conflicts. This could be breaking Logstash configs if you rely on the `host` field being a string. {pull}7051[7051]
-
-*Auditbeat*
 
 *Filebeat*
 
@@ -29,8 +98,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Heartbeat*
 
-- Made the URL field of heartbeat aggregatable. {pull}6263[6263]
-- Use `match.Matcher` for checking heartbeat response bodies with regular expressions. {pull}6539[6539]
+- Made the URL field of Heartbeat aggregateable. {pull}6263[6263]
+- Use `match.Matcher` for checking Heartbeat response bodies with regular expressions. {pull}6539[6539]
 
 *Metricbeat*
 
@@ -41,17 +110,13 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Refactor docker CPU calculations to be more consistent with `docker stats`. {pull}6608[6608]
 - Update logstash.node_stats metricset to write data under `logstash.node.stats.*`. {pull}6714[6714]
 
-*Packetbeat*
-
-*Winlogbeat*
-
 ==== Bugfixes
 
 *Affecting all Beats*
 
 - Fix panic when Events containing a float32 value are normalized. {pull}6129[6129]
 - Fix `setup.dashboards.always_kibana` when using Kibana 5.6. {issue}6090[6090]
-- Fix for kafka logger. {pull}6430[6430]
+- Fix for Kafka logger. {pull}6430[6430]
 - Remove double slashes in Windows service script. {pull}6491[6491]
 - Ensure Kubernetes labels/annotations don't break mapping {pull}6490[6490]
 - Ensure that the dashboard zip files can't contain files outside of the kibana directory. {pull}6921[6921]
@@ -71,6 +136,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix a parsing issue in the syslog input for RFC3339 timestamp and time with nanoseconds. {pull}7046[7046]
 
 *Heartbeat*
+
 - Fix race due to updates of shared a map, that was not supposed to be shared between multiple go-routines. {issue}6616[6616]
 
 *Metricbeat*
@@ -89,8 +155,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - disk reads and write count metrics in RabbitMQ queue metricset made optional. {issue}6876[6876]
 - Add mapping for docker metrics per cpu. {pull}6843[6843]
 
-*Packetbeat*
-
 *Winlogbeat*
 
 - Fixed a crash under Windows 2003 and XP when an event had less insert strings than required by its format string. {pull}6247[6247]
@@ -101,7 +165,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Update Golang 1.9.4 {pull}6326[6326]
 - Add the ability to log to the Windows Event Log. {pull}5913[5913]
-- The node name can be discovered automatically by machine-id matching when beat deployed outside kubernetes cluster. {pull}6146[6146]
+- The node name can be discovered automatically by machine-id matching when beat deployed outside Kubernetes cluster. {pull}6146[6146]
 - Panics will be written to the logger before exiting. {pull}6199[6199]
 - Add builder support for autodiscover and annotations builder {pull}6408[6408]
 - Add plugin support for autodiscover builders, providers {pull}6457[6457]
@@ -115,8 +179,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Added logging of system info at Beat startup. {issue}5946[5946]
 - Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
 - Add rename processor. {pull}6292[6292]
-
-*Auditbeat*
 
 *Filebeat*
 
@@ -137,8 +199,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Release config reloading feature as GA.
 - Add support human friendly size for the UDP input. {pull}6886[6886]
 - Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
-
-*Heartbeat*
 
 *Metricbeat*
 
@@ -218,24 +278,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Use bookmarks to persist the last published event. {pull}6150[6150]
 
-==== Deprecated
-
-*Affecting all Beats*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Metricbeat*
-
-*Packetbeat*
-
-*Winlogbeat*
-
-==== Known Issue
-
-
-////////////////////////////////////////////////////////////
 
 [[release-notes-6.2.3]]
 === Beats version 6.2.3
