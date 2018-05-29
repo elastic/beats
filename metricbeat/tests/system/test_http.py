@@ -55,6 +55,7 @@ class Test(metricbeat.BaseTest):
 
         self.wait_until(lambda: self.log_contains("Starting http server on "))
 
+        time.sleep(2)
         requests.post(self.get_host(), json={'hello': 'world'}, headers={'Content-Type': 'application/json'})
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
