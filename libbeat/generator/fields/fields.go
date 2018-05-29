@@ -1,12 +1,14 @@
 package fields
 
 import (
-	"bytes"
+	"bufio"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 var (
@@ -46,34 +48,40 @@ func writeGeneratedFieldsYml(beatsPath string, fieldFiles []*YmlFile) error {
 	}
 	defer f.Close()
 
+	fw := bufio.NewWriter(f)
 	for _, p := range fieldFiles {
-		content, err := ioutil.ReadFile(p.Path)
+		ff, err := os.Open(p.Path)
 		if err != nil {
 			return err
 		}
 
-		content = indent(content, p.Indent)
+		fr := bufio.NewReader(ff)
+		for {
+			l, err := fr.ReadString('\n')
+			if err != nil {
+				if err == io.EOF {
+					err = writeIndentedLine(fw, l+"\n", p.Indent)
+					if err != nil {
+						return err
+					}
+					break
+				}
+				return err
+			}
+			err = writeIndentedLine(fw, l, p.Indent)
+			if err != nil {
+				return err
+			}
 
-		_, err = f.Write(content)
-		if err != nil {
-			return err
 		}
 	}
 	return nil
 }
 
-func indent(content []byte, n int) []byte {
-	newline := []byte("\n")
-	empty := []byte("")
-	i := bytes.Repeat([]byte(" "), n)
-	c := bytes.Join([][]byte{newline, i}, empty)
-
-	content = bytes.Join([][]byte{i, content}, empty)
-	content = bytes.TrimRight(content, "\n")
-	content = bytes.Replace(content, newline, c, -1)
-	content = bytes.TrimRight(content, " ")
-
-	return bytes.Join([][]byte{newline, content, newline}, empty)
+func writeIndentedLine(fw *bufio.Writer, l string, indent int) error {
+	ll := strings.Repeat(" ", indent) + l
+	fmt.Fprint(fw, ll)
+	return fw.Flush()
 }
 
 // Generate collects fields.yml files and concatenates them into one global file.
