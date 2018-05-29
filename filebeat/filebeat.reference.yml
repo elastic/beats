@@ -83,10 +83,10 @@ filebeat.modules:
     #input:
 
 #---------------------------- elasticsearch Module ---------------------------
-- module: elasticsearch
+#- module: elasticsearch
   # Server log
-  server:
-    enabled: true
+  #server:
+    #enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -157,10 +157,10 @@ filebeat.modules:
     #input:
 
 #-------------------------------- Kafka Module -------------------------------
-- module: kafka
+#- module: kafka
   # All logs
-  log:
-    enabled: true
+  #log:
+    #enabled: true
 
     # Set custom paths for Kafka. If left empty,
     # Filebeat will look under /opt.
@@ -172,10 +172,10 @@ filebeat.modules:
 
 
 #------------------------------- kibana Module -------------------------------
-- module: kibana
+#- module: kibana
   # All logs
-  log:
-    enabled: true
+  #log:
+    #enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -265,9 +265,9 @@ filebeat.modules:
     #input:
 
 #------------------------------- Osquery Module ------------------------------
-- module: osquery
-  result:
-    enabled: true
+#- module: osquery
+  #result:
+    #enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
