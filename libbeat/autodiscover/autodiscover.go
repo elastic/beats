@@ -14,7 +14,7 @@ import (
 const (
 	debugK = "autodiscover"
 
-	/// If a config reload fails after a new event, a new reload will be run after this period
+	// If a config reload fails after a new event, a new reload will be run after this period
 	retryPeriod = 10 * time.Second
 )
 
@@ -128,6 +128,8 @@ func (a *Autodiscover) worker() {
 
 			// On error, make sure the next run also updates because some runners were not properly loaded
 			retry = err != nil
+			// reset updated status
+			updated = false
 		}
 	}
 }
