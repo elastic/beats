@@ -259,7 +259,7 @@ func (d *Discovery) update(config InterfaceConfig, message common.MapStr) {
 	}
 	agentID, ok := v.(string)
 	if len(agentID) == 0 || !ok {
-		logp.Err("empty agent?")
+		logp.Err("incorrect or empty agent id in Jolokia Discovery response")
 		return
 	}
 
