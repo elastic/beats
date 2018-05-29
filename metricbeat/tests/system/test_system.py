@@ -49,7 +49,7 @@ SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
 # is not available on all OSes and requires root to read for all processes.
 # cgroup is only available on linux.
 SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "pgid",
-                         "state", "username", "cgroup", "cwd"]
+                         "state", "username"]
 
 
 class Test(metricbeat.BaseTest):
@@ -366,12 +366,6 @@ class Test(metricbeat.BaseTest):
         """
         Test system/process output.
         """
-        if not sys.platform.startswith("linux") and "cgroup" in SYSTEM_PROCESS_FIELDS:
-            SYSTEM_PROCESS_FIELDS.remove("cgroup")
-
-        if not sys.platform.startswith("linux") and "cwd" in SYSTEM_PROCESS_FIELDS:
-            SYSTEM_PROCESS_FIELDS.remove("cwd")
-
         self.render_config_template(modules=[{
             "name": "system",
             "metricsets": ["process"],
@@ -391,6 +385,7 @@ class Test(metricbeat.BaseTest):
         found_cmdline = False
         found_env = False
         found_fd = False
+        found_cwd = not sys.platform.startswith("linux")
         for evt in output:
             process = evt["system"]["process"]
 
@@ -399,15 +394,23 @@ class Test(metricbeat.BaseTest):
             if env is not None:
                 found_env = True
 
+            # Remove 'percpu' prior to checking documented fields because its keys are dynamic.
+            if "cgroup" in process and "cpuacct" in process["cgroup"]:
+                del process["cgroup"]["cpuacct"]["percpu"]
+
             self.assert_fields_are_documented(evt)
 
             # Remove optional keys.
+            process.pop("cgroup", None)
             cmdline = process.pop("cmdline", None)
             if cmdline is not None:
                 found_cmdline = True
             fd = process.pop("fd", None)
             if fd is not None:
                 found_fd = True
+            cwd = process.pop("cwd", None)
+            if cwd is not None:
+                found_cwd = True
 
             self.assertItemsEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 

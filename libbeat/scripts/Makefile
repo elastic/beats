@@ -11,12 +11,16 @@ BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEAT_NAME}/current/index.h
 BEAT_LICENSE?=ASL 2.0 ## @packaging Software license of the application
 BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
+BEAT_REF_YAML?=true
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
 GOPACKAGES?=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/ | grep -v /scripts/cmd/ )
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
 NOTICE_FILE?=../NOTICE.txt
 LICENSE_FILE?=../licenses/APACHE-LICENSE-2.0.txt
 ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
+SECCOMP_BINARY?=${BEAT_NAME}
+SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
+SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
 
 space:=$() #
 comma:=,
@@ -79,9 +83,10 @@ PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
 
 # Cross compiling targets
 CGO?=true ## @building if true, Build with C Go support
-TARGETS?="windows/amd64 windows/386 darwin/amd64" ## @building list of platforms/architecture to be built by "make package"
+TARGETS?="windows/amd64 windows/386 darwin/amd64 linux/arm" ## @building list of platforms/architecture to be built by "make package"
 TARGETS_OLD?="linux/amd64 linux/386" ## @building list of Debian6 architecture to be built by "make package" when CGO is true
 PACKAGES?=${BEAT_NAME}/deb ${BEAT_NAME}/rpm ${BEAT_NAME}/darwin ${BEAT_NAME}/win ${BEAT_NAME}/bin ## @Building List of OS to be supported by "make package"
+PACKAGES_EXPERIMENTAL?=${BEAT_NAME}/arm ## @Building List of experimental OS by "make package". Only build when SNAPSHOT=yes
 SNAPSHOT?=yes ## @Building If yes, builds a snapshot version
 BEATS_BUILDER_IMAGE?=tudorg/beats-builder ## @Building Name of the docker image to use when packaging the application
 BEATS_BUILDER_DEB_IMAGE?=tudorg/beats-builder-deb7 ## @Building Name of the docker image to use when packaging the application for Debian 7
@@ -95,6 +100,10 @@ ifeq ($(RACE_DETECTOR),1)
 	RACE=-race
 endif
 
+# Only build experimental targets for snapshots
+ifneq ($(SNAPSHOT),yes)
+	PACKAGES_EXPERIMENTAL=
+endif
 
 ### BUILDING ###
 
@@ -121,6 +130,7 @@ check: python-env prepare-tests ## @build Checks project and source code if ever
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep .) || (echo "Code differs from goimports' style ^" && false)
 	@${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@${FIND} -wholename "*tests/system/test_*.py" -perm ${PERM_EXEC} -exec false {} + || (echo "Python test files shouldn't be executable, otherwise nose doesn't find them" && false)
+	@${FIND} -name "*.yml" -perm ${PERM_EXEC} -exec false {} + || (echo "YAML files should not be executable" && false)
 
 .PHONY: fmt
 fmt: python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
@@ -301,12 +311,18 @@ update: python-env collect
 
 	@# Update config files.
 	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.yml
+	@chmod 0640 ${BEAT_NAME}.yml
+
+
+	@# Update reference config files.
+ifeq ($(BEAT_REF_YAML),true)
 	@if [ -e _meta/beat.reference.yml ]; then \
-        cat _meta/beat.reference.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
-    else \
-        cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
-    fi;
-	@chmod 0640 ${BEAT_NAME}.yml ${BEAT_NAME}.reference.yml
+      cat _meta/beat.reference.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
+  else \
+      cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
+  fi;
+	@chmod 0640 ${BEAT_NAME}.reference.yml
+endif
 
 	@# Update libbeat fields.generated.yml
 	@$(MAKE) -C ${ES_BEATS}/libbeat fields
@@ -427,6 +443,7 @@ prepare-package:
 		-e BEAT_PATH=${BEAT_PATH} \
 		-e BEAT_NAME=${BEAT_NAME} \
 		-e LICENSE_FILE=${LICENSE_FILE} \
+		-e BEAT_REF_YAML=${BEAT_REF_YAML} \
 		${BEATS_BUILDER_IMAGE}
 
 # Prepares for packaging. Builds binaries with cgo
@@ -448,6 +465,7 @@ prepare-package-cgo:
 		-e BEAT_PATH=${BEAT_PATH} \
 		-e BEAT_NAME=${BEAT_NAME} \
 		-e LICENSE_FILE=${LICENSE_FILE} \
+		-e BEAT_REF_YAML=${BEAT_REF_YAML} \
 		${BEATS_BUILDER_IMAGE}
 
 	# linux builds on older debian for compatibility
@@ -465,6 +483,7 @@ prepare-package-cgo:
 		-e BEAT_PATH=${BEAT_PATH} \
 		-e BEAT_NAME=${BEAT_NAME} \
 		-e LICENSE_FILE=${LICENSE_FILE} \
+		-e BEAT_REF_YAML=${BEAT_REF_YAML} \
 		${BEATS_BUILDER_DEB_IMAGE}
 
 # Prepares images for packaging
@@ -504,7 +523,8 @@ package: update package-setup
 		$(MAKE) prepare-package; \
 	fi
 
-	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_PATH=${BEAT_PATH} BUILD_DIR=${PKG_BUILD_DIR} UPLOAD_DIR=${PKG_UPLOAD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
+	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_PATH=${BEAT_PATH} BUILD_DIR=${PKG_BUILD_DIR} UPLOAD_DIR=${PKG_UPLOAD_DIR} $(MAKE) BEAT_REF_YAML=${BEAT_REF_YAML} -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${PACKAGES_EXPERIMENTAL} ${BUILD_DIR}/upload/build_id.txt
+
 	$(MAKE) fix-permissions
 	echo "Finished packages for ${BEAT_NAME}"
 
@@ -542,3 +562,23 @@ help: ## @help Show this help.
 
 help_variables: ## @help Show Makefile customizable variables.
 	@python ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
+
+# Generates a seccomp whitelist policy for the binary pointed to by
+# SECCOMP_BINARY.
+.PHONY: seccomp
+seccomp:
+	@go get github.com/elastic/beats/vendor/github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
+	@test -f ${SECCOMP_BINARY} || (echo "${SECCOMP_BINARY} binary is not built."; false)
+	seccomp-profiler \
+	-b "$(shell grep -v ^# "${SECCOMP_BLACKLIST}")" \
+	-allow "$(shell grep -v ^# "${SECCOMP_ALLOWLIST}")" \
+	-t "${ES_BEATS}/libbeat/common/seccomp/policy.go.tpl" \
+	-pkg include \
+	-out "include/seccomp_linux_{{.GOARCH}}.go" \
+	${SECCOMP_BINARY}
+
+# Generates seccomp profiles based on the binaries produced by the package target.
+.PHONY: seccomp-package
+seccomp-package:
+	SECCOMP_BINARY=build/package/${BEAT_NAME}-linux-386 $(MAKE) seccomp
+	SECCOMP_BINARY=build/package/${BEAT_NAME}-linux-amd64 $(MAKE) seccomp

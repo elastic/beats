@@ -13,8 +13,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -91,7 +91,7 @@ func NewKibanaClient(cfg *common.Config) (*Client, error) {
 
 	var dialer, tlsDialer transport.Dialer
 
-	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, fmt.Errorf("fail to load the TLS config: %v", err)
 	}

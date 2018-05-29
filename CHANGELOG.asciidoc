@@ -66,12 +66,16 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Ensure that the dashboard zip files can't contain files outside of the kibana directory. {pull}6921[6921]
 - Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
 - Fix error if lz4 compression is used with the kafka output. {pull}7025[7025]
+- Preserve the event when source matching fails in `add_docker_metadata`. {pull}7133[7133]
+- Negotiate Docker API version from our client instead of using a hardcoded one. {pull}7165[7165]
+- Fix delays on autodiscovery events handling caused by blocking runner stops. {pull}7170[7170]
 
 *Auditbeat*
 
 - Add hex decoding for the name field in audit path records. {pull}6687[6687]
 - Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
 - Fixed parsing of AppArmor audit messages. {pull}6978[6978]
+- Allow `auditbeat setup` to run without requiring elevated privileges for the audit client. {issue}7111[7111]
 
 *Filebeat*
 
@@ -105,6 +109,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 *Packetbeat*
 
 - Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
+- Fix missing type for `http.response.body` field. {pull}7169[7169]
 
 *Winlogbeat*
 
@@ -131,10 +136,17 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
 - Add rename processor. {pull}6292[6292]
 - Add IP-addresses and MAC-addresses to add_host_metadata. {pull}6878[6878]
-- Add a default seccomp (secure computing) filter on Linux that prohibits
-  execve, execveat, fork, and vfork syscalls. A custom policy can be configured. {issue}5213[5213]
+- Added a seccomp (secure computing) filter on Linux that whitelists the
+  necessary system calls used by each Beat. {issue}5213[5213]
 - Update Sarama to v1.16.0, adding better support for kafka 0.11, 1.0, and 1.1 {pull}7025[7025]
 - Ship fields.yml as part of the binary {pull}4834[4834]
+- Added options to dev-tools/cmd/dashboards/export_dashboard.go: -indexPattern to include index-pattern in output, -quiet to be quiet. {pull}7101[7101]
+- Add Indexer indexing by pod uid. Enable pod uid metadata gathering in add_kubernetes_metadata. Extended Matcher log_path matching to support volume mounts {pull}7072[7072]
+- Add Kibana module with log fileset. {pull}7052[7052]
+- Add default_fields to Elasticsearch template when connecting to Elasticsearch >= 7.0. {pull}7015[7015]
+- Add support for loading a template.json file directly instead of using fields.yml. {pull}7039[7039]
+- Add support for keyword multifields in field.yml. {pull}7131[7131]
+- Add dissect processor. {pull}6925[6925]
 
 *Auditbeat*
 
@@ -164,6 +176,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
 - Support MySQL 5.7.19 by mysql/slowlog {pull}6969[6969]
 - Correctly join partial log lines when using `docker` input. {pull}6967[6967]
+- Add support for TLS with client authentication to the TCP input {pull}7056[7056]
 
 *Heartbeat*
 
@@ -241,6 +254,9 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add Elasticsearch index_summary metricset. {pull}6918[6918]
 - Add config option `management_path_prefix` for RabbitMQ module to configure management plugin path prefix {issue}6875[6875] {pull}7074[7074]
 - Add shard metricset to Elasticsearch module. {pull}7006[7006]
+- Add apiserver metricset to Kubernetes module. {pull}7059[7059]
+- Add maxmemory to redis info metricset. {pull}7127[7127]
+- Set guest as default user in RabbitMQ module. {pull}7107[7107]
 
 *Packetbeat*
 
@@ -248,6 +264,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix high memory usage on HTTP body if body is not published. {pull}6680[6680]
 - Allow to capture the HTTP request or response bodies independently. {pull}6784[6784]
 - HTTP publishes an Error event for unmatched requests or responses. {pull}6794[6794]
+- The process monitor now reports the command-line for all processes, under Linux and Windows. {pull}7135[7135]
 
 *Winlogbeat*
 

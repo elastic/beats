@@ -1,13 +1,12 @@
 package rabbitmq
 
 import (
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -23,7 +22,7 @@ type testMetricSet struct {
 }
 
 func newTestMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	ms, err := NewMetricSet(base, "/api/test")
+	ms, err := NewMetricSet(base, "/api/overview")
 	if err != nil {
 		return nil, err
 	}
@@ -37,17 +36,10 @@ func (m *testMetricSet) Fetch() ([]common.MapStr, error) {
 }
 
 func TestManagementPathPrefix(t *testing.T) {
-	visited := false
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/management_prefix/api/test":
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json;")
-			visited = true
-		default:
-			w.WriteHeader(404)
-		}
-	}))
+	server := mtest.Server(t, mtest.ServerConfig{
+		ManagementPathPrefix: "/management_prefix",
+		DataDir:              "./_meta/testdata",
+	})
 	defer server.Close()
 
 	config := map[string]interface{}{
@@ -58,6 +50,6 @@ func TestManagementPathPrefix(t *testing.T) {
 	}
 
 	f := mbtest.NewEventsFetcher(t, config)
-	f.Fetch()
-	assert.True(t, visited)
+	_, err := f.Fetch()
+	assert.NoError(t, err)
 }

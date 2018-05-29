@@ -168,3 +168,17 @@ are `never`, `once`, and `freely`. The default value is never.
 * `never` - Disables renegotiation.
 * `once` - Allows a remote server to request renegotiation once per connection.
 * `freely` - Allows a remote server to repeatedly request renegotiation.
+
+ifeval::["{beatname_lc}" == "filebeat"]
+[float]
+==== `client_authentication`
+
+This configures what types of client authentication are supported. The valid options
+are `none`, `optional`, and `required`. The default value is required.
+
+NOTE: This option is only valid with the TCP or the Syslog input.
+
+* `none` - Disables client authentification.
+* `optional` - When a client certificate is given, the server will verify it.
+* `required` - Will require clients to provide a valid certificate.
+endif::[]

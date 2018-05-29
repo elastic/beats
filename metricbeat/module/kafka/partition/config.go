@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 )
 
 type connConfig struct {
-	Retries  int                `config:"retries" validate:"min=0"`
-	Backoff  time.Duration      `config:"backoff" validate:"min=0"`
-	TLS      *outputs.TLSConfig `config:"ssl"`
-	Username string             `config:"username"`
-	Password string             `config:"password"`
-	ClientID string             `config:"client_id"`
-	Topics   []string           `config:"topics"`
+	Retries  int               `config:"retries" validate:"min=0"`
+	Backoff  time.Duration     `config:"backoff" validate:"min=0"`
+	TLS      *tlscommon.Config `config:"ssl"`
+	Username string            `config:"username"`
+	Password string            `config:"password"`
+	ClientID string            `config:"client_id"`
+	Topics   []string          `config:"topics"`
 }
 
 var defaultConfig = connConfig{

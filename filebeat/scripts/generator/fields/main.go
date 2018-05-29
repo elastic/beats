@@ -155,8 +155,22 @@ func accumulatePatterns(grok interface{}) ([]string, error) {
 func accumulateRemoveFields(remove interface{}, out []string) []string {
 	for k, v := range remove.(map[string]interface{}) {
 		if k == "field" {
-			vs := v.(string)
-			return append(out, vs)
+			switch vs := v.(type) {
+			case string:
+				return append(out, vs)
+			case []string:
+				for _, vv := range vs {
+					out = append(out, vv)
+				}
+			case []interface{}:
+				for _, vv := range vs {
+					vvs := vv.(string)
+					out = append(out, vvs)
+				}
+			default:
+				return out
+
+			}
 		}
 	}
 	return out

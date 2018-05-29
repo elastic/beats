@@ -201,7 +201,7 @@ var (
 
 	// x86_64RawSyscallRegex matches the instruction to load the syscall number
 	// into a register for a raw "SYSCALL".
-	x86_64RawSyscallRegex = regexp.MustCompile(`MOV[A-Z]? \$(.+), AX`)
+	x86_64RawSyscallRegex = regexp.MustCompile(`MOV[A-Z]? \$(.+), (?:AX|BP)`)
 )
 
 func parseX86_64(p *parser, line, caller string, instructions []string) (*Syscall, error) {
@@ -221,7 +221,6 @@ func parseX86_64(p *parser, line, caller string, instructions []string) (*Syscal
 					Assembly: "XORL AX, AX",
 				}, nil
 			}
-
 		}
 	} else if p.isFunctionCall(line) && isSyscallFunction(line) {
 		m = x86_64SyscallRegex

@@ -212,7 +212,9 @@ metricbeat.modules:
 
 #------------------------------- Golang Module -------------------------------
 - module: golang
-  metricsets: ["expvar","heap"]
+  #metricsets:
+  #  - expvar
+  #  - heap
   period: 10s
   hosts: ["localhost:6060"]
   heap.path: "/debug/vars"
@@ -253,53 +255,63 @@ metricbeat.modules:
 
 #-------------------------------- HTTP Module --------------------------------
 - module: http
-  metricsets: ["json"]
+  #metricsets:
+  #  - json
   period: 10s
   hosts: ["localhost:80"]
   namespace: "json_namespace"
   path: "/"
   #body: ""
   #method: "GET"
+  #username: "user"
+  #password: "secret"
   #request.enabled: false
   #response.enabled: false
   #json.is_array: false
   #dedot.enabled: false
 
 - module: http
-  metricsets: ["server"]
+  #metricsets:
+  #  - server
   host: "localhost"
   port: "8080"
   enabled: false
-#  paths:
-#    - path: "/foo"
-#      namespace: "foo"
-#      fields: # added to the the response in root. overwrites existing fields
-#        key: "value"
+  #paths:
+  #  - path: "/foo"
+  #    namespace: "foo"
+  #    fields: # added to the the response in root. overwrites existing fields
+  #      key: "value"
 
 #------------------------------- Jolokia Module ------------------------------
 - module: jolokia
-  metricsets: ["jmx"]
+  #metricsets: ["jmx"]
   period: 10s
   hosts: ["localhost"]
   namespace: "metrics"
+  #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+  #username: "user"
+  #password: "secret"
   jmx.mappings:
-    - mbean: 'java.lang:type=Runtime'
-      attributes:
-        - attr: Uptime
-          field: uptime
-    - mbean: 'java.lang:type=Memory'
-      attributes:
-        - attr: HeapMemoryUsage
-          field: memory.heap_usage
-        - attr: NonHeapMemoryUsage
-          field: memory.non_heap_usage
+    #- mbean: 'java.lang:type=Runtime'
+    #  attributes:
+    #    - attr: Uptime
+    #      field: uptime
+    #- mbean: 'java.lang:type=Memory'
+    #  attributes:
+    #    - attr: HeapMemoryUsage
+    #      field: memory.heap_usage
+    #    - attr: NonHeapMemoryUsage
+    #      field: memory.non_heap_usage
     # GC Metrics - this depends on what is available on your JVM
-    # - mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
-    #   attributes:
-    #     - attr: CollectionTime
-    #       field: gc.cms_collection_time
-    #     - attr: CollectionCount
-    #       field: gc.cms_collection_count
+    #- mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
+    #  attributes:
+    #    - attr: CollectionTime
+    #      field: gc.cms_collection_time
+    #    - attr: CollectionCount
+    #      field: gc.cms_collection_count
+
+  jmx.application:
+  jmx.instance:
 
 #-------------------------------- Kafka Module -------------------------------
 - module: kafka
@@ -370,6 +382,13 @@ metricbeat.modules:
   enabled: true
   metricsets:
     - event
+
+# Kubernetes API server
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - apiserver
+  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
 
 #--------------------------------- kvm Module --------------------------------
 - module: kvm
@@ -743,6 +762,14 @@ metricbeat.modules:
 #    fields:
 #       - from: "a"
 #         to: "b"
+#
+# The following example tokenizes the string into fields:
+#
+#processors:
+#- dissect:
+#    tokenizer: "%{key1} - %{key2}"
+#    field: "message"
+#    target_prefix: "dissect"
 #
 # The following example enriches each event with metadata from the cloud
 # provider about the host machine. It works on EC2, GCE, DigitalOcean,
@@ -1348,6 +1375,15 @@ output.elasticsearch:
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
 
+# Enable json template loading. If this is enabled, the fields.yml is ignored.
+#setup.template.json.enabled: false
+
+# Path to the json template file
+#setup.template.json.path: "${path.config}/template.json"
+
+# Name under which the template is stored in Elasticsearch
+#setup.template.json.name: ""
+
 # Overwrite existing template
 #setup.template.overwrite: false
 
@@ -1582,16 +1618,4 @@ logging.files:
 #============================= Process Security ================================
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
-seccomp.enabled: true
-
-# The default seccomp policy. This policy blacklists system calls that allow
-# process creation.
-seccomp:
-  default_action: allow
-  syscalls:
-  - action: errno
-    names:
-    - execve
-    - execveat
-    - fork
-    - vfork
+#seccomp.enabled: true

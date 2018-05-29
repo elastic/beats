@@ -58,18 +58,18 @@ func NewExtractField(c *common.Config) (processors.Processor, error) {
 func (f *extract_field) Run(event *beat.Event) (*beat.Event, error) {
 	fieldValue, err := event.GetValue(f.Field)
 	if err != nil {
-		return nil, fmt.Errorf("error getting field '%s' from event", f.Field)
+		return event, fmt.Errorf("error getting field '%s' from event", f.Field)
 	}
 
 	value, ok := fieldValue.(string)
 	if !ok {
-		return nil, fmt.Errorf("could not get a string from field '%s'", f.Field)
+		return event, fmt.Errorf("could not get a string from field '%s'", f.Field)
 	}
 
 	parts := strings.Split(value, f.Separator)
 	parts = deleteEmpty(parts)
 	if len(parts) < f.Index+1 {
-		return nil, fmt.Errorf("index is out of range for field '%s'", f.Field)
+		return event, fmt.Errorf("index is out of range for field '%s'", f.Field)
 	}
 
 	event.PutValue(f.Target, parts[f.Index])

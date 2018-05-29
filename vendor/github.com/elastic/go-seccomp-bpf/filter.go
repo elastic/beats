@@ -115,8 +115,8 @@ type Filter struct {
 
 // Policy defines the BPF seccomp filter.
 type Policy struct {
-	DefaultAction Action         `config:"default_action" validate:"required" json:"default_action" yaml:"default_action"` // Action when no syscalls match.
-	Syscalls      []SyscallGroup `config:"syscalls"       validate:"required" json:"syscalls"       yaml:"syscalls"`       // Groups of syscalls and actions.
+	DefaultAction Action         `config:"default_action" json:"default_action" yaml:"default_action"` // Action when no syscalls match.
+	Syscalls      []SyscallGroup `config:"syscalls"       json:"syscalls"       yaml:"syscalls"`       // Groups of syscalls and actions.
 
 	arch *arch.Info
 }
@@ -130,9 +130,28 @@ type SyscallGroup struct {
 	arch *arch.Info
 }
 
+// Validate validates that the configuration has both a default action and a
+// set of syscalls.
+func (p *Policy) Validate() error {
+	if _, found := actionNames[p.DefaultAction]; !found {
+		return errors.Errorf("invalid default_action value %d", p.DefaultAction)
+	}
+
+	if len(p.Syscalls) == 0 {
+		return errors.New("syscalls must not be empty")
+	}
+
+	return nil
+}
+
 // Assemble assembles the policy into a list of BPF instructions. If the policy
 // contains any unknown syscalls or invalid actions an error will be returned.
 func (p *Policy) Assemble() ([]bpf.Instruction, error) {
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
+
+	// Ensure arch has been set for the policy.
 	if p.arch == nil {
 		arch, err := arch.GetInfo("")
 		if err != nil {
@@ -141,6 +160,13 @@ func (p *Policy) Assemble() ([]bpf.Instruction, error) {
 		p.arch = arch
 	}
 
+	// Setup the action.
+	action := p.DefaultAction
+	if action == ActionErrno {
+		action |= Action(errnoEPERM)
+	}
+
+	// Build the syscall filters.
 	var instructions []bpf.Instruction
 	for _, group := range p.Syscalls {
 		if group.arch == nil {
@@ -155,19 +181,24 @@ func (p *Policy) Assemble() ([]bpf.Instruction, error) {
 		instructions = append(instructions, groupInsts...)
 	}
 
-	header := []bpf.Instruction{
-		bpf.LoadAbsolute{Off: archOffset, Size: 4},
-		bpf.JumpIf{Cond: bpf.JumpNotEqual, Val: uint32(p.arch.ID), SkipTrue: uint8(len(instructions)) + 1},
-		bpf.LoadAbsolute{Off: syscallNumOffset, Size: 4},
+	// Filter out x32 to prevent bypassing blacklists by using the 32-bit ABI.
+	var x32Filter []bpf.Instruction
+	if p.arch.ID == arch.X86_64.ID {
+		x32Filter = []bpf.Instruction{
+			bpf.JumpIf{Cond: bpf.JumpGreaterOrEqual, Val: uint32(arch.X32.SeccompMask), SkipFalse: 1},
+			bpf.RetConstant{Val: uint32(ActionErrno) | uint32(errnoENOSYS)},
+		}
 	}
 
-	action := p.DefaultAction
-	if action == ActionErrno {
-		action |= Action(errnoEPERM)
+	program := []bpf.Instruction{
+		bpf.LoadAbsolute{Off: archOffset, Size: 4},
+		bpf.JumpIf{Cond: bpf.JumpNotEqual, Val: uint32(p.arch.ID), SkipTrue: uint8(1 + len(x32Filter) + len(instructions))},
+		bpf.LoadAbsolute{Off: syscallNumOffset, Size: 4},
 	}
-	instructions = append(header, instructions...)
-	instructions = append(instructions, bpf.RetConstant{Val: uint32(action)})
-	return instructions, nil
+	program = append(program, x32Filter...)
+	program = append(program, instructions...)
+	program = append(program, bpf.RetConstant{Val: uint32(action)})
+	return program, nil
 }
 
 // Dump writes a textual represenation of the BPF instructions to out.

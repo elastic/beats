@@ -19,6 +19,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/sha256"
 	"debug/elf"
 	"encoding/hex"
@@ -63,6 +64,8 @@ var (
 	templateFile string
 	packageName  string
 	blacklist    stringSlice
+	allowList    stringSlice
+	outFile      string
 )
 
 func init() {
@@ -71,6 +74,8 @@ func init() {
 	flag.StringVar(&packageName, "pkg", "main", "package name to use in source code")
 	flag.BoolVar(&debug, "d", false, "add debug to the config output")
 	flag.Var(&blacklist, "b", "blacklist syscalls by name")
+	flag.Var(&allowList, "allow", "allow syscalls by name (always include them in the profile)")
+	flag.StringVar(&outFile, "out", "-", "output filename")
 }
 
 func main() {
@@ -114,29 +119,43 @@ func main() {
 	for _, s := range m {
 		names = append(names, s.Name)
 	}
-	sort.Strings(names)
-	names = filterBlacklist(names)
 
 	log.Printf("Found %d total syscalls", len(syscalls))
 	log.Printf("Found %d unique syscalls", len(m))
 	if len(blacklist) > 0 {
-		log.Printf("Filtered %d blacklisted syscalls", len(m)-len(names))
+		var filtered []string
+		names, filtered = filterBlacklist(names)
+		log.Printf("Filtered %d blacklisted syscalls (%v)", len(m)-len(names), strings.Join(filtered, ", "))
 	}
+	if len(allowList) > 0 {
+		size := len(names)
+		var added []string
+		names, added = addWhitelist(archInfo, names)
+		log.Printf("Added %d allowed syscalls (%v)", len(names)-size, strings.Join(added, ", "))
+	}
+	sort.Strings(names)
+
+	// Open the output.
+	f, err := openOutput(goarch)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
 
 	// Write output.
 	switch format {
 	case "code":
-		if err = writeGoTemplate(goarch, names); err != nil {
+		if err = writeGoTemplate(f, goarch, names); err != nil {
 			log.Fatal(err)
 		}
 	case "config":
 		if debug {
-			if err = writeDebugYAML(syscalls); err != nil {
+			if err = writeDebugYAML(f, syscalls); err != nil {
 				log.Fatal(err)
 			}
 		}
 
-		if err = writeProfileConfig(names); err != nil {
+		if err = writeProfileConfig(f, names); err != nil {
 			log.Fatal(err)
 		}
 	default:
@@ -166,6 +185,7 @@ func getBinaryArch(binary string) (*arch.Info, string, error) {
 	}
 	if len(libs) > 0 {
 		log.Println("Binary is dynamically linked with", strings.Join(libs, ", "))
+		log.Println("WARN: The profiler cannot detect syscalls used in linked libraries.")
 	}
 
 	switch bin.Machine {
@@ -261,22 +281,79 @@ func doObjdump(binary, hash string) (string, error) {
 	return dumpFile, nil
 }
 
-func filterBlacklist(syscalls []string) []string {
+func filterBlacklist(syscalls []string) ([]string, []string) {
 	filter := make(map[string]struct{}, len(blacklist))
 	for _, s := range blacklist {
 		filter[s] = struct{}{}
 	}
 
 	var out []string
+	var filtered []string
 	for _, s := range syscalls {
 		if _, found := filter[s]; !found {
 			out = append(out, s)
+		} else {
+			filtered = append(filtered, s)
 		}
 	}
-	return out
+	return out, filtered
 }
 
-func writeDebugYAML(syscalls []disasm.Syscall) error {
+func addWhitelist(archInfo *arch.Info, syscalls []string) ([]string, []string) {
+	m := make(map[string]struct{}, len(syscalls))
+	for _, s := range syscalls {
+		m[s] = struct{}{}
+	}
+
+	var added []string
+	for _, s := range allowList {
+		if _, found := archInfo.SyscallNames[s]; found {
+			_, found := m[s]
+			if !found {
+				m[s] = struct{}{}
+				added = append(added, s)
+			}
+		}
+	}
+
+	out := make([]string, 0, len(m))
+	for s, _ := range m {
+		out = append(out, s)
+	}
+	return out, added
+}
+
+func openOutput(goarch string) (io.WriteCloser, error) {
+	if outFile == "-" {
+		return os.Stdout, nil
+	}
+
+	t, err := template.New("outFile").Parse(outFile)
+	if err != nil {
+		return nil, err
+	}
+	buf := new(bytes.Buffer)
+	err = t.Execute(buf, map[string]string{
+		"GOOS":   "linux",
+		"GOARCH": goarch,
+	})
+	if err != nil {
+		return nil, err
+	}
+	outFile = buf.String()
+	log.Println("Output File:", outFile)
+
+	dir := filepath.Dir(outFile)
+	if dir != "" {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return nil, err
+		}
+	}
+
+	return os.Create(outFile)
+}
+
+func writeDebugYAML(w io.Writer, syscalls []disasm.Syscall) error {
 	sort.Slice(syscalls, func(i, j int) bool {
 		return syscalls[i].Name < syscalls[j].Name
 	})
@@ -292,11 +369,11 @@ func writeDebugYAML(syscalls []disasm.Syscall) error {
 		return err
 	}
 
-	fmt.Println(string(data))
+	fmt.Fprintln(w, string(data))
 	return nil
 }
 
-func writeProfileConfig(syscalls []string) error {
+func writeProfileConfig(w io.Writer, syscalls []string) error {
 	type Config struct {
 		Seccomp seccomp.Policy `yaml:"seccomp"`
 	}
@@ -318,7 +395,7 @@ func writeProfileConfig(syscalls []string) error {
 		return err
 	}
 
-	fmt.Println(string(data))
+	fmt.Fprintln(w, string(data))
 	return nil
 }
 
@@ -349,7 +426,7 @@ var SeccompProfile = seccomp.Policy{
 
 var codeTemplate = template.Must(template.New("profile").Parse(defaultTemplate))
 
-func writeGoTemplate(goarch string, syscalls []string) error {
+func writeGoTemplate(w io.Writer, goarch string, syscalls []string) error {
 	t := codeTemplate
 	if templateFile != "" {
 		var err error
@@ -370,5 +447,5 @@ func writeGoTemplate(goarch string, syscalls []string) error {
 		GOARCH:       goarch,
 		SyscallNames: syscalls,
 	}
-	return t.Execute(os.Stdout, p)
+	return t.Execute(w, p)
 }
