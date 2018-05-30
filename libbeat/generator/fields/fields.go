@@ -3,7 +3,6 @@ package fields
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -55,24 +54,16 @@ func writeGeneratedFieldsYml(beatsPath string, fieldFiles []*YmlFile) error {
 			return err
 		}
 
-		fr := bufio.NewReader(ff)
-		for {
-			l, err := fr.ReadString('\n')
-			if err != nil {
-				if err == io.EOF {
-					err = writeIndentedLine(fw, l+"\n", p.Indent)
-					if err != nil {
-						return err
-					}
-					break
-				}
-				return err
-			}
-			err = writeIndentedLine(fw, l, p.Indent)
+		fs := bufio.NewScanner(ff)
+		for fs.Scan() {
+			err = writeIndentedLine(fw, fs.Text()+"\n", p.Indent)
 			if err != nil {
 				return err
 			}
 
+		}
+		if err := fs.Err(); err != nil {
+			return err
 		}
 	}
 	return nil
