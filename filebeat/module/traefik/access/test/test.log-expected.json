@@ -16,10 +16,12 @@
                     "geoip": {
                         "continent_name": "Europe",
                         "country_iso_code": "DE",
+                        "city_name": "Berlin",
                         "location": {
-                            "lon": 9,
-                            "lat": 51
-                        }
+                            "lon": 13.4,
+                            "lat": 52.5167
+                        },
+                        "region_name": "Land Berlin"
                     },
                     "method": "GET",
                     "user_name": "-",
