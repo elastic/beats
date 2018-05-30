@@ -7,6 +7,7 @@ GOX_OS?=linux windows ## @Building List of all OS to be supported by "make cross
 DEV_OS?=linux
 TESTING_ENVIRONMENT?=snapshot-noxpack
 ES_BEATS?=..
+FIELDS_FILE_PATH=module
 
 # Path to the libbeat Makefile
 include ${ES_BEATS}/libbeat/scripts/Makefile
@@ -57,13 +58,6 @@ before-build:
 # Collects all dependencies and then calls update
 .PHONY: collect
 collect: fields collect-docs configs kibana
-
-# Collects all module and metricset fields
-.PHONY: fields
-fields: python-env
-	@mkdir -p _meta
-	@cp _meta/fields.common.yml _meta/fields.generated.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
 
 # Collects all module configs
 .PHONY: configs
