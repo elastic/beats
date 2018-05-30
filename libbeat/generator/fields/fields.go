@@ -137,7 +137,7 @@ func copyFileWithFlag(in, out string, flag int) error {
 		return err
 	}
 
-	output, err := os.OpenFile(out, flag, 0664)
+	output, err := os.OpenFile(out, flag, 0644)
 	if err != nil {
 		return err
 	}
