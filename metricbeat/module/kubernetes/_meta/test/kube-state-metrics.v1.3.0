@@ -365,7 +365,7 @@ kube_pod_container_status_terminated_reason{container="kubernetes-dashboard",nam
 kube_pod_container_status_terminated_reason{container="sidecar",namespace="kube-system",pod="kube-dns-6f4fd4bdf-wlmht",reason="Completed"} 0
 kube_pod_container_status_terminated_reason{container="sidecar",namespace="kube-system",pod="kube-dns-6f4fd4bdf-wlmht",reason="ContainerCannotRun"} 0
 kube_pod_container_status_terminated_reason{container="sidecar",namespace="kube-system",pod="kube-dns-6f4fd4bdf-wlmht",reason="Error"} 0
-kube_pod_container_status_terminated_reason{container="sidecar",namespace="kube-system",pod="kube-dns-6f4fd4bdf-wlmht",reason="OOMKilled"} 0
+kube_pod_container_status_terminated_reason{container="sidecar",namespace="kube-system",pod="kube-dns-6f4fd4bdf-wlmht",reason="OOMKilled"} 1
 kube_pod_container_status_terminated_reason{container="storage-provisioner",namespace="kube-system",pod="storage-provisioner",reason="Completed"} 0
 kube_pod_container_status_terminated_reason{container="storage-provisioner",namespace="kube-system",pod="storage-provisioner",reason="ContainerCannotRun"} 0
 kube_pod_container_status_terminated_reason{container="storage-provisioner",namespace="kube-system",pod="storage-provisioner",reason="Error"} 0
@@ -438,7 +438,7 @@ kube_pod_container_status_waiting_reason{container="sidecar",namespace="kube-sys
 kube_pod_container_status_waiting_reason{container="storage-provisioner",namespace="kube-system",pod="storage-provisioner",reason="ContainerCreating"} 0
 kube_pod_container_status_waiting_reason{container="storage-provisioner",namespace="kube-system",pod="storage-provisioner",reason="CrashLoopBackOff"} 0
 kube_pod_container_status_waiting_reason{container="storage-provisioner",namespace="kube-system",pod="storage-provisioner",reason="ErrImagePull"} 0
-kube_pod_container_status_waiting_reason{container="storage-provisioner",namespace="kube-system",pod="storage-provisioner",reason="ImagePullBackOff"} 0
+kube_pod_container_status_waiting_reason{container="storage-provisioner",namespace="kube-system",pod="storage-provisioner",reason="ImagePullBackOff"} 1
 # HELP kube_pod_created Unix creation timestamp
 # TYPE kube_pod_created gauge
 kube_pod_created{namespace="kube-system",pod="etcd-minikube"} 1.527697527e+09
