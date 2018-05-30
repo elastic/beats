@@ -1,0 +1,26 @@
+- name: network
+  type: group
+  description: >
+    `network` contains network IO metrics for a single network interface.
+  release: ga
+  fields:
+    - name: name
+      type: keyword
+      example: eth0
+      description: >
+        The network interface name.
+      rollup.term: true
+
+    - name: out.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes sent.
+      rollup.metrics: ["max", "avg"]
+
+    - name: in.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes received.
+      rollup.metrics: ["min", "max"]

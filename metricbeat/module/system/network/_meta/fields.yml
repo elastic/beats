@@ -9,46 +9,55 @@
       example: eth0
       description: >
         The network interface name.
+      rollup.term: true
 
     - name: out.bytes
       type: long
       format: bytes
       description: >
         The number of bytes sent.
+      rollup.metrics: ["min", "max", "avg"]
 
     - name: in.bytes
       type: long
       format: bytes
       description: >
         The number of bytes received.
+      rollup.metrics: ["min", "max", "avg"]
 
     - name: out.packets
       type: long
       description: >
         The number of packets sent.
+      rollup.metrics: ["min", "max", "avg"]
 
     - name: in.packets
       type: long
       description: >
         The number or packets received.
+      rollup.metrics: ["min", "max", "avg"]
 
     - name: in.errors
       type: long
       description: >
         The number of errors while receiving.
+      rollup.metrics: ["min", "max", "avg"]
 
     - name: out.errors
       type: long
       description: >
         The number of errors while sending.
+      rollup.metrics: ["min", "max", "avg"]
 
     - name: in.dropped
       type: long
       description: >
         The number of incoming packets that were dropped.
+      rollup.metrics: ["min", "max", "avg"]
 
     - name: out.dropped
       type: long
       description: >
         The number of outgoing packets that were dropped. This value is always
         0 on Darwin and BSD because it is not reported by the operating system.
+      rollup.metrics: ["min", "max", "avg"]

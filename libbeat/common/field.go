@@ -69,6 +69,10 @@ type Field struct {
 	UrlTemplate          []VersionizedString `config:"url_template"`
 	OpenLinkInCurrentTab *bool               `config:"open_link_in_current_tab"`
 
+	// Rollup config options
+	RollupTerm    bool     `config:"rollup.term"`
+	RollupMetrics []string `config:"rollup.metrics"`
+
 	Path string
 }
 
@@ -100,13 +104,31 @@ func LoadFieldsYaml(path string) (Fields, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.Unpack(&keys)
+	err = cfg.Unpack(&keys)
+	if err != nil {
+		return nil, err
+	}
 
 	fields := Fields{}
 
 	for _, key := range keys {
 		fields = append(fields, key.Fields...)
 	}
+	return fields, nil
+}
+
+func LoadFieldsYamlNoKeys(path string) (Fields, error) {
+	fields := Fields{}
+
+	cfg, err := yaml.NewConfigWithFile(path)
+	if err != nil {
+		return nil, err
+	}
+	err = cfg.Unpack(&fields)
+	if err != nil {
+		return nil, err
+	}
+
 	return fields, nil
 }
 
