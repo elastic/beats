@@ -10,9 +10,11 @@ VERSION?=1.0.0
 default: build
 
 build:
-	xcodebuild build -project $(PROJECT) -alltargets -configuration $(CONFIGURATION)
+	xcodebuild build -project $(PROJECT) -alltargets -configuration $(CONFIGURATION) CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 	echo version="${VERSION}"
-	test -z '$(SIGN_IDENTITY_APP)' || \
+	test -n '$(SIGN_IDENTITY_APP)' && \
+	    codesign -s '$(SIGN_IDENTITY_APP)' --force --keychain '$(KEYCHAIN)' --timestamp \
+	    build/$(CONFIGURATION)/*.prefPane/Contents/MacOS/helper && \
 	    codesign -s '$(SIGN_IDENTITY_APP)' --force --keychain '$(KEYCHAIN)' --timestamp \
 	    build/$(CONFIGURATION)/*.prefPane
 
