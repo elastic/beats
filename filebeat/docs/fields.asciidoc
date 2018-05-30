@@ -2684,6 +2684,16 @@ Logging level.
 
 --
 
+*`log.message`*::
++
+--
+type: keyword
+
+The unprocesses raw log message. This can be used for reprocessing logs.
+
+
+--
+
 *`event.created`*::
 +
 --

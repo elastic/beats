@@ -108,6 +108,11 @@
       description: >
         Logging level.
 
+    - name: log.message
+      type: keyword
+      description: >
+        The unprocesses raw log message. This can be used for reprocessing logs.
+
     - name: event.created
       type: date
       description: >

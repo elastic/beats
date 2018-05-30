@@ -306,6 +306,10 @@ func (h *Harvester) Run() error {
 			}
 			fields.DeepUpdate(message.Fields)
 
+			if h.config.RawMessage {
+				fields.Put("log.message", string(message.Raw))
+			}
+
 			// Check if json fields exist
 			var jsonFields common.MapStr
 			if f, ok := fields["json"]; ok {

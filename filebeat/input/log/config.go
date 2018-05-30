@@ -53,6 +53,7 @@ var (
 		ScanSort:       "",
 		ScanOrder:      "asc",
 		RecursiveGlob:  true,
+		RawMessage:     true,
 
 		// Harvester
 		BufferSize: 16 * humanize.KiByte,
@@ -101,6 +102,7 @@ type config struct {
 	MaxBytes     int               `config:"max_bytes" validate:"min=0,nonzero"`
 	Multiline    *multiline.Config `config:"multiline"`
 	JSON         *readjson.Config  `config:"json"`
+	RawMessage   bool              `config:"raw_message"`
 
 	// Hidden on purpose, used by the docker input:
 	DockerJSON *struct {

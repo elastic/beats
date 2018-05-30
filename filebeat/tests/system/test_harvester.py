@@ -818,3 +818,58 @@ class Test(BaseTest):
 
         output = self.read_output_json()
         assert output[2]["message"] == "hello world2"
+
+    def test_raw_message_enabled(self):
+        """
+        Test raw message enabled for json use case
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            json=dict(
+                keys_under_root=True,
+            ),
+        )
+        os.mkdir(self.working_dir + "/log/")
+        logfile = self.working_dir + "/log/test.log"
+        message = '{"hello":"world"}'
+        with open(logfile, 'a') as file:
+            file.write(message + "\n")
+
+        proc = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+        proc.check_kill_and_wait()
+
+        output = self.read_output()
+        assert len(output) == 1
+
+        assert output[0]["log.message"] == message
+
+    def test_raw_message_disabled(self):
+        """
+        Test raw message enabled for json use case
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            json=dict(
+                keys_under_root=True,
+            ),
+            raw_message=False,
+        )
+        os.mkdir(self.working_dir + "/log/")
+        logfile = self.working_dir + "/log/test.log"
+        message = '{"hello":"world"}'
+        with open(logfile, 'a') as file:
+            file.write(message + "\n")
+
+        proc = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+        proc.check_kill_and_wait()
+
+        output = self.read_output()
+        assert len(output) == 1
+
+        assert "log.message" not in output[0]
