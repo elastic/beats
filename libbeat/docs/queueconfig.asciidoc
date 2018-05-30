@@ -66,7 +66,7 @@ Minimum number of events required for publishing. If this value is set to 0, the
 output can start publishing events without additional waiting times. Otherwise
 the output has to wait for more events to become available.
 
-The default value is 0.
+The default value is 2048.
 
 [float]
 ===== `flush.timeout`
