@@ -303,7 +303,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	registrarChannel := newRegistrarLogger(registrar)
 
 	err = b.Publisher.SetACKHandler(beat.PipelineACKHandler{
-		ACKEvents: newEventACKer(registrarChannel).ackEvents,
+		ACKEvents: newEventACKer(finishedLogger, registrarChannel).ackEvents,
 	})
 	if err != nil {
 		logp.Err("Failed to install the registry with the publisher pipeline: %v", err)
