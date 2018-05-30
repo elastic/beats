@@ -33,6 +33,8 @@ https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
 
 *Filebeat*
 
+- Comply with PostgreSQL database name format {pull}7198[7198]
+
 *Heartbeat*
 
 *Metricbeat*
