@@ -53,6 +53,7 @@ func writeGeneratedFieldsYml(beatsPath string, fieldFiles []*YmlFile) error {
 		if err != nil {
 			return err
 		}
+		defer ff.Close()
 
 		fs := bufio.NewScanner(ff)
 		for fs.Scan() {
