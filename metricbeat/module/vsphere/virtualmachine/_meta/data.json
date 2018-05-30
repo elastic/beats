@@ -18,6 +18,7 @@
                 }
             },
             "host": "ha-host",
+            "hostname": "localhost.localdomain",
             "memory": {
                 "free": {
                     "guest": {

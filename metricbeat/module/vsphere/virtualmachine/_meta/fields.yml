@@ -7,7 +7,11 @@
     - name: host
       type: keyword
       description: >
-        Host name
+        unique Host name id
+    - name: hostname
+      type: keyword
+      description: >
+        Host name of the host
     - name: name
       type: keyword
       description: >

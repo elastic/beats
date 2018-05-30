@@ -49,6 +49,7 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
 	assert.EqualValues(t, "ha-host", event["host"])
+	assert.EqualValues(t, "localhost.localdomain", event["hostname"])
 	assert.True(t, strings.Contains(event["name"].(string), "ha-host_VM"))
 
 	cpu := event["cpu"].(common.MapStr)
