@@ -11,25 +11,25 @@ import (
 
 // Encode reader produces lines by reading lines from an io.Reader
 // through a decoder converting the reader it's encoding to utf-8.
-type Encode struct {
+type Reader struct {
 	reader *line.Line
 }
 
-// NewEncode creates a new Encode reader from input reader by applying
+// New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewEncode(
+func New(
 	r io.Reader,
 	codec encoding.Encoding,
 	bufferSize int,
-) (Encode, error) {
+) (Reader, error) {
 	eReader, err := line.NewLine(r, codec, bufferSize)
-	return Encode{eReader}, err
+	return Reader{eReader}, err
 }
 
 // Next reads the next line from it's initial io.Reader
 // This converts a io.Reader to a reader.reader
-func (p Encode) Next() (reader.Message, error) {
-	c, sz, err := p.reader.Next()
+func (r Reader) Next() (reader.Message, error) {
+	c, sz, err := r.reader.Next()
 	// Creating message object
 	return reader.Message{
 		Ts:      time.Now(),
