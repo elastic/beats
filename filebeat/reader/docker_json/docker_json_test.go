@@ -121,7 +121,7 @@ func TestDockerJSON(t *testing.T) {
 
 	for _, test := range tests {
 		r := &mockReader{messages: test.input}
-		json := NewDockerJSON(r, test.stream, test.partial)
+		json := New(r, test.stream, test.partial)
 		message, err := json.Next()
 
 		assert.Equal(t, test.expectedError, err != nil)

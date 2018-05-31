@@ -12,8 +12,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// DockerJSON processor renames a given field
-type DockerJSON struct {
+// Reader processor renames a given field
+type Reader struct {
 	reader reader.Reader
 	// stream filter, `all`, `stderr` or `stdout`
 	stream string
@@ -34,9 +34,9 @@ type crioLog struct {
 	Log       []byte
 }
 
-// NewDockerJSON creates a new reader renaming a field
-func NewDockerJSON(r reader.Reader, stream string, partial bool) *DockerJSON {
-	return &DockerJSON{
+// New creates a new reader renaming a field
+func New(r reader.Reader, stream string, partial bool) *Reader {
+	return &Reader{
 		stream:  stream,
 		partial: partial,
 		reader:  r,
@@ -68,7 +68,7 @@ func parseCRILog(message reader.Message, msg *crioLog) (reader.Message, error) {
 	return message, nil
 }
 
-// parseDockerJSONLog parses logs in Docker JSON log format.
+// parseReaderLog parses logs in Docker JSON log format.
 // Docker JSON log format example:
 // {"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}
 func parseDockerJSONLog(message reader.Message, msg *dockerLog) (reader.Message, error) {
@@ -93,7 +93,7 @@ func parseDockerJSONLog(message reader.Message, msg *dockerLog) (reader.Message,
 }
 
 // Next returns the next line.
-func (p *DockerJSON) Next() (reader.Message, error) {
+func (p *Reader) Next() (reader.Message, error) {
 	for {
 		message, err := p.reader.Next()
 		if err != nil {
