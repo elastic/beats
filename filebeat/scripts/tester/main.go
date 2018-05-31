@@ -135,7 +135,7 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 			Match:   conf.matchMode,
 			Pattern: &p,
 		}
-		r, err = multiline.NewMultiline(r, "\n", 1<<20, &c)
+		r, err = multiline.New(r, "\n", 1<<20, &c)
 		if err != nil {
 			return nil, err
 		}
