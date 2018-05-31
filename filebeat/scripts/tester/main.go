@@ -140,7 +140,7 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 			return nil, err
 		}
 	}
-	r = limit.NewLimit(r, conf.maxBytes)
+	r = limit.New(r, conf.maxBytes)
 
 	var logs []string
 	for {

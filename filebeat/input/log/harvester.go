@@ -557,5 +557,5 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		}
 	}
 
-	return limit.NewLimit(r, h.config.MaxBytes), nil
+	return limit.New(r, h.config.MaxBytes), nil
 }
