@@ -1,8 +1,10 @@
-package reader
+package timeout
 
 import (
 	"errors"
 	"time"
+
+	"github.com/elastic/beats/filebeat/reader"
 )
 
 var (
@@ -12,7 +14,7 @@ var (
 // timeoutProcessor will signal some configurable timeout error if no
 // new line can be returned in time.
 type Timeout struct {
-	reader  Reader
+	reader  reader.Reader
 	timeout time.Duration
 	signal  error
 	running bool
@@ -20,12 +22,12 @@ type Timeout struct {
 }
 
 type lineMessage struct {
-	line Message
+	line reader.Message
 	err  error
 }
 
 // NewTimeout returns a new timeout reader from an input line reader.
-func NewTimeout(reader Reader, signal error, t time.Duration) *Timeout {
+func NewTimeout(reader reader.Reader, signal error, t time.Duration) *Timeout {
 	if signal == nil {
 		signal = errTimeout
 	}
@@ -43,7 +45,7 @@ func NewTimeout(reader Reader, signal error, t time.Duration) *Timeout {
 // For handline timeouts a goroutine is started for reading lines from
 // configured line reader. Only when underlying reader returns an error, the
 // goroutine will be finished.
-func (p *Timeout) Next() (Message, error) {
+func (p *Timeout) Next() (reader.Message, error) {
 	if !p.running {
 		p.running = true
 		go func() {
@@ -64,6 +66,6 @@ func (p *Timeout) Next() (Message, error) {
 		}
 		return msg.line, msg.err
 	case <-time.After(p.timeout):
-		return Message{}, p.signal
+		return reader.Message{}, p.signal
 	}
 }

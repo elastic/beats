@@ -1,4 +1,4 @@
-package reader
+package multiline
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/match"
 )
 
-type MultilineConfig struct {
+type Config struct {
 	Negate       bool           `config:"negate"`
 	Match        string         `config:"match" validate:"required"`
 	MaxLines     *int           `config:"max_lines"`
@@ -16,7 +16,7 @@ type MultilineConfig struct {
 	FlushPattern *match.Matcher `config:"flush_pattern"`
 }
 
-func (c *MultilineConfig) Validate() error {
+func (c *Config) Validate() error {
 	if c.Match != "after" && c.Match != "before" {
 		return fmt.Errorf("unknown matcher type: %s", c.Match)
 	}

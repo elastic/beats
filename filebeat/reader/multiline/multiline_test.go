@@ -1,6 +1,6 @@
 // +build !integration
 
-package reader
+package multiline
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/reader/encode/encoding"
 	"github.com/elastic/beats/libbeat/common/match"
 )
 
@@ -135,7 +135,7 @@ func testMultilineOK(t *testing.T, cfg MultilineConfig, events int, expected ...
 	_, buf := createLineBuffer(expected...)
 	reader := createMultilineTestReader(t, buf, cfg)
 
-	var messages []Message
+	var messages []reader.Message
 	for {
 		message, err := reader.Next()
 		if err != nil {

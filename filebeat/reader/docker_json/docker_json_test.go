@@ -1,4 +1,4 @@
-package reader
+package docker_json
 
 import (
 	"testing"

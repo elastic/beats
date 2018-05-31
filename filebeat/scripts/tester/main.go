@@ -12,8 +12,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/filebeat/harvester/encoding"
-	"github.com/elastic/beats/filebeat/harvester/reader"
+	"github.com/elastic/beats/filebeat/reader"
+	"github.com/elastic/beats/filebeat/reader/encode"
+	"github.com/elastic/beats/filebeat/reader/limit"
+	"github.com/elastic/beats/filebeat/reader/multiline"
+	"github.com/elastic/beats/filebeat/reader/strip_newline"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 )
@@ -114,12 +117,12 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 	}
 
 	var r reader.Reader
-	r, err = reader.NewEncode(f, enc, 4096)
+	r, err = encode.NewEncode(f, enc, 4096)
 	if err != nil {
 		return nil, err
 	}
 
-	r = reader.NewStripNewline(r)
+	r = strip_newline.NewStripNewline(r)
 
 	if conf.multiPattern != "" {
 		p, err := match.Compile(conf.multiPattern)
@@ -127,17 +130,17 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 			return nil, err
 		}
 
-		c := reader.MultilineConfig{
+		c := multiline.MultilineConfig{
 			Negate:  conf.multiNegate,
 			Match:   conf.matchMode,
 			Pattern: &p,
 		}
-		r, err = reader.NewMultiline(r, "\n", 1<<20, &c)
+		r, err = multiline.NewMultiline(r, "\n", 1<<20, &c)
 		if err != nil {
 			return nil, err
 		}
 	}
-	r = reader.NewLimit(r, conf.maxBytes)
+	r = limit.NewLimit(r, conf.maxBytes)
 
 	var logs []string
 	for {
