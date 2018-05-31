@@ -19,13 +19,13 @@ type JSON struct {
 }
 
 // NewJSONReader creates a new reader that can decode JSON.
-func NewJSON(r reader.Reader, cfg *Config) *JSON {
+func New(r reader.Reader, cfg *Config) *JSON {
 	return &JSON{reader: r, cfg: cfg}
 }
 
 // decodeJSON unmarshals the text parameter into a MapStr and
 // returns the new text column if one was requested.
-func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
+func (r *JSON) decode(text []byte) ([]byte, common.MapStr) {
 	var jsonFields map[string]interface{}
 
 	err := unmarshal(text, &jsonFields)
@@ -83,7 +83,7 @@ func (r *JSON) Next() (reader.Message, error) {
 	}
 
 	var fields common.MapStr
-	message.Content, fields = r.decodeJSON(message.Content)
+	message.Content, fields = r.decode(message.Content)
 	message.AddFields(common.MapStr{"json": fields})
 	return message, nil
 }
