@@ -1,4 +1,53 @@
-Filebeat supports a autodiscover based on hints from the provider:
+Filebeat supports a autodiscover based on hints from the provider. The `hints` system looks for
+hints in Kubernetes annotations or Docker labels which have the prefix `co.elastic.logs`. Hints tell
+Filebeat how to get logs for the given container. By default logs will be retrieved as they are,
+you can use hints to modify this behavior. This is the full list of supported hints:
+
+[float]
+===== `co.elastic.logs.multiline.*`
+
+Multiline settings, see <<multiline-examples>> for a full list of all supported options.
+
+[float]
+===== `co.elastic.logs.include_lines`
+
+A list of regular expressions to match the lines that you want {beatname_uc} to include.
+See <<configuration-filebeat-options>> for more info.
+
+[float]
+===== `co.elastic.logs.exclude_lines`
+
+A list of regular expressions to match the lines that you want {beatname_uc} to exclude.
+See <<configuration-filebeat-options>> for more info.
+
+[float]
+===== `co.elastic.logs.module`
+
+Instead of using raw `docker` input, use the given module to parse logs from the container.
+
+[float]
+===== `co.elastic.logs.fileset`
+
+When module is configured, map container logs to module filesets. You can either configure
+a single fileset like this:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.logs/fileset: access
+-------------------------------------------------------------------------------------
+
+Or configure a fileset per stream in the container (stdout and stderr):
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.logs/fileset.stdout: access
+co.elastic.logs/fileset.stderr: error
+-------------------------------------------------------------------------------------
+
+[float]
+==== Kubernetes
+
+Kubernetes autodiscover provider supports hints in Pod annotations, to enable it just set `hints.enabled`:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -8,32 +57,37 @@ filebeat.autodiscover:
       hints.enabled: true
 -------------------------------------------------------------------------------------
 
-This configuration enables the `hints` autodiscover for Kubernetes. The `hints` system looks for
-hints in Kubernetes annotations or Docker labels which have the prefix `co.elastic.logs`.
-
-[float]
-==== Kubernetes
-
 You can annotate Kubernetes Pods with useful info to spin up Filebeat inputs or modules:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
 annotations:
   co.elastic.logs/multiline.pattern: '^\['
-  co.elastic.logs/multiline.negate: 'true'
+  co.elastic.logs/multiline.negate: true
+  co.elastic.logs/multiline.match: after
+-------------------------------------------------------------------------------------
+
+
+[float]
+===== Multiple containers
+
+When a Pod has multiple containers, these settings are shared. To set hints specific to a container in
+the pod you can put the container name in the hint.
+
+For example, these hints configure a common behavior for all containers in the Pod, and sets a specific
+`exclude_lines` hint for the container called `sidecar`:
+
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.logs/multiline.pattern: '^\['
+  co.elastic.logs/multiline.negate: true
   co.elastic.logs/multiline.match: after
   co.elastic.logs.sidecar/exlude_lines: '^DBG'
 -------------------------------------------------------------------------------------
 
-The above annotations are used to add additional information to the input that is generated. The hints
-generated convey the multiline configuration to use and the lines to exclude in the container which is
-named `sidecar`. Hints can also be provided for the following input configuration:
-parameters:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
-include_lines
--------------------------------------------------------------------------------------
 
 [float]
 ==== Docker
@@ -52,10 +106,10 @@ You can label Docker containers with useful info to spin up Filebeat inputs, for
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-  co.elastic.logs/multiline.pattern: '^\['
-  co.elastic.logs/multiline.negate: 'true'
-  co.elastic.logs/multiline.match: after
+  co.elastic.logs/module: nginx
+  co.elastic.logs/fileset.stdout: access
+  co.elastic.logs/fileset.stderr: error
 -------------------------------------------------------------------------------------
 
-The above labels would allow Filebeat to add a multiline pattern to the input that will be
-generated for the logs of the running container.
+The above labels would make Filebeat to harvest logs for this container using the Nginx module.
+Access log will be retrieved from stdout stream, error log from stderr.
