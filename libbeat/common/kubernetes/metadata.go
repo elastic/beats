@@ -1,6 +1,8 @@
 package kubernetes
 
 import (
+	"strings"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
@@ -15,15 +17,20 @@ type MetaGenerator interface {
 }
 
 type metaGenerator struct {
-	IncludeLabels      []string `config:"include_labels"`
-	ExcludeLabels      []string `config:"exclude_labels"`
-	IncludeAnnotations []string `config:"include_annotations"`
-	IncludePodUID      bool     `config:"include_pod_uid"`
+	IncludeLabels          []string `config:"include_labels"`
+	ExcludeLabels          []string `config:"exclude_labels"`
+	IncludeAnnotations     []string `config:"include_annotations"`
+	IncludePodUID          bool     `config:"include_pod_uid"`
+	IncludeCreatorMetadata bool     `config:"include_creator_metadata"`
 }
 
 // NewMetaGenerator initializes and returns a new kubernetes metadata generator
 func NewMetaGenerator(cfg *common.Config) (MetaGenerator, error) {
-	generator := metaGenerator{}
+	// default settings:
+	generator := metaGenerator{
+		IncludeCreatorMetadata: true,
+	}
+
 	err := cfg.Unpack(&generator)
 	return &generator, err
 }
@@ -58,6 +65,21 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	// Add Pod UID metadata if enabled
 	if g.IncludePodUID {
 		safemapstr.Put(meta, "pod.uid", pod.Metadata.UID)
+	}
+
+	// Add controller metadata if present
+	if g.IncludeCreatorMetadata {
+		for _, ref := range pod.Metadata.OwnerReferences {
+			if ref.Controller {
+				switch ref.Kind {
+				// TODO grow this list as we keep adding more `state_*` metricsets
+				case "Deployment",
+					"ReplicaSet",
+					"StatefulSet":
+					safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
+				}
+			}
+		}
 	}
 
 	if len(labelMap) != 0 {
