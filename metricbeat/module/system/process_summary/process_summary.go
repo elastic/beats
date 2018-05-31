@@ -71,6 +71,8 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 			summary.running++
 		case 'D':
 			summary.idle++
+		case 'I':
+			summary.idle++
 		case 'T':
 			summary.stopped++
 		case 'Z':
