@@ -64,7 +64,7 @@ func (bt *{Beat}) Run(b *beat.Beat) error {
 	}
 }
 
-// Stop is called when the beater is started
+// Stop is called when the beater is stopped
 func (bt *{Beat}) Stop() {
 	bt.client.Close()
 	close(bt.done)
