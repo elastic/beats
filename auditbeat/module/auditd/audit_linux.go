@@ -41,7 +41,7 @@ const (
 
 var (
 	auditdMetrics         = monitoring.Default.NewRegistry(moduleName)
-	reassemblerlostMetric = monitoring.NewInt(auditdMetrics, "reassembler_lost")
+	reassemblerGapsMetric = monitoring.NewInt(auditdMetrics, "reassembler_seq_gaps")
 	kernelLostMetric      = monitoring.NewInt(auditdMetrics, "kernel_lost")
 	userspaceLostMetric   = monitoring.NewInt(auditdMetrics, "userspace_lost")
 )
@@ -86,7 +86,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to create audit client")
 	}
 
-	reassemblerlostMetric.Set(0)
+	reassemblerGapsMetric.Set(0)
 	kernelLostMetric.Set(0)
 	userspaceLostMetric.Set(0)
 
@@ -638,7 +638,7 @@ func (s *stream) ReassemblyComplete(msgs []*auparse.AuditMessage) {
 }
 
 func (s *stream) EventsLost(count int) {
-	reassemblerlostMetric.Inc()
+	reassemblerGapsMetric.Add(int64(count))
 }
 
 // nonBlockingStream behaves as stream above, except that it will never block
