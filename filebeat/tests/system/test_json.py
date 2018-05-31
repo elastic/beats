@@ -42,7 +42,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             json=dict(message_key="log", keys_under_root=True),
-            exclude_lines=["windows"]
+            exclude_lines=["windows"],
+            raw_message=False,
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -74,7 +75,8 @@ class Test(BaseTest):
             multiline=True,
             pattern="^\[log\]",
             match="after",
-            negate="true"
+            negate="true",
+            raw_message=False,
         )
 
         os.mkdir(self.working_dir + "/log/")
