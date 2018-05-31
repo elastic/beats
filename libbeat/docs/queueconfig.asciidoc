@@ -135,6 +135,7 @@ The spool file path. The file is created on startup, if it does not exist.
 
 The default value is "${path.data}/spool.dat".
 
+[float]
 ===== `file.permissions`
 
 The file permissions. The permissions are applied when the file is
@@ -145,6 +146,7 @@ permissions are more permissive then configured.
 The default value is 0600.
 
 
+[float]
 ===== `file.size`
 
 Spool file size. 
@@ -158,7 +160,7 @@ enough space.
 NOTE: The file size cannot be changed once the file has been generated. This
 limitation will be removed in the future.
 
-
+[float]
 ===== `file.page_size`
 
 The file's page size.
@@ -175,7 +177,7 @@ might create additional read operations on writes.
 NOTE: The page size is only set at file creation time. It cannot be changed
 afterwards.
 
-
+[float]
 ===== `file.prealloc`
 
 If `prealloc` is set to `true`, truncate is used to reserve the space up to
@@ -186,6 +188,7 @@ blocks, if `prealloc` is `false` and the system is out of disk space.
 
 The default value is `true`.
 
+[float]
 ===== `write.buffer_size`
 
 The write buffer size. The write buffer is flushed, once the buffer size is exceeded.
@@ -195,12 +198,14 @@ the write buffer will be flushed right after the event has been serialized.
 
 The default value is 1MiB.
 
+[float]
 ===== `write.codec`
 
 The event encoding used for serialized events. Valid values are `json` and `cbor`.
 
 The default value is `cbor`.
 
+[float]
 ===== `write.flush.timeout`
 
 Maximum wait time of the oldest event in the write buffer. If set to 0, the
@@ -208,12 +213,14 @@ write buffer will only be flushed once `write.flush.events` or `write.buffer_siz
 
 The default value is 1s.
 
+[float]
 ===== `write.flush.events`
 
 Number of buffered events. The write buffer is flushed once the limit is reached.
 
 The default value is 16384.
 
+[float]
 ===== `read.flush.timeout`
 
 The spool reader tries to read up to the output's `bulk_max_size` events at once.
