@@ -10658,7 +10658,7 @@ CPU-specific statistics per process.
 
 
 [float]
-=== `system.process.cpu.user`
+=== `system.process.cpu.user.ticks`
 
 type: long
 
@@ -10694,7 +10694,7 @@ The percentage of CPU time spent by the process since the last event. This value
 
 
 [float]
-=== `system.process.cpu.system`
+=== `system.process.cpu.system.ticks`
 
 type: long
 
