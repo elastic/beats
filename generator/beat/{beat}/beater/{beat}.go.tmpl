@@ -11,14 +11,14 @@ import (
 	"{beat_path}/config"
 )
 
-// {Beat} configuration
+// {Beat} configuration.
 type {Beat} struct {
 	done   chan struct{}
 	config config.Config
 	client beat.Client
 }
 
-// New is called when the beater is created
+// New creates an instance of {beat}.
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
@@ -32,7 +32,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	return bt, nil
 }
 
-// Run is called when the beater is started
+// Run starts {beat}.
 func (bt *{Beat}) Run(b *beat.Beat) error {
 	logp.Info("{beat} is running! Hit CTRL-C to stop it.")
 
@@ -64,7 +64,7 @@ func (bt *{Beat}) Run(b *beat.Beat) error {
 	}
 }
 
-// Stop is called when the beater is stopped
+// Stop stops {beat}.
 func (bt *{Beat}) Stop() {
 	bt.client.Close()
 	close(bt.done)
