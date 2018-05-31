@@ -52,7 +52,7 @@
       prefix: "[float]"
       description: CPU-specific statistics per process.
       fields:
-        - name: user
+        - name: user.ticks
           type: long
           description: >
             The amount of CPU time the process spent in user space.
@@ -73,7 +73,7 @@
             The percentage of CPU time spent by the process since the last event.
             This value is normalized by the number of CPU cores and it ranges
             from 0 to 100%.
-        - name: system
+        - name: system.ticks
           type: long
           description: >
             The amount of CPU time the process spent in kernel space.

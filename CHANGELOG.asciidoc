@@ -37,6 +37,8 @@ https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix field mapping for the system process CPU ticks fields. {pull}7230[7230]
+
 *Packetbeat*
 
 *Winlogbeat*
