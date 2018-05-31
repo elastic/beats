@@ -11,7 +11,7 @@ options in the `queue` section of the +{beatname_lc}.yml+ config file. Only one
 queue type can be configured.
 
 
-This sample configurations configures the memory queue, buffering up to 4096 events:
+This sample configuration sets the memory queue to buffer up to 4096 events:
 
 [source,yaml]
 ------------------------------------------------------------------------------
