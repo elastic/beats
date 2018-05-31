@@ -548,7 +548,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		r = json.New(r, h.config.JSON)
 	}
 
-	r = strip_newline.NewStripNewline(r)
+	r = strip_newline.New(r)
 
 	if h.config.Multiline != nil {
 		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)

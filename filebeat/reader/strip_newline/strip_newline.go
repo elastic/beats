@@ -10,8 +10,8 @@ type StripNewline struct {
 	reader reader.Reader
 }
 
-// NewStripNewline creates a new line reader stripping the last tailing newline.
-func NewStripNewline(r reader.Reader) *StripNewline {
+// New creates a new line reader stripping the last tailing newline.
+func New(r reader.Reader) *StripNewline {
 	return &StripNewline{r}
 }
 

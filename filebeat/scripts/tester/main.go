@@ -122,7 +122,7 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 		return nil, err
 	}
 
-	r = strip_newline.NewStripNewline(r)
+	r = strip_newline.New(r)
 
 	if conf.multiPattern != "" {
 		p, err := match.Compile(conf.multiPattern)
