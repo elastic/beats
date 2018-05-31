@@ -142,9 +142,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 				case <-reporter.Done():
 					return
 				case <-timer.C:
-					if seq, err := ms.client.GetStatusAsync(false); err == nil {
-						ms.log.Debugf("sent async status request seq=%d", seq)
-					} else {
+					if _, err := ms.client.GetStatusAsync(false); err != nil {
 						ms.log.Error("get async status request failed:", err)
 					}
 				case status := <-statusC:
