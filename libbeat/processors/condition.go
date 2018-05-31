@@ -68,7 +68,7 @@ func NewCondition(config *ConditionConfig) (*Condition, error) {
 
 	if config == nil {
 		// empty condition
-		return nil, nil
+		return nil, errors.New("missing condition config")
 	}
 
 	var err error

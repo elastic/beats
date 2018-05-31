@@ -57,6 +57,12 @@ func TestCreateConditions(t *testing.T) {
 	}
 }
 
+func TestCreateNilCondition(t *testing.T) {
+	cond, err := NewCondition(nil)
+	assert.Nil(t, cond)
+	assert.Error(t, err)
+}
+
 func GetConditions(t *testing.T, configs []ConditionConfig) []Condition {
 	conds := []Condition{}
 

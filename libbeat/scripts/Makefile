@@ -304,9 +304,19 @@ coverage-report:
 	test ! -s ${COVERAGE_DIR}/unit.cov   || go tool cover -html=${COVERAGE_DIR}/unit.cov   -o ${COVERAGE_DIR}/unit.html
 
 
+.PHONY: fields
+fields:
+	echo $(PWD)
+	@go run ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go --es_beats_path $(ES_BEATS) --beat_path $(PWD) $(FIELDS_FILE_PATH)
+
+
+.PHONY: libbeat_fields
+libbeat_fields:
+	@$(MAKE) -C ${ES_BEATS}/libbeat fields
+
 .PHONY: update
 update: ## @build Update expects the most recent version of libbeat in the GOPATH
-update: python-env collect
+update: python-env libbeat_fields collect
 	@echo "Updating generated files for ${BEAT_NAME}"
 
 	@# Update config files.
@@ -324,15 +334,7 @@ ifeq ($(BEAT_REF_YAML),true)
 	@chmod 0640 ${BEAT_NAME}.reference.yml
 endif
 
-	@# Update libbeat fields.generated.yml
-	@$(MAKE) -C ${ES_BEATS}/libbeat fields
-
-	@# Update fields.yml
-	@test -s  _meta/fields.generated.yml || cp _meta/fields.yml _meta/fields.generated.yml
-ifeq ($(BEAT_NAME), libbeat)
-	@cp ${ES_BEATS}/libbeat/_meta/fields.generated.yml fields.yml
-else
-	@cat ${ES_BEATS}/libbeat/_meta/fields.generated.yml _meta/fields.generated.yml > fields.yml
+ifneq ($(BEAT_NAME), libbeat)
 	mkdir -p include
 	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include fields.yml $(BEAT_NAME) > include/fields.go
 endif

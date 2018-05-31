@@ -6,7 +6,8 @@ import (
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 )
 
-type kibanaConfig struct {
+// ClientConfig to connect to Kibana
+type ClientConfig struct {
 	Protocol string            `config:"protocol"`
 	Host     string            `config:"host"`
 	Path     string            `config:"path"`
@@ -17,7 +18,7 @@ type kibanaConfig struct {
 }
 
 var (
-	defaultKibanaConfig = kibanaConfig{
+	defaultClientConfig = ClientConfig{
 		Protocol: "http",
 		Host:     "localhost:5601",
 		Path:     "",
