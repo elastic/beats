@@ -11,10 +11,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/libbeat/logp"
 	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
 	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/libbeat/setup/kibana"
 )
 
 var availableMLModules = map[string]string{
