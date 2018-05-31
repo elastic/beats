@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/reader"
 	"github.com/elastic/beats/filebeat/reader/encode"
+	"github.com/elastic/beats/filebeat/reader/encode/encoding"
 	"github.com/elastic/beats/filebeat/reader/limit"
 	"github.com/elastic/beats/filebeat/reader/multiline"
 	"github.com/elastic/beats/filebeat/reader/strip_newline"
@@ -130,7 +131,7 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 			return nil, err
 		}
 
-		c := multiline.MultilineConfig{
+		c := multiline.Config{
 			Negate:  conf.multiNegate,
 			Match:   conf.matchMode,
 			Pattern: &p,
