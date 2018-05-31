@@ -19,7 +19,9 @@ def transform_data(data, method):
             obj["attributes"]["visState"] = method(obj["attributes"]["visState"])
 
         if "kibanaSavedObjectMeta" in obj["attributes"] and "searchSourceJSON" in obj["attributes"]["kibanaSavedObjectMeta"]:
-            obj["attributes"]["kibanaSavedObjectMeta"]["searchSourceJSON"] = method(obj["attributes"]["kibanaSavedObjectMeta"]["searchSourceJSON"])
+            obj["attributes"]["kibanaSavedObjectMeta"]["searchSourceJSON"] = method(
+                obj["attributes"]["kibanaSavedObjectMeta"]["searchSourceJSON"])
+
 
 def transform_file(path, method):
     with open(path) as f:
@@ -27,6 +29,7 @@ def transform_file(path, method):
 
     transform_data(data, method)
     return data
+
 
 if __name__ == "__main__":
 
