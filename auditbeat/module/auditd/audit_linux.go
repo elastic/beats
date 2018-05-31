@@ -44,6 +44,7 @@ var (
 	reassemblerGapsMetric = monitoring.NewInt(auditdMetrics, "reassembler_seq_gaps")
 	kernelLostMetric      = monitoring.NewInt(auditdMetrics, "kernel_lost")
 	userspaceLostMetric   = monitoring.NewInt(auditdMetrics, "userspace_lost")
+	receivedMetric        = monitoring.NewInt(auditdMetrics, "received_msgs")
 )
 
 func init() {
@@ -89,6 +90,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	reassemblerGapsMetric.Set(0)
 	kernelLostMetric.Set(0)
 	userspaceLostMetric.Set(0)
+	receivedMetric.Set(0)
 
 	return &MetricSet{
 		BaseMetricSet:        base,
@@ -362,7 +364,7 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 			if filterRecordType(raw.Type) {
 				continue
 			}
-
+			receivedMetric.Inc()
 			if err := reassembler.Push(raw.Type, raw.Data); err != nil {
 				ms.log.Debugw("Dropping audit message",
 					"record_type", raw.Type,
