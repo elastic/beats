@@ -303,6 +303,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Added Traefik module with health metricset. {pull}7413[7413]
 - Add Elasticsearch ml_job metricsets. {pull}7196[7196]
 - Add support for bearer token files to HTTP helper. {pull}7527[7527]
+- Add Elasticsearch index recovery metricset. {pull}7225[7225]
 
 *Packetbeat*
 

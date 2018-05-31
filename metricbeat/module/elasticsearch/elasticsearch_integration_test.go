@@ -35,6 +35,7 @@ import (
 	"bytes"
 
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index"
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_summary"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/ml_job"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node"
@@ -44,6 +45,7 @@ import (
 
 var metricSets = []string{
 	"index",
+	"index_recovery",
 	"index_summary",
 	"ml_job",
 	"node",
@@ -116,6 +118,7 @@ func getConfig(metricset string) map[string]interface{} {
 		"module":     "elasticsearch",
 		"metricsets": []string{metricset},
 		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
+		"index_recovery.active_only": false,
 	}
 }
 

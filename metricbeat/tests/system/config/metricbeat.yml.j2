@@ -7,6 +7,12 @@ metricbeat.modules:
   enabled: {{ m.enabled }}
   {% endif -%}
 
+  {% for items in m.metricset_options -%}
+  {% for k, v in items.items() -%}
+  {{ k }}: {{ v }}
+  {% endfor %}
+  {% endfor %}
+
   {% if m.hosts -%}
   hosts:
     {% for host in m.hosts -%}
