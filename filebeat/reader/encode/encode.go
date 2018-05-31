@@ -12,7 +12,7 @@ import (
 // Encode reader produces lines by reading lines from an io.Reader
 // through a decoder converting the reader it's encoding to utf-8.
 type Reader struct {
-	reader *line.Line
+	reader *line.Reader
 }
 
 // New creates a new Encode reader from input reader by applying
@@ -22,7 +22,7 @@ func New(
 	codec encoding.Encoding,
 	bufferSize int,
 ) (Reader, error) {
-	eReader, err := line.NewLine(r, codec, bufferSize)
+	eReader, err := line.New(r, codec, bufferSize)
 	return Reader{eReader}, err
 }
 
