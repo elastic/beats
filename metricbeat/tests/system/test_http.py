@@ -49,10 +49,9 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "http",
             "metricsets": ["server"],
+            "port": 8082,
         }])
         proc = self.start_beat()
-        time.sleep(5)
-
         self.wait_until(lambda: self.log_contains("Starting http server on "))
 
         time.sleep(2)
@@ -75,4 +74,4 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_host(self):
-        return "http://" + os.getenv('HTTP_HOST', 'localhost') + ':' + os.getenv('HTTP_PORT', '8080')
+        return "http://" + os.getenv('HTTP_HOST', 'localhost') + ':' + os.getenv('HTTP_PORT', '8082')
