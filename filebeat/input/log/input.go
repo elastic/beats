@@ -631,7 +631,7 @@ func (p *Input) startHarvester(state file.State, offset int64) error {
 	err = h.Setup()
 	if err != nil {
 		p.numHarvesters.Dec()
-		return fmt.Errorf("Error setting up harvester: %s", err)
+		return fmt.Errorf("error setting up harvester: %s", err)
 	}
 
 	// Update state before staring harvester
