@@ -46,16 +46,18 @@ class Test(metricbeat.BaseTest):
         """
         http server metricset test
         """
+        port = 8082
+        host = "localhost"
         self.render_config_template(modules=[{
             "name": "http",
             "metricsets": ["server"],
-            "port": 8082,
+            "port": port,
+            "host": host,
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("Starting http server on "))
-
-        time.sleep(2)
-        requests.post(self.get_host(), json={'hello': 'world'}, headers={'Content-Type': 'application/json'})
+        requests.post("http://" + host + ":" + str(port),
+                      json={'hello': 'world'}, headers={'Content-Type': 'application/json'})
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
@@ -74,4 +76,4 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_host(self):
-        return "http://" + os.getenv('HTTP_HOST', 'localhost') + ':' + os.getenv('HTTP_PORT', '8082')
+        return "http://" + os.getenv('HTTP_HOST', 'localhost') + ':' + os.getenv('HTTP_PORT', '8080')
