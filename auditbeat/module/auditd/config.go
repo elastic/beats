@@ -134,5 +134,5 @@ var defaultConfig = Config{
 	Warnings:               false,
 	ReassemblerMaxInFlight: 50,
 	ReassemblerTimeout:     2 * time.Second,
-	StreamBufferQueueSize:  64,
+	StreamBufferQueueSize:  8192,
 }
