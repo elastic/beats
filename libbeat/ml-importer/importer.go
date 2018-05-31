@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -43,7 +44,7 @@ type MLLoader interface {
 
 // MLSetupper is a subset of the Kibana client API capable of setting up ML objects.
 type MLSetupper interface {
-	Request(method, path string, params url.Values, body io.Reader) (int, []byte, error)
+	Request(method, path string, params url.Values, headers http.Header, body io.Reader) (int, []byte, error)
 	GetVersion() string
 }
 
@@ -188,7 +189,7 @@ func HaveXpackML(esClient MLLoader) (bool, error) {
 func SetupModule(kibanaClient MLSetupper, module, prefix string) error {
 	setupURL := fmt.Sprintf(kibanaSetupModuleURL, module)
 	prefixPayload := fmt.Sprintf("{\"prefix\": \"%s\"}", prefix)
-	status, response, err := kibanaClient.Request("POST", setupURL, nil, strings.NewReader(prefixPayload))
+	status, response, err := kibanaClient.Request("POST", setupURL, nil, nil, strings.NewReader(prefixPayload))
 	if status != 200 {
 		return errors.Errorf("cannot set up ML with prefix: %s", prefix)
 	}
