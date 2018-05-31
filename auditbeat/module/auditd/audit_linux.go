@@ -245,12 +245,6 @@ func (ms *MetricSet) initClient() error {
 		}
 	}
 
-	if status.RateLimit != ms.config.RateLimit {
-		if err = ms.client.SetRateLimit(ms.config.RateLimit, libaudit.NoWait); err != nil {
-			return errors.Wrap(err, "failed to set audit rate limit in kernel")
-		}
-	}
-
 	if status.BacklogLimit != ms.config.BacklogLimit {
 		if err = ms.client.SetBacklogLimit(ms.config.BacklogLimit, libaudit.NoWait); err != nil {
 			return errors.Wrap(err, "failed to set audit backlog limit in kernel")
@@ -274,6 +268,18 @@ func (ms *MetricSet) initClient() error {
 			} else {
 				return errors.New("kernel backlog wait time not supported by kernel, but required by backpressure_strategy")
 			}
+		}
+	}
+
+	if ms.backpressureStrategy&(bsKernel|bsUserSpace) == bsUserSpace && ms.config.RateLimit == 0 {
+		// force a rate limit if the user-space strategy will be used without
+		// corresponding backlog_wait_time setting in the kernel
+		ms.config.RateLimit = 5000
+	}
+
+	if status.RateLimit != ms.config.RateLimit {
+		if err = ms.client.SetRateLimit(ms.config.RateLimit, libaudit.NoWait); err != nil {
+			return errors.Wrap(err, "failed to set audit rate limit in kernel")
 		}
 	}
 
