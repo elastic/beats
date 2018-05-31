@@ -13,7 +13,7 @@ var (
 
 // timeoutProcessor will signal some configurable timeout error if no
 // new line can be returned in time.
-type Timeout struct {
+type Reader struct {
 	reader  reader.Reader
 	timeout time.Duration
 	signal  error
@@ -26,13 +26,13 @@ type lineMessage struct {
 	err  error
 }
 
-// NewTimeout returns a new timeout reader from an input line reader.
-func NewTimeout(reader reader.Reader, signal error, t time.Duration) *Timeout {
+// New returns a new timeout reader from an input line reader.
+func New(reader reader.Reader, signal error, t time.Duration) *Reader {
 	if signal == nil {
 		signal = errTimeout
 	}
 
-	return &Timeout{
+	return &Reader{
 		reader:  reader,
 		signal:  signal,
 		timeout: t,
@@ -45,13 +45,13 @@ func NewTimeout(reader reader.Reader, signal error, t time.Duration) *Timeout {
 // For handline timeouts a goroutine is started for reading lines from
 // configured line reader. Only when underlying reader returns an error, the
 // goroutine will be finished.
-func (p *Timeout) Next() (reader.Message, error) {
-	if !p.running {
-		p.running = true
+func (r *Reader) Next() (reader.Message, error) {
+	if !r.running {
+		r.running = true
 		go func() {
 			for {
-				message, err := p.reader.Next()
-				p.ch <- lineMessage{message, err}
+				message, err := r.reader.Next()
+				r.ch <- lineMessage{message, err}
 				if err != nil {
 					break
 				}
@@ -60,12 +60,12 @@ func (p *Timeout) Next() (reader.Message, error) {
 	}
 
 	select {
-	case msg := <-p.ch:
+	case msg := <-r.ch:
 		if msg.err != nil {
-			p.running = false
+			r.running = false
 		}
 		return msg.line, msg.err
-	case <-time.After(p.timeout):
-		return reader.Message{}, p.signal
+	case <-time.After(r.timeout):
+		return reader.Message{}, r.signal
 	}
 }

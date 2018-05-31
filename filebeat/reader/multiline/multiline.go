@@ -95,7 +95,7 @@ func NewMultiline(
 	}
 
 	if tout > 0 {
-		r = timeout.NewTimeout(r, sigMultilineTimeout, tout)
+		r = timeout.New(r, sigMultilineTimeout, tout)
 	}
 
 	mlr := &Multiline{
