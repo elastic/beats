@@ -4,7 +4,7 @@ import (
 	"github.com/elastic/beats/filebeat/reader"
 )
 
-// LimitProcessor sets an upper limited on line length. Lines longer
+// Reader sets an upper limited on line length. Lines longer
 // then the max configured line length will be snapped short.
 type Reader struct {
 	reader   reader.Reader

@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/filebeat/reader/line"
 )
 
-// Encode reader produces lines by reading lines from an io.Reader
+// Reader produces lines by reading lines from an io.Reader
 // through a decoder converting the reader it's encoding to utf-8.
 type Reader struct {
 	reader *line.Reader
