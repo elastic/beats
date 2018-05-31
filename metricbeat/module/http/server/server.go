@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	serverhelper "github.com/elastic/beats/metricbeat/helper/server"
 	"github.com/elastic/beats/metricbeat/helper/server/http"
@@ -50,7 +51,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Run method provides the Graphite server with a reporter with which events can be reported.
-func (m *MetricSet) Run(reporter mb.PushReporter) {
+func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	// Start event watcher
 	m.server.Start()
 
@@ -60,10 +61,15 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 			m.server.Stop()
 			return
 		case msg := <-m.server.GetEvents():
-			event, err := m.processor.Process(msg)
+			fields, err := m.processor.Process(msg)
 			if err != nil {
 				reporter.Error(err)
 			} else {
+				event := mb.Event{}
+				event.ModuleFields = common.MapStr{}
+				metricSetName := fields[mb.NamespaceKey].(string)
+				delete(fields, mb.NamespaceKey)
+				event.ModuleFields.Put(metricSetName, fields)
 				reporter.Event(event)
 			}
 
