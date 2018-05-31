@@ -185,7 +185,12 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 		request.SetBasicAuth(config.Username, config.Password)
 	}
 	for k, v := range config.Check.Request.SendHeaders {
-		request.Header.Add(k, v)
+		if strings.ToLower(k) == "host" {
+			// http.Request header "Host" can only be set directly:
+			request.Host = v
+		} else {
+			request.Header.Add(k, v)
+		}
 	}
 
 	if enc != nil {
