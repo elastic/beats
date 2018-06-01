@@ -16,7 +16,7 @@ var schema = s.Schema{
 	"query": s.Object{
 		"id":    c.Str("queryid"),
 		"text":  c.Str("query"),
-		"calls": c.Int("datid"),
+		"calls": c.Int("calls"),
 		"rows":  c.Int("rows"),
 		"time": s.Object{
 			"total":  s.Object{"ms": c.Float("total_time")},
