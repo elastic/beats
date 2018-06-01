@@ -66,7 +66,11 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		Indexing.RUnlock()
 	}
 
-	metaGen := kubernetes.NewMetaGenerator(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels, config.IncludePodUID)
+	metaGen, err := kubernetes.NewMetaGenerator(cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	indexers := NewIndexers(config.Indexers, metaGen)
 
 	matchers := NewMatchers(config.Matchers)
