@@ -49,14 +49,14 @@ func TestProcessor(t *testing.T) {
 			values: map[string]string{"new_target.key": "world"},
 		},
 		{
-			name: "set map under a root key",
+			name: "extract to already existing namespace not conflicting",
 			c: map[string]interface{}{
 				"tokenizer":     "hello %{key} %{key2}",
 				"target_prefix": "extracted",
 				"field":         "message",
 			},
-			fields: common.MapStr{"message": "hello world super", "extracted": "not hello"},
-			values: map[string]string{"extracted.key": "world", "extracted.key2": "super"},
+			fields: common.MapStr{"message": "hello world super", "extracted": common.MapStr{"not": "hello"}},
+			values: map[string]string{"extracted.key": "world", "extracted.key2": "super", "extracted.not": "hello"},
 		},
 	}
 
@@ -109,24 +109,53 @@ func TestFieldDoesntExist(t *testing.T) {
 }
 
 func TestFieldAlreadyExist(t *testing.T) {
-	t.Run("root prefix", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
-			"tokenizer":     "hello %{key}",
-			"target_prefix": "",
+	tests := []struct {
+		name      string
+		tokenizer string
+		prefix    string
+		fields    common.MapStr
+	}{
+		{
+			name:      "no prefix",
+			tokenizer: "hello %{key}",
+			prefix:    "",
+			fields:    common.MapStr{"message": "hello world", "key": "exists"},
+		},
+		{
+			name:      "with prefix",
+			tokenizer: "hello %{key}",
+			prefix:    "extracted",
+			fields:    common.MapStr{"message": "hello world", "extracted": "exists"},
+		},
+		{
+			name:      "with conflicting key in prefix",
+			tokenizer: "hello %{key}",
+			prefix:    "extracted",
+			fields:    common.MapStr{"message": "hello world", "extracted": common.MapStr{"key": "exists"}},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c, err := common.NewConfigFrom(map[string]interface{}{
+				"tokenizer":     test.tokenizer,
+				"target_prefix": test.prefix,
+			})
+
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			processor, err := newProcessor(c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			e := beat.Event{Fields: test.fields}
+			_, err = processor.Run(&e)
+			if !assert.Error(t, err) {
+				return
+			}
 		})
-		if !assert.NoError(t, err) {
-			return
-		}
-
-		processor, err := newProcessor(c)
-		if !assert.NoError(t, err) {
-			return
-		}
-
-		e := beat.Event{Fields: common.MapStr{"message": "hello world", "key": "exist"}}
-		_, err = processor.Run(&e)
-		if !assert.Error(t, err) {
-			return
-		}
-	})
+	}
 }
