@@ -16,7 +16,15 @@ func RemoveIndexPattern(data []byte) (common.MapStr, error) {
 		Objects []interface{}
 	}
 
-	err := json.Unmarshal(data, &kbResult)
+	var result common.MapStr
+	// Full struct need to not loose any data
+	err := json.Unmarshal(data, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	// For easier handling, unmarshal into predefined struct
+	err = json.Unmarshal(data, &kbResult)
 	if err != nil {
 		return nil, err
 	}
@@ -33,9 +41,7 @@ func RemoveIndexPattern(data []byte) (common.MapStr, error) {
 		}
 	}
 
-	result := common.MapStr{
-		"objects": objs,
-	}
+	result["objects"] = objs
 
 	return result, nil
 }
