@@ -467,7 +467,10 @@ environment without actually running {beatname_uc} and ingesting data.
 *FLAGS*
 
 *`--dashboards`*::
-Sets up the Kibana dashboards only.
+Sets up the Kibana dashboards only. This option loads the dashboards from the
+{beatname_uc} package. For more options, such as loading customized dashboards,
+see {beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards]
+in the _Beats Developer Guide_.
 
 *`-h, --help`*::
 Shows help for the `setup` command.
