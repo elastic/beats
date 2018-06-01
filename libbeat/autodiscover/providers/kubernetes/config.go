@@ -16,11 +16,6 @@ type Config struct {
 	SyncPeriod     time.Duration `config:"sync_period"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout"`
 
-	IncludeLabels      []string `config:"include_labels"`
-	ExcludeLabels      []string `config:"exclude_labels"`
-	IncludeAnnotations []string `config:"include_annotations"`
-	IncludePodUID      bool     `config:"include_pod_uid"`
-
 	Prefix       string                  `config:"prefix"`
 	HintsEnabled bool                    `config:"hints.enabled"`
 	Builders     []*common.Config        `config:"builders"`
