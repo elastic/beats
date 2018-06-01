@@ -352,6 +352,14 @@ make create-fields MODULE={module} FILESET={fileset}
 Please, always check the generated file and make sure the fields are correct.
 Documenatation of fields must be added manually.
 
+If the fields are correct, it is time to generate documentation, configuration
+and Kibana index patterns.
+
+[source,bash]
+----
+make update
+----
+
 [float]
 ==== test
 
