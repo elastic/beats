@@ -3,8 +3,10 @@ package auditd
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -29,7 +31,8 @@ const (
 	unicast   = "unicast"
 	multicast = "multicast"
 
-	lostEventsUpdateInterval = time.Second * 15
+	lostEventsUpdateInterval        = time.Second * 15
+	maxDefaultStreamBufferConsumers = 4
 )
 
 type backpressureStrategy uint8
@@ -153,14 +156,32 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		}()
 	}
 
-	for {
-		select {
-		case <-reporter.Done():
-			return
-		case msgs := <-out:
-			reporter.Event(buildMetricbeatEvent(msgs, ms.config))
+	// Spawn the stream buffer consumers
+	numConsumers := ms.config.StreamBufferConsumers
+	// By default (stream_buffer_consumers=0) use as many consumers as local CPUs
+	// with a max of `maxDefaultStreamBufferConsumers`
+	if numConsumers == 0 {
+		if numConsumers = runtime.NumCPU(); numConsumers > maxDefaultStreamBufferConsumers {
+			numConsumers = maxDefaultStreamBufferConsumers
 		}
 	}
+	var wg sync.WaitGroup
+	wg.Add(numConsumers)
+
+	for i := 0; i < numConsumers; i++ {
+		go func() {
+			defer wg.Done()
+			for {
+				select {
+				case <-reporter.Done():
+					return
+				case msgs := <-out:
+					reporter.Event(buildMetricbeatEvent(msgs, ms.config))
+				}
+			}
+		}()
+	}
+	wg.Wait()
 }
 
 func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {

@@ -37,7 +37,8 @@ type Config struct {
 	// propagating to the kernel causing audited processes to block until
 	// Auditbeat can keep-up.
 	// One of "user-space", "kernel", "both", "none", "auto" (default)
-	BackpressureStrategy string `config:"backpressure_strategy"`
+	BackpressureStrategy  string `config:"backpressure_strategy"`
+	StreamBufferConsumers int    `config:"stream_buffer_consumers"`
 }
 
 type auditRule struct {
@@ -135,4 +136,5 @@ var defaultConfig = Config{
 	ReassemblerMaxInFlight: 50,
 	ReassemblerTimeout:     2 * time.Second,
 	StreamBufferQueueSize:  8192,
+	StreamBufferConsumers:  0,
 }
