@@ -42,7 +42,7 @@ Docker autodiscover provider supports hints in labels, to enable it just set `hi
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-metricbeat.autodiscover:
+filebeat.autodiscover:
   providers:
     - type: docker
       hints.enabled: true

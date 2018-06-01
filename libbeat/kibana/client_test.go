@@ -20,7 +20,7 @@ func TestErrorJson(t *testing.T) {
 		URL:  kibanaTs.URL,
 		http: http.DefaultClient,
 	}
-	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, nil)
+	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, nil, nil)
 	assert.Equal(t, http.StatusOK, code)
 	assert.Error(t, err)
 }
@@ -35,7 +35,7 @@ func TestErrorBadJson(t *testing.T) {
 		URL:  kibanaTs.URL,
 		http: http.DefaultClient,
 	}
-	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, nil)
+	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, nil, nil)
 	assert.Equal(t, http.StatusOK, code)
 	assert.Error(t, err)
 }
@@ -43,6 +43,9 @@ func TestErrorBadJson(t *testing.T) {
 func TestSuccess(t *testing.T) {
 	kibanaTs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"objects":[{"id":"test-*","type":"index-pattern","updated_at":"2018-01-24T19:04:13.371Z","version":1}]}`))
+
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+		assert.Equal(t, "bar", r.Header.Get("foo"))
 	}))
 	defer kibanaTs.Close()
 
@@ -50,7 +53,7 @@ func TestSuccess(t *testing.T) {
 		URL:  kibanaTs.URL,
 		http: http.DefaultClient,
 	}
-	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, nil)
+	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, http.Header{"foo": []string{"bar"}}, nil)
 	assert.Equal(t, http.StatusOK, code)
 	assert.NoError(t, err)
 }

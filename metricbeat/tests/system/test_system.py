@@ -371,7 +371,8 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["process"],
             "period": "5s",
             "extras": {
-                "process.env.whitelist": ["PATH"]
+                "process.env.whitelist": ["PATH"],
+                "process.include_cpu_ticks": True,
             }
         }])
         proc = self.start_beat()

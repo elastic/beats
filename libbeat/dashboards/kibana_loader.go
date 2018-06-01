@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/setup/kibana"
 )
 
 var importAPI = "/api/kibana/dashboards/import"
