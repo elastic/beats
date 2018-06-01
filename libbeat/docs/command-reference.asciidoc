@@ -11,7 +11,6 @@
 
 
 // These attributes are used to resolve short descriptions
-
 :global-flags: Also see <<global-flags,Global flags>>.
 
 :export-command-short-desc: Exports the configuration or index template to stdout
@@ -22,10 +21,10 @@
 
 ifeval::["{has_ml_jobs}"=="yes"]
 :setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available), and machine learning jobs (when available)
-else::[]
-:setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available)
 endif::[]
-
+ifeval::["{has_ml_jobs}"!="yes"]
+:setup-command-short-desc: Sets up the initial environment, including the index template and Kibana dashboards (when available)
+endif::[]
 :test-command-short-desc: Tests the configuration
 :version-command-short-desc: Shows information about the current version
 
