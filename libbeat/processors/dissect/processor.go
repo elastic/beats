@@ -3,6 +3,8 @@ package dissect
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
@@ -59,12 +61,18 @@ func (p *processor) mapper(event *beat.Event, m common.MapStr) (*beat.Event, err
 	if p.config.TargetPrefix != "" {
 		prefix = p.config.TargetPrefix + "."
 	}
+	var prefixKey string
 	for k, v := range m {
-		if _, err := event.GetValue(k); err == common.ErrKeyNotFound {
-			event.PutValue(prefix+k, v)
+		prefixKey = prefix + k
+		if _, err := event.GetValue(prefixKey); err == common.ErrKeyNotFound {
+			event.PutValue(prefixKey, v)
 		} else {
 			event.Fields = copy
-			return event, fmt.Errorf("cannot override existing key: `%s`", k)
+			// When the target key exists but is a string instead of a map.
+			if err != nil {
+				return event, errors.Wrapf(err, "cannot override existing key with `%s`", prefixKey)
+			}
+			return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
 		}
 	}
 
