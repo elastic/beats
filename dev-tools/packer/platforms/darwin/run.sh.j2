@@ -20,7 +20,7 @@ fi
 cp fields.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/
 cp -a modules.d-darwin/ /{{.beat_name}}-${VERSION}-darwin-x86_64/modules.d || true
 
-tar czvf /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-darwin-x86_64.tar.gz /{{.beat_name}}-${VERSION}-darwin-x86_64
+tar czvf /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-darwin-x86_64.tar.gz --owner=0 --group=0 /{{.beat_name}}-${VERSION}-darwin-x86_64
 echo "Created /upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz"
 
 cd /upload

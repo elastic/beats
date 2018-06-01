@@ -149,7 +149,7 @@ func checkConfigOwner(t *testing.T, p *packageFile) {
 		for _, entry := range p.Contents {
 			if configFilePattern.MatchString(entry.File) {
 				if expectedConfigUID != entry.UID {
-					t.Errorf("file %v should be owned by user %v, owner=%v", entry.File, expectedConfigGID, entry.UID)
+					t.Errorf("file %v should be owned by user %v, owner=%v", entry.File, expectedConfigUID, entry.UID)
 				}
 				if expectedConfigGID != entry.GID {
 					t.Errorf("file %v should be owned by group %v, group=%v", entry.File, expectedConfigGID, entry.GID)
@@ -182,7 +182,7 @@ func checkManifestOwner(t *testing.T, p *packageFile) {
 		for _, entry := range p.Contents {
 			if manifestFilePattern.MatchString(entry.File) {
 				if expectedConfigUID != entry.UID {
-					t.Errorf("file %v should be owned by user %v, owner=%v", entry.File, expectedConfigGID, entry.UID)
+					t.Errorf("file %v should be owned by user %v, owner=%v", entry.File, expectedConfigUID, entry.UID)
 				}
 				if expectedConfigGID != entry.GID {
 					t.Errorf("file %v should be owned by group %v, group=%v", entry.File, expectedConfigGID, entry.GID)
@@ -219,7 +219,7 @@ func checkModulesOwner(t *testing.T, p *packageFile) {
 		for _, entry := range p.Contents {
 			if modulesFilePattern.MatchString(entry.File) || modulesDirPattern.MatchString(entry.File) {
 				if expectedConfigUID != entry.UID {
-					t.Errorf("file %v should be owned by user %v, owner=%v", entry.File, expectedConfigGID, entry.UID)
+					t.Errorf("file %v should be owned by user %v, owner=%v", entry.File, expectedConfigUID, entry.UID)
 				}
 				if expectedConfigGID != entry.GID {
 					t.Errorf("file %v should be owned by group %v, group=%v", entry.File, expectedConfigGID, entry.GID)
