@@ -127,6 +127,12 @@ func TestFieldAlreadyExist(t *testing.T) {
 			prefix:    "extracted",
 			fields:    common.MapStr{"message": "hello world", "extracted": "exists"},
 		},
+		{
+			name:      "with conflicting key in prefix",
+			tokenizer: "hello %{key}",
+			prefix:    "extracted",
+			fields:    common.MapStr{"message": "hello world", "extracted": common.MapStr{"key": "exists"}},
+		},
 	}
 
 	for _, test := range tests {
