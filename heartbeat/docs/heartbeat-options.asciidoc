@@ -252,8 +252,8 @@ A list of hosts to ping. The entries in the list can be:
 
 * A plain host name, such as `localhost`, or an IP address. If you specify this
 option, you must also specify a value for <<monitor-tcp-ports,`ports`>>.  If the
-monitor is configured to use SSL, Heartbeat establishes an SSL/TLS-based
-connection. Otherwise, it establishes a plain TCP connection.
+monitor is <<configuration-ssl,configured to use SSL>>, Heartbeat establishes an
+SSL/TLS-based connection. Otherwise, it establishes a plain TCP connection.
 * A hostname and port, such as `localhost:12345`. Heartbeat connects
 to the port on the specified host. If the monitor is
 <<configuration-ssl,configured to use SSL>>, Heartbeat establishes an
@@ -360,6 +360,8 @@ Example configuration:
 -------------------------------------------------------------------------------
 
 
+Also see <<configuration-ssl>> for a full description of the `ssl` options.
+
 [float]
 [[monitor-http-options]]
 === HTTP options
@@ -428,6 +430,8 @@ Example configuration:
     supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
 -------------------------------------------------------------------------------
 
+
+Also see <<configuration-ssl>> for a full description of the `ssl` options.
 
 [float]
 [[monitor-http-check]]
