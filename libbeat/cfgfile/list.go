@@ -79,7 +79,10 @@ func (r *RunnerList) Reload(configs []*ConfigWithMeta) error {
 
 	// Start new runners
 	for hash, config := range startList {
-		runner, err := r.factory.Create(r.pipeline, config.Config, config.Meta)
+		// Pass a copy of the config to the factory, this way if the factory modifies it,
+		// that doesn't affect the hash of the original one.
+		c, _ := common.NewConfigFrom(config.Config)
+		runner, err := r.factory.Create(r.pipeline, c, config.Meta)
 		if err != nil {
 			r.logger.Errorf("Error creating runner from config: %s", err)
 			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
