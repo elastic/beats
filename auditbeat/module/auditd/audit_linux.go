@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/go-libaudit"
 	"github.com/elastic/go-libaudit/aucoalesce"
 	"github.com/elastic/go-libaudit/auparse"
+	"github.com/elastic/go-libaudit/rule"
 )
 
 const (
@@ -198,6 +199,12 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	}
 	ms.log.Infof("Deleted %v pre-existing audit rules.", n)
 
+	// Add rule to ignore syscalls from this process
+	if rule, err := buildPIDIgnoreRule(os.Getpid()); err == nil {
+		rules = append([]auditRule{rule}, rules...)
+	} else {
+		ms.log.Errorf("Failed to build a rule to ignore self: %v", err)
+	}
 	// Add rules from config.
 	var failCount int
 	for _, rule := range rules {
@@ -814,4 +821,25 @@ func getBackpressureStrategy(value string, logger *logp.Logger) backpressureStra
 	case "", "default":
 		return bsAuto
 	}
+}
+
+func buildPIDIgnoreRule(pid int) (ruleData auditRule, err error) {
+	r := rule.SyscallRule{
+		Type:   rule.AppendSyscallRuleType,
+		List:   "exit",
+		Action: "never",
+		Filters: []rule.FilterSpec{
+			{
+				Type:       rule.ValueFilterType,
+				LHS:        "pid",
+				Comparator: "=",
+				RHS:        strconv.Itoa(pid),
+			},
+		},
+		Syscalls: []string{"all"},
+		Keys:     nil,
+	}
+	ruleData.flags = fmt.Sprintf("-A exit,never -F pid=%d -S all", pid)
+	ruleData.data, err = rule.Build(&r)
+	return ruleData, err
 }
