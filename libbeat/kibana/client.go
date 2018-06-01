@@ -247,10 +247,10 @@ func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[str
 func (client *Client) Close() error { return nil }
 
 // GetDashboard returns the dashboard with the given id with the index pattern removed
-func (c *Client) GetDashboard(id string) (common.MapStr, error) {
+func (client *Client) GetDashboard(id string) (common.MapStr, error) {
 	params := url.Values{}
 	params.Add("dashboard", id)
-	_, response, err := c.Request("GET", "/api/kibana/dashboards/export", params, nil, nil)
+	_, response, err := client.Request("GET", "/api/kibana/dashboards/export", params, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error exporting dashboard: %+v", err)
 	}
