@@ -319,15 +319,17 @@ number of events to be contained in a batch.
 
 ===== `backoff.init`
 
-The number of seconds to wait before attempting to connect to Elasticsearch
-after an initial connection error. The default is 1s. If additional errors
-occur, the wait time is increased exponentially for each try until `backoff.max`
-is met.
+The number of seconds to wait before trying to reconnect to Elasticsearch after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
+
 
 ===== `backoff.max`
 
 The maximum number of seconds to wait before attempting to connect to
-Elasticsearch after a connection error. The default is 60s.
+Elasticsearch after a network error. The default is 60s.
 
 ===== `timeout`
 
@@ -595,15 +597,16 @@ The default is `false`.
 
 ===== `backoff.init`
 
-The number of seconds to wait before attempting to connect to Logstash
-after an initial connection error. The default is 1s. If additional errors
-occur, the wait time is increased exponentially for each try until `backoff.max`
-is met.
+The number of seconds to wait before trying to reconnect to Logstash after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
 
 ===== `backoff.max`
 
 The maximum number of seconds to wait before attempting to connect to
-Logstash after a connection error. The default is 60s.
+Logstash after a network error. The default is 60s.
 
 [[kafka-output]]
 === Configure the Kafka output
