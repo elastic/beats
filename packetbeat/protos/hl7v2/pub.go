@@ -62,7 +62,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		"bytes_out":    resp.Size,
 		"src":          src,
 		"dst":          dst,
-        "hl7v2": common.MapStr{},
+        "hl7v2":        common.MapStr{},
 	}
 
 	hl7message := "request"
