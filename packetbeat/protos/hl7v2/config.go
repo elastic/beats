@@ -14,7 +14,6 @@ type hl7v2Config struct {
 	Fields                 []string            `config:"fields"`
 	ComponentSelectionMode string              `config:"component_selection_mode"`
 	Components             []string            `config:"components"`
-	NameMappingMap         []map[string]string `config:"name_mapping"`
 }
 
 var (

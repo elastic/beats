@@ -20,7 +20,6 @@ type transPub struct {
 	segmentsmap            map[string]bool
 	fieldsmap              map[string]bool
 	componentsmap          map[string]bool
-	namemappingmap         map[string]string
 	results                protos.Reporter
 }
 
@@ -69,7 +68,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 	var hl7segments []string
 	var hl7fieldseperator string
-	var hl7componentseperator string
+	//var hl7componentseperator string
 	//var hl7subcomponentseperator string
 	//var hl7fieldrepeatseperator string
 	//var hl7escapecharacter string
@@ -99,7 +98,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 				// If MSH get our encoding characters
 				if strings.EqualFold(hl7segmentheader, "MSH") {
 					hl7fieldseperator = string(hl7segments[hl7segment][3])
-					hl7componentseperator = string(hl7segments[hl7segment][4])
+					//hl7componentseperator = string(hl7segments[hl7segment][4])
 					//hl7subcomponentseperator = string(hl7segments[hl7segment][5])
 					//hl7fieldrepeatseperator = string(hl7segments[hl7segment][6])
 					//hl7escapecharacter = string(hl7segments[hl7segment][7])
@@ -124,8 +123,10 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 						// If field matches
 						if strings.EqualFold(pub.FieldSelectionMode, "Include") && pub.fieldsmap[hl7fieldname] || strings.EqualFold(pub.FieldSelectionMode, "Exclude") && !pub.fieldsmap[hl7fieldname] {
 							debugf("Field %s matched.", hl7fieldname)
+
+                            // To be added once get fields.yml down to component level
 							// If selected split field into components
-							if pub.ComponentSelectionMode != "" {
+							/*if pub.ComponentSelectionMode != "" {
 								debugf("componentsmap: %s", pub.componentsmap)
 								debugf("ComponentSelectionMode: %s", pub.ComponentSelectionMode)
 								hl7fieldcomponents := strings.Split(hl7fields[hl7field], hl7componentseperator)
@@ -137,11 +138,6 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 									// If component matches
 									if strings.EqualFold(pub.ComponentSelectionMode, "Include") && pub.componentsmap[hl7fieldcomponentname] || strings.EqualFold(pub.ComponentSelectionMode, "Exclude") && !pub.componentsmap[hl7fieldcomponentname] {
 										debugf("Component %s matched.", hl7fieldcomponentname)
-										// Re-map componentname if configured
-										if pub.namemappingmap[hl7fieldcomponentname] != "" {
-											debugf("Component %s renamed to %s.", hl7fieldcomponentname, pub.namemappingmap[hl7fieldcomponentname])
-											hl7fieldcomponentname = pub.namemappingmap[hl7fieldcomponentname]
-										}
 										// Add component if not empty
 										if hl7fieldcomponentvalue != "" {
 											hl7data[hl7fieldcomponentname] = hl7fieldcomponentvalue
@@ -149,20 +145,22 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 										}
 									}
 								}
-							}
-							// Re-map fieldname if configured
-							if pub.namemappingmap[hl7fieldname] != "" {
-								debugf("Field %s renamed to %s.", hl7fieldname, pub.namemappingmap[hl7fieldname])
-								hl7fieldname = pub.namemappingmap[hl7fieldname]
-							}
-							// Add to field if not empty
-							if hl7fieldvalue != "" {
-								hl7data[hl7fieldname] = hl7fieldvalue
-								debugf("Added field %s with value %s", hl7fieldname, hl7fieldvalue)
-							}
+							} else {*/
+							    // Add to field if not empty
+							    if hl7fieldvalue != "" {
+								    hl7data[hl7fieldname] = hl7fieldvalue
+								    debugf("Added field %s with value %s", hl7fieldname, hl7fieldvalue)
+							    }
+                            //}
 						}
 					}
-				}
+				} else {
+                    // Add segment if not empty
+                    if hl7segments[hl7segment] != "" {
+                        hl7data[hl7segmentheader] = hl7segments[hl7segment]
+					    debugf("Added segment %s with value %s", hl7segmentheader, hl7segments[hl7segment])
+                    }
+                }
 			}
 		}
 		fields["hl7v2"].(common.MapStr)[hl7message] = hl7data

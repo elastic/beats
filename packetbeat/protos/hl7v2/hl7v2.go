@@ -126,16 +126,6 @@ func (hp *hl7v2Plugin) setFromConfig(config *hl7v2Config) error {
 		pub.componentsmap = componentsmap
 	}
 
-	namemappingmap := make(map[string]string)
-	if len(config.NameMappingMap) > 0 {
-		for mappings := range config.NameMappingMap {
-			for name, mapping := range config.NameMappingMap[mappings] {
-				namemappingmap[name] = mapping
-			}
-		}
-		pub.namemappingmap = namemappingmap
-	}
-
 	return nil
 }
 
