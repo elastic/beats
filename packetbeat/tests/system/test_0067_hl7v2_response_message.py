@@ -15,13 +15,7 @@ class Test(BaseTest):
         # MSA-1 is a field that is configured to be selected in the test and should match the below value
         assert o["hl7v2.response.MSA-1"] == "AA"
         # MSH-11 is not a field configured to be selected in the test
-        try:
-            o["hl7v2.response.MSH-11"]
-        except NameError:
-            result = "ERROR"
-        else:
-            result = "PASS"
-        assert result == "PASS"
+
 
     def test_hl7v2_reject(self):
         self.render_config_template()
@@ -35,10 +29,4 @@ class Test(BaseTest):
         # MSA-1 is a field that is configured to be selected in the test and should match the below value
         assert o["hl7v2.response.MSA-1"] == "AR"
         # MSH-11 is not a field configured to be selected in the test
-        try:
-            o["hl7v2.response.MSH-11"]
-        except NameError:
-            result = "ERROR"
-        else:
-            result = "PASS"
-        assert result == "PASS"
+

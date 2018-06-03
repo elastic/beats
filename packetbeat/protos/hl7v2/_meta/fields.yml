@@ -9,6 +9,730 @@
           description: HL7 v2 request
           type: group
           fields:
+            - name: ABS
+              type: keyword
+              description: Abstract
+            
+            - name: ACC
+              type: keyword
+              description: Accident
+            
+            - name: ADD
+              type: keyword
+              description: Addendum
+            
+            - name: ADJ
+              type: keyword
+              description: Adjustment
+            
+            - name: AFF
+              type: keyword
+              description: Professional Affiliation
+            
+            - name: AIG
+              type: keyword
+              description: Appointment Information - General Resource
+            
+            - name: AIL
+              type: keyword
+              description: Appointment Information - Location Resource
+            
+            - name: AIP
+              type: keyword
+              description: Appointment Information - Personnel Resource
+            
+            - name: AIS
+              type: keyword
+              description: Appointment Information
+            
+            - name: AL1
+              type: keyword
+              description: Patient Allergy Information
+            
+            - name: APR
+              type: keyword
+              description: Appointment Preferences
+            
+            - name: ARQ
+              type: keyword
+              description: Appointment Request
+            
+            - name: ARV
+              type: keyword
+              description: Access Restriction
+            
+            - name: AUT
+              type: keyword
+              description: Authorization Information
+            
+            - name: BHS
+              type: keyword
+              description: Batch Header
+            
+            - name: BLC
+              type: keyword
+              description: Blood Code
+            
+            - name: BLG
+              type: keyword
+              description: Billing
+            
+            - name: BPO
+              type: keyword
+              description: Blood product order
+            
+            - name: BPX
+              type: keyword
+              description: Blood product dispense status
+            
+            - name: BTS
+              type: keyword
+              description: Batch Trailer
+            
+            - name: BTX
+              type: keyword
+              description: Blood Product Transfusion/Disposition
+            
+            - name: BUI
+              type: keyword
+              description: Blood Unit Information
+            
+            - name: CDM
+              type: keyword
+              description: Charge Description Master
+            
+            - name: CDO
+              type: keyword
+              description: Cumulative Dosage
+            
+            - name: CER
+              type: keyword
+              description: Certificate Detail
+            
+            - name: CM0
+              type: keyword
+              description: Clinical Study Master
+            
+            - name: CM1
+              type: keyword
+              description: Clinical Study Phase Master
+            
+            - name: CM2
+              type: keyword
+              description: Clinical Study Schedule Master
+            
+            - name: CNS
+              type: keyword
+              description: Clear Notification
+            
+            - name: CON
+              type: keyword
+              description: Consent Segment
+            
+            - name: CSP
+              type: keyword
+              description: Clinical Study Phase
+            
+            - name: CSR
+              type: keyword
+              description: Clinical Study Registration
+            
+            - name: CSS
+              type: keyword
+              description: Clinical Study Data Schedule Segment
+            
+            - name: CTD
+              type: keyword
+              description: Contact Data
+            
+            - name: CTI
+              type: keyword
+              description: Clinical Trial Identification
+            
+            - name: DB1
+              type: keyword
+              description: Disability
+            
+            - name: DG1
+              type: keyword
+              description: Diagnosis
+            
+            - name: DMI
+              type: keyword
+              description: DRG Master File Information
+            
+            - name: DON
+              type: keyword
+              description: Donation
+            
+            - name: DRG
+              type: keyword
+              description: Diagnosis Related Group
+            
+            - name: DSC
+              type: keyword
+              description: Continuation Pointer
+            
+            - name: DSP
+              type: keyword
+              description: Display Data
+            
+            - name: ECD
+              type: keyword
+              description: Equipment Command
+            
+            - name: ECR
+              type: keyword
+              description: Equipment Command Response
+            
+            - name: EDU
+              type: keyword
+              description: Educational Detail
+            
+            - name: EQP
+              type: keyword
+              description: Equipment/log Service
+            
+            - name: EQU
+              type: keyword
+              description: Equipment Detail
+            
+            - name: ERR
+              type: keyword
+              description: Error
+            
+            - name: EVN
+              type: keyword
+              description: Event Type
+            
+            - name: FAC
+              type: keyword
+              description: Facility
+            
+            - name: FHS
+              type: keyword
+              description: File Header
+            
+            - name: FT1
+              type: keyword
+              description: Financial Transaction
+            
+            - name: FTS
+              type: keyword
+              description: File Trailer
+            
+            - name: GOL
+              type: keyword
+              description: Goal Detail
+            
+            - name: GP1
+              type: keyword
+              description: Grouping/Reimbursement - Visit
+            
+            - name: GP2
+              type: keyword
+              description: Grouping/Reimbursement - Procedure Line Item
+            
+            - name: GT1
+              type: keyword
+              description: Guarantor
+            
+            - name: Hxx
+              type: keyword
+              description: any HL7 segment
+            
+            - name: IAM
+              type: keyword
+              description: Patient Adverse Reaction Information
+            
+            - name: IAR
+              type: keyword
+              description: allergy reaction
+            
+            - name: IIM
+              type: keyword
+              description: Inventory Item Master
+            
+            - name: ILT
+              type: keyword
+              description: Material Lot
+            
+            - name: IN1
+              type: keyword
+              description: Insurance
+            
+            - name: IN2
+              type: keyword
+              description: Insurance Additional Information
+            
+            - name: IN3
+              type: keyword
+              description: Insurance Additional Information, Certification
+            
+            - name: INV
+              type: keyword
+              description: Inventory Detail
+            
+            - name: IPC
+              type: keyword
+              description: Imaging Procedure Control Segment
+            
+            - name: IPR
+              type: keyword
+              description: Invoice Processing Results
+            
+            - name: ISD
+              type: keyword
+              description: Interaction Status Detail
+            
+            - name: ITM
+              type: keyword
+              description: Material Item
+            
+            - name: IVC
+              type: keyword
+              description: Invoice Segment
+            
+            - name: IVT
+              type: keyword
+              description: Material Location
+            
+            - name: LAN
+              type: keyword
+              description: Language Detail
+            
+            - name: LCC
+              type: keyword
+              description: Location Charge Code
+            
+            - name: LCH
+              type: keyword
+              description: Location Characteristic
+            
+            - name: LDP
+              type: keyword
+              description: Location Department
+            
+            - name: LOC
+              type: keyword
+              description: Location Identification
+            
+            - name: LRL
+              type: keyword
+              description: Location Relationship
+            
+            - name: MFA
+              type: keyword
+              description: Master File Acknowledgment
+            
+            - name: MFE
+              type: keyword
+              description: Master File Entry
+            
+            - name: MFI
+              type: keyword
+              description: Master File Identification
+            
+            - name: MRG
+              type: keyword
+              description: Merge Patient Information
+            
+            - name: MSA
+              type: keyword
+              description: Message Acknowledgment
+            
+            - name: MSH
+              type: keyword
+              description: Message Header
+            
+            - name: NCK
+              type: keyword
+              description: System Clock
+            
+            - name: NDS
+              type: keyword
+              description: Notification Detail
+            
+            - name: NK1
+              type: keyword
+              description: Next of Kin / Associated Parties
+            
+            - name: NPU
+              type: keyword
+              description: Bed Status Update
+            
+            - name: NSC
+              type: keyword
+              description: Application Status Change
+            
+            - name: NST
+              type: keyword
+              description: Application control level statistics
+            
+            - name: NTE
+              type: keyword
+              description: Notes and Comments
+            
+            - name: OBR
+              type: keyword
+              description: Observation Request
+            
+            - name: OBX
+              type: keyword
+              description: Observation/Result
+            
+            - name: ODS
+              type: keyword
+              description: Dietary Orders, Supplements, and Preferences
+            
+            - name: ODT
+              type: keyword
+              description: Diet Tray Instructions
+            
+            - name: OM1
+              type: keyword
+              description: General Segment
+            
+            - name: OM2
+              type: keyword
+              description: Numeric Observation
+            
+            - name: OM3
+              type: keyword
+              description: Categorical Service/Test/Observation
+            
+            - name: OM4
+              type: keyword
+              description: Observations that Require Specimens
+            
+            - name: OM5
+              type: keyword
+              description: Observation Batteries (Sets)
+            
+            - name: OM6
+              type: keyword
+              description: Observations that are Calculated from Other Observations
+            
+            - name: OM7
+              type: keyword
+              description: Additional Basic Attributes
+            
+            - name: ORC
+              type: keyword
+              description: Common Order
+            
+            - name: ORG
+              type: keyword
+              description: Practitioner Organization Unit
+            
+            - name: OVR
+              type: keyword
+              description: Override Segment
+            
+            - name: PAC
+              type: keyword
+              description: Shipment Package
+            
+            - name: PCE
+              type: keyword
+              description: Patient Charge Cost Center Exceptions
+            
+            - name: PCR
+              type: keyword
+              description: Possible Causal Relationship
+            
+            - name: PD1
+              type: keyword
+              description: Patient Additional Demographic
+            
+            - name: PDA
+              type: keyword
+              description: Patient Death and Autopsy
+            
+            - name: PDC
+              type: keyword
+              description: Product Detail Country
+            
+            - name: PEO
+              type: keyword
+              description: Product Experience Observation
+            
+            - name: PES
+              type: keyword
+              description: Product Experience Sender
+            
+            - name: PID
+              type: keyword
+              description: Patient Identification
+            
+            - name: PKG
+              type: keyword
+              description: Item Packaging
+            
+            - name: PMT
+              type: keyword
+              description: Payment Information
+            
+            - name: PR1
+              type: keyword
+              description: Procedures
+            
+            - name: PRA
+              type: keyword
+              description: Practitioner Detail
+            
+            - name: PRB
+              type: keyword
+              description: Problem Details
+            
+            - name: PRC
+              type: keyword
+              description: Pricing
+            
+            - name: PRD
+              type: keyword
+              description: Provider Data
+            
+            - name: PRT
+              type: keyword
+              description: Participation Information
+            
+            - name: PSG
+              type: keyword
+              description: Product/Service Group
+            
+            - name: PSH
+              type: keyword
+              description: Product Summary Header
+            
+            - name: PSL
+              type: keyword
+              description: Product/Service Line Item
+            
+            - name: PSS
+              type: keyword
+              description: Product/Service Section
+            
+            - name: PTH
+              type: keyword
+              description: Pathway
+            
+            - name: PV1
+              type: keyword
+              description: Patient Visit
+            
+            - name: PV2
+              type: keyword
+              description: Patient Visit - Additional Information
+            
+            - name: PYE
+              type: keyword
+              description: Payee Information
+            
+            - name: QAK
+              type: keyword
+              description: Query Acknowledgment
+            
+            - name: QID
+              type: keyword
+              description: Query Identification
+            
+            - name: QPD
+              type: keyword
+              description: Query Parameter Definition
+            
+            - name: QRD
+              type: keyword
+              description: withdrawn
+            
+            - name: QRF
+              type: keyword
+              description: withdrawn
+            
+            - name: QRI
+              type: keyword
+              description: Query Response Instance
+            
+            - name: RCP
+              type: keyword
+              description: Response Control Parameter
+            
+            - name: RDF
+              type: keyword
+              description: Table Row Definition
+            
+            - name: RDT
+              type: keyword
+              description: Table Row Data
+            
+            - name: REL
+              type: keyword
+              description: Clinical Relationship Segment
+            
+            - name: RF1
+              type: keyword
+              description: Referral Information
+            
+            - name: RFI
+              type: keyword
+              description: Request for Information
+            
+            - name: RGS
+              type: keyword
+              description: Resource Group
+            
+            - name: RMI
+              type: keyword
+              description: Risk Management Incident
+            
+            - name: ROL
+              type: keyword
+              description: Role
+            
+            - name: RQ1
+              type: keyword
+              description: Requisition Detail-1
+            
+            - name: RQD
+              type: keyword
+              description: Requisition Detail
+            
+            - name: RXA
+              type: keyword
+              description: Pharmacy/Treatment Administration
+            
+            - name: RXC
+              type: keyword
+              description: Pharmacy/Treatment Component Order
+            
+            - name: RXD
+              type: keyword
+              description: Pharmacy/Treatment Dispense
+            
+            - name: RXE
+              type: keyword
+              description: Pharmacy/Treatment Encoded Order
+            
+            - name: RXG
+              type: keyword
+              description: Pharmacy/Treatment Give
+            
+            - name: RXO
+              type: keyword
+              description: Pharmacy/Treatment Order
+            
+            - name: RXR
+              type: keyword
+              description: Pharmacy/Treatment Route
+            
+            - name: RXV
+              type: keyword
+              description: Pharmacy/Treatment Infusion
+            
+            - name: SAC
+              type: keyword
+              description: Specimen Container detail
+            
+            - name: SCD
+              type: keyword
+              description: Anti-Microbial Cycle Data
+            
+            - name: SCH
+              type: keyword
+              description: Scheduling Activity Information
+            
+            - name: SCP
+              type: keyword
+              description: Sterilizer Configuration (Anti-Microbial Devices)
+            
+            - name: SDD
+              type: keyword
+              description: Sterilization Device Data
+            
+            - name: SFT
+              type: keyword
+              description: Software Segment
+            
+            - name: SGH
+              type: keyword
+              description: Segment Group Header
+            
+            - name: SGT
+              type: keyword
+              description: Segment Group Trailer
+            
+            - name: SHP
+              type: keyword
+              description: Shipment
+            
+            - name: SID
+              type: keyword
+              description: Substance Identifier
+            
+            - name: SLT
+              type: keyword
+              description: Sterilization Lot
+            
+            - name: SPM
+              type: keyword
+              description: Specimen
+            
+            - name: STF
+              type: keyword
+              description: Staff Identification
+            
+            - name: STZ
+              type: keyword
+              description: Sterilization Parameter
+            
+            - name: TCC
+              type: keyword
+              description: Test Code Configuration
+            
+            - name: TCD
+              type: keyword
+              description: Test Code Detail
+            
+            - name: TQ1
+              type: keyword
+              description: Timing/Quantity
+            
+            - name: TQ2
+              type: keyword
+              description: Timing/Quantity Relationship
+            
+            - name: TXA
+              type: keyword
+              description: Transcription Document Header
+            
+            - name: UAC
+              type: keyword
+              description: User Authentication Credential Segment
+            
+            - name: UB1
+              type: keyword
+              description: 
+            
+            - name: UB2
+              type: keyword
+              description: Uniform Billing Data
+            
+            - name: URD
+              type: keyword
+              description: withdrawn
+            
+            - name: URS
+              type: keyword
+              description: withdrawn
+            
+            - name: VAR
+              type: keyword
+              description: Variance
+            
+            - name: VND
+              type: keyword
+              description: Purchasing Vendor
+            
             - name: ABS-1
               type: keyword
               description: Discharge Care Provider
@@ -10629,6 +11353,14 @@
           description: HL7 v2 response
           type: group
           fields:
+            - name: MSA
+              type: keyword
+              description: Message Acknowledgment
+            
+            - name: MSH
+              type: keyword
+              description: Message Header
+
             - name: MSA-1
               type: keyword
               description: Acknowledgment Code
@@ -10760,5 +11492,3 @@
             - name: MSH-25
               type: keyword
               description: Receiving Network Address
-
-
