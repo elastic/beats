@@ -62,6 +62,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		"bytes_out":    resp.Size,
 		"src":          src,
 		"dst":          dst,
+        "hl7v2": common.MapStr{},
 	}
 
 	hl7message := "request"
@@ -74,6 +75,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 	//var hl7escapecharacter string
 
 	for i := 0; i < 2; i++ {
+        hl7data := map[string]interface{}{}
 		// Split message into segments
 		if hl7message == "request" {
 			hl7segments = strings.Split(string(requ.content), pub.NewLineChars)
@@ -142,8 +144,8 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 										}
 										// Add component if not empty
 										if hl7fieldcomponentvalue != "" {
-											fields[hl7message+"-"+hl7fieldcomponentname] = hl7fieldcomponentvalue
-											debugf("Added component %s with value %s", hl7message+"-"+hl7fieldcomponentname, hl7fieldcomponentvalue)
+                                            hl7data[hl7fieldcomponentname] = hl7fieldcomponentvalue
+                                            debugf("Added component %s with value %s", hl7fieldcomponentname, hl7fieldcomponentvalue)
 										}
 									}
 								}
@@ -155,14 +157,15 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 							}
 							// Add to field if not empty
 							if hl7fieldvalue != "" {
-								fields[hl7message+"-"+hl7fieldname] = hl7fieldvalue
-								debugf("Added field %s with value %s", hl7message+"-"+hl7fieldname, hl7fieldvalue)
+                                hl7data[hl7fieldname] = hl7fieldvalue
+                                debugf("Added field %s with value %s", hl7fieldname, hl7fieldvalue)
 							}
 						}
 					}
 				}
 			}
 		}
+        fields["hl7v2"].(common.MapStr)[hl7message] = hl7data
 		hl7message = "response"
 	}
 
