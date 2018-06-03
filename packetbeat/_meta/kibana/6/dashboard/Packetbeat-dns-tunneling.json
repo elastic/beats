@@ -89,7 +89,7 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"query\":\"NOT dns.question.type:PTR\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"highlightAll\":true,\"version\":true}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"query\":\"NOT dns.question.type:PTR\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false}",
         "panelsJSON": "[{\"col\":1,\"id\":\"Unique-FQDNs-per-eTLD 1\",\"panelIndex\":1,\"row\":1,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Unique-FQDNs-per-eTLD 1-Table\",\"panelIndex\":2,\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Bytes-Transferred-per-Domain\",\"panelIndex\":4,\"row\":5,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"dc743240-1665-11e7-a6de-cbac1a3d0a7d\",\"panelIndex\":5,\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"}]",

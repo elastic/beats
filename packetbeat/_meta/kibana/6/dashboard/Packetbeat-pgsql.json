@@ -179,7 +179,7 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false}",
         "panelsJSON": "[{\"col\":1,\"id\":\"Navigation\",\"panelIndex\":1,\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\"},{\"col\":4,\"id\":\"PgSQL-Errors\",\"panelIndex\":2,\"row\":1,\"size_x\":5,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"PgSQL-Methods\",\"panelIndex\":3,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"PgSQL-response-times-percentiles\",\"panelIndex\":4,\"row\":5,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"PgSQL-throughput\",\"panelIndex\":5,\"row\":8,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"PgSQL-Reads-vs-Writes\",\"panelIndex\":6,\"row\":8,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Most-frequent-PgSQL-queries\",\"panelIndex\":7,\"row\":11,\"size_x\":6,\"size_y\":6,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Slowest-PgSQL-queries\",\"panelIndex\":8,\"row\":11,\"size_x\":6,\"size_y\":6,\"type\":\"visualization\"}]",

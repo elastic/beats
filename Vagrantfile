@@ -145,13 +145,57 @@ Vagrant.configure(2) do |config|
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   end
 
-  config.vm.define "fedora26", primary: true do |c|
-    c.vm.box = "bento/fedora-26"
+  config.vm.define "centos6", primary: true do |c|
+    c.vm.box = "bento/centos-6.9"
+    c.vm.network :forwarded_port, guest: 22,   host: 2229,  id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "yum install -y make gcc python-pip python-virtualenv git"
+
+    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
+  config.vm.define "fedora27", primary: true do |c|
+    c.vm.box = "bento/fedora-27"
     c.vm.network :forwarded_port, guest: 22,   host: 2227,  id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
     c.vm.provision "shell", inline: "dnf install -y make gcc python-pip python-virtualenv git"
+
+    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
+  config.vm.define "archlinux", primary: true do |c|
+    c.vm.box = "archlinux/archlinux"
+    c.vm.network :forwarded_port, guest: 22,   host: 2228,  id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "pacman -Sy && pacman -S --noconfirm make gcc python-pip python-virtualenv git"
+
+    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
+  config.vm.define "ubuntu1804", primary: true do |c|
+    c.vm.box = "ubuntu/bionic64"
+    c.vm.network :forwarded_port, guest: 22,   host: 2229,  id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "apt-get update && apt-get install -y make gcc python-pip python-virtualenv git"
+
+    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
+  config.vm.define "sles12", primary: true do |c|
+    c.vm.box = "elastic/sles-12-x86_64"
+    c.vm.network :forwarded_port, guest: 22,   host: 2230,  id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "pip install virtualenv"
 
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   end

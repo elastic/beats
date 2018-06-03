@@ -65,3 +65,21 @@ func TestConfigsMapping(t *testing.T) {
 		assert.Equal(t, test.expected, res)
 	}
 }
+
+func TestNilConditionConfig(t *testing.T) {
+	var mappings MapperSettings
+	data := `
+- config:
+    - type: config1`
+	config, err := common.NewConfigWithYAML([]byte(data), "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := config.Unpack(&mappings); err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = NewConfigMapper(mappings)
+	assert.Error(t, err)
+}

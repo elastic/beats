@@ -7,8 +7,8 @@ import (
 )
 
 type HttpServerConfig struct {
-	Paths       []PathConfig `config:"paths"`
-	DefaultPath PathConfig   `config:"default_path"`
+	Paths       []PathConfig `config:"server.paths"`
+	DefaultPath PathConfig   `config:"server.default_path"`
 }
 
 type PathConfig struct {
@@ -21,7 +21,7 @@ func defaultHttpServerConfig() HttpServerConfig {
 	return HttpServerConfig{
 		DefaultPath: PathConfig{
 			Path:      "/",
-			Namespace: "http",
+			Namespace: "server",
 		},
 	}
 }

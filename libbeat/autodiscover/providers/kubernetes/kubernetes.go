@@ -43,7 +43,10 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	metagen := kubernetes.NewMetaGenerator(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels, config.IncludePodUID)
+	metagen, err := kubernetes.NewMetaGenerator(c)
+	if err != nil {
+		return nil, err
+	}
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
 

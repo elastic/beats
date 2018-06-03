@@ -1,0 +1,3 @@
+This is the `stats` metricset of the Kibana module. This stats endpoint is available in 6.4 by default.
+
+The intention of the Kibana module is to have a minimal data set that works across Kibana versions.

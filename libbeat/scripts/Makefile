@@ -11,6 +11,7 @@ BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEAT_NAME}/current/index.h
 BEAT_LICENSE?=ASL 2.0 ## @packaging Software license of the application
 BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
+BEAT_REF_YAML?=true
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
 GOPACKAGES?=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/ | grep -v /scripts/cmd/ )
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
@@ -303,29 +304,37 @@ coverage-report:
 	test ! -s ${COVERAGE_DIR}/unit.cov   || go tool cover -html=${COVERAGE_DIR}/unit.cov   -o ${COVERAGE_DIR}/unit.html
 
 
+.PHONY: fields
+fields:
+	echo $(PWD)
+	@go run ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go --es_beats_path $(ES_BEATS) --beat_path $(PWD) $(FIELDS_FILE_PATH)
+
+
+.PHONY: libbeat_fields
+libbeat_fields:
+	@$(MAKE) -C ${ES_BEATS}/libbeat fields
+
 .PHONY: update
 update: ## @build Update expects the most recent version of libbeat in the GOPATH
-update: python-env collect
+update: python-env libbeat_fields collect
 	@echo "Updating generated files for ${BEAT_NAME}"
 
 	@# Update config files.
 	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.yml
+	@chmod 0640 ${BEAT_NAME}.yml
+
+
+	@# Update reference config files.
+ifeq ($(BEAT_REF_YAML),true)
 	@if [ -e _meta/beat.reference.yml ]; then \
-        cat _meta/beat.reference.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
-    else \
-        cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
-    fi;
-	@chmod 0640 ${BEAT_NAME}.yml ${BEAT_NAME}.reference.yml
+      cat _meta/beat.reference.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
+  else \
+      cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
+  fi;
+	@chmod 0640 ${BEAT_NAME}.reference.yml
+endif
 
-	@# Update libbeat fields.generated.yml
-	@$(MAKE) -C ${ES_BEATS}/libbeat fields
-
-	@# Update fields.yml
-	@test -s  _meta/fields.generated.yml || cp _meta/fields.yml _meta/fields.generated.yml
-ifeq ($(BEAT_NAME), libbeat)
-	@cp ${ES_BEATS}/libbeat/_meta/fields.generated.yml fields.yml
-else
-	@cat ${ES_BEATS}/libbeat/_meta/fields.generated.yml _meta/fields.generated.yml > fields.yml
+ifneq ($(BEAT_NAME), libbeat)
 	mkdir -p include
 	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include fields.yml $(BEAT_NAME) > include/fields.go
 endif
@@ -347,10 +356,6 @@ docs:  ## @build Builds the documents for the beat
 .PHONY: docs-preview
 docs-preview:  ## @build Preview the documents for the beat in the browser
 	PREVIEW=1 $(MAKE) docs
-
-.PHONY: index-template
-index-template: ## @build Generate index templates for the given $VERSION. This is for manual testing.
-	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -index ${BEAT_INDEX_PREFIX} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template-es${VERSION}.json -file ${BEAT_GOPATH}/src/${BEAT_PATH}/fields.yml -es.version=${VERSION}
 
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200
@@ -436,6 +441,7 @@ prepare-package:
 		-e BEAT_PATH=${BEAT_PATH} \
 		-e BEAT_NAME=${BEAT_NAME} \
 		-e LICENSE_FILE=${LICENSE_FILE} \
+		-e BEAT_REF_YAML=${BEAT_REF_YAML} \
 		${BEATS_BUILDER_IMAGE}
 
 # Prepares for packaging. Builds binaries with cgo
@@ -457,6 +463,7 @@ prepare-package-cgo:
 		-e BEAT_PATH=${BEAT_PATH} \
 		-e BEAT_NAME=${BEAT_NAME} \
 		-e LICENSE_FILE=${LICENSE_FILE} \
+		-e BEAT_REF_YAML=${BEAT_REF_YAML} \
 		${BEATS_BUILDER_IMAGE}
 
 	# linux builds on older debian for compatibility
@@ -474,6 +481,7 @@ prepare-package-cgo:
 		-e BEAT_PATH=${BEAT_PATH} \
 		-e BEAT_NAME=${BEAT_NAME} \
 		-e LICENSE_FILE=${LICENSE_FILE} \
+		-e BEAT_REF_YAML=${BEAT_REF_YAML} \
 		${BEATS_BUILDER_DEB_IMAGE}
 
 # Prepares images for packaging
@@ -513,7 +521,7 @@ package: update package-setup
 		$(MAKE) prepare-package; \
 	fi
 
-	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_PATH=${BEAT_PATH} BUILD_DIR=${PKG_BUILD_DIR} UPLOAD_DIR=${PKG_UPLOAD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${PACKAGES_EXPERIMENTAL} ${BUILD_DIR}/upload/build_id.txt
+	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_PATH=${BEAT_PATH} BUILD_DIR=${PKG_BUILD_DIR} UPLOAD_DIR=${PKG_UPLOAD_DIR} $(MAKE) BEAT_REF_YAML=${BEAT_REF_YAML} -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${PACKAGES_EXPERIMENTAL} ${BUILD_DIR}/upload/build_id.txt
 
 	$(MAKE) fix-permissions
 	echo "Finished packages for ${BEAT_NAME}"

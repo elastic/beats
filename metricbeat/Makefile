@@ -5,6 +5,7 @@ BEAT_DESCRIPTION?=Metricbeat is a lightweight shipper for metrics.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
 ES_BEATS?=..
+FIELDS_FILE_PATH?=module
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO.
 GOX_OS=netbsd linux windows
@@ -20,13 +21,6 @@ kibana:
 	@rm -rf _meta/kibana
 	@mkdir -p _meta/kibana
 	@-cp -r module/*/_meta/kibana _meta/
-
-# Collects all module and metricset fields
-.PHONY: fields
-fields: python-env
-	@mkdir -p _meta
-	@cp ${ES_BEATS}/metricbeat/_meta/fields.common.yml _meta/fields.generated.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
 
 # Collects all module docs
 .PHONY: collect-docs

@@ -1,0 +1,59 @@
+[2018-05-17T08:19:35,939][INFO ][o.e.n.Node               ] [] initializing ...
+[2018-05-17T08:19:36,089][INFO ][o.e.e.NodeEnvironment    ] [vWNJsZ3] using [1] data paths, mounts [[/ (/dev/disk1s1)]], net usable_space [32.4gb], net total_space [233.5gb], types [apfs]
+[2018-05-17T08:19:36,090][INFO ][o.e.e.NodeEnvironment    ] [vWNJsZ3] heap size [990.7mb], compressed ordinary object pointers [true]
+[2018-05-17T08:19:36,116][INFO ][o.e.n.Node               ] node name [vWNJsZ3] derived from node ID [vWNJsZ3nTIKh5a1ai-ftYQ]; set [node.name] to override
+[2018-05-17T08:19:36,117][INFO ][o.e.n.Node               ] version[6.2.4], pid[32981], build[ccec39f/2018-04-12T20:37:28.497551Z], OS[Mac OS X/10.13.4/x86_64], JVM[Oracle Corporation/Java HotSpot(TM) 64-Bit Server VM/1.8.0_144/25.144-b01]
+[2018-05-17T08:19:36,117][INFO ][o.e.n.Node               ] JVM arguments [-Xms1g, -Xmx1g, -XX:+UseConcMarkSweepGC, -XX:CMSInitiatingOccupancyFraction=75, -XX:+UseCMSInitiatingOccupancyOnly, -XX:+AlwaysPreTouch, -Xss1m, -Djava.awt.headless=true, -Dfile.encoding=UTF-8, -Djna.nosys=true, -XX:-OmitStackTraceInFastThrow, -Dio.netty.noUnsafe=true, -Dio.netty.noKeySetOptimization=true, -Dio.netty.recycler.maxCapacityPerThread=0, -Dlog4j.shutdownHookEnabled=false, -Dlog4j2.disable.jmx=true, -Djava.io.tmpdir=/var/folders/k3/xlwbcsmj6dd7vjv2tg1d7c_40000gn/T/elasticsearch.CaIZtfV0, -XX:+HeapDumpOnOutOfMemoryError, -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, -XX:+PrintTenuringDistribution, -XX:+PrintGCApplicationStoppedTime, -Xloggc:logs/gc.log, -XX:+UseGCLogFileRotation, -XX:NumberOfGCLogFiles=32, -XX:GCLogFileSize=64m, -Des.path.home=/Users/ruflin/Downloads/elasticsearch-6.2.4, -Des.path.conf=/Users/ruflin/Downloads/elasticsearch-6.2.4/config]
+[2018-05-17T08:19:37,563][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [aggs-matrix-stats]
+[2018-05-17T08:19:37,564][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [analysis-common]
+[2018-05-17T08:19:37,564][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [ingest-common]
+[2018-05-17T08:19:37,564][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [lang-expression]
+[2018-05-17T08:19:37,564][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [lang-mustache]
+[2018-05-17T08:19:37,564][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [lang-painless]
+[2018-05-17T08:19:37,565][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [mapper-extras]
+[2018-05-17T08:19:37,565][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [parent-join]
+[2018-05-17T08:19:37,565][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [percolator]
+[2018-05-17T08:19:37,565][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [rank-eval]
+[2018-05-17T08:19:37,566][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [reindex]
+[2018-05-17T08:19:37,566][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [repository-url]
+[2018-05-17T08:19:37,566][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [transport-netty4]
+[2018-05-17T08:19:37,566][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] loaded module [tribe]
+[2018-05-17T08:19:37,567][INFO ][o.e.p.PluginsService     ] [vWNJsZ3] no plugins loaded
+[2018-05-17T08:19:43,741][INFO ][o.e.d.DiscoveryModule    ] [vWNJsZ3] using discovery type [zen]
+[2018-05-17T08:19:45,090][INFO ][o.e.n.Node               ] initialized
+[2018-05-17T08:19:45,090][INFO ][o.e.n.Node               ] [vWNJsZ3] starting ...
+[2018-05-17T08:19:45,482][INFO ][o.e.t.TransportService   ] [vWNJsZ3] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
+[2018-05-17T08:19:48,816][INFO ][o.e.c.s.MasterService    ] [vWNJsZ3] zen-disco-elected-as-master ([0] nodes joined), reason: new_master {vWNJsZ3}{vWNJsZ3nTIKh5a1ai-ftYQ}{WWQIkoohTtWqa2gfWhFq-w}{127.0.0.1}{127.0.0.1:9300}
+[2018-05-17T08:19:48,826][INFO ][o.e.c.s.ClusterApplierService] [vWNJsZ3] new_master {vWNJsZ3}{vWNJsZ3nTIKh5a1ai-ftYQ}{WWQIkoohTtWqa2gfWhFq-w}{127.0.0.1}{127.0.0.1:9300}, reason: apply cluster state (from master [master {vWNJsZ3}{vWNJsZ3nTIKh5a1ai-ftYQ}{WWQIkoohTtWqa2gfWhFq-w}{127.0.0.1}{127.0.0.1:9300} committed version [1] source [zen-disco-elected-as-master ([0] nodes joined)]])
+[2018-05-17T08:19:48,895][INFO ][o.e.h.n.Netty4HttpServerTransport] [vWNJsZ3] publish_address {127.0.0.1:9200}, bound_addresses {[::1]:9200}, {127.0.0.1:9200}
+[2018-05-17T08:19:48,895][INFO ][o.e.n.Node               ] [vWNJsZ3] started
+[2018-05-17T08:19:49,354][INFO ][o.e.g.GatewayService     ] [vWNJsZ3] recovered [1] indices into cluster_state
+[2018-05-17T08:19:50,077][INFO ][o.e.c.r.a.AllocationService] [vWNJsZ3] Cluster health status changed from [RED] to [YELLOW] (reason: [shards started [[metricbeat-7.0.0-alpha1-2018.05.07][0]] ...]).
+[2018-05-17T08:20:18,871][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 32.4gb[13.9%], replicas will not be assigned to this node
+[2018-05-17T08:20:19,467][INFO ][o.e.c.m.MetaDataCreateIndexService] [vWNJsZ3] [metricbeat-7.0.0-alpha1-2018.05.17] creating index, cause [auto(bulk api)], templates [metricbeat-7.0.0-alpha1], shards [1]/[1], mappings [doc]
+[2018-05-17T08:20:48,886][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 32.4gb[13.9%], replicas will not be assigned to this node
+[2018-05-17T08:21:18,895][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:21:48,904][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:22:18,911][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:22:48,920][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:23:18,932][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:23:48,941][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:24:18,956][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:24:48,963][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:25:18,976][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:25:48,988][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:26:18,997][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:26:49,009][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:27:19,024][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:27:49,035][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:28:19,048][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:28:49,060][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:29:09,245][INFO ][o.e.c.m.MetaDataCreateIndexService] [vWNJsZ3] [filebeat-test-input] creating index, cause [auto(bulk api)], templates [filebeat-test-input], shards [5]/[1], mappings [doc]
+[2018-05-17T08:29:09,576][INFO ][o.e.c.m.MetaDataMappingService] [vWNJsZ3] [filebeat-test-input/aOGgDwbURfCV57AScqbCgw] update_mapping [doc]
+[2018-05-17T08:29:12,177][INFO ][o.e.c.m.MetaDataCreateIndexService] [vWNJsZ3] [test-filebeat-modules] creating index, cause [auto(bulk api)], templates [test-filebeat-modules], shards [5]/[1], mappings [doc]
+[2018-05-17T08:29:12,660][INFO ][o.e.c.m.MetaDataMappingService] [vWNJsZ3] [test-filebeat-modules/npNY8YrBQtC7JpFOh1sB0w] update_mapping [doc]
+[2018-05-17T08:29:19,114][INFO ][o.e.c.r.a.DiskThresholdMonitor] [vWNJsZ3] low disk watermark [85%] exceeded on [vWNJsZ3nTIKh5a1ai-ftYQ][vWNJsZ3][/Users/ruflin/Downloads/elasticsearch-6.2.4/data/nodes/0] free: 33.4gb[14.3%], replicas will not be assigned to this node
+[2018-05-17T08:29:25,418][INFO ][o.e.n.Node               ] [vWNJsZ3] stopping ...
+[2018-05-17T08:29:25,598][INFO ][o.e.n.Node               ] [vWNJsZ3] stopped
+[2018-05-17T08:29:25,598][INFO ][o.e.n.Node               ] [vWNJsZ3] closing ...
+[2018-05-17T08:29:25,612][INFO ][o.e.n.Node               ] [vWNJsZ3] closed

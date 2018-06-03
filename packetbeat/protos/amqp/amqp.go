@@ -251,16 +251,7 @@ func (amqp *amqpPlugin) handleAmqpRequest(msg *amqpMessage) {
 	}
 
 	trans.ts = msg.ts
-	trans.src = common.Endpoint{
-		IP:   msg.tcpTuple.SrcIP.String(),
-		Port: msg.tcpTuple.SrcPort,
-		Proc: string(msg.cmdlineTuple.Src),
-	}
-	trans.dst = common.Endpoint{
-		IP:   msg.tcpTuple.DstIP.String(),
-		Port: msg.tcpTuple.DstPort,
-		Proc: string(msg.cmdlineTuple.Dst),
-	}
+	trans.src, trans.dst = common.MakeEndpointPair(msg.tcpTuple.BaseTuple, msg.cmdlineTuple)
 	if msg.direction == tcp.TCPDirectionReverse {
 		trans.src, trans.dst = trans.dst, trans.src
 	}
@@ -354,16 +345,7 @@ func (amqp *amqpPlugin) handlePublishing(client *amqpMessage) {
 	}
 
 	trans.ts = client.ts
-	trans.src = common.Endpoint{
-		IP:   client.tcpTuple.SrcIP.String(),
-		Port: client.tcpTuple.SrcPort,
-		Proc: string(client.cmdlineTuple.Src),
-	}
-	trans.dst = common.Endpoint{
-		IP:   client.tcpTuple.DstIP.String(),
-		Port: client.tcpTuple.DstPort,
-		Proc: string(client.cmdlineTuple.Dst),
-	}
+	trans.src, trans.dst = common.MakeEndpointPair(client.tcpTuple.BaseTuple, client.cmdlineTuple)
 
 	trans.method = client.method
 	//for publishing and delivering, bytes in and out represent the length of the
@@ -398,16 +380,7 @@ func (amqp *amqpPlugin) handleDelivering(server *amqpMessage) {
 	}
 
 	trans.ts = server.ts
-	trans.src = common.Endpoint{
-		IP:   server.tcpTuple.SrcIP.String(),
-		Port: server.tcpTuple.SrcPort,
-		Proc: string(server.cmdlineTuple.Src),
-	}
-	trans.dst = common.Endpoint{
-		IP:   server.tcpTuple.DstIP.String(),
-		Port: server.tcpTuple.DstPort,
-		Proc: string(server.cmdlineTuple.Dst),
-	}
+	trans.src, trans.dst = common.MakeEndpointPair(server.tcpTuple.BaseTuple, server.cmdlineTuple)
 
 	//for publishing and delivering, bytes in and out represent the length of the
 	//message itself

@@ -39,11 +39,14 @@ FPM_ARGS=(
         beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}
         {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}
         ${BEATS_YML_NAME}.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml
-        ${BEATS_YML_NAME}.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml
         fields.yml=/etc/{{.beat_name}}/fields.yml
         ${RUNID}.service=/lib/systemd/system/{{.beat_pkg_name}}.service
         god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god
   )
+
+if [ -z "${BEAT_REF_YAML}" ] || [ ${BEAT_REF_YAML} = true ]; then
+  FPM_ARGS+=(${BEATS_YML_NAME}.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml)
+fi
 
 if [ -d modules.d-linux ]; then
   FPM_ARGS+=(modules.d-linux/=/etc/{{.beat_name}}/modules.d/)

@@ -11,6 +11,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/tlsconfig"
 
+	"github.com/elastic/beats/libbeat/common/docker"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
@@ -67,7 +68,7 @@ func NewDockerClient(endpoint string, config Config) (*client.Client, error) {
 		}
 	}
 
-	client, err := client.NewClient(endpoint, dockerAPIVersion, httpClient, nil)
+	client, err := docker.NewClient(endpoint, httpClient, nil)
 	if err != nil {
 		return nil, err
 	}

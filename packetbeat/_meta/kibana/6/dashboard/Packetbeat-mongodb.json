@@ -203,7 +203,7 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false}",
         "panelsJSON": "[{\"col\":1,\"id\":\"Navigation\",\"panelIndex\":1,\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\"},{\"col\":4,\"id\":\"MongoDB-errors\",\"panelIndex\":2,\"row\":1,\"size_x\":5,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"MongoDB-commands\",\"panelIndex\":3,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"MongoDB-errors-per-collection\",\"panelIndex\":4,\"row\":5,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":5,\"id\":\"MongoDB-in-slash-out-throughput\",\"panelIndex\":5,\"row\":5,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"MongoDB-response-times-by-collection\",\"panelIndex\":6,\"row\":8,\"size_x\":8,\"size_y\":5,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Top-slowest-MongoDB-queries\",\"panelIndex\":7,\"row\":8,\"size_x\":4,\"size_y\":5,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Number-of-MongoDB-transactions-with-writeConcern-w-equal-0\",\"panelIndex\":8,\"row\":5,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"}]",

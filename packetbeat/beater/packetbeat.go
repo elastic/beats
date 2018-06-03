@@ -92,11 +92,17 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 
 // init packetbeat components
 func (pb *packetbeat) init(b *beat.Beat) error {
+	var err error
 	cfg := &pb.config
-	err := procs.ProcWatcher.Init(cfg.Procs)
-	if err != nil {
-		logp.Critical(err.Error())
-		return err
+	// Enable the process watcher only if capturing live traffic
+	if cfg.Interfaces.File == "" {
+		err = procs.ProcWatcher.Init(cfg.Procs)
+		if err != nil {
+			logp.Critical(err.Error())
+			return err
+		}
+	} else {
+		logp.Info("Process watcher disabled when file input is used")
 	}
 
 	pb.pipeline = b.Publisher
