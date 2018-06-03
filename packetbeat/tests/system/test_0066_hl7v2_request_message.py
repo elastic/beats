@@ -17,7 +17,6 @@ class Test(BaseTest):
         assert o["hl7v2.request.PID-5"] == "Durden^Tyler^^^Mr."
         # MSH-11 is not a field configured to be selected in the test
 
-
     def test_hl7v2_reject(self):
         self.render_config_template()
         self.run_packetbeat(pcap="hl7v2_application_reject.pcap",
@@ -31,4 +30,3 @@ class Test(BaseTest):
         assert o["hl7v2.request.MSH-10"] == "MSGID12349877"
         assert o["hl7v2.request.PID-5"] == "Durden^^^^Mr."
         # MSH-11 is not a field configured to be selected in the test
-
