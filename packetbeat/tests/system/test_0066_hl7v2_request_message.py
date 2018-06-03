@@ -4,7 +4,13 @@ from packetbeat import BaseTest
 class Test(BaseTest):
 
     def test_hl7v2_accept(self):
-        self.render_config_template()
+        self.render_config_template(
+            hl7v2_ports=[2575],
+            hl7v2_segment_selection_mode="Include",
+            hl7v2_field_selection_mode="Include",
+            hl7v2_segments=[MSH,PID],
+            hl7v2_fields=[MSH-10,PID-5],
+        )
         self.run_packetbeat(pcap="hl7v2_application_accept.pcap",
                             debug_selectors=["*"])
         objs = self.read_output()
