@@ -37,19 +37,4 @@ segments: [MSH,MSA]
 
 fields: [MSH-3,MSH-4,MSH-5,MSH-6,MSH-9,MSH-10,MSA-1,MSA-2]
 
-
-### Map field/component names to custom names
-
-name_mapping:  
-  `-` MSH-3: MSH-3 Sending Application  
-  `-` MSH-4: MSH-4 Sending Facility  
-  `-` MSH-5: MSH-5 Receiving Application  
-  `-` MSH-6: MSH-6 Receiving Facility  
-  `-` MSH-9: MSH-9 Message Type  
-  `-` MSH-9-1: MSH-9.1 Message Type  
-  `-` MSH-9-2: MSH-9.2 Event Type  
-  `-` MSH-10: MSH-10 Message Control ID  
-  `-` MSA-1: MSA-1 Acknowledgement Code  
-  `-` MSA-2: MSA-2 Message Control ID  
-
   
