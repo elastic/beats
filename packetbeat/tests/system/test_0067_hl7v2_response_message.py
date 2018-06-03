@@ -12,7 +12,7 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "hl7v2"
-        assert o["MSA-1"] == "AA"
+        assert o["response-MSA-1"] == "AA"
 
     def test_hl7v2_reject(self):
         self.render_config_template()
@@ -23,4 +23,4 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "hl7v2"
-        assert o["MSA-1"] == "AR"
+        assert o["response-MSA-1"] == "AR"
