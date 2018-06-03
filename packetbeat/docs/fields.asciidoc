@@ -2264,6 +2264,1635 @@ HL7v2-specific event fields.
 HL7 v2 request
 
 
+*`hl7v2.request.ABS`*::
++
+--
+type: keyword
+
+Abstract
+
+--
+
+*`hl7v2.request.ACC`*::
++
+--
+type: keyword
+
+Accident
+
+--
+
+*`hl7v2.request.ADD`*::
++
+--
+type: keyword
+
+Addendum
+
+--
+
+*`hl7v2.request.ADJ`*::
++
+--
+type: keyword
+
+Adjustment
+
+--
+
+*`hl7v2.request.AFF`*::
++
+--
+type: keyword
+
+Professional Affiliation
+
+--
+
+*`hl7v2.request.AIG`*::
++
+--
+type: keyword
+
+Appointment Information - General Resource
+
+--
+
+*`hl7v2.request.AIL`*::
++
+--
+type: keyword
+
+Appointment Information - Location Resource
+
+--
+
+*`hl7v2.request.AIP`*::
++
+--
+type: keyword
+
+Appointment Information - Personnel Resource
+
+--
+
+*`hl7v2.request.AIS`*::
++
+--
+type: keyword
+
+Appointment Information
+
+--
+
+*`hl7v2.request.AL1`*::
++
+--
+type: keyword
+
+Patient Allergy Information
+
+--
+
+*`hl7v2.request.APR`*::
++
+--
+type: keyword
+
+Appointment Preferences
+
+--
+
+*`hl7v2.request.ARQ`*::
++
+--
+type: keyword
+
+Appointment Request
+
+--
+
+*`hl7v2.request.ARV`*::
++
+--
+type: keyword
+
+Access Restriction
+
+--
+
+*`hl7v2.request.AUT`*::
++
+--
+type: keyword
+
+Authorization Information
+
+--
+
+*`hl7v2.request.BHS`*::
++
+--
+type: keyword
+
+Batch Header
+
+--
+
+*`hl7v2.request.BLC`*::
++
+--
+type: keyword
+
+Blood Code
+
+--
+
+*`hl7v2.request.BLG`*::
++
+--
+type: keyword
+
+Billing
+
+--
+
+*`hl7v2.request.BPO`*::
++
+--
+type: keyword
+
+Blood product order
+
+--
+
+*`hl7v2.request.BPX`*::
++
+--
+type: keyword
+
+Blood product dispense status
+
+--
+
+*`hl7v2.request.BTS`*::
++
+--
+type: keyword
+
+Batch Trailer
+
+--
+
+*`hl7v2.request.BTX`*::
++
+--
+type: keyword
+
+Blood Product Transfusion/Disposition
+
+--
+
+*`hl7v2.request.BUI`*::
++
+--
+type: keyword
+
+Blood Unit Information
+
+--
+
+*`hl7v2.request.CDM`*::
++
+--
+type: keyword
+
+Charge Description Master
+
+--
+
+*`hl7v2.request.CDO`*::
++
+--
+type: keyword
+
+Cumulative Dosage
+
+--
+
+*`hl7v2.request.CER`*::
++
+--
+type: keyword
+
+Certificate Detail
+
+--
+
+*`hl7v2.request.CM0`*::
++
+--
+type: keyword
+
+Clinical Study Master
+
+--
+
+*`hl7v2.request.CM1`*::
++
+--
+type: keyword
+
+Clinical Study Phase Master
+
+--
+
+*`hl7v2.request.CM2`*::
++
+--
+type: keyword
+
+Clinical Study Schedule Master
+
+--
+
+*`hl7v2.request.CNS`*::
++
+--
+type: keyword
+
+Clear Notification
+
+--
+
+*`hl7v2.request.CON`*::
++
+--
+type: keyword
+
+Consent Segment
+
+--
+
+*`hl7v2.request.CSP`*::
++
+--
+type: keyword
+
+Clinical Study Phase
+
+--
+
+*`hl7v2.request.CSR`*::
++
+--
+type: keyword
+
+Clinical Study Registration
+
+--
+
+*`hl7v2.request.CSS`*::
++
+--
+type: keyword
+
+Clinical Study Data Schedule Segment
+
+--
+
+*`hl7v2.request.CTD`*::
++
+--
+type: keyword
+
+Contact Data
+
+--
+
+*`hl7v2.request.CTI`*::
++
+--
+type: keyword
+
+Clinical Trial Identification
+
+--
+
+*`hl7v2.request.DB1`*::
++
+--
+type: keyword
+
+Disability
+
+--
+
+*`hl7v2.request.DG1`*::
++
+--
+type: keyword
+
+Diagnosis
+
+--
+
+*`hl7v2.request.DMI`*::
++
+--
+type: keyword
+
+DRG Master File Information
+
+--
+
+*`hl7v2.request.DON`*::
++
+--
+type: keyword
+
+Donation
+
+--
+
+*`hl7v2.request.DRG`*::
++
+--
+type: keyword
+
+Diagnosis Related Group
+
+--
+
+*`hl7v2.request.DSC`*::
++
+--
+type: keyword
+
+Continuation Pointer
+
+--
+
+*`hl7v2.request.DSP`*::
++
+--
+type: keyword
+
+Display Data
+
+--
+
+*`hl7v2.request.ECD`*::
++
+--
+type: keyword
+
+Equipment Command
+
+--
+
+*`hl7v2.request.ECR`*::
++
+--
+type: keyword
+
+Equipment Command Response
+
+--
+
+*`hl7v2.request.EDU`*::
++
+--
+type: keyword
+
+Educational Detail
+
+--
+
+*`hl7v2.request.EQP`*::
++
+--
+type: keyword
+
+Equipment/log Service
+
+--
+
+*`hl7v2.request.EQU`*::
++
+--
+type: keyword
+
+Equipment Detail
+
+--
+
+*`hl7v2.request.ERR`*::
++
+--
+type: keyword
+
+Error
+
+--
+
+*`hl7v2.request.EVN`*::
++
+--
+type: keyword
+
+Event Type
+
+--
+
+*`hl7v2.request.FAC`*::
++
+--
+type: keyword
+
+Facility
+
+--
+
+*`hl7v2.request.FHS`*::
++
+--
+type: keyword
+
+File Header
+
+--
+
+*`hl7v2.request.FT1`*::
++
+--
+type: keyword
+
+Financial Transaction
+
+--
+
+*`hl7v2.request.FTS`*::
++
+--
+type: keyword
+
+File Trailer
+
+--
+
+*`hl7v2.request.GOL`*::
++
+--
+type: keyword
+
+Goal Detail
+
+--
+
+*`hl7v2.request.GP1`*::
++
+--
+type: keyword
+
+Grouping/Reimbursement - Visit
+
+--
+
+*`hl7v2.request.GP2`*::
++
+--
+type: keyword
+
+Grouping/Reimbursement - Procedure Line Item
+
+--
+
+*`hl7v2.request.GT1`*::
++
+--
+type: keyword
+
+Guarantor
+
+--
+
+*`hl7v2.request.Hxx`*::
++
+--
+type: keyword
+
+any HL7 segment
+
+--
+
+*`hl7v2.request.IAM`*::
++
+--
+type: keyword
+
+Patient Adverse Reaction Information
+
+--
+
+*`hl7v2.request.IAR`*::
++
+--
+type: keyword
+
+allergy reaction
+
+--
+
+*`hl7v2.request.IIM`*::
++
+--
+type: keyword
+
+Inventory Item Master
+
+--
+
+*`hl7v2.request.ILT`*::
++
+--
+type: keyword
+
+Material Lot
+
+--
+
+*`hl7v2.request.IN1`*::
++
+--
+type: keyword
+
+Insurance
+
+--
+
+*`hl7v2.request.IN2`*::
++
+--
+type: keyword
+
+Insurance Additional Information
+
+--
+
+*`hl7v2.request.IN3`*::
++
+--
+type: keyword
+
+Insurance Additional Information, Certification
+
+--
+
+*`hl7v2.request.INV`*::
++
+--
+type: keyword
+
+Inventory Detail
+
+--
+
+*`hl7v2.request.IPC`*::
++
+--
+type: keyword
+
+Imaging Procedure Control Segment
+
+--
+
+*`hl7v2.request.IPR`*::
++
+--
+type: keyword
+
+Invoice Processing Results
+
+--
+
+*`hl7v2.request.ISD`*::
++
+--
+type: keyword
+
+Interaction Status Detail
+
+--
+
+*`hl7v2.request.ITM`*::
++
+--
+type: keyword
+
+Material Item
+
+--
+
+*`hl7v2.request.IVC`*::
++
+--
+type: keyword
+
+Invoice Segment
+
+--
+
+*`hl7v2.request.IVT`*::
++
+--
+type: keyword
+
+Material Location
+
+--
+
+*`hl7v2.request.LAN`*::
++
+--
+type: keyword
+
+Language Detail
+
+--
+
+*`hl7v2.request.LCC`*::
++
+--
+type: keyword
+
+Location Charge Code
+
+--
+
+*`hl7v2.request.LCH`*::
++
+--
+type: keyword
+
+Location Characteristic
+
+--
+
+*`hl7v2.request.LDP`*::
++
+--
+type: keyword
+
+Location Department
+
+--
+
+*`hl7v2.request.LOC`*::
++
+--
+type: keyword
+
+Location Identification
+
+--
+
+*`hl7v2.request.LRL`*::
++
+--
+type: keyword
+
+Location Relationship
+
+--
+
+*`hl7v2.request.MFA`*::
++
+--
+type: keyword
+
+Master File Acknowledgment
+
+--
+
+*`hl7v2.request.MFE`*::
++
+--
+type: keyword
+
+Master File Entry
+
+--
+
+*`hl7v2.request.MFI`*::
++
+--
+type: keyword
+
+Master File Identification
+
+--
+
+*`hl7v2.request.MRG`*::
++
+--
+type: keyword
+
+Merge Patient Information
+
+--
+
+*`hl7v2.request.MSA`*::
++
+--
+type: keyword
+
+Message Acknowledgment
+
+--
+
+*`hl7v2.request.MSH`*::
++
+--
+type: keyword
+
+Message Header
+
+--
+
+*`hl7v2.request.NCK`*::
++
+--
+type: keyword
+
+System Clock
+
+--
+
+*`hl7v2.request.NDS`*::
++
+--
+type: keyword
+
+Notification Detail
+
+--
+
+*`hl7v2.request.NK1`*::
++
+--
+type: keyword
+
+Next of Kin / Associated Parties
+
+--
+
+*`hl7v2.request.NPU`*::
++
+--
+type: keyword
+
+Bed Status Update
+
+--
+
+*`hl7v2.request.NSC`*::
++
+--
+type: keyword
+
+Application Status Change
+
+--
+
+*`hl7v2.request.NST`*::
++
+--
+type: keyword
+
+Application control level statistics
+
+--
+
+*`hl7v2.request.NTE`*::
++
+--
+type: keyword
+
+Notes and Comments
+
+--
+
+*`hl7v2.request.OBR`*::
++
+--
+type: keyword
+
+Observation Request
+
+--
+
+*`hl7v2.request.OBX`*::
++
+--
+type: keyword
+
+Observation/Result
+
+--
+
+*`hl7v2.request.ODS`*::
++
+--
+type: keyword
+
+Dietary Orders, Supplements, and Preferences
+
+--
+
+*`hl7v2.request.ODT`*::
++
+--
+type: keyword
+
+Diet Tray Instructions
+
+--
+
+*`hl7v2.request.OM1`*::
++
+--
+type: keyword
+
+General Segment
+
+--
+
+*`hl7v2.request.OM2`*::
++
+--
+type: keyword
+
+Numeric Observation
+
+--
+
+*`hl7v2.request.OM3`*::
++
+--
+type: keyword
+
+Categorical Service/Test/Observation
+
+--
+
+*`hl7v2.request.OM4`*::
++
+--
+type: keyword
+
+Observations that Require Specimens
+
+--
+
+*`hl7v2.request.OM5`*::
++
+--
+type: keyword
+
+Observation Batteries (Sets)
+
+--
+
+*`hl7v2.request.OM6`*::
++
+--
+type: keyword
+
+Observations that are Calculated from Other Observations
+
+--
+
+*`hl7v2.request.OM7`*::
++
+--
+type: keyword
+
+Additional Basic Attributes
+
+--
+
+*`hl7v2.request.ORC`*::
++
+--
+type: keyword
+
+Common Order
+
+--
+
+*`hl7v2.request.ORG`*::
++
+--
+type: keyword
+
+Practitioner Organization Unit
+
+--
+
+*`hl7v2.request.OVR`*::
++
+--
+type: keyword
+
+Override Segment
+
+--
+
+*`hl7v2.request.PAC`*::
++
+--
+type: keyword
+
+Shipment Package
+
+--
+
+*`hl7v2.request.PCE`*::
++
+--
+type: keyword
+
+Patient Charge Cost Center Exceptions
+
+--
+
+*`hl7v2.request.PCR`*::
++
+--
+type: keyword
+
+Possible Causal Relationship
+
+--
+
+*`hl7v2.request.PD1`*::
++
+--
+type: keyword
+
+Patient Additional Demographic
+
+--
+
+*`hl7v2.request.PDA`*::
++
+--
+type: keyword
+
+Patient Death and Autopsy
+
+--
+
+*`hl7v2.request.PDC`*::
++
+--
+type: keyword
+
+Product Detail Country
+
+--
+
+*`hl7v2.request.PEO`*::
++
+--
+type: keyword
+
+Product Experience Observation
+
+--
+
+*`hl7v2.request.PES`*::
++
+--
+type: keyword
+
+Product Experience Sender
+
+--
+
+*`hl7v2.request.PID`*::
++
+--
+type: keyword
+
+Patient Identification
+
+--
+
+*`hl7v2.request.PKG`*::
++
+--
+type: keyword
+
+Item Packaging
+
+--
+
+*`hl7v2.request.PMT`*::
++
+--
+type: keyword
+
+Payment Information
+
+--
+
+*`hl7v2.request.PR1`*::
++
+--
+type: keyword
+
+Procedures
+
+--
+
+*`hl7v2.request.PRA`*::
++
+--
+type: keyword
+
+Practitioner Detail
+
+--
+
+*`hl7v2.request.PRB`*::
++
+--
+type: keyword
+
+Problem Details
+
+--
+
+*`hl7v2.request.PRC`*::
++
+--
+type: keyword
+
+Pricing
+
+--
+
+*`hl7v2.request.PRD`*::
++
+--
+type: keyword
+
+Provider Data
+
+--
+
+*`hl7v2.request.PRT`*::
++
+--
+type: keyword
+
+Participation Information
+
+--
+
+*`hl7v2.request.PSG`*::
++
+--
+type: keyword
+
+Product/Service Group
+
+--
+
+*`hl7v2.request.PSH`*::
++
+--
+type: keyword
+
+Product Summary Header
+
+--
+
+*`hl7v2.request.PSL`*::
++
+--
+type: keyword
+
+Product/Service Line Item
+
+--
+
+*`hl7v2.request.PSS`*::
++
+--
+type: keyword
+
+Product/Service Section
+
+--
+
+*`hl7v2.request.PTH`*::
++
+--
+type: keyword
+
+Pathway
+
+--
+
+*`hl7v2.request.PV1`*::
++
+--
+type: keyword
+
+Patient Visit
+
+--
+
+*`hl7v2.request.PV2`*::
++
+--
+type: keyword
+
+Patient Visit - Additional Information
+
+--
+
+*`hl7v2.request.PYE`*::
++
+--
+type: keyword
+
+Payee Information
+
+--
+
+*`hl7v2.request.QAK`*::
++
+--
+type: keyword
+
+Query Acknowledgment
+
+--
+
+*`hl7v2.request.QID`*::
++
+--
+type: keyword
+
+Query Identification
+
+--
+
+*`hl7v2.request.QPD`*::
++
+--
+type: keyword
+
+Query Parameter Definition
+
+--
+
+*`hl7v2.request.QRD`*::
++
+--
+type: keyword
+
+withdrawn
+
+--
+
+*`hl7v2.request.QRF`*::
++
+--
+type: keyword
+
+withdrawn
+
+--
+
+*`hl7v2.request.QRI`*::
++
+--
+type: keyword
+
+Query Response Instance
+
+--
+
+*`hl7v2.request.RCP`*::
++
+--
+type: keyword
+
+Response Control Parameter
+
+--
+
+*`hl7v2.request.RDF`*::
++
+--
+type: keyword
+
+Table Row Definition
+
+--
+
+*`hl7v2.request.RDT`*::
++
+--
+type: keyword
+
+Table Row Data
+
+--
+
+*`hl7v2.request.REL`*::
++
+--
+type: keyword
+
+Clinical Relationship Segment
+
+--
+
+*`hl7v2.request.RF1`*::
++
+--
+type: keyword
+
+Referral Information
+
+--
+
+*`hl7v2.request.RFI`*::
++
+--
+type: keyword
+
+Request for Information
+
+--
+
+*`hl7v2.request.RGS`*::
++
+--
+type: keyword
+
+Resource Group
+
+--
+
+*`hl7v2.request.RMI`*::
++
+--
+type: keyword
+
+Risk Management Incident
+
+--
+
+*`hl7v2.request.ROL`*::
++
+--
+type: keyword
+
+Role
+
+--
+
+*`hl7v2.request.RQ1`*::
++
+--
+type: keyword
+
+Requisition Detail-1
+
+--
+
+*`hl7v2.request.RQD`*::
++
+--
+type: keyword
+
+Requisition Detail
+
+--
+
+*`hl7v2.request.RXA`*::
++
+--
+type: keyword
+
+Pharmacy/Treatment Administration
+
+--
+
+*`hl7v2.request.RXC`*::
++
+--
+type: keyword
+
+Pharmacy/Treatment Component Order
+
+--
+
+*`hl7v2.request.RXD`*::
++
+--
+type: keyword
+
+Pharmacy/Treatment Dispense
+
+--
+
+*`hl7v2.request.RXE`*::
++
+--
+type: keyword
+
+Pharmacy/Treatment Encoded Order
+
+--
+
+*`hl7v2.request.RXG`*::
++
+--
+type: keyword
+
+Pharmacy/Treatment Give
+
+--
+
+*`hl7v2.request.RXO`*::
++
+--
+type: keyword
+
+Pharmacy/Treatment Order
+
+--
+
+*`hl7v2.request.RXR`*::
++
+--
+type: keyword
+
+Pharmacy/Treatment Route
+
+--
+
+*`hl7v2.request.RXV`*::
++
+--
+type: keyword
+
+Pharmacy/Treatment Infusion
+
+--
+
+*`hl7v2.request.SAC`*::
++
+--
+type: keyword
+
+Specimen Container detail
+
+--
+
+*`hl7v2.request.SCD`*::
++
+--
+type: keyword
+
+Anti-Microbial Cycle Data
+
+--
+
+*`hl7v2.request.SCH`*::
++
+--
+type: keyword
+
+Scheduling Activity Information
+
+--
+
+*`hl7v2.request.SCP`*::
++
+--
+type: keyword
+
+Sterilizer Configuration (Anti-Microbial Devices)
+
+--
+
+*`hl7v2.request.SDD`*::
++
+--
+type: keyword
+
+Sterilization Device Data
+
+--
+
+*`hl7v2.request.SFT`*::
++
+--
+type: keyword
+
+Software Segment
+
+--
+
+*`hl7v2.request.SGH`*::
++
+--
+type: keyword
+
+Segment Group Header
+
+--
+
+*`hl7v2.request.SGT`*::
++
+--
+type: keyword
+
+Segment Group Trailer
+
+--
+
+*`hl7v2.request.SHP`*::
++
+--
+type: keyword
+
+Shipment
+
+--
+
+*`hl7v2.request.SID`*::
++
+--
+type: keyword
+
+Substance Identifier
+
+--
+
+*`hl7v2.request.SLT`*::
++
+--
+type: keyword
+
+Sterilization Lot
+
+--
+
+*`hl7v2.request.SPM`*::
++
+--
+type: keyword
+
+Specimen
+
+--
+
+*`hl7v2.request.STF`*::
++
+--
+type: keyword
+
+Staff Identification
+
+--
+
+*`hl7v2.request.STZ`*::
++
+--
+type: keyword
+
+Sterilization Parameter
+
+--
+
+*`hl7v2.request.TCC`*::
++
+--
+type: keyword
+
+Test Code Configuration
+
+--
+
+*`hl7v2.request.TCD`*::
++
+--
+type: keyword
+
+Test Code Detail
+
+--
+
+*`hl7v2.request.TQ1`*::
++
+--
+type: keyword
+
+Timing/Quantity
+
+--
+
+*`hl7v2.request.TQ2`*::
++
+--
+type: keyword
+
+Timing/Quantity Relationship
+
+--
+
+*`hl7v2.request.TXA`*::
++
+--
+type: keyword
+
+Transcription Document Header
+
+--
+
+*`hl7v2.request.UAC`*::
++
+--
+type: keyword
+
+User Authentication Credential Segment
+
+--
+
+*`hl7v2.request.UB1`*::
++
+--
+type: keyword
+
+None
+
+--
+
+*`hl7v2.request.UB2`*::
++
+--
+type: keyword
+
+Uniform Billing Data
+
+--
+
+*`hl7v2.request.URD`*::
++
+--
+type: keyword
+
+withdrawn
+
+--
+
+*`hl7v2.request.URS`*::
++
+--
+type: keyword
+
+withdrawn
+
+--
+
+*`hl7v2.request.VAR`*::
++
+--
+type: keyword
+
+Variance
+
+--
+
+*`hl7v2.request.VND`*::
++
+--
+type: keyword
+
+Purchasing Vendor
+
+--
+
 *`hl7v2.request.ABS-1`*::
 +
 --
@@ -26155,6 +27784,24 @@ Primary Vendor Indicator
 
 HL7 v2 response
 
+
+*`hl7v2.response.MSA`*::
++
+--
+type: keyword
+
+Message Acknowledgment
+
+--
+
+*`hl7v2.response.MSH`*::
++
+--
+type: keyword
+
+Message Header
+
+--
 
 *`hl7v2.response.MSA-1`*::
 +
