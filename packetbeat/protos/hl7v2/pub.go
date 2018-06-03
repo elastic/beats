@@ -124,7 +124,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 						if strings.EqualFold(pub.FieldSelectionMode, "Include") && pub.fieldsmap[hl7fieldname] || strings.EqualFold(pub.FieldSelectionMode, "Exclude") && !pub.fieldsmap[hl7fieldname] {
 							debugf("Field %s matched.", hl7fieldname)
 
-                            // To be added once get fields.yml down to component level
+							// To be added once get fields.yml down to component level
 							// If selected split field into components
 							/*if pub.ComponentSelectionMode != "" {
 								debugf("componentsmap: %s", pub.componentsmap)
@@ -146,21 +146,21 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 									}
 								}
 							} else {*/
-							    // Add to field if not empty
-							    if hl7fieldvalue != "" {
-								    hl7data[hl7fieldname] = hl7fieldvalue
-								    debugf("Added field %s with value %s", hl7fieldname, hl7fieldvalue)
-							    }
-                            //}
+							// Add to field if not empty
+							if hl7fieldvalue != "" {
+								hl7data[hl7fieldname] = hl7fieldvalue
+								debugf("Added field %s with value %s", hl7fieldname, hl7fieldvalue)
+							}
+							//}
 						}
 					}
 				} else {
-                    // Add segment if not empty
-                    if hl7segments[hl7segment] != "" {
-                        hl7data[hl7segmentheader] = hl7segments[hl7segment]
-					    debugf("Added segment %s with value %s", hl7segmentheader, hl7segments[hl7segment])
-                    }
-                }
+					// Add segment if not empty
+					if hl7segments[hl7segment] != "" {
+						hl7data[hl7segmentheader] = hl7segments[hl7segment]
+						debugf("Added segment %s with value %s", hl7segmentheader, hl7segments[hl7segment])
+					}
+				}
 			}
 		}
 		fields["hl7v2"].(common.MapStr)[hl7message] = hl7data

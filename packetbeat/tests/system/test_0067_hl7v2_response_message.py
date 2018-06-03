@@ -12,15 +12,15 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "hl7v2"
-        #MSA-1 is a field that is configured to be selected in the test and should match the below value
+        # MSA-1 is a field that is configured to be selected in the test and should match the below value
         assert o["hl7v2.response.MSA-1"] == "AA"
-        #MSH-11 is not a field configured to be selected in the test
+        # MSH-11 is not a field configured to be selected in the test
         try:
-          o["hl7v2.response.MSH-11"]
+            o["hl7v2.response.MSH-11"]
         except NameError:
-          result = "ERROR"
+            result = "ERROR"
         else:
-          result = "PASS"
+            result = "PASS"
         assert result == "PASS"
 
     def test_hl7v2_reject(self):
@@ -32,13 +32,13 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "hl7v2"
-        #MSA-1 is a field that is configured to be selected in the test and should match the below value
+        # MSA-1 is a field that is configured to be selected in the test and should match the below value
         assert o["hl7v2.response.MSA-1"] == "AR"
-        #MSH-11 is not a field configured to be selected in the test
+        # MSH-11 is not a field configured to be selected in the test
         try:
-          o["hl7v2.response.MSH-11"]
+            o["hl7v2.response.MSH-11"]
         except NameError:
-          result = "ERROR"
+            result = "ERROR"
         else:
-          result = "PASS"
+            result = "PASS"
         assert result == "PASS"
