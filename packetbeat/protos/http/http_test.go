@@ -1231,8 +1231,10 @@ func TestHttpParser_sendRequestResponse(t *testing.T) {
 func testCreateTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
-		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
-		SrcPort: 6512, DstPort: 80,
+		BaseTuple: common.BaseTuple{
+			SrcIP: net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+			SrcPort: 6512, DstPort: 80,
+		},
 	}
 	t.ComputeHashebles()
 	return t

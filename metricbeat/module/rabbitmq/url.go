@@ -21,7 +21,9 @@ const (
 var (
 	// HostParser parses host urls for RabbitMQ management plugin
 	HostParser = parse.URLHostParserBuilder{
-		DefaultScheme: defaultScheme,
-		PathConfigKey: pathConfigKey,
+		DefaultScheme:   defaultScheme,
+		PathConfigKey:   pathConfigKey,
+		DefaultUsername: "guest",
+		DefaultPassword: "guest",
 	}.Build()
 )

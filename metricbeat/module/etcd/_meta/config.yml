@@ -5,3 +5,5 @@
   #  - store
   period: 10s
   hosts: ["localhost:2379"]
+  #username: "user"
+  #password: "secret"

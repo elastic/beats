@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 	"github.com/elastic/go-txfile"
@@ -86,7 +88,7 @@ func NewSpool(logger logger, path string, settings Settings) (*Spool, error) {
 
 	f, err := txfile.Open(path, mode, settings.File)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "spool queue: failed to open file at path '%s'", path)
 	}
 	defer ifNotOK(&ok, ignoreErr(f.Close))
 

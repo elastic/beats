@@ -62,7 +62,7 @@ func (h *HttpServer) Start() error {
 
 		logp.Info("Starting http server on %s", h.server.Addr)
 		err := h.server.ListenAndServe()
-		if err != nil {
+		if err != nil && err != http.ErrServerClosed {
 			logp.Critical("Unable to start HTTP server due to error: %v", err)
 		}
 	}()

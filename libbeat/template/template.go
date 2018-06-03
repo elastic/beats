@@ -19,6 +19,8 @@ var (
 
 	// Array to store dynamicTemplate parts in
 	dynamicTemplates []common.MapStr
+
+	defaultFields []string
 )
 
 type Template struct {
@@ -180,6 +182,11 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 	version61, _ := common.NewVersion("6.1.0")
 	if !t.esVersion.LessThan(version61) {
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
+	}
+
+	if t.esVersion.IsMajor(7) {
+		defaultFields = append(defaultFields, "fields.*")
+		indexSettings.Put("query.default_field", defaultFields)
 	}
 
 	indexSettings.DeepUpdate(t.config.Settings.Index)

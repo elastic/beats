@@ -5,6 +5,8 @@ SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 ES_BEATS?=..
+FIELDS_FILE_PATH=module
+
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 
@@ -18,13 +20,6 @@ kibana:
 	@rm -rf _meta/kibana
 	@mkdir -p _meta/kibana
 	@-cp -r module/*/_meta/kibana _meta/
-
-# Collects all module and dataset fields
-.PHONY: fields
-fields: python-env
-	@mkdir -p _meta/
-	@cp ${ES_BEATS}/filebeat/_meta/fields.common.yml  _meta/fields.generated.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
 
 # Collects all modules files to be packaged in a temporary folder
 .PHONY: modules

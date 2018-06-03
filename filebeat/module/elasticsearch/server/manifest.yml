@@ -1,0 +1,11 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/elasticsearch/*.log
+    os.darwin: []
+    os.windows: []
+
+ingest_pipeline: ingest/pipeline.json
+prospector: config/log.yml

@@ -1,0 +1,1 @@
+[2018-05-17T08:29:12,177][INFO ][o.e.c.m.MetaDataCreateIndexService] [vWNJsZ3] [test-filebeat-modules] creating index, cause [auto(bulk api)], templates [test-filebeat-modules], shards [5]/[1], mappings [doc]

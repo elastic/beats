@@ -1,0 +1,9 @@
+- key: elasticsearch
+  title: "elasticsearch"
+  description: >
+    elasticsearch Module
+  fields:
+    - name: elasticsearch
+      type: group
+      description: >
+      fields:

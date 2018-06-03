@@ -7,3 +7,5 @@
   #  - node_stats
   period: 10s
   hosts: ["localhost:9600"]
+  #username: "user"
+  #password: "secret"

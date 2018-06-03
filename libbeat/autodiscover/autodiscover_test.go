@@ -40,6 +40,11 @@ func (m *mockRunner) Clone() *mockRunner {
 		stopped: m.stopped,
 	}
 }
+func (m *mockRunner) String() string {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return "runner"
+}
 
 type mockAdapter struct {
 	mutex   sync.Mutex
