@@ -703,7 +703,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of Redis server metrics",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {

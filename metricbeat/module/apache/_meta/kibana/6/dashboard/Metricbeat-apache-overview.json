@@ -656,7 +656,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of Apache server status",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {

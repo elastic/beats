@@ -2,7 +2,7 @@
     "objects": [
         {
             "attributes": {
-                "description": "", 
+                "description": "HAProxy metrics for HTTP mode",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
@@ -10,7 +10,7 @@
                         "highlightAll": true, 
                         "query": {
                             "language": "lucene", 
-                            "query": "haproxy.stat.service_name:\"nginx2\""
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -101,7 +101,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Haproxy] HTTP server", 
+                "title": "[Metricbeat HAProxy] HTTP server", 
                 "version": 1
             }, 
             "id": "8cc50a50-47e0-11e8-bc13-1397384faad3", 

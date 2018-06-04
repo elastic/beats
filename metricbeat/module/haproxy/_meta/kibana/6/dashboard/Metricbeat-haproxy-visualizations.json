@@ -6,7 +6,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Connections [Metricbeat Haproxy]", 
+                "title": "Connections [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -86,7 +86,7 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Haproxy connections", 
+                    "title": "HAProxy connections", 
                     "type": "metrics"
                 }
             }, 
@@ -101,7 +101,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Active servers in backend [Metricbeat Haproxy]", 
+                "title": "Active servers in backend [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -212,7 +212,7 @@
                         "time_field": "@timestamp", 
                         "type": "metric"
                     }, 
-                    "title": "Haproxy active servers in backend", 
+                    "title": "HAProxy active servers in backend", 
                     "type": "metrics"
                 }
             }, 
@@ -227,7 +227,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Connections per server [Metricbeat Haproxy]", 
+                "title": "Connections per server [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -280,7 +280,7 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Haproxy connections per server", 
+                    "title": "HAProxy connections per server", 
                     "type": "metrics"
                 }
             }, 
@@ -295,7 +295,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Downtime seconds [Metricbeat Haproxy]", 
+                "title": "Downtime seconds [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -354,7 +354,7 @@
                         "time_field": "@timestamp", 
                         "type": "metric"
                     }, 
-                    "title": "Haproxy downtime seconds", 
+                    "title": "HAProxy downtime seconds", 
                     "type": "metrics"
                 }
             }, 
@@ -369,7 +369,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Average time in queue [Metricbeat Haproxy]", 
+                "title": "Average time in queue [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -408,7 +408,7 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Haproxy average time in queue", 
+                    "title": "HAProxy average time in queue", 
                     "type": "metrics"
                 }
             }, 
@@ -423,7 +423,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Traffic volume [Metricbeat Haproxy]", 
+                "title": "Traffic volume [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -496,7 +496,7 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Haproxy traffic volume", 
+                    "title": "HAProxy traffic volume", 
                     "type": "metrics"
                 }
             }, 
@@ -511,7 +511,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "HTTP response codes [Metricbeat Haproxy]", 
+                "title": "HTTP response codes [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -697,7 +697,7 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Haproxy HTTP response codes", 
+                    "title": "HAProxy HTTP response codes", 
                     "type": "metrics"
                 }
             }, 
@@ -712,7 +712,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Average response time [Metricbeat Haproxy]", 
+                "title": "Average response time [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -752,7 +752,7 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Haproxy average response time", 
+                    "title": "HAProxy average response time", 
                     "type": "metrics"
                 }
             }, 
@@ -767,7 +767,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Requests [Metricbeat Haproxy]", 
+                "title": "Requests [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -884,7 +884,7 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Haproxy requests", 
+                    "title": "HAProxy requests", 
                     "type": "metrics"
                 }
             }, 
@@ -899,7 +899,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Average connection time [Metricbeat Haproxy]", 
+                "title": "Average connection time [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -963,7 +963,7 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Haproxy average connection time", 
+                    "title": "HAProxy average connection time", 
                     "type": "metrics"
                 }
             }, 
@@ -978,7 +978,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Number of server connections [Metricbeat Haproxy]", 
+                "title": "Number of server connections [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1031,7 +1031,7 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Haproxy number of server connections", 
+                    "title": "HAProxy number of server connections", 
                     "type": "metrics"
                 }
             }, 
@@ -1046,7 +1046,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Healthcheck [Metricbeat Haproxy]", 
+                "title": "Healthcheck [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1131,7 +1131,7 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Haproxy healthcheck", 
+                    "title": "HAProxy healthcheck", 
                     "type": "metrics"
                 }
             }, 
@@ -1146,7 +1146,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Servers per connection [Metricbeat Haproxy]", 
+                "title": "Servers per connection [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1199,7 +1199,7 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Haproxy servers per connection", 
+                    "title": "HAProxy servers per connection", 
                     "type": "metrics"
                 }
             }, 
@@ -1214,7 +1214,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Backends per connection [Metricbeat Haproxy]", 
+                "title": "Backends per connection [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1263,7 +1263,7 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Haproxy backends per connection", 
+                    "title": "HAProxy backends per connection", 
                     "type": "metrics"
                 }
             }, 
@@ -1278,7 +1278,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Frontends per connection [Metricbeat Haproxy]", 
+                "title": "Frontends per connection [Metricbeat HAProxy]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1327,7 +1327,7 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Haproxy frontends per connection", 
+                    "title": "HAProxy frontends per connection", 
                     "type": "metrics"
                 }
             }, 

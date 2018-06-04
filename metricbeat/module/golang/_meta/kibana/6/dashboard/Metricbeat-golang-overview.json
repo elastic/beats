@@ -206,7 +206,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of Go profiling information",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {

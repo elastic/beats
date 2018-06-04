@@ -460,7 +460,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of container metrics",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {

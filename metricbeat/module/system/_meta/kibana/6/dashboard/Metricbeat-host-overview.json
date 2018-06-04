@@ -2218,7 +2218,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overviw of host metrics",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {

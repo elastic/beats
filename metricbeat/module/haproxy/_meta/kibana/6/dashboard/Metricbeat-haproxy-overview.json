@@ -2,7 +2,7 @@
     "objects": [
         {
             "attributes": {
-                "description": "", 
+                "description": "HAProxy overview",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
@@ -78,7 +78,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Haproxy] Overview", 
+                "title": "[Metricbeat HAProxy] Overview", 
                 "version": 1
             }, 
             "id": "4b555c30-47dd-11e8-bc13-1397384faad3", 
