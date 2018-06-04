@@ -11247,6 +11247,221 @@ Time at which these statistics were last reset.
 
 --
 
+[float]
+== statement fields
+
+One document per query per user per database, showing information related invocation of that query, such as cpu usage and total time. Collected by querying pg_stat_statements.
+
+
+
+*`postgresql.statement.user.id`*::
++
+--
+type: long
+
+OID of the user logged into the backend that ran the query.
+
+
+--
+
+*`postgresql.statement.database.oid`*::
++
+--
+type: long
+
+OID of the database the query was run on.
+
+
+--
+
+*`postgresql.statement.query.id`*::
++
+--
+type: long
+
+ID of the statement.
+
+
+--
+
+*`postgresql.statement.query.text`*::
++
+--
+Query text
+
+
+--
+
+*`postgresql.statement.query.calls`*::
++
+--
+type: long
+
+Number of times the query has been run.
+
+
+--
+
+*`postgresql.statement.query.rows`*::
++
+--
+type: long
+
+Total number of rows returned by query.
+
+
+--
+
+*`postgresql.statement.time.total`*::
++
+--
+type: long
+
+Total number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.min`*::
++
+--
+type: long
+
+Minimum number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.max`*::
++
+--
+type: long
+
+Maximum number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.mean`*::
++
+--
+type: long
+
+Mean number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.stddev`*::
++
+--
+type: long
+
+Population standard deviation of time spent running query, in milliseconds.
+
+
+--
+
+*`postgresql.statement.memory.shared.hit`*::
++
+--
+type: long
+
+Total number of shared block cache hits by the query.
+
+
+--
+
+*`postgresql.statement.memory.shared.read`*::
++
+--
+type: long
+
+Total number of shared block cache read by the query.
+
+
+--
+
+*`postgresql.statement.memory.shared.dirtied`*::
++
+--
+type: long
+
+Total number of shared block cache dirtied by the query.
+
+
+--
+
+*`postgresql.statement.memory.shared.written`*::
++
+--
+type: long
+
+Total number of shared block cache written by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.hit`*::
++
+--
+type: long
+
+Total number of local block cache hits by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.read`*::
++
+--
+type: long
+
+Total number of local block cache read by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.dirtied`*::
++
+--
+type: long
+
+Total number of local block cache dirtied by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.written`*::
++
+--
+type: long
+
+Total number of local block cache written by the query.
+
+
+--
+
+*`postgresql.statement.memory.temp.read`*::
++
+--
+type: long
+
+Total number of temp block cache read by the query.
+
+
+--
+
+*`postgresql.statement.memory.temp.written`*::
++
+--
+type: long
+
+Total number of temp block cache written by the query.
+
+
+--
+
 [[exported-fields-prometheus]]
 == Prometheus fields
 
