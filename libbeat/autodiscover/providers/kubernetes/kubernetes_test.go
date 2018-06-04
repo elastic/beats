@@ -2,11 +2,14 @@ package kubernetes
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -126,6 +129,140 @@ func TestGenerateHints(t *testing.T) {
 	}
 	for _, test := range tests {
 		assert.Equal(t, p.generateHints(test.event), test.result)
+	}
+}
+
+func TestEmitEvent(t *testing.T) {
+	tests := []struct {
+		Message  string
+		Flag     string
+		Pod      *kubernetes.Pod
+		Expected bus.Event
+	}{
+		{
+			Message: "Test common pod start",
+			Flag:    "start",
+			Pod: &kubernetes.Pod{
+				Metadata: kubernetes.ObjectMeta{
+					Name:        "filebeat",
+					Namespace:   "default",
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				Status: kubernetes.PodStatus{
+					PodIP: "127.0.0.1",
+					ContainerStatuses: []kubernetes.PodContainerStatus{
+						{
+							Name:        "filebeat",
+							ContainerID: "docker://foobar",
+						},
+					},
+				},
+				Spec: kubernetes.PodSpec{
+					NodeName: "node",
+					Containers: []kubernetes.Container{
+						{
+							Image: "elastic/filebeat:6.3.0",
+							Name:  "filebeat",
+						},
+					},
+				},
+			},
+			Expected: bus.Event{
+				"start": true,
+				"host":  "127.0.0.1",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"id":      "foobar",
+						"name":    "filebeat",
+						"image":   "elastic/filebeat:6.3.0",
+						"runtime": "docker",
+					},
+					"pod": common.MapStr{
+						"name": "filebeat",
+					},
+					"node": common.MapStr{
+						"name": "node",
+					},
+					"namespace":   "default",
+					"annotations": common.MapStr{},
+				},
+				"meta": common.MapStr{
+					"kubernetes": common.MapStr{
+						"namespace": "default",
+						"container": common.MapStr{
+							"name": "filebeat",
+						}, "pod": common.MapStr{
+							"name": "filebeat",
+						}, "node": common.MapStr{
+							"name": "node",
+						},
+					},
+				},
+			},
+		},
+		{
+			Message: "Test pod without host",
+			Flag:    "start",
+			Pod: &kubernetes.Pod{
+				Metadata: kubernetes.ObjectMeta{
+					Name:        "filebeat",
+					Namespace:   "default",
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				Status: kubernetes.PodStatus{
+					ContainerStatuses: []kubernetes.PodContainerStatus{
+						{
+							Name:        "filebeat",
+							ContainerID: "docker://foobar",
+						},
+					},
+				},
+				Spec: kubernetes.PodSpec{
+					NodeName: "node",
+					Containers: []kubernetes.Container{
+						{
+							Image: "elastic/filebeat:6.3.0",
+							Name:  "filebeat",
+						},
+					},
+				},
+			},
+			Expected: nil,
+		},
+	}
+
+	for _, test := range tests {
+		mapper, err := template.NewConfigMapper(nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		p := &Provider{
+			config:    defaultConfig(),
+			bus:       bus.New("test"),
+			metagen:   metaGen,
+			templates: mapper,
+		}
+
+		listener := p.bus.Subscribe()
+
+		p.emit(test.Pod, test.Flag)
+
+		select {
+		case event := <-listener.Events():
+			assert.Equal(t, test.Expected, event)
+		case <-time.After(2 * time.Second):
+			if test.Expected != nil {
+				t.Fatal("Timeout while waiting for event")
+			}
+		}
 	}
 }
 
