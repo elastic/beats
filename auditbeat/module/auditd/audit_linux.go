@@ -161,7 +161,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 	// By default (stream_buffer_consumers=0) use as many consumers as local CPUs
 	// with a max of `maxDefaultStreamBufferConsumers`
 	if numConsumers == 0 {
-		if numConsumers = runtime.NumCPU(); numConsumers > maxDefaultStreamBufferConsumers {
+		if numConsumers = runtime.GOMAXPROCS(-1); numConsumers > maxDefaultStreamBufferConsumers {
 			numConsumers = maxDefaultStreamBufferConsumers
 		}
 	}
