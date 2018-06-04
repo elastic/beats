@@ -48,12 +48,13 @@ func BooleanMetric(field string) MetricMap {
 
 // LabelMetric maps a Prometheus metric to a Metricbeat field, stores the value
 // of a given label on it if the gauge value is 1
-func LabelMetric(field, label string) MetricMap {
+func LabelMetric(field, label string, lowercase bool) MetricMap {
 	return &labelMetric{
 		commonMetric{
 			field: field,
 		},
 		label,
+		lowercase,
 	}
 }
 
@@ -152,13 +153,18 @@ func (m *booleanMetric) GetValue(metric *dto.Metric) interface{} {
 
 type labelMetric struct {
 	commonMetric
-	label string
+	label     string
+	lowercase bool
 }
 
 // GetValue returns the resulting value
 func (m *labelMetric) GetValue(metric *dto.Metric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil && gauge.GetValue() == 1 {
-		return strings.ToLower(getLabel(metric, m.label))
+		value := getLabel(metric, m.label)
+		if m.lowercase {
+			return strings.ToLower(value)
+		}
+		return value
 	}
 	return nil
 }

@@ -23,6 +23,11 @@
           type: integer
           description: >
             Container restarts count
+        - name: reason
+          type: keyword
+          description: >
+            Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff)
+            or termination (Completed, ContainerCannotRun, Error, OOMKilled) reason.
     - name: cpu
       type: group
       fields:
