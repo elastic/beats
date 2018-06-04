@@ -94,15 +94,6 @@ POST /_xpack/security/user/{beat_default_index_prefix}_internal
 ---------------------------------------------------------------
 // CONSOLE
 
-// REVIEWERS: Not sure if this is exactly what we want to recommend, but I want
-// to make sure we've covered the case where the beats user needs to load 
-// dashboards, but hasn't set setup.kibana.username. Then the credentials are
-// inherited from the ES output. Also--please confirm that the kibana_user
-// role is the CORRECT role to assign here. It works, but is it restrictive
-// enough? 
-// 
-
-
 --
 
 .. To use PKI authentication, assign the writer role, plus any other roles that are

@@ -58,16 +58,12 @@ endif::[]
 ----------------------------------------------------------------------
 
 
-ifeval::["{beatname_lc}"!="auditbeat"]
-
 *docker:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 docker run {dockerimage} setup --dashboards
 ----------------------------------------------------------------------
-
-endif::[]
 
 *win:*
 
@@ -109,16 +105,11 @@ ifdef::allplatforms[]
 {beatname_lc} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
-  -E output.elasticsearch.username=filebeat_internal \
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal \
   -E output.elasticsearch.password={pwd} \
-  -E setup.kibana.host=localhost:5601 \
-  -E setup.dashboards.always_kibana=true
+  -E setup.kibana.host=localhost:5601
 ----
 
-
-// REVIEWERS: I don't really understand how always_kibana is meant to be used.
-// It seems like you still need to query ES even if you have this options set.
-// Do we want to tell users to set it or no?
 
 // REVIEWERS: Is this the correct way for users to set credentials? I assume
 // they need to do this from the command line because the settings will be
@@ -131,10 +122,9 @@ ifdef::allplatforms[]
 ./{beatname_lc} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
-  -E output.elasticsearch.username=filebeat_internal \
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal \
   -E output.elasticsearch.password={pwd} \
-  -E setup.kibana.host=localhost:5601 \
-  -E setup.dashboards.always_kibana=true
+  -E setup.kibana.host=localhost:5601 
 ----
 
 
@@ -143,13 +133,6 @@ ifdef::allplatforms[]
 // likely that the user will need to pass credentials. 
 
 
-ifeval::["{beatname_lc}"!="auditbeat"]
-
-// REVIEWERS: we used to conditionally exclude docker commands for auditbeat, but
-// I see that we have a topic about running auditbeat on docker now. Do I need
-// to remove the conditional sections so that this content appears for
-// auditbeat, too?
-
 *docker:*
 
 ["source","sh",subs="attributes"]
@@ -157,14 +140,11 @@ ifeval::["{beatname_lc}"!="auditbeat"]
 docker run {dockerimage} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
-  -E output.elasticsearch.username=filebeat_internal \
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal \
   -E output.elasticsearch.password={pwd} \
-  -E setup.kibana.host=localhost:5601 \
-  -E setup.dashboards.always_kibana=true
+  -E setup.kibana.host=localhost:5601
 ----
 
-
-endif::[]
 
 *win:*
 
@@ -181,15 +161,11 @@ and run:
 PS > .{backslash}{beatname_lc}.exe setup -e `
   -E output.logstash.enabled=false `
   -E output.elasticsearch.hosts=['localhost:9200'] `
-  -E output.elasticsearch.username=filebeat_internal `
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal `
   -E output.elasticsearch.password={pwd} `
-  -E setup.kibana.host=localhost:5601 `
-  -E setup.dashboards.always_kibana=true
+  -E setup.kibana.host=localhost:5601 
 ----
 
-
-// REVIEWERS: Please confirm the syntax here. The internet told me to use
-// back ticks for line continuation, but I have not tested/confirmed on PS.
 
 endif::only-elasticsearch[]
 

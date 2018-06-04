@@ -66,11 +66,6 @@ are {xpack-ref}/built-in-roles.html[built-in].]
 |View {beatname_uc} dashboards in {kib} | `kibana_user`
 |=======
 
-// REVIEWERS: Should I mention machine learning jobs? TBH, I'm not sure which
-// Beats have machine learning jobs, but I think it will be weird for users
-// if this shows up for a Beat that doesn't have ML jobs. I can conditionally
-// code this row, but I need to know which Beats have ML jobs to load.
-
 include::basic-auth.asciidoc[]
 
 include::user-access.asciidoc[]
