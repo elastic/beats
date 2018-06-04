@@ -147,6 +147,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add support for loading a template.json file directly instead of using fields.yml. {pull}7039[7039]
 - Add support for keyword multifields in field.yml. {pull}7131[7131]
 - Add dissect processor. {pull}6925[6925]
+- Add experimental Jolokia Discovery autodiscover provider. {pull}7141[7141]
 - Add owner object info to Kubernetes metadata. {pull}7231[7231]
 - Add beat export dashboard command. {pull}7239[7239]
 
