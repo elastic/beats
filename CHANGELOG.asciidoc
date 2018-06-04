@@ -262,6 +262,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add apiserver metricset to Kubernetes module. {pull}7059[7059]
 - Add maxmemory to redis info metricset. {pull}7127[7127]
 - Set guest as default user in RabbitMQ module. {pull}7107[7107]
+- Add postgresql statement metricset. {issue}7048[7048] {pull}7060[7060]
 - Update `state_container` metricset to support latest `kube-state-metrics` version. {pull}7216[7216]
 
 *Packetbeat*
