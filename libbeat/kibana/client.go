@@ -246,6 +246,22 @@ func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[str
 
 func (client *Client) Close() error { return nil }
 
+// GetDashboard returns the dashboard with the given id with the index pattern removed
+func (client *Client) GetDashboard(id string) (common.MapStr, error) {
+	params := url.Values{}
+	params.Add("dashboard", id)
+	_, response, err := client.Request("GET", "/api/kibana/dashboards/export", params, nil, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error exporting dashboard: %+v", err)
+	}
+
+	result, err := RemoveIndexPattern(response)
+	if err != nil {
+		return nil, fmt.Errorf("error removing index pattern: %+v", err)
+	}
+	return result, nil
+}
+
 // truncateString returns a truncated string if the length is greater than 250
 // runes. If the string is truncated "... (truncated)" is appended. Newlines are
 // replaced by spaces in the returned string.

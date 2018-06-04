@@ -29,9 +29,12 @@ var (
 			"kube_pod_container_resource_requests_memory_bytes": p.Metric("memory.request.bytes"),
 			"kube_pod_container_status_ready":                   p.BooleanMetric("status.ready"),
 			"kube_pod_container_status_restarts":                p.Metric("status.restarts"),
+			"kube_pod_container_status_restarts_total":          p.Metric("status.restarts"),
 			"kube_pod_container_status_running":                 p.KeywordMetric("status.phase", "running"),
 			"kube_pod_container_status_terminated":              p.KeywordMetric("status.phase", "terminated"),
 			"kube_pod_container_status_waiting":                 p.KeywordMetric("status.phase", "waiting"),
+			"kube_pod_container_status_terminated_reason":       p.LabelMetric("status.reason", "reason", false),
+			"kube_pod_container_status_waiting_reason":          p.LabelMetric("status.reason", "reason", false),
 		},
 
 		Labels: map[string]p.LabelMap{

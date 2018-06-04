@@ -14,6 +14,7 @@ func genExportCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 
 	exportCmd.AddCommand(export.GenExportConfigCmd(name, idxPrefix, beatVersion))
 	exportCmd.AddCommand(export.GenTemplateConfigCmd(name, idxPrefix, beatVersion))
+	exportCmd.AddCommand(export.GenDashboardCmd(name, idxPrefix, beatVersion))
 
 	return exportCmd
 }

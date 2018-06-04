@@ -16,7 +16,7 @@ import (
 
 const promMetrics = `
 # TYPE first_metric gauge
-first_metric{label1="value1",label2="value2",label3="value3"} 1
+first_metric{label1="value1",label2="value2",label3="Value3",label4="FOO"} 1
 # TYPE second_metric gauge
 second_metric{label1="value1",label3="othervalue"} 0
 # TYPE summary_metric summary
@@ -110,7 +110,7 @@ func TestPrometheus(t *testing.T) {
 			expected: []common.MapStr{
 				common.MapStr{
 					"first.metric":  1.0,
-					"labels.label3": "value3",
+					"labels.label3": "Value3",
 				},
 				common.MapStr{
 					"second.metric": 0.0,
@@ -180,7 +180,7 @@ func TestPrometheus(t *testing.T) {
 			msg: "Label metrics",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"first_metric": LabelMetric("first.metric", "label3"),
+					"first_metric": LabelMetric("first.metric", "label3", false),
 				},
 				Labels: map[string]LabelMap{
 					"label1": Label("labels.label1"),
@@ -188,7 +188,24 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  "value3",
+					"first.metric":  "Value3",
+					"labels.label1": "value1",
+				},
+			},
+		},
+		{
+			msg: "Label metrics, lowercase",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"first_metric": LabelMetric("first.metric", "label4", true),
+				},
+				Labels: map[string]LabelMap{
+					"label1": Label("labels.label1"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"first.metric":  "foo",
 					"labels.label1": "value1",
 				},
 			},

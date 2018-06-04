@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Negotiate Docker API version from our client instead of using a hardcoded one. {pull}7165[7165]
 - Fix delays on autodiscovery events handling caused by blocking runner stops. {pull}7170[7170]
 - Error out on invalid Autodiscover template conditions settings. {pull}7200[7200]
+- Do not emit Kubernetes autodiscover events for Pods without IP address. {pull}7235[7235]
 
 *Auditbeat*
 
@@ -146,7 +147,9 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add support for loading a template.json file directly instead of using fields.yml. {pull}7039[7039]
 - Add support for keyword multifields in field.yml. {pull}7131[7131]
 - Add dissect processor. {pull}6925[6925]
+- Add experimental Jolokia Discovery autodiscover provider. {pull}7141[7141]
 - Add owner object info to Kubernetes metadata. {pull}7231[7231]
+- Add beat export dashboard command. {pull}7239[7239]
 
 *Auditbeat*
 
@@ -177,6 +180,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Support MySQL 5.7.19 by mysql/slowlog {pull}6969[6969]
 - Correctly join partial log lines when using `docker` input. {pull}6967[6967]
 - Add support for TLS with client authentication to the TCP input {pull}7056[7056]
+- Converted part of pipeline from treafik/access metricSet to dissect to improve efficeny. {pull}7209[7209]
 
 *Heartbeat*
 
@@ -258,6 +262,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add maxmemory to redis info metricset. {pull}7127[7127]
 - Set guest as default user in RabbitMQ module. {pull}7107[7107]
 - Add postgresql statement metricset. {issue}7048[7048] {pull}7060[7060]
+- Update `state_container` metricset to support latest `kube-state-metrics` version. {pull}7216[7216]
 
 *Packetbeat*
 

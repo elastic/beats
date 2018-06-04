@@ -7908,6 +7908,16 @@ Container restarts count
 
 --
 
+*`kubernetes.container.status.reason`*::
++
+--
+type: keyword
+
+Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or termination (Completed, ContainerCannotRun, Error, OOMKilled) reason.
+
+
+--
+
 
 *`kubernetes.container.cpu.limit.cores`*::
 +
