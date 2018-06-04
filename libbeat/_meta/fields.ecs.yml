@@ -1,0 +1,55 @@
+- key: ecs
+  title: ECS
+  description: >
+    Contains ECS fields (https://github.com/elastic/ecs)
+  fields:
+    # Container
+    - name: container.runtime
+      type: keyword
+      description: >
+        Runtime managing this container.
+    - name: container.id
+      type: keyword
+      description: >
+        Unique container id.
+    - name: container.image.name
+      type: keyword
+      description: >
+        Name of the image the container was built on.
+    - name: container.image.tag
+      type: keyword
+      description: >
+        Container image tag.
+    - name: container.name
+      type: keyword
+      description: >
+        Container name.
+    - name: container.labels
+      type: object
+      object_type: keyword
+      description: >
+        Image labels.
+
+    # Network
+    - name: network.direction
+      type: keyword
+      description: >
+        Direction of network traffic (`incoming`, `outgoing` or `unknown`)
+    - name: network.inbound.bytes
+      type: long
+      format: bytes
+      description: >
+        Total number of incoming bytes.
+    - name: network.inbound.packets
+      type: long
+      description: >
+        Total number of incoming packets.
+    - name: network.outbound.bytes
+      type: long
+      format: bytes
+      description: >
+        Total number of outgoing bytes.
+    - name: packets
+      type: long
+      description: >
+        Total number of outgoing packets.

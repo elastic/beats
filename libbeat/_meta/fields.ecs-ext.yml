@@ -1,0 +1,26 @@
+- key: ecs-ext
+  title: ECS extensions
+  description: >
+    Contains extensions to ECS (https://github.com/elastic/ecs)
+  fields:
+    # Network
+    - name: network.interface
+      type: keyword
+      description: >
+        Network interface name.
+    - name: network.inbound.dropped
+      type: scaled_float
+      description: >
+        Total number of dropped incoming packets.
+    - name: network.inbound.errors
+      type: long
+      description: >
+        Total errors on incoming packets.
+    - name: network.outbound.dropped
+      type: scaled_float
+      description: >
+        Total number of dropped outgoing packets.
+    - name: network.outbound.errors
+      type: long
+      description: >
+        Total errors on outgoing packets.

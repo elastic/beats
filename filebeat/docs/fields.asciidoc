@@ -17,6 +17,8 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
+* <<exported-fields-ecs>>
+* <<exported-fields-ecs-ext>>
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
@@ -783,6 +785,184 @@ Container name.
 type: object
 
 Image labels.
+
+
+--
+
+[[exported-fields-ecs]]
+== ECS fields
+
+Contains ECS fields (https://github.com/elastic/ecs)
+
+
+
+*`container.runtime`*::
++
+--
+type: keyword
+
+Runtime managing this container.
+
+
+--
+
+*`container.id`*::
++
+--
+type: keyword
+
+Unique container id.
+
+
+--
+
+*`container.image.name`*::
++
+--
+type: keyword
+
+Name of the image the container was built on.
+
+
+--
+
+*`container.image.tag`*::
++
+--
+type: keyword
+
+Container image tag.
+
+
+--
+
+*`container.name`*::
++
+--
+type: keyword
+
+Container name.
+
+
+--
+
+*`container.labels`*::
++
+--
+type: object
+
+Image labels.
+
+
+--
+
+*`network.direction`*::
++
+--
+type: keyword
+
+Direction of network traffic (`incoming`, `outgoing` or `unknown`)
+
+
+--
+
+*`network.inbound.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of incoming bytes.
+
+
+--
+
+*`network.inbound.packets`*::
++
+--
+type: long
+
+Total number of incoming packets.
+
+
+--
+
+*`network.outbound.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of outgoing bytes.
+
+
+--
+
+*`packets`*::
++
+--
+type: long
+
+Total number of outgoing packets.
+
+
+--
+
+[[exported-fields-ecs-ext]]
+== ECS extensions fields
+
+Contains extensions to ECS (https://github.com/elastic/ecs)
+
+
+
+*`network.interface`*::
++
+--
+type: keyword
+
+Network interface name.
+
+
+--
+
+*`network.inbound.dropped`*::
++
+--
+type: scaled_float
+
+Total number of dropped incoming packets.
+
+
+--
+
+*`network.inbound.errors`*::
++
+--
+type: long
+
+Total errors on incoming packets.
+
+
+--
+
+*`network.outbound.dropped`*::
++
+--
+type: scaled_float
+
+Total number of dropped outgoing packets.
+
+
+--
+
+*`network.outbound.errors`*::
++
+--
+type: long
+
+Total errors on outgoing packets.
 
 
 --
