@@ -343,9 +343,8 @@ endif
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_TITLE} ${ES_BEATS}
 
 	@# Generate Kibana index pattern and copy dashboard files
-	rm -r $(PWD)/_meta/kibana.generated
 	if [ -d $(PWD)/_meta/kibana ]; then \
-		cp -r $(PWD)/_meta/kibana $(PWD)/_meta/kibana.generated; \
+		cp -r $(PWD)/_meta/kibana/ $(PWD)/_meta/kibana.generated; \
 	fi
 	@mkdir -p $(PWD)/_meta/kibana.generated/5/index-pattern
 	@mkdir -p $(PWD)/_meta/kibana.generated/6/index-pattern
