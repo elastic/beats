@@ -40,6 +40,11 @@ func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 	return &prometheus{http}, nil
 }
 
+// NewPrometheusClientWithHTTP creates a new prometheus client with the given HTTP helper
+func NewPrometheusClientWithHTTP(http *helper.HTTP) Prometheus {
+	return &prometheus{http}
+}
+
 // GetFamilies requests metric families from prometheus endpoint and returns them
 func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 	resp, err := p.FetchResponse()
