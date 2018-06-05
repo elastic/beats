@@ -71,8 +71,9 @@ class Test(BaseTest):
         self.index_name = "test-filebeat-modules"
 
     @parameterized.expand(load_fileset_test_cases)
-    @unittest.skipIf(not INTEGRATION_TESTS or
-                     os.getenv("TESTING_ENVIRONMENT") == "2x",
+    @unittest.skipIf(not INTEGRATION_TESTS,
+                     "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
+    @unittest.skipIf(os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
     def test_fileset_file(self, module, fileset, test_file):
         self.init()
