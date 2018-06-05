@@ -18,12 +18,12 @@ newline_chars: \r
 segment_selection_mode: Include
 
 
-### Set the field selection mode, Include (only the fields specified will be matched) or Exclude (everything except the fields specified will be matched)
+### Set the field selection mode, Include (only the fields specified will be matched) or Exclude (everything except the fields specified will be matched). Refines segment selection mode.
 
 field_selection_mode: Include
 
 
-### Set the component selection mode, Include (only the components specified will be matched) or Exclude (everything except the components specified will be matched)
+### Set the component selection mode, Include (only the components specified will be matched) or Exclude (everything except the components specified will be matched). Refines field selection mode.
 
 component_selection_mode: Include
 
@@ -35,6 +35,11 @@ segments: [MSH,MSA]
 
 ### Fields to include or exclude
 
-fields: [MSH-3,MSH-4,MSH-5,MSH-6,MSH-9,MSH-10,MSA-1,MSA-2]
+fields: [MSH.3,MSH.4,MSH.5,MSH.6,MSH.9,MSH.10,MSA.1,MSA.2]
+
+
+### Components to include or exclude
+
+fields: [MSH.3.1,MSH.4.1,MSH.5.1,MSH.6.1,MSH.9.1,MSH.10.1,MSA.1.1,MSA.2.1]
 
   
