@@ -4,7 +4,7 @@
 
 heartbeat
 
-_meta/kibana/*/index-pattern
+_meta/kibana
 
 build
 /tests/load/logs

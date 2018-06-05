@@ -15,7 +15,7 @@ before-build:
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: fields imports
+collect: fields imports kibana
 
 # Generate imports for all monitors
 .PHONY: imports
@@ -27,3 +27,12 @@ imports: python-env
 .PHONY: create-monitor
 create-monitor:
 	go run scripts/generate_monitor/main.go -monitor=${MONITOR}
+
+# Collects all module dashboards
+.PHONY: kibana
+kibana:
+	@rm -rf _meta/kibana
+	@mkdir -p _meta/kibana
+	@-cp -r monitors/active/*/_meta/kibana _meta/
+	@# Convert all dashboards to string
+	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana/6/dashboard/*.json"
