@@ -1119,7 +1119,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of MongoDB server status",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {

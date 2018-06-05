@@ -6,7 +6,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kuberntes API Server: Top clients by number of requests", 
+                "title": "Kubernetes API Server: Top clients by number of requests", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -66,7 +66,7 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Kuberntes API Server: Top clients by number of requests", 
+                    "title": "Kubernetes API Server: Top clients by number of requests", 
                     "type": "metrics"
                 }
             }, 
@@ -186,7 +186,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kuberntes API Server: Top clients by resource", 
+                "title": "Kubernetes API Server: Top clients by resource", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -248,7 +248,7 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Kuberntes API Server: Top clients by resource", 
+                    "title": "Kubernetes API Server: Top clients by resource", 
                     "type": "metrics"
                 }
             }, 
@@ -259,7 +259,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Kubernetes API server metrics",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {

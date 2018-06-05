@@ -375,7 +375,7 @@
         }, 
         {
             "attributes": {
-                "description": "Overview dashboard for the Nginx module in Metricbeat", 
+                "description": "Overview dashboard for the Nginx module in Metricbeat",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {

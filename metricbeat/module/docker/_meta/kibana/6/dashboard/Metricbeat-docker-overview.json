@@ -884,7 +884,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of docker containers",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {

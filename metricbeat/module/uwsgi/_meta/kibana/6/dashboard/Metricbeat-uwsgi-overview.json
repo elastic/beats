@@ -120,7 +120,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of uWSGI service metrics",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
