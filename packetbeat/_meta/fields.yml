@@ -1176,6 +1176,23 @@
                         - name: component
                           type: keyword
                           description: HL7 component
+        - name: response
+          type: group
+          fields:
+            - name: linenumber
+              type: group
+              fields:
+                - name: segment
+                  type: keyword
+                  description: HL7 segment
+                  fields:
+                    - name: field
+                      type: keyword
+                      description: HL7 field
+                      fields:
+                        - name: component
+                          type: keyword
+                          description: HL7 component
 
 
 

@@ -2269,6 +2269,17 @@ HL7 segment
 
 --
 
+
+
+*`hl7v2.response.linenumber.segment`*::
++
+--
+type: keyword
+
+HL7 segment
+
+--
+
 [[exported-fields-host-processor]]
 == Host fields
 
