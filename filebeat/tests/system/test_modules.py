@@ -113,7 +113,7 @@ class Test(BaseTest):
                     break
 
             assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
-                ev["_source"][module], objects)
+                pretty_json(ev["_source"][module]), pretty_json(objects))
 
     def run_on_file(self, module, fileset, test_file, cfgfile):
         print("Testing {}/{} on {}".format(module, fileset, test_file))
@@ -321,3 +321,6 @@ class Test(BaseTest):
                                    max_timeout=30)
 
         beat.kill()
+
+def pretty_json(obj):
+    return json.dumps(obj, indent=2, separators=(',',': '))

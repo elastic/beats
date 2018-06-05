@@ -10,6 +10,7 @@
         ],
         "pattern_definitions": {
           "LOCALDATETIME": "[-0-9]+ %{TIME}",
+          "GREEDYDATA": "(.|\n|\t)*",
           "POSTGRESQL_DB_NAME": "[a-zA-Z0-9_]+[a-zA-Z0-9_\\$]*"
         }
       }
