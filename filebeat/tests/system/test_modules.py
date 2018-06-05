@@ -170,8 +170,9 @@ class Test(BaseTest):
         if os.path.exists(test_file + "-expected.json"):
             self._test_expected_events(module, test_file, res, objects)
 
-    @unittest.skipIf(not INTEGRATION_TESTS or
-                     os.getenv("TESTING_ENVIRONMENT") == "2x",
+    @unittest.skipIf(not INTEGRATION_TESTS,
+                     "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
+    @unittest.skipIf(os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
     def test_input_pipeline_config(self):
         """
