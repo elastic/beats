@@ -21,7 +21,7 @@ var (
 	}.Build()
 
 	// Mapping of state metrics
-	mapping = &p.MetricsMapping{
+	Mapping = p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
 			"kube_pod_info":                                     p.InfoMetric(),
 			"kube_pod_container_info":                           p.InfoMetric(),
@@ -90,11 +90,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	events, err := m.prometheus.GetProcessedMetrics(mapping)
+	events, err := m.prometheus.GetProcessedMetrics(&Mapping)
 	if err != nil {
 		return nil, err
 	}
 
+	// Add deprecated nanocore calculations
 	for _, event := range events {
 		if request, ok := event["cpu.request.cores"]; ok {
 			if requestCores, ok := request.(float64); ok {

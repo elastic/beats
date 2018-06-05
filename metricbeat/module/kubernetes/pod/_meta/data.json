@@ -1,35 +1,60 @@
 {
-    "@timestamp": "2017-04-06T15:29:27.150Z",
-    "beat": {
-        "hostname": "beathost",
-        "name": "beathost",
-        "version": "6.0.0-alpha1"
-    },
-    "kubernetes": {
-        "namespace": "ns",
-        "node": {
-          "name": "localhost",
-        },
-        "pod": {
-            "name": "nginx-3137573019-pcfzh",
-            "network": {
-                "rx": {
-                    "bytes": 18999261,
-                    "errors": 0
-                },
-                "tx": {
-                    "bytes": 28580621,
-                    "errors": 0
-                }
-            },
-            "start_time": "2017-04-06T12:09:05Z"
-        }
+    "@timestamp": "2018-06-20T16:26:58.613Z",
+    "@metadata": {
+      "beat": "metricbeat",
+      "type": "doc",
+      "version": "7.0.0-alpha1"
     },
     "metricset": {
-        "host": "localhost:10255",
-        "module": "kubernetes",
-        "name": "pod",
-        "rtt": 636230
+      "module": "kubernetes",
+      "host": "192.168.99.100:10255",
+      "rtt": 375751,
+      "name": "pod"
     },
-    "type": "metricsets"
-}
+    "kubernetes": {
+      "namespace": "kube-system",
+      "node": {
+        "name": "minikube"
+      },
+      "pod": {
+        "name": "kube-proxy-qmp9j",
+        "start_time": "2018-06-20T10:08:16Z",
+        "status": {
+          "phase": "running",
+          "ready": "true",
+          "scheduled": "true"
+        },
+        "ip": "10.0.2.15",
+        "cpu": {
+          "usage": {
+            "nanocores": 2693393
+          }
+        },
+        "memory": {
+          "usage": {
+            "bytes": 45080576
+          }
+        },
+        "network": {
+          "tx": {
+            "bytes": 1406924,
+            "errors": 0
+          },
+          "rx": {
+            "bytes": 438959140,
+            "errors": 0
+          }
+        },
+        "host_ip": "10.0.2.15"
+      }
+    },
+    "beat": {
+      "name": "X1",
+      "hostname": "X1",
+      "version": "7.0.0-alpha1"
+    },
+    "host": {
+      "name": "X1"
+    }
+  }
+  

@@ -10,9 +10,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
 )
 
-func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.MapStr, error) {
-	events := []common.MapStr{}
-
+func eventMapping(content []byte, stateMetrics []common.MapStr) ([]common.MapStr, error) {
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
@@ -20,18 +18,12 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 	}
 
 	node := summary.Node
-	nodeCores := perfMetrics.NodeCoresAllocatable.Get(node.NodeName)
-	nodeMem := perfMetrics.NodeMemAllocatable.Get(node.NodeName)
+	pods := []common.MapStr{}
 	for _, pod := range summary.Pods {
 		var usageNanoCores, usageMem int64
-		var coresLimit, memLimit float64
-
 		for _, cont := range pod.Containers {
-			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, cont.Name)
 			usageNanoCores += cont.CPU.UsageNanoCores
 			usageMem += cont.Memory.UsageBytes
-			coresLimit += perfMetrics.ContainerCoresLimit.GetWithDefault(cuid, nodeCores)
-			memLimit += perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
 		}
 
 		podEvent := common.MapStr{
@@ -68,31 +60,19 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 			},
 		}
 
-		if coresLimit > nodeCores {
-			coresLimit = nodeCores
-		}
-
-		if memLimit > nodeMem {
-			memLimit = nodeMem
-		}
-
-		if nodeCores > 0 {
-			podEvent.Put("cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores)
-		}
-
-		if nodeMem > 0 {
-			podEvent.Put("memory.usage.node.pct", float64(usageMem)/nodeMem)
-		}
-
-		if coresLimit > 0 {
-			podEvent.Put("cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit)
-		}
-
-		if memLimit > 0 {
-			podEvent.Put("memory.usage.limit.pct", float64(usageMem)/memLimit)
-		}
-
-		events = append(events, podEvent)
+		pods = append(pods, podEvent)
 	}
+
+	events := util.MergeEvents(pods, stateMetrics,
+		map[string]string{
+			mb.ModuleDataKey + ".node.name": node.NodeName,
+		},
+		[]string{mb.NamespaceKey},
+		[]string{
+			mb.ModuleDataKey + ".namespace",
+			"name",
+		},
+	)
+
 	return events, nil
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
@@ -21,7 +22,24 @@ func TestEventMapping(t *testing.T) {
 	body, err := ioutil.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
-	event, err := eventMapping(body)
+	events, err := eventMapping(body, []common.MapStr{
+		common.MapStr{
+			mb.NamespaceKey: "kubernetes.node",
+			"name":          "gke-beats-default-pool-a5b33e2e-hdww",
+			"host_ip":       "10.0.2.15",
+			"pod": common.MapStr{
+				"allocatable": common.MapStr{
+					"total": 110,
+				},
+				"capacity": common.MapStr{
+					"total": 110,
+				},
+			},
+			"status": common.MapStr{
+				"unschedulable": false,
+			},
+		},
+	})
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	testCases := map[string]interface{}{
@@ -52,10 +70,17 @@ func TestEventMapping(t *testing.T) {
 		"runtime.imagefs.available.bytes": 98727014400,
 		"runtime.imagefs.capacity.bytes":  101258067968,
 		"runtime.imagefs.used.bytes":      860204379,
+
+		"pod.allocatable.total": 110,
+		"pod.capacity.total":    110,
+
+		"status.unschedulable": false,
 	}
 
+	assert.Equal(t, 1, len(events))
+
 	for k, v := range testCases {
-		testValue(t, event, k, v)
+		testValue(t, events[0], k, v)
 	}
 }
 

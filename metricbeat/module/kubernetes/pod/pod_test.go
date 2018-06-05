@@ -7,10 +7,11 @@ import (
 	"os"
 	"testing"
 
+	"github.com/elastic/beats/metricbeat/mb"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
@@ -22,12 +23,24 @@ func TestEventMapping(t *testing.T) {
 	body, err := ioutil.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
-	cache := util.NewPerfMetricsCache()
-	cache.NodeCoresAllocatable.Set("gke-beats-default-pool-a5b33e2e-hdww", 2)
-	cache.NodeMemAllocatable.Set("gke-beats-default-pool-a5b33e2e-hdww", 146227200)
-	cache.ContainerMemLimit.Set(util.ContainerUID("default", "nginx-deployment-2303442956-pcqfc", "nginx"), 14622720)
-
-	events, err := eventMapping(body, cache)
+	events, err := eventMapping(body, []common.MapStr{
+		common.MapStr{
+			mb.NamespaceKey: "kubernetes.pod",
+			mb.ModuleDataKey: common.MapStr{
+				"node": common.MapStr{
+					"name": "gke-beats-default-pool-a5b33e2e-hdww",
+				},
+				"namespace": "default",
+			},
+			"name":    "nginx-deployment-2303442956-pcqfc",
+			"host_ip": "10.0.2.15",
+			"status": common.MapStr{
+				"ready":     "true",
+				"phase":     "running",
+				"scheduled": "true",
+			},
+		},
+	})
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 1, "got wrong number of events")
@@ -35,19 +48,16 @@ func TestEventMapping(t *testing.T) {
 	testCases := map[string]interface{}{
 		"name": "nginx-deployment-2303442956-pcqfc",
 
-		"network.rx.bytes":  107056,
-		"network.rx.errors": 0,
-		"network.tx.bytes":  72447,
-		"network.tx.errors": 0,
-
-		// calculated pct fields:
+		"network.rx.bytes":    107056,
+		"network.rx.errors":   0,
+		"network.tx.bytes":    72447,
+		"network.tx.errors":   0,
 		"cpu.usage.nanocores": 11263994,
-		"cpu.usage.node.pct":  0.005631997,
-		"cpu.usage.limit.pct": 0.005631997,
+		"memory.usage.bytes":  1462272,
 
-		"memory.usage.bytes":     1462272,
-		"memory.usage.node.pct":  0.01,
-		"memory.usage.limit.pct": 0.1,
+		"status.ready":     "true",
+		"status.phase":     "running",
+		"status.scheduled": "true",
 	}
 
 	for k, v := range testCases {

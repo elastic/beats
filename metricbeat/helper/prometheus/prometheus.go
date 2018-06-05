@@ -130,7 +130,8 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 
 			// Keep a info document if it's an infoMetric
-			if _, ok = m.(*infoMetric); ok {
+			_, ok = m.(*infoMetric)
+			if ok {
 				labels.DeepUpdate(keyLabels)
 				infoMetrics = append(infoMetrics, &infoMetricData{
 					Labels: keyLabels,
@@ -177,7 +178,6 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	}
 
 	return events, nil
-
 }
 
 // infoMetricData keeps data about an infoMetric
