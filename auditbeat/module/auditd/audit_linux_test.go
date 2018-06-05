@@ -56,7 +56,7 @@ func TestData(t *testing.T) {
 		// Get Status response for initClient
 		returnACK().returnStatus().
 		// Send expected ACKs for initialization
-		returnACK().returnACK().returnACK().returnACK().
+		returnACK().returnACK().returnACK().returnACK().returnACK().
 		// Send a single audit message from the kernel.
 		returnMessage(userLoginMsg)
 

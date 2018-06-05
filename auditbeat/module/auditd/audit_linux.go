@@ -3,8 +3,10 @@ package auditd
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -18,6 +20,7 @@ import (
 	"github.com/elastic/go-libaudit"
 	"github.com/elastic/go-libaudit/aucoalesce"
 	"github.com/elastic/go-libaudit/auparse"
+	"github.com/elastic/go-libaudit/rule"
 )
 
 const (
@@ -28,13 +31,24 @@ const (
 	unicast   = "unicast"
 	multicast = "multicast"
 
-	lostEventsUpdateInterval = time.Second * 15
+	lostEventsUpdateInterval        = time.Second * 15
+	maxDefaultStreamBufferConsumers = 4
+)
+
+type backpressureStrategy uint8
+
+const (
+	bsKernel backpressureStrategy = 1 << iota
+	bsUserSpace
+	bsAuto
 )
 
 var (
 	auditdMetrics         = monitoring.Default.NewRegistry(moduleName)
-	reassemblerlostMetric = monitoring.NewInt(auditdMetrics, "reassembler_lost")
+	reassemblerGapsMetric = monitoring.NewInt(auditdMetrics, "reassembler_seq_gaps")
 	kernelLostMetric      = monitoring.NewInt(auditdMetrics, "kernel_lost")
+	userspaceLostMetric   = monitoring.NewInt(auditdMetrics, "userspace_lost")
+	receivedMetric        = monitoring.NewInt(auditdMetrics, "received_msgs")
 )
 
 func init() {
@@ -58,6 +72,7 @@ type MetricSet struct {
 		enabled bool
 		counter uint32
 	}
+	backpressureStrategy backpressureStrategy
 }
 
 // New constructs a new MetricSet.
@@ -76,14 +91,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to create audit client")
 	}
 
-	reassemblerlostMetric.Set(0)
+	reassemblerGapsMetric.Set(0)
 	kernelLostMetric.Set(0)
+	userspaceLostMetric.Set(0)
+	receivedMetric.Set(0)
 
 	return &MetricSet{
-		BaseMetricSet: base,
-		client:        client,
-		config:        config,
-		log:           log,
+		BaseMetricSet:        base,
+		client:               client,
+		config:               config,
+		log:                  log,
+		backpressureStrategy: getBackpressureStrategy(config.BackpressureStrategy, log),
 	}, nil
 }
 
@@ -128,9 +146,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 				case <-reporter.Done():
 					return
 				case <-timer.C:
-					if seq, err := ms.client.GetStatusAsync(false); err == nil {
-						ms.log.Debugf("sent async status request seq=%d", seq)
-					} else {
+					if _, err := ms.client.GetStatusAsync(false); err != nil {
 						ms.log.Error("get async status request failed:", err)
 					}
 				case status := <-statusC:
@@ -140,14 +156,32 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		}()
 	}
 
-	for {
-		select {
-		case <-reporter.Done():
-			return
-		case msgs := <-out:
-			reporter.Event(buildMetricbeatEvent(msgs, ms.config))
+	// Spawn the stream buffer consumers
+	numConsumers := ms.config.StreamBufferConsumers
+	// By default (stream_buffer_consumers=0) use as many consumers as local CPUs
+	// with a max of `maxDefaultStreamBufferConsumers`
+	if numConsumers == 0 {
+		if numConsumers = runtime.GOMAXPROCS(-1); numConsumers > maxDefaultStreamBufferConsumers {
+			numConsumers = maxDefaultStreamBufferConsumers
 		}
 	}
+	var wg sync.WaitGroup
+	wg.Add(numConsumers)
+
+	for i := 0; i < numConsumers; i++ {
+		go func() {
+			defer wg.Done()
+			for {
+				select {
+				case <-reporter.Done():
+					return
+				case msgs := <-out:
+					reporter.Event(buildMetricbeatEvent(msgs, ms.config))
+				}
+			}
+		}()
+	}
+	wg.Wait()
 }
 
 func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
@@ -186,6 +220,12 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	}
 	ms.log.Infof("Deleted %v pre-existing audit rules.", n)
 
+	// Add rule to ignore syscalls from this process
+	if rule, err := buildPIDIgnoreRule(os.Getpid()); err == nil {
+		rules = append([]auditRule{rule}, rules...)
+	} else {
+		ms.log.Errorf("Failed to build a rule to ignore self: %v", err)
+	}
 	// Add rules from config.
 	var failCount int
 	for _, rule := range rules {
@@ -233,15 +273,41 @@ func (ms *MetricSet) initClient() error {
 		}
 	}
 
-	if status.RateLimit != ms.config.RateLimit {
-		if err = ms.client.SetRateLimit(ms.config.RateLimit, libaudit.NoWait); err != nil {
-			return errors.Wrap(err, "failed to set audit rate limit in kernel")
-		}
-	}
-
 	if status.BacklogLimit != ms.config.BacklogLimit {
 		if err = ms.client.SetBacklogLimit(ms.config.BacklogLimit, libaudit.NoWait); err != nil {
 			return errors.Wrap(err, "failed to set audit backlog limit in kernel")
+		}
+	}
+
+	if ms.backpressureStrategy&(bsKernel|bsAuto) != 0 {
+		// "kernel" backpressure mitigation strategy
+		//
+		// configure the kernel to drop audit events immediately if the
+		// backlog queue is full.
+		if status.FeatureBitmap&libaudit.AuditFeatureBitmapBacklogWaitTime != 0 {
+			ms.log.Info("Setting kernel backlog wait time to prevent backpressure propagating to the kernel.")
+			if err = ms.client.SetBacklogWaitTime(0, libaudit.NoWait); err != nil {
+				return errors.Wrap(err, "failed to set audit backlog wait time in kernel")
+			}
+		} else {
+			if ms.backpressureStrategy == bsAuto {
+				ms.log.Warn("setting backlog wait time is not supported in this kernel. Enabling workaround.")
+				ms.backpressureStrategy |= bsUserSpace
+			} else {
+				return errors.New("kernel backlog wait time not supported by kernel, but required by backpressure_strategy")
+			}
+		}
+	}
+
+	if ms.backpressureStrategy&(bsKernel|bsUserSpace) == bsUserSpace && ms.config.RateLimit == 0 {
+		// force a rate limit if the user-space strategy will be used without
+		// corresponding backlog_wait_time setting in the kernel
+		ms.config.RateLimit = 5000
+	}
+
+	if status.RateLimit != ms.config.RateLimit {
+		if err = ms.client.SetRateLimit(ms.config.RateLimit, libaudit.NoWait); err != nil {
+			return errors.Wrap(err, "failed to set audit rate limit in kernel")
 		}
 	}
 
@@ -287,7 +353,17 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 
 	out := make(chan []*auparse.AuditMessage, ms.config.StreamBufferQueueSize)
 	statusC := make(chan *libaudit.AuditStatus, 8)
-	reassembler, err := libaudit.NewReassembler(int(ms.config.ReassemblerMaxInFlight), ms.config.ReassemblerTimeout, &stream{done, out})
+
+	var st libaudit.Stream = &stream{done, out}
+	if ms.backpressureStrategy&bsUserSpace != 0 {
+		// "user-space" backpressure mitigation strategy
+		//
+		// Consume events from our side as fast as possible, by dropping events
+		// if the publishing pipeline would block.
+		ms.log.Info("Using non-blocking stream to prevent backpressure propagating to the kernel.")
+		st = &nonBlockingStream{done, out}
+	}
+	reassembler, err := libaudit.NewReassembler(int(ms.config.ReassemblerMaxInFlight), ms.config.ReassemblerTimeout, st)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "failed to create Reassembler")
 	}
@@ -320,7 +396,7 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 			if filterRecordType(raw.Type) {
 				continue
 			}
-
+			receivedMetric.Inc()
 			if err := reassembler.Push(raw.Type, raw.Data); err != nil {
 				ms.log.Debugw("Dropping audit message",
 					"record_type", raw.Type,
@@ -596,7 +672,26 @@ func (s *stream) ReassemblyComplete(msgs []*auparse.AuditMessage) {
 }
 
 func (s *stream) EventsLost(count int) {
-	reassemblerlostMetric.Inc()
+	reassemblerGapsMetric.Add(int64(count))
+}
+
+// nonBlockingStream behaves as stream above, except that it will never block
+// on backpressure from the publishing pipeline.
+// Instead, events will be discarded.
+type nonBlockingStream stream
+
+func (s *nonBlockingStream) ReassemblyComplete(msgs []*auparse.AuditMessage) {
+	select {
+	case <-s.done:
+		return
+	case s.out <- msgs:
+	default:
+		userspaceLostMetric.Add(int64(len(msgs)))
+	}
+}
+
+func (s *nonBlockingStream) EventsLost(count int) {
+	(*stream)(s).EventsLost(count)
 }
 
 func hasMulticastSupport() bool {
@@ -727,4 +822,45 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 		return unicast, nil
 	}
 
+}
+
+func getBackpressureStrategy(value string, logger *logp.Logger) backpressureStrategy {
+	switch value {
+	case "kernel":
+		return bsKernel
+	case "userspace", "user-space":
+		return bsUserSpace
+	case "auto":
+		return bsAuto
+	case "both":
+		return bsKernel | bsUserSpace
+	case "none":
+		return 0
+	default:
+		logger.Warn("Unknown value for the 'backpressure_strategy' option. Using default.")
+		fallthrough
+	case "", "default":
+		return bsAuto
+	}
+}
+
+func buildPIDIgnoreRule(pid int) (ruleData auditRule, err error) {
+	r := rule.SyscallRule{
+		Type:   rule.AppendSyscallRuleType,
+		List:   "exit",
+		Action: "never",
+		Filters: []rule.FilterSpec{
+			{
+				Type:       rule.ValueFilterType,
+				LHS:        "pid",
+				Comparator: "=",
+				RHS:        strconv.Itoa(pid),
+			},
+		},
+		Syscalls: []string{"all"},
+		Keys:     nil,
+	}
+	ruleData.flags = fmt.Sprintf("-A exit,never -F pid=%d -S all", pid)
+	ruleData.data, err = rule.Build(&r)
+	return ruleData, err
 }

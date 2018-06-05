@@ -33,6 +33,12 @@ type Config struct {
 	ReassemblerMaxInFlight uint32        `config:"reassembler.max_in_flight"`
 	ReassemblerTimeout     time.Duration `config:"reassembler.timeout"`
 	StreamBufferQueueSize  uint32        `config:"reassembler.queue_size"`
+	// BackpressureStrategy defines the strategy used to mitigate backpressure
+	// propagating to the kernel causing audited processes to block until
+	// Auditbeat can keep-up.
+	// One of "user-space", "kernel", "both", "none", "auto" (default)
+	BackpressureStrategy  string `config:"backpressure_strategy"`
+	StreamBufferConsumers int    `config:"stream_buffer_consumers"`
 }
 
 type auditRule struct {
@@ -129,5 +135,6 @@ var defaultConfig = Config{
 	Warnings:               false,
 	ReassemblerMaxInFlight: 50,
 	ReassemblerTimeout:     2 * time.Second,
-	StreamBufferQueueSize:  64,
+	StreamBufferQueueSize:  8192,
+	StreamBufferConsumers:  0,
 }
