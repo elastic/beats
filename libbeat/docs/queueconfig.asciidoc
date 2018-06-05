@@ -67,7 +67,7 @@ Minimum number of events required for publishing. If this value is set to 0, the
 output can start publishing events without additional waiting times. Otherwise
 the output has to wait for more events to become available.
 
-The default value is 0.
+The default value is 2048.
 
 [float]
 ===== `flush.timeout`
@@ -75,7 +75,7 @@ The default value is 0.
 Maximum wait time for `flush.min_events` to be fulfilled. If set to 0s, events
 will be immediately available for consumption.
 
-The default values is 0s.
+The default value is 1s.
 
 [float]
 [[configuration-internal-queue-spool]]
