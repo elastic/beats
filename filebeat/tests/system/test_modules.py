@@ -234,8 +234,9 @@ class Test(BaseTest):
         o = objects[0]
         assert o["x-pipeline"] == "test-pipeline"
 
-    @unittest.skipIf(not INTEGRATION_TESTS or
-                     os.getenv("TESTING_ENVIRONMENT") == "2x",
+    @unittest.skipIf(not INTEGRATION_TESTS,
+                     "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
+    @unittest.skipIf(os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
     def test_ml_setup(self):
         """ Test ML are installed in all possible ways """
