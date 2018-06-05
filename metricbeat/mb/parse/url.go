@@ -32,37 +32,43 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 			return mb.HostData{}, err
 		}
 
-		var user, pass, path string
-		t, ok := conf["username"]
-		if ok {
-			user, ok = t.(string)
-			if !ok {
-				return mb.HostData{}, errors.Errorf("'username' config for module %v is not a string", module.Name())
-			}
-		} else {
-			user = b.DefaultUsername
-		}
-		t, ok = conf["password"]
-		if ok {
-			pass, ok = t.(string)
-			if !ok {
-				return mb.HostData{}, errors.Errorf("'password' config for module %v is not a string", module.Name())
-			}
-		} else {
-			pass = b.DefaultPassword
-		}
-		t, ok = conf[b.PathConfigKey]
-		if ok {
-			path, ok = t.(string)
-			if !ok {
-				return mb.HostData{}, errors.Errorf("'%v' config for module %v is not a string", b.PathConfigKey, module.Name())
-			}
-		} else {
-			path = b.DefaultPath
-		}
-
-		return ParseURL(host, b.DefaultScheme, user, pass, path, b.QueryParams)
+		return b.BuildFromConfig(conf, module.Name(), host)
 	}
+}
+
+// BuildFromConfig returns a new HostParser function whose behavior is influenced by the
+// options set in URLHostParserBuilder.
+func (b URLHostParserBuilder) BuildFromConfig(conf map[string]interface{}, module string, host string) (mb.HostData, error) {
+	var user, pass, path string
+	t, ok := conf["username"]
+	if ok {
+		user, ok = t.(string)
+		if !ok {
+			return mb.HostData{}, errors.Errorf("'username' config for module %v is not a string", module)
+		}
+	} else {
+		user = b.DefaultUsername
+	}
+	t, ok = conf["password"]
+	if ok {
+		pass, ok = t.(string)
+		if !ok {
+			return mb.HostData{}, errors.Errorf("'password' config for module %v is not a string", module)
+		}
+	} else {
+		pass = b.DefaultPassword
+	}
+	t, ok = conf[b.PathConfigKey]
+	if ok {
+		path, ok = t.(string)
+		if !ok {
+			return mb.HostData{}, errors.Errorf("'%v' config for module %v is not a string", b.PathConfigKey, module)
+		}
+	} else {
+		path = b.DefaultPath
+	}
+
+	return ParseURL(host, b.DefaultScheme, user, pass, path, b.QueryParams)
 }
 
 // NewHostDataFromURL returns a new HostData based on the contents of the URL.
