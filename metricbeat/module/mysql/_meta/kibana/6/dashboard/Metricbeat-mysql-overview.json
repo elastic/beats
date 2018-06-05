@@ -524,7 +524,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of MySQL server",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {

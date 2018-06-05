@@ -985,7 +985,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of system metrics",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {

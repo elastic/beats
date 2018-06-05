@@ -4,7 +4,7 @@ collection from using TCP sockets or HTTP with or without basic authentication.
 To configure HAProxy to collect stats, you must enable the stats module, it can
 be done by enabling a TCP socket, or by adding an HTTP stats frontend.
 
-Metricbeat can collect two metric sets from HAproxy, `info` and `stats`. `info`
+Metricbeat can collect two metric sets from HAProxy, `info` and `stats`. `info`
 is not available when using HTTP stats frontend.
 
 For example, to enable stats reporting via any local IP on port 14567, place

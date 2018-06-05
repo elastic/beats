@@ -1180,7 +1180,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of Kubernetes cluster metrics",
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
