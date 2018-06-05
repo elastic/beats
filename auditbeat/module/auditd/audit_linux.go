@@ -370,6 +370,7 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 	go maintain(done, reassembler)
 
 	go func() {
+		defer ms.log.Debug("receiveEvents goroutine exited")
 		defer close(out)
 		defer close(statusC)
 		defer reassembler.Close()
@@ -377,6 +378,10 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 		for {
 			raw, err := ms.client.Receive(false)
 			if err != nil {
+				if errors.Cause(err) == syscall.EBADF {
+					// Client has been closed.
+					break
+				}
 				continue
 			}
 			if raw.Type == auparse.AUDIT_GET {
@@ -430,8 +435,14 @@ func maintain(done <-chan struct{}, reassembler *libaudit.Reassembler) {
 }
 
 func filterRecordType(typ auparse.AuditMessageType) bool {
+	switch {
+	// REPLACE messages are tests to check if Auditbeat is still healthy by
+	// seeing if unicast messages can be sent without error from the kernel.
+	// Ignore them.
+	case typ == auparse.AUDIT_REPLACE:
+		return true
 	// Messages from 1300-2999 are valid audit message types.
-	if typ < auparse.AUDIT_USER_AUTH || typ > auparse.AUDIT_LAST_USER_MSG2 {
+	case typ < auparse.AUDIT_USER_AUTH || typ > auparse.AUDIT_LAST_USER_MSG2:
 		return true
 	}
 
