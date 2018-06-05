@@ -18,12 +18,9 @@ include ${ES_BEATS}/libbeat/scripts/Makefile
 # Collects all module dashboards
 .PHONY: kibana
 kibana:
-	@rm -rf _meta/kibana
-	@mkdir -p _meta/kibana
-	@-cp -r module/*/_meta/kibana _meta/
-	@-cp -r module/*/_meta/kibana _meta/
-	@# Convert all dashboards to string
-	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana/6/dashboard/*.json"
+	@rm -rf _meta/kibana.generated
+	@mkdir -p _meta/kibana.generated
+	@-cp -pr module/*/_meta/kibana/* _meta/kibana.generated
 
 # Collects all module docs
 .PHONY: collect-docs

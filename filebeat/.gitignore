@@ -5,7 +5,6 @@
 filebeat
 
 build
-_meta/kibana
 _meta/module.generated
 _meta/beat.yml
 _meta/beat.reference.yml
