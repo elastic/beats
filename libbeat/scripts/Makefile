@@ -342,9 +342,11 @@ endif
 	@mkdir -p docs
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_TITLE} ${ES_BEATS}
 
-	@# Generate Kibana index pattern
-	# Copy kibana files to generated directory and convert files
-	cp -r $(PWD)/_meta/kibana $(PWD)/_meta/kibana.generated
+	@# Generate Kibana index pattern and copy dashboard files
+	rm -r $(PWD)/_meta/kibana.generated
+	if [ -d $(PWD)/_meta/kibana ]; then \
+		cp -r $(PWD)/_meta/kibana $(PWD)/_meta/kibana.generated; \
+	fi
 	@mkdir -p $(PWD)/_meta/kibana.generated/5/index-pattern
 	@mkdir -p $(PWD)/_meta/kibana.generated/6/index-pattern
 	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go -index '${BEAT_INDEX_PREFIX}-*' -beat-name ${BEAT_NAME} -beat-dir $(PWD) -version ${BEAT_VERSION}
