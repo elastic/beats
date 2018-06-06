@@ -2,6 +2,8 @@
   title: "Common heartbeat monitor"
   description:
   fields:
+    - name: type
+      type: keyword
     - name: monitor
       type: group
       description: >
