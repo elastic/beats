@@ -19,8 +19,6 @@ include::./overview.asciidoc[]
 
 include::./communitybeats.asciidoc[]
 
-include::../../libbeat/docs/contributing-to-beats.asciidoc[]
-
 include::./gettingstarted.asciidoc[]
 
 include::./installing-beats.asciidoc[]
@@ -32,3 +30,5 @@ include::./upgrading.asciidoc[]
 include::./config-file-format.asciidoc[]
 
 include::./release.asciidoc[]
+
+include::../../libbeat/docs/contributing-to-beats.asciidoc[]
