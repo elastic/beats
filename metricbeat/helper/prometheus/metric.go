@@ -58,6 +58,12 @@ func LabelMetric(field, label string, lowercase bool) MetricMap {
 	}
 }
 
+// InfoMetric obtains info labels from the given metric and puts them
+// into events matching all the key labels present in the metric
+func InfoMetric() MetricMap {
+	return &infoMetric{}
+}
+
 type commonMetric struct {
 	field string
 }
@@ -175,5 +181,17 @@ func getLabel(metric *dto.Metric, name string) string {
 			return label.GetValue()
 		}
 	}
+	return ""
+}
+
+type infoMetric struct{}
+
+// GetValue returns the resulting value
+func (m *infoMetric) GetValue(metric *dto.Metric) interface{} {
+	return ""
+}
+
+// GetField returns the resulting field name
+func (m *infoMetric) GetField() string {
 	return ""
 }

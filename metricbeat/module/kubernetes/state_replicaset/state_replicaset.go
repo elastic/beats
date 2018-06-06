@@ -20,7 +20,7 @@ var (
 
 	mapping = &p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
-			"kube_replicaset_metadata_generation":           p.Metric(""),
+			"kube_replicaset_metadata_generation":           p.InfoMetric(),
 			"kube_replicaset_status_fully_labeled_replicas": p.Metric("replicas.labeled"),
 			"kube_replicaset_status_observed_generation":    p.Metric("replicas.observed"),
 			"kube_replicaset_status_ready_replicas":         p.Metric("replicas.ready"),

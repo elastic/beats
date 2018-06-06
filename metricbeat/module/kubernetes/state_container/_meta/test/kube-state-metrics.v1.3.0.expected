@@ -156,23 +156,9 @@
 	{
 		"_module": {
 			"namespace": "kube-system",
-			"pod": {
-				"name": "kube-proxy-znhg6"
-			}
-		},
-		"_namespace": "container",
-		"id": "docker://76c260259ddfd0267b5acb4e514465215ef1ebfa93a4057d592828772e6b39f5",
-		"image": "gcr.io/google_containers/kube-proxy-amd64:v1.9.7",
-		"name": "kube-proxy",
-		"status": {
-			"phase": "running",
-			"ready": true,
-			"restarts": 0
-		}
-	},
-	{
-		"_module": {
-			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			},
 			"pod": {
 				"name": "etcd-minikube"
 			}
@@ -190,6 +176,30 @@
 	{
 		"_module": {
 			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			},
+			"pod": {
+				"name": "storage-provisioner"
+			}
+		},
+		"_namespace": "container",
+		"id": "docker://f4cc07b8e7ee5952738c69a0bff0c7b331c10af66faa541197684127d393b760",
+		"image": "gcr.io/k8s-minikube/storage-provisioner:v1.8.1",
+		"name": "storage-provisioner",
+		"status": {
+			"phase": "running",
+			"ready": true,
+			"reason": "ImagePullBackOff",
+			"restarts": 0
+		}
+	},
+	{
+		"_module": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			},
 			"pod": {
 				"name": "kubernetes-dashboard-77d8b98585-vqtzm"
 			}
@@ -243,18 +253,20 @@
 	{
 		"_module": {
 			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			},
 			"pod": {
-				"name": "storage-provisioner"
+				"name": "kube-proxy-znhg6"
 			}
 		},
 		"_namespace": "container",
-		"id": "docker://f4cc07b8e7ee5952738c69a0bff0c7b331c10af66faa541197684127d393b760",
-		"image": "gcr.io/k8s-minikube/storage-provisioner:v1.8.1",
-		"name": "storage-provisioner",
+		"id": "docker://76c260259ddfd0267b5acb4e514465215ef1ebfa93a4057d592828772e6b39f5",
+		"image": "gcr.io/google_containers/kube-proxy-amd64:v1.9.7",
+		"name": "kube-proxy",
 		"status": {
 			"phase": "running",
 			"ready": true,
-			"reason": "ImagePullBackOff",
 			"restarts": 0
 		}
 	},
