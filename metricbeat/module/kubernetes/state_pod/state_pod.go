@@ -20,7 +20,7 @@ var (
 
 	mapping = &p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
-			"kube_pod_info":             p.Metric(""),
+			"kube_pod_info":             p.InfoMetric(),
 			"kube_pod_status_phase":     p.LabelMetric("status.phase", "phase", true),
 			"kube_pod_status_ready":     p.LabelMetric("status.ready", "condition", true),
 			"kube_pod_status_scheduled": p.LabelMetric("status.scheduled", "condition", true),

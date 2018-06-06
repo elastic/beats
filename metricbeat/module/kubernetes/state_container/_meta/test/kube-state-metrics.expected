@@ -1,6 +1,26 @@
 [
 	{
 		"_module": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			},
+			"pod": {
+				"name": "kubernetes-dashboard-vw0l6"
+			}
+		},
+		"_namespace": "container",
+		"id": "docker://3aaee8bdd311c015240e99fa2a5a5f2f26b11b51236a683b39d8c1902e423978",
+		"image": "gcr.io/google_containers/kubernetes-dashboard-amd64:v1.5.1",
+		"name": "kubernetes-dashboard",
+		"status": {
+			"phase": "running",
+			"ready": true,
+			"restarts": 2
+		}
+	},
+	{
+		"_module": {
 			"namespace": "jenkins",
 			"node": {
 				"name": "minikube"
@@ -27,23 +47,6 @@
 			"phase": "running",
 			"ready": true,
 			"restarts": 1
-		}
-	},
-	{
-		"_module": {
-			"namespace": "kube-system",
-			"pod": {
-				"name": "kube-dns-v20-5g5cb"
-			}
-		},
-		"_namespace": "container",
-		"id": "docker://9a4c9462cd078d7be4f0a9b94bcfeb69d5fdd76bff67142df3f58367ac7e8d61",
-		"image": "gcr.io/google_containers/kube-dnsmasq-amd64:1.4",
-		"name": "dnsmasq",
-		"status": {
-			"phase": "running",
-			"ready": true,
-			"restarts": 2
 		}
 	},
 	{
@@ -156,6 +159,26 @@
 			}
 		},
 		"_namespace": "container",
+		"id": "docker://9a4c9462cd078d7be4f0a9b94bcfeb69d5fdd76bff67142df3f58367ac7e8d61",
+		"image": "gcr.io/google_containers/kube-dnsmasq-amd64:1.4",
+		"name": "dnsmasq",
+		"status": {
+			"phase": "running",
+			"ready": true,
+			"restarts": 2
+		}
+	},
+	{
+		"_module": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			},
+			"pod": {
+				"name": "kube-dns-v20-5g5cb"
+			}
+		},
+		"_namespace": "container",
 		"cpu": {
 			"request": {
 				"cores": 0.01
@@ -181,6 +204,9 @@
 	{
 		"_module": {
 			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			},
 			"pod": {
 				"name": "tiller-deploy-3067024529-9lpmb"
 			}
@@ -250,23 +276,6 @@
 			}
 		},
 		"name": "kube-state-metrics"
-	},
-	{
-		"_module": {
-			"namespace": "kube-system",
-			"pod": {
-				"name": "kubernetes-dashboard-vw0l6"
-			}
-		},
-		"_namespace": "container",
-		"id": "docker://3aaee8bdd311c015240e99fa2a5a5f2f26b11b51236a683b39d8c1902e423978",
-		"image": "gcr.io/google_containers/kubernetes-dashboard-amd64:v1.5.1",
-		"name": "kubernetes-dashboard",
-		"status": {
-			"phase": "running",
-			"ready": true,
-			"restarts": 2
-		}
 	},
 	{
 		"_module": {
