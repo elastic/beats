@@ -21,7 +21,7 @@ var (
 
 	mapping = &p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
-			"kube_deployment_metadata_generation":         p.Metric(""),
+			"kube_deployment_metadata_generation":         p.InfoMetric(),
 			"kube_deployment_status_replicas_updated":     p.Metric("replicas.updated"),
 			"kube_deployment_status_replicas_unavailable": p.Metric("replicas.unavailable"),
 			"kube_deployment_status_replicas_available":   p.Metric("replicas.available"),

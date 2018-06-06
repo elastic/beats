@@ -20,7 +20,7 @@ var (
 
 	mapping = &p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
-			"kube_node_info":                            p.Metric(""),
+			"kube_node_info":                            p.InfoMetric(),
 			"kube_node_status_allocatable_pods":         p.Metric("pod.allocatable.total"),
 			"kube_node_status_capacity_pods":            p.Metric("pod.capacity.total"),
 			"kube_node_status_capacity_memory_bytes":    p.Metric("memory.capacity.bytes"),

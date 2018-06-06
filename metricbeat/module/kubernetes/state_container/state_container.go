@@ -20,9 +20,11 @@ var (
 		DefaultPath:   defaultPath,
 	}.Build()
 
+	// Mapping of state metrics
 	mapping = &p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
-			"kube_pod_container_info":                           p.Metric(""),
+			"kube_pod_info":                                     p.InfoMetric(),
+			"kube_pod_container_info":                           p.InfoMetric(),
 			"kube_pod_container_resource_limits_cpu_cores":      p.Metric("cpu.limit.cores"),
 			"kube_pod_container_resource_requests_cpu_cores":    p.Metric("cpu.request.cores"),
 			"kube_pod_container_resource_limits_memory_bytes":   p.Metric("memory.limit.bytes"),
