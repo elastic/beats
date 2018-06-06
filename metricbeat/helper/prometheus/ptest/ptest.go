@@ -7,7 +7,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"sort"
 	"testing"
+
+	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -60,6 +63,11 @@ func TestMetricSetEventsFetcher(t *testing.T, module, metricset string, cases Te
 		assert.Nil(t, err, "Errors while fetching metrics")
 
 		if *expectedFlag {
+			sort.SliceStable(events, func(i, j int) bool {
+				h1, _ := hashstructure.Hash(events[i], nil)
+				h2, _ := hashstructure.Hash(events[j], nil)
+				return h1 < h2
+			})
 			eventsJSON, _ := json.MarshalIndent(events, "", "\t")
 			err = ioutil.WriteFile(test.ExpectedFile, eventsJSON, 0644)
 			assert.NoError(t, err)
@@ -137,7 +145,13 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 		assert.Nil(t, reporter.GetErrors(), "Errors while fetching metrics")
 
 		if *expectedFlag {
-			eventsJSON, _ := json.MarshalIndent(reporter.GetEvents(), "", "\t")
+			events := reporter.GetEvents()
+			sort.SliceStable(events, func(i, j int) bool {
+				h1, _ := hashstructure.Hash(events[i], nil)
+				h2, _ := hashstructure.Hash(events[j], nil)
+				return h1 < h2
+			})
+			eventsJSON, _ := json.MarshalIndent(events, "", "\t")
 			err = ioutil.WriteFile(test.ExpectedFile, eventsJSON, 0644)
 			assert.NoError(t, err)
 		}
