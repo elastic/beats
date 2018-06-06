@@ -73,7 +73,9 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric": 1.0,
+					"first": common.MapStr{
+						"metric": 1.0,
+					},
 				},
 			},
 		},
@@ -90,9 +92,13 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  1.0,
-					"labels.label1": "value1",
-					"labels.label2": "value2",
+					"first": common.MapStr{
+						"metric": 1.0,
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+						"label2": "value2",
+					},
 				},
 			},
 		},
@@ -109,12 +115,20 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  1.0,
-					"labels.label3": "Value3",
+					"first": common.MapStr{
+						"metric": 1.0,
+					},
+					"labels": common.MapStr{
+						"label3": "Value3",
+					},
 				},
 				common.MapStr{
-					"second.metric": 0.0,
-					"labels.label3": "othervalue",
+					"second": common.MapStr{
+						"metric": 0.0,
+					},
+					"labels": common.MapStr{
+						"label3": "othervalue",
+					},
 				},
 			},
 		},
@@ -132,10 +146,16 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  1.0,
-					"second.metric": 0.0,
-					"labels.label1": "value1",
-					"labels.label2": "value2",
+					"first": common.MapStr{
+						"metric": 1.0,
+					},
+					"second": common.MapStr{
+						"metric": 0.0,
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+						"label2": "value2",
+					},
 				},
 			},
 		},
@@ -152,8 +172,12 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  "works",
-					"labels.label1": "value1",
+					"first": common.MapStr{
+						"metric": "works",
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+					},
 				},
 			},
 		},
@@ -170,9 +194,15 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  true,
-					"second.metric": false,
-					"labels.label1": "value1",
+					"first": common.MapStr{
+						"metric": true,
+					},
+					"second": common.MapStr{
+						"metric": false,
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+					},
 				},
 			},
 		},
@@ -188,8 +218,12 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  "Value3",
-					"labels.label1": "value1",
+					"first": common.MapStr{
+						"metric": "Value3",
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+					},
 				},
 			},
 		},
@@ -205,8 +239,12 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  "foo",
-					"labels.label1": "value1",
+					"first": common.MapStr{
+						"metric": "foo",
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+					},
 				},
 			},
 		},
@@ -219,13 +257,15 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"summary.metric": common.MapStr{
-						"sum":   234892394.0,
-						"count": uint64(44000),
-						"percentile": common.MapStr{
-							"50": 29735.0,
-							"90": 47103.0,
-							"99": 50681.0,
+					"summary": common.MapStr{
+						"metric": common.MapStr{
+							"sum":   234892394.0,
+							"count": uint64(44000),
+							"percentile": common.MapStr{
+								"50": 29735.0,
+								"90": 47103.0,
+								"99": 50681.0,
+							},
 						},
 					},
 				},
@@ -240,18 +280,20 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"histogram.metric": common.MapStr{
-						"count": uint64(1),
-						"bucket": common.MapStr{
-							"1000000000": uint64(1),
-							"+Inf":       uint64(1),
-							"1000":       uint64(1),
-							"10000":      uint64(1),
-							"100000":     uint64(1),
-							"1000000":    uint64(1),
-							"100000000":  uint64(1),
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"count": uint64(1),
+							"bucket": common.MapStr{
+								"1000000000": uint64(1),
+								"+Inf":       uint64(1),
+								"1000":       uint64(1),
+								"10000":      uint64(1),
+								"100000":     uint64(1),
+								"1000000":    uint64(1),
+								"100000000":  uint64(1),
+							},
+							"sum": 117.0,
 						},
-						"sum": 117.0,
 					},
 				},
 			},
