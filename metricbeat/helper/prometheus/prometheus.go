@@ -116,9 +116,9 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			for k, v := range getLabels(metric) {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
-						keyLabels[l.GetField()] = v
+						keyLabels.Put(l.GetField(), v)
 					} else {
-						labels[l.GetField()] = v
+						labels.Put(l.GetField(), v)
 					}
 				}
 			}
@@ -126,10 +126,10 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			event := getEvent(eventsMap, keyLabels)
 			// Empty field means we ignore the metric but still process its labels
 			if field != "" {
-				event[field] = value
+				event.Put(field, value)
 			}
 
-			event.Update(labels)
+			event.DeepUpdate(labels)
 		}
 	}
 
@@ -172,7 +172,7 @@ func getLabels(metric *dto.Metric) common.MapStr {
 	labels := common.MapStr{}
 	for _, label := range metric.GetLabel() {
 		if label.GetName() != "" && label.GetValue() != "" {
-			labels[label.GetName()] = label.GetValue()
+			labels.Put(label.GetName(), label.GetValue())
 		}
 	}
 	return labels
