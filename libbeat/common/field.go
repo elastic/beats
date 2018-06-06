@@ -34,6 +34,7 @@ type Field struct {
 	Index                 *bool       `config:"index"`
 	DocValues             *bool       `config:"doc_values"`
 	CopyTo                string      `config:"copy_to"`
+	IgnoreAbove           int         `config:"ignore_above"`
 
 	// Kibana specific
 	Analyzed     *bool  `config:"analyzed"`

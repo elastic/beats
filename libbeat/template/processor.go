@@ -14,6 +14,7 @@ type Processor struct {
 
 var (
 	defaultScalingFactor = 1000
+	defaultIgnoreAbove   = 1024
 )
 
 // Process recursively processes the given fields and writes the template in the given output
@@ -150,11 +151,14 @@ func (p *Processor) keyword(f *common.Field) common.MapStr {
 	defaultFields = append(defaultFields, fullName)
 
 	property["type"] = "keyword"
-	property["ignore_above"] = 1024
+	if f.IgnoreAbove == 0 {
+		property["ignore_above"] = defaultIgnoreAbove
+	} else {
+		property["ignore_above"] = f.IgnoreAbove
+	}
 
 	if p.EsVersion.IsMajor(2) {
 		property["type"] = "string"
-		property["ignore_above"] = 1024
 		property["index"] = "not_analyzed"
 	}
 

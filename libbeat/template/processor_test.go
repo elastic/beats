@@ -131,6 +131,20 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
+			output: p.keyword(&common.Field{Type: "keyword", IgnoreAbove: 256}),
+			expected: common.MapStr{
+				"type":         "keyword",
+				"ignore_above": 256,
+			},
+		},
+		{
+			output: p.keyword(&common.Field{Type: "keyword"}),
+			expected: common.MapStr{
+				"type":         "keyword",
+				"ignore_above": 1024,
+			},
+		},
+		{
 			output: p.text(&common.Field{Type: "text", MultiFields: common.Fields{
 				common.Field{Name: "raw", Type: "keyword"},
 				common.Field{Name: "indexed", Type: "text"},
