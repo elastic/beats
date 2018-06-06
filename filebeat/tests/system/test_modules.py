@@ -71,8 +71,9 @@ class Test(BaseTest):
         self.index_name = "test-filebeat-modules"
 
     @parameterized.expand(load_fileset_test_cases)
-    @unittest.skipIf(not INTEGRATION_TESTS or
-                     os.getenv("TESTING_ENVIRONMENT") == "2x",
+    @unittest.skipIf(not INTEGRATION_TESTS,
+                     "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
+    @unittest.skipIf(os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
     def test_fileset_file(self, module, fileset, test_file):
         self.init()
@@ -169,8 +170,9 @@ class Test(BaseTest):
         if os.path.exists(test_file + "-expected.json"):
             self._test_expected_events(module, test_file, res, objects)
 
-    @unittest.skipIf(not INTEGRATION_TESTS or
-                     os.getenv("TESTING_ENVIRONMENT") == "2x",
+    @unittest.skipIf(not INTEGRATION_TESTS,
+                     "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
+    @unittest.skipIf(os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
     def test_input_pipeline_config(self):
         """
@@ -233,8 +235,9 @@ class Test(BaseTest):
         o = objects[0]
         assert o["x-pipeline"] == "test-pipeline"
 
-    @unittest.skipIf(not INTEGRATION_TESTS or
-                     os.getenv("TESTING_ENVIRONMENT") == "2x",
+    @unittest.skipIf(not INTEGRATION_TESTS,
+                     "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
+    @unittest.skipIf(os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
     def test_ml_setup(self):
         """ Test ML are installed in all possible ways """
