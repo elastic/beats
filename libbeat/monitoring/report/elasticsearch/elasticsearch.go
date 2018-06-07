@@ -10,6 +10,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
@@ -72,7 +73,7 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	if proxyURL != nil {
 		logp.Info("Using proxy URL: %s", proxyURL)
 	}
-	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}

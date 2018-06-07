@@ -1,0 +1,8 @@
+- name: server
+  type: group
+  description: >
+  fields:
+    - name: component
+      type: keyword
+      description: >
+        Elasticsearch component.

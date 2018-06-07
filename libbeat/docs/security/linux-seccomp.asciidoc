@@ -15,10 +15,21 @@ surface exposed to {beatname_uc} (principle of least privilege). This minimizes
 the impact of unknown vulnerabilities that might be found in the process.
 
 The filter is expressed as a Berkeley Packet Filter (BPF) program. The BPF
-program is generated based on a policy defined in the {beatname_uc}
-configuration. If you don't specify a policy, {beatname_uc} uses a minimal
-default blacklist policy that prohibits `execve`, `execveat`, `fork`, and
-`vfork` syscalls. This is the default policy.
+program is generated based on a policy defined by {beatname_uc}. The policy
+can be customized through configuration as well.
+
+A seccomp policy is architecture specific due to the fact that system calls vary
+by architecture. {beatname_uc} includes a whitelist seccomp policy for the
+amd64 and 386 architectures. You can view those policies
+https://github.com/elastic/beats/tree/{doc-branch}/libbeat/common/seccomp[here].
+
+[float]
+[[seccomp-policy-config]]
+=== Seccomp Policy Configuration
+
+The seccomp policy can be customized through the configuration policy. This is
+an example blacklist policy that prohibits `execve`, `execveat`, `fork`, and
+`vfork` syscalls.
 
 [source,yaml]
 ----
@@ -37,10 +48,6 @@ names below then it will be allowed.
 <2> If the system call being invoked matches one of the names below then an
 error will be returned to caller. This is known as a blacklist policy.
 <3> These are system calls being prohibited.
-
-[float]
-[[seccomp-policy-config]]
-=== Seccomp Policy Configuration
 
 These are the configuration options for a seccomp policy.
 
@@ -68,7 +75,7 @@ actions that are available depend on the kernel version.
 - `trace` - The kernel will notify a `ptrace` tracer. If no tracer is present
   then the system call fails with `ENOSYS` (function not implemented).
 - `trap` - The kernel will send a `SIGSYS` signal to the calling thread and not
-  execute the system call.
+  execute the system call. The Go runtime will exit.
 - `kill_thread` - The kernel will immediately terminate the thread. Other
   threads will continue to execute.
 - `kill_process` - The kernel will terminate the process. Available in Linux

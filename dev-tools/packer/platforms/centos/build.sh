@@ -17,7 +17,7 @@ gotpl ${BASEDIR}/beatname.sh.j2 < ${BUILD_DIR}/settings-$runid.yml > ${BUILD_DIR
 chmod +x ${BUILD_DIR}/beatname-$runid.sh
 
 docker run --rm -v ${BUILD_DIR}:/build -v ${UPLOAD_DIR}:/upload \
-    -e BUILDID=$BUILDID -e SNAPSHOT=$SNAPSHOT -e RUNID=$runid \
+    -e BUILDID=$BUILDID -e SNAPSHOT=$SNAPSHOT -e RUNID=$runid -e BEAT_REF_YAML=$BEAT_REF_YAML \
     tudorg/fpm /build/run-$runid.sh
 
 rm ${BUILD_DIR}/settings-$runid.yml ${BUILD_DIR}/run-$runid.sh

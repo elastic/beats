@@ -102,7 +102,7 @@ class Test(BaseTest):
             f.write(inputConfigTemplate.format(self.working_dir + "/logs/test2.log"))
 
         self.wait_until(
-            lambda: self.log_contains_count("New runner started") == 2,
+            lambda: self.log_contains_count("Starting runner") == 2,
             max_timeout=15)
 
         # Add new log line and see if it is picked up = new input is running

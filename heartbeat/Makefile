@@ -4,6 +4,7 @@ BEAT_PACKAGE_NAME=heartbeat-elastic
 BEAT_DESCRIPTION?=Ping remote services for availability and log results to Elasticsearch or send to Logstash.
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
+FIELDS_FILE_PATH=monitors/active
 
 # Path to the libbeat Makefile
 -include ../libbeat/scripts/Makefile
@@ -14,14 +15,7 @@ before-build:
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: fields imports
-
-# Collects all module and metricset fields
-.PHONY: fields
-fields:
-	@mkdir -p _meta/
-	@cp ${ES_BEATS}/heartbeat/_meta/fields.common.yml _meta/fields.generated.yml
-	@cat ${ES_BEATS}/heartbeat/monitors/active/*/_meta/fields.yml >> _meta/fields.generated.yml
+collect: fields imports kibana
 
 # Generate imports for all monitors
 .PHONY: imports
@@ -33,3 +27,12 @@ imports: python-env
 .PHONY: create-monitor
 create-monitor:
 	go run scripts/generate_monitor/main.go -monitor=${MONITOR}
+
+# Collects all module dashboards
+.PHONY: kibana
+kibana:
+	@rm -rf _meta/kibana
+	@mkdir -p _meta/kibana
+	@-cp -r monitors/active/*/_meta/kibana _meta/
+	@# Convert all dashboards to string
+	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana/6/dashboard/*.json"

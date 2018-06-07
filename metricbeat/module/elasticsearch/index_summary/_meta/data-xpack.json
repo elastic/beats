@@ -1,0 +1,60 @@
+{
+    "_index": ".monitoring-es-6-2018.05.15",
+    "_type": "doc",
+    "_id": "CGdxY2MBLoB8ROglGWFD",
+    "_score": 1,
+    "_source": {
+        "cluster_uuid": "SFQoPJkbSc2-n_so4ZbUwA",
+        "timestamp": "2018-05-15T10:55:46.476Z",
+        "interval_ms": 10000,
+        "type": "indices_stats",
+        "source_node": {
+            "uuid": "YYSPA7QWSQyBQSYgIdOAKw",
+            "host": "127.0.0.1",
+            "transport_address": "127.0.0.1:9300",
+            "ip": "127.0.0.1",
+            "name": "YYSPA7Q",
+            "timestamp": "2018-05-15T10:55:46.360Z"
+        },
+        "indices_stats": {
+            "_all": {
+                "primaries": {
+                    "docs": {
+                        "count": 509
+                    },
+                    "store": {
+                        "size_in_bytes": 1377439
+                    },
+                    "indexing": {
+                        "index_total": 531,
+                        "index_time_in_millis": 5220,
+                        "is_throttled": false,
+                        "throttle_time_in_millis": 0
+                    },
+                    "search": {
+                        "query_total": 908,
+                        "query_time_in_millis": 10160
+                    }
+                },
+                "total": {
+                    "docs": {
+                        "count": 509
+                    },
+                    "store": {
+                        "size_in_bytes": 1377439
+                    },
+                    "indexing": {
+                        "index_total": 531,
+                        "index_time_in_millis": 5220,
+                        "is_throttled": false,
+                        "throttle_time_in_millis": 0
+                    },
+                    "search": {
+                        "query_total": 908,
+                        "query_time_in_millis": 10160
+                    }
+                }
+            }
+        }
+    }
+}

@@ -9,7 +9,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/tlsconfig"
 	"golang.org/x/net/context"
 
@@ -19,8 +18,7 @@ import (
 
 // Select Docker API version
 const (
-	dockerAPIVersion = "1.22"
-	shortIDLen       = 12
+	shortIDLen = 12
 )
 
 // Watcher reads docker events and keeps a list of known containers
@@ -106,7 +104,7 @@ func NewWatcher(host string, tls *TLSConfig, storeShortID bool) (Watcher, error)
 		}
 	}
 
-	client, err := client.NewClient(host, dockerAPIVersion, httpClient, nil)
+	client, err := NewClient(host, httpClient, nil)
 	if err != nil {
 		return nil, err
 	}

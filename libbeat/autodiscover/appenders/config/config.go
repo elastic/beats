@@ -45,11 +45,14 @@ func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 	var configMaps []configMap
 	for _, conf := range confs {
 		// Unpack the condition
-		cond, err := processors.NewCondition(conf.ConditionConfig)
+		var cond *processors.Condition
 
-		if err != nil {
-			logp.Warn("config", "unable to create condition due to error: %v", err)
-			continue
+		if conf.ConditionConfig != nil {
+			cond, err = processors.NewCondition(conf.ConditionConfig)
+			if err != nil {
+				logp.Warn("config", "unable to create condition due to error: %v", err)
+				continue
+			}
 		}
 		cm := configMap{condition: cond}
 

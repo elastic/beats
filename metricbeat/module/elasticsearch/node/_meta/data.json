@@ -6,7 +6,7 @@
     },
     "elasticsearch": {
         "cluster": {
-            "name": "docker-cluster"
+            "name": "elasticsearch"
         },
         "node": {
             "jvm": {
@@ -16,7 +16,7 @@
                             "bytes": 1073741824
                         },
                         "max": {
-                            "bytes": 1056309248
+                            "bytes": 1038876672
                         }
                     },
                     "nonheap": {
@@ -28,13 +28,13 @@
                         }
                     }
                 },
-                "version": "1.8.0_161"
+                "version": "1.8.0_144"
             },
-            "name": "xMLdnuCzSoempTmcPqdtfw",
+            "name": "523zXyT6TRWiqXcQItnkyQ",
             "process": {
                 "mlockall": false
             },
-            "version": "6.2.4"
+            "version": "6.3.0"
         }
     },
     "metricset": {

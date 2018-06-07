@@ -467,7 +467,10 @@ environment without actually running {beatname_uc} and ingesting data.
 *FLAGS*
 
 *`--dashboards`*::
-Sets up the Kibana dashboards only.
+Sets up the Kibana dashboards only. This option loads the dashboards from the
+{beatname_uc} package. For more options, such as loading customized dashboards,
+see {beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards]
+in the _Beats Developer Guide_.
 
 *`-h, --help`*::
 Shows help for the `setup` command.
@@ -480,6 +483,9 @@ ifeval::["{beatname_lc}"=="filebeat"]
 *`--modules MODULE_LIST`*::
 Specifies a comma-separated list of modules. Use this flag to avoid errors when
 there are no modules defined in the +{beatname_lc}.yml+ file.
+
+*`--pipelines`*::
+Sets up ingest pipelines for configured filesets.
 
 endif::[]
 

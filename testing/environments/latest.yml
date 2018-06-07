@@ -7,6 +7,8 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch-platinum:6.2.4
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      retries: 300
+      interval: 1s
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "network.host="
@@ -18,6 +20,8 @@ services:
     image: docker.elastic.co/logstash/logstash:6.2.4
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
+      retries: 300
+      interval: 1s
     volumes:
     - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
     - ./docker/logstash/pki:/etc/pki:ro
@@ -26,4 +30,5 @@ services:
     image: docker.elastic.co/kibana/kibana:6.2.4
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5601"]
-      retries: 6
+      retries: 300
+      interval: 1s

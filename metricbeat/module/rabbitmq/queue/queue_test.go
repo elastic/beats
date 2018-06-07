@@ -1,27 +1,17 @@
 package queue
 
 import (
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"path/filepath"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFetchEventContents(t *testing.T) {
-	absPath, err := filepath.Abs("../_meta/testdata/")
-
-	response, err := ioutil.ReadFile(absPath + "/queue_sample_response.json")
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
-	}))
+	server := mtest.Server(t, mtest.DefaultServerConfig)
 	defer server.Close()
 
 	config := map[string]interface{}{

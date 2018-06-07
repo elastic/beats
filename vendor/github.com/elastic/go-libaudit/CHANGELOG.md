@@ -2,6 +2,33 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+
+## [0.3.0]
+
+### Added
+
+- Added support for setting the kernel's backlog wait time via the new
+  SetBacklogWaitTime function. #34
+- New method `GetStatusAsync` to perform asynchronous status checks. #37
+
+### Changed
+
+- AuditClient `Close()` is now safe to call more than once. #35
+
+### Deprecated
+
+### Removed
+
 ## [0.2.1]
 
 ### Added

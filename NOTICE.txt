@@ -373,8 +373,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit
-Version: v0.2.1
-Revision: 55225d06b15c74082f9a7af75aa4284dbe48d20a
+Version: v0.3.0
+Revision: c18782ee4f957de48620718231d20ca12c8dc4e9
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-libaudit/LICENSE.txt:
 --------------------------------------------------------------------
@@ -398,7 +398,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-seccomp-bpf
-Revision: bc35619931bc4ae13c582a78cfb2ebdaee789ff2
+Revision: 5bed103a93993f24c58dd267faaab582f2373e31
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-seccomp-bpf/LICENSE.txt:
 --------------------------------------------------------------------
@@ -2012,8 +2012,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
-Version: v1.12/enh/offset-replica-id
-Revision: c292021939f5aba53b3ffc2cb09c7aadb32a42df
+Version: v1.16.0/enh/offset-replica-id
+Revision: 32b4ad5c9537ed14e471779b76713ff65420db39
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------

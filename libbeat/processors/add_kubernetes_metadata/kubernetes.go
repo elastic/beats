@@ -28,6 +28,7 @@ func init() {
 
 	// Register default indexers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
+	Indexing.AddIndexer(PodUIDIndexerName, NewPodUIDIndexer)
 	Indexing.AddIndexer(ContainerIndexerName, NewContainerIndexer)
 	Indexing.AddIndexer(IPPortIndexerName, NewIPPortIndexer)
 	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
@@ -65,7 +66,11 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		Indexing.RUnlock()
 	}
 
-	metaGen := kubernetes.NewMetaGenerator(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels)
+	metaGen, err := kubernetes.NewMetaGenerator(cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	indexers := NewIndexers(config.Indexers, metaGen)
 
 	matchers := NewMatchers(config.Matchers)

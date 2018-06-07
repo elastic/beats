@@ -18,7 +18,7 @@ func main() {
 	flag.Parse()
 
 	if *index == "" {
-		fmt.Fprint(os.Stderr, "The name of the index pattern msut be set.")
+		fmt.Fprint(os.Stderr, "The name of the index pattern must be set.")
 		os.Exit(1)
 	}
 

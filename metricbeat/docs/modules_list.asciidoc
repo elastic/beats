@@ -33,9 +33,12 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-dropwizard,Dropwizard>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>> beta[]  
 |<<metricbeat-module-elasticsearch,Elasticsearch>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.3+| .3+|  |<<metricbeat-metricset-elasticsearch-index,index>> experimental[]  
+.6+| .6+|  |<<metricbeat-metricset-elasticsearch-index,index>> experimental[]  
+|<<metricbeat-metricset-elasticsearch-index_summary,index_summary>> experimental[]  
 |<<metricbeat-metricset-elasticsearch-node,node>> beta[]  
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>> beta[]  
+|<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>> experimental[]  
+|<<metricbeat-metricset-elasticsearch-shard,shard>> experimental[]  
 |<<metricbeat-module-etcd,Etcd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .3+| .3+|  |<<metricbeat-metricset-etcd-leader,leader>> beta[]  
 |<<metricbeat-metricset-etcd-self,self>> beta[]  
@@ -57,7 +60,8 @@ This file is generated! See scripts/docs_collector.py
 .2+| .2+|  |<<metricbeat-metricset-kafka-consumergroup,consumergroup>> beta[]  
 |<<metricbeat-metricset-kafka-partition,partition>> beta[]  
 |<<metricbeat-module-kibana,Kibana>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-kibana-status,status>> beta[]  
+.2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>> beta[]  
+|<<metricbeat-metricset-kibana-status,status>> beta[]  
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .12+| .12+|  |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-event,event>> beta[]  
@@ -91,9 +95,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-php_fpm,PHP_FPM>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-php_fpm-pool,pool>> beta[]  
 |<<metricbeat-module-postgresql,PostgreSQL>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.3+| .3+|  |<<metricbeat-metricset-postgresql-activity,activity>>   
+.4+| .4+|  |<<metricbeat-metricset-postgresql-activity,activity>>   
 |<<metricbeat-metricset-postgresql-bgwriter,bgwriter>>   
 |<<metricbeat-metricset-postgresql-database,database>>   
+|<<metricbeat-metricset-postgresql-statement,statement>> beta[]  
 |<<metricbeat-module-prometheus,Prometheus>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-prometheus-collector,collector>> beta[]  
 |<<metricbeat-metricset-prometheus-stats,stats>> beta[]  

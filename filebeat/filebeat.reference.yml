@@ -82,6 +82,16 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#---------------------------- elasticsearch Module ---------------------------
+- module: elasticsearch
+  # Server log
+  server:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Icinga Module -------------------------------
 #- module: icinga
   # Main logs
@@ -130,9 +140,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
   # Error logs
   #error:
@@ -142,9 +152,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
 #-------------------------------- Kafka Module -------------------------------
 - module: kafka
@@ -160,6 +170,16 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+
+#------------------------------- kibana Module -------------------------------
+- module: kibana
+  # All logs
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
 
 #------------------------------ logstash Module ------------------------------
 #- module: logstash
@@ -228,9 +248,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
   # Error logs
   #error:
@@ -567,6 +587,36 @@ filebeat.inputs:
   # The number of seconds of inactivity before a remote connection is closed.
   #timeout: 300s
 
+  # Use SSL settings for TCP.
+  #ssl.enabled: true
+
+  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # 1.2 are enabled.
+  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # SSL configuration. By default is off.
+  # List of root certificates for client verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL server authentication.
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Server Certificate Key,
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
+
+  # Configure cipher suites to be used for SSL connections.
+  #ssl.cipher_suites: []
+
+  # Configure curve types for ECDHE based cipher suites.
+  #ssl.curve_types: []
+
+  # Configure what types of client authentication are supported. Valid options
+  # are `none`, `optional`, and `required`. Default is required.
+  #ssl.client_authentication: "required"
+
 #------------------------------ Syslog input --------------------------------
 # Experimental: Config options for the Syslog input
 # Accept RFC3164 formatted syslog event via UDP.
@@ -595,6 +645,36 @@ filebeat.inputs:
 
     # The number of seconds of inactivity before a remote connection is closed.
     #timeout: 300s
+
+    # Use SSL settings for TCP.
+    #ssl.enabled: true
+
+    # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+    # 1.2 are enabled.
+    #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+    # SSL configuration. By default is off.
+    # List of root certificates for client verifications
+    #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+    # Certificate for SSL server authentication.
+    #ssl.certificate: "/etc/pki/client/cert.pem"
+
+    # Server Certificate Key,
+    #ssl.key: "/etc/pki/client/cert.key"
+
+    # Optional passphrase for decrypting the Certificate Key.
+    #ssl.key_passphrase: ''
+
+    # Configure cipher suites to be used for SSL connections.
+    #ssl.cipher_suites: []
+
+    # Configure curve types for ECDHE based cipher suites.
+    #ssl.curve_types: []
+
+    # Configure what types of client authentication are supported. Valid options
+    # are `none`, `optional`, and `required`. Default is required.
+    #ssl.client_authentication: "required"
 
 #------------------------------ Docker input --------------------------------
 # Experimental: Docker input reads and parses `json-file` logs from Docker
@@ -805,6 +885,14 @@ filebeat.inputs:
 #    fields:
 #       - from: "a"
 #         to: "b"
+#
+# The following example tokenizes the string into fields:
+#
+#processors:
+#- dissect:
+#    tokenizer: "%{key1} - %{key2}"
+#    field: "message"
+#    target_prefix: "dissect"
 #
 # The following example enriches each event with metadata from the cloud
 # provider about the host machine. It works on EC2, GCE, DigitalOcean,
@@ -1410,6 +1498,15 @@ output.elasticsearch:
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
 
+# Enable json template loading. If this is enabled, the fields.yml is ignored.
+#setup.template.json.enabled: false
+
+# Path to the json template file
+#setup.template.json.path: "${path.config}/template.json"
+
+# Name under which the template is stored in Elasticsearch
+#setup.template.json.name: ""
+
 # Overwrite existing template
 #setup.template.overwrite: false
 
@@ -1644,16 +1741,4 @@ logging.files:
 #============================= Process Security ================================
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
-seccomp.enabled: true
-
-# The default seccomp policy. This policy blacklists system calls that allow
-# process creation.
-seccomp:
-  default_action: allow
-  syscalls:
-  - action: errno
-    names:
-    - execve
-    - execveat
-    - fork
-    - vfork
+#seccomp.enabled: true

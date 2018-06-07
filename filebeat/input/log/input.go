@@ -22,12 +22,15 @@ import (
 
 const (
 	recursiveGlobDepth = 8
+	harvesterErrMsg    = "Harvester could not be started on new file: %s, Err: %s"
 )
 
 var (
 	filesRenamed     = monitoring.NewInt(nil, "filebeat.input.log.files.renamed")
 	filesTruncated   = monitoring.NewInt(nil, "filebeat.input.log.files.truncated")
 	harvesterSkipped = monitoring.NewInt(nil, "filebeat.harvester.skipped")
+
+	errHarvesterLimit = errors.New("harvester limit reached")
 )
 
 func init() {
@@ -434,8 +437,12 @@ func (p *Input) scan() {
 		if lastState.IsEmpty() {
 			logp.Debug("input", "Start harvester for new file: %s", newState.Source)
 			err := p.startHarvester(newState, 0)
+			if err == errHarvesterLimit {
+				logp.Debug("input", harvesterErrMsg, newState.Source, err)
+				continue
+			}
 			if err != nil {
-				logp.Err("Harvester could not be started on new file: %s, Err: %s", newState.Source, err)
+				logp.Err(harvesterErrMsg, newState.Source, err)
 			}
 		} else {
 			p.harvestExistingFile(newState, lastState)
@@ -608,7 +615,7 @@ func (p *Input) startHarvester(state file.State, offset int64) error {
 	if p.numHarvesters.Inc() > p.config.HarvesterLimit && p.config.HarvesterLimit > 0 {
 		p.numHarvesters.Dec()
 		harvesterSkipped.Add(1)
-		return fmt.Errorf("Harvester limit reached")
+		return errHarvesterLimit
 	}
 	// Set state to "not" finished to indicate that a harvester is running
 	state.Finished = false
@@ -624,7 +631,7 @@ func (p *Input) startHarvester(state file.State, offset int64) error {
 	err = h.Setup()
 	if err != nil {
 		p.numHarvesters.Dec()
-		return fmt.Errorf("Error setting up harvester: %s", err)
+		return fmt.Errorf("error setting up harvester: %s", err)
 	}
 
 	// Update state before staring harvester

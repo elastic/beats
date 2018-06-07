@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 
 	"github.com/elastic/beats/heartbeat/monitors"
 )
@@ -26,7 +26,7 @@ type Config struct {
 	Password string `config:"password"`
 
 	// configure tls (if not configured HTTPS will use system defaults)
-	TLS *outputs.TLSConfig `config:"ssl"`
+	TLS *tlscommon.Config `config:"ssl"`
 
 	// http(s) ping validation
 	Check checkConfig `config:"check"`

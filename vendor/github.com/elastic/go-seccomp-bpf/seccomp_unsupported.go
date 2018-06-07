@@ -19,6 +19,13 @@
 
 package seccomp
 
+// Supported returns true if the seccomp syscall is supported.
+//
+// This is a stub for non-Linux systems. It always returns false.
+func Supported() bool {
+	return false
+}
+
 // SetNoNewPrivs will use prctl to set the calling thread's no_new_privs bit to
 // 1 (true). Once set, this bit cannot be unset.
 //

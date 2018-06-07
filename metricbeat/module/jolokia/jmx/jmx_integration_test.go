@@ -29,6 +29,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "jolokia")
+
 	for _, config := range getConfigs() {
 		f := mbtest.NewEventsFetcher(t, config)
 		err := mbtest.WriteEvents(f, t)
@@ -100,6 +102,34 @@ func getConfigs() []map[string]interface{} {
 							"attr":  "port",
 							"field": "port",
 						},
+					},
+				},
+				{
+					"mbean": "Catalina:type=Server",
+					"attributes": []map[string]string{
+						{
+							"attr":  "serverNumber",
+							"field": "server_number_dosntconnect",
+						},
+					},
+					"target": &TargetBlock{
+						URL:      "service:jmx:rmi:///jndi/rmi://localhost:7091/jmxrmi",
+						User:     "monitorRole",
+						Password: "IGNORE",
+					},
+				},
+				{
+					"mbean": "Catalina:type=Server",
+					"attributes": []map[string]string{
+						{
+							"attr":  "serverInfo",
+							"field": "server_info_proxy",
+						},
+					},
+					"target": &TargetBlock{
+						URL:      "service:jmx:rmi:///jndi/rmi://localhost:7091/jmxrmi",
+						User:     "monitorRole",
+						Password: "QED",
 					},
 				},
 			},

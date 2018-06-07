@@ -1,7 +1,11 @@
 package prometheus
 
 import (
+	"math"
+	"strconv"
 	"strings"
+
+	"github.com/elastic/beats/libbeat/common"
 
 	dto "github.com/prometheus/client_model/go"
 )
@@ -44,12 +48,13 @@ func BooleanMetric(field string) MetricMap {
 
 // LabelMetric maps a Prometheus metric to a Metricbeat field, stores the value
 // of a given label on it if the gauge value is 1
-func LabelMetric(field, label string) MetricMap {
+func LabelMetric(field, label string, lowercase bool) MetricMap {
 	return &labelMetric{
 		commonMetric{
 			field: field,
 		},
 		label,
+		lowercase,
 	}
 }
 
@@ -72,6 +77,49 @@ func (m *commonMetric) GetValue(metric *dto.Metric) interface{} {
 	gauge := metric.GetGauge()
 	if gauge != nil {
 		return gauge.GetValue()
+	}
+
+	summary := metric.GetSummary()
+	if summary != nil {
+		value := common.MapStr{}
+		value["sum"] = summary.GetSampleSum()
+		value["count"] = summary.GetSampleCount()
+
+		quantiles := summary.GetQuantile()
+		percentileMap := common.MapStr{}
+		for _, quantile := range quantiles {
+			if !math.IsNaN(quantile.GetValue()) {
+				key := strconv.FormatFloat((100 * quantile.GetQuantile()), 'f', -1, 64)
+				percentileMap[key] = quantile.GetValue()
+			}
+
+		}
+
+		if len(percentileMap) != 0 {
+			value["percentile"] = percentileMap
+		}
+
+		return value
+	}
+
+	histogram := metric.GetHistogram()
+	if histogram != nil {
+		value := common.MapStr{}
+		value["sum"] = histogram.GetSampleSum()
+		value["count"] = histogram.GetSampleCount()
+
+		buckets := histogram.GetBucket()
+		bucketMap := common.MapStr{}
+		for _, bucket := range buckets {
+			key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
+			bucketMap[key] = bucket.GetCumulativeCount()
+		}
+
+		if len(bucketMap) != 0 {
+			value["bucket"] = bucketMap
+		}
+
+		return value
 	}
 
 	// Other types are not supported here
@@ -105,13 +153,18 @@ func (m *booleanMetric) GetValue(metric *dto.Metric) interface{} {
 
 type labelMetric struct {
 	commonMetric
-	label string
+	label     string
+	lowercase bool
 }
 
 // GetValue returns the resulting value
 func (m *labelMetric) GetValue(metric *dto.Metric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil && gauge.GetValue() == 1 {
-		return strings.ToLower(getLabel(metric, m.label))
+		value := getLabel(metric, m.label)
+		if m.lowercase {
+			return strings.ToLower(value)
+		}
+		return value
 	}
 	return nil
 }
