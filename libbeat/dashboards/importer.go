@@ -278,8 +278,10 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 	if !imp.cfg.OnlyDashboards {
 		check = append(check, "index-pattern")
 	}
+	wantDashboards := false
 	if !imp.cfg.OnlyIndex {
 		check = append(check, "dashboard")
+		wantDashboards = true
 	}
 
 	types := []string{}
@@ -306,7 +308,7 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 		}
 	}
 
-	if !importDashboards {
+	if wantDashboards && !importDashboards {
 		return fmt.Errorf("No dashboards to import. Please make sure the %s directory contains a dashboard directory.",
 			dir)
 	}
