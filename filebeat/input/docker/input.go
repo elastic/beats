@@ -55,7 +55,9 @@ func NewInput(
 	}
 
 	// Add stream to meta to ensure different state per stream
-	context.Meta["stream"] = config.Containers.Stream
+	if config.Containers.Stream != "all" {
+		context.Meta["stream"] = config.Containers.Stream
+	}
 
 	return log.NewInput(cfg, outletFactory, context)
 }
