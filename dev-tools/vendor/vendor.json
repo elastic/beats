@@ -75,6 +75,10 @@
 			"revisionTime": "2017-03-30T16:02:45Z"
 		},
 		{
+			"checksumSHA1": "DnH0WldhYTUVJnsx3vlNLP0Yh/A=",
+			"path": "golang.org/x/tools/go/vcs",
+			"revision": "a5b4c53f6e8bdcafa95a94671bf2d1203365858b",
+			"revisionTime": "2018-05-20T07:57:22Z"
 		}
 	],
 	"rootPath": "github.com/elastic/beats/dev-tools"
