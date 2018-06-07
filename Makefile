@@ -72,7 +72,7 @@ clean-vendor:
 
 .PHONY: check
 check: python-env
-	@$(GOCSFIXER_DIFF) | sh ./script/cscheck.sh
+	@($(GOCSFIXER_DIFF) | sh ./script/cscheck.sh) || exit 1
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
 	@# Checks also python files which are not part of the beats
 	@$(FIND) -name *.py -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
