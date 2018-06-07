@@ -47,7 +47,7 @@ const (
 )
 
 var (
-	configFilePattern   = regexp.MustCompile(`.*beat\.yml`)
+	configFilePattern   = regexp.MustCompile(`.*beat\.yml|apm-server\.yml`)
 	manifestFilePattern = regexp.MustCompile(`manifest.yml`)
 	modulesDirPattern   = regexp.MustCompile(`modules.d/$`)
 	modulesFilePattern  = regexp.MustCompile(`modules.d/.+`)

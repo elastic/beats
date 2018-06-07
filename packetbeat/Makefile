@@ -1,30 +1,11 @@
 BEAT_NAME?=packetbeat
 BEAT_TITLE?=Packetbeat
-BEAT_DESCRIPTION?=Packetbeat analyzes network traffic and sends the data to Elasticsearch.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT=false
 ES_BEATS?=..
 FIELDS_FILE_PATH=protos
 
-TARGETS?="windows/amd64 windows/386 darwin/amd64"## @building list of platforms/architecture to be built by "make package"
-PACKAGES?=${BEAT_NAME}/deb ${BEAT_NAME}/rpm ${BEAT_NAME}/darwin ${BEAT_NAME}/win ${BEAT_NAME}/bin ## @Building List of OS to be supported by "make package"
-PACKAGES_EXPERIMENTAL=
-
 include ${ES_BEATS}/libbeat/scripts/Makefile
-
-
-# This is called by the beats packer before building starts
-.PHONY: before-build
-before-build:
-	sed -i.bk 's/device: any/device: en0/' $(PREFIX)/packetbeat-darwin.yml
-	rm $(PREFIX)/packetbeat-darwin.yml.bk
-	sed -i.bk 's/device: any/device: en0/' $(PREFIX)/packetbeat-darwin.reference.yml
-	rm $(PREFIX)/packetbeat-darwin.reference.yml.bk
-	# win
-	sed -i.bk 's/device: any/device: 0/' $(PREFIX)/packetbeat-win.yml
-	rm $(PREFIX)/packetbeat-win.yml.bk
-	sed -i.bk 's/device: any/device: 0/' $(PREFIX)/packetbeat-win.reference.yml
-	rm $(PREFIX)/packetbeat-win.reference.yml.bk
 
 # Collects all dependencies and then calls update
 .PHONY: collect
