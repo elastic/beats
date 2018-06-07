@@ -10,8 +10,6 @@ FIND=find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*
 GOLINT=golint
 GOLINT_REPO=github.com/golang/lint/golint
 GOCSFIXER_DIFF?=git diff master --name-status | grep "^D" -v | sed "s/^.\t//g" | grep "\.go$$"
-GOCSFIXER=gocsfixer
-GOCSFIXER_REPO=github.com/ewgRa/gocsfixer
 REVIEWDOG=reviewdog
 REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
@@ -74,8 +72,7 @@ clean-vendor:
 
 .PHONY: check
 check: python-env
-	@go get $(GOCSFIXER_REPO)
-	export GOCSFIXER='$(GOCSFIXER)' && ($(GOCSFIXER_DIFF) | sh ./script/cscheck.sh)
+	@$(GOCSFIXER_DIFF) | sh ./script/cscheck.sh
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
 	@# Checks also python files which are not part of the beats
 	@$(FIND) -name *.py -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
@@ -105,13 +102,13 @@ lint:
 
 .PHONY: cscheck
 cscheck:
-	@go get $(GOCSFIXER_REPO)
-	$(GOCSFIXER_DIFF) | $(GOCSFIXER) -recommend -lint
+	@go get github.com/ewgRa/gocsfixer/cmd/gocsfixer
+	$(GOCSFIXER_DIFF) | gocsfixer -recommend -lint
 
 .PHONY: csfix
 csfix:
-	@go get $(GOCSFIXER_REPO)
-	$(GOCSFIXER_DIFF) | $(GOCSFIXER) -fix
+	@go get github.com/ewgRa/gocsfixer/cmd/gocsfixer
+	$(GOCSFIXER_DIFF) | gocsfixer -fix
 
 # Collects all dashboards and generates dashboard folder for https://github.com/elastic/beats-dashboards/tree/master/dashboards
 .PHONY: beats-dashboards

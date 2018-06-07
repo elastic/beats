@@ -1,33 +1,42 @@
 #!/usr/bin/env bash
 
-STDIN=`cat | $GOCSFIXER -recommend -lint`
-EXIT_CODE=$?
-
-set -e
-
-echo "$STDIN"
-
-if [ "$STDIN" = "" ]; then
-    exit 0
-fi
-
 if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
     exit 0
 fi
 
-if [ "$GOCSFIXER_GITHUB_TOKEN" = "" ]; then
+go get github.com/ewgRa/gocsfixer/cmd/gocsfixer
+go get github.com/ewgRa/ci-utils/cmd/diff_liner
+go get github.com/ewgRa/ci-utils/cmd/github_comments_diff
+
+cat | gocsfixer -recommend -lint > /tmp/gocsfixer.json
+
+set -e
+
+if [ "$(cat /tmp/gocsfixer.json)" = "[]" ]; then
     exit 0
 fi
 
-json_escape () {
-    printf '%s' "$1" | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))'
-}
+# Get PR diff and transform file lines to diff lines
+curl -sH "Accept: application/vnd.github.v3.diff.json" https://api.github.com/repos/$TRAVIS_REPO_SLUG/pulls/$TRAVIS_PULL_REQUEST > /tmp/pr.diff
+cat /tmp/pr.diff | diff_liner > /tmp/pr_liner.json
 
-BODY=$(json_escape "Gocsfixer check:
-\`\`\`
-$STDIN
-\`\`\`")
+go run script/csfixer/main.go -pr-liner /tmp/pr_liner.json -csfixer-comments /tmp/gocsfixer.json > /tmp/comments.json
 
-curl -s -H "Authorization: token $GOCSFIXER_GITHUB_TOKEN" -X POST -d "{\"body\": $BODY}" "https://api.github.com/repos/$TRAVIS_REPO_SLUG/issues/$TRAVIS_PULL_REQUEST/comments" | ((grep created_at -q) || (echo "Error when try post comment to Pull Request" && false))
+cat /tmp/comments.json
+
+EXIT_CODE=0
+
+if [ "$(cat /tmp/comments.json)" != "[]" ]; then
+    # Get exists comments, diff them with exists same comments and send comments as review
+    curl -s https://api.github.com/repos/$TRAVIS_REPO_SLUG/pulls/$TRAVIS_PULL_REQUEST/comments > /tmp/pr_comments.json
+
+    github_comments_diff -comments /tmp/comments.json -exists-comments /tmp/pr_comments.json > /tmp/send_comments.json
+
+    if [ "$(cat /tmp/send_comments.json)" != "[]" ]; then
+        curl -XPOST "https://github-api-bot.herokuapp.com/send_review?repo=$TRAVIS_REPO_SLUG&pr=$TRAVIS_PULL_REQUEST&body=Thanks%20for%20PR.%20Please%20check%20results%20of%20automatic%20CI%20checks" -d @/tmp/send_comments.json
+    fi
+
+    EXIT_CODE=1
+fi
 
 exit $EXIT_CODE
