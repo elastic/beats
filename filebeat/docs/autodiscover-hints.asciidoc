@@ -1,12 +1,14 @@
-Filebeat supports a autodiscover based on hints from the provider. The `hints` system looks for
-hints in Kubernetes annotations or Docker labels which have the prefix `co.elastic.logs`. Hints tell
-Filebeat how to get logs for the given container. By default logs will be retrieved as they are,
-you can use hints to modify this behavior. This is the full list of supported hints:
+{beatname_uc} supports autodiscover based on hints from the provider. The hints system looks for
+hints in Kubernetes Pod annotations or Docker labels that have the prefix `co.elastic.logs`, as soon as
+the container starts, {beatname_uc} will check if it contains any hints and launch the proper config for
+it. Hints tell {beatname_uc} how to get logs for the given container. By default logs will be retrieved
+from the container using the `docker` input, you can use hints to modify this behavior. This is the full
+list of supported hints:
 
 [float]
 ===== `co.elastic.logs.multiline.*`
 
-Multiline settings, see <<multiline-examples>> for a full list of all supported options.
+Multiline settings. See <<multiline-examples>> for a full list of all supported options.
 
 [float]
 ===== `co.elastic.logs.include_lines`
@@ -23,7 +25,8 @@ See <<configuration-filebeat-options>> for more info.
 [float]
 ===== `co.elastic.logs.module`
 
-Instead of using raw `docker` input, use the given module to parse logs from the container.
+Instead of using raw `docker` input, specifies the module to use to parse logs from the container. See
+<<filebeat-modules>> for the list of supported modules.
 
 [float]
 ===== `co.elastic.logs.fileset`
@@ -57,7 +60,7 @@ filebeat.autodiscover:
       hints.enabled: true
 -------------------------------------------------------------------------------------
 
-You can annotate Kubernetes Pods with useful info to spin up Filebeat inputs or modules:
+You can annotate Kubernetes Pods with useful info to spin up {beatname_uc} inputs or modules:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -71,11 +74,9 @@ annotations:
 [float]
 ===== Multiple containers
 
-When a Pod has multiple containers, these settings are shared. To set hints specific to a container in
-the pod you can put the container name in the hint.
-
-For example, these hints configure a common behavior for all containers in the Pod, and sets a specific
-`exclude_lines` hint for the container called `sidecar`:
+When a pod has multiple containers, the settings are shared unless you put the container name in the
+hint. For example, these hints configure multiline settings for all containers in the pod, but set a
+specific `exclude_lines` hint for the container called `sidecar`.
 
 
 ["source","yaml",subs="attributes"]
@@ -102,7 +103,7 @@ filebeat.autodiscover:
       hints.enabled: true
 -------------------------------------------------------------------------------------
 
-You can label Docker containers with useful info to spin up Filebeat inputs, for example:
+You can label Docker containers with useful info to spin up {beatname_uc} inputs, for example:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -111,5 +112,5 @@ You can label Docker containers with useful info to spin up Filebeat inputs, for
   co.elastic.logs/fileset.stderr: error
 -------------------------------------------------------------------------------------
 
-The above labels would make Filebeat to harvest logs for this container using the Nginx module.
-Access log will be retrieved from stdout stream, error log from stderr.
+The above labels configure {beatname_uc} to use the Nginx module to harvest logs for this container.
+Access logs will be retrieved from stdout stream, and error logs from stderr.

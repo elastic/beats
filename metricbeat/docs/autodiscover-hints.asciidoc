@@ -1,23 +1,24 @@
-Metricbeat supports a autodiscover based on hints from the provider. The `hints` system looks for
-hints in Kubernetes annotations or Docker labels which have the prefix `co.elastic.metrics`. Hints tell
-Metricbeat how to get metrics for the given container. This is the full list of supported hints:
+{beatname_uc} supports a autodiscover based on hints from the provider. The `hints` system looks for
+hints in Kubernetes Pod annotations or Docker labels which have the prefix `co.elastic.metrics`, as soon as
+the container starts, {beatname_uc} will check if it contains any hints and launch the proper config for
+it. Hints tell {beatname_uc} how to get metrics for the given container. This is the full list of supported hints:
 
 [float]
 ===== `co.elastic.metrics.module`
 
-Metricbeat module to use to fetch metrics.
+{beatname_uc} module to use to fetch metrics. See <<metricbeat-modules>> for the list of supported modules.
 
 [float]
 ===== `co.elastic.metrics.hosts`
 
-Hosts setting, as documented by the configured module. Hosts can include `${data.host}` and `${data.port}`
+Hosts setting to use with the given module. Hosts can include `${data.host}` and `${data.port}`
 values from the autodiscover event, ie: `${data.host}:80`.
 
 [float]
 ===== `co.elastic.metrics.metricsets`
 
 List of metricsets to use, comma separated. If no metricsets are provided, default metricsets for the module
-will be used.
+are used.
 
 [float]
 ===== `co.elastic.metrics.period`
@@ -52,7 +53,7 @@ metricbeat.autodiscover:
 This configuration enables the `hints` autodiscover for Kubernetes. The `hints` system looks for
 hints in Kubernetes annotations or Docker labels which have the prefix `co.elastic.metrics`.
 
-You can annotate Kubernetes Pods with useful info to spin up Metricbeat modules:
+You can annotate Kubernetes Pods with useful info to spin up {beatname_uc} modules:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -72,6 +73,10 @@ parent container on port `9090` at a 1 minute interval.
 When a Pod has multiple containers, these settings are shared. To set hints specific to a container in
 the pod you can put the container name in the hint.
 
+When a pod has multiple containers, the settings are shared unless you put the container name in the
+hint. For example, these hints configure a common behavior for all containers in the Pod, and sets a specific
+`hosts` hint for the container called `sidecar`.
+
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
 annotations:
@@ -79,9 +84,6 @@ annotations:
   co.elastic.metrics/hosts: '${data.host}:80'
   co.elastic.metrics.sidecar/hosts: '${data.host}:8080'
 -------------------------------------------------------------------------------------
-
-For example, these hints configure a common behavior for all containers in the Pod, and sets a specific
-`hosts` hint for the container called `sidecar`.
 
 [float]
 === Docker
@@ -96,7 +98,7 @@ metricbeat.autodiscover:
       hints.enabled: true
 -------------------------------------------------------------------------------------
 
-You can label Docker containers with useful info to spin up Metricbeat modules, for example:
+You can label Docker containers with useful info to spin up {beatname_uc} modules, for example:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -106,5 +108,5 @@ You can label Docker containers with useful info to spin up Metricbeat modules, 
   co.elastic.metrics/period: 10s
 -------------------------------------------------------------------------------------
 
-The above labels would allow Metricbeat to configure a Prometheus collector to poll port `9090`
+The above labels would allow {beatname_uc} to configure a Prometheus collector to poll port `9090`
 of the Docker container every 1 minute.
