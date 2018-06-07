@@ -1,9 +1,10 @@
 package file
 
 import (
-	"fmt"
 	"os"
 	"reflect"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/mitchellh/hashstructure"
@@ -43,9 +44,25 @@ func NewState(fileInfo os.FileInfo, path string, t string, meta map[string]strin
 func (s *State) ID() string {
 	// Generate id on first request. This is needed as id is not set when converting back from json
 	if s.Id == "" {
-		h, _ := hashstructure.Hash(s.Meta, nil)
-		s.Id = s.FileStateOS.String() + fmt.Sprintf("-%d", h)
+		if s.Meta == nil {
+			s.Id = s.FileStateOS.String()
+		} else {
+			hashValue, _ := hashstructure.Hash(s.Meta, nil)
+			var hashBuf [17]byte
+			hash := strconv.AppendUint(hashBuf[:0], hashValue, 16)
+			hash = append(hash, '-')
+
+			fileID := s.FileStateOS.String()
+
+			var b strings.Builder
+			b.Grow(len(hash) + len(fileID))
+			b.Write(hash)
+			b.WriteString(fileID)
+
+			s.Id = b.String()
+		}
 	}
+
 	return s.Id
 }
 
