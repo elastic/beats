@@ -1115,6 +1115,60 @@
 			"revisionTime": "2017-02-10T14:05:23Z"
 		},
 		{
+			"checksumSHA1": "k3e1TD8wrhxfUUG3pQBb10ppNGA=",
+			"path": "github.com/magefile/mage",
+			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
+			"revisionTime": "2018-04-12T15:54:34Z"
+		},
+		{
+			"checksumSHA1": "KODorM0Am1g55qObNz3jVOdRVFs=",
+			"path": "github.com/magefile/mage/build",
+			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
+			"revisionTime": "2018-04-12T15:54:34Z"
+		},
+		{
+			"checksumSHA1": "9yeXUlqhNcsR7MlYMouJTO3AXv0=",
+			"path": "github.com/magefile/mage/mage",
+			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
+			"revisionTime": "2018-04-12T15:54:34Z"
+		},
+		{
+			"checksumSHA1": "TkAemcxaY44gsEjO1BiBxwlEI4A=",
+			"path": "github.com/magefile/mage/mg",
+			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
+			"revisionTime": "2018-04-12T15:54:34Z"
+		},
+		{
+			"checksumSHA1": "b1qY9BFtpJnIZEa8yvpJCRbOhRM=",
+			"path": "github.com/magefile/mage/parse",
+			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
+			"revisionTime": "2018-04-12T15:54:34Z"
+		},
+		{
+			"checksumSHA1": "fEuDveZzYX6oqYOT9jqyZROun/Q=",
+			"path": "github.com/magefile/mage/parse/srcimporter",
+			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
+			"revisionTime": "2018-04-12T15:54:34Z"
+		},
+		{
+			"checksumSHA1": "0/j3qlGc8fsWG42uIDZ5p8tVzPM=",
+			"path": "github.com/magefile/mage/sh",
+			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
+			"revisionTime": "2018-04-12T15:54:34Z"
+		},
+		{
+			"checksumSHA1": "oAjx69UIs6F6hPh+2GQSBMaHAfc=",
+			"path": "github.com/magefile/mage/target",
+			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
+			"revisionTime": "2018-04-12T15:54:34Z"
+		},
+		{
+			"checksumSHA1": "He+VtZO7BsPDCZhZtJ1IkNp629o=",
+			"path": "github.com/magefile/mage/types",
+			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
+			"revisionTime": "2018-04-12T15:54:34Z"
+		},
+		{
 			"checksumSHA1": "qNkx9+OTwZI6aFv7K9zuFCGODUw=",
 			"path": "github.com/mattn/go-colorable",
 			"revision": "941b50ebc6efddf4c41c8e4537a5f68a4e686b24",
