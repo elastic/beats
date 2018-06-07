@@ -200,6 +200,16 @@ Vagrant.configure(2) do |config|
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   end
 
+  # Windows Server 2016
+  config.vm.define "win2016", primary: true do |machine|
+    machine.vm.box = "elastic/windows-2016-x86_64"
+    machine.vm.provision "shell", inline: $winPsProvision
+
+    machine.vm.provider "virtualbox" do |v|
+      v.memory = 4096
+    end
+  end
+
 end
 
 # -*- mode: ruby -*-
