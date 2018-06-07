@@ -64,6 +64,61 @@ func TestIsCleanInactive(t *testing.T) {
 	}
 }
 
+func TestMatchesMeta(t *testing.T) {
+	tests := []struct {
+		Input  *Input
+		Meta   map[string]string
+		Result bool
+	}{
+		{
+			Input: &Input{
+				meta: map[string]string{
+					"it": "matches",
+				},
+			},
+			Meta: map[string]string{
+				"it": "matches",
+			},
+			Result: true,
+		},
+		{
+			Input: &Input{
+				meta: map[string]string{
+					"it":     "doesnt",
+					"doesnt": "match",
+				},
+			},
+			Meta: map[string]string{
+				"it": "doesnt",
+			},
+			Result: false,
+		},
+		{
+			Input: &Input{
+				meta: map[string]string{
+					"it": "doesnt",
+				},
+			},
+			Meta: map[string]string{
+				"it":     "doesnt",
+				"doesnt": "match",
+			},
+			Result: false,
+		},
+		{
+			Input: &Input{
+				meta: map[string]string{},
+			},
+			Meta:   map[string]string{},
+			Result: true,
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.Result, test.Input.matchesMeta(test.Meta))
+	}
+}
+
 type TestFileInfo struct {
 	time time.Time
 }
