@@ -1,7 +1,6 @@
 # Name can be overwritten, as Metricbeat is also a library
 BEAT_NAME?=metricbeat
 BEAT_TITLE?=Metricbeat
-BEAT_DESCRIPTION?=Metricbeat is a lightweight shipper for metrics.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
 ES_BEATS?=..
@@ -47,17 +46,6 @@ configs: python-env
 imports: python-env
 	@mkdir -p include
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
-
-# This is called by the beats packer before building starts
-.PHONY: before-build
-before-build:
-ifeq ($(BEAT_NAME), metricbeat)
-	# disable the system/load metricset on windows
-	sed -i.bk 's/- load/#- load/' $(PREFIX)/modules.d-win/system.yml
-	rm $(PREFIX)/modules.d-win/system.yml.bk
-	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.reference.yml
-	rm $(PREFIX)/metricbeat-win.reference.yml.bk
-endif
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect

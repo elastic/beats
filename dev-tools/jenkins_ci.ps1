@@ -17,6 +17,10 @@ $env:GOPATH = $env:WORKSPACE
 $env:PATH = "$env:GOPATH\bin;C:\tools\mingw64\bin;$env:PATH"
 & gvm --format=powershell $(Get-Content .go-version) | Invoke-Expression
 
+# Write cached magefile binaries to workspace to ensure
+# each run starts from a clean slate.
+$env:MAGEFILE_CACHE = "$env:WORKSPACE\.magefile"
+
 if (Test-Path "$env:beat") {
     cd "$env:beat"
 } else {
