@@ -1,9 +1,9 @@
-{{ if .reference -}}
+{{ if .Reference -}}
 # The file integrity module sends events when files are changed (created,
 # updated, deleted). The events contain file metadata and hashes.
 {{ end -}}
 - module: file_integrity
-  {{ if eq .goos "darwin" -}}
+  {{ if eq .GOOS "darwin" -}}
   paths:
   - /bin
   - /usr/bin
@@ -11,7 +11,7 @@
   - /sbin
   - /usr/sbin
   - /usr/local/sbin
-  {{ else if eq .goos "windows" -}}
+  {{ else if eq .GOOS "windows" -}}
   paths:
   - C:/windows
   - C:/windows/system32
@@ -25,15 +25,15 @@
   - /usr/sbin
   - /etc
   {{- end }}
-{{ if .reference }}
+{{ if .Reference }}
   # List of regular expressions to filter out notifications for unwanted files.
   # Wrap in single quotes to workaround YAML escaping rules. By default no files
   # are ignored.
-  {{ if eq .goos "darwin" -}}
+  {{ if eq .GOOS "darwin" -}}
   exclude_files:
   - '\.DS_Store$'
   - '\.swp$'
-  {{ else if eq .goos "windows" -}}
+  {{ else if eq .GOOS "windows" -}}
   exclude_files:
   - '(?i)\.lnk$'
   - '(?i)\.swp$'
