@@ -1,5 +1,5 @@
-{beatname_uc} supports a autodiscover based on hints from the provider. The `hints` system looks for
-hints in Kubernetes Pod annotations or Docker labels which have the prefix `co.elastic.metrics`, as soon as
+{beatname_uc} supports autodiscover based on hints from the provider. The `hints` system looks for
+hints in Kubernetes Pod annotations or Docker labels which have the prefix `co.elastic.metrics`. As soon as
 the container starts, {beatname_uc} will check if it contains any hints and launch the proper config for
 it. Hints tell {beatname_uc} how to get metrics for the given container. This is the full list of supported hints:
 
@@ -40,7 +40,7 @@ SSL parameters, as seen in <<configuration-ssl>>.
 [float]
 === Kubernetes
 
-Docker autodiscover provider supports hints in labels, to enable it just set `hints.enabled`:
+Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ annotations:
 [float]
 === Docker
 
-Docker autodiscover provider supports hints in labels, to enable it just set `hints.enabled`:
+Docker autodiscover provider supports hints in labels. To enable it just set `hints.enabled`:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 {beatname_uc} supports autodiscover based on hints from the provider. The hints system looks for
-hints in Kubernetes Pod annotations or Docker labels that have the prefix `co.elastic.logs`, as soon as
+hints in Kubernetes Pod annotations or Docker labels that have the prefix `co.elastic.logs`. As soon as
 the container starts, {beatname_uc} will check if it contains any hints and launch the proper config for
 it. Hints tell {beatname_uc} how to get logs for the given container. By default logs will be retrieved
-from the container using the `docker` input, you can use hints to modify this behavior. This is the full
+from the container using the `docker` input. You can use hints to modify this behavior. This is the full
 list of supported hints:
 
 [float]
@@ -50,7 +50,7 @@ co.elastic.logs/fileset.stderr: error
 [float]
 ==== Kubernetes
 
-Kubernetes autodiscover provider supports hints in Pod annotations, to enable it just set `hints.enabled`:
+Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ annotations:
 [float]
 ==== Docker
 
-Docker autodiscover provider supports hints in labels, to enable it just set `hints.enabled`:
+Docker autodiscover provider supports hints in labels. To enable it just set `hints.enabled`:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
