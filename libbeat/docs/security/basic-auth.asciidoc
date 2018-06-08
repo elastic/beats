@@ -109,8 +109,6 @@ kibana_user:
   - "cn=Internal {beatname_uc} User,ou=example,o=com"
 ---------------------------------------------------------------
 
-// REVIEWERS: Have not tested the above example because I don't have time to
-// test. Is it correct?
 
 For more information, see
 {xpack-ref}/mapping-roles.html#mapping-roles-file[Using Role Mapping Files].

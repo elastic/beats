@@ -84,9 +84,6 @@ ifndef::only-elasticsearch[]
 [[load-dashboards-logstash]]
 ==== Set up dashboards for Logstash output
 
-// REVIEWERS: Please confirm that the command syntax is correct on all the
-// platforms shown below. I've only tested on mac OS.
-
 During dashboard loading, {beatname_uc} connects to Elasticsearch to check
 version information. To load dashboards when the Logstash output is enabled, you
 need to temporarily disable the Logstash output and enable Elasticsearch. To
@@ -111,10 +108,6 @@ ifdef::allplatforms[]
 ----
 
 
-// REVIEWERS: Is this the correct way for users to set credentials? I assume
-// they need to do this from the command line because the settings will be
-// commented out in the config file, right?
-
 *mac:*
 
 ["source","sh",subs="attributes"]
@@ -126,11 +119,6 @@ ifdef::allplatforms[]
   -E output.elasticsearch.password={pwd} \
   -E setup.kibana.host=localhost:5601 
 ----
-
-
-//REVEIWERS: Do you think we should show how to pass credentials here? We don't
-// do that in other places, but this seems like a special situation where it's
-// likely that the user will need to pass credentials. 
 
 
 *docker:*

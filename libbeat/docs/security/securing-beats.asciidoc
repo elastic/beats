@@ -49,14 +49,15 @@ For more information about {security}, see
 === {beatname_uc} features that require authorization
 
 After securing {beatname_uc}, make sure your users have the roles (or associated
-privileges) required to use these {beatname_uc} features:
+privileges) required to use these {beatname_uc} features. You must create the
+++{beat_default_index_prefix}_writer++ and
+++{beat_default_index_prefix}_reader++ roles (see <<beats-basic-auth>> and
+<<beats-user-access>>). The `machine_learning_admin` and `kibana_user` roles are
+{xpack-ref}/built-in-roles.html[built-in].
 
 [options="header"]
 |=======
-|Feature | Role footnote:[You must create the ++{beat_default_index_prefix}_writer++
-and +{beat_default_index_prefix}_reader+ roles (see <<beats-basic-auth>> and
-<<beats-user-access>>.) The `machine_learning_admin` and `kibana_user` roles
-are {xpack-ref}/built-in-roles.html[built-in].]
+|Feature | Role
 |Send data to a secured cluster   | ++{beat_default_index_prefix}_writer++
 |Run Filebeat modules | ++{beat_default_index_prefix}_writer++
 |Load index templates | ++{beat_default_index_prefix}_writer++ and `kibana_user`
