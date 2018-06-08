@@ -2,7 +2,6 @@ package file
 
 import (
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -73,5 +72,8 @@ func (s *State) IsEqual(c *State) bool {
 
 // IsEmpty returns true if the state is empty
 func (s *State) IsEmpty() bool {
-	return reflect.DeepEqual(*s, State{})
+	return s.FileStateOS == file.StateOS{} &&
+		s.Source == "" &&
+		s.Meta == nil &&
+		s.Timestamp.IsZero()
 }
