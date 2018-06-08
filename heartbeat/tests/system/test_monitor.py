@@ -33,7 +33,7 @@ class Test(BaseTest):
 
         server.shutdown()
         output = self.read_output()
-        assert status_code == output[0]["http.response.status"]
+        assert status_code == output[0]["http.response.status_code"]
 
     @parameterized.expand([
         ("8181", "up"),
