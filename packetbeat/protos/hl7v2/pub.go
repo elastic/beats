@@ -26,19 +26,19 @@ type transPub struct {
 
 // Component struct
 type Component struct {
-	ID    string `json:"id"`
+	Id    string `json:"id"`
 	Value string `json:"value"`
 }
 
 // Field struct
 type Field struct {
-	ID        string      `json:"id"`
+	Id        string      `json:"id"`
 	Component []Component `json:"component"`
 }
 
 // Segment struct
 type Segment struct {
-	ID    string  `json:"id"`
+	Id    string  `json:"id"`
 	Field []Field `json:"field"`
 }
 
@@ -167,7 +167,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 						hl7componentvalue := strings.TrimSpace(hl7components[hl7component])
 
 						// If this is MSH field 1, component 1 then set value to the field seperator
-						if hl7fieldnumber == "1" && hl7componentnumber == "1" {
+						if hl7segmentheader == "MSH" && hl7fieldnumber == "1" && hl7componentnumber == "1" {
 							hl7componentvalue = hl7fieldseperator
 						}
 
