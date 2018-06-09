@@ -32,6 +32,9 @@ The following topics describe how to configure each supported output:
 * <<file-output>>
 * <<console-output>>
 
+If you've secured the {stack}, also read <<securing-{beatname_lc}>> for more about
+security-related configuration options.
+
 endif::[]
 
 [[elasticsearch-output]]
@@ -49,12 +52,14 @@ Example configuration:
 ------------------------------------------------------------------------------
 
 output.elasticsearch:
-  hosts: ["http://localhost:9200"]
+  hosts: ["https://localhost:9200"]
   index: "{beatname_lc}-%{[beat.version]}-%{+yyyy.MM.dd}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   ssl.certificate: "/etc/pki/client/cert.pem"
   ssl.key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
+
+//
 
 To enable SSL, just add `https` to all URLs defined under __hosts__.
 
@@ -63,8 +68,8 @@ To enable SSL, just add `https` to all URLs defined under __hosts__.
 
 output.elasticsearch:
   hosts: ["https://localhost:9200"]
-  username: "admin"
-  password: "s3cr3t"
+  username: "{beatname_lc}_internal"
+  password: "{pwd}"
 ------------------------------------------------------------------------------
 
 If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` to the yaml file.
@@ -74,10 +79,14 @@ If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` 
 output.elasticsearch:
   hosts: ["localhost"]
   protocol: "https"
-  username: "admin"
-  password: "s3cr3t"
+  username: "{beatname_lc}_internal"
+  password: "{pwd}"
 
 ------------------------------------------------------------------------------
+
+
+For more information about securing {beatname_uc}, see
+<<securing-{beatname_lc}>>.
 
 ==== Compatibility
 

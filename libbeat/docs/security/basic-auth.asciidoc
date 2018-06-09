@@ -1,6 +1,6 @@
 [role="xpack"]
 [[beats-basic-auth]]
-=== Configuring authentication credentials for {beatname_uc}
+=== Configure authentication credentials
 
 When sending data to a secured cluster through the `elasticsearch`
 output, {beatname_uc} must either provide basic authentication credentials
@@ -8,17 +8,30 @@ or present a client certificate.
 
 To configure authentication credentials for {beatname_uc}:
 
-. Create a role that has the `manage_index_templates` and
-`monitor` cluster privileges, and `read`, `write`, and `create_index`
-privileges for the indices that {beatname_uc} creates. You can create roles from the
-**Management / Roles** UI in {kib} or through the `role` API.
-For example, the following request creates a ++{beat_default_index_prefix}_writer++ role:
+. Create a writer role that has the following privileges:
 +
+--
+ifeval::["{beatname_lc}"!="filebeat"]
+* *Cluster*: `manage_index_templates` and `monitor`
+endif::[]
+ifeval::["{beatname_lc}"=="filebeat"]
+* *Cluster*: `manage_index_templates`, `monitor`, and
+`manage_ingest_pipelines`
+endif::[]
+* *Index*: `write` and `create_index` on the {beatname_uc} indices 
+--
++
+You can create roles from the **Management / Roles** UI in {kib} or through the
+`role` API. For example, the following request creates a role named
+++{beat_default_index_prefix}_writer++:
++
+--
+ifeval::["{beatname_lc}"!="filebeat"]
 ["source","sh",subs="attributes,callouts"]
 ---------------------------------------------------------------
 POST _xpack/security/role/{beat_default_index_prefix}_writer
 {
-  "cluster": ["manage_index_templates", "monitor"],
+  "cluster": ["manage_index_templates","monitor"],
   "indices": [
     {
       "names": [ "{beat_default_index_prefix}-*" ], <1>
@@ -29,67 +42,107 @@ POST _xpack/security/role/{beat_default_index_prefix}_writer
 ---------------------------------------------------------------
 <1> If you use a custom {beatname_uc} index pattern, specify that pattern
 instead of the default ++{beat_default_index_prefix}-*++ pattern.
+endif::[]
+ifeval::["{beatname_lc}"=="filebeat"]
+["source","sh",subs="attributes,callouts"]
+---------------------------------------------------------------
+POST _xpack/security/role/{beat_default_index_prefix}_writer
+{
+  "cluster": ["manage_index_templates","monitor","manage_ingest_pipelines"], <1>
+  "indices": [
+    {
+      "names": [ "{beat_default_index_prefix}-*" ], <2>
+      "privileges": ["write","create_index"]
+    }
+  ]
+}
+---------------------------------------------------------------
+// CONSOLE
+<1> The `manage_ingest_pipelines` cluster privilege is required to run
+{beatname_uc} modules.
+<2> If you use a custom {beatname_uc} index pattern, specify that pattern
+instead of the default ++{beat_default_index_prefix}-*++ pattern.
+endif::[]
+--
 
 . Assign the writer role to the user that {beatname_uc} will use to connect to
-{es}:
+{es}. If you plan to load the pre-built {kib} dashboards, also assign the
+`kibana_user` role. 
+ifdef::has_ml_jobs[]
+If you plan to load machine learning jobs, assign the `machine_learning_admin`
+role.
+endif::[]
 
-.. To authenticate as a native user, create a user for the {beatname_uc} to use
-internally and assign it the writer role. You can create users from the
-**Management / Users** UI in {kib} or through the `user` API. For example, the
-following request creates a ++{beat_default_index_prefix}_internal++ user that has the
-++{beat_default_index_prefix}_writer++ role:
+.. To authenticate as a native user, create a user for {beatname_uc} to use
+internally and assign it the writer role, plus any other roles that are
+needed.
 +
+You can create users from the **Management / Users** UI in {kib} or through the
+`user` API. For example, following request creates a user
+named ++{beat_default_index_prefix}_internal++ that has the
+++{beat_default_index_prefix}_writer++ and `kibana_user` roles:
++
+--
 ["source","sh",subs="attributes,callouts"]
 ---------------------------------------------------------------
 POST /_xpack/security/user/{beat_default_index_prefix}_internal
 {
-  "password" : "test-password",
-  "roles" : [ "{beat_default_index_prefix}_writer"],
+  "password" : "{pwd}",
+  "roles" : [ "{beat_default_index_prefix}_writer","kibana_user"],
   "full_name" : "Internal {beatname_uc} User"
 }
 ---------------------------------------------------------------
+// CONSOLE
 
-.. To authenticate using PKI authentication, assign the writer role
-to the internal {beatname_uc} user in the `role_mapping.yml` configuration file. Specify
-the user by the distinguished name that appears in its certificate.
+--
+
+.. To use PKI authentication, assign the writer role, plus any other roles that are
+needed, in the `role_mapping.yml` configuration file. Specify the user by the
+distinguished name that appears in its certificate:
 +
 --
 ["source","yaml",subs="attributes,callouts"]
 ---------------------------------------------------------------
 {beat_default_index_prefix}_writer:
   - "cn=Internal {beatname_uc} User,ou=example,o=com"
+kibana_user:
+  - "cn=Internal {beatname_uc} User,ou=example,o=com"
 ---------------------------------------------------------------
+
+
 For more information, see
 {xpack-ref}/mapping-roles.html#mapping-roles-file[Using Role Mapping Files].
 --
 
-. Configure authentication credentials for the `elasticsearch` output
-in the {beatname_uc} configuration file:
+. In the {beatname_uc} configuration file, specify authentication credentials
+for the `elasticsearch` output:
 
-.. To use basic authentication, configure the `username` and `password`
-settings. For example, the following {beatname_uc} output configuration
-uses the native ++{beat_default_index_prefix}_internal++ user to connect to {es}:
+
+.. To use basic authentication, configure the `username` and `password` settings.
+For example, the following {beatname_uc} output configuration uses the native
+++{beat_default_index_prefix}_internal++ user to connect to {es}: 
 +
 ["source","js",subs="attributes,callouts"]
 --------------------------------------------------
 output.elasticsearch:
-    hosts: ["localhost:9200"]
-    index: "{beat_default_index_prefix}"
-    username: "{beat_default_index_prefix}_internal"
-    password: "test-password"
+  hosts: ["localhost:9200"]
+  username: "{beat_default_index_prefix}_internal" <1>
+  password: "{pwd}" <2>
 --------------------------------------------------
+<1> You created this user earlier.
+<2> The example shows a hard-coded password, but you should store sensitive
+values in the <<keystore,secrets keystore>>.
 
-.. To use PKI authentication, configure the `certificate` and
-`key` settings:
+.. To use PKI authentication, configure the `certificate` and `key` settings:
 +
 ["source","js",subs="attributes,callouts"]
 --------------------------------------------------
 output.elasticsearch:
-    hosts: ["localhost:9200"]
-    index: "{beat_default_index_prefix}"
-    ssl.certificate: "/etc/pki/client/cert.pem" <1>
-    ssl.key: "/etc/pki/client/cert.key"
+  hosts: ["localhost:9200"]
+  ssl.certificate: "/etc/pki/client/cert.pem" <1>
+  ssl.key: "/etc/pki/client/cert.key"
 --------------------------------------------------
 <1> The distinguished name (DN) in the certificate must be mapped to
-the writer role in the `role_mapping.yml` configuration file on each
-node in the {es} cluster.
+the ++{beat_default_index_prefix}_writer++ and `kibana_user` roles in the
+`role_mapping.yml` configuration file on each node in the {es} cluster.
+
