@@ -2,6 +2,7 @@ package hl7v2
 
 import (
 	//"encoding/json"
+	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -25,14 +26,16 @@ type transPub struct {
 
 // SubComponent struct
 type SubComponent struct {
-	ID    int    `json:"id"`
-	Value string `json:"value"`
+	ID      int     `json:"id"`
+	Value   string  `json:"value,omitempty"`
+	Numeric float64 `json:"numeric,omitempty"`
 }
 
 // Component struct
 type Component struct {
 	ID           int            `json:"id"`
 	Value        string         `json:"value,omitempty"`
+	Numeric      float64        `json:"numeric,omitempty"`
 	SubComponent []SubComponent `json:"subcomponent,omitempty"`
 }
 
@@ -40,6 +43,7 @@ type Component struct {
 type Field struct {
 	ID        int         `json:"id"`
 	Value     string      `json:"value,omitempty"`
+	Numeric   float64     `json:"numeric,omitempty"`
 	Component []Component `json:"component,omitempty"`
 }
 
@@ -52,6 +56,12 @@ type Segment struct {
 // Message struct
 type Message struct {
 	Segment []Segment `json:"segment"`
+}
+
+// Check if a string is a numeric value
+func IsNumeric(s string) bool {
+	_, err := strconv.ParseFloat(s, 64)
+	return err == nil
 }
 
 func (pub *transPub) onTransaction(requ, resp *message) error {
@@ -214,21 +224,31 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 									// Add hl7subcomponentvalue to subcomponentslice if not empty
 									if hl7subcomponentvalue != "" {
-										subcomponentslice = append(subcomponentslice, SubComponent{hl7subcomponentnumber, hl7subcomponentvalue})
+										if IsNumeric(hl7subcomponentvalue) {
+											hl7subcomponentnumericvalue, _ := strconv.ParseFloat(hl7subcomponentvalue, 64)
+											subcomponentslice = append(subcomponentslice, SubComponent{hl7subcomponentnumber, hl7subcomponentvalue, hl7subcomponentnumericvalue})
+										} else {
+											subcomponentslice = append(subcomponentslice, SubComponent{hl7subcomponentnumber, hl7subcomponentvalue, 0})
+										}
 									}
 
 								}
 
 								// Add subcomponentslice to componentslice
 								if len(subcomponentslice) != 0 {
-									componentslice = append(componentslice, Component{hl7componentnumber, "", subcomponentslice})
+									componentslice = append(componentslice, Component{hl7componentnumber, "", 0, subcomponentslice})
 								}
 
 							} else {
 
 								// Add component without subcomponent
 								if hl7componentvalue != "" {
-									componentslice = append(componentslice, Component{hl7componentnumber, hl7componentvalue, subcomponentslice})
+									if IsNumeric(hl7componentvalue) {
+										hl7componentnumericvalue, _ := strconv.ParseFloat(hl7componentvalue, 64)
+										componentslice = append(componentslice, Component{hl7componentnumber, hl7componentvalue, hl7componentnumericvalue, subcomponentslice})
+									} else {
+										componentslice = append(componentslice, Component{hl7componentnumber, hl7componentvalue, 0, subcomponentslice})
+									}
 								}
 
 							}
@@ -237,14 +257,19 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 						// Add componentslice to fieldslice
 						if len(componentslice) != 0 {
-							fieldslice = append(fieldslice, Field{hl7fieldnumber, "", componentslice})
+							fieldslice = append(fieldslice, Field{hl7fieldnumber, "", 0, componentslice})
 						}
 
 					} else {
 
 						// Add field without component
 						if hl7fieldvalue != "" {
-							fieldslice = append(fieldslice, Field{hl7fieldnumber, hl7fieldvalue, componentslice})
+							if IsNumeric(hl7fieldvalue) {
+								hl7fieldnumericvalue, _ := strconv.ParseFloat(hl7fieldvalue, 64)
+								fieldslice = append(fieldslice, Field{hl7fieldnumber, hl7fieldvalue, hl7fieldnumericvalue, componentslice})
+							} else {
+								fieldslice = append(fieldslice, Field{hl7fieldnumber, hl7fieldvalue, 0, componentslice})
+							}
 						}
 
 					}
