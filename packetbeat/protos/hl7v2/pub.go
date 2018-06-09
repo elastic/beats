@@ -26,19 +26,19 @@ type transPub struct {
 
 // Component struct
 type Component struct {
-	Id    string `json:"id"`
+	ID    string `json:"id"`
 	Value string `json:"value"`
 }
 
 // Field struct
 type Field struct {
-	Id        string      `json:"id"`
+	ID        string      `json:"id"`
 	Component []Component `json:"component"`
 }
 
 // Segment struct
 type Segment struct {
-	Id    string  `json:"id"`
+	ID    string  `json:"id"`
 	Field []Field `json:"field"`
 }
 
