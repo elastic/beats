@@ -24,22 +24,31 @@ type transPub struct {
 	results                protos.Reporter
 }
 
+// Sub-component struct
+type SubComponent struct {
+	ID    string `json:"id"`
+	Value string `json:"value"`
+}
+
 // Component struct
 type Component struct {
-	Id    string `json:"id"`
-	Value string `json:"value"`
+	ID           string         `json:"id"`
+	Value        string         `json:"value"`
+	SubComponent []SubComponent `json:"subcomponent,omitempty"`
 }
 
 // Field struct
 type Field struct {
-	Id        string      `json:"id"`
-	Component []Component `json:"component"`
+	ID        string      `json:"id"`
+	Value     string      `json:"value"`
+	Component []Component `json:"component,omitempty"`
 }
 
 // Segment struct
 type Segment struct {
-	Id    string  `json:"id"`
-	Field []Field `json:"field"`
+	ID    string  `json:"id"`
+	Value string  `json:"value"`
+	Field []Field `json:"field,omitempty"`
 }
 
 // Message struct
@@ -102,6 +111,9 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		// Default component seperator
 		hl7componentseperator := "^"
 
+		// Default subcomponent seperator
+		hl7subcomponentseperator := "&"
+
 		// Split message into segments
 		if hl7message == "request" {
 			hl7segments = strings.Split(string(requ.content), pub.NewLineChars)
@@ -131,6 +143,9 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 				hl7componentseperator = string(hl7segments[hl7segment][4])
 			}
 
+			// Set segment value
+			hl7segmentvalue := strings.TrimSpace(hl7segments[hl7segment])
+
 			// Split segment into fields
 			hl7fields := strings.Split(hl7segments[hl7segment], hl7fieldseperator)
 
@@ -148,38 +163,98 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 					hl7fieldnumber = strconv.Itoa(hl7field + 1)
 				}
 
+				// Set field value
+				hl7fieldvalue := strings.TrimSpace(hl7fields[hl7field])
+
+				// If this is MSH-1 then set value to the field seperator
+				if strings.EqualFold(hl7segmentheader, "MSH") && hl7fieldnumber == "1" {
+					hl7fieldvalue = hl7fieldseperator
+				}
+
 				// Process if not hl7fieldnumber 0
 				if hl7fieldnumber != "0" {
-
-					// Split field into components
-					hl7components := strings.Split(hl7fields[hl7field], hl7componentseperator)
 
 					// Slice for our component values
 					var componentslice []Component
 
-					// Loop through components
-					for hl7component := range hl7components {
+					// If not MSH-2 and hl7fieldvalue contains the hl7componentseperator then split
+					if !(strings.EqualFold(hl7segmentheader, "MSH") && hl7fieldnumber == "2") && strings.Contains(hl7fieldvalue, hl7componentseperator) {
+						debugf("%s has components.", hl7fieldvalue)
 
-						// Set component number
-						hl7componentnumber := strconv.Itoa(hl7component + 1)
+						// Split field into components
+						hl7components := strings.Split(hl7fields[hl7field], hl7componentseperator)
 
-						// Set component value
-						hl7componentvalue := strings.TrimSpace(hl7components[hl7component])
+						// Loop through components
+						for hl7component := range hl7components {
 
-						// If this is MSH field 1, component 1 then set value to the field seperator
-						if hl7segmentheader == "MSH" && hl7fieldnumber == "1" && hl7componentnumber == "1" {
-							hl7componentvalue = hl7fieldseperator
+							// Set component number
+							hl7componentnumber := strconv.Itoa(hl7component + 1)
+
+							// Set component value
+							hl7componentvalue := strings.TrimSpace(hl7components[hl7component])
+
+							// If this is MSH field 2, component 1 then set value to the field seperator
+							if strings.EqualFold(hl7segmentheader, "MSH") && hl7fieldnumber == "1" && hl7componentnumber == "1" {
+								hl7componentvalue = hl7fieldseperator
+							}
+
+							// Slice for our subcomponent values
+							var subcomponentslice []SubComponent
+
+							// If not MSH-1.1 and hl7componentvalue contains the hl7subcomponentseperator then split
+							if !(strings.EqualFold(hl7segmentheader, "MSH") && hl7fieldnumber == "2" && hl7componentnumber == "1") && strings.Contains(hl7componentvalue, hl7subcomponentseperator) {
+								debugf("%s has subcomponents.", hl7componentvalue)
+
+								// Split component into subcomponents
+								hl7subcomponents := strings.Split(hl7components[hl7component], hl7subcomponentseperator)
+
+								// Loop through subcomponents
+								for hl7subcomponent := range hl7subcomponents {
+
+									// Set subcomponent number
+									hl7subcomponentnumber := strconv.Itoa(hl7subcomponent + 1)
+
+									// Set subcomponent value
+									hl7subcomponentvalue := strings.TrimSpace(hl7subcomponents[hl7subcomponent])
+
+									// Add hl7subcomponentvalue to subcomponentslice if not empty
+									debugf("hl7subcomponentvalue size: %v", hl7subcomponentvalue)
+									if hl7subcomponentvalue != "" {
+										subcomponentslice = append(subcomponentslice, SubComponent{"" + hl7subcomponentnumber + "", "" + hl7subcomponentvalue + ""})
+									}
+
+								}
+
+								// Add subcomponentslice to componentslice
+								debugf("subcomponentslice size: %v", len(subcomponentslice))
+								if len(subcomponentslice) != 0 {
+									componentslice = append(componentslice, Component{"" + hl7componentnumber + "", hl7componentvalue, subcomponentslice})
+								}
+
+							} else {
+
+								// Add component without subcomponent
+								if hl7componentvalue != "" {
+									componentslice = append(componentslice, Component{"" + hl7componentnumber + "", hl7componentvalue, subcomponentslice})
+								}
+
+							}
+
 						}
 
-						// Add hl7componentvalue to componentslice if not empty
-						if hl7componentvalue != "" {
-							componentslice = append(componentslice, Component{"" + hl7componentnumber + "", "" + hl7componentvalue + ""})
+						// Add componentslice to fieldslice
+						debugf("componentslice size: %v", len(componentslice))
+						if len(componentslice) != 0 {
+							fieldslice = append(fieldslice, Field{"" + hl7fieldnumber + "", hl7fieldvalue, componentslice})
 						}
-					}
 
-					// Add componentslice to fieldslice
-					if len(componentslice) != 0 {
-						fieldslice = append(fieldslice, Field{"" + hl7fieldnumber + "", componentslice})
+					} else {
+
+						// Add field without component
+						if hl7fieldvalue != "" {
+							fieldslice = append(fieldslice, Field{"" + hl7fieldnumber + "", hl7fieldvalue, componentslice})
+						}
+
 					}
 
 				}
@@ -187,8 +262,9 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 			}
 
 			// Add fieldslice to segmentslice
+			debugf("fieldslice size: %v", len(fieldslice))
 			if len(fieldslice) != 0 {
-				segmentslice = append(segmentslice, Segment{"" + hl7segmentheader + "", fieldslice})
+				segmentslice = append(segmentslice, Segment{"" + hl7segmentheader + "", hl7segmentvalue, fieldslice})
 			}
 
 		}
@@ -198,6 +274,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 		// Switch to response message
 		hl7message = "response"
+
 	}
 
 	// add processing notes/errors to event
