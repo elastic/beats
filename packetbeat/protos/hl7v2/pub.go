@@ -24,7 +24,7 @@ type transPub struct {
 	results                protos.Reporter
 }
 
-// Sub-component struct
+// SubComponent struct
 type SubComponent struct {
 	ID    string `json:"id"`
 	Value string `json:"value"`
@@ -33,21 +33,20 @@ type SubComponent struct {
 // Component struct
 type Component struct {
 	ID           string         `json:"id"`
-	Value        string         `json:"value"`
+	Value        string         `json:"value,omitempty"`
 	SubComponent []SubComponent `json:"subcomponent,omitempty"`
 }
 
 // Field struct
 type Field struct {
 	ID        string      `json:"id"`
-	Value     string      `json:"value"`
+	Value     string      `json:"value,omitempty"`
 	Component []Component `json:"component,omitempty"`
 }
 
 // Segment struct
 type Segment struct {
 	ID    string  `json:"id"`
-	Value string  `json:"value"`
 	Field []Field `json:"field,omitempty"`
 }
 
@@ -141,10 +140,8 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 			if strings.EqualFold(hl7segmentheader, "MSH") {
 				hl7fieldseperator = string(hl7segments[hl7segment][3])
 				hl7componentseperator = string(hl7segments[hl7segment][4])
+				hl7subcomponentseperator = string(hl7segments[hl7segment][7])
 			}
-
-			// Set segment value
-			hl7segmentvalue := strings.TrimSpace(hl7segments[hl7segment])
 
 			// Split segment into fields
 			hl7fields := strings.Split(hl7segments[hl7segment], hl7fieldseperator)
@@ -228,7 +225,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 								// Add subcomponentslice to componentslice
 								debugf("subcomponentslice size: %v", len(subcomponentslice))
 								if len(subcomponentslice) != 0 {
-									componentslice = append(componentslice, Component{"" + hl7componentnumber + "", hl7componentvalue, subcomponentslice})
+									componentslice = append(componentslice, Component{"" + hl7componentnumber + "", "", subcomponentslice})
 								}
 
 							} else {
@@ -245,7 +242,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 						// Add componentslice to fieldslice
 						debugf("componentslice size: %v", len(componentslice))
 						if len(componentslice) != 0 {
-							fieldslice = append(fieldslice, Field{"" + hl7fieldnumber + "", hl7fieldvalue, componentslice})
+							fieldslice = append(fieldslice, Field{"" + hl7fieldnumber + "", "", componentslice})
 						}
 
 					} else {
@@ -264,7 +261,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 			// Add fieldslice to segmentslice
 			debugf("fieldslice size: %v", len(fieldslice))
 			if len(fieldslice) != 0 {
-				segmentslice = append(segmentslice, Segment{"" + hl7segmentheader + "", hl7segmentvalue, fieldslice})
+				segmentslice = append(segmentslice, Segment{"" + hl7segmentheader + "", fieldslice})
 			}
 
 		}
