@@ -2258,39 +2258,17 @@ HL7v2-specific event fields.
 
 
 
-
-
-
-
-*`hl7v2.request.segment.field.component.id`*::
+*`hl7v2.request`*::
 +
 --
-type: keyword
+type: nested
 
 --
 
-*`hl7v2.request.segment.field.component.value`*::
+*`hl7v2.response`*::
 +
 --
-type: keyword
-
---
-
-
-
-
-
-*`hl7v2.response.segment.field.component.id`*::
-+
---
-type: keyword
-
---
-
-*`hl7v2.response.segment.field.component.value`*::
-+
---
-type: keyword
+type: nested
 
 --
 
