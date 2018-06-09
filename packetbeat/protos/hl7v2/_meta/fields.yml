@@ -6,13 +6,13 @@
       type: group
       fields:
         - name: request
-          type: group
+          type: nested
           fields:
             - name: segment
-              type: group
+              type: nested
               fields:
                 - name: field
-                  type: group
+                  type: nested
                   fields:
                     - name: component
                       type: group
@@ -22,13 +22,13 @@
                         - name: value
                           type: keyword
         - name: response
-          type: group
+          type: nested
           fields:
             - name: segment
-              type: group
+              type: nested
               fields:
                 - name: field
-                  type: group
+                  type: nested
                   fields:
                     - name: component
                       type: group
