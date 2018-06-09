@@ -2260,23 +2260,37 @@ HL7v2-specific event fields.
 
 
 
-*`hl7v2.request.linenumber.segment`*::
+
+
+*`hl7v2.request.segment.field.component.id`*::
 +
 --
 type: keyword
 
-HL7 segment
-
 --
 
-
-
-*`hl7v2.response.linenumber.segment`*::
+*`hl7v2.request.segment.field.component.value`*::
 +
 --
 type: keyword
 
-HL7 segment
+--
+
+
+
+
+
+*`hl7v2.response.segment.field.component.id`*::
++
+--
+type: keyword
+
+--
+
+*`hl7v2.response.segment.field.component.value`*::
++
+--
+type: keyword
 
 --
 

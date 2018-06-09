@@ -8,35 +8,33 @@
         - name: request
           type: group
           fields:
-            - name: linenumber
+            - name: segment
               type: group
               fields:
-                - name: segment
-                  type: keyword
-                  description: HL7 segment
+                - name: field
+                  type: group
                   fields:
-                    - name: field
-                      type: keyword
-                      description: HL7 field
+                    - name: component
+                      type: group
                       fields:
-                        - name: component
+                        - name: id
                           type: keyword
-                          description: HL7 component
+                        - name: value
+                          type: keyword
         - name: response
           type: group
           fields:
-            - name: linenumber
+            - name: segment
               type: group
               fields:
-                - name: segment
-                  type: keyword
-                  description: HL7 segment
+                - name: field
+                  type: group
                   fields:
-                    - name: field
-                      type: keyword
-                      description: HL7 field
+                    - name: component
+                      type: group
                       fields:
-                        - name: component
+                        - name: id
                           type: keyword
-                          description: HL7 component
+                        - name: value
+                          type: keyword
 

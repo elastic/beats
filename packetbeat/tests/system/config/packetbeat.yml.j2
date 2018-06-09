@@ -134,10 +134,7 @@ packetbeat.protocols:
 
 - type: hl7v2
   ports: [2575]
-  segment_selection_mode: Include
-  field_selection_mode: Include
-  segments: [MSH,PID,MSA]
-  fields: [MSH.10,PID.5,MSA.1]
+
 
 {% if procs_enabled %}
 #=========================== Monitored processes ==============================
