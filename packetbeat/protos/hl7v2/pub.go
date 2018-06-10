@@ -34,17 +34,19 @@ type SubComponent struct {
 // Component struct
 type Component struct {
 	ID           int            `json:"id"`
-	Value        string         `json:"value,omitempty"`
-	Numeric      float64        `json:"numeric,omitempty"`
 	SubComponent []SubComponent `json:"subcomponent,omitempty"`
+}
+
+// Repeat struct
+type Repeat struct {
+	ID        int         `json:"id"`
+	Component []Component `json:"component,omitempty"`
 }
 
 // Field struct
 type Field struct {
-	ID        int         `json:"id"`
-	Value     string      `json:"value,omitempty"`
-	Numeric   float64     `json:"numeric,omitempty"`
-	Component []Component `json:"component,omitempty"`
+	ID     int      `json:"id"`
+	Repeat []Repeat `json:"repeat,omitempty"`
 }
 
 // Segment struct
@@ -58,7 +60,7 @@ type Message struct {
 	Segment []Segment `json:"segment"`
 }
 
-// Check if a string is a numeric value
+// IsNumeric checks if a string is a numeric value
 func IsNumeric(s string) bool {
 	_, err := strconv.ParseFloat(s, 64)
 	return err == nil
@@ -107,20 +109,22 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 	// Start with the request
 	hl7message := "request"
 
-	// Var for our segments array
 	var hl7segments []string
+
+	// Default field seperator
+	hl7fieldseperator := "|"
+
+	// Default repeat seperator
+	hl7repeatseperator := "~"
+
+	// Default component seperator
+	hl7componentseperator := "^"
+
+	// Default subcomponent seperator
+	hl7subcomponentseperator := "&"
 
 	// Loop through request and response
 	for i := 0; i < 2; i++ {
-
-		// Default field seperator
-		hl7fieldseperator := "|"
-
-		// Default component seperator
-		hl7componentseperator := "^"
-
-		// Default subcomponent seperator
-		hl7subcomponentseperator := "&"
 
 		// Split message into segments
 		if hl7message == "request" {
@@ -131,9 +135,8 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 			continue
 		}
 
-		// Slice for our segment fields
-		var segmentslice []Segment
-
+		// Array for our segment values
+		var segmentarray []Segment
 		// Loop through hl7segments
 		for hl7segment := range hl7segments {
 
@@ -142,151 +145,133 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 				continue
 			}
 
-			// Set segment header
-			hl7segmentheader := hl7segments[hl7segment][0:3]
+			hl7segmentvalue := hl7segments[hl7segment]
+			debugf("hl7segmentvalue: %v", hl7segmentvalue)
+			hl7segmentnumber := hl7segment + 1
+			debugf("hl7segmentnumber: %v", hl7segmentnumber)
 
-			// If this is the MSH segment get our encoding characters
-			if strings.EqualFold(hl7segmentheader, "MSH") {
+			// Set segment header
+			hl7segmentheader := hl7segmentvalue[0:3]
+
+			// If this is the MSH segment get our seperators
+			if hl7segmentheader == "MSH" {
 				hl7fieldseperator = string(hl7segments[hl7segment][3])
+				debugf("hl7fieldseperator: %s", hl7fieldseperator)
+				hl7repeatseperator = string(hl7segments[hl7segment][5])
+				debugf("hl7repeatseperator: %s", hl7repeatseperator)
 				hl7componentseperator = string(hl7segments[hl7segment][4])
+				debugf("hl7componentseperator: %s", hl7componentseperator)
 				hl7subcomponentseperator = string(hl7segments[hl7segment][7])
+				debugf("hl7subcomponentseperator: %s", hl7subcomponentseperator)
 			}
 
-			// Split segment into fields
-			hl7fields := strings.Split(hl7segments[hl7segment], hl7fieldseperator)
+			// Split hl7segmentvalue into hl7fields
+			hl7fields := strings.Split(hl7segmentvalue, hl7fieldseperator)
 
-			// Slice for our field components
-			var fieldslice []Field
-
-			// Loop through fields
+			// Array for our field values
+			var fieldarray []Field
+			// Loop through hl7fields
 			for hl7field := range hl7fields {
 
-				// Set field number
-				hl7fieldnumber := hl7field
-
-				// Increment field numbers if this is an MSH value
-				if strings.EqualFold(hl7segmentheader, "MSH") {
-					hl7fieldnumber++
+				// If field header dont process
+				if hl7field == 0 {
+					debugf("Not processing %v-%v.", hl7segmentheader, hl7field)
+					continue
 				}
 
-				// Set field value
-				hl7fieldvalue := strings.TrimSpace(hl7fields[hl7field])
+				hl7fieldvalue := hl7fields[hl7field]
+				debugf("hl7fieldvalue: %v", hl7fieldvalue)
+				hl7fieldnumber := hl7field + 1
+				debugf("hl7fieldnumber: %v", hl7fieldnumber)
 
-				// If this is MSH-1 then set value to the field seperator
-				if strings.EqualFold(hl7segmentheader, "MSH") && hl7fieldnumber == 1 {
-					hl7fieldvalue = hl7fieldseperator
+				// If MSH-1 or MSH-2 don't process
+				if hl7segmentheader == "MSH" && (hl7fieldnumber == 1 || hl7fieldnumber == 2) {
+					debugf("Not processing %v-%v.", hl7segmentheader, hl7fieldnumber)
+					continue
 				}
 
-				// Process if not hl7fieldnumber 0
-				if hl7fieldnumber != 0 {
+				// Split hl7fieldvalue into hl7repeats
+				hl7repeats := strings.Split(hl7fieldvalue, hl7repeatseperator)
 
-					// Slice for our component values
-					var componentslice []Component
+				// Array for our repeat values
+				var repeatarray []Repeat
+				// Loop through hl7repeats
+				for hl7repeat := range hl7repeats {
+					hl7repeatvalue := hl7repeats[hl7repeat]
+					debugf("hl7repeatvalue: %v", hl7repeatvalue)
+					hl7repeatnumber := hl7repeat + 1
+					debugf("hl7repeatnumber: %v", hl7repeatnumber)
 
-					// If not MSH-2 and hl7fieldvalue contains the hl7componentseperator then split
-					if !(strings.EqualFold(hl7segmentheader, "MSH") && hl7fieldnumber == 2) && strings.Contains(hl7fieldvalue, hl7componentseperator) {
-						debugf("%s has components.", hl7fieldvalue)
+					// Split hl7repeatvalue into hl7components
+					hl7components := strings.Split(hl7repeatvalue, hl7componentseperator)
 
-						// Split field into components
-						hl7components := strings.Split(hl7fields[hl7field], hl7componentseperator)
+					// Array for our component values
+					var componentarray []Component
+					// Loop through hl7components
+					for hl7component := range hl7components {
+						hl7componentvalue := hl7components[hl7component]
+						debugf("hl7componentvalue: %v", hl7componentvalue)
+						hl7componentnumber := hl7component + 1
+						debugf("hl7componentnumber: %v", hl7componentnumber)
 
-						// Loop through components
-						for hl7component := range hl7components {
+						// Split hl7componentvalue into hl7subcomponents
+						hl7subcomponents := strings.Split(hl7componentvalue, hl7subcomponentseperator)
 
-							// Set component number
-							hl7componentnumber := hl7component + 1
+						// Array for our subcomponent values
+						var subcomponentarray []SubComponent
+						// Loop through hl7subcomponents
+						for hl7subcomponent := range hl7subcomponents {
+							hl7subcomponentvalue := hl7subcomponents[hl7subcomponent]
+							debugf("hl7subcomponentvalue: %v", hl7subcomponentvalue)
+							hl7subcomponentnumber := hl7subcomponent + 1
+							debugf("hl7subcomponentnumber: %v", hl7subcomponentnumber)
 
-							// Set component value
-							hl7componentvalue := strings.TrimSpace(hl7components[hl7component])
-
-							// If this is MSH field 2, component 1 then set value to the field seperator
-							if strings.EqualFold(hl7segmentheader, "MSH") && hl7fieldnumber == 1 && hl7componentnumber == 1 {
-								hl7componentvalue = hl7fieldseperator
+							// Add value to subcomponentarray
+							if hl7subcomponentvalue != "" {
+								if IsNumeric(hl7subcomponentvalue) {
+									hl7subcomponentnumericvalue, _ := strconv.ParseFloat(hl7subcomponentvalue, 64)
+									subcomponentarray = append(subcomponentarray, SubComponent{hl7subcomponentnumber, hl7subcomponentvalue, hl7subcomponentnumericvalue})
+								} else {
+									subcomponentarray = append(subcomponentarray, SubComponent{hl7subcomponentnumber, hl7subcomponentvalue, 0})
+								}
 							}
-
-							// Slice for our subcomponent values
-							var subcomponentslice []SubComponent
-
-							// If not MSH-1.1 and hl7componentvalue contains the hl7subcomponentseperator then split
-							if !(strings.EqualFold(hl7segmentheader, "MSH") && hl7fieldnumber == 2 && hl7componentnumber == 1) && strings.Contains(hl7componentvalue, hl7subcomponentseperator) {
-
-								// Split component into subcomponents
-								hl7subcomponents := strings.Split(hl7components[hl7component], hl7subcomponentseperator)
-
-								// Loop through subcomponents
-								for hl7subcomponent := range hl7subcomponents {
-
-									// Set subcomponent number
-									hl7subcomponentnumber := hl7subcomponent + 1
-
-									// Set subcomponent value
-									hl7subcomponentvalue := strings.TrimSpace(hl7subcomponents[hl7subcomponent])
-
-									// Add hl7subcomponentvalue to subcomponentslice if not empty
-									if hl7subcomponentvalue != "" {
-										if IsNumeric(hl7subcomponentvalue) {
-											hl7subcomponentnumericvalue, _ := strconv.ParseFloat(hl7subcomponentvalue, 64)
-											subcomponentslice = append(subcomponentslice, SubComponent{hl7subcomponentnumber, hl7subcomponentvalue, hl7subcomponentnumericvalue})
-										} else {
-											subcomponentslice = append(subcomponentslice, SubComponent{hl7subcomponentnumber, hl7subcomponentvalue, 0})
-										}
-									}
-
-								}
-
-								// Add subcomponentslice to componentslice
-								if len(subcomponentslice) != 0 {
-									componentslice = append(componentslice, Component{hl7componentnumber, "", 0, subcomponentslice})
-								}
-
-							} else {
-
-								// Add component without subcomponent
-								if hl7componentvalue != "" {
-									if IsNumeric(hl7componentvalue) {
-										hl7componentnumericvalue, _ := strconv.ParseFloat(hl7componentvalue, 64)
-										componentslice = append(componentslice, Component{hl7componentnumber, hl7componentvalue, hl7componentnumericvalue, subcomponentslice})
-									} else {
-										componentslice = append(componentslice, Component{hl7componentnumber, hl7componentvalue, 0, subcomponentslice})
-									}
-								}
-
-							}
-
 						}
+						// End hl7subcomponents loop
 
-						// Add componentslice to fieldslice
-						if len(componentslice) != 0 {
-							fieldslice = append(fieldslice, Field{hl7fieldnumber, "", 0, componentslice})
-						}
-
-					} else {
-
-						// Add field without component
-						if hl7fieldvalue != "" {
-							if IsNumeric(hl7fieldvalue) {
-								hl7fieldnumericvalue, _ := strconv.ParseFloat(hl7fieldvalue, 64)
-								fieldslice = append(fieldslice, Field{hl7fieldnumber, hl7fieldvalue, hl7fieldnumericvalue, componentslice})
-							} else {
-								fieldslice = append(fieldslice, Field{hl7fieldnumber, hl7fieldvalue, 0, componentslice})
-							}
+						// Add subcomponentarray to componentarray
+						if len(subcomponentarray) != 0 {
+							componentarray = append(componentarray, Component{hl7componentnumber, subcomponentarray})
 						}
 
 					}
+					// End hl7components loop
 
+					// Add componentarray to repeatarray
+					if len(componentarray) != 0 {
+						repeatarray = append(repeatarray, Repeat{hl7repeatnumber, componentarray})
+					}
+
+				}
+				// End hl7repeats loop
+
+				// Add repeatarray to fieldarray
+				if len(repeatarray) != 0 {
+					fieldarray = append(fieldarray, Field{hl7fieldnumber, repeatarray})
 				}
 
 			}
+			// End hl7fields loop
 
-			// Add fieldslice to segmentslice
-			if len(fieldslice) != 0 {
-				segmentslice = append(segmentslice, Segment{hl7segmentheader, fieldslice})
+			// Add fieldarray to segmentarray
+			if len(fieldarray) != 0 {
+				segmentarray = append(segmentarray, Segment{hl7segmentheader, fieldarray})
 			}
 
 		}
+		// End hl7segments loop
 
 		// Add Message to fields.hl7message map
-		fields["hl7v2"].(common.MapStr)[hl7message] = Message{segmentslice}
+		fields["hl7v2"].(common.MapStr)[hl7message] = Message{segmentarray}
 
 		// Switch to response message
 		hl7message = "response"
