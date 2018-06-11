@@ -6,13 +6,11 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: metricbeat
-    kubernetes.io/cluster-service: "true"
 spec:
   template:
     metadata:
       labels:
         k8s-app: metricbeat
-        kubernetes.io/cluster-service: "true"
     spec:
       serviceAccountName: metricbeat
       containers:

@@ -6,7 +6,6 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: metricbeat
-    kubernetes.io/cluster-service: "true"
 data:
   metricbeat.yml: |-
     metricbeat.config.modules:
@@ -33,7 +32,6 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: metricbeat
-    kubernetes.io/cluster-service: "true"
 data:
   system.yml: |-
     - module: system

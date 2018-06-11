@@ -5,13 +5,11 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: filebeat
-    kubernetes.io/cluster-service: "true"
 spec:
   template:
     metadata:
       labels:
         k8s-app: filebeat
-        kubernetes.io/cluster-service: "true"
     spec:
       serviceAccountName: filebeat
       terminationGracePeriodSeconds: 30
