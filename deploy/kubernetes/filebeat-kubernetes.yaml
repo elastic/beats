@@ -6,7 +6,6 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: filebeat
-    kubernetes.io/cluster-service: "true"
 data:
   filebeat.yml: |-
     filebeat.config:
@@ -38,7 +37,6 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: filebeat
-    kubernetes.io/cluster-service: "true"
 data:
   kubernetes.yml: |-
     - type: docker
@@ -55,13 +53,11 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: filebeat
-    kubernetes.io/cluster-service: "true"
 spec:
   template:
     metadata:
       labels:
         k8s-app: filebeat
-        kubernetes.io/cluster-service: "true"
     spec:
       serviceAccountName: filebeat
       terminationGracePeriodSeconds: 30
