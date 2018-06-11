@@ -8,7 +8,7 @@ metricbeat.autodiscover:
       templates:
         - condition:
             contains:
-              docker.container.image: "redis"
+              docker.container.image: redis
           config:
             - module: redis
               metricsets: ["info", "keyspace"]
