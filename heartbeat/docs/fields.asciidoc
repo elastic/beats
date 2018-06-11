@@ -585,7 +585,7 @@ Duration in microseconds
 --
 type: long
 
-Time reuired to retrieved the content in micro seconds.
+Time required to retrieved the content in micro seconds.
 
 --
 
