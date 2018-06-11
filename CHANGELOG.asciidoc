@@ -69,6 +69,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Error out on invalid Autodiscover template conditions settings. {pull}7200[7200]
 - Do not emit Kubernetes autodiscover events for Pods without IP address. {pull}7235[7235]
 - Allow to override the `ignore_above` option when defining new field with the type keyword. {pull}7238[7238]
+- Allow index-pattern only setup when setup.dashboards.only_index=true. {pull}7285[7285]
 
 *Auditbeat*
 
