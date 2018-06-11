@@ -342,10 +342,13 @@ endif
 	@mkdir -p docs
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_TITLE} ${ES_BEATS}
 
+	@mkdir -p $(PWD)/_meta/kibana.generated
 	@# Generate Kibana index pattern and copy dashboard files
 	if [ -d $(PWD)/_meta/kibana ]; then \
-		cp -r $(PWD)/_meta/kibana/ $(PWD)/_meta/kibana.generated; \
+		cp -pr $(PWD)/_meta/kibana/* $(PWD)/_meta/kibana.generated ; \
 	fi
+	@# Convert all dashboards to string
+	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/6/dashboard/*.json"
 	@mkdir -p $(PWD)/_meta/kibana.generated/5/index-pattern
 	@mkdir -p $(PWD)/_meta/kibana.generated/6/index-pattern
 	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go -index '${BEAT_INDEX_PREFIX}-*' -beat-name ${BEAT_NAME} -beat-dir $(PWD) -version ${BEAT_VERSION}
