@@ -4,7 +4,7 @@ MAINTAINER Nicolas Ruflin <ruflin@elastic.co>
 RUN set -x && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-         netcat python-pip virtualenv && \
+         netcat python-pip rsync virtualenv && \
     apt-get clean
 
 RUN pip install --upgrade setuptools
