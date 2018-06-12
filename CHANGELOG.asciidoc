@@ -110,6 +110,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add mapping for docker metrics per cpu. {pull}6843[6843]
 - Ensure canonical naming for JMX beans is disabled in Jolokia module. {pull}7047[7047]
 - Fix field mapping for the system process CPU ticks fields. {pull}7230[7230]
+- Fix Windows service metricset when using a 32-bit binary on a 64-bit OS. {pull}7294[7294]
 
 *Packetbeat*
 
