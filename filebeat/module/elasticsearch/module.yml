@@ -1,2 +1,4 @@
 dashboards:
 
+- id: Filebeat-elasticsearch-jvm-Dashboard
+  file: Filebeat-elasticsearch-jvm.json

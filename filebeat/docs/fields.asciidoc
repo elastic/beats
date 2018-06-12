@@ -801,6 +801,23 @@ elasticsearch Module
 
 
 [float]
+== jvm fields
+
+Contains fields for the Elasticsearch JVM logs.
+
+
+
+*`elasticsearch.jvm.message`*::
++
+--
+type: text
+
+Original GC log message.
+
+
+--
+
+[float]
 == server fields
 
 

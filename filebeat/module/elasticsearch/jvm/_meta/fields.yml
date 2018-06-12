@@ -1,0 +1,9 @@
+- name: jvm
+  type: group
+  description: >
+    Contains fields for the Elasticsearch JVM logs.
+  fields:
+    - name: message
+      type: text
+      description: >
+        Original GC log message.
