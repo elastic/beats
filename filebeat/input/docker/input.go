@@ -49,6 +49,12 @@ func NewInput(
 	if err := cfg.SetString("docker-json", -1, config.Containers.Stream); err != nil {
 		return nil, errors.Wrap(err, "update input config")
 	}
+
+	// Add stream to meta to ensure different state per stream
+	if config.Containers.Stream != "all" {
+		context.Meta["stream"] = config.Containers.Stream
+	}
+
 	return log.NewInput(cfg, outletFactory, context)
 }
 
