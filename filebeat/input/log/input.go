@@ -50,6 +50,7 @@ type Input struct {
 	stateOutlet   channel.Outleter
 	done          chan struct{}
 	numHarvesters atomic.Uint32
+	meta          map[string]string
 }
 
 // NewInput instantiates a new Log
@@ -83,6 +84,7 @@ func NewInput(
 		stateOutlet: stateOut,
 		states:      file.NewStates(),
 		done:        context.Done,
+		meta:        context.Meta,
 	}
 
 	if err := cfg.Unpack(&p.config); err != nil {
@@ -124,7 +126,7 @@ func (p *Input) loadStates(states []file.State) error {
 
 	for _, state := range states {
 		// Check if state source belongs to this input. If yes, update the state.
-		if p.matchesFile(state.Source) {
+		if p.matchesFile(state.Source) && p.matchesMeta(state.Meta) {
 			state.TTL = -1
 
 			// In case a input is tried to be started with an unfinished state matching the glob pattern
@@ -186,7 +188,7 @@ func (p *Input) Run() {
 				}
 			} else {
 				// Check if existing source on disk and state are the same. Remove if not the case.
-				newState := file.NewState(stat, state.Source, p.config.Type)
+				newState := file.NewState(stat, state.Source, p.config.Type, p.meta)
 				if !newState.FileStateOS.IsSame(state.FileStateOS) {
 					p.removeState(state)
 					logp.Debug("input", "Remove state for file as file removed or renamed: %s", state.Source)
@@ -300,6 +302,21 @@ func (p *Input) matchesFile(filePath string) bool {
 	return false
 }
 
+// matchesMeta returns true in case the given meta is equal to the one of this input, false if not
+func (p *Input) matchesMeta(meta map[string]string) bool {
+	if len(meta) != len(p.meta) {
+		return false
+	}
+
+	for k, v := range p.meta {
+		if meta[k] != v {
+			return false
+		}
+	}
+
+	return true
+}
+
 type FileSortInfo struct {
 	info os.FileInfo
 	path string
@@ -364,7 +381,7 @@ func getFileState(path string, info os.FileInfo, p *Input) (file.State, error) {
 	}
 	logp.Debug("input", "Check file for harvesting: %s", absolutePath)
 	// Create new state for comparison
-	newState := file.NewState(info, absolutePath, p.config.Type)
+	newState := file.NewState(info, absolutePath, p.config.Type, p.meta)
 	return newState, nil
 }
 

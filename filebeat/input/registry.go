@@ -14,6 +14,7 @@ type Context struct {
 	Done          chan struct{}
 	BeatDone      chan struct{}
 	DynamicFields *common.MapStrPointer
+	Meta          map[string]string
 }
 
 // Factory is used to register functions creating new Input instances.
