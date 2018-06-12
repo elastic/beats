@@ -21,19 +21,32 @@ type YmlFile struct {
 }
 
 func collectBeatFiles(beatPath string, fieldFiles []*YmlFile) ([]*YmlFile, error) {
-	commonFields := filepath.Join(beatPath, "_meta", "fields.common.yml")
-	_, err := os.Stat(commonFields)
-	if os.IsNotExist(err) {
-		return fieldFiles, nil
-	} else if err != nil {
-		return nil, err
+	commonFieldsFiles := []string{
+		// Common to all beats
+		"fields.common.yml",
+
+		// ECS fields
+		"fields.ecs.yml",
+
+		// Extensions to ECS
+		"fields.ecs-ext.yml",
 	}
 
-	files := []*YmlFile{
-		&YmlFile{
-			Path:   commonFields,
+	var files []*YmlFile
+	for _, f := range commonFieldsFiles {
+		commonFieldsPath := filepath.Join(beatPath, "_meta", f)
+		_, err := os.Stat(commonFieldsPath)
+		if os.IsNotExist(err) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		files = append(files, &YmlFile{
+			Path:   commonFieldsPath,
 			Indent: 0,
-		},
+		})
 	}
 
 	return append(files, fieldFiles...), nil

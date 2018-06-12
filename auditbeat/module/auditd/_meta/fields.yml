@@ -159,10 +159,6 @@
       type: keyword
       description: This is the path associated with a unix socket.
 
-  - name: network.direction
-    type: keyword
-    description: Direction of the network traffic (`incoming` or `outgoing`).
-
   - name: auditd
     type: group
     fields:
