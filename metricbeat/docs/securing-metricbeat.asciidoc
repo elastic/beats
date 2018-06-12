@@ -1,4 +1,4 @@
-[[securing-meticbeat]]
+[[securing-metricbeat]]
 = Securing {beatname_uc}
 
 [partintro]
