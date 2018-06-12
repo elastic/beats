@@ -53,6 +53,12 @@ func NewInput(
 	if err := cfg.SetBool("docker-json.partial", -1, config.Partial); err != nil {
 		return nil, errors.Wrap(err, "update input config")
 	}
+
+	// Add stream to meta to ensure different state per stream
+	if config.Containers.Stream != "all" {
+		context.Meta["stream"] = config.Containers.Stream
+	}
+
 	return log.NewInput(cfg, outletFactory, context)
 }
 
