@@ -138,6 +138,12 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
+			output: p.keyword(&common.Field{Type: "keyword", IgnoreAbove: -1}),
+			expected: common.MapStr{
+				"type": "keyword",
+			},
+		},
+		{
 			output: p.keyword(&common.Field{Type: "keyword"}),
 			expected: common.MapStr{
 				"type":         "keyword",
