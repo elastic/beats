@@ -213,6 +213,13 @@ Region in which this host is running.
 None
 
 
+*`type`*::
++
+--
+type: keyword
+
+--
+
 [float]
 == monitor fields
 
@@ -570,6 +577,15 @@ Time required between sending the start of sending the HTTP request and first by
 type: long
 
 Duration in microseconds
+
+--
+
+*`http.rtt.content.us`*::
++
+--
+type: long
+
+Time required to retrieved the content in micro seconds.
 
 --
 
