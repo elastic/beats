@@ -151,9 +151,12 @@ func (p *Processor) keyword(f *common.Field) common.MapStr {
 	defaultFields = append(defaultFields, fullName)
 
 	property["type"] = "keyword"
-	if f.IgnoreAbove == 0 {
+
+	switch f.IgnoreAbove {
+	case 0: // Use libbeat default
 		property["ignore_above"] = defaultIgnoreAbove
-	} else {
+	case -1: // Use ES default
+	default: // Use user value
 		property["ignore_above"] = f.IgnoreAbove
 	}
 
