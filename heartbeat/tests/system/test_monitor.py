@@ -2,6 +2,8 @@ from heartbeat import BaseTest
 import BaseHTTPServer
 import threading
 from parameterized import parameterized
+import os
+from nose.plugins.skip import SkipTest
 
 
 class Test(BaseTest):
@@ -35,6 +37,11 @@ class Test(BaseTest):
         output = self.read_output()
         assert status_code == output[0]["http.response.status_code"]
 
+        if os.name == "nt":
+            # Currently skipped on Windows as fields.yml not generated
+            raise SkipTest
+        self.assert_fields_are_documented(output[0])
+
     @parameterized.expand([
         ("8181", "up"),
         ("8182", "down"),
@@ -63,6 +70,10 @@ class Test(BaseTest):
 
         output = self.read_output()
         assert status == output[0]["monitor.status"]
+        if os.name == "nt":
+            # Currently skipped on Windows as fields.yml not generated
+            raise SkipTest
+        self.assert_fields_are_documented(output[0])
 
     def start_server(self, content, status_code):
         class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):

@@ -82,6 +82,11 @@
                   type: long
                   description: Duration in microseconds
 
+            - name: content.us
+              type: long
+              description:
+                Time required to retrieved the content in micro seconds.
+
             - name: total
               type: group
               description: |
