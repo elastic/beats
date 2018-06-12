@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.6.9...5.6[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.6.10...5.6[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -35,8 +35,6 @@ https://github.com/elastic/beats/compare/v5.6.9...5.6[Check the HEAD diff]
 *Metricbeat*
 
 *Packetbeat*
-
-- Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
 
 *Winlogbeat*
 
@@ -83,6 +81,16 @@ https://github.com/elastic/beats/compare/v5.6.9...5.6[Check the HEAD diff]
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.6.10]]
+=== Beats version 5.6.10
+https://github.com/elastic/beats/compare/v5.6.9...v5.6.10[View commits]
+
+==== Bugfixes
+
+*Packetbeat*
+
+- Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
 
 [[release-notes-5.6.9]]
 === Beats version 5.6.9
