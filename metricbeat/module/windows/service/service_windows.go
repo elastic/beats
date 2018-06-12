@@ -528,7 +528,7 @@ func getMachineGUID() (string, error) {
 	const path = `SOFTWARE\Microsoft\Cryptography`
 	const name = "MachineGuid"
 
-	k, err := registry.OpenKey(key, path, registry.READ)
+	k, err := registry.OpenKey(key, path, registry.READ|registry.WOW64_64KEY)
 	if err != nil {
 		return "", errors.Wrapf(err, `failed to open HKLM\%v`, path)
 	}
