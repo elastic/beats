@@ -114,7 +114,7 @@ class Test(BaseTest):
                     break
 
             assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
-                ev["_source"][module], objects)
+                pretty_json(ev["_source"][module]), pretty_json(objects))
 
     def run_on_file(self, module, fileset, test_file, cfgfile):
         print("Testing {}/{} on {}".format(module, fileset, test_file))
@@ -131,7 +131,8 @@ class Test(BaseTest):
             "-c", cfgfile,
             "-modules={}".format(module),
             "-M", "{module}.*.enabled=false".format(module=module),
-            "-M", "{module}.{fileset}.enabled=true".format(module=module, fileset=fileset),
+            "-M", "{module}.{fileset}.enabled=true".format(
+                module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file),
             "-M", "*.*.input.close_eof=true",
@@ -158,7 +159,8 @@ class Test(BaseTest):
             assert obj["fileset"]["module"] == module, "expected fileset.module={} but got {}".format(
                 module, obj["fileset"]["module"])
 
-            assert "error" not in obj, "not error expected but got: {}".format(obj)
+            assert "error" not in obj, "not error expected but got: {}".format(
+                obj)
 
             if (module == "auditd" and fileset == "log") \
                     or (module == "osquery" and fileset == "result"):
@@ -251,13 +253,16 @@ class Test(BaseTest):
         # Clean any previous state
         for df in self.es.transport.perform_request("GET", "/_xpack/ml/datafeeds/")["datafeeds"]:
             if df["datafeed_id"] == 'filebeat-nginx-access-response_code':
-                self.es.transport.perform_request("DELETE", "/_xpack/ml/datafeeds/" + df["datafeed_id"])
+                self.es.transport.perform_request(
+                    "DELETE", "/_xpack/ml/datafeeds/" + df["datafeed_id"])
 
         for df in self.es.transport.perform_request("GET", "/_xpack/ml/anomaly_detectors/")["jobs"]:
             if df["job_id"] == 'datafeed-filebeat-nginx-access-response_code':
-                self.es.transport.perform_request("DELETE", "/_xpack/ml/anomaly_detectors/" + df["job_id"])
+                self.es.transport.perform_request(
+                    "DELETE", "/_xpack/ml/anomaly_detectors/" + df["job_id"])
 
-        shutil.rmtree(os.path.join(self.working_dir, "modules.d"), ignore_errors=True)
+        shutil.rmtree(os.path.join(self.working_dir,
+                                   "modules.d"), ignore_errors=True)
 
         # generate a minimal configuration
         cfgfile = os.path.join(self.working_dir, "filebeat.yml")
@@ -324,3 +329,7 @@ class Test(BaseTest):
                                    max_timeout=30)
 
         beat.kill()
+
+
+def pretty_json(obj):
+    return json.dumps(obj, indent=2, separators=(',', ': '))
