@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
 *Filebeat*
 
 - Comply with PostgreSQL database name format {pull}7198[7198]
+- Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
 
 *Heartbeat*
 
