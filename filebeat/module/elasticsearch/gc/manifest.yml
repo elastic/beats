@@ -8,4 +8,4 @@ var:
     os.windows: []
 
 ingest_pipeline: ingest/pipeline.json
-input: config/jvm.yml
+input: config/gc.yml
