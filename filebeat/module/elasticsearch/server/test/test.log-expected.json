@@ -12,7 +12,9 @@
             "prospector": {
                 "type": "log"
             },
-            "read_timestamp": "2018-05-17T06:59:59.786Z",
+            "event": {
+                "created": "2018-06-13T08:12:36.737Z"
+            },
             "source": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/elasticsearch/log/test/test.log",
             "fileset": {
                 "module": "elasticsearch",
@@ -32,6 +34,9 @@
                 "hostname": "ruflin",
                 "name": "ruflin",
                 "version": "7.0.0-alpha1"
+            },
+            "service": {
+                "name": "elasticsearch"
             }
         }
     }
