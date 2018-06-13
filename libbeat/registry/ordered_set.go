@@ -46,10 +46,7 @@ func (o *orderedSet) remove(id PluginID) error {
 		}
 	}
 
-	if pos == -1 {
-		panic("inconsistent state in the plugin list")
-	}
-
+	o.assertPos(pos)
 	o.ordered = append(o.ordered[:pos], o.ordered[pos+1:]...)
 	return nil
 }
@@ -78,10 +75,17 @@ func (o *orderedSet) insert(order order, target, id PluginID, newPlugin Plugin) 
 		}
 	}
 
+	o.assertPos(pos)
+	if order == After {
+		pos++
+
+	}
+	o.ordered = append(o.ordered[:pos], append([]Plugin{newPlugin}, o.ordered[pos:]...)...)
+	return nil
+}
+
+func (o *orderedSet) assertPos(pos int) {
 	if pos == -1 {
 		panic("inconsistent state in the plugin list")
 	}
-
-	o.ordered = append(o.ordered[:pos+int(order)], newPlugin, o.ordered[pos+-1*int(order):])
-	return nil
 }

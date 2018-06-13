@@ -177,4 +177,22 @@ func TestPlugins(t *testing.T) {
 		}
 		assert.Equal(t, []Plugin{pluginA, pluginB, pluginC}, l)
 	})
+
+	t.Run("allow to register a plugin before another one in the ordered set if the plugin exist", func(t *testing.T) {
+		r := New(logp.NewLogger("testing"))
+		err := r.RegisterType(key, builder)
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		r.RegisterPlugin(key, "a", pluginA)
+		r.RegisterPlugin(key, "c", pluginC)
+		r.OrderedRegisterPlugin(key, Before, "c", "b", pluginB)
+
+		_, l, err := r.Plugins(key)
+		if !assert.NoError(t, err) {
+			return
+		}
+		assert.Equal(t, []Plugin{pluginA, pluginB, pluginC}, l)
+	})
 }
