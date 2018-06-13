@@ -132,7 +132,7 @@ func TestRemovePlugin(t *testing.T) {
 	})
 }
 
-func TestPlugins(t *testing.T) {
+func TestPluginsInsert(t *testing.T) {
 	builder := func(i interface{}) (interface{}, error) {
 		return i, nil
 	}
@@ -143,56 +143,73 @@ func TestPlugins(t *testing.T) {
 
 	key := PluginTypeKey("hello")
 
-	t.Run("default to appending order", func(t *testing.T) {
-		r := New(logp.NewLogger("testing"))
-		err := r.RegisterType(key, builder)
-		if !assert.NoError(t, err) {
-			return
-		}
+	tests := []struct {
+		name     string
+		add      func(r *Registry)
+		expected []Plugin
+	}{
+		{
+			name: "default append at the end",
+			add: func(r *Registry) {
+				r.RegisterPlugin(key, "a", pluginA)
+				r.RegisterPlugin(key, "b", pluginB)
+				r.RegisterPlugin(key, "c", pluginC)
+			},
+			expected: []Plugin{pluginA, pluginB, pluginC},
+		},
+		{
+			name: "allow to register a plugin before another one in the ordered set if the plugin exist",
+			add: func(r *Registry) {
+				r.RegisterPlugin(key, "a", pluginA)
+				r.RegisterPlugin(key, "b", pluginB)
+				r.OrderedRegisterPlugin(key, Before, "b", "c", pluginC)
+			},
+			expected: []Plugin{pluginA, pluginC, pluginB},
+		},
+		{
+			name: "allow to register a plugin before another one in the ordered set if the plugin exist",
+			add: func(r *Registry) {
+				r.RegisterPlugin(key, "a", pluginA)
+				r.RegisterPlugin(key, "b", pluginB)
+				r.OrderedRegisterPlugin(key, Before, "a", "c", pluginC)
+			},
+			expected: []Plugin{pluginC, pluginA, pluginB},
+		},
+		{
+			name: "allow to register a plugin after another one in the ordered set if the plugin exist",
+			add: func(r *Registry) {
+				r.RegisterPlugin(key, "a", pluginA)
+				r.RegisterPlugin(key, "b", pluginB)
+				r.OrderedRegisterPlugin(key, After, "a", "c", pluginC)
+			},
+			expected: []Plugin{pluginA, pluginC, pluginB},
+		},
+		{
+			name: "allow to register a plugin after another one in the ordered set if the plugin exist",
+			add: func(r *Registry) {
+				r.RegisterPlugin(key, "a", pluginA)
+				r.RegisterPlugin(key, "b", pluginB)
+				r.OrderedRegisterPlugin(key, After, "b", "c", pluginC)
+			},
+			expected: []Plugin{pluginA, pluginB, pluginC},
+		},
+	}
 
-		r.RegisterPlugin(key, "a", pluginA)
-		r.RegisterPlugin(key, "b", pluginB)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			r := New(logp.NewLogger("testing"))
+			err := r.RegisterType(key, builder)
+			if !assert.NoError(t, err) {
+				return
+			}
 
-		_, l, err := r.Plugins(key)
-		if !assert.NoError(t, err) {
-			return
-		}
-		assert.Equal(t, []Plugin{pluginA, pluginB}, l)
-	})
+			test.add(r)
 
-	t.Run("allow to register a plugin before another one in the ordered set if the plugin exist", func(t *testing.T) {
-		r := New(logp.NewLogger("testing"))
-		err := r.RegisterType(key, builder)
-		if !assert.NoError(t, err) {
-			return
-		}
-
-		r.RegisterPlugin(key, "a", pluginA)
-		r.RegisterPlugin(key, "c", pluginC)
-		r.OrderedRegisterPlugin(key, Before, "c", "b", pluginB)
-
-		_, l, err := r.Plugins(key)
-		if !assert.NoError(t, err) {
-			return
-		}
-		assert.Equal(t, []Plugin{pluginA, pluginB, pluginC}, l)
-	})
-
-	t.Run("allow to register a plugin before another one in the ordered set if the plugin exist", func(t *testing.T) {
-		r := New(logp.NewLogger("testing"))
-		err := r.RegisterType(key, builder)
-		if !assert.NoError(t, err) {
-			return
-		}
-
-		r.RegisterPlugin(key, "a", pluginA)
-		r.RegisterPlugin(key, "c", pluginC)
-		r.OrderedRegisterPlugin(key, Before, "c", "b", pluginB)
-
-		_, l, err := r.Plugins(key)
-		if !assert.NoError(t, err) {
-			return
-		}
-		assert.Equal(t, []Plugin{pluginA, pluginB, pluginC}, l)
-	})
+			_, l, err := r.Plugins(key)
+			if !assert.NoError(t, err) {
+				return
+			}
+			assert.Equal(t, test.expected, l)
+		})
+	}
 }
