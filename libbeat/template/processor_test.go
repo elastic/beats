@@ -348,6 +348,28 @@ func TestDynamicTemplate(t *testing.T) {
 		},
 	}
 
+	for _, numericType := range []string{"byte", "double", "float", "long", "short"} {
+		gen := struct {
+			field    common.Field
+			expected common.MapStr
+		}{
+			field: common.Field{
+				Type: "object", ObjectType: numericType,
+				Name: "somefield", ObjectTypeMappingType: "long",
+			},
+			expected: common.MapStr{
+				"somefield": common.MapStr{
+					"mapping": common.MapStr{
+						"type": numericType,
+					},
+					"match_mapping_type": "long",
+					"path_match":         "somefield.*",
+				},
+			},
+		}
+		tests = append(tests, gen)
+	}
+
 	for _, test := range tests {
 		dynamicTemplates = nil
 		p.object(&test.field)
