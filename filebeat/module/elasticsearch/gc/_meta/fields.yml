@@ -1,7 +1,7 @@
-- name: jvm
+- name: gc
   type: group
   description: >
-    Contains fields for the Elasticsearch JVM logs.
+    Contains fields for the Elasticsearch JVM garbage collection logs.
   fields:
     - name: message
       type: text

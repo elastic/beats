@@ -1,12 +1,12 @@
 {
-  "description": "Pipeline for parsing elasticsearch JVM logs",
+  "description": "Pipeline for parsing Elasticsearch JVM garbage collection logs",
   "processors": [
     {
       "grok": {
         "field": "message",
         "patterns": [
           "%{TIMESTAMP_ISO8601:timestamp}",
-          "%{GREEDYMULTILINE:elasticsearch.jvm.message}"
+          "%{GREEDYMULTILINE:elasticsearch.gc.message}"
         ],
         "pattern_definitions": {
           "GREEDYMULTILINE": "(.|\n)*"
@@ -16,28 +16,13 @@
     {
       "rename": {
         "field": "@timestamp",
-        "target_field": "read_timestamp"
+        "target_field": "event.created"
       }
     },
     {
-      "date": {
+      "rename": {
         "field": "timestamp",
-        "target_field": "@timestamp",
-        "formats": [
-          "ISO8601",
-          "YYYY-MM-dd HH:mm:ss,SSS"
-        ]
-      }
-    },
-    {
-      "remove": {
-        "field": "timestamp"
-      }
-    },
-    {
-      "append": {
-        "field": "service.name",
-        "value": "elasticsearch"
+        "target_field": "@timestamp"
       }
     }
   ],
