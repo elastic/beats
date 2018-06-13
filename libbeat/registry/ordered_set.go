@@ -56,6 +56,9 @@ func (o *orderedSet) list() []Plugin {
 }
 
 func (o *orderedSet) insert(order order, target, id PluginID, newPlugin Plugin) error {
+	if o.len() == 0 {
+		return fmt.Errorf("could not insert at a specific position no plugin found")
+	}
 	_, found := o.mapped[id]
 	if found {
 		return fmt.Errorf("could not add plugin: '%s', the plugin is already registered", id)
@@ -88,4 +91,8 @@ func (o *orderedSet) assertPos(pos int) {
 	if pos == -1 {
 		panic("inconsistent state in the plugin list")
 	}
+}
+
+func (o *orderedSet) len() int {
+	return len(o.mapped)
 }

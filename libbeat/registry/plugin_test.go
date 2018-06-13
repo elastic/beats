@@ -213,3 +213,46 @@ func TestPluginsInsert(t *testing.T) {
 		})
 	}
 }
+
+func TestFailInsert(t *testing.T) {
+	builder := func(i interface{}) (interface{}, error) {
+		return i, nil
+	}
+
+	pluginA := "A"
+	pluginC := "C"
+
+	key := PluginTypeKey("hello")
+
+	t.Run("fail if no plugins are registered", func(t *testing.T) {
+		r := New(logp.NewLogger("testing"))
+		err := r.RegisterType(key, builder)
+		if !assert.NoError(t, err) {
+			return
+		}
+		err = r.OrderedRegisterPlugin(key, After, "b", "c", pluginC)
+		assert.Error(t, err)
+	})
+
+	t.Run("fail insert after if plugin doesnt exist", func(t *testing.T) {
+		r := New(logp.NewLogger("testing"))
+		err := r.RegisterType(key, builder)
+		if !assert.NoError(t, err) {
+			return
+		}
+		err = r.RegisterPlugin(key, "a", pluginA)
+		err = r.OrderedRegisterPlugin(key, After, "b", "c", pluginC)
+		assert.Error(t, err)
+	})
+
+	t.Run("fail insert before if plugin doesnt exist", func(t *testing.T) {
+		r := New(logp.NewLogger("testing"))
+		err := r.RegisterType(key, builder)
+		if !assert.NoError(t, err) {
+			return
+		}
+		err = r.RegisterPlugin(key, "a", pluginA)
+		err = r.OrderedRegisterPlugin(key, Before, "b", "c", pluginC)
+		assert.Error(t, err)
+	})
+}
