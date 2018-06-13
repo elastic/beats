@@ -62,6 +62,16 @@ For example, with the example event, "`${data.port}`" resolves to `6379`.
 
 include::../../{beatname_lc}/docs/autodiscover-docker-config.asciidoc[]
 
+[WARNING]
+=======================================
+Something to take into account when defining config templates is that they will be launched for every container
+matching the given condition. In practice, this means that your configuration template should be scoped to the
+container. You can do so by using `${data.*}` fields in the config definition. For instance, use `${data.host}`
+to scope a module when monitoring the container instance or `$(data.docker.container.id)` when dealing with
+log files.
+=======================================
+
+
 [float]
 ===== Kubernetes
 
