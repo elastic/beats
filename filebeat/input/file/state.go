@@ -3,7 +3,6 @@ package file
 import (
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/mitchellh/hashstructure"
@@ -51,14 +50,7 @@ func (s *State) ID() string {
 			hash := strconv.AppendUint(hashBuf[:0], hashValue, 16)
 			hash = append(hash, '-')
 
-			fileID := s.FileStateOS.String()
-
-			var b strings.Builder
-			b.Grow(len(hash) + len(fileID))
-			b.Write(hash)
-			b.WriteString(fileID)
-
-			s.Id = b.String()
+			s.Id = string(hash) + s.FileStateOS.String()
 		}
 	}
 
