@@ -801,13 +801,13 @@ elasticsearch Module
 
 
 [float]
-== jvm fields
+== gc fields
 
-Contains fields for the Elasticsearch JVM logs.
+Contains fields for the Elasticsearch JVM garbage collection logs.
 
 
 
-*`elasticsearch.jvm.message`*::
+*`elasticsearch.gc.message`*::
 +
 --
 type: text
