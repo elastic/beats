@@ -62,8 +62,6 @@ type jobCanceller func() error
 
 var defaultFilePollInterval = 5 * time.Second
 
-const defaultEventType = "monitor"
-
 func newMonitorManager(
 	pipeline beat.Pipeline,
 	jobControl jobControl,
@@ -291,10 +289,6 @@ func (m *monitorTask) prepareSchedulerJob(client beat.Client, meta common.MapStr
 
 		if event.Fields != nil {
 			event.Fields.DeepUpdate(meta)
-			if _, exists := event.Fields["type"]; !exists {
-				event.Fields["type"] = defaultEventType
-			}
-
 			client.Publish(event)
 		}
 
