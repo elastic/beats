@@ -213,13 +213,6 @@ Region in which this host is running.
 None
 
 
-*`type`*::
-+
---
-type: keyword
-
---
-
 [float]
 == monitor fields
 

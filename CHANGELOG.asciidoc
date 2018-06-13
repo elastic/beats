@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Made the URL field of heartbeat aggregatable. {pull}6263[6263]
 - Use `match.Matcher` for checking heartbeat response bodies with regular expressions. {pull}6539[6539]
 - Rename http.response.status to http.response.status_code to align with ECS. {pull}7274[7274]
+- Remove `type` field as not needed. {pull}7307[7307]
 
 *Metricbeat*
 
