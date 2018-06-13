@@ -57,34 +57,20 @@ Use `sudo` to run the following commands if:
 
 endif::[]
 
-[horizontal]
-<<export-command,`export`>>::
-{export-command-short-desc}.
-
-<<help-command,`help`>>::
-{help-command-short-desc}.
-
-<<keystore-command,`keystore`>>::
-{keystore-command-short-desc}.
-
+[options="header"]
+|=======================
+|Commands | 
+|<<export-command,`export`>> |{export-command-short-desc}.
+|<<help-command,`help`>> |{help-command-short-desc}.
+|<<keystore-command,`keystore`>> |{keystore-command-short-desc}.
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
-
-<<modules-command,`modules`>>::
-{modules-command-short-desc}.
-
+|<<modules-command,`modules`>> |{modules-command-short-desc}.
 endif::[]
-
-<<run-command,`run`>>::
-{run-command-short-desc}.
-
-<<setup-command,`setup`>>::
-{setup-command-short-desc}.
-
-<<test-command,`test`>>::
-{test-command-short-desc}.
-
-<<version-command,`version`>>::
-{version-command-short-desc}.
+|<<run-command,`run`>> |{run-command-short-desc}.
+|<<setup-command,`setup`>> |{setup-command-short-desc}.
+|<<test-command,`test`>> |{test-command-short-desc}.
+|<<version-command,`version`>> |{version-command-short-desc}.
+|=======================
 
 Also see <<global-flags,Global flags>>.
 
