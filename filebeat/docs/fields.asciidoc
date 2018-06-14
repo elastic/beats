@@ -803,19 +803,6 @@ elasticsearch Module
 [float]
 == gc fields
 
-Contains fields for the Elasticsearch JVM garbage collection logs.
-
-
-
-*`elasticsearch.gc.message`*::
-+
---
-type: text
-
-Original GC log message.
-
-
---
 
 [float]
 == server fields
