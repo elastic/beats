@@ -2252,20 +2252,2472 @@ optional TCP connection id
 --
 
 [[exported-fields-hl7v2]]
-== HL7 v2 fields
+== hl7v2 fields
 
-HL7v2-specific event fields.
+hl7v2 specific event fields.
 
 
 
-*`hl7v2.request`*::
+
+*`hl7v2.request.APR`*::
 +
 --
 type: nested
 
 --
 
-*`hl7v2.response`*::
+*`hl7v2.request.ABS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ACC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ADD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ADJ`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.AFF`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.AIG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.AIL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.AIP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.AIS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.AL1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ARQ`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ARV`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.AUT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.BHS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.BLC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.BLG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.BPO`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.BPX`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.BTS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.BTX`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.BUI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CDM`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CDO`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CER`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CM0`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CM1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CM2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CNS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CON`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CSP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CSR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CSS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CTD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.CTI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.DB1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.DG1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.DMI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.DON`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.DRG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.DSC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.DSP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ECD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ECR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.EDU`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.EQP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.EQU`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ERR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.EVN`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.FAC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.FHS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.FT1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.FTS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.GOL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.GP1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.GP2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.GT1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.IAM`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.IAR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.IIM`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ILT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.IN1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.IN2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.IN3`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.INV`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.IPC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.IPR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ISD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ITM`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.IVC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.IVT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.LAN`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.LCC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.LCH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.LDP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.LOC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.LRL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.MFA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.MFE`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.MFI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.MRG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.MSA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.MSH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.NCK`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.NDS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.NK1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.NPU`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.NSC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.NST`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.NTE`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.OBR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.OBX`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ODS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ODT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.OM1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.OM2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.OM3`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.OM4`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.OM5`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.OM6`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.OM7`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ORC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ORG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.OVR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PAC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PCE`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PCR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PD1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PDA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PDC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PEO`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PES`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PID`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PKG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PMT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PR1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PRA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PRB`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PRC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PRD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PRT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PSG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PSH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PSL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PSS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PTH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PV1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PV2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.PYE`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.QAK`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.QID`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.QPD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.QRI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RCP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RDF`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RDT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.REL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RF1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RFI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RGS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RMI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.ROL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RQ1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RQD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RXA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RXC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RXD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RXE`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RXG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RXO`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RXR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.RXV`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SAC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SCD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SCH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SCP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SDD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SFT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SGH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SGT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SHP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SID`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SLT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.SPM`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.STF`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.STZ`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.TCC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.TCD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.TQ1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.TQ2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.TXA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.UAC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.UB1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.UB2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.VAR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.VND`*::
++
+--
+type: nested
+
+--
+
+
+*`hl7v2.result.APR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ABS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ACC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ADD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ADJ`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.AFF`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.AIG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.AIL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.AIP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.AIS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.AL1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ARQ`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ARV`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.AUT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.BHS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.BLC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.BLG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.BPO`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.BPX`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.BTS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.BTX`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.BUI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CDM`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CDO`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CER`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CM0`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CM1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CM2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CNS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CON`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CSP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CSR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CSS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CTD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.CTI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.DB1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.DG1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.DMI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.DON`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.DRG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.DSC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.DSP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ECD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ECR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.EDU`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.EQP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.EQU`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ERR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.EVN`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.FAC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.FHS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.FT1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.FTS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.GOL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.GP1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.GP2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.GT1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.IAM`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.IAR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.IIM`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ILT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.IN1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.IN2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.IN3`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.INV`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.IPC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.IPR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ISD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ITM`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.IVC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.IVT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.LAN`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.LCC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.LCH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.LDP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.LOC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.LRL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.MFA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.MFE`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.MFI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.MRG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.MSA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.MSH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.NCK`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.NDS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.NK1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.NPU`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.NSC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.NST`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.NTE`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.OBR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.OBX`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ODS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ODT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.OM1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.OM2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.OM3`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.OM4`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.OM5`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.OM6`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.OM7`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ORC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ORG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.OVR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PAC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PCE`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PCR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PD1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PDA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PDC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PEO`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PES`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PID`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PKG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PMT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PR1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PRA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PRB`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PRC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PRD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PRT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PSG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PSH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PSL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PSS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PTH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PV1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PV2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.PYE`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.QAK`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.QID`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.QPD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.QRI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RCP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RDF`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RDT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.REL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RF1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RFI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RGS`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RMI`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.ROL`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RQ1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RQD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RXA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RXC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RXD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RXE`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RXG`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RXO`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RXR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.RXV`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SAC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SCD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SCH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SCP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SDD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SFT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SGH`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SGT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SHP`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SID`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SLT`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.SPM`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.STF`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.STZ`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.TCC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.TCD`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.TQ1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.TQ2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.TXA`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.UAC`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.UB1`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.UB2`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.VAR`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.result.VND`*::
 +
 --
 type: nested

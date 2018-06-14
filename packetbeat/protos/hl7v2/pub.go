@@ -51,13 +51,9 @@ type Field struct {
 
 // Segment struct
 type Segment struct {
-	ID    string  `json:"id"`
-	Field []Field `json:"field,omitempty"`
-}
-
-// Message struct
-type Message struct {
-	Segment []Segment `json:"segment"`
+	LineNumber int     `json:"linenumber"`
+	ID         string  `json:"id"`
+	Field      []Field `json:"field,omitempty"`
 }
 
 // IsNumeric checks if a string is a numeric value
@@ -137,8 +133,18 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 		// Array for our segment values
 		var segmentarray []Segment
+
+		// Map for unique segment names
+		segmentsmap := common.MapStr{}
+
+		// Var for linenumber
+		linenumber := 0
+
 		// Loop through hl7segments
 		for hl7segment := range hl7segments {
+
+			// Increment linenumber
+			linenumber++
 
 			// Prevent error when reading blank lines.
 			if strings.TrimSpace(hl7segments[hl7segment]) == "" {
@@ -152,6 +158,9 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 			// Set segment header
 			hl7segmentheader := hl7segmentvalue[0:3]
+
+			// Add hl7segmentheader to segmentsmap
+			segmentsmap[hl7segmentheader] = hl7segmentheader
 
 			// If this is the MSH segment get our seperators
 			if hl7segmentheader == "MSH" {
@@ -181,7 +190,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 				hl7fieldvalue := hl7fields[hl7field]
 				debugf("hl7fieldvalue: %v", hl7fieldvalue)
-				hl7fieldnumber := hl7field + 1
+				hl7fieldnumber := hl7field
 				debugf("hl7fieldnumber: %v", hl7fieldnumber)
 
 				// If MSH-1 or MSH-2 don't process
@@ -264,14 +273,27 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 			// Add fieldarray to segmentarray
 			if len(fieldarray) != 0 {
-				segmentarray = append(segmentarray, Segment{hl7segmentheader, fieldarray})
+				segmentarray = append(segmentarray, Segment{linenumber, hl7segmentheader, fieldarray})
 			}
 
 		}
 		// End hl7segments loop
 
-		// Add Message to fields.hl7message map
-		fields["hl7v2"].(common.MapStr)[hl7message] = Message{segmentarray}
+		// Loop though the segmentsmap
+		for name, _ := range segmentsmap {
+			var uniquearray []Segment
+			// Loop through segmentarray
+			for _, elem := range segmentarray {
+				if elem.ID == name {
+					uniquearray = append(uniquearray, Segment{elem.LineNumber, elem.ID, elem.Field})
+				}
+			}
+			// Add to map
+			segmentsmap[name] = uniquearray
+		}
+
+		// Add segmentsmap to fields.hl7message map
+		fields["hl7v2"].(common.MapStr)[hl7message] = segmentsmap
 
 		// Switch to response message
 		hl7message = "response"
