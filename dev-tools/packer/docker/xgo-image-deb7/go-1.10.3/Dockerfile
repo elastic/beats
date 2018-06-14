@@ -1,4 +1,4 @@
-# Go cross compiler (xgo): Go 1.10.2 layer
+# Go cross compiler (xgo): Go 1.10.3 layer
 # Copyright (c) 2014 Péter Szilágyi. All rights reserved.
 #
 # Released under the MIT license.
@@ -9,7 +9,7 @@ MAINTAINER Tudor Golubenco <tudor@elastic.co>
 
 # Configure the root Go distribution and bootstrap based on it
 RUN \
-  export ROOT_DIST="https://storage.googleapis.com/golang/go1.10.2.linux-amd64.tar.gz" && \
-  export ROOT_DIST_SHA1="77f0ac48994946c0d3349baf2d973ed6decb15ca" && \
+  export ROOT_DIST="https://storage.googleapis.com/golang/go1.10.3.linux-amd64.tar.gz" && \
+  export ROOT_DIST_SHA1="dfa39cac093a7a9c94d25130671ec474d51a2995" && \
   \
   $BOOTSTRAP_PURE
