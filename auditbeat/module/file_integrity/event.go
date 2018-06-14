@@ -16,11 +16,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/OneOfOne/xxhash"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
-
-	"github.com/OneOfOne/xxhash"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
