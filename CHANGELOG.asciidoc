@@ -91,6 +91,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Comply with PostgreSQL database name format {pull}7198[7198]
 - Fix an issue with an overflowing wait group when using the TCP input. {issue}7202[7202]
 - Keep different registry entry per container stream to avoid wrong offsets. {issue}7281[7281]
+- Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
 
 *Heartbeat*
 - Fix race due to updates of shared a map, that was not supposed to be shared between multiple go-routines. {issue}6616[6616]
