@@ -33,20 +33,17 @@ information, see
 {xpack-ref}/setting-up-authentication.html[Setting Up User Authentication] and
 {xpack-ref}/built-in-roles.html[Built-in Roles].
 
-. Add the `xpack.monitoring` settings in the {beatname_uc} configuration file.
-If you configured {es} output and you want to use the same {es} production
-cluster and credentials, you can specify the following minimal configuration
-options:
+. Add the `xpack.monitoring` settings in the {beatname_uc} configuration file. If you
+configured {es} output, specify the following minimal configuration:
 +
 --
 [source, yml]
 --------------------
-xpack.monitoring:
-  enabled: true
-  elasticsearch:
+xpack.monitoring.enabled: true
 --------------------
 
-Otherwise, you must specify additional configuration options. For example:
+If you configured a different output, such as {ls}, you must specify additional
+configuration options. For example:
 
 [source, yml]
 --------------------
@@ -57,6 +54,10 @@ xpack.monitoring:
     username: beats_system
     password: beatspassword
 --------------------
+
+NOTE: Currently you must send monitoring data to the same cluster as all other events.
+If you configured {es} output, do not specify additional hosts in the monitoring
+configuration.
 
 --
 
