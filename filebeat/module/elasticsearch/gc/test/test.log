@@ -1,3 +1,4 @@
+2018-06-11T01:53:11.382+0000: 1396138.752: Total time for which application threads were stopped: 0.0083760 seconds, Stopping threads took: 0.0000702 seconds
 2018-06-11T02:00:11.097+0000: 1396558.467: [GC (Allocation Failure) 2018-06-11T02:00:11.097+0000: 1396558.467: [ParNew
 Desired survivor size 8716288 bytes, new threshold 6 (max 6)
 - age   1:    1142528 bytes,    1142528 total

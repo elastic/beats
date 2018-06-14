@@ -5,10 +5,13 @@
       "grok": {
         "field": "message",
         "patterns": [
-          "%{TIMESTAMP_ISO8601:timestamp}: %{GREEDYMULTILINE:message}"
+          "%{GCTIMESTAMP}: %{GCPROCRUNTIME}: Total time for which application threads were stopped: %{BASE10NUM:elasticsearch.gc.threads_total_stop_time_secs} seconds, Stopping threads took: %{BASE10NUM:elasticsearch.gc.stopping_threads_time_secs} seconds",
+          "%{GCTIMESTAMP}: %{GREEDYMULTILINE:message}"
         ],
         "pattern_definitions": {
-          "GREEDYMULTILINE": "(.|\n)*"
+          "GREEDYMULTILINE": "(.|\n)*",
+          "GCTIMESTAMP": "%{TIMESTAMP_ISO8601:timestamp}",
+          "GCPROCRUNTIME": "%{BASE10NUM:elasticsearch.gc.relative_process_timestamp_secs}"
         }
       }
     },
