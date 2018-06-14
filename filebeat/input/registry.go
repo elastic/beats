@@ -14,6 +14,7 @@ type Context struct {
 	Done          chan struct{}
 	BeatDone      chan struct{}
 	DynamicFields *common.MapStrPointer
+	Meta          map[string]string
 }
 
 type Factory = func(config *common.Config, outletFactory channel.Factory, context Context) (Input, error)
