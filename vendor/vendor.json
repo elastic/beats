@@ -369,44 +369,44 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "xnqOjimkuBpJ7ecRgl04tAHomIw=",
+			"checksumSHA1": "hAB/G2FIWYwg3Rujgpt6UPtHMis=",
 			"path": "github.com/elastic/go-libaudit",
-			"revision": "bc9f53eaa23bfe3fbf023ab5ec7523336b4d9b2f",
-			"revisionTime": "2018-04-05T19:19:11Z",
-			"version": "v0.1.1",
-			"versionExact": "v0.1.1"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
-			"checksumSHA1": "uu4544BCRlonueK+mB7549opucs=",
+			"checksumSHA1": "3V0tnqlCgmCXnbocuTqUKluynm8=",
 			"path": "github.com/elastic/go-libaudit/aucoalesce",
-			"revision": "bc9f53eaa23bfe3fbf023ab5ec7523336b4d9b2f",
-			"revisionTime": "2018-04-05T19:19:11Z",
-			"version": "v0.1.1",
-			"versionExact": "v0.1.1"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
-			"checksumSHA1": "+L/ZGneCw2zrkK5Vlto9UB3LaEk=",
+			"checksumSHA1": "6OK3lLgocjmIUyLo8xNhYGpwE1E=",
 			"path": "github.com/elastic/go-libaudit/auparse",
-			"revision": "bc9f53eaa23bfe3fbf023ab5ec7523336b4d9b2f",
-			"revisionTime": "2018-04-05T19:19:11Z",
-			"version": "v0.1.1",
-			"versionExact": "v0.1.1"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
-			"checksumSHA1": "aItCMksfjRftKVKgTd8Ro3yBB/0=",
+			"checksumSHA1": "Rr15sVPpJRQ+ggimmx3/0s1gUJc=",
 			"path": "github.com/elastic/go-libaudit/rule",
-			"revision": "bc9f53eaa23bfe3fbf023ab5ec7523336b4d9b2f",
-			"revisionTime": "2018-04-05T19:19:11Z",
-			"version": "v0.1.1",
-			"versionExact": "v0.1.1"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
-			"checksumSHA1": "36UaYid29Kyhrsa5D8N6BoM8dVw=",
+			"checksumSHA1": "5C083BvwcAVSKquRXbxXa950/wE=",
 			"path": "github.com/elastic/go-libaudit/rule/flags",
-			"revision": "bc9f53eaa23bfe3fbf023ab5ec7523336b4d9b2f",
-			"revisionTime": "2018-04-05T19:19:11Z",
-			"version": "v0.1.1",
-			"versionExact": "v0.1.1"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",
