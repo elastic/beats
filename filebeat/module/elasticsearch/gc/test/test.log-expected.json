@@ -1,8 +1,8 @@
 [
   {
-    "_index": "filebeat-7.0.0-alpha1-2018.06.13",
+    "_index": "filebeat-7.0.0-alpha1-2018.06.14",
     "_type": "doc",
-    "_id": "QgKh-WMBTsDQhtAzVH5V",
+    "_id": "ubXy_mMBiF0NvuCjjB5r",
     "_score": 1,
     "_source": {
       "offset": 226,
@@ -10,7 +10,7 @@
         "type": "log"
       },
       "source": "/Users/jbryan/es/filebeat/snapshot/filebeat-7.0.0-alpha1-SNAPSHOT-darwin-x86_64/test.log",
-      "message": "2018-06-11T02:00:11.097+0000: 1396558.467: [GC (Allocation Failure) 2018-06-11T02:00:11.097+0000: 1396558.467: [ParNew\nDesired survivor size 8716288 bytes, new threshold 6 (max 6)\n- age   1:    1142528 bytes,    1142528 total",
+      "message": "1396558.467: [GC (Allocation Failure) 2018-06-11T02:00:11.097+0000: 1396558.467: [ParNew\nDesired survivor size 8716288 bytes, new threshold 6 (max 6)\n- age   1:    1142528 bytes,    1142528 total",
       "input": {
         "type": "log"
       },
@@ -27,7 +27,7 @@
         "name": "peanut.lan"
       },
       "event": {
-        "created": "2018-06-13T14:51:23.265Z"
+        "created": "2018-06-14T15:38:11.902Z"
       }
     }
   }

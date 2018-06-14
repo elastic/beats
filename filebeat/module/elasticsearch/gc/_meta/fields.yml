@@ -1,9 +1,0 @@
-- name: gc
-  type: group
-  description: >
-    Contains fields for the Elasticsearch JVM garbage collection logs.
-  fields:
-    - name: message
-      type: text
-      description: >
-        Original GC log message.

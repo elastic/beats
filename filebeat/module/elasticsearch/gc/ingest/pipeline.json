@@ -5,8 +5,7 @@
       "grok": {
         "field": "message",
         "patterns": [
-          "%{TIMESTAMP_ISO8601:timestamp}",
-          "%{GREEDYMULTILINE:elasticsearch.gc.message}"
+          "%{TIMESTAMP_ISO8601:timestamp}: %{GREEDYMULTILINE:message}"
         ],
         "pattern_definitions": {
           "GREEDYMULTILINE": "(.|\n)*"

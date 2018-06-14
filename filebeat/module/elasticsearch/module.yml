@@ -1,4 +1,3 @@
 dashboards:
 
-- id: Filebeat-elasticsearch-gc-Dashboard
-  file: Filebeat-elasticsearch-gc.json
+
