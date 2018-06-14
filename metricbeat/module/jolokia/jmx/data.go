@@ -149,7 +149,7 @@ func parseResponseEntry(
 ) error {
 	field, exists := mapping.Get(requestMbeanName, attributeName)
 	if !exists {
-		return errors.Errorf("metric key '%v' not found in response (%+v)", attributeName, mapping)
+		return errors.Errorf("metric key '%v' for mbean '%s' not found in mapping (%+v)", attributeName, requestMbeanName, mapping)
 	}
 
 	var key eventKey
