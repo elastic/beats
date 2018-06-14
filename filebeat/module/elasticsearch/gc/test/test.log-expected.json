@@ -2,33 +2,40 @@
   {
     "_index": "filebeat-7.0.0-alpha1-2018.06.14",
     "_type": "doc",
-    "_id": "yL36_2MBiF0NvuCjWruZ",
+    "_id": "TsBUAGQBiF0NvuCjCqDR",
     "_score": 1,
     "_source": {
-      "offset": 360,
+      "offset": 158,
       "prospector": {
         "type": "log"
       },
       "source": "/Users/jbryan/dev/go/src/github.com/elastic/beats/filebeat/module/elasticsearch/gc/test/test.log",
+      "message": "2018-06-11T01:53:11.382+0000: 1396138.752: Total time for which application threads were stopped: 0.0083760 seconds, Stopping threads took: 0.0000702 seconds",
       "fileset": {
         "module": "elasticsearch",
         "name": "gc"
       },
-      "message": "1396558.467: [GC (Allocation Failure) 2018-06-11T02:00:11.097+0000: 1396558.467: [ParNew\nDesired survivor size 8716288 bytes, new threshold 6 (max 6)\n- age   1:    1142528 bytes,    1142528 total\n: 153138K->12252K(153344K), 0.0077785 secs] 680068K->540560K(1031552K), 0.0078609 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] \n",
       "input": {
         "type": "log"
       },
-      "@timestamp": "2018-06-11T02:00:11.097+0000",
+      "@timestamp": "2018-06-11T01:53:11.382+0000",
+      "elasticsearch": {
+        "gc": {
+          "stopping_threads_time_secs": "0.0000702",
+          "relative_process_timestamp_secs": "1396138.752",
+          "threads_total_stop_time_secs": "0.0083760"
+        }
+      },
+      "host": {
+        "name": "peanut.local"
+      },
       "beat": {
         "hostname": "peanut.local",
         "name": "peanut.local",
         "version": "7.0.0-alpha1"
       },
-      "host": {
-        "name": "peanut.local"
-      },
       "event": {
-        "created": "2018-06-14T20:26:20.945Z"
+        "created": "2018-06-14T22:04:23.755Z"
       }
     }
   }
