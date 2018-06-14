@@ -2,36 +2,33 @@
   {
     "_index": "filebeat-7.0.0-alpha1-2018.06.14",
     "_type": "doc",
-    "_id": "ubXy_mMBiF0NvuCjjB5r",
+    "_id": "yL36_2MBiF0NvuCjWruZ",
     "_score": 1,
     "_source": {
-      "offset": 226,
+      "offset": 360,
       "prospector": {
         "type": "log"
       },
-      "source": "/Users/jbryan/es/filebeat/snapshot/filebeat-7.0.0-alpha1-SNAPSHOT-darwin-x86_64/test.log",
+      "source": "/Users/jbryan/dev/go/src/github.com/elastic/beats/filebeat/module/elasticsearch/gc/test/test.log",
       "fileset": {
         "module": "elasticsearch",
         "name": "gc"
       },
-      "message": "1396558.467: [GC (Allocation Failure) 2018-06-11T02:00:11.097+0000: 1396558.467: [ParNew\nDesired survivor size 8716288 bytes, new threshold 6 (max 6)\n- age   1:    1142528 bytes,    1142528 total",
+      "message": "1396558.467: [GC (Allocation Failure) 2018-06-11T02:00:11.097+0000: 1396558.467: [ParNew\nDesired survivor size 8716288 bytes, new threshold 6 (max 6)\n- age   1:    1142528 bytes,    1142528 total\n: 153138K->12252K(153344K), 0.0077785 secs] 680068K->540560K(1031552K), 0.0078609 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] \n",
       "input": {
         "type": "log"
       },
       "@timestamp": "2018-06-11T02:00:11.097+0000",
-      "service": {
-        "name": "elasticsearch"
-      },
       "beat": {
-        "hostname": "peanut.lan",
-        "name": "peanut.lan",
+        "hostname": "peanut.local",
+        "name": "peanut.local",
         "version": "7.0.0-alpha1"
       },
       "host": {
-        "name": "peanut.lan"
+        "name": "peanut.local"
       },
       "event": {
-        "created": "2018-06-14T15:38:11.902Z"
+        "created": "2018-06-14T20:26:20.945Z"
       }
     }
   }
