@@ -801,10 +801,6 @@ elasticsearch Module
 
 
 [float]
-== gc fields
-
-
-[float]
 == server fields
 
 
