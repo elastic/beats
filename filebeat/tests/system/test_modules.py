@@ -10,6 +10,8 @@ import json
 import logging
 from parameterized import parameterized
 
+EXTENDED_COMPARE = ["elasticsearch"]
+
 
 def load_fileset_test_cases():
     """
@@ -89,29 +91,6 @@ class Test(BaseTest):
             test_file=test_file,
             cfgfile=cfgfile)
 
-    def _test_expected_events(self, module, test_file, res, objects):
-        with open(test_file + "-expected.json", "r") as f:
-            expected = json.load(f)
-
-        if len(expected) > len(objects):
-            res = self.es.search(index=self.index_name,
-                                 body={"query": {"match_all": {}},
-                                       "size": len(expected)})
-            objects = [o["_source"] for o in res["hits"]["hits"]]
-
-        assert len(expected) == res['hits']['total'], "expected {} but got {}".format(
-            len(expected), res['hits']['total'])
-
-        for ev in expected:
-            found = False
-            for obj in objects:
-                if ev["_source"][module] == obj[module]:
-                    found = True
-                    break
-
-            assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
-                pretty_json(ev["_source"][module]), pretty_json(objects))
-
     def run_on_file(self, module, fileset, test_file, cfgfile):
         print("Testing {}/{} on {}".format(module, fileset, test_file))
 
@@ -147,8 +126,9 @@ class Test(BaseTest):
         self.wait_until(lambda: self.es.indices.exists(self.index_name))
 
         self.es.indices.refresh(index=self.index_name)
+        # Loads the first 100 events to be checked
         res = self.es.search(index=self.index_name,
-                             body={"query": {"match_all": {}}})
+                             body={"query": {"match_all": {}}, "size": 100})
         objects = [o["_source"] for o in res["hits"]["hits"]]
         assert len(objects) > 0
         for obj in objects:
@@ -166,7 +146,37 @@ class Test(BaseTest):
                 self.assert_fields_are_documented(obj)
 
         if os.path.exists(test_file + "-expected.json"):
-            self._test_expected_events(module, test_file, res, objects)
+            self._test_expected_events(module, test_file, objects)
+
+    def _test_expected_events(self, module, test_file, objects):
+        with open(test_file + "-expected.json", "r") as f:
+            expected = json.load(f)
+
+        assert len(expected) == len(objects), "expected {} events to compare but got {}".format(
+            len(expected), len(objects))
+
+        for ev in expected:
+            found = False
+            for obj in objects:
+
+                # Skip read timestamp as always different
+                del obj["read_timestamp"]
+                del ev["_source"]["read_timestamp"]
+                print self.flatten_object(obj, {}, "")
+                print self.flatten_object(ev["_source"], {}, "")
+
+                # All modules in EXTENDED_COMPARE are checked in more detail
+                if module in EXTENDED_COMPARE:
+                    if ev["_source"] == obj:
+                        found = True
+                        break
+                else:
+                    if ev["_source"][module] == obj[module]:
+                        found = True
+                        break
+
+            assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
+                pretty_json(ev["_source"]), pretty_json(objects))
 
 
 def pretty_json(obj):
