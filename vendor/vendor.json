@@ -9,6 +9,14 @@
 			"revisionTime": "2017-05-24T00:36:31Z"
 		},
 		{
+			"checksumSHA1": "wshQ6/MnQx8nH6pgufu4kJEX6JI=",
+			"path": "github.com/OneOfOne/xxhash",
+			"revision": "6def279d2ce6c81a79dd1c1be580f03bb216fb8a",
+			"revisionTime": "2018-05-30T13:49:54Z",
+			"version": "v1.2.2",
+			"versionExact": "v1.2.2"
+		},
+		{
 			"checksumSHA1": "pH1jOw5Kfigc2tteo6KlaU9+JE8=",
 			"origin": "github.com/urso/sarama",
 			"path": "github.com/Shopify/sarama",

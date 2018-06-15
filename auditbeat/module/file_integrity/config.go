@@ -27,6 +27,7 @@ var validHashes = []HashType{
 	SHA1,
 	SHA224, SHA256, SHA384, SHA512, SHA512_224, SHA512_256,
 	SHA3_224, SHA3_256, SHA3_384, SHA3_512,
+	XXH64,
 }
 
 // Enum of hash types.
@@ -46,6 +47,7 @@ const (
 	SHA512      HashType = "sha512"
 	SHA512_224  HashType = "sha512_224"
 	SHA512_256  HashType = "sha512_256"
+	XXH64       HashType = "xxh64"
 )
 
 // Config contains the configuration parameters for the file integrity
