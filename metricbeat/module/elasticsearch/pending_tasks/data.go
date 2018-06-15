@@ -3,6 +3,8 @@ package pending_tasks
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -27,13 +29,15 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	}
 
 	var events []common.MapStr
-	errors := s.NewErrors()
+	var errors multierror.Errors
 
 	for _, task := range tasksStruct.Tasks {
-		event, errs := schema.Apply(task)
-		errors.AddErrors(errs)
+		event, err := schema.Apply(task)
+		if err != nil {
+			errors = append(errors, err)
+		}
 		events = append(events, event)
 	}
 
-	return events, errors
+	return events, errors.Err()
 }

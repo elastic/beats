@@ -106,3 +106,52 @@ func TestConversions(t *testing.T) {
 	output, _ := schema.Apply(input)
 	assert.Equal(t, output, expected)
 }
+
+func TestOptionalField(t *testing.T) {
+	cases := []struct {
+		Description string
+		Input       map[string]interface{}
+		Schema      s.Schema
+		Expected    common.MapStr
+		ExpectError bool
+	}{
+		{
+			"missing optional field",
+			map[string]interface{}{
+				"testString": "hello",
+				"testInt":    42,
+			},
+			s.Schema{
+				"test_string": Str("testString"),
+				"test_int":    Int("testInt"),
+				"test_opt":    Bool("testOptionalInt", s.Optional),
+			},
+			common.MapStr{
+				"test_string": "hello",
+				"test_int":    int64(42),
+			},
+			false,
+		},
+		{
+			"wrong format in optional field",
+			map[string]interface{}{
+				"testInt": "hello",
+			},
+			s.Schema{
+				"test_int": Int("testInt", s.Optional),
+			},
+			common.MapStr{},
+			true,
+		},
+	}
+
+	for _, c := range cases {
+		output, err := c.Schema.Apply(c.Input)
+		if c.ExpectError {
+			assert.Error(t, err, c.Description)
+		} else {
+			assert.NoError(t, err, c.Description)
+			assert.Equal(t, c.Expected, output, c.Description)
+		}
+	}
+}

@@ -236,6 +236,6 @@ func TestStatusOutputs(t *testing.T) {
 		scanner := bufio.NewScanner(f)
 
 		_, errors := eventMapping(scanner, "localhost")
-		assert.False(t, errors.HasRequiredErrors(), "error mapping "+filename)
+		assert.NoError(t, errors)
 	}
 }

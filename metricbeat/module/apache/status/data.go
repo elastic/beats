@@ -76,7 +76,7 @@ var (
 	}
 )
 
-func applySchema(event common.MapStr, fullEvent map[string]interface{}) *s.Errors {
+func applySchema(event common.MapStr, fullEvent map[string]interface{}) error {
 	applicableSchema := schema
 	if _, found := fullEvent["ServerUptimeSeconds"]; !found {
 		applicableSchema = schemaOld
@@ -86,7 +86,7 @@ func applySchema(event common.MapStr, fullEvent map[string]interface{}) *s.Error
 }
 
 // Map body to MapStr
-func eventMapping(scanner *bufio.Scanner, hostname string) (common.MapStr, *s.Errors) {
+func eventMapping(scanner *bufio.Scanner, hostname string) (common.MapStr, error) {
 	var (
 		totalS          int
 		totalR          int
