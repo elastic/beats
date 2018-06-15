@@ -81,6 +81,8 @@ https://github.com/elastic/beats/compare/v6.2.4...6.2[Check the HEAD diff]
 
 *Metricbeat*
 
+- Ensure canonical naming for JMX beans is disabled in Jolokia module. {pull}7047[7047]
+
 *Packetbeat*
 
 *Winlogbeat*

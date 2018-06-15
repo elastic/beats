@@ -32,19 +32,25 @@ type Attribute struct {
 //    }
 // ]
 type RequestBlock struct {
-	Type      string   `json:"type"`
-	MBean     string   `json:"mbean"`
-	Attribute []string `json:"attribute"`
+	Type      string                 `json:"type"`
+	MBean     string                 `json:"mbean"`
+	Attribute []string               `json:"attribute"`
+	Config    map[string]interface{} `json:"config"`
 }
 
 func buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, map[string]string, error) {
 	responseMapping := map[string]string{}
 	var blocks []RequestBlock
 
+	config := map[string]interface{}{
+		"ignoreErrors":    true,
+		"canonicalNaming": false,
+	}
 	for _, mapping := range mappings {
 		rb := RequestBlock{
-			Type:  "read",
-			MBean: mapping.MBean,
+			Type:   "read",
+			MBean:  mapping.MBean,
+			Config: config,
 		}
 
 		for _, attribute := range mapping.Attributes {

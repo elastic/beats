@@ -1,1 +1,2 @@
 kafka-python==1.4.2
+parameterized==0.6.1
