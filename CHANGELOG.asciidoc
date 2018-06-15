@@ -41,6 +41,8 @@ https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
+
 *Winlogbeat*
 
 ==== Added
