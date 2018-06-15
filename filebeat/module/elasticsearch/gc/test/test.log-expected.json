@@ -1,16 +1,16 @@
 [
   {
-    "_index": "filebeat-7.0.0-alpha1-2018.06.14",
+    "_index": "filebeat-7.0.0-alpha1-2018.06.15",
     "_type": "doc",
-    "_id": "TsBUAGQBiF0NvuCjCqDR",
+    "_id": "w-p9BWQBiF0NvuCjhcyk",
     "_score": 1,
     "_source": {
-      "offset": 158,
+      "offset": 160,
       "prospector": {
         "type": "log"
       },
       "source": "/Users/jbryan/dev/go/src/github.com/elastic/beats/filebeat/module/elasticsearch/gc/test/test.log",
-      "message": "2018-06-11T01:53:11.382+0000: 1396138.752: Total time for which application threads were stopped: 0.0083760 seconds, Stopping threads took: 0.0000702 seconds",
+      "message": "2018-06-11T01:53:11.382+0000: 1396138.752: Total time for which application threads were stopped: 0.0083760 seconds, Stopping threads took: 0.0000702 seconds\n\n",
       "fileset": {
         "module": "elasticsearch",
         "name": "gc"
@@ -26,6 +26,9 @@
           "threads_total_stop_time_secs": "0.0083760"
         }
       },
+      "service": {
+        "name": "elasticsearch"
+      },
       "host": {
         "name": "peanut.local"
       },
@@ -35,7 +38,7 @@
         "version": "7.0.0-alpha1"
       },
       "event": {
-        "created": "2018-06-14T22:04:23.755Z"
+        "created": "2018-06-15T22:07:43.170Z"
       }
     }
   }

@@ -9,4 +9,6 @@ multiline:
   negate: true
   match: after
 
+fields:
+  service.name: "elasticsearch"
 fields_under_root: true
