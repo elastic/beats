@@ -166,6 +166,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Updated syscall tables for Linux 4.16. {pull}6978[6978]
 - Added better error messages for when the auditd module fails due to the
   Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
+- Added XXH64 hash option for file integrity checks. {pull}7311[7311]
 
 *Filebeat*
 
