@@ -6,30 +6,30 @@ from the container using the `docker` input. You can use hints to modify this be
 list of supported hints:
 
 [float]
-===== `co.elastic.logs.multiline.*`
+===== `co.elastic.logs/multiline.*`
 
 Multiline settings. See <<multiline-examples>> for a full list of all supported options.
 
 [float]
-===== `co.elastic.logs.include_lines`
+===== `co.elastic.logs/include_lines`
 
 A list of regular expressions to match the lines that you want {beatname_uc} to include.
 See <<configuration-filebeat-options>> for more info.
 
 [float]
-===== `co.elastic.logs.exclude_lines`
+===== `co.elastic.logs/exclude_lines`
 
 A list of regular expressions to match the lines that you want {beatname_uc} to exclude.
 See <<configuration-filebeat-options>> for more info.
 
 [float]
-===== `co.elastic.logs.module`
+===== `co.elastic.logs/module`
 
 Instead of using raw `docker` input, specifies the module to use to parse logs from the container. See
 <<filebeat-modules>> for the list of supported modules.
 
 [float]
-===== `co.elastic.logs.fileset`
+===== `co.elastic.logs/fileset`
 
 When module is configured, map container logs to module filesets. You can either configure
 a single fileset like this:
