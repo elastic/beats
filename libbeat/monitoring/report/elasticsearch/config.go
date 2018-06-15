@@ -37,7 +37,7 @@ type config struct {
 	TLS              *tlscommon.Config `config:"ssl"`
 	MaxRetries       int               `config:"max_retries"`
 	Timeout          time.Duration     `config:"timeout"`
-	StatsPeriod      time.Duration     `config:"stats.period"`
+	MetricPeriod     time.Duration     `config:"metric.period"`
 	StatePeriod      time.Duration     `config:"state.period"`
 	BulkMaxSize      int               `config:"bulk_max_size" validate:"min=0"`
 	BufferSize       int               `config:"buffer_size"`
@@ -56,7 +56,7 @@ var defaultConfig = config{
 	TLS:              nil,
 	MaxRetries:       3,
 	Timeout:          60 * time.Second,
-	StatsPeriod:      10 * time.Second,
+	MetricPeriod:     10 * time.Second,
 	StatePeriod:      1 * time.Minute,
 	BulkMaxSize:      50,
 	BufferSize:       50,

@@ -197,7 +197,7 @@ func (r *reporter) initLoop(c config) {
 
 	// Start collector and send loop if monitoring endpoint has been found.
 	go r.snapshotLoop("state", c.StatePeriod)
-	go r.snapshotLoop("stats", c.StatsPeriod)
+	go r.snapshotLoop("stats", c.MetricPeriod)
 }
 
 func (r *reporter) snapshotLoop(namespace string, period time.Duration) {

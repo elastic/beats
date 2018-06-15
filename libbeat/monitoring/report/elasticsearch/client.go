@@ -96,8 +96,8 @@ func (c *publishClient) Close() error {
 
 func (c *publishClient) Publish(batch publisher.Batch) error {
 	events := batch.Events()
-	bulk := make([]interface{}, 0, 2*len(events))
-
+	var failed []publisher.Event
+	var reason error
 	var params map[string]string
 	for _, event := range events {
 
@@ -125,21 +125,29 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		}
 		actMonitoringBeats.Put("index._type", t)
 
-		bulk = append(bulk,
-			actMonitoringBeats, report.Event{
+		bulk := [2]interface{}{
+			actMonitoringBeats,
+			report.Event{
 				Timestamp: event.Content.Timestamp,
 				Fields:    event.Content.Fields,
-			})
+			},
+		}
+
+		// Currently one request per event is sent. Reason is that each event can contain different
+		// interval params and X-Pack requires to send the interval param.
+		_, err = c.es.BulkWith("_xpack", "monitoring", params, nil, bulk[:])
+		if err != nil {
+			failed = append(failed, event)
+			reason = err
+		}
 	}
 
-	_, err := c.es.BulkWith("_xpack", "monitoring", params, nil, bulk)
-	if err != nil {
-		batch.Retry()
-		return err
+	if len(failed) > 0 {
+		batch.RetryEvents(failed)
+	} else {
+		batch.ACK()
 	}
-
-	batch.ACK()
-	return nil
+	return reason
 }
 
 func (c *publishClient) Test(d testing.Driver) {

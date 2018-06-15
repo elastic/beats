@@ -1067,7 +1067,7 @@ logging.files:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
-  #stats.period: 10s
+  #metric.period: 10s
   #state.period: 1m
 
 #================================ HTTP Endpoint ======================================
