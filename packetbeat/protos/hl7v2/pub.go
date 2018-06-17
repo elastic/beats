@@ -285,7 +285,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		// End hl7segments loop
 
 		// Loop though the segmentsmap
-		for name, _ := range segmentsmap {
+		for name := range segmentsmap {
 			var uniquearray []Segment
 			// Loop through segmentarray
 			for _, elem := range segmentarray {
