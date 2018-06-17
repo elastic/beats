@@ -193,8 +193,13 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 				hl7fieldnumber := hl7field
 				debugf("hl7fieldnumber: %v", hl7fieldnumber)
 
-				// If MSH-1 or MSH-2 don't process
-				if hl7segmentheader == "MSH" && (hl7fieldnumber == 1 || hl7fieldnumber == 2) {
+				// If this is the MSH segment increment the fieldnumber
+				if hl7segmentheader == "MSH" {
+					hl7fieldnumber++
+				}
+
+				// If MSH-1 (encoding chars) don't process
+				if hl7segmentheader == "MSH" && hl7fieldnumber == 1 {
 					debugf("Not processing %v-%v.", hl7segmentheader, hl7fieldnumber)
 					continue
 				}
