@@ -70,6 +70,7 @@ func New(
 		Done:          input.done,
 		BeatDone:      input.beatDone,
 		DynamicFields: dynFields,
+		Meta:          map[string]string{},
 	}
 	var ipt Input
 	ipt, err = f(conf, outlet, context)

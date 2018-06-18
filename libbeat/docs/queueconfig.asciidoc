@@ -81,6 +81,8 @@ The default value is 1s.
 [[configuration-internal-queue-spool]]
 === Configure the file spool queue
 
+beta[]
+
 The file spool queue stores all events in an on disk ring buffer. The spool
 has a write buffer, which new events are written to. Events written to the
 spool are forwarded to the outputs, only after the write buffer has been

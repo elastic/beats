@@ -732,7 +732,7 @@
         "log": {
           "duration": "10.540",
           "thread_id": "5502",
-          "database": "clients",
+          "database": "c$lients",
           "level": "LOG",
           "timezone": "CEST",
           "query": "insert into cats(name, toy, born) values('kate', 'ball', now());",
@@ -781,7 +781,7 @@
         "log": {
           "duration": "5.156",
           "thread_id": "5502",
-          "database": "clients",
+          "database": "_clients$db",
           "level": "LOG",
           "timezone": "CEST",
           "query": "insert into cats(name, toy, born) values('frida', 'horse', now());",
@@ -830,7 +830,7 @@
         "log": {
           "duration": "25.871",
           "thread_id": "5502",
-          "database": "clients",
+          "database": "clients_db",
           "level": "LOG",
           "timezone": "CEST",
           "query": "create table dogs(name varchar(50) primary key, owner varchar (50) not null, born timestamp not null);",

@@ -28,7 +28,7 @@ func (d *Data) GetState() file.State {
 
 // HasState returns true if the data object contains state data
 func (d *Data) HasState() bool {
-	return d.state != file.State{}
+	return !d.state.IsEmpty()
 }
 
 // GetEvent returns the event in the data object

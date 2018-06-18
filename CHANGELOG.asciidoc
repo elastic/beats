@@ -30,16 +30,24 @@ https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
 *Affecting all Beats*
 
 - Preserve the event when source matching fails in `add_docker_metadata`. {pull}7133[7133]
+- Negotiate Docker API version from our client instead of using a hardcoded one. {pull}7165[7165]
 
 *Auditbeat*
 
 *Filebeat*
 
+- Comply with PostgreSQL database name format {pull}7198[7198]
+- Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
+
 *Heartbeat*
 
 *Metricbeat*
 
+- Fix field mapping for the system process CPU ticks fields. {pull}7230[7230]
+
 *Packetbeat*
+
+- Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
 
 *Winlogbeat*
 
@@ -130,6 +138,7 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 
 - Add hex decoding for the name field in audit path records. {pull}6687[6687]
 - Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
+- Fixed parsing of AppArmor audit messages. {pull}6978[6978]
 
 *Filebeat*
 
@@ -139,6 +148,8 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Commit registry writes to stable storage to avoid corrupt registry files. {pull}6877[6877]
 - Fix a parsing issue in the syslog input for RFC3339 timestamp and time with nanoseconds. {pull}7046[7046]
 - Fix an issue with an overflowing wait group when using the TCP input. {issue}7202[7202]
+- Keep different registry entry per container stream to avoid wrong offsets. {issue}7281[7281]
+- Fix offset field pointing at end of a line. {issue}6514[6514]
 
 *Heartbeat*
 
@@ -159,6 +170,7 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Don't stop Metricbeat if aerospike server is down. {pull}6874[6874]
 - disk reads and write count metrics in RabbitMQ queue metricset made optional. {issue}6876[6876]
 - Add mapping for docker metrics per cpu. {pull}6843[6843]
+- Ensure canonical naming for JMX beans is disabled in Jolokia module. {pull}7047[7047]
 
 *Winlogbeat*
 
@@ -184,6 +196,13 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Added logging of system info at Beat startup. {issue}5946[5946]
 - Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
 - Add rename processor. {pull}6292[6292]
+
+*Auditbeat*
+
+- Added caching of UID and GID values to auditd module. {pull}6978[6978]
+- Updated syscall tables for Linux 4.16. {pull}6978[6978]
+- Added better error messages for when the auditd module fails due to the
+  Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
 
 *Filebeat*
 

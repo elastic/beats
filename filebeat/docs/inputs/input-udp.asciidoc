@@ -7,6 +7,8 @@
 <titleabbrev>UDP</titleabbrev>
 ++++
 
+experimental[]
+
 Use the `udp` input to read events over UDP.
 
 Example configuration:

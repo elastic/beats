@@ -57,7 +57,10 @@ func EnsureUpWithTimeout(t *testing.T, timeout int, services ...string) {
 	}
 
 	// Kill no longer used containers
-	compose.KillOld(services)
+	err = compose.KillOld(services)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	for _, service := range services {
 		err = compose.Start(service)
@@ -125,16 +128,22 @@ func (c *composeProject) Wait(seconds int, services ...string) error {
 	return nil
 }
 
-func (c *composeProject) Kill(service string) {
+func (c *composeProject) Kill(service string) error {
 	c.Lock()
 	defer c.Unlock()
 
-	c.p.Kill(context.Background(), "KILL", service)
+	return c.p.Kill(context.Background(), "KILL", service)
 }
 
 func (c *composeProject) KillOld(except []string) error {
-	// Do not kill ourselves or elasticsearch :)
-	except = append(except, "beat", "elasticsearch")
+	// Do not kill ourselves ;)
+	except = append(except, "beat")
+
+	// These services take very long to start up and stop. If they are stopped
+	// it can happen that an other package tries to start them at the same time
+	// which leads to a conflict. We need a better solution long term but that should
+	// solve the problem for now.
+	except = append(except, "elasticsearch", "kibana", "logstash")
 
 	servicesStatus, err := c.getServices()
 	if err != nil {
@@ -148,7 +157,10 @@ func (c *composeProject) KillOld(except []string) error {
 		}
 
 		if s.Old {
-			c.Kill(s.Name)
+			err = c.Kill(s.Name)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

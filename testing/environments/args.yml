@@ -5,6 +5,6 @@ services:
   args:
     build:
       args:
-        DOWNLOAD_URL: https://staging.elastic.co/6.3.0-46941e7c/downloads
-        ELASTIC_VERSION: 6.3.0
-        CACHE_BUST: 20180424
+        DOWNLOAD_URL: https://snapshots.elastic.co/downloads
+        ELASTIC_VERSION: 6.3.1-SNAPSHOT
+        CACHE_BUST: 20180615
