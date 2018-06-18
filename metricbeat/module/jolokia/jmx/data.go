@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 const (
@@ -149,7 +150,10 @@ func parseResponseEntry(
 ) error {
 	field, exists := mapping.Get(requestMbeanName, attributeName)
 	if !exists {
-		return errors.Errorf("metric key '%v' for mbean '%s' not found in mapping (%+v)", attributeName, requestMbeanName, mapping)
+		// This shouldn't ever happen, if it does it is probably that some of our
+		// assumptions when building the request and the mapping is wrong.
+		logp.Debug("jolokia.jmx", "mapping: %+v", mapping)
+		return errors.Errorf("metric key '%v' for mbean '%s' not found in mapping", attributeName, requestMbeanName)
 	}
 
 	var key eventKey
