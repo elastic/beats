@@ -97,6 +97,9 @@ func New(beatVersion string, beatName string, esVersion string, config TemplateC
 
 func (t *Template) load(fields common.Fields) (common.MapStr, error) {
 
+	dynamicTemplates = nil
+	defaultFields = nil
+
 	var err error
 	if len(t.config.AppendFields) > 0 {
 		cfgwarn.Experimental("append_fields is used.")
