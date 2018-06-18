@@ -29,6 +29,7 @@ https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Preserve the event when source matching fails in `add_docker_metadata`. {pull}7133[7133]
 - Negotiate Docker API version from our client instead of using a hardcoded one. {pull}7165[7165]
 
 *Auditbeat*
