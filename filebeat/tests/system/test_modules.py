@@ -161,7 +161,17 @@ class Test(BaseTest):
 
                 # Skip read timestamp as always different
                 del obj["read_timestamp"]
-                del ev["_source"]["read_timestamp"]
+
+                if "event" in obj and "created" in obj["event"]:
+                    del obj["event"]["created"]
+
+                del ev["_source"]["event"]["created"]
+                del ev["_source"]["host"]["name"]
+                del obj["host"]["name"]
+                del ev["_source"]["beat"]
+                del obj["source"]
+                del ev["_source"]["source"]
+                del obj["beat"]
                 print self.flatten_object(obj, {}, "")
                 print self.flatten_object(ev["_source"], {}, "")
 

@@ -5,7 +5,7 @@
     "_id": "w-p9BWQBiF0NvuCjhcyk",
     "_score": 1,
     "_source": {
-      "offset": 160,
+      "offset": 0,
       "prospector": {
         "type": "log"
       },
