@@ -150,6 +150,7 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Fix an issue with an overflowing wait group when using the TCP input. {issue}7202[7202]
 - Keep different registry entry per container stream to avoid wrong offsets. {issue}7281[7281]
 - Fix offset field pointing at end of a line. {issue}6514[6514]
+- Commit registry writes to stable storage to avoid corrupt registry files. {issue}6792[6792]
 
 *Heartbeat*
 
