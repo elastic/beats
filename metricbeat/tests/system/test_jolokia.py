@@ -11,7 +11,9 @@ class Test(metricbeat.BaseTest):
 
     @parameterized.expand([
         'java.lang:name=PS MarkSweep,type=GarbageCollector',
-        'java.lang:type=GarbageCollector,name=PS MarkSweep'
+        'java.lang:type=GarbageCollector,name=PS MarkSweep',
+        'java.lang:name=*,type=GarbageCollector',
+        'java.lang:type=GarbageCollector,name=*',
     ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_jmx(self, mbean):

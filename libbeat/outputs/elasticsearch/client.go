@@ -300,7 +300,7 @@ func (client *Client) publishEvents(
 		return data, sendErr
 	}
 
-	debugf("PublishEvents: %d events have been  published to elasticsearch in %v.",
+	debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
 		len(data),
 		time.Now().Sub(begin))
 

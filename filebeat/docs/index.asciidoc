@@ -17,8 +17,6 @@ include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
-include::../../libbeat/docs/contributing-to-beats.asciidoc[]
-
 include::./getting-started.asciidoc[]
 
 include::./modules-getting-started.asciidoc[]
@@ -46,3 +44,6 @@ include::./troubleshooting.asciidoc[]
 include::./faq.asciidoc[]
 
 include::./migration.asciidoc[]
+
+include::../../libbeat/docs/contributing-to-beats.asciidoc[]
+

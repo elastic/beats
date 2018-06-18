@@ -299,7 +299,18 @@ output.elasticsearch:
   # The default is 50.
   #bulk_max_size: 50
 
-  # Configure http request timeout before failing an request to Elasticsearch.
+  # The number of seconds to wait before trying to reconnect to Elasticsearch
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Elasticsearch after a network error. The default is 60s.
+  #backoff.max: 60s
+
+  # Configure http request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
@@ -363,7 +374,7 @@ output.elasticsearch:
   # Optional load balance the events between the Logstash hosts. Default is false.
   #loadbalance: false
 
-  # Number of batches to be sent asynchronously to logstash while processing
+  # Number of batches to be sent asynchronously to Logstash while processing
   # new batches.
   #pipelining: 2
 
@@ -371,6 +382,17 @@ output.elasticsearch:
   # transaction.  The number of events to be sent increases up to `bulk_max_size`
   # if no error is encountered.
   #slow_start: false
+
+  # The number of seconds to wait before trying to reconnect to Logstash
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Logstash after a network error. The default is 60s.
+  #backoff.max: 60s
 
   # Optional index name. The default index name is set to winlogbeat
   # in all lowercase.

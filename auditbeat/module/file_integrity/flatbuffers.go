@@ -95,6 +95,8 @@ func fbWriteHash(b *flatbuffers.Builder, hashes map[HashType]Digest) flatbuffers
 			schema.HashAddSha512224(b, offset)
 		case SHA512_256:
 			schema.HashAddSha512256(b, offset)
+		case XXH64:
+			schema.HashAddXx64(b, offset)
 		}
 	}
 	return schema.HashEnd(b)
@@ -309,6 +311,9 @@ func fbDecodeHash(e *schema.Event) map[HashType]Digest {
 		case SHA512_256:
 			length = hash.Sha512256Length()
 			producer = hash.Sha512256
+		case XXH64:
+			length = hash.Xx64Length()
+			producer = hash.Xx64
 		default:
 			panic(errors.Errorf("unhandled hash type: %v", hashType))
 		}
