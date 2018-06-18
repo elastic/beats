@@ -801,6 +801,42 @@ elasticsearch Module
 
 
 [float]
+== gc fields
+
+
+
+
+*`elasticsearch.gc.relative_process_timestamp_secs`*::
++
+--
+type: float
+
+Garbage collection threads total stop time seconds.
+
+
+--
+
+*`elasticsearch.gc.threads_total_stop_time_secs`*::
++
+--
+type: float
+
+Garbage collection threads total stop time seconds.
+
+
+--
+
+*`elasticsearch.gc.stopping_threads_time_secs`*::
++
+--
+type: float
+
+Time took to stop threads seconds.
+
+
+--
+
+[float]
 == server fields
 
 

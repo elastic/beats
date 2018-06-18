@@ -192,6 +192,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Correctly join partial log lines when using `docker` input. {pull}6967[6967]
 - Add support for TLS with client authentication to the TCP input {pull}7056[7056]
 - Converted part of pipeline from treafik/access metricSet to dissect to improve efficeny. {pull}7209[7209]
+- Add GC fileset to the Elasticsearch module. {pull}7305[7305]
 
 *Heartbeat*
 
