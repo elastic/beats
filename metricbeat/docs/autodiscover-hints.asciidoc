@@ -4,34 +4,34 @@ the container starts, {beatname_uc} will check if it contains any hints and laun
 it. Hints tell {beatname_uc} how to get metrics for the given container. This is the full list of supported hints:
 
 [float]
-===== `co.elastic.metrics.module`
+===== `co.elastic.metrics/module`
 
 {beatname_uc} module to use to fetch metrics. See <<metricbeat-modules>> for the list of supported modules.
 
 [float]
-===== `co.elastic.metrics.hosts`
+===== `co.elastic.metrics/hosts`
 
 Hosts setting to use with the given module. Hosts can include `${data.host}` and `${data.port}`
 values from the autodiscover event, ie: `${data.host}:80`.
 
 [float]
-===== `co.elastic.metrics.metricsets`
+===== `co.elastic.metrics/metricsets`
 
 List of metricsets to use, comma separated. If no metricsets are provided, default metricsets for the module
 are used.
 
 [float]
-===== `co.elastic.metrics.period`
+===== `co.elastic.metrics/period`
 
 The time interval for metrics retrieval, ie: 10s
 
 [float]
-===== `co.elastic.metrics.timeout`
+===== `co.elastic.metrics/timeout`
 
 Metrics retrieval timeout, default: 3s
 
 [float]
-===== `co.elastic.metrics.ssl.*`
+===== `co.elastic.metrics/ssl.*`
 
 SSL parameters, as seen in <<configuration-ssl>>.
 
