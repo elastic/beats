@@ -67,7 +67,7 @@
           description: >
             Total number of incoming bytes.
         - name: dropped
-          type: scaled_float
+          type: long
           description: >
             Total number of dropped incoming packets.
         - name: errors
@@ -90,7 +90,7 @@
           description: >
             Total number of outgoing bytes.
         - name: dropped
-          type: scaled_float
+          type: long
           description: >
             Total number of dropped outgoing packets.
         - name: errors

@@ -3315,7 +3315,7 @@ Total number of incoming bytes.
 *`docker.network.inbound.dropped`*::
 +
 --
-type: scaled_float
+type: long
 
 Total number of dropped incoming packets.
 
@@ -3364,7 +3364,7 @@ Total number of outgoing bytes.
 *`docker.network.outbound.dropped`*::
 +
 --
-type: scaled_float
+type: long
 
 Total number of dropped outgoing packets.
 
