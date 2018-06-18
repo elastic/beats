@@ -147,6 +147,7 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Fix a parsing issue in the syslog input for RFC3339 timestamp and time with nanoseconds. {pull}7046[7046]
 - Fix an issue with an overflowing wait group when using the TCP input. {issue}7202[7202]
 - Keep different registry entry per container stream to avoid wrong offsets. {issue}7281[7281]
+- Fix offset field pointing at end of a line. {issue}6514[6514]
 
 *Heartbeat*
 
