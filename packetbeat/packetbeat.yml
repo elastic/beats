@@ -40,6 +40,10 @@ packetbeat.protocols:
   #Cassandra port for traffic monitoring.
   ports: [9042]
 
+- type: dhcpv4
+  # Configure the DHCP for IPv4 ports.
+  ports: [67, 68]
+
 - type: dns
   # Configure the ports where to listen for DNS traffic. You can disable
   # the DNS protocol by commenting out the list of ports.
