@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-cassandra>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-dhcpv4>>
 * <<exported-fields-dns>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-flows_event>>
@@ -1521,6 +1522,385 @@ The command-line of the process that initiated the transaction.
 +
 --
 The software release of the service serving the transaction. This can be the commit id or a semantic version.
+
+
+--
+
+[[exported-fields-dhcpv4]]
+== DHCPv4 fields
+
+DHCPv4 event fields
+
+
+
+*`dhcpv4.transaction_id`*::
++
+--
+type: keyword
+
+Transaction ID, a random number chosen by the
+client, used by the client and server to associate
+messages and responses between a client and a
+server.
+
+
+--
+
+*`dhcpv4.seconds`*::
++
+--
+type: long
+
+Number of seconds elapsed since client began address acquisition or
+renewal process.
+
+
+--
+
+*`dhcpv4.flags`*::
++
+--
+type: keyword
+
+Flags are set by the client to indicate how the DHCP server should
+its reply -- either unicast or broadcast.
+
+
+--
+
+*`dhcpv4.client_ip`*::
++
+--
+type: ip
+
+The current IP address of the client.
+
+--
+
+*`dhcpv4.assigned_ip`*::
++
+--
+type: ip
+
+The IP address that the DHCP server is assigning to the client.
+This field is also known as "your" IP address.
+
+
+--
+
+*`dhcpv4.server_ip`*::
++
+--
+type: ip
+
+The IP address of the DHCP server that the client should use for the
+next step in the bootstrap process.
+
+
+--
+
+*`dhcpv4.relay_ip`*::
++
+--
+type: ip
+
+The relay IP address used by the client to contact the server
+(i.e. a DHCP relay server).
+
+
+--
+
+*`dhcpv4.client_mac`*::
++
+--
+type: keyword
+
+The client's MAC address (layer two).
+
+--
+
+*`dhcpv4.server_name`*::
++
+--
+type: keyword
+
+The name of the server sending the message. Optional. Used in
+DHCPOFFER or DHCPACK messages.
+
+
+--
+
+*`dhcpv4.op_code`*::
++
+--
+type: keyword
+
+example: bootreply
+
+The message op code (bootrequest or bootreply).
+
+
+--
+
+*`dhcpv4.hops`*::
++
+--
+type: long
+
+The number of hops the DHCP message went through.
+
+--
+
+*`dhcpv4.hardware_type`*::
++
+--
+type: keyword
+
+The type of hardware used for the local network (Ethernet,
+LocalTalk, etc).
+
+
+--
+
+
+*`dhcpv4.option.message_type`*::
++
+--
+type: keyword
+
+example: ack
+
+The specific type of DHCP message being sent (e.g. discover,
+offer, request, decline, ack, nak, release, inform).
+
+
+--
+
+*`dhcpv4.option.parameter_request_list`*::
++
+--
+type: keyword
+
+This option is used by a DHCP client to request values for
+specified configuration parameters.
+
+
+--
+
+*`dhcpv4.option.requested_ip_address`*::
++
+--
+type: ip
+
+This option is used in a client request (DHCPDISCOVER) to allow
+the client to request that a particular IP address be assigned.
+
+
+--
+
+*`dhcpv4.option.server_identifier`*::
++
+--
+type: ip
+
+IP address of the individual DHCP server which handled this
+message.
+
+
+--
+
+*`dhcpv4.option.broadcast_address`*::
++
+--
+type: ip
+
+This option specifies the broadcast address in use on the
+client's subnet.
+
+
+--
+
+*`dhcpv4.option.max_dhcp_message_size`*::
++
+--
+type: long
+
+This option specifies the maximum length DHCP message that the
+client is willing to accept.
+
+
+--
+
+*`dhcpv4.option.class_identifier`*::
++
+--
+type: keyword
+
+This option is used by DHCP clients to optionally identify the
+vendor type and configuration of a DHCP client. Vendors may
+choose to define specific vendor class identifiers to convey
+particular configuration or other identification information
+about a client.  For example, the identifier may encode the
+client's hardware configuration.
+
+
+--
+
+*`dhcpv4.option.domain_name`*::
++
+--
+type: keyword
+
+This option specifies the domain name that client should use
+when resolving hostnames via the Domain Name System.
+
+
+--
+
+*`dhcpv4.option.dns_servers`*::
++
+--
+type: ip
+
+The domain name server option specifies a list of Domain Name
+System servers available to the client.
+
+
+--
+
+*`dhcpv4.option.vendor_identifying_options`*::
++
+--
+type: object
+
+A DHCP client may use this option to unambiguously identify the
+vendor that manufactured the hardware on which the client is
+running, the software in use, or an industry consortium to which
+the vendor belongs. This field is described in RFC 3925.
+
+
+--
+
+*`dhcpv4.option.subnet_mask`*::
++
+--
+type: ip
+
+The subnet mask that the client should use on the currnet
+network.
+
+
+--
+
+*`dhcpv4.option.utc_time_offset_sec`*::
++
+--
+type: long
+
+The time offset field specifies the offset of the client's
+subnet in seconds from Coordinated Universal Time (UTC).
+
+
+--
+
+*`dhcpv4.option.router`*::
++
+--
+type: ip
+
+The router option specifies a list of IP addresses for routers
+on the client's subnet.
+
+
+--
+
+*`dhcpv4.option.time_servers`*::
++
+--
+type: ip
+
+The time server option specifies a list of RFC 868 time servers
+available to the client.
+
+
+--
+
+*`dhcpv4.option.ntp_servers`*::
++
+--
+type: ip
+
+This option specifies a list of IP addresses indicating NTP
+servers available to the client.
+
+
+--
+
+*`dhcpv4.option.hostname`*::
++
+--
+type: keyword
+
+This option specifies the name of the client.
+
+
+--
+
+*`dhcpv4.option.ip_address_lease_time_sec`*::
++
+--
+type: long
+
+This option is used in a client request (DHCPDISCOVER or
+DHCPREQUEST) to allow the client to request a lease time for the
+IP address.  In a server reply (DHCPOFFER), a DHCP server uses
+this option to specify the lease time it is willing to offer.
+
+
+--
+
+*`dhcpv4.option.message`*::
++
+--
+type: text
+
+This option is used by a DHCP server to provide an error message
+to a DHCP client in a DHCPNAK message in the event of a failure.
+A client may use this option in a DHCPDECLINE message to
+indicate the why the client declined the offered parameters.
+
+
+--
+
+*`dhcpv4.option.renewal_time_sec`*::
++
+--
+type: long
+
+This option specifies the time interval from address assignment
+until the client transitions to the RENEWING state.
+
+
+--
+
+*`dhcpv4.option.rebinding_time_sec`*::
++
+--
+type: long
+
+This option specifies the time interval from address assignment
+until the client transitions to the REBINDING state.
+
+
+--
+
+*`dhcpv4.option.boot_file_name`*::
++
+--
+type: keyword
+
+This option is used to identify a bootfile when the 'file' field
+in the DHCP header has been used for DHCP options.
 
 
 --
