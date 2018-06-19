@@ -49,10 +49,7 @@ func (r *Reader) GetState() common.MapStr {
 			"file":    r.lineScanner.in.fileOffset,
 		},
 		"scanner": common.MapStr{
-			"line": common.MapStr{
-				"buffer": r.lineScanner.bufOffset,
-				"total":  r.lineScanner.offset,
-			},
+			"line": r.lineScanner.offset,
 		},
 	}
 }
@@ -100,9 +97,8 @@ type lineScanner struct {
 	nl         []byte
 	bufferSize int
 
-	buf       *streambuf.Buffer
-	bufOffset int
-	offset    int
+	buf    *streambuf.Buffer
+	offset int
 }
 
 func newLineScanner(in *decoderReader, nl []byte, bufferSize int) *lineScanner {
@@ -111,16 +107,14 @@ func newLineScanner(in *decoderReader, nl []byte, bufferSize int) *lineScanner {
 		nl:         nl,
 		bufferSize: bufferSize,
 		buf:        streambuf.New(nil),
-		bufOffset:  0,
 		offset:     0,
 	}
 }
 
 // Scan reads from the underlying decoder reader and returns decoded lines.
 func (s *lineScanner) scan() ([]byte, int, error) {
-	idx := s.buf.IndexFrom(s.bufOffset, s.nl)
+	idx := s.buf.Index(s.nl)
 	for !newLineFound(idx) {
-		s.bufOffset = 0
 
 		b := make([]byte, s.bufferSize)
 		n, err := s.in.read(b)
@@ -134,7 +128,7 @@ func (s *lineScanner) scan() ([]byte, int, error) {
 		}
 
 		s.buf.Append(b[:n])
-		idx = s.buf.IndexFrom(s.bufOffset, s.nl)
+		idx = s.buf.Index(s.nl)
 	}
 
 	return s.line(idx)
@@ -152,8 +146,7 @@ func (s *lineScanner) line(i int) ([]byte, int, error) {
 		panic(err)
 	}
 
-	s.offset = s.offset + i + len(s.nl)
-	s.bufOffset = s.bufOffset + i + len(s.nl)
-	s.buf.Advance(s.bufOffset)
+	s.offset = s.offset + i
+	s.buf.Reset()
 	return line, len(line), nil
 }
