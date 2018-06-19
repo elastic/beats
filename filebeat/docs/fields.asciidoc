@@ -801,6 +801,109 @@ elasticsearch Module
 
 
 [float]
+== audit fields
+
+
+
+
+*`elasticsearch.audit.timestamp`*::
++
+--
+example: Please add example
+
+Please add description
+
+--
+
+*`elasticsearch.audit.layer`*::
++
+--
+type: keyword
+
+example: Please add example
+
+Please add description
+
+--
+
+*`elasticsearch.audit.event_type`*::
++
+--
+type: keyword
+
+example: Please add example
+
+Please add description
+
+--
+
+*`elasticsearch.audit.origin_type`*::
++
+--
+type: keyword
+
+example: Please add example
+
+Please add description
+
+--
+
+*`elasticsearch.audit.origin_address`*::
++
+--
+type: keyword
+
+example: Please add example
+
+Please add description
+
+--
+
+*`elasticsearch.audit.principal`*::
++
+--
+type: keyword
+
+example: Please add example
+
+Please add description
+
+--
+
+*`elasticsearch.audit.action`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`elasticsearch.audit.uri`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`elasticsearch.audit.request`*::
++
+--
+type: keyword
+
+example: Please add example
+
+Please add description
+
+--
+
+[float]
 == gc fields
 
 

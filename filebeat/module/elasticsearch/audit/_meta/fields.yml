@@ -1,0 +1,39 @@
+- name: audit
+  type: group
+  description: >
+  fields:
+    - name: timestamp
+      description: Please add description
+      example: Please add example
+    - name: layer
+      description: Please add description
+      example: Please add example
+      type: keyword
+    - name: event_type
+      description: Please add description
+      example: Please add example
+      type: keyword
+    - name: origin_type
+      description: Please add description
+      example: Please add example
+      type: keyword
+    - name: origin_address
+      description: Please add description
+      example: Please add example
+      type: keyword
+    - name: principal
+      description: Please add description
+      example: Please add example
+      type: keyword
+    - name: action
+      description: Please add description
+      example: Please add example
+      type: text
+    - name: uri
+      description: Please add description
+      example: Please add example
+      type: text
+    - name: request
+      description: Please add description
+      example: Please add example
+      type: keyword
