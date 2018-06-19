@@ -1,6 +1,6 @@
 // +build !integration
 
-package reader
+package multiline
 
 import (
 	"bytes"
@@ -12,7 +12,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/reader"
+	"github.com/elastic/beats/filebeat/reader/encode"
+	"github.com/elastic/beats/filebeat/reader/encode/encoding"
+	"github.com/elastic/beats/filebeat/reader/strip_newline"
 	"github.com/elastic/beats/libbeat/common/match"
 )
 
@@ -27,7 +30,7 @@ func (p bufferSource) Continuable() bool          { return false }
 func TestMultilineAfterOK(t *testing.T) {
 	pattern := match.MustCompile(`^[ \t] +`) // next line is indented by spaces
 	testMultilineOK(t,
-		MultilineConfig{
+		Config{
 			Pattern: &pattern,
 			Match:   "after",
 		},
@@ -41,7 +44,7 @@ func TestMultilineBeforeOK(t *testing.T) {
 	pattern := match.MustCompile(`\\$`) // previous line ends with \
 
 	testMultilineOK(t,
-		MultilineConfig{
+		Config{
 			Pattern: &pattern,
 			Match:   "before",
 		},
@@ -55,7 +58,7 @@ func TestMultilineAfterNegateOK(t *testing.T) {
 	pattern := match.MustCompile(`^-`) // first line starts with '-' at beginning of line
 
 	testMultilineOK(t,
-		MultilineConfig{
+		Config{
 			Pattern: &pattern,
 			Negate:  true,
 			Match:   "after",
@@ -70,7 +73,7 @@ func TestMultilineBeforeNegateOK(t *testing.T) {
 	pattern := match.MustCompile(`;$`) // last line ends with ';'
 
 	testMultilineOK(t,
-		MultilineConfig{
+		Config{
 			Pattern: &pattern,
 			Negate:  true,
 			Match:   "before",
@@ -86,7 +89,7 @@ func TestMultilineAfterNegateOKFlushPattern(t *testing.T) {
 	pattern := match.MustCompile(`EventStart`)
 
 	testMultilineOK(t,
-		MultilineConfig{
+		Config{
 			Pattern:      &pattern,
 			Negate:       true,
 			Match:        "after",
@@ -104,7 +107,7 @@ func TestMultilineAfterNegateOKFlushPatternWhereTheFirstLinesDosentMatchTheStart
 	pattern := match.MustCompile(`EventStart`)
 
 	testMultilineOK(t,
-		MultilineConfig{
+		Config{
 			Pattern:      &pattern,
 			Negate:       true,
 			Match:        "after",
@@ -120,7 +123,7 @@ func TestMultilineAfterNegateOKFlushPatternWhereTheFirstLinesDosentMatchTheStart
 func TestMultilineBeforeNegateOKWithEmptyLine(t *testing.T) {
 	pattern := match.MustCompile(`;$`) // last line ends with ';'
 	testMultilineOK(t,
-		MultilineConfig{
+		Config{
 			Pattern: &pattern,
 			Negate:  true,
 			Match:   "before",
@@ -131,13 +134,13 @@ func TestMultilineBeforeNegateOKWithEmptyLine(t *testing.T) {
 	)
 }
 
-func testMultilineOK(t *testing.T, cfg MultilineConfig, events int, expected ...string) {
+func testMultilineOK(t *testing.T, cfg Config, events int, expected ...string) {
 	_, buf := createLineBuffer(expected...)
-	reader := createMultilineTestReader(t, buf, cfg)
+	r := createMultilineTestReader(t, buf, cfg)
 
-	var messages []Message
+	var messages []reader.Message
 	for {
-		message, err := reader.Next()
+		message, err := r.Next()
 		if err != nil {
 			break
 		}
@@ -158,7 +161,7 @@ func testMultilineOK(t *testing.T, cfg MultilineConfig, events int, expected ...
 	}
 }
 
-func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg MultilineConfig) Reader {
+func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg Config) reader.Reader {
 	encFactory, ok := encoding.FindEncoding("plain")
 	if !ok {
 		t.Fatalf("unable to find 'plain' encoding")
@@ -169,18 +172,18 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg MultilineConf
 		t.Fatalf("failed to initialize encoding: %v", err)
 	}
 
-	var reader Reader
-	reader, err = NewEncode(in, enc, 4096)
+	var r reader.Reader
+	r, err = encode.New(in, enc, 4096)
 	if err != nil {
 		t.Fatalf("Failed to initialize line reader: %v", err)
 	}
 
-	reader, err = NewMultiline(NewStripNewline(reader), "\n", 1<<20, &cfg)
+	r, err = New(strip_newline.New(r), "\n", 1<<20, &cfg)
 	if err != nil {
 		t.Fatalf("failed to initializ reader: %v", err)
 	}
 
-	return reader
+	return r
 }
 
 func createLineBuffer(lines ...string) ([]string, *bytes.Buffer) {

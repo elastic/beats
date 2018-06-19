@@ -1,18 +1,22 @@
-package reader
+package strip_newline
+
+import (
+	"github.com/elastic/beats/filebeat/reader"
+)
 
 // StripNewline reader removes the last trailing newline characters from
 // read lines.
 type StripNewline struct {
-	reader Reader
+	reader reader.Reader
 }
 
-// NewStripNewline creates a new line reader stripping the last tailing newline.
-func NewStripNewline(r Reader) *StripNewline {
+// New creates a new line reader stripping the last tailing newline.
+func New(r reader.Reader) *StripNewline {
 	return &StripNewline{r}
 }
 
 // Next returns the next line.
-func (p *StripNewline) Next() (Message, error) {
+func (p *StripNewline) Next() (reader.Message, error) {
 	message, err := p.reader.Next()
 	if err != nil {
 		return message, err

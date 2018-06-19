@@ -1,4 +1,4 @@
-package reader
+package docker_json
 
 import (
 	"bytes"
@@ -6,14 +6,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/filebeat/reader"
 	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/pkg/errors"
 )
 
-// DockerJSON processor renames a given field
-type DockerJSON struct {
-	reader Reader
+// Reader processor renames a given field
+type Reader struct {
+	reader reader.Reader
 	// stream filter, `all`, `stderr` or `stdout`
 	stream string
 
@@ -33,9 +34,9 @@ type crioLog struct {
 	Log       []byte
 }
 
-// NewDockerJSON creates a new reader renaming a field
-func NewDockerJSON(r Reader, stream string, partial bool) *DockerJSON {
-	return &DockerJSON{
+// New creates a new reader renaming a field
+func New(r reader.Reader, stream string, partial bool) *Reader {
+	return &Reader{
 		stream:  stream,
 		partial: partial,
 		reader:  r,
@@ -45,7 +46,7 @@ func NewDockerJSON(r Reader, stream string, partial bool) *DockerJSON {
 // parseCRILog parses logs in CRI log format.
 // CRI log format example :
 // 2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache
-func parseCRILog(message Message, msg *crioLog) (Message, error) {
+func parseCRILog(message reader.Message, msg *crioLog) (reader.Message, error) {
 	log := strings.SplitN(string(message.Content), " ", 3)
 	if len(log) < 3 {
 		return message, errors.New("invalid CRI log")
@@ -67,10 +68,10 @@ func parseCRILog(message Message, msg *crioLog) (Message, error) {
 	return message, nil
 }
 
-// parseDockerJSONLog parses logs in Docker JSON log format.
+// parseReaderLog parses logs in Docker JSON log format.
 // Docker JSON log format example:
 // {"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}
-func parseDockerJSONLog(message Message, msg *dockerLog) (Message, error) {
+func parseDockerJSONLog(message reader.Message, msg *dockerLog) (reader.Message, error) {
 	dec := json.NewDecoder(bytes.NewReader(message.Content))
 	if err := dec.Decode(&msg); err != nil {
 		return message, errors.Wrap(err, "decoding docker JSON")
@@ -92,7 +93,7 @@ func parseDockerJSONLog(message Message, msg *dockerLog) (Message, error) {
 }
 
 // Next returns the next line.
-func (p *DockerJSON) Next() (Message, error) {
+func (p *Reader) Next() (reader.Message, error) {
 	for {
 		message, err := p.reader.Next()
 		if err != nil {

@@ -1,6 +1,6 @@
 // +build !integration
 
-package reader
+package strip_newline
 
 import (
 	"testing"
