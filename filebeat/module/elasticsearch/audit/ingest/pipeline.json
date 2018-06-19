@@ -11,13 +11,13 @@
           "grok": {
               "field": "message",
               "patterns": [
-                  "\\[%{TIMESTAMP_ISO8601:timestamp}\\]\\s*\\[%{WORD:layer}\\]\\s*\\[%{WORD:event_type}\\]\\s*(origin_type\\=\\[%{WORD:origin_type}\\])?,?\\s*(origin_address\\=\\[%{IPORHOST:origin_address}\\])?,?\\s*(principal\\=\\[%{WORD:principal}\\])?,?\\s*(action\\=\\[%{DATA:action}\\])?,?\\s*?(uri=\\[%{DATA:uri}\\])?,?\\s*(request\\=\\[%{WORD:request}\\])?,?"
+                  "\\[%{TIMESTAMP_ISO8601:elasticsearch.audit.timestamp}\\]\\s*\\[%{WORD:elasticsearch.audit.layer}\\]\\s*\\[%{WORD:elasticsearch.audit.event_type}\\]\\s*(origin_type\\=\\[%{WORD:elasticsearch.audit.origin_type}\\])?,?\\s*(origin_address\\=\\[%{IPORHOST:elasticsearch.audit.origin_address}\\])?,?\\s*(principal\\=\\[%{WORD:elasticsearch.audit.principal}\\])?,?\\s*(action\\=\\[%{DATA:elasticsearch.audit.action}\\])?,?\\s*?(uri=\\[%{DATA:elasticsearch.audit.uri}\\])?,?\\s*(request\\=\\[%{WORD:elasticsearch.audit.request}\\])?,?"
               ]
           }
       },
       {
           "rename": {
-              "field": "timestamp",
+              "field": "elasticsearch.audit.timestamp",
               "target_field": "@timestamp"
           }
       }
