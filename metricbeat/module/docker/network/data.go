@@ -5,32 +5,44 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func eventsMapping(netsStatsList []NetStats) []common.MapStr {
-	myEvents := []common.MapStr{}
+func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats) {
 	for _, netsStats := range netsStatsList {
-		myEvents = append(myEvents, eventMapping(&netsStats))
+		eventMapping(r, &netsStats)
 	}
-	return myEvents
 }
 
-func eventMapping(stats *NetStats) common.MapStr {
-	event := common.MapStr{
-		mb.ModuleDataKey: common.MapStr{
+func eventMapping(r mb.ReporterV2, stats *NetStats) {
+	// Deprecated fields
+	r.Event(mb.Event{
+		ModuleFields: common.MapStr{
 			"container": stats.Container.ToMapStr(),
 		},
-		"interface": stats.NameInterface,
-		"in": common.MapStr{
-			"bytes":   stats.RxBytes,
-			"dropped": stats.RxDropped,
-			"errors":  stats.RxErrors,
-			"packets": stats.RxPackets,
+		MetricSetFields: common.MapStr{
+			"interface": stats.NameInterface,
+			"in": common.MapStr{
+				"bytes":   stats.RxBytes,
+				"dropped": stats.RxDropped,
+				"errors":  stats.RxErrors,
+				"packets": stats.RxPackets,
+			},
+			"out": common.MapStr{
+				"bytes":   stats.TxBytes,
+				"dropped": stats.TxDropped,
+				"errors":  stats.TxErrors,
+				"packets": stats.TxPackets,
+			},
+			"inbound": common.MapStr{
+				"bytes":   stats.Total.RxBytes,
+				"dropped": stats.Total.RxDropped,
+				"errors":  stats.Total.RxErrors,
+				"packets": stats.Total.RxPackets,
+			},
+			"outbound": common.MapStr{
+				"bytes":   stats.Total.TxBytes,
+				"dropped": stats.Total.TxDropped,
+				"errors":  stats.Total.TxErrors,
+				"packets": stats.Total.TxPackets,
+			},
 		},
-		"out": common.MapStr{
-			"bytes":   stats.TxBytes,
-			"dropped": stats.TxDropped,
-			"errors":  stats.TxErrors,
-			"packets": stats.TxPackets,
-		},
-	}
-	return event
+	})
 }

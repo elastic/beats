@@ -6,19 +6,16 @@
     },
     "docker": {
         "container": {
-            "id": "da57ef738524e5a4f6ae17b477f134d30719603db7b96d2c01b6f34010412e66",
+            "id": "452523bf833fd9fd1a8425135b720de4cb9b5a32096deac5b52a97e97bb6d16d",
             "labels": {
-                "build-date": "20170911",
-                "com_docker_compose_config-hash": "13a74b89a90a6fdcb6bbbc7eb37b7cb0615bdaf8",
+                "com_docker_compose_config-hash": "68a840a9e1c606ca1026492e50620e139ca342c585f330025a90f39a5fd32538",
                 "com_docker_compose_container-number": "1",
                 "com_docker_compose_oneoff": "False",
                 "com_docker_compose_project": "metricbeat",
                 "com_docker_compose_service": "elasticsearch",
-                "com_docker_compose_version": "1.5.0",
-                "license": "GPLv2",
+                "com_docker_compose_version": "1.21.0",
                 "maintainer": "Elastic Docker Team \u003cdocker@elastic.co\u003e",
-                "name": "CentOS Base Image",
-                "vendor": "CentOS"
+                "org_label-schema_schema-version": "= 1.0     org.label-schema.name=CentOS Base Image     org.label-schema.vendor=CentOS     org.label-schema.license=GPLv2     org.label-schema.build-date=20180402"
             },
             "name": "metricbeat_elasticsearch_1"
         },
@@ -29,12 +26,24 @@
                 "errors": 0,
                 "packets": 0
             },
+            "inbound": {
+                "bytes": 61694097,
+                "dropped": 0,
+                "errors": 0,
+                "packets": 714036
+            },
             "interface": "eth0",
             "out": {
                 "bytes": 0,
                 "dropped": 0,
                 "errors": 0,
                 "packets": 0
+            },
+            "outbound": {
+                "bytes": 69114459,
+                "dropped": 0,
+                "errors": 0,
+                "packets": 713985
             }
         }
     },
