@@ -1,17 +1,7 @@
 [[winlogbeat-getting-started]]
 == Getting Started With Winlogbeat
 
-To get started with your own Winlogbeat setup, install and configure these
-related products:
-
- * Elasticsearch for storage and indexing the data.
- * Kibana for the UI.
- * Logstash (optional) for inserting data into Elasticsearch.
-
-See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic
-Stack] for more information.
-
-After installing the Elastic Stack, read the following topics to learn how to install, configure, and run Winlogbeat:
+include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
 
 * <<winlogbeat-installation>>
 * <<winlogbeat-configuration>>
@@ -23,6 +13,9 @@ After installing the Elastic Stack, read the following topics to learn how to in
 
 [[winlogbeat-installation]]
 === Step 1: Install Winlogbeat
+
+*Before you begin*: If you haven't installed the {stack}, do that now. See
+{stack-ov}/get-started-elastic-stack.html[Getting started with the {stack}].
 
 . Download the Winlogbeat zip file from the
 https://www.elastic.co/downloads/beats/winlogbeat[downloads page].

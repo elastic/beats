@@ -3,6 +3,7 @@
 
 include::../../libbeat/docs/version.asciidoc[]
 
+:dev-guide: true
 :beatname_lc: beatname
 :beatname_uc: a Beat
 
