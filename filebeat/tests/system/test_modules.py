@@ -158,35 +158,43 @@ class Test(BaseTest):
         for ev in expected:
             found = False
             for obj in objects:
-
-                # Skip read timestamp as always different
-                del obj["read_timestamp"]
-
-                if "event" in obj and "created" in obj["event"]:
-                    del obj["event"]["created"]
-
-                del ev["_source"]["event"]["created"]
-                del ev["_source"]["host"]["name"]
-                del obj["host"]["name"]
-                del ev["_source"]["beat"]
-                del obj["source"]
-                del ev["_source"]["source"]
-                del obj["beat"]
-                print self.flatten_object(obj, {}, "")
-                print self.flatten_object(ev["_source"], {}, "")
-
-                # All modules in EXTENDED_COMPARE are checked in more detail
-                if module in EXTENDED_COMPARE:
-                    if ev["_source"] == obj:
-                        found = True
-                        break
-                else:
+                # For Modules not in EXTENDED_COMPARE on module level fields are compared
+                if module not in EXTENDED_COMPARE:
                     if ev["_source"][module] == obj[module]:
                         found = True
                         break
 
+                # Flatten objects for easier comparing
+                obj = self.flatten_object(obj, {}, "")
+                ex = self.flatten_object(ev["_source"], {}, "")
+
+                clean_keys(obj)
+                clean_keys(ex)
+
+                # All modules in EXTENDED_COMPARE are checked in more detail
+                if ex == obj:
+                    found = True
+                    break
+
             assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
                 pretty_json(ev["_source"]), pretty_json(objects))
+
+
+def clean_keys(obj):
+    # These keys are host dependent
+    host_keys = ["host.name", "beat.hostname", "beat.name"]
+    # The create timestamps area always new
+    time_keys = ["read_timestamp", "event.created"]
+    # source path and beat.version can be different for each run
+    other_keys = ["source", "beat.version"]
+
+    for key in host_keys + time_keys + other_keys:
+        delete_key(obj, key)
+
+
+def delete_key(obj, key):
+    if key in obj:
+        del obj[key]
 
 
 def pretty_json(obj):

@@ -5,7 +5,7 @@
         "_id": "OJjlbGMBLvTnJwyR-YUx",
         "_score": 1,
         "_source": {
-            "offset": 209,
+            "offset": 0,
             "log": {
                 "level": "INFO"
             },
@@ -22,7 +22,7 @@
             "input": {
                 "type": "log"
             },
-            "@timestamp": "2018-05-17T08:29:12.177Z",
+            "@timestamp": "2018-05-17T08:29:12,177",
             "elasticsearch": {
                 "server": {
                     "component": "o.e.c.m.MetaDataCreateIndexService"
