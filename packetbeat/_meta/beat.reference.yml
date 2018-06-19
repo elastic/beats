@@ -124,6 +124,10 @@ packetbeat.protocols:
   # This option indicates which Operator/Operators will be ignored.
   #ignored_ops: ["SUPPORTED","OPTIONS"]
 
+- type: dhcpv4
+  # Configure the DHCP for IPv4 ports.
+  ports: [67, 68]
+
 - type: dns
   # Enable DNS monitoring. Default: true
   #enabled: true
