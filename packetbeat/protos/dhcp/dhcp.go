@@ -177,7 +177,7 @@ func init() {
 	protos.Register("dhcp", New)
 }
 
-// Creates and returns a new dhcpPlugin.
+// New dhcpPlugin is created.
 func New(
 	testMode bool,
 	results protos.Reporter,
