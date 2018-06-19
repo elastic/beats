@@ -55,8 +55,9 @@ func (r *Reader) GetState() common.MapStr {
 }
 
 type decoderReader struct {
-	in      io.Reader
-	decoder transform.Transformer
+	in         io.Reader
+	decoder    transform.Transformer
+	decoderBuf *streambuf.Buffer
 
 	fileOffset    int
 	encodedOffset int
@@ -67,6 +68,7 @@ func newDecoderReader(in io.Reader, codec encoding.Encoding) *decoderReader {
 	return &decoderReader{
 		in:            in,
 		decoder:       codec.NewDecoder(),
+		decoderBuf:    streambuf.New(nil),
 		fileOffset:    0,
 		encodedOffset: 0,
 		decodedOffset: 0,
@@ -74,16 +76,31 @@ func newDecoderReader(in io.Reader, codec encoding.Encoding) *decoderReader {
 }
 
 func (r *decoderReader) read(buf []byte) (int, error) {
-	buffer := make([]byte, len(buf))
-	n, err := r.in.Read(buffer)
-	if n == 0 {
-		return 0, streambuf.ErrNoMoreBytes
+	var n int
+	var buffer []byte
+
+	if r.decoderBuf.Len() == 0 {
+		buffer = make([]byte, 1024)
+		n, err := r.in.Read(buffer)
+		r.decoderBuf.Append(buffer[:n])
+
+		if err != nil {
+			return 0, err
+		}
+		if n == 0 {
+			return 0, streambuf.ErrNoMoreBytes
+		}
 	}
 
+	buffer = r.decoderBuf.Bytes()
 	nDst, nSrc, err := r.decoder.Transform(buf, buffer, false)
 	if err != nil {
-		return 0, err
+		if err != transform.ErrShortDst && err != transform.ErrShortSrc {
+			return 0, err
+		}
 	}
+	r.decoderBuf.Advance(nSrc)
+	r.decoderBuf.Reset()
 
 	r.fileOffset = r.fileOffset + n
 	r.encodedOffset = r.encodedOffset + nSrc
