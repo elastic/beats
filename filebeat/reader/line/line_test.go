@@ -57,7 +57,7 @@ func TestReaderEncodings(t *testing.T) {
 			continue
 		}
 
-		// read decodec lines from buffer
+		// read decoded lines from buffer
 		var readLines []string
 		var byteCounts []int
 		current := 0
