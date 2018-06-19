@@ -10,12 +10,12 @@ https://www.elastic.co/products/elasticsearch[{es}]. Elastic provides {beats}
 for capturing:
 
 [horizontal]
-Network traffic:: https://www.elastic.co/products/beats/packetbeat[Packetbeat] 
-Log files:: https://www.elastic.co/products/beats/filebeat[Filebeat] 
+Audit data:: https://www.elastic.co/products/beats/auditbeat[Auditbeat]
+Log files:: https://www.elastic.co/products/beats/filebeat[Filebeat]
+Availability:: https://www.elastic.co/products/beats/heartbeat[Heartbeat]
 Metrics:: https://www.elastic.co/products/beats/metricbeat[Metricbeat] 
+Network traffic:: https://www.elastic.co/products/beats/packetbeat[Packetbeat] 
 Windows event logs:: https://www.elastic.co/products/beats/winlogbeat[Winlogbeat] 
-Audit data:: https://www.elastic.co/products/beats/auditbeat[Auditbeat] 
-Uptime:: https://www.elastic.co/products/beats/heartbeat[Heartbeat] 
 
 {beats} can send data directly to {es} or via
 https://www.elastic.co/products/logstash[{ls}], where you can further process

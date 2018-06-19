@@ -8,10 +8,10 @@ quickly, see {stack-ov}/get-started-elastic-stack.html[Getting started with the
 
 After installing the {stack}, see the {beats} getting started guides: 
 
-* {packetbeat-ref}/packetbeat-getting-started.html[Packetbeat]
+* {auditbeat-ref}/auditbeat-getting-started.html[Auditbeat]
 * {filebeat-ref}/filebeat-getting-started.html[Filebeat]
-* {metricbeat-ref}/metricbeat-getting-started.html[Metricbeat]
-* {winlogbeat-ref}/winlogbeat-getting-started.html[Winlogbeat]
-* {winlogbeat-ref}/auditbeat-getting-started.html[Auditbeat]
 * {heartbeat-ref}/heartbeat-getting-started.html[Heartbeat]
+* {metricbeat-ref}/metricbeat-getting-started.html[Metricbeat]
+* {packetbeat-ref}/packetbeat-getting-started.html[Packetbeat]
+* {winlogbeat-ref}/winlogbeat-getting-started.html[Winlogbeat]
 
