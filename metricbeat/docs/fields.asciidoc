@@ -3198,7 +3198,7 @@ Network interface name.
 [float]
 == in fields
 
-Incoming network stats.
+Incoming network stats per second.
 
 
 
@@ -3247,7 +3247,7 @@ Total number of incoming packets.
 [float]
 == out fields
 
-Outgoing network stats.
+Outgoing network stats per second.
 
 
 
@@ -3284,6 +3284,104 @@ Total errors on outgoing packets.
 --
 
 *`docker.network.out.packets`*::
++
+--
+type: long
+
+Total number of outgoing packets.
+
+
+--
+
+[float]
+== inbound fields
+
+Incoming network stats since the container started.
+
+
+
+*`docker.network.inbound.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of incoming bytes.
+
+
+--
+
+*`docker.network.inbound.dropped`*::
++
+--
+type: long
+
+Total number of dropped incoming packets.
+
+
+--
+
+*`docker.network.inbound.errors`*::
++
+--
+type: long
+
+Total errors on incoming packets.
+
+
+--
+
+*`docker.network.inbound.packets`*::
++
+--
+type: long
+
+Total number of incoming packets.
+
+
+--
+
+[float]
+== outbound fields
+
+Outgoing network stats since the container started.
+
+
+
+*`docker.network.outbound.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of outgoing bytes.
+
+
+--
+
+*`docker.network.outbound.dropped`*::
++
+--
+type: long
+
+Total number of dropped outgoing packets.
+
+
+--
+
+*`docker.network.outbound.errors`*::
++
+--
+type: long
+
+Total errors on outgoing packets.
+
+
+--
+
+*`docker.network.outbound.packets`*::
 +
 --
 type: long
