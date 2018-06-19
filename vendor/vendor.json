@@ -377,44 +377,34 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "qghOCT8VCZFNPvu8/LCmletBKd8=",
+			"checksumSHA1": "1NvZjGE2MFmIxQQJ87s/wUKQFnY=",
 			"path": "github.com/elastic/go-libaudit",
-			"revision": "c18782ee4f957de48620718231d20ca12c8dc4e9",
-			"revisionTime": "2018-05-25T13:51:51Z",
-			"version": "v0.3.0",
-			"versionExact": "v0.3.0"
+			"revision": "0c842c62c7c04344b204e2059eadd98c757defe0",
+			"revisionTime": "2018-06-20T15:43:49Z"
 		},
 		{
 			"checksumSHA1": "3V0tnqlCgmCXnbocuTqUKluynm8=",
 			"path": "github.com/elastic/go-libaudit/aucoalesce",
-			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
-			"revisionTime": "2018-05-03T13:36:58Z",
-			"version": "v0.2.1",
-			"versionExact": "v0.2.1"
+			"revision": "0c842c62c7c04344b204e2059eadd98c757defe0",
+			"revisionTime": "2018-06-20T15:43:49Z"
 		},
 		{
 			"checksumSHA1": "6OK3lLgocjmIUyLo8xNhYGpwE1E=",
 			"path": "github.com/elastic/go-libaudit/auparse",
-			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
-			"revisionTime": "2018-05-03T13:36:58Z",
-			"version": "v0.2.1",
-			"versionExact": "v0.2.1"
+			"revision": "0c842c62c7c04344b204e2059eadd98c757defe0",
+			"revisionTime": "2018-06-20T15:43:49Z"
 		},
 		{
-			"checksumSHA1": "Rr15sVPpJRQ+ggimmx3/0s1gUJc=",
+			"checksumSHA1": "zGv2vPwSLoFCRt1kcD81pBzTo+0=",
 			"path": "github.com/elastic/go-libaudit/rule",
-			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
-			"revisionTime": "2018-05-03T13:36:58Z",
-			"version": "v0.2.1",
-			"versionExact": "v0.2.1"
+			"revision": "0c842c62c7c04344b204e2059eadd98c757defe0",
+			"revisionTime": "2018-06-20T15:43:49Z"
 		},
 		{
 			"checksumSHA1": "5C083BvwcAVSKquRXbxXa950/wE=",
 			"path": "github.com/elastic/go-libaudit/rule/flags",
-			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
-			"revisionTime": "2018-05-03T13:36:58Z",
-			"version": "v0.2.1",
-			"versionExact": "v0.2.1"
+			"revision": "0c842c62c7c04344b204e2059eadd98c757defe0",
+			"revisionTime": "2018-06-20T15:43:49Z"
 		},
 		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",
