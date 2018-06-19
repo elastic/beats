@@ -4,16 +4,7 @@
 {beatname_uc} helps you monitor your servers and the services they host by
 collecting metrics from the operating system and services.
 
-To get started with your own {beatname_uc} setup, install and configure these
-related products:
-
- * Elasticsearch for storage and indexing the data.
- * Kibana for the UI.
- * Logstash (optional) for inserting data into Elasticsearch.
-
-See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information.
-
-After installing the Elastic Stack, read the following topics to learn how to install, configure, and run {beatname_uc}:
+include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
 
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
