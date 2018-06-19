@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- Added method to convert kernel rules to text format in order to display them.
+
 ### Changed
 
 ### Deprecated
