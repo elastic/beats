@@ -1,4 +1,4 @@
-package reader
+package line
 
 import (
 	"io"
@@ -13,7 +13,7 @@ import (
 // lineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
-type Line struct {
+type Reader struct {
 	reader     io.Reader
 	codec      encoding.Encoding
 	bufferSize int
@@ -25,8 +25,8 @@ type Line struct {
 	decoder    transform.Transformer
 }
 
-// NewLine creates a new Line reader object
-func NewLine(input io.Reader, codec encoding.Encoding, bufferSize int) (*Line, error) {
+// New creates a new reader object
+func New(input io.Reader, codec encoding.Encoding, bufferSize int) (*Reader, error) {
 	encoder := codec.NewEncoder()
 
 	// Create newline char based on encoding
@@ -35,7 +35,7 @@ func NewLine(input io.Reader, codec encoding.Encoding, bufferSize int) (*Line, e
 		return nil, err
 	}
 
-	return &Line{
+	return &Reader{
 		reader:     input,
 		codec:      codec,
 		bufferSize: bufferSize,
@@ -47,19 +47,19 @@ func NewLine(input io.Reader, codec encoding.Encoding, bufferSize int) (*Line, e
 }
 
 // Next reads the next line until the new line character
-func (l *Line) Next() ([]byte, int, error) {
+func (r *Reader) Next() ([]byte, int, error) {
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
 	for {
 		// read next 'potential' line from input buffer/reader
-		err := l.advance()
+		err := r.advance()
 		if err != nil {
 			return nil, 0, err
 		}
 
 		// Check last decoded byte really being '\n' also unencoded
 		// if not, continue reading
-		buf := l.outBuffer.Bytes()
+		buf := r.outBuffer.Bytes()
 
 		// This can happen if something goes wrong during decoding
 		if len(buf) == 0 {
@@ -76,40 +76,40 @@ func (l *Line) Next() ([]byte, int, error) {
 
 	// output buffer contains complete line ending with '\n'. Extract
 	// byte slice from buffer and reset output buffer.
-	bytes, err := l.outBuffer.Collect(l.outBuffer.Len())
-	l.outBuffer.Reset()
+	bytes, err := r.outBuffer.Collect(r.outBuffer.Len())
+	r.outBuffer.Reset()
 	if err != nil {
 		// This should never happen as otherwise we have a broken state
 		panic(err)
 	}
 
 	// return and reset consumed bytes count
-	sz := l.byteCount
-	l.byteCount = 0
+	sz := r.byteCount
+	r.byteCount = 0
 	return bytes, sz, nil
 }
 
 // Reads from the buffer until a new line character is detected
 // Returns an error otherwise
-func (l *Line) advance() error {
+func (r *Reader) advance() error {
 	// Initial check if buffer has already a newLine character
-	idx := l.inBuffer.IndexFrom(l.inOffset, l.nl)
+	idx := r.inBuffer.IndexFrom(r.inOffset, r.nl)
 
 	// fill inBuffer until '\n' sequence has been found in input buffer
 	for idx == -1 {
 		// increase search offset to reduce iterations on buffer when looping
-		newOffset := l.inBuffer.Len() - len(l.nl)
-		if newOffset > l.inOffset {
-			l.inOffset = newOffset
+		newOffset := r.inBuffer.Len() - len(r.nl)
+		if newOffset > r.inOffset {
+			r.inOffset = newOffset
 		}
 
-		buf := make([]byte, l.bufferSize)
+		buf := make([]byte, r.bufferSize)
 
 		// try to read more bytes into buffer
-		n, err := l.reader.Read(buf)
+		n, err := r.reader.Read(buf)
 
 		// Appends buffer also in case of err
-		l.inBuffer.Append(buf[:n])
+		r.inBuffer.Append(buf[:n])
 		if err != nil {
 			return err
 		}
@@ -120,46 +120,46 @@ func (l *Line) advance() error {
 		}
 
 		// Check if buffer has newLine character
-		idx = l.inBuffer.IndexFrom(l.inOffset, l.nl)
+		idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
 	}
 
 	// found encoded byte sequence for '\n' in buffer
 	// -> decode input sequence into outBuffer
-	sz, err := l.decode(idx + len(l.nl))
+	sz, err := r.decode(idx + len(r.nl))
 	if err != nil {
 		logp.Err("Error decoding line: %s", err)
 		// In case of error increase size by unencoded length
-		sz = idx + len(l.nl)
+		sz = idx + len(r.nl)
 	}
 
 	// consume transformed bytes from input buffer
-	err = l.inBuffer.Advance(sz)
-	l.inBuffer.Reset()
+	err = r.inBuffer.Advance(sz)
+	r.inBuffer.Reset()
 
 	// continue scanning input buffer from last position + 1
-	l.inOffset = idx + 1 - sz
-	if l.inOffset < 0 {
-		// fix inOffset if '\n' has encoding > 8bits + fill line has been decoded
-		l.inOffset = 0
+	r.inOffset = idx + 1 - sz
+	if r.inOffset < 0 {
+		// fix inOffset if '\n' has encoding > 8bits + firl line has been decoded
+		r.inOffset = 0
 	}
 
 	return err
 }
 
-func (l *Line) decode(end int) (int, error) {
+func (r *Reader) decode(end int) (int, error) {
 	var err error
 	buffer := make([]byte, 1024)
-	inBytes := l.inBuffer.Bytes()
+	inBytes := r.inBuffer.Bytes()
 	start := 0
 
 	for start < end {
 		var nDst, nSrc int
 
-		nDst, nSrc, err = l.decoder.Transform(buffer, inBytes[start:end], false)
+		nDst, nSrc, err = r.decoder.Transform(buffer, inBytes[start:end], false)
 		if err != nil {
 			// Check if error is different from destination buffer too short
 			if err != transform.ErrShortDst {
-				l.outBuffer.Write(inBytes[0:end])
+				r.outBuffer.Write(inBytes[0:end])
 				start = end
 				break
 			}
@@ -169,9 +169,9 @@ func (l *Line) decode(end int) (int, error) {
 		}
 
 		start += nSrc
-		l.outBuffer.Write(buffer[:nDst])
+		r.outBuffer.Write(buffer[:nDst])
 	}
 
-	l.byteCount += start
+	r.byteCount += start
 	return start, err
 }

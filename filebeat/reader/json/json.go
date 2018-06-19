@@ -1,11 +1,12 @@
-package reader
+package json
 
 import (
 	"bytes"
-	"encoding/json"
+	gojson "encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/filebeat/reader"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/jsontransform"
@@ -13,18 +14,18 @@ import (
 )
 
 type JSON struct {
-	reader Reader
-	cfg    *JSONConfig
+	reader reader.Reader
+	cfg    *Config
 }
 
 // NewJSONReader creates a new reader that can decode JSON.
-func NewJSON(r Reader, cfg *JSONConfig) *JSON {
+func New(r reader.Reader, cfg *Config) *JSON {
 	return &JSON{reader: r, cfg: cfg}
 }
 
 // decodeJSON unmarshals the text parameter into a MapStr and
 // returns the new text column if one was requested.
-func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
+func (r *JSON) decode(text []byte) ([]byte, common.MapStr) {
 	var jsonFields map[string]interface{}
 
 	err := unmarshal(text, &jsonFields)
@@ -64,7 +65,7 @@ func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 // unmarshal is equivalent with json.Unmarshal but it converts numbers
 // to int64 where possible, instead of using always float64.
 func unmarshal(text []byte, fields *map[string]interface{}) error {
-	dec := json.NewDecoder(bytes.NewReader(text))
+	dec := gojson.NewDecoder(bytes.NewReader(text))
 	dec.UseNumber()
 	err := dec.Decode(fields)
 	if err != nil {
@@ -75,14 +76,14 @@ func unmarshal(text []byte, fields *map[string]interface{}) error {
 }
 
 // Next decodes JSON and returns the filled Line object.
-func (r *JSON) Next() (Message, error) {
+func (r *JSON) Next() (reader.Message, error) {
 	message, err := r.reader.Next()
 	if err != nil {
 		return message, err
 	}
 
 	var fields common.MapStr
-	message.Content, fields = r.decodeJSON(message.Content)
+	message.Content, fields = r.decode(message.Content)
 	message.AddFields(common.MapStr{"json": fields})
 	return message, nil
 }
@@ -95,7 +96,7 @@ func createJSONError(message string) common.MapStr {
 // respecting the KeysUnderRoot and OverwriteKeys configuration options.
 // If MessageKey is defined, the Text value from the event always
 // takes precedence.
-func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string, config JSONConfig) time.Time {
+func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string, config Config) time.Time {
 	// The message key might have been modified by multiline
 	if len(config.MessageKey) > 0 && text != nil {
 		jsonFields[config.MessageKey] = *text

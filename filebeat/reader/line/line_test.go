@@ -1,6 +1,6 @@
 // +build !integration
 
-package reader
+package line
 
 import (
 	"bytes"
@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/transform"
 
-	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/reader/encode/encoding"
 )
 
 // Sample texts are from http://www.columbia.edu/~kermit/utf8.html
@@ -51,7 +51,7 @@ func TestReaderEncodings(t *testing.T) {
 		}
 
 		// create line reader
-		reader, err := NewLine(buffer, codec, 1024)
+		reader, err := New(buffer, codec, 1024)
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
 			continue
@@ -142,7 +142,7 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
 	codec, _ := encoding.Plain(buffer)
-	reader, err := NewLine(buffer, codec, buffer.Len())
+	reader, err := New(buffer, codec, buffer.Len())
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}

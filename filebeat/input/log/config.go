@@ -9,8 +9,9 @@ import (
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/reader/json"
+	"github.com/elastic/beats/filebeat/reader/multiline"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
@@ -78,11 +79,11 @@ type config struct {
 	ScanOrder  string `config:"scan.order"`
 	ScanSort   string `config:"scan.sort"`
 
-	ExcludeLines []match.Matcher         `config:"exclude_lines"`
-	IncludeLines []match.Matcher         `config:"include_lines"`
-	MaxBytes     int                     `config:"max_bytes" validate:"min=0,nonzero"`
-	Multiline    *reader.MultilineConfig `config:"multiline"`
-	JSON         *reader.JSONConfig      `config:"json"`
+	ExcludeLines []match.Matcher   `config:"exclude_lines"`
+	IncludeLines []match.Matcher   `config:"include_lines"`
+	MaxBytes     int               `config:"max_bytes" validate:"min=0,nonzero"`
+	Multiline    *multiline.Config `config:"multiline"`
+	JSON         *json.Config      `config:"json"`
 
 	// Hidden on purpose, used by the docker input:
 	DockerJSON *struct {
