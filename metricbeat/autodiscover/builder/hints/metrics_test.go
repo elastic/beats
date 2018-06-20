@@ -114,7 +114,7 @@ func TestGenerateHints(t *testing.T) {
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"modules": "[{\"enabled\":true,\"metricsets\":[\"default\"],\"module\":\"mockmoduledefaults\",\"period\":\"1m\",\"timeout\":\"3s\"}]",
+						"raw": "{\"enabled\":true,\"metricsets\":[\"default\"],\"module\":\"mockmoduledefaults\",\"period\":\"1m\",\"timeout\":\"3s\"}",
 					},
 				},
 			},

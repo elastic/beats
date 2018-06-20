@@ -135,7 +135,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"inputs": "[{\"containers\":{\"ids\":[\"${data.container.id}\"]},\"multiline\":{\"negate\":\"true\",\"pattern\":\"^test\"},\"type\":\"docker\"}]",
+						"raw": "[{\"containers\":{\"ids\":[\"${data.container.id}\"]},\"multiline\":{\"negate\":\"true\",\"pattern\":\"^test\"},\"type\":\"docker\"}]",
 					},
 				},
 			},

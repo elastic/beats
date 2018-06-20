@@ -66,12 +66,22 @@ func getStringAsList(input string) []string {
 	return list
 }
 
-// GetHintAsConfig can read a hint in the form of a stringified JSON and return a common.MapStr
-func GetHintAsConfig(hints common.MapStr, key, config string) []common.MapStr {
-	if str := GetHintString(hints, key, config); str != "" {
+// GetHintAsConfigs can read a hint in the form of a stringified JSON and return a common.MapStr
+func GetHintAsConfigs(hints common.MapStr, key string) []common.MapStr {
+	if str := GetHintString(hints, key, "raw"); str != "" {
+		// check if it is a single config
+		if str[0] != '[' {
+			cfg := common.MapStr{}
+			if err := json.Unmarshal([]byte(str), &cfg); err != nil {
+				logp.Debug("autodiscover.builder", "unable to unmarshal json due to error: %v", err)
+				return nil
+			}
+			return []common.MapStr{cfg}
+		}
+
 		cfg := []common.MapStr{}
 		if err := json.Unmarshal([]byte(str), &cfg); err != nil {
-			logp.Debug("autodiscover.builder", "unable to unmarshall json due to error: %v", err)
+			logp.Debug("autodiscover.builder", "unable to unmarshal json due to error: %v", err)
 			return nil
 		}
 		return cfg

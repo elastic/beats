@@ -22,7 +22,6 @@ const (
 	multiline    = "multiline"
 	includeLines = "include_lines"
 	excludeLines = "exclude_lines"
-	inputs       = "inputs"
 )
 
 // validModuleNames to sanitize user input
@@ -71,6 +70,19 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		return []*common.Config{config}
 	}
 
+	inputConfig := l.getInputs(hints)
+	if inputConfig != nil {
+		configs := []*common.Config{}
+		for _, cfg := range inputConfig {
+			if config, err := common.NewConfigFrom(cfg); err == nil {
+				configs = append(configs, config)
+			}
+		}
+		logp.Debug("hints.builder", "generated config %+v", configs)
+		// Apply information in event to the template to generate the final config
+		return template.ApplyConfigTemplate(event, configs)
+	}
+
 	tempCfg := common.MapStr{}
 	mline := l.getMultiline(hints)
 	if len(mline) != 0 {
@@ -107,21 +119,6 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		}
 		config, _ = common.NewConfigFrom(moduleConf)
 	}
-
-	inputConfig := l.getInputs(hints)
-	if inputConfig != nil {
-		configs := []*common.Config{}
-		for _, cfg := range inputConfig {
-			if config, err := common.NewConfigFrom(cfg); err == nil {
-				configs = append(configs, config)
-			}
-		}
-		logp.Debug("hints.builder", "generated config %+v", configs)
-		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
-
-	}
-
 	logp.Debug("hints.builder", "generated config %+v", config)
 
 	// Apply information in event to the template to generate the final config
@@ -147,7 +144,7 @@ func (l *logHints) getModule(hints common.MapStr) string {
 }
 
 func (l *logHints) getInputs(hints common.MapStr) []common.MapStr {
-	return builder.GetHintAsConfig(hints, l.Key, inputs)
+	return builder.GetHintAsConfigs(hints, l.Key)
 }
 
 type filesetConfig struct {

@@ -27,7 +27,6 @@ const (
 	period     = "period"
 	timeout    = "timeout"
 	ssl        = "ssl"
-	modules    = "modules"
 
 	defaultTimeout = "3s"
 	defaultPeriod  = "1m"
@@ -184,5 +183,5 @@ func (m *metricHints) getSSLConfig(hints common.MapStr) common.MapStr {
 }
 
 func (m *metricHints) getModules(hints common.MapStr) []common.MapStr {
-	return builder.GetHintAsConfig(hints, m.Key, modules)
+	return builder.GetHintAsConfigs(hints, m.Key)
 }
