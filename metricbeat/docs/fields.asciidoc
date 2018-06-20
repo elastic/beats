@@ -3198,7 +3198,7 @@ Network interface name.
 [float]
 == in fields
 
-Incoming network stats.
+Incoming network stats per second.
 
 
 
@@ -3247,7 +3247,7 @@ Total number of incoming packets.
 [float]
 == out fields
 
-Outgoing network stats.
+Outgoing network stats per second.
 
 
 
@@ -3284,6 +3284,104 @@ Total errors on outgoing packets.
 --
 
 *`docker.network.out.packets`*::
++
+--
+type: long
+
+Total number of outgoing packets.
+
+
+--
+
+[float]
+== inbound fields
+
+Incoming network stats since the container started.
+
+
+
+*`docker.network.inbound.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of incoming bytes.
+
+
+--
+
+*`docker.network.inbound.dropped`*::
++
+--
+type: long
+
+Total number of dropped incoming packets.
+
+
+--
+
+*`docker.network.inbound.errors`*::
++
+--
+type: long
+
+Total errors on incoming packets.
+
+
+--
+
+*`docker.network.inbound.packets`*::
++
+--
+type: long
+
+Total number of incoming packets.
+
+
+--
+
+[float]
+== outbound fields
+
+Outgoing network stats since the container started.
+
+
+
+*`docker.network.outbound.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of outgoing bytes.
+
+
+--
+
+*`docker.network.outbound.dropped`*::
++
+--
+type: long
+
+Total number of dropped outgoing packets.
+
+
+--
+
+*`docker.network.outbound.errors`*::
++
+--
+type: long
+
+Total errors on outgoing packets.
+
+
+--
+
+*`docker.network.outbound.packets`*::
 +
 --
 type: long
@@ -6419,6 +6517,270 @@ Kibana module
 
 
 [float]
+== stats fields
+
+Kibana stats and run-time metrics.
+
+
+
+*`kibana.stats.cluster_uuid`*::
++
+--
+type: keyword
+
+UUID of the Elasticsearch cluster to which Kibana connects.
+
+
+--
+
+*`kibana.stats.name`*::
++
+--
+type: keyword
+
+Kibana instance name.
+
+
+--
+
+*`kibana.stats.uuid`*::
++
+--
+type: keyword
+
+Kibana instance uuid.
+
+
+--
+
+*`kibana.stats.version.number`*::
++
+--
+type: keyword
+
+Kibana version number.
+
+
+--
+
+*`kibana.stats.status.overall.state`*::
++
+--
+type: keyword
+
+Kibana overall state.
+
+
+--
+
+[float]
+== process fields
+
+Kibana process metrics.
+
+
+
+[float]
+== mem fields
+
+Memory usage metrics of the Kibana instance.
+
+
+
+*`kibana.stats.process.mem.heap.max.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total amount of heap memory used by V8.
+
+
+--
+
+*`kibana.stats.process.mem.heap.used.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Amount of memory in use by V8.
+
+
+--
+
+*`kibana.stats.process.mem.resident_set_size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The amount of space occupied in main memory for the process. Includes heap, code segment, and stack.
+
+
+--
+
+*`kibana.stats.process.mem.external.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Memory usage of C++ objects bound to JavaScript objects managed by V8.
+
+
+--
+
+*`kibana.stats.process.pid`*::
++
+--
+type: long
+
+Process ID of the Kibana instance.
+
+
+--
+
+*`kibana.stats.process.uptime.ms`*::
++
+--
+type: long
+
+Amount of time that the Kibana process has been running in milliseconds.
+
+
+--
+
+[float]
+== response_times fields
+
+HTTP Server response time metrics
+
+
+
+*`kibana.stats.response_times.avg.ms`*::
++
+--
+type: long
+
+Accumulated averages for response times, for all responses in a 5-second time window.
+
+
+--
+
+*`kibana.stats.response_times.max.ms`*::
++
+--
+type: long
+
+Accumulated maximums for response times, for all responses in a 5-second time window.
+
+
+--
+
+[float]
+== requests fields
+
+HTTP Server request metrics
+
+
+
+*`kibana.stats.requests.status_codes`*::
++
+--
+type: object
+
+Key-value pairs for each status code sent by the server, and the number of times it sent that code.
+
+
+--
+
+*`kibana.stats.requests.total`*::
++
+--
+type: long
+
+Total number of requests sent by the server.
+
+
+--
+
+*`kibana.stats.requests.disconnects`*::
++
+--
+type: long
+
+Total number of client disconnects encountered by the server.
+
+
+--
+
+*`kibana.stats.concurrent_connections`*::
++
+--
+type: long
+
+Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request mulitple server assets at once, and they can re-use established connections.
+
+
+--
+
+[float]
+== sockets fields
+
+HTTP Web Sockets metrics
+
+
+
+[float]
+== http fields
+
+Web Sockets over plaintext HTTP
+
+
+
+*`kibana.stats.sockets.http.total`*::
++
+--
+type: long
+
+Number of HTTP web socket connections established
+
+
+--
+
+[float]
+== https fields
+
+Web Sockets over encrypted HTTPS
+
+
+
+*`kibana.stats.sockets.https.total`*::
++
+--
+type: long
+
+Number of HTTPS web socket connections established
+
+
+--
+
+*`kibana.stats.event_loop_delay`*::
++
+--
+type: long
+
+Node event loop delay calculated with internal benchmarking.
+
+
+--
+
+[float]
 == status fields
 
 Status fields
@@ -7640,6 +8002,16 @@ Container ready status
 type: integer
 
 Container restarts count
+
+
+--
+
+*`kubernetes.container.status.reason`*::
++
+--
+type: keyword
+
+Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or termination (Completed, ContainerCannotRun, Error, OOMKilled) reason.
 
 
 --
@@ -11467,6 +11839,221 @@ Time at which these statistics were last reset.
 
 --
 
+[float]
+== statement fields
+
+One document per query per user per database, showing information related invocation of that query, such as cpu usage and total time. Collected by querying pg_stat_statements.
+
+
+
+*`postgresql.statement.user.id`*::
++
+--
+type: long
+
+OID of the user logged into the backend that ran the query.
+
+
+--
+
+*`postgresql.statement.database.oid`*::
++
+--
+type: long
+
+OID of the database the query was run on.
+
+
+--
+
+*`postgresql.statement.query.id`*::
++
+--
+type: long
+
+ID of the statement.
+
+
+--
+
+*`postgresql.statement.query.text`*::
++
+--
+Query text
+
+
+--
+
+*`postgresql.statement.query.calls`*::
++
+--
+type: long
+
+Number of times the query has been run.
+
+
+--
+
+*`postgresql.statement.query.rows`*::
++
+--
+type: long
+
+Total number of rows returned by query.
+
+
+--
+
+*`postgresql.statement.time.total`*::
++
+--
+type: long
+
+Total number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.min`*::
++
+--
+type: long
+
+Minimum number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.max`*::
++
+--
+type: long
+
+Maximum number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.mean`*::
++
+--
+type: long
+
+Mean number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.stddev`*::
++
+--
+type: long
+
+Population standard deviation of time spent running query, in milliseconds.
+
+
+--
+
+*`postgresql.statement.memory.shared.hit`*::
++
+--
+type: long
+
+Total number of shared block cache hits by the query.
+
+
+--
+
+*`postgresql.statement.memory.shared.read`*::
++
+--
+type: long
+
+Total number of shared block cache read by the query.
+
+
+--
+
+*`postgresql.statement.memory.shared.dirtied`*::
++
+--
+type: long
+
+Total number of shared block cache dirtied by the query.
+
+
+--
+
+*`postgresql.statement.memory.shared.written`*::
++
+--
+type: long
+
+Total number of shared block cache written by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.hit`*::
++
+--
+type: long
+
+Total number of local block cache hits by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.read`*::
++
+--
+type: long
+
+Total number of local block cache read by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.dirtied`*::
++
+--
+type: long
+
+Total number of local block cache dirtied by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.written`*::
++
+--
+type: long
+
+Total number of local block cache written by the query.
+
+
+--
+
+*`postgresql.statement.memory.temp.read`*::
++
+--
+type: long
+
+Total number of temp block cache read by the query.
+
+
+--
+
+*`postgresql.statement.memory.temp.written`*::
++
+--
+type: long
+
+Total number of temp block cache written by the query.
+
+
+--
+
 [[exported-fields-prometheus]]
 == Prometheus fields
 
@@ -14696,7 +15283,7 @@ The environment variables used to start the process. The data is available on Fr
 CPU-specific statistics per process.
 
 
-*`system.process.cpu.user`*::
+*`system.process.cpu.user.ticks`*::
 +
 --
 type: long
@@ -14740,7 +15327,7 @@ The percentage of CPU time spent by the process since the last event. This value
 
 --
 
-*`system.process.cpu.system`*::
+*`system.process.cpu.system.ticks`*::
 +
 --
 type: long

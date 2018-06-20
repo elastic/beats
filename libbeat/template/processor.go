@@ -14,6 +14,7 @@ type Processor struct {
 
 var (
 	defaultScalingFactor = 1000
+	defaultIgnoreAbove   = 1024
 )
 
 // Process recursively processes the given fields and writes the template in the given output
@@ -150,11 +151,17 @@ func (p *Processor) keyword(f *common.Field) common.MapStr {
 	defaultFields = append(defaultFields, fullName)
 
 	property["type"] = "keyword"
-	property["ignore_above"] = 1024
+
+	switch f.IgnoreAbove {
+	case 0: // Use libbeat default
+		property["ignore_above"] = defaultIgnoreAbove
+	case -1: // Use ES default
+	default: // Use user value
+		property["ignore_above"] = f.IgnoreAbove
+	}
 
 	if p.EsVersion.IsMajor(2) {
 		property["type"] = "string"
-		property["ignore_above"] = 1024
 		property["index"] = "not_analyzed"
 	}
 
@@ -243,7 +250,7 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 	case "keyword":
 		dynProperties["type"] = f.ObjectType
 		addDynamicTemplate(f, dynProperties, matchType("string"))
-	case "long", "double":
+	case "byte", "double", "float", "long", "short":
 		dynProperties["type"] = f.ObjectType
 		addDynamicTemplate(f, dynProperties, matchType(f.ObjectType))
 	}

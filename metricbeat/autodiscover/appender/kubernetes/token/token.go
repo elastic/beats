@@ -32,10 +32,13 @@ func NewTokenAppender(cfg *common.Config) (autodiscover.Appender, error) {
 		return nil, fmt.Errorf("unable to unpack config due to error: %v", err)
 	}
 
-	// Attempt to create a condition. If fails then report error
-	cond, err := processors.NewCondition(conf.ConditionConfig)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create condition due to error: %v", err)
+	var cond *processors.Condition
+	if conf.ConditionConfig != nil {
+		// Attempt to create a condition. If fails then report error
+		cond, err = processors.NewCondition(conf.ConditionConfig)
+		if err != nil {
+			return nil, fmt.Errorf("unable to create condition due to error: %v", err)
+		}
 	}
 	appender := tokenAppender{
 		TokenPath: conf.TokenPath,

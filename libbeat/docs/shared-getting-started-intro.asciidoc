@@ -1,0 +1,13 @@
+
+To get started with your own {beatname_uc} setup, install and configure these
+related products:
+
+* Elasticsearch for storing and indexing the data.
+* Kibana for the UI.
+* Logstash (optional) for parsing and enhancing the data.
+
+See {stack-ov}/get-started-elastic-stack.html[Getting started with the {stack}]
+for more information.
+
+After installing the {stack}, read the following topics to learn how to
+install, configure, and run {beatname_uc}:

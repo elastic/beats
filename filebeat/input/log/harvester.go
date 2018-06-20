@@ -31,9 +31,15 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/harvester/encoding"
-	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/reader"
+	"github.com/elastic/beats/filebeat/reader/docker_json"
+	"github.com/elastic/beats/filebeat/reader/encode"
+	"github.com/elastic/beats/filebeat/reader/encode/encoding"
+	"github.com/elastic/beats/filebeat/reader/json"
+	"github.com/elastic/beats/filebeat/reader/limit"
+	"github.com/elastic/beats/filebeat/reader/multiline"
+	"github.com/elastic/beats/filebeat/reader/strip_newline"
 	"github.com/elastic/beats/filebeat/util"
 )
 
@@ -267,6 +273,7 @@ func (h *Harvester) Run() error {
 		// This is important in case sending is not successful so on shutdown
 		// the old offset is reported
 		state := h.getState()
+		startingOffset := state.Offset
 		state.Offset += int64(message.Bytes)
 
 		// Create state event
@@ -281,7 +288,7 @@ func (h *Harvester) Run() error {
 		if !message.IsEmpty() && h.shouldExportLine(text) {
 			fields := common.MapStr{
 				"source": state.Source,
-				"offset": state.Offset, // Offset here is the offset before the starting char.
+				"offset": startingOffset, // Offset here is the offset before the starting char.
 			}
 			fields.DeepUpdate(message.Fields)
 
@@ -296,7 +303,7 @@ func (h *Harvester) Run() error {
 			}
 
 			if h.config.JSON != nil && len(jsonFields) > 0 {
-				ts := reader.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
+				ts := json.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
 				if !ts.IsZero() {
 					// there was a `@timestamp` key in the event, so overwrite
 					// the resulting timestamp
@@ -528,28 +535,28 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = reader.NewEncode(h.log, h.encoding, h.config.BufferSize)
+	r, err = encode.New(h.log, h.encoding, h.config.BufferSize)
 	if err != nil {
 		return nil, err
 	}
 
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = reader.NewDockerJSON(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial)
+		r = docker_json.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial)
 	}
 
 	if h.config.JSON != nil {
-		r = reader.NewJSON(r, h.config.JSON)
+		r = json.New(r, h.config.JSON)
 	}
 
-	r = reader.NewStripNewline(r)
+	r = strip_newline.New(r)
 
 	if h.config.Multiline != nil {
-		r, err = reader.NewMultiline(r, "\n", h.config.MaxBytes, h.config.Multiline)
+		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return reader.NewLimit(r, h.config.MaxBytes), nil
+	return limit.New(r, h.config.MaxBytes), nil
 }

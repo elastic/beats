@@ -7,6 +7,8 @@
 <titleabbrev>TCP</titleabbrev>
 ++++
 
+experimental[]
+
 Use the `TCP` input to read events over TCP.
 
 Example configuration:

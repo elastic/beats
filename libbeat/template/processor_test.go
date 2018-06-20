@@ -131,6 +131,26 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
+			output: p.keyword(&common.Field{Type: "keyword", IgnoreAbove: 256}),
+			expected: common.MapStr{
+				"type":         "keyword",
+				"ignore_above": 256,
+			},
+		},
+		{
+			output: p.keyword(&common.Field{Type: "keyword", IgnoreAbove: -1}),
+			expected: common.MapStr{
+				"type": "keyword",
+			},
+		},
+		{
+			output: p.keyword(&common.Field{Type: "keyword"}),
+			expected: common.MapStr{
+				"type":         "keyword",
+				"ignore_above": 1024,
+			},
+		},
+		{
 			output: p.text(&common.Field{Type: "text", MultiFields: common.Fields{
 				common.Field{Name: "raw", Type: "keyword"},
 				common.Field{Name: "indexed", Type: "text"},
@@ -326,6 +346,28 @@ func TestDynamicTemplate(t *testing.T) {
 				},
 			},
 		},
+	}
+
+	for _, numericType := range []string{"byte", "double", "float", "long", "short"} {
+		gen := struct {
+			field    common.Field
+			expected common.MapStr
+		}{
+			field: common.Field{
+				Type: "object", ObjectType: numericType,
+				Name: "somefield", ObjectTypeMappingType: "long",
+			},
+			expected: common.MapStr{
+				"somefield": common.MapStr{
+					"mapping": common.MapStr{
+						"type": numericType,
+					},
+					"match_mapping_type": "long",
+					"path_match":         "somefield.*",
+				},
+			},
+		}
+		tests = append(tests, gen)
 	}
 
 	for _, test := range tests {

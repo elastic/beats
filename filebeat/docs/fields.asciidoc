@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
+* <<exported-fields-elasticsearch>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
@@ -782,6 +783,71 @@ Container name.
 type: object
 
 Image labels.
+
+
+--
+
+[[exported-fields-elasticsearch]]
+== elasticsearch fields
+
+elasticsearch Module
+
+
+
+[float]
+== elasticsearch fields
+
+
+
+
+[float]
+== gc fields
+
+
+
+
+*`elasticsearch.gc.relative_process_timestamp_secs`*::
++
+--
+type: float
+
+Garbage collection threads total stop time seconds.
+
+
+--
+
+*`elasticsearch.gc.threads_total_stop_time_secs`*::
++
+--
+type: float
+
+Garbage collection threads total stop time seconds.
+
+
+--
+
+*`elasticsearch.gc.stopping_threads_time_secs`*::
++
+--
+type: float
+
+Time took to stop threads seconds.
+
+
+--
+
+[float]
+== server fields
+
+
+
+
+*`elasticsearch.server.component`*::
++
+--
+type: keyword
+
+Elasticsearch component.
 
 
 --
@@ -1976,6 +2042,26 @@ The severity of the event.
 type: keyword
 
 Service name.
+
+
+--
+
+*`log.level`*::
++
+--
+type: keyword
+
+Logging level.
+
+
+--
+
+*`event.created`*::
++
+--
+type: date
+
+event.created contains the date on which the event was created. In case of log events this is when the log line was read by Filebeat. In comparison @timestamp is the processed timestamp from the log line. If both are identical only @timestamp should be used.
 
 
 --

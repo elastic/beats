@@ -1,0 +1,43 @@
+[
+        {
+        "_index": "test-filebeat-modules",
+        "_type": "doc",
+        "_id": "OJjlbGMBLvTnJwyR-YUx",
+        "_score": 1,
+        "_source": {
+            "offset": 209,
+            "log": {
+                "level": "INFO"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "event": {
+                "created": "2018-06-13T08:12:36.737Z"
+            },
+            "source": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/elasticsearch/log/test/test.log",
+            "fileset": {
+                "module": "elasticsearch",
+                "name": "log"
+            },
+            "message": " [vWNJsZ3] [test-filebeat-modules] creating index, cause [auto(bulk api)], templates [test-filebeat-modules], shards [5]/[1], mappings [doc]",
+            "input": {
+                "type": "log"
+            },
+            "@timestamp": "2018-05-17T08:29:12.177Z",
+            "elasticsearch": {
+                "server": {
+                    "component": "o.e.c.m.MetaDataCreateIndexService"
+                }
+            },
+            "beat": {
+                "hostname": "ruflin",
+                "name": "ruflin",
+                "version": "7.0.0-alpha1"
+            },
+            "service": {
+                "name": "elasticsearch"
+            }
+        }
+    }
+]

@@ -23,7 +23,7 @@
           description: >
             Service response parameters.
           fields:
-            - name: status
+            - name: status_code
               type: integer
               description: >
                 Response status code.
@@ -81,6 +81,11 @@
                 - name: us
                   type: long
                   description: Duration in microseconds
+
+            - name: content.us
+              type: long
+              description:
+                Time required to retrieved the content in micro seconds.
 
             - name: total
               type: group

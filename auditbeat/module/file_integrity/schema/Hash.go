@@ -281,8 +281,25 @@ func (rcv *Hash) Blake2b512Length() int {
 	return 0
 }
 
+func (rcv *Hash) Xx64(j int) int8 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(34))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.GetInt8(a + flatbuffers.UOffsetT(j*1))
+	}
+	return 0
+}
+
+func (rcv *Hash) Xx64Length() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(34))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
 func HashStart(builder *flatbuffers.Builder) {
-	builder.StartObject(15)
+	builder.StartObject(16)
 }
 func HashAddMd5(builder *flatbuffers.Builder, md5 flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(md5), 0)
@@ -372,6 +389,12 @@ func HashAddBlake2b512(builder *flatbuffers.Builder, blake2b512 flatbuffers.UOff
 	builder.PrependUOffsetTSlot(14, flatbuffers.UOffsetT(blake2b512), 0)
 }
 func HashStartBlake2b512Vector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(1, numElems, 1)
+}
+func HashAddXx64(builder *flatbuffers.Builder, xx64 flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(15, flatbuffers.UOffsetT(xx64), 0)
+}
+func HashStartXx64Vector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(1, numElems, 1)
 }
 func HashEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {

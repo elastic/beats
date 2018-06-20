@@ -373,8 +373,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit
-Version: v0.2.1
-Revision: 55225d06b15c74082f9a7af75aa4284dbe48d20a
+Version: v0.3.0
+Revision: c18782ee4f957de48620718231d20ca12c8dc4e9
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-libaudit/LICENSE.txt:
 --------------------------------------------------------------------
@@ -1574,6 +1574,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/OneOfOne/xxhash
+Version: v1.2.2
+Revision: 6def279d2ce6c81a79dd1c1be580f03bb216fb8a
+License type (autodetected): Apache-2.0
+./vendor/github.com/OneOfOne/xxhash/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: github.com/opencontainers/go-digest

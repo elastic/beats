@@ -20,7 +20,7 @@ var (
 
 	mapping = &p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
-			"kube_node_info":                            p.Metric(""),
+			"kube_node_info":                            p.InfoMetric(),
 			"kube_node_status_allocatable_pods":         p.Metric("pod.allocatable.total"),
 			"kube_node_status_capacity_pods":            p.Metric("pod.capacity.total"),
 			"kube_node_status_capacity_memory_bytes":    p.Metric("memory.capacity.bytes"),
@@ -28,7 +28,7 @@ var (
 			"kube_node_status_capacity_cpu_cores":       p.Metric("cpu.capacity.cores"),
 			"kube_node_status_allocatable_cpu_cores":    p.Metric("cpu.allocatable.cores"),
 			"kube_node_spec_unschedulable":              p.BooleanMetric("status.unschedulable"),
-			"kube_node_status_ready":                    p.LabelMetric("status.ready", "condition"),
+			"kube_node_status_ready":                    p.LabelMetric("status.ready", "condition", false),
 		},
 
 		Labels: map[string]p.LabelMap{

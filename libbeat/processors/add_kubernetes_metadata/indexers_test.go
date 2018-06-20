@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
 
-var metagen = kubernetes.NewMetaGenerator([]string{}, []string{}, []string{}, false)
+var metagen, _ = kubernetes.NewMetaGenerator(common.NewConfig())
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
@@ -60,7 +60,8 @@ func TestPodIndexer(t *testing.T) {
 func TestPodUIDIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	metaGenWithPodUID := kubernetes.NewMetaGenerator([]string{}, []string{}, []string{}, true)
+	metaGenWithPodUID, err := kubernetes.NewMetaGenerator(common.NewConfig())
+	assert.Nil(t, err)
 
 	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metaGenWithPodUID)
 	assert.Nil(t, err)
@@ -89,7 +90,6 @@ func TestPodUIDIndexer(t *testing.T) {
 	expected := common.MapStr{
 		"pod": common.MapStr{
 			"name": "testpod",
-			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 		},
 		"namespace": "testns",
 		"labels": common.MapStr{
@@ -220,7 +220,15 @@ func TestFilteredGenMeta(t *testing.T) {
 	rawAnnotations := indexers[0].Data["annotations"]
 	assert.Nil(t, rawAnnotations)
 
-	filteredGen := kubernetes.NewMetaGenerator([]string{"a"}, []string{"foo"}, []string{}, false)
+	config, err := common.NewConfigFrom(map[string]interface{}{
+		"include_annotations": []string{"a"},
+		"include_labels":      []string{"foo"},
+	})
+	assert.Nil(t, err)
+
+	filteredGen, err := kubernetes.NewMetaGenerator(config)
+	assert.Nil(t, err)
+
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 
@@ -251,7 +259,14 @@ func TestFilteredGenMeta(t *testing.T) {
 func TestFilteredGenMetaExclusion(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	filteredGen := kubernetes.NewMetaGenerator([]string{}, []string{}, []string{"x"}, false)
+	config, err := common.NewConfigFrom(map[string]interface{}{
+		"exclude_labels": []string{"x"},
+	})
+	assert.Nil(t, err)
+
+	filteredGen, err := kubernetes.NewMetaGenerator(config)
+	assert.Nil(t, err)
+
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 

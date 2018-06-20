@@ -32,6 +32,8 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 
 - Made the URL field of heartbeat aggregatable. {pull}6263[6263]
 - Use `match.Matcher` for checking heartbeat response bodies with regular expressions. {pull}6539[6539]
+- Rename http.response.status to http.response.status_code to align with ECS. {pull}7274[7274]
+- Remove `type` field as not needed. {pull}7307[7307]
 
 *Metricbeat*
 
@@ -44,6 +46,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fixed typo in values for `state_container` `status.phase`, from `terminate` to `terminated`. {pull}6916[6916]
 - RabbitMQ management plugin path is now configured at the module level instead of having to do it in each of the metricsets. New `management_path_prefix` option should be used now {pull}7074[7074]
 - RabbitMQ node metricset only collects metrics of the instance it connects to, `node.collect: cluster` can be used to collect all nodes as before. {issue}6556[6556] {pull}6971[6971]
+- Change http/server metricset to put events by default under http.server and prefix config options with server.. {pull}7100[7100]
 
 *Packetbeat*
 
@@ -62,6 +65,12 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
 - Fix error if lz4 compression is used with the kafka output. {pull}7025[7025]
 - Preserve the event when source matching fails in `add_docker_metadata`. {pull}7133[7133]
+- Negotiate Docker API version from our client instead of using a hardcoded one. {pull}7165[7165]
+- Fix delays on autodiscovery events handling caused by blocking runner stops. {pull}7170[7170]
+- Error out on invalid Autodiscover template conditions settings. {pull}7200[7200]
+- Do not emit Kubernetes autodiscover events for Pods without IP address. {pull}7235[7235]
+- Allow to override the `ignore_above` option when defining new field with the type keyword. {pull}7238[7238]
+- Allow index-pattern only setup when setup.dashboards.only_index=true. {pull}7285[7285]
 
 *Auditbeat*
 
@@ -69,6 +78,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
 - Fixed parsing of AppArmor audit messages. {pull}6978[6978]
 - Allow `auditbeat setup` to run without requiring elevated privileges for the audit client. {issue}7111[7111]
+- Fix goroutine leak that occured when the auditd module was stopped. {pull}7163[7163]
 
 *Filebeat*
 
@@ -78,6 +88,11 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Commit registry writes to stable storage to avoid corrupt registry files. {issue}6792[6792]
 - Fix a data race between stopping and starting of the harverters. {issue}#6879[6879]
 - Fix a parsing issue in the syslog input for RFC3339 timestamp and time with nanoseconds. {pull}7046[7046]
+- Comply with PostgreSQL database name format {pull}7198[7198]
+- Fix an issue with an overflowing wait group when using the TCP input. {issue}7202[7202]
+- Keep different registry entry per container stream to avoid wrong offsets. {issue}7281[7281]
+- Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
+- Fix offset field pointing at end of a line. {issue}6514[6514]
 
 *Heartbeat*
 - Fix race due to updates of shared a map, that was not supposed to be shared between multiple go-routines. {issue}6616[6616]
@@ -98,10 +113,14 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - disk reads and write count metrics in RabbitMQ queue metricset made optional. {issue}6876[6876]
 - Add mapping for docker metrics per cpu. {pull}6843[6843]
 - Ensure canonical naming for JMX beans is disabled in Jolokia module. {pull}7047[7047]
+- Fix field mapping for the system process CPU ticks fields. {pull}7230[7230]
+- Fix Windows service metricset when using a 32-bit binary on a 64-bit OS. {pull}7294[7294]
+- Fix Jolokia attribute mapping when using wildcards and MBean names with multiple properties. {pull}7321[7321]
 
 *Packetbeat*
 
 - Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
+- Fix missing type for `http.response.body` field. {pull}7169[7169]
 
 *Winlogbeat*
 
@@ -138,6 +157,10 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add default_fields to Elasticsearch template when connecting to Elasticsearch >= 7.0. {pull}7015[7015]
 - Add support for loading a template.json file directly instead of using fields.yml. {pull}7039[7039]
 - Add support for keyword multifields in field.yml. {pull}7131[7131]
+- Add dissect processor. {pull}6925[6925]
+- Add experimental Jolokia Discovery autodiscover provider. {pull}7141[7141]
+- Add owner object info to Kubernetes metadata. {pull}7231[7231]
+- Add beat export dashboard command. {pull}7239[7239]
 
 *Auditbeat*
 
@@ -145,6 +168,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Updated syscall tables for Linux 4.16. {pull}6978[6978]
 - Added better error messages for when the auditd module fails due to the
   Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
+- Added XXH64 hash option for file integrity checks. {pull}7311[7311]
 
 *Filebeat*
 
@@ -168,6 +192,8 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Support MySQL 5.7.19 by mysql/slowlog {pull}6969[6969]
 - Correctly join partial log lines when using `docker` input. {pull}6967[6967]
 - Add support for TLS with client authentication to the TCP input {pull}7056[7056]
+- Converted part of pipeline from treafik/access metricSet to dissect to improve efficeny. {pull}7209[7209]
+- Add GC fileset to the Elasticsearch module. {pull}7305[7305]
 
 *Heartbeat*
 
@@ -247,6 +273,10 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add shard metricset to Elasticsearch module. {pull}7006[7006]
 - Add apiserver metricset to Kubernetes module. {pull}7059[7059]
 - Add maxmemory to redis info metricset. {pull}7127[7127]
+- Set guest as default user in RabbitMQ module. {pull}7107[7107]
+- Add postgresql statement metricset. {issue}7048[7048] {pull}7060[7060]
+- Update `state_container` metricset to support latest `kube-state-metrics` version. {pull}7216[7216]
+- Collect accumulated docker network metrics and mark old ones as deprecated. {pull}7253[7253]
 
 *Packetbeat*
 
@@ -254,6 +284,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix high memory usage on HTTP body if body is not published. {pull}6680[6680]
 - Allow to capture the HTTP request or response bodies independently. {pull}6784[6784]
 - HTTP publishes an Error event for unmatched requests or responses. {pull}6794[6794]
+- The process monitor now reports the command-line for all processes, under Linux and Windows. {pull}7135[7135]
 
 *Winlogbeat*
 

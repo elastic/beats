@@ -579,3 +579,17 @@ class TestCase(unittest.TestCase, ComposeMixin):
             host=os.getenv("KIBANA_HOST", "localhost"),
             port=os.getenv("KIBANA_PORT", "5601"),
         )
+
+    def assert_fields_are_documented(self, evt):
+        """
+        Assert that all keys present in evt are documented in fields.yml.
+        This reads from the global fields.yml, means `make collect` has to be run before the check.
+        """
+        expected_fields, dict_fields = self.load_fields()
+        flat = self.flatten_object(evt, dict_fields)
+
+        for key in flat.keys():
+            documented = key in expected_fields
+            metaKey = key.startswith('@metadata.')
+            if not(documented or metaKey):
+                raise Exception("Key '{}' found in event is not documented!".format(key))

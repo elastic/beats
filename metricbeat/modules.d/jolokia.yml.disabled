@@ -7,6 +7,8 @@
   hosts: ["localhost"]
   namespace: "metrics"
   #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+  #username: "user"
+  #password: "secret"
   jmx.mappings:
     #- mbean: 'java.lang:type=Runtime'
     #  attributes:

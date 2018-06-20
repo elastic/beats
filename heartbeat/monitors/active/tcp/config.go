@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 
 	"github.com/elastic/beats/heartbeat/monitors"
@@ -22,7 +22,7 @@ type Config struct {
 	Socks5 transport.ProxyConfig `config:",inline"`
 
 	// configure tls
-	TLS *outputs.TLSConfig `config:"ssl"`
+	TLS *tlscommon.Config `config:"ssl"`
 
 	Timeout time.Duration `config:"timeout"`
 

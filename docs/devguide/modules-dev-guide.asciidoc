@@ -321,8 +321,10 @@ While developing the pipeline definition, we recommend making use of the
 {elasticsearch}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
 and quick iteration.
 
-By default Filebeat does not update Ingest pipelines if already loaded. If you want to force updating your pipeline
-during development, use `--update-pipelines` flag. This uploads pipelines even if they are already available on the node.
+By default Filebeat does not update Ingest pipelines if already loaded. If you
+want to force updating your pipeline during development, use
+`./filebeat setup --pipelines` command. This uploads pipelines even if they
+are already available on the node.
 
 [float]
 ==== _meta/fields.yml
@@ -349,6 +351,14 @@ make create-fields MODULE={module} FILESET={fileset}
 
 Please, always check the generated file and make sure the fields are correct.
 Documenatation of fields must be added manually.
+
+If the fields are correct, it is time to generate documentation, configuration
+and Kibana index patterns.
+
+[source,bash]
+----
+make update
+----
 
 [float]
 ==== test

@@ -91,7 +91,7 @@ func genEnableModulesCmd(name, version string, modulesFactory modulesManagerFact
 
 			for _, module := range args {
 				if !modules.Exists(module) {
-					fmt.Printf("Module %s doesn't exists!\n", module)
+					fmt.Printf("Module %s doesn't exist!\n", module)
 					os.Exit(1)
 				}
 
@@ -120,7 +120,7 @@ func genDisableModulesCmd(name, version string, modulesFactory modulesManagerFac
 
 			for _, module := range args {
 				if !modules.Exists(module) {
-					fmt.Fprintf(os.Stderr, "Module %s doesn't exists!\n", module)
+					fmt.Fprintf(os.Stderr, "Module %s doesn't exist!\n", module)
 					os.Exit(1)
 				}
 

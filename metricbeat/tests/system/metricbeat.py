@@ -23,20 +23,6 @@ class BaseTest(TestCase):
         self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
         super(BaseTest, self).setUpClass()
 
-    def assert_fields_are_documented(self, evt):
-        """
-        Assert that all keys present in evt are documented in fields.yml.
-        This reads from the global fields.yml, means `make collect` has to be run before the check.
-        """
-        expected_fields, _ = self.load_fields()
-        flat = self.flatten_object(evt, [])
-
-        for key in flat.keys():
-            documented = key in expected_fields
-            metaKey = key.startswith('@metadata.')
-            if not(documented or metaKey):
-                raise Exception("Key '{}' found in event is not documented!".format(key))
-
     def de_dot(self, existing_fields):
         fields = {}
 

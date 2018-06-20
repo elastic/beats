@@ -9,6 +9,14 @@
 			"revisionTime": "2017-05-24T00:36:31Z"
 		},
 		{
+			"checksumSHA1": "wshQ6/MnQx8nH6pgufu4kJEX6JI=",
+			"path": "github.com/OneOfOne/xxhash",
+			"revision": "6def279d2ce6c81a79dd1c1be580f03bb216fb8a",
+			"revisionTime": "2018-05-30T13:49:54Z",
+			"version": "v1.2.2",
+			"versionExact": "v1.2.2"
+		},
+		{
 			"checksumSHA1": "pH1jOw5Kfigc2tteo6KlaU9+JE8=",
 			"origin": "github.com/urso/sarama",
 			"path": "github.com/Shopify/sarama",
@@ -369,12 +377,12 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "hAB/G2FIWYwg3Rujgpt6UPtHMis=",
+			"checksumSHA1": "qghOCT8VCZFNPvu8/LCmletBKd8=",
 			"path": "github.com/elastic/go-libaudit",
-			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
-			"revisionTime": "2018-05-03T13:36:58Z",
-			"version": "v0.2.1",
-			"versionExact": "v0.2.1"
+			"revision": "c18782ee4f957de48620718231d20ca12c8dc4e9",
+			"revisionTime": "2018-05-25T13:51:51Z",
+			"version": "v0.3.0",
+			"versionExact": "v0.3.0"
 		},
 		{
 			"checksumSHA1": "3V0tnqlCgmCXnbocuTqUKluynm8=",

@@ -25,7 +25,14 @@ secured Kibana instance, make sure you've configured credentials as described in
 <<{beatname_lc}-configuration>>.
 
 To set up the Kibana dashboards for {beatname_uc}, use the appropriate command
-for your system.
+for your system. The command shown here loads the dashboards from the {beatname_uc}
+package. For more options, such as loading customized dashboards, see
+{beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards] in
+the _Beats Developer Guide_.
+ifndef::only-elasticsearch[]
+If you've configured the Logstash output, see
+<<load-dashboards-logstash>>.
+endif::[]
 
 ifdef::allplatforms[]
 
@@ -51,16 +58,12 @@ endif::[]
 ----------------------------------------------------------------------
 
 
-ifeval::["{beatname_lc}"!="auditbeat"]
-
 *docker:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 docker run {dockerimage} setup --dashboards
 ----------------------------------------------------------------------
-
-endif::[]
 
 *win:*
 
@@ -76,3 +79,81 @@ and run:
 ----------------------------------------------------------------------
 PS > .{backslash}{beatname_lc}.exe setup --dashboards
 ----------------------------------------------------------------------
+
+ifndef::only-elasticsearch[]
+[[load-dashboards-logstash]]
+==== Set up dashboards for Logstash output
+
+During dashboard loading, {beatname_uc} connects to Elasticsearch to check
+version information. To load dashboards when the Logstash output is enabled, you
+need to temporarily disable the Logstash output and enable Elasticsearch. To
+connect to a secured Elasticsearch cluster, you also need to pass Elasticsearch
+credentials.
+
+TIP: The example shows a hard-coded password, but you should store sensitive
+values in the <<keystore,secrets keystore>>.
+
+ifdef::allplatforms[]
+
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup -e \
+  -E output.logstash.enabled=false \
+  -E output.elasticsearch.hosts=['localhost:9200'] \
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal \
+  -E output.elasticsearch.password={pwd} \
+  -E setup.kibana.host=localhost:5601
+----
+
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup -e \
+  -E output.logstash.enabled=false \
+  -E output.elasticsearch.hosts=['localhost:9200'] \
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal \
+  -E output.elasticsearch.password={pwd} \
+  -E setup.kibana.host=localhost:5601 
+----
+
+
+*docker:*
+
+["source","sh",subs="attributes"]
+----
+docker run {dockerimage} setup -e \
+  -E output.logstash.enabled=false \
+  -E output.elasticsearch.hosts=['localhost:9200'] \
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal \
+  -E output.elasticsearch.password={pwd} \
+  -E setup.kibana.host=localhost:5601
+----
+
+
+*win:*
+
+endif::allplatforms[]
+
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*).
+
+From the PowerShell prompt, change to the directory where you installed {beatname_uc},
+and run:
+
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe setup -e `
+  -E output.logstash.enabled=false `
+  -E output.elasticsearch.hosts=['localhost:9200'] `
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal `
+  -E output.elasticsearch.password={pwd} `
+  -E setup.kibana.host=localhost:5601 
+----
+
+
+endif::only-elasticsearch[]
+

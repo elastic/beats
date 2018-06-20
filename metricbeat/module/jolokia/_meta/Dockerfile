@@ -23,9 +23,11 @@ RUN echo "monitorRole QED" >> /usr/lib/jvm/java-1.8-openjdk/jre/lib/management/j
     echo "controlRole R&D" >> /usr/lib/jvm/java-1.8-openjdk/jre/lib/management/jmxremote.password;\
     chmod 600 /usr/lib/jvm/java-1.8-openjdk/jre/lib/management/jmxremote.password
 
+ADD jolokia.xml /usr/${TC}/conf/Catalina/localhost/jolokia.xml
+
 # Start tomcat to accept JMX connection and enable jolokia proxy mode
-CMD env CATALINA_OPTS="$(jolokia_opts)\
+CMD env CATALINA_OPTS="\
     -Dcom.sun.management.jmxremote.port=7091\
     -Dcom.sun.management.jmxremote.ssl=false\
     -Dcom.sun.management.jmxremote.authenticate=true\
-    -Dorg.jolokia.jsr160ProxyEnabled" /usr/${TC}/bin/catalina.sh run
+    -Dorg.jolokia.jsr160ProxyEnabled=true" /usr/${TC}/bin/catalina.sh run

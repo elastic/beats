@@ -13,10 +13,10 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/setup/kibana"
 
 	fbautodiscover "github.com/elastic/beats/filebeat/autodiscover"
 	"github.com/elastic/beats/filebeat/channel"
@@ -303,7 +303,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	registrarChannel := newRegistrarLogger(registrar)
 
 	err = b.Publisher.SetACKHandler(beat.PipelineACKHandler{
-		ACKEvents: newEventACKer(registrarChannel).ackEvents,
+		ACKEvents: newEventACKer(finishedLogger, registrarChannel).ackEvents,
 	})
 	if err != nil {
 		logp.Err("Failed to install the registry with the publisher pipeline: %v", err)

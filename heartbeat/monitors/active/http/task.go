@@ -225,7 +225,7 @@ func execPing(
 	rtt := end.Sub(start)
 	event := common.MapStr{"http": common.MapStr{
 		"response": common.MapStr{
-			"status": resp.StatusCode,
+			"status_code": resp.StatusCode,
 		},
 		"rtt": common.MapStr{
 			"total": look.RTT(rtt),

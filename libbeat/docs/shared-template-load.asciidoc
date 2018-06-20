@@ -159,8 +159,6 @@ endif::[]
 ----
 
 
-ifeval::["{beatname_lc}"!="auditbeat"]
-
 *docker:*
 
 ["source","sh",subs="attributes"]
@@ -168,8 +166,6 @@ ifeval::["{beatname_lc}"!="auditbeat"]
 docker run {dockerimage} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 
-
-endif::[]
 
 *win:*
 

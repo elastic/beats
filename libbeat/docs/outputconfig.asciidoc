@@ -32,6 +32,9 @@ The following topics describe how to configure each supported output:
 * <<file-output>>
 * <<console-output>>
 
+If you've secured the {stack}, also read <<securing-{beatname_lc}>> for more about
+security-related configuration options.
+
 endif::[]
 
 [[elasticsearch-output]]
@@ -49,12 +52,14 @@ Example configuration:
 ------------------------------------------------------------------------------
 
 output.elasticsearch:
-  hosts: ["http://localhost:9200"]
+  hosts: ["https://localhost:9200"]
   index: "{beatname_lc}-%{[beat.version]}-%{+yyyy.MM.dd}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   ssl.certificate: "/etc/pki/client/cert.pem"
   ssl.key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
+
+//
 
 To enable SSL, just add `https` to all URLs defined under __hosts__.
 
@@ -63,8 +68,8 @@ To enable SSL, just add `https` to all URLs defined under __hosts__.
 
 output.elasticsearch:
   hosts: ["https://localhost:9200"]
-  username: "admin"
-  password: "s3cr3t"
+  username: "{beatname_lc}_internal"
+  password: "{pwd}"
 ------------------------------------------------------------------------------
 
 If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` to the yaml file.
@@ -74,10 +79,14 @@ If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` 
 output.elasticsearch:
   hosts: ["localhost"]
   protocol: "https"
-  username: "admin"
-  password: "s3cr3t"
+  username: "{beatname_lc}_internal"
+  password: "{pwd}"
 
 ------------------------------------------------------------------------------
+
+
+For more information about securing {beatname_uc}, see
+<<securing-{beatname_lc}>>.
 
 ==== Compatibility
 
@@ -283,18 +292,23 @@ endif::[]
 
 ===== `max_retries`
 
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
+{beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
+endif::[]
+
+ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
-ifeval::["{beatname_lc}" == "filebeat"]
-Filebeat will ignore the `max_retries` setting and retry until all
-events are published.
-endif::[]
-ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
-endif::[]
 
 The default is 3.
+
+endif::[]
+
 
 ===== `bulk_max_size`
 
@@ -311,6 +325,20 @@ throughput.
 Setting `bulk_max_size` to values less than or equal to 0 disables the
 splitting of batches. When splitting is disabled, the queue decides on the
 number of events to be contained in a batch.
+
+===== `backoff.init`
+
+The number of seconds to wait before trying to reconnect to Elasticsearch after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
+
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Elasticsearch after a network error. The default is 60s.
 
 ===== `timeout`
 
@@ -533,18 +561,22 @@ The number of seconds to wait for responses from the Logstash server before timi
 
 ===== `max_retries`
 
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
+{beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
+endif::[]
+
+ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
-ifeval::["{beatname_lc}" == "filebeat"]
-Filebeat will ignore the `max_retries` setting and retry until all
-events are published.
-endif::[]
-ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
-endif::[]
 
 The default is 3.
+
+endif::[]
 
 ===== `bulk_max_size`
 
@@ -571,6 +603,19 @@ The number of events to be sent increases up to `bulk_max_size` if no error is e
 On error the number of events per transaction is reduced again.
 
 The default is `false`.
+
+===== `backoff.init`
+
+The number of seconds to wait before trying to reconnect to Logstash after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Logstash after a network error. The default is 60s.
 
 [[kafka-output]]
 === Configure the Kafka output
@@ -728,19 +773,22 @@ brokers, topics, partition, and active leaders to use for publishing.
 
 ===== `max_retries`
 
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
+{beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
+endif::[]
+
+ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
-ifeval::["{beatname_lc}" == "filebeat"]
-Filebeat will ignore the `max_retries` setting and retry until all
-events are published.
-endif::[]
-
-ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
-endif::[]
 
 The default is 3.
+
+endif::[]
 
 ===== `bulk_max_size`
 
@@ -955,18 +1003,22 @@ The Redis connection timeout in seconds. The default is 5 seconds.
 
 ===== `max_retries`
 
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
+{beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
+endif::[]
+
+ifeval::["{beatname_lc}"!="filebeat" and "{beatname_lc}"!="winlogbeat"]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
-ifeval::["{beatname_lc}" == "filebeat"]
-Filebeat will ignore the `max_retries` setting and retry until all
-events are published.
-endif::[]
-ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
-endif::[]
 
 The default is 3.
+
+endif::[]
 
 
 ===== `bulk_max_size`

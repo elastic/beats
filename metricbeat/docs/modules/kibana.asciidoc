@@ -28,14 +28,18 @@ metricbeat.modules:
   enabled: default
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>. It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-kibana-stats,stats>>
+
 * <<metricbeat-metricset-kibana-status,status>>
+
+include::kibana/stats.asciidoc[]
 
 include::kibana/status.asciidoc[]
 

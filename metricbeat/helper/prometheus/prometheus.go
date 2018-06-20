@@ -93,6 +93,7 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	}
 
 	eventsMap := map[string]common.MapStr{}
+	infoMetrics := []*infoMetricData{}
 	for _, family := range families {
 		for _, metric := range family.GetMetric() {
 			m, ok := mapping.Metrics[family.GetName()]
@@ -116,20 +117,27 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			for k, v := range getLabels(metric) {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
-						keyLabels[l.GetField()] = v
+						keyLabels.Put(l.GetField(), v)
 					} else {
-						labels[l.GetField()] = v
+						labels.Put(l.GetField(), v)
 					}
 				}
 			}
 
-			event := getEvent(eventsMap, keyLabels)
-			// Empty field means we ignore the metric but still process its labels
-			if field != "" {
-				event[field] = value
+			// Keep a info document if it's an infoMetric
+			if _, ok = m.(*infoMetric); ok {
+				labels.DeepUpdate(keyLabels)
+				infoMetrics = append(infoMetrics, &infoMetricData{
+					Labels: keyLabels,
+					Meta:   labels,
+				})
+				continue
 			}
 
-			event.Update(labels)
+			// Put it in the event if it's a common metric
+			event := getEvent(eventsMap, keyLabels)
+			event.Put(field, value)
+			event.DeepUpdate(labels)
 		}
 	}
 
@@ -143,8 +151,34 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 		events = append(events, event)
 
 	}
+
+	// fill info from infoMetrics
+	for _, info := range infoMetrics {
+		for _, event := range events {
+			found := true
+			for k, v := range info.Labels.Flatten() {
+				value, err := event.GetValue(k)
+				if err != nil || v != value {
+					found = false
+					break
+				}
+			}
+
+			// fill info from this metric
+			if found {
+				event.DeepUpdate(info.Meta)
+			}
+		}
+	}
+
 	return events, nil
 
+}
+
+// infoMetricData keeps data about an infoMetric
+type infoMetricData struct {
+	Labels common.MapStr
+	Meta   common.MapStr
 }
 
 func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) {
@@ -172,7 +206,7 @@ func getLabels(metric *dto.Metric) common.MapStr {
 	labels := common.MapStr{}
 	for _, label := range metric.GetLabel() {
 		if label.GetName() != "" && label.GetValue() != "" {
-			labels[label.GetName()] = label.GetValue()
+			labels.Put(label.GetName(), label.GetValue())
 		}
 	}
 	return labels

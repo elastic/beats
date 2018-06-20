@@ -43,7 +43,10 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	metagen := kubernetes.NewMetaGenerator(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels, config.IncludePodUID)
+	metagen, err := kubernetes.NewMetaGenerator(c)
+	if err != nil {
+		return nil, err
+	}
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
 
@@ -84,13 +87,16 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj kubernetes.Resource) {
+			logp.Debug("kubernetes", "Watcher Pod add: %+v", obj)
 			p.emit(obj.(*kubernetes.Pod), "start")
 		},
 		UpdateFunc: func(obj kubernetes.Resource) {
+			logp.Debug("kubernetes", "Watcher Pod update: %+v", obj)
 			p.emit(obj.(*kubernetes.Pod), "stop")
 			p.emit(obj.(*kubernetes.Pod), "start")
 		},
 		DeleteFunc: func(obj kubernetes.Resource) {
+			logp.Debug("kubernetes", "Watcher Pod delete: %+v", obj)
 			time.AfterFunc(config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 		},
 	})
@@ -116,6 +122,11 @@ func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
 func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,
 	containerstatuses []kubernetes.PodContainerStatus) {
 	host := pod.Status.PodIP
+
+	// Do not emit events without host (container is still being configured)
+	if host == "" {
+		return
+	}
 
 	// Collect all container IDs and runtimes from status information.
 	containerIDs := map[string]string{}
