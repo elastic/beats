@@ -293,7 +293,8 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Added support for haproxy 1.7 and 1.8. {pull}6793[6793]
 - Add accumulated I/O stats to diskio in the line of `docker stats`. {pull}6701[6701]
 - Ignore virtual filesystem types by default in system module. {pull}6819[6819]
-- Release config reloading feature as GA.
+- Release config reloading feature as GA. {pull}6891[6891]
+- Collect accumulated docker network metrics and mark old ones as deprecated. {pull}7253[7253]
 
 *Packetbeat*
 

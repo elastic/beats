@@ -9,8 +9,8 @@ import (
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
+	err := mbtest.WriteEventsReporterV2(ms, t)
 	if err != nil {
 		t.Fatal("write", err)
 	}

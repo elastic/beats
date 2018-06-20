@@ -47,6 +47,7 @@ type NetStats struct {
 	TxDropped     float64
 	TxErrors      float64
 	TxPackets     float64
+	Total         *types.NetworkStats
 }
 
 func (n *NetService) getNetworkStatsPerContainer(rawStats []docker.Stat, dedot bool) []NetStats {
@@ -68,6 +69,7 @@ func (n *NetService) getNetworkStats(nameInterface string, rawNetStats *types.Ne
 		Container:     docker.NewContainer(myRawstats.Container, dedot),
 		Time:          myRawstats.Stats.Read,
 		NameInterface: nameInterface,
+		Total:         rawNetStats,
 	}
 
 	if exist {
