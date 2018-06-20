@@ -1,11 +1,13 @@
 package builder
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // GetContainerID returns the id of a container
@@ -62,6 +64,19 @@ func getStringAsList(input string) []string {
 	}
 
 	return list
+}
+
+// GetHintAsConfig can read a hint in the form of a stringified JSON and return a common.MapStr
+func GetHintAsConfig(hints common.MapStr, key, config string) []common.MapStr {
+	if str := GetHintString(hints, key, config); str != "" {
+		cfg := []common.MapStr{}
+		if err := json.Unmarshal([]byte(str), &cfg); err != nil {
+			logp.Debug("autodiscover.builder", "unable to unmarshall json due to error: %v", err)
+			return nil
+		}
+		return cfg
+	}
+	return nil
 }
 
 // IsNoOp is a big red button to prevent spinning up Runners in case of issues.
