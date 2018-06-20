@@ -109,7 +109,6 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	if len(container.IPAddresses) > 0 {
 		host = container.IPAddresses[0]
 	}
-
 	labelMap := common.MapStr{}
 	for k, v := range container.Labels {
 		safemapstr.Put(labelMap, k, v)
