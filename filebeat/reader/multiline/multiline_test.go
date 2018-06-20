@@ -189,10 +189,7 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg Config) reade
 	}
 
 	var r reader.Reader
-	r, err = readfile.NewEncodeReader(in, enc, 4096)
-	if err != nil {
-		t.Fatalf("Failed to initialize line reader: %v", err)
-	}
+	r = readfile.NewEncodeReader(in, enc, 4096)
 
 	r, err = New(readfile.NewStripNewline(r), "\n", 1<<20, &cfg)
 	if err != nil {

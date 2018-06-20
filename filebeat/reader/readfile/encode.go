@@ -37,9 +37,9 @@ func NewEncodeReader(
 	r io.Reader,
 	codec encoding.Encoding,
 	bufferSize int,
-) (EncoderReader, error) {
-	eReader, err := NewLineReader(r, codec, bufferSize)
-	return EncoderReader{eReader}, err
+) EncoderReader {
+	eReader := NewLineReader(r, codec, []byte("\n"), bufferSize)
+	return EncoderReader{eReader}
 }
 
 // Next reads the next line from it's initial io.Reader
