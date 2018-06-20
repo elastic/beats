@@ -76,8 +76,8 @@ func newDecoderReader(in io.Reader, codec encoding.Encoding) *decoderReader {
 }
 
 func (r *decoderReader) read(buf []byte) (int, error) {
-	var n int
 	var buffer []byte
+	out := streambuf.New(nil)
 
 	if r.decoderBuf.Len() == 0 {
 		buffer = make([]byte, 1024)
@@ -90,23 +90,40 @@ func (r *decoderReader) read(buf []byte) (int, error) {
 		if n == 0 {
 			return 0, streambuf.ErrNoMoreBytes
 		}
+
+		r.fileOffset += n
 	}
 
-	buffer = r.decoderBuf.Bytes()
-	nDst, nSrc, err := r.decoder.Transform(buf, buffer, false)
-	if err != nil {
-		if err != transform.ErrShortDst && err != transform.ErrShortSrc {
-			return 0, err
+	inBytes := r.decoderBuf.Bytes()
+	outBytes := make([]byte, 2048)
+
+	end := len(inBytes)
+	start := 0
+	for start < end {
+		nDst, nSrc, err := r.decoder.Transform(outBytes, inBytes[start:end], false)
+		if err != nil {
+			if err != transform.ErrShortDst {
+				out.Write(inBytes[:end])
+				start = end
+				break
+			}
 		}
+
+		start += nSrc
+		r.decoderBuf.Advance(nSrc)
+		r.decoderBuf.Reset()
+		out.Write(outBytes[:nDst])
+
+		r.encodedOffset += nSrc
+		r.decodedOffset += nDst
 	}
-	r.decoderBuf.Advance(nSrc)
-	r.decoderBuf.Reset()
 
-	r.fileOffset = r.fileOffset + n
-	r.encodedOffset = r.encodedOffset + nSrc
-	r.decodedOffset = r.decodedOffset + nDst
+	dec, err := out.Collect(out.Len())
+	if err != nil {
+		panic(err)
+	}
 
-	return nDst, nil
+	return copy(buf, dec), nil
 }
 
 type lineScanner struct {
