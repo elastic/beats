@@ -3,11 +3,12 @@ package dhcp
 import (
 	"bytes"
 	"encoding/hex"
+	"net"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
-	"net"
 )
 
 var hardwareTypes = map[int]string{
