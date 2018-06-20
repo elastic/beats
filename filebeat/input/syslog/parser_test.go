@@ -3,6 +3,7 @@ package syslog
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -64,6 +65,139 @@ func TestParseSyslog(t *testing.T) {
 				minute:     13,
 				second:     38,
 				nanosecond: 6353220,
+				loc:        time.FixedZone("", int(-7*time.Hour)),
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322-0700 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.FixedZone("", int(-7*time.Hour)),
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322-07 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.FixedZone("", int(-7*time.Hour)),
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322Z super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.UTC,
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322Z+0000 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.UTC,
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322Z+00:00 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.UTC,
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322Z+00 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.UTC,
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38Z+00 super mon message"),
+			syslog: event{
+				priority: 190,
+				message:  "mon message",
+				hostname: "super",
+				program:  "",
+				month:    6,
+				pid:      -1,
+				day:      19,
+				year:     2018,
+				hour:     2,
+				minute:   13,
+				second:   38,
+				loc:      time.UTC,
 			},
 		},
 		{
@@ -366,6 +500,7 @@ func TestParseSyslog(t *testing.T) {
 			assert.Equal(t, test.syslog.Minute(), l.Minute())
 			assert.Equal(t, test.syslog.Second(), l.Second())
 			assert.Equal(t, test.syslog.Nanosecond(), l.Nanosecond())
+			assert.Equal(t, test.syslog.loc, l.loc)
 		})
 	}
 }

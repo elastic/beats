@@ -27,7 +27,11 @@
   second = ([0-5][0-9])>tok %second;
   nanosecond = digit+>tok %nanosecond;
   time = hour ":" minute ":" second ("." nanosecond)?;
-  timezone = ("+"|"-") digit{2} ":"? digit{2}>tok %timezone;
+  offset_marker = "Z" | "z";
+  offset_direction = "-" | "+";
+  offset_hour = digit{2};
+  offset_minute = digit{2};
+  timezone = (offset_marker | offset_marker? offset_direction offset_hour (":"? offset_minute)?)>tok %timezone;
 
   # Some BSD style actually uses rfc3339 formatted date.
   year = digit{4}>tok %year;
@@ -36,7 +40,8 @@
 
   # common timestamp format
   timestamp_rfc3164 = month space day space time;
-  timestamp_rfc3339 = year "-" month_numeric "-" day_two_digits ("T" | space) time timezone?;
+  time_separator = "T" | "t";
+  timestamp_rfc3339 = year "-" month_numeric "-" day_two_digits (time_separator | space) time timezone?;
   timestamp = timestamp_rfc3339 | timestamp_rfc3164;
 
   hostname = [a-zA-Z0-9.-_:]+>tok %hostname;

@@ -73,7 +73,9 @@ func Parse(data []byte, event *event) {
         event.SetPid(data[tok:p])
       }
 
-      action timezone { }
+      action timezone {
+        event.SetTimeZone(data[tok:p])
+      }
 
       include syslog_rfc3164 "syslog_rfc3164.rl";
 
