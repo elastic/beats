@@ -19,6 +19,7 @@ var tests = []struct {
 	strings  []string
 }{
 	{"plain", []string{""}},
+	{"plain", []string{"I can"}},
 	{"plain", []string{"I can", "eat glass"}},
 
 	{"latin1", []string{""}},
@@ -44,8 +45,11 @@ var tests = []struct {
 	{"utf-16le", []string{"काचं शक्नोम्यत्तुम् ।", "नोपहिनस्ति माम् ॥"}},
 
 	{"big5", []string{"我能吞下玻", "璃而不傷身體。"}},
+
 	{"gb18030", []string{"我能吞下玻璃", "而不傷身。體"}},
+
 	{"euc-kr", []string{" 나는 유리를 먹을 수 있어요.", " 그래도 아프지 않아요"}},
+
 	{"euc-jp", []string{"私はガラスを食べられます。", "それは私を傷つけません。"}},
 }
 
@@ -61,14 +65,26 @@ func TestReaderEncodings(t *testing.T) {
 
 		buffer := bytes.NewBuffer(nil)
 		codec, _ := codecFactory(buffer)
+		writer := transform.NewWriter(buffer, codec.NewEncoder())
+
+		decoder := codec.NewDecoder()
+		encoder := codec.NewEncoder()
 
 		// write with encoding to buffer
-		writer := transform.NewWriter(buffer, codec.NewEncoder())
 		var expectedCount []int
 		for _, line := range test.strings {
 			writer.Write([]byte(line))
 			writer.Write([]byte{'\n'})
-			expectedCount = append(expectedCount, buffer.Len())
+
+			encoded, n, err := transform.Bytes(encoder, []byte(line+"\n"))
+			if err != nil {
+				panic(err)
+			}
+			_, n, err = transform.Bytes(decoder, encoded[:n])
+			if err != nil {
+				panic(err)
+			}
+			expectedCount = append(expectedCount, n)
 		}
 
 		// create line reader
@@ -81,7 +97,6 @@ func TestReaderEncodings(t *testing.T) {
 		// read decoded lines from buffer
 		var readLines []string
 		var byteCounts []int
-		current := 0
 		for {
 			bytes, sz, err := reader.Next()
 			if sz > 0 {
@@ -92,8 +107,7 @@ func TestReaderEncodings(t *testing.T) {
 				break
 			}
 
-			current += sz
-			byteCounts = append(byteCounts, current)
+			byteCounts = append(byteCounts, sz)
 		}
 
 		// validate lines and byte offsets
