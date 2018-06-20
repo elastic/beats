@@ -35,10 +35,31 @@ var tests = []struct {
 	encoding string
 	strings  []string
 }{
+	{"plain", []string{""}},
 	{"plain", []string{"I can", "eat glass"}},
+
+	{"latin1", []string{""}},
+	{"latin1", []string{"I can"}},
+	{"latin1", []string{"I kå Glas frässa"}},
 	{"latin1", []string{"I kå Glas frässa", "ond des macht mr nix!"}},
+
+	{"utf-8", []string{""}},
+	{"utf-8", []string{"I can"}},
+	{"utf-8", []string{"árvíztűrő tükörfúrógép"}},
+	{"utf-8", []string{"árvíztűrő", "tükörfúrógép"}},
+
+	{"utf-16be", []string{""}},
+	{"utf-16be", []string{"I can"}},
+	{"utf-16be", []string{"I can", "eat glass"}},
+	{"utf-16be", []string{"Pot să mănânc sticlă"}},
 	{"utf-16be", []string{"Pot să mănânc sticlă", "și ea nu mă rănește."}},
+
+	{"utf-16le", []string{""}},
+	{"utf-16le", []string{"I can"}},
+	{"utf-16le", []string{"I can", "eat glass"}},
+	{"utf-16le", []string{"काचं शक्नोम्यत्तुम् ।"}},
 	{"utf-16le", []string{"काचं शक्नोम्यत्तुम् ।", "नोपहिनस्ति माम् ॥"}},
+
 	{"big5", []string{"我能吞下玻", "璃而不傷身體。"}},
 	{"gb18030", []string{"我能吞下玻璃", "而不傷身。體"}},
 	{"euc-kr", []string{" 나는 유리를 먹을 수 있어요.", " 그래도 아프지 않아요"}},
