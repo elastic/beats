@@ -92,11 +92,11 @@ func (s *event) SetTimeZone(b []byte) {
 		s.loc = time.FixedZone("", d*h)
 	case 4:
 		h = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[1:3]))))
-		m = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[3:5]))))
+		m = int(time.Minute * time.Duration(bytesToInt(skipLeadZero(b[3:5]))))
 		s.loc = time.FixedZone("", d*(h+m))
 	case 5:
 		h = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[1:3]))))
-		m = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[4:6]))))
+		m = int(time.Minute * time.Duration(bytesToInt(skipLeadZero(b[4:6]))))
 		s.loc = time.FixedZone("", d*(h+m))
 	}
 }
