@@ -99,7 +99,7 @@ func New(namespace, name string, factory interface{}, stability Stability) *Feat
 }
 
 // RegisterBundle registers a bundle of features.
-func RegisterBundle(bundle Bundle) error {
+func RegisterBundle(bundle *Bundle) error {
 	for _, f := range bundle.Features {
 		Registry.Register(f)
 	}
