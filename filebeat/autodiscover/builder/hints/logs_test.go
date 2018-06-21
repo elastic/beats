@@ -120,6 +120,38 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
+			msg: "Hint with inputs config as json must be accepted",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"raw": "[{\"containers\":{\"ids\":[\"${data.container.id}\"]},\"multiline\":{\"negate\":\"true\",\"pattern\":\"^test\"},\"type\":\"docker\"}]",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"type": "docker",
+				"containers": map[string]interface{}{
+					"ids": []interface{}{"abc"},
+				},
+				"multiline": map[string]interface{}{
+					"pattern": "^test",
+					"negate":  "true",
+				},
+			},
+		},
+		{
 			msg: "Hint with module should attach input to its filesets",
 			event: bus.Event{
 				"host": "1.2.3.4",
@@ -282,7 +314,6 @@ func TestGenerateHints(t *testing.T) {
 
 		cfgs := l.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len, test.msg)
-
 		if test.len != 0 {
 			config := common.MapStr{}
 			err := cfgs[0].Unpack(&config)
