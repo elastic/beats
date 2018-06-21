@@ -18,7 +18,7 @@
       "input": {
         "type": "log"
       },
-      "@timestamp": "2018-06-11T01:53:11.382+0000",
+      "@timestamp": "2018-06-11T01:53:11.382Z",
       "elasticsearch": {
         "gc": {
           "stopping_threads_time_secs": "0.0000702",
