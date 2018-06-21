@@ -811,7 +811,7 @@ elasticsearch Module
 --
 type: float
 
-Garbage collection threads total stop time seconds.
+The time from JVM start up in seconds, as a floating point number.
 
 
 --
@@ -832,6 +832,26 @@ Garbage collection threads total stop time seconds.
 type: float
 
 Time took to stop threads seconds.
+
+
+--
+
+*`elasticsearch.gc.pid`*::
++
+--
+type: long
+
+The PID of JVM process.
+
+
+--
+
+*`elasticsearch.gc.tags`*::
++
+--
+type: keyword
+
+GC logging tags.
 
 
 --

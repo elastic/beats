@@ -4,6 +4,7 @@ var:
   - name: paths
     default:
       - /var/log/elasticsearch/gc.log.[0-9]*
+      - /var/log/elasticsearch/gc.log
     os.darwin: []
     os.windows: []
 
