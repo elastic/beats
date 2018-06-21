@@ -10,8 +10,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
 )
 
-func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.MapStr, error) {
-	events := []common.MapStr{}
+func eventMapping(content []byte, stateMetrics []common.MapStr) ([]common.MapStr, error) {
 	var summary kubernetes.Summary
 
 	err := json.Unmarshal(content, &summary)
@@ -20,8 +19,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 	}
 
 	node := summary.Node
-	nodeCores := perfMetrics.NodeCoresAllocatable.Get(node.NodeName)
-	nodeMem := perfMetrics.NodeMemAllocatable.Get(node.NodeName)
+	containers := []common.MapStr{}
 	for _, pod := range summary.Pods {
 		for _, container := range pod.Containers {
 			containerEvent := common.MapStr{
@@ -97,29 +95,33 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 				},
 			}
 
-			if nodeCores > 0 {
-				containerEvent.Put("cpu.usage.node.pct", float64(container.CPU.UsageNanoCores)/1e9/nodeCores)
-			}
+			containers = append(containers, containerEvent)
+		}
+	}
 
-			if nodeMem > 0 {
-				containerEvent.Put("memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem)
-			}
+	events := util.MergeEvents(containers, stateMetrics,
+		map[string]string{
+			mb.ModuleDataKey + ".node.name": node.NodeName,
+		},
+		[]string{mb.NamespaceKey},
+		[]string{
+			mb.ModuleDataKey + ".namespace",
+			mb.ModuleDataKey + ".pod.name",
+			"name",
+		},
+	)
 
-			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
-			coresLimit := perfMetrics.ContainerCoresLimit.GetWithDefault(cuid, nodeCores)
-			memLimit := perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
-
-			if coresLimit > 0 {
-				containerEvent.Put("cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit)
-			}
-
-			if memLimit > 0 {
-				containerEvent.Put("memory.usage.limit.pct", float64(container.Memory.UsageBytes)/memLimit)
-			}
-
-			events = append(events, containerEvent)
+	// Calculate pct fields
+	for _, event := range events {
+		memLimit := util.GetFloat64(event, "memory.limit.bytes")
+		if memLimit > 0 {
+			event.Put("memory.usage.limit.pct", float64(util.GetInt64(event, "memory.usage.bytes"))/memLimit)
 		}
 
+		cpuLimit := util.GetFloat64(event, "cpu.limit.cores")
+		if cpuLimit > 0 {
+			event.Put("cpu.usage.limit.pct", float64(util.GetInt64(event, "cpu.usage.nanocores"))/cpuLimit/1e9)
+		}
 	}
 
 	return events, nil

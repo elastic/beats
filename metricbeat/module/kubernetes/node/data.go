@@ -5,10 +5,12 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
 )
 
-func eventMapping(content []byte) (common.MapStr, error) {
+func eventMapping(content []byte, stateMetrics []common.MapStr) ([]common.MapStr, error) {
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
@@ -88,5 +90,14 @@ func eventMapping(content []byte) (common.MapStr, error) {
 			},
 		},
 	}
-	return nodeEvent, nil
+
+	events := util.MergeEvents([]common.MapStr{nodeEvent}, stateMetrics,
+		map[string]string{
+			"name": node.NodeName,
+		},
+		[]string{mb.NamespaceKey},
+		nil,
+	)
+
+	return events, nil
 }

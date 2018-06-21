@@ -1,10 +1,15 @@
 package container
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/kubernetes/state_container"
 	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
 )
 
@@ -36,6 +41,9 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	http *helper.HTTP
+
+	// kube-state-metrics client
+	state prometheus.Prometheus
 }
 
 // New create a new instance of the MetricSet
@@ -46,9 +54,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	state, err := util.NewStateMetricsClient(base)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
+		state:         state,
 	}, nil
 }
 
@@ -61,7 +76,15 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	events, err := eventMapping(body, util.PerfMetrics)
+	var stateMetrics []common.MapStr
+	if m.state != nil {
+		stateMetrics, err = m.state.GetProcessedMetrics(&state_container.Mapping)
+		if err != nil {
+			logp.Warn(fmt.Sprintf("Error fetching kube-state-metrics for %s: %s", m.Name(), err))
+		}
+	}
+
+	events, err := eventMapping(body, stateMetrics)
 	if err != nil {
 		return nil, err
 	}

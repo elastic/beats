@@ -1,84 +1,115 @@
 {
-    "@timestamp": "2017-04-06T15:29:27.150Z",
-    "beat": {
-        "hostname": "beathost",
-        "name": "beathost",
-        "version": "6.0.0-alpha1"
-    },
-    "kubernetes": {
-        "node": {
-            "cpu": {
-                "usage": {
-                    "core" : {
-                        "ns": 7247863769557035
-                    },
-                    "nanocores": 1662117892
-                }
-            },
-            "fs": {
-                "available": {
-                    "bytes": 1188063105024
-                },
-                "capacity": {
-                    "bytes": 1197211648000
-                },
-                "inodes": {
-                    "count": 584581120,
-                    "free": 584447029,
-                    "used": 134091
-                },
-                "used": {
-                    "bytes": 9148542976
-                }
-            },
-            "memory": {
-                "available": {
-                    "bytes": 134202847232
-                },
-                "majorpagefaults": 1044,
-                "pagefaults": 83482928,
-                "rss": {
-                    "bytes": 178053120
-                },
-                "usage": {
-                    "bytes": 67062091776
-                },
-                "workingset": {
-                    "bytes": 51496206336
-                }
-            },
-            "name": "localhost",
-            "network": {
-                "rx": {
-                    "bytes": 957942806894,
-                    "errors": 0
-                },
-                "tx": {
-                    "bytes": 461158498276,
-                    "errors": 0
-                }
-            },
-            "runtime": {
-                "imagefs": {
-                    "available": {
-                        "bytes": 64694517760
-                    },
-                    "capacity": {
-                        "bytes": 142782496768
-                    },
-                    "used": {
-                        "bytes": 29570629855
-                    }
-                }
-            },
-            "start_time": "2017-02-08T10:33:38Z"
-        }
+    "@timestamp": "2018-06-20T16:43:18.476Z",
+    "@metadata": {
+      "beat": "metricbeat",
+      "type": "doc",
+      "version": "7.0.0-alpha1"
     },
     "metricset": {
-        "host": "localhost:10255",
-        "module": "kubernetes",
-        "name": "node",
-        "rtt": 650741
+      "name": "node",
+      "module": "kubernetes",
+      "host": "192.168.99.100:10255",
+      "rtt": 83124
     },
-    "type": "metricsets"
-}
+    "kubernetes": {
+      "node": {
+        "memory": {
+          "allocatable": {
+            "bytes": 1992347648
+          },
+          "available": {
+            "bytes": 794632192
+          },
+          "usage": {
+            "bytes": 1896058880
+          },
+          "workingset": {
+            "bytes": 1302573056
+          },
+          "rss": {
+            "bytes": 575946752
+          },
+          "pagefaults": 88467,
+          "majorpagefaults": 0,
+          "capacity": {
+            "bytes": 2097205248
+          }
+        },
+        "network": {
+          "tx": {
+            "errors": 0,
+            "bytes": 1416560
+          },
+          "rx": {
+            "errors": 0,
+            "bytes": 438971592
+          }
+        },
+        "fs": {
+          "inodes": {
+            "used": 8844,
+            "free": 9723252,
+            "count": 9732096
+          },
+          "available": {
+            "bytes": 14077607936
+          },
+          "capacity": {
+            "bytes": 17293533184
+          },
+          "used": {
+            "bytes": 2203054080
+          }
+        },
+        "runtime": {
+          "imagefs": {
+            "available": {
+              "bytes": 14077607936
+            },
+            "capacity": {
+              "bytes": 17293533184
+            },
+            "used": {
+              "bytes": 1921188234
+            }
+          }
+        },
+        "pod": {
+          "allocatable": {
+            "total": 110
+          },
+          "capacity": {
+            "total": 110
+          }
+        },
+        "name": "minikube",
+        "start_time": "2018-06-20T10:06:39Z",
+        "status": {
+          "unschedulable": false
+        },
+        "cpu": {
+          "allocatable": {
+            "cores": 2
+          },
+          "usage": {
+            "nanocores": 205552356,
+            "core": {
+              "ns": 7842232236440
+            }
+          },
+          "capacity": {
+            "cores": 2
+          }
+        }
+      }
+    },
+    "beat": {
+      "name": "X1",
+      "hostname": "X1",
+      "version": "7.0.0-alpha1"
+    },
+    "host": {
+      "name": "X1"
+    }
+  }
+  

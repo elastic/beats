@@ -18,7 +18,8 @@ var (
 		DefaultPath:   defaultPath,
 	}.Build()
 
-	mapping = &p.MetricsMapping{
+	// Mapping of state metrics
+	Mapping = p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
 			"kube_pod_info":             p.InfoMetric(),
 			"kube_pod_status_phase":     p.LabelMetric("status.phase", "phase", true),
@@ -76,5 +77,5 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	return m.prometheus.GetProcessedMetrics(mapping)
+	return m.prometheus.GetProcessedMetrics(&Mapping)
 }

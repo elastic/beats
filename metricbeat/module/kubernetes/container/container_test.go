@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
@@ -22,12 +22,39 @@ func TestEventMapping(t *testing.T) {
 	body, err := ioutil.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
-	cache := util.NewPerfMetricsCache()
-	cache.NodeCoresAllocatable.Set("gke-beats-default-pool-a5b33e2e-hdww", 2)
-	cache.NodeMemAllocatable.Set("gke-beats-default-pool-a5b33e2e-hdww", 146227200)
-	cache.ContainerMemLimit.Set(util.ContainerUID("default", "nginx-deployment-2303442956-pcqfc", "nginx"), 14622720)
-
-	events, err := eventMapping(body, cache)
+	// TODO pass some state containers here
+	events, err := eventMapping(body, []common.MapStr{
+		common.MapStr{
+			mb.NamespaceKey: "kubernetes.container",
+			mb.ModuleDataKey: common.MapStr{
+				"node": common.MapStr{
+					"name": "gke-beats-default-pool-a5b33e2e-hdww",
+				},
+				"namespace": "default",
+				"pod": common.MapStr{
+					"name": "nginx-deployment-2303442956-pcqfc",
+				},
+			},
+			"name": "nginx",
+			"cpu": common.MapStr{
+				"limit": common.MapStr{
+					"cores": 2.0,
+				},
+			},
+			"id":    "docker://39f3267ad1b0c46025e664bfe0b70f3f18a9f172aad00463c8e87e0e93bbf628",
+			"image": "jenkinsci/jenkins:2.46.1",
+			"memory": common.MapStr{
+				"limit": common.MapStr{
+					"bytes": 14622720.0,
+				},
+			},
+			"status": common.MapStr{
+				"phase":    "running",
+				"ready":    true,
+				"restarts": 4,
+			},
+		},
+	})
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 1, "got wrong number of events")
@@ -43,6 +70,8 @@ func TestEventMapping(t *testing.T) {
 		"logs.inodes.free":     6120096,
 		"logs.inodes.used":     138624,
 
+		"id": "docker://39f3267ad1b0c46025e664bfe0b70f3f18a9f172aad00463c8e87e0e93bbf628",
+
 		"memory.available.bytes":  0,
 		"memory.usage.bytes":      1462272,
 		"memory.rss.bytes":        1409024,
@@ -50,10 +79,11 @@ func TestEventMapping(t *testing.T) {
 		"memory.pagefaults":       841,
 		"memory.majorpagefaults":  0,
 
+		"cpu.limit.cores":    2,
+		"memory.limit.bytes": 14622720,
+
 		// calculated pct fields:
-		"cpu.usage.node.pct":     0.005631997,
 		"cpu.usage.limit.pct":    0.005631997,
-		"memory.usage.node.pct":  0.01,
 		"memory.usage.limit.pct": 0.1,
 
 		"name": "nginx",
@@ -62,6 +92,10 @@ func TestEventMapping(t *testing.T) {
 		"rootfs.capacity.bytes":  101258067968,
 		"rootfs.used.bytes":      61440,
 		"rootfs.inodes.used":     21,
+
+		"status.phase":    "running",
+		"status.ready":    true,
+		"status.restarts": 4,
 	}
 
 	for k, v := range testCases {

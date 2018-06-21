@@ -40,6 +40,11 @@ func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 	return &prometheus{http}, nil
 }
 
+// NewPrometheusClientWithHTTP creates a new prometheus client with the given HTTP helper
+func NewPrometheusClientWithHTTP(http *helper.HTTP) Prometheus {
+	return &prometheus{http}
+}
+
 // GetFamilies requests metric families from prometheus endpoint and returns them
 func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 	resp, err := p.FetchResponse()
@@ -125,7 +130,8 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 
 			// Keep a info document if it's an infoMetric
-			if _, ok = m.(*infoMetric); ok {
+			_, ok = m.(*infoMetric)
+			if ok {
 				labels.DeepUpdate(keyLabels)
 				infoMetrics = append(infoMetrics, &infoMetricData{
 					Labels: keyLabels,
@@ -172,7 +178,6 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	}
 
 	return events, nil
-
 }
 
 // infoMetricData keeps data about an infoMetric

@@ -1,10 +1,16 @@
 package node
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/kubernetes/state_node"
+	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
 )
 
 const (
@@ -35,6 +41,9 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	http *helper.HTTP
+
+	// kube-state-metrics client
+	state prometheus.Prometheus
 }
 
 // New create a new instance of the MetricSet
@@ -45,25 +54,40 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	state, err := util.NewStateMetricsClient(base)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
+		state:         state,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	body, err := m.http.FetchContent()
 	if err != nil {
 		return nil, err
 	}
 
-	event, err := eventMapping(body)
+	var stateMetrics []common.MapStr
+	if m.state != nil {
+		stateMetrics, err = m.state.GetProcessedMetrics(&state_node.Mapping)
+		if err != nil {
+			logp.Warn(fmt.Sprintf("Error fetching kube-state-metrics for %s: %s", m.Name(), err))
+		}
+	}
+
+	events, err := eventMapping(body, stateMetrics)
 	if err != nil {
 		return nil, err
 	}
 
-	return event, nil
+	return events, nil
 }

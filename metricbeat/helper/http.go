@@ -16,21 +16,25 @@ import (
 )
 
 type HTTP struct {
-	base    mb.BaseMetricSet
-	client  *http.Client // HTTP client that is reused across requests.
-	headers map[string]string
-	uri     string
-	method  string
-	body    []byte
+	hostData  mb.HostData
+	metricset string
+	client    *http.Client // HTTP client that is reused across requests.
+	headers   map[string]string
+	uri       string
+	method    string
+	body      []byte
+}
+
+// HTTPConfig is used to configure the HTTP helper
+type HTTPConfig struct {
+	TLS     *tlscommon.Config `config:"ssl"`
+	Timeout time.Duration     `config:"timeout"`
+	Headers map[string]string `config:"headers"`
 }
 
 // NewHTTP creates new http helper
 func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
-	config := struct {
-		TLS     *tlscommon.Config `config:"ssl"`
-		Timeout time.Duration     `config:"timeout"`
-		Headers map[string]string `config:"headers"`
-	}{}
+	config := HTTPConfig{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -39,6 +43,11 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		config.Headers = map[string]string{}
 	}
 
+	return NewHTTPFromConfig(&config, base.HostData(), base.Name())
+}
+
+// NewHTTPFromConfig builds and returns an HTTP helper using the given config parameters
+func NewHTTPFromConfig(config *HTTPConfig, hostData mb.HostData, metricset string) (*HTTP, error) {
 	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
@@ -53,7 +62,8 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 	}
 
 	return &HTTP{
-		base: base,
+		metricset: metricset,
+		hostData:  hostData,
 		client: &http.Client{
 			Transport: &http.Transport{
 				Dial:    dialer.Dial,
@@ -63,7 +73,7 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		},
 		headers: config.Headers,
 		method:  "GET",
-		uri:     base.HostData().SanitizedURI,
+		uri:     hostData.SanitizedURI,
 		body:    nil,
 	}, nil
 }
@@ -79,8 +89,8 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 	}
 
 	req, err := http.NewRequest(h.method, h.uri, reader)
-	if h.base.HostData().User != "" || h.base.HostData().Password != "" {
-		req.SetBasicAuth(h.base.HostData().User, h.base.HostData().Password)
+	if h.hostData.User != "" || h.hostData.Password != "" {
+		req.SetBasicAuth(h.hostData.User, h.hostData.Password)
 	}
 
 	for k, v := range h.headers {
@@ -129,7 +139,7 @@ func (h *HTTP) FetchContent() ([]byte, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("HTTP error %d in %s: %s", resp.StatusCode, h.base.Name(), resp.Status)
+		return nil, fmt.Errorf("HTTP error %d in %s: %s", resp.StatusCode, h.metricset, resp.Status)
 	}
 
 	return ioutil.ReadAll(resp.Body)

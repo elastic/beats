@@ -8,6 +8,9 @@
     - volume
   period: 10s
   hosts: ["localhost:10255"]
+  # define state_metrics.host to enrich node, pod & container metrics with
+  # info from kube-state-metrics:
+  state_metrics.host: "kube-state-metrics:8080"
   enabled: true
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   #ssl.certificate: "/etc/pki/client/cert.pem"
