@@ -5,7 +5,7 @@
     - name: relative_process_timestamp_secs
       type: float
       description: >
-        Garbage collection threads total stop time seconds.
+        The time from JVM start up in seconds, as a floating point number.
     - name: threads_total_stop_time_secs
       type: float
       description: >
@@ -14,3 +14,11 @@
       type: float
       description: >
         Time took to stop threads seconds.
+    - name: pid
+      type: long
+      description: >
+        The PID of JVM process.
+    - name: tags
+      type: keyword
+      description: >
+        GC logging tags.
