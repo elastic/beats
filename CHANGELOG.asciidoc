@@ -175,6 +175,7 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - disk reads and write count metrics in RabbitMQ queue metricset made optional. {issue}6876[6876]
 - Add mapping for docker metrics per cpu. {pull}6843[6843]
 - Ensure canonical naming for JMX beans is disabled in Jolokia module. {pull}7047[7047]
+- Fix Jolokia attribute mapping when using wildcards and MBean names with multiple properties. {pull}7321[7321]
 
 *Winlogbeat*
 
