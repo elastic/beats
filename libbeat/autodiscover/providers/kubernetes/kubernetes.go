@@ -136,9 +136,9 @@ func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
 	p.emitEvents(pod, flag, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
 }
 
-func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,
-	containerstatuses []kubernetes.PodContainerStatus) {
-	host := pod.Status.PodIP
+func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*kubernetes.Container,
+	containerstatuses []*kubernetes.PodContainerStatus) {
+	host := pod.Status.GetPodIP()
 
 	// Do not emit events without host (container is still being configured)
 	if host == "" {
@@ -149,20 +149,20 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 	containerIDs := map[string]string{}
 	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
-		cid, runtime := c.GetContainerIDWithRuntime()
-		containerIDs[c.Name] = cid
-		runtimes[c.Name] = runtime
+		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
+		containerIDs[c.GetName()] = cid
+		runtimes[c.GetName()] = runtime
 	}
 
 	// Emit container and port information
 	for _, c := range containers {
 		cmeta := common.MapStr{
-			"id":      containerIDs[c.Name],
-			"name":    c.Name,
-			"image":   c.Image,
-			"runtime": runtimes[c.Name],
+			"id":      containerIDs[c.GetName()],
+			"name":    c.GetName(),
+			"image":   c.GetImage(),
+			"runtime": runtimes[c.GetName()],
 		}
-		meta := p.metagen.ContainerMetadata(pod, c.Name)
+		meta := p.metagen.ContainerMetadata(pod, c.GetName())
 
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()
@@ -192,7 +192,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 			event := bus.Event{
 				flag:         true,
 				"host":       host,
-				"port":       port.ContainerPort,
+				"port":       port.GetContainerPort(),
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,

@@ -135,7 +135,7 @@ func (p *PodNameIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	data := p.metaGen.PodMetadata(pod)
 	return []MetadataIndex{
 		{
-			Index: fmt.Sprintf("%s/%s", pod.Metadata.Namespace, pod.Metadata.Name),
+			Index: fmt.Sprintf("%s/%s", pod.Metadata.GetNamespace(), pod.Metadata.GetName()),
 			Data:  data,
 		},
 	}
@@ -143,7 +143,7 @@ func (p *PodNameIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // GetIndexes returns the indexes for the given Pod
 func (p *PodNameIndexer) GetIndexes(pod *kubernetes.Pod) []string {
-	return []string{fmt.Sprintf("%s/%s", pod.Metadata.Namespace, pod.Metadata.Name)}
+	return []string{fmt.Sprintf("%s/%s", pod.Metadata.GetNamespace(), pod.Metadata.GetName())}
 }
 
 // PodUIDIndexer indexes pods based on the pod UID
@@ -161,7 +161,7 @@ func (p *PodUIDIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	data := p.metaGen.PodMetadata(pod)
 	return []MetadataIndex{
 		{
-			Index: pod.Metadata.UID,
+			Index: pod.Metadata.GetUid(),
 			Data:  data,
 		},
 	}
@@ -169,7 +169,7 @@ func (p *PodUIDIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // GetIndexes returns the indexes for the given Pod
 func (p *PodUIDIndexer) GetIndexes(pod *kubernetes.Pod) []string {
-	return []string{pod.Metadata.UID}
+	return []string{pod.Metadata.GetUid()}
 }
 
 // ContainerIndexer indexes pods based on all their containers IDs
@@ -186,13 +186,13 @@ func NewContainerIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Ind
 func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var metadata []MetadataIndex
 	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
-		cID := status.GetContainerID()
+		cID := kubernetes.ContainerID(status)
 		if cID == "" {
 			continue
 		}
 		metadata = append(metadata, MetadataIndex{
 			Index: cID,
-			Data:  c.metaGen.ContainerMetadata(pod, status.Name),
+			Data:  c.metaGen.ContainerMetadata(pod, status.GetName()),
 		})
 	}
 
@@ -203,7 +203,7 @@ func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 func (c *ContainerIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	var containers []string
 	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
-		cID := status.GetContainerID()
+		cID := kubernetes.ContainerID(status)
 		if cID == "" {
 			continue
 		}
@@ -226,23 +226,23 @@ func NewIPPortIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Indexe
 func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var metadata []MetadataIndex
 
-	if pod.Status.PodIP == "" {
+	if pod.Status.GetPodIP() == "" {
 		return metadata
 	}
 
 	// Add pod IP
 	metadata = append(metadata, MetadataIndex{
-		Index: pod.Status.PodIP,
+		Index: pod.Status.GetPodIP(),
 		Data:  h.metaGen.PodMetadata(pod),
 	})
 
 	for _, container := range pod.Spec.Containers {
 		for _, port := range container.Ports {
-			if port.ContainerPort != int64(0) {
+			if port.GetContainerPort() != 0 {
 
 				metadata = append(metadata, MetadataIndex{
-					Index: fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort),
-					Data:  h.metaGen.ContainerMetadata(pod, container.Name),
+					Index: fmt.Sprintf("%s:%d", pod.Status.GetPodIP(), port.GetContainerPort()),
+					Data:  h.metaGen.ContainerMetadata(pod, container.GetName()),
 				})
 			}
 		}
@@ -255,19 +255,19 @@ func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 func (h *IPPortIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	var hostPorts []string
 
-	if pod.Status.PodIP == "" {
+	if pod.Status.GetPodIP() == "" {
 		return hostPorts
 	}
 
 	// Add pod IP
-	hostPorts = append(hostPorts, pod.Status.PodIP)
+	hostPorts = append(hostPorts, pod.Status.GetPodIP())
 
 	for _, container := range pod.Spec.Containers {
 		ports := container.Ports
 
 		for _, port := range ports {
-			if port.ContainerPort != int64(0) {
-				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort))
+			if port.GetContainerPort() != 0 {
+				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", pod.Status.GetPodIP(), port.GetContainerPort()))
 			}
 		}
 	}
