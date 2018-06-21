@@ -13,12 +13,15 @@ func NewBundle(features []Featurable) *Bundle {
 }
 
 // Filter creates a new bundle with only the feature matching the requested stability.
-func (b *Bundle) Filter(stability Stability) *Bundle {
+func (b *Bundle) Filter(stabilities ...Stability) *Bundle {
 	var filtered []Featurable
 
 	for _, feature := range b.Features {
-		if feature.Stability() == stability {
-			filtered = append(filtered, feature)
+		for _, stability := range stabilities {
+			if feature.Stability() == stability {
+				filtered = append(filtered, feature)
+				break
+			}
 		}
 	}
 	return NewBundle(filtered)
