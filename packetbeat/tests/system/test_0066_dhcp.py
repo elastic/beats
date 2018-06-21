@@ -13,8 +13,8 @@ class Test(BaseTest):
         )
         self.run_packetbeat(pcap="dhcp.pcap")
 
-        objs = self.read_output()
-        assert len(objs) == 3
+        objs = self.read_output(types=['dhcp'])
+        assert len(objs) == 4
         assert objs[0]['dhcp.client_ip'] == ''
         assert objs[0]['dhcp.server_ip'] == ''
         assert objs[0]['dhcp.op_code'] == 1
@@ -29,4 +29,4 @@ class Test(BaseTest):
         assert objs[1]['dhcp.server_ip'] == '192.168.0.1'
         assert objs[1]['dhcp.assigned_ip'] == '192.168.0.10'
         assert objs[1]['dhcp.server_identifier'] == '192.168.0.1'
-        assert objs[0]['dhcp.message_type'] == 'DHCPOFFER'
+        assert objs[1]['dhcp.message_type'] == 'DHCPOFFER'
