@@ -164,6 +164,7 @@ func (dhcp *dhcpPlugin) parsePacket(pkt *protos.Packet) beat.Event {
 			"client_port": pkt.Tuple.SrcPort,
 			"type":        "dhcp",
 			"dhcp":        dhcpFields,
+			"status":      "OK",
 		},
 	}
 	return event
