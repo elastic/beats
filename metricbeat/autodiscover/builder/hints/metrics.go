@@ -65,6 +65,20 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		return config
 	}
 
+	modulesConfig := m.getModules(hints)
+	if modulesConfig != nil {
+		configs := []*common.Config{}
+		for _, cfg := range modulesConfig {
+			if config, err := common.NewConfigFrom(cfg); err == nil {
+				configs = append(configs, config)
+			}
+		}
+		logp.Debug("hints.builder", "generated config %+v", configs)
+		// Apply information in event to the template to generate the final config
+		return template.ApplyConfigTemplate(event, configs)
+
+	}
+
 	mod := m.getModule(hints)
 	if mod == "" {
 		return config
@@ -98,14 +112,13 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	if err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: %v", *cfg)
+	logp.Debug("hints.builder", "generated config: +%v", *cfg)
 	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
 	// This especially helps in a scenario where endpoints are configured as:
 	// co.elastic.metrics/hosts= "${data.host}:9090"
-	config = template.ApplyConfigTemplate(event, config)
-	return config
+	return template.ApplyConfigTemplate(event, config)
 }
 
 func (m *metricHints) getModule(hints common.MapStr) string {
@@ -167,4 +180,8 @@ func (m *metricHints) getTimeout(hints common.MapStr) string {
 
 func (m *metricHints) getSSLConfig(hints common.MapStr) common.MapStr {
 	return builder.GetHintMapStr(hints, m.Key, ssl)
+}
+
+func (m *metricHints) getModules(hints common.MapStr) []common.MapStr {
+	return builder.GetHintAsConfigs(hints, m.Key)
 }

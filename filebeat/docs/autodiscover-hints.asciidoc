@@ -48,6 +48,17 @@ co.elastic.logs/fileset.stderr: error
 -------------------------------------------------------------------------------------
 
 [float]
+===== `co.elastic.logs/raw`
+When an entire input/module configuration needs to be completely set the `raw` hint can be used. You can provide a
+stringified JSON of the input configuration. `raw` overrides every other hint and can be used to create bot a single or
+a list of configurations.
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.logs/raw: "[{\"containers\":{\"ids\":[\"${data.container.id}\"]},\"multiline\":{\"negate\":\"true\",\"pattern\":\"^test\"},\"type\":\"docker\"}]"
+-------------------------------------------------------------------------------------
+
+[float]
 ==== Kubernetes
 
 Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:

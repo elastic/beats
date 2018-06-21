@@ -109,6 +109,25 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
+			message: "Module defined in modules as a JSON string should return a config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"raw": "{\"enabled\":true,\"metricsets\":[\"default\"],\"module\":\"mockmoduledefaults\",\"period\":\"1m\",\"timeout\":\"3s\"}",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module":     "mockmoduledefaults",
+				"metricsets": []string{"default"},
+				"timeout":    "3s",
+				"period":     "1m",
+				"enabled":    true,
+			},
+		},
+		{
 			message: "Module, namespace, host hint should return valid config with port should return hosts for " +
 				"docker host network scenario",
 			event: bus.Event{
@@ -171,7 +190,7 @@ func TestGenerateHints(t *testing.T) {
 		cfgs := m.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len)
 
-		if test.len != 0 {
+		if len(cfgs) != 0 {
 			config := common.MapStr{}
 			err := cfgs[0].Unpack(&config)
 			assert.Nil(t, err, test.message)
