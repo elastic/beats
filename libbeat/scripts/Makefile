@@ -124,7 +124,7 @@ crosscompile: $(GOFILES)
 	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
 
 .PHONY: check
-check: python-env prepare-tests ## @build Checks project and source code if everything is according to standard
+check: check-headers python-env prepare-tests ## @build Checks project and source code if everything is according to standard
 	@go vet ${GOPACKAGES}
 	@go get $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep .) || (echo "Code differs from goimports' style ^" && false)
@@ -132,8 +132,22 @@ check: python-env prepare-tests ## @build Checks project and source code if ever
 	@${FIND} -wholename "*tests/system/test_*.py" -perm ${PERM_EXEC} -exec false {} + || (echo "Python test files shouldn't be executable, otherwise nose doesn't find them" && false)
 	@${FIND} -name "*.yml" -perm ${PERM_EXEC} -exec false {} + || (echo "YAML files should not be executable" && false)
 
+.PHONY: check-headers
+check-headers:
+ifndef CHECK_HEADERS_DISABLED
+	@go get github.com/elastic/go-licenser
+	@go-licenser -d
+endif
+
+.PHONY: add-headers
+add-headers:
+ifndef CHECK_HEADERS_DISABLED
+	@go get github.com/elastic/go-licenser
+	@go-licenser
+endif
+
 .PHONY: fmt
-fmt: python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
+fmt: add-headers python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
 	@go get $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l -w ${GOFILES_NOVENDOR}
 	@${FIND} -name *.py -exec ${PYTHON_ENV}/bin/autopep8 --in-place --max-line-length 120  {} \;
@@ -305,7 +319,6 @@ coverage-report:
 
 .PHONY: fields
 fields:
-	echo $(PWD)
 	@go run ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go --es_beats_path $(ES_BEATS) --beat_path $(PWD) $(FIELDS_FILE_PATH)
 
 
