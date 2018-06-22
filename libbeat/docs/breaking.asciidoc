@@ -23,10 +23,6 @@ Breaking Changes sections of the <<release-notes,release notes>>.
 [[breaking-changes-mapping-conflict]]
 ==== New `host` namespace may cause mapping conflicts for Logstash
 
-// REVIEWERS: I describe these as mapping conflicts throughout, but the acutal
-// error message says mapper parsing exception. I'm wondering if I should use
-// that instead?
-
 This breaking change applies only to users who send Beats events to Logstash.
 
 Starting with version 6.3, Beats provides an `add_host_metadata` processor for
@@ -44,14 +40,9 @@ conflict with the `host` object defined in the index template.)
 
 *What does this mean to you?*
 
-If you *are* using the index template and versioned indices recommended for
-Beats, you might need to modify your searches and visualizations. See:
+See the info for your particular use case:
 
 * <<beats-template-versioned-indices>>
-
-If you *are not* using the recommended index template and versioned indices,
-see the section for your use case:
-
 * <<custom-template-non-versioned-indices>>
 * <<beats-template-non-versioned-indices>>
 
@@ -68,11 +59,7 @@ searches in Elasticsearch still work as expected.
 *What do you need to change?*
 
 If you searched for the `host` field previously, you now need to search for the
-`host` and `host.name` fields. Or you can adjust your queries to use
-`beat.hostname`, instead of `host`, to work across all indices. 
-
-// REVIEWERS: Would it better just to tell users to uses to change their
-// searches to use `beat.hostname` instead of `host`?
+`host` and `host.name` fields.  
 
 If you have visualizations in Kibana that reference the `host` field, export the
 objects by using the Kibana API or UI, change any aggregation references to use
@@ -125,7 +112,9 @@ processor.
 +
 With this configuration, Beats drops the `host` fields before sending the
 event to Logstash, and Logstash adds a default `host` field, as it did with
-previous Beats versions.
+previous Beats versions. This approach resolves the mapping conflict, but you
+should plan to migrate your Logstash configurations to use `host.name` in
+future releases. 
 
 [[beats-template-non-versioned-indices]]
 ===== Use case: You use the Beats index template and your indices are not versioned
@@ -134,27 +123,42 @@ In this use case, you load the Beats index template manually into Elasticsearch,
 and send your data through Logstash, but you don’t use the versioned index
 pattern to create versioned indices.
 
-You cannot resolve the problem by dropping the `host.*` fields, as described
-earlier, because Logstash will add a default `host` field, resulting in a
-mapping conflict because the index template defines the `host` field as an
-object. 
+You cannot resolve the problem by dropping the `host.*` fields, because Logstash
+will add a default `host` field, resulting in a mapping conflict because the
+index template defines the `host` field as an object. 
 
 *What do you need to change?*
 
 To resolve the mapping issue, do *one* of the following:
 
-// TOOD: Should add an example of the LS filter here, don't you think?
+* Drop the `host.*` fields in a Logstash filter. For example:
++
+[source,yaml]
+----
+filter {
+  mutate {
+    remove_field => [ "[host]" ]
+  }
+}
+----
++
+With this configuration, there will be no `host` field in the final event at
+ingestion time, and the mapping conflict is avoided.
 
-* Drop the `host.*` fields in a Logstash filter. There will be no
-`host` field at ingestion time, and the mapping conflict is avoided.
 * Or:
 ** Modify the Beats index template by removing the `host.*` fields, and
-** Configure Beats to drop all `host.*` fields, as described earlier.
+** Configure Beats to drop all `host.*` fields, as described in
+<<custom-template-non-versioned-indices,this section>>.
 +
 This solution prevents a mapping conflict because the fields are no longer
 defined in the Elasticsearch template. Elasticsearch can use the `host`
 mapping created when Logstash added a default `host` field.
 
+The difference between these two approaches is that the first approach, using
+a Logstash filter, drops the `host` fields completely. There will be no `host`
+field in the final event. The second approach drops the `host` fields from the
+Beats event, but because Logstash adds a default `host` field, there will be a
+`host` field in the final event.
 
 [[breaking-changes-6.0]]
 === Breaking changes in 6.0
