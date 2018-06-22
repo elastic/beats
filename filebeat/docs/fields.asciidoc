@@ -853,7 +853,7 @@ Where the request originated: rest (request originated from a REST API request),
 *`elasticsearch.audit.origin_address`*::
 +
 --
-type: keyword
+type: ip
 
 example: 192.168.1.42
 
