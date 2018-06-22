@@ -806,12 +806,14 @@ elasticsearch Module
 
 
 
-*`elasticsearch.audit.timestamp`*::
+*`elasticsearch.audit.node_name`*::
 +
 --
-example: Please add example
+type: keyword
 
-Please add description
+example: v_VJhjV
+
+The name of the node
 
 --
 
@@ -820,9 +822,9 @@ Please add description
 --
 type: keyword
 
-example: Please add example
+example: rest
 
-Please add description
+The layer from which this event originated: rest, transport or ip_filter
 
 --
 
@@ -831,9 +833,9 @@ Please add description
 --
 type: keyword
 
-example: Please add example
+example: access_granted
 
-Please add description
+The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied
 
 --
 
@@ -842,9 +844,9 @@ Please add description
 --
 type: keyword
 
-example: Please add example
+example: local_node
 
-Please add description
+Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)
 
 --
 
@@ -853,9 +855,9 @@ Please add description
 --
 type: keyword
 
-example: Please add example
+example: 192.168.1.42
 
-Please add description
+The IP address from which the request originated
 
 --
 
@@ -864,31 +866,31 @@ Please add description
 --
 type: keyword
 
-example: Please add example
+example: _anonymous
 
-Please add description
+The principal (username) that failed authentication
 
 --
 
 *`elasticsearch.audit.action`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
+example: cluster:monitor/main
 
-Please add description
+The name of the action that was executed
 
 --
 
 *`elasticsearch.audit.uri`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
+example: /_xpack/security/_authenticate
 
-Please add description
+The REST endpoint URI
 
 --
 
@@ -897,9 +899,9 @@ Please add description
 --
 type: keyword
 
-example: Please add example
+example: ClearScrollRequest
 
-Please add description
+The type of request that was executed
 
 --
 
