@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -33,9 +34,8 @@ const (
 
 var debugf = logp.MakeDebug("logstash")
 
-func init() {
-	outputs.RegisterType("logstash", makeLogstash)
-}
+// Feature exposes the logstash output.
+var Feature = outputs.Feature("logstash", makeLogstash, feature.Stable)
 
 func makeLogstash(
 	beat beat.Info,

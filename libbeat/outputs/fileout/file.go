@@ -24,15 +24,15 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
-func init() {
-	outputs.RegisterType("file", makeFileout)
-}
+// Feature expose the file output.
+var Feature = outputs.Feature("file", makeFileout, feature.Stable)
 
 type fileOutput struct {
 	beat     beat.Info

@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
+	_ "github.com/elastic/beats/libbeat/include/"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outest"
@@ -157,9 +158,9 @@ func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 }
 
 func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
-	plugin := outputs.FindFactory("elasticsearch")
-	if plugin == nil {
-		t.Fatalf("No elasticsearch output plugin found")
+	plugin, err := outputs.FindFactory("elasticsearch")
+	if err != nil {
+		t.Fatalf("No elasticsearch output plugin found, error: %s", err)
 	}
 
 	index := testElasticsearchIndex(test)

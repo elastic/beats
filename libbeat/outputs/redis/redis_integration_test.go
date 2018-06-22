@@ -33,12 +33,17 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 
 	_ "github.com/elastic/beats/libbeat/outputs/codec/format"
 	_ "github.com/elastic/beats/libbeat/outputs/codec/json"
 )
+
+func init() {
+	feature.Register(Feature)
+}
 
 const (
 	RedisDefaultHost = "localhost"
@@ -286,9 +291,9 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *client {
 		t.Fatalf("Error reading config: %v", err)
 	}
 
-	plugin := outputs.FindFactory("redis")
-	if plugin == nil {
-		t.Fatalf("redis output module not registered")
+	plugin, err := outputs.FindFactory("redis")
+	if err != nil {
+		t.Fatalf("redis output module not registered, error: %s", err)
 	}
 
 	out, err := plugin(beat.Info{Beat: testBeatname, Version: testBeatversion}, outputs.NewNilObserver(), config)
