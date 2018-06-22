@@ -9,7 +9,7 @@ var:
       - /usr/local/elasticsearch/gc.log.[0-9]*
       - /usr/local/elasticsearch/gc.log
     os.windows:
-      - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log.[0-9]*
+      - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log.*
       - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log
 
 ingest_pipeline: ingest/pipeline.json
