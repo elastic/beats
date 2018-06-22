@@ -76,9 +76,20 @@ check: python-env
 	@$(FIND) -name *.py -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@# Validate that all updates were committed
 	@$(MAKE) update
+	@$(MAKE) check-headers
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --
+
+.PHONY: check-headers
+check-headers:
+	@go get github.com/elastic/go-licenser
+	@go-licenser -d
+
+.PHONY: add-headers
+add-headers:
+	@go get github.com/elastic/go-licenser
+	@go-licenser
 
 # Corrects spelling errors
 .PHONY: misspell
@@ -88,7 +99,7 @@ misspell:
 	$(FIND) -not -path "*.json" -name '*' -exec misspell -w {} \;
 
 .PHONY: fmt
-fmt: python-env
+fmt: add-headers python-env
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) fmt || exit 1;)
 	@# Cleans also python files which are not part of the beats
 	@$(FIND) -name "*.py" -exec $(PYTHON_ENV)/bin/autopep8 --in-place --max-line-length 120 {} \;
