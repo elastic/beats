@@ -61,12 +61,11 @@ searches in Elasticsearch still work as expected.
 If you searched for the `host` field previously, you now need to search for the
 `host` and `host.name` fields.  
 
-If you have visualizations in Kibana that reference the `host` field, export the
-objects by using the Kibana API or UI, change any aggregation references to use
-`beat.hostname` instead of `host`, and then re-import the objects into Kibana.
+If you have multiple visualizations in Kibana that reference the `host` field,
+you can export the objects by using the Kibana API or UI, change any aggregation
+references to use `host.name` instead of `host`, and then re-import the
+objects into Kibana.
 
-// REVIEWERS: Are the above details correct? Got them from a comment Pius made
-// on ruflin's doc.
 
 //TODO: Add links to the Kibana docs for exporting/importing objects.
 
