@@ -6890,12 +6890,12 @@ Kubernetes pod name
 
 --
 
-*`kubernetes.pod.uid`*::
+*`kubernetes.uid`*::
 +
 --
 type: keyword
 
-Kubernetes pod uid
+Kubernetes uid
 
 
 --
