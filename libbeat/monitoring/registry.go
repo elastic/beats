@@ -58,7 +58,7 @@ func (r *Registry) Do(mode Mode, f func(string, interface{})) {
 	r.doVisit(mode, NewKeyValueVisitor(f))
 }
 
-// Visit uses the Visitor interface to iterate the complete metrics hieararchie.
+// Visit uses the Visitor interface to iterate the complete metrics hierarchies.
 // In case of the visitor reporting an error, Visit will return immediately,
 // reporting the very same error.
 func (r *Registry) Visit(mode Mode, vs Visitor) {
