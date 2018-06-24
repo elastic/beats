@@ -112,7 +112,7 @@ If `mode` is `any`, the monitor pings only one IP address for a hostname. If
 ping every IP address for the specified hostname. The default is `any`.
 
 [float]
-[[monitor-timieout]]
+[[monitor-timeout]]
 ==== `timeout`
 
 The total running time for each ping test. This is the total time allowed for
