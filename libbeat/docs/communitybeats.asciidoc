@@ -85,7 +85,7 @@ https://github.com/GoogleCloudPlatform/pubsubbeat[pubsubbeat]:: Reads data from 
 https://github.com/voigt/redditbeat[redditbeat]:: Collects new Reddit Submissions of one or multiple Subreddits.
 https://github.com/chrsblck/redisbeat[redisbeat]:: Used for Redis monitoring.
 https://github.com/consulthys/retsbeat[retsbeat]:: Collects counts of http://www.reso.org[RETS] resource/class records from https://en.wikipedia.org/wiki/Multiple_listing_service[Multiple Listing Service] (MLS) servers.
-https://github.com/yourdream/rsbeat[rsbeat]:: Ships redis slow logs to elasticsearch and anlyze by Kibana.
+https://github.com/yourdream/rsbeat[rsbeat]:: Ships redis slow logs to elasticsearch and analyze by Kibana.
 https://github.com/martinhoefling/saltbeat[saltbeat]:: Reads events from salt master event bus.
 https://github.com/benben/serialbeat[serialbeat]:: Reads from a serial device.
 https://github.com/consulthys/springbeat[springbeat]:: Collects health and metrics data from Spring Boot applications running with the actuator module.
