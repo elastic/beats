@@ -68,7 +68,7 @@ type serializableSecureString struct {
 
 // NewFileKeystore returns an new File based keystore or an error, currently users cannot set their
 // own password on the keystore, the default password will be an empty string. When the keystore
-// is initialied the secrets are automatically loaded into memory.
+// is initialized the secrets are automatically loaded into memory.
 func NewFileKeystore(keystoreFile string) (Keystore, error) {
 	return NewFileKeystoreWithPassword(keystoreFile, NewSecureString([]byte("")))
 }

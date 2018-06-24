@@ -87,7 +87,7 @@ func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 	return builder(c)
 }
 
-// GetConfig creates configs for all builders initalized.
+// GetConfig creates configs for all builders initialized.
 func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	var configs []*common.Config
 
