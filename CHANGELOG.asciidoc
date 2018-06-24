@@ -1779,7 +1779,7 @@ The list below covers the changes between 5.0.0-rc1 and 5.0.0 GA only.
 
 - Fix high CPU usage on macOS when encountering processes with long command lines. {issue}2747[2747]
 - Fix high value of `system.memory.actual.free` and `system.memory.actual.used`. {issue}2653[2653]
-- Change several `OpenProcess` calls on Windows to request the lowest possible access provilege.  {issue}1897[1897]
+- Change several `OpenProcess` calls on Windows to request the lowest possible access privilege.  {issue}1897[1897]
 - Fix system.memory.actual.free high value on Windows. {issue}2653[2653]
 
 *Filebeat*
