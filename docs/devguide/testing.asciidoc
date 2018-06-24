@@ -18,7 +18,7 @@ The golang tests can be executed in each Golang package by running `go test .`. 
 
 To run all non integration tests for a beat run `make unit`. This will execute all the tests which are not inside a `vendor` directory. If you want to have a coverage report for the tests which were run use `make unit-tests`. A coverage report will be generated under `build/coverage` directory.
 
-All Golang tests are in the same package as the tested code itself and have the postfix `_test` in the file name. Most of the tests are in the same package as the rest of the code. Some of the tests which should be sepearate from the rest of the code or should not use private variables go under `{packagename}_test`.
+All Golang tests are in the same package as the tested code itself and have the postfix `_test` in the file name. Most of the tests are in the same package as the rest of the code. Some of the tests which should be separate from the rest of the code or should not use private variables go under `{packagename}_test`.
 
 
 ==== Running Python Tests
