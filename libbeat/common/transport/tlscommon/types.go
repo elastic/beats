@@ -235,7 +235,7 @@ func (cs tlsCipherSuite) String() string {
 	if s, found := tlsCipherSuitesInverse[cs]; found {
 		return s
 	}
-	return "unkown"
+	return "unknown"
 }
 
 type tlsCurveType tls.CurveID

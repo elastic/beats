@@ -383,7 +383,7 @@ func makeSubMessageParser(commands []textCommandType) parserStateFn {
 		cmd := findTextCommandType(commands, sub)
 		if cmd == nil {
 			debug("unknown sub-command: %s", sub)
-			if parser.config.parseUnkown {
+			if parser.config.parseUnknown {
 				cmd = &unknownCommand
 			} else {
 				return parser.failing(errParserUnknownCommand)
@@ -470,7 +470,7 @@ func doParseTextCommand(parser *parser, buf *streambuf.Buffer) parseResult {
 	}
 	if cmd == nil {
 		debug("unknown command: %s", msg.command)
-		if parser.config.parseUnkown {
+		if parser.config.parseUnknown {
 			cmd = &unknownCommand
 		} else {
 			return parser.failing(errParserUnknownCommand)
