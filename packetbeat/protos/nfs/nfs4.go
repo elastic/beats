@@ -216,7 +216,7 @@ func (nfs *nfs) findV4MainOpcode(xdr *xdr) string {
 		// First class ops
 		//
 		// The first class ops usually the main operation in the compound.
-		// NFS spec allows to build compound opertion where multiple
+		// NFS spec allows to build compound operation where multiple
 		// first class ops are used, like OPEN->LOCK->WRITE->LOCKU->CLOSE,
 		// but such construction are not used in the practice.
 		case
