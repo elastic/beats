@@ -61,7 +61,7 @@ func Connect(address string, timeout time.Duration) (*Node, error) {
 	return n, scanner.Err()
 }
 
-// Close node connection relasing its resources
+// Close node connection releasing its resources
 func (n *Node) Close() error {
 	return n.conn.Close()
 }
