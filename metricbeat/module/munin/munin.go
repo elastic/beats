@@ -95,7 +95,7 @@ func (n *Node) Fetch(items ...string) (common.MapStr, error) {
 		for scanner.Scan() {
 			name := strings.TrimSpace(scanner.Text())
 
-			// Munin delimites metrics with a dot
+			// Munin delimits metrics with a dot
 			if name == "." {
 				break
 			}
