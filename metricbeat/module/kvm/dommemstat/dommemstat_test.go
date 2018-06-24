@@ -55,7 +55,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	statName, err := e.MetricSetFields.GetValue("stat.name")
 	if err == nil {
-		assert.EqualValues(t, statName.(string), "actualballon")
+		assert.EqualValues(t, statName.(string), "actualballoon")
 	} else {
 		t.Errorf("error while getting value from event: %v", err)
 	}
