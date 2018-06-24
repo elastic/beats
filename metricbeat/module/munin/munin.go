@@ -54,7 +54,7 @@ func Connect(address string, timeout time.Duration) (*Node, error) {
 		writer: conn,
 		reader: bufio.NewReader(conn),
 	}
-	// Cosume and ignore first line returned by munin, it is a comment
+	// Consume and ignore first line returned by munin, it is a comment
 	// about the node
 	scanner := bufio.NewScanner(n.reader)
 	scanner.Scan()
