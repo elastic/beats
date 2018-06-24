@@ -141,7 +141,7 @@ filebeat.inputs:
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
-  # If symlinks is enabled, symlinks are opened and harvested. The harvester is openening the
+  # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
   # original for harvesting but will report the symlink name as source.
   #symlinks: false
 
