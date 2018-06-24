@@ -4348,7 +4348,7 @@ number of append requests this node has processed
 
 --
 
-*`etcd.self.recv.bandwithrate`*::
+*`etcd.self.recv.bandwidthrate`*::
 +
 --
 type: scaled_float
@@ -4378,7 +4378,7 @@ number of requests that this node has sent
 
 --
 
-*`etcd.self.send.bandwithrate`*::
+*`etcd.self.send.bandwidthrate`*::
 +
 --
 type: scaled_float
