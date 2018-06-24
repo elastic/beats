@@ -49,7 +49,7 @@ func (m *AutodiscoverAdapter) CreateConfig(e bus.Event) ([]*common.Config, error
 
 // CheckConfig tests given config to check if it will work or not, returns errors in case it won't work
 func (m *AutodiscoverAdapter) CheckConfig(c *common.Config) error {
-	// TODO implment config check for all modules
+	// TODO implement config check for all modules
 	return nil
 }
 
