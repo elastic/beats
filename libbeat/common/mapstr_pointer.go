@@ -25,7 +25,7 @@ import (
 // MapStrPointer stores a pointer to atomically get/set a MapStr object
 // This should give faster access for use cases with lots of reads and a few
 // changes.
-// It's imortant to note that modifying the map is not thread safe, only fully
+// It's important to note that modifying the map is not thread safe, only fully
 // replacing it.
 type MapStrPointer struct {
 	p *unsafe.Pointer
