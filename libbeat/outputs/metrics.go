@@ -100,7 +100,7 @@ func (s *Stats) Duplicate(n int) {
 
 // Dropped updates total number of event drops as reported by the output.
 // Outputs will only report dropped events on fatal errors which lead to the
-// event not being publishabel. For example encoding errors or total event size
+// event not being publishable. For example encoding errors or total event size
 // being bigger then maximum supported event size.
 func (s *Stats) Dropped(n int) {
 	// number of dropped events (e.g. encoding failures)
