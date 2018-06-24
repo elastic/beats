@@ -153,7 +153,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add `has_fields` conditional to filter events based on the existence of all the given fields. {issue}6285[6285] {pull}6653[6653]
 - Add support for spooling to disk to the beats event publishing pipeline. {pull}6581[6581]
 - Added logging of system info at Beat startup. {issue}5946[5946]
-- Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
+- Do not log errors if X-Pack Monitoring is enabled but Elasticsearch X-Pack is not. {pull}6627[6627]
 - Add rename processor. {pull}6292[6292]
 - Add IP-addresses and MAC-addresses to add_host_metadata. {pull}6878[6878]
 - Added a seccomp (secure computing) filter on Linux that whitelists the
@@ -578,7 +578,7 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 
 *Affecting all Beats*
 
-- Support dashboard loading without Elasticseach {pull}5653[5653]
+- Support dashboard loading without Elasticsearch {pull}5653[5653]
 - Changed the hashbang used in the beat helper script from `/bin/bash` to `/usr/bin/env bash`. {pull}5051[5051]
 - Changed beat helper script to use `exec` when running the beat. {pull}5051[5051]
 - Fix reloader error message to only print on actual error {pull}5066[5066]
@@ -2037,7 +2037,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...v5.0.0-alpha4[View comm
 
 *Affecting all Beats*
 
-- The topology_expire option of the Elasticserach output was removed. {pull}1907[1907]
+- The topology_expire option of the Elasticsearch output was removed. {pull}1907[1907]
 
 *Filebeat*
 
