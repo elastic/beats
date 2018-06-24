@@ -2534,7 +2534,7 @@ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
 - Add multiline support for combining multiple related lines into one event. {issue}461[461]
 - Add `exclude_lines` and `include_lines` options for regexp based line filtering. {pull}430[430]
 - Add `exclude_files` configuration option. {pull}563[563]
-- Add experimental option to enable filebeat publisher pipeline to operate asynchonrously {pull}782[782]
+- Add experimental option to enable filebeat publisher pipeline to operate asynchronously {pull}782[782]
 
 *Winlogbeat*
 
