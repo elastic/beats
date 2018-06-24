@@ -720,7 +720,7 @@ Indexers take in a pod's metadata and builds indices based on the pod metadata.
 For example, the `ip_port` indexer can take a Kubernetes pod and index the pod
 metadata based on all `pod_ip:container_port` combinations.
 
-Matchers are used to contruct lookup keys for querying indices. For example,
+Matchers are used to construct lookup keys for querying indices. For example,
 when the `fields` matcher takes `["metricset.host"]` as a lookup field, it would
 construct a lookup key with the value of the field `metricset.host`.
 
