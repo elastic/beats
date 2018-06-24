@@ -449,7 +449,7 @@ https://github.com/elastic/beats/compare/v6.1.3...v6.2.0[View commits]
 - Use structured logging for the metrics that are periodically logged via the
   `logging.metrics` feature. {pull}5915[5915]
 - Improve Elasticsearch output metrics to count number of dropped and duplicate (if event ID is given) events. {pull}5811[5811]
-- Add the abilility for the add_docker_metadata process to enrich based on process ID. {pull}6100[6100]
+- Add the ability for the add_docker_metadata process to enrich based on process ID. {pull}6100[6100]
 - The `add_docker_metadata` and `add_kubernetes_metadata` processors are now GA, instead of Beta. {pull}6105[6105]
 - Update go-ucfg library to support top level key reference and cyclic key reference for the
   keystore {pull}6098[6098]
