@@ -76,7 +76,7 @@ BOOL setRunAtBoot(NSString* plistPath, BOOL runAtBoot) {
         err = [output streamError];
     }
     if (err != nil) {
-        fail([NSString stringWithFormat:@"Error writting property-list. Code=%u `%@`", (unsigned int)[err code], [err localizedDescription]]);
+        fail([NSString stringWithFormat:@"Error writing property-list. Code=%u `%@`", (unsigned int)[err code], [err localizedDescription]]);
         return NO;
     }
     [output close];
