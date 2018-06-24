@@ -71,7 +71,7 @@ func (r *registry) GetBuilder(name string) BuilderConstructor {
 	return r.builders[name]
 }
 
-// BuildBuilder reads provider configuration and instatiate one
+// BuildBuilder reads provider configuration and instantiate one
 func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 	var config BuilderConfig
 	err := c.Unpack(&config)
