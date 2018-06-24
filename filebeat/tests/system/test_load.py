@@ -78,7 +78,7 @@ class Test(BaseTest):
                 v = int(content["message"])
                 entry_list.append(v)
 
-        ### This lines can be uncomemnted for debugging ###
+        ### This lines can be uncommented for debugging ###
         # Prints out the missing entries
         # for i in range(total_lines):
         #    if i not in entry_list:
