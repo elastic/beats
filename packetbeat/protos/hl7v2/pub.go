@@ -24,36 +24,17 @@ type transPub struct {
 	results                protos.Reporter
 }
 
-// SubComponent struct
-type SubComponent struct {
-	ID      int     `json:"id"`
-	Value   string  `json:"value,omitempty"`
-	Numeric float64 `json:"numeric,omitempty"`
-}
-
-// Component struct
-type Component struct {
-	ID           int            `json:"id"`
-	SubComponent []SubComponent `json:"subcomponent,omitempty"`
-}
-
-// Repeat struct
-type Repeat struct {
-	ID        int         `json:"id"`
-	Component []Component `json:"component,omitempty"`
-}
-
-// Field struct
-type Field struct {
-	ID     int      `json:"id"`
-	Repeat []Repeat `json:"repeat,omitempty"`
-}
-
-// Segment struct
-type Segment struct {
-	LineNumber int     `json:"linenumber"`
-	ID         string  `json:"id"`
-	Field      []Field `json:"field,omitempty"`
+// Value struct
+type Value struct {
+	Line         int     `json:"line"`
+	Segment      string  `json:"segment"`
+	Field        int     `json:"field"`
+	Repeat       int     `json:"repeat"`
+	Component    int     `json:"component"`
+	SubComponent int     `json:"subcomponent"`
+	Text         string  `json:"text"`
+	Numeric      float64 `json:"numeric,omitempty"`
+	Date         string  `json:"date,omitempty"`
 }
 
 // IsNumeric checks if a string is a numeric value
@@ -122,6 +103,9 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 	// Loop through request and response
 	for i := 0; i < 2; i++ {
 
+		// Map for our message
+		messageMap := common.MapStr{}
+
 		// Split message into segments
 		if hl7message == "request" {
 			hl7segments = strings.Split(string(requ.content), pub.NewLineChars)
@@ -131,67 +115,61 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 			continue
 		}
 
-		// Array for our segment values
-		var segmentarray []Segment
+		// Array for our values
+		var valuesarray []Value
 
-		// Map for unique segment names
-		segmentsmap := common.MapStr{}
-
-		// Var for linenumber
-		linenumber := 0
+		// Var for hl7linenumber
+		hl7linenumber := 0
 
 		// Loop through hl7segments
 		for hl7segment := range hl7segments {
 
-			// Increment linenumber
-			linenumber++
+			// Increment hl7linenumber
+			hl7linenumber = hl7segment + 1
 
 			// Prevent error when reading blank lines.
 			if strings.TrimSpace(hl7segments[hl7segment]) == "" {
 				continue
 			}
 
+			// Set segment value
 			hl7segmentvalue := hl7segments[hl7segment]
-			debugf("hl7segmentvalue: %v", hl7segmentvalue)
-			hl7segmentnumber := hl7segment + 1
-			debugf("hl7segmentnumber: %v", hl7segmentnumber)
+			//debugf("hl7segmentvalue: %v", hl7segmentvalue)
 
 			// Set segment header
 			hl7segmentheader := hl7segmentvalue[0:3]
 
 			// Add hl7segmentheader to segmentsmap
-			segmentsmap[hl7segmentheader] = hl7segmentheader
+			//segmentsmap[hl7segmentheader] = hl7segmentheader
 
 			// If this is the MSH segment get our seperators
 			if hl7segmentheader == "MSH" {
 				hl7fieldseperator = string(hl7segments[hl7segment][3])
-				debugf("hl7fieldseperator: %s", hl7fieldseperator)
+				//debugf("hl7fieldseperator: %s", hl7fieldseperator)
 				hl7repeatseperator = string(hl7segments[hl7segment][5])
-				debugf("hl7repeatseperator: %s", hl7repeatseperator)
+				//debugf("hl7repeatseperator: %s", hl7repeatseperator)
 				hl7componentseperator = string(hl7segments[hl7segment][4])
-				debugf("hl7componentseperator: %s", hl7componentseperator)
+				//debugf("hl7componentseperator: %s", hl7componentseperator)
 				hl7subcomponentseperator = string(hl7segments[hl7segment][7])
-				debugf("hl7subcomponentseperator: %s", hl7subcomponentseperator)
+				//debugf("hl7subcomponentseperator: %s", hl7subcomponentseperator)
 			}
 
 			// Split hl7segmentvalue into hl7fields
 			hl7fields := strings.Split(hl7segmentvalue, hl7fieldseperator)
 
-			// Array for our field values
-			var fieldarray []Field
 			// Loop through hl7fields
 			for hl7field := range hl7fields {
 
 				// If field header dont process
 				if hl7field == 0 {
-					debugf("Not processing %v-%v.", hl7segmentheader, hl7field)
+					//debugf("Not processing %v-%v.", hl7segmentheader, hl7field)
 					continue
 				}
 
 				hl7fieldvalue := hl7fields[hl7field]
-				debugf("hl7fieldvalue: %v", hl7fieldvalue)
+				//debugf("hl7fieldvalue: %v", hl7fieldvalue)
 				hl7fieldnumber := hl7field
-				debugf("hl7fieldnumber: %v", hl7fieldnumber)
+				//debugf("hl7fieldnumber: %v", hl7fieldnumber)
 
 				// If this is the MSH segment increment the fieldnumber
 				if hl7segmentheader == "MSH" {
@@ -200,105 +178,104 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 				// If MSH-2 (encoding chars) don't process
 				if hl7segmentheader == "MSH" && hl7fieldnumber == 2 {
-					debugf("Not processing %v-%v.", hl7segmentheader, hl7fieldnumber)
+					//debugf("Not processing %v-%v.", hl7segmentheader, hl7fieldnumber)
 					continue
+				}
+
+				// Log out core message info
+				if hl7segmentheader == "MSH" {
+					switch {
+					case hl7fieldnumber == 3:
+						messageMap["sending_application"] = hl7fieldvalue
+					case hl7fieldnumber == 4:
+						messageMap["sending_facility"] = hl7fieldvalue
+					case hl7fieldnumber == 5:
+						messageMap["receiving_application"] = hl7fieldvalue
+					case hl7fieldnumber == 6:
+						messageMap["receiving_facility"] = hl7fieldvalue
+					case hl7fieldnumber == 7:
+						messageMap["datetime_of_message"] = hl7fieldvalue
+					case hl7fieldnumber == 9:
+						messageMap["message_type"] = hl7fieldvalue
+					case hl7fieldnumber == 10:
+						messageMap["message_control_id"] = hl7fieldvalue
+					case hl7fieldnumber == 12:
+						messageMap["version_id"] = hl7fieldvalue
+					default:
+					}
+				}
+
+				if hl7segmentheader == "MSA" {
+					switch {
+					case hl7fieldnumber == 1:
+						messageMap["acknowledgement_code"] = hl7fieldvalue
+					case hl7fieldnumber == 2:
+						messageMap["message_control_id"] = hl7fieldvalue
+					case hl7fieldnumber == 3:
+						messageMap["text_message"] = hl7fieldvalue
+					default:
+					}
 				}
 
 				// Split hl7fieldvalue into hl7repeats
 				hl7repeats := strings.Split(hl7fieldvalue, hl7repeatseperator)
 
-				// Array for our repeat values
-				var repeatarray []Repeat
 				// Loop through hl7repeats
 				for hl7repeat := range hl7repeats {
 					hl7repeatvalue := hl7repeats[hl7repeat]
-					debugf("hl7repeatvalue: %v", hl7repeatvalue)
+					//debugf("hl7repeatvalue: %v", hl7repeatvalue)
 					hl7repeatnumber := hl7repeat + 1
-					debugf("hl7repeatnumber: %v", hl7repeatnumber)
+					//debugf("hl7repeatnumber: %v", hl7repeatnumber)
 
 					// Split hl7repeatvalue into hl7components
 					hl7components := strings.Split(hl7repeatvalue, hl7componentseperator)
 
-					// Array for our component values
-					var componentarray []Component
 					// Loop through hl7components
 					for hl7component := range hl7components {
 						hl7componentvalue := hl7components[hl7component]
-						debugf("hl7componentvalue: %v", hl7componentvalue)
+						//debugf("hl7componentvalue: %v", hl7componentvalue)
 						hl7componentnumber := hl7component + 1
-						debugf("hl7componentnumber: %v", hl7componentnumber)
+						//debugf("hl7componentnumber: %v", hl7componentnumber)
 
 						// Split hl7componentvalue into hl7subcomponents
 						hl7subcomponents := strings.Split(hl7componentvalue, hl7subcomponentseperator)
 
-						// Array for our subcomponent values
-						var subcomponentarray []SubComponent
 						// Loop through hl7subcomponents
 						for hl7subcomponent := range hl7subcomponents {
 							hl7subcomponentvalue := hl7subcomponents[hl7subcomponent]
-							debugf("hl7subcomponentvalue: %v", hl7subcomponentvalue)
+							//debugf("hl7subcomponentvalue: %v", hl7subcomponentvalue)
 							hl7subcomponentnumber := hl7subcomponent + 1
-							debugf("hl7subcomponentnumber: %v", hl7subcomponentnumber)
+							//debugf("hl7subcomponentnumber: %v", hl7subcomponentnumber)
 
-							// Add value to subcomponentarray
+							// Add value to valuesarray
 							if hl7subcomponentvalue != "" {
 								if IsNumeric(hl7subcomponentvalue) {
 									hl7subcomponentnumericvalue, _ := strconv.ParseFloat(hl7subcomponentvalue, 64)
-									subcomponentarray = append(subcomponentarray, SubComponent{hl7subcomponentnumber, hl7subcomponentvalue, hl7subcomponentnumericvalue})
+									valuesarray = append(valuesarray, Value{hl7linenumber, hl7segmentheader, hl7fieldnumber, hl7repeatnumber, hl7componentnumber, hl7subcomponentnumber, hl7subcomponentvalue, hl7subcomponentnumericvalue, ""})
 								} else {
-									subcomponentarray = append(subcomponentarray, SubComponent{hl7subcomponentnumber, hl7subcomponentvalue, 0})
+									valuesarray = append(valuesarray, Value{hl7linenumber, hl7segmentheader, hl7fieldnumber, hl7repeatnumber, hl7componentnumber, hl7subcomponentnumber, hl7subcomponentvalue, 0, ""})
 								}
 							}
 						}
 						// End hl7subcomponents loop
 
-						// Add subcomponentarray to componentarray
-						if len(subcomponentarray) != 0 {
-							componentarray = append(componentarray, Component{hl7componentnumber, subcomponentarray})
-						}
-
 					}
 					// End hl7components loop
-
-					// Add componentarray to repeatarray
-					if len(componentarray) != 0 {
-						repeatarray = append(repeatarray, Repeat{hl7repeatnumber, componentarray})
-					}
 
 				}
 				// End hl7repeats loop
 
-				// Add repeatarray to fieldarray
-				if len(repeatarray) != 0 {
-					fieldarray = append(fieldarray, Field{hl7fieldnumber, repeatarray})
-				}
-
 			}
 			// End hl7fields loop
-
-			// Add fieldarray to segmentarray
-			if len(fieldarray) != 0 {
-				segmentarray = append(segmentarray, Segment{linenumber, hl7segmentheader, fieldarray})
-			}
 
 		}
 		// End hl7segments loop
 
-		// Loop though the segmentsmap
-		for name := range segmentsmap {
-			var uniquearray []Segment
-			// Loop through segmentarray
-			for _, elem := range segmentarray {
-				if elem.ID == name {
-					uniquearray = append(uniquearray, Segment{elem.LineNumber, elem.ID, elem.Field})
-				}
-			}
-			// Add to map
-			segmentsmap[name] = uniquearray
-		}
+		// Add valuesarray to messageMap.items map
+		messageMap["items"] = valuesarray
 
-		// Add segmentsmap to fields.hl7message map
-		fields["hl7v2"].(common.MapStr)[hl7message] = segmentsmap
+		// Add messageMap to fields.hl7message map
+		fields["hl7v2"].(common.MapStr)[hl7message] = messageMap
 
 		// Switch to response message
 		hl7message = "response"
