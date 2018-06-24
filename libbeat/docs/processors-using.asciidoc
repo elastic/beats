@@ -857,7 +857,7 @@ processors:
 
 It has the following settings:
 
-`netinfo.enabled`:: (Optional) Default false. Include IP adresses and MAC addresses as fields host.ip and host.mac
+`netinfo.enabled`:: (Optional) Default false. Include IP addresses and MAC addresses as fields host.ip and host.mac
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
 The fields added to the event are looking as following:

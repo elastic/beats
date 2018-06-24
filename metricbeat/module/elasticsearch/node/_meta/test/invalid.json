@@ -172,7 +172,7 @@
         {
           "name" : "ingest-geoip",
           "version" : "5.2.2",
-          "description" : "Ingest processor that uses looksup geo data based on ip adresses using the Maxmind geo database",
+          "description" : "Ingest processor that uses looksup geo data based on ip addresses using the Maxmind geo database",
           "classname" : "org.elasticsearch.ingest.geoip.IngestGeoIpPlugin"
         },
         {
