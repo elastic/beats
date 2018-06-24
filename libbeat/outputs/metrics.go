@@ -90,7 +90,7 @@ func (s *Stats) Failed(n int) {
 	}
 }
 
-// Duplicate updats the active and duplicate event metrics.
+// Duplicate updates the active and duplicate event metrics.
 func (s *Stats) Duplicate(n int) {
 	if s != nil {
 		s.duplicates.Add(uint64(n))
