@@ -17,7 +17,7 @@
 
 package memcache
 
-// Memcache text protocol command defitions with parsers and serializers to
+// Memcache text protocol command definitions with parsers and serializers to
 // create events from parsed messages.
 //
 // All defined messages implement the textCommandType.
