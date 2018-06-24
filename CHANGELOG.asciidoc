@@ -2575,7 +2575,7 @@ https://github.com/elastic/beats/compare/1.0.0-rc2...1.0.0[Check 1.0.0 diff]
 *Affecting all Beats*
 
 - Fix random panic on shutdown by calling shutdown handler only once. elastic/filebeat#204
-- Fix credentials are not send when pinging an elasticsearch host. elastic/fileabeat#287
+- Fix credentials are not send when pinging an elasticsearch host. elastic/filebeat#287
 
 *Filebeat*
 
