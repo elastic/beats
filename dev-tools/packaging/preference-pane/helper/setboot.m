@@ -84,7 +84,7 @@ BOOL setRunAtBoot(NSString* plistPath, BOOL runAtBoot) {
     NSData *data = [output propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
     BOOL success = [data writeToFile:plistPath atomically:YES];
     if (!success) {
-        fail(@"Error overwritting plist file");
+        fail(@"Error overwriting plist file");
         return NO;
     }
     return YES;
