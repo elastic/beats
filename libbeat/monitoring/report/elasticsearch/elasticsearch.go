@@ -25,6 +25,8 @@ import (
 	"strings"
 	"time"
 
+	"strconv"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
@@ -234,8 +236,9 @@ func (r *reporter) snapshotLoop(namespace string, period time.Duration) {
 			Fields:    fields,
 			Meta: common.MapStr{
 				"type":        "beats_" + namespace,
-				"interval_ms": period * time.Millisecond,
-				"params":      map[string]string{"interval": period.String()},
+				"interval_ms": int64(period / time.Millisecond),
+				// Converting to seconds as interval only accepts `s` as unit
+				"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
 			},
 		})
 	}
