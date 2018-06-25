@@ -12,9 +12,8 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "hl7v2"
-        # MSA-1 is a field that is configured to be selected in the test and should match the below value
-        #assert o["hl7v2.response.2.MSA.1"] == "AA"
-        # MSH-11 is not a field configured to be selected in the test
+        assert o["hl7v2.response.message_control_id"] == "MSGID12349876"
+        assert o["hl7v2.response.acknowledgement_code"] == "AA"
 
     def test_hl7v2_reject(self):
         self.render_config_template()
@@ -25,6 +24,5 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "hl7v2"
-        # MSA-1 is a field that is configured to be selected in the test and should match the below value
-        #assert o["hl7v2.response.2.MSA.1"] == "AR"
-        # MSH-11 is not a field configured to be selected in the test
+        assert o["hl7v2.response.message_control_id"] == "MSGID12349877"
+        assert o["hl7v2.response.acknowledgement_code"] == "AR"

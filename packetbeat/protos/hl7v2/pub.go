@@ -1,7 +1,6 @@
 package hl7v2
 
 import (
-	//"encoding/json"
 	"strconv"
 	"strings"
 
@@ -24,10 +23,8 @@ type transPub struct {
 	results                protos.Reporter
 }
 
-// Value struct
-type Value struct {
-	Line         int     `json:"line"`
-	Segment      string  `json:"segment"`
+// Field struct
+type Field struct {
 	Field        int     `json:"field"`
 	Repeat       int     `json:"repeat"`
 	Component    int     `json:"component"`
@@ -35,6 +32,13 @@ type Value struct {
 	Text         string  `json:"text"`
 	Numeric      float64 `json:"numeric,omitempty"`
 	Date         string  `json:"date,omitempty"`
+}
+
+// Segment struct
+type Segment struct {
+	Line    int     `json:"line"`
+	Segment string  `json:"segment"`
+	Fields  []Field `json:"fields,omitempty"`
 }
 
 // IsNumeric checks if a string is a numeric value
@@ -115,14 +119,17 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 			continue
 		}
 
-		// Array for our values
-		var valuesarray []Value
+		// Array for our segments
+		var segmentarray []Segment
 
 		// Var for hl7linenumber
 		hl7linenumber := 0
 
 		// Loop through hl7segments
 		for hl7segment := range hl7segments {
+
+			// Array for our fields
+			var fieldarray []Field
 
 			// Increment hl7linenumber
 			hl7linenumber = hl7segment + 1
@@ -247,13 +254,13 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 							hl7subcomponentnumber := hl7subcomponent + 1
 							//debugf("hl7subcomponentnumber: %v", hl7subcomponentnumber)
 
-							// Add value to valuesarray
+							// Add value to fieldarray
 							if hl7subcomponentvalue != "" {
 								if IsNumeric(hl7subcomponentvalue) {
 									hl7subcomponentnumericvalue, _ := strconv.ParseFloat(hl7subcomponentvalue, 64)
-									valuesarray = append(valuesarray, Value{hl7linenumber, hl7segmentheader, hl7fieldnumber, hl7repeatnumber, hl7componentnumber, hl7subcomponentnumber, hl7subcomponentvalue, hl7subcomponentnumericvalue, ""})
+									fieldarray = append(fieldarray, Field{hl7fieldnumber, hl7repeatnumber, hl7componentnumber, hl7subcomponentnumber, hl7subcomponentvalue, hl7subcomponentnumericvalue, ""})
 								} else {
-									valuesarray = append(valuesarray, Value{hl7linenumber, hl7segmentheader, hl7fieldnumber, hl7repeatnumber, hl7componentnumber, hl7subcomponentnumber, hl7subcomponentvalue, 0, ""})
+									fieldarray = append(fieldarray, Field{hl7fieldnumber, hl7repeatnumber, hl7componentnumber, hl7subcomponentnumber, hl7subcomponentvalue, 0, ""})
 								}
 							}
 						}
@@ -268,11 +275,14 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 			}
 			// End hl7fields loop
 
+			// Add fieldarray to segmentarray
+			segmentarray = append(segmentarray, Segment{hl7linenumber, hl7segmentheader, fieldarray})
+
 		}
 		// End hl7segments loop
 
-		// Add valuesarray to messageMap.items map
-		messageMap["items"] = valuesarray
+		// Add segmentarray to messageMap.items map
+		messageMap["segments"] = segmentarray
 
 		// Add messageMap to fields.hl7message map
 		fields["hl7v2"].(common.MapStr)[hl7message] = messageMap

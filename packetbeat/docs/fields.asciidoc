@@ -2315,70 +2315,77 @@ type: float
 
 --
 
-*`hl7v2.request.items`*::
+*`hl7v2.request.segments`*::
 +
 --
 type: nested
 
 --
 
-*`hl7v2.request.items.line`*::
+*`hl7v2.request.segments.line`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.request.items.segment`*::
+*`hl7v2.request.segments.segment`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.items.field`*::
+*`hl7v2.request.segments.fields`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.request.segments.fields.field`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.request.items.repeat`*::
+*`hl7v2.request.segments.fields.repeat`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.request.items.component`*::
+*`hl7v2.request.segments.fields.component`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.request.items.subcomponent`*::
+*`hl7v2.request.segments.fields.subcomponent`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.request.items.text`*::
+*`hl7v2.request.segments.fields.text`*::
 +
 --
 type: text
 
 --
 
-*`hl7v2.request.items.numeric`*::
+*`hl7v2.request.segments.fields.numeric`*::
 +
 --
 type: float
 
 --
 
-*`hl7v2.request.items.date`*::
+*`hl7v2.request.segments.fields.date`*::
 +
 --
 type: date
@@ -2409,70 +2416,77 @@ type: text
 
 --
 
-*`hl7v2.response.items`*::
+*`hl7v2.response.segments`*::
 +
 --
 type: nested
 
 --
 
-*`hl7v2.response.items.line`*::
+*`hl7v2.response.segments.line`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.response.items.segment`*::
+*`hl7v2.response.segments.segment`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.response.items.field`*::
+*`hl7v2.response.segments.fields`*::
++
+--
+type: nested
+
+--
+
+*`hl7v2.response.segments.fields.field`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.response.items.repeat`*::
+*`hl7v2.response.segments.fields.repeat`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.response.items.component`*::
+*`hl7v2.response.segments.fields.component`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.response.items.subcomponent`*::
+*`hl7v2.response.segments.fields.subcomponent`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.response.items.text`*::
+*`hl7v2.response.segments.fields.text`*::
 +
 --
 type: text
 
 --
 
-*`hl7v2.response.items.numeric`*::
+*`hl7v2.response.segments.fields.numeric`*::
 +
 --
 type: float
 
 --
 
-*`hl7v2.response.items.date`*::
+*`hl7v2.response.segments.fields.date`*::
 +
 --
 type: date

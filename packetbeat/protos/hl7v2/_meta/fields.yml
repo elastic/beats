@@ -24,26 +24,28 @@
               type: text
             - name: version_id
               type: float
-        - name: request.items
+        - name: request.segments
           type: nested
-        - name: request.items.line
+        - name: request.segments.line
           type: long
-        - name: request.items.segment
+        - name: request.segments.segment
           type: keyword
-        - name: request.items.field
-          type: long 
-        - name: request.items.repeat
-          type: long 
-        - name: request.items.component
+        - name: request.segments.fields
+          type: nested
+        - name: request.segments.fields.field
           type: long
-        - name: request.items.subcomponent
+        - name: request.segments.fields.repeat
+          type: long 
+        - name: request.segments.fields.component
           type: long
-        - name: request.items.text
+        - name: request.segments.fields.subcomponent
+          type: long
+        - name: request.segments.fields.text
           type: text
-        - name: request.items.numeric
+        - name: request.segments.fields.numeric
           type: float
           ignore_malformed: true
-        - name: request.items.date
+        - name: request.segments.fields.date
           type: date
           format: strict_basic_date_time||strict_basic_date_time_no_millis||strict_basic_date
           ignore_malformed: true
@@ -57,26 +59,28 @@
               type: text
             - name: text_message
               type: text
-        - name: response.items
+        - name: response.segments
           type: nested
-        - name: response.items.line
+        - name: response.segments.line
           type: long
-        - name: response.items.segment
+        - name: response.segments.segment
           type: keyword
-        - name: response.items.field
-          type: long 
-        - name: response.items.repeat
-          type: long 
-        - name: response.items.component
+        - name: response.segments.fields
+          type: nested
+        - name: response.segments.fields.field
           type: long
-        - name: response.items.subcomponent
+        - name: response.segments.fields.repeat
+          type: long 
+        - name: response.segments.fields.component
           type: long
-        - name: response.items.text
+        - name: response.segments.fields.subcomponent
+          type: long
+        - name: response.segments.fields.text
           type: text
-        - name: response.items.numeric
+        - name: response.segments.fields.numeric
           type: float
           ignore_malformed: true
-        - name: response.items.date
+        - name: response.segments.fields.date
           type: date
           format: strict_basic_date_time||strict_basic_date_time_no_millis||strict_basic_date
           ignore_malformed: true
