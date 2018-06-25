@@ -11,7 +11,7 @@
         "pattern_definitions": {
           "GREEDYMULTILINE": "(.|\n)*",
           "JVM8HEADER": "%{TIMESTAMP_ISO8601:timestamp}: %{BASE10NUM:elasticsearch.gc.relative_process_timestamp_secs}:",
-          "JVM9HEADER": "\\[%{TIMESTAMP_ISO8601:timestamp}\\]\\[%{POSINT:elasticsearch.gc.pid}\\]\\[%{DATA:elasticsearch.gc.tags}%{SPACE}*\\]"
+          "JVM9HEADER": "\\[%{TIMESTAMP_ISO8601:timestamp}\\]\\[%{POSINT:process.pid}\\]\\[%{DATA:elasticsearch.gc.tags}%{SPACE}*\\]"
         }
       }
     },

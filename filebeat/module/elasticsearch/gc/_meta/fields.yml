@@ -14,10 +14,6 @@
       type: float
       description: >
         Time took to stop threads seconds.
-    - name: pid
-      type: long
-      description: >
-        The PID of JVM process.
     - name: tags
       type: keyword
       description: >
