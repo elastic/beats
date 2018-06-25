@@ -507,16 +507,13 @@ prepare-package-cgo:
 package-setup:
 	$(MAKE) -C ${ES_BEATS}/dev-tools/packer deps images
 
-.PHONY: package
-package: ## @packaging Create binary packages for the beat.
-package: update package-setup
-	echo "Start building packages for ${BEAT_NAME}"
-
+.PHONY: package-yml
+package-yml:
+	# Generates the package.yml file with all information needed to create packages
 	rm -rf ${PKG_BUILD_DIR}
 	mkdir -p ${PKG_BUILD_DIR}
 	mkdir -p ${PKG_UPLOAD_DIR}
 
-	# Generates the package.yml file with all information needed to create packages
 	echo "beat_name: ${BEAT_NAME}"                          >  ${PKG_BUILD_DIR}/package.yml
 	echo "beat_url: ${BEAT_URL}"                            >> ${PKG_BUILD_DIR}/package.yml
 	echo "beat_repo: ${BEAT_PATH}"                          >> ${PKG_BUILD_DIR}/package.yml
@@ -532,6 +529,13 @@ package: update package-setup
 	else \
 		cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${PKG_BUILD_DIR}/package.yml; \
 	fi
+
+.PHONY: package
+package: ## @packaging Create binary packages for the beat.
+package: update package-setup package-yml
+
+	echo "Start building packages for ${BEAT_NAME}"
+	mkdir -p ${BUILD_DIR}/upload
 
 	if [ $(CGO) = true ]; then \
 		 $(MAKE) prepare-package-cgo; \
@@ -562,6 +566,22 @@ package-dashboards: package-setup
 	cp -r _meta/kibana.generated ${BUILD_DIR}/dashboards
 	# build the dashboards package
 	BEAT_NAME=${BEAT_NAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C ${ES_BEATS}/dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt
+
+.PHONY: osx-package-all
+osx-package-all: osx-package-elastic osx-package-oss
+
+.PHONY: osx-package-elastic
+osx-package-elastic:
+	@$(MAKE) osx-package
+
+.PHONY: osx-package-oss
+osx-package-oss:
+	@$(MAKE) PKG_SUFFIX=-oss osx-package
+
+.PHONY: osx-package
+osx-package: package-yml
+osx-package: ## @packaging Create OSX packages for the beat.
+	$(MAKE) -C ${ES_BEATS}/dev-tools/packer -e PKG_SUFFIX=${PKG_SUFFIX} BEAT_NAME=${BEAT_NAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(BEAT_NAME)/dmg
 
 fix-permissions:
 	# Change ownership of all files inside /build folder from root/root to current user/group

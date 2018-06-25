@@ -1,0 +1,3 @@
+min_supported_osx_version: 10.6
+install_path: "/Library/Application Support"
+identifier_base: "co.elastic.beats"

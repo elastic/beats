@@ -23,7 +23,7 @@ fi
 cp fields.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/
 cp -a modules.d-linux/ /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/modules.d || true
 
-tar czvf /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-linux-{{.bin_arch}}.tar.gz /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}
+tar czvf /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-linux-{{.bin_arch}}.tar.gz --owner=0 --group=0 /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}
 echo "Created /upload/{{.beat_name}}{{.beat_pkg_suffix}}--${VERSION}-linux-{{.bin_arch}}.tar.gz"
 
 cd /upload

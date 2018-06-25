@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+    <pkg-ref id="{{.identifier_base}}.{{.beat_name}}"/>
+    <options customize="never" require-scripts="false" hostArchitectures="{{.osx_arch}}"/>
+    <volume-check>
+        <allowed-os-versions>
+            <os-version min="{{.min_supported_osx_version}}"/>
+        </allowed-os-versions>
+    </volume-check>
+    <choices-outline>
+        <line choice="default">
+            <line choice="{{.identifier_base}}.{{.beat_name}}"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="{{.identifier_base}}.{{.beat_name}}" visible="false">
+        <pkg-ref id="{{.identifier_base}}.{{.beat_name}}"/>
+        <pkg-ref id="{{.identifier_base}}.preference-pane"/>
+    </choice>
+    <pkg-ref id="{{.identifier_base}}.{{.beat_name}}" version="{{.version}}{{.snapshot}}" auth="Root" onConclusion="none">internal-{{.beat_name}}{{.pkg_suffix}}-{{.version}}{{.snapshot}}-{{.osx_arch}}.pkg</pkg-ref>
+    <readme file="README.html" />
+    <license file="LICENSE.txt" />
+    <title>{{.beat_name}} {{.version}}{{.snapshot}}</title>
+    <pkg-ref id="{{.identifier_base}}.preference-pane" version="{{.version}}{{.snapshot}}" auth="Root" onConclusion="none">BeatsPrefPane.pkg</pkg-ref>
+</installer-gui-script>
