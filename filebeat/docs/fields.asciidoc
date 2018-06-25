@@ -836,16 +836,6 @@ Time took to stop threads seconds.
 
 --
 
-*`elasticsearch.gc.pid`*::
-+
---
-type: long
-
-The PID of JVM process.
-
-
---
-
 *`elasticsearch.gc.tags`*::
 +
 --
