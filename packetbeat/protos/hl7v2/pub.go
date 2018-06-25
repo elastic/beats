@@ -193,21 +193,21 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 				if hl7segmentheader == "MSH" {
 					switch {
 					case hl7fieldnumber == 3:
-						messageMap["sending_application"] = hl7fieldvalue
+						messageMap["msh_sending_application"] = hl7fieldvalue
 					case hl7fieldnumber == 4:
-						messageMap["sending_facility"] = hl7fieldvalue
+						messageMap["msh_sending_facility"] = hl7fieldvalue
 					case hl7fieldnumber == 5:
-						messageMap["receiving_application"] = hl7fieldvalue
+						messageMap["msh_receiving_application"] = hl7fieldvalue
 					case hl7fieldnumber == 6:
-						messageMap["receiving_facility"] = hl7fieldvalue
+						messageMap["msh_receiving_facility"] = hl7fieldvalue
 					case hl7fieldnumber == 7:
-						messageMap["datetime_of_message"] = hl7fieldvalue
+						messageMap["msh_datetime_of_message"] = hl7fieldvalue
 					case hl7fieldnumber == 9:
-						messageMap["message_type"] = hl7fieldvalue
+						messageMap["msh_message_type"] = hl7fieldvalue
 					case hl7fieldnumber == 10:
-						messageMap["message_control_id"] = hl7fieldvalue
+						messageMap["msh_message_control_id"] = hl7fieldvalue
 					case hl7fieldnumber == 12:
-						messageMap["version_id"] = hl7fieldvalue
+						messageMap["msh_version_id"] = hl7fieldvalue
 					default:
 					}
 				}
@@ -215,11 +215,11 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 				if hl7segmentheader == "MSA" {
 					switch {
 					case hl7fieldnumber == 1:
-						messageMap["acknowledgement_code"] = hl7fieldvalue
+						messageMap["msa_acknowledgement_code"] = hl7fieldvalue
 					case hl7fieldnumber == 2:
-						messageMap["message_control_id"] = hl7fieldvalue
+						messageMap["msa_message_control_id"] = hl7fieldvalue
 					case hl7fieldnumber == 3:
-						messageMap["text_message"] = hl7fieldvalue
+						messageMap["msa_text_message"] = hl7fieldvalue
 					default:
 					}
 				}

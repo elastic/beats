@@ -2259,56 +2259,56 @@ hl7v2 specific event fields.
 
 
 
-*`hl7v2.request.sending_application`*::
+*`hl7v2.request.msh_sending_application`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.sending_facility`*::
+*`hl7v2.request.msh_sending_facility`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.receiving_application`*::
+*`hl7v2.request.msh_receiving_application`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.receiving_facility`*::
+*`hl7v2.request.msh_receiving_facility`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.datetime_of_message`*::
+*`hl7v2.request.msh_datetime_of_message`*::
 +
 --
 type: date
 
 --
 
-*`hl7v2.request.message_type`*::
+*`hl7v2.request.msh_message_type`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.message_control_id`*::
+*`hl7v2.request.msh_message_control_id`*::
 +
 --
 type: text
 
 --
 
-*`hl7v2.request.version_id`*::
+*`hl7v2.request.msh_version_id`*::
 +
 --
 type: float
@@ -2395,21 +2395,77 @@ format: strict_basic_date_time||strict_basic_date_time_no_millis||strict_basic_d
 --
 
 
-*`hl7v2.response.acknowledgement_code`*::
+*`hl7v2.response.msh_sending_application`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.response.message_control_id`*::
+*`hl7v2.response.msh_sending_facility`*::
++
+--
+type: keyword
+
+--
+
+*`hl7v2.response.msh_receiving_application`*::
++
+--
+type: keyword
+
+--
+
+*`hl7v2.response.msh_receiving_facility`*::
++
+--
+type: keyword
+
+--
+
+*`hl7v2.response.msh_datetime_of_message`*::
++
+--
+type: date
+
+--
+
+*`hl7v2.response.msh_message_type`*::
++
+--
+type: keyword
+
+--
+
+*`hl7v2.response.msh_message_control_id`*::
 +
 --
 type: text
 
 --
 
-*`hl7v2.response.text_message`*::
+*`hl7v2.response.msh_version_id`*::
++
+--
+type: float
+
+--
+
+*`hl7v2.response.msa_acknowledgement_code`*::
++
+--
+type: keyword
+
+--
+
+*`hl7v2.response.msa_message_control_id`*::
++
+--
+type: text
+
+--
+
+*`hl7v2.response.msa_text_message`*::
 +
 --
 type: text

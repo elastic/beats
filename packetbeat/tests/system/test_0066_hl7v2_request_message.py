@@ -12,7 +12,7 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "hl7v2"
-        assert o["hl7v2.request.message_control_id"] == "MSGID12349876"
+        assert o["hl7v2.request.msh_message_control_id"] == "MSGID12349876"
 
     def test_hl7v2_reject(self):
         self.render_config_template()
@@ -23,4 +23,4 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "hl7v2"
-        assert o["hl7v2.request.message_control_id"] == "MSGID12349877"
+        assert o["hl7v2.request.msh_message_control_id"] == "MSGID12349877"

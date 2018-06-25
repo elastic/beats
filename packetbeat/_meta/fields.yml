@@ -1161,21 +1161,21 @@
         - name: request
           type: group
           fields:
-            - name: sending_application
+            - name: msh_sending_application
               type: keyword
-            - name: sending_facility
+            - name: msh_sending_facility
               type: keyword
-            - name: receiving_application
+            - name: msh_receiving_application
               type: keyword
-            - name: receiving_facility
+            - name: msh_receiving_facility
               type: keyword
-            - name: datetime_of_message
+            - name: msh_datetime_of_message
               type: date
-            - name: message_type
+            - name: msh_message_type
               type: keyword
-            - name: message_control_id
+            - name: msh_message_control_id
               type: text
-            - name: version_id
+            - name: msh_version_id
               type: float
         - name: request.segments
           type: nested
@@ -1206,11 +1206,27 @@
         - name: response
           type: group
           fields:
-            - name: acknowledgement_code
+            - name: msh_sending_application
               type: keyword
-            - name: message_control_id
+            - name: msh_sending_facility
+              type: keyword
+            - name: msh_receiving_application
+              type: keyword
+            - name: msh_receiving_facility
+              type: keyword
+            - name: msh_datetime_of_message
+              type: date
+            - name: msh_message_type
+              type: keyword
+            - name: msh_message_control_id
               type: text
-            - name: text_message
+            - name: msh_version_id
+              type: float
+            - name: msa_acknowledgement_code
+              type: keyword
+            - name: msa_message_control_id
+              type: text
+            - name: msa_text_message
               type: text
         - name: response.segments
           type: nested
