@@ -98,7 +98,6 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 	events := batch.Events()
 	var failed []publisher.Event
 	var reason error
-	var params map[string]string
 	for _, event := range events {
 
 		// Extract time
@@ -108,7 +107,7 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 			continue
 		}
 
-		params = map[string]string{}
+		var params = map[string]string{}
 		// Copy params
 		for k, v := range c.params {
 			params[k] = v
