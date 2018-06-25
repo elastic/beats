@@ -24,6 +24,7 @@ import (
 	"gopkg.in/mgo.v2"
 
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -59,7 +60,12 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		}
 
 		dialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
-			return tls.Dial("tcp", addr.String(), tlsConfig.BuildModuleConfig(""))
+			hostname, _, err := net.SplitHostPort(base.HostData().Host)
+			if err != nil {
+				logp.Warn("Failed to obtain hostname from `%s`: %s", hostname, err)
+				hostname = ""
+			}
+			return tls.Dial("tcp", addr.String(), tlsConfig.BuildModuleConfig(hostname))
 		}
 	}
 
