@@ -62,15 +62,50 @@ For example, with the example event, "`${data.port}`" resolves to `6379`.
 
 include::../../{beatname_lc}/docs/autodiscover-docker-config.asciidoc[]
 
+
+ifeval::["{beatname_lc}"=="filebeat"]
 [WARNING]
 =======================================
-Something to take into account when defining config templates is that they will be launched for every container
-matching the given condition. In practice, this means that your configuration template should be scoped to the
-container. You can do so by using `${data.*}` fields in the config definition. For instance, use `${data.host}`
-to scope a module when monitoring the container instance or `$(data.docker.container.id)` when dealing with
-log files.
-=======================================
+When using autodiscover, you have to be careful when defining config templates, especially if they are
+reading from places holding information for several containers. For instance, under this file structure:
 
+`/mnt/logs/<container_id>/*.log`
+
+You can define a config template like this:
+
+**Wrong settings**:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+autodiscover.providers:
+  - type: docker
+    templates:
+      - condition.contains:
+          docker.container.image: nginx
+        config:
+          - type: log
+            paths:
+              - "/mnt/logs/*/*.log"
+-------------------------------------------------------------------------------------
+
+That would read all the files under the given path several times (one per nginx container). What you really
+want is to scope your template to the container that matched the autodiscover condition. Good settings:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+autodiscover.providers:
+  - type: docker
+    templates:
+      - condition.contains:
+          docker.container.image: nginx
+        config:
+          - type: log
+            paths:
+              - "/mnt/logs/${data.docker.container.id}/*.log"
+-------------------------------------------------------------------------------------
+
+=======================================
+endif::[]
 
 [float]
 ===== Kubernetes
