@@ -47,6 +47,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
@@ -16412,6 +16413,37 @@ type: long
 format: duration
 
 The OS uptime in milliseconds.
+
+
+--
+
+[[exported-fields-traefik]]
+== traefik fields
+
+experimental[]
+traefik module
+
+
+
+[float]
+== traefik fields
+
+
+
+
+[float]
+== health fields
+
+health
+
+
+
+*`traefik.health.example`*::
++
+--
+type: keyword
+
+Example field
 
 
 --

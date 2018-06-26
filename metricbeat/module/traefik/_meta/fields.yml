@@ -1,0 +1,11 @@
+- key: traefik
+  title: "traefik"
+  description: >
+    experimental[]
+
+    traefik module
+  fields:
+    - name: traefik
+      type: group
+      description: >
+      fields:
