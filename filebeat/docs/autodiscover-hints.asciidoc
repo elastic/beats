@@ -58,6 +58,7 @@ a list of configurations.
 co.elastic.logs/raw: "[{\"containers\":{\"ids\":[\"${data.container.id}\"]},\"multiline\":{\"negate\":\"true\",\"pattern\":\"^test\"},\"type\":\"docker\"}]"
 -------------------------------------------------------------------------------------
 
+[float]
 ===== `co.elastic.logs/processors`
 
 Define a processor to be added to the {beatname_uc} input/module configuration. See <<filebeat-filtering>> for the list
