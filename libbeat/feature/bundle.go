@@ -11,7 +11,7 @@ type Bundle struct {
 }
 
 // NewBundle creates a new Bundle of feature to be registered.
-func NewBundle(features []Featurable) *Bundle {
+func NewBundle(features ...Featurable) *Bundle {
 	return &Bundle{features: features}
 }
 
@@ -27,7 +27,7 @@ func (b *Bundle) Filter(stabilities ...Stability) *Bundle {
 			}
 		}
 	}
-	return NewBundle(filtered)
+	return NewBundle(filtered...)
 }
 
 // Features returns the interface features slice so
@@ -41,5 +41,5 @@ func MustBundle(bundle ...bundleable) *Bundle {
 	for _, feature := range bundle {
 		merged = append(merged, feature.Features()...)
 	}
-	return NewBundle(merged)
+	return NewBundle(merged...)
 }

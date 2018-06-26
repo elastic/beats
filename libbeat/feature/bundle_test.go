@@ -15,18 +15,18 @@ func TestBundle(t *testing.T) {
 	}
 
 	t.Run("Creates a new Bundle", func(t *testing.T) {
-		b := NewBundle(features)
+		b := NewBundle(features...)
 		assert.Equal(t, 3, len(b.Features()))
 	})
 
 	t.Run("Filters feature based on stability", func(t *testing.T) {
-		b := NewBundle(features)
+		b := NewBundle(features...)
 		new := b.Filter(Experimental)
 		assert.Equal(t, 1, len(new.Features()))
 	})
 
 	t.Run("Filters feature based on multiple different stability", func(t *testing.T) {
-		b := NewBundle(features)
+		b := NewBundle(features...)
 		new := b.Filter(Experimental, Stable)
 		assert.Equal(t, 2, len(new.Features()))
 	})
