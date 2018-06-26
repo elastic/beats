@@ -3,7 +3,12 @@
   description: >
     health
   fields:
-    - name: example
-      type: keyword
+    - name: uptime
+      type: group
       description: >
-        Example field
+        Uptime of Traefik instance
+      fields:
+        - name: sec
+          type: integer
+          description: >
+            Uptime in seconds
