@@ -110,7 +110,7 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	eventMeta := common.MapStr{
 		"timestamp": common.MapStr{
-			"created": kubernetes.Time(eve.Metadata.CreationTimestamp),
+			"created": kubernetes.Time(eve.Metadata.CreationTimestamp).UTC(),
 		},
 		"name":             eve.Metadata.GetName(),
 		"namespace":        eve.Metadata.GetNamespace(),
@@ -156,11 +156,11 @@ func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	tsMap := make(common.MapStr)
 
 	if eve.FirstTimestamp != nil {
-		tsMap["first_occurrence"] = kubernetes.Time(eve.FirstTimestamp)
+		tsMap["first_occurrence"] = kubernetes.Time(eve.FirstTimestamp).UTC()
 	}
 
 	if eve.LastTimestamp != nil {
-		tsMap["last_occurrence"] = kubernetes.Time(eve.LastTimestamp)
+		tsMap["last_occurrence"] = kubernetes.Time(eve.LastTimestamp).UTC()
 	}
 
 	if len(tsMap) != 0 {
