@@ -107,6 +107,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	tout := m.getTimeout(hints)
 	ival := m.getPeriod(hints)
 	sslConf := m.getSSLConfig(hints)
+	procs := m.getProcessors(hints)
 
 	moduleConfig := common.MapStr{
 		"module":     mod,
@@ -116,6 +117,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		"period":     ival,
 		"enabled":    true,
 		"ssl":        sslConf,
+		"processors": procs,
 	}
 
 	if ns != "" {
@@ -201,4 +203,9 @@ func (m *metricHints) getSSLConfig(hints common.MapStr) common.MapStr {
 
 func (m *metricHints) getModules(hints common.MapStr) []common.MapStr {
 	return builder.GetHintAsConfigs(hints, m.Key)
+}
+
+func (m *metricHints) getProcessors(hints common.MapStr) []common.MapStr {
+	return builder.GetProcessors(hints, m.Key)
+
 }

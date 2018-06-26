@@ -164,6 +164,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add beat export dashboard command. {pull}7239[7239]
 - Add support for docker autodiscover to monitor containers on host network {pull}6708[6708]
 - Add ability to define input configuration as stringified JSON for autodiscover. {pull}7372[7372]
+- Add processor definition support for hints builder {pull}7386[7386]
 
 *Auditbeat*
 

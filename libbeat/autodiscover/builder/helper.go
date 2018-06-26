@@ -20,6 +20,7 @@ package builder
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -68,6 +69,43 @@ func GetHintAsList(hints common.MapStr, key, config string) []string {
 	}
 
 	return nil
+}
+
+// GetProcessors gets processor definitions from the hints and returns a list of configs as a MapStr
+func GetProcessors(hints common.MapStr, key string) []common.MapStr {
+	rawProcs := GetHintMapStr(hints, key, "processors")
+	if rawProcs == nil {
+		return nil
+	}
+
+	var words, nums []string
+
+	for key := range rawProcs {
+		if _, err := strconv.Atoi(key); err != nil {
+			words = append(words, key)
+			continue
+		} else {
+			nums = append(nums, key)
+		}
+	}
+
+	sort.Strings(nums)
+
+	var configs []common.MapStr
+	for _, key := range nums {
+		rawCfg, _ := rawProcs[key]
+		if config, ok := rawCfg.(common.MapStr); ok {
+			configs = append(configs, config)
+		}
+	}
+
+	for _, word := range words {
+		configs = append(configs, common.MapStr{
+			word: rawProcs[word],
+		})
+	}
+
+	return configs
 }
 
 func getStringAsList(input string) []string {
