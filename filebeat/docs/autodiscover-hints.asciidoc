@@ -65,6 +65,23 @@ co.elastic.logs/raw: "[{\"containers\":{\"ids\":[\"${data.container.id}\"]},\"mu
 -------------------------------------------------------------------------------------
 
 [float]
+===== `co.elastic.logs/processors`
+
+Define a processor to be added to the {beatname_uc} input/module configuration. See <<filtering-and-enhancing-data>> for the list
+of supported processors.
+
+In order to provide ordering of the processor definition, numbers can be provided. If not, the hints builder will do
+arbitrary ordering:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.logs/processors.1.dissect.tokenizer: "%{key1} %{key2}"
+co.elastic.logs/processors.dissect.tokenizer: "%{key2} %{key1}"
+-------------------------------------------------------------------------------------
+
+In the above sample the processor definition tagged with `1` would be executed first.
+
+[float]
 ==== Kubernetes
 
 Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:

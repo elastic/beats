@@ -169,6 +169,51 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
+			msg: "Hint with processors config must have a processors in the input config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"processors": common.MapStr{
+							"1": common.MapStr{
+								"dissect": common.MapStr{
+									"tokenizer": "%{key1} %{key2}",
+								},
+							},
+							"drop_event": common.MapStr{},
+						},
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"type": "docker",
+				"containers": map[string]interface{}{
+					"ids": []interface{}{"abc"},
+				},
+				"processors": []interface{}{
+					map[string]interface{}{
+						"dissect": map[string]interface{}{
+							"tokenizer": "%{key1} %{key2}",
+						},
+					},
+					map[string]interface{}{
+						"drop_event": nil,
+					},
+				},
+			},
+		},
+		{
 			msg: "Hint with module should attach input to its filesets",
 			event: bus.Event{
 				"host": "1.2.3.4",
