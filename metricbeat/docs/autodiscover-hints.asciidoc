@@ -49,7 +49,7 @@ co.elastic.metrics/raw: "[{\"enabled\":true,\"metricsets\":[\"default\"],\"modul
 [float]
 ===== `co.elastic.metrics/processors`
 
-Define a processor to be added to the {beatname_uc} module configuration. See <<metricbeat-filtering>> for the list
+Define a processor to be added to the {beatname_uc} module configuration. See <<filtering-and-enhancing-data>> for the list
 of supported processors.
 
 In order to provide ordering of the processor definition, numbers can be provided. If not, the hints builder will do
