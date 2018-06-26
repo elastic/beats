@@ -22,9 +22,13 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
+
+// Feature exposes a memory queue.
+var Feature = queue.Feature("mem", create, feature.Stable)
 
 type Broker struct {
 	done chan struct{}
