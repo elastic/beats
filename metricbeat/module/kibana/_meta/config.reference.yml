@@ -2,4 +2,4 @@
   metricsets: ["status"]
   period: 10s
   hosts: ["localhost:5601"]
-  enabled: default
+  enabled: true
