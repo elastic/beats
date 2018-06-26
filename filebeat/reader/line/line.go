@@ -76,7 +76,6 @@ func newDecoderReader(in io.Reader, codec encoding.Encoding, bufferSize int) *de
 }
 
 func (r *decoderReader) read(buf []byte) (int, error) {
-	return r.in.Read(buf)
 	b := make([]byte, r.bufferSize)
 	n, err := r.in.Read(b)
 	if err != nil {
@@ -93,7 +92,7 @@ func (r *decoderReader) read(buf []byte) (int, error) {
 	r.bytesOffset += nBytes
 	r.decodedOffset += nSymbols
 
-	return nSymbols, nil
+	return nBytes, nil
 }
 
 // conv
@@ -102,19 +101,19 @@ func (r *decoderReader) conv(in []byte, out []byte, symlen []int) (int, int, err
 	nBytes := 0
 	nSymbols := 0
 	bufSymLen := make([]int, len(symlen))
+	deChar := make([]byte, 1024)
 
 	i := 0
 	srcLen := len(in)
 	for i < srcLen {
 		j := i + 1
 		for j <= srcLen {
-			deChar := make([]byte, 1024)
-			nDst, nSrc, err := r.decoder.Transform(deChar, in[i:j], false)
+			nDst, _, err := r.decoder.Transform(deChar, in[i:j], false)
 			if err != nil {
 				if err == transform.ErrShortSrc {
 					j++
 
-					if srcLen < j {
+					if srcLen == j {
 						return nBytes, nSymbols, err
 					}
 					continue
@@ -123,20 +122,21 @@ func (r *decoderReader) conv(in []byte, out []byte, symlen []int) (int, int, err
 			}
 			bufSymLen[nSymbols] = nDst
 			r.buf.Write(deChar[:nDst])
-			nBytes += nSrc
+			nBytes += nDst
 			nSymbols++
 			break
 		}
 		i = j
 	}
 
-	b, err := r.buf.Collect(nSymbols)
+	b, err := r.buf.Collect(nBytes)
 	if err != nil {
 		panic(err)
 	}
-	copy(out, b)
 
-	return nBytes, nSymbols, err
+	copy(symlen, bufSymLen)
+
+	return nBytes, copy(out, b), err
 }
 
 type lineScanner struct {
@@ -160,7 +160,7 @@ func newLineScanner(in *decoderReader, bufferSize int, nl []byte) *lineScanner {
 
 // Scan reads from the underlying decoder reader and returns decoded lines.
 func (s *lineScanner) scan() ([]byte, int, error) {
-	idx := s.buf.Index(s.nl)
+	idx := s.buf.IndexRune('\n')
 	for !newLineFound(idx) {
 		b := make([]byte, s.bufferSize)
 		n, err := s.in.read(b)
@@ -169,7 +169,7 @@ func (s *lineScanner) scan() ([]byte, int, error) {
 		}
 
 		s.buf.Append(b[:n])
-		idx = s.buf.Index(s.nl)
+		idx = s.buf.IndexRune('\n')
 	}
 
 	return s.line(idx)
