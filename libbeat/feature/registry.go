@@ -93,8 +93,8 @@ func (r *registry) Unregister(namespace, name string) error {
 	return nil
 }
 
-// Find returns a specific Find from a namespace or an error if not found.
-func (r *registry) Find(namespace, name string) (Featurable, error) {
+// Lookup searches for a Feature by the namespace-name pair.
+func (r *registry) Lookup(namespace, name string) (Featurable, error) {
 	r.RLock()
 	defer r.RUnlock()
 
@@ -111,8 +111,8 @@ func (r *registry) Find(namespace, name string) (Featurable, error) {
 	return m, nil
 }
 
-// FindAll returns all the features for a specific namespace.
-func (r *registry) FindAll(namespace string) ([]Featurable, error) {
+// LookupAll returns all the features for a specific namespace.
+func (r *registry) LookupAll(namespace string) ([]Featurable, error) {
 	r.RLock()
 	defer r.RUnlock()
 

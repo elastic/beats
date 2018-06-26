@@ -59,7 +59,7 @@ func TestFeature(t *testing.T) {
 	r.Register(New("processor", "foo", f, Stable))
 
 	t.Run("when namespace and feature are present", func(t *testing.T) {
-		feature, err := r.Find("processor", "foo")
+		feature, err := r.Lookup("processor", "foo")
 		if !assert.NotNil(t, feature.Factory()) {
 			return
 		}
@@ -67,7 +67,7 @@ func TestFeature(t *testing.T) {
 	})
 
 	t.Run("when namespace doesn't exist", func(t *testing.T) {
-		_, err := r.Find("hello", "foo")
+		_, err := r.Lookup("hello", "foo")
 		if !assert.Error(t, err) {
 			return
 		}
@@ -82,7 +82,7 @@ func TestFeatures(t *testing.T) {
 	r.Register(New("processor", "foo2", f, Stable))
 
 	t.Run("when namespace and feature are present", func(t *testing.T) {
-		features, err := r.FindAll("processor")
+		features, err := r.LookupAll("processor")
 		if !assert.NoError(t, err) {
 			return
 		}
@@ -90,7 +90,7 @@ func TestFeatures(t *testing.T) {
 	})
 
 	t.Run("when namespace is not present", func(t *testing.T) {
-		_, err := r.FindAll("foobar")
+		_, err := r.LookupAll("foobar")
 		if !assert.Error(t, err) {
 			return
 		}
