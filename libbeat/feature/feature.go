@@ -2,29 +2,33 @@ package feature
 
 import (
 	"fmt"
-	"reflect"
 )
 
-// Registry is the global plugin registry, this variable is mean to be temporary to move all the
+// Registry is the global plugin registry, this variable is meant to be temporary to move all the
 // internal factory to receive a context that include the current beat registry.
 var Registry = newRegistry()
 
 // Featurable implements the description of a feature.
 type Featurable interface {
-	// Namespace returns the namespace of the Feature.
+	bundleable
+
+	// Namespace is the kind of plugin or functionality we want to expose as a feature.
+	// Examples: Autodiscover's provider, processors, outputs.
 	Namespace() string
 
-	// Name returns the name of the feature. The name must be unique for each namespace.
+	// Name is the name of the feature, the name must unique by namespace and be a description of the
+	// actual functionality, it is usually the name of the package.
+	// Examples: dissect, elasticsearch, redis
 	Name() string
 
-	// Factory returns the factory func.
+	// Factory returns the function used to create an instance of the Feature, the signature
+	// of the method is type checked by the 'FindFactory' of each namespace.
 	Factory() interface{}
 
-	// Stability returns the stability of the feature.
+	// Stability is the stability of the Feature, this allow the user to filter embedded functionality
+	// by their maturity at runtime.
+	// Example: Beta, Experimental, Stable or Undefined.
 	Stability() Stability
-
-	// Equal returns true if the two object are equal.
-	Equal(other Featurable) bool
 
 	String() string
 }
@@ -57,17 +61,9 @@ func (f *Feature) Stability() Stability {
 	return f.stability
 }
 
-// Equal return true if both object are equals.
-func (f *Feature) Equal(other Featurable) bool {
-	// There is no safe way to compare function in go,
-	// but since the method are global it should be stable.
-	if f.Name() == other.Name() &&
-		f.Namespace() == other.Namespace() &&
-		reflect.ValueOf(f.Factory()).Pointer() == reflect.ValueOf(other.Factory()).Pointer() {
-		return true
-	}
-
-	return false
+// Features return the current feature as a slice to be compatible with Bundle merging and filtering.
+func (f *Feature) Features() []Featurable {
+	return []Featurable{f}
 }
 
 // String return the debug information
@@ -87,7 +83,7 @@ func New(namespace, name string, factory interface{}, stability Stability) *Feat
 
 // RegisterBundle registers a bundle of features.
 func RegisterBundle(bundle *Bundle) error {
-	for _, f := range bundle.Features {
+	for _, f := range bundle.Features() {
 		Registry.Register(f)
 	}
 	return nil

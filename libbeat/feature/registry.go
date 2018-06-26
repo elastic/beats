@@ -2,6 +2,7 @@ package feature
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -32,40 +33,43 @@ func (r *registry) Register(feature Featurable) error {
 	r.Lock()
 	defer r.Unlock()
 
+	ns := feature.Namespace()
+	name := feature.Name()
+
 	// Lazy create namespaces
-	_, found := r.namespaces[feature.Namespace()]
+	_, found := r.namespaces[ns]
 	if !found {
-		r.namespaces[feature.Namespace()] = make(map[string]Featurable)
+		r.namespaces[ns] = make(map[string]Featurable)
 	}
 
-	f, found := r.namespaces[feature.Namespace()][feature.Name()]
+	f, found := r.namespaces[ns][name]
 	if found {
-		if feature.Equal(f) {
+		if featuresEqual(feature, f) {
 			// Allow both old style and new style of plugin to work together.
 			r.log.Debugw(
 				"ignoring, feature '%s' is already registered in the namespace '%s'",
-				feature.Name(),
-				feature.Namespace(),
+				name,
+				ns,
 			)
 			return nil
 		}
 
 		return fmt.Errorf(
 			"could not register new feature '%s' in namespace '%s', feature name must be unique",
-			feature.Name(),
-			feature.Namespace(),
+			name,
+			ns,
 		)
 	}
 
 	r.log.Debugw(
 		"registering new feature",
 		"namespace",
-		feature.Namespace(),
+		ns,
 		"name",
-		feature.Name(),
+		name,
 	)
 
-	r.namespaces[feature.Namespace()][feature.Name()] = feature
+	r.namespaces[ns][name] = feature
 
 	return nil
 }
@@ -138,4 +142,16 @@ func (r *registry) Size() int {
 	}
 
 	return c
+}
+
+func featuresEqual(f1, f2 Featurable) bool {
+	// There is no safe way to compare function in go,
+	// but since the function pointers are global it should be stable.
+	if f1.Name() == f2.Name() &&
+		f1.Namespace() == f2.Namespace() &&
+		reflect.ValueOf(f1.Factory()).Pointer() == reflect.ValueOf(f2.Factory()).Pointer() {
+		return true
+	}
+
+	return false
 }
