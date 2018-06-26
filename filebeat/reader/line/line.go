@@ -104,6 +104,7 @@ func (r *decoderReader) conv(in []byte, out []byte, symlen []int) (int, int, err
 	bufSymLen := make([]int, len(symlen))
 
 	i := 0
+	srcLen := len(in)
 	for i < srcLen {
 		j := i + 1
 		for j <= srcLen {
