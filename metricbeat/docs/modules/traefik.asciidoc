@@ -24,9 +24,8 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: traefik
   metricsets: ["health"]
-  enabled: false
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["localhost:8080"]
 ----
 
 [float]
