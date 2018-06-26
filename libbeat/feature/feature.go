@@ -5,8 +5,6 @@ import (
 	"reflect"
 )
 
-//go:generate stringer -type=Stability
-
 // Registry is the global plugin registry, this variable is mean to be temporary to move all the
 // internal factory to receive a context that include the current beat registry.
 var Registry = newRegistry()
@@ -76,17 +74,6 @@ func (f *Feature) Equal(other Featurable) bool {
 func (f *Feature) String() string {
 	return fmt.Sprintf("%s/%s (stability: %s)", f.namespace, f.name, f.stability)
 }
-
-// Stability defines the stability of the feature, this value can be used to filter a bundler.
-type Stability int
-
-// List all the available stability for a feature.
-const (
-	Stable Stability = iota
-	Beta
-	Experimental
-	Undefined
-)
 
 // New returns a new Feature.
 func New(namespace, name string, factory interface{}, stability Stability) *Feature {

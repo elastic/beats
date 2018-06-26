@@ -4,9 +4,9 @@ package feature
 
 import "strconv"
 
-const _Stability_name = "StableBetaExperimentalUndefined"
+const _Stability_name = "UndefinedStableBetaExperimental"
 
-var _Stability_index = [...]uint8{0, 6, 10, 22, 31}
+var _Stability_index = [...]uint8{0, 9, 15, 19, 31}
 
 func (i Stability) String() string {
 	if i < 0 || i >= Stability(len(_Stability_index)-1) {
