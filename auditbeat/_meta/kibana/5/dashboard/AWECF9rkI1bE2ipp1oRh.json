@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "[Auditbeat File Integrity]", 
+  "uiStateJSON": "{\"P-1\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-11\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-5\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-6\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-7\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"AV0tVcg6g1PYniApZa-v\",\"panelIndex\":1,\"row\":1,\"size_x\":2,\"size_y\":6,\"type\":\"visualization\"},{\"col\":10,\"id\":\"AV0tWL-Yg1PYniApZbCs\",\"panelIndex\":2,\"row\":1,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":10,\"id\":\"AV0tWSdXg1PYniApZbDU\",\"panelIndex\":3,\"row\":4,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":3,\"id\":\"AV0tV05vg1PYniApZbA2\",\"panelIndex\":4,\"row\":1,\"size_x\":7,\"size_y\":6,\"type\":\"visualization\"},{\"col\":1,\"id\":\"AV0tY6jwg1PYniApZbRY\",\"panelIndex\":5,\"row\":7,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"AV0tav8Ag1PYniApZbbK\",\"panelIndex\":6,\"row\":7,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":9,\"id\":\"AV0tbcUdg1PYniApZbe1\",\"panelIndex\":7,\"row\":7,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"AV0te0TCg1PYniApZbw9\",\"panelIndex\":8,\"row\":9,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"AV0tW0djg1PYniApZbGL\",\"panelIndex\":9,\"row\":9,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":9,\"id\":\"AV0tes4Eg1PYniApZbwV\",\"panelIndex\":10,\"row\":9,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"AV0tc_xZg1PYniApZbnL\",\"panelIndex\":11,\"row\":11,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":7,\"columns\":[\"file.path\",\"event.action\"],\"id\":\"a380a060-cb44-11e7-9835-2f31fe08873b\",\"panelIndex\":12,\"row\":11,\"size_x\":6,\"size_y\":5,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"match_all\":{}}}],\"highlightAll\":true,\"version\":true}"
+  }
+}

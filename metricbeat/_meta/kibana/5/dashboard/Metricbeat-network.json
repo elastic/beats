@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Metricbeat-network", 
+  "uiStateJSON": "{\"P-6\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"In-vs-Out-Network-Bytes\",\"panelIndex\":5,\"row\":5,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Top-10-interfaces\",\"panelIndex\":6,\"row\":10,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Network-Packetloss\",\"panelIndex\":13,\"row\":2,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Packet-loss-on-interfaces\",\"panelIndex\":22,\"row\":5,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"System-Navigation\",\"panelIndex\":23,\"row\":1,\"size_x\":12,\"size_y\":1,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Network-Bytes\",\"panelIndex\":24,\"row\":2,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}],\"highlightAll\":true,\"version\":true}"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "hits": 0, 
+  "timeFrom": "now-1h", 
+  "timeRestore": true, 
+  "description": "", 
+  "title": "Metricbeat Hosts Overview", 
+  "uiStateJSON": "{\"P-6\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"855899e0-1b1c-11e7-b09e-037021c4f8df\",\"panelIndex\":1,\"row\":2,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"fe064790-1b1f-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":2,\"row\":2,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":10,\"id\":\"aa984970-1e0b-11e7-852e-cdcfcfdffddd\",\"panelIndex\":5,\"row\":1,\"size_x\":3,\"size_y\":1,\"type\":\"visualization\"},{\"col\":1,\"id\":\"95490a10-1e23-11e7-958f-490b8dcb96d8\",\"panelIndex\":6,\"row\":5,\"size_x\":12,\"size_y\":9,\"type\":\"visualization\"},{\"col\":1,\"id\":\"System-Navigation\",\"panelIndex\":7,\"row\":1,\"size_x\":9,\"size_y\":1,\"type\":\"visualization\"}]", 
+  "timeTo": "now", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "refreshInterval": {
+    "section": 1, 
+    "pause": false, 
+    "display": "10 seconds", 
+    "value": 10000
+  }, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}],\"highlightAll\":true,\"version\":true}"
+  }
+}

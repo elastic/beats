@@ -1,0 +1,10 @@
+{
+  "visState": "{\"type\":\"timelion\",\"title\":\"Audit Event Results\",\"params\":{\"expression\":\".es(q=\\\"_exists_:auditd.log NOT auditd.log.res:failure\\\").label(\\\"Success\\\") .es(q=\\\"auditd.log.res:failed\\\").label(\\\"Failure\\\").title(\\\"Audit Event Results\\\")\",\"interval\":\"auto\"}}", 
+  "description": "", 
+  "title": "Audit Event Results", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{}"
+  }
+}

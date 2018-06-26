@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Golang: Heap", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"58000780-f529-11e6-844d-b170e2f0a07e\",\"panelIndex\":8,\"row\":1,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"95388680-f52a-11e6-969c-518c48c913e4\",\"panelIndex\":9,\"row\":4,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"b59a5200-f52a-11e6-969c-518c48c913e4\",\"panelIndex\":10,\"row\":4,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":5,\"id\":\"9a9a8bf0-f52a-11e6-969c-518c48c913e4\",\"panelIndex\":11,\"row\":4,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"b046cb80-f52a-11e6-969c-518c48c913e4\",\"panelIndex\":12,\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"ab226b50-f52a-11e6-969c-518c48c913e4\",\"panelIndex\":13,\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

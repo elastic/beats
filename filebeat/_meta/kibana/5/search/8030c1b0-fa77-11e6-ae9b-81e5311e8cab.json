@@ -1,0 +1,20 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "useradd logs", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"_exists_:system.auth.useradd\"}},\"filter\":[]}"
+  }, 
+  "columns": [
+    "system.auth.useradd.name", 
+    "system.auth.useradd.uid", 
+    "system.auth.useradd.gid", 
+    "system.auth.useradd.home", 
+    "system.auth.useradd.shell"
+  ]
+}

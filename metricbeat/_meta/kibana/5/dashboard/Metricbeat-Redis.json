@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Metricbeat: Redis", 
+  "uiStateJSON": "{\"P-3\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-4\":{\"vis\":{\"legendOpen\":true}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"Redis-Clients-Metrics\",\"panelIndex\":2,\"row\":1,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Redis-Connected-clients\",\"panelIndex\":1,\"row\":1,\"size_x\":5,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Redis-hosts\",\"panelIndex\":3,\"row\":4,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Redis-Server-Versions\",\"panelIndex\":4,\"row\":6,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Redis-server-mode\",\"panelIndex\":5,\"row\":6,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Redis-multiplexing-API\",\"panelIndex\":6,\"row\":6,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"id\":\"Redis-Keyspaces\",\"type\":\"visualization\",\"panelIndex\":7,\"size_x\":4,\"size_y\":3,\"col\":9,\"row\":1}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

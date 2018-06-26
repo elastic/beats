@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Golang: Objects\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.allocations.objects\\\").label(\\\"Object Count(avg)\\\").yaxis(1,label=\\\"Count\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.allocations.total\\\").derivative().label(\\\"Allocation Rate\\\").yaxis(2,label=\\\"Rate\\\").movingaverage(30)\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Golang: Objects", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

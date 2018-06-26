@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Icinga Debug Log", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"0bc34b60-2419-11e7-a83b-d5f4cebac9ff\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"type\":\"visualization\",\"id\":\"fb09d4b0-2418-11e7-a83b-d5f4cebac9ff\",\"col\":7,\"row\":1},{\"size_x\":12,\"size_y\":29,\"panelIndex\":3,\"type\":\"search\",\"id\":\"c876e6a0-2418-11e7-a83b-d5f4cebac9ff\",\"col\":1,\"row\":4,\"columns\":[\"icinga.debug.facility\",\"icinga.debug.severity\",\"icinga.debug.message\"],\"sort\":[\"@timestamp\",\"desc\"]}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+  }
+}

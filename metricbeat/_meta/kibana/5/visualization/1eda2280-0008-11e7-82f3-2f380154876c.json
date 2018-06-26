@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"MySQL commands\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*, metric='avg:mysql.status.command.select').derivative().label(\\\"SELECT\\\"),.es(*, metric='avg:mysql.status.command.insert').derivative().label(\\\"INSERT\\\"),.es(*, metric='avg:mysql.status.command.insert').derivative().label(\\\"UPDATE\\\"),.es(*, metric='avg:mysql.status.command.insert').derivative().label(\\\"DELETE\\\")\",\"interval\":\"1m\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "MySQL commands", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+  }
+}
