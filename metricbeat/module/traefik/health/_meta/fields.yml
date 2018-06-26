@@ -9,6 +9,37 @@
         Uptime of Traefik instance
       fields:
         - name: sec
-          type: integer
+          type: float
           description: >
             Uptime in seconds
+    - name: response
+      type: group
+      description: >
+        Response metrics
+      fields:
+        - name: count
+          type: int
+          description: >
+            Number of responses
+        - name: avg_time
+          type: group
+          description: >
+            Average response time
+          fields:
+            - name: sec
+              type: float
+              description:
+                  Average response time in seconds
+        - name: status_codes
+          type: group
+          description: >
+            Respone status codes
+          fields:
+            - name: code
+              type: keyword
+              description: >
+                Status code
+            - name: count
+              type: int
+              description: >
+                Number of responses for status code

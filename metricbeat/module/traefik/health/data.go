@@ -26,11 +26,25 @@ import (
 var (
 	schema = s.Schema{
 		"uptime": s.Object{
-			"sec": c.Int("uptime_sec"),
+			"sec": c.Float("uptime_sec"),
+		},
+		"response": s.Object{
+			"count": c.Int("total_count"),
+			"avg_time": s.Object{
+				"sec": c.Float("average_response_time_sec"),
+			},
+			"status_codes": s.Object{},
 		},
 	}
 )
 
 func eventMapping(health map[string]interface{}) (common.MapStr, *s.Errors) {
-	return schema.Apply(health)
+	event, _ := schema.Apply(health)
+
+	statusCodeCountMap := health["total_status_code_count"].(map[string]interface{})
+	for code, count := range statusCodeCountMap {
+		event.Put("response.status_codes."+code, count)
+	}
+
+	return event, nil
 }
