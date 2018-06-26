@@ -20,11 +20,6 @@
               "field": "elasticsearch.audit.timestamp",
               "target_field": "@timestamp"
           }
-      },
-      {
-          "remove": {
-              "field": "elasticsearch.audit.timestamp"
-          }
       }
     ],
   "on_failure" : [{
