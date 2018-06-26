@@ -6,6 +6,12 @@ from the container using the `docker` input. You can use hints to modify this be
 list of supported hints:
 
 [float]
+===== `co.elastic.logs/disable`
+
+Filebeat gets logs from all containers by default, you can set this hint to `true` to ignore
+the output of the container. Filebeat won't read or send logs from it.
+
+[float]
 ===== `co.elastic.logs/multiline.*`
 
 Multiline settings. See <<multiline-examples>> for a full list of all supported options.
