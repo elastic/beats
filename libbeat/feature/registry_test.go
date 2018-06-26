@@ -74,6 +74,7 @@ func TestFeature(t *testing.T) {
 
 	r := newRegistry()
 	r.Register(New("processor", "foo", f, Stable))
+	r.Register(New("HOLA", "fOO", f, Stable))
 
 	t.Run("when namespace and feature are present", func(t *testing.T) {
 		feature, err := r.Lookup("processor", "foo")
@@ -89,14 +90,22 @@ func TestFeature(t *testing.T) {
 			return
 		}
 	})
+
+	t.Run("when namespace and key are normalized", func(t *testing.T) {
+		_, err := r.Lookup("HOLA", "foo")
+		if !assert.NoError(t, err) {
+			return
+		}
+	})
 }
 
-func TestFeatures(t *testing.T) {
+func TestLookup(t *testing.T) {
 	f := func() {}
 
 	r := newRegistry()
 	r.Register(New("processor", "foo", f, Stable))
 	r.Register(New("processor", "foo2", f, Stable))
+	r.Register(New("HELLO", "fOO", f, Stable))
 
 	t.Run("when namespace and feature are present", func(t *testing.T) {
 		features, err := r.LookupAll("processor")
@@ -111,6 +120,15 @@ func TestFeatures(t *testing.T) {
 		if !assert.Error(t, err) {
 			return
 		}
+	})
+
+	t.Run("when namespace and name are normalized", func(t *testing.T) {
+		features, err := r.LookupAll("hello")
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		assert.Equal(t, 1, len(features))
 	})
 }
 
