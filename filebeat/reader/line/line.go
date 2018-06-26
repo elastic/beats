@@ -114,6 +114,7 @@ func (r *decoderReader) conv(in []byte, out []byte, symlen []int) (int, int, err
 					j++
 
 					if srcLen == j {
+					if srcLen < j {
 						return nBytes, nSymbols, err
 					}
 					continue
