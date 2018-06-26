@@ -15,11 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package builder
+package include
 
-import "github.com/elastic/beats/libbeat/feature"
+import (
+	"github.com/elastic/beats/libbeat/autodiscover/appenders/config"
+	"github.com/elastic/beats/libbeat/autodiscover/providers/docker"
+	"github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
+	"github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
+	"github.com/elastic/beats/libbeat/feature"
+)
 
-// Plugin accepts a builder to be registered as a plugin
-func Plugin(name string, factory Factory) *feature.Feature {
-	return Feature(name, factory, feature.Beta)
+// Bundle expose the main features.
+var Bundle = feature.MustBundle(
+	// Autodiscovery providers
+	feature.MustBundle(
+		jolokia.Feature,
+		docker.Feature,
+		kubernetes.Feature,
+	),
+
+	// Autodiscovery appenders
+	feature.MustBundle(
+		config.Feature,
+	),
+)
+
+func init() {
+	// Register main bundle
+	feature.RegisterBundle(Bundle)
 }

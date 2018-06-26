@@ -22,8 +22,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/feature"
 )
 
 type fakeBuilder struct{}
@@ -37,13 +39,8 @@ func newFakeBuilder(_ *common.Config) (Builder, error) {
 }
 
 func TestBuilderRegistry(t *testing.T) {
-	// Add a new builder
-	reg := NewRegistry()
-	reg.AddBuilder("fake", newFakeBuilder)
-
-	// Check if that builder is available in registry
-	b := reg.GetBuilder("fake")
-	assert.NotNil(t, b)
+	feature.MustRegister(builder.Feature("fake", newFakeBuilder, feature.Beta))
+	defer feature.Registry.Unregister(builder.Namespace, "fake")
 
 	// Generate a config with type fake
 	config := BuilderConfig{
@@ -55,7 +52,7 @@ func TestBuilderRegistry(t *testing.T) {
 	// Make sure that config building doesn't fail
 	assert.Nil(t, err)
 
-	builder, err := reg.BuildBuilder(cfg)
+	builder, err := builder.Build(cfg)
 	assert.Nil(t, err)
 	assert.NotNil(t, builder)
 

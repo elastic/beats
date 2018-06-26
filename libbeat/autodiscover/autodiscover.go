@@ -23,6 +23,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/autodiscover/meta"
+	"github.com/elastic/beats/libbeat/autodiscover/providers"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
@@ -75,14 +76,14 @@ func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, confi
 	bus := bus.New(name)
 
 	// Init providers
-	var providers []Provider
+	var list []Provider
 	for _, providerCfg := range config.Providers {
-		provider, err := Registry.BuildProvider(bus, providerCfg)
+		provider, err := providers.Build(bus, providerCfg)
 		if err != nil {
 			return nil, errors.Wrap(err, "error in autodiscover provider settings")
 		}
 		logp.Debug(debugK, "Configured autodiscover provider: %s", provider)
-		providers = append(providers, provider)
+		list = append(list, provider)
 	}
 
 	return &Autodiscover{
@@ -91,7 +92,7 @@ func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, confi
 		adapter:         adapter,
 		configs:         map[uint64]*cfgfile.ConfigWithMeta{},
 		runners:         cfgfile.NewRunnerList("autodiscover", adapter, pipeline),
-		providers:       providers,
+		providers:       list,
 		meta:            meta.NewMap(),
 	}, nil
 }
