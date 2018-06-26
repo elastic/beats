@@ -57,8 +57,8 @@ arbitrary ordering:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-co.elastic.logs/processor.1.add_locale.abbrevation: "MST"
-co.elastic.logs/processor.add_locale.abbrevation: "PST"
+co.elastic.logs/processors.1.add_locale.abbrevation: "MST"
+co.elastic.logs/processors.add_locale.abbrevation: "PST"
 -------------------------------------------------------------------------------------
 
 In the above sample the processor definition tagged with `1` would be executed first.
