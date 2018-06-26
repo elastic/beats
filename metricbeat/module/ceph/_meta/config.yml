@@ -1,7 +1,6 @@
 - module: ceph
   metricsets: ["cluster_health", "cluster_status", "monitor_health"]
   period: 10s
-  hosts: ["localhost:5000"]
   #username: "user"
   #password: "secret"
 
