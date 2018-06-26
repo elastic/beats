@@ -68,8 +68,8 @@ arbitrary ordering:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-co.elastic.logs/processor.1.dissect.tokenizer: "%{key1} %{key2}"
-co.elastic.logs/processor.dissect.tokenizer: "%{key2} %{key1}"
+co.elastic.logs/processors.1.dissect.tokenizer: "%{key1} %{key2}"
+co.elastic.logs/processors.dissect.tokenizer: "%{key2} %{key1}"
 -------------------------------------------------------------------------------------
 
 In the above sample the processor definition tagged with `1` would be executed first.
