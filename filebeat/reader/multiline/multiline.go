@@ -7,6 +7,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/reader"
 	"github.com/elastic/beats/filebeat/reader/timeout"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -332,4 +333,8 @@ func genPatternMatcher(
 		return pat.Match(line)
 	}
 	return matcher, nil
+}
+
+func (mlr *Reader) GetState() common.MapStr {
+	return mlr.reader.GetState()
 }
