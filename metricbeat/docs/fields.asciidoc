@@ -16438,12 +16438,79 @@ health
 
 
 
-*`traefik.health.example`*::
+[float]
+== uptime fields
+
+Uptime of Traefik instance
+
+
+
+*`traefik.health.uptime.sec`*::
++
+--
+type: float
+
+Uptime in seconds
+
+
+--
+
+[float]
+== response fields
+
+Response metrics
+
+
+
+*`traefik.health.response.count`*::
++
+--
+type: int
+
+Number of responses
+
+
+--
+
+[float]
+== avg_time fields
+
+Average response time
+
+
+
+*`traefik.health.response.avg_time.sec`*::
++
+--
+type: float
+
+Average response time in seconds
+
+--
+
+[float]
+== status_codes fields
+
+Respone status codes
+
+
+
+*`traefik.health.response.status_codes.code`*::
 +
 --
 type: keyword
 
-Example field
+Status code
+
+
+--
+
+*`traefik.health.response.status_codes.count`*::
++
+--
+type: int
+
+Number of responses for status code
 
 
 --
