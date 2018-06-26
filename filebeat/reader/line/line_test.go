@@ -48,6 +48,12 @@ var tests = []struct {
 	{"utf-8", []string{"árvíztűrő tükörfúrógép"}},
 	{"utf-8", []string{"árvíztűrő", "tükörfúrógép"}},
 
+	{"utf-16", []string{""}},
+	{"utf-16", []string{"I can"}},
+	{"utf-16", []string{"I can", "eat glass"}},
+	{"utf-16", []string{"Pot să mănânc sticlă"}},
+	{"utf-16", []string{"Pot să mănânc sticlă", "și ea nu mă rănește."}},
+
 	{"utf-16be", []string{""}},
 	{"utf-16be", []string{"I can"}},
 	{"utf-16be", []string{"I can", "eat glass"}},
