@@ -1,0 +1,50 @@
+{
+  "description": "Pipeline for parsing MariaDB error logs. It currently uses message1 and message2 to workaround bug https://github.com/elastic/elasticsearch/issues/22117",
+  "processors": [{
+    "grok": {
+        "field": "message",
+        "patterns": [
+          "%{LOCALDATETIME:mariadb.error.timestamp} (\\[%{DATA:mariadb.error.level}\\] )?%{GREEDYDATA:mariadb.error.message}",
+          "%{DATA:mariadb.error.timestamp} %{NUMBER:mariadb.error.thread_id} \\[%{DATA:mariadb.error.level}\\] %{GREEDYDATA:mariadb.error.message1}",
+          "%{GREEDYDATA:mariadb.error.message2}"
+        ],
+        "ignore_missing": true,
+        "pattern_definitions": {
+          "LOCALDATETIME": "[0-9]+ %{TIME}",
+          "GREEDYDATA1": ".*"
+        }
+      }
+    }, {
+      "remove": {
+        "field": "message"
+      }
+    }, {
+      "rename": {
+        "field": "mariadb.error.message1",
+        "target_field": "mariadb.error.message",
+        "ignore_failure": true
+      }
+    }, {
+      "rename": {
+        "field": "mariadb.error.message2",
+        "target_field": "mariadb.error.message",
+        "ignore_failure": true
+      }
+    }, {
+      "date": {
+        "field": "mariadb.error.timestamp",
+        "target_field": "@timestamp",
+        "formats": [
+          "ISO8601",
+          "YYMMdd H:m:s"
+        ],
+        "ignore_failure": true
+      }
+    }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}
