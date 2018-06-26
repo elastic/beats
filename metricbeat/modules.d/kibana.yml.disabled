@@ -1,2 +1,4 @@
 - module: kibana
   hosts: ["localhost:5601"]
+  #username: "user"
+  #password: "secret"

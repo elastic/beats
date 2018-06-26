@@ -2,3 +2,5 @@
   period: 10s
   hosts: ["localhost:9090"]
   #namespace: example
+  #username: "user"
+  #password: "secret"

@@ -1,2 +1,4 @@
 - module: etcd
   hosts: ["localhost:2379"]
+  #username: "user"
+  #password: "secret"

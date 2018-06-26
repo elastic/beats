@@ -1,6 +1,8 @@
 - module: ceph
   metricsets: ["cluster_health", "cluster_status", "monitor_health"]
   period: 10s
+  #username: "user"
+  #password: "secret"
 
 - module: ceph
   metricsets: ["cluster_disk", "osd_tree", "pool_disk"]

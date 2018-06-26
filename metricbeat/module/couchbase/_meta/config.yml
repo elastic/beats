@@ -1,2 +1,4 @@
 - module: couchbase
   hosts: ["localhost:8091"]
+  #username: "user"
+  #password: "secret"

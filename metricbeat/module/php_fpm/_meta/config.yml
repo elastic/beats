@@ -1,2 +1,4 @@
 - module: php_fpm
   hosts: ["localhost:8080"]
+  #username: "user"
+  #password: "secret"
