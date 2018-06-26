@@ -1,0 +1,23 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false,\"hidePanelTitles\":false,\"useMargins\":true}",
+        "panelsJSON": "[{\"panelIndex\":\"1\",\"gridData\":{\"x\":0,\"y\":0,\"w\":6,\"h\":2,\"i\":\"1\"},\"id\":\"a64b4fd0-471c-11e8-bc13-1397384faad3\",\"type\":\"visualization\",\"version\":\"6.2.2\"},{\"panelIndex\":\"2\",\"gridData\":{\"x\":6,\"y\":0,\"w\":3,\"h\":2,\"i\":\"2\"},\"id\":\"794b6cd0-471d-11e8-bc13-1397384faad3\",\"type\":\"visualization\",\"version\":\"6.2.2\"},{\"panelIndex\":\"3\",\"gridData\":{\"x\":6,\"y\":2,\"w\":6,\"h\":4,\"i\":\"3\"},\"id\":\"bb0ab500-4735-11e8-bc13-1397384faad3\",\"type\":\"visualization\",\"version\":\"6.2.2\"},{\"panelIndex\":\"4\",\"gridData\":{\"x\":9,\"y\":0,\"w\":3,\"h\":2,\"i\":\"4\"},\"id\":\"40bed190-473b-11e8-bc13-1397384faad3\",\"type\":\"visualization\",\"version\":\"6.2.2\"},{\"panelIndex\":\"5\",\"gridData\":{\"x\":0,\"y\":2,\"w\":6,\"h\":2,\"i\":\"5\"},\"id\":\"0751ed00-479c-11e8-bc13-1397384faad3\",\"type\":\"visualization\",\"version\":\"6.2.2\"},{\"panelIndex\":\"6\",\"gridData\":{\"x\":0,\"y\":4,\"w\":6,\"h\":2,\"i\":\"6\"},\"version\":\"6.2.2\",\"type\":\"visualization\",\"id\":\"b3463670-47a1-11e8-bc13-1397384faad3\"}]",
+        "timeRestore": false,
+        "title": "[Metricbeat Haproxy] Backend",
+        "version": 1
+      },
+      "id": "9151c900-471d-11e8-bc13-1397384faad3",
+      "type": "dashboard",
+      "updated_at": "2018-04-24T18:31:25.838Z",
+      "version": 15
+    }
+  ],
+  "version": "6.2.2"
+}

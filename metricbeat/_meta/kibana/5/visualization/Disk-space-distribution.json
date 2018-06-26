@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Disk space distribution\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"isDonut\":false,\"legendPosition\":\"bottom\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"system.filesystem.total\",\"customLabel\":\"Total size\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"system.filesystem.mount_point\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"_term\",\"customLabel\":\"Mount point\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Disk space distribution", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Filesystem-stats", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

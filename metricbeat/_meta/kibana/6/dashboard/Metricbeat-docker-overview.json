@@ -1,0 +1,188 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "Metricbeat-Docker",
+        "title": "Docker containers [Metricbeat Docker]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"asc\"}}}}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"Name\",\"field\":\"docker.container.name\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":5},\"schema\":\"bucket\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"CPU usage (%)\",\"field\":\"docker.cpu.total.pct\"},\"schema\":\"metric\",\"type\":\"max\"},{\"enabled\":true,\"id\":\"4\",\"params\":{\"customLabel\":\"DiskIO\",\"field\":\"docker.diskio.total\"},\"schema\":\"metric\",\"type\":\"max\"},{\"enabled\":true,\"id\":\"5\",\"params\":{\"customLabel\":\"Mem (%)\",\"field\":\"docker.memory.usage.pct\"},\"schema\":\"metric\",\"type\":\"max\"},{\"enabled\":true,\"id\":\"6\",\"params\":{\"customLabel\":\"Mem RSS\",\"field\":\"docker.memory.rss.total\"},\"schema\":\"metric\",\"type\":\"max\"},{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"Number of Containers\",\"field\":\"docker.container.id\"},\"schema\":\"metric\",\"type\":\"cardinality\"}],\"listeners\":{},\"params\":{\"perPage\":8,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":true,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"title\":\"Docker containers [Metricbeat Docker]\",\"type\":\"table\"}"
+      },
+      "col": 1,
+      "id": "Docker-containers",
+      "panelIndex": 1,
+      "row": 1,
+      "size_x": 7,
+      "size_y": 5,
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "Metricbeat-Docker",
+        "title": "Number of Containers [Metricbeat Docker]",
+        "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"Running\",\"field\":\"docker.info.containers.running\"},\"schema\":\"metric\",\"type\":\"max\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"Paused\",\"field\":\"docker.info.containers.paused\"},\"schema\":\"metric\",\"type\":\"max\"},{\"enabled\":true,\"id\":\"4\",\"params\":{\"customLabel\":\"Stopped\",\"field\":\"docker.info.containers.stopped\"},\"schema\":\"metric\",\"type\":\"max\"}],\"listeners\":{},\"params\":{\"addLegend\":false,\"addTooltip\":true,\"fontSize\":\"36\",\"gauge\":{\"autoExtend\":false,\"backStyle\":\"Full\",\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":100}],\"gaugeColorMode\":\"None\",\"gaugeStyle\":\"Full\",\"gaugeType\":\"Metric\",\"invertColors\":false,\"labels\":{\"color\":\"black\",\"show\":true},\"orientation\":\"vertical\",\"percentageMode\":false,\"scale\":{\"color\":\"#333\",\"labels\":false,\"show\":false,\"width\":2},\"style\":{\"bgColor\":false,\"fontSize\":60,\"labelColor\":false,\"subText\":\"\"},\"type\":\"simple\",\"useRange\":false,\"verticalSplit\":false},\"handleNoResults\":true,\"type\":\"gauge\"},\"title\":\"Number of Containers [Metricbeat Docker]\",\"type\":\"metric\"}"
+      },
+      "col": 8,
+      "id": "Docker-Number-of-Containers",
+      "panelIndex": 2,
+      "row": 1,
+      "size_x": 5,
+      "size_y": 2,
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "Metricbeat-Docker",
+        "title": "Docker containers per host [Metricbeat Docker]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Docker containers per host [Metricbeat Docker]\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"docker.container.id\",\"customLabel\":\"Number of containers\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"beat.hostname\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Hosts\"}}],\"listeners\":{}}"
+      },
+      "col": 8,
+      "id": "Docker-containers-per-host",
+      "panelIndex": 3,
+      "row": 3,
+      "size_x": 2,
+      "size_y": 3,
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "Metricbeat-Docker",
+        "title": "Docker images and names [Metricbeat Docker]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Docker images and names [Metricbeat Docker]\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"docker.container.image\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"docker.container.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "col": 10,
+      "id": "Docker-images-and-names",
+      "panelIndex": 7,
+      "row": 3,
+      "size_x": 3,
+      "size_y": 3,
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"metricbeat-*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"query\":\"metricset.module:docker AND metricset.name:cpu\",\"analyze_wildcard\":true}}}"
+        },
+        "title": "CPU usage [Metricbeat Docker]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"Total CPU time\",\"field\":\"docker.cpu.total.pct\",\"percents\":[75]},\"schema\":\"metric\",\"type\":\"percentiles\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customInterval\":\"2h\",\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"Container name\",\"field\":\"docker.container.name\",\"order\":\"desc\",\"orderBy\":\"1.75\",\"size\":5},\"schema\":\"group\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"show\":true,\"truncate\":100},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"defaultYExtents\":false,\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"interpolate\":\"linear\",\"legendPosition\":\"top\",\"mode\":\"stacked\",\"scale\":\"linear\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"Count\"},\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"mode\":\"stacked\",\"show\":\"true\",\"showCircles\":true,\"type\":\"area\",\"valueAxis\":\"ValueAxis-1\"}],\"setYExtents\":false,\"shareYAxis\":true,\"smoothLines\":true,\"times\":[],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"Count\"},\"type\":\"value\"}],\"yAxis\":{}},\"title\":\"CPU usage [Metricbeat Docker]\",\"type\":\"area\"}"
+      },
+      "col": 1,
+      "id": "Docker-CPU-usage",
+      "panelIndex": 4,
+      "row": 6,
+      "size_x": 6,
+      "size_y": 3,
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"metricbeat-*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"query\":\"metricset.module:docker AND metricset.name:memory\",\"analyze_wildcard\":true}}}"
+        },
+        "title": "Memory usage [Metricbeat Docker]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"Memory\",\"field\":\"docker.memory.usage.total\"},\"schema\":\"metric\",\"type\":\"max\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customInterval\":\"2h\",\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"Container name\",\"field\":\"docker.container.name\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":5},\"schema\":\"group\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"show\":true,\"truncate\":100},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"defaultYExtents\":false,\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"interpolate\":\"linear\",\"legendPosition\":\"top\",\"mode\":\"stacked\",\"scale\":\"linear\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"Count\"},\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"mode\":\"stacked\",\"show\":\"true\",\"showCircles\":true,\"type\":\"area\",\"valueAxis\":\"ValueAxis-1\"}],\"setYExtents\":false,\"shareYAxis\":true,\"smoothLines\":false,\"times\":[],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"Count\"},\"type\":\"value\"}],\"yAxis\":{}},\"title\":\"Memory usage [Metricbeat Docker]\",\"type\":\"area\"}"
+      },
+      "col": 7,
+      "id": "Docker-memory-usage",
+      "panelIndex": 5,
+      "row": 6,
+      "size_x": 6,
+      "size_y": 3,
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"metricbeat-*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"query\":\"metricset.module:docker AND metricset.name:network\",\"analyze_wildcard\":true}}}"
+        },
+        "title": "Network IO [Metricbeat Docker]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"IN bytes\",\"field\":\"docker.network.in.bytes\"},\"schema\":\"metric\",\"type\":\"max\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customInterval\":\"2h\",\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"Container name\",\"field\":\"docker.container.name\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":5},\"schema\":\"group\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"4\",\"params\":{\"customLabel\":\"OUT bytes\",\"field\":\"docker.network.out.bytes\"},\"schema\":\"metric\",\"type\":\"max\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"show\":true,\"truncate\":100},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"defaultYExtents\":false,\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"interpolate\":\"linear\",\"legendPosition\":\"top\",\"mode\":\"stacked\",\"scale\":\"linear\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"Count\"},\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"mode\":\"stacked\",\"show\":\"true\",\"showCircles\":true,\"type\":\"area\",\"valueAxis\":\"ValueAxis-1\"}],\"setYExtents\":false,\"shareYAxis\":true,\"smoothLines\":true,\"times\":[],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"Count\"},\"type\":\"value\"}],\"yAxis\":{}},\"title\":\"Network IO [Metricbeat Docker]\",\"type\":\"area\"}"
+      },
+      "col": 1,
+      "id": "Docker-Network-IO",
+      "panelIndex": 6,
+      "row": 9,
+      "size_x": 12,
+      "size_y": 3,
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"query\":\"metricset.module:docker\",\"analyze_wildcard\":true}}}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Metricbeat Docker",
+        "version": 1
+      },
+      "id": "Metricbeat-Docker",
+      "type": "search",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"Docker-containers\",\"panelIndex\":1,\"row\":1,\"size_x\":7,\"size_y\":5,\"type\":\"visualization\"},{\"col\":8,\"id\":\"Docker-Number-of-Containers\",\"panelIndex\":2,\"row\":1,\"size_x\":5,\"size_y\":2,\"type\":\"visualization\"},{\"col\":8,\"id\":\"Docker-containers-per-host\",\"panelIndex\":3,\"row\":3,\"size_x\":2,\"size_y\":3,\"type\":\"visualization\"},{\"col\":10,\"id\":\"Docker-images-and-names\",\"panelIndex\":7,\"row\":3,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Docker-CPU-usage\",\"panelIndex\":4,\"row\":6,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Docker-memory-usage\",\"panelIndex\":5,\"row\":6,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Docker-Network-IO\",\"panelIndex\":6,\"row\":9,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"}]",
+        "timeRestore": false,
+        "title": "[Metricbeat Docker] Overview",
+        "uiStateJSON": "{\"P-1\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"asc\"}}}},\"P-2\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-3\":{\"vis\":{\"legendOpen\":true}},\"P-5\":{\"vis\":{\"legendOpen\":true}},\"P-7\":{\"vis\":{\"legendOpen\":true}}}",
+        "version": 1
+      },
+      "id": "AV4REOpp5NkDleZmzKkE",
+      "type": "dashboard",
+      "version": 3
+    }
+  ],
+  "version": "5.6.0-SNAPSHOT"
+}

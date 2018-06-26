@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Network Packetloss\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"30\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.network.in.dropped\",\"customLabel\":\"In\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.network.out.dropped\",\"customLabel\":\"Out\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Network Packetloss", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Network-data", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

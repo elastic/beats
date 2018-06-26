@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Number of processes\",\"type\":\"metric\",\"params\":{\"fontSize\":\"40\",\"handleNoResults\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"system.process.summary.total\",\"customLabel\":\"Max number of processes\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Number of processes", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[],\"index\":\"metricbeat-*\",\"query\":{\"query_string\":{\"query\":\"metricset.name:process_summary\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+  }
+}

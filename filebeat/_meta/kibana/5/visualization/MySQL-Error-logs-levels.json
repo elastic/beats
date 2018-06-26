@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"MySQL Error logs levels\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"mysql.error.level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "MySQL Error logs levels", 
+  "uiStateJSON": "{\"vis\":{\"colors\":{\"Note\":\"#9AC48A\",\"Warning\":\"#F9934E\",\"ERROR\":\"#E24D42\"}}}", 
+  "version": 1, 
+  "savedSearchId": "Filebeat-MySQL-error-log", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

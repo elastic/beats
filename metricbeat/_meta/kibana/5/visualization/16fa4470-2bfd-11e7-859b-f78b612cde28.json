@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Kubernetes - Network in by node\",\"type\":\"metrics\",\"params\":{\"id\":\"0d5c6b10-2bf2-11e7-859b-f78b612cde28\",\"type\":\"timeseries\",\"series\":[{\"id\":\"0d5c9220-2bf2-11e7-859b-f78b612cde28\",\"color\":\"rgba(104,188,0,1)\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"0d5c9221-2bf2-11e7-859b-f78b612cde28\",\"type\":\"sum\",\"field\":\"kubernetes.pod.network.rx.bytes\"},{\"unit\":\"\",\"id\":\"494fc310-2bf7-11e7-859b-f78b612cde28\",\"type\":\"derivative\",\"field\":\"0d5c9221-2bf2-11e7-859b-f78b612cde28\"},{\"unit\":\"\",\"id\":\"37c72a70-3598-11e7-aa4a-8313a0c92a88\",\"type\":\"positive_only\",\"field\":\"494fc310-2bf7-11e7-859b-f78b612cde28\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"stacked\",\"terms_field\":\"kubernetes.node.name\",\"terms_size\":\"100000\",\"terms_order_by\":\"0d5c9221-2bf2-11e7-859b-f78b612cde28\",\"label\":\"\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"background_color_rules\":[{\"id\":\"12c1f2f0-2bf2-11e7-859b-f78b612cde28\"}],\"bar_color_rules\":[{\"id\":\"1373ddd0-2bf2-11e7-859b-f78b612cde28\"}],\"gauge_color_rules\":[{\"id\":\"140e4910-2bf2-11e7-859b-f78b612cde28\"}],\"gauge_width\":10,\"gauge_inner_width\":10,\"gauge_style\":\"half\",\"filter\":\"metricset.module:kubernetes AND metricset.name:pod\"},\"aggs\":[],\"listeners\":{}}",
+  "description": "",
+  "title": "Kubernetes - Network in by node",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

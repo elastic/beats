@@ -1,0 +1,16 @@
+{
+    "description": "",
+    "hits": 0,
+    "columns": [
+      "_source"
+    ],
+    "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"metricset.module: uwsgi\"},\"filter\":[]}"
+    },
+    "sort": [
+      "@timestamp",
+      "desc"
+    ],
+    "title": "Metricbeat uWSGI status",
+    "version": 1
+}

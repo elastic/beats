@@ -1,0 +1,19 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "Sudo commands", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:system.auth.sudo\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }, 
+  "columns": [
+    "system.auth.user", 
+    "system.auth.sudo.user", 
+    "system.auth.sudo.pwd", 
+    "system.auth.sudo.command"
+  ]
+}

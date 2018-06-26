@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"System Load\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.load.norm.1\",\"customLabel\":\"Load/cores last min\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.load.norm.5\",\"customLabel\":\"Load/cores last 5 mins\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.load.norm.15\",\"customLabel\":\"Load/cores last 15mins\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "System Load", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Load-stats", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

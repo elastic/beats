@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"New users by shell\",\"type\":\"pie\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"system.auth.useradd.shell\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"system.auth.useradd.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "New users by shell", 
+  "uiStateJSON": "{\"vis\":{\"colors\":{\"/bin/bash\":\"#E24D42\",\"/bin/false\":\"#508642\",\"/sbin/nologin\":\"#7EB26D\"},\"legendOpen\":true}}", 
+  "version": 1, 
+  "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

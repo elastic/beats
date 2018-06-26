@@ -1,0 +1,10 @@
+{
+  "description": "",
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{}"
+  },
+  "title": "Workers [Metricbeat uWSGI]",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "visState": "{\"type\":\"timelion\",\"title\":\"Workers [Metricbeat uWSGI]\",\"params\":{\"expression\":\".es(split=uwsgi.status.core.id:16,metric=max:uwsgi.status.core.requests.total).derivative().bars().title('Requests handled by each thread (core) per period')\",\"interval\":\"15s\"}}"
+}

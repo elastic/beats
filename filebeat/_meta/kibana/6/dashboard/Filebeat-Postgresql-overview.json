@@ -1,0 +1,80 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "PostgreSQL All Logs",
+        "title": "Log Level Count [Filebeat PostgreSQL]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Log Level Count [Filebeat PostgreSQL]\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"postgresql.log.level\",\"size\":12,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
+      },
+      "id": "PostgreSQL Log Level Count",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "postgresql.log.user",
+          "postgresql.log.database",
+          "postgresql.log.level",
+          "postgresql.log.message",
+          "postgresql.log.query"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"*\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"index\":\"filebeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"fileset.module\",\"value\":\"postgresql\",\"params\":{\"query\":\"postgresql\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"fileset.module\":{\"query\":\"postgresql\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "All Logs [Filebeat PostgreSQL]",
+        "version": 1
+      },
+      "id": "PostgreSQL All Logs",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "PostgreSQL All Logs",
+        "title": "Logs by level over time [Filebeat PostgreSQL]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Logs by level over time [Filebeat PostgreSQL]\",\"type\":\"histogram\",\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"@timestamp per month\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"postgresql.log.level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
+      },
+      "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "Overview dashboard for the Filebeat PostgreSQL module",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"PostgreSQL Log Level Count\",\"panelIndex\":1,\"row\":1,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"postgresql.log.user\",\"postgresql.log.database\",\"postgresql.log.level\",\"postgresql.log.message\",\"postgresql.log.query\"],\"id\":\"PostgreSQL All Logs\",\"panelIndex\":2,\"row\":4,\"size_x\":12,\"size_y\":6,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"},{\"size_x\":9,\"size_y\":3,\"panelIndex\":3,\"type\":\"visualization\",\"id\":\"3dbd5370-87f3-11e7-ad9c-db80de0bf8d3\",\"col\":4,\"row\":1}]",
+        "timeRestore": false,
+        "title": "[Filebeat PostgreSQL] Overview",
+        "uiStateJSON": "{\"P-1\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "version": 1
+      },
+      "id": "158be870-87f4-11e7-ad9c-db80de0bf8d3",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-beta1-SNAPSHOT"
+}

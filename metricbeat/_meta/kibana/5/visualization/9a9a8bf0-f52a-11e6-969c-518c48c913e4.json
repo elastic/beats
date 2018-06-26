@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Golang: System\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.total\\\").label(\\\"System Total\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.obtained\\\").label(\\\"System Obtained\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.stack\\\").label(\\\"System Stack\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.released\\\").label(\\\"System Released\\\")\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Golang: System", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

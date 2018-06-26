@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Metricbeat: 5m Load Gauge\",\"type\":\"metrics\",\"params\":{\"id\":\"fdcc6180-1b90-11e7-bec4-a5e9ec5cab8b\",\"type\":\"gauge\",\"series\":[{\"id\":\"fdcc6181-1b90-11e7-bec4-a5e9ec5cab8b\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"fdcc6182-1b90-11e7-bec4-a5e9ec5cab8b\",\"type\":\"avg\",\"field\":\"system.load.5\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"5m Load\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"background_color_rules\":[{\"id\":\"feefabd0-1b90-11e7-bec4-a5e9ec5cab8b\"}],\"gauge_color_rules\":[{\"id\":\"ffd94880-1b90-11e7-bec4-a5e9ec5cab8b\"}],\"gauge_width\":10,\"gauge_inner_width\":10,\"gauge_style\":\"half\"},\"aggs\":[],\"listeners\":{}}",
+  "description": "",
+  "title": "Metricbeat: 5m Load Gauge",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

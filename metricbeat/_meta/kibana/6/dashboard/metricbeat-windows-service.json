@@ -1,0 +1,129 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "title": "Service States [Metricbeat Windows]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"aggregate\":\"concat\",\"customLabel\":\"Latest Report\",\"field\":\"@timestamp\",\"size\":1,\"sortField\":\"@timestamp\",\"sortOrder\":\"desc\"},\"schema\":\"metric\",\"type\":\"top_hits\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"Service\",\"field\":\"windows.service.display_name\",\"order\":\"asc\",\"orderBy\":\"_term\",\"size\":100},\"schema\":\"bucket\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"5\",\"params\":{\"customLabel\":\"Host\",\"field\":\"beat.name\",\"order\":\"desc\",\"orderBy\":\"_term\",\"size\":5},\"schema\":\"bucket\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"State\",\"field\":\"windows.service.state\",\"order\":\"desc\",\"orderAgg\":{\"enabled\":true,\"id\":\"3-orderAgg\",\"params\":{\"field\":\"@timestamp\"},\"schema\":{\"aggFilter\":[\"!top_hits\",\"!percentiles\",\"!median\",\"!std_dev\",\"!derivative\",\"!moving_avg\",\"!serial_diff\",\"!cumulative_sum\",\"!avg_bucket\",\"!max_bucket\",\"!min_bucket\",\"!sum_bucket\"],\"deprecate\":false,\"editor\":false,\"group\":\"none\",\"hideCustomLabel\":true,\"max\":null,\"min\":0,\"name\":\"orderAgg\",\"params\":[],\"title\":\"Order Agg\"},\"type\":\"max\"},\"orderBy\":\"custom\",\"size\":1},\"schema\":\"bucket\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"4\",\"params\":{\"customLabel\":\"Startup Type\",\"field\":\"windows.service.start_type\",\"order\":\"desc\",\"orderAgg\":{\"enabled\":true,\"id\":\"4-orderAgg\",\"params\":{\"field\":\"@timestamp\"},\"schema\":{\"aggFilter\":[\"!top_hits\",\"!percentiles\",\"!median\",\"!std_dev\",\"!derivative\",\"!moving_avg\",\"!serial_diff\",\"!cumulative_sum\",\"!avg_bucket\",\"!max_bucket\",\"!min_bucket\",\"!sum_bucket\"],\"deprecate\":false,\"editor\":false,\"group\":\"none\",\"hideCustomLabel\":true,\"max\":null,\"min\":0,\"name\":\"orderAgg\",\"params\":[],\"title\":\"Order Agg\"},\"type\":\"max\"},\"orderBy\":\"custom\",\"size\":1},\"schema\":\"bucket\",\"type\":\"terms\"}],\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"title\":\"Service States [Metricbeat Windows]\",\"type\":\"table\"}"
+      },
+      "id": "eb8277d0-c98c-11e7-9835-2f31fe08873b",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b",
+        "title": "Hosts [Metricbeat Windows]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Hosts [Metricbeat Windows]\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"windows.service.id\",\"customLabel\":\"Total Services\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"beat.name\",\"size\":100,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Host\"}}]}"
+      },
+      "id": "23a5fff0-c98e-11e7-9835-2f31fe08873b",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b",
+        "title": "Startup States [Metricbeat Windows]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Startup States [Metricbeat Windows]\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"windows.service.id\",\"customLabel\":\"Service Count\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"windows.service.start_type\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Startup Type\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"windows.service.state\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"State\"}}]}"
+      },
+      "id": "830c45f0-c991-11e7-9835-2f31fe08873b",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b",
+        "title": "Unique Services [Metricbeat Windows]",
+        "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Unique Services [Metricbeat Windows]\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"gauge\",\"gauge\":{\"verticalSplit\":false,\"autoExtend\":false,\"percentageMode\":false,\"gaugeType\":\"Metric\",\"gaugeStyle\":\"Full\",\"backStyle\":\"Full\",\"orientation\":\"vertical\",\"colorSchema\":\"Green to Red\",\"gaugeColorMode\":\"None\",\"useRange\":false,\"colorsRange\":[{\"from\":0,\"to\":100}],\"invertColors\":false,\"labels\":{\"show\":false,\"color\":\"black\"},\"scale\":{\"show\":false,\"labels\":false,\"color\":\"#333\",\"width\":2},\"type\":\"simple\",\"style\":{\"fontSize\":60,\"bgColor\":false,\"labelColor\":false,\"subText\":\"\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"windows.service.id\",\"customLabel\":\"Services\"}}]}"
+      },
+      "id": "35f5ad60-c996-11e7-9835-2f31fe08873b",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"meta\":{\"index\":\"metricbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"windows.service.exit_code\",\"value\":\"exists\"},\"exists\":{\"field\":\"windows.service.exit_code\"},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"metricbeat-*\",\"negate\":true,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"windows.service.exit_code\",\"value\":\"0\",\"params\":{\"query\":\"0\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"windows.service.exit_code\":{\"query\":\"0\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"metricbeat-*\",\"negate\":true,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"windows.service.exit_code\",\"value\":\"ERROR_SERVICE_NEVER_STARTED\",\"params\":{\"query\":\"ERROR_SERVICE_NEVER_STARTED\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"windows.service.exit_code\":{\"query\":\"ERROR_SERVICE_NEVER_STARTED\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b",
+        "title": "Non-zero Service Exit Codes [Metricbeat Windows]",
+        "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Non-zero Service Exit Codes [Metricbeat Windows]\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"gauge\",\"gauge\":{\"verticalSplit\":false,\"autoExtend\":false,\"percentageMode\":false,\"gaugeType\":\"Metric\",\"gaugeStyle\":\"Full\",\"backStyle\":\"Full\",\"orientation\":\"vertical\",\"colorSchema\":\"Green to Red\",\"gaugeColorMode\":\"None\",\"useRange\":false,\"colorsRange\":[{\"from\":0,\"to\":100}],\"invertColors\":false,\"labels\":{\"show\":false,\"color\":\"black\"},\"scale\":{\"show\":false,\"labels\":false,\"color\":\"#333\",\"width\":2},\"type\":\"simple\",\"style\":{\"fontSize\":60,\"bgColor\":false,\"labelColor\":false,\"subText\":\"\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"windows.service.id\",\"customLabel\":\"Non-zero Exit Codes\"}}]}"
+      },
+      "id": "c36b2ba0-ca29-11e7-9835-2f31fe08873b",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "beat.name",
+          "windows.service.display_name",
+          "windows.service.state",
+          "windows.service.start_type",
+          "windows.service.uptime.ms",
+          "windows.service.pid",
+          "windows.service.exit_code"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"metricbeat-*\",\"type\":\"phrase\",\"key\":\"metricset.module\",\"value\":\"windows\",\"params\":{\"query\":\"windows\",\"type\":\"phrase\"},\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"metricset.module\":{\"query\":\"windows\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"negate\":false,\"index\":\"metricbeat-*\",\"type\":\"phrase\",\"key\":\"metricset.name\",\"value\":\"service\",\"params\":{\"query\":\"service\",\"type\":\"phrase\"},\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"metricset.name\":{\"query\":\"service\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Services [Metricbeat Windows]",
+        "version": 1
+      },
+      "id": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b",
+      "type": "search",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "Overview of the Windows Service States",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":4,\"id\":\"eb8277d0-c98c-11e7-9835-2f31fe08873b\",\"panelIndex\":1,\"row\":4,\"size_x\":9,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"23a5fff0-c98e-11e7-9835-2f31fe08873b\",\"panelIndex\":2,\"row\":4,\"size_x\":3,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"830c45f0-c991-11e7-9835-2f31fe08873b\",\"panelIndex\":3,\"row\":1,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"size_x\":4,\"size_y\":3,\"panelIndex\":4,\"type\":\"visualization\",\"id\":\"35f5ad60-c996-11e7-9835-2f31fe08873b\",\"col\":5,\"row\":1},{\"size_x\":4,\"size_y\":3,\"panelIndex\":5,\"type\":\"visualization\",\"id\":\"c36b2ba0-ca29-11e7-9835-2f31fe08873b\",\"col\":9,\"row\":1}]",
+        "timeRestore": false,
+        "title": "[Metricbeat Windows] Services",
+        "uiStateJSON": "{\"P-1\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-2\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-4\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-5\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}}",
+        "version": 1
+      },
+      "id": "d9eba730-c991-11e7-9835-2f31fe08873b",
+      "type": "dashboard",
+      "version": 6
+    }
+  ],
+  "version": "6.0.0"
+}

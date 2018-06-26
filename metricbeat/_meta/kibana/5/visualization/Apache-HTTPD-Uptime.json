@@ -1,0 +1,11 @@
+{
+  "description": "",
+  "uiStateJSON": "{}",
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\n  \"filter\": []\n}"
+  },
+  "savedSearchId": "Apache-HTTPD",
+  "visState": "{\n  \"title\": \"Apache HTTPD - Uptime\",\n  \"type\": \"metric\",\n  \"params\": {\n    \"handleNoResults\": true,\n    \"fontSize\": 60\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"apache.status.uptime.uptime\",\n        \"customLabel\": \"Uptime\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"apache.status.uptime.server_uptime\",\n        \"customLabel\": \"Server uptime\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}",
+  "title": "Apache HTTPD - Uptime",
+  "version": 1
+}
