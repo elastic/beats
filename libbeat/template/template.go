@@ -19,6 +19,7 @@ package template
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -41,6 +42,7 @@ var (
 )
 
 type Template struct {
+	sync.Mutex
 	name        string
 	pattern     string
 	beatVersion common.Version
@@ -113,6 +115,13 @@ func New(beatVersion string, beatName string, esVersion string, config TemplateC
 }
 
 func (t *Template) load(fields common.Fields) (common.MapStr, error) {
+
+	// Locking to make sure dynamicTemplates and defaultFields is not accessed in parallel
+	t.Lock()
+	defer t.Unlock()
+
+	dynamicTemplates = nil
+	defaultFields = nil
 
 	var err error
 	if len(t.config.AppendFields) > 0 {
