@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Kubernetes - Available pods per deployment\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"filter\":\"metricset.module:kubernetes AND metricset.name:state_deployment\",\"id\":\"117fadf0-30df-11e7-8df8-6d3604a72912\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(104,188,0,1)\",\"fill\":0.5,\"formatter\":\"number\",\"id\":\"64456840-30df-11e7-8df8-6d3604a72912\",\"label\":\"Available pods\",\"line_width\":1,\"metrics\":[{\"field\":\"kubernetes.deployment.replicas.available\",\"id\":\"64456841-30df-11e7-8df8-6d3604a72912\",\"type\":\"sum\"}],\"point_size\":1,\"seperate_axis\":0,\"split_filters\":[{\"color\":\"#68BC00\",\"id\":\"53d35ad0-30df-11e7-8df8-6d3604a72912\"}],\"split_mode\":\"terms\",\"stacked\":\"stacked\",\"terms_field\":\"kubernetes.deployment.name\",\"terms_size\":\"10000\"}],\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"timeseries\"},\"aggs\":[],\"listeners\":{}}",
+  "description": "",
+  "title": "Kubernetes - Available pods per deployment",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

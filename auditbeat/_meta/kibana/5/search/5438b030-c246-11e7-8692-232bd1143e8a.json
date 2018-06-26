@@ -1,0 +1,22 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "Socket Connects [Auditbeat Auditd]", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\n  \"index\": \"auditbeat-*\",\n  \"highlightAll\": true,\n  \"version\": true,\n  \"filter\": [\n    {\n      \"$state\": {\n        \"store\": \"appState\"\n      },\n      \"meta\": {\n        \"alias\": null,\n        \"disabled\": false,\n        \"index\": \"auditbeat-*\",\n        \"key\": \"event.module\",\n        \"negate\": false,\n        \"params\": {\n          \"query\": \"auditd\",\n          \"type\": \"phrase\"\n        },\n        \"type\": \"phrase\",\n        \"value\": \"auditd\"\n      },\n      \"query\": {\n        \"match\": {\n          \"event.module\": {\n            \"query\": \"auditd\",\n            \"type\": \"phrase\"\n          }\n        }\n      }\n    },\n    {\n      \"meta\": {\n        \"negate\": false,\n        \"index\": \"auditbeat-*\",\n        \"type\": \"phrase\",\n        \"key\": \"event.action\",\n        \"value\": \"connected-to\",\n        \"params\": {\n          \"query\": \"connected-to\",\n          \"type\": \"phrase\"\n        },\n        \"disabled\": false,\n        \"alias\": null\n      },\n      \"query\": {\n        \"match\": {\n          \"event.action\": {\n            \"query\": \"connected-to\",\n            \"type\": \"phrase\"\n          }\n        }\n      },\n      \"$state\": {\n        \"store\": \"appState\"\n      }\n    },\n    {\n      \"meta\": {\n        \"index\": \"auditbeat-*\",\n        \"negate\": false,\n        \"disabled\": false,\n        \"alias\": null,\n        \"type\": \"exists\",\n        \"key\": \"auditd.summary.object.primary\",\n        \"value\": \"exists\"\n      },\n      \"exists\": {\n        \"field\": \"auditd.summary.object.primary\"\n      },\n      \"$state\": {\n        \"store\": \"appState\"\n      }\n    }\n  ]\n}"
+  }, 
+  "columns": [
+    "beat.hostname", 
+    "auditd.summary.how", 
+    "auditd.summary.object.primary", 
+    "auditd.summary.object.secondary", 
+    "auditd.data.socket.family", 
+    "auditd.result", 
+    "auditd.data.exit"
+  ]
+}

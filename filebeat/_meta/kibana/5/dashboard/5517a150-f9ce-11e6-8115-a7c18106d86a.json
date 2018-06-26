@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Filebeat SSH login attempts", 
+  "uiStateJSON": "{\"P-4\":{\"mapCenter\":[39.774769485295465,23.203125],\"mapZoom\":3}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"d16bb400-f9cc-11e6-8115-a7c18106d86a\",\"panelIndex\":1,\"row\":4,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"78b74f30-f9cd-11e6-8115-a7c18106d86a\",\"panelIndex\":2,\"row\":1,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"341ffe70-f9ce-11e6-8115-a7c18106d86a\",\"panelIndex\":3,\"row\":7,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"3cec3eb0-f9d3-11e6-8a3e-2b904044ea1d\",\"panelIndex\":4,\"row\":7,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"size_x\":12,\"size_y\":3,\"panelIndex\":5,\"type\":\"search\",\"id\":\"62439dc0-f9c9-11e6-a747-6121780e0414\",\"col\":1,\"row\":11,\"columns\":[\"system.auth.ssh.event\",\"system.auth.ssh.method\",\"system.auth.user\",\"system.auth.ssh.ip\",\"system.auth.ssh.geoip.country_iso_code\"],\"sort\":[\"@timestamp\",\"desc\"]}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

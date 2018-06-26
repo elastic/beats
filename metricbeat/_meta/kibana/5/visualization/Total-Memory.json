@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Total Memory\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"30\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.memory.total\",\"customLabel\":\"Total Memory\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Total Memory", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Memory-stats", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

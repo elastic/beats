@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Socket Families [Auditbeat Auditd]\",\"type\":\"pie\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"left\",\"isDonut\":true,\"type\":\"pie\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"auditd.data.socket.family\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Family\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"auditd.data.syscall\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Syscall\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Socket Families [Auditbeat Auditd]", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"auditbeat-*\",\"query\":{\"match_all\":{}},\"filter\":[]}"
+  }
+}

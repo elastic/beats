@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Kubernetes - Desired pods\",\"type\":\"metrics\",\"params\":{\"id\":\"2fe9d3b0-30d5-11e7-8df8-6d3604a72912\",\"type\":\"metric\",\"series\":[{\"id\":\"2fe9d3b1-30d5-11e7-8df8-6d3604a72912\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"54cf79a0-30d5-11e7-8df8-6d3604a72912\",\"type\":\"sum\",\"field\":\"kubernetes.deployment.replicas.desired\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Desired Pods\",\"override_index_pattern\":1,\"series_time_field\":\"@timestamp\",\"series_interval\":\"10s\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"background_color_rules\":[{\"id\":\"508ffb30-30d5-11e7-8df8-6d3604a72912\"}],\"gauge_color_rules\":[{\"id\":\"50f9b980-30d5-11e7-8df8-6d3604a72912\"}],\"gauge_width\":\"10\",\"gauge_inner_width\":\"10\",\"gauge_style\":\"half\",\"bar_color_rules\":[{\"id\":\"674d83b0-30d5-11e7-8df8-6d3604a72912\"}],\"gauge_max\":\"5\",\"filter\":\"metricset.module:kubernetes AND metricset.name:state_deployment\"},\"aggs\":[],\"listeners\":{}}",
+  "description": "",
+  "title": "Kubernetes - Desired pods",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

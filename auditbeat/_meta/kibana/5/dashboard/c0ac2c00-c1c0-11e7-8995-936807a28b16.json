@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "Summary of Linux kernel audit events.", 
+  "title": "[Auditbeat Auditd] Overview", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"97680df0-c1c0-11e7-8995-936807a28b16\",\"panelIndex\":1,\"row\":1,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"08679220-c25a-11e7-8692-232bd1143e8a\",\"panelIndex\":2,\"row\":1,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"beat.hostname\",\"auditd.summary.actor.primary\",\"auditd.summary.actor.secondary\",\"event.action\",\"auditd.summary.object.type\",\"auditd.summary.object.primary\",\"auditd.summary.object.secondary\",\"auditd.summary.how\",\"auditd.result\"],\"id\":\"0f10c430-c1c3-11e7-8995-936807a28b16\",\"panelIndex\":3,\"row\":5,\"size_x\":12,\"size_y\":6,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"}]", 
+  "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"match_all\":{}}}],\"highlightAll\":true,\"version\":true}"
+  }
+}

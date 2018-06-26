@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Redis Connected clients\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"grouped\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"redis.info.clients.connected\",\"customLabel\":\"Connected\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"redis.info.clients.blocked\",\"customLabel\":\"Blocked\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Redis Connected clients", 
+  "uiStateJSON": "{\"vis\":{\"colors\":{\"Blocked\":\"#C15C17\"}}}", 
+  "version": 1, 
+  "savedSearchId": "Metricbeat-Redis", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

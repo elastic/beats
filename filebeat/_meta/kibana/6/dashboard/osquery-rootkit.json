@@ -1,0 +1,114 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Info OSSEC rootkit [Osquery Result]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Info OSSEC rootkit [Osquery Result]\",\"type\":\"markdown\",\"params\":{\"fontSize\":12,\"markdown\":\"This dashboard shows data collected by the ossec-rootkit pack from osquery.\"},\"aggs\":[]}"
+      },
+      "id": "6ec10290-f4aa-11e7-8647-534bb4c21040",
+      "type": "visualization",
+      "updated_at": "2018-01-08T19:30:49.785Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "0fe5dc00-f49b-11e7-8647-534bb4c21040",
+        "title": "Number of rootkits found [Osquery Result]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Number of rootkits found [Osquery Result]\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":40}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"osquery.result.name\",\"customLabel\":\"Rootkits\"}}]}"
+      },
+      "id": "ffdbba50-f4a9-11e7-8647-534bb4c21040",
+      "type": "visualization",
+      "updated_at": "2018-01-08T19:40:05.060Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "0fe5dc00-f49b-11e7-8647-534bb4c21040",
+        "title": "Number of hosts infected [Osquery Result]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Number of hosts infected [Osquery Result]\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":40}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"beat.hostname\",\"customLabel\":\"Hosts\"}}]}"
+      },
+      "id": "ab587180-f4a9-11e7-8647-534bb4c21040",
+      "type": "visualization",
+      "updated_at": "2018-01-08T19:39:45.085Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Navigation [Osquery Result]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Navigation [Osquery Result]\",\"type\":\"markdown\",\"params\":{\"fontSize\":10,\"markdown\":\"[Compilance](#/dashboard/69f5ae20-eb02-11e7-8f04-51231daa5b05) | [OSSEC Rootkit](#/dashboard/c0a7ce90-f4aa-11e7-8647-534bb4c21040)\"},\"aggs\":[]}"
+      },
+      "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040",
+      "type": "visualization",
+      "updated_at": "2018-01-08T19:41:10.264Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "columns": [
+          "osquery.result.name",
+          "osquery.result.columns.path",
+          "beat.hostname"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"filebeat-*\",\"key\":\"query\",\"negate\":false,\"type\":\"custom\",\"value\":\"{\\\"prefix\\\":{\\\"osquery.result.name\\\":\\\"pack_ossec-rootkit\\\"}}\"},\"query\":{\"prefix\":{\"osquery.result.name\":\"pack_ossec-rootkit\"}}},{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"filebeat-*\",\"key\":\"fileset.module\",\"negate\":false,\"params\":{\"query\":\"osquery\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"osquery\"},\"query\":{\"match\":{\"fileset.module\":{\"query\":\"osquery\",\"type\":\"phrase\"}}}},{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"filebeat-*\",\"key\":\"fileset.name\",\"negate\":false,\"params\":{\"query\":\"result\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"result\"},\"query\":{\"match\":{\"fileset.name\":{\"query\":\"result\",\"type\":\"phrase\"}}}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "OSSEC Rootkits [Osquery Result]",
+        "version": 1
+      },
+      "id": "0fe5dc00-f49b-11e7-8647-534bb4c21040",
+      "type": "search",
+      "updated_at": "2018-01-08T19:38:24.483Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "This dashboard shows data collected by the OSSEC rootkit pack from osquery",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false,\"hidePanelTitles\":false,\"useMargins\":true}",
+        "panelsJSON": "[{\"gridData\":{\"h\":2,\"i\":\"1\",\"w\":4,\"x\":8,\"y\":1},\"id\":\"6ec10290-f4aa-11e7-8647-534bb4c21040\",\"panelIndex\":\"1\",\"type\":\"visualization\",\"version\":\"6.1.0-SNAPSHOT\"},{\"gridData\":{\"h\":2,\"i\":\"2\",\"w\":4,\"x\":4,\"y\":1},\"id\":\"ffdbba50-f4a9-11e7-8647-534bb4c21040\",\"panelIndex\":\"2\",\"type\":\"visualization\",\"version\":\"6.1.0-SNAPSHOT\"},{\"gridData\":{\"h\":2,\"i\":\"3\",\"w\":4,\"x\":0,\"y\":1},\"id\":\"ab587180-f4a9-11e7-8647-534bb4c21040\",\"panelIndex\":\"3\",\"type\":\"visualization\",\"version\":\"6.1.0-SNAPSHOT\"},{\"gridData\":{\"h\":1,\"i\":\"4\",\"w\":12,\"x\":0,\"y\":0},\"id\":\"2d6e0760-f4ab-11e7-8647-534bb4c21040\",\"panelIndex\":\"4\",\"type\":\"visualization\",\"version\":\"6.1.0-SNAPSHOT\"},{\"gridData\":{\"h\":4,\"i\":\"5\",\"w\":12,\"x\":0,\"y\":3},\"id\":\"0fe5dc00-f49b-11e7-8647-534bb4c21040\",\"panelIndex\":\"5\",\"type\":\"search\",\"version\":\"6.1.0-SNAPSHOT\"}]",
+        "timeRestore": false,
+        "title": "[Osquery Result] OSSEC rootkit pack",
+        "uiStateJSON": "{}",
+        "version": 1
+      },
+      "id": "c0a7ce90-f4aa-11e7-8647-534bb4c21040",
+      "type": "dashboard",
+      "updated_at": "2018-01-08T19:40:16.304Z",
+      "version": 6
+    }
+  ],
+  "version": "6.1.0-SNAPSHOT"
+}

@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"System Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"| [System Overview](#/dashboard/Metricbeat-system-overview)  | [Hosts Overview (requires Kibana > 5.4)](#/dashboard/d1f1f9e0-1b1c-11e7-b09e-037021c4f8df) | [Host Overview (requires Kibana > 5.4)](#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8) | [Load/CPU](#/dashboard/Metricbeat-cpu) | [Memory](#/dashboard/Metricbeat-memory) | [Processes](#/dashboard/Metricbeat-processes) | [Network](#/dashboard/Metricbeat-network) | [Filesystem](#/dashboard/Metricbeat-filesystem) | [Filesystem per Host](#/dashboard/Metricbeat-filesystem-per-Host) | [CPU/Memory per container](#/dashboard/CPU-slash-Memory-per-container) |\"},\"aggs\":[],\"listeners\":{}}",
+  "description": "",
+  "title": "System Navigation",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Kubernetes - Deployments\",\"type\":\"metrics\",\"params\":{\"id\":\"4c4690b0-30e0-11e7-8df8-6d3604a72912\",\"type\":\"metric\",\"series\":[{\"id\":\"4c4690b1-30e0-11e7-8df8-6d3604a72912\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"4c4690b2-30e0-11e7-8df8-6d3604a72912\",\"type\":\"cardinality\",\"field\":\"kubernetes.deployment.name\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"terms_field\":\"kubernetes.deployment.name\",\"label\":\"Deployments\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"filter\":\"metricset.module:kubernetes AND metricset.name:state_deployment\",\"background_color_rules\":[{\"id\":\"67ee7da0-30e0-11e7-8df8-6d3604a72912\"}],\"bar_color_rules\":[{\"id\":\"68cdba10-30e0-11e7-8df8-6d3604a72912\"}],\"gauge_color_rules\":[{\"id\":\"69765620-30e0-11e7-8df8-6d3604a72912\"}],\"gauge_width\":10,\"gauge_inner_width\":10,\"gauge_style\":\"half\"},\"aggs\":[],\"listeners\":{}}",
+  "description": "",
+  "title": "Kubernetes - Deployments",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"World Writable Files\",\"field\":\"file.inode\"},\"schema\":\"metric\",\"type\":\"cardinality\"}],\"listeners\":{},\"params\":{\"addLegend\":false,\"addTooltip\":true,\"gauge\":{\"autoExtend\":false,\"backStyle\":\"Full\",\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":100}],\"gaugeColorMode\":\"None\",\"gaugeStyle\":\"Full\",\"gaugeType\":\"Metric\",\"invertColors\":false,\"labels\":{\"color\":\"black\",\"show\":false},\"orientation\":\"vertical\",\"percentageMode\":false,\"scale\":{\"color\":\"#333\",\"labels\":false,\"show\":false,\"width\":2},\"style\":{\"bgColor\":false,\"bgFill\":\"#000\",\"fontSize\":\"23\",\"labelColor\":false,\"subText\":\"\"},\"type\":\"simple\",\"useRange\":false,\"verticalSplit\":false},\"type\":\"gauge\"},\"title\":\"World Writable File Count [Auditbeat File Integrity]\",\"type\":\"metric\"}", 
+  "description": "", 
+  "title": "World Writable File Count [Auditbeat File Integrity]", 
+  "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}", 
+  "version": 1, 
+  "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"regexp\":{\"file.mode\":{\"value\":\"0..[2367]\"}}},\"meta\":{\"negate\":false,\"index\":\"auditbeat-*\",\"disabled\":false,\"alias\":null,\"type\":\"custom\",\"key\":\"query\",\"value\":\"{\\\"regexp\\\":{\\\"file.mode\\\":{\\\"value\\\":\\\"0..[2367]\\\"}}}\"},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"negate\":true,\"index\":\"auditbeat-*\",\"type\":\"phrase\",\"key\":\"file.type\",\"value\":\"symlink\",\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"file.type\":{\"query\":\"symlink\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}]}"
+  }
+}

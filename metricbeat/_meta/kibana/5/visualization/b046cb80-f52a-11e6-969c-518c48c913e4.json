@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Golang: GC count\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.pause.count\\\").label(\\\"GC Count\\\").bars().yaxis(label=\\\"Count\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.total_count\\\").label(\\\"GC Rate\\\").derivative().movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.cpu_fraction\\\").label(\\\"CPU Fraction\\\").yaxis(2,label=\\\"Fraction\\\")\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Golang: GC count", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

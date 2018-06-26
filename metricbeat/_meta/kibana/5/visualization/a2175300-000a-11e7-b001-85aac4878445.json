@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Mysql sent and received bytes\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*,metric=\\\"avg:mysql.status.bytes.sent\\\").derivative().divide(1000).label(\\\"Sent bytes (KB)\\\"),.es(*,metric=\\\"avg:mysql.status.bytes.received\\\").derivative().multiply(-1).divide(1000).label(\\\"Received bytes (KB)\\\")\",\"interval\":\"1m\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Mysql sent and received bytes", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

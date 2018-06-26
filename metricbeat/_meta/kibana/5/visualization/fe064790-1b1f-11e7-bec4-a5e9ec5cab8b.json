@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Top Hosts By Memory (Realtime)\",\"type\":\"metrics\",\"params\":{\"id\":\"31e5afa0-1b1c-11e7-b09e-037021c4f8df\",\"type\":\"top_n\",\"series\":[{\"id\":\"31e5afa1-1b1c-11e7-b09e-037021c4f8df\",\"color\":\"#68BC00\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"31e5afa2-1b1c-11e7-b09e-037021c4f8df\",\"type\":\"avg\",\"field\":\"system.memory.actual.used.pct\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"percent\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"terms_field\":\"beat.hostname\",\"terms_order_by\":\"31e5afa2-1b1c-11e7-b09e-037021c4f8df\",\"terms_size\":\"10\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"bar_color_rules\":[{\"value\":0,\"id\":\"33349dd0-1b1c-11e7-b09e-037021c4f8df\",\"bar_color\":\"rgba(104,188,0,1)\",\"opperator\":\"gte\"},{\"value\":0.6,\"id\":\"997dc440-1b1c-11e7-b09e-037021c4f8df\",\"bar_color\":\"rgba(254,146,0,1)\",\"opperator\":\"gte\"},{\"value\":0.85,\"id\":\"a10d7f20-1b1c-11e7-b09e-037021c4f8df\",\"bar_color\":\"rgba(211,49,21,1)\",\"opperator\":\"gte\"}],\"drilldown_url\":\"../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8?_a=(query:(query_string:(analyze_wildcard:!t,query:'beat.hostname:\\\"{{key}}\\\"')))\",\"filter\":\"\"},\"aggs\":[],\"listeners\":{}}",
+  "description": "",
+  "title": "Top Hosts By Memory (Realtime)",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

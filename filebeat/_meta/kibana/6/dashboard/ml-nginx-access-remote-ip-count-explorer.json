@@ -1,0 +1,124 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "savedSearchId": "ML-Filebeat-Nginx-Access",
+        "title": "Remote IP Timechart [Filebeat Nginx] [ML]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"legendOpen\": false\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"ML Nginx Access Remote IP Timechart\",\n  \"type\": \"area\",\n  \"params\": {\n    \"addLegend\": true,\n    \"addTimeMarker\": false,\n    \"addTooltip\": true,\n    \"categoryAxes\": [\n      {\n        \"id\": \"CategoryAxis-1\",\n        \"labels\": {\n          \"show\": true,\n          \"truncate\": 100\n        },\n        \"position\": \"bottom\",\n        \"scale\": {\n          \"type\": \"linear\"\n        },\n        \"show\": true,\n        \"style\": {},\n        \"title\": {\n          \"text\": \"@timestamp per 5 minutes\"\n        },\n        \"type\": \"category\"\n      }\n    ],\n    \"defaultYExtents\": false,\n    \"drawLinesBetweenPoints\": true,\n    \"grid\": {\n      \"categoryLines\": false,\n      \"style\": {\n        \"color\": \"#eee\"\n      }\n    },\n    \"interpolate\": \"linear\",\n    \"legendPosition\": \"right\",\n    \"radiusRatio\": 9,\n    \"scale\": \"linear\",\n    \"seriesParams\": [\n      {\n        \"data\": {\n          \"id\": \"1\",\n          \"label\": \"Count\"\n        },\n        \"drawLinesBetweenPoints\": true,\n        \"interpolate\": \"linear\",\n        \"mode\": \"stacked\",\n        \"show\": \"true\",\n        \"showCircles\": true,\n        \"type\": \"area\",\n        \"valueAxis\": \"ValueAxis-1\"\n      }\n    ],\n    \"setYExtents\": false,\n    \"showCircles\": true,\n    \"times\": [],\n    \"valueAxes\": [\n      {\n        \"id\": \"ValueAxis-1\",\n        \"labels\": {\n          \"filter\": false,\n          \"rotate\": 0,\n          \"show\": true,\n          \"truncate\": 100\n        },\n        \"name\": \"LeftAxis-1\",\n        \"position\": \"left\",\n        \"scale\": {\n          \"mode\": \"normal\",\n          \"type\": \"linear\"\n        },\n        \"show\": true,\n        \"style\": {},\n        \"title\": {},\n        \"type\": \"value\"\n      }\n    ]\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"nginx.access.remote_ip\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "ML-Nginx-Access-Remote-IP-Timechart",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "ML-Filebeat-Nginx-Access",
+        "title": "Response Code Timechart [Filebeat Nginx] [ML]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"200\": \"#7EB26D\",\n      \"404\": \"#614D93\"\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"ML Nginx Access Response Code Timechart\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"nginx.access.response_code\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "ML-Nginx-Access-Response-Code-Timechart",
+      "type": "visualization",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "savedSearchId": "ML-Filebeat-Nginx-Access",
+        "title": "Top Remote IPs [Filebeat Nginx] [ML]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": null,\n        \"direction\": null\n      }\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"ML Nginx Access Top Remote IPs Table\",\n  \"type\": \"table\",\n  \"params\": {\n    \"perPage\": 10,\n    \"showPartialRows\": false,\n    \"showMeticsAtAllLevels\": false,\n    \"sort\": {\n      \"columnIndex\": null,\n      \"direction\": null\n    },\n    \"showTotal\": false,\n    \"totalFunc\": \"sum\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"nginx.access.remote_ip\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "ML-Nginx-Access-Top-Remote-IPs-Table",
+      "type": "visualization",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "ML-Filebeat-Nginx-Access",
+        "title": "Access Map [Filebeat Nginx] [ML]",
+        "uiStateJSON": "{\n  \"mapCenter\": [\n    12.039320557540572,\n    -0.17578125\n  ]\n}",
+        "version": 1,
+        "visState": "{\n  \"aggs\": [\n    {\n      \"enabled\": true,\n      \"id\": \"1\",\n      \"params\": {},\n      \"schema\": \"metric\",\n      \"type\": \"count\"\n    },\n    {\n      \"enabled\": true,\n      \"id\": \"2\",\n      \"params\": {\n        \"autoPrecision\": true,\n        \"field\": \"nginx.access.geoip.location\"\n      },\n      \"schema\": \"segment\",\n      \"type\": \"geohash_grid\"\n    }\n  ],\n  \"listeners\": {},\n  \"params\": {\n    \"addTooltip\": true,\n    \"heatBlur\": 15,\n    \"heatMaxZoom\": 16,\n    \"heatMinOpacity\": 0.1,\n    \"heatNormalizeData\": true,\n    \"heatRadius\": 25,\n    \"isDesaturated\": true,\n    \"legendPosition\": \"bottomright\",\n    \"mapCenter\": [\n      15,\n      5\n    ],\n    \"mapType\": \"Scaled Circle Markers\",\n    \"mapZoom\": 2,\n    \"wms\": {\n      \"enabled\": false,\n      \"options\": {\n        \"attribution\": \"Maps provided by USGS\",\n        \"format\": \"image/png\",\n        \"layers\": \"0\",\n        \"styles\": \"\",\n        \"transparent\": true,\n        \"version\": \"1.3.0\"\n      },\n      \"url\": \"https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer\"\n    }\n  },\n  \"title\": \"ML Nginx Access Map\",\n  \"type\": \"tile_map\"\n}"
+      },
+      "id": "ML-Nginx-Access-Map",
+      "type": "visualization",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "savedSearchId": "ML-Filebeat-Nginx-Access",
+        "title": "Top URLs [Filebeat Nginx] [ML]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": null,\n        \"direction\": null\n      }\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"ML Nginx Access Top URLs Table\",\n  \"type\": \"table\",\n  \"params\": {\n    \"perPage\": 100,\n    \"showPartialRows\": false,\n    \"showMeticsAtAllLevels\": false,\n    \"sort\": {\n      \"columnIndex\": null,\n      \"direction\": null\n    },\n    \"showTotal\": false,\n    \"totalFunc\": \"sum\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"nginx.access.url\",\n        \"size\": 1000,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "ML-Nginx-Access-Top-URLs-Table",
+      "type": "visualization",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "Filebeat Nginx Access Data",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"index\": \"filebeat-*\",\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"_exists_:nginx.access\",\n      \"analyze_wildcard\": true\n    }\n  },\n  \"filter\": [],\n  \"highlight\": {\n    \"pre_tags\": [\n      \"@kibana-highlighted-field@\"\n    ],\n    \"post_tags\": [\n      \"@/kibana-highlighted-field@\"\n    ],\n    \"fields\": {\n      \"*\": {}\n    },\n    \"require_field_match\": false,\n    \"fragment_size\": 2147483647\n  }\n}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "ML Access Data [Filebeat Nginx]",
+        "version": 1
+      },
+      "id": "ML-Filebeat-Nginx-Access",
+      "type": "search",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "Machine learning dashboard, for the Filebeat Nginx module",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": [\n    {\n      \"query\": {\n        \"query_string\": {\n          \"analyze_wildcard\": true,\n          \"query\": \"*\"\n        }\n      }\n    }\n  ],\n  \"highlightAll\": true,\n  \"version\": true\n}"
+        },
+        "optionsJSON": "{\n  \"darkTheme\": false\n}",
+        "panelsJSON": "[\n  {\n    \"size_x\": 6,\n    \"size_y\": 3,\n    \"panelIndex\": 1,\n    \"type\": \"visualization\",\n    \"id\": \"ML-Nginx-Access-Remote-IP-Timechart\",\n    \"col\": 1,\n    \"row\": 1\n  },\n  {\n    \"size_x\": 6,\n    \"size_y\": 3,\n    \"panelIndex\": 2,\n    \"type\": \"visualization\",\n    \"id\": \"ML-Nginx-Access-Response-Code-Timechart\",\n    \"col\": 7,\n    \"row\": 1\n  },\n  {\n    \"size_x\": 6,\n    \"size_y\": 3,\n    \"panelIndex\": 3,\n    \"type\": \"visualization\",\n    \"id\": \"ML-Nginx-Access-Top-Remote-IPs-Table\",\n    \"col\": 1,\n    \"row\": 4\n  },\n  {\n    \"size_x\": 6,\n    \"size_y\": 3,\n    \"panelIndex\": 4,\n    \"type\": \"visualization\",\n    \"id\": \"ML-Nginx-Access-Map\",\n    \"col\": 7,\n    \"row\": 4\n  },\n  {\n    \"size_x\": 12,\n    \"size_y\": 9,\n    \"panelIndex\": 5,\n    \"type\": \"visualization\",\n    \"id\": \"ML-Nginx-Access-Top-URLs-Table\",\n    \"col\": 1,\n    \"row\": 7\n  }\n]",
+        "timeRestore": false,
+        "title": "[Filebeat Nginx] [ML]  Remote IP Count Explorer",
+        "uiStateJSON": "{\n  \"P-3\": {\n    \"vis\": {\n      \"params\": {\n        \"sort\": {\n          \"columnIndex\": null,\n          \"direction\": null\n        }\n      }\n    }\n  },\n  \"P-5\": {\n    \"vis\": {\n      \"params\": {\n        \"sort\": {\n          \"columnIndex\": null,\n          \"direction\": null\n        }\n      }\n    }\n  }\n}",
+        "version": 1
+      },
+      "id": "ML-Nginx-Access-Remote-IP-Count-Explorer",
+      "type": "dashboard",
+      "version": 3
+    }
+  ],
+  "version": "6.0.0-beta1-SNAPSHOT"
+}

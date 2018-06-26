@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Metricbeat: Top Processes By CPU\",\"type\":\"metrics\",\"params\":{\"id\":\"5f5b8d50-1b18-11e7-b09e-037021c4f8df\",\"type\":\"top_n\",\"series\":[{\"id\":\"5f5b8d51-1b18-11e7-b09e-037021c4f8df\",\"color\":\"#68BC00\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"5f5b8d52-1b18-11e7-b09e-037021c4f8df\",\"type\":\"avg\",\"field\":\"system.process.cpu.total.pct\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"percent\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"terms_field\":\"system.process.name\",\"terms_order_by\":\"5f5b8d52-1b18-11e7-b09e-037021c4f8df\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"bar_color_rules\":[{\"value\":0,\"id\":\"60e11be0-1b18-11e7-b09e-037021c4f8df\",\"bar_color\":\"rgba(104,188,0,1)\",\"opperator\":\"gte\"}],\"drilldown_url\":\"\",\"filter\":\"\"},\"aggs\":[],\"listeners\":{}}",
+  "description": "",
+  "title": "Metricbeat: Top Processes By CPU",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\"}},\"filter\":[]}"
+  }
+}
