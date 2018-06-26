@@ -10237,9 +10237,9 @@ MySQL server status metrics collected from MySQL.
 
 
 [float]
-== status fields
+== galera_status fields
 
-`status` contains the metrics that were obtained by the status SQL-Galera query.
+`galera_status` contains the metrics that were obtained by the status SQL query on Galera.
 
 
 
@@ -10250,7 +10250,7 @@ Apply status fields.
 
 
 
-*`mysql.status.apply.oooe`*::
+*`mysql.galera_status.apply.oooe`*::
 +
 --
 type: double
@@ -10260,7 +10260,7 @@ How often applier started write-set applying out-of-order (parallelization effic
 
 --
 
-*`mysql.status.apply.oool`*::
+*`mysql.galera_status.apply.oool`*::
 +
 --
 type: double
@@ -10270,7 +10270,7 @@ How often write-set was so slow to apply that write-set with higher seqno's were
 
 --
 
-*`mysql.status.apply.window`*::
+*`mysql.galera_status.apply.window`*::
 +
 --
 type: double
@@ -10287,7 +10287,7 @@ Certification status fields.
 
 
 
-*`mysql.status.cert.deps_distance`*::
+*`mysql.galera_status.cert.deps_distance`*::
 +
 --
 type: double
@@ -10297,7 +10297,7 @@ Average distance between highest and lowest seqno value that can be possibly app
 
 --
 
-*`mysql.status.cert.index_size`*::
+*`mysql.galera_status.cert.index_size`*::
 +
 --
 type: long
@@ -10307,7 +10307,7 @@ The number of entries in the certification index.
 
 --
 
-*`mysql.status.cert.interval`*::
+*`mysql.galera_status.cert.interval`*::
 +
 --
 type: double
@@ -10324,7 +10324,7 @@ Cluster status fields.
 
 
 
-*`mysql.status.cluster.conf_id`*::
+*`mysql.galera_status.cluster.conf_id`*::
 +
 --
 type: long
@@ -10334,7 +10334,7 @@ Total number of cluster membership changes happened.
 
 --
 
-*`mysql.status.cluster.size`*::
+*`mysql.galera_status.cluster.size`*::
 +
 --
 type: long
@@ -10344,7 +10344,7 @@ Current number of members in the cluster.
 
 --
 
-*`mysql.status.cluster.status`*::
+*`mysql.galera_status.cluster.status`*::
 +
 --
 type: keyword
@@ -10361,7 +10361,7 @@ Commit status fields.
 
 
 
-*`mysql.status.commit.oooe`*::
+*`mysql.galera_status.commit.oooe`*::
 +
 --
 type: double
@@ -10371,7 +10371,7 @@ How often a transaction was committed out of order.
 
 --
 
-*`mysql.status.commit.window`*::
+*`mysql.galera_status.commit.window`*::
 +
 --
 type: long
@@ -10381,7 +10381,7 @@ Average distance between highest and lowest concurrently committed seqno.
 
 --
 
-*`mysql.status.connected`*::
+*`mysql.galera_status.connected`*::
 +
 --
 type: keyword
@@ -10398,7 +10398,7 @@ Evs Fields.
 
 
 
-*`mysql.status.evs.evict`*::
+*`mysql.galera_status.evs.evict`*::
 +
 --
 type: keyword
@@ -10408,7 +10408,7 @@ Lists the UUID's of all nodes evicted from the cluster. Evicted nodes cannot rej
 
 --
 
-*`mysql.status.evs.state`*::
+*`mysql.galera_status.evs.state`*::
 +
 --
 type: keyword
@@ -10425,7 +10425,7 @@ Flow Control fields.
 
 
 
-*`mysql.status.flow_ctl.paused`*::
+*`mysql.galera_status.flow_ctl.paused`*::
 +
 --
 type: double
@@ -10435,7 +10435,7 @@ The fraction of time since the last FLUSH STATUS command that replication was pa
 
 --
 
-*`mysql.status.flow_ctl.paused_ns`*::
+*`mysql.galera_status.flow_ctl.paused_ns`*::
 +
 --
 type: long
@@ -10445,7 +10445,7 @@ The total time spent in a paused state measured in nanoseconds.
 
 --
 
-*`mysql.status.flow_ctl.recv`*::
+*`mysql.galera_status.flow_ctl.recv`*::
 +
 --
 type: long
@@ -10455,7 +10455,7 @@ Returns the number of FC_PAUSE events the node has received, including those the
 
 --
 
-*`mysql.status.flow_ctl.sent`*::
+*`mysql.galera_status.flow_ctl.sent`*::
 +
 --
 type: long
@@ -10465,7 +10465,7 @@ Returns the number of FC_PAUSE events the node has sent. Unlike most status vari
 
 --
 
-*`mysql.status.last_committed`*::
+*`mysql.galera_status.last_committed`*::
 +
 --
 type: long
@@ -10482,7 +10482,7 @@ Node specific Cluster status fields.
 
 
 
-*`mysql.status.local.bf_aborts`*::
+*`mysql.galera_status.local.bf_aborts`*::
 +
 --
 type: long
@@ -10492,7 +10492,7 @@ Total number of local transactions that were aborted by slave transactions while
 
 --
 
-*`mysql.status.local.cert_failures`*::
+*`mysql.galera_status.local.cert_failures`*::
 +
 --
 type: long
@@ -10502,7 +10502,7 @@ Total number of local transactions that failed certification test.
 
 --
 
-*`mysql.status.local.commits`*::
+*`mysql.galera_status.local.commits`*::
 +
 --
 type: long
@@ -10519,7 +10519,7 @@ Node specific recv fields.
 
 
 
-*`mysql.status.local.recv.queue`*::
+*`mysql.galera_status.local.recv.queue`*::
 +
 --
 type: long
@@ -10529,7 +10529,7 @@ Current (instantaneous) length of the recv queue.
 
 --
 
-*`mysql.status.local.recv.queue_avg`*::
+*`mysql.galera_status.local.recv.queue_avg`*::
 +
 --
 type: double
@@ -10539,7 +10539,7 @@ Recv queue length averaged over interval since the last FLUSH STATUS command. Va
 
 --
 
-*`mysql.status.local.recv.queue_max`*::
+*`mysql.galera_status.local.recv.queue_max`*::
 +
 --
 type: long
@@ -10549,7 +10549,7 @@ The maximum length of the recv queue since the last FLUSH STATUS command.
 
 --
 
-*`mysql.status.local.recv.queue_min`*::
+*`mysql.galera_status.local.recv.queue_min`*::
 +
 --
 type: long
@@ -10559,7 +10559,7 @@ The minimum length of the recv queue since the last FLUSH STATUS command.
 
 --
 
-*`mysql.status.local.replays`*::
+*`mysql.galera_status.local.replays`*::
 +
 --
 type: long
@@ -10576,7 +10576,7 @@ Node specific sent fields.
 
 
 
-*`mysql.status.local.send.queue`*::
+*`mysql.galera_status.local.send.queue`*::
 +
 --
 type: long
@@ -10586,7 +10586,7 @@ Current (instantaneous) length of the send queue.
 
 --
 
-*`mysql.status.local.send.queue_avg`*::
+*`mysql.galera_status.local.send.queue_avg`*::
 +
 --
 type: double
@@ -10596,7 +10596,7 @@ Send queue length averaged over time since the last FLUSH STATUS command. Values
 
 --
 
-*`mysql.status.local.send.queue_max`*::
+*`mysql.galera_status.local.send.queue_max`*::
 +
 --
 type: long
@@ -10606,7 +10606,7 @@ The maximum length of the send queue since the last FLUSH STATUS command.
 
 --
 
-*`mysql.status.local.send.queue_min`*::
+*`mysql.galera_status.local.send.queue_min`*::
 +
 --
 type: long
@@ -10616,7 +10616,7 @@ The minimum length of the send queue since the last FLUSH STATUS command.
 
 --
 
-*`mysql.status.local.state`*::
+*`mysql.galera_status.local.state`*::
 +
 --
 type: keyword
@@ -10626,7 +10626,7 @@ Internal Galera Cluster FSM state number.
 
 --
 
-*`mysql.status.ready`*::
+*`mysql.galera_status.ready`*::
 +
 --
 type: keyword
@@ -10643,7 +10643,7 @@ Write-Set receive status fields.
 
 
 
-*`mysql.status.received.count`*::
+*`mysql.galera_status.received.count`*::
 +
 --
 type: long
@@ -10653,7 +10653,7 @@ Total number of write-sets received from other nodes.
 
 --
 
-*`mysql.status.received.bytes`*::
+*`mysql.galera_status.received.bytes`*::
 +
 --
 type: long
@@ -10670,7 +10670,7 @@ Replication status fields.
 
 
 
-*`mysql.status.repl.data_bytes`*::
+*`mysql.galera_status.repl.data_bytes`*::
 +
 --
 type: long
@@ -10680,7 +10680,7 @@ Total size of data replicated.
 
 --
 
-*`mysql.status.repl.keys`*::
+*`mysql.galera_status.repl.keys`*::
 +
 --
 type: long
@@ -10690,7 +10690,7 @@ Total number of keys replicated.
 
 --
 
-*`mysql.status.repl.keys_bytes`*::
+*`mysql.galera_status.repl.keys_bytes`*::
 +
 --
 type: long
@@ -10700,7 +10700,7 @@ Total size of keys replicated.
 
 --
 
-*`mysql.status.repl.other_bytes`*::
+*`mysql.galera_status.repl.other_bytes`*::
 +
 --
 type: long
@@ -10710,7 +10710,7 @@ Total size of other bits replicated.
 
 --
 
-*`mysql.status.repl.count`*::
+*`mysql.galera_status.repl.count`*::
 +
 --
 type: long
@@ -10720,7 +10720,7 @@ Total number of write-sets replicated (sent to other nodes).
 
 --
 
-*`mysql.status.repl.bytes`*::
+*`mysql.galera_status.repl.bytes`*::
 +
 --
 type: long
