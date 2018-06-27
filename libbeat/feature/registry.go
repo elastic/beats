@@ -20,6 +20,7 @@ package feature
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -50,8 +51,12 @@ func (r *registry) Register(feature Featurable) error {
 	r.Lock()
 	defer r.Unlock()
 
-	ns := feature.Namespace()
-	name := feature.Name()
+	ns := normalize(feature.Namespace())
+	name := normalize(feature.Name())
+
+	if feature.Factory() == nil {
+		return fmt.Errorf("feature '%s' cannot be registered with a nil factory", name)
+	}
 
 	// Lazy create namespaces
 	_, found := r.namespaces[ns]
@@ -95,18 +100,19 @@ func (r *registry) Register(feature Featurable) error {
 func (r *registry) Unregister(namespace, name string) error {
 	r.Lock()
 	defer r.Unlock()
+	ns := normalize(namespace)
 
-	v, found := r.namespaces[namespace]
+	v, found := r.namespaces[ns]
 	if !found {
-		return fmt.Errorf("unknown namespace named '%s'", namespace)
+		return fmt.Errorf("unknown namespace named '%s'", ns)
 	}
 
 	_, found = v[name]
 	if !found {
-		return fmt.Errorf("unknown feature '%s' in namespace '%s'", name, namespace)
+		return fmt.Errorf("unknown feature '%s' in namespace '%s'", name, ns)
 	}
 
-	delete(r.namespaces[namespace], name)
+	delete(r.namespaces[ns], name)
 	return nil
 }
 
@@ -115,14 +121,17 @@ func (r *registry) Lookup(namespace, name string) (Featurable, error) {
 	r.RLock()
 	defer r.RUnlock()
 
-	v, found := r.namespaces[namespace]
+	ns := normalize(namespace)
+	n := normalize(name)
+
+	v, found := r.namespaces[ns]
 	if !found {
-		return nil, fmt.Errorf("unknown namespace named '%s'", namespace)
+		return nil, fmt.Errorf("unknown namespace named '%s'", ns)
 	}
 
-	m, found := v[name]
+	m, found := v[n]
 	if !found {
-		return nil, fmt.Errorf("unknown feature '%s' in namespace '%s'", name, namespace)
+		return nil, fmt.Errorf("unknown feature '%s' in namespace '%s'", n, ns)
 	}
 
 	return m, nil
@@ -133,9 +142,11 @@ func (r *registry) LookupAll(namespace string) ([]Featurable, error) {
 	r.RLock()
 	defer r.RUnlock()
 
-	v, found := r.namespaces[namespace]
+	ns := normalize(namespace)
+
+	v, found := r.namespaces[ns]
 	if !found {
-		return nil, fmt.Errorf("unknown namespace named '%s'", namespace)
+		return nil, fmt.Errorf("unknown namespace named '%s'", ns)
 	}
 
 	list := make([]Featurable, len(v))
@@ -171,4 +182,8 @@ func featuresEqual(f1, f2 Featurable) bool {
 	}
 
 	return false
+}
+
+func normalize(s string) string {
+	return strings.ToLower(s)
 }
