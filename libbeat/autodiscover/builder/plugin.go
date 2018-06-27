@@ -21,5 +21,5 @@ import "github.com/elastic/beats/libbeat/feature"
 
 // Plugin accepts a builder to be registered as a plugin
 func Plugin(name string, factory Factory) *feature.Feature {
-	return Feature(name, factory, feature.Beta)
+	return Feature(name, factory, feature.Undefined)
 }
