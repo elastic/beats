@@ -167,7 +167,8 @@ func TestAutodiscover(t *testing.T) {
 			"foo": "bar",
 		},
 	})
-	time.Sleep(10 * time.Millisecond)
+	wait(t, func() bool { return len(adapter.Runners()) == 1 })
+
 	runners := adapter.Runners()
 	assert.Equal(t, len(runners), 1)
 	assert.Equal(t, runners[0].meta.Get()["foo"], "bar")
@@ -181,7 +182,8 @@ func TestAutodiscover(t *testing.T) {
 			"foo": "baz",
 		},
 	})
-	time.Sleep(10 * time.Millisecond)
+	wait(t, func() bool { return adapter.Runners()[0].meta.Get()["foo"] == "baz" })
+
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 1)
 	assert.Equal(t, runners[0].meta.Get()["foo"], "baz") // meta is updated
@@ -201,7 +203,8 @@ func TestAutodiscover(t *testing.T) {
 			"foo": "baz",
 		},
 	})
-	time.Sleep(10 * time.Millisecond)
+	wait(t, func() bool { return len(adapter.Runners()) == 2 })
+
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 2)
 	assert.True(t, runners[0].stopped)
@@ -216,7 +219,8 @@ func TestAutodiscover(t *testing.T) {
 			"foo": "baz",
 		},
 	})
-	time.Sleep(10 * time.Millisecond)
+	wait(t, func() bool { return adapter.Runners()[1].stopped })
+
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 2)
 	assert.Equal(t, runners[1].meta.Get()["foo"], "baz")
@@ -273,7 +277,8 @@ func TestAutodiscoverHash(t *testing.T) {
 			"foo": "bar",
 		},
 	})
-	time.Sleep(10 * time.Millisecond)
+	wait(t, func() bool { return len(adapter.Runners()) == 2 })
+
 	runners := adapter.Runners()
 	assert.Equal(t, len(runners), 2)
 	assert.Equal(t, runners[0].meta.Get()["foo"], "bar")
@@ -282,4 +287,18 @@ func TestAutodiscoverHash(t *testing.T) {
 	assert.Equal(t, runners[1].meta.Get()["foo"], "bar")
 	assert.True(t, runners[1].started)
 	assert.False(t, runners[1].stopped)
+}
+
+func wait(t *testing.T, test func() bool) {
+	sleep := 20 * time.Millisecond
+	ready := test()
+	for !ready && sleep < 10*time.Second {
+		time.Sleep(sleep)
+		sleep = sleep + 1*time.Second
+		ready = test()
+	}
+
+	if !ready {
+		t.Fatal("Waiting for condition")
+	}
 }
