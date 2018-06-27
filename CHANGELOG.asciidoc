@@ -29,6 +29,8 @@ https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix duplicating dynamic_fields in template when overwriting the template. {pull}7352[7352]
+
 *Auditbeat*
 
 *Filebeat*
@@ -150,9 +152,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
 - Fix delays on autodiscovery events handling caused by blocking runner stops. {pull}7170[7170]
 - Do not emit Kubernetes autodiscover events for Pods without IP address. {pull}7235[7235]
-- Allow to override the `ignore_above` option when defining new field with the type keyword. {pull}7238[7238]
-- Allow index-pattern only setup when setup.dashboards.only_index=true. {pull}7285[7285]
-- Fix duplicating dynamic_fields in template when overwriting the template. {pull}7352[7352]
 
 *Auditbeat*
 
