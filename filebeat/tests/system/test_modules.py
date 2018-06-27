@@ -10,8 +10,6 @@ import json
 import logging
 from parameterized import parameterized
 
-EXTENDED_COMPARE = ["elasticsearch"]
-
 
 def load_fileset_test_cases():
     """
@@ -128,7 +126,7 @@ class Test(BaseTest):
         self.es.indices.refresh(index=self.index_name)
         # Loads the first 100 events to be checked
         res = self.es.search(index=self.index_name,
-                             body={"query": {"match_all": {}}, "size": 100})
+                             body={"query": {"match_all": {}}, "size": 100, "sort": {"offset": {"order": "asc"}}})
         objects = [o["_source"] for o in res["hits"]["hits"]]
         assert len(objects) > 0
         for obj in objects:
@@ -146,9 +144,20 @@ class Test(BaseTest):
                 self.assert_fields_are_documented(obj)
 
         if os.path.exists(test_file + "-expected.json"):
-            self._test_expected_events(module, test_file, objects)
+            self._test_expected_events(test_file, objects)
 
-    def _test_expected_events(self, module, test_file, objects):
+    def _test_expected_events(self, test_file, objects):
+
+        # Generate expected files if GENERATE env variable is set
+        if os.getenv("GENERATE"):
+            with open(test_file + "-expected.json", 'w') as f:
+                # Flatten an cleanup objects
+                # This makes sure when generated on different machines / version the expected.json stays the same.
+                for k, obj in enumerate(objects):
+                    objects[k] = self.flatten_object(obj, {}, "")
+                    clean_keys(objects[k])
+                json.dump(objects, f, indent=4, sort_keys=True)
+
         with open(test_file + "-expected.json", "r") as f:
             expected = json.load(f)
 
@@ -158,26 +167,22 @@ class Test(BaseTest):
         for ev in expected:
             found = False
             for obj in objects:
-                # For Modules not in EXTENDED_COMPARE on module level fields are compared
-                if module not in EXTENDED_COMPARE:
-                    if ev["_source"][module] == obj[module]:
-                        found = True
-                        break
 
                 # Flatten objects for easier comparing
                 obj = self.flatten_object(obj, {}, "")
-                ex = self.flatten_object(ev["_source"], {}, "")
-
                 clean_keys(obj)
-                clean_keys(ex)
 
-                # All modules in EXTENDED_COMPARE are checked in more detail
-                if ex == obj:
+                # Remove timestamp for comparison where timestamp is not part of the log line
+                if obj["fileset.module"] == "icinga" and obj["fileset.name"] == "startup":
+                    delete_key(obj, "@timestamp")
+                    delete_key(ev, "@timestamp")
+
+                if ev == obj:
                     found = True
                     break
 
             assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
-                pretty_json(ev["_source"]), pretty_json(objects))
+                pretty_json(ev), pretty_json(objects))
 
 
 def clean_keys(obj):
