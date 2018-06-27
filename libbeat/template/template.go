@@ -2,6 +2,7 @@ package template
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -21,6 +22,7 @@ var (
 )
 
 type Template struct {
+	sync.Mutex
 	name        string
 	pattern     string
 	beatVersion common.Version
@@ -99,6 +101,12 @@ func (t *Template) Load(file string) (common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Locking to make sure dynamicTemplates and defaultFields is not accessed in parallel
+	t.Lock()
+	defer t.Unlock()
+
+	dynamicTemplates = nil
 
 	if len(t.config.AppendFields) > 0 {
 		cfgwarn.Experimental("append_fields is used.")
