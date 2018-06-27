@@ -1,7 +1,7 @@
 - name: health
   type: group
   description: >
-    health
+    Metrics obtained from Traefik's health API endpoint
   fields:
     - name: uptime
       type: group
