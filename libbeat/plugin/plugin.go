@@ -19,8 +19,8 @@ package plugin
 
 import "github.com/elastic/beats/libbeat/feature"
 
-// Bundle takes a an existing bundle or a set of feature and will merge the into a new Bundle that
-// can be registered.
+// Bundle takes a an existing bundle or a set of features and will merge them the into a new Bundle
+// that can be registered.
 func Bundle(bundle ...feature.Bundleable) *feature.Bundle {
 	return feature.MustBundle(bundle...)
 }
