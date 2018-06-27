@@ -31,18 +31,21 @@ import (
 
 // Encoder for serializing a beat.Event to json.
 type Encoder struct {
-	buf     bytes.Buffer
-	folder  *gotype.Iterator
-	pretty  bool
+	buf    bytes.Buffer
+	folder *gotype.Iterator
+
 	version string
+	config  config
 }
 
 type config struct {
-	Pretty bool
+	Pretty     bool
+	EscapeHTML bool
 }
 
 var defaultConfig = config{
-	Pretty: false,
+	Pretty:     false,
+	EscapeHTML: true,
 }
 
 func init() {
@@ -54,19 +57,23 @@ func init() {
 			}
 		}
 
-		return New(config.Pretty, info.Version), nil
+		return New(config.Pretty, config.EscapeHTML, info.Version), nil
 	})
 }
 
 // New creates a new json Encoder.
-func New(pretty bool, version string) *Encoder {
-	e := &Encoder{pretty: pretty, version: version}
+func New(pretty, escapeHTML bool, version string) *Encoder {
+	e := &Encoder{version: version, config: config{
+		Pretty:     pretty,
+		EscapeHTML: escapeHTML,
+	}}
 	e.reset()
 	return e
 }
 
 func (e *Encoder) reset() {
 	visitor := json.NewVisitor(&e.buf)
+	visitor.SetEscapeHTML(e.config.EscapeHTML)
 
 	var err error
 
@@ -93,7 +100,7 @@ func (e *Encoder) Encode(index string, event *beat.Event) ([]byte, error) {
 	}
 
 	json := e.buf.Bytes()
-	if !e.pretty {
+	if !e.config.Pretty {
 		return json, nil
 	}
 

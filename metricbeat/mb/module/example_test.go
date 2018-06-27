@@ -147,7 +147,7 @@ func ExampleRunner() {
 }
 
 func encodeEvent(event beat.Event) (string, error) {
-	output, err := json.New(false, "1.2.3").Encode("noindex", &event)
+	output, err := json.New(false, true, "1.2.3").Encode("noindex", &event)
 	if err != nil {
 		return "", nil
 	}
