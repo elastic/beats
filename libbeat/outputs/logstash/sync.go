@@ -57,7 +57,7 @@ func newSyncClient(
 	}
 
 	var err error
-	enc := makeLogstashEventEncoder(beat, config.Index)
+	enc := makeLogstashEventEncoder(beat, config.EscapeHTML, config.Index)
 	c.client, err = v2.NewSyncClientWithConn(conn,
 		v2.JSONEncoder(enc),
 		v2.Timeout(config.Timeout),
