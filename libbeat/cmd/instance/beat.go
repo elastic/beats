@@ -192,7 +192,7 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		return nil, err
 	}
 
-	fields, err := asset.GetFields(name + "/fields.yml")
+	fields, err := asset.GetFields(name)
 	if err != nil {
 		return nil, err
 	}
