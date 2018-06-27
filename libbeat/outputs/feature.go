@@ -1,14 +1,12 @@
 package outputs
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/plugin"
 )
 
 // Namespace exposes the output type.
@@ -35,14 +33,14 @@ func RegisterType(name string, f Factory) {
 
 // FindFactory finds an output type its factory if available.
 func FindFactory(name string) (Factory, error) {
-	f, err := feature.Registry.Find(Namespace, name)
+	f, err := feature.Registry.Lookup(Namespace, name)
 	if err != nil {
 		return nil, err
 	}
 
 	factory, ok := f.Factory().(Factory)
 	if !ok {
-		return nil, fmt.Errorf("invalid processor type, received: %T", f.Factory())
+		return nil, fmt.Errorf("invalid output type, received: %T", f.Factory())
 	}
 
 	return factory, nil
@@ -68,25 +66,4 @@ func Load(info beat.Info, stats Observer, name string, config *common.Config) (G
 // Feature creates a new output.
 func Feature(name string, factory Factory, stability feature.Stability) *feature.Feature {
 	return feature.New(Namespace, name, factory, stability)
-}
-
-type outputPlugin struct {
-	name    string
-	factory Factory
-}
-
-// Plugin creates a new loadable plugin.
-func Plugin(name string, f Factory) map[string][]interface{} {
-	return plugin.MakePlugin(Namespace, outputPlugin{name, f})
-}
-
-func init() {
-	plugin.MustRegisterLoader(Namespace, func(ifc interface{}) error {
-		b, ok := ifc.(outputPlugin)
-		if !ok {
-			return errors.New("plugin does not match output plugin type")
-		}
-		f := feature.New(Namespace, b.name, b.factory, feature.Undefined)
-		return feature.Register(f)
-	})
 }
