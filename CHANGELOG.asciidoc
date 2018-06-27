@@ -208,6 +208,7 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Commit registry writes to stable storage to avoid corrupt registry files. {pull}6877[6877]
 - Fix a parsing issue in the syslog input for RFC3339 timestamp and time with nanoseconds. {pull}7046[7046]
 - Fix an issue with an overflowing wait group when using the TCP input. {issue}7202[7202]
+- Fix an issue when parsing ISO8601 dates with timezone definition {issue}7367[7367]
 
 *Heartbeat*
 
