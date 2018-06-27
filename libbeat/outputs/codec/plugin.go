@@ -23,5 +23,5 @@ import (
 
 // Plugin accepts a codec to be registered as a plugin.
 func Plugin(name string, f Factory) *feature.Feature {
-	return Feature(name, f, feature.Stable)
+	return Feature(name, f, feature.Undefined)
 }
