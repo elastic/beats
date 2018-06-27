@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package dashboards
 
 import (
@@ -118,6 +135,16 @@ func (imp Importer) unzip(archive, target string) error {
 	// Closure to close the files on each iteration
 	unzipFile := func(file *zip.File) error {
 		filePath := filepath.Join(target, file.Name)
+
+		// check that the resulting file path is indeed under target
+		// Note that Rel calls Clean.
+		relPath, err := filepath.Rel(target, filePath)
+		if err != nil {
+			return err
+		}
+		if strings.HasPrefix(filepath.ToSlash(relPath), "../") {
+			return fmt.Errorf("Zip file contains files outside of the target directory: %s", relPath)
+		}
 
 		if file.FileInfo().IsDir() {
 			return os.MkdirAll(filePath, file.Mode())
@@ -268,8 +295,10 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 	if !imp.cfg.OnlyDashboards {
 		check = append(check, "index-pattern")
 	}
+	wantDashboards := false
 	if !imp.cfg.OnlyIndex {
 		check = append(check, "dashboard")
+		wantDashboards = true
 	}
 
 	types := []string{}
@@ -296,7 +325,7 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 		}
 	}
 
-	if !importDashboards {
+	if wantDashboards && !importDashboards {
 		return fmt.Errorf("No dashboards to import. Please make sure the %s directory contains a dashboard directory.",
 			dir)
 	}

@@ -14,3 +14,13 @@
           type: keyword
           description: >
             Elasticsearch cluster name.
+
+        - name: cluster.id
+          type: keyword
+          description: >
+            Elasticsearch cluster id.
+
+        - name: cluster.state.id
+          type: keyword
+          description: >
+            Elasticsearch state id.

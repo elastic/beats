@@ -7,7 +7,7 @@ This file is generated! See scripts/docs_collector.py
 
 beta[]
 
-The Elasticsearch module contains a minimal set of metrics to enable monitoring of Elasticsearch across multiple versions. To monitor more Elasticsearch metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
+The Elasticsearch module contains a minimal set of metrics to enable monitoring of Elasticsearch across multiple versions. To monitor more Elasticsearch metrics, use our {monitoringdoc}/xpack-monitoring.html[monitoring] feature.
 
 The default metricsets are `node` and `node_stats`.
 
@@ -22,23 +22,44 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: elasticsearch
-  metricsets: ["node", "node_stats"]
+  metricsets:
+    - node
+    - node_stats
+    #- index
+    #- index_summary
+    #- shard
   period: 10s
   hosts: ["localhost:9200"]
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>. It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-elasticsearch-index,index>>
+
+* <<metricbeat-metricset-elasticsearch-index_summary,index_summary>>
+
 * <<metricbeat-metricset-elasticsearch-node,node>>
 
 * <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
 
+* <<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>
+
+* <<metricbeat-metricset-elasticsearch-shard,shard>>
+
+include::elasticsearch/index.asciidoc[]
+
+include::elasticsearch/index_summary.asciidoc[]
+
 include::elasticsearch/node.asciidoc[]
 
 include::elasticsearch/node_stats.asciidoc[]
+
+include::elasticsearch/pending_tasks.asciidoc[]
+
+include::elasticsearch/shard.asciidoc[]
 

@@ -6,38 +6,38 @@
     },
     "elasticsearch": {
         "cluster": {
-            "name": "docker-cluster"
+            "name": "elasticsearch"
         },
         "node": {
-            "name": "ab1_1Gw3Rtax_2l78Gq_CQ",
+            "name": "523zXyT6TRWiqXcQItnkyQ",
             "stats": {
                 "fs": {
                     "summary": {
                         "available": {
-                            "bytes": 50680381440
+                            "bytes": 47081816064
                         },
                         "free": {
-                            "bytes": 54133080064
+                            "bytes": 52054323200
                         },
                         "total": {
-                            "bytes": 67371577344
+                            "bytes": 250790436864
                         }
                     }
                 },
                 "indices": {
                     "docs": {
-                        "count": 52,
-                        "deleted": 4
+                        "count": 231,
+                        "deleted": 56
                     },
                     "segments": {
-                        "count": 3,
+                        "count": 16,
                         "memory": {
-                            "bytes": 20655
+                            "bytes": 105245
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 107559
+                            "bytes": 444882
                         }
                     }
                 },
@@ -46,14 +46,14 @@
                         "collectors": {
                             "old": {
                                 "collection": {
-                                    "count": 7,
-                                    "ms": 3801
+                                    "count": 2,
+                                    "ms": 139
                                 }
                             },
                             "young": {
                                 "collection": {
                                     "count": 56,
-                                    "ms": 14782
+                                    "ms": 1288
                                 }
                             }
                         }
@@ -62,44 +62,44 @@
                         "pools": {
                             "old": {
                                 "max": {
-                                    "bytes": 62914560
+                                    "bytes": 724828160
                                 },
                                 "peak": {
-                                    "bytes": 53816432
+                                    "bytes": 225180248
                                 },
                                 "peak_max": {
-                                    "bytes": 62914560
+                                    "bytes": 724828160
                                 },
                                 "used": {
-                                    "bytes": 40017472
+                                    "bytes": 225180248
                                 }
                             },
                             "survivor": {
                                 "max": {
-                                    "bytes": 3145728
+                                    "bytes": 34865152
                                 },
                                 "peak": {
-                                    "bytes": 3145728
+                                    "bytes": 34865152
                                 },
                                 "peak_max": {
-                                    "bytes": 3145728
+                                    "bytes": 34865152
                                 },
                                 "used": {
-                                    "bytes": 3145728
+                                    "bytes": 5280456
                                 }
                             },
                             "young": {
                                 "max": {
-                                    "bytes": 25165824
+                                    "bytes": 279183360
                                 },
                                 "peak": {
-                                    "bytes": 25165824
+                                    "bytes": 279183360
                                 },
                                 "peak_max": {
-                                    "bytes": 25165824
+                                    "bytes": 279183360
                                 },
                                 "used": {
-                                    "bytes": 21071064
+                                    "bytes": 188134984
                                 }
                             }
                         }
@@ -109,10 +109,13 @@
         }
     },
     "metricset": {
-        "host": "elasticsearch:9200",
+        "host": "127.0.0.1:9200",
         "module": "elasticsearch",
         "name": "node_stats",
-        "namespace": "node.stats",
+        "namespace": "elasticsearch.node.stats",
         "rtt": 115
+    },
+    "service": {
+        "name": "elasticsearch"
     }
 }

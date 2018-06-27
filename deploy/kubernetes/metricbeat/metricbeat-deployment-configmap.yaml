@@ -5,7 +5,6 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: metricbeat
-    kubernetes.io/cluster-service: "true"
 data:
   # This module requires `kube-state-metrics` up and running under `kube-system` namespace
   kubernetes.yml: |-

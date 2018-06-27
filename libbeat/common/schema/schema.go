@@ -1,8 +1,24 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package schema
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Schema describes how a map[string]interface{} object can be parsed and converted into
@@ -37,8 +53,6 @@ func (conv Conv) Map(key string, event common.MapStr, data map[string]interface{
 		err := NewError(key, err.Error())
 		if conv.Optional {
 			err.SetType(OptionalType)
-		} else {
-			logp.Err("Error on field '%s': %v", key, err)
 		}
 
 		errs := NewErrors()
@@ -73,6 +87,7 @@ func (o Object) HasKey(key string) bool {
 // event map.
 func (s Schema) ApplyTo(event common.MapStr, data map[string]interface{}) (common.MapStr, *Errors) {
 	errors := applySchemaToEvent(event, data, s)
+	errors.Log()
 	return event, errors
 }
 

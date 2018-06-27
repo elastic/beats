@@ -1,0 +1,20 @@
+- name: gc
+  type: group
+  description: >
+  fields:
+    - name: relative_process_timestamp_secs
+      type: float
+      description: >
+        The time from JVM start up in seconds, as a floating point number.
+    - name: threads_total_stop_time_secs
+      type: float
+      description: >
+        Garbage collection threads total stop time seconds.
+    - name: stopping_threads_time_secs
+      type: float
+      description: >
+        Time took to stop threads seconds.
+    - name: tags
+      type: keyword
+      description: >
+        GC logging tags.

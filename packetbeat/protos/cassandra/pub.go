@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package cassandra
 
 import (
@@ -56,11 +73,8 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		// resp_time in milliseconds
 		responseTime := int32(resp.Ts.Sub(requ.Ts).Nanoseconds() / 1e6)
 
-		src := &common.Endpoint{
-			IP:   requ.Tuple.SrcIP.String(),
-			Port: requ.Tuple.SrcPort,
-			Proc: string(requ.CmdlineTuple.Src),
-		}
+		source, dest := common.MakeEndpointPair(requ.Tuple.BaseTuple, requ.CmdlineTuple)
+		src, dst := &source, &dest
 
 		timestamp = requ.Ts
 		fields["responsetime"] = responseTime
@@ -85,11 +99,6 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 			}
 		}
 
-		dst := &common.Endpoint{
-			IP:   requ.Tuple.DstIP.String(),
-			Port: requ.Tuple.DstPort,
-			Proc: string(requ.CmdlineTuple.Dst),
-		}
 		fields["dst"] = dst
 
 	} else {

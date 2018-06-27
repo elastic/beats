@@ -6,17 +6,17 @@
     },
     "elasticsearch": {
         "cluster": {
-            "name": "docker-cluster"
+            "name": "elasticsearch"
         },
         "node": {
             "jvm": {
                 "memory": {
                     "heap": {
                         "init": {
-                            "bytes": 94371840
+                            "bytes": 1073741824
                         },
                         "max": {
-                            "bytes": 91226112
+                            "bytes": 1038876672
                         }
                     },
                     "nonheap": {
@@ -28,19 +28,22 @@
                         }
                     }
                 },
-                "version": "1.8.0_151"
+                "version": "1.8.0_144"
             },
-            "name": "ab1_1Gw3Rtax_2l78Gq_CQ",
+            "name": "523zXyT6TRWiqXcQItnkyQ",
             "process": {
                 "mlockall": false
             },
-            "version": "6.0.0"
+            "version": "6.3.0"
         }
     },
     "metricset": {
-        "host": "elasticsearch:9200",
+        "host": "127.0.0.1:9200",
         "module": "elasticsearch",
         "name": "node",
         "rtt": 115
+    },
+    "service": {
+        "name": "elasticsearch"
     }
 }

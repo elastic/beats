@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package beater
 
 import (
@@ -98,6 +115,11 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		applyOption(metricbeat)
 	}
 
+	if b.InSetupCmd {
+		// Return without instantiating the metricsets.
+		return metricbeat, nil
+	}
+
 	moduleOptions := append(
 		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
 		metricbeat.moduleOptions...)
@@ -146,9 +168,9 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 
 	if config.Autodiscover != nil {
 		var err error
-		factory := module.NewFactory(b.Publisher, metricbeat.moduleOptions...)
+		factory := module.NewFactory(metricbeat.moduleOptions...)
 		adapter := mbautodiscover.NewAutodiscoverAdapter(factory)
-		metricbeat.autodiscover, err = autodiscover.NewAutodiscover("metricbeat", adapter, config.Autodiscover)
+		metricbeat.autodiscover, err = autodiscover.NewAutodiscover("metricbeat", b.Publisher, adapter, config.Autodiscover)
 		if err != nil {
 			return nil, err
 		}
@@ -182,8 +204,8 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	if bt.config.ConfigModules.Enabled() {
-		moduleReloader := cfgfile.NewReloader(bt.config.ConfigModules)
-		factory := module.NewFactory(b.Publisher, bt.moduleOptions...)
+		moduleReloader := cfgfile.NewReloader(b.Publisher, bt.config.ConfigModules)
+		factory := module.NewFactory(bt.moduleOptions...)
 
 		if err := moduleReloader.Check(factory); err != nil {
 			return err

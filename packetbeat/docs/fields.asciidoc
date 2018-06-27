@@ -2318,6 +2318,26 @@ OS family (e.g. redhat, debian, freebsd, windows).
 
 --
 
+*`host.ip`*::
++
+--
+type: ip
+
+List of IP-addresses.
+
+
+--
+
+*`host.mac`*::
++
+--
+type: keyword
+
+List of hardware-addresses, usually MAC-addresses.
+
+
+--
+
 [[exported-fields-http]]
 == HTTP fields
 
@@ -2400,6 +2420,8 @@ A map containing the captured header fields from the response. Which headers to 
 *`http.response.body`*::
 +
 --
+type: text
+
 The body of the HTTP response.
 
 --
@@ -2487,6 +2509,16 @@ Kubernetes metadata added by the kubernetes processor
 type: keyword
 
 Kubernetes pod name
+
+
+--
+
+*`kubernetes.pod.uid`*::
++
+--
+type: keyword
+
+Kubernetes pod uid
 
 
 --

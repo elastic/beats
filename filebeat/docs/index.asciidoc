@@ -17,8 +17,6 @@ include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
-include::../../libbeat/docs/contributing-to-beats.asciidoc[]
-
 include::./getting-started.asciidoc[]
 
 include::./modules-getting-started.asciidoc[]
@@ -39,12 +37,13 @@ include::./fields.asciidoc[]
 
 include::../../libbeat/docs/monitoring/monitoring-beats.asciidoc[]
 
-include::./securing-filebeat.asciidoc[]
-
-include::../../libbeat/docs/security/securing-beats.asciidoc[]
+include::../../libbeat/docs/shared-securing-beat.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
 
 include::./migration.asciidoc[]
+
+include::../../libbeat/docs/contributing-to-beats.asciidoc[]
+

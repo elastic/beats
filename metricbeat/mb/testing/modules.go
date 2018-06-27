@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 /*
 Package testing provides utility functions for testing Module and MetricSet
 implementations.
@@ -151,25 +168,38 @@ func NewReportingMetricSetV2(t testing.TB, config interface{}) mb.ReportingMetri
 	return reportingMetricSetV2
 }
 
-type capturingReporterV2 struct {
+// CapturingReporterV2 is a reporter used for testing which stores all events and errors
+type CapturingReporterV2 struct {
 	events []mb.Event
 	errs   []error
 }
 
-func (r *capturingReporterV2) Event(event mb.Event) bool {
+// Event is used to report an event
+func (r *CapturingReporterV2) Event(event mb.Event) bool {
 	r.events = append(r.events, event)
 	return true
 }
 
-func (r *capturingReporterV2) Error(err error) bool {
+// Error is used to report an error
+func (r *CapturingReporterV2) Error(err error) bool {
 	r.errs = append(r.errs, err)
 	return true
+}
+
+// GetEvents returns all reported events
+func (r *CapturingReporterV2) GetEvents() []mb.Event {
+	return r.events
+}
+
+// GetErrors returns all reported errors
+func (r *CapturingReporterV2) GetErrors() []error {
+	return r.errs
 }
 
 // ReportingFetchV2 runs the given reporting metricset and returns all of the
 // events and errors that occur during that period.
 func ReportingFetchV2(metricSet mb.ReportingMetricSetV2) ([]mb.Event, []error) {
-	r := &capturingReporterV2{}
+	r := &CapturingReporterV2{}
 	metricSet.Fetch(r)
 	return r.events, r.errs
 }

@@ -6,6 +6,7 @@ BEAT_PATH=${BUILD_DIR}/src/beatpath/testbeat
 ES_BEATS=${GOPATH}/src/github.com/elastic/beats
 PREPARE_COMMAND?=
 
+
 # Runs test build for mock beat
 .PHONY: test
 test: prepare-test
@@ -15,8 +16,8 @@ test: prepare-test
 	cd ${BEAT_PATH} ; \
 	$(MAKE) copy-vendor || exit 1  ; \
 	${PREPARE_COMMAND} \
-	$(MAKE) check || exit 1 ; \
 	$(MAKE) update || exit 1 ; \
+	$(MAKE) check || exit 1 ; \
 	$(MAKE) || exit 1 ; \
 	$(MAKE) unit
 

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package instance
 
 import (
@@ -19,12 +36,14 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/libbeat/api"
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cloudid"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
@@ -52,9 +71,11 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/add_host_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
+	_ "github.com/elastic/beats/libbeat/processors/dissect"
 
 	// Register autodiscover providers
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
 
 	// Register default monitoring reporting
@@ -76,8 +97,9 @@ type beatConfig struct {
 	// instance internal configs
 
 	// beat top-level settings
-	Name     string `config:"name"`
-	MaxProcs int    `config:"max_procs"`
+	Name     string         `config:"name"`
+	MaxProcs int            `config:"max_procs"`
+	Seccomp  *common.Config `config:"seccomp"`
 
 	// beat internal components configurations
 	HTTP          *common.Config `config:"http"`
@@ -143,6 +165,15 @@ func Run(name, idxPrefix, version string, bt beat.Creator) error {
 		if err != nil {
 			return err
 		}
+
+		registry := monitoring.NewRegistry()
+		monitoring.GetNamespace("state").SetRegistry(registry)
+		monitoring.NewString(registry, "version").Set(b.Info.Version)
+		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
+		monitoring.NewString(registry, "name").Set(b.Info.Name)
+		monitoring.NewString(registry, "uuid").Set(b.Info.UUID.String())
+		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
+
 		return b.launch(bt)
 	}())
 }
@@ -161,6 +192,11 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		return nil, err
 	}
 
+	fields, err := asset.GetFields(name + "/fields.yml")
+	if err != nil {
+		return nil, err
+	}
+
 	b := beat.Beat{
 		Info: beat.Info{
 			Beat:        name,
@@ -170,6 +206,7 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 			Hostname:    hostname,
 			UUID:        uuid.NewV4(),
 		},
+		Fields: fields,
 	}
 
 	return &Beat{Beat: b}, nil
@@ -270,6 +307,10 @@ func (b *Beat) launch(bt beat.Creator) error {
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
+	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
+		return err
+	}
+
 	beater, err := b.createBeater(bt)
 	if err != nil {
 		return err
@@ -315,7 +356,7 @@ func (b *Beat) launch(bt beat.Creator) error {
 	logp.Info("%s start running.", b.Info.Beat)
 
 	if b.Config.HTTP.Enabled() {
-		api.Start(b.Config.HTTP, b.Info)
+		api.Start(b.Config.HTTP)
 	}
 
 	return beater.Run(&b.Beat)
@@ -663,7 +704,7 @@ func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) e
 			b.Config.Template = common.NewConfig()
 		}
 
-		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info)
+		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info, b.Fields)
 		if err != nil {
 			return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
 		}

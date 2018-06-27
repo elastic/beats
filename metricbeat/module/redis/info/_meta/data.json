@@ -31,6 +31,10 @@
             },
             "memory": {
                 "allocator": "jemalloc-4.0.3",
+                "max": {
+                    "policy": "noeviction",
+                    "value": 0
+                },
                 "used": {
                     "lua": 37888,
                     "peak": 822240,

@@ -1,21 +1,11 @@
-//Added conditional coding to support Beats that don't offer all of these install options
 
-ifeval::["{beatname_lc}"!="auditbeat"]
+*Before you begin*: If you haven't installed the {stack}, do that now. See
+{stack-ov}/get-started-elastic-stack.html[Getting started with the {stack}].
 
 To download and install {beatname_uc}, use the commands that work with your system
 (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
 mac>> for OS X, <<docker, docker>> for any Docker platform, and <<win, win>> for
 Windows).
-
-endif::[]
-
-ifeval::["{beatname_lc}"=="auditbeat"]
-
-To download and install {beatname_uc}, use the commands that work with your system
-(<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
-mac>> for OS X, and <<win, win>> for Windows).
-
-endif::[]
 
 [NOTE]
 ==================================================

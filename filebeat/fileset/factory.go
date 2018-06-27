@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package fileset
 
 import (
@@ -6,6 +23,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	input "github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -45,7 +63,7 @@ func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVers
 }
 
 // Create creates a module based on a config
-func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	// Start a registry of one module:
 	m, err := NewModuleRegistry([]*common.Config{c}, f.beatVersion, false)
 	if err != nil {
@@ -66,8 +84,9 @@ func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.
 	}
 
 	inputs := make([]*input.Runner, len(pConfigs))
+	connector := channel.ConnectTo(p, f.outlet)
 	for i, pConfig := range pConfigs {
-		inputs[i], err = input.New(pConfig, f.outlet, f.beatDone, f.registrar.GetStates(), meta)
+		inputs[i], err = input.New(pConfig, connector, f.beatDone, f.registrar.GetStates(), meta)
 		if err != nil {
 			logp.Err("Error creating input: %s", err)
 			return nil, err

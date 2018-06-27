@@ -23,7 +23,7 @@ class ComposeMixin(object):
     COMPOSE_PROJECT_DIR = '.'
 
     # timeout waiting for health (seconds)
-    COMPOSE_TIMEOUT = 60
+    COMPOSE_TIMEOUT = 300
 
     @classmethod
     def compose_up(cls):

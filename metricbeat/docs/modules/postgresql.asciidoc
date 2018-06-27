@@ -103,9 +103,13 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-postgresql-database,database>>
 
+* <<metricbeat-metricset-postgresql-statement,statement>>
+
 include::postgresql/activity.asciidoc[]
 
 include::postgresql/bgwriter.asciidoc[]
 
 include::postgresql/database.asciidoc[]
+
+include::postgresql/statement.asciidoc[]
 

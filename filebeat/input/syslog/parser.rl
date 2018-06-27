@@ -33,6 +33,14 @@ func Parse(data []byte, event *event) {
         event.SetMonth(data[tok:p])
       }
 
+      action year{
+        event.SetYear(data[tok:p])
+      }
+
+      action month_numeric {
+        event.SetMonthNumeric(data[tok:p])
+      }
+
       action day {
         event.SetDay(data[tok:p])
       }
@@ -63,6 +71,10 @@ func Parse(data []byte, event *event) {
 
       action pid {
         event.SetPid(data[tok:p])
+      }
+
+      action timezone {
+        event.SetTimeZone(data[tok:p])
       }
 
       include syslog_rfc3164 "syslog_rfc3164.rl";

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // Package dns provides support for parsing DNS messages and reporting the
 // results. This package supports the DNS protocol as defined by RFC 1034
 // and RFC 1035. It does not have any special support for RFC 2671 (EDNS) or
@@ -9,7 +26,6 @@ package dns
 import (
 	"bytes"
 	"fmt"
-	"net"
 	"sort"
 	"strconv"
 	"strings"
@@ -93,11 +109,10 @@ type dnsMessage struct {
 // DnsTuple contains source IP/port, destination IP/port, transport protocol,
 // and DNS ID.
 type dnsTuple struct {
-	ipLength         int
-	srcIP, dstIP     net.IP
-	srcPort, dstPort uint16
-	transport        transport
-	id               uint16
+	common.BaseTuple
+	ipLength  int
+	transport transport
+	id        uint16
 
 	raw    hashableDNSTuple // Src_ip:Src_port:Dst_ip:Dst_port:Transport:Id
 	revRaw hashableDNSTuple // Dst_ip:Dst_port:Src_ip:Src_port:Transport:Id
@@ -105,11 +120,13 @@ type dnsTuple struct {
 
 func dnsTupleFromIPPort(t *common.IPPortTuple, trans transport, id uint16) dnsTuple {
 	tuple := dnsTuple{
-		ipLength:  t.IPLength,
-		srcIP:     t.SrcIP,
-		dstIP:     t.DstIP,
-		srcPort:   t.SrcPort,
-		dstPort:   t.DstPort,
+		ipLength: t.IPLength,
+		BaseTuple: common.BaseTuple{
+			SrcIP:   t.SrcIP,
+			DstIP:   t.DstIP,
+			SrcPort: t.SrcPort,
+			DstPort: t.DstPort,
+		},
 		transport: trans,
 		id:        id,
 	}
@@ -120,11 +137,13 @@ func dnsTupleFromIPPort(t *common.IPPortTuple, trans transport, id uint16) dnsTu
 
 func (t dnsTuple) reverse() dnsTuple {
 	return dnsTuple{
-		ipLength:  t.ipLength,
-		srcIP:     t.dstIP,
-		dstIP:     t.srcIP,
-		srcPort:   t.dstPort,
-		dstPort:   t.srcPort,
+		ipLength: t.ipLength,
+		BaseTuple: common.BaseTuple{
+			SrcIP:   t.DstIP,
+			DstIP:   t.SrcIP,
+			SrcPort: t.DstPort,
+			DstPort: t.SrcPort,
+		},
 		transport: t.transport,
 		id:        t.id,
 		raw:       t.revRaw,
@@ -133,27 +152,27 @@ func (t dnsTuple) reverse() dnsTuple {
 }
 
 func (t *dnsTuple) computeHashebles() {
-	copy(t.raw[0:16], t.srcIP)
-	copy(t.raw[16:18], []byte{byte(t.srcPort >> 8), byte(t.srcPort)})
-	copy(t.raw[18:34], t.dstIP)
-	copy(t.raw[34:36], []byte{byte(t.dstPort >> 8), byte(t.dstPort)})
+	copy(t.raw[0:16], t.SrcIP)
+	copy(t.raw[16:18], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
+	copy(t.raw[18:34], t.DstIP)
+	copy(t.raw[34:36], []byte{byte(t.DstPort >> 8), byte(t.DstPort)})
 	copy(t.raw[36:38], []byte{byte(t.id >> 8), byte(t.id)})
 	t.raw[39] = byte(t.transport)
 
-	copy(t.revRaw[0:16], t.dstIP)
-	copy(t.revRaw[16:18], []byte{byte(t.dstPort >> 8), byte(t.dstPort)})
-	copy(t.revRaw[18:34], t.srcIP)
-	copy(t.revRaw[34:36], []byte{byte(t.srcPort >> 8), byte(t.srcPort)})
+	copy(t.revRaw[0:16], t.DstIP)
+	copy(t.revRaw[16:18], []byte{byte(t.DstPort >> 8), byte(t.DstPort)})
+	copy(t.revRaw[18:34], t.SrcIP)
+	copy(t.revRaw[34:36], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
 	copy(t.revRaw[36:38], []byte{byte(t.id >> 8), byte(t.id)})
 	t.revRaw[39] = byte(t.transport)
 }
 
 func (t *dnsTuple) String() string {
 	return fmt.Sprintf("DnsTuple src[%s:%d] dst[%s:%d] transport[%s] id[%d]",
-		t.srcIP.String(),
-		t.srcPort,
-		t.dstIP.String(),
-		t.dstPort,
+		t.SrcIP.String(),
+		t.SrcPort,
+		t.DstIP.String(),
+		t.DstPort,
 		t.transport,
 		t.id)
 }
@@ -254,16 +273,7 @@ func newTransaction(ts time.Time, tuple dnsTuple, cmd common.CmdlineTuple) *dnsT
 		ts:        ts,
 		tuple:     tuple,
 	}
-	trans.src = common.Endpoint{
-		IP:   tuple.srcIP.String(),
-		Port: tuple.srcPort,
-		Proc: string(cmd.Src),
-	}
-	trans.dst = common.Endpoint{
-		IP:   tuple.dstIP.String(),
-		Port: tuple.dstPort,
-		Proc: string(cmd.Dst),
-	}
+	trans.src, trans.dst = common.MakeEndpointPair(tuple.BaseTuple, &cmd)
 	return trans
 }
 
@@ -314,8 +324,7 @@ func (dns *dnsPlugin) receivedDNSResponse(tuple *dnsTuple, msg *dnsMessage) {
 
 	trans := dns.getTransaction(tuple.revHashable())
 	if trans == nil {
-		trans = newTransaction(msg.ts, tuple.reverse(), common.CmdlineTuple{
-			Src: msg.cmdlineTuple.Dst, Dst: msg.cmdlineTuple.Src})
+		trans = newTransaction(msg.ts, tuple.reverse(), msg.cmdlineTuple.Reverse())
 		trans.notes = append(trans.notes, orphanedResponse.Error())
 		debugf("%s %s", orphanedResponse.Error(), tuple.String())
 		unmatchedResponses.Add(1)
