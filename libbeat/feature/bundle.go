@@ -18,7 +18,7 @@
 package feature
 
 // Bundleable merges featurable and bundle interface together.
-type bundleable interface {
+type Bundleable interface {
 	Features() []Featurable
 }
 
@@ -53,7 +53,7 @@ func (b *Bundle) Features() []Featurable {
 }
 
 // MustBundle takes existing bundle or features and create a new Bundle with all the merged Features.
-func MustBundle(bundle ...bundleable) *Bundle {
+func MustBundle(bundle ...Bundleable) *Bundle {
 	var merged []Featurable
 	for _, feature := range bundle {
 		merged = append(merged, feature.Features()...)
