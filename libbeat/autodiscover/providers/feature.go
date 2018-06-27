@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/feature"
 )
 
+// Provider for autodiscover
 type Provider interface {
 	cfgfile.Runner
 }
@@ -46,6 +47,7 @@ func Feature(name string, factory Factory, stability feature.Stability) *feature
 	return feature.New(Namespace, name, factory, stability)
 }
 
+// FindFactory find, assert and return a provider factory.
 func FindFactory(name string) (Factory, error) {
 	f, err := feature.Registry.Lookup(Namespace, name)
 	if err != nil {
@@ -60,6 +62,7 @@ func FindFactory(name string) (Factory, error) {
 	return factory, nil
 }
 
+// Build takes the configuration and will create the appropriate provider.
 func Build(bus bus.Bus, c *common.Config) (Provider, error) {
 	var config Config
 	err := c.Unpack(&config)
