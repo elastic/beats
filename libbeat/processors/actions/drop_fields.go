@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
@@ -30,12 +31,12 @@ type dropFields struct {
 	Fields []string
 }
 
-func init() {
-	processors.RegisterPlugin("drop_fields",
-		configChecked(newDropFields,
-			requireFields("fields"),
-			allowedFields("fields", "when")))
-}
+// DropFieldsFeature exposes decode json field.
+var DropFieldsFeature = processors.Feature("drop_fields",
+	configChecked(newDropFields,
+		requireFields("fields"),
+		allowedFields("fields", "when")),
+	feature.Stable)
 
 func newDropFields(c *common.Config) (processors.Processor, error) {
 	config := struct {

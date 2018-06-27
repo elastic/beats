@@ -32,6 +32,7 @@ type processorPlugin struct {
 	constr Constructor
 }
 
+// Constructor is the factory method to create a new processor.
 type Constructor func(config *common.Config) (Processor, error)
 
 // Feature define a new feature.

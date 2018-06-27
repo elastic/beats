@@ -25,4 +25,5 @@ var Bundle = feature.MustBundle(
 	DropEventFeature,
 	IncludeFieldsFeature,
 	RenameFeature,
+	DropFieldsFeature,
 )
