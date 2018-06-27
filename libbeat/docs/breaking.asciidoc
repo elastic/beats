@@ -1,3 +1,5 @@
+:see-relnotes: See the <<release-notes,release notes>> for a complete list of breaking changes, including changes to beta or experimental functionality.
+
 [[breaking-changes]]
 == Breaking changes
 
@@ -10,6 +12,8 @@ changes, but there are breaking changes between major versions (e.g. 5.x to
 See the following topics for a description of breaking changes:
 
 * <<breaking-changes-6.3>>
+* <<breaking-changes-6.2>>
+* <<breaking-changes-6.1>>
 * <<breaking-changes-6.0>>
 * {auditbeat}/auditbeat-breaking-changes.html[Breaking changes in Auditbeat 6.2]
 
@@ -17,8 +21,7 @@ See the following topics for a description of breaking changes:
 === Breaking changes in 6.3
 
 This section discusses the main changes that you should be aware of if you
-upgrade the Beats to version 6.3. Please also review the relevant
-Breaking Changes sections of the <<release-notes,release notes>>.
+upgrade the Beats to version 6.3. {see-relnotes}
 
 [[breaking-changes-mapping-conflict]]
 ==== New `host` namespace may cause mapping conflicts for Logstash
@@ -159,12 +162,21 @@ field in the final event. The second approach drops the `host` fields from the
 Beats event, but because Logstash adds a default `host` field, there will be a
 `host` field in the final event.
 
+[[breaking-changes-6.2]]
+=== Breaking changes in 6.2
+
+{see-relnotes}
+
+[[breaking-changes-6.1]]
+=== Breaking changes in 6.1
+
+{see-relnotes}
+
 [[breaking-changes-6.0]]
 === Breaking changes in 6.0
 
 This section discusses the main changes that you should be aware of if you
-upgrade the Beats from version 5.x to 6.x. Please also review the relevant
-Breaking Changes sections of the <<release-notes,release notes>>.
+upgrade the Beats from version 5.x to 6.x. {see-relnotes}
 
 // TODO: better link to the consolidated release notes for 6.0.0.
 
