@@ -21,5 +21,5 @@ import "github.com/elastic/beats/libbeat/feature"
 
 // Plugin accepts a AppenderBuilder to be registered as a plugin.
 func Plugin(name string, appender Factory) *feature.Feature {
-	return Feature(name, appender, feature.Beta)
+	return Feature(name, appender, feature.Undefined)
 }
