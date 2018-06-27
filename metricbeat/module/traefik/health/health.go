@@ -18,8 +18,6 @@
 package health
 
 import (
-	"fmt"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -79,8 +77,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		report.Error(errors.Wrap(err, "failed to sample health"))
 		return
 	}
-
-	fmt.Println(data)
 
 	event, _ := eventMapping(data)
 	report.Event(mb.Event{

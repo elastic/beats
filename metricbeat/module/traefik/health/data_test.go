@@ -47,9 +47,7 @@ func TestEventMapping(t *testing.T) {
 	}
 
 	event, errors := eventMapping(input)
-	if errors != nil && len(*errors) > 0 {
-		t.FailNow()
-	}
+	assert.Nil(t, errors, "Errors while mapping input to event")
 
 	uptime := event["uptime"].(common.MapStr)
 	assert.EqualValues(t, 60231, uptime["sec"])
