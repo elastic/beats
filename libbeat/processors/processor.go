@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -46,15 +48,14 @@ func New(config PluginConfig) (*Processors, error) {
 		}
 
 		for processorName, cfg := range processor {
+			factory, err := Find(processorName)
 
-			gen, exists := registry.reg[processorName]
-			if !exists {
-				return nil, fmt.Errorf("the processor %s doesn't exist", processorName)
+			if err != nil {
+				return nil, errors.Wrapf(err, "cannot create the processor '%s'", processorName)
 			}
 
 			cfg.PrintDebugf("Configure processor '%v' with:", processorName)
-			constructor := gen.Plugin()
-			plugin, err := constructor(cfg)
+			plugin, err := factory(cfg)
 			if err != nil {
 				return nil, err
 			}

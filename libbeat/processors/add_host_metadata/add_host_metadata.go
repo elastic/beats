@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/processors"
@@ -34,9 +35,13 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
-func init() {
-	processors.RegisterPlugin("add_host_metadata", newHostMetadataProcessor)
-}
+const (
+	processorName   = "add_host_metadata"
+	cacheExpiration = time.Minute * 5
+)
+
+// Feature exposes add_host_metadata.
+var Feature = processors.Feature(processorName, newHostMetadataProcessor, feature.Stable)
 
 type addHostMetadata struct {
 	info       types.HostInfo
@@ -44,11 +49,6 @@ type addHostMetadata struct {
 	data       common.MapStr
 	config     Config
 }
-
-const (
-	processorName   = "add_host_metadata"
-	cacheExpiration = time.Minute * 5
-)
 
 func newHostMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()

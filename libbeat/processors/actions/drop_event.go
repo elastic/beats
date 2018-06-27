@@ -20,15 +20,15 @@ package actions
 import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
 type dropEvent struct{}
 
-func init() {
-	processors.RegisterPlugin("drop_event",
-		configChecked(newDropEvent, allowedFields("when")))
-}
+// DropEventFeature exposes the drop event processor.
+var DropEventFeature = processors.Feature("drop_event",
+	configChecked(newDropEvent, allowedFields("when")), feature.Stable)
 
 var dropEventsSingleton = (*dropEvent)(nil)
 

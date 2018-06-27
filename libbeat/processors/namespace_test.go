@@ -17,130 +17,120 @@
 
 package processors
 
-import (
-	"errors"
-	"testing"
+// type testFilterRule struct {
+// 	str func() string
+// 	run func(*beat.Event) (*beat.Event, error)
+// }
 
-	"github.com/stretchr/testify/assert"
+// func TestNamespace(t *testing.T) {
+// 	tests := []struct {
+// 		name string
+// 	}{
+// 		{"test"},
+// 		{"test.test"},
+// 		{"abc.def.test"},
+// 	}
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-)
+// 	for i, test := range tests {
+// 		t.Logf("run (%v): %v", i, test.name)
 
-type testFilterRule struct {
-	str func() string
-	run func(*beat.Event) (*beat.Event, error)
-}
+// 		ns := NewNamespace()
+// 		err := ns.Register(test.name, newTestFilterRule)
+// 		fatalError(t, err)
 
-func TestNamespace(t *testing.T) {
-	tests := []struct {
-		name string
-	}{
-		{"test"},
-		{"test.test"},
-		{"abc.def.test"},
-	}
+// 		cfg, _ := common.NewConfigFrom(map[string]interface{}{
+// 			test.name: nil,
+// 		})
 
-	for i, test := range tests {
-		t.Logf("run (%v): %v", i, test.name)
+// 		filter, err := ns.Plugin()(cfg)
 
-		ns := NewNamespace()
-		err := ns.Register(test.name, newTestFilterRule)
-		fatalError(t, err)
+// 		assert.NoError(t, err)
+// 		assert.NotNil(t, filter)
+// 	}
+// }
 
-		cfg, _ := common.NewConfigFrom(map[string]interface{}{
-			test.name: nil,
-		})
+// func TestNamespaceRegisterFail(t *testing.T) {
+// 	ns := NewNamespace()
+// 	err := ns.Register("test", newTestFilterRule)
+// 	fatalError(t, err)
 
-		filter, err := ns.Plugin()(cfg)
+// 	err = ns.Register("test", newTestFilterRule)
+// 	assert.Error(t, err)
+// }
 
-		assert.NoError(t, err)
-		assert.NotNil(t, filter)
-	}
-}
+// func TestNamespaceError(t *testing.T) {
+// 	tests := []struct {
+// 		title   string
+// 		factory Constructor
+// 		config  interface{}
+// 	}{
+// 		{
+// 			"no module configured",
+// 			newTestFilterRule,
+// 			map[string]interface{}{},
+// 		},
+// 		{
+// 			"unknown module configured",
+// 			newTestFilterRule,
+// 			map[string]interface{}{
+// 				"notTest": nil,
+// 			},
+// 		},
+// 		{
+// 			"too many modules",
+// 			newTestFilterRule,
+// 			map[string]interface{}{
+// 				"a":    nil,
+// 				"b":    nil,
+// 				"test": nil,
+// 			},
+// 		},
+// 		{
+// 			"filter init fail",
+// 			func(_ *common.Config) (Processor, error) {
+// 				return nil, errors.New("test")
+// 			},
+// 			map[string]interface{}{
+// 				"test": nil,
+// 			},
+// 		},
+// 	}
 
-func TestNamespaceRegisterFail(t *testing.T) {
-	ns := NewNamespace()
-	err := ns.Register("test", newTestFilterRule)
-	fatalError(t, err)
+// 	for i, test := range tests {
+// 		t.Logf("run (%v): %v", i, test.title)
 
-	err = ns.Register("test", newTestFilterRule)
-	assert.Error(t, err)
-}
+// 		ns := NewNamespace()
+// 		err := ns.Register("test", test.factory)
+// 		fatalError(t, err)
 
-func TestNamespaceError(t *testing.T) {
-	tests := []struct {
-		title   string
-		factory Constructor
-		config  interface{}
-	}{
-		{
-			"no module configured",
-			newTestFilterRule,
-			map[string]interface{}{},
-		},
-		{
-			"unknown module configured",
-			newTestFilterRule,
-			map[string]interface{}{
-				"notTest": nil,
-			},
-		},
-		{
-			"too many modules",
-			newTestFilterRule,
-			map[string]interface{}{
-				"a":    nil,
-				"b":    nil,
-				"test": nil,
-			},
-		},
-		{
-			"filter init fail",
-			func(_ *common.Config) (Processor, error) {
-				return nil, errors.New("test")
-			},
-			map[string]interface{}{
-				"test": nil,
-			},
-		},
-	}
+// 		config, err := common.NewConfigFrom(test.config)
+// 		fatalError(t, err)
 
-	for i, test := range tests {
-		t.Logf("run (%v): %v", i, test.title)
+// 		_, err = ns.Plugin()(config)
+// 		assert.Error(t, err)
+// 	}
+// }
 
-		ns := NewNamespace()
-		err := ns.Register("test", test.factory)
-		fatalError(t, err)
+// func newTestFilterRule(_ *common.Config) (Processor, error) {
+// 	return &testFilterRule{}, nil
+// }
 
-		config, err := common.NewConfigFrom(test.config)
-		fatalError(t, err)
+// func (r *testFilterRule) String() string {
+// 	if r.str == nil {
+// 		return "test"
+// 	}
+// 	return r.str()
+// }
 
-		_, err = ns.Plugin()(config)
-		assert.Error(t, err)
-	}
-}
+// func (r *testFilterRule) Run(evt *beat.Event) (*beat.Event, error) {
+// 	if r.run == nil {
+// 		return evt, nil
+// 	}
+// 	return r.Run(evt)
+// }
 
-func newTestFilterRule(_ *common.Config) (Processor, error) {
-	return &testFilterRule{}, nil
-}
-
-func (r *testFilterRule) String() string {
-	if r.str == nil {
-		return "test"
-	}
-	return r.str()
-}
-
-func (r *testFilterRule) Run(evt *beat.Event) (*beat.Event, error) {
-	if r.run == nil {
-		return evt, nil
-	}
-	return r.Run(evt)
-}
-
-func fatalError(t *testing.T, err error) {
-	if err != nil {
-		t.Fatal(err)
-	}
-}
+// func fatalError(t *testing.T, err error) {
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// }

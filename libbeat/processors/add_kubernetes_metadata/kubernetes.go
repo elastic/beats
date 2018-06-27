@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -40,9 +41,10 @@ type kubernetesAnnotator struct {
 	cache    *cache
 }
 
-func init() {
-	processors.RegisterPlugin("add_kubernetes_metadata", newKubernetesAnnotator)
+// Feature exposes add_kubernetes_metadata.
+var Feature = processors.Feature("add_kubernetes_metadata", newKubernetesAnnotator, feature.Stable)
 
+func init() {
 	// Register default indexers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
 	Indexing.AddIndexer(PodUIDIndexerName, NewPodUIDIndexer)

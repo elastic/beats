@@ -17,107 +17,99 @@
 
 package processors
 
-import (
-	"errors"
-	"fmt"
-	"strings"
+// type Namespace struct {
+// 	reg map[string]pluginer
+// }
 
-	"github.com/elastic/beats/libbeat/common"
-)
+// type plugin struct {
+// 	c Constructor
+// }
 
-type Namespace struct {
-	reg map[string]pluginer
-}
+// type pluginer interface {
+// 	Plugin() Constructor
+// }
 
-type plugin struct {
-	c Constructor
-}
+// func NewNamespace() *Namespace {
+// 	return &Namespace{
+// 		reg: map[string]pluginer{},
+// 	}
+// }
 
-type pluginer interface {
-	Plugin() Constructor
-}
+// func (ns *Namespace) Register(name string, factory Constructor) error {
+// 	p := plugin{NewConditional(factory)}
+// 	names := strings.Split(name, ".")
+// 	if err := ns.add(names, p); err != nil {
+// 		return fmt.Errorf("plugin %s registration fail %v", name, err)
+// 	}
+// 	return nil
+// }
 
-func NewNamespace() *Namespace {
-	return &Namespace{
-		reg: map[string]pluginer{},
-	}
-}
+// func (ns *Namespace) add(names []string, p pluginer) error {
+// 	name := names[0]
 
-func (ns *Namespace) Register(name string, factory Constructor) error {
-	p := plugin{NewConditional(factory)}
-	names := strings.Split(name, ".")
-	if err := ns.add(names, p); err != nil {
-		return fmt.Errorf("plugin %s registration fail %v", name, err)
-	}
-	return nil
-}
+// 	// register plugin if intermediate node in path being processed
+// 	if len(names) == 1 {
+// 		if _, found := ns.reg[name]; found {
+// 			return errors.New("exists already")
+// 		}
 
-func (ns *Namespace) add(names []string, p pluginer) error {
-	name := names[0]
+// 		ns.reg[name] = p
+// 		return nil
+// 	}
 
-	// register plugin if intermediate node in path being processed
-	if len(names) == 1 {
-		if _, found := ns.reg[name]; found {
-			return errors.New("exists already")
-		}
+// 	// check if namespace path already exists
+// 	tmp, found := ns.reg[name]
+// 	if found {
+// 		ns, ok := tmp.(*Namespace)
+// 		if !ok {
+// 			return errors.New("non-namespace plugin already registered")
+// 		}
+// 		return ns.add(names[1:], p)
+// 	}
 
-		ns.reg[name] = p
-		return nil
-	}
+// 	// register new namespace
+// 	sub := NewNamespace()
+// 	err := sub.add(names[1:], p)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	ns.reg[name] = sub
+// 	return nil
+// }
 
-	// check if namespace path already exists
-	tmp, found := ns.reg[name]
-	if found {
-		ns, ok := tmp.(*Namespace)
-		if !ok {
-			return errors.New("non-namespace plugin already registered")
-		}
-		return ns.add(names[1:], p)
-	}
+// func (ns *Namespace) Plugin() Constructor {
+// 	return NewConditional(func(cfg *common.Config) (Processor, error) {
+// 		var section string
+// 		for _, name := range cfg.GetFields() {
+// 			if name == "when" { // TODO: remove check for "when" once fields are filtered
+// 				continue
+// 			}
 
-	// register new namespace
-	sub := NewNamespace()
-	err := sub.add(names[1:], p)
-	if err != nil {
-		return err
-	}
-	ns.reg[name] = sub
-	return nil
-}
+// 			if section != "" {
+// 				return nil, fmt.Errorf("Too many lookup modules configured (%v, %v)",
+// 					section, name)
+// 			}
 
-func (ns *Namespace) Plugin() Constructor {
-	return NewConditional(func(cfg *common.Config) (Processor, error) {
-		var section string
-		for _, name := range cfg.GetFields() {
-			if name == "when" { // TODO: remove check for "when" once fields are filtered
-				continue
-			}
+// 			section = name
+// 		}
 
-			if section != "" {
-				return nil, fmt.Errorf("Too many lookup modules configured (%v, %v)",
-					section, name)
-			}
+// 		if section == "" {
+// 			return nil, errors.New("No lookup module configured")
+// 		}
 
-			section = name
-		}
+// 		backend, found := ns.reg[section]
+// 		if !found {
+// 			return nil, fmt.Errorf("Unknown lookup module: %v", section)
+// 		}
 
-		if section == "" {
-			return nil, errors.New("No lookup module configured")
-		}
+// 		config, err := cfg.Child(section, -1)
+// 		if err != nil {
+// 			return nil, err
+// 		}
 
-		backend, found := ns.reg[section]
-		if !found {
-			return nil, fmt.Errorf("Unknown lookup module: %v", section)
-		}
+// 		constructor := backend.Plugin()
+// 		return constructor(config)
+// 	})
+// }
 
-		config, err := cfg.Child(section, -1)
-		if err != nil {
-			return nil, err
-		}
-
-		constructor := backend.Plugin()
-		return constructor(config)
-	})
-}
-
-func (p plugin) Plugin() Constructor { return p.c }
+// func (p plugin) Plugin() Constructor { return p.c }

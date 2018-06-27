@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -43,11 +44,10 @@ type fromTo struct {
 	To   string `config:"to"`
 }
 
-func init() {
-	processors.RegisterPlugin("rename",
-		configChecked(newRenameFields,
-			requireFields("fields")))
-}
+// RenameFeature expose the feature.
+var RenameFeature = processors.Feature("rename",
+	configChecked(newRenameFields,
+		requireFields("fields")), feature.Stable)
 
 func newRenameFields(c *common.Config) (processors.Processor, error) {
 	config := renameFieldsConfig{

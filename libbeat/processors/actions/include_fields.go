@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
@@ -32,12 +33,11 @@ type includeFields struct {
 	Fields []string
 }
 
-func init() {
-	processors.RegisterPlugin("include_fields",
-		configChecked(newIncludeFields,
-			requireFields("fields"),
-			allowedFields("fields", "when")))
-}
+// IncludeFieldsFeature exposes the feature.
+var IncludeFieldsFeature = processors.Feature("include_fields",
+	configChecked(newIncludeFields,
+		requireFields("fields"),
+		allowedFields("fields", "when")), feature.Stable)
 
 func newIncludeFields(c *common.Config) (processors.Processor, error) {
 	config := struct {
