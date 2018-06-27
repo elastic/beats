@@ -5,8 +5,12 @@ var:
     default:
       - /var/log/elasticsearch/gc.log.[0-9]*
       - /var/log/elasticsearch/gc.log
-    os.darwin: []
-    os.windows: []
+    os.darwin:
+      - /usr/local/elasticsearch/gc.log.[0-9]*
+      - /usr/local/elasticsearch/gc.log
+    os.windows:
+      - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log.*
+      - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log
 
 ingest_pipeline: ingest/pipeline.json
 input: config/gc.yml

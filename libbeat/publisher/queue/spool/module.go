@@ -20,10 +20,14 @@ package spool
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 	"github.com/elastic/go-txfile"
 )
+
+// Feature exposes a spooling to disk queue.
+var Feature = queue.Feature("spool", create, feature.Beta)
 
 func init() {
 	queue.RegisterType("spool", create)

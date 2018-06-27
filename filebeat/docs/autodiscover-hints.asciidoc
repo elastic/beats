@@ -6,6 +6,12 @@ from the container using the `docker` input. You can use hints to modify this be
 list of supported hints:
 
 [float]
+===== `co.elastic.logs/disable`
+
+Filebeat gets logs from all containers by default, you can set this hint to `true` to ignore
+the output of the container. Filebeat won't read or send logs from it.
+
+[float]
 ===== `co.elastic.logs/multiline.*`
 
 Multiline settings. See <<multiline-examples>> for a full list of all supported options.
@@ -57,6 +63,23 @@ a list of configurations.
 -------------------------------------------------------------------------------------
 co.elastic.logs/raw: "[{\"containers\":{\"ids\":[\"${data.container.id}\"]},\"multiline\":{\"negate\":\"true\",\"pattern\":\"^test\"},\"type\":\"docker\"}]"
 -------------------------------------------------------------------------------------
+
+[float]
+===== `co.elastic.logs/processors`
+
+Define a processor to be added to the {beatname_uc} input/module configuration. See <<filtering-and-enhancing-data>> for the list
+of supported processors.
+
+In order to provide ordering of the processor definition, numbers can be provided. If not, the hints builder will do
+arbitrary ordering:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.logs/processors.1.dissect.tokenizer: "%{key1} %{key2}"
+co.elastic.logs/processors.dissect.tokenizer: "%{key2} %{key1}"
+-------------------------------------------------------------------------------------
+
+In the above sample the processor definition tagged with `1` would be executed first.
 
 [float]
 ==== Kubernetes

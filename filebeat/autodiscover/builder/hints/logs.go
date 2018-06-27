@@ -39,6 +39,7 @@ const (
 	multiline    = "multiline"
 	includeLines = "include_lines"
 	excludeLines = "exclude_lines"
+	processors   = "processors"
 )
 
 // validModuleNames to sanitize user input
@@ -112,6 +113,10 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		tempCfg.Put(excludeLines, elines)
 	}
 
+	if procs := l.getProcessors(hints); len(procs) != 0 {
+		tempCfg.Put(processors, procs)
+	}
+
 	// Merge config template with the configs from the annotations
 	if err := config.Merge(tempCfg); err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
@@ -162,6 +167,10 @@ func (l *logHints) getModule(hints common.MapStr) string {
 
 func (l *logHints) getInputs(hints common.MapStr) []common.MapStr {
 	return builder.GetHintAsConfigs(hints, l.Key)
+}
+
+func (l *logHints) getProcessors(hints common.MapStr) []common.MapStr {
+	return builder.GetProcessors(hints, l.Key)
 }
 
 type filesetConfig struct {

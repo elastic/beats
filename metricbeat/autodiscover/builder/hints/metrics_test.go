@@ -169,6 +169,41 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
+			message: "Module with processor config must return an module having the processor defined",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:9090",
+						"processors": common.MapStr{
+							"add_locale": common.MapStr{
+								"abbrevation": "MST",
+							},
+						},
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module":     "mockmoduledefaults",
+				"namespace":  "test",
+				"metricsets": []string{"default"},
+				"timeout":    "3s",
+				"period":     "1m",
+				"enabled":    true,
+				"hosts":      []interface{}{"1.2.3.4:9090"},
+				"processors": []interface{}{
+					map[string]interface{}{
+						"add_locale": map[string]interface{}{
+							"abbrevation": "MST",
+						},
+					},
+				},
+			},
+		},
+		{
 			message: "Module, namespace, host hint should return valid config",
 			event: bus.Event{
 				"host": "1.2.3.4",
