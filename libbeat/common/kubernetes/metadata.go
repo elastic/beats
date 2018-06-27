@@ -71,29 +71,29 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	annotationsMap := generateMapSubset(pod.Metadata.Annotations, g.IncludeAnnotations)
 	meta := common.MapStr{
 		"pod": common.MapStr{
-			"name": pod.Metadata.Name,
+			"name": pod.Metadata.GetName(),
 		},
 		"node": common.MapStr{
-			"name": pod.Spec.NodeName,
+			"name": pod.Spec.GetNodeName(),
 		},
-		"namespace": pod.Metadata.Namespace,
+		"namespace": pod.Metadata.GetNamespace(),
 	}
 
 	// Add Pod UID metadata if enabled
 	if g.IncludePodUID {
-		safemapstr.Put(meta, "pod.uid", pod.Metadata.UID)
+		safemapstr.Put(meta, "pod.uid", pod.Metadata.GetUid())
 	}
 
 	// Add controller metadata if present
 	if g.IncludeCreatorMetadata {
 		for _, ref := range pod.Metadata.OwnerReferences {
-			if ref.Controller {
-				switch ref.Kind {
+			if ref.GetController() {
+				switch ref.GetKind() {
 				// TODO grow this list as we keep adding more `state_*` metricsets
 				case "Deployment",
 					"ReplicaSet",
 					"StatefulSet":
-					safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
+					safemapstr.Put(meta, strings.ToLower(ref.GetKind())+".name", ref.GetName())
 				}
 			}
 		}

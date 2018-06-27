@@ -66,7 +66,6 @@ type watcher struct {
 	stop                context.CancelFunc
 	resourceList        k8s.ResourceList
 	k8sResourceFactory  func() k8s.Resource
-	resourceFactory     func() Resource
 	items               func() []k8s.Resource
 	handler             ResourceEventHandler
 }
@@ -92,7 +91,6 @@ func NewWatcher(client *k8s.Client, resource Resource, options WatchOptions) (Wa
 		list := &v1.PodList{}
 		w.resourceList = list
 		w.k8sResourceFactory = func() k8s.Resource { return &v1.Pod{} }
-		w.resourceFactory = func() Resource { return &Pod{} }
 		w.items = func() []k8s.Resource {
 			rs := make([]k8s.Resource, 0, len(list.Items))
 			for _, item := range list.Items {
@@ -104,7 +102,6 @@ func NewWatcher(client *k8s.Client, resource Resource, options WatchOptions) (Wa
 		list := &v1.EventList{}
 		w.resourceList = list
 		w.k8sResourceFactory = func() k8s.Resource { return &v1.Event{} }
-		w.resourceFactory = func() Resource { return &Event{} }
 		w.items = func() []k8s.Resource {
 			rs := make([]k8s.Resource, 0, len(list.Items))
 			for _, item := range list.Items {
@@ -152,16 +149,16 @@ func (w *watcher) sync() error {
 	return nil
 }
 
-func (w *watcher) onAdd(obj k8s.Resource) {
-	w.handler.OnAdd(resourceConverter(obj, w.resourceFactory()))
+func (w *watcher) onAdd(obj Resource) {
+	w.handler.OnAdd(obj)
 }
 
-func (w *watcher) onUpdate(obj k8s.Resource) {
-	w.handler.OnUpdate(resourceConverter(obj, w.resourceFactory()))
+func (w *watcher) onUpdate(obj Resource) {
+	w.handler.OnUpdate(obj)
 }
 
-func (w *watcher) onDelete(obj k8s.Resource) {
-	w.handler.OnDelete(resourceConverter(obj, w.resourceFactory()))
+func (w *watcher) onDelete(obj Resource) {
+	w.handler.OnDelete(obj)
 }
 
 // Start watching pods
