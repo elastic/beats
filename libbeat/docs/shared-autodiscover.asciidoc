@@ -157,6 +157,15 @@ For example:
 The configuration of templates and conditions is similar to that of the Docker provider. Configuration templates can
 contain variables from the autodiscover event. They can be accessed under data namespace.
 
+The `kubernetes` autodiscover provider has the following configuration settings:
+
+`in_cluster`:: (Optional) Use in cluster settings for Kubernetes client, `true`
+  by default.
+`host`:: (Optional) In case `in_cluster` is false, use this host to connect to
+  Kubernetes API.
+`kube_config`:: (Optional) Use given config file as configuration for Kubernetes
+  client.
+
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
 
 [[configuration-autodiscover-hints]]
