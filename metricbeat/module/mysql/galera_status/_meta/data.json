@@ -11,7 +11,7 @@
         "rtt":44269
     },
     "mysql":{
-        "galera-status":{
+        "galera_status":{
             "apply": {
                 "oooe": 0,
                 "oool": 0,
