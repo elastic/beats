@@ -20,6 +20,8 @@ package kubernetes
 import (
 	"testing"
 
+	v1 "github.com/ericchiang/k8s/apis/core/v1"
+	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -28,6 +30,12 @@ import (
 func TestPodMetadataDeDot(t *testing.T) {
 	withPodUID, _ := common.NewConfigFrom(map[string]interface{}{"include_pod_uid": true})
 
+	UID := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	Deployment := "Deployment"
+	test := "test"
+	ReplicaSet := "ReplicaSet"
+	True := true
+	False := false
 	tests := []struct {
 		pod    *Pod
 		meta   common.MapStr
@@ -35,63 +43,66 @@ func TestPodMetadataDeDot(t *testing.T) {
 	}{
 		{
 			pod: &Pod{
-				Metadata: ObjectMeta{
+				Metadata: &metav1.ObjectMeta{
 					Labels: map[string]string{"a.key": "foo", "a": "bar"},
-					UID:    "005f3b90-4b9d-12f8-acf0-31020a840133",
+					Uid:    &UID,
+				},
+				Spec: &v1.PodSpec{
+					NodeName: &test,
 				},
 			},
 			meta: common.MapStr{
 				"pod":       common.MapStr{"name": ""},
 				"namespace": "",
-				"node":      common.MapStr{"name": ""},
+				"node":      common.MapStr{"name": "test"},
 				"labels":    common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
 			},
 			config: common.NewConfig(),
 		},
 		{
 			pod: &Pod{
-				Metadata: ObjectMeta{
+				Metadata: &metav1.ObjectMeta{
 					Labels: map[string]string{"a.key": "foo", "a": "bar"},
-					UID:    "005f3b90-4b9d-12f8-acf0-31020a840133",
+					Uid:    &UID,
+				},
+				Spec: &v1.PodSpec{
+					NodeName: &test,
 				},
 			},
 			meta: common.MapStr{
 				"pod":       common.MapStr{"name": "", "uid": "005f3b90-4b9d-12f8-acf0-31020a840133"},
 				"namespace": "",
-				"node":      common.MapStr{"name": ""},
+				"node":      common.MapStr{"name": "test"},
 				"labels":    common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
 			},
 			config: withPodUID,
 		},
 		{
 			pod: &Pod{
-				Metadata: ObjectMeta{
+				Metadata: &metav1.ObjectMeta{
 					Labels: map[string]string{"a.key": "foo", "a": "bar"},
-					UID:    "005f3b90-4b9d-12f8-acf0-31020a840133",
-					OwnerReferences: []struct {
-						APIVersion string `json:"apiVersion"`
-						Controller bool   `json:"controller"`
-						Kind       string `json:"kind"`
-						Name       string `json:"name"`
-						UID        string `json:"uid"`
-					}{
+					Uid:    &UID,
+					OwnerReferences: []*metav1.OwnerReference{
 						{
-							Kind:       "Deployment",
-							Name:       "test",
-							Controller: true,
+							Kind:       &Deployment,
+							Name:       &test,
+							Controller: &True,
 						},
 						{
-							Kind:       "Replicaset",
-							Name:       "replicaset",
-							Controller: false,
+							Kind:       &ReplicaSet,
+							Name:       &ReplicaSet,
+							Controller: &False,
 						},
 					},
+				},
+				Spec: &v1.PodSpec{
+					NodeName: &test,
 				},
 			},
 			meta: common.MapStr{
 				"pod":        common.MapStr{"name": ""},
 				"namespace":  "",
-				"node":       common.MapStr{"name": ""},
+				"node":       common.MapStr{"name": "test"},
 				"labels":     common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
 				"deployment": common.MapStr{"name": "test"},
 			},

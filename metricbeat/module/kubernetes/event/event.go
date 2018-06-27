@@ -93,7 +93,7 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 		// skip events happened before watch
 		FilterFunc: func(obj kubernetes.Resource) bool {
 			eve := obj.(*kubernetes.Event)
-			if eve.LastTimestamp.Before(now) {
+			if kubernetes.Time(eve.LastTimestamp).Before(now) {
 				return false
 			}
 			return true
@@ -110,14 +110,14 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	eventMeta := common.MapStr{
 		"timestamp": common.MapStr{
-			"created": eve.Metadata.CreationTimestamp,
+			"created": kubernetes.Time(eve.Metadata.CreationTimestamp).UTC(),
 		},
-		"name":             eve.Metadata.Name,
-		"namespace":        eve.Metadata.Namespace,
-		"self_link":        eve.Metadata.SelfLink,
-		"generate_name":    eve.Metadata.GenerateName,
-		"uid":              eve.Metadata.UID,
-		"resource_version": eve.Metadata.ResourceVersion,
+		"name":             eve.Metadata.GetName(),
+		"namespace":        eve.Metadata.GetNamespace(),
+		"self_link":        eve.Metadata.GetSelfLink(),
+		"generate_name":    eve.Metadata.GetGenerateName(),
+		"uid":              eve.Metadata.GetUid(),
+		"resource_version": eve.Metadata.GetResourceVersion(),
 	}
 
 	if len(eve.Metadata.Labels) != 0 {
@@ -139,16 +139,16 @@ func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	}
 
 	output := common.MapStr{
-		"message": eve.Message,
-		"reason":  eve.Reason,
-		"type":    eve.Type,
-		"count":   eve.Count,
+		"message": eve.GetMessage(),
+		"reason":  eve.GetReason(),
+		"type":    eve.GetType(),
+		"count":   eve.GetCount(),
 		"involved_object": common.MapStr{
-			"api_version":      eve.InvolvedObject.APIVersion,
-			"resource_version": eve.InvolvedObject.ResourceVersion,
-			"name":             eve.InvolvedObject.Name,
-			"kind":             eve.InvolvedObject.Kind,
-			"uid":              eve.InvolvedObject.UID,
+			"api_version":      eve.GetInvolvedObject().GetApiVersion(),
+			"resource_version": eve.GetInvolvedObject().GetResourceVersion(),
+			"name":             eve.GetInvolvedObject().GetName(),
+			"kind":             eve.GetInvolvedObject().GetKind(),
+			"uid":              eve.GetInvolvedObject().GetUid(),
 		},
 		"metadata": eventMeta,
 	}
@@ -156,11 +156,11 @@ func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	tsMap := make(common.MapStr)
 
 	if eve.FirstTimestamp != nil {
-		tsMap["first_occurrence"] = eve.FirstTimestamp.UTC()
+		tsMap["first_occurrence"] = kubernetes.Time(eve.FirstTimestamp).UTC()
 	}
 
 	if eve.LastTimestamp != nil {
-		tsMap["last_occurrence"] = eve.LastTimestamp.UTC()
+		tsMap["last_occurrence"] = kubernetes.Time(eve.LastTimestamp).UTC()
 	}
 
 	if len(tsMap) != 0 {
