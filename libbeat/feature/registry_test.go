@@ -26,6 +26,14 @@ import (
 func TestRegister(t *testing.T) {
 	f := func() {}
 
+	t.Run("when the factory is nil", func(t *testing.T) {
+		r := newRegistry()
+		err := r.Register(New("outputs", "null", nil, Stable))
+		if !assert.Error(t, err) {
+			return
+		}
+	})
+
 	t.Run("namespace and feature doesn't exist", func(t *testing.T) {
 		r := newRegistry()
 		err := r.Register(New("outputs", "null", f, Stable))

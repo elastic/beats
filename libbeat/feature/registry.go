@@ -54,6 +54,10 @@ func (r *registry) Register(feature Featurable) error {
 	ns := normalize(feature.Namespace())
 	name := normalize(feature.Name())
 
+	if feature.Factory() == nil {
+		return fmt.Errorf("feature '%s' cannot be registered with a nil factory", name)
+	}
+
 	// Lazy create namespaces
 	_, found := r.namespaces[ns]
 	if !found {
