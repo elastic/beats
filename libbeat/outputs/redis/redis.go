@@ -51,21 +51,6 @@ func makeRedis(
 	observer outputs.Observer,
 	cfg *common.Config,
 ) (outputs.Group, error) {
-	config := defaultConfig
-	if err := cfg.Unpack(&config); err != nil {
-		return outputs.Fail(err)
-	}
-
-	var dataType redisDataType
-	switch config.DataType {
-	case "", "list":
-		dataType = redisListType
-	case "channel":
-		dataType = redisChannelType
-	default:
-		return outputs.Fail(errors.New("Bad Redis data type"))
-	}
-
 	// ensure we have a `key` field in settings
 	if cfg.HasField("index") && !cfg.HasField("key") {
 		s, err := cfg.String("index", -1)
@@ -81,6 +66,21 @@ func makeRedis(
 	}
 	if !cfg.HasField("key") {
 		cfg.SetString("key", -1, beat.Beat)
+	}
+
+	config := defaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return outputs.Fail(err)
+	}
+
+	var dataType redisDataType
+	switch config.DataType {
+	case "", "list":
+		dataType = redisListType
+	case "channel":
+		dataType = redisChannelType
+	default:
+		return outputs.Fail(errors.New("Bad Redis data type"))
 	}
 
 	key, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
