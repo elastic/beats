@@ -78,7 +78,7 @@ func TestConsoleOutput(t *testing.T) {
 	}{
 		{
 			"single json event (pretty=false)",
-			json.New(false, "1.2.3"),
+			json.New(false, true, "1.2.3"),
 			[]beat.Event{
 				{Fields: event("field", "value")},
 			},
@@ -86,7 +86,7 @@ func TestConsoleOutput(t *testing.T) {
 		},
 		{
 			"single json event (pretty=true)",
-			json.New(true, "1.2.3"),
+			json.New(true, true, "1.2.3"),
 			[]beat.Event{
 				{Fields: event("field", "value")},
 			},

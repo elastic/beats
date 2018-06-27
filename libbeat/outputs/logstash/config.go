@@ -38,6 +38,7 @@ type Config struct {
 	TLS              *tlscommon.Config     `config:"ssl"`
 	Proxy            transport.ProxyConfig `config:",inline"`
 	Backoff          Backoff               `config:"backoff"`
+	EscapeHTML       bool                  `config:"escape_html"`
 }
 
 type Backoff struct {
@@ -59,6 +60,7 @@ var defaultConfig = Config{
 		Init: 1 * time.Second,
 		Max:  60 * time.Second,
 	},
+	EscapeHTML: true,
 }
 
 func newConfig() *Config {
