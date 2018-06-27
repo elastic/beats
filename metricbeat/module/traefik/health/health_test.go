@@ -50,7 +50,7 @@ const response = `{
 }
 `
 
-func TestFetch(t *testing.T) {
+func TestFetchEventContents(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
