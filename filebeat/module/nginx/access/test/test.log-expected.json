@@ -1,412 +1,208 @@
 [
-  {
-    "_index" : "filebeat-6.0.0-alpha2-2017.05.30",
-    "_type" : "doc",
-    "_id" : "AVxWUuZ8OMOtQBaTipsE",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2016-12-07T10:05:07.000Z",
-      "offset" : 527,
-      "nginx" : {
-        "access" : {
-          "referrer" : "-",
-          "response_code" : "200",
-          "remote_ip" : "85.181.35.98",
-          "geoip" : {
-            "continent_name" : "Europe",
-            "country_iso_code" : "DE",
-            "location" : {
-              "lon" : 13.4,
-              "lat" : 52.5167
-            },
-            "region_name": "Land Berlin",
-            "city_name": "Berlin"
-          },
-          "method" : "GET",
-          "user_name" : "-",
-          "http_version" : "1.1",
-          "body_sent" : {
-            "bytes" : "571"
-          },
-          "remote_ip_list" : [
-            "10.0.0.2",
-            "10.0.0.1",
-            "85.181.35.98"
-          ],
-          "url" : "/ocelot",
-          "user_agent" : {
-            "major" : "49",
-            "minor" : "0",
-            "os" : "Mac OS X 10.12",
-            "os_minor" : "12",
-            "os_major" : "10",
-            "name" : "Firefox",
-            "os_name" : "Mac OS X",
-            "device" : "Other"
-          }
-        }
-      },
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key-2.local",
-        "name" : "a-mac-with-esc-key-2.local",
-        "version" : "6.0.0-alpha2"
-      },
-      "prospector" : {
-        "type" : "log"
-      },
-      "input" : {
-        "type" : "log"
-      },
-      "read_timestamp" : "2017-05-29T22:28:06.246Z",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
-      "fileset" : {
-        "module" : "nginx",
-        "name" : "access"
-      }
-    }
-  },
-  {
-    "_index" : "filebeat-6.0.0-alpha2-2017.05.30",
-    "_type" : "doc",
-    "_id" : "AVxWUuZ8OMOtQBaTipsD",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-05-29T19:02:48.000Z",
-      "offset" : 341,
-      "nginx" : {
-        "access" : {
-          "referrer" : "-",
-          "response_code" : "404",
-          "remote_ip" : "172.17.0.1",
-          "method" : "GET",
-          "user_name" : "-",
-          "http_version" : "1.1",
-          "body_sent" : {
-            "bytes" : "612"
-          },
-          "remote_ip_list" : [
-            "172.17.0.1"
-          ],
-          "url" : "/stringpatch",
-          "user_agent" : {
-            "patch" : "a2",
-            "major" : "15",
-            "minor" : "0",
-            "os" : "Windows 7",
-            "name" : "Firefox Alpha",
-            "os_name" : "Windows 7",
-            "device" : "Other"
-          }
-        }
-      },
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key-2.local",
-        "name" : "a-mac-with-esc-key-2.local",
-        "version" : "6.0.0-alpha2"
-      },
-      "prospector" : {
-        "type" : "log"
-      },
-      "" : {
-        "type" : "log"
-      },
-      "read_timestamp" : "2017-05-29T22:28:06.246Z",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
-      "fileset" : {
-        "module" : "nginx",
-        "name" : "access"
-      }
-    }
-  },
-  {
-    "_index" : "filebeat-6.0.0-alpha2-2017.05.30",
-    "_type" : "doc",
-    "_id" : "AVxWUuZ8OMOtQBaTipsF",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2016-12-07T10:05:07.000Z",
-      "offset" : 693,
-      "nginx" : {
-        "access" : {
-          "referrer" : "-",
-          "response_code" : "200",
-          "remote_ip" : "85.181.35.98",
-          "geoip" : {
-            "continent_name" : "Europe",
-            "country_iso_code" : "DE",
-            "location" : {
-              "lon" : 13.4,
-              "lat" : 52.5167
-            },
-            "region_name": "Land Berlin",
-            "city_name": "Berlin"
-          },
-          "method" : "GET",
-          "user_name" : "-",
-          "http_version" : "1.1",
-          "body_sent" : {
-            "bytes" : "571"
-          },
-          "remote_ip_list" : [
-            "85.181.35.98"
-          ],
-          "url" : "/ocelot",
-          "user_agent" : {
-            "major" : "49",
-            "minor" : "0",
-            "os" : "Mac OS X 10.12",
-            "os_minor" : "12",
-            "os_major" : "10",
-            "name" : "Firefox",
-            "os_name" : "Mac OS X",
-            "device" : "Other"
-          }
-        }
-      },
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key-2.local",
-        "name" : "a-mac-with-esc-key-2.local",
-        "version" : "6.0.0-alpha2"
-      },
-      "prospector" : {
-        "type" : "log"
-      },
-      "input" : {
-        "type" : "log"
-      },
-      "read_timestamp" : "2017-05-29T22:28:06.246Z",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
-      "fileset" : {
-        "module" : "nginx",
-        "name" : "access"
-      }
-    }
-  },
-  {
-    "_index" : "filebeat-6.0.0-alpha2-2017.05.30",
-    "_type" : "doc",
-    "_id" : "AVxWUuZ8OMOtQBaTipsC",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2016-12-07T10:05:07.000Z",
-      "offset" : 183,
-      "nginx" : {
-        "access" : {
-          "referrer" : "-",
-          "response_code" : "200",
-          "remote_ip" : "10.0.0.2",
-          "method" : "GET",
-          "user_name" : "-",
-          "http_version" : "1.1",
-          "body_sent" : {
-            "bytes" : "571"
-          },
-          "remote_ip_list" : [
-            "10.0.0.2",
-            "10.0.0.1",
+    {
+        "@timestamp": "2016-12-07T10:05:07.000Z", 
+        "fileset.module": "nginx", 
+        "fileset.name": "access", 
+        "input.type": "log", 
+        "nginx.access.body_sent.bytes": "571", 
+        "nginx.access.http_version": "1.1", 
+        "nginx.access.method": "GET", 
+        "nginx.access.referrer": "-", 
+        "nginx.access.remote_ip": "10.0.0.2", 
+        "nginx.access.remote_ip_list": [
+            "10.0.0.2", 
+            "10.0.0.1", 
             "127.0.0.1"
-          ],
-          "url" : "/ocelot",
-          "user_agent" : {
-            "major" : "49",
-            "minor" : "0",
-            "os" : "Mac OS X 10.12",
-            "os_minor" : "12",
-            "os_major" : "10",
-            "name" : "Firefox",
-            "os_name" : "Mac OS X",
-            "device" : "Other"
-          }
-        }
-      },
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key-2.local",
-        "name" : "a-mac-with-esc-key-2.local",
-        "version" : "6.0.0-alpha2"
-      },
-      "prospector" : {
-        "type" : "log"
-      },
-      "input" : {
-        "type" : "log"
-      },
-      "read_timestamp" : "2017-05-29T22:28:06.245Z",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
-      "fileset" : {
-        "module" : "nginx",
-        "name" : "access"
-      }
-    }
-  },
-  {
-    "_index" : "filebeat-6.0.0-alpha2-2017.05.30",
-    "_type" : "doc",
-    "_id" : "AVxWUuZ8OMOtQBaTipsG",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2016-01-22T13:18:29.000Z",
-      "offset" : 845,
-      "nginx" : {
-        "access" : {
-          "referrer" : "-",
-          "response_code" : "200",
-          "remote_ip" : "199.96.1.1",
-          "geoip" : {
-            "continent_name" : "North America",
-            "city_name" : "Springfield",
-            "country_iso_code" : "US",
-            "region_name" : "Illinois",
-            "location" : {
-              "lon" : -89.6859,
-              "lat" : 39.772
-            }
-          },
-          "method" : "GET",
-          "user_name" : "-",
-          "http_version" : "1.1",
-          "body_sent" : {
-            "bytes" : "25507"
-          },
-          "remote_ip_list" : [
-            "10.5.102.222",
-            "199.96.1.1",
-            "204.246.1.1",
+        ], 
+        "nginx.access.response_code": "200", 
+        "nginx.access.url": "/ocelot", 
+        "nginx.access.user_agent.device": "Other", 
+        "nginx.access.user_agent.major": "49", 
+        "nginx.access.user_agent.minor": "0", 
+        "nginx.access.user_agent.name": "Firefox", 
+        "nginx.access.user_agent.os": "Mac OS X 10.12", 
+        "nginx.access.user_agent.os_major": "10", 
+        "nginx.access.user_agent.os_minor": "12", 
+        "nginx.access.user_agent.os_name": "Mac OS X", 
+        "nginx.access.user_name": "-", 
+        "offset": 0, 
+        "prospector.type": "log"
+    }, 
+    {
+        "@timestamp": "2017-05-29T19:02:48.000Z", 
+        "fileset.module": "nginx", 
+        "fileset.name": "access", 
+        "input.type": "log", 
+        "nginx.access.body_sent.bytes": "612", 
+        "nginx.access.http_version": "1.1", 
+        "nginx.access.method": "GET", 
+        "nginx.access.referrer": "-", 
+        "nginx.access.remote_ip": "172.17.0.1", 
+        "nginx.access.remote_ip_list": [
+            "172.17.0.1"
+        ], 
+        "nginx.access.response_code": "404", 
+        "nginx.access.url": "/stringpatch", 
+        "nginx.access.user_agent.device": "Other", 
+        "nginx.access.user_agent.major": "15", 
+        "nginx.access.user_agent.minor": "0", 
+        "nginx.access.user_agent.name": "Firefox Alpha", 
+        "nginx.access.user_agent.os": "Windows 7", 
+        "nginx.access.user_agent.os_name": "Windows 7", 
+        "nginx.access.user_agent.patch": "a2", 
+        "nginx.access.user_name": "-", 
+        "offset": 183, 
+        "prospector.type": "log"
+    }, 
+    {
+        "@timestamp": "2016-12-07T10:05:07.000Z", 
+        "fileset.module": "nginx", 
+        "fileset.name": "access", 
+        "input.type": "log", 
+        "nginx.access.body_sent.bytes": "571", 
+        "nginx.access.geoip.city_name": "Berlin", 
+        "nginx.access.geoip.continent_name": "Europe", 
+        "nginx.access.geoip.country_iso_code": "DE", 
+        "nginx.access.geoip.location.lat": 52.5167, 
+        "nginx.access.geoip.location.lon": 13.4, 
+        "nginx.access.geoip.region_name": "Land Berlin", 
+        "nginx.access.http_version": "1.1", 
+        "nginx.access.method": "GET", 
+        "nginx.access.referrer": "-", 
+        "nginx.access.remote_ip": "85.181.35.98", 
+        "nginx.access.remote_ip_list": [
+            "10.0.0.2", 
+            "10.0.0.1", 
+            "85.181.35.98"
+        ], 
+        "nginx.access.response_code": "200", 
+        "nginx.access.url": "/ocelot", 
+        "nginx.access.user_agent.device": "Other", 
+        "nginx.access.user_agent.major": "49", 
+        "nginx.access.user_agent.minor": "0", 
+        "nginx.access.user_agent.name": "Firefox", 
+        "nginx.access.user_agent.os": "Mac OS X 10.12", 
+        "nginx.access.user_agent.os_major": "10", 
+        "nginx.access.user_agent.os_minor": "12", 
+        "nginx.access.user_agent.os_name": "Mac OS X", 
+        "nginx.access.user_name": "-", 
+        "offset": 341, 
+        "prospector.type": "log"
+    }, 
+    {
+        "@timestamp": "2016-12-07T10:05:07.000Z", 
+        "fileset.module": "nginx", 
+        "fileset.name": "access", 
+        "input.type": "log", 
+        "nginx.access.body_sent.bytes": "571", 
+        "nginx.access.geoip.city_name": "Berlin", 
+        "nginx.access.geoip.continent_name": "Europe", 
+        "nginx.access.geoip.country_iso_code": "DE", 
+        "nginx.access.geoip.location.lat": 52.5167, 
+        "nginx.access.geoip.location.lon": 13.4, 
+        "nginx.access.geoip.region_name": "Land Berlin", 
+        "nginx.access.http_version": "1.1", 
+        "nginx.access.method": "GET", 
+        "nginx.access.referrer": "-", 
+        "nginx.access.remote_ip": "85.181.35.98", 
+        "nginx.access.remote_ip_list": [
+            "85.181.35.98"
+        ], 
+        "nginx.access.response_code": "200", 
+        "nginx.access.url": "/ocelot", 
+        "nginx.access.user_agent.device": "Other", 
+        "nginx.access.user_agent.major": "49", 
+        "nginx.access.user_agent.minor": "0", 
+        "nginx.access.user_agent.name": "Firefox", 
+        "nginx.access.user_agent.os": "Mac OS X 10.12", 
+        "nginx.access.user_agent.os_major": "10", 
+        "nginx.access.user_agent.os_minor": "12", 
+        "nginx.access.user_agent.os_name": "Mac OS X", 
+        "nginx.access.user_name": "-", 
+        "offset": 527, 
+        "prospector.type": "log"
+    }, 
+    {
+        "@timestamp": "2016-01-22T13:18:29.000Z", 
+        "fileset.module": "nginx", 
+        "fileset.name": "access", 
+        "input.type": "log", 
+        "nginx.access.body_sent.bytes": "25507", 
+        "nginx.access.geoip.city_name": "Springfield", 
+        "nginx.access.geoip.continent_name": "North America", 
+        "nginx.access.geoip.country_iso_code": "US", 
+        "nginx.access.geoip.location.lat": 39.772, 
+        "nginx.access.geoip.location.lon": -89.6859, 
+        "nginx.access.geoip.region_name": "Illinois", 
+        "nginx.access.http_version": "1.1", 
+        "nginx.access.method": "GET", 
+        "nginx.access.referrer": "-", 
+        "nginx.access.remote_ip": "199.96.1.1", 
+        "nginx.access.remote_ip_list": [
+            "10.5.102.222", 
+            "199.96.1.1", 
+            "204.246.1.1", 
             "10.2.1.185"
-          ],
-          "url" : "/assets/xxxx?q=100",
-          "user_agent" : {
-            "os" : "Other",
-            "name" : "Other",
-            "os_name" : "Other",
-            "device" : "Other"
-          }
-        }
-      },
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key-2.local",
-        "name" : "a-mac-with-esc-key-2.local",
-        "version" : "6.0.0-alpha2"
-      },
-      "prospector" : {
-        "type" : "log"
-      },
-      "input" : {
-        "type" : "log"
-      },
-      "read_timestamp" : "2017-05-29T22:28:06.246Z",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
-      "fileset" : {
-        "module" : "nginx",
-        "name" : "access"
-      }
-    }
-  },
-  {
-    "_index" : "filebeat-6.0.0-alpha2-2017.05.30",
-    "_type" : "doc",
-    "_id" : "AVxWUuZ8OMOtQBaTipsH",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2016-12-30T06:47:09.000Z",
-      "offset" : 1085,
-      "nginx" : {
-        "access" : {
-          "referrer" : "-",
-          "response_code" : "404",
-          "remote_ip" : "2a03:0000:10ff:f00f:0000:0000:0:8000",
-          "geoip" : {
-            "continent_name" : "Europe",
-            "country_iso_code" : "PT",
-            "location" : {
-              "lon" : -8.0,
-              "lat" : 39.5
-            }
-          },
-          "method" : "GET",
-          "user_name" : "-",
-          "http_version" : "1.1",
-          "body_sent" : {
-            "bytes" : "8571"
-          },
-          "remote_ip_list" : [
-            "2a03:0000:10ff:f00f:0000:0000:0:8000",
-            "10.225.192.17",
+        ], 
+        "nginx.access.response_code": "200", 
+        "nginx.access.url": "/assets/xxxx?q=100", 
+        "nginx.access.user_agent.device": "Other", 
+        "nginx.access.user_agent.name": "Other", 
+        "nginx.access.user_agent.os": "Other", 
+        "nginx.access.user_agent.os_name": "Other", 
+        "nginx.access.user_name": "-", 
+        "offset": 693, 
+        "prospector.type": "log"
+    }, 
+    {
+        "@timestamp": "2016-12-30T06:47:09.000Z", 
+        "fileset.module": "nginx", 
+        "fileset.name": "access", 
+        "input.type": "log", 
+        "nginx.access.body_sent.bytes": "8571", 
+        "nginx.access.geoip.continent_name": "Europe", 
+        "nginx.access.geoip.country_iso_code": "PT", 
+        "nginx.access.geoip.location.lat": 39.5, 
+        "nginx.access.geoip.location.lon": -8.0, 
+        "nginx.access.http_version": "1.1", 
+        "nginx.access.method": "GET", 
+        "nginx.access.referrer": "-", 
+        "nginx.access.remote_ip": "2a03:0000:10ff:f00f:0000:0000:0:8000", 
+        "nginx.access.remote_ip_list": [
+            "2a03:0000:10ff:f00f:0000:0000:0:8000", 
+            "10.225.192.17", 
             "10.2.2.121"
-          ],
-          "url" : "/test.html",
-          "user_agent" : {
-            "major" : "1",
-            "minor" : "0",
-            "os" : "Other",
-            "name" : "Facebot",
-            "os_name" : "Other",
-            "device" : "Spider"
-          }
-        }
-      },
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key-2.local",
-        "name" : "a-mac-with-esc-key-2.local",
-        "version" : "6.0.0-alpha2"
-      },
-      "prospector" : {
-        "type" : "log"
-      },
-      "input" : {
-        "type" : "log"
-      },
-      "read_timestamp" : "2017-05-29T22:28:06.246Z",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
-      "fileset" : {
-        "module" : "nginx",
-        "name" : "access"
-      }
+        ], 
+        "nginx.access.response_code": "404", 
+        "nginx.access.url": "/test.html", 
+        "nginx.access.user_agent.device": "Spider", 
+        "nginx.access.user_agent.major": "1", 
+        "nginx.access.user_agent.minor": "0", 
+        "nginx.access.user_agent.name": "Facebot", 
+        "nginx.access.user_agent.os": "Other", 
+        "nginx.access.user_agent.os_name": "Other", 
+        "nginx.access.user_name": "-", 
+        "offset": 845, 
+        "prospector.type": "log"
+    }, 
+    {
+        "@timestamp": "2018-04-12T07:48:40.000Z", 
+        "fileset.module": "nginx", 
+        "fileset.name": "access", 
+        "input.type": "log", 
+        "nginx.access.body_sent.bytes": "0", 
+        "nginx.access.referrer": "-", 
+        "nginx.access.remote_ip": "127.0.0.1", 
+        "nginx.access.remote_ip_list": [
+            "127.0.0.1"
+        ], 
+        "nginx.access.response_code": "400", 
+        "nginx.access.user_agent.device": "Other", 
+        "nginx.access.user_agent.name": "Other", 
+        "nginx.access.user_agent.os": "Other", 
+        "nginx.access.user_agent.os_name": "Other", 
+        "nginx.access.user_name": "-", 
+        "offset": 1085, 
+        "prospector.type": "log"
     }
-  },
-  {
-    "_index" : "filebeat-6.0.0-alpha2-2017.05.30",
-    "_type" : "doc",
-    "_id" : "AVxWUuZ8OMOtqbaTipsE",
-    "_score" : 1.0,
-    "_source": {
-      "@timestamp": "2018-04-12T07:48:40.000Z",
-      "nginx": {
-      "access": {
-        "body_sent": {
-          "bytes": "0"
-        },
-        "referrer": "-",
-        "remote_ip": "127.0.0.1",
-        "remote_ip_list": [
-          "127.0.0.1"
-        ],
-        "response_code": "400",
-        "user_agent": {
-         "device": "Other",
-         "name": "Other",
-         "os": "Other",
-         "os_name": "Other"
-        },
-        "user_name": "-"
-      }
-      },
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key-2.local",
-        "name" : "a-mac-with-esc-key-2.local",
-        "version" : "6.0.0-alpha2"
-      },
-      "prospector" : {
-        "type" : "log"
-      },
-      "input" : {
-        "type" : "log"
-      },
-      "read_timestamp": "2018-04-13T11:13:43.103Z",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
-      "fileset" : {
-        "module" : "nginx",
-        "name" : "access"
-      }
-    }
-  }
 ]

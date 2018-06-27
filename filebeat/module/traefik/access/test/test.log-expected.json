@@ -1,130 +1,54 @@
 [
     {
-        "_index": "filebeat-2017.10",
-        "_type": "doc",
-        "_id": "AV8CftO9KnxqdH7bMrjU",
-        "_version": 1,
-        "_score": null,
-        "_source": {
-            "@timestamp": "2017-10-02T20:22:08.000Z",
-            "offset": 552,
-            "traefik": {
-                "access": {
-                    "referrer": "http://example.com/login",
-                    "response_code": "304",
-                    "remote_ip": "85.181.35.98",
-                    "geoip": {
-                        "continent_name": "Europe",
-                        "country_iso_code": "DE",
-                        "city_name": "Berlin",
-                        "location": {
-                            "lon": 13.4,
-                            "lat": 52.5167
-                        },
-                        "region_name": "Land Berlin"
-                    },
-                    "method": "GET",
-                    "user_name": "-",
-                    "http_version": "1.1",
-                    "body_sent": {
-                        "bytes": "0"
-                    },
-                    "url": "/ui/favicons/favicon.ico",
-                    "user_agent": {
-                        "patch": "3163",
-                        "major": "61",
-                        "minor": "0",
-                        "os": "Linux",
-                        "name": "Chrome",
-                        "os_name": "Linux",
-                        "device": "Other"
-                    }
-                }
-            },
-            "beat": {
-                "hostname": "MM-XPS-15",
-                "name": "MM-XPS-15",
-                "version": "7.0.0-alpha1"
-            },
-            "prospector": {
-                "type": "log"
-            },
-            "input": {
-                "type": "log"
-            },
-            "read_timestamp": "2017-10-09T18:56:25.032Z",
-            "source": "/var/log/traefik/access.log",
-            "fileset": {
-                "module": "traefik",
-                "name": "access"
-            }
-        },
-        "fields": {
-            "@timestamp": [
-                1506975728000
-            ]
-        },
-        "sort": [
-            1506975728000
-        ]
-    },
+        "@timestamp": "2017-10-02T20:22:07.000Z", 
+        "fileset.module": "traefik", 
+        "fileset.name": "access", 
+        "input.type": "log", 
+        "offset": 0, 
+        "prospector.type": "log", 
+        "traefik.access.body_sent.bytes": "0", 
+        "traefik.access.http_version": "1.1", 
+        "traefik.access.method": "GET", 
+        "traefik.access.referrer": "http://example.com/login", 
+        "traefik.access.remote_ip": "192.168.33.1", 
+        "traefik.access.response_code": "304", 
+        "traefik.access.url": "/ui/favicons/favicon-16x16.png", 
+        "traefik.access.user_agent.device": "Other", 
+        "traefik.access.user_agent.major": "61", 
+        "traefik.access.user_agent.minor": "0", 
+        "traefik.access.user_agent.name": "Chrome", 
+        "traefik.access.user_agent.os": "Linux", 
+        "traefik.access.user_agent.os_name": "Linux", 
+        "traefik.access.user_agent.patch": "3163", 
+        "traefik.access.user_name": "-"
+    }, 
     {
-        "_index": "filebeat-2017.10",
-        "_type": "doc",
-        "_id": "AV8CftO9KnxqdH7bMrjT",
-        "_version": 1,
-        "_score": null,
-        "_source": {
-            "@timestamp": "2017-10-02T20:22:07.000Z",
-            "offset": 280,
-            "traefik": {
-                "access": {
-                    "referrer": "http://example.com/login",
-                    "response_code": "304",
-                    "remote_ip": "192.168.33.1",
-                    "method": "GET",
-                    "user_name": "-",
-                    "http_version": "1.1",
-                    "body_sent": {
-                        "bytes": "0"
-                    },
-                    "url": "/ui/favicons/favicon-16x16.png",
-                    "user_agent": {
-                        "patch": "3163",
-                        "major": "61",
-                        "minor": "0",
-                        "os": "Linux",
-                        "name": "Chrome",
-                        "os_name": "Linux",
-                        "device": "Other"
-                    }
-                }
-            },
-            "beat": {
-                "hostname": "MM-XPS-15",
-                "name": "MM-XPS-15",
-                "version": "7.0.0-alpha1"
-            },
-            "prospector": {
-                "type": "log"
-            },
-            "input": {
-                "type": "log"
-            },
-            "read_timestamp": "2017-10-09T18:56:25.031Z",
-            "source": "/var/log/traefik/access.log",
-            "fileset": {
-                "module": "traefik",
-                "name": "access"
-            }
-        },
-        "fields": {
-            "@timestamp": [
-                1506975727000
-            ]
-        },
-        "sort": [
-            1506975727000
-        ]
+        "@timestamp": "2017-10-02T20:22:08.000Z", 
+        "fileset.module": "traefik", 
+        "fileset.name": "access", 
+        "input.type": "log", 
+        "offset": 280, 
+        "prospector.type": "log", 
+        "traefik.access.body_sent.bytes": "0", 
+        "traefik.access.geoip.city_name": "Berlin", 
+        "traefik.access.geoip.continent_name": "Europe", 
+        "traefik.access.geoip.country_iso_code": "DE", 
+        "traefik.access.geoip.location.lat": 52.5167, 
+        "traefik.access.geoip.location.lon": 13.4, 
+        "traefik.access.geoip.region_name": "Land Berlin", 
+        "traefik.access.http_version": "1.1", 
+        "traefik.access.method": "GET", 
+        "traefik.access.referrer": "http://example.com/login", 
+        "traefik.access.remote_ip": "85.181.35.98", 
+        "traefik.access.response_code": "304", 
+        "traefik.access.url": "/ui/favicons/favicon.ico", 
+        "traefik.access.user_agent.device": "Other", 
+        "traefik.access.user_agent.major": "61", 
+        "traefik.access.user_agent.minor": "0", 
+        "traefik.access.user_agent.name": "Chrome", 
+        "traefik.access.user_agent.os": "Linux", 
+        "traefik.access.user_agent.os_name": "Linux", 
+        "traefik.access.user_agent.patch": "3163", 
+        "traefik.access.user_name": "-"
     }
 ]
