@@ -446,9 +446,8 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version beatname is assumed to run against. Defaults to the oldest
-  # supported stable version (currently version 0.8.2.0)
-  #version: 0.8.2
+  # Kafka version beatname is assumed to run against. Defaults to the "1.0.0".
+  #version: '1.0.0'
 
   # Metadata update configuration. Metadata do contain leader information
   # deciding which broker to use when publishing.

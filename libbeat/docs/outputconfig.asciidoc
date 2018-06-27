@@ -668,12 +668,11 @@ The cluster metadata contain the actual Kafka brokers events are published to.
 
 ===== `version`
 
-Kafka version ${beatname_lc} is assumed to run against. Defaults to oldest
-supported stable version (currently version 0.8.2.0).
+Kafka version ${beatname_lc} is assumed to run against. Defaults to 1.0.0.
 
 Event timestamps will be added, if version 0.10.0.0+ is enabled.
 
-Valid values are all kafka releases in between `0.8.2.0` and `0.11.0.0`.
+Valid values are all kafka releases in between `0.8.2.0` and `1.1.0`.
 
 ===== `username`
 
