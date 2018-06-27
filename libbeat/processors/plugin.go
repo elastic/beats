@@ -17,6 +17,9 @@
 
 package processors
 
-func Plugin(name string, c Constructor) map[string][]interface{} {
-	return p.MakePlugin(Namespace, processorPlugin{name, c})
+import "github.com/elastic/beats/libbeat/feature"
+
+// Plugin exposes the processor as an external plugin.
+func Plugin(name string, c Constructor) *feature.Feature {
+	return Feature(name, c, feature.Undefined)
 }
