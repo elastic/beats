@@ -70,6 +70,37 @@ func newEvent() *event {
 	}
 }
 
+// SetTimeZone set the timezone offset from the string.
+func (s *event) SetTimeZone(b []byte) {
+	// We assume that we are in utc and ignore any other bytes after.
+	// This can be followed by others bytes +00, +00:00 or +0000.
+	if b[0] == 'Z' || b[0] == 'z' {
+		s.loc = time.UTC
+		return
+	}
+
+	d := 1
+	if b[0] == '-' {
+		d = -1
+	}
+
+	// +00 +00:00 or +0000
+	var h, m int
+	switch len(b[1:]) {
+	case 2:
+		h = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[1:]))))
+		s.loc = time.FixedZone("", d*h)
+	case 4:
+		h = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[1:3]))))
+		m = int(time.Minute * time.Duration(bytesToInt(skipLeadZero(b[3:5]))))
+		s.loc = time.FixedZone("", d*(h+m))
+	case 5:
+		h = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[1:3]))))
+		m = int(time.Minute * time.Duration(bytesToInt(skipLeadZero(b[4:6]))))
+		s.loc = time.FixedZone("", d*(h+m))
+	}
+}
+
 // SetMonthNumeric sets the month with a number.
 func (s *event) SetMonthNumeric(b []byte) {
 	s.month = monthIndexed[bytesToInt(skipLeadZero(b))]
@@ -237,6 +268,13 @@ func (s *event) Nanosecond() int {
 
 // Timestamp return the timestamp in UTC.
 func (s *event) Timestamp(timezone *time.Location) time.Time {
+	var t *time.Location
+	if s.loc == nil {
+		t = timezone
+	} else {
+		t = s.loc
+	}
+
 	return time.Date(
 		s.Year(),
 		s.Month(),
@@ -245,7 +283,7 @@ func (s *event) Timestamp(timezone *time.Location) time.Time {
 		s.Minute(),
 		s.Second(),
 		s.Nanosecond(),
-		timezone,
+		t,
 	).UTC()
 }
 
