@@ -346,7 +346,7 @@ func validateMeta(t *testing.T, raw []byte) {
 	}{}
 	err := json.Unmarshal(raw, &evt)
 	if err != nil {
-		t.Errorf("failed to unmarshal meta section: ", err)
+		t.Errorf("failed to unmarshal meta section: %v", err)
 		return
 	}
 
