@@ -482,44 +482,56 @@
 			"revisionTime": "2018-05-17T07:14:48Z"
 		},
 		{
-			"checksumSHA1": "AaEPt+KMknLXze11YOnBGKzP3aA=",
+			"checksumSHA1": "BY+a5iQICad7U2AZqwej2SIW9J8=",
 			"path": "github.com/elastic/go-structform",
-			"revision": "0a66add879601f69f55663f4c913c72988218982",
-			"revisionTime": "2018-03-09T00:36:09Z",
-			"version": "v0.0.3",
-			"versionExact": "v0.0.3"
+			"revision": "0ea09ff9b43c387dd183a4088f6d573bf823e4ed",
+			"revisionTime": "2018-06-27T12:43:37Z",
+			"version": "v0.0.4",
+			"versionExact": "v0.0.4"
 		},
 		{
 			"checksumSHA1": "SXsT/tWnjLqR8dBiJGZqxCyuNaY=",
 			"path": "github.com/elastic/go-structform/cborl",
-			"revision": "0a66add879601f69f55663f4c913c72988218982",
-			"revisionTime": "2018-03-09T00:36:09Z",
-			"version": "v0.0.3",
-			"versionExact": "v0.0.3"
+			"revision": "0ea09ff9b43c387dd183a4088f6d573bf823e4ed",
+			"revisionTime": "2018-06-27T12:43:37Z",
+			"version": "v0.0.4",
+			"versionExact": "v0.0.4"
 		},
 		{
 			"checksumSHA1": "LUbWdzbpzhBh+5TizsScD8gTm4M=",
 			"path": "github.com/elastic/go-structform/gotype",
-			"revision": "0a66add879601f69f55663f4c913c72988218982",
-			"revisionTime": "2018-03-09T00:36:09Z",
-			"version": "v0.0.3",
-			"versionExact": "v0.0.3"
+			"revision": "0ea09ff9b43c387dd183a4088f6d573bf823e4ed",
+			"revisionTime": "2018-06-27T12:43:37Z",
+			"version": "v0.0.4",
+			"versionExact": "v0.0.4"
+		},
+		{
+			"path": "github.com/elastic/go-structform/internal/ubjson",
+			"revision": "v0.0.4",
+			"version": "v0.0.4",
+			"versionExact": "v0.0.4"
 		},
 		{
 			"checksumSHA1": "s7k0vEuuqkoPXU0FtrD6Y0jxd7U=",
 			"path": "github.com/elastic/go-structform/internal/unsafe",
-			"revision": "0a66add879601f69f55663f4c913c72988218982",
-			"revisionTime": "2018-03-09T00:36:09Z",
-			"version": "v0.0.3",
-			"versionExact": "v0.0.3"
+			"revision": "0ea09ff9b43c387dd183a4088f6d573bf823e4ed",
+			"revisionTime": "2018-06-27T12:43:37Z",
+			"version": "v0.0.4",
+			"versionExact": "v0.0.4"
 		},
 		{
-			"checksumSHA1": "s5nSu8O8TOv4DZhdbU7OC5x0C50=",
+			"path": "github.com/elastic/go-structform/internal/visitors",
+			"revision": "",
+			"version": "v0.0.4",
+			"versionExact": "v0.0.4"
+		},
+		{
+			"checksumSHA1": "KTDpLMZRFtSVeUuXdaz5o5ehzfI=",
 			"path": "github.com/elastic/go-structform/json",
-			"revision": "0a66add879601f69f55663f4c913c72988218982",
-			"revisionTime": "2018-03-09T00:36:09Z",
-			"version": "v0.0.3",
-			"versionExact": "v0.0.3"
+			"revision": "0ea09ff9b43c387dd183a4088f6d573bf823e4ed",
+			"revisionTime": "2018-06-27T12:43:37Z",
+			"version": "v0.0.4",
+			"versionExact": "v0.0.4"
 		},
 		{
 			"checksumSHA1": "PDqC4Sh2H2EIxVhWZHdsusBMPB8=",
