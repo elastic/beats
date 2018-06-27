@@ -9,7 +9,7 @@
         Uptime of Traefik instance
       fields:
         - name: sec
-          type: float
+          type: int
           description: >
             Uptime in seconds
     - name: response

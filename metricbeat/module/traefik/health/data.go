@@ -26,7 +26,7 @@ import (
 var (
 	schema = s.Schema{
 		"uptime": s.Object{
-			"sec": c.Float("uptime_sec"),
+			"sec": c.Int("uptime_sec"),
 		},
 		"response": s.Object{
 			"count": c.Int("total_count"),

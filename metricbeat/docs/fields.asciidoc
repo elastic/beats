@@ -16448,7 +16448,7 @@ Uptime of Traefik instance
 *`traefik.health.uptime.sec`*::
 +
 --
-type: float
+type: int
 
 Uptime in seconds
 
