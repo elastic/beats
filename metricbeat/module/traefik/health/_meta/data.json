@@ -1,19 +1,27 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"traefik",
-        "name":"health",
-        "rtt":44269
+    "metricset": {
+        "host": "127.0.0.1:8080",
+        "module": "traefik",
+        "name": "health",
+        "rtt": 115
     },
-    "traefik":{
-        "health":{
-            "example": "health"
+    "traefik": {
+        "health": {
+            "response": {
+                "avg_time": {
+                    "sec": 0
+                },
+                "count": 0,
+                "status_codes": {}
+            },
+            "uptime": {
+                "sec": 75
+            }
         }
-    },
-    "type":"metricsets"
+    }
 }
