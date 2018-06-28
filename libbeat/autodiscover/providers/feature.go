@@ -56,7 +56,7 @@ func FindFactory(name string) (Factory, error) {
 
 	factory, ok := f.Factory().(Factory)
 	if !ok {
-		return nil, fmt.Errorf("incompatible type for provider, received: '%T'", factory)
+		return nil, fmt.Errorf("incompatible type for provider, received: '%T'", f.Factory())
 	}
 
 	return factory, nil
