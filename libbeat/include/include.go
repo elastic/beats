@@ -15,34 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package appenders
+package include
 
 import (
-	"errors"
-
-	"github.com/elastic/beats/libbeat/autodiscover"
-	p "github.com/elastic/beats/libbeat/plugin"
+	"github.com/elastic/beats/libbeat/autodiscover/appenders/config"
+	"github.com/elastic/beats/libbeat/autodiscover/providers/docker"
+	"github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
+	"github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
+	"github.com/elastic/beats/libbeat/feature"
 )
 
-type appenderPlugin struct {
-	name     string
-	appender autodiscover.AppenderBuilder
-}
+// Bundle expose the main features.
+var Bundle = feature.MustBundle(
+	// Autodiscovery providers
+	feature.MustBundle(
+		jolokia.Feature,
+		docker.Feature,
+		kubernetes.Feature,
+	),
 
-var pluginKey = "libbeat.autodiscover.appender"
-
-// Plugin accepts a AppenderBuilder to be registered as a plugin
-func Plugin(name string, appender autodiscover.AppenderBuilder) map[string][]interface{} {
-	return p.MakePlugin(pluginKey, appenderPlugin{name, appender})
-}
+	// Autodiscovery appenders
+	feature.MustBundle(
+		config.Feature,
+	),
+)
 
 func init() {
-	p.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
-		app, ok := ifc.(appenderPlugin)
-		if !ok {
-			return errors.New("plugin does not match appender plugin type")
-		}
-
-		return autodiscover.Registry.AddAppender(app.name, app.appender)
-	})
+	// Register main bundle
+	feature.RegisterBundle(Bundle)
 }

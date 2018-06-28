@@ -15,11 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package builder
+package appenders
 
 import "github.com/elastic/beats/libbeat/feature"
 
-// Plugin accepts a builder to be registered as a plugin
-func Plugin(name string, factory Factory) *feature.Feature {
-	return Feature(name, factory, feature.Undefined)
+// Plugin accepts a AppenderBuilder to be registered as a plugin.
+func Plugin(name string, appender Factory) *feature.Feature {
+	return Feature(name, appender, feature.Undefined)
 }

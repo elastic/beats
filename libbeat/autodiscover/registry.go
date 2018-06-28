@@ -17,28 +17,28 @@
 
 package autodiscover
 
-import "sync"
+import (
+	"github.com/elastic/beats/libbeat/autodiscover/appenders"
+	"github.com/elastic/beats/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/libbeat/autodiscover/providers"
+	"github.com/elastic/beats/libbeat/feature"
+)
 
-// Register of autodiscover providers
-type registry struct {
-	// Lock to control concurrent read/writes
-	lock sync.RWMutex
-	// A map of provider name to ProviderBuilder.
-	providers map[string]ProviderBuilder
-	// A map of builder name to BuilderConstructor.
-	builders map[string]BuilderConstructor
-	// A map of appender name to AppenderBuilder.
-	appenders map[string]AppenderBuilder
+// Registry is a wrapper over the new global registry, this will be removed in 7.0
+var Registry = newRegistryWrapper{}
+
+// newRegistryWrapper wraps the new global registry with the old style registry that were used by
+// the autodiscover feature, this allow plugin that register at init() to still work.
+type newRegistryWrapper struct{}
+
+func (n *newRegistryWrapper) AddAppender(name string, factory appenders.Factory) {
+	feature.MustRegister(appenders.Feature(name, factory, feature.Beta))
 }
 
-// Registry holds all known autodiscover providers, they must be added to it to enable them for use
-var Registry = NewRegistry()
+func (n *newRegistryWrapper) AddBuilder(name string, factory builder.Factory) {
+	feature.MustRegister(builder.Feature(name, factory, feature.Beta))
+}
 
-// NewRegistry creates and returns a new Registry
-func NewRegistry() *registry {
-	return &registry{
-		providers: make(map[string]ProviderBuilder, 0),
-		builders:  make(map[string]BuilderConstructor, 0),
-		appenders: make(map[string]AppenderBuilder, 0),
-	}
+func (n *newRegistryWrapper) AddProvider(name string, factory providers.Factory) {
+	feature.MustRegister(providers.Feature(name, factory, feature.Beta))
 }

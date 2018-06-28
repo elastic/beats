@@ -22,18 +22,19 @@ import (
 
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/libbeat/autodiscover/providers"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-func init() {
-	autodiscover.Registry.AddProvider("kubernetes", AutodiscoverBuilder)
-}
+// Feature exposes the kubernetes autodiscovery provider.
+var Feature = providers.Feature("kubernetes", AutodiscoverBuilder, feature.Beta)
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
