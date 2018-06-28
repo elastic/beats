@@ -801,6 +801,122 @@ elasticsearch Module
 
 
 [float]
+== audit fields
+
+
+
+
+*`elasticsearch.audit.node_name`*::
++
+--
+type: keyword
+
+example: v_VJhjV
+
+The name of the node
+
+--
+
+*`elasticsearch.audit.layer`*::
++
+--
+type: keyword
+
+example: rest
+
+The layer from which this event originated: rest, transport or ip_filter
+
+--
+
+*`elasticsearch.audit.event_type`*::
++
+--
+type: keyword
+
+example: access_granted
+
+The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied
+
+--
+
+*`elasticsearch.audit.origin_type`*::
++
+--
+type: keyword
+
+example: local_node
+
+Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)
+
+--
+
+*`elasticsearch.audit.origin_address`*::
++
+--
+type: ip
+
+example: 192.168.1.42
+
+The IP address from which the request originated
+
+--
+
+*`elasticsearch.audit.principal`*::
++
+--
+type: keyword
+
+example: _anonymous
+
+The principal (username) that failed authentication
+
+--
+
+*`elasticsearch.audit.action`*::
++
+--
+type: keyword
+
+example: cluster:monitor/main
+
+The name of the action that was executed
+
+--
+
+*`elasticsearch.audit.uri`*::
++
+--
+type: keyword
+
+example: /_xpack/security/_authenticate
+
+The REST endpoint URI
+
+--
+
+*`elasticsearch.audit.request`*::
++
+--
+type: keyword
+
+example: ClearScrollRequest
+
+The type of request that was executed
+
+--
+
+*`elasticsearch.audit.request_body`*::
++
+--
+type: text
+
+example: body
+
+The body of the request, if enabled
+
+--
+
+[float]
 == gc fields
 
 
