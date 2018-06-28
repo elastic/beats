@@ -3,6 +3,7 @@ package hl7v2
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -11,6 +12,7 @@ import (
 
 // Transaction Publisher.
 type transPub struct {
+	transactionTimeout     time.Duration
 	sendRequest            bool
 	sendResponse           bool
 	NewLineChars           string
@@ -47,44 +49,60 @@ func IsNumeric(s string) bool {
 	return err == nil
 }
 
-func (pub *transPub) onTransaction(requ, resp *message) error {
+func (pub *transPub) onTransaction(requ, resp *message, state string) error {
 	if pub.results == nil {
 		return nil
 	}
-	pub.results(pub.createEvent(requ, resp))
+	pub.results(pub.createEvent(requ, resp, state))
 	return nil
 }
 
-func (pub *transPub) createEvent(requ, resp *message) beat.Event {
+func (pub *transPub) createEvent(requ, resp *message, state string) beat.Event {
 
 	status := common.OK_STATUS
-	if resp.failed {
-		status = common.ERROR_STATUS
-	}
-
-	// resp_time in milliseconds
-	responseTime := int32(resp.Ts.Sub(requ.Ts).Nanoseconds() / 1e6)
 
 	src := &common.Endpoint{
 		IP:   requ.Tuple.SrcIP.String(),
 		Port: requ.Tuple.SrcPort,
 		Proc: string(requ.CmdlineTuple.Src),
 	}
+
 	dst := &common.Endpoint{
 		IP:   requ.Tuple.DstIP.String(),
 		Port: requ.Tuple.DstPort,
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
 
-	fields := common.MapStr{
-		"type":         "hl7v2",
-		"status":       status,
-		"responsetime": responseTime,
-		"bytes_in":     requ.Size,
-		"bytes_out":    resp.Size,
-		"src":          src,
-		"dst":          dst,
-		"hl7v2":        common.MapStr{},
+	fields := common.MapStr{}
+
+	if resp == nil {
+		status = state
+		fields = common.MapStr{
+			"type":   "hl7v2",
+			"status": status,
+			//"timeout_seconds":	pub.transactionTimeout/1000/1000/1000,
+			"bytes_in": requ.Size,
+			"src":      src,
+			"dst":      dst,
+			"hl7v2":    common.MapStr{},
+		}
+	} else {
+		if resp.failed {
+			status = common.ERROR_STATUS
+		}
+		// resp_time in milliseconds
+		responseTime := int32(resp.Ts.Sub(requ.Ts).Nanoseconds() / 1e6)
+		fields = common.MapStr{
+			"type":   "hl7v2",
+			"status": status,
+			//"timeout_seconds":	pub.transactionTimeout/1000/1000/1000,
+			"responsetime": responseTime,
+			"bytes_in":     requ.Size,
+			"bytes_out":    resp.Size,
+			"src":          src,
+			"dst":          dst,
+			"hl7v2":        common.MapStr{},
+		}
 	}
 
 	// Start with the request
@@ -189,7 +207,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 					continue
 				}
 
-				// Log out core message info
+				// Log out core MSH/MSA info
 				if hl7segmentheader == "MSH" {
 					switch {
 					case hl7fieldnumber == 3:
@@ -210,9 +228,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 						messageMap["msh_version_id"] = hl7fieldvalue
 					default:
 					}
-				}
-
-				if hl7segmentheader == "MSA" {
+				} else if hl7segmentheader == "MSA" {
 					switch {
 					case hl7fieldnumber == 1:
 						messageMap["msa_acknowledgement_code"] = hl7fieldvalue
@@ -287,21 +303,31 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		// Add messageMap to fields.hl7message map
 		fields["hl7v2"].(common.MapStr)[hl7message] = messageMap
 
+		if resp == nil {
+			continue
+		}
+
 		// Switch to response message
 		hl7message = "response"
-
 	}
 
 	// add processing notes/errors to event
-	if len(requ.Notes)+len(resp.Notes) > 0 {
-		fields["notes"] = append(requ.Notes, resp.Notes...)
+
+	if len(requ.Notes) > 0 {
+		fields["notes"] = append(requ.Notes)
 	}
 
 	if pub.sendRequest {
 		fields["request"] = requ.content
 	}
-	if pub.sendResponse {
-		fields["response"] = resp.content
+
+	if !(resp == nil) {
+		if len(resp.Notes) > 0 {
+			fields["notes"] = append(resp.Notes)
+		}
+		if pub.sendResponse {
+			fields["response"] = resp.content
+		}
 	}
 
 	return beat.Event{

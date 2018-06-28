@@ -22,7 +22,7 @@ type transactionConfig struct {
 	transactionTimeout time.Duration
 }
 
-type transactionHandler func(requ, resp *message) error
+type transactionHandler func(requ, resp *message, state string) error
 
 // List of messages available for correlation
 type messageList struct {
@@ -92,7 +92,7 @@ func (trans *transactions) onRequest(
 	return trans.correlate()
 }
 
-// onRequest handles response messages, merging with incomplete requests
+// onResponse handles response messages, merging with incomplete responses
 // and adding non-merged responses into the correlation list.
 func (trans *transactions) onResponse(
 	tuple *common.IPPortTuple,
@@ -159,11 +159,23 @@ func (trans *transactions) correlate() error {
 		requ := requests.pop()
 		responses.pop()
 
-		if err := trans.onTransaction(requ, resp); err != nil {
+		if err := trans.onTransaction(requ, resp, "OK"); err != nil {
 			return err
 		}
 	}
 
+	return nil
+}
+
+func (trans *transactions) publishIncomplete(conn *connection, state string) error {
+	requests := &trans.requests
+	responses := &trans.responses
+	for !requests.empty() && responses.empty() {
+		requ := requests.pop()
+		if err := trans.onTransaction(requ, nil, state); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

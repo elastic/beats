@@ -94,6 +94,7 @@ func (hp *hl7v2Plugin) setFromConfig(config *hl7v2Config) error {
 
 	// set transaction publisher configuration
 	pub := &hp.pub
+	pub.transactionTimeout = config.TransactionTimeout
 	pub.sendRequest = config.SendRequest
 	pub.sendResponse = config.SendResponse
 	pub.NewLineChars = strings.Replace(strings.Replace(config.NewLineChars, `\r`, "\r", -1), `\n`, "\n", -1)
@@ -172,6 +173,17 @@ func (hp *hl7v2Plugin) ReceivedFin(
 	tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
+
+	// If possible publish un-published request
+	conn := getConnection(private)
+	if conn == nil {
+		return private
+	}
+	if isDebug {
+		debugf("hl7v2 connection closed %s", tcptuple)
+	}
+	conn.trans.publishIncomplete(conn, "CONNECTION_CLOSED")
+
 	return private
 }
 
@@ -191,6 +203,15 @@ func (hp *hl7v2Plugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 // onDropConnection processes and optionally sends incomplete
 // transaction in case of connection being dropped due to error
 func (hp *hl7v2Plugin) onDropConnection(conn *connection) {
+
+	// If possible publish un-published request
+	if conn == nil {
+		return
+	}
+	if isDebug {
+		debugf("hl7v2 connection dropped")
+	}
+	conn.trans.publishIncomplete(conn, "CONNECTION_DROPPED")
 }
 
 func (hp *hl7v2Plugin) ensureConnection(private protos.ProtocolData) *connection {
@@ -222,4 +243,17 @@ func getConnection(private protos.ProtocolData) *connection {
 		return nil
 	}
 	return priv
+}
+
+func (hp *hl7v2Plugin) Expired(tcptuple *common.TCPTuple, private protos.ProtocolData) {
+
+	// If possible publish un-published request
+	conn := getConnection(private)
+	if conn == nil {
+		return
+	}
+	if isDebug {
+		debugf("hl7v2 expired connection %s", tcptuple)
+	}
+	conn.trans.publishIncomplete(conn, "CONNECTION_TIMEOUT")
 }
