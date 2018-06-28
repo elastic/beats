@@ -39,3 +39,22 @@ func defaultConfig() config {
 		Config: cfg,
 	}
 }
+
+// Unpack is needed here as go-ucfg fails to unpack the Config object by default
+func (c *config) Unpack(from *common.Config) error {
+	tmpConfig := struct {
+		Key string `config:"key"`
+	}{
+		Key: c.Key,
+	}
+	if err := from.Unpack(&tmpConfig); err != nil {
+		return err
+	}
+
+	if config, err := from.Child("config", -1); err == nil {
+		c.Config = config
+	}
+
+	c.Key = tmpConfig.Key
+	return nil
+}
