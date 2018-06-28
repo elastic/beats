@@ -46,7 +46,7 @@ func eventMapping(health map[string]interface{}) (common.MapStr, *s.Errors) {
 
 	statusCodeCountMap := health["total_status_code_count"].(map[string]interface{})
 	for code, count := range statusCodeCountMap {
-		event.Put("response.status_codes."+code, int64(count.(float64)))
+		event.Put("response.status_codes."+code, count)
 	}
 
 	return event, nil

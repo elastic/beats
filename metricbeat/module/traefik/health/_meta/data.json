@@ -14,15 +14,15 @@
         "health": {
             "response": {
                 "avg_time": {
-                    "us": 35
+                    "us": 32
                 },
-                "count": 12,
+                "count": 15,
                 "status_codes": {
-                    "404": 12
+                    "404": 15
                 }
             },
             "uptime": {
-                "sec": 541
+                "sec": 1944
             }
         }
     }

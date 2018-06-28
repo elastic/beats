@@ -62,7 +62,7 @@ func TestFetch(t *testing.T) {
 	assert.True(t, responseCount.(int64) >= 1)
 
 	badResponseCount, _ := event.MetricSetFields.GetValue("response.status_codes.404")
-	assert.True(t, badResponseCount.(int64) >= 1)
+	assert.True(t, badResponseCount.(float64) >= 1)
 }
 
 func TestData(t *testing.T) {
