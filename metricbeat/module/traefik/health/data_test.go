@@ -58,7 +58,7 @@ func TestEventMapping(t *testing.T) {
 	assert.EqualValues(t, 18, response["count"])
 
 	avgTime := response["avg_time"].(common.MapStr)
-	assert.EqualValues(t, 1.5117e-05, avgTime["sec"])
+	assert.EqualValues(t, 15, avgTime["us"])
 
 	statusCodes := response["status_codes"].(common.MapStr)
 	assert.EqualValues(t, 17, statusCodes["200"])

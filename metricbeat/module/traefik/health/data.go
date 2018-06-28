@@ -31,7 +31,7 @@ var (
 		"response": s.Object{
 			"count": c.Int("total_count"),
 			"avg_time": s.Object{
-				"sec": c.Float("average_response_time_sec"),
+				"us": c.Int("average_response_time_us"),
 			},
 			"status_codes": s.Object{},
 		},
@@ -39,6 +39,10 @@ var (
 )
 
 func eventMapping(health map[string]interface{}) (common.MapStr, *s.Errors) {
+	if averageResponseTimeSec, ok := health["average_response_time_sec"]; ok {
+		health["average_response_time_us"] = averageResponseTimeSec.(float64) * 1000 * 1000
+	}
+
 	event, _ := schema.Apply(health)
 
 	statusCodeCountMap := health["total_status_code_count"].(map[string]interface{})

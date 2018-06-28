@@ -16465,19 +16465,13 @@ Number of responses
 
 --
 
-[float]
-== avg_time fields
-
-Average response time
-
-
-
-*`traefik.health.response.avg_time.sec`*::
+*`traefik.health.response.avg_time.us`*::
 +
 --
-type: float
+type: long
 
-Average response time in seconds
+Average response time in microseconds
+
 
 --
 

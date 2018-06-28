@@ -14,13 +14,13 @@
         "health": {
             "response": {
                 "avg_time": {
-                    "sec": 0
+                    "us": 0
                 },
                 "count": 0,
                 "status_codes": {}
             },
             "uptime": {
-                "sec": 75
+                "sec": 1816
             }
         }
     }

@@ -16,15 +16,10 @@
           type: int
           description: >
             Number of responses
-        - name: avg_time
-          type: group
+        - name: avg_time.us
+          type: long
           description: >
-            Average response time
-          fields:
-            - name: sec
-              type: float
-              description:
-                  Average response time in seconds
+            Average response time in microseconds
         - name: status_codes
           type: group
           description: >
