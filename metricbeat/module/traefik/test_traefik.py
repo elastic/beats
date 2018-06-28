@@ -8,28 +8,15 @@ class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['traefik']
 
+    @parameterized.expand([
+        "health"
+    ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_health(self):
+    def test_health(self, metricset):
         """
-        traefik health metricset test
+        traefik metricset tests
         """
-        self.render_config_template(modules=[{
-            "name": "traefik",
-            "metricsets": ["health"],
-            "hosts": self.get_hosts(),
-            "period": "1s",
-        }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
-
-        output = self.read_output_json()
-        self.assertTrue(len(output) >= 1)
-        evt = output[0]
-        print(evt)
-
-        self.assert_fields_are_documented(evt)
+        self.check_metricset("traefik", metricset, self.get_hosts(), self.FIELDS + ["service.name"])
 
     def get_hosts(self):
         return [os.getenv('TRAEFIK_HOST', 'localhost') + ':' +
