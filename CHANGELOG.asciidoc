@@ -284,6 +284,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add postgresql statement metricset. {issue}7048[7048] {pull}7060[7060]
 - Update `state_container` metricset to support latest `kube-state-metrics` version. {pull}7216[7216]
 - Collect accumulated docker network metrics and mark old ones as deprecated. {pull}7253[7253]
+- Add TLS support to MongoDB module. {pull}7401[7401]
 
 *Packetbeat*
 
