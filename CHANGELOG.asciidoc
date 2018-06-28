@@ -137,14 +137,13 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 
 - De dot keys of labels and annotations in kubernetes meta processors to prevent collisions. {pull}6203[6203]
 - Rename `beat.cpu.*.time metrics` to `beat.cpu.*.time.ms`. {pull}6449[6449]
-- Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
-- Allow override of dynamic template `match_mapping_type` for fields with object_type. {pull}6691[6691]
 - Add `host.name` field to all events, to avoid mapping conflicts. This could be breaking Logstash configs if you rely on the `host` field being a string. {pull}7051[7051]
 
 *Filebeat*
 
 - Remove the undefined `username` option from the Redis input and clarify the documentation. {pull}6662[6662]
 - Add validation for Stdin, when Filebeat is configured with Stdin and any other inputs, Filebeat
+- Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
   will now refuses to start. {pull}6463[6463]
 
 *Metricbeat*
@@ -226,6 +225,7 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Added logging of system info at Beat startup. {issue}5946[5946]
 - Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
 - Add rename processor. {pull}6292[6292]
+- Allow override of dynamic template `match_mapping_type` for fields with object_type. {pull}6691[6691]
 
 *Filebeat*
 
