@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Allow index-pattern only setup when setup.dashboards.only_index=true. {pull}7285[7285]
 - Fix duplicating dynamic_fields in template when overwriting the template. {pull}7352[7352]
 - Fix a panic on the Dissect processor when we have data remaining after the last delimiter. {pull}7449[7449]
+- When we fail to build a Kubernetes' indexer or matcher we produce a warning but we don't add them to the execution. {pull}7466[7466]
 
 *Auditbeat*
 
