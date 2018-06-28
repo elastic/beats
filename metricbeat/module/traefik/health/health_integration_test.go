@@ -20,6 +20,7 @@
 package health
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -29,10 +30,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func makeBadRequest(config map[string]interface{}) error {
+	host := config["hosts"].([]string)[0]
+
+	resp, err := http.Get("http://" + host + "/foobar")
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+	return nil
+}
+
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "traefik")
 
-	ms := mbtest.NewReportingMetricSetV2(t, traefik.GetConfig("health"))
+	config := traefik.GetConfig("health")
+
+	makeBadRequest(config)
+
+	ms := mbtest.NewReportingMetricSetV2(t, config)
 	reporter := &mbtest.CapturingReporterV2{}
 
 	ms.Fetch(reporter)
@@ -41,6 +57,12 @@ func TestFetch(t *testing.T) {
 	event := reporter.GetEvents()[0]
 	assert.NotNil(t, event)
 	t.Logf("%s/%s event: %+v", ms.Module().Name(), ms.Name(), event)
+
+	responseCount, _ := event.MetricSetFields.GetValue("response.count")
+	assert.True(t, responseCount.(int64) >= 1)
+
+	badResponseCount, _ := event.MetricSetFields.GetValue("response.status_codes.404")
+	assert.True(t, badResponseCount.(int64) >= 1)
 }
 
 func TestData(t *testing.T) {
