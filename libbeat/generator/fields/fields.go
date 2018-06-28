@@ -19,6 +19,7 @@ package fields
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -47,7 +48,7 @@ func collectBeatFiles(beatPath string, fieldFiles []*YmlFile) ([]*YmlFile, error
 	}
 
 	files := []*YmlFile{
-		&YmlFile{
+		{
 			Path:   commonFields,
 			Indent: 0,
 		},
@@ -64,33 +65,43 @@ func writeGeneratedFieldsYml(beatsPath string, fieldFiles []*YmlFile) error {
 	}
 	defer f.Close()
 
-	fw := bufio.NewWriter(f)
-	for _, p := range fieldFiles {
-		ff, err := os.Open(p.Path)
-		if err != nil {
-			return err
-		}
-		defer ff.Close()
-
-		fs := bufio.NewScanner(ff)
-		for fs.Scan() {
-			err = writeIndentedLine(fw, fs.Text()+"\n", p.Indent)
-			if err != nil {
-				return err
-			}
-
-		}
-		if err := fs.Err(); err != nil {
-			return err
-		}
+	data, err := GenerateFieldsYml(fieldFiles)
+	if err != nil {
+		return err
 	}
-	return nil
+	fw := bufio.NewWriter(f)
+	fw.Write(data)
+	return fw.Flush()
 }
 
-func writeIndentedLine(fw *bufio.Writer, l string, indent int) error {
-	ll := strings.Repeat(" ", indent) + l
-	fmt.Fprint(fw, ll)
-	return fw.Flush()
+// GenerateFieldsYml generates a fields.yml based on the given files
+func GenerateFieldsYml(fieldFiles []*YmlFile) ([]byte, error) {
+	buf := bytes.NewBufferString("")
+	for _, p := range fieldFiles {
+		file, err := os.Open(p.Path)
+		if err != nil {
+			return nil, err
+		}
+		defer file.Close()
+
+		fs := bufio.NewScanner(file)
+		for fs.Scan() {
+			err = writeIndentedLine(buf, fs.Text()+"\n", p.Indent)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if err := fs.Err(); err != nil {
+			return nil, err
+		}
+	}
+	return buf.Bytes(), nil
+}
+
+func writeIndentedLine(buf *bytes.Buffer, line string, indent int) error {
+	newLine := strings.Repeat(" ", indent) + line
+	_, err := buf.WriteString(newLine)
+	return err
 }
 
 // Generate collects fields.yml files and concatenates them into one global file.
@@ -162,5 +173,4 @@ func copyFileWithFlag(in, out string, flag int) error {
 
 	_, err = output.Write(input)
 	return err
-
 }
