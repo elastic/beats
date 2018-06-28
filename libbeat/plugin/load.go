@@ -38,10 +38,10 @@ func loadPlugins(path string) error {
 		return err
 	}
 
-	bundle, ok := sym.(*feature.Bundle)
+	bundle, ok := sym.(**feature.Bundle)
 	if !ok {
-		return fmt.Errorf("invalid bundle type, received '%T'", bundle)
+		return fmt.Errorf("invalid bundle type, received '%T'", sym)
 	}
 
-	return feature.RegisterBundle(bundle)
+	return feature.RegisterBundle(*bundle)
 }
