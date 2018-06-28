@@ -62,6 +62,7 @@ func NewMatchers(configs PluginConfig) *Matchers {
 			matcher, err := matchFunc(pluginConfig)
 			if err != nil {
 				logp.Warn("Unable to initialize matcher plugin %s due to error %v", name, err)
+				continue
 			}
 
 			matchers = append(matchers, matcher)
