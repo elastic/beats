@@ -24,7 +24,7 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("winlogbeat/fields.yml", Asset); err != nil {
+	if err := asset.SetFields("winlogbeat", "fields.yml", Asset); err != nil {
 		panic(err)
 	}
 }
