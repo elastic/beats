@@ -905,6 +905,17 @@ The type of request that was executed
 
 --
 
+*`elasticsearch.audit.request_body`*::
++
+--
+type: text
+
+example: body
+
+The body of the request, if enabled
+
+--
+
 [float]
 == gc fields
 

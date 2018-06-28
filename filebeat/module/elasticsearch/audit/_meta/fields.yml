@@ -38,3 +38,7 @@
       description: "The type of request that was executed"
       example: "ClearScrollRequest"
       type: keyword
+    - name: request_body
+      description: "The body of the request, if enabled"
+      example: "body"
+      type: text

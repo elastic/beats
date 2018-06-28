@@ -1,22 +1,20 @@
 [
     {
-        "_index": "filebeat-7.0.0-alpha1-2018.06.21",
+        "_index": "filebeat-7.0.0-alpha1-2018.06.28",
         "_type": "doc",
-        "_id": "akP1I2QB7b1vCjbP01xs",
-        "_score": 1,
+        "_id": "pghJRmQBnnBuxKOlA7Me",
+        "_version": 1,
+        "_score": null,
         "_source": {
             "offset": 0,
             "prospector": {
                 "type": "log"
             },
             "source": "/Users/rado/workspace/go/src/github.com/elastic/beats/filebeat/module/elasticsearch/audit/test/test.log",
+            "message": "[2018-06-19T05:16:15,549] [rest] [authentication_failed]        origin_address=[147.107.128.77], principal=[i030648], uri=[/_xpack/security/_authenticate]",
             "fileset": {
                 "module": "elasticsearch",
                 "name": "audit"
-            },
-            "message": "[2018-06-19T05:16:15,549] [rest] [authentication_failed]        origin_address=[147.107.128.77], principal=[i030648], uri=[/_xpack/security/_authenticate]",
-            "error": {
-                "message": "field [timestamp] not present as part of path [elasticsearch.audit.timestamp]"
             },
             "input": {
                 "type": "log"
@@ -43,29 +41,38 @@
                 "version": "7.0.0-alpha1"
             },
             "event": {
-                "created": "2018-06-21T20:07:48.891Z"
+                "created": "2018-06-28T12:05:46.254Z"
             }
-        }
+        },
+        "fields": {
+            "@timestamp": [
+                "2018-06-19T05:16:15.549Z"
+            ],
+            "event.created": [
+                "2018-06-28T12:05:46.254Z"
+            ]
+        },
+        "sort": [
+            1529385375549
+        ]
     },
     {
-        "_index": "filebeat-7.0.0-alpha1-2018.06.21",
+        "_index": "filebeat-7.0.0-alpha1-2018.06.28",
         "_type": "doc",
-        "_id": "bUP1I2QB7b1vCjbP01xs",
-        "_score": 1,
+        "_id": "pwhJRmQBnnBuxKOlA7Me",
+        "_version": 1,
+        "_score": null,
         "_source": {
-            "offset": 438,
+            "offset": 155,
             "prospector": {
                 "type": "log"
             },
             "source": "/Users/rado/workspace/go/src/github.com/elastic/beats/filebeat/module/elasticsearch/audit/test/test.log",
-            "message": "[2018-06-19T05:07:52,304] [v_VJhjV] [rest] [authentication_failed]\torigin_address=[172.22.0.3], principal=[rado], uri=[/_xpack/security/_authenticate]",
             "fileset": {
                 "module": "elasticsearch",
                 "name": "audit"
             },
-            "error": {
-                "message": "field [timestamp] not present as part of path [elasticsearch.audit.timestamp]"
-            },
+            "message": "[2018-06-19T05:07:52,304] [v_VJhjV] [rest] [authentication_failed]\torigin_address=[172.22.0.3], principal=[rado], uri=[/_xpack/security/_authenticate]",
             "input": {
                 "type": "log"
             },
@@ -83,38 +90,47 @@
             "service": {
                 "name": "elasticsearch"
             },
+            "host": {
+                "name": "Rados-MacBook-Pro.local"
+            },
             "beat": {
                 "hostname": "Rados-MacBook-Pro.local",
                 "name": "Rados-MacBook-Pro.local",
                 "version": "7.0.0-alpha1"
             },
-            "host": {
-                "name": "Rados-MacBook-Pro.local"
-            },
             "event": {
-                "created": "2018-06-21T20:07:48.891Z"
+                "created": "2018-06-28T12:05:46.254Z"
             }
-        }
+        },
+        "fields": {
+            "@timestamp": [
+                "2018-06-19T05:07:52.304Z"
+            ],
+            "event.created": [
+                "2018-06-28T12:05:46.254Z"
+            ]
+        },
+        "sort": [
+            1529384872304
+        ]
     },
     {
-        "_index": "filebeat-7.0.0-alpha1-2018.06.21",
+        "_index": "filebeat-7.0.0-alpha1-2018.06.28",
         "_type": "doc",
-        "_id": "bkP1I2QB7b1vCjbP01xs",
-        "_score": 1,
+        "_id": "qAhJRmQBnnBuxKOlA7Me",
+        "_version": 1,
+        "_score": null,
         "_source": {
-            "offset": 589,
+            "offset": 306,
             "prospector": {
                 "type": "log"
             },
             "source": "/Users/rado/workspace/go/src/github.com/elastic/beats/filebeat/module/elasticsearch/audit/test/test.log",
-            "message": "[2018-06-19T05:00:15,778] [transport] [access_granted]  origin_type=[local_node], origin_address=[192.168.1.165], principal=[_xpack_security], action=[indices:data/read/scroll/clear], request=[ClearScrollRequest]",
             "fileset": {
                 "module": "elasticsearch",
                 "name": "audit"
             },
-            "error": {
-                "message": "field [timestamp] not present as part of path [elasticsearch.audit.timestamp]"
-            },
+            "message": "[2018-06-19T05:00:15,778] [transport] [access_granted]  origin_type=[local_node], origin_address=[192.168.1.165], principal=[_xpack_security], action=[indices:data/read/scroll/clear], request=[ClearScrollRequest]",
             "input": {
                 "type": "log"
             },
@@ -133,26 +149,38 @@
             "service": {
                 "name": "elasticsearch"
             },
+            "host": {
+                "name": "Rados-MacBook-Pro.local"
+            },
             "beat": {
                 "hostname": "Rados-MacBook-Pro.local",
                 "name": "Rados-MacBook-Pro.local",
                 "version": "7.0.0-alpha1"
             },
-            "host": {
-                "name": "Rados-MacBook-Pro.local"
-            },
             "event": {
-                "created": "2018-06-21T20:07:48.891Z"
+                "created": "2018-06-28T12:05:46.254Z"
             }
-        }
+        },
+        "fields": {
+            "@timestamp": [
+                "2018-06-19T05:00:15.778Z"
+            ],
+            "event.created": [
+                "2018-06-28T12:05:46.254Z"
+            ]
+        },
+        "sort": [
+            1529384415778
+        ]
     },
     {
-        "_index": "filebeat-7.0.0-alpha1-2018.06.21",
+        "_index": "filebeat-7.0.0-alpha1-2018.06.28",
         "_type": "doc",
-        "_id": "bEP1I2QB7b1vCjbP01xs",
-        "_score": 1,
+        "_id": "qQhJRmQBnnBuxKOlA7Me",
+        "_version": 1,
+        "_score": null,
         "_source": {
-            "offset": 303,
+            "offset": 519,
             "prospector": {
                 "type": "log"
             },
@@ -162,9 +190,6 @@
                 "name": "audit"
             },
             "message": "[2018-06-19T05:07:45,544] [v_VJhjV] [rest] [anonymous_access_denied]\torigin_address=[172.22.0.3], uri=[/_xpack/security/_authenticate]",
-            "error": {
-                "message": "field [timestamp] not present as part of path [elasticsearch.audit.timestamp]"
-            },
             "input": {
                 "type": "log"
             },
@@ -181,37 +206,46 @@
             "service": {
                 "name": "elasticsearch"
             },
+            "host": {
+                "name": "Rados-MacBook-Pro.local"
+            },
             "beat": {
                 "hostname": "Rados-MacBook-Pro.local",
                 "name": "Rados-MacBook-Pro.local",
                 "version": "7.0.0-alpha1"
             },
-            "host": {
-                "name": "Rados-MacBook-Pro.local"
-            },
             "event": {
-                "created": "2018-06-21T20:07:48.891Z"
+                "created": "2018-06-28T12:05:46.254Z"
             }
-        }
+        },
+        "fields": {
+            "@timestamp": [
+                "2018-06-19T05:07:45.544Z"
+            ],
+            "event.created": [
+                "2018-06-28T12:05:46.254Z"
+            ]
+        },
+        "sort": [
+            1529384865544
+        ]
     },
     {
-        "_index": "filebeat-7.0.0-alpha1-2018.06.21",
+        "_index": "filebeat-7.0.0-alpha1-2018.06.28",
         "_type": "doc",
-        "_id": "a0P1I2QB7b1vCjbP01xs",
-        "_score": 1,
+        "_id": "qghJRmQBnnBuxKOlA7Me",
+        "_version": 1,
+        "_score": null,
         "_source": {
-            "offset": 155,
+            "offset": 654,
             "prospector": {
                 "type": "log"
             },
             "source": "/Users/rado/workspace/go/src/github.com/elastic/beats/filebeat/module/elasticsearch/audit/test/test.log",
+            "message": "[2018-06-19T05:26:27,268] [rest] [authentication_failed]\torigin_address=[147.107.128.77], principal=[N078801], uri=[/_xpack/security/_authenticate]",
             "fileset": {
                 "module": "elasticsearch",
                 "name": "audit"
-            },
-            "message": "[2018-06-19T05:26:27,268] [rest] [authentication_failed]\torigin_address=[147.107.128.77], principal=[N078801], uri=[/_xpack/security/_authenticate]",
-            "error": {
-                "message": "field [timestamp] not present as part of path [elasticsearch.audit.timestamp]"
             },
             "input": {
                 "type": "log"
@@ -229,24 +263,36 @@
             "service": {
                 "name": "elasticsearch"
             },
+            "host": {
+                "name": "Rados-MacBook-Pro.local"
+            },
             "beat": {
                 "hostname": "Rados-MacBook-Pro.local",
                 "name": "Rados-MacBook-Pro.local",
                 "version": "7.0.0-alpha1"
             },
-            "host": {
-                "name": "Rados-MacBook-Pro.local"
-            },
             "event": {
-                "created": "2018-06-21T20:07:48.891Z"
+                "created": "2018-06-28T12:05:46.254Z"
             }
-        }
+        },
+        "fields": {
+            "@timestamp": [
+                "2018-06-19T05:26:27.268Z"
+            ],
+            "event.created": [
+                "2018-06-28T12:05:46.254Z"
+            ]
+        },
+        "sort": [
+            1529385987268
+        ]
     },
     {
-        "_index": "filebeat-7.0.0-alpha1-2018.06.21",
+        "_index": "filebeat-7.0.0-alpha1-2018.06.28",
         "_type": "doc",
-        "_id": "b0P1I2QB7b1vCjbP01xs",
-        "_score": 1,
+        "_id": "qwhJRmQBnnBuxKOlA7Me",
+        "_version": 1,
+        "_score": null,
         "_source": {
             "offset": 802,
             "prospector": {
@@ -257,9 +303,6 @@
             "fileset": {
                 "module": "elasticsearch",
                 "name": "audit"
-            },
-            "error": {
-                "message": "field [timestamp] not present as part of path [elasticsearch.audit.timestamp]"
             },
             "input": {
                 "type": "log"
@@ -288,8 +331,78 @@
                 "name": "Rados-MacBook-Pro.local"
             },
             "event": {
-                "created": "2018-06-21T20:07:48.891Z"
+                "created": "2018-06-28T12:05:46.254Z"
             }
-        }
+        },
+        "fields": {
+            "@timestamp": [
+                "2018-06-19T05:55:26.898Z"
+            ],
+            "event.created": [
+                "2018-06-28T12:05:46.254Z"
+            ]
+        },
+        "sort": [
+            1529387726898
+        ]
+    },
+    {
+        "_index": "filebeat-7.0.0-alpha1-2018.06.28",
+        "_type": "doc",
+        "_id": "rAhJRmQBnnBuxKOlA7Me",
+        "_version": 1,
+        "_score": null,
+        "_source": {
+            "offset": 986,
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/rado/workspace/go/src/github.com/elastic/beats/filebeat/module/elasticsearch/audit/test/test.log",
+            "fileset": {
+                "module": "elasticsearch",
+                "name": "audit"
+            },
+            "message": "[2018-06-19T05:24:15,190] [v_VJhjV] [rest] [authentication_failed]\torigin_address=[172.18.0.3], principal=[elastic], uri=[/_nodes?filter_path=nodes.*.version%2Cnodes.*.http.publish_address%2Cnodes.*.ip], request_body=[body]",
+            "input": {
+                "type": "log"
+            },
+            "@timestamp": "2018-06-19T05:24:15,190",
+            "elasticsearch": {
+                "audit": {
+                    "principal": "elastic",
+                    "event_type": "authentication_failed",
+                    "request_body": "body",
+                    "node_name": "v_VJhjV",
+                    "origin_address": "172.18.0.3",
+                    "uri": "/_nodes?filter_path=nodes.*.version%2Cnodes.*.http.publish_address%2Cnodes.*.ip",
+                    "layer": "rest"
+                }
+            },
+            "service": {
+                "name": "elasticsearch"
+            },
+            "host": {
+                "name": "Rados-MacBook-Pro.local"
+            },
+            "beat": {
+                "hostname": "Rados-MacBook-Pro.local",
+                "name": "Rados-MacBook-Pro.local",
+                "version": "7.0.0-alpha1"
+            },
+            "event": {
+                "created": "2018-06-28T12:05:46.254Z"
+            }
+        },
+        "fields": {
+            "@timestamp": [
+                "2018-06-19T05:24:15.190Z"
+            ],
+            "event.created": [
+                "2018-06-28T12:05:46.254Z"
+            ]
+        },
+        "sort": [
+            1529385855190
+        ]
     }
 ]
