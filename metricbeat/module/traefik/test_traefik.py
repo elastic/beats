@@ -8,6 +8,7 @@ from parameterized import parameterized
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['traefik']
+    FIELDS = ['traefik']
 
     @parameterized.expand([
         "health"
