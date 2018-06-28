@@ -2,6 +2,7 @@ import os
 import metricbeat
 import unittest
 import time
+from parameterized import parameterized
 
 
 class Test(metricbeat.BaseTest):
