@@ -72,6 +72,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Allow to override the `ignore_above` option when defining new field with the type keyword. {pull}7238[7238]
 - Allow index-pattern only setup when setup.dashboards.only_index=true. {pull}7285[7285]
 - Fix duplicating dynamic_fields in template when overwriting the template. {pull}7352[7352]
+- Fix a panic on the Dissect processor when we have data remaining after the last delimiter. {pull}7449[7449]
 
 *Auditbeat*
 
