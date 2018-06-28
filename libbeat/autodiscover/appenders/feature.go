@@ -58,7 +58,7 @@ func FindFactory(name string) (Factory, error) {
 
 	factory, ok := f.Factory().(Factory)
 	if !ok {
-		return nil, fmt.Errorf("incompatible type for appender, received: '%T'", factory)
+		return nil, fmt.Errorf("incompatible type for appender, received: '%T'", f.Factory())
 	}
 
 	return factory, nil
