@@ -21,15 +21,7 @@
           description: >
             Average response time in microseconds
         - name: status_codes
-          type: group
+          type: object
+          object_type: long
           description: >
-            Respone status codes
-          fields:
-            - name: code
-              type: keyword
-              description: >
-                Status code
-            - name: count
-              type: int
-              description: >
-                Number of responses for status code
+            Number of responses per status code

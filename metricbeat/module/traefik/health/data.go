@@ -33,7 +33,6 @@ var (
 			"avg_time": s.Object{
 				"us": c.Int("average_response_time_us"),
 			},
-			"status_codes": s.Object{},
 		},
 	}
 )

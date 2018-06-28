@@ -16475,29 +16475,12 @@ Average response time in microseconds
 
 --
 
-[float]
-== status_codes fields
-
-Respone status codes
-
-
-
-*`traefik.health.response.status_codes.code`*::
+*`traefik.health.response.status_codes`*::
 +
 --
-type: keyword
+type: object
 
-Status code
-
-
---
-
-*`traefik.health.response.status_codes.count`*::
-+
---
-type: int
-
-Number of responses for status code
+Number of responses per status code
 
 
 --
