@@ -18,7 +18,7 @@ class Test(metricbeat.BaseTest):
         """
         traefik metricset tests
         """
-        self.check_metricset("traefik", metricset, self.get_hosts(), self.FIELDS + ["service.name"])
+        self.check_metricset("traefik", metricset, self.get_hosts(), self.FIELDS)
 
     def get_hosts(self):
         return [os.getenv('TRAEFIK_HOST', 'localhost') + ':' +
