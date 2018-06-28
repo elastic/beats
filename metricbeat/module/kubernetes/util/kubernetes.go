@@ -23,10 +23,12 @@ type Enricher interface {
 }
 
 type kubernetesConfig struct {
-	InCluster  bool          `config:"in_cluster"`
-	KubeConfig string        `config:"kube_config"`
-	Host       string        `config:"host"`
-	SyncPeriod time.Duration `config:"sync_period"`
+	// AddMetadata enables enriching metricset events with metadata from the API server
+	AddMetadata bool          `config:"add_metadata"`
+	InCluster   bool          `config:"in_cluster"`
+	KubeConfig  string        `config:"kube_config"`
+	Host        string        `config:"host"`
+	SyncPeriod  time.Duration `config:"sync_period"`
 }
 
 type enricher struct {
@@ -41,10 +43,16 @@ type enricher struct {
 // scope (node or cluster), and resource type
 func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, error) {
 	config := kubernetesConfig{
-		InCluster: true,
+		AddMetadata: true,
+		InCluster:   true,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
+	}
+
+	// Return nil if metadata enriching is disabled:
+	if !config.AddMetadata {
+		return nil, nil
 	}
 
 	client, err := kubernetes.GetKubernetesClient(config.InCluster, config.KubeConfig)
@@ -73,6 +81,11 @@ func NewResourceMetadataEnricher(
 	watcher, err := GetWatcher(base, resource, nodeScope)
 	if err != nil {
 		logp.Warn("Error initializing Kubernetes metadata enricher: %s", err)
+		return nilEnricher
+	}
+
+	if watcher == nil {
+		logp.Info("Kubernetes metricset enriching is disabled")
 		return nilEnricher
 	}
 
