@@ -13,6 +13,8 @@ spec:
         k8s-app: metricbeat
     spec:
       serviceAccountName: metricbeat
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
         image: docker.elastic.co/beats/metricbeat:%VERSION%
@@ -33,10 +35,6 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
         securityContext:
           runAsUser: 0
         resources:
