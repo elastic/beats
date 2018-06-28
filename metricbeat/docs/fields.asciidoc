@@ -16438,19 +16438,12 @@ Metrics obtained from Traefik's health API endpoint
 
 
 
-[float]
-== uptime fields
-
-Uptime of Traefik instance
-
-
-
 *`traefik.health.uptime.sec`*::
 +
 --
 type: int
 
-Uptime in seconds
+Uptime of Traefik instance in seconds
 
 
 --
