@@ -46,6 +46,9 @@ type PodSpec = v1.PodSpec
 // PodStatus data
 type PodStatus = v1.PodStatus
 
+// Node data
+type Node = v1.Node
+
 // Container data
 type Container = v1.Container
 
