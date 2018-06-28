@@ -29,8 +29,6 @@ https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix duplicating dynamic_fields in template when overwriting the template. {pull}7352[7352]
-
 *Auditbeat*
 
 *Filebeat*
@@ -89,21 +87,45 @@ https://github.com/elastic/beats/compare/v6.3.0...v6.3.1[View commits]
 - Allow index-pattern only setup when setup.dashboards.only_index=true. {pull}7285[7285]
 - Preserve the event when source matching fails in `add_docker_metadata`. {pull}7133[7133]
 - Negotiate Docker API version from our client instead of using a hardcoded one. {pull}7165[7165]
+- Fix duplicating dynamic_fields in template when overwriting the template. {pull}7352[7352]
+
+*Auditbeat*
+
+- Fixed parsing of AppArmor audit messages. {pull}6978[6978]
 
 *Filebeat*
 
 - Comply with PostgreSQL database name format {pull}7198[7198]
 - Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
 - Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
+- Keep different registry entry per container stream to avoid wrong offsets. {issue}7281[7281]
+- Fix offset field pointing at end of a line. {issue}6514[6514]
+- Commit registry writes to stable storage to avoid corrupt registry files. {issue}6792[6792]
 
 *Metricbeat*
 
 - Fix field mapping for the system process CPU ticks fields. {pull}7230[7230]
+- Ensure canonical naming for JMX beans is disabled in Jolokia module. {pull}7047[7047]
+- Fix Jolokia attribute mapping when using wildcards and MBean names with multiple properties. {pull}7321[7321]
 
 *Packetbeat*
 
 - Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
 - Fix missing type for `http.response.body` field. {pull}7169[7169]
+
+== Added ==
+
+*Filebeat*
+
+- Collect accumulated docker network metrics and mark old ones as deprecated. {pull}7253[7253]
+
+*Auditbeat*
+
+- Added caching of UID and GID values to auditd module. {pull}6978[6978]
+- Updated syscall tables for Linux 4.16. {pull}6978[6978]
+- Added better error messages for when the auditd module fails due to the
+  Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
+
 
 [[release-notes-6.3.0]]
 === Beats version 6.3.0
@@ -157,7 +179,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 
 - Add hex decoding for the name field in audit path records. {pull}6687[6687]
 - Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
-- Fixed parsing of AppArmor audit messages. {pull}6978[6978]
 
 *Filebeat*
 
@@ -167,9 +188,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Commit registry writes to stable storage to avoid corrupt registry files. {pull}6877[6877]
 - Fix a parsing issue in the syslog input for RFC3339 timestamp and time with nanoseconds. {pull}7046[7046]
 - Fix an issue with an overflowing wait group when using the TCP input. {issue}7202[7202]
-- Keep different registry entry per container stream to avoid wrong offsets. {issue}7281[7281]
-- Fix offset field pointing at end of a line. {issue}6514[6514]
-- Commit registry writes to stable storage to avoid corrupt registry files. {issue}6792[6792]
 
 *Heartbeat*
 
@@ -190,8 +208,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Don't stop Metricbeat if aerospike server is down. {pull}6874[6874]
 - disk reads and write count metrics in RabbitMQ queue metricset made optional. {issue}6876[6876]
 - Add mapping for docker metrics per cpu. {pull}6843[6843]
-- Ensure canonical naming for JMX beans is disabled in Jolokia module. {pull}7047[7047]
-- Fix Jolokia attribute mapping when using wildcards and MBean names with multiple properties. {pull}7321[7321]
 
 *Winlogbeat*
 
@@ -217,13 +233,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Added logging of system info at Beat startup. {issue}5946[5946]
 - Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
 - Add rename processor. {pull}6292[6292]
-
-*Auditbeat*
-
-- Added caching of UID and GID values to auditd module. {pull}6978[6978]
-- Updated syscall tables for Linux 4.16. {pull}6978[6978]
-- Added better error messages for when the auditd module fails due to the
-  Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
 
 *Filebeat*
 
@@ -311,7 +320,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Add accumulated I/O stats to diskio in the line of `docker stats`. {pull}6701[6701]
 - Ignore virtual filesystem types by default in system module. {pull}6819[6819]
 - Release config reloading feature as GA. {pull}6891[6891]
-- Collect accumulated docker network metrics and mark old ones as deprecated. {pull}7253[7253]
 
 *Packetbeat*
 
