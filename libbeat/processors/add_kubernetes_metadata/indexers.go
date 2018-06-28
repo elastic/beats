@@ -114,6 +114,8 @@ func (i *Indexers) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // Empty returns true if indexers list is empty
 func (i *Indexers) Empty() bool {
+	i.RLock()
+	defer i.RUnlock()
 	if len(i.indexers) == 0 {
 		return true
 	}

@@ -90,6 +90,8 @@ func (m *Matchers) MetadataIndex(event common.MapStr) string {
 }
 
 func (m *Matchers) Empty() bool {
+	m.RLock()
+	defer m.RUnlock()
 	if len(m.matchers) == 0 {
 		return true
 	}
