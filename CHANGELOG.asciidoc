@@ -154,8 +154,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 
 *Metricbeat*
 
-- Kubernetes deployment: Add ServiceAccount config to system metricbeat. {pull}6824[6824]
-- Kubernetes deployment: Add DNS Policy to system metricbeat. {pull}6656[6656]
 - De dot keys in kubernetes/event metricset to prevent collisions. {pull}6203[6203]
 - Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
 - Refactor docker CPU calculations to be more consistent with `docker stats`. {pull}6608[6608]
@@ -320,6 +318,8 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Add accumulated I/O stats to diskio in the line of `docker stats`. {pull}6701[6701]
 - Ignore virtual filesystem types by default in system module. {pull}6819[6819]
 - Release config reloading feature as GA. {pull}6891[6891]
+- Kubernetes deployment: Add ServiceAccount config to system metricbeat. {pull}6824[6824]
+- Kubernetes deployment: Add DNS Policy to system metricbeat. {pull}6656[6656]
 
 *Packetbeat*
 
