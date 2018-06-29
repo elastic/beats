@@ -72,6 +72,7 @@ var (
 		"go_version":        GoVersion,
 		"repo":              GetProjectRepoInfo,
 		"title":             strings.Title,
+		"tolower":           strings.ToLower,
 	}
 )
 

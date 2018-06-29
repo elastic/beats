@@ -15,8 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#import "BeatManager.h"
+// +build darwin
 
-@implementation BeatManager
+package mage
 
-@end
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestAppleKeychainListIdentities(t *testing.T) {
+	idents, err := _appleKeychain.ListIdentities()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.NotZero(t, idents)
+
+	for i, ident := range idents {
+		t.Log(i, ident)
+	}
+}
+
+func TestGetAppleSigningInfo(t *testing.T) {
+	signingInfo, err := GetAppleSigningInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if assert.NotNil(t, signingInfo) {
+		assert.False(t, signingInfo.Sign)
+	}
+}

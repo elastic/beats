@@ -125,6 +125,9 @@ func customizePackaging() {
 		case mage.Deb, mage.RPM:
 			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
 			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
+		case mage.DMG:
+			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}"+moduleTarget] = module
+			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
 		default:
 			panic(errors.Errorf("unhandled package type: %v", pkgType))
 		}

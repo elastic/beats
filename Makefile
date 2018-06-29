@@ -144,7 +144,9 @@ snapshot:
 .PHONY: release
 release: beats-dashboards
 	@$(foreach var,$(BEATS),$(MAKE) -C $(var) release || exit 1;)
-	@$(foreach var,$(BEATS),mkdir -p build/distributions/$(var) && mv -f $(var)/build/distributions/* build/distributions/$(var)/ || exit 1;)
+	@$(foreach var,$(BEATS), \
+      test -d $(var)/build/distributions && test -n "$$(ls $(var)/build/distributions)" || exit 0; \
+      mkdir -p build/distributions/$(var) && mv -f $(var)/build/distributions/* build/distributions/$(var)/ || exit 1;)
 
 # Builds a snapshot release. The Go version defined in .go-version will be
 # installed and used for the build.
