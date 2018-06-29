@@ -917,6 +917,22 @@ The body of the request, if enabled
 --
 
 [float]
+== deprecation fields
+
+
+
+
+*`elasticsearch.deprecation.component`*::
++
+--
+type: keyword
+
+Elasticsearch component.
+
+
+--
+
+[float]
 == gc fields
 
 
