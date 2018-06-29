@@ -56,21 +56,24 @@ In this use case, you load the versioned template manually and use the Beats
 versioned index pattern, `%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}`,
 as recommended in the {logstash-ref}/plugins-inputs-beats.html[Beats input
 plugin] documentation. This results in a `host` field in 6.2 indices, and a
-`host.name` field in 6.3 indices. There are no mapping conflicts. Cross index
-searches in Elasticsearch still work as expected. 
+`host.name` field in 6.3 indices. There are no mapping conflicts, but
+any visualizations or searches that use `host` will no longer show results for
+6.3 indices. 
 
 *What do you need to change?*
 
-If you searched for the `host` field previously, you now need to search for the
-`host` and `host.name` fields.  
+If you searched for the `host` field previously, modify your searches to use the
+`beat.hostname` field instead. The `beat.hostname` field existed prior to 6.3
+and contains the same information as `host.name`. Using this field ensures that
+your queries and aggregations will work as expected in earlier releases and 6.3.
 
-If you have multiple visualizations in Kibana that reference the `host` field,
-you can export the objects by using the Kibana API or UI, change any aggregation
-references to use `host.name` instead of `host`, and then re-import the
-objects into Kibana.
+If you have multiple visualizations in Kibana that reference the `host` field:
 
-
-//TODO: Add links to the Kibana docs for exporting/importing objects.
+. Export the objects. You can use the Kibana API, or in the Kibana UI, go to
+*Management > Kibana > Saved Objects* to export the objects. 
+. In the exported JSON file, change `host` to `beat.hostname`.
+. Import the modified objects into Kibana. You can use the Kibana API, or in the
+Kibana UI, go to *Saved Objects* to import the objects.
 
 [[custom-template-non-versioned-indices]]
 ===== Use case: You use a custom template and your indices are not versioned
