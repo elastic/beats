@@ -7,6 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 
 import metricbeat
 
+
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['traefik']
