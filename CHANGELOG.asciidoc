@@ -170,6 +170,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add ability to define input configuration as stringified JSON for autodiscover. {pull}7372[7372]
 - Add processor definition support for hints builder {pull}7386[7386]
 - Add support to disable html escaping in outputs. {pull}7445[7445]
+- Add additional types to kubernetes metadata {pull}7457[7457]
 
 *Auditbeat*
 
