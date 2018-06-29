@@ -101,8 +101,9 @@ func Update() error {
 // not supported.
 func customizePackaging() {
 	var (
-		archiveModulesDir  = "modules.d"
-		linuxPkgModulesDir = "/usr/share/{{.BeatName}}/modules.d"
+		archiveModulesDir   = "modules.d"
+		linuxPkgModulesDir  = "/usr/share/{{.BeatName}}/modules.d"
+		darwinDMGModulesDir = "/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/modules.d"
 
 		modulesDir = mage.PackageFile{
 			Mode:   0644,
@@ -144,11 +145,16 @@ func customizePackaging() {
 			args.Spec.Files[archiveModulesDir] = windowsModulesDir
 			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", windowsReferenceConfig)
 		default:
-			switch args.Types[0] {
+			pkgType := args.Types[0]
+			switch pkgType {
 			case mage.TarGz, mage.Zip:
 				args.Spec.Files[archiveModulesDir] = modulesDir
 			case mage.Deb, mage.RPM:
 				args.Spec.Files[linuxPkgModulesDir] = modulesDir
+			case mage.DMG:
+				args.Spec.Files[darwinDMGModulesDir] = modulesDir
+			default:
+				panic(errors.Errorf("unhandled package type: %v", pkgType))
 			}
 		}
 	}

@@ -34,6 +34,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -44,6 +45,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
 	"github.com/magefile/mage/types"
@@ -600,13 +602,47 @@ func CreateSHA512File(file string) error {
 	return ioutil.WriteFile(file+".sha512", []byte(out), 0644)
 }
 
+// Mage executes mage targets in the specified directory.
+func Mage(dir string, targets ...string) error {
+	c := exec.Command("mage", targets...)
+	c.Dir = dir
+	if mg.Verbose() {
+		c.Env = append(os.Environ(), "MAGEFILE_VERBOSE=1")
+	}
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	c.Stdin = os.Stdin
+	log.Println("exec:", strings.Join(c.Args, " "))
+	err := c.Run()
+	return err
+}
+
 // IsUpToDate returns true iff dst exists and is older based on modtime than all
 // of the sources.
 func IsUpToDate(dst string, sources ...string) bool {
 	if len(sources) == 0 {
 		panic("No sources passed to IsUpToDate")
 	}
-	execute, err := target.Path(dst, sources...)
+
+	var files []string
+	for _, s := range sources {
+		filepath.Walk(s, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				if os.IsNotExist(err) {
+					return nil
+				}
+				return err
+			}
+
+			if info.Mode().IsRegular() {
+				files = append(files, path)
+			}
+
+			return nil
+		})
+	}
+
+	execute, err := target.Path(dst, files...)
 	return err == nil && !execute
 }
 

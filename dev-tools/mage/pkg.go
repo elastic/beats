@@ -20,6 +20,7 @@ package mage
 import (
 	"fmt"
 	"log"
+	"runtime"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -27,11 +28,11 @@ import (
 )
 
 // Package packages the Beat for distribution. It generates packages based on
-// the set of target plaforms and registered packaging specifications.
+// the set of target platforms and registered packaging specifications.
 func Package() error {
 	if len(Platforms) == 0 {
-		return errors.New("PLATFORMS environment must be set to a list of " +
-			"GOOS/Arch values, but Platforms is empty")
+		fmt.Println(">> package: Skipping because the platform list is empty")
+		return nil
 	}
 
 	if len(Packages) == 0 {
@@ -47,6 +48,11 @@ func Package() error {
 			}
 
 			for _, pkgType := range pkg.Types {
+				if pkgType == DMG && runtime.GOOS != "darwin" {
+					log.Printf("Skipping DMG package type because build host isn't darwin")
+					continue
+				}
+
 				packageArch, err := getOSArchName(target, pkgType)
 				if err != nil {
 					log.Printf("Skipping arch %v for package type %v: %v", target.Arch(), pkgType, err)
@@ -94,15 +100,24 @@ func (b packageBuilder) Build() error {
 // inspect things like file ownership and mode.
 func TestPackages() error {
 	fmt.Println(">> Testing package contents")
+	goTest := sh.OutCmd("go", "test")
+
 	var args []string
 	if mg.Verbose() {
 		args = append(args, "-v")
 	}
 	args = append(args,
-		MustExpand("{{ elastic_beats_dir }}/dev-tools/package_test.go"),
+		MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/package_test.go"),
 		"-files",
 		MustExpand("{{.PWD}}/build/distributions/*"),
 	)
-	goTest := sh.RunCmd("go", "test")
-	return goTest(args...)
+
+	if out, err := goTest(args...); err != nil {
+		if !mg.Verbose() {
+			fmt.Println(out)
+		}
+		return err
+	}
+
+	return nil
 }
