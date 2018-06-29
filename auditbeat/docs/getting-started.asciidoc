@@ -1,18 +1,7 @@
 [id="{beatname_lc}-getting-started"]
 == Getting started with {beatname_uc}
 
-To get started with your own {beatname_uc} setup, install and configure these
-related products:
-
- * Elasticsearch for storage and indexing the data.
- * Kibana for the UI.
- * Logstash (optional) for inserting data into Elasticsearch.
-
-See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack]
-for more information.
-
-After installing the Elastic Stack, read the following topics to learn how to
-install, configure, and run {beatname_uc}:
+include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
 
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
@@ -25,7 +14,7 @@ install, configure, and run {beatname_uc}:
 [id="{beatname_lc}-installation"]
 === Step 1: Install {beatname_uc}
 
-You should install {beatname_uc} on all the servers you want to monitor.
+Install {beatname_uc} on all the servers you want to monitor.
 
 include::../../libbeat/docs/shared-download-and-install.asciidoc[]
 
@@ -123,8 +112,7 @@ https://www.elastic.co/downloads/beats/{beatname_lc}[downloads page].
 . Rename the +{beatname_lc}-<version>-windows+ directory to +{beatname_uc}+.
 
 . Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
-and select *Run As Administrator*). If you are running Windows XP, you may need
-to download and install PowerShell.
+and select *Run As Administrator*).
 
 . From the PowerShell prompt, run the following commands to install {beatname_uc}
 as a Windows service:

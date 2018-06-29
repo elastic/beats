@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package common
 
 import (
@@ -15,10 +32,15 @@ const MaxIPPortTupleRawSize = 16 + 16 + 2 + 2
 
 type HashableIPPortTuple [MaxIPPortTupleRawSize]byte
 
-type IPPortTuple struct {
-	IPLength         int
+type BaseTuple struct {
 	SrcIP, DstIP     net.IP
 	SrcPort, DstPort uint16
+}
+
+type IPPortTuple struct {
+	BaseTuple
+
+	IPLength int
 
 	raw    HashableIPPortTuple // Src_ip:Src_port:Dst_ip:Dst_port
 	revRaw HashableIPPortTuple // Dst_ip:Dst_port:Src_ip:Src_port
@@ -29,10 +51,12 @@ func NewIPPortTuple(ipLength int, srcIP net.IP, srcPort uint16,
 
 	tuple := IPPortTuple{
 		IPLength: ipLength,
-		SrcIP:    srcIP,
-		DstIP:    dstIP,
-		SrcPort:  srcPort,
-		DstPort:  dstPort,
+		BaseTuple: BaseTuple{
+			SrcIP:   srcIP,
+			DstIP:   dstIP,
+			SrcPort: srcPort,
+			DstPort: dstPort,
+		},
 	}
 	tuple.ComputeHashebles()
 
@@ -76,10 +100,10 @@ const MaxTCPTupleRawSize = 16 + 16 + 2 + 2 + 4
 type HashableTCPTuple [MaxTCPTupleRawSize]byte
 
 type TCPTuple struct {
-	IPLength         int
-	SrcIP, DstIP     net.IP
-	SrcPort, DstPort uint16
-	StreamID         uint32
+	BaseTuple
+	IPLength int
+
+	StreamID uint32
 
 	raw HashableTCPTuple // Src_ip:Src_port:Dst_ip:Dst_port:stream_id
 }
@@ -87,10 +111,12 @@ type TCPTuple struct {
 func TCPTupleFromIPPort(t *IPPortTuple, streamID uint32) TCPTuple {
 	tuple := TCPTuple{
 		IPLength: t.IPLength,
-		SrcIP:    t.SrcIP,
-		DstIP:    t.DstIP,
-		SrcPort:  t.SrcPort,
-		DstPort:  t.DstPort,
+		BaseTuple: BaseTuple{
+			SrcIP:   t.SrcIP,
+			DstIP:   t.DstIP,
+			SrcPort: t.SrcPort,
+			DstPort: t.DstPort,
+		},
 		StreamID: streamID,
 	}
 	tuple.ComputeHashebles()
@@ -129,7 +155,22 @@ func (t *TCPTuple) Hashable() HashableTCPTuple {
 	return t.raw
 }
 
-// Source and destination process names, as found by the proc module.
+// CmdlineTuple contains the source and destination process names, as found by
+// the proc module.
 type CmdlineTuple struct {
+	// Source and destination processes names as specified in packetbeat.procs.monitored
 	Src, Dst []byte
+	// Source and destination full command lines
+	SrcCommand, DstCommand []byte
+}
+
+// Reverse returns a copy of the receiver with the source and destination fields
+// swapped.
+func (c *CmdlineTuple) Reverse() CmdlineTuple {
+	return CmdlineTuple{
+		Src:        c.Dst,
+		Dst:        c.Src,
+		SrcCommand: c.DstCommand,
+		DstCommand: c.SrcCommand,
+	}
 }

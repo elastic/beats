@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build integration
 
 package template
@@ -46,7 +63,7 @@ func TestLoadTemplate(t *testing.T) {
 
 	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
 	assert.NoError(t, err)
-	content, err := tmpl.Load(fieldsPath)
+	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
 
 	loader := &Loader{
@@ -134,7 +151,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 
 		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
 		assert.NoError(t, err)
-		content, err := tmpl.Load(fieldsPath)
+		content, err := tmpl.LoadFile(fieldsPath)
 		assert.NoError(t, err)
 
 		loader := &Loader{
@@ -183,7 +200,7 @@ func TestTemplateSettings(t *testing.T) {
 	}
 	tmpl, err := New(version.GetDefaultVersion(), "testbeat", client.GetVersion(), config)
 	assert.NoError(t, err)
-	content, err := tmpl.Load(fieldsPath)
+	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
 
 	loader := &Loader{
@@ -237,7 +254,7 @@ func TestOverwrite(t *testing.T) {
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
 	})
-	loader, err := NewLoader(config, client, beatInfo)
+	loader, err := NewLoader(config, client, beatInfo, nil)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
@@ -252,7 +269,7 @@ func TestOverwrite(t *testing.T) {
 			},
 		},
 	})
-	loader, err = NewLoader(config, client, beatInfo)
+	loader, err = NewLoader(config, client, beatInfo, nil)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
@@ -273,7 +290,7 @@ func TestOverwrite(t *testing.T) {
 			},
 		},
 	})
-	loader, err = NewLoader(config, client, beatInfo)
+	loader, err = NewLoader(config, client, beatInfo, nil)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
@@ -341,7 +358,7 @@ func TestTemplateWithData(t *testing.T) {
 
 	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{})
 	assert.NoError(t, err)
-	content, err := tmpl.Load(fieldsPath)
+	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
 
 	loader := &Loader{

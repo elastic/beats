@@ -373,13 +373,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit
-Version: v0.1.1
-Revision: bc9f53eaa23bfe3fbf023ab5ec7523336b4d9b2f
+Version: v0.3.0
+Revision: c18782ee4f957de48620718231d20ca12c8dc4e9
 License type (autodetected): Apache-2.0
-./vendor/github.com/elastic/go-libaudit/LICENSE:
+./vendor/github.com/elastic/go-libaudit/LICENSE.txt:
 --------------------------------------------------------------------
 Apache License 2.0
 
+-------NOTICE.txt-----
+Elastic go-libaudit
+Copyright 2017-2018 Elasticsearch B.V.
+
+This product includes software developed at
+Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-lumber
@@ -391,9 +397,24 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/elastic/go-seccomp-bpf
+Revision: 5bed103a93993f24c58dd267faaab582f2373e31
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/go-seccomp-bpf/LICENSE.txt:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE.txt-----
+Elastic go-seccomp-bpf
+Copyright 2018 Elasticsearch B.V.
+
+This product includes software developed at
+Elasticsearch, B.V. (https://www.elastic.co/).
+
+--------------------------------------------------------------------
 Dependency: github.com/elastic/go-structform
-Version: v0.0.3
-Revision: 0a66add879601f69f55663f4c913c72988218982
+Version: v0.0.4
+Revision: 0ea09ff9b43c387dd183a4088f6d573bf823e4ed
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-structform/LICENSE:
 --------------------------------------------------------------------
@@ -509,7 +530,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/fsnotify/fsevents
-Revision: 70114c7d2e1e4d1ae5179b285d65ea21aae111cc
+Revision: 4d5197691b054c220286f7c6ea167de9753d902d
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/fsnotify/fsevents/LICENSE:
 --------------------------------------------------------------------
@@ -1555,6 +1576,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/OneOfOne/xxhash
+Version: v1.2.2
+Revision: 6def279d2ce6c81a79dd1c1be580f03bb216fb8a
+License type (autodetected): Apache-2.0
+./vendor/github.com/OneOfOne/xxhash/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/opencontainers/go-digest
 Revision: eaa60544f31ccf3b0653b1a118b76d33418ff41b
 License type (autodetected): Apache-2.0
@@ -1991,8 +2022,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
-Version: v1.12/enh/offset-replica-id
-Revision: c292021939f5aba53b3ffc2cb09c7aadb32a42df
+Version: v1.16.0/enh/offset-replica-id
+Revision: 32b4ad5c9537ed14e471779b76713ff65420db39
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------

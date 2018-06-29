@@ -5,7 +5,7 @@ if [ -z ${DOWNLOAD_URL+x} ]; then echo "DOWNLOAD_URL is unset"; exit 1; fi
 if [ -z ${ELASTIC_VERSION+x} ]; then echo "ELASTIC_VERSION is unset"; exit 1; fi
 if [ -z ${IMAGE_FLAVOR+x} ]; then echo "IMAGE_FLAVOR is unset"; exit 1; fi
 
-url=${DOWNLOAD_URL}/kibana/kibana-oss/kibana-oss-${ELASTIC_VERSION}-linux-x86_64.tar.gz
+url=${DOWNLOAD_URL}/kibana/kibana-oss-${ELASTIC_VERSION}-linux-x86_64.tar.gz
 if [ "${IMAGE_FLAVOR}" = "x-pack" ]; then
   url=${DOWNLOAD_URL}/kibana/kibana-${ELASTIC_VERSION}-linux-x86_64.tar.gz
 fi

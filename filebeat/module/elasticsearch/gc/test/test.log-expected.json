@@ -1,0 +1,15 @@
+[
+    {
+        "@timestamp": "2018-06-11T01:53:11.382Z", 
+        "elasticsearch.gc.relative_process_timestamp_secs": "1396138.752", 
+        "elasticsearch.gc.stopping_threads_time_secs": "0.0000702", 
+        "elasticsearch.gc.threads_total_stop_time_secs": "0.0083760", 
+        "fileset.module": "elasticsearch", 
+        "fileset.name": "gc", 
+        "input.type": "log", 
+        "message": "2018-06-11T01:53:11.382+0000: 1396138.752: Total time for which application threads were stopped: 0.0083760 seconds, Stopping threads took: 0.0000702 seconds\n\n", 
+        "offset": 0, 
+        "prospector.type": "log", 
+        "service.name": "elasticsearch"
+    }
+]

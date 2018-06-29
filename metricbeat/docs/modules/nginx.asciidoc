@@ -45,7 +45,7 @@ metricbeat.modules:
   server_status_path: "server-status"
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>. It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

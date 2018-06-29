@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package main
 
 import (
@@ -10,6 +27,11 @@ import (
 type FieldsGeneratorTestCase struct {
 	patterns []string
 	fields   []*fieldYml
+}
+
+type RemoveProcessorTestCase struct {
+	processor map[string]interface{}
+	fields    []string
 }
 
 func TestFieldsGenerator(t *testing.T) {
@@ -157,5 +179,40 @@ func TestFieldsGeneratorKnownLimitations(t *testing.T) {
 
 		f := generateFields(fs, false)
 		assert.False(t, reflect.DeepEqual(f, tc.fields))
+	}
+}
+
+func TestRemoveProcessor(t *testing.T) {
+	tests := []RemoveProcessorTestCase{
+		RemoveProcessorTestCase{
+			processor: map[string]interface{}{
+				"field": []string{},
+			},
+			fields: []string{},
+		},
+		RemoveProcessorTestCase{
+			processor: map[string]interface{}{
+				"field": []interface{}{},
+			},
+			fields: []string{},
+		},
+		RemoveProcessorTestCase{
+			processor: map[string]interface{}{
+				"field": "prospector.type",
+			},
+			fields: []string{"prospector.type"},
+		},
+		RemoveProcessorTestCase{
+			processor: map[string]interface{}{
+				"field": []string{"prospector.type", "input.type"},
+			},
+			fields: []string{"prospector.type", "input.type"},
+		},
+	}
+
+	for _, tc := range tests {
+		out := []string{}
+		res := accumulateRemoveFields(tc.processor, out)
+		assert.True(t, reflect.DeepEqual(res, tc.fields))
 	}
 }

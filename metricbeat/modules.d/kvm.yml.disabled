@@ -1,8 +1,8 @@
+# Module: kvm
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/6.x/metricbeat-module-kvm.html
+
 - module: kvm
-  metricsets: ["dommemstat"]
-  enabled: false
+  #metricsets:
+  #  - dommemstat
   period: 10s
   hosts: ["localhost"]
-
-  # Timeout to connect to Libvirt server
-  #timeout: 1s

@@ -51,8 +51,6 @@ metricbeat.modules:
 - module: system
   metricsets:
     - cpu             # CPU usage
-    - filesystem      # File system usage for each mountpoint
-    - fsstat          # File system summary metrics
     - load            # CPU load averages
     - memory          # Memory usage
     - network         # Network IO
@@ -61,6 +59,8 @@ metricbeat.modules:
     - uptime          # System Uptime
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
+    #- filesystem     # File system usage for each mountpoint
+    #- fsstat         # File system summary metrics
     #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
   enabled: true
@@ -195,7 +195,12 @@ metricbeat.modules:
 
 #---------------------------- Elasticsearch Module ---------------------------
 - module: elasticsearch
-  metricsets: ["node", "node_stats"]
+  metricsets:
+    - node
+    - node_stats
+    #- index
+    #- index_summary
+    #- shard
   period: 10s
   hosts: ["localhost:9200"]
 
@@ -207,7 +212,9 @@ metricbeat.modules:
 
 #------------------------------- Golang Module -------------------------------
 - module: golang
-  metricsets: ["expvar","heap"]
+  #metricsets:
+  #  - expvar
+  #  - heap
   period: 10s
   hosts: ["localhost:6060"]
   heap.path: "/debug/vars"
@@ -248,53 +255,63 @@ metricbeat.modules:
 
 #-------------------------------- HTTP Module --------------------------------
 - module: http
-  metricsets: ["json"]
+  #metricsets:
+  #  - json
   period: 10s
   hosts: ["localhost:80"]
   namespace: "json_namespace"
   path: "/"
   #body: ""
   #method: "GET"
+  #username: "user"
+  #password: "secret"
   #request.enabled: false
   #response.enabled: false
   #json.is_array: false
   #dedot.enabled: false
 
 - module: http
-  metricsets: ["server"]
+  #metricsets:
+  #  - server
   host: "localhost"
   port: "8080"
   enabled: false
-#  paths:
-#    - path: "/foo"
-#      namespace: "foo"
-#      fields: # added to the the response in root. overwrites existing fields
-#        key: "value"
+  #paths:
+  #  - path: "/foo"
+  #    namespace: "foo"
+  #    fields: # added to the the response in root. overwrites existing fields
+  #      key: "value"
 
 #------------------------------- Jolokia Module ------------------------------
 - module: jolokia
-  metricsets: ["jmx"]
+  #metricsets: ["jmx"]
   period: 10s
   hosts: ["localhost"]
   namespace: "metrics"
+  #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+  #username: "user"
+  #password: "secret"
   jmx.mappings:
-    - mbean: 'java.lang:type=Runtime'
-      attributes:
-        - attr: Uptime
-          field: uptime
-    - mbean: 'java.lang:type=Memory'
-      attributes:
-        - attr: HeapMemoryUsage
-          field: memory.heap_usage
-        - attr: NonHeapMemoryUsage
-          field: memory.non_heap_usage
+    #- mbean: 'java.lang:type=Runtime'
+    #  attributes:
+    #    - attr: Uptime
+    #      field: uptime
+    #- mbean: 'java.lang:type=Memory'
+    #  attributes:
+    #    - attr: HeapMemoryUsage
+    #      field: memory.heap_usage
+    #    - attr: NonHeapMemoryUsage
+    #      field: memory.non_heap_usage
     # GC Metrics - this depends on what is available on your JVM
-    # - mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
-    #   attributes:
-    #     - attr: CollectionTime
-    #       field: gc.cms_collection_time
-    #     - attr: CollectionCount
-    #       field: gc.cms_collection_count
+    #- mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
+    #  attributes:
+    #    - attr: CollectionTime
+    #      field: gc.cms_collection_time
+    #    - attr: CollectionCount
+    #      field: gc.cms_collection_count
+
+  jmx.application:
+  jmx.instance:
 
 #-------------------------------- Kafka Module -------------------------------
 - module: kafka
@@ -329,7 +346,7 @@ metricbeat.modules:
   metricsets: ["status"]
   period: 10s
   hosts: ["localhost:5601"]
-  enabled: default
+  enabled: true
 
 #----------------------------- Kubernetes Module -----------------------------
 # Node metrics, from kubelet:
@@ -366,10 +383,17 @@ metricbeat.modules:
   metricsets:
     - event
 
+# Kubernetes API server
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - apiserver
+  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
 #--------------------------------- kvm Module --------------------------------
 - module: kvm
   metricsets: ["dommemstat"]
-  enabled: false
+  enabled: true
   period: 10s
   hosts: ["localhost"]
 
@@ -419,7 +443,9 @@ metricbeat.modules:
 
 #-------------------------------- MySQL Module -------------------------------
 - module: mysql
-  metricsets: ["status"]
+  metricsets:
+    - "status"
+  #  - "galera_status"
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
@@ -506,6 +532,10 @@ metricbeat.modules:
   enabled: true
   period: 10s
   hosts: ["localhost:15672"]
+
+  # Management path prefix, if `management.path_prefix` is set in RabbitMQ
+  # configuration, it has to be set to the same value.
+  #management_path_prefix: ""
 
   #username: guest
   #password: guest
@@ -735,6 +765,14 @@ metricbeat.modules:
 #       - from: "a"
 #         to: "b"
 #
+# The following example tokenizes the string into fields:
+#
+#processors:
+#- dissect:
+#    tokenizer: "%{key1} - %{key2}"
+#    field: "message"
+#    target_prefix: "dissect"
+#
 # The following example enriches each event with metadata from the cloud
 # provider about the host machine. It works on EC2, GCE, DigitalOcean,
 # Tencent Cloud, and Alibaba Cloud.
@@ -773,7 +811,13 @@ metricbeat.modules:
 #
 #processors:
 #- add_docker_metadata: ~
-#- add_host_metadata: ~
+#
+# The following example enriches each event with host metadata.
+#
+#processors:
+#- add_host_metadata:
+#   netinfo.enabled: false
+#
 
 #============================= Elastic Cloud ==================================
 
@@ -805,6 +849,9 @@ output.elasticsearch:
 
   # Set gzip compression level.
   #compression_level: 0
+
+  # Configure escaping html symbols in strings.
+  #escape_html: true
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
@@ -846,7 +893,18 @@ output.elasticsearch:
   # The default is 50.
   #bulk_max_size: 50
 
-  # Configure http request timeout before failing an request to Elasticsearch.
+  # The number of seconds to wait before trying to reconnect to Elasticsearch
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Elasticsearch after a network error. The default is 60s.
+  #backoff.max: 60s
+
+  # Configure http request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
@@ -900,6 +958,9 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 3
 
+  # Configure escaping html symbols in strings.
+  #escape_html: true
+
   # Optional maximum time to live for a connection to Logstash, after which the
   # connection will be re-established.  A value of `0s` (the default) will
   # disable this feature.
@@ -910,7 +971,7 @@ output.elasticsearch:
   # Optional load balance the events between the Logstash hosts. Default is false.
   #loadbalance: false
 
-  # Number of batches to be sent asynchronously to logstash while processing
+  # Number of batches to be sent asynchronously to Logstash while processing
   # new batches.
   #pipelining: 2
 
@@ -918,6 +979,17 @@ output.elasticsearch:
   # transaction.  The number of events to be sent increases up to `bulk_max_size`
   # if no error is encountered.
   #slow_start: false
+
+  # The number of seconds to wait before trying to reconnect to Logstash
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Logstash after a network error. The default is 60s.
+  #backoff.max: 60s
 
   # Optional index name. The default index name is set to metricbeat
   # in all lowercase.
@@ -1000,9 +1072,16 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version metricbeat is assumed to run against. Defaults to the oldest
-  # supported stable version (currently version 0.8.2.0)
-  #version: 0.8.2
+  # Kafka version metricbeat is assumed to run against. Defaults to the "1.0.0".
+  #version: '1.0.0'
+
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
 
   # Metadata update configuration. Metadata do contain leader information
   # deciding which broker to use when publishing.
@@ -1106,6 +1185,14 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
+
   # The list of Redis servers to connect to. If load balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
@@ -1207,6 +1294,14 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
+
   # Path to the directory where to save the generated files. The option is
   # mandatory.
   #path: "/tmp/metricbeat"
@@ -1234,8 +1329,13 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
-  # Pretty print json event
-  #pretty: false
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
 
 #================================= Paths ======================================
 
@@ -1332,6 +1432,15 @@ output.elasticsearch:
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
+
+# Enable json template loading. If this is enabled, the fields.yml is ignored.
+#setup.template.json.enabled: false
+
+# Path to the json template file
+#setup.template.json.path: "${path.config}/template.json"
+
+# Name under which the template is stored in Elasticsearch
+#setup.template.json.name: ""
 
 # Overwrite existing template
 #setup.template.overwrite: false
@@ -1563,3 +1672,8 @@ logging.files:
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+#============================= Process Security ================================
+
+# Enable or disable seccomp system call filtering on Linux. Default is enabled.
+#seccomp.enabled: true

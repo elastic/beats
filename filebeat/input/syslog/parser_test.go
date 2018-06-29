@@ -1,8 +1,26 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package syslog
 
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -13,6 +31,282 @@ func TestParseSyslog(t *testing.T) {
 		log    []byte
 		syslog event
 	}{
+		{
+			title: "no timezone in date",
+			log:   []byte("<190>2018-06-19 02:13:38 super mon message"),
+			syslog: event{
+				priority: 190,
+				message:  "mon message",
+				hostname: "super",
+				program:  "",
+				month:    6,
+				pid:      -1,
+				day:      19,
+				year:     2018,
+				hour:     2,
+				minute:   13,
+				second:   38,
+			},
+		},
+		{
+			title: "no timezone in date with nanoseconds",
+			log:   []byte("<190>2018-06-19 02:13:38.0004 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 4000,
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322-07:00 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.FixedZone("", int(-7*time.Hour)),
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322-0700 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.FixedZone("", int(-7*time.Hour)),
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322-0730 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.FixedZone("", int(-7*time.Hour)+int(-30*time.Minute)),
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322-07:10 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.FixedZone("", int(-7*time.Hour)+int(-10*time.Minute)),
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322-07 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.FixedZone("", int(-7*time.Hour)),
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322Z super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.UTC,
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322Z+0000 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.UTC,
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322Z+00:00 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.UTC,
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38.635322Z+00 super mon message"),
+			syslog: event{
+				priority:   190,
+				message:    "mon message",
+				hostname:   "super",
+				program:    "",
+				month:      6,
+				pid:        -1,
+				day:        19,
+				year:       2018,
+				hour:       2,
+				minute:     13,
+				second:     38,
+				nanosecond: 6353220,
+				loc:        time.UTC,
+			},
+		},
+		{
+			title: "time in ISO8601 format",
+			log:   []byte("<190>2018-06-19T02:13:38Z+00 super mon message"),
+			syslog: event{
+				priority: 190,
+				message:  "mon message",
+				hostname: "super",
+				program:  "",
+				month:    6,
+				pid:      -1,
+				day:      19,
+				year:     2018,
+				hour:     2,
+				minute:   13,
+				second:   38,
+				loc:      time.UTC,
+			},
+		},
+		{
+			title: "priority and timestamp defined as 2018-05-08T10:31:24 (rfc3339)",
+			log:   []byte("<38>2018-05-08T10:31:24 localhost prg00000[1234]: seq: 0000000000, thread: 0000, runid: 1525768284, stamp: 2018-05-08T10:31:24 PADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPAD DPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADD"),
+			syslog: event{
+				priority: 38,
+				message:  "seq: 0000000000, thread: 0000, runid: 1525768284, stamp: 2018-05-08T10:31:24 PADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPAD DPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADD",
+				hostname: "localhost",
+				program:  "prg00000",
+				pid:      1234,
+				month:    5,
+				day:      8,
+				hour:     10,
+				minute:   31,
+				second:   24,
+				year:     2016,
+			},
+		},
+		{
+			title: "timestamp defined as 2018-05-08T10:31:24 (rfc3339)",
+			log:   []byte("2016-05-08T10:31:24 localhost prg00000[1234]: seq: 0000000000, thread: 0000, runid: 1525768284"),
+			syslog: event{
+				priority: -1,
+				message:  "seq: 0000000000, thread: 0000, runid: 1525768284",
+				hostname: "localhost",
+				program:  "prg00000",
+				pid:      1234,
+				month:    5,
+				day:      8,
+				hour:     10,
+				minute:   31,
+				second:   24,
+				year:     2016,
+			},
+		},
+		{
+			title: "timestamp with nanosecond defined as 2018-05-08T10:31:24.0004 (rfc3339)",
+			log:   []byte("2016-05-08T10:31:24.0004 localhost prg00000[1234]: seq: 0000000000, thread: 0000, runid: 1525768284"),
+			syslog: event{
+				priority:   -1,
+				message:    "seq: 0000000000, thread: 0000, runid: 1525768284",
+				hostname:   "localhost",
+				program:    "prg00000",
+				pid:        1234,
+				month:      5,
+				day:        8,
+				hour:       10,
+				minute:     31,
+				second:     24,
+				year:       2016,
+				nanosecond: 4000,
+			},
+		},
 		{
 			title: "message only",
 			log:   []byte("--- last message repeated 1 time ---"),
@@ -43,6 +337,23 @@ func TestParseSyslog(t *testing.T) {
 				hour:     22,
 				minute:   14,
 				second:   15,
+			},
+		},
+		{
+			title: "time with nanosecond",
+			log:   []byte("Oct 11 22:14:15.0000005 --- last message repeated 1 time ---"),
+			syslog: event{
+				priority:   -1,
+				message:    "--- last message repeated 1 time ---",
+				hostname:   "",
+				program:    "",
+				pid:        -1,
+				month:      10,
+				day:        11,
+				hour:       22,
+				minute:     14,
+				second:     15,
+				nanosecond: 5,
 			},
 		},
 		{
@@ -89,7 +400,7 @@ func TestParseSyslog(t *testing.T) {
 				hour:       22,
 				minute:     14,
 				second:     15,
-				nanosecond: 57643,
+				nanosecond: 5764300,
 			},
 		},
 		{
@@ -243,6 +554,8 @@ func TestParseSyslog(t *testing.T) {
 			assert.Equal(t, test.syslog.Hour(), l.Hour())
 			assert.Equal(t, test.syslog.Minute(), l.Minute())
 			assert.Equal(t, test.syslog.Second(), l.Second())
+			assert.Equal(t, test.syslog.Nanosecond(), l.Nanosecond())
+			assert.Equal(t, test.syslog.loc, l.loc)
 		})
 	}
 }

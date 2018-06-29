@@ -10,7 +10,7 @@
         "wineventlog" for the Windows Event Log API or "eventlogging" for the
         Event Logging API.
 
-        The Event Logging API was designed for Windows Server 2003, Windows XP,
+        The Event Logging API was designed for Windows Server 2003
         or Windows 2000 operating systems. In Windows Vista, the event logging
         infrastructure was redesigned. On Windows Vista or later operating
         systems, the Windows Event Log API is used. Winlogbeat automatically

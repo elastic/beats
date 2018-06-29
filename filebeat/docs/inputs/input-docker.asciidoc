@@ -9,7 +9,7 @@
 
 experimental[]
 
-Use the `docker` input to read logs from Docker containers. 
+Use the `docker` input to read logs from Docker containers.
 
 This input searches for container logs under its path, and parse them into
 common message lines, extracting timestamps too. Everything happens before line
@@ -49,12 +49,19 @@ is `/var/lib/docker/containers`.
 Reads from the specified streams only: `all`, `stdout` or `stderr`. The default
 is `all`.
 
+===== `combine_partial`
+
+Enable partial messages joining. Docker `json-file` driver splits log lines larger than 16k bytes,
+end of line (`\n`) is present for common lines in the resulting file, while it's not the for the lines
+that have been split. `combine_partial` joins them back together when enabled. It is enabled by default.
+
 The following input configures {beatname_uc} to read the `stdout` stream from
 all containers under the default Docker containers path:
 
 [source,yaml]
 ----
 - type: docker
+  combine_partial: true
   containers:
     path: "/var/lib/docker/containers"
     stream: "stdout"

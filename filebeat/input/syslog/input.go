@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package syslog
 
 import (
@@ -88,7 +105,7 @@ type Input struct {
 // NewInput creates a new syslog input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Factory,
+	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	cfgwarn.Experimental("Syslog input type is used")
@@ -109,11 +126,27 @@ func NewInput(
 	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
 		ev := newEvent()
 		Parse(data, ev)
+		var d *util.Data
 		if !ev.IsValid() {
 			log.Errorw("can't not parse event as syslog rfc3164", "message", string(data))
+			// On error revert to the raw bytes content, we need a better way to communicate this kind of
+			// error upstream this should be a global effort.
+			d = &util.Data{
+				Event: beat.Event{
+					Timestamp: time.Now(),
+					Meta: common.MapStr{
+						"truncated": metadata.Truncated,
+					},
+					Fields: common.MapStr{
+						"message": string(data),
+					},
+				},
+			}
+		} else {
+			event := createEvent(ev, metadata, time.Local, log)
+			d = &util.Data{Event: *event}
 		}
-		event := createEvent(ev, metadata, time.Local, log)
-		d := &util.Data{Event: *event}
+
 		forwarder.Send(d)
 	}
 

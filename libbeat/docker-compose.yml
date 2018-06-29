@@ -40,7 +40,7 @@ services:
       kibana:        { condition: service_healthy }
     healthcheck:
       interval: 1s
-      retries: 600
+      retries: 1200
 
   elasticsearch:
     extends:

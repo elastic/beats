@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package mb
 
 import (
@@ -6,8 +23,10 @@ import (
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+	"github.com/satori/go.uuid"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 var (
@@ -156,10 +175,21 @@ func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 	for _, name := range metricSetNames {
 		name = strings.ToLower(name)
 		for _, host := range hosts {
+			id := uuid.NewV4().String()
+			metrics := monitoring.NewRegistry()
+			monitoring.NewString(metrics, "module").Set(m.Name())
+			monitoring.NewString(metrics, "metricset").Set(name)
+			if host != "" {
+				monitoring.NewString(metrics, "host").Set(host)
+			}
+			monitoring.NewString(metrics, "id").Set(id)
+
 			metricsets = append(metricsets, BaseMetricSet{
-				name:   name,
-				module: m,
-				host:   host,
+				id:      id,
+				name:    name,
+				module:  m,
+				host:    host,
+				metrics: metrics,
 			})
 		}
 	}

@@ -1,0 +1,14 @@
+[
+    {
+        "@timestamp": "2018-05-17T08:29:12,177", 
+        "elasticsearch.server.component": "o.e.c.m.MetaDataCreateIndexService", 
+        "fileset.module": "elasticsearch", 
+        "fileset.name": "server", 
+        "input.type": "log", 
+        "log.level": "INFO", 
+        "message": " [vWNJsZ3] [test-filebeat-modules] creating index, cause [auto(bulk api)], templates [test-filebeat-modules], shards [5]/[1], mappings [doc]", 
+        "offset": 0, 
+        "prospector.type": "log", 
+        "service.name": "elasticsearch"
+    }
+]

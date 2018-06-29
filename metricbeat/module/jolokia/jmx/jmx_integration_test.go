@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build integration
 
 package jmx
@@ -29,6 +46,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "jolokia")
+
 	for _, config := range getConfigs() {
 		f := mbtest.NewEventsFetcher(t, config)
 		err := mbtest.WriteEvents(f, t)
@@ -100,6 +119,34 @@ func getConfigs() []map[string]interface{} {
 							"attr":  "port",
 							"field": "port",
 						},
+					},
+				},
+				{
+					"mbean": "Catalina:type=Server",
+					"attributes": []map[string]string{
+						{
+							"attr":  "serverNumber",
+							"field": "server_number_dosntconnect",
+						},
+					},
+					"target": &TargetBlock{
+						URL:      "service:jmx:rmi:///jndi/rmi://localhost:7091/jmxrmi",
+						User:     "monitorRole",
+						Password: "IGNORE",
+					},
+				},
+				{
+					"mbean": "Catalina:type=Server",
+					"attributes": []map[string]string{
+						{
+							"attr":  "serverInfo",
+							"field": "server_info_proxy",
+						},
+					},
+					"target": &TargetBlock{
+						URL:      "service:jmx:rmi:///jndi/rmi://localhost:7091/jmxrmi",
+						User:     "monitorRole",
+						Password: "QED",
 					},
 				},
 			},

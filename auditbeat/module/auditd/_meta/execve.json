@@ -40,8 +40,8 @@
         "session": "11",
         "summary": {
             "actor": {
-                "primary": "1001",
-                "secondary": "1001"
+                "primary": "ubuntu",
+                "secondary": "ubuntu"
             },
             "how": "/bin/uname",
             "object": {
@@ -88,6 +88,13 @@
         "fsgid": "1002",
         "fsuid": "1001",
         "gid": "1002",
+        "name_map": {
+            "auid": "ubuntu",
+            "euid": "ubuntu",
+            "fsuid": "ubuntu",
+            "suid": "ubuntu",
+            "uid": "ubuntu"
+        },
         "sgid": "1002",
         "suid": "1001",
         "uid": "1001"

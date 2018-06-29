@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package auditd
 
 import (
@@ -33,6 +50,12 @@ type Config struct {
 	ReassemblerMaxInFlight uint32        `config:"reassembler.max_in_flight"`
 	ReassemblerTimeout     time.Duration `config:"reassembler.timeout"`
 	StreamBufferQueueSize  uint32        `config:"reassembler.queue_size"`
+	// BackpressureStrategy defines the strategy used to mitigate backpressure
+	// propagating to the kernel causing audited processes to block until
+	// Auditbeat can keep-up.
+	// One of "user-space", "kernel", "both", "none", "auto" (default)
+	BackpressureStrategy  string `config:"backpressure_strategy"`
+	StreamBufferConsumers int    `config:"stream_buffer_consumers"`
 }
 
 type auditRule struct {
@@ -129,5 +152,6 @@ var defaultConfig = Config{
 	Warnings:               false,
 	ReassemblerMaxInFlight: 50,
 	ReassemblerTimeout:     2 * time.Second,
-	StreamBufferQueueSize:  64,
+	StreamBufferQueueSize:  8192,
+	StreamBufferConsumers:  0,
 }

@@ -68,7 +68,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Runner stopped:"),
+            lambda: self.log_contains("Stopping runner:"),
             max_timeout=15)
 
         with open(logfile, 'a') as f:
@@ -114,7 +114,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Runner stopped:"),
+            lambda: self.log_contains("Stopping runner:"),
             max_timeout=15)
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
@@ -177,7 +177,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Runner stopped:"),
+            lambda: self.log_contains("Stopping runner:"),
             max_timeout=15)
 
         # Update both log files, only 1 change should be picke dup
@@ -285,7 +285,7 @@ class Test(BaseTest):
 
         # Wait until old runner is stopped
         self.wait_until(
-            lambda: self.log_contains("Runner stopped:"),
+            lambda: self.log_contains("Stopping runner:"),
             max_timeout=15)
 
         # Add new log line and see if it is picked up = new input is running
@@ -325,7 +325,7 @@ class Test(BaseTest):
             f.write(inputConfigTemplate.format(self.working_dir + "/logs/test2.log"))
 
         self.wait_until(
-            lambda: self.log_contains_count("New runner started") == 2,
+            lambda: self.log_contains_count("Starting runner:") == 2,
             max_timeout=15)
 
         # Add new log line and see if it is picked up = new input is running

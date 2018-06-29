@@ -1,18 +1,7 @@
 [[heartbeat-getting-started]]
 == Getting Started With Heartbeat
 
-To get started with your own Heartbeat setup, install and configure these
-related products:
-
- * Elasticsearch for storage and indexing the data.
- * Kibana for the UI.
- * Logstash (optional) for inserting data into Elasticsearch.
-
-See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack]
-for more information.
-
-After installing the Elastic Stack, read the following topics to learn how to
-install, configure, and run Heartbeat:
+include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
 
 * <<heartbeat-installation>>
 * <<heartbeat-configuration>>
@@ -130,8 +119,7 @@ https://www.elastic.co/downloads/beats/heartbeat[downloads page].
 . Rename the +heartbeat-<version>-windows+ directory to +Heartbeat+.
 
 . Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
-and select *Run As Administrator*). If you are running Windows XP, you may need
-to download and install PowerShell.
+and select *Run As Administrator*).
 
 . From the PowerShell prompt, run the following commands to install Heartbeat as
 a Windows service:

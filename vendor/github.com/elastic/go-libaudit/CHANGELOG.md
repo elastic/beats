@@ -2,6 +2,48 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+
+## [0.3.0]
+
+### Added
+
+- Added support for setting the kernel's backlog wait time via the new
+  SetBacklogWaitTime function. #34
+- New method `GetStatusAsync` to perform asynchronous status checks. #37
+
+### Changed
+
+- AuditClient `Close()` is now safe to call more than once. #35
+
+### Deprecated
+
+### Removed
+
+## [0.2.1]
+
+### Added
+
+- Added better error messages for when `NewAuditClient` fails due to the
+  Linux kernel not supporting auditing (CONFIG_AUDIT=n). #32
+
+## [0.2.0]
+
+### Changed
+
+- auparse - Fixed parsing of apparmor AVC messages. #25
+- auparse - Update syscall and audit message type tables for Linux 4.16.
+- aucoalesce - Cache UID/GID values for one minute. #24
+
 ## [0.1.1]
 
 - rules - Detect s390 or s390x as the runtime architecture (GOOS) and

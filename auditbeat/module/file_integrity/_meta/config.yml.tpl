@@ -58,7 +58,7 @@
 
   # Hash types to compute when the file changes. Supported types are
   # blake2b_256, blake2b_384, blake2b_512, md5, sha1, sha224, sha256, sha384,
-  # sha512, sha512_224, sha512_256, sha3_224, sha3_256, sha3_384 and sha3_512.
+  # sha512, sha512_224, sha512_256, sha3_224, sha3_256, sha3_384, sha3_512, and xxh64.
   # Default is sha1.
   hash_types: [sha1]
 

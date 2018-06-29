@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package compose
 
 import (
@@ -37,9 +54,9 @@ type serviceInfo struct {
 var oldRegexp = regexp.MustCompile("minute")
 
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
-// with a default timeout of 60 seconds
+// with a default timeout of 300 seconds
 func EnsureUp(t *testing.T, services ...string) {
-	EnsureUpWithTimeout(t, 60, services...)
+	EnsureUpWithTimeout(t, 300, services...)
 }
 
 // EnsureUpWithTimeout starts all the requested services (must be defined in docker-compose.yml)
@@ -57,7 +74,10 @@ func EnsureUpWithTimeout(t *testing.T, timeout int, services ...string) {
 	}
 
 	// Kill no longer used containers
-	compose.KillOld(services)
+	err = compose.KillOld(services)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	for _, service := range services {
 		err = compose.Start(service)
@@ -125,16 +145,22 @@ func (c *composeProject) Wait(seconds int, services ...string) error {
 	return nil
 }
 
-func (c *composeProject) Kill(service string) {
+func (c *composeProject) Kill(service string) error {
 	c.Lock()
 	defer c.Unlock()
 
-	c.p.Kill(context.Background(), "KILL", service)
+	return c.p.Kill(context.Background(), "KILL", service)
 }
 
 func (c *composeProject) KillOld(except []string) error {
-	// Do not kill ourselves or elasticsearch :)
-	except = append(except, "beat", "elasticsearch")
+	// Do not kill ourselves ;)
+	except = append(except, "beat")
+
+	// These services take very long to start up and stop. If they are stopped
+	// it can happen that an other package tries to start them at the same time
+	// which leads to a conflict. We need a better solution long term but that should
+	// solve the problem for now.
+	except = append(except, "elasticsearch", "kibana", "logstash")
 
 	servicesStatus, err := c.getServices()
 	if err != nil {
@@ -148,7 +174,10 @@ func (c *composeProject) KillOld(except []string) error {
 		}
 
 		if s.Old {
-			c.Kill(s.Name)
+			err = c.Kill(s.Name)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

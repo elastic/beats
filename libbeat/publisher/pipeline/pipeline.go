@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // Package pipeline combines all publisher functionality (processors, queue,
 // outputs) to create instances of complete publisher pipelines, beats can
 // connect to publish events to.
@@ -62,9 +79,9 @@ type pipelineProcessors struct {
 	// The pipeline its processor settings for
 	// constructing the clients complete processor
 	// pipeline on connect.
-	beatsMeta common.MapStr
-	fields    common.MapStr
-	tags      []string
+	builtinMeta common.MapStr
+	fields      common.MapStr
+	tags        []string
 
 	processors beat.Processor
 
@@ -91,8 +108,8 @@ type Settings struct {
 // processors, so all processors configured with the pipeline or client will see
 // the same/complete event.
 type Annotations struct {
-	Beat  common.MapStr
-	Event common.EventMetadata
+	Event   common.EventMetadata
+	Builtin common.MapStr
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -401,8 +418,8 @@ func makePipelineProcessors(
 		p.processors = tmp
 	}
 
-	if meta := annotations.Beat; meta != nil {
-		p.beatsMeta = common.MapStr{"beat": meta}
+	if meta := annotations.Builtin; meta != nil {
+		p.builtinMeta = meta
 	}
 
 	if em := annotations.Event; len(em.Fields) > 0 {

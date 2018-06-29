@@ -1864,6 +1864,16 @@ The document type. Always set to "doc".
 
 --
 
+*`service.name`*::
++
+--
+example: elasticsearch
+
+Name of the service metricbeat fetches the data from.
+
+
+--
+
 [[exported-fields-couchbase]]
 == Couchbase fields
 
@@ -3188,7 +3198,7 @@ Network interface name.
 [float]
 == in fields
 
-Incoming network stats.
+Incoming network stats per second.
 
 
 
@@ -3237,7 +3247,7 @@ Total number of incoming packets.
 [float]
 == out fields
 
-Outgoing network stats.
+Outgoing network stats per second.
 
 
 
@@ -3283,6 +3293,104 @@ Total number of outgoing packets.
 
 --
 
+[float]
+== inbound fields
+
+Incoming network stats since the container started.
+
+
+
+*`docker.network.inbound.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of incoming bytes.
+
+
+--
+
+*`docker.network.inbound.dropped`*::
++
+--
+type: long
+
+Total number of dropped incoming packets.
+
+
+--
+
+*`docker.network.inbound.errors`*::
++
+--
+type: long
+
+Total errors on incoming packets.
+
+
+--
+
+*`docker.network.inbound.packets`*::
++
+--
+type: long
+
+Total number of incoming packets.
+
+
+--
+
+[float]
+== outbound fields
+
+Outgoing network stats since the container started.
+
+
+
+*`docker.network.outbound.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of outgoing bytes.
+
+
+--
+
+*`docker.network.outbound.dropped`*::
++
+--
+type: long
+
+Total number of dropped outgoing packets.
+
+
+--
+
+*`docker.network.outbound.errors`*::
++
+--
+type: long
+
+Total errors on outgoing packets.
+
+
+--
+
+*`docker.network.outbound.packets`*::
++
+--
+type: long
+
+Total number of outgoing packets.
+
+
+--
+
 [[exported-fields-dropwizard]]
 == Dropwizard fields
 
@@ -3315,6 +3423,215 @@ Elasticsearch module
 type: keyword
 
 Elasticsearch cluster name.
+
+
+--
+
+*`elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+Elasticsearch cluster id.
+
+
+--
+
+*`elasticsearch.cluster.state.id`*::
++
+--
+type: keyword
+
+Elasticsearch state id.
+
+
+--
+
+[float]
+== index fields
+
+index
+
+
+
+*`elasticsearch.index.name`*::
++
+--
+type: keyword
+
+Index name.
+
+
+--
+
+
+*`elasticsearch.index.total.docs.count`*::
++
+--
+type: long
+
+Total number of documents in the index.
+
+
+--
+
+*`elasticsearch.index.total.docs.deleted`*::
++
+--
+type: long
+
+Total number of deleted documents in the index.
+
+
+--
+
+*`elasticsearch.index.total.store.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total size of the index in bytes.
+
+
+--
+
+*`elasticsearch.index.total.segments.count`*::
++
+--
+type: long
+
+Total number of index segments.
+
+
+--
+
+*`elasticsearch.index.total.segments.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of memory used by the segments in bytes.
+
+
+--
+
+[float]
+== index.summary fields
+
+index
+
+
+
+
+*`elasticsearch.index.summary.primaries.docs.count`*::
++
+--
+type: long
+
+Total number of documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.docs.deleted`*::
++
+--
+type: long
+
+Total number of deleted documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.store.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total size of the index in bytes.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.segments.count`*::
++
+--
+type: long
+
+Total number of index segments.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.segments.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of memory used by the segments in bytes.
+
+
+--
+
+
+*`elasticsearch.index.summary.total.docs.count`*::
++
+--
+type: long
+
+Total number of documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.total.docs.deleted`*::
++
+--
+type: long
+
+Total number of deleted documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.total.store.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total size of the index in bytes.
+
+
+--
+
+*`elasticsearch.index.summary.total.segments.count`*::
++
+--
+type: long
+
+Total number of index segments.
+
+
+--
+
+*`elasticsearch.index.summary.total.segments.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of memory used by the segments in bytes.
 
 
 --
@@ -3740,6 +4057,90 @@ type: long
 
 format: bytes
 
+
+
+--
+
+[float]
+== cluster.pending_task fields
+
+`cluster.pending_task` contains a pending task description.
+
+
+
+*`elasticsearch.cluster.pending_task.insert_order`*::
++
+--
+type: long
+
+Insert order
+
+
+--
+
+*`elasticsearch.cluster.pending_task.priority`*::
++
+--
+type: long
+
+Priority
+
+
+--
+
+*`elasticsearch.cluster.pending_task.source`*::
++
+--
+type: keyword
+
+Source. For example: put-mapping
+
+
+--
+
+*`elasticsearch.cluster.pending_task.time_in_queue.ms`*::
++
+--
+type: long
+
+Time in queue
+
+
+--
+
+[float]
+== shard fields
+
+shard fields
+
+
+
+*`elasticsearch.shard.primary`*::
++
+--
+type: boolean
+
+True if this is the primary shard.
+
+
+--
+
+*`elasticsearch.shard.number`*::
++
+--
+type: long
+
+The number of this shard.
+
+
+--
+
+*`elasticsearch.shard.state`*::
++
+--
+type: keyword
+
+The state of this shard.
 
 
 --
@@ -5678,6 +6079,26 @@ OS family (e.g. redhat, debian, freebsd, windows).
 
 --
 
+*`host.ip`*::
++
+--
+type: ip
+
+List of IP-addresses.
+
+
+--
+
+*`host.mac`*::
++
+--
+type: keyword
+
+List of hardware-addresses, usually MAC-addresses.
+
+
+--
+
 [[exported-fields-http]]
 == HTTP fields
 
@@ -6096,6 +6517,270 @@ Kibana module
 
 
 [float]
+== stats fields
+
+Kibana stats and run-time metrics.
+
+
+
+*`kibana.stats.cluster_uuid`*::
++
+--
+type: keyword
+
+UUID of the Elasticsearch cluster to which Kibana connects.
+
+
+--
+
+*`kibana.stats.name`*::
++
+--
+type: keyword
+
+Kibana instance name.
+
+
+--
+
+*`kibana.stats.uuid`*::
++
+--
+type: keyword
+
+Kibana instance uuid.
+
+
+--
+
+*`kibana.stats.version.number`*::
++
+--
+type: keyword
+
+Kibana version number.
+
+
+--
+
+*`kibana.stats.status.overall.state`*::
++
+--
+type: keyword
+
+Kibana overall state.
+
+
+--
+
+[float]
+== process fields
+
+Kibana process metrics.
+
+
+
+[float]
+== mem fields
+
+Memory usage metrics of the Kibana instance.
+
+
+
+*`kibana.stats.process.mem.heap.max.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total amount of heap memory used by V8.
+
+
+--
+
+*`kibana.stats.process.mem.heap.used.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Amount of memory in use by V8.
+
+
+--
+
+*`kibana.stats.process.mem.resident_set_size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The amount of space occupied in main memory for the process. Includes heap, code segment, and stack.
+
+
+--
+
+*`kibana.stats.process.mem.external.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Memory usage of C++ objects bound to JavaScript objects managed by V8.
+
+
+--
+
+*`kibana.stats.process.pid`*::
++
+--
+type: long
+
+Process ID of the Kibana instance.
+
+
+--
+
+*`kibana.stats.process.uptime.ms`*::
++
+--
+type: long
+
+Amount of time that the Kibana process has been running in milliseconds.
+
+
+--
+
+[float]
+== response_times fields
+
+HTTP Server response time metrics
+
+
+
+*`kibana.stats.response_times.avg.ms`*::
++
+--
+type: long
+
+Accumulated averages for response times, for all responses in a 5-second time window.
+
+
+--
+
+*`kibana.stats.response_times.max.ms`*::
++
+--
+type: long
+
+Accumulated maximums for response times, for all responses in a 5-second time window.
+
+
+--
+
+[float]
+== requests fields
+
+HTTP Server request metrics
+
+
+
+*`kibana.stats.requests.status_codes`*::
++
+--
+type: object
+
+Key-value pairs for each status code sent by the server, and the number of times it sent that code.
+
+
+--
+
+*`kibana.stats.requests.total`*::
++
+--
+type: long
+
+Total number of requests sent by the server.
+
+
+--
+
+*`kibana.stats.requests.disconnects`*::
++
+--
+type: long
+
+Total number of client disconnects encountered by the server.
+
+
+--
+
+*`kibana.stats.concurrent_connections`*::
++
+--
+type: long
+
+Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request mulitple server assets at once, and they can re-use established connections.
+
+
+--
+
+[float]
+== sockets fields
+
+HTTP Web Sockets metrics
+
+
+
+[float]
+== http fields
+
+Web Sockets over plaintext HTTP
+
+
+
+*`kibana.stats.sockets.http.total`*::
++
+--
+type: long
+
+Number of HTTP web socket connections established
+
+
+--
+
+[float]
+== https fields
+
+Web Sockets over encrypted HTTPS
+
+
+
+*`kibana.stats.sockets.https.total`*::
++
+--
+type: long
+
+Number of HTTPS web socket connections established
+
+
+--
+
+*`kibana.stats.event_loop_delay`*::
++
+--
+type: long
+
+Node event loop delay calculated with internal benchmarking.
+
+
+--
+
+[float]
 == status fields
 
 Status fields
@@ -6204,6 +6889,16 @@ Kubernetes pod name
 
 --
 
+*`kubernetes.pod.uid`*::
++
+--
+type: keyword
+
+Kubernetes pod uid
+
+
+--
+
 *`kubernetes.namespace`*::
 +
 --
@@ -6277,6 +6972,103 @@ Kubernetes metrics
 Information and statistics of pods managed by kubernetes.
 
 
+
+[float]
+== apiserver fields
+
+Kubernetes API server metrics
+
+
+
+*`kubernetes.apiserver.request.client`*::
++
+--
+type: keyword
+
+Client doing the requests
+
+
+--
+
+*`kubernetes.apiserver.request.resource`*::
++
+--
+type: keyword
+
+Requested resource
+
+
+--
+
+*`kubernetes.apiserver.request.subresource`*::
++
+--
+type: keyword
+
+Requested subresource
+
+
+--
+
+*`kubernetes.apiserver.request.scope`*::
++
+--
+type: keyword
+
+Request scope (cluster, namespace, resource)
+
+
+--
+
+*`kubernetes.apiserver.request.verb`*::
++
+--
+type: keyword
+
+Request HTTP verb
+
+
+--
+
+*`kubernetes.apiserver.request.count`*::
++
+--
+type: long
+
+Total number of requests
+
+
+--
+
+*`kubernetes.apiserver.request.latency.sum`*::
++
+--
+type: long
+
+Requests latency, sum of latencies in microseconds
+
+
+--
+
+*`kubernetes.apiserver.request.latency.count`*::
++
+--
+type: long
+
+Request latency, number of requests
+
+
+--
+
+*`kubernetes.apiserver.request.latency.bucket`*::
++
+--
+type: object
+
+Request latency histagram buckets
+
+
+--
 
 [float]
 == container fields
@@ -7214,6 +8006,36 @@ Container restarts count
 
 --
 
+*`kubernetes.container.status.reason`*::
++
+--
+type: keyword
+
+Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or termination (Completed, ContainerCannotRun, Error, OOMKilled) reason.
+
+
+--
+
+
+*`kubernetes.container.cpu.limit.cores`*::
++
+--
+type: long
+
+Container CPU cores limit
+
+
+--
+
+*`kubernetes.container.cpu.request.cores`*::
++
+--
+type: long
+
+Container CPU requested cores
+
+
+--
 
 *`kubernetes.container.cpu.limit.nanocores`*::
 +
@@ -9415,6 +10237,500 @@ MySQL server status metrics collected from MySQL.
 
 
 [float]
+== galera_status fields
+
+`galera_status` contains the metrics that were obtained by the status SQL query on Galera.
+
+
+
+[float]
+== apply fields
+
+Apply status fields.
+
+
+
+*`mysql.galera_status.apply.oooe`*::
++
+--
+type: double
+
+How often applier started write-set applying out-of-order (parallelization efficiency).
+
+
+--
+
+*`mysql.galera_status.apply.oool`*::
++
+--
+type: double
+
+How often write-set was so slow to apply that write-set with higher seqno's were applied earlier. Values closer to 0 refer to a greater gap between slow and fast write-sets.
+
+
+--
+
+*`mysql.galera_status.apply.window`*::
++
+--
+type: double
+
+Average distance between highest and lowest concurrently applied seqno.
+
+
+--
+
+[float]
+== cert fields
+
+Certification status fields.
+
+
+
+*`mysql.galera_status.cert.deps_distance`*::
++
+--
+type: double
+
+Average distance between highest and lowest seqno value that can be possibly applied in parallel (potential degree of parallelization).
+
+
+--
+
+*`mysql.galera_status.cert.index_size`*::
++
+--
+type: long
+
+The number of entries in the certification index.
+
+
+--
+
+*`mysql.galera_status.cert.interval`*::
++
+--
+type: double
+
+Average number of transactions received while a transaction replicates.
+
+
+--
+
+[float]
+== cluster fields
+
+Cluster status fields.
+
+
+
+*`mysql.galera_status.cluster.conf_id`*::
++
+--
+type: long
+
+Total number of cluster membership changes happened.
+
+
+--
+
+*`mysql.galera_status.cluster.size`*::
++
+--
+type: long
+
+Current number of members in the cluster.
+
+
+--
+
+*`mysql.galera_status.cluster.status`*::
++
+--
+type: keyword
+
+Status of this cluster component. That is, whether the node is part of a PRIMARY or NON_PRIMARY component.
+
+
+--
+
+[float]
+== commit fields
+
+Commit status fields.
+
+
+
+*`mysql.galera_status.commit.oooe`*::
++
+--
+type: double
+
+How often a transaction was committed out of order.
+
+
+--
+
+*`mysql.galera_status.commit.window`*::
++
+--
+type: long
+
+Average distance between highest and lowest concurrently committed seqno.
+
+
+--
+
+*`mysql.galera_status.connected`*::
++
+--
+type: keyword
+
+If the value is OFF, the node has not yet connected to any of the cluster components. This may be due to misconfiguration. Check the error log for proper diagnostics.
+
+
+--
+
+[float]
+== evs fields
+
+Evs Fields.
+
+
+
+*`mysql.galera_status.evs.evict`*::
++
+--
+type: keyword
+
+Lists the UUID's of all nodes evicted from the cluster. Evicted nodes cannot rejoin the cluster until you restart their mysqld processes.
+
+
+--
+
+*`mysql.galera_status.evs.state`*::
++
+--
+type: keyword
+
+Shows the internal state of the EVS Protocol.
+
+
+--
+
+[float]
+== flow_ctl fields
+
+Flow Control fields.
+
+
+
+*`mysql.galera_status.flow_ctl.paused`*::
++
+--
+type: double
+
+The fraction of time since the last FLUSH STATUS command that replication was paused due to flow control. In other words, how much the slave lag is slowing down the cluster.
+
+
+--
+
+*`mysql.galera_status.flow_ctl.paused_ns`*::
++
+--
+type: long
+
+The total time spent in a paused state measured in nanoseconds.
+
+
+--
+
+*`mysql.galera_status.flow_ctl.recv`*::
++
+--
+type: long
+
+Returns the number of FC_PAUSE events the node has received, including those the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
+
+
+--
+
+*`mysql.galera_status.flow_ctl.sent`*::
++
+--
+type: long
+
+Returns the number of FC_PAUSE events the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
+
+
+--
+
+*`mysql.galera_status.last_committed`*::
++
+--
+type: long
+
+The sequence number, or seqno, of the last committed transaction.
+
+
+--
+
+[float]
+== local fields
+
+Node specific Cluster status fields.
+
+
+
+*`mysql.galera_status.local.bf_aborts`*::
++
+--
+type: long
+
+Total number of local transactions that were aborted by slave transactions while in execution.
+
+
+--
+
+*`mysql.galera_status.local.cert_failures`*::
++
+--
+type: long
+
+Total number of local transactions that failed certification test.
+
+
+--
+
+*`mysql.galera_status.local.commits`*::
++
+--
+type: long
+
+Total number of local transactions committed.
+
+
+--
+
+[float]
+== recv fields
+
+Node specific recv fields.
+
+
+
+*`mysql.galera_status.local.recv.queue`*::
++
+--
+type: long
+
+Current (instantaneous) length of the recv queue.
+
+
+--
+
+*`mysql.galera_status.local.recv.queue_avg`*::
++
+--
+type: double
+
+Recv queue length averaged over interval since the last FLUSH STATUS command. Values considerably larger than 0.0 mean that the node cannot apply write-sets as fast as they are received and will generate a lot of replication throttling.
+
+
+--
+
+*`mysql.galera_status.local.recv.queue_max`*::
++
+--
+type: long
+
+The maximum length of the recv queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.recv.queue_min`*::
++
+--
+type: long
+
+The minimum length of the recv queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.replays`*::
++
+--
+type: long
+
+Total number of transaction replays due to asymmetric lock granularity.
+
+
+--
+
+[float]
+== send fields
+
+Node specific sent fields.
+
+
+
+*`mysql.galera_status.local.send.queue`*::
++
+--
+type: long
+
+Current (instantaneous) length of the send queue.
+
+
+--
+
+*`mysql.galera_status.local.send.queue_avg`*::
++
+--
+type: double
+
+Send queue length averaged over time since the last FLUSH STATUS command. Values considerably larger than 0.0 indicate replication throttling or network throughput issue.
+
+
+--
+
+*`mysql.galera_status.local.send.queue_max`*::
++
+--
+type: long
+
+The maximum length of the send queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.send.queue_min`*::
++
+--
+type: long
+
+The minimum length of the send queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.state`*::
++
+--
+type: keyword
+
+Internal Galera Cluster FSM state number.
+
+
+--
+
+*`mysql.galera_status.ready`*::
++
+--
+type: keyword
+
+Whether the server is ready to accept queries.
+
+
+--
+
+[float]
+== received fields
+
+Write-Set receive status fields.
+
+
+
+*`mysql.galera_status.received.count`*::
++
+--
+type: long
+
+Total number of write-sets received from other nodes.
+
+
+--
+
+*`mysql.galera_status.received.bytes`*::
++
+--
+type: long
+
+Total size of write-sets received from other nodes.
+
+
+--
+
+[float]
+== repl fields
+
+Replication status fields.
+
+
+
+*`mysql.galera_status.repl.data_bytes`*::
++
+--
+type: long
+
+Total size of data replicated.
+
+
+--
+
+*`mysql.galera_status.repl.keys`*::
++
+--
+type: long
+
+Total number of keys replicated.
+
+
+--
+
+*`mysql.galera_status.repl.keys_bytes`*::
++
+--
+type: long
+
+Total size of keys replicated.
+
+
+--
+
+*`mysql.galera_status.repl.other_bytes`*::
++
+--
+type: long
+
+Total size of other bits replicated.
+
+
+--
+
+*`mysql.galera_status.repl.count`*::
++
+--
+type: long
+
+Total number of write-sets replicated (sent to other nodes).
+
+
+--
+
+*`mysql.galera_status.repl.bytes`*::
++
+--
+type: long
+
+Total size of write-sets replicated.
+
+
+--
+
+[float]
 == status fields
 
 `status` contains the metrics that were obtained by the status SQL query.
@@ -10523,6 +11839,221 @@ Time at which these statistics were last reset.
 
 --
 
+[float]
+== statement fields
+
+One document per query per user per database, showing information related invocation of that query, such as cpu usage and total time. Collected by querying pg_stat_statements.
+
+
+
+*`postgresql.statement.user.id`*::
++
+--
+type: long
+
+OID of the user logged into the backend that ran the query.
+
+
+--
+
+*`postgresql.statement.database.oid`*::
++
+--
+type: long
+
+OID of the database the query was run on.
+
+
+--
+
+*`postgresql.statement.query.id`*::
++
+--
+type: long
+
+ID of the statement.
+
+
+--
+
+*`postgresql.statement.query.text`*::
++
+--
+Query text
+
+
+--
+
+*`postgresql.statement.query.calls`*::
++
+--
+type: long
+
+Number of times the query has been run.
+
+
+--
+
+*`postgresql.statement.query.rows`*::
++
+--
+type: long
+
+Total number of rows returned by query.
+
+
+--
+
+*`postgresql.statement.time.total`*::
++
+--
+type: long
+
+Total number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.min`*::
++
+--
+type: long
+
+Minimum number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.max`*::
++
+--
+type: long
+
+Maximum number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.mean`*::
++
+--
+type: long
+
+Mean number of milliseconds spent running query.
+
+
+--
+
+*`postgresql.statement.time.stddev`*::
++
+--
+type: long
+
+Population standard deviation of time spent running query, in milliseconds.
+
+
+--
+
+*`postgresql.statement.memory.shared.hit`*::
++
+--
+type: long
+
+Total number of shared block cache hits by the query.
+
+
+--
+
+*`postgresql.statement.memory.shared.read`*::
++
+--
+type: long
+
+Total number of shared block cache read by the query.
+
+
+--
+
+*`postgresql.statement.memory.shared.dirtied`*::
++
+--
+type: long
+
+Total number of shared block cache dirtied by the query.
+
+
+--
+
+*`postgresql.statement.memory.shared.written`*::
++
+--
+type: long
+
+Total number of shared block cache written by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.hit`*::
++
+--
+type: long
+
+Total number of local block cache hits by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.read`*::
++
+--
+type: long
+
+Total number of local block cache read by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.dirtied`*::
++
+--
+type: long
+
+Total number of local block cache dirtied by the query.
+
+
+--
+
+*`postgresql.statement.memory.local.written`*::
++
+--
+type: long
+
+Total number of local block cache written by the query.
+
+
+--
+
+*`postgresql.statement.memory.temp.read`*::
++
+--
+type: long
+
+Total number of temp block cache read by the query.
+
+
+--
+
+*`postgresql.statement.memory.temp.written`*::
++
+--
+type: long
+
+Total number of temp block cache written by the query.
+
+
+--
+
 [[exported-fields-prometheus]]
 == Prometheus fields
 
@@ -10778,6 +12309,113 @@ Number of octets sent on the connection.
 type: long
 
 Number of octets received on the connection.
+
+
+--
+
+[float]
+== exchange fields
+
+exchange
+
+
+
+*`rabbitmq.exchange.name`*::
++
+--
+type: keyword
+
+The name of the queue with non-ASCII characters escaped as in C.
+
+
+--
+
+*`rabbitmq.exchange.vhost`*::
++
+--
+type: keyword
+
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+--
+
+*`rabbitmq.exchange.durable`*::
++
+--
+type: boolean
+
+Whether or not the queue survives server restarts.
+
+
+--
+
+*`rabbitmq.exchange.auto_delete`*::
++
+--
+type: boolean
+
+Whether the queue will be deleted automatically when no longer used.
+
+
+--
+
+*`rabbitmq.exchange.internal`*::
++
+--
+type: boolean
+
+Whether the exchange is internal, i.e. cannot be directly published to by a client.
+
+
+--
+
+*`rabbitmq.exchange.user`*::
++
+--
+type: keyword
+
+User who created the exchange.
+
+
+--
+
+*`rabbitmq.exchange.messages.publish_in.count`*::
++
+--
+type: long
+
+Count of messages published "in" to an exchange, i.e. not taking account of routing.
+
+
+--
+
+*`rabbitmq.exchange.messages.publish_in.details.rate`*::
++
+--
+type: float
+
+How much the exchange publish-in count has changed per second in the most recent sampling interval.
+
+
+--
+
+*`rabbitmq.exchange.messages.publish_out.count`*::
++
+--
+type: long
+
+Count of messages published "out" of an exchange, i.e. taking account of routing.
+
+
+--
+
+*`rabbitmq.exchange.messages.publish_out.details.rate`*::
++
+--
+type: float
+
+How much the exchange publish-out count has changed per second in the most recent sampling interval.
 
 
 --
@@ -11290,6 +12928,16 @@ Sum of ready and unacknowledged messages (queue depth).
 
 --
 
+*`rabbitmq.queue.messages.total.details.rate`*::
++
+--
+type: float
+
+How much the queue depth has changed per second in the most recent sampling interval.
+
+
+--
+
 *`rabbitmq.queue.messages.ready.count`*::
 +
 --
@@ -11300,12 +12948,32 @@ Number of messages ready to be delivered to clients.
 
 --
 
+*`rabbitmq.queue.messages.ready.details.rate`*::
++
+--
+type: float
+
+How much the count of messages ready has changed per second in the most recent sampling interval.
+
+
+--
+
 *`rabbitmq.queue.messages.unacknowledged.count`*::
 +
 --
 type: long
 
 Number of messages delivered to clients but not yet acknowledged.
+
+
+--
+
+*`rabbitmq.queue.messages.unacknowledged.details.rate`*::
++
+--
+type: float
+
+How much the count of unacknowledged messages has changed per second in the most recent sampling interval.
 
 
 --
@@ -11535,6 +13203,27 @@ format: bytes
 
 Used memory lua.
 
+
+--
+
+*`redis.info.memory.max.value`*::
++
+--
+type: long
+
+format: bytes
+
+Memory limit.
+
+
+--
+
+*`redis.info.memory.max.policy`*::
++
+--
+type: keyword
+
+Eviction policy to use when memory limit is reached.
 
 --
 
@@ -13594,7 +15283,7 @@ The environment variables used to start the process. The data is available on Fr
 CPU-specific statistics per process.
 
 
-*`system.process.cpu.user`*::
+*`system.process.cpu.user.ticks`*::
 +
 --
 type: long
@@ -13638,7 +15327,7 @@ The percentage of CPU time spent by the process since the last event. This value
 
 --
 
-*`system.process.cpu.system`*::
+*`system.process.cpu.system.ticks`*::
 +
 --
 type: long

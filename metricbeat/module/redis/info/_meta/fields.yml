@@ -93,6 +93,17 @@
           description: >
             Used memory lua.
 
+        - name: max.value
+          type: long
+          format: bytes
+          description: >
+            Memory limit.
+
+        - name: max.policy
+          type: keyword
+          description:
+            Eviction policy to use when memory limit is reached.
+
         - name: allocator
           type: keyword
           description: >

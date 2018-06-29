@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package jmx
 
 import (
@@ -33,6 +50,8 @@ func TestEventMapper(t *testing.T) {
 			Attr: "NonHEapMemoryUsage", Field: "memory.non_heap_usage"},
 		attributeMappingKey{"org.springframework.boot:type=Endpoint,name=metricsEndpoint", "Metrics"}: Attribute{
 			Attr: "Metrics", Field: "metrics"},
+		attributeMappingKey{"Catalina:type=Server", "serverInfo"}: Attribute{
+			Attr: "serverInfo", Field: "server_info"},
 	}
 
 	events, err := eventMapping(jolokiaResponse, mapping)
@@ -65,6 +84,7 @@ func TestEventMapper(t *testing.T) {
 				"classes_loaded":          float64(19127),
 				"classes_unloaded":        float64(270),
 			},
+			"server_info": "Apache Tomcat/9.0.7",
 		},
 	}
 
@@ -94,6 +114,8 @@ func TestEventGroupingMapper(t *testing.T) {
 			Attr: "NonHEapMemoryUsage", Field: "memory.non_heap_usage", Event: "memory"},
 		attributeMappingKey{"org.springframework.boot:type=Endpoint,name=metricsEndpoint", "Metrics"}: Attribute{
 			Attr: "Metrics", Field: "metrics"},
+		attributeMappingKey{"Catalina:type=Server", "serverInfo"}: Attribute{
+			Attr: "serverInfo", Field: "server_info"},
 	}
 
 	events, err := eventMapping(jolokiaResponse, mapping)
@@ -108,6 +130,7 @@ func TestEventGroupingMapper(t *testing.T) {
 				"classes_loaded":          float64(19127),
 				"classes_unloaded":        float64(270),
 			},
+			"server_info": "Apache Tomcat/9.0.7",
 		},
 		{
 			"gc": common.MapStr{
