@@ -16475,7 +16475,7 @@ Average response time in microseconds
 
 --
 
-*`traefik.health.response.status_codes`*::
+*`traefik.health.response.status_code`*::
 +
 --
 type: object
