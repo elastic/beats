@@ -19,9 +19,11 @@ package state_replicaset
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
 )
 
 const (
@@ -71,6 +73,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
+	enricher   util.Enricher
 }
 
 // New create a new instance of the MetricSet
@@ -84,6 +87,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
+		enricher:      util.NewResourceMetadataEnricher(base, "replicaset", &kubernetes.ReplicaSet{}, false),
 	}, nil
 }
 
@@ -91,5 +95,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	return m.prometheus.GetProcessedMetrics(mapping)
+	m.enricher.Start()
+
+	events, err := m.prometheus.GetProcessedMetrics(mapping)
+	if err == nil {
+		m.enricher.Enrich(events)
+	}
+
+	return events, err
 }

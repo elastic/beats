@@ -24,6 +24,7 @@ import (
 	"github.com/ericchiang/k8s"
 	appsv1 "github.com/ericchiang/k8s/apis/apps/v1beta1"
 	"github.com/ericchiang/k8s/apis/core/v1"
+	extv1 "github.com/ericchiang/k8s/apis/extensions/v1beta1"
 	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 )
 
@@ -64,6 +65,9 @@ type PodContainerStatus = v1.ContainerStatus
 
 // Deployment data
 type Deployment = appsv1.Deployment
+
+// ReplicaSet data
+type ReplicaSet = extv1.ReplicaSet
 
 // Time extracts time from k8s.Time type
 func Time(t *metav1.Time) time.Time {
