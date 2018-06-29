@@ -21,6 +21,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -79,11 +80,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		return
 	}
 
-	event, _ := eventMapping(data)
-	report.Event(mb.Event{
-		MetricSetFields: event,
-		RootFields: common.MapStr{
-			"service.name": "traefik",
-		},
-	})
+	metricSetFields, _ := eventMapping(data)
+	event := mb.Event{
+		MetricSetFields: metricSetFields,
+		RootFields:      common.MapStr{},
+	}
+	event.RootFields.Put("service.name", "traefik")
+
+	report.Event(event)
 }
