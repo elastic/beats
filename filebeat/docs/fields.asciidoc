@@ -801,6 +801,22 @@ elasticsearch Module
 
 
 [float]
+== deprecation fields
+
+
+
+
+*`elasticsearch.deprecation.component`*::
++
+--
+type: keyword
+
+Elasticsearch component.
+
+
+--
+
+[float]
 == gc fields
 
 
