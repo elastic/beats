@@ -978,6 +978,166 @@ Elasticsearch component.
 
 --
 
+[float]
+== slowlog fields
+
+Slowlog events from Elasticsearch
+
+
+*`elasticsearch.slowlog.loglevel`*::
++
+--
+type: keyword
+
+example: INFO
+
+Log level
+
+--
+
+*`elasticsearch.slowlog.logger`*::
++
+--
+type: keyword
+
+example: index.search.slowlog.fetch
+
+Logger name
+
+--
+
+*`elasticsearch.slowlog.node_name`*::
++
+--
+type: keyword
+
+example: v_VJhjV
+
+Name of the node
+
+--
+
+*`elasticsearch.slowlog.index_name`*::
++
+--
+type: keyword
+
+example: metricbeat-6.3.0-2018.06.26
+
+Name of the index
+
+--
+
+*`elasticsearch.slowlog.shard_id`*::
++
+--
+type: keyword
+
+example: 0
+
+Id of the shard
+
+--
+
+*`elasticsearch.slowlog.took`*::
++
+--
+type: text
+
+example: 300ms
+
+Time it took to execute the query
+
+--
+
+*`elasticsearch.slowlog.types`*::
++
+--
+type: keyword
+
+example: 
+
+Types
+
+--
+
+*`elasticsearch.slowlog.stats`*::
++
+--
+type: text
+
+example: 
+
+Statistics
+
+--
+
+*`elasticsearch.slowlog.search_type`*::
++
+--
+type: keyword
+
+example: QUERY_THEN_FETCH
+
+Please add description
+
+--
+
+*`elasticsearch.slowlog.source_query`*::
++
+--
+type: text
+
+example: {"query":{"match_all":{"boost":1.0}}}
+
+Slow query
+
+--
+
+*`elasticsearch.slowlog.extra_source`*::
++
+--
+type: text
+
+example: 
+
+Extra source information
+
+--
+
+*`elasticsearch.slowlog.took_millis`*::
++
+--
+type: keyword
+
+example: 42
+
+Time took in milliseconds
+
+--
+
+*`elasticsearch.slowlog.total_hits`*::
++
+--
+type: keyword
+
+example: 42
+
+Total hits
+
+--
+
+*`elasticsearch.slowlog.total_shards`*::
++
+--
+type: keyword
+
+example: 22
+
+Total queried shards
+
+--
+
 [[exported-fields-host-processor]]
 == Host fields
 
