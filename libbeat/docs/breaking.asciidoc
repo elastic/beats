@@ -67,13 +67,21 @@ If you searched for the `host` field previously, modify your searches to use the
 and contains the same information as `host.name`. Using this field ensures that
 your queries and aggregations will work as expected in earlier releases and 6.3.
 
-If you have multiple visualizations in Kibana that reference the `host` field:
+If you have multiple visualizations in Kibana that reference the `host` field,
+export the objects, modify them by changing `host` to `beat.hostname`, and then
+re-import them into Kibana. You can use the Kibana UI or API.
 
-. Export the objects. You can use the Kibana API, or in the Kibana UI, go to
-*Management > Kibana > Saved Objects* to export the objects. 
+To use the Kibana UI:
+
+. In Kibana, go to *Management > Kibana > Saved Objects* and export the objects. 
 . In the exported JSON file, change `host` to `beat.hostname`.
-. Import the modified objects into Kibana. You can use the Kibana API, or in the
-Kibana UI, go to *Saved Objects* to import the objects.
+. In Kibana, go to *Saved Objects* and import the modified objects. 
+
+For more information, see:
+
+* {kibana-ref}/saved-objects-api.html[Kibana Saved Objects API]
+* {kibana-ref}/managing-saved-objects.html[Managing Saved Searches, Visualizations, and Dashboards]
+
 
 [[custom-template-non-versioned-indices]]
 ===== Use case: You use a custom template and your indices are not versioned
