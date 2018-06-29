@@ -34,11 +34,23 @@ func init() {
 // Resource data
 type Resource = k8s.Resource
 
+// ObjectMeta data
+type ObjectMeta = metav1.ObjectMeta
+
 // Pod data
 type Pod = v1.Pod
 
+// PodSpec data
+type PodSpec = v1.PodSpec
+
+// PodStatus data
+type PodStatus = v1.PodStatus
+
 // Container data
 type Container = v1.Container
+
+// ContainerPort data
+type ContainerPort = v1.ContainerPort
 
 // Event data
 type Event = v1.Event
