@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/traefik"
+	"github.com/elastic/beats/metricbeat/module/traefik/mtest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -44,7 +44,7 @@ func makeBadRequest(config map[string]interface{}) error {
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "traefik")
 
-	config := traefik.GetConfig("health")
+	config := mtest.GetConfig("health")
 
 	makeBadRequest(config)
 
@@ -68,7 +68,7 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "traefik")
 
-	ms := mbtest.NewReportingMetricSetV2(t, traefik.GetConfig("health"))
+	ms := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("health"))
 	err := mbtest.WriteEventsReporterV2(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
