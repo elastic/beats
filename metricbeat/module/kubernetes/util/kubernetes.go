@@ -73,6 +73,7 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 	return kubernetes.NewWatcher(client, resource, options)
 }
 
+// NewResourceMetadataEnricher returns a Enricher configured for kubernetes resource events
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	resource kubernetes.Resource,
@@ -96,7 +97,7 @@ func NewResourceMetadataEnricher(
 	}
 
 	metaGen := kubernetes.NewMetaGeneratorFromConfig(&metaConfig)
-	enricher := BuildMetadataEnricher(watcher,
+	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
 			id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName())
@@ -116,6 +117,7 @@ func NewResourceMetadataEnricher(
 	return enricher
 }
 
+// NewContainerMetadataEnricher returns a Enricher configured for container events
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
 	nodeScope bool) Enricher {
@@ -138,7 +140,7 @@ func NewContainerMetadataEnricher(
 	}
 
 	metaGen := kubernetes.NewMetaGeneratorFromConfig(&metaConfig)
-	enricher := BuildMetadataEnricher(watcher,
+	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
 			pod := r.(*kubernetes.Pod)
@@ -179,7 +181,7 @@ func join(fields ...string) string {
 	return strings.Join(fields, ":")
 }
 
-func BuildMetadataEnricher(
+func buildMetadataEnricher(
 	watcher kubernetes.Watcher,
 	update func(map[string]common.MapStr, kubernetes.Resource),
 	delete func(map[string]common.MapStr, kubernetes.Resource),

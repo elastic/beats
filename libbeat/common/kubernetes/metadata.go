@@ -36,7 +36,7 @@ type MetaGenerator interface {
 	ContainerMetadata(pod *Pod, container string) common.MapStr
 }
 
-// Config for MetaGenerator
+// MetaGeneratorConfig settings
 type MetaGeneratorConfig struct {
 	IncludeLabels          []string `config:"include_labels"`
 	ExcludeLabels          []string `config:"exclude_labels"`
