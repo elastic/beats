@@ -150,13 +150,16 @@ func customizePackaging() {
 	)
 
 	for _, args := range mage.Packages {
-		switch args.Types[0] {
+		pkgType := args.Types[0]
+		switch pkgType {
 		case mage.TarGz, mage.Zip:
 			args.Spec.ReplaceFile("{{.BeatName}}.yml", shortConfig)
 			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfig)
-		default:
+		case mage.Deb, mage.RPM, mage.DMG:
 			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", shortConfig)
 			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
+		default:
+			panic(errors.Errorf("unhandled package type: %v", pkgType))
 		}
 	}
 }

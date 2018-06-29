@@ -398,6 +398,12 @@ func customizePackaging() {
 	for _, args := range mage.Packages {
 		switch args.OS {
 		case "windows", "darwin":
+			if args.Types[0] == mage.DMG {
+				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", configYml)
+				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfigYml)
+				continue
+			}
+
 			args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
 			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
 		}

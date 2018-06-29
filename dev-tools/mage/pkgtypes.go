@@ -60,6 +60,7 @@ const (
 	Deb
 	Zip
 	TarGz
+	DMG
 )
 
 // OSPackageArgs define a set of package types to build for an operating
@@ -82,12 +83,15 @@ type PackageSpec struct {
 	License           string                 `yaml:"license,omitempty"`
 	URL               string                 `yaml:"url,omitempty"`
 	Description       string                 `yaml:"description,omitempty"`
+	PreInstallScript  string                 `yaml:"pre_install_script,omitempty"`
 	PostInstallScript string                 `yaml:"post_install_script,omitempty"`
 	Files             map[string]PackageFile `yaml:"files"`
 	OutputFile        string                 `yaml:"output_file,omitempty"` // Optional
+	ExtraVars         map[string]string      `yaml:"extra_vars,omitempty"`  // Optional
 
 	evalContext            map[string]interface{}
 	packageDir             string
+	localPreInstallScript  string
 	localPostInstallScript string
 }
 
@@ -112,6 +116,10 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 	},
 	"darwin": map[PackageType]map[string]string{
 		TarGz: map[string]string{
+			"386":   "x86",
+			"amd64": "x86_64",
+		},
+		DMG: map[string]string{
 			"386":   "x86",
 			"amd64": "x86_64",
 		},
@@ -194,6 +202,8 @@ func (typ PackageType) String() string {
 		return "zip"
 	case TarGz:
 		return "tar.gz"
+	case DMG:
+		return "dmg"
 	default:
 		return "invalid"
 	}
@@ -215,6 +225,8 @@ func (typ *PackageType) UnmarshalText(text []byte) error {
 		*typ = TarGz
 	case "zip":
 		*typ = Zip
+	case "dmg":
+		*typ = DMG
 	default:
 		return errors.Errorf("unknown package type: %v", string(text))
 	}
@@ -242,6 +254,8 @@ func (typ PackageType) Build(spec PackageSpec) error {
 		return PackageZip(spec)
 	case TarGz:
 		return PackageTarGz(spec)
+	case DMG:
+		return PackageDMG(spec)
 	default:
 		return errors.Errorf("unknown package type: %v", typ)
 	}
@@ -292,8 +306,10 @@ func (s PackageSpec) ExpandFile(src, dst string, args ...map[string]interface{})
 
 // MustExpandFile expands a template file using data from the spec. It panics if
 // an error occurs.
-func (s PackageSpec) MustExpandFile(src, dst string, args ...map[string]interface{}) error {
-	return s.ExpandFile(src, dst, args...)
+func (s PackageSpec) MustExpandFile(src, dst string, args ...map[string]interface{}) {
+	if err := s.ExpandFile(src, dst, args...); err != nil {
+		panic(err)
+	}
 }
 
 // Evaluate expands all variables used in the spec definition and writes any
@@ -307,6 +323,10 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 		return MustExpand(in, args...)
 	}
 
+	for k, v := range s.ExtraVars {
+		s.evalContext[k] = mustExpand(v)
+	}
+
 	s.Name = mustExpand(s.Name)
 	s.ServiceName = mustExpand(s.ServiceName)
 	s.OS = mustExpand(s.OS)
@@ -316,6 +336,7 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 	s.License = mustExpand(s.License)
 	s.URL = mustExpand(s.URL)
 	s.Description = mustExpand(s.Description)
+	s.PreInstallScript = mustExpand(s.PreInstallScript)
 	s.PostInstallScript = mustExpand(s.PostInstallScript)
 	s.OutputFile = mustExpand(s.OutputFile)
 
@@ -368,7 +389,7 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 			}
 		case f.Template != "":
 			f.Source = filepath.Join(s.packageDir, filepath.Base(f.Template))
-			if err := s.ExpandFile(createDir(f.Template), f.Source); err != nil {
+			if err := s.ExpandFile(f.Template, createDir(f.Source)); err != nil {
 				panic(errors.Wrapf(err, "failed to expand template file for target=%v", target))
 			}
 		default:
@@ -380,15 +401,35 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 	// Replace the map instead of modifying the source.
 	s.Files = evaluatedFiles
 
-	if s.PostInstallScript != "" {
-		// Copy the inside the build dir so that it's available inside of Docker for FPM.
-		s.localPostInstallScript = filepath.Join(s.packageDir, filepath.Base(s.PostInstallScript))
-		if err := Copy(s.PostInstallScript, s.localPostInstallScript); err != nil {
-			panic(errors.Wrap(err, "failed to copy post install script to build dir"))
-		}
+	if err := copyInstallScript(s, s.PreInstallScript, &s.localPreInstallScript); err != nil {
+		panic(err)
+	}
+	if err := copyInstallScript(s, s.PostInstallScript, &s.localPostInstallScript); err != nil {
+		panic(err)
 	}
 
 	return s
+}
+
+func copyInstallScript(spec PackageSpec, script string, local *string) error {
+	if script == "" {
+		return nil
+	}
+
+	*local = filepath.Join(spec.packageDir, "scripts", filepath.Base(script))
+	if filepath.Ext(*local) == ".tmpl" {
+		*local = strings.TrimSuffix(*local, ".tmpl")
+	}
+
+	if err := spec.ExpandFile(script, createDir(*local)); err != nil {
+		return errors.Wrap(err, "failed to copy install script to package dir")
+	}
+
+	if err := os.Chmod(*local, 0755); err != nil {
+		return errors.Wrap(err, "failed to chmod install script")
+	}
+
+	return nil
 }
 
 func (s PackageSpec) hash() string {
@@ -766,4 +807,19 @@ func addFileToTar(ar *tar.Writer, baseDir string, pkgFile PackageFile) error {
 		}
 		return file.Close()
 	})
+}
+
+// PackageDMG packages the Beat into a .dmg file containing an installer pkg
+// and uninstaller app.
+func PackageDMG(spec PackageSpec) error {
+	if runtime.GOOS != "darwin" {
+		return errors.New("packaging a dmg requires darwin")
+	}
+
+	b, err := newDMGBuilder(spec)
+	if err != nil {
+		return err
+	}
+
+	return b.Build()
 }
