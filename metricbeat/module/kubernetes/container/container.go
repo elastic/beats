@@ -52,7 +52,8 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	http *helper.HTTP
+	http     *helper.HTTP
+	enricher util.Enricher
 }
 
 // New create a new instance of the MetricSet
@@ -66,6 +67,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
+		enricher:      util.NewContainerMetadataEnricher(base, true),
 	}, nil
 }
 
@@ -73,6 +75,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+	m.enricher.Start()
+
 	body, err := m.http.FetchContent()
 	if err != nil {
 		return nil, err
@@ -82,6 +86,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	m.enricher.Enrich(events)
 
 	return events, nil
 }

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"strings"
 	"sync"
 	"time"
 
@@ -74,7 +75,6 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
-	kind string,
 	resource kubernetes.Resource,
 	nodeScope bool) Enricher {
 
@@ -99,15 +99,66 @@ func NewResourceMetadataEnricher(
 	enricher := BuildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			m[r.GetMetadata().GetNamespace()+r.GetMetadata().GetName()] = metaGen.ResourceMetadata(r)
+			id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName())
+			m[id] = metaGen.ResourceMetadata(r)
 		},
 		// delete
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			delete(m, r.GetMetadata().GetNamespace()+r.GetMetadata().GetName())
+			id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName())
+			delete(m, id)
 		},
 		// index
 		func(e common.MapStr) string {
-			return getString(e, mb.ModuleDataKey+".namespace") + getString(e, "name")
+			return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, "name"))
+		},
+	)
+
+	return enricher
+}
+
+func NewContainerMetadataEnricher(
+	base mb.BaseMetricSet,
+	nodeScope bool) Enricher {
+
+	watcher, err := GetWatcher(base, &kubernetes.Pod{}, nodeScope)
+	if err != nil {
+		logp.Warn("Error initializing Kubernetes metadata enricher: %s", err)
+		return nilEnricher
+	}
+
+	if watcher == nil {
+		logp.Info("Kubernetes metricset enriching is disabled")
+		return nilEnricher
+	}
+
+	metaConfig := kubernetes.MetaGeneratorConfig{}
+	if err := base.Module().UnpackConfig(&metaConfig); err != nil {
+		logp.Warn("Error initializing Kubernetes metadata enricher: %s", err)
+		return nilEnricher
+	}
+
+	metaGen := kubernetes.NewMetaGeneratorFromConfig(&metaConfig)
+	enricher := BuildMetadataEnricher(watcher,
+		// update
+		func(m map[string]common.MapStr, r kubernetes.Resource) {
+			pod := r.(*kubernetes.Pod)
+			meta := metaGen.ResourceMetadata(r)
+			for _, container := range append(pod.GetSpec().GetContainers(), pod.GetSpec().GetInitContainers()...) {
+				id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName(), container.GetName())
+				m[id] = meta
+			}
+		},
+		// delete
+		func(m map[string]common.MapStr, r kubernetes.Resource) {
+			pod := r.(*kubernetes.Pod)
+			for _, container := range append(pod.GetSpec().GetContainers(), pod.GetSpec().GetInitContainers()...) {
+				id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName(), container.GetName())
+				delete(m, id)
+			}
+		},
+		// index
+		func(e common.MapStr) string {
+			return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, mb.ModuleDataKey+".pod.name"), getString(e, "name"))
 		},
 	)
 
@@ -122,6 +173,10 @@ func getString(m common.MapStr, key string) string {
 
 	str, _ := val.(string)
 	return str
+}
+
+func join(fields ...string) string {
+	return strings.Join(fields, ":")
 }
 
 func BuildMetadataEnricher(
