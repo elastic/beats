@@ -150,13 +150,15 @@ release: beats-dashboards
 # installed and used for the build.
 .PHONY: release-manager-snapshot
 release-manager-snapshot:
-	./dev-tools/run_with_go_ver $(MAKE) snapshot
+	@$(MAKE) SNAPSHOT=true release-manager-release
 
 # Builds a snapshot release. The Go version defined in .go-version will be
-# installed and used for the build.
+# installed and used for the build. The symlink needed for the
+# elastic/beats-docker build.
 .PHONY: release-manager-release
 release-manager-release:
 	./dev-tools/run_with_go_ver $(MAKE) release
+	ln -s distributions build/upload
 
 # Installs the mage build tool from the vendor directory.
 .PHONY: mage
