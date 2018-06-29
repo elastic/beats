@@ -44,5 +44,6 @@ func TestEmpty(t *testing.T) {
 
 	reporter := &mbtest.CapturingReporterV2{}
 	eventMapping(reporter, info, input)
+	assert.Empty(t, reporter.GetErrors())
 	assert.Equal(t, 1, len(reporter.GetEvents()))
 }

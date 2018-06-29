@@ -48,8 +48,8 @@ var (
 			},
 		}),
 		"requests": c.Dict("requests", s.Schema{
-			"total":       c.Int("total"),
-			"disconnects": c.Int("disconnects"),
+			"total":       c.Int("total", s.Optional),
+			"disconnects": c.Int("disconnects", s.Optional),
 		}),
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"sockets": c.Dict("sockets", s.Schema{
@@ -95,8 +95,11 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	}
 
 	dataFields, err := schema.Apply(data)
-	event := mb.Event{}
+	if err != nil {
+		r.Error(err)
+	}
 
+	var event mb.Event
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", "kibana")
 

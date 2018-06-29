@@ -62,7 +62,6 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 				event := mb.Event{}
 
 				fields, _ := schema.Apply(shard)
-
 				event.ModuleFields = common.MapStr{}
 				event.ModuleFields.Put("node.name", fields["node"])
 				delete(fields, "node")

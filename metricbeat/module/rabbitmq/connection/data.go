@@ -20,6 +20,8 @@ package connection
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -62,19 +64,19 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	events := []common.MapStr{}
-	errors := s.NewErrors()
-
+	var events []common.MapStr
+	var errors multierror.Errors
 	for _, node := range connections {
-		event, errs := eventMapping(node)
+		event, err := eventMapping(node)
 		events = append(events, event)
-		errors.AddErrors(errs)
-
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 
-	return events, errors
+	return events, errors.Err()
 }
 
-func eventMapping(connection map[string]interface{}) (common.MapStr, *s.Errors) {
+func eventMapping(connection map[string]interface{}) (common.MapStr, error) {
 	return schema.Apply(connection)
 }

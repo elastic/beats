@@ -20,6 +20,8 @@ package exchange
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -61,18 +63,20 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	events := []common.MapStr{}
-	errors := s.NewErrors()
+	var events []common.MapStr
+	var errors multierror.Errors
 
 	for _, exchange := range exchanges {
-		event, errs := eventMapping(exchange)
+		event, err := eventMapping(exchange)
+		if err != nil {
+			errors = append(errors, err)
+		}
 		events = append(events, event)
-		errors.AddErrors(errs)
 	}
 
-	return events, errors
+	return events, errors.Err()
 }
 
-func eventMapping(exchange map[string]interface{}) (common.MapStr, *s.Errors) {
+func eventMapping(exchange map[string]interface{}) (common.MapStr, error) {
 	return schema.Apply(exchange)
 }

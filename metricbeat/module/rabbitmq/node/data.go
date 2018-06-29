@@ -159,7 +159,11 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 }
 
 func eventMapping(r mb.ReporterV2, node map[string]interface{}) {
-	event, _ := schema.Apply(node)
+	event, err := schema.Apply(node)
+	if err != nil {
+		r.Error(err)
+		return
+	}
 	r.Event(mb.Event{
 		MetricSetFields: event,
 	})
