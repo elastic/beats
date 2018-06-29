@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/ericchiang/k8s"
+	appsv1 "github.com/ericchiang/k8s/apis/apps/v1beta1"
 	"github.com/ericchiang/k8s/apis/core/v1"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -113,6 +114,17 @@ func NewWatcher(client *k8s.Client, resource Resource, options WatchOptions) (Wa
 		list := &v1.NodeList{}
 		w.resourceList = list
 		w.k8sResourceFactory = func() k8s.Resource { return &v1.Node{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
+	case *Deployment:
+		list := &appsv1.DeploymentList{}
+		w.resourceList = list
+		w.k8sResourceFactory = func() k8s.Resource { return &appsv1.Deployment{} }
 		w.items = func() []k8s.Resource {
 			rs := make([]k8s.Resource, 0, len(list.Items))
 			for _, item := range list.Items {
