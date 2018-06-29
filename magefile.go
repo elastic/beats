@@ -46,7 +46,7 @@ func PackageBeatDashboards() error {
 	}
 
 	spec := mage.PackageSpec{
-		Name:     "beat-dashboards",
+		Name:     "beats-dashboards",
 		Version:  version,
 		Snapshot: mage.Snapshot,
 		Files: map[string]mage.PackageFile{
