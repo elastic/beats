@@ -22,7 +22,7 @@
                     "GREEDYMULTILINE": "(.|\n)*"
                 },
                 "patterns": [
-                    "\\[%{TIMESTAMP_ISO8601:timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}*\\]\\[%{DATA:elasticsearch.deprecation.component}%{SPACE}*\\] %{GREEDYMULTILINE:message}"
+                    "\\[%{TIMESTAMP_ISO8601:timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}*\\]\\[%{DATA:elasticsearch.server.component}%{SPACE}*\\] %{GREEDYMULTILINE:message}"
                 ]
             }
         },
