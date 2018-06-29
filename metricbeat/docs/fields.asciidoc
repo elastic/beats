@@ -359,6 +359,9 @@ Namespace name
 --
 type: keyword
 
+Node host
+
+
 --
 
 *`aerospike.namespace.node.name`*::
