@@ -1,0 +1,11 @@
+- key: mariadb
+  title: "MariaDB"
+  description: >
+    Module for parsing the MariaDB log files.
+  short_config: true
+  fields:
+    - name: mariadb
+      type: group
+      description: >
+        Fields from the MariaDB log files.
+      fields:
