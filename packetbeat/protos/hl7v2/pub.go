@@ -134,7 +134,7 @@ func (pub *transPub) createEvent(requ, resp *message, state string) beat.Event {
 		} else if hl7message == "response" {
 			hl7segments = strings.Split(string(resp.content), pub.NewLineChars)
 		} else {
-			continue
+			break
 		}
 
 		// Array for our segments
@@ -185,7 +185,7 @@ func (pub *transPub) createEvent(requ, resp *message, state string) beat.Event {
 			// Loop through hl7fields
 			for hl7field := range hl7fields {
 
-				// If field header dont process
+				// If field header don't process
 				if hl7field == 0 {
 					//debugf("Not processing %v-%v.", hl7segmentheader, hl7field)
 					continue
@@ -304,7 +304,7 @@ func (pub *transPub) createEvent(requ, resp *message, state string) beat.Event {
 		fields["hl7v2"].(common.MapStr)[hl7message] = messageMap
 
 		if resp == nil {
-			continue
+			break
 		}
 
 		// Switch to response message

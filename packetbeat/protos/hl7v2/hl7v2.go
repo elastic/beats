@@ -174,7 +174,7 @@ func (hp *hl7v2Plugin) ReceivedFin(
 	private protos.ProtocolData,
 ) protos.ProtocolData {
 
-	// If possible publish un-published request
+	// If possible publish request
 	conn := getConnection(private)
 	if conn == nil {
 		return private
@@ -204,7 +204,7 @@ func (hp *hl7v2Plugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 // transaction in case of connection being dropped due to error
 func (hp *hl7v2Plugin) onDropConnection(conn *connection) {
 
-	// If possible publish un-published request
+	// If possible publish request
 	if conn == nil {
 		return
 	}
@@ -247,7 +247,7 @@ func getConnection(private protos.ProtocolData) *connection {
 
 func (hp *hl7v2Plugin) Expired(tcptuple *common.TCPTuple, private protos.ProtocolData) {
 
-	// If possible publish un-published request
+	// If possible publish request
 	conn := getConnection(private)
 	if conn == nil {
 		return
@@ -255,5 +255,5 @@ func (hp *hl7v2Plugin) Expired(tcptuple *common.TCPTuple, private protos.Protoco
 	if isDebug {
 		debugf("hl7v2 expired connection %s", tcptuple)
 	}
-	conn.trans.publishIncomplete(conn, "CONNECTION_TIMEOUT")
+	conn.trans.publishIncomplete(conn, "TRANSACTION_TIMEOUT")
 }
