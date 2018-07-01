@@ -54,7 +54,7 @@ var (
 )
 
 var (
-	files = flag.String("files", "../build/upload/*/*", "filepath glob containing package files")
+	files = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
 )
 
 func TestRPM(t *testing.T) {

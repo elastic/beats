@@ -26,7 +26,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const packageSpecFile = "dev-tools/mage/files/packages.yml"
+const packageSpecFile = "dev-tools/packaging/packages.yml"
 
 // Packages defines the set of packages to be built when the package target is
 // executed.
