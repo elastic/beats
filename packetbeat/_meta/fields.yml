@@ -1151,11 +1151,11 @@
           type: long
           description: Requestor's UDP payload size (in bytes).
 
-- key: hl7v2
-  title: "hl7v2"
-  description: hl7v2 specific event fields.
+- key: hl7
+  title: "hl7"
+  description: hl7 specific event fields.
   fields:
-    - name: hl7v2
+    - name: hl7
       type: group
       fields:
         - name: request

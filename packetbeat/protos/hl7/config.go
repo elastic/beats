@@ -1,11 +1,11 @@
-package hl7v2
+package hl7
 
 import (
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/protos"
 )
 
-type hl7v2Config struct {
+type hl7Config struct {
 	config.ProtocolCommon  `config:",inline"`
 	NewLineChars           string   `config:"newline_chars"`
 	SegmentSelectionMode   string   `config:"segment_selection_mode"`
@@ -17,13 +17,13 @@ type hl7v2Config struct {
 }
 
 var (
-	defaultConfig = hl7v2Config{
+	defaultConfig = hl7Config{
 		ProtocolCommon: config.ProtocolCommon{
 			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
 	}
 )
 
-func (c *hl7v2Config) Validate() error {
+func (c *hl7Config) Validate() error {
 	return nil
 }

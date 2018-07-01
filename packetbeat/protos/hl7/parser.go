@@ -1,4 +1,4 @@
-package hl7v2
+package hl7
 
 import (
 	"errors"
@@ -118,30 +118,51 @@ func (p *parser) parse() (*message, error) {
 	msg.Size = uint64(p.buf.BufferConsumed())
 
 	isRequest := true
+	hl7Type := ""
 
 	dir := applayer.NetOriginalDirection
+
 	if len(buf) > 0 {
 
 		// First char in an HL7 should be <vt> (0x0b)
-		if buf[0] == '\v' {
+		if !(buf[0] == '\v') {
+			// Not a well formed hl7 messages
+			return nil, nil
+		} else {
 			buf = buf[1:]
 		}
 
 		// Remove the ending <fs><cr> (0x1c0x0d)
 		buf = buf[:len(buf)-2]
 
-		// Split into segments
-		segments := strings.Split(string(buf[:]), p.config.NewLineChars)
-
-		// Split MSH segment into fields
-		msh := strings.Split(segments[0], string(segments[0][3]))
-
-		// If the 8th value in MSH segment contains ACK then it's a response
-		isRequest = !strings.Contains(msh[8], "ACK")
-		if !isRequest {
-			dir = applayer.NetReverseDirection
+		// v2 or v3 message
+		if string(buf[0]) == "M" {
+			hl7Type = "v2"
+		} else if string(buf[0]) == "<" {
+			hl7Type = "v3"
+		} else {
+			return nil, nil
 		}
-		buf = buf[:]
+
+		if hl7Type == "v2" {
+			// Split into segments
+			segments := strings.Split(string(buf[:]), p.config.NewLineChars)
+
+			// Split MSH segment into fields
+			msh := strings.Split(segments[0], string(segments[0][3]))
+
+			// If the 8th value in MSH segment contains ACK then it's a response
+			isRequest = !strings.Contains(msh[8], "ACK")
+			if !isRequest {
+				dir = applayer.NetReverseDirection
+			}
+		} else {
+			// If contains <acknowledgement> then it's a response
+			isRequest = !strings.Contains(string(buf[:]), "<acknowledgement>")
+			if !isRequest {
+				dir = applayer.NetReverseDirection
+			}
+		}
 	}
 
 	msg.content = common.NetString(buf)

@@ -20,7 +20,7 @@ grouped in the following categories:
 * <<exported-fields-dns>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-flows_event>>
-* <<exported-fields-hl7v2>>
+* <<exported-fields-hl7>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
@@ -2251,141 +2251,141 @@ optional TCP connection id
 
 --
 
-[[exported-fields-hl7v2]]
-== hl7v2 fields
+[[exported-fields-hl7]]
+== hl7 fields
 
-hl7v2 specific event fields.
-
-
+hl7 specific event fields.
 
 
-*`hl7v2.request.msh_sending_application`*::
+
+
+*`hl7.request.msh_sending_application`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.msh_sending_facility`*::
+*`hl7.request.msh_sending_facility`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.msh_receiving_application`*::
+*`hl7.request.msh_receiving_application`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.msh_receiving_facility`*::
+*`hl7.request.msh_receiving_facility`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.msh_datetime_of_message`*::
+*`hl7.request.msh_datetime_of_message`*::
 +
 --
 type: date
 
 --
 
-*`hl7v2.request.msh_message_type`*::
+*`hl7.request.msh_message_type`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.msh_message_control_id`*::
+*`hl7.request.msh_message_control_id`*::
 +
 --
 type: text
 
 --
 
-*`hl7v2.request.msh_version_id`*::
+*`hl7.request.msh_version_id`*::
 +
 --
 type: float
 
 --
 
-*`hl7v2.request.segments`*::
+*`hl7.request.segments`*::
 +
 --
 type: nested
 
 --
 
-*`hl7v2.request.segments.line`*::
+*`hl7.request.segments.line`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.request.segments.segment`*::
+*`hl7.request.segments.segment`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.request.segments.fields`*::
+*`hl7.request.segments.fields`*::
 +
 --
 type: nested
 
 --
 
-*`hl7v2.request.segments.fields.field`*::
+*`hl7.request.segments.fields.field`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.request.segments.fields.repeat`*::
+*`hl7.request.segments.fields.repeat`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.request.segments.fields.component`*::
+*`hl7.request.segments.fields.component`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.request.segments.fields.subcomponent`*::
+*`hl7.request.segments.fields.subcomponent`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.request.segments.fields.text`*::
+*`hl7.request.segments.fields.text`*::
 +
 --
 type: text
 
 --
 
-*`hl7v2.request.segments.fields.numeric`*::
+*`hl7.request.segments.fields.numeric`*::
 +
 --
 type: float
 
 --
 
-*`hl7v2.request.segments.fields.date`*::
+*`hl7.request.segments.fields.date`*::
 +
 --
 type: date
@@ -2395,154 +2395,154 @@ format: strict_basic_date_time||strict_basic_date_time_no_millis||strict_basic_d
 --
 
 
-*`hl7v2.response.msh_sending_application`*::
+*`hl7.response.msh_sending_application`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.response.msh_sending_facility`*::
+*`hl7.response.msh_sending_facility`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.response.msh_receiving_application`*::
+*`hl7.response.msh_receiving_application`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.response.msh_receiving_facility`*::
+*`hl7.response.msh_receiving_facility`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.response.msh_datetime_of_message`*::
+*`hl7.response.msh_datetime_of_message`*::
 +
 --
 type: date
 
 --
 
-*`hl7v2.response.msh_message_type`*::
+*`hl7.response.msh_message_type`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.response.msh_message_control_id`*::
+*`hl7.response.msh_message_control_id`*::
 +
 --
 type: text
 
 --
 
-*`hl7v2.response.msh_version_id`*::
+*`hl7.response.msh_version_id`*::
 +
 --
 type: float
 
 --
 
-*`hl7v2.response.msa_acknowledgement_code`*::
+*`hl7.response.msa_acknowledgement_code`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.response.msa_message_control_id`*::
+*`hl7.response.msa_message_control_id`*::
 +
 --
 type: text
 
 --
 
-*`hl7v2.response.msa_text_message`*::
+*`hl7.response.msa_text_message`*::
 +
 --
 type: text
 
 --
 
-*`hl7v2.response.segments`*::
+*`hl7.response.segments`*::
 +
 --
 type: nested
 
 --
 
-*`hl7v2.response.segments.line`*::
+*`hl7.response.segments.line`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.response.segments.segment`*::
+*`hl7.response.segments.segment`*::
 +
 --
 type: keyword
 
 --
 
-*`hl7v2.response.segments.fields`*::
+*`hl7.response.segments.fields`*::
 +
 --
 type: nested
 
 --
 
-*`hl7v2.response.segments.fields.field`*::
+*`hl7.response.segments.fields.field`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.response.segments.fields.repeat`*::
+*`hl7.response.segments.fields.repeat`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.response.segments.fields.component`*::
+*`hl7.response.segments.fields.component`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.response.segments.fields.subcomponent`*::
+*`hl7.response.segments.fields.subcomponent`*::
 +
 --
 type: long
 
 --
 
-*`hl7v2.response.segments.fields.text`*::
+*`hl7.response.segments.fields.text`*::
 +
 --
 type: text
 
 --
 
-*`hl7v2.response.segments.fields.numeric`*::
+*`hl7.response.segments.fields.numeric`*::
 +
 --
 type: float
 
 --
 
-*`hl7v2.response.segments.fields.date`*::
+*`hl7.response.segments.fields.date`*::
 +
 --
 type: date

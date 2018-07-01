@@ -1,4 +1,4 @@
-package hl7v2
+package hl7
 
 import (
 	"time"

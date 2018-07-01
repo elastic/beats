@@ -1,4 +1,4 @@
-package hl7v2
+package hl7
 
 import (
 	"strings"
@@ -11,8 +11,8 @@ import (
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
-// hl7v2Plugin application level protocol analyzer plugin
-type hl7v2Plugin struct {
+// hl7Plugin application level protocol analyzer plugin
+type hl7Plugin struct {
 	ports        protos.PortsConfig
 	parserConfig parserConfig
 	transConfig  transactionConfig
@@ -31,7 +31,7 @@ type stream struct {
 }
 
 var (
-	debugf = logp.MakeDebug("hl7v2")
+	debugf = logp.MakeDebug("hl7")
 
 	// use isDebug/isDetailed to guard debugf/detailedf to minimize allocations
 	// (garbage collection) when debug log is disabled.
@@ -39,17 +39,17 @@ var (
 )
 
 func init() {
-	protos.Register("hl7v2", New)
+	protos.Register("hl7", New)
 }
 
-// New create and initializes a new hl7v2 protocol analyzer instance.
+// New create and initializes a new hl7 protocol analyzer instance.
 func New(
 	testMode bool,
 	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	cfgwarn.Experimental("The HL7 v2 protocol is experimental")
-	p := &hl7v2Plugin{}
+	p := &hl7Plugin{}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -63,17 +63,17 @@ func New(
 	return p, nil
 }
 
-func (hp *hl7v2Plugin) init(results protos.Reporter, config *hl7v2Config) error {
+func (hp *hl7Plugin) init(results protos.Reporter, config *hl7Config) error {
 	if err := hp.setFromConfig(config); err != nil {
 		return err
 	}
 	hp.pub.results = results
 
-	isDebug = logp.IsDebug("hl7v2")
+	isDebug = logp.IsDebug("hl7")
 	return nil
 }
 
-func (hp *hl7v2Plugin) setFromConfig(config *hl7v2Config) error {
+func (hp *hl7Plugin) setFromConfig(config *hl7Config) error {
 
 	// set module configuration
 	if err := hp.ports.Set(config.Ports); err != nil {
@@ -132,23 +132,23 @@ func (hp *hl7v2Plugin) setFromConfig(config *hl7v2Config) error {
 
 // ConnectionTimeout returns the per stream connection timeout.
 // Return <=0 to set default tcp module transaction timeout.
-func (hp *hl7v2Plugin) ConnectionTimeout() time.Duration {
+func (hp *hl7Plugin) ConnectionTimeout() time.Duration {
 	return hp.transConfig.transactionTimeout
 }
 
 // GetPorts returns the ports numbers packets shall be processed for.
-func (hp *hl7v2Plugin) GetPorts() []int {
+func (hp *hl7Plugin) GetPorts() []int {
 	return hp.ports.Ports
 }
 
 // Parse processes a TCP packet. Return nil if connection
 // state shall be dropped (e.g. parser not in sync with tcp stream)
-func (hp *hl7v2Plugin) Parse(
+func (hp *hl7Plugin) Parse(
 	pkt *protos.Packet,
 	tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("Parse hl7v2Plugin exception")
+	defer logp.Recover("Parse hl7Plugin exception")
 
 	conn := hp.ensureConnection(private)
 	st := conn.streams[dir]
@@ -169,7 +169,7 @@ func (hp *hl7v2Plugin) Parse(
 }
 
 // ReceivedFin handles TCP-FIN packet.
-func (hp *hl7v2Plugin) ReceivedFin(
+func (hp *hl7Plugin) ReceivedFin(
 	tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
@@ -180,7 +180,7 @@ func (hp *hl7v2Plugin) ReceivedFin(
 		return private
 	}
 	if isDebug {
-		debugf("hl7v2 connection closed %s", tcptuple)
+		debugf("hl7 connection closed %s", tcptuple)
 	}
 	conn.trans.publishIncomplete(conn, "CONNECTION_CLOSED")
 
@@ -188,7 +188,7 @@ func (hp *hl7v2Plugin) ReceivedFin(
 }
 
 // GapInStream handles lost packets in tcp-stream.
-func (hp *hl7v2Plugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
+func (hp *hl7Plugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int,
 	private protos.ProtocolData,
 ) (protos.ProtocolData, bool) {
@@ -202,19 +202,19 @@ func (hp *hl7v2Plugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 
 // onDropConnection processes and optionally sends incomplete
 // transaction in case of connection being dropped due to error
-func (hp *hl7v2Plugin) onDropConnection(conn *connection) {
+func (hp *hl7Plugin) onDropConnection(conn *connection) {
 
 	// If possible publish request
 	if conn == nil {
 		return
 	}
 	if isDebug {
-		debugf("hl7v2 connection dropped")
+		debugf("hl7 connection dropped")
 	}
 	conn.trans.publishIncomplete(conn, "CONNECTION_DROPPED")
 }
 
-func (hp *hl7v2Plugin) ensureConnection(private protos.ProtocolData) *connection {
+func (hp *hl7Plugin) ensureConnection(private protos.ProtocolData) *connection {
 	conn := getConnection(private)
 	if conn == nil {
 		conn = &connection{}
@@ -235,17 +235,17 @@ func getConnection(private protos.ProtocolData) *connection {
 
 	priv, ok := private.(*connection)
 	if !ok {
-		logp.Warn("hl7v2 connection type error")
+		logp.Warn("hl7 connection type error")
 		return nil
 	}
 	if priv == nil {
-		logp.Warn("Unexpected: hl7v2 connection data not set")
+		logp.Warn("Unexpected: hl7 connection data not set")
 		return nil
 	}
 	return priv
 }
 
-func (hp *hl7v2Plugin) Expired(tcptuple *common.TCPTuple, private protos.ProtocolData) {
+func (hp *hl7Plugin) Expired(tcptuple *common.TCPTuple, private protos.ProtocolData) {
 
 	// If possible publish request
 	conn := getConnection(private)
@@ -253,7 +253,7 @@ func (hp *hl7v2Plugin) Expired(tcptuple *common.TCPTuple, private protos.Protoco
 		return
 	}
 	if isDebug {
-		debugf("hl7v2 expired connection %s", tcptuple)
+		debugf("hl7 expired connection %s", tcptuple)
 	}
 	conn.trans.publishIncomplete(conn, "TRANSACTION_TIMEOUT")
 }
