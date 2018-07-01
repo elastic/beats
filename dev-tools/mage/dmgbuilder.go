@@ -61,7 +61,7 @@ func newDMGBuilder(spec PackageSpec) (*dmgBuilder, error) {
 		return nil, err
 	}
 
-	preferencePaneDir := filepath.Join(beatsDir, "dev-tools/packer/platforms/darwin/preference-pane")
+	preferencePaneDir := filepath.Join(beatsDir, "dev-tools/packaging/preference-pane")
 	preferencePanePkgFile := filepath.Join(preferencePaneDir, "build/BeatsPrefPane.pkg")
 	beatIdentifier, ok := spec.evalContext["identifier"].(string)
 	if !ok {
@@ -152,10 +152,10 @@ func (b *dmgBuilder) buildProductPkg() error {
 	)
 
 	b.MustExpandFile(
-		filepath.Join(b.beatsDir, "dev-tools/mage/templates/darwin/distribution.plist.tmpl"),
+		filepath.Join(b.beatsDir, "dev-tools/packaging/templates/darwin/distribution.plist.tmpl"),
 		distributionPlist)
 	b.MustExpandFile(
-		filepath.Join(b.beatsDir, "dev-tools/mage/templates/darwin/README.html.tmpl"),
+		filepath.Join(b.beatsDir, "dev-tools/packaging/templates/darwin/README.html.tmpl"),
 		filepath.Join(resourcesDir, "README.html"))
 	for t, pf := range b.Files {
 		if strings.HasSuffix(t, "LICENSE.txt") {
@@ -164,7 +164,7 @@ func (b *dmgBuilder) buildProductPkg() error {
 		}
 	}
 	b.MustExpandFile(
-		filepath.Join(b.beatsDir, "dev-tools/mage/templates/darwin/README.html.tmpl"),
+		filepath.Join(b.beatsDir, "dev-tools/packaging/templates/darwin/README.html.tmpl"),
 		filepath.Join(resourcesDir, "README.html"))
 
 	if err := os.RemoveAll(b.dmgDir); err != nil {
@@ -204,7 +204,7 @@ func (b *dmgBuilder) buildUninstallApp() error {
 		infoPlist        = "Uninstall.app/Contents/Info.plist"
 	)
 
-	inputDir := filepath.Join(b.beatsDir, "dev-tools/mage/templates/darwin/dmg")
+	inputDir := filepath.Join(b.beatsDir, "dev-tools/packaging/templates/darwin/dmg")
 
 	Copy(
 		filepath.Join(inputDir, uninstallerIcons),
