@@ -1161,21 +1161,21 @@
         - name: request
           type: group
           fields:
-            - name: msh_sending_application
+            - name: sending_application
               type: keyword
-            - name: msh_sending_facility
+            - name: sending_facility
               type: keyword
-            - name: msh_receiving_application
+            - name: receiving_application
               type: keyword
-            - name: msh_receiving_facility
+            - name: receiving_facility
               type: keyword
-            - name: msh_datetime_of_message
+            - name: datetime_of_message
               type: date
-            - name: msh_message_type
+            - name: message_type
               type: keyword
-            - name: msh_message_control_id
+            - name: message_control_id
               type: text
-            - name: msh_version_id
+            - name: version_id
               type: float
         - name: request.segments
           type: nested
@@ -1206,27 +1206,25 @@
         - name: response
           type: group
           fields:
-            - name: msh_sending_application
+            - name: sending_application
               type: keyword
-            - name: msh_sending_facility
+            - name: sending_facility
               type: keyword
-            - name: msh_receiving_application
+            - name: receiving_application
               type: keyword
-            - name: msh_receiving_facility
+            - name: receiving_facility
               type: keyword
-            - name: msh_datetime_of_message
+            - name: datetime_of_message
               type: date
-            - name: msh_message_type
+            - name: message_type
               type: keyword
-            - name: msh_message_control_id
+            - name: message_control_id
               type: text
-            - name: msh_version_id
+            - name: version_id
               type: float
-            - name: msa_acknowledgement_code
+            - name: acknowledgement_code
               type: keyword
-            - name: msa_message_control_id
-              type: text
-            - name: msa_text_message
+            - name: text_message
               type: text
         - name: response.segments
           type: nested

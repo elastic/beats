@@ -12,8 +12,8 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "hl7"
-        assert o["hl7.response.msa_message_control_id"] == "MSGID12349876"
-        assert o["hl7.response.msa_acknowledgement_code"] == "AA"
+        assert o["hl7.response.message_control_id"] == "MSGID12349876"
+        assert o["hl7.response.acknowledgement_code"] == "AA"
 
     def test_hl7_v2_reject(self):
         self.render_config_template()
@@ -24,5 +24,5 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "hl7"
-        assert o["hl7.response.msa_message_control_id"] == "MSGID12349877"
-        assert o["hl7.response.msa_acknowledgement_code"] == "AR"
+        assert o["hl7.response.message_control_id"] == "MSGID12349877"
+        assert o["hl7.response.acknowledgement_code"] == "AR"

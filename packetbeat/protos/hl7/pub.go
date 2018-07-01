@@ -223,31 +223,29 @@ Loop:
 					if hl7segmentheader == "MSH" {
 						switch {
 						case hl7fieldnumber == 3:
-							messageMap["msh_sending_application"] = hl7fieldvalue
+							messageMap["sending_application"] = hl7fieldvalue
 						case hl7fieldnumber == 4:
-							messageMap["msh_sending_facility"] = hl7fieldvalue
+							messageMap["sending_facility"] = hl7fieldvalue
 						case hl7fieldnumber == 5:
-							messageMap["msh_receiving_application"] = hl7fieldvalue
+							messageMap["receiving_application"] = hl7fieldvalue
 						case hl7fieldnumber == 6:
-							messageMap["msh_receiving_facility"] = hl7fieldvalue
+							messageMap["receiving_facility"] = hl7fieldvalue
 						case hl7fieldnumber == 7:
-							messageMap["msh_datetime_of_message"] = hl7fieldvalue
+							messageMap["datetime_of_message"] = hl7fieldvalue
 						case hl7fieldnumber == 9:
-							messageMap["msh_message_type"] = hl7fieldvalue
+							messageMap["message_type"] = hl7fieldvalue
 						case hl7fieldnumber == 10:
-							messageMap["msh_message_control_id"] = hl7fieldvalue
+							messageMap["message_control_id"] = hl7fieldvalue
 						case hl7fieldnumber == 12:
-							messageMap["msh_version_id"] = hl7fieldvalue
+							messageMap["version_id"] = hl7fieldvalue
 						default:
 						}
 					} else if hl7segmentheader == "MSA" {
 						switch {
 						case hl7fieldnumber == 1:
-							messageMap["msa_acknowledgement_code"] = hl7fieldvalue
-						case hl7fieldnumber == 2:
-							messageMap["msa_message_control_id"] = hl7fieldvalue
+							messageMap["acknowledgement_code"] = hl7fieldvalue
 						case hl7fieldnumber == 3:
-							messageMap["msa_text_message"] = hl7fieldvalue
+							messageMap["text_message"] = hl7fieldvalue
 						default:
 						}
 					}
