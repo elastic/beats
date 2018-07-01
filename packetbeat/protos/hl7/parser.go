@@ -130,8 +130,8 @@ func (p *parser) parse() (*message, error) {
 			return nil, nil
 		}
 
-        // Remove leading <vt> (0x0b) and trailing fs><cr> (0x1c0x0d)
-		buf = buf[1:len(buf)-2]
+		// Remove leading <vt> (0x0b) and trailing fs><cr> (0x1c0x0d)
+		buf = buf[1 : len(buf)-2]
 
 		// v2 or v3 message
 		if string(buf[0]) == "M" {
