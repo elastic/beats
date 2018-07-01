@@ -128,12 +128,10 @@ func (p *parser) parse() (*message, error) {
 		if !(buf[0] == '\v') {
 			// Not a well formed hl7 messages
 			return nil, nil
-		} else {
-			buf = buf[1:]
 		}
 
-		// Remove the ending <fs><cr> (0x1c0x0d)
-		buf = buf[:len(buf)-2]
+        // Remove leading <vt> (0x0b) and trailing fs><cr> (0x1c0x0d)
+		buf = buf[1:len(buf)-2]
 
 		// v2 or v3 message
 		if string(buf[0]) == "M" {
