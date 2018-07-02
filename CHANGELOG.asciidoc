@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - RabbitMQ management plugin path is now configured at the module level instead of having to do it in each of the metricsets. New `management_path_prefix` option should be used now {pull}7074[7074]
 - RabbitMQ node metricset only collects metrics of the instance it connects to, `node.collect: cluster` can be used to collect all nodes as before. {issue}6556[6556] {pull}6971[6971]
 - Change http/server metricset to put events by default under http.server and prefix config options with server.. {pull}7100[7100]
+- Disable dedotting in docker module configuration. This will change the out-of-the-box behaviour, but not the one of already configured instances. {pull}7485[7485]
 
 *Packetbeat*
 
