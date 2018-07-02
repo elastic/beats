@@ -39,7 +39,9 @@ var (
 
 func eventMapping(health map[string]interface{}) (common.MapStr, *s.Errors) {
 	if averageResponseTimeSec, ok := health["average_response_time_sec"]; ok {
-		health["average_response_time_us"] = averageResponseTimeSec.(float64) * 1000 * 1000
+		if averageResponseTimeSec, ok := averageResponseTimeSec.(float64); ok {
+			health["average_response_time_us"] = averageResponseTimeSec * 1000 * 1000
+		}
 	}
 
 	event, _ := schema.Apply(health)
