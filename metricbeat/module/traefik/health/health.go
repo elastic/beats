@@ -27,10 +27,8 @@ import (
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
 
-// init registers the MetricSet with the central registry as soon as the program
-// starts. The New function will be called later to instantiate an instance of
-// the MetricSet for each host defined in the module's configuration. After the
-// MetricSet has been created then Fetch will begin to be called periodically.
+// init registers the MetricSet with the central registry.
+// The New method will be called after the setup of the module and before starting to fetch data
 func init() {
 	mb.Registry.MustAddMetricSet("traefik", "health", New,
 		mb.WithHostParser(hostParser),
@@ -45,17 +43,13 @@ var (
 	}.Build()
 )
 
-// MetricSet holds any configuration or state information. It must implement
-// the mb.MetricSet interface. And this is best achieved by embedding
-// mb.BaseMetricSet because it implements all of the required mb.MetricSet
-// interface methods except for Fetch.
+// MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	http *helper.HTTP
 }
 
-// New creates a new instance of the MetricSet. New is responsible for unpacking
-// any MetricSet specific configuration options if there are any.
+// New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The traefik health metricset is experimental.")
 	http, err := helper.NewHTTP(base)
@@ -69,9 +63,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right
-// format. It publishes the event which is then forwarded to the output. In case
-// of an error set the Error field of mb.Event or simply call report.Error().
+// Fetch methods gather data, convert it to the right format, and publish it.
+// If there are errors, those are published instead.
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	data, err := m.http.FetchJSON()
 	if err != nil {
