@@ -206,6 +206,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add GC fileset to the Elasticsearch module. {pull}7305[7305]
 - Add Audit log fileset to the Elasticsearch module. {pull}7365[7365]
 - Add Slow log fileset to the Elasticsearch module. {pull}7473[7473]
+- Add deprecation fileset to the Elasticsearch module. {pull}7474[7474]
 
 *Heartbeat*
 

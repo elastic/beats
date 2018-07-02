@@ -1,0 +1,16 @@
+[2017-11-30T13:38:16,911][WARN ][o.e.d.c.ParseField       ] Deprecated field [inline] used, expected [source] instead
+[2017-11-30T13:38:16,941][WARN ][o.e.d.c.ParseField       ] Deprecated field [inline] used, expected [source] instead
+[2017-11-30T13:39:28,986][WARN ][o.e.d.i.m.UidFieldMapper ] Fielddata access on the _uid field is deprecated, use _id instead
+[2017-11-30T13:39:36,339][WARN ][o.e.d.i.m.UidFieldMapper ] Fielddata access on the _uid field is deprecated, use _id instead
+[2017-11-30T13:40:49,540][WARN ][o.e.d.i.m.UidFieldMapper ] Fielddata access on the _uid field is deprecated, use _id instead
+[2017-11-30T14:08:37,413][WARN ][o.e.d.i.m.UidFieldMapper ] Fielddata access on the _uid field is deprecated, use _id instead
+[2017-11-30T14:08:37,413][WARN ][o.e.d.i.m.UidFieldMapper ] Fielddata access on the _uid field is deprecated, use _id instead
+[2017-11-30T14:08:46,006][WARN ][o.e.d.i.m.UidFieldMapper ] Fielddata access on the _uid field is deprecated, use _id instead
+[2017-11-30T14:08:46,006][WARN ][o.e.d.i.m.UidFieldMapper ] Fielddata access on the _uid field is deprecated, use _id instead
+[2017-12-01T14:05:54,017][WARN ][o.e.d.i.m.AllFieldMapper ] [_all] is deprecated in 6.0+ and will be removed in 7.0. As a replacement, you can use [copy_to] on mapping fields to create your own catch all field.
+[2017-12-01T14:05:54,019][WARN ][o.e.d.i.m.AllFieldMapper ] [_all] is deprecated in 6.0+ and will be removed in 7.0. As a replacement, you can use [copy_to] on mapping fields to create your own catch all field.
+[2017-12-01T14:06:52,059][WARN ][o.e.d.i.m.AllFieldMapper ] [_all] is deprecated in 6.0+ and will be removed in 7.0. As a replacement, you can use [copy_to] on mapping fields to create your own catch all field.
+[2017-12-01T14:46:10,428][WARN ][o.e.d.s.a.InternalOrder$Parser] Deprecated aggregation order key [_term] used, replaced by [_key]
+[2017-12-04T16:17:18,271][WARN ][o.e.d.a.a.i.t.p.PutIndexTemplateRequest] Deprecated field [template] used, replaced by [index_patterns]
+[2017-12-04T16:17:18,282][WARN ][o.e.d.i.m.MapperService  ] [_default_] mapping is deprecated since it is not useful anymore now that indexes cannot have more than one type
+[2017-12-04T16:20:43,248][WARN ][o.e.d.i.m.MapperService  ] [_default_] mapping is deprecated since it is not useful anymore now that indexes cannot have more than one type
