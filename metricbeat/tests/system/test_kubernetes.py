@@ -53,7 +53,10 @@ class Test(metricbeat.BaseTest):
             "enabled": "true",
             "metricsets": [metricset],
             "hosts": hosts,
-            "period": "5s"
+            "period": "5s",
+            "extras": {
+                "add_metadata": "false",
+            }
         }])
 
         proc = self.start_beat()
