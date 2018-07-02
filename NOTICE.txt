@@ -1963,8 +1963,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/shirou/gopsutil
-Version: v2.18.01
-Revision: c432be29ccce470088d07eea25b3ea7e68a8afbb
+Version: v2.18.06
+Revision: 4a180b209f5f494e5923cfce81ea30ba23915877
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/shirou/gopsutil/LICENSE:
 --------------------------------------------------------------------
