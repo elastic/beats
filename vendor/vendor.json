@@ -521,7 +521,7 @@
 		},
 		{
 			"path": "github.com/elastic/go-structform/internal/visitors",
-			"revision": "",
+			"revision": "v0.0.4",
 			"version": "v0.0.4",
 			"versionExact": "v0.0.4"
 		},
@@ -1310,28 +1310,36 @@
 			"revisionTime": "2017-03-21T23:07:31Z"
 		},
 		{
-			"checksumSHA1": "lZRqG0Rl5w+mkaTUOuEjcKvNU6c=",
+			"checksumSHA1": "wZ7Q/3JyIlVKeYVqRUGh1zuLa9E=",
+			"path": "github.com/shirou/gopsutil",
+			"revision": "4a180b209f5f494e5923cfce81ea30ba23915877",
+			"revisionTime": "2018-06-25T08:11:43Z",
+			"version": "v2.18.06",
+			"versionExact": "v2.18.06"
+		},
+		{
+			"checksumSHA1": "RPCF/ke7rAfTtFnU1M3jCZIKsj0=",
 			"path": "github.com/shirou/gopsutil/disk",
-			"revision": "c432be29ccce470088d07eea25b3ea7e68a8afbb",
-			"revisionTime": "2018-01-30T01:13:38Z",
-			"version": "v2.18.01",
-			"versionExact": "v2.18.01"
+			"revision": "4a180b209f5f494e5923cfce81ea30ba23915877",
+			"revisionTime": "2018-06-25T08:11:43Z",
+			"version": "v2.18.06",
+			"versionExact": "v2.18.06"
 		},
 		{
-			"checksumSHA1": "jWpwWWcywJPNhKTYxi4RXds+amQ=",
+			"checksumSHA1": "ElneFnzdyg/mWfMFukLUHdy9DHY=",
 			"path": "github.com/shirou/gopsutil/internal/common",
-			"revision": "c432be29ccce470088d07eea25b3ea7e68a8afbb",
-			"revisionTime": "2018-01-30T01:13:38Z",
-			"version": "v2.18.01",
-			"versionExact": "v2.18.01"
+			"revision": "4a180b209f5f494e5923cfce81ea30ba23915877",
+			"revisionTime": "2018-06-25T08:11:43Z",
+			"version": "v2.18.06",
+			"versionExact": "v2.18.06"
 		},
 		{
-			"checksumSHA1": "Z7FjZvR5J5xh6Ne572gD7tRUsc8=",
+			"checksumSHA1": "cqp+0Xxb51xFf3ekjlaS/EpipZU=",
 			"path": "github.com/shirou/gopsutil/net",
-			"revision": "c432be29ccce470088d07eea25b3ea7e68a8afbb",
-			"revisionTime": "2018-01-30T01:13:38Z",
-			"version": "v2.18.01",
-			"versionExact": "v2.18.01"
+			"revision": "4a180b209f5f494e5923cfce81ea30ba23915877",
+			"revisionTime": "2018-06-25T08:11:43Z",
+			"version": "v2.18.06",
+			"versionExact": "v2.18.06"
 		},
 		{
 			"checksumSHA1": "e7mAb9jMke2ASQGZepFgOmfBFzM=",
