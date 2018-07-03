@@ -47,6 +47,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
@@ -16412,6 +16413,74 @@ type: long
 format: duration
 
 The OS uptime in milliseconds.
+
+
+--
+
+[[exported-fields-traefik]]
+== traefik fields
+
+Traefik reverse proxy / load balancer metrics
+
+
+
+[float]
+== traefik fields
+
+Traefik reverse proxy / load balancer metrics
+
+
+
+[float]
+== health fields
+
+Metrics obtained from Traefik's health API endpoint
+
+
+
+*`traefik.health.uptime.sec`*::
++
+--
+type: long
+
+Uptime of Traefik instance in seconds
+
+
+--
+
+[float]
+== response fields
+
+Response metrics
+
+
+
+*`traefik.health.response.count`*::
++
+--
+type: long
+
+Number of responses
+
+
+--
+
+*`traefik.health.response.avg_time.us`*::
++
+--
+type: long
+
+Average response time in microseconds
+
+
+--
+
+*`traefik.health.response.status_code`*::
++
+--
+type: object
+
+Number of responses per status code
 
 
 --

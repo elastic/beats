@@ -15,18 +15,5 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package schema
-
-import (
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-)
-
-func TestErrors(t *testing.T) {
-	errs := NewErrors()
-	err := NewError("test", "Hello World")
-	errs.AddError(err)
-
-	assert.True(t, errs.HasRequiredErrors())
-}
+// Package traefik is a Metricbeat module that contains MetricSets.
+package traefik

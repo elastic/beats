@@ -66,7 +66,7 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) []error {
+func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
 	}
@@ -74,17 +74,16 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) []er
 	err := json.Unmarshal(content, &all)
 	if err != nil {
 		r.Error(err)
-		return []error{err}
+		return err
 	}
 
-	var errs []error
-
-	fields, err := schema.Apply(all.Data)
+	fields, err := schema.Apply(all.Data, s.FailOnRequired)
 	if err != nil {
-		errs = append(errs, err)
+		r.Error(err)
+		return err
 	}
 
-	event := mb.Event{}
+	var event mb.Event
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", "elasticsearch")
 
@@ -96,5 +95,5 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) []er
 
 	r.Event(event)
 
-	return errs
+	return nil
 }

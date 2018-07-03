@@ -24,7 +24,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	s "github.com/elastic/beats/libbeat/common/schema"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
@@ -41,11 +40,8 @@ func TestStats(t *testing.T) {
 
 		reporter := &mbtest.CapturingReporterV2{}
 		err = eventMapping(reporter, input)
-		if e, ok := err.(*s.Errors); ok {
-			assert.False(t, e.HasRequiredErrors(), "mapping error: %s", e)
-		}
-
-		assert.True(t, len(reporter.GetEvents()) >= 1)
-		assert.Equal(t, 0, len(reporter.GetErrors()))
+		assert.NoError(t, err, f)
+		assert.True(t, len(reporter.GetEvents()) >= 1, f)
+		assert.Equal(t, 0, len(reporter.GetErrors()), f)
 	}
 }

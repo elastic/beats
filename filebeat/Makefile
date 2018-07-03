@@ -15,13 +15,6 @@ kibana:
 	@mkdir -p _meta/kibana.generated
 	@-cp -pr module/*/_meta/kibana/* _meta/kibana.generated
 
-# Collects all modules files to be packaged in a temporary folder
-.PHONY: modules
-modules:
-	@mkdir -p _meta/
-	@rm -rf _meta/module.generated
-	@rsync -q -av module/ _meta/module.generated --exclude "_meta" --exclude "*/*/test"
-
 # Collects all module configs
 .PHONY: configs
 configs: python-env
@@ -49,7 +42,7 @@ imports: python-env
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields kibana modules configs collect-docs imports
+collect: fields kibana configs collect-docs imports
 
 # Creates a new module. Requires the params MODULE
 .PHONY: create-module

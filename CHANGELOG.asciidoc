@@ -170,6 +170,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add ability to define input configuration as stringified JSON for autodiscover. {pull}7372[7372]
 - Add processor definition support for hints builder {pull}7386[7386]
 - Add support to disable html escaping in outputs. {pull}7445[7445]
+- Refactor error handing in schema.Apply(). {pull}7335[7335]
 - Add additional types to kubernetes metadata {pull}7457[7457]
 
 *Auditbeat*
@@ -206,6 +207,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add GC fileset to the Elasticsearch module. {pull}7305[7305]
 - Add Audit log fileset to the Elasticsearch module. {pull}7365[7365]
 - Add Slow log fileset to the Elasticsearch module. {pull}7473[7473]
+- Add deprecation fileset to the Elasticsearch module. {pull}7474[7474]
 
 *Heartbeat*
 
@@ -290,6 +292,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Update `state_container` metricset to support latest `kube-state-metrics` version. {pull}7216[7216]
 - Collect accumulated docker network metrics and mark old ones as deprecated. {pull}7253[7253]
 - Add TLS support to MongoDB module. {pull}7401[7401]
+- Added Traefik module with health metricset. {pull}7413[7413]
 
 *Packetbeat*
 

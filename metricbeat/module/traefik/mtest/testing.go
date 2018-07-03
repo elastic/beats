@@ -15,23 +15,35 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package schema
+package mtest
 
-import (
-	"testing"
+import "os"
 
-	"github.com/stretchr/testify/assert"
-)
+// GetEnvHost for Traefik
+func GetEnvHost() string {
+	host := os.Getenv("TRAEFIK_HOST")
 
-func TestIsError(t *testing.T) {
-	err := NewError("test", "Hello World")
-	assert.Error(t, err)
+	if len(host) == 0 {
+		host = "127.0.0.1"
+	}
+	return host
 }
 
-func TestType(t *testing.T) {
-	err := NewError("test", "Hello World")
-	assert.True(t, err.IsType(RequiredType))
+// GetEnvAPIPort for Traefik
+func GetEnvAPIPort() string {
+	port := os.Getenv("TRAEFIK_API_PORT")
 
-	err.SetType(OptionalType)
-	assert.True(t, err.IsType(OptionalType))
+	if len(port) == 0 {
+		port = "8080"
+	}
+	return port
+}
+
+// GetConfig for Traefik
+func GetConfig(metricset string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "traefik",
+		"metricsets": []string{metricset},
+		"hosts":      []string{GetEnvHost() + ":" + GetEnvAPIPort()},
+	}
 }
