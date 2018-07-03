@@ -1,0 +1,45 @@
+- key: access
+  type: group
+  description: >
+    squid Module
+  fields:
+    - name: duration
+      description: Please add description
+      example: Please add example
+      type: long
+    - name: client_address
+      description: Please add description
+      example: Please add example
+    - name: cache_result
+      description: Please add description
+      example: Please add example
+      type: keyword
+    - name: status_code
+      description: Please add description
+      example: Please add example
+      type: long
+    - name: bytes
+      description: Please add description
+      example: Please add example
+      type: long
+    - name: request_method
+      description: Please add description
+      example: Please add example
+      type: keyword
+    - name: url
+      description: Please add description
+      example: Please add example
+    - name: user
+      description: Please add description
+      example: Please add example
+    - name: hierarchy_code
+      description: Please add description
+      example: Please add example
+      type: keyword
+    - name: server
+      description: Please add description
+      example: Please add example
+      type: keyword
+    - name: content_type
+      description: Please add description
+      example: Please add example

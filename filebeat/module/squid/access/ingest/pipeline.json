@@ -1,0 +1,40 @@
+{
+  "description": "Pipeline for parsing squid access logs",
+  "processors": [
+      {
+          "grok": {
+              "field": "message",
+              "trace_match": true,
+              "patterns": [
+                  "%{NUMBER:unixtime}%{SPACE}*%{NUMBER:duration} %{IP:client_address} %{WORD:cache_result}/%{POSINT:status_code} %{NUMBER:bytes} %{WORD:request_method} %{NOTSPACE:url} (%{NOTSPACE:user}|-) %{WORD:hierarchy_code}/(%{IPORHOST:server}|-) %{NOTSPACE:content_type}"
+              ]
+          }
+      },
+      {
+          "remove": {
+              "field": "message"
+          }
+      },
+      {
+          "date": {
+              "field": "unixtime",
+              "target_field": "@timestamp",
+              "formats": [
+                  "UNIX"
+              ],
+              "ignore_failure": true
+          }
+      },
+      {
+          "remove": {
+              "field": "unixtime"
+          }
+      }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

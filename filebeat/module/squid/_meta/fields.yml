@@ -1,0 +1,9 @@
+- key: squid
+  title: "squid"
+  description: >
+    squid Module
+  fields:
+    - name: squid
+      type: group
+      description: >
+      fields:

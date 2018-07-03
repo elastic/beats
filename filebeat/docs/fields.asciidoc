@@ -32,6 +32,7 @@ grouped in the following categories:
 * <<exported-fields-osquery>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-redis>>
+* <<exported-fields-squid>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
 
@@ -3394,6 +3395,19 @@ The arguments with which the command was called.
 
 
 --
+
+[[exported-fields-squid]]
+== squid fields
+
+squid Module
+
+
+
+[float]
+== squid fields
+
+
+
 
 [[exported-fields-system]]
 == System fields
