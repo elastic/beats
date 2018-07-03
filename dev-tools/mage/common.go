@@ -237,66 +237,6 @@ func MustFindReplace(file string, re *regexp.Regexp, repl string) {
 	}
 }
 
-// Copy copies a file or a directory (recursively) and preserves the permissions.
-func Copy(src, dest string) error {
-	info, err := os.Stat(src)
-	if err != nil {
-		return errors.Wrapf(err, "failed to stat source file %v", src)
-	}
-	return recursiveCopy(src, dest, info)
-}
-
-func fileCopy(src, dest string, info os.FileInfo) error {
-	srcFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-
-	if !info.Mode().IsRegular() {
-		return errors.Errorf("failed to copy source file because it is not a regular file")
-	}
-
-	destFile, err := os.OpenFile(createDir(dest), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, info.Mode()&os.ModePerm)
-	if err != nil {
-		return err
-	}
-	defer destFile.Close()
-
-	if _, err = io.Copy(destFile, srcFile); err != nil {
-		return err
-	}
-	return destFile.Close()
-}
-
-func dirCopy(src, dest string, info os.FileInfo) error {
-	if err := os.MkdirAll(dest, info.Mode()); err != nil {
-		return errors.Wrap(err, "failed creating dirs")
-	}
-
-	contents, err := ioutil.ReadDir(src)
-	if err != nil {
-		return errors.Wrapf(err, "failed to read dir %v", src)
-	}
-
-	for _, info := range contents {
-		srcFile := filepath.Join(src, info.Name())
-		destFile := filepath.Join(dest, info.Name())
-		if err = recursiveCopy(srcFile, destFile, info); err != nil {
-			return errors.Wrapf(err, "failed to copy %v to %v", srcFile, destFile)
-		}
-	}
-
-	return nil
-}
-
-func recursiveCopy(src, dest string, info os.FileInfo) error {
-	if info.IsDir() {
-		return dirCopy(src, dest, info)
-	}
-	return fileCopy(src, dest, info)
-}
-
 // DownloadFile downloads the given URL and writes the file to destinationDir.
 // The path to the file is returned.
 func DownloadFile(url, destinationDir string) (string, error) {
