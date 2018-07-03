@@ -23,7 +23,6 @@ import (
 	"io/ioutil"
 	"testing"
 
-	s "github.com/elastic/beats/libbeat/common/schema"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
@@ -42,12 +41,6 @@ func TestInvalid(t *testing.T) {
 	assert.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	errs := eventsMapping(reporter, content)
-
-	errors, ok := errs[0].(*s.Errors)
-	if ok {
-		assert.True(t, errors.HasRequiredErrors(), "mapping error: %s", errors)
-	} else {
-		t.Error(err)
-	}
+	err = eventsMapping(reporter, content)
+	assert.Error(t, err)
 }

@@ -62,7 +62,11 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 		for _, shards := range index.Shards {
 			for _, shard := range shards {
 				event := mb.Event{}
-				fields, _ := schema.Apply(shard)
+				fields, err := schema.Apply(shard)
+				if err != nil {
+					r.Error(err)
+					continue
+				}
 
 				fields["shard"] = fields["number"]
 				delete(fields, "number")
