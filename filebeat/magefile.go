@@ -21,10 +21,12 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage"
 )
@@ -72,7 +74,9 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	mage.UseElasticBeatPackaging()
-	mg.Deps(Update)
+	customizePackaging()
+
+	mg.Deps(Update, prepareModulePackaging)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
@@ -85,4 +89,64 @@ func TestPackages() error {
 // Update updates the generated files (aka make update).
 func Update() error {
 	return sh.Run("make", "update")
+}
+
+// -----------------------------------------------------------------------------
+// Customizations specific to Filebeat.
+// - Include modules directory in packages (minus _meta and test files).
+// - Include modules.d directory in packages.
+
+var modulesDirGenerated = filepath.Clean("build/packaging/modules")
+
+// customizePackaging modifies the package specs to add the modules and
+// modules.d directory.
+func customizePackaging() {
+	var (
+		moduleTarget = "module"
+		module       = mage.PackageFile{
+			Mode:   0644,
+			Source: modulesDirGenerated,
+		}
+
+		modulesDTarget = "modules.d"
+		modulesD       = mage.PackageFile{
+			Mode:   0644,
+			Source: "modules.d",
+			Config: true,
+		}
+	)
+
+	for _, args := range mage.Packages {
+		pkgType := args.Types[0]
+		switch pkgType {
+		case mage.TarGz, mage.Zip:
+			args.Spec.Files[moduleTarget] = module
+			args.Spec.Files[modulesDTarget] = modulesD
+		case mage.Deb, mage.RPM:
+			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
+			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
+		default:
+			panic(errors.Errorf("unhandled package type: %v", pkgType))
+		}
+	}
+}
+
+// prepareModulePackaging copies the module dir to the build dir and excludes
+// _meta and test files so that they are not included in packages.
+func prepareModulePackaging() error {
+	if err := sh.Rm(modulesDirGenerated); err != nil {
+		return err
+	}
+
+	copy := &mage.CopyTask{
+		Source:  "module",
+		Dest:    modulesDirGenerated,
+		Mode:    0644,
+		DirMode: 0755,
+		Exclude: []string{
+			"/_meta",
+			"/test",
+		},
+	}
+	return copy.Execute()
 }

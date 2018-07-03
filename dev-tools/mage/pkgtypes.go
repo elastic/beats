@@ -608,6 +608,11 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 	if spec.localPostInstallScript != "" {
 		args = append(args, "--after-install", spec.localPostInstallScript)
 	}
+	for _, pf := range spec.Files {
+		if pf.Config {
+			args = append(args, "--config-files", pf.Target)
+		}
+	}
 	args = append(args,
 		"-p", spec.OutputFile,
 		inputTar,
