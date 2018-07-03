@@ -37,14 +37,8 @@ func TestEmptyQueueShouldGiveNoError(t *testing.T) {
 	content, err := ioutil.ReadFile(file)
 	assert.NoError(t, err)
 
-	_, errs := eventsMapping(content)
-
-	errors, ok := errs.(*s.Errors)
-	if ok {
-		assert.False(t, errors.HasRequiredErrors(), "mapping error: %s", errors)
-	} else {
-		t.Error(err)
-	}
+	_, err = eventsMapping(content)
+	assert.NoError(t, err)
 }
 
 func TestNotEmptyQueueShouldGiveNoError(t *testing.T) {
@@ -52,14 +46,8 @@ func TestNotEmptyQueueShouldGiveNoError(t *testing.T) {
 	content, err := ioutil.ReadFile(file)
 	assert.NoError(t, err)
 
-	_, errs := eventsMapping(content)
-
-	errors, ok := errs.(*s.Errors)
-	if ok {
-		assert.False(t, errors.HasRequiredErrors(), "mapping error: %s", errors)
-	} else {
-		t.Error(err)
-	}
+	_, err = eventsMapping(content)
+	assert.NoError(t, err)
 }
 
 func TestEmptyQueueShouldGiveZeroEvent(t *testing.T) {
@@ -68,7 +56,6 @@ func TestEmptyQueueShouldGiveZeroEvent(t *testing.T) {
 	assert.NoError(t, err)
 
 	events, _ := eventsMapping(content)
-
 	assert.Zero(t, len(events))
 }
 
@@ -97,15 +84,13 @@ func TestInvalidJsonForRequiredFieldShouldThrowError(t *testing.T) {
 	content, err := ioutil.ReadFile(file)
 	assert.NoError(t, err)
 
-	_, errs := eventsMapping(content)
-
-	errors, ok := errs.(*s.Errors)
-	if ok {
-		assert.True(t, errors.HasRequiredErrors(), "mapping error: %s", errors)
-		assert.EqualError(t, errors, "Required fields are missing: ,source")
-	} else {
-		t.Error(err)
-	}
+	var notFoundKeys []string
+	expectedNotFoundKeys := []string{"source"}
+	_, err = eventsMapping(content, s.NotFoundKeys(func(keys []string) {
+		notFoundKeys = keys
+	}))
+	assert.ElementsMatch(t, expectedNotFoundKeys, notFoundKeys)
+	assert.Error(t, err)
 }
 
 func TestInvalidJsonForBadFormatShouldThrowError(t *testing.T) {
@@ -114,7 +99,6 @@ func TestInvalidJsonForBadFormatShouldThrowError(t *testing.T) {
 	assert.NoError(t, err)
 
 	_, err = eventsMapping(content)
-
 	assert.Error(t, err)
 }
 
