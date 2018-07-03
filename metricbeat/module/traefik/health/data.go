@@ -37,7 +37,7 @@ var (
 	}
 )
 
-func eventMapping(health map[string]interface{}) (common.MapStr, *s.Errors) {
+func eventMapping(health map[string]interface{}) (common.MapStr, error) {
 	if averageResponseTimeSec, ok := health["average_response_time_sec"]; ok {
 		if averageResponseTimeSec, ok := averageResponseTimeSec.(float64); ok {
 			health["average_response_time_us"] = averageResponseTimeSec * 1000 * 1000
