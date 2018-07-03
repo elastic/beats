@@ -29,6 +29,9 @@ https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix default value for logging.files.keepfiles. It was being set to 0 and now
+  it's set to the documented value of 7. {issue}7494[7494]
+
 *Auditbeat*
 
 *Filebeat*
