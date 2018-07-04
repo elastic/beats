@@ -25,6 +25,8 @@ import (
 	"strings"
 	"time"
 
+	"strconv"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
@@ -43,7 +45,6 @@ import (
 type reporter struct {
 	done *stopper
 
-	period     time.Duration
 	checkRetry time.Duration
 
 	// event metadata
@@ -102,7 +103,6 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	for k, v := range config.Params {
 		params[k] = v
 	}
-	params["interval"] = config.Period.String()
 
 	out := outputs.Group{
 		Clients:   nil,
@@ -129,7 +129,7 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 		}), nil
 	}
 
-	monitoring := monitoring.Default.NewRegistry("xpack.monitoring")
+	monitoring := monitoring.Default.GetRegistry("xpack.monitoring")
 
 	pipeline, err := pipeline.New(
 		beat,
@@ -150,7 +150,6 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 
 	r := &reporter{
 		done:       newStopper(),
-		period:     config.Period,
 		beatMeta:   makeMeta(beat),
 		tags:       config.Tags,
 		checkRetry: checkRetry,
@@ -158,7 +157,7 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 		client:     client,
 		out:        out,
 	}
-	go r.initLoop()
+	go r.initLoop(config)
 	return r, nil
 }
 
@@ -168,7 +167,7 @@ func (r *reporter) Stop() {
 	r.pipeline.Close()
 }
 
-func (r *reporter) initLoop() {
+func (r *reporter) initLoop(c config) {
 	debugf("Start monitoring endpoint init loop.")
 	defer debugf("Finish monitoring endpoint init loop.")
 
@@ -199,15 +198,16 @@ func (r *reporter) initLoop() {
 	logp.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop()
+	go r.snapshotLoop("state", c.StatePeriod)
+	go r.snapshotLoop("stats", c.MetricsPeriod)
 }
 
-func (r *reporter) snapshotLoop() {
-	ticker := time.NewTicker(r.period)
+func (r *reporter) snapshotLoop(namespace string, period time.Duration) {
+	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
-	logp.Info("Start monitoring metrics snapshot loop.")
-	defer logp.Info("Stop monitoring metrics snapshot loop.")
+	logp.Info("Start monitoring %s metrics snapshot loop with period %s.", namespace, period)
+	defer logp.Info("Stop monitoring %s metrics snapshot loop.", namespace)
 
 	for {
 		var ts time.Time
@@ -218,7 +218,7 @@ func (r *reporter) snapshotLoop() {
 		case ts = <-ticker.C:
 		}
 
-		snapshot := makeSnapshot(monitoring.Default)
+		snapshot := makeSnapshot(monitoring.GetNamespace(namespace).GetRegistry())
 		if snapshot == nil {
 			debugf("Empty snapshot.")
 			continue
@@ -226,15 +226,20 @@ func (r *reporter) snapshotLoop() {
 
 		fields := common.MapStr{
 			"beat":    r.beatMeta,
-			"metrics": snapshot,
+			namespace: snapshot,
 		}
 		if len(r.tags) > 0 {
 			fields["tags"] = r.tags
 		}
-
 		r.client.Publish(beat.Event{
 			Timestamp: ts,
 			Fields:    fields,
+			Meta: common.MapStr{
+				"type":        "beats_" + namespace,
+				"interval_ms": int64(period / time.Millisecond),
+				// Converting to seconds as interval only accepts `s` as unit
+				"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
+			},
 		})
 	}
 }

@@ -17,16 +17,9 @@
 
 package monitoring
 
-import (
-	"sync"
-)
+import "sync"
 
-var namespaces = struct {
-	sync.Mutex
-	m map[string]*Namespace
-}{
-	m: make(map[string]*Namespace),
-}
+var namespaces = NewNamespaces()
 
 // Namespace contains the name of the namespace and it's registry
 type Namespace struct {
@@ -34,18 +27,17 @@ type Namespace struct {
 	registry *Registry
 }
 
+func newNamespace(name string) *Namespace {
+	n := &Namespace{
+		name: name,
+	}
+	return n
+}
+
 // GetNamespace gets the namespace with the given name.
 // If the namespace does not exist yet, a new one is created.
 func GetNamespace(name string) *Namespace {
-	namespaces.Lock()
-	defer namespaces.Unlock()
-
-	n, ok := namespaces.m[name]
-	if !ok {
-		n = &Namespace{name: name}
-		namespaces.m[name] = n
-	}
-	return n
+	return namespaces.Get(name)
 }
 
 // SetRegistry sets the registry of the namespace
@@ -59,4 +51,29 @@ func (n *Namespace) GetRegistry() *Registry {
 		n.registry = NewRegistry()
 	}
 	return n.registry
+}
+
+// Namespaces is a list of Namespace structs
+type Namespaces struct {
+	sync.Mutex
+	namespaces map[string]*Namespace
+}
+
+// NewNamespaces creates a new namespaces list
+func NewNamespaces() *Namespaces {
+	return &Namespaces{
+		namespaces: map[string]*Namespace{},
+	}
+}
+
+// Get returns the namespace for the given key. If the key does not exist, new namespace is created.
+func (n *Namespaces) Get(key string) *Namespace {
+	n.Lock()
+	defer n.Unlock()
+	if namespace, ok := n.namespaces[key]; ok {
+		return namespace
+	}
+
+	n.namespaces[key] = newNamespace(key)
+	return n.namespaces[key]
 }

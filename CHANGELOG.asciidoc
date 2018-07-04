@@ -175,6 +175,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add support to disable html escaping in outputs. {pull}7445[7445]
 - Refactor error handing in schema.Apply(). {pull}7335[7335]
 - Add additional types to kubernetes metadata {pull}7457[7457]
+- Add module state reporting for X-Pack Monitoring. {pull}7075[7075]
 
 *Auditbeat*
 

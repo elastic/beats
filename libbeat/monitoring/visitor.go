@@ -28,6 +28,7 @@ type ValueVisitor interface {
 	OnBool(b bool)
 	OnInt(i int64)
 	OnFloat(f float64)
+	OnStringSlice(f []string)
 }
 
 type RegistryVisitor interface {
@@ -66,4 +67,9 @@ func ReportInt(V Visitor, name string, value int64) {
 func ReportFloat(V Visitor, name string, value float64) {
 	V.OnKey(name)
 	V.OnFloat(value)
+}
+
+func ReportStringSlice(V Visitor, name string, value []string) {
+	V.OnKey(name)
+	V.OnStringSlice(value)
 }

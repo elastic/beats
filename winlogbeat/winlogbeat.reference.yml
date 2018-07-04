@@ -1067,6 +1067,9 @@ logging.files:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
+  #metrics.period: 10s
+  #state.period: 1m
+
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security
 # reasons the endpoint is disabled by default. This feature is currently experimental.
