@@ -124,11 +124,10 @@ func (d *decoderScanner) Scan() ([]byte, int, error) {
 	return transform.Bytes(d.decoder, buf[:n])
 }
 
+// Next returns a new decoded line from the input file
 func (r *Reader) Next() ([]byte, int, error) {
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
-	var buf []byte
-	var n int
 	for {
 		// read next 'potential' line from input buffer/reader
 		buf, n, err := r.in.Scan()
@@ -138,10 +137,8 @@ func (r *Reader) Next() ([]byte, int, error) {
 
 		if buf[len(buf)-1] == '\n' {
 			return buf, n, err
-		} else {
-			logp.Debug("line", "Line ending char found which wasn't one: %s", buf[len(buf)-1])
 		}
-	}
 
-	return buf, n, nil
+		logp.Debug("line", "Line ending char found which wasn't one: %s", buf[len(buf)-1])
+	}
 }
