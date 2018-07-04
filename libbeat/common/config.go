@@ -87,6 +87,12 @@ func NewConfig() *Config {
 	return fromConfig(ucfg.New())
 }
 
+// NewConfigFrom creates a new Config object from the given input.
+// From can be any kind of structured data (struct, map, array, slice).
+//
+// If from is a string, the contents is treated like raw YAML input. The string
+// will be parsed and a structure config object is build from the parsed
+// result.
 func NewConfigFrom(from interface{}) (*Config, error) {
 	if str, ok := from.(string); ok {
 		c, err := yaml.NewConfig([]byte(str), configOpts...)
@@ -97,6 +103,14 @@ func NewConfigFrom(from interface{}) (*Config, error) {
 	return fromConfig(c), err
 }
 
+// MustNewConfigFrom creates a new Config object from the given input.
+// From can be any kind of structured data (struct, map, array, slice).
+//
+// If from is a string, the contents is treated like raw YAML input. The string
+// will be parsed and a structure config object is build from the parsed
+// result.
+//
+// MustNewConfigFrom panics if an error occurs.
 func MustNewConfigFrom(from interface{}) *Config {
 	cfg, err := NewConfigFrom(from)
 	if err != nil {
