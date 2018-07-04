@@ -383,6 +383,27 @@ func (b *Buffer) Index(seq []byte) int {
 	return b.IndexFrom(0, seq)
 }
 
+// IndexRune returns offset of seq in unprocessed buffer.
+// Returns -1 if rune can not be found.
+func (b *Buffer) IndexRune(r rune) int {
+	return b.IndexRuneFrom(0, r)
+}
+
+// IndexRuneFrom returns offset of seq in unprocessed buffer start at from.
+// Returns -1 if rune can not be found.
+func (b *Buffer) IndexRuneFrom(from int, r rune) int {
+	if b.err != nil {
+		return -1
+	}
+
+	idx := bytes.IndexRune(b.data[b.mark+from:], r)
+	if idx < 0 {
+		return -1
+	}
+
+	return idx + from + b.mark
+}
+
 // IndexFrom returns offset of seq in unprocessed buffer start at from.
 // Returns -1 if seq can not be found.
 func (b *Buffer) IndexFrom(from int, seq []byte) int {
@@ -424,6 +445,23 @@ func (b *Buffer) IndexByteFrom(off int, byte byte) int {
 		return -1
 	}
 	return idx + (b.offset - b.mark) + off
+}
+
+// CollectUntilRune collects all bytes until delimiting rune was found (including delim).
+func (b *Buffer) CollectUntilRune(r rune) ([]byte, error) {
+	if b.err != nil {
+		return nil, b.err
+	}
+
+	idx := bytes.IndexRune(b.data[b.mark:], r)
+	if idx < 0 {
+		return nil, b.bufferEndError()
+	}
+
+	end := b.mark + idx + 1
+	data := b.data[b.mark:end]
+	b.Advance(len(data))
+	return data, nil
 }
 
 // CollectUntil collects all bytes until delim was found (including delim).

@@ -811,8 +811,8 @@ class Test(BaseTest):
 
         # Wait until error shows up
         self.wait_until(
-            lambda: self.log_contains("Error decoding line: transform: short source buffer"),
-            max_timeout=5)
+            lambda: self.log_contains("Read line error: transform: short source buffer"),
+            max_timeout=20)
 
         filebeat.check_kill_and_wait()
 

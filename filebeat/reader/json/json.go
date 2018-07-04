@@ -105,6 +105,10 @@ func (r *JSON) Next() (reader.Message, error) {
 	return message, nil
 }
 
+func (r *JSON) GetState() common.MapStr {
+	return r.reader.GetState()
+}
+
 func createJSONError(message string) common.MapStr {
 	return common.MapStr{"message": message, "type": "json"}
 }

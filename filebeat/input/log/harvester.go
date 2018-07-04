@@ -289,9 +289,17 @@ func (h *Harvester) Run() error {
 		// Get copy of state to work on
 		// This is important in case sending is not successful so on shutdown
 		// the old offset is reported
+		iBytesOffset, err := h.reader.GetState().GetValue("decoder.file")
+		if err != nil {
+			return err
+		}
+		bytesOffset, ok := iBytesOffset.(int)
+		if !ok {
+			return fmt.Errorf("cannot convert %v to int", iBytesOffset)
+		}
 		state := h.getState()
 		startingOffset := state.Offset
-		state.Offset += int64(message.Bytes)
+		state.Offset += int64(bytesOffset)
 
 		// Create state event
 		data := util.NewData()

@@ -23,172 +23,189 @@ import (
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/transform"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // lineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
 type Reader struct {
-	reader     io.Reader
-	codec      encoding.Encoding
-	bufferSize int
-	nl         []byte
-	inBuffer   *streambuf.Buffer
-	outBuffer  *streambuf.Buffer
-	inOffset   int // input buffer read offset
-	byteCount  int // number of bytes decoded from input buffer into output buffer
-	decoder    transform.Transformer
+	lineScanner *lineScanner
 }
 
 // New creates a new reader object
 func New(input io.Reader, codec encoding.Encoding, bufferSize int) (*Reader, error) {
-	encoder := codec.NewEncoder()
+	decReader := newDecoderReader(input, codec, bufferSize)
 
-	// Create newline char based on encoding
+	encoder := codec.NewEncoder()
 	nl, _, err := transform.Bytes(encoder, []byte{'\n'})
 	if err != nil {
 		return nil, err
 	}
+	lineScanner := newLineScanner(decReader, bufferSize, nl)
 
 	return &Reader{
-		reader:     input,
-		codec:      codec,
-		bufferSize: bufferSize,
-		nl:         nl,
-		decoder:    codec.NewDecoder(),
-		inBuffer:   streambuf.New(nil),
-		outBuffer:  streambuf.New(nil),
+		lineScanner: lineScanner,
 	}, nil
 }
 
 // Next reads the next line until the new line character
 func (r *Reader) Next() ([]byte, int, error) {
-	// This loop is need in case advance detects an line ending which turns out
-	// not to be one when decoded. If that is the case, reading continues.
-	for {
-		// read next 'potential' line from input buffer/reader
-		err := r.advance()
+	return r.lineScanner.scan()
+}
+
+type decoderReader struct {
+	in         io.Reader
+	decoder    transform.Transformer
+	buf        *streambuf.Buffer
+	bufferSize int
+
+	inOffset      int
+	bytesOffset   int
+	decodedOffset int
+}
+
+func (r *Reader) GetState() common.MapStr {
+	return common.MapStr{
+		"decoder": common.MapStr{
+			"file":    r.lineScanner.in.inOffset,
+			"encoded": r.lineScanner.in.bytesOffset,
+			"decoded": r.lineScanner.in.decodedOffset,
+		},
+		"scanner": common.MapStr{
+			"line": r.lineScanner.offset,
+		},
+	}
+}
+
+func newDecoderReader(in io.Reader, codec encoding.Encoding, bufferSize int) *decoderReader {
+	return &decoderReader{
+		in:         in,
+		decoder:    codec.NewDecoder(),
+		buf:        streambuf.New(nil),
+		bufferSize: bufferSize,
+
+		inOffset:      0,
+		bytesOffset:   0,
+		decodedOffset: 0,
+	}
+}
+
+func (r *decoderReader) read(buf []byte) (int, error) {
+	b := make([]byte, r.bufferSize)
+	n, err := r.in.Read(b)
+	if err != nil {
+		return 0, err
+	}
+
+	r.inOffset += n
+	symlen := make([]int, n)
+	nBytes, nSymbols, err := r.conv(b[:n], buf, symlen)
+	if err != nil {
+		return 0, err
+	}
+
+	r.bytesOffset += nBytes
+	r.decodedOffset += nSymbols
+
+	return nBytes, nil
+}
+
+// conv
+func (r *decoderReader) conv(in []byte, out []byte, symlen []int) (int, int, error) {
+	var err error
+	nBytes := 0
+	nSymbols := 0
+	bufSymLen := make([]int, len(symlen))
+	deChar := make([]byte, 1024)
+
+	i := 0
+	srcLen := len(in)
+	for i < srcLen {
+		j := i + 1
+		for j <= srcLen {
+			nDst, _, err := r.decoder.Transform(deChar, in[i:j], false)
+			if err != nil {
+				if err == transform.ErrShortSrc {
+					j++
+
+					if srcLen == j {
+					if srcLen < j {
+						return nBytes, nSymbols, err
+					}
+					continue
+				}
+				err = nil
+			}
+			bufSymLen[nSymbols] = nDst
+			r.buf.Write(deChar[:nDst])
+			nBytes += nDst
+			nSymbols++
+			break
+		}
+		i = j
+	}
+
+	b, err := r.buf.Collect(nBytes)
+	if err != nil {
+		panic(err)
+	}
+
+	copy(symlen, bufSymLen)
+
+	return nBytes, copy(out, b), err
+}
+
+type lineScanner struct {
+	in         *decoderReader
+	nl         []byte
+	bufferSize int
+
+	buf    *streambuf.Buffer
+	offset int
+}
+
+func newLineScanner(in *decoderReader, bufferSize int, nl []byte) *lineScanner {
+	return &lineScanner{
+		in:         in,
+		nl:         nl,
+		bufferSize: bufferSize,
+		buf:        streambuf.New(nil),
+		offset:     0,
+	}
+}
+
+// Scan reads from the underlying decoder reader and returns decoded lines.
+func (s *lineScanner) scan() ([]byte, int, error) {
+	idx := s.buf.IndexRune('\n')
+	for !newLineFound(idx) {
+		b := make([]byte, s.bufferSize)
+		n, err := s.in.read(b)
 		if err != nil {
 			return nil, 0, err
 		}
 
-		// Check last decoded byte really being '\n' also unencoded
-		// if not, continue reading
-		buf := r.outBuffer.Bytes()
-
-		// This can happen if something goes wrong during decoding
-		if len(buf) == 0 {
-			logp.Err("Empty buffer returned by advance")
-			continue
-		}
-
-		if buf[len(buf)-1] == '\n' {
-			break
-		} else {
-			logp.Debug("line", "Line ending char found which wasn't one: %s", buf[len(buf)-1])
-		}
+		s.buf.Append(b[:n])
+		idx = s.buf.IndexRune('\n')
 	}
 
-	// output buffer contains complete line ending with '\n'. Extract
-	// byte slice from buffer and reset output buffer.
-	bytes, err := r.outBuffer.Collect(r.outBuffer.Len())
-	r.outBuffer.Reset()
+	return s.line(idx)
+}
+
+// newLineFound checks if a new line was found.
+func newLineFound(i int) bool {
+	return i != -1
+}
+
+// line sets the offset of the scanner and returns a line.
+func (s *lineScanner) line(i int) ([]byte, int, error) {
+	line, err := s.buf.CollectUntilRune('\n')
 	if err != nil {
-		// This should never happen as otherwise we have a broken state
 		panic(err)
 	}
 
-	// return and reset consumed bytes count
-	sz := r.byteCount
-	r.byteCount = 0
-	return bytes, sz, nil
-}
-
-// Reads from the buffer until a new line character is detected
-// Returns an error otherwise
-func (r *Reader) advance() error {
-	// Initial check if buffer has already a newLine character
-	idx := r.inBuffer.IndexFrom(r.inOffset, r.nl)
-
-	// fill inBuffer until '\n' sequence has been found in input buffer
-	for idx == -1 {
-		// increase search offset to reduce iterations on buffer when looping
-		newOffset := r.inBuffer.Len() - len(r.nl)
-		if newOffset > r.inOffset {
-			r.inOffset = newOffset
-		}
-
-		buf := make([]byte, r.bufferSize)
-
-		// try to read more bytes into buffer
-		n, err := r.reader.Read(buf)
-
-		// Appends buffer also in case of err
-		r.inBuffer.Append(buf[:n])
-		if err != nil {
-			return err
-		}
-
-		// empty read => return buffer error (more bytes required error)
-		if n == 0 {
-			return streambuf.ErrNoMoreBytes
-		}
-
-		// Check if buffer has newLine character
-		idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
-	}
-
-	// found encoded byte sequence for '\n' in buffer
-	// -> decode input sequence into outBuffer
-	sz, err := r.decode(idx + len(r.nl))
-	if err != nil {
-		logp.Err("Error decoding line: %s", err)
-		// In case of error increase size by unencoded length
-		sz = idx + len(r.nl)
-	}
-
-	// consume transformed bytes from input buffer
-	err = r.inBuffer.Advance(sz)
-	r.inBuffer.Reset()
-
-	// continue scanning input buffer from last position + 1
-	r.inOffset = idx + 1 - sz
-	if r.inOffset < 0 {
-		// fix inOffset if '\n' has encoding > 8bits + firl line has been decoded
-		r.inOffset = 0
-	}
-
-	return err
-}
-
-func (r *Reader) decode(end int) (int, error) {
-	var err error
-	buffer := make([]byte, 1024)
-	inBytes := r.inBuffer.Bytes()
-	start := 0
-
-	for start < end {
-		var nDst, nSrc int
-
-		nDst, nSrc, err = r.decoder.Transform(buffer, inBytes[start:end], false)
-		if err != nil {
-			// Check if error is different from destination buffer too short
-			if err != transform.ErrShortDst {
-				r.outBuffer.Write(inBytes[0:end])
-				start = end
-				break
-			}
-
-			// Reset error as decoding continues
-			err = nil
-		}
-
-		start += nSrc
-		r.outBuffer.Write(buffer[:nDst])
-	}
-
-	r.byteCount += start
-	return start, err
+	s.offset += i
+	s.buf.Reset()
+	return line, len(line), nil
 }
