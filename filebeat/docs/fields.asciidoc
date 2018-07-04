@@ -924,10 +924,125 @@ The body of the request, if enabled
 [float]
 == gc fields
 
+GC fileset fields.
 
 
 
-*`elasticsearch.gc.relative_process_timestamp_secs`*::
+[float]
+== phase fields
+
+Fields specific to GC phase.
+
+
+
+*`elasticsearch.gc.phase.name`*::
++
+--
+type: keyword
+
+Name of the GC collection phase.
+
+
+--
+
+*`elasticsearch.gc.phase.duration_sec`*::
++
+--
+type: float
+
+Collection phase duration according to the Java virtual machine.
+
+
+--
+
+*`elasticsearch.gc.phase.scrub_symbol_table_time_sec`*::
++
+--
+type: float
+
+Pause time in seconds cleaning up symbol tables.
+
+
+--
+
+*`elasticsearch.gc.phase.scrub_string_table_time_sec`*::
++
+--
+type: float
+
+Pause time in seconds cleaning up string tables.
+
+
+--
+
+*`elasticsearch.gc.phase.weak_refs_processing_time_sec`*::
++
+--
+type: float
+
+Time spent processing weak references in seconds.
+
+
+--
+
+*`elasticsearch.gc.phase.parallel_rescan_time_sec`*::
++
+--
+type: float
+
+Time spent in seconds marking live objects while application is stopped.
+
+
+--
+
+*`elasticsearch.gc.phase.class_unload_time_sec`*::
++
+--
+type: float
+
+Time spent unloading unused classes in seconds.
+
+
+--
+
+[float]
+== cpu_time fields
+
+Process CPU time spent performing collections.
+
+
+
+*`elasticsearch.gc.phase.cpu_time.user_sec`*::
++
+--
+type: float
+
+CPU time spent outside the kernel.
+
+
+--
+
+*`elasticsearch.gc.phase.cpu_time.sys_sec`*::
++
+--
+type: float
+
+CPU time spent inside the kernel. 
+
+
+--
+
+*`elasticsearch.gc.phase.cpu_time.real_sec`*::
++
+--
+type: float
+
+Total elapsed CPU time spent to complete the collection from start to finish.
+
+
+--
+
+*`elasticsearch.gc.jvm_runtime_sec`*::
 +
 --
 type: float
@@ -937,7 +1052,7 @@ The time from JVM start up in seconds, as a floating point number.
 
 --
 
-*`elasticsearch.gc.threads_total_stop_time_secs`*::
+*`elasticsearch.gc.threads_total_stop_time_sec`*::
 +
 --
 type: float
@@ -947,7 +1062,7 @@ Garbage collection threads total stop time seconds.
 
 --
 
-*`elasticsearch.gc.stopping_threads_time_secs`*::
+*`elasticsearch.gc.stopping_threads_time_sec`*::
 +
 --
 type: float
@@ -963,6 +1078,87 @@ Time took to stop threads seconds.
 type: keyword
 
 GC logging tags.
+
+
+--
+
+[float]
+== heap fields
+
+Heap allocation and total size.
+
+
+
+*`elasticsearch.gc.heap.size_kb`*::
++
+--
+type: integer
+
+Total heap size in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.heap.used_kb`*::
++
+--
+type: integer
+
+Used heap in kilobytes.
+
+
+--
+
+[float]
+== old_gen fields
+
+Old generation occupancy and total size.
+
+
+
+*`elasticsearch.gc.old_gen.size_kb`*::
++
+--
+type: integer
+
+Total size of old generation in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.old_gen.used_kb`*::
++
+--
+type: integer
+
+Old generation occupancy in kilobytes.
+
+
+--
+
+[float]
+== young_gen fields
+
+Young generation occupancy and total size.
+
+
+
+*`elasticsearch.gc.young_gen.size_kb`*::
++
+--
+type: integer
+
+Total size of young generation in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.young_gen.used_kb`*::
++
+--
+type: integer
+
+Young generation occupancy in kilobytes.
 
 
 --
