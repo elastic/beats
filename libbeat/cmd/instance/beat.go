@@ -166,8 +166,7 @@ func Run(name, idxPrefix, version string, bt beat.Creator) error {
 			return err
 		}
 
-		registry := monitoring.NewRegistry()
-		monitoring.GetNamespace("state").SetRegistry(registry)
+		registry := monitoring.GetNamespace("info").GetRegistry()
 		monitoring.NewString(registry, "version").Set(b.Info.Version)
 		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
 		monitoring.NewString(registry, "name").Set(b.Info.Name)
