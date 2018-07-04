@@ -58,6 +58,8 @@ https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
 
 *Packetbeat*
 
+- Updated the TLS protocol parser with new cipher suites added to TLS 1.3. {issue}7455[7455]
+
 *Winlogbeat*
 
 ==== Deprecated
