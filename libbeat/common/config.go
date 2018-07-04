@@ -88,8 +88,21 @@ func NewConfig() *Config {
 }
 
 func NewConfigFrom(from interface{}) (*Config, error) {
+	if str, ok := from.(string); ok {
+		c, err := yaml.NewConfig([]byte(str), configOpts...)
+		return fromConfig(c), err
+	}
+
 	c, err := ucfg.NewFrom(from, configOpts...)
 	return fromConfig(c), err
+}
+
+func MustNewConfigFrom(from interface{}) *Config {
+	cfg, err := NewConfigFrom(from)
+	if err != nil {
+		panic(err)
+	}
+	return cfg
 }
 
 func MergeConfigs(cfgs ...*Config) (*Config, error) {
