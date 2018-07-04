@@ -31,7 +31,7 @@ import (
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
 type Reader struct {
-	in *decoderReader
+	in *decoderScanner
 }
 
 // New creates a new reader object
@@ -42,7 +42,7 @@ func New(input io.Reader, codec encoding.Encoding, bufferSize int) (*Reader, err
 	}
 
 	return &Reader{
-		in: newDecoderReader(lineReader, codec, bufferSize),
+		in: newDecoderScanner(lineReader, codec, bufferSize),
 	}, nil
 }
 
@@ -98,15 +98,15 @@ func isNewLine(idx int) bool {
 	return idx != -1
 }
 
-type decoderReader struct {
+type decoderScanner struct {
 	reader     io.Reader
 	decoder    transform.Transformer
 	bufferSize int
 	byteCount  int
 }
 
-func newDecoderReader(reader io.Reader, codec encoding.Encoding, bufferSize int) *decoderReader {
-	return &decoderReader{
+func newDecoderScanner(reader io.Reader, codec encoding.Encoding, bufferSize int) *decoderScanner {
+	return &decoderScanner{
 		reader:     reader,
 		decoder:    codec.NewDecoder(),
 		bufferSize: bufferSize,
@@ -114,7 +114,7 @@ func newDecoderReader(reader io.Reader, codec encoding.Encoding, bufferSize int)
 	}
 }
 
-func (d *decoderReader) Scan() ([]byte, int, error) {
+func (d *decoderScanner) Scan() ([]byte, int, error) {
 	buf := make([]byte, d.bufferSize)
 	n, err := d.reader.Read(buf)
 	if err != nil {
