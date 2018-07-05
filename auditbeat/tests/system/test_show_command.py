@@ -1,5 +1,5 @@
 import os
-import re
+import platform
 import sys
 import tempfile
 import unittest
@@ -14,7 +14,19 @@ def is_root():
     return euid == 0
 
 
-@unittest.skipUnless(re.match("(?i)linux", sys.platform), "Requires Linux")
+# Require Linux greater than 3.10
+# Can't connect to kauditd in 3.10 or older
+def is_supported_linux():
+    p = platform.platform().split('-')
+    if p[0] != 'Linux':
+        return False
+    kv = p[1].split('.')
+    if int(kv[0]) < 3 or (int(kv[0]) == 3 and int(kv[1]) <= 10):
+        return False
+    return True
+
+
+@unittest.skipUnless(is_supported_linux(), "Requires Linux 3.11+")
 class Test(BaseTest):
 
     def test_show_command(self):
