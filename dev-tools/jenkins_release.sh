@@ -4,7 +4,7 @@ set -euox pipefail
 : "${HOME:?Need to set HOME to a non-empty value.}"
 : "${WORKSPACE:?Need to set WORKSPACE to a non-empty value.}"
 
-source ./dev-tools/common.bash
+source $(dirname "$0")/common.bash
 
 jenkins_setup
 
