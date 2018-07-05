@@ -96,7 +96,10 @@ add-headers:
 misspell:
 	go get -u github.com/client9/misspell/cmd/misspell
 	# Ignore Kibana files (.json)
-	$(FIND) -not -path "*.json" -name '*' -exec misspell -w {} \;
+	$(FIND) \
+		-not -path "*.json" \
+		-name '*' \
+		-exec misspell -w {} \;
 
 .PHONY: fmt
 fmt: add-headers python-env
