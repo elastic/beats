@@ -135,6 +135,9 @@ func makeConfigTemplates() error {
 
 // customizePackaging modifies the package specs to use templated config files
 // instead of the defaults.
+//
+// Customizations specific to Auditbeat:
+// - Include audit.rules.d directory in packages.
 func customizePackaging() {
 	var (
 		shortConfig = mage.PackageFile{
@@ -149,6 +152,26 @@ func customizePackaging() {
 		}
 	)
 
+	archiveRulesDir := "audit.rules.d"
+	linuxPkgRulesDir := "/etc/{{.BeatName}}/audit.rules.d"
+	rulesSrcDir := "module/auditd/_meta/audit.rules.d"
+	sampleRules := mage.PackageFile{
+		Mode:   0644,
+		Source: rulesSrcDir,
+		Dep: func(spec mage.PackageSpec) error {
+			if spec.OS == "linux" {
+				params := map[string]interface{}{
+					"ArchBits": archBits,
+				}
+				rulesFile := spec.MustExpand(rulesSrcDir+"/sample-rules-linux-{{call .ArchBits .GOARCH}}bit.conf", params)
+				if err := mage.Copy(rulesFile, spec.MustExpand("{{.PackageDir}}/audit.rules.d/sample-rules.conf.disabled")); err != nil {
+					return errors.Wrap(err, "failed to copy sample rules")
+				}
+			}
+			return nil
+		},
+	}
+
 	for _, args := range mage.Packages {
 		pkgType := args.Types[0]
 		switch pkgType {
@@ -160,6 +183,13 @@ func customizePackaging() {
 			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
 		default:
 			panic(errors.Errorf("unhandled package type: %v", pkgType))
+		}
+		if args.OS == "linux" {
+			rulesDest := archiveRulesDir
+			if pkgType != mage.TarGz {
+				rulesDest = linuxPkgRulesDir
+			}
+			args.Spec.Files[rulesDest] = sampleRules
 		}
 	}
 }
