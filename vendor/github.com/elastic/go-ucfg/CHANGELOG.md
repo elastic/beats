@@ -14,6 +14,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.6.0]
+
+### Added
+- Add *Config merging options merge, append, prepend, replace. #107
+
+### Fixed
+- Fix: do not treat ucfg.Config (or castable type) as Unpacker. #106
+
 ## [0.5.1]
 
 ### Fixed
@@ -189,7 +197,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/elastic/go-ucfg/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/elastic/go-ucfg/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/elastic/go-ucfg/compare/v0.4.6...v0.5.0
 [0.4.6]: https://github.com/elastic/go-ucfg/compare/v0.4.5...v0.4.6
