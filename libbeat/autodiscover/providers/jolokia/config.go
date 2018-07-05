@@ -33,7 +33,7 @@ var (
 // Config for Jolokia Discovery autodiscover provider
 type Config struct {
 	// List of network interfaces to use for discovery probes
-	Interfaces []InterfaceConfig `config:"interfaces" validate:"nonzero"`
+	Interfaces []InterfaceConfig `config:"interfaces,replace" validate:"nonzero"`
 
 	Builders  []*common.Config        `config:"builders"`
 	Appenders []*common.Config        `config:"appenders"`

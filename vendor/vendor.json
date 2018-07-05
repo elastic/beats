@@ -638,42 +638,52 @@
 			"versionExact": "v0.0.1"
 		},
 		{
-			"checksumSHA1": "61XUpyQ3zWnJ7Tlj0xLsHtnzwJY=",
+			"checksumSHA1": "d0qibYdQy5G1YqI5H+xNC0QJ66g=",
 			"path": "github.com/elastic/go-ucfg",
-			"revision": "0ba28e36add27704e6b49a7ed8557989a8f4a635",
-			"revisionTime": "2018-01-30T20:43:55Z",
-			"version": "v0.5.1",
-			"versionExact": "v0.5.1"
+			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
+			"revisionTime": "2018-07-04T14:42:58Z",
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
-			"checksumSHA1": "8cr5YhslUMgpvF2JebYvKC+Ezr4=",
+			"checksumSHA1": "X+R/CD8SokJrmlxFTx2nSevRDhQ=",
 			"path": "github.com/elastic/go-ucfg/cfgutil",
-			"revision": "ec8488a52542c0c51e42e8ea204dcaff400bc644",
-			"revisionTime": "2017-02-07T06:38:51Z"
+			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
+			"revisionTime": "2018-07-04T14:42:58Z",
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
-			"checksumSHA1": "Q2qrc/nI9d1tNzWTmfrkWvBNqsc=",
+			"checksumSHA1": "dShGF53hLUufO70RAjju+RT0fHY=",
 			"path": "github.com/elastic/go-ucfg/flag",
-			"revision": "ec8488a52542c0c51e42e8ea204dcaff400bc644",
-			"revisionTime": "2017-02-07T06:38:51Z"
+			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
+			"revisionTime": "2018-07-04T14:42:58Z",
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
-			"checksumSHA1": "uOrhvj7stlb0foxGZ5vbC1XJeto=",
+			"checksumSHA1": "esXpiQlEvTOUwsE0nNesso8albo=",
 			"path": "github.com/elastic/go-ucfg/internal/parse",
-			"revision": "ec8488a52542c0c51e42e8ea204dcaff400bc644",
-			"revisionTime": "2017-02-07T06:38:51Z"
+			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
+			"revisionTime": "2018-07-04T14:42:58Z",
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
-			"checksumSHA1": "sMBM95+VYBPhwtNVHqqN1yrvk1o=",
+			"checksumSHA1": "5mXUhhlPdvcAFKiQENInTJWrtQM=",
 			"path": "github.com/elastic/go-ucfg/json",
-			"revision": "ec8488a52542c0c51e42e8ea204dcaff400bc644",
-			"revisionTime": "2017-02-07T06:38:51Z"
+			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
+			"revisionTime": "2018-07-04T14:42:58Z",
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
-			"checksumSHA1": "qvzj0KzxrWvYhHIbo+FwBxUNDFw=",
+			"checksumSHA1": "Bg6vistPQLftv2fEYB7GWwSExv8=",
 			"path": "github.com/elastic/go-ucfg/yaml",
-			"revision": "ec8488a52542c0c51e42e8ea204dcaff400bc644",
-			"revisionTime": "2017-02-07T06:38:51Z"
+			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
+			"revisionTime": "2018-07-04T14:42:58Z",
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
 			"checksumSHA1": "yu/X+qHftvfQlAnjPdYLwrDn2nI=",
