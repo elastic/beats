@@ -2553,6 +2553,38 @@ event.created contains the date on which the event was created. In case of log e
 
 --
 
+*`http.response.status_code`*::
++
+--
+type: long
+
+example: 404
+
+HTTP response status_code.
+
+
+--
+
+*`http.response.elapsed_time`*::
++
+--
+type: long
+
+Elapsed time between request and response in milli seconds.
+
+
+--
+
+*`http.response.content_length`*::
++
+--
+type: long
+
+Content length of the HTTP response body.
+
+
+--
+
 [[exported-fields-logstash]]
 == logstash fields
 
