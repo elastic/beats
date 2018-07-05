@@ -98,6 +98,7 @@ misspell:
 	# Ignore Kibana files (.json)
 	$(FIND) \
 		-not -path "*.json" \
+		-not -path "*.log" \
 		-not -path "CHANGELOG*" \
 		-name '*' \
 		-exec misspell -w {} \;
