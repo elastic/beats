@@ -295,7 +295,7 @@ func BenchmarkDissect(b *testing.B) {
 		})
 	}
 
-	// Add a few regular expression matches agains the same string the test suite,
+	// Add a few regular expression matches against the same string the test suite,
 	// this give us a baseline to compare to, note that we only test a raw match against the string.
 	b.Run("Regular expression", func(b *testing.B) {
 		re := regexp.MustCompile("/var/log/([a-z]+)/log/([a-z]+)/apache/([a-b]+)")
