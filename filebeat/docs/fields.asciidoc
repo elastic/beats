@@ -1280,7 +1280,7 @@ type: keyword
 
 example: QUERY_THEN_FETCH
 
-Please add description
+Search type
 
 --
 
@@ -1336,6 +1336,39 @@ type: keyword
 example: 22
 
 Total queried shards
+
+--
+
+*`elasticsearch.slowlog.routing`*::
++
+--
+type: keyword
+
+example: s01HZ2QBk9jw4gtgaFtn
+
+Routing
+
+--
+
+*`elasticsearch.slowlog.id`*::
++
+--
+type: keyword
+
+example: 
+
+Id
+
+--
+
+*`elasticsearch.slowlog.type`*::
++
+--
+type: keyword
+
+example: doc
+
+Type
 
 --
 
