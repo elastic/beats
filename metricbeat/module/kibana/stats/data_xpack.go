@@ -38,19 +38,20 @@ var (
 				"15m": c.Float("15m"),
 			}),
 			"memory": c.Dict("mem", s.Schema{
-				"total_in_bytes": c.Int("total_in_bytes"),
-				"free_in_bytes":  c.Int("free_in_bytes"),
-				"used_in_bytes":  c.Int("used_in_bytes"),
+				"total_in_bytes": c.Int("total_bytes"),
+				"free_in_bytes":  c.Int("free_bytes"),
+				"used_in_bytes":  c.Int("used_bytes"),
 			}),
-			"uptime_in_millis": c.Int("uptime_ms"), // TODO: Verify that this field is being sent
+			"uptime_in_millis": c.Int("uptime_ms"),
 		}),
 		"process": c.Dict("process", s.Schema{
 			"event_loop_delay": c.Float("event_loop_delay_ms"),
 			"memory": c.Dict("mem", s.Schema{
 				"heap": s.Object{
-					"total_in_bytes": c.Int("heap_max_bytes"),
-					"used_in_bytes":  c.Int("heap_used_bytes"),
-					"size_limit":     c.Int("size_limit"), // TODO: Verify that this field is being sent
+					"total_in_bytes":    c.Int("heap_max_bytes"),
+					"used_in_bytes":     c.Int("heap_used_bytes"),
+					"external_in_bytes": c.Int("external_bytes"), // TODO: new field, must update monitoring-kibana template in ES x-pack plugin
+					"size_limit":        c.Int("size_limit"),
 				},
 			}),
 			"uptime_in_millis": c.Int("uptime_ms"),
@@ -137,6 +138,12 @@ var (
 							"count": c.Int("total"),
 						},
 					}, c.DictOptional),
+					"status": c.Dict("status", s.Schema{
+						"completed":  c.Int("completed"),
+						"failed":     c.Int("failed"),
+						"processing": c.Int("processing"),
+						"pending":    c.Int("pending"),
+					}),
 					"lastDay": c.Dict("lastDay", s.Schema{
 						"_all": s.Object{
 							"count": c.Int("_all"),
@@ -153,6 +160,12 @@ var (
 								"count": c.Int("total"),
 							},
 						}, c.DictOptional),
+						"status": c.Dict("status", s.Schema{
+							"completed":  c.Int("completed"),
+							"failed":     c.Int("failed"),
+							"processing": c.Int("processing"),
+							"pending":    c.Int("pending"),
+						}),
 					}, c.DictOptional),
 					"last7Days": c.Dict("last7Days", s.Schema{
 						"_all": s.Object{
@@ -170,6 +183,12 @@ var (
 								"count": c.Int("total"),
 							},
 						}, c.DictOptional),
+						"status": c.Dict("status", s.Schema{
+							"completed":  c.Int("completed"),
+							"failed":     c.Int("failed"),
+							"processing": c.Int("processing"),
+							"pending":    c.Int("pending"),
+						}),
 					}, c.DictOptional),
 				}, c.DictOptional),
 			}, c.DictOptional),
@@ -185,21 +204,18 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return err
 	}
 
-	kibanaStats := data["kibana_stats"].(map[string]interface{})
-	kibanaStatsFields, err := schemaXPack.Apply(kibanaStats)
+	kibanaStatsFields, err := schemaXPack.Apply(data)
 	if err != nil {
 		r.Error(err)
 		return err
 	}
 
-	process := kibanaStats["process"].(map[string]interface{})
+	process := data["process"].(map[string]interface{})
 	mem := process["mem"].(map[string]interface{})
 	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", mem["resident_set_size_bytes"].(int))
 
 	timestamp := time.Now()
 	kibanaStatsFields.Put("timestamp", timestamp)
-
-	// TODO: reporting status object: dynamic statuses + their counts --- toe level, inside lastDay, inside last7days
 
 	var event mb.Event
 	event.RootFields = common.MapStr{
