@@ -38,11 +38,13 @@ type MetaGenerator interface {
 
 // MetaGeneratorConfig settings
 type MetaGeneratorConfig struct {
-	IncludeLabels          []string `config:"include_labels"`
-	ExcludeLabels          []string `config:"exclude_labels"`
-	IncludeAnnotations     []string `config:"include_annotations"`
-	IncludeUID             bool     `config:"include_uid"`
-	IncludeCreatorMetadata bool     `config:"include_creator_metadata"`
+	IncludeLabels      []string `config:"include_labels"`
+	ExcludeLabels      []string `config:"exclude_labels"`
+	IncludeAnnotations []string `config:"include_annotations"`
+
+	// Undocumented settings, to be deprecated in favor of `drop_fields` processor:
+	IncludeUID             bool `config:"include_uid"`
+	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
 }
 
 type metaGenerator = MetaGeneratorConfig
