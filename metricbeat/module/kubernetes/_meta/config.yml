@@ -10,9 +10,10 @@
   hosts: ["localhost:10255"]
 
   # Enriching parameters:
-  add_metadata: true
-  in_cluster: true
+  #add_metadata: true
+  #in_cluster: true
   # When used outside the cluster:
+  #in_cluster: false
   #host: node_name
   #kube_config: ~/.kube/config
 
