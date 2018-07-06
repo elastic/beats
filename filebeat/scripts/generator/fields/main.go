@@ -66,6 +66,7 @@ type pipeline struct {
 type field struct {
 	Type     string
 	Elements []string
+	Hint     string
 }
 
 type fieldYml struct {
@@ -95,17 +96,19 @@ func newFieldYml(name, typeName string, noDoc bool) *fieldYml {
 func newField(lp string) field {
 	lp = lp[1 : len(lp)-1]
 	ee := strings.Split(lp, ":")
-	if len(ee) != 2 {
-		return field{
-			Type:     ee[0],
-			Elements: nil,
-		}
+	if 2 < len(ee) && len(ee) < 3 {
+		return field{}
 	}
 
-	e := strings.Split(ee[1], ".")
+	hint := ""
+	if len(ee) == 3 {
+		hint = ee[2]
+		fmt.Println(hint)
+	}
 	return field{
 		Type:     ee[0],
-		Elements: e,
+		Elements: strings.Split(ee[1], "."),
+		Hint:     hint,
 	}
 }
 
@@ -275,13 +278,17 @@ func getFieldByName(f []*fieldYml, name string) *fieldYml {
 	return nil
 }
 
-func insertLastField(f []*fieldYml, name, typeName string, noDoc bool) []*fieldYml {
+func insertLastField(f []*fieldYml, name string, field field, noDoc bool) []*fieldYml {
 	ff := getFieldByName(f, name)
 	if ff != nil {
 		return f
 	}
 
-	nf := newFieldYml(name, types[typeName], noDoc)
+	fieldType := field.Hint
+	if fieldType == "" {
+		fieldType = types[field.Type]
+	}
+	nf := newFieldYml(name, fieldType, noDoc)
 	return append(f, nf)
 }
 
@@ -301,7 +308,7 @@ func insertGroup(out []*fieldYml, field field, index, count int, noDoc bool) []*
 
 func generateField(out []*fieldYml, field field, index, count int, noDoc bool) []*fieldYml {
 	if index+1 == count {
-		return insertLastField(out, field.Elements[index], field.Type, noDoc)
+		return insertLastField(out, field.Elements[index], field, noDoc)
 	}
 	return insertGroup(out, field, index, count, noDoc)
 }
