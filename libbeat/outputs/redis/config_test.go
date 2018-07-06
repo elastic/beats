@@ -32,7 +32,7 @@ func TestValidate(t *testing.T) {
 		{"No config", redisConfig{Key: "", Index: ""}, true},
 		{"Only key", redisConfig{Key: "test", Index: ""}, true},
 		{"Only index", redisConfig{Key: "", Index: "test"}, true},
-		{"Both", redisConfig{Key: "test", Index: "test"}, false},
+		{"Both", redisConfig{Key: "test", Index: "test"}, true},
 
 		{"Invalid Datatype", redisConfig{Key: "test", DataType: "something"}, false},
 		{"List Datatype", redisConfig{Key: "test", DataType: "list"}, true},

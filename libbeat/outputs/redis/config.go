@@ -18,12 +18,10 @@
 package redis
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
@@ -62,16 +60,6 @@ func (c *redisConfig) Validate() error {
 	case "", "list", "channel":
 	default:
 		return fmt.Errorf("redis data type %v not supported", c.DataType)
-	}
-
-	if c.Key != "" && c.Index != "" {
-		return errors.New("Cannot use both `output.redis.key` and `output.redis.index` configuration options." +
-			" Set only `output.redis.key`")
-	}
-
-	if c.Key == "" && c.Index != "" {
-		c.Key = c.Index
-		logp.Warn("The `output.redis.index` configuration setting is deprecated. Use `output.redis.key` instead.")
 	}
 
 	return nil

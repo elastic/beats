@@ -897,15 +897,12 @@ The Redis port to use if `hosts` does not contain a port number. The default is 
 
 ===== `index`
 
-deprecated[5.0.0,The `index` setting is renamed to `key`]
-
-The name of the Redis list or channel the events are published to. The default is
-"{beatname_lc}".
+The index name added to the events metadata for use by Logstash. The default is "{beatname_lc}".
 
 ===== `key`
 
-The name of the Redis list or channel the events are published to. The default is
-"{beatname_lc}".
+The name of the Redis list or channel the events are published to. If not
+configured, the value of the `index` setting is used.
 
 The redis key can be set dynamically using a format string accessing any
 fields in the event to be published.
