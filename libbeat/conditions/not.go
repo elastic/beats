@@ -15,13 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package processors
+package conditions
 
-import (
-	"github.com/elastic/beats/libbeat/common"
-)
+import "fmt"
 
-type PluginConfig []map[string]*common.Config
+// Not is a condition that negates its inner condition.
+type Not struct {
+	inner Condition
+}
 
-// fields that should be always exported
-var MandatoryExportedFields = []string{"type"}
+// NewNotCondition builds a new Not condition that negates the provided Condition.
+func NewNotCondition(c Condition) (Not, error) {
+	if c == nil {
+		return Not{}, fmt.Errorf("Empty not conditions are not allowed")
+	}
+	return Not{c}, nil
+}
+
+// Check determines whether the given event matches this condition.
+func (c Not) Check(event ValuesMap) bool {
+	return !c.inner.Check(event)
+}
+
+func (c Not) String() string {
+	return "!" + c.inner.String()
+}

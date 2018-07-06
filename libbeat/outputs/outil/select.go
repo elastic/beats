@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/conditions"
 )
 
 type Selector struct {
@@ -56,7 +56,7 @@ type listSelector struct {
 
 type condSelector struct {
 	s    SelectorExpr
-	cond *processors.Condition
+	cond conditions.Condition
 }
 
 type constSelector struct {
@@ -201,7 +201,7 @@ func ConcatSelectorExpr(s ...SelectorExpr) SelectorExpr {
 
 func ConditionalSelectorExpr(
 	s SelectorExpr,
-	cond *processors.Condition,
+	cond conditions.Condition,
 ) SelectorExpr {
 	return &condSelector{s, cond}
 }
@@ -253,19 +253,19 @@ func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 	}
 
 	// 4. extract conditional
-	var cond *processors.Condition
+	var cond conditions.Condition
 	if cfg.HasField("when") {
 		sub, err := cfg.Child("when", -1)
 		if err != nil {
 			return nil, err
 		}
 
-		condConfig := processors.ConditionConfig{}
+		condConfig := conditions.Config{}
 		if err := sub.Unpack(&condConfig); err != nil {
 			return nil, err
 		}
 
-		tmp, err := processors.NewCondition(&condConfig)
+		tmp, err := conditions.NewCondition(&condConfig)
 		if err != nil {
 			return nil, err
 		}
