@@ -15,13 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package processors
+package conditions
 
-import (
-	"github.com/elastic/beats/libbeat/common"
-)
+// Or is a compound condition that combines multiple conditions with logical OR.
+type Or []Condition
 
-type PluginConfig []map[string]*common.Config
+// NewOrCondition builds this condition from a slice of Condition objects.
+func NewOrCondition(conditions []Condition) Or {
+	return Or(conditions)
+}
 
-// fields that should be always exported
-var MandatoryExportedFields = []string{"type"}
+// Check determines whether the given event matches this condition.
+func (c Or) Check(event ValuesMap) bool {
+	for _, cond := range c {
+		if cond.Check(event) {
+			return true
+		}
+	}
+	return false
+}
+
+func (c Or) String() (s string) {
+	for _, cond := range c {
+		s = s + cond.String() + " or "
+	}
+	s = s[:len(s)-len(" or ")] //delete the last or
+	return s
+}

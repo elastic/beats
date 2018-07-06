@@ -15,13 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package processors
+package conditions
 
-import (
-	"github.com/elastic/beats/libbeat/common"
-)
+import "testing"
 
-type PluginConfig []map[string]*common.Config
+func TestHasFieldsMultiFieldPositiveMatch(t *testing.T) {
+	testConfig(t, true, secdTestEvent, &Config{
+		HasFields: []string{"proc.cmdline", "type"},
+	})
+}
 
-// fields that should be always exported
-var MandatoryExportedFields = []string{"type"}
+func TestHasFieldsSingleFieldNegativeMatch(t *testing.T) {
+	testConfig(t, false, secdTestEvent, &Config{
+		HasFields: []string{"cpu"},
+	})
+}
+
+func TestHasFieldsMultiFieldNegativeMatch(t *testing.T) {
+	testConfig(t, false, secdTestEvent, &Config{
+		HasFields: []string{"proc", "beat"},
+	})
+}

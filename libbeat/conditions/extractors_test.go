@@ -15,13 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package processors
+package conditions
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-type PluginConfig []map[string]*common.Config
+func TestExtractString(t *testing.T) {
+	input := "test"
 
-// fields that should be always exported
-var MandatoryExportedFields = []string{"type"}
+	v, err := ExtractString(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, input, v)
+}
+
+func TestExtractBool(t *testing.T) {
+	input := true
+
+	v, err := ExtractBool(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, input, v)
+}

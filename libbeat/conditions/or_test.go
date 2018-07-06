@@ -15,13 +15,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package processors
+package conditions
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
-type PluginConfig []map[string]*common.Config
+func TestORCondition(t *testing.T) {
+	logp.TestingSetup()
 
-// fields that should be always exported
-var MandatoryExportedFields = []string{"type"}
+	config := Config{
+		OR: []Config{
+			{
+				Range: &Fields{fields: map[string]interface{}{
+					"http.code.gte": 400,
+					"http.code.lt":  500,
+				}},
+			},
+			{
+				Range: &Fields{fields: map[string]interface{}{
+					"http.code.gte": 200,
+					"http.code.lt":  300,
+				}},
+			},
+		},
+	}
+
+	cond := GetCondition(t, config)
+
+	assert.True(t, cond.Check(httpResponseTestEvent))
+}
