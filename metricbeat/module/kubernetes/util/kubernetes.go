@@ -11,8 +11,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-var nilEnricher = &enricher{}
-
 // Enricher takes Kubernetes events and enrich them with k8s metadata
 type Enricher interface {
 	// Start will start the Kubernetes watcher on the first call, does nothing on the rest
@@ -85,18 +83,18 @@ func NewResourceMetadataEnricher(
 	watcher, err := GetWatcher(base, resource, nodeScope)
 	if err != nil {
 		logp.Warn("Error initializing Kubernetes metadata enricher: %s", err)
-		return nilEnricher
+		return &nilEnricher{}
 	}
 
 	if watcher == nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
-		return nilEnricher
+		return &nilEnricher{}
 	}
 
 	metaConfig := kubernetes.MetaGeneratorConfig{}
 	if err := base.Module().UnpackConfig(&metaConfig); err != nil {
 		logp.Warn("Error initializing Kubernetes metadata enricher: %s", err)
-		return nilEnricher
+		return &nilEnricher{}
 	}
 
 	metaGen := kubernetes.NewMetaGeneratorFromConfig(&metaConfig)
@@ -128,18 +126,18 @@ func NewContainerMetadataEnricher(
 	watcher, err := GetWatcher(base, &kubernetes.Pod{}, nodeScope)
 	if err != nil {
 		logp.Warn("Error initializing Kubernetes metadata enricher: %s", err)
-		return nilEnricher
+		return &nilEnricher{}
 	}
 
 	if watcher == nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
-		return nilEnricher
+		return &nilEnricher{}
 	}
 
 	metaConfig := kubernetes.MetaGeneratorConfig{}
 	if err := base.Module().UnpackConfig(&metaConfig); err != nil {
 		logp.Warn("Error initializing Kubernetes metadata enricher: %s", err)
-		return nilEnricher
+		return &nilEnricher{}
 	}
 
 	metaGen := kubernetes.NewMetaGeneratorFromConfig(&metaConfig)
@@ -218,10 +216,6 @@ func buildMetadataEnricher(
 }
 
 func (m *enricher) Start() {
-	if m == nilEnricher {
-		return
-	}
-
 	if !m.watcherStarted {
 		err := m.watcher.Start()
 		if err != nil {
@@ -232,10 +226,6 @@ func (m *enricher) Start() {
 }
 
 func (m *enricher) Stop() {
-	if m == nilEnricher {
-		return
-	}
-
 	if m.watcherStarted {
 		m.watcher.Stop()
 		m.watcherStarted = false
@@ -243,10 +233,6 @@ func (m *enricher) Stop() {
 }
 
 func (m *enricher) Enrich(events []common.MapStr) {
-	if m == nilEnricher {
-		return
-	}
-
 	for _, event := range events {
 		if meta := m.metadata[m.index(event)]; meta != nil {
 			event.DeepUpdate(common.MapStr{
@@ -255,3 +241,9 @@ func (m *enricher) Enrich(events []common.MapStr) {
 		}
 	}
 }
+
+type nilEnricher struct{}
+
+func (*nilEnricher) Start()                 {}
+func (*nilEnricher) Stop()                  {}
+func (*nilEnricher) Enrich([]common.MapStr) {}
