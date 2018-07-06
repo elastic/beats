@@ -332,7 +332,7 @@ ifeq ($(BEAT_REF_YAML),true)
 	@chmod 0640 ${BEAT_NAME}.reference.yml
 endif
 
-ifneq ($(BEAT_NAME), libbeat)
+ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
 	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include fields.yml $(BEAT_NAME) > include/fields.go
 endif
