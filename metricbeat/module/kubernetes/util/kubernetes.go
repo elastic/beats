@@ -74,7 +74,7 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 	return kubernetes.NewWatcher(client, resource, options)
 }
 
-// NewResourceMetadataEnricher returns a Enricher configured for kubernetes resource events
+// NewResourceMetadataEnricher returns an Enricher configured for kubernetes resource events
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	resource kubernetes.Resource,
@@ -118,7 +118,7 @@ func NewResourceMetadataEnricher(
 	return enricher
 }
 
-// NewContainerMetadataEnricher returns a Enricher configured for container events
+// NewContainerMetadataEnricher returns an Enricher configured for container events
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
 	nodeScope bool) Enricher {
