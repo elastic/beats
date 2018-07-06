@@ -28,20 +28,20 @@ code can be found on
 ==== Configure {beatname_uc} on Docker
 
 The Docker image provides several methods for configuring {beatname_uc}. The
-conventional approach is to provide a configuration file via a bind-mounted
-volume, but it's also possible to create a custom image with your
+conventional approach is to provide a configuration file via a bind mount, but 
+it's also possible to create a custom image with your
 configuration included.
 
 [float]
 ===== Bind-mounted configuration
 
-One way to configure {beatname_uc} on Docker is to provide +{beatname_lc}.yml+ via bind-mounting.
-With +docker run+, the bind-mount can be specified like this:
+One way to configure {beatname_uc} on Docker is to provide +{beatname_lc}.yml+ via a bind mount.
+With +docker run+, the bind mount can be specified like this:
 
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run \
-  -v ~/{beatname_lc}.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml \
+  --mount type=bind,source="$(pwd)"/{beatname_lc}.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml \
   {dockerimage}
 --------------------------------------------
 
