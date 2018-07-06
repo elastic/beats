@@ -32,10 +32,22 @@ type PathComponentType int
 
 const (
 	// PCMapKey is the Type for map keys.
-	PCMapKey = iota
+	PCMapKey PathComponentType = 1 + iota
 	// PCSliceIdx is the Type for slice indices.
 	PCSliceIdx
 )
+
+func (pct PathComponentType) String() string {
+	if pct == PCMapKey {
+		return "map"
+	} else if pct == PCSliceIdx {
+		return "slice"
+	} else {
+		// This should never happen, but we don't want to return an
+		// error since that would unnecessarily complicate the fluid API
+		return "<unknown>"
+	}
+}
 
 // PathComponent structs represent one breadcrumb in a Path.
 type PathComponent struct {
@@ -90,9 +102,14 @@ func (p Path) String() string {
 	return strings.Join(out, ".")
 }
 
-// Last returns the last PathComponent in this Path.
-func (p Path) Last() PathComponent {
-	return p[len(p)-1]
+// Last returns a pointer to the last PathComponent in this path. If the path empty,
+// a nil pointer is returned.
+func (p Path) Last() *PathComponent {
+	idx := len(p) - 1
+	if idx < 0 {
+		return nil
+	}
+	return &p[len(p)-1]
 }
 
 // GetFrom takes a map and fetches the given path from it.
@@ -100,7 +117,8 @@ func (p Path) GetFrom(m common.MapStr) (value interface{}, exists bool) {
 	value = m
 	exists = true
 	for _, pc := range p {
-		switch reflect.TypeOf(value).Kind() {
+		rt := reflect.TypeOf(value)
+		switch rt.Kind() {
 		case reflect.Map:
 			converted := interfaceToMapStr(value)
 			value, exists = converted[pc.Key]
@@ -114,7 +132,11 @@ func (p Path) GetFrom(m common.MapStr) (value interface{}, exists bool) {
 				value = nil
 			}
 		default:
-			panic("Unexpected type")
+			// If this case has been reached this means the expected type, say a map,
+			// is actually something else, like a string or an array. In this case we
+			// simply say the value doesn't exist. From a practical perspective this is
+			// the right behavior since it will cause validation to fail.
+			return nil, false
 		}
 
 		if exists == false {
@@ -141,7 +163,7 @@ func ParsePath(in string) (p Path, err error) {
 	p = make(Path, len(keyParts))
 	for idx, part := range keyParts {
 		r := arrMatcher.FindStringSubmatch(part)
-		pc := PathComponent{}
+		pc := PathComponent{Index: -1}
 		if len(r) > 0 {
 			pc.Type = PCSliceIdx
 			// Cannot fail, validated by regexp already

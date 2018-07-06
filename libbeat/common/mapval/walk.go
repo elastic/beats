@@ -39,7 +39,12 @@ func walk(m common.MapStr, expandPaths bool, wo walkObserver) error {
 }
 
 func walkFull(o interface{}, root common.MapStr, path Path, expandPaths bool, wo walkObserver) (err error) {
-	err = wo(walkObserverInfo{path.Last(), o, root, path})
+	lastPathComponent := path.Last()
+	if lastPathComponent == nil {
+		panic("Attempted to traverse an empty path in mapval.walkFull, this should never happen.")
+	}
+
+	err = wo(walkObserverInfo{*lastPathComponent, o, root, path})
 	if err != nil {
 		return err
 	}
