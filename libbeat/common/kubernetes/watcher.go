@@ -209,7 +209,7 @@ func (w *watcher) watch() {
 				logp.Err("kubernetes: Watching API error %v", err)
 				watcher.Close()
 				if !(err == io.EOF || err == io.ErrUnexpectedEOF) {
-					// This is an error event which can be recovered by moving to the latest resource verison
+					// This is an error event which can be recovered by moving to the latest resource version
 					logp.Info("kubernetes: Ignoring event, moving to most recent resource version")
 					w.lastResourceVersion = ""
 				}
