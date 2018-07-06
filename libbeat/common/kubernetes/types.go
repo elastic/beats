@@ -69,6 +69,9 @@ type Deployment = appsv1.Deployment
 // ReplicaSet data
 type ReplicaSet = extv1.ReplicaSet
 
+// StatefulSet data
+type StatefulSet = appsv1.StatefulSet
+
 // Time extracts time from k8s.Time type
 func Time(t *metav1.Time) time.Time {
 	return time.Unix(t.GetSeconds(), int64(t.GetNanos()))
