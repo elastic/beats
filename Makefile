@@ -99,7 +99,6 @@ misspell:
 	$(FIND) \
 		-not -path "*.json" \
 		-not -path "*.log" \
-		-not -path "CHANGELOG*" \
 		-name '*' \
 		-exec misspell -w {} \;
 
