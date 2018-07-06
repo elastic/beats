@@ -19,6 +19,9 @@ type Enricher interface {
 	// errors are logged as warning
 	Start()
 
+	// Stop will stop the Kubernetes watcher
+	Stop()
+
 	// Enrich the given list of events
 	Enrich([]common.MapStr)
 }
@@ -225,6 +228,17 @@ func (m *enricher) Start() {
 			logp.Warn("Error starting Kubernetes watcher: %s", err)
 		}
 		m.watcherStarted = true
+	}
+}
+
+func (m *enricher) Stop() {
+	if m == nilEnricher {
+		return
+	}
+
+	if m.watcherStarted {
+		m.watcher.Stop()
+		m.watcherStarted = false
 	}
 }
 

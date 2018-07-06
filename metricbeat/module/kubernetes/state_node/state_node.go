@@ -107,3 +107,9 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	return events, err
 }
+
+// Close stops this metricset
+func (m *MetricSet) Close() error {
+	m.enricher.Stop()
+	return nil
+}
