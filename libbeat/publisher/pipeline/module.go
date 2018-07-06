@@ -134,6 +134,10 @@ func loadOutput(
 		monitoring.NewString(outReg, "type").Set(outcfg.Name())
 	}
 
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	outputRegistry := stateRegistry.NewRegistry("output")
+	monitoring.NewString(outputRegistry, "name").Set(outcfg.Name())
+
 	return out, nil
 }
 
