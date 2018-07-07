@@ -56,109 +56,14 @@ var (
 			}),
 			"uptime_in_millis": c.Int("uptime_ms"),
 		}),
-		"requests": c.Dict("requests", s.Schema{
-			"disconnects": c.Int("disconnects", s.Optional),
-			"total":       c.Int("total", s.Optional),
-		}),
+		"requests": RequestsDict),
 		"response_times": c.Dict("response_times", s.Schema{
 			"average": c.Float("avg_ms"),
 			"max":     c.Float("max_ms"),
 		}),
-		"sockets": c.Dict("sockets", s.Schema{
-			"http": c.Dict("http", s.Schema{
-				"total": c.Int("total"),
-			}),
-			"https": c.Dict("https", s.Schema{
-				"total": c.Int("total"),
-			}),
-		}),
-		"kibana": c.Dict("kibana", s.Schema{
-			"uuid":              c.Str("uuid"),
-			"name":              c.Str("name"),
-			"index":             c.Str("index"),
-			"host":              c.Str("host"),
-			"transport_address": c.Str("transport_address"),
-			"version":           c.Str("version"),
-			"snapshot":          c.Bool("snapshot"),
-			"status":            c.Str("status"),
-		}),
-		"usage": c.Dict("usage", s.Schema{
-			"index": c.Str("index"),
-			"dashboard": c.Dict("dashboard", s.Schema{
-				"total": c.Int("total"),
-			}, c.DictOptional),
-			"visualization": c.Dict("visualization", s.Schema{
-				"total": c.Int("total"),
-			}, c.DictOptional),
-			"search": c.Dict("search", s.Schema{
-				"total": c.Int("total"),
-			}, c.DictOptional),
-			"index_pattern": c.Dict("index_pattern", s.Schema{
-				"total": c.Int("total"),
-			}, c.DictOptional),
-			"graph_workspace": c.Dict("graph_workspace", s.Schema{
-				"total": c.Int("total"),
-			}, c.DictOptional),
-			"timelion_sheet": c.Dict("timelion_sheet", s.Schema{
-				"total": c.Int("total"),
-			}, c.DictOptional),
-			"xpack": c.Dict("xpack", s.Schema{
-				"reporting": c.Dict("reporting", s.Schema{
-					"available":    c.Bool("available"),
-					"enabled":      c.Bool("enabled"),
-					"browser_type": c.Str("browser_type"),
-					"_all":         c.Int("_all"),
-					"csv": c.Dict("csv", s.Schema{
-						"available": c.Bool("available"),
-						"total":     c.Int("total"),
-					}, c.DictOptional),
-					"printable_pdf": c.Dict("printable_pdf", s.Schema{
-						"available": c.Bool("available"),
-						"total":     c.Int("total"),
-					}, c.DictOptional),
-					"status": c.Dict("status", s.Schema{
-						"completed":  c.Int("completed", s.Optional),
-						"failed":     c.Int("failed", s.Optional),
-						"processing": c.Int("processing", s.Optional),
-						"pending":    c.Int("pending", s.Optional),
-					}, c.DictOptional),
-					"lastDay": c.Dict("lastDay", s.Schema{
-						"_all": c.Int("_all"),
-						"csv": c.Dict("csv", s.Schema{
-							"available": c.Bool("available"),
-							"total":     c.Int("total"),
-						}, c.DictOptional),
-						"printable_pdf": c.Dict("printable_pdf", s.Schema{
-							"available": c.Bool("available"),
-							"total":     c.Int("total"),
-						}, c.DictOptional),
-						"status": c.Dict("status", s.Schema{
-							"completed":  c.Int("completed", s.Optional),
-							"failed":     c.Int("failed", s.Optional),
-							"processing": c.Int("processing", s.Optional),
-							"pending":    c.Int("pending", s.Optional),
-						}, c.DictOptional),
-					}, c.DictOptional),
-					"last7Days": c.Dict("last7Days", s.Schema{
-						"_all": c.Int("_all"),
-						"csv": c.Dict("csv", s.Schema{
-							"available": c.Bool("available"),
-							"total":     c.Int("total"),
-						}, c.DictOptional),
-						"printable_pdf": c.Dict("printable_pdf", s.Schema{
-							"available": c.Bool("available"),
-							"total":     c.Int("total"),
-						}, c.DictOptional),
-						"status": c.Dict("status", s.Schema{
-							"completed":  c.Int("completed", s.Optional),
-							"failed":     c.Int("failed", s.Optional),
-							"processing": c.Int("processing", s.Optional),
-							"pending":    c.Int("pending", s.Optional),
-						}, c.DictOptional),
-					}, c.DictOptional),
-				}, c.DictOptional),
-			}, c.DictOptional),
-		}),
+		"sockets": SocketsDict,
+		"kibana":  KibanaDict,
+		"usage":   UsageDict,
 	}
 )
 
