@@ -28,30 +28,67 @@ import (
 
 var (
 	schema = s.Schema{
-		"cluster_uuid": c.Str("cluster_uuid"),
-		"name":         c.Str("name"),
-		"uuid":         c.Str("uuid"),
-		"version": c.Dict("version", s.Schema{
-			"number": c.Str("number"),
-		}),
-		"status": c.Dict("status", s.Schema{
-			"overall": c.Dict("overall", s.Schema{
-				"state": c.Str("state"),
-			}),
-		}),
-		"response_times": c.Dict("response_times", s.Schema{
-			"avg": s.Object{
-				"ms": c.Float("avg_in_millis"),
+		"cluster_uuid":           c.Str("cluster_uuid"),
+		"concurrent_connections": c.Int("concurrent_connections"),
+		"os": c.Dict("os", s.Schema{
+			"load": s.Object{
+				"avg": c.Dict("cpu.load_average", s.Schema{
+					"1m":  c.Float("1m"),
+					"5m":  c.Float("5m"),
+					"15m": c.Float("15m"),
+				}),
 			},
-			"max": s.Object{
-				"ms": c.Int("max_in_millis"),
+			"memory": c.Dict("mem", s.Schema{
+				"total": s.Object{
+					"bytes": c.Int("total_bytes"),
+				},
+				"free": s.Object{
+					"bytes": c.Int("free_bytes"),
+				},
+				"used": s.Object{
+					"bytes": c.Int("used_bytes"),
+				},
+			}),
+			"uptime": s.Object{
+				"ms": c.Int("uptime_ms"),
+			},
+		}),
+		"process": c.Dict("process", s.Schema{
+			"event_loop_delay": s.Object{
+				"ms": c.Float("event_loop_delay_ms"),
+			},
+			"memory": c.Dict("mem", s.Schema{
+				"heap": s.Object{
+					"total": s.Object{
+						"bytes": c.Int("heap_max_bytes"),
+					},
+					"used": s.Object{
+						"bytes": c.Int("heap_used_bytes"),
+					},
+					"external": s.Object{
+						"bytes": c.Int("external_bytes"),
+					},
+					"size_limit": s.Object{
+						"bytes": c.Int("size_limit"),
+					},
+				},
+			}),
+			"uptime": s.Object{
+				"bytes": c.Int("uptime_ms"),
 			},
 		}),
 		"requests": c.Dict("requests", s.Schema{
-			"total":       c.Int("total", s.Optional),
 			"disconnects": c.Int("disconnects", s.Optional),
+			"total":       c.Int("total", s.Optional),
 		}),
-		"concurrent_connections": c.Int("concurrent_connections"),
+		"response_times": c.Dict("response_times", s.Schema{
+			"avg": s.Object{
+				"ms": c.Float("avg_ms"),
+			},
+			"max": s.Object{
+				"ms": c.Float("max_ms"),
+			},
+		}),
 		"sockets": c.Dict("sockets", s.Schema{
 			"http": c.Dict("http", s.Schema{
 				"total": c.Int("total"),
