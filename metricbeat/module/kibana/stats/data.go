@@ -60,29 +60,74 @@ var (
 				"total": c.Int("total"),
 			}),
 		}),
-		"event_loop_delay": c.Float("event_loop_delay"),
-		"process": c.Dict("process", s.Schema{
-			"memory": c.Dict("mem", s.Schema{
-				"heap": s.Object{
-					"max": s.Object{
-						"bytes": c.Int("heap_max_in_bytes"),
-					},
-					"used": s.Object{
-						"bytes": c.Int("heap_used_in_bytes"),
-					},
-				},
-				"resident_set_size": s.Object{
-					"bytes": c.Int("resident_set_size_in_bytes"),
-				},
-				"external": s.Object{
-					"bytes": c.Int("external_in_bytes"),
-				},
-			}),
-			"pid": c.Int("pid"),
-			"uptime": s.Object{
-				"ms": c.Int("uptime_ms"),
-			},
+		"kibana": c.Dict("kibana", s.Schema{
+			"uuid":              c.Str("uuid"),
+			"name":              c.Str("name"),
+			"index":             c.Str("index"),
+			"host":              c.Str("host"),
+			"transport_address": c.Str("transport_address"),
+			"version":           c.Str("version"),
+			"snapshot":          c.Bool("snapshot"),
+			"status":            c.Str("status"),
 		}),
+		"usage": c.Dict("usage", s.Schema{
+			"index": c.Str("index"),
+			"dashboard": c.Dict("dashboard", s.Schema{
+				"total": c.Int("total"),
+			}, c.DictOptional),
+			"visualization": c.Dict("visualization", s.Schema{
+				"total": c.Int("total"),
+			}, c.DictOptional),
+			"search": c.Dict("search", s.Schema{
+				"total": c.Int("total"),
+			}, c.DictOptional),
+			"index_pattern": c.Dict("index_pattern", s.Schema{
+				"total": c.Int("total"),
+			}, c.DictOptional),
+			"graph_workspace": c.Dict("graph_workspace", s.Schema{
+				"total": c.Int("total"),
+			}, c.DictOptional),
+			"timelion_sheet": c.Dict("timelion_sheet", s.Schema{
+				"total": c.Int("total"),
+			}, c.DictOptional),
+			"xpack": c.Dict("xpack", s.Schema{
+				"reporting": c.Dict("reporting", s.Schema{
+					"available":     c.Bool("available"),
+					"enabled":       c.Bool("enabled"),
+					"browser_type":  c.Str("browser_type"),
+					"_all":          c.Int("_all"),
+					"csv":           reportingCsvDict,
+					"printable_pdf": reportingPrintablePdfDict,
+					"status":        reportingStatusDict,
+					"lastDay":       c.Dict("lastDay", reportingPeriodSchema, c.DictOptional),
+					"last7Days":     c.Dict("last7Days", reportingPeriodSchema, c.DictOptional),
+				}, c.DictOptional),
+			}, c.DictOptional),
+		}),
+	}
+
+	reportingCsvDict = c.Dict("csv", s.Schema{
+		"available": c.Bool("available"),
+		"total":     c.Int("total"),
+	}, c.DictOptional)
+
+	reportingPrintablePdfDict = c.Dict("printable_pdf", s.Schema{
+		"available": c.Bool("available"),
+		"total":     c.Int("total"),
+	}, c.DictOptional)
+
+	reportingStatusDict = c.Dict("status", s.Schema{
+		"completed":  c.Int("completed", s.Optional),
+		"failed":     c.Int("failed", s.Optional),
+		"processing": c.Int("processing", s.Optional),
+		"pending":    c.Int("pending", s.Optional),
+	}, c.DictOptional)
+
+	reportingPeriodSchema = s.Schema{
+		"_all":          c.Int("_all"),
+		"csv":           reportingCsvDict,
+		"printable_pdf": reportingPrintablePdfDict,
+		"status":        reportingStatusDict,
 	}
 )
 
