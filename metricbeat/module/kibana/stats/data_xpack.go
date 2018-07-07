@@ -57,8 +57,8 @@ var (
 			"uptime_in_millis": c.Int("uptime_ms"),
 		}),
 		"requests": c.Dict("requests", s.Schema{
-			"disconnects": c.Int("disconnects"),
-			"total":       c.Int("total"),
+			"disconnects": c.Int("disconnects", s.Optional),
+			"total":       c.Int("total", s.Optional),
 		}),
 		"response_times": c.Dict("response_times", s.Schema{
 			"average": c.Float("avg_ms"),
@@ -139,11 +139,11 @@ var (
 						},
 					}, c.DictOptional),
 					"status": c.Dict("status", s.Schema{
-						"completed":  c.Int("completed"),
-						"failed":     c.Int("failed"),
-						"processing": c.Int("processing"),
-						"pending":    c.Int("pending"),
-					}),
+						"completed":  c.Int("completed", s.Optional),
+						"failed":     c.Int("failed", s.Optional),
+						"processing": c.Int("processing", s.Optional),
+						"pending":    c.Int("pending", s.Optional),
+					}, c.DictOptional),
 					"lastDay": c.Dict("lastDay", s.Schema{
 						"_all": s.Object{
 							"count": c.Int("_all"),
@@ -161,11 +161,11 @@ var (
 							},
 						}, c.DictOptional),
 						"status": c.Dict("status", s.Schema{
-							"completed":  c.Int("completed"),
-							"failed":     c.Int("failed"),
-							"processing": c.Int("processing"),
-							"pending":    c.Int("pending"),
-						}),
+							"completed":  c.Int("completed", s.Optional),
+							"failed":     c.Int("failed", s.Optional),
+							"processing": c.Int("processing", s.Optional),
+							"pending":    c.Int("pending", s.Optional),
+						}, c.DictOptional),
 					}, c.DictOptional),
 					"last7Days": c.Dict("last7Days", s.Schema{
 						"_all": s.Object{
@@ -184,11 +184,11 @@ var (
 							},
 						}, c.DictOptional),
 						"status": c.Dict("status", s.Schema{
-							"completed":  c.Int("completed"),
-							"failed":     c.Int("failed"),
-							"processing": c.Int("processing"),
-							"pending":    c.Int("pending"),
-						}),
+							"completed":  c.Int("completed", s.Optional),
+							"failed":     c.Int("failed", s.Optional),
+							"processing": c.Int("processing", s.Optional),
+							"pending":    c.Int("pending", s.Optional),
+						}, c.DictOptional),
 					}, c.DictOptional),
 				}, c.DictOptional),
 			}, c.DictOptional),
