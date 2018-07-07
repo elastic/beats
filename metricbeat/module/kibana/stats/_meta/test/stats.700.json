@@ -1,53 +1,128 @@
 {
-  "cluster_uuid": "G279hqGeSDqjj_OgBq6wUw",
-  "name": "ruflin",
-  "uuid": "3a64c6a4-b758-41b4-9564-375ca3165039",
-  "version": {
-    "number": "6.4.0"
-  },
-  "status": {
-    "overall": {
-      "state": "green"
-    }
-  },
-  "response_times": {
-    "avg_in_millis": 401,
-    "max_in_millis": 411
-  },
-  "requests": {
-    "status_codes": {}
-  },
-  "concurrent_connections": 0,
-  "sockets": {
-    "http": {
-      "total": 76
+    "cluster_uuid":"4Yg2A7RuT0SIZBMzTE2quA",
+    "timestamp":"2018-07-05T18:07:12.974Z",
+    "kibana":{
+      "uuid":"fc5ec764-19e4-4e51-86e7-3f5a2a2b7cc0",
+      "name":"spicy.local",
+      "host":"spicy.local",
+      "index":".kibana",
+      "transport_address":"spicy.local:5601",
+      "version":"7.0.0-alpha1",
+      "snapshot":false,
+      "status":"green"
     },
-    "https": {
-      "total": 0
-    }
-  },
-  "event_loop_delay": 46.37134699523449,
-  "process": {
-    "mem": {
-      "heap_max_in_bytes": 171405312,
-      "heap_used_in_bytes": 143607728,
-      "resident_set_size_in_bytes": 237985792,
-      "external_in_bytes": 2075915
+    "last_updated":"2018-07-05T18:14:12.574Z",
+    "collection_interval_ms":5000,
+    "response_times":{
+      "avg_ms":31.666666666666668,
+      "max_ms":40
     },
-    "pid": 18204,
-    "uptime_ms": 584494
-  },
-  "os": {
-    "cpu": {
-      "load_average": {
-        "1m": 1.96044921875,
-        "5m": 2.00732421875,
-        "15m": 2.07470703125
+    "requests":{
+      "total":220,
+      "disconnects":0
+    },
+    "concurrent_connections":0,
+    "sockets":{
+      "http":{
+        "total":5
+      },
+      "https":{
+        "total":0
       }
     },
-    "mem": {
-      "free_in_bytes": 896122880,
-      "total_in_bytes": 17179869184
+    "process":{
+      "mem":{
+        "heap_max_bytes":344432640,
+        "heap_used_bytes":184244040,
+        "resident_set_size_bytes":440311808,
+        "size_limit":1501560832,
+        "external_bytes":2168139
+      },
+      "pid":51785,
+      "uptime_ms":34725,
+      "event_loop_delay_ms":3.7904850244522095
+    },
+    "os":{
+      "uptime_ms":1151777000,
+      "cpu":{
+        "load_average":{
+          "1m":3.1123046875,
+          "5m":2.94189453125,
+          "15m":2.83349609375
+        }
+      },
+      "mem":{
+        "free_bytes":567361536,
+        "total_bytes":17179869184,
+        "used_bytes":16612507648
+      }
+    },
+    "usage":{
+      "index":".kibana",
+      "dashboard":{
+        "total":0
+      },
+      "visualization":{
+        "total":1
+      },
+      "search":{
+        "total":2
+      },
+      "index_pattern":{
+        "total":3
+      },
+      "graph_workspace":{
+        "total":0
+      },
+      "timelion_sheet":{
+        "total":0
+      },
+      "xpack":{
+        "reporting":{
+          "available":true,
+          "enabled":true,
+          "browser_type":"phantom",
+          "_all":3,
+          "csv":{
+            "available":true,
+            "total":3
+          },
+          "printable_pdf":{
+            "available":false,
+            "total":0
+          },
+          "status":{
+            "completed":3
+          },
+          "lastDay":{
+            "_all":0,
+            "csv":{
+              "available":true,
+              "total":0
+            },
+            "printable_pdf":{
+              "available":false,
+              "total":0
+            },
+            "status":{
+
+            }
+          },
+          "last7Days":{
+            "_all":3,
+            "csv":{
+              "available":true,
+              "total":3
+            },
+            "printable_pdf":{
+              "available":false,
+              "total":0
+            },
+            "status":{
+              "completed":3
+            }
+          }
+        }
+      }
     }
   }
-}
