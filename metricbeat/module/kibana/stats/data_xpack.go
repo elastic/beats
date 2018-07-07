@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	schemaXPack = s.Schema{
+	schemaXPackMonitoring = s.Schema{
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"os": c.Dict("os", s.Schema{
 			"load": c.Dict("cpu.load_average", s.Schema{
@@ -204,7 +204,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return err
 	}
 
-	kibanaStatsFields, err := schemaXPack.Apply(data)
+	kibanaStatsFields, err := schemaXPackMonitoring.Apply(data)
 	if err != nil {
 		r.Error(err)
 		return err
