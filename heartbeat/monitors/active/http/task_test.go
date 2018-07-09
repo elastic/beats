@@ -23,6 +23,8 @@ import (
 	"net/url"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSplitHostnamePort(t *testing.T) {
@@ -121,4 +123,34 @@ func TestSplitHostnamePort(t *testing.T) {
 
 		})
 	}
+}
+
+func makeTestHTTPRequest(t *testing.T) *http.Request {
+	req, err := http.NewRequest("GET", "http://example.net", nil)
+	assert.Nil(t, err)
+	return req
+}
+
+func TestZeroMaxRedirectShouldError(t *testing.T) {
+	checker := makeCheckRedirect(0)
+	req := makeTestHTTPRequest(t)
+
+	res := checker(req, nil)
+	assert.Equal(t, http.ErrUseLastResponse, res)
+}
+
+func TestNonZeroRedirect(t *testing.T) {
+	limit := 5
+	checker := makeCheckRedirect(limit)
+
+	var via []*http.Request
+	// Test requests within the limit
+	for i := 0; i < limit; i++ {
+		req := makeTestHTTPRequest(t)
+		assert.Nil(t, checker(req, via))
+		via = append(via, req)
+	}
+
+	// We are now at the limit, this request should fail
+	assert.Equal(t, http.ErrUseLastResponse, checker(makeTestHTTPRequest(t), via))
 }
