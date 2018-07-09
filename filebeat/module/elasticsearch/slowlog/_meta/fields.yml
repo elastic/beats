@@ -36,7 +36,7 @@
     example: ""
     type: text
   - name: search_type
-    description: Please add description
+    description: "Search type"
     example: "QUERY_THEN_FETCH"
     type: keyword
   - name: source_query
@@ -58,4 +58,16 @@
   - name: total_shards
     description: "Total queried shards"
     example: 22
+    type: keyword
+  - name: routing
+    description: "Routing"
+    example: "s01HZ2QBk9jw4gtgaFtn"
+    type: keyword
+  - name: id
+    description: Id
+    example: ""
+    type: keyword
+  - name: type
+    description: "Type"
+    example: "doc"
     type: keyword
