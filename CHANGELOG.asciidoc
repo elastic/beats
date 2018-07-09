@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.3.0...6.3[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.3.1...6.3[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -101,7 +101,6 @@ https://github.com/elastic/beats/compare/v6.3.0...v6.3.1[View commits]
 *Filebeat*
 
 - Comply with PostgreSQL database name format {pull}7198[7198]
-- Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
 - Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
 - Keep different registry entry per container stream to avoid wrong offsets. {issue}7281[7281]
 - Fix offset field pointing at end of a line. {issue}6514[6514]
