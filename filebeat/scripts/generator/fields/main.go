@@ -96,14 +96,13 @@ func newFieldYml(name, typeName string, noDoc bool) *fieldYml {
 func newField(lp string) field {
 	lp = lp[1 : len(lp)-1]
 	ee := strings.Split(lp, ":")
-	if 2 < len(ee) && len(ee) < 3 {
+	if 2 != len(ee) && len(ee) != 3 {
 		return field{}
 	}
 
 	hint := ""
 	if len(ee) == 3 {
 		hint = ee[2]
-		fmt.Println(hint)
 	}
 	return field{
 		Type:     ee[0],
