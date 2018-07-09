@@ -8,6 +8,8 @@ var:
       - /usr/local/var/log/nginx/access.log*
     os.windows:
       - c:/programdata/nginx/logs/*access.log*
+  - name: grok_pattern
+    default: ""
 
 ingest_pipeline: ingest/default.json
 input: config/nginx-access.yml

@@ -4,7 +4,9 @@
     "grok": {
       "field": "message",
       "patterns":[
+        {< if .grok_pattern >}{< .grok_pattern >}{< else >}
         "\"?%{IP_LIST:nginx.access.remote_ip_list} - %{DATA:nginx.access.user_name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:nginx.access.response_code} %{NUMBER:nginx.access.body_sent.bytes} \"%{DATA:nginx.access.referrer}\" \"%{DATA:nginx.access.agent}\""
+        {< end >}
         ],
       "pattern_definitions": {
         "IP_LIST": "%{IP}(\"?,?\\s*%{IP})*"
