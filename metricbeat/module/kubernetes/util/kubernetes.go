@@ -82,7 +82,7 @@ func NewResourceMetadataEnricher(
 
 	watcher, err := GetWatcher(base, resource, nodeScope)
 	if err != nil {
-		logp.Warn("Error initializing Kubernetes metadata enricher: %s", err)
+		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
 
@@ -93,7 +93,7 @@ func NewResourceMetadataEnricher(
 
 	metaConfig := kubernetes.MetaGeneratorConfig{}
 	if err := base.Module().UnpackConfig(&metaConfig); err != nil {
-		logp.Warn("Error initializing Kubernetes metadata enricher: %s", err)
+		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
 
@@ -125,7 +125,7 @@ func NewContainerMetadataEnricher(
 
 	watcher, err := GetWatcher(base, &kubernetes.Pod{}, nodeScope)
 	if err != nil {
-		logp.Warn("Error initializing Kubernetes metadata enricher: %s", err)
+		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
 
@@ -136,7 +136,7 @@ func NewContainerMetadataEnricher(
 
 	metaConfig := kubernetes.MetaGeneratorConfig{}
 	if err := base.Module().UnpackConfig(&metaConfig); err != nil {
-		logp.Warn("Error initializing Kubernetes metadata enricher: %s", err)
+		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
 
