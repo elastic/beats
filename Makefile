@@ -95,9 +95,13 @@ add-headers:
 # Corrects spelling errors
 .PHONY: misspell
 misspell:
-	go get github.com/client9/misspell
+	go get -u github.com/client9/misspell/cmd/misspell
 	# Ignore Kibana files (.json)
-	$(FIND) -not -path "*.json" -name '*' -exec misspell -w {} \;
+	$(FIND) \
+		-not -path "*.json" \
+		-not -path "*.log" \
+		-name '*' \
+		-exec misspell -w {} \;
 
 .PHONY: fmt
 fmt: add-headers python-env
