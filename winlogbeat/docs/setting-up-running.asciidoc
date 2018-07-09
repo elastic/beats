@@ -25,3 +25,5 @@ include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 include::../../libbeat/docs/keystore.asciidoc[]
 
 include::../../libbeat/docs/command-reference.asciidoc[]
+
+include::../../libbeat/docs/shared-shutdown.asciidoc[]
