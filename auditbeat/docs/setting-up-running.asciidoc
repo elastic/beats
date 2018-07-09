@@ -30,3 +30,5 @@ include::../../libbeat/docs/keystore.asciidoc[]
 include::../../libbeat/docs/command-reference.asciidoc[]
 
 include::./running-on-docker.asciidoc[]
+
+include::../../libbeat/docs/shared-shutdown.asciidoc[]
