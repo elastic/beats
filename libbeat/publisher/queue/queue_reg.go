@@ -18,9 +18,6 @@
 package queue
 
 import (
-	"fmt"
-
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/feature"
 )
 
@@ -49,20 +46,6 @@ func FindFactory(name string) Factory {
 	}
 
 	return factory
-}
-
-// Load instantiates a new queue.
-func Load(eventer Eventer, config common.ConfigNamespace) (Queue, error) {
-	t, cfg := config.Name(), config.Config()
-	if t == "" {
-		t = "mem"
-	}
-
-	factory := FindFactory(t)
-	if factory == nil {
-		return nil, fmt.Errorf("queue type %v undefined", t)
-	}
-	return factory(eventer, cfg)
 }
 
 // Feature creates a new type of queue.
