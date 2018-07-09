@@ -24,19 +24,20 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/dev-tools/mage"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/dev-tools/mage"
 )
 
 var builder = preferencePaneBuilder{
-	Project:         "beats-preference-pane.xcodeproj",
-	Configuration:   mage.EnvOr("XCODE_CONFIGURATION", "Release"),
-	PackageName:     "BeatsPrefPane.pkg",
-	InstallDir:      "/Library/PreferencePanes",
-	Identifier:      "co.elastic.beats.preference-pane",
-	Version:         "1.0.0",
+	Project:       "beats-preference-pane.xcodeproj",
+	Configuration: mage.EnvOr("XCODE_CONFIGURATION", "Release"),
+	PackageName:   "BeatsPrefPane.pkg",
+	InstallDir:    "/Library/PreferencePanes",
+	Identifier:    "co.elastic.beats.preference-pane",
+	Version:       "1.0.0",
 }
 
 // Default specifies the default build target for mage.
@@ -57,12 +58,12 @@ func Clean() error { return sh.Rm("build") }
 // --- preferencePaneBuilder
 
 type preferencePaneBuilder struct {
-	Project         string
-	Configuration   string
-	PackageName     string
-	InstallDir      string
-	Identifier      string
-	Version         string
+	Project       string
+	Configuration string
+	PackageName   string
+	InstallDir    string
+	Identifier    string
+	Version       string
 }
 
 func (b preferencePaneBuilder) SigningInfo() *mage.AppleSigningInfo {
