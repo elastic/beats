@@ -27,6 +27,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestPingExecution(t *testing.T) {
+
+}
+
 func TestSplitHostnamePort(t *testing.T) {
 	var urlTests = []struct {
 		name          string

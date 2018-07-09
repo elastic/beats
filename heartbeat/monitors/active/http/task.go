@@ -223,6 +223,7 @@ func execPing(
 	defer cancel()
 
 	req = attachRequestBody(&ctx, req, body)
+	defer req.Body.Close()
 
 	start, end, resp, errReason := execRequest(client, req, validator)
 	if errReason != nil {
