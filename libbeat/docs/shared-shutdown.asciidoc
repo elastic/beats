@@ -6,7 +6,7 @@
 //// Use the appropriate variables defined in the index.asciidoc file to
 //// resolve Beat names: beatname_uc and beatname_lc.
 //// Use the following include to pull this content into a doc file:
-//// include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+//// include::../../libbeat/docs/shared-shutdown.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
 [[shutdown]]
