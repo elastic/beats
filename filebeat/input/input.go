@@ -28,7 +28,16 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
+
+var (
+	inputList = monitoring.NewUniqueList()
+)
+
+func init() {
+	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "input", inputList.Report, monitoring.Report)
+}
 
 // Input is the interface common to all input
 type Input interface {
@@ -111,6 +120,7 @@ func (p *Runner) Start() {
 	}
 
 	onceWg.Add(1)
+	inputList.Add(p.config.Type)
 	// Add waitgroup to make sure input is finished
 	go func() {
 		defer func() {
@@ -150,6 +160,7 @@ func (p *Runner) Stop() {
 	// Stop scanning and wait for completion
 	close(p.done)
 	p.wg.Wait()
+	inputList.Remove(p.config.Type)
 }
 
 func (p *Runner) stop() {
