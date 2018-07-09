@@ -22,15 +22,17 @@ package elasticsearch_test
 import (
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
+	"bytes"
 
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_summary"
@@ -52,7 +54,7 @@ var metricSets = []string{
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "elasticsearch")
 
-	host := getEnvHost() + ":" + getEnvPort()
+	host := net.JoinHostPort(getEnvHost(), getEnvPort())
 	err := createIndex(host)
 	assert.NoError(t, err)
 
@@ -165,23 +167,10 @@ func enableLicense(host string) error {
 
 func createMLJob(host string) error {
 
-	mlJob := `{
-		"description" : "Total sum of requests",
-			"analysis_config" : {
-		"bucket_span":"10m",
-		"detectors": [
-		{
-		"detector_description": "Sum of total",
-		"function": "sum",
-		"field_name": "total"
-		}
-		]
-		},
-		"data_description" : {
-		"time_field":"timestamp",
-		"time_format": "epoch_ms"
-		}
-	}`
+	mlJob, err := ioutil.ReadFile("ml_job/_meta/test/test_job.json")
+	if err != nil {
+		return err
+	}
 
 	client := &http.Client{}
 
@@ -191,7 +180,7 @@ func createMLJob(host string) error {
 		return nil
 	}
 
-	req, err := http.NewRequest("PUT", "http://"+host+jobURL, strings.NewReader(mlJob))
+	req, err := http.NewRequest("PUT", "http://"+host+jobURL, bytes.NewReader(mlJob))
 	if err != nil {
 		return err
 	}
