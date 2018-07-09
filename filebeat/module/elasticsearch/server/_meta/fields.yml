@@ -1,8 +1,54 @@
+- name: timestamp
+  description: "Event timestamp"
+  example: "2018-05-17T08:29:09,245"
+- name: level
+  description: "Log level"
+  example: "INFO"
+  type: keyword
 - name: server
+  description: "Server log file"
+  example: "[2018-05-17T08:29:09,245][INFO ][o.e.c.m.MetaDataCreateIndexService] [vWNJsZ3] [filebeat-test-input] creating index, cause [auto(bulk api)], templates [filebeat-test-input], shards [5]/[1], mappings [doc]"
   type: group
-  description: >
   fields:
-    - name: component
-      type: keyword
-      description: >
-        Elasticsearch component.
+  - name: component
+    description: "Log component"
+    example: "o.e.c.m.MetaDataCreateIndexService"
+    type: keyword
+  - name: node_name
+    description: "Name of the node"
+    example: "vWNJsZ3"
+    type: keyword
+  - name: gc
+    description: "GC log"
+    example: "[gc][young][3449979][986594]"
+    type: group
+    fields:
+    - name: young
+      description: "Young GC"
+      example: ""
+      type: group
+      fields:
+      - name: one
+        description: ""
+        example: ""
+        type: long
+      - name: two
+        description: ""
+        example: ""
+        type: long
+  - name: gc_overhead
+    description: ""
+    example: ""
+    type: long
+  - name: index_name
+    description: "Index name"
+    example: "filebeat-test-input"
+    type: keyword
+  - name: index_id
+    description: "Index id"
+    example: "aOGgDwbURfCV57AScqbCgw"
+    type: keyword
+- name: message
+  description: Please add description
+  example: Please add example
+  type: text
