@@ -26,13 +26,12 @@ import (
 )
 
 var (
-	moduleList     map[string]int
-	moduleListLock sync.Mutex
+	moduleList *monitoring.UniqueList
 )
 
 func init() {
-	moduleList = map[string]int{}
-	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", reportModules, monitoring.Report)
+	moduleList = monitoring.NewUniqueList()
+	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
 }
 
 // Runner is a facade for a Wrapper that provides a simple interface
@@ -72,7 +71,7 @@ func (mr *runner) Start() {
 	mr.startOnce.Do(func() {
 		output := mr.mod.Start(mr.done)
 		mr.wg.Add(1)
-		addModule(mr.mod.Name())
+		moduleList.Add(mr.mod.Name())
 		go func() {
 			defer mr.wg.Done()
 			PublishChannels(mr.client, output)
@@ -85,43 +84,10 @@ func (mr *runner) Stop() {
 		close(mr.done)
 		mr.client.Close()
 		mr.wg.Wait()
-		removeModule(mr.mod.Name())
+		moduleList.Remove(mr.mod.Name())
 	})
 }
 
 func (mr *runner) String() string {
 	return fmt.Sprintf("%s [metricsets=%d]", mr.mod.Name(), len(mr.mod.metricSets))
-}
-
-func addModule(module string) {
-	moduleListLock.Lock()
-	defer moduleListLock.Unlock()
-	moduleList[module]++
-}
-
-func removeModule(module string) {
-	moduleListLock.Lock()
-	defer moduleListLock.Unlock()
-	moduleList[module]--
-}
-
-func reportModules(m monitoring.Mode, V monitoring.Visitor) {
-	V.OnRegistryStart()
-	defer V.OnRegistryFinished()
-
-	var modules []string
-	var count int64
-
-	moduleListLock.Lock()
-	defer moduleListLock.Unlock()
-
-	for key, val := range moduleList {
-		if val > 0 {
-			modules = append(modules, key)
-		}
-		count += int64(val)
-	}
-
-	monitoring.ReportInt(V, "count", count)
-	monitoring.ReportStringSlice(V, "names", modules)
 }
