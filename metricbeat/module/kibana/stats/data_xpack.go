@@ -56,7 +56,7 @@ var (
 			}),
 			"uptime_in_millis": c.Int("uptime_ms"),
 		}),
-		"requests": RequestsDict),
+		"requests": RequestsDict,
 		"response_times": c.Dict("response_times", s.Schema{
 			"average": c.Float("avg_ms"),
 			"max":     c.Float("max_ms"),
