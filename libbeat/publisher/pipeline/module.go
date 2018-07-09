@@ -157,6 +157,10 @@ func createQueueBuilder(config common.ConfigNamespace) (func(queue.Eventer) (que
 		queueConfig = common.NewConfig()
 	}
 
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	queueRegistry := stateRegistry.NewRegistry("queue")
+	monitoring.NewString(queueRegistry, "name").Set(queueType)
+
 	return func(eventer queue.Eventer) (queue.Queue, error) {
 		return queueFactory(eventer, queueConfig)
 	}, nil
