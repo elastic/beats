@@ -58,7 +58,7 @@ func TestFetch(t *testing.T) {
 	err := createIndex(host)
 	assert.NoError(t, err)
 
-	err = enableLicense(host)
+	err = enableTrialLicense(host)
 	assert.NoError(t, err)
 
 	err = createMLJob(host)
@@ -146,7 +146,7 @@ func createIndex(host string) error {
 }
 
 // createIndex creates and elasticsearch index in case it does not exit yet
-func enableLicense(host string) error {
+func enableTrialLicense(host string) error {
 	client := &http.Client{}
 
 	enableXPackURL := "/_xpack/license/start_trial?acknowledge=true"
