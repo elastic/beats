@@ -2,10 +2,6 @@
   type: group
   description: >
   fields:
-    - name: node_name
-      description: "The name of the node"
-      example: "v_VJhjV"
-      type: keyword
     - name: layer
       description: "The layer from which this event originated: rest, transport or ip_filter"
       example: "rest"

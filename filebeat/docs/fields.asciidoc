@@ -800,22 +800,44 @@ elasticsearch Module
 
 
 
+*`elasticsearch.node.name`*::
++
+--
+type: keyword
+
+example: vWNJsZ3
+
+Name of the node
+
+--
+
+*`elasticsearch.index.name`*::
++
+--
+type: keyword
+
+example: filebeat-test-input
+
+Index name
+
+--
+
+*`elasticsearch.index.id`*::
++
+--
+type: keyword
+
+example: aOGgDwbURfCV57AScqbCgw
+
+Index id
+
+--
+
 [float]
 == audit fields
 
 
 
-
-*`elasticsearch.audit.node_name`*::
-+
---
-type: keyword
-
-example: v_VJhjV
-
-The name of the node
-
---
 
 *`elasticsearch.audit.layer`*::
 +
