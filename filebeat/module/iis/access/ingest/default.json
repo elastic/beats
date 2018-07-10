@@ -39,6 +39,10 @@
       "field": "iis.access.agent"
     }
   }, {
+    "lowercase": {
+      "field": "iis.access.hostname"
+    }
+  }, {
     "geoip": {
       "field": "iis.access.remote_ip",
       "target_field": "iis.access.geoip"
