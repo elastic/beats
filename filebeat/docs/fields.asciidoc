@@ -1163,26 +1163,6 @@ Young generation occupancy in kilobytes.
 
 --
 
-*`elasticsearch.timestamp`*::
-+
---
-example: 2018-05-17T08:29:09,245
-
-Event timestamp
-
---
-
-*`elasticsearch.level`*::
-+
---
-type: keyword
-
-example: INFO
-
-Log level
-
---
-
 [float]
 == server fields
 
@@ -1275,17 +1255,6 @@ type: keyword
 example: aOGgDwbURfCV57AScqbCgw
 
 Index id
-
---
-
-*`elasticsearch.message`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
 
 --
 
