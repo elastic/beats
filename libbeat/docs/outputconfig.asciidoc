@@ -28,7 +28,9 @@ The following topics describe how to configure each supported output:
 * <<elasticsearch-output>>
 * <<logstash-output>>
 * <<kafka-output>>
+ifndef::no-redis-output[]
 * <<redis-output>>
+endif::[]
 * <<file-output>>
 * <<console-output>>
 
@@ -843,6 +845,7 @@ Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silentl
 Configuration options for SSL parameters like the root CA for Kafka connections. See
 <<configuration-ssl>> for more information.
 
+ifndef::no-redis-output[]
 [[redis-output]]
 === Configure the Redis output
 
@@ -1071,6 +1074,8 @@ client. You can change this behavior by setting the
 
 This option determines whether Redis hostnames are resolved locally when using a proxy.
 The default value is false, which means that name resolution occurs on the proxy server.
+
+endif::[]
 
 [[file-output]]
 === Configure the File output
