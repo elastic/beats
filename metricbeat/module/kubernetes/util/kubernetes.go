@@ -102,7 +102,12 @@ func NewResourceMetadataEnricher(
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
 			id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName())
-			m[id] = metaGen.ResourceMetadata(r)
+			switch r := r.(type) {
+			case *kubernetes.Pod:
+				m[id] = metaGen.PodMetadata(r)
+			default:
+				m[id] = metaGen.ResourceMetadata(r)
+			}
 		},
 		// delete
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
@@ -145,7 +150,7 @@ func NewContainerMetadataEnricher(
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
 			pod := r.(*kubernetes.Pod)
-			meta := metaGen.ResourceMetadata(r)
+			meta := metaGen.PodMetadata(pod)
 			for _, container := range append(pod.GetSpec().GetContainers(), pod.GetSpec().GetInitContainers()...) {
 				id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName(), container.GetName())
 				m[id] = meta

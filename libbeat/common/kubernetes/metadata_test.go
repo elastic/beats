@@ -28,7 +28,7 @@ import (
 )
 
 func TestPodMetadataDeDot(t *testing.T) {
-	withUID, _ := common.NewConfigFrom(map[string]interface{}{"include_uid": true})
+	withUID, _ := common.NewConfigFrom(map[string]interface{}{"include_pod_uid": true})
 
 	UID := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	Deployment := "Deployment"
@@ -71,8 +71,10 @@ func TestPodMetadataDeDot(t *testing.T) {
 				},
 			},
 			meta: common.MapStr{
-				"pod":    common.MapStr{"name": ""},
-				"uid":    "005f3b90-4b9d-12f8-acf0-31020a840133",
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
 				"node":   common.MapStr{"name": "test"},
 				"labels": common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
 			},

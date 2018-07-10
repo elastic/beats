@@ -43,7 +43,7 @@ type MetaGeneratorConfig struct {
 	IncludeAnnotations []string `config:"include_annotations"`
 
 	// Undocumented settings, to be deprecated in favor of `drop_fields` processor:
-	IncludeUID             bool `config:"include_uid"`
+	IncludePodUID          bool `config:"include_pod_uid"`
 	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
 }
 
@@ -88,11 +88,6 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 		meta["namespace"] = objMeta.GetNamespace()
 	}
 
-	// Add UID metadata if enabled
-	if g.IncludeUID {
-		meta["uid"] = objMeta.GetUid()
-	}
-
 	// Add controller metadata if present
 	if g.IncludeCreatorMetadata {
 		for _, ref := range objMeta.OwnerReferences {
@@ -122,6 +117,11 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 // PodMetadata generates metadata for the given pod taking to account certain filters
 func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	podMeta := g.ResourceMetadata(pod)
+
+	// Add UID metadata if enabled
+	if g.IncludePodUID {
+		safemapstr.Put(podMeta, "pod.uid", pod.GetMetadata().GetUid())
+	}
 
 	safemapstr.Put(podMeta, "pod.name", pod.GetMetadata().GetName())
 	safemapstr.Put(podMeta, "node.name", pod.Spec.GetNodeName())
