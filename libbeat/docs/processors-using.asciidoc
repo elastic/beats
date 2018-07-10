@@ -26,7 +26,7 @@ Where:
 * `<processor_name>` specifies a <<processors,processor>> that performs some kind
 of action, such as selecting the fields that are exported or adding metadata to
 the event.
-* `<when: condition>` specifies an optional <<conditions,condition>>. If the
+* `<condition>` specifies an optional <<conditions,condition>>. If the
 condition is present, then the action is executed only if the condition is
 fulfilled. If no condition is passed, then the action is always executed.
 * `<parameters>` is the list of parameters to pass to the processor.
@@ -144,7 +144,7 @@ ifeval::["{beatname_lc}"=="winlogbeat"]
 [source,yaml]
 ----
 winlogbeat.event_logs:
-  - name: <network_shipper_name>
+- name: <network_shipper_name>
   processors:
   - <processor_name>:
       when:
@@ -153,7 +153,6 @@ winlogbeat.event_logs:
 ----
 endif::[]
 
-// REVIEWERS: I'm not sure if the syntax of the winlog example is correct.
 
 [[processors]]
 ==== Processors
