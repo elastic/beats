@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package processors
+package conditions
 
 import (
 	"testing"
@@ -23,22 +23,38 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExtractString(t *testing.T) {
-	input := "test"
-
-	v, err := extractString(input)
-	if err != nil {
-		t.Fatal(err)
+func TestEqualsCreate(t *testing.T) {
+	config := Config{
+		Equals: &Fields{fields: map[string]interface{}{
+			"proc.pid": 0.08,
+		}},
 	}
-	assert.Equal(t, input, v)
+
+	_, err := NewCondition(&config)
+	assert.NotNil(t, err)
 }
 
-func TestExtractBool(t *testing.T) {
-	input := true
+func TestEqualsSingleFieldPositiveMatch(t *testing.T) {
+	testConfig(t, true, secdTestEvent, &Config{
+		Equals: &Fields{fields: map[string]interface{}{
+			"type": "process",
+		}},
+	})
+}
 
-	v, err := extractBool(input)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, input, v)
+func TestEqualsBooleanFieldNegativeMatch(t *testing.T) {
+	testConfig(t, false, secdTestEvent, &Config{
+		Equals: &Fields{fields: map[string]interface{}{
+			"final": true,
+		}},
+	})
+}
+
+func TestEqualsMultiFieldAndTypePositiveMatch(t *testing.T) {
+	testConfig(t, true, secdTestEvent, &Config{
+		Equals: &Fields{fields: map[string]interface{}{
+			"type":     "process",
+			"proc.pid": 305,
+		}},
+	})
 }

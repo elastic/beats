@@ -18,8 +18,6 @@
 package fileset
 
 import (
-	"github.com/mitchellh/hashstructure"
-
 	"github.com/elastic/beats/filebeat/channel"
 	input "github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
@@ -27,8 +25,19 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+
+	"github.com/mitchellh/hashstructure"
 )
+
+var (
+	moduleList = monitoring.NewUniqueList()
+)
+
+func init() {
+	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
+}
 
 // Factory for modules
 type Factory struct {
@@ -127,10 +136,20 @@ func (p *inputsRunner) Start() {
 	for _, input := range p.inputs {
 		input.Start()
 	}
+
+	// Loop through and add modules, only 1 normally
+	for m := range p.moduleRegistry.registry {
+		moduleList.Add(m)
+	}
 }
 func (p *inputsRunner) Stop() {
 	for _, input := range p.inputs {
 		input.Stop()
+	}
+
+	// Loop through and remove modules, only 1 normally
+	for m := range p.moduleRegistry.registry {
+		moduleList.Remove(m)
 	}
 }
 

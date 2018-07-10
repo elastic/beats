@@ -307,6 +307,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - HTTP publishes an Error event for unmatched requests or responses. {pull}6794[6794]
 - The process monitor now reports the command-line for all processes, under Linux and Windows. {pull}7135[7135]
 - Updated the TLS protocol parser with new cipher suites added to TLS 1.3. {issue}7455[7455]
+- Flows are enriched with process information using the process monitor. {pull}7507[7507]
 
 *Winlogbeat*
 
