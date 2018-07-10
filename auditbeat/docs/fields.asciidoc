@@ -3307,12 +3307,12 @@ Kubernetes pod name
 
 --
 
-*`kubernetes.uid`*::
+*`kubernetes.pod.uid`*::
 +
 --
 type: keyword
 
-Kubernetes uid
+Kubernetes Pod UID
 
 
 --
