@@ -77,6 +77,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - When we fail to build a Kubernetes' indexer or matcher we produce a warning but we don't add them to the execution. {pull}7466[7466]
 - Fix default value for logging.files.keepfiles. It was being set to 0 and now
   it's set to the documented value of 7. {issue}7494[7494]
+- Retain compatibility with older Docker server versions. {issue}7542[7542]
 
 *Auditbeat*
 
