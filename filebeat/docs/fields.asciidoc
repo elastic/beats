@@ -1166,7 +1166,7 @@ Young generation occupancy in kilobytes.
 [float]
 == server fields
 
-
+Server log file
 
 
 *`elasticsearch.server.component`*::
@@ -1174,8 +1174,87 @@ Young generation occupancy in kilobytes.
 --
 type: keyword
 
-Elasticsearch component.
+example: o.e.c.m.MetaDataCreateIndexService
 
+Log component
+
+--
+
+*`elasticsearch.server.node_name`*::
++
+--
+type: keyword
+
+example: vWNJsZ3
+
+Name of the node
+
+--
+
+[float]
+== gc fields
+
+GC log
+
+
+[float]
+== young fields
+
+Young GC
+
+
+*`elasticsearch.server.gc.young.one`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+*`elasticsearch.server.gc.young.two`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+*`elasticsearch.server.gc_overhead`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+*`elasticsearch.server.index_name`*::
++
+--
+type: keyword
+
+example: filebeat-test-input
+
+Index name
+
+--
+
+*`elasticsearch.server.index_id`*::
++
+--
+type: keyword
+
+example: aOGgDwbURfCV57AScqbCgw
+
+Index id
 
 --
 
