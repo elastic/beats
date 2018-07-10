@@ -40,7 +40,8 @@
     }
   }, {
     "lowercase": {
-      "field": "iis.access.hostname"
+      "field": "iis.access.hostname",
+      "ignore_missing": true
     }
   }, {
     "geoip": {
