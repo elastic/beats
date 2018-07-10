@@ -74,7 +74,7 @@ var (
 				},
 			}),
 			"uptime": s.Object{
-				"bytes": c.Int("uptime_ms"),
+				"ms": c.Int("uptime_ms"),
 			},
 		}),
 		"requests": RequestsDict,
@@ -121,6 +121,11 @@ var (
 
 	// UsageDict defines how to convert the usage field
 	UsageDict = c.Dict("usage", s.Schema{
+		"kibana":    kibanaUsageDict,
+		"reporting": reportingUsageDict,
+	})
+
+	kibanaUsageDict = c.Dict("kibana", s.Schema{
 		"index": c.Str("index"),
 		"dashboard": c.Dict("dashboard", s.Schema{
 			"total": c.Int("total"),
@@ -140,21 +145,18 @@ var (
 		"timelion_sheet": c.Dict("timelion_sheet", s.Schema{
 			"total": c.Int("total"),
 		}, c.DictOptional),
-		"xpack": xPackDict,
 	})
 
-	xPackDict = c.Dict("xpack", s.Schema{
-		"reporting": c.Dict("reporting", s.Schema{
-			"available":     c.Bool("available"),
-			"enabled":       c.Bool("enabled"),
-			"browser_type":  c.Str("browser_type"),
-			"_all":          c.Int("_all"),
-			"csv":           reportingCsvDict,
-			"printable_pdf": reportingPrintablePdfDict,
-			"status":        reportingStatusDict,
-			"lastDay":       c.Dict("lastDay", reportingPeriodSchema, c.DictOptional),
-			"last7Days":     c.Dict("last7Days", reportingPeriodSchema, c.DictOptional),
-		}, c.DictOptional),
+	reportingUsageDict = c.Dict("reporting", s.Schema{
+		"available":     c.Bool("available"),
+		"enabled":       c.Bool("enabled"),
+		"browser_type":  c.Str("browser_type"),
+		"_all":          c.Int("_all"),
+		"csv":           reportingCsvDict,
+		"printable_pdf": reportingPrintablePdfDict,
+		"status":        reportingStatusDict,
+		"lastDay":       c.Dict("lastDay", reportingPeriodSchema, c.DictOptional),
+		"last7Days":     c.Dict("last7Days", reportingPeriodSchema, c.DictOptional),
 	}, c.DictOptional)
 
 	reportingCsvDict = c.Dict("csv", s.Schema{

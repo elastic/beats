@@ -6691,42 +6691,109 @@ UUID of the Elasticsearch cluster to which Kibana connects.
 
 --
 
-*`kibana.stats.name`*::
+*`kibana.stats.concurrent_connections`*::
 +
 --
-type: keyword
+type: long
 
-Kibana instance name.
+Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request mulitple server assets at once, and they can re-use established connections.
 
 
 --
 
-*`kibana.stats.uuid`*::
+[float]
+== os fields
+
+Operating system metrics
+
+
+
+[float]
+== load.avg fields
+
+Operating system load averages
+
+
+
+*`kibana.stats.os.load.avg.1m`*::
 +
 --
-type: keyword
+type: scaled_float
 
-Kibana instance uuid.
+1 minute load average
 
 
 --
 
-*`kibana.stats.version.number`*::
+*`kibana.stats.os.load.avg.5m`*::
 +
 --
-type: keyword
+type: scaled_float
 
-Kibana version number.
+5 minute load average
 
 
 --
 
-*`kibana.stats.status.overall.state`*::
+*`kibana.stats.os.load.avg.15m`*::
 +
 --
-type: keyword
+type: scaled_float
 
-Kibana overall state.
+15 minute load average
+
+
+--
+
+[float]
+== memory fields
+
+Operating system memory metrics
+
+
+
+*`kibana.stats.os.memory.total.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total operating system memory available in bytes
+
+
+--
+
+*`kibana.stats.os.memory.free.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Operating system memory free in bytes
+
+
+--
+
+*`kibana.stats.os.memory.used.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Operating system memory used in bytes
+
+
+--
+
+*`kibana.stats.os.uptime.ms`*::
++
+--
+type: long
+
+Operating system uptime in seconds
 
 
 --
@@ -6734,108 +6801,81 @@ Kibana overall state.
 [float]
 == process fields
 
-Kibana process metrics.
+Process metrics
 
 
 
-[float]
-== mem fields
-
-Memory usage metrics of the Kibana instance.
-
-
-
-*`kibana.stats.process.mem.heap.max.bytes`*::
+*`kibana.stats.process.event_loop_delay.ms`*::
 +
 --
-type: long
+type: scaled_float
 
-format: bytes
-
-Total amount of heap memory used by V8.
-
-
---
-
-*`kibana.stats.process.mem.heap.used.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-Amount of memory in use by V8.
-
-
---
-
-*`kibana.stats.process.mem.resident_set_size.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The amount of space occupied in main memory for the process. Includes heap, code segment, and stack.
-
-
---
-
-*`kibana.stats.process.mem.external.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-Memory usage of C++ objects bound to JavaScript objects managed by V8.
-
-
---
-
-*`kibana.stats.process.pid`*::
-+
---
-type: long
-
-Process ID of the Kibana instance.
-
-
---
-
-*`kibana.stats.process.uptime.ms`*::
-+
---
-type: long
-
-Amount of time that the Kibana process has been running in milliseconds.
+Event loop delay in milliseconds
 
 
 --
 
 [float]
-== response_times fields
+== memory.heap fields
 
-HTTP Server response time metrics
+Process heap metrics
 
 
 
-*`kibana.stats.response_times.avg.ms`*::
+*`kibana.stats.process.memory.heap.total.bytes`*::
 +
 --
 type: long
 
-Accumulated averages for response times, for all responses in a 5-second time window.
+format: bytes
+
+Total heap allocated to process in bytes
 
 
 --
 
-*`kibana.stats.response_times.max.ms`*::
+*`kibana.stats.process.memory.heap.used.bytes`*::
 +
 --
 type: long
 
-Accumulated maximums for response times, for all responses in a 5-second time window.
+format: bytes
+
+Heap used by process in bytes
+
+
+--
+
+*`kibana.stats.process.memory.heap.external.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Heap used by C++ objects bound to Javascript objects managed by V8, in bytes
+
+
+--
+
+*`kibana.stats.process.memory.heap.size_limit.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Max. old space size allocated to Node.js process, in bytes
+
+
+--
+
+*`kibana.stats.process.memory.heap.uptime.ms`*::
++
+--
+type: long
+
+Uptime of process in milliseconds
 
 
 --
@@ -6843,16 +6883,16 @@ Accumulated maximums for response times, for all responses in a 5-second time wi
 [float]
 == requests fields
 
-HTTP Server request metrics
+Request count metrics
 
 
 
-*`kibana.stats.requests.status_codes`*::
+*`kibana.stats.requests.disconnects`*::
 +
 --
-type: object
+type: long
 
-Key-value pairs for each status code sent by the server, and the number of times it sent that code.
+Number of requests that were disconnected
 
 
 --
@@ -6862,27 +6902,34 @@ Key-value pairs for each status code sent by the server, and the number of times
 --
 type: long
 
-Total number of requests sent by the server.
+Total number of requests
 
 
 --
 
-*`kibana.stats.requests.disconnects`*::
+[float]
+== response_times fields
+
+Response times metrics
+
+
+
+*`kibana.stats.response_times.avg.ms`*::
 +
 --
-type: long
+type: scaled_float
 
-Total number of client disconnects encountered by the server.
+Average response time in milliseconds
 
 
 --
 
-*`kibana.stats.concurrent_connections`*::
+*`kibana.stats.response_times.max.ms`*::
 +
 --
-type: long
+type: scaled_float
 
-Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
+Maximum response time in milliseconds
 
 
 --
@@ -6890,14 +6937,7 @@ Number of client connections made to the server. Note that browsers can send mul
 [float]
 == sockets fields
 
-HTTP Web Sockets metrics
-
-
-
-[float]
-== http fields
-
-Web Sockets over plaintext HTTP
+Socket connections metrics
 
 
 
@@ -6906,34 +6946,572 @@ Web Sockets over plaintext HTTP
 --
 type: long
 
-Number of HTTP web socket connections established
+Number of HTTP connections
 
 
 --
-
-[float]
-== https fields
-
-Web Sockets over encrypted HTTPS
-
-
 
 *`kibana.stats.sockets.https.total`*::
 +
 --
 type: long
 
-Number of HTTPS web socket connections established
+Number of HTTPS connections
 
 
 --
 
-*`kibana.stats.event_loop_delay`*::
+[float]
+== kibana fields
+
+Kibana metadata
+
+
+
+*`kibana.stats.kibana.uuid`*::
++
+--
+type: keyword
+
+Kibana instance UUID
+
+
+--
+
+*`kibana.stats.kibana.name`*::
++
+--
+type: text
+
+Kibana instance name
+
+
+--
+
+*`kibana.stats.kibana.index`*::
++
+--
+type: keyword
+
+Name of Kibana's internal index
+
+
+--
+
+*`kibana.stats.kibana.host`*::
++
+--
+type: keyword
+
+Kibana instance hostname
+
+
+--
+
+*`kibana.stats.kibana.transport_address`*::
++
+--
+type: keyword
+
+Kibana server's hostname and port
+
+
+--
+
+*`kibana.stats.kibana.version`*::
++
+--
+type: keyword
+
+Kibana version
+
+
+--
+
+*`kibana.stats.kibana.snapshot`*::
++
+--
+type: boolean
+
+Whether the Kibana build is a snapshot build
+
+
+--
+
+*`kibana.stats.kibana.status`*::
++
+--
+type: keyword
+
+Kibana instance's health status
+
+
+--
+
+[float]
+== usage fields
+
+Kibana plugins' usage metrics
+
+
+
+[float]
+== kibana fields
+
+Kibana core plugins' usage metrics
+
+
+
+*`kibana.stats.usage.kibana.index`*::
++
+--
+type: keyword
+
+Name of Kibana's internal index
+
+
+--
+
+*`kibana.stats.usage.kibana.dashboard.total`*::
 +
 --
 type: long
 
-Node event loop delay calculated with internal benchmarking.
+Total number of dashboards saved
+
+
+--
+
+*`kibana.stats.usage.kibana.visualization.total`*::
++
+--
+type: long
+
+Total number of visualizations saved
+
+
+--
+
+*`kibana.stats.usage.kibana.search.total`*::
++
+--
+type: long
+
+Total number of searches saved
+
+
+--
+
+*`kibana.stats.usage.kibana.index_pattern.total`*::
++
+--
+type: long
+
+Total number of index patterns saved
+
+
+--
+
+*`kibana.stats.usage.kibana.graph_workspace.total`*::
++
+--
+type: long
+
+Total number of graph workspaces saved
+
+
+--
+
+*`kibana.stats.usage.kibana.timelion_sheet.total`*::
++
+--
+type: long
+
+Total number of timelion sheets saved
+
+
+--
+
+[float]
+== reporting fields
+
+Kibana Reporting plugin's usage metrics
+
+
+
+*`kibana.stats.usage.reporting.available`*::
++
+--
+type: boolean
+
+Whether the Reporting plugin is available
+
+
+--
+
+*`kibana.stats.usage.reporting.enabled`*::
++
+--
+type: boolean
+
+Whether the Reporting plugin is enabled
+
+
+--
+
+*`kibana.stats.usage.reporting.browser_type`*::
++
+--
+type: keyword
+
+Type of browser being used by Reporting for screenshots
+
+
+--
+
+*`kibana.stats.usage.reporting._all`*::
++
+--
+type: long
+
+Total number of reports generated across all types of reports
+
+
+--
+
+[float]
+== csv fields
+
+Metrics for CSV reports
+
+
+
+*`kibana.stats.usage.reporting.csv.available`*::
++
+--
+type: boolean
+
+Whether CSV reporting is available
+
+
+--
+
+*`kibana.stats.usage.reporting.csv.total`*::
++
+--
+type: long
+
+Total number of CSV reports generated
+
+
+--
+
+[float]
+== printable_pdf fields
+
+Metrics for PDF reports
+
+
+
+*`kibana.stats.usage.reporting.printable_pdf.available`*::
++
+--
+type: boolean
+
+Whether PDF reporting is available
+
+
+--
+
+*`kibana.stats.usage.reporting.printable_pdf.total`*::
++
+--
+type: long
+
+Total number of PDF reports generated
+
+
+--
+
+[float]
+== status fields
+
+Report status metrics
+
+
+
+*`kibana.stats.usage.reporting.status.completed`*::
++
+--
+type: long
+
+Number of reports completed
+
+
+--
+
+*`kibana.stats.usage.reporting.status.failed`*::
++
+--
+type: long
+
+Number of reports failed
+
+
+--
+
+*`kibana.stats.usage.reporting.status.processing`*::
++
+--
+type: long
+
+Number of reports currently processing
+
+
+--
+
+*`kibana.stats.usage.reporting.status.pending`*::
++
+--
+type: long
+
+Number of reports waiting to start processing
+
+
+--
+
+[float]
+== lastDay fields
+
+Metrics for the last day
+
+
+
+*`kibana.stats.usage.reporting.lastDay._all`*::
++
+--
+type: long
+
+Total number of reports generated across all types of reports
+
+
+--
+
+[float]
+== csv fields
+
+Metrics for CSV reports
+
+
+
+*`kibana.stats.usage.reporting.lastDay.csv.available`*::
++
+--
+type: boolean
+
+Whether CSV reporting is available
+
+
+--
+
+*`kibana.stats.usage.reporting.lastDay.csv.total`*::
++
+--
+type: long
+
+Total number of CSV reports generated
+
+
+--
+
+[float]
+== printable_pdf fields
+
+Metrics for PDF reports
+
+
+
+*`kibana.stats.usage.reporting.lastDay.printable_pdf.available`*::
++
+--
+type: boolean
+
+Whether PDF reporting is available
+
+
+--
+
+*`kibana.stats.usage.reporting.lastDay.printable_pdf.total`*::
++
+--
+type: long
+
+Total number of PDF reports generated
+
+
+--
+
+[float]
+== status fields
+
+Report status metrics
+
+
+
+*`kibana.stats.usage.reporting.lastDay.status.completed`*::
++
+--
+type: long
+
+Number of reports completed
+
+
+--
+
+*`kibana.stats.usage.reporting.lastDay.status.failed`*::
++
+--
+type: long
+
+Number of reports failed
+
+
+--
+
+*`kibana.stats.usage.reporting.lastDay.status.processing`*::
++
+--
+type: long
+
+Number of reports currently processing
+
+
+--
+
+*`kibana.stats.usage.reporting.lastDay.status.pending`*::
++
+--
+type: long
+
+Number of reports waiting to start processing
+
+
+--
+
+[float]
+== last7Days fields
+
+Metrics for the last seven days
+
+
+
+*`kibana.stats.usage.reporting.last7Days._all`*::
++
+--
+type: long
+
+Total number of reports generated across all types of reports
+
+
+--
+
+[float]
+== csv fields
+
+Metrics for CSV reports
+
+
+
+*`kibana.stats.usage.reporting.last7Days.csv.available`*::
++
+--
+type: boolean
+
+Whether CSV reporting is available
+
+
+--
+
+*`kibana.stats.usage.reporting.last7Days.csv.total`*::
++
+--
+type: long
+
+Total number of CSV reports generated
+
+
+--
+
+[float]
+== printable_pdf fields
+
+Metrics for PDF reports
+
+
+
+*`kibana.stats.usage.reporting.last7Days.printable_pdf.available`*::
++
+--
+type: boolean
+
+Whether PDF reporting is available
+
+
+--
+
+*`kibana.stats.usage.reporting.last7Days.printable_pdf.total`*::
++
+--
+type: long
+
+Total number of PDF reports generated
+
+
+--
+
+[float]
+== status fields
+
+Report status metrics
+
+
+
+*`kibana.stats.usage.reporting.last7Days.status.completed`*::
++
+--
+type: long
+
+Number of reports completed
+
+
+--
+
+*`kibana.stats.usage.reporting.last7Days.status.failed`*::
++
+--
+type: long
+
+Number of reports failed
+
+
+--
+
+*`kibana.stats.usage.reporting.last7Days.status.processing`*::
++
+--
+type: long
+
+Number of reports currently processing
+
+
+--
+
+*`kibana.stats.usage.reporting.last7Days.status.pending`*::
++
+--
+type: long
+
+Number of reports waiting to start processing
 
 
 --
