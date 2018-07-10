@@ -36,6 +36,8 @@ var tests = []struct {
 	strings  []string
 }{
 	{"plain", []string{""}},
+	{"plain", []string{"", ""}},
+	{"plain", []string{"I can"}},
 	{"plain", []string{"I can", "eat glass"}},
 
 	{"latin1", []string{""}},
@@ -46,13 +48,14 @@ var tests = []struct {
 	{"utf-8", []string{""}},
 	{"utf-8", []string{"I can"}},
 	{"utf-8", []string{"árvíztűrő tükörfúrógép"}},
-	{"utf-8", []string{"árvíztűrő", "tükörfúrógép"}},
+	{"utf-8", []string{"A nap tüze, látod,", "a fürge diákot", "a hegyre kicsalta: a csúcsra kiállt."}},
 
 	{"utf-16", []string{""}},
 	{"utf-16", []string{"I can"}},
 	{"utf-16", []string{"I can", "eat glass"}},
 	{"utf-16", []string{"Pot să mănânc sticlă"}},
 	{"utf-16", []string{"Pot să mănânc sticlă", "și ea nu mă rănește."}},
+	{"utf-16", []string{"\u0001234", "\u0000", "\u3453"}},
 
 	{"utf-16be", []string{""}},
 	{"utf-16be", []string{"I can"}},
@@ -73,6 +76,14 @@ var tests = []struct {
 }
 
 func TestReaderEncodings(t *testing.T) {
+	testReaderWithEncodings(t, 1024)
+}
+
+func TestReaderEncodingsWithSmallBuffer(t *testing.T) {
+	testReaderWithEncodings(t, 3)
+}
+
+func testReaderWithEncodings(t *testing.T, bufferSize int) {
 	for _, test := range tests {
 		t.Logf("test codec: %v", test.encoding)
 
@@ -95,16 +106,11 @@ func TestReaderEncodings(t *testing.T) {
 		}
 
 		// create line reader
-		reader, err := New(buffer, codec, 1024)
-		if err != nil {
-			t.Errorf("failed to initialize reader: %v", err)
-			continue
-		}
+		reader := New(buffer, codec, bufferSize)
 
 		// read decodec lines from buffer
 		var readLines []string
 		var byteCounts []int
-		current := 0
 		for {
 			bytes, sz, err := reader.Next()
 			if sz > 0 {
@@ -115,14 +121,22 @@ func TestReaderEncodings(t *testing.T) {
 				break
 			}
 
-			current += sz
-			byteCounts = append(byteCounts, current)
+			state := reader.GetState()
+			iMsgBytes, err := state.GetValue("scanner.bytes")
+			if err != nil {
+				t.Errorf("error wilhe getting scanner.bytes: %v", err)
+			}
+			msgBytes, ok := iMsgBytes.(int)
+			if !ok {
+				t.Errorf("error converting msg_bytes to int")
+			}
+			byteCounts = append(byteCounts, msgBytes)
 		}
 
 		// validate lines and byte offsets
 		if len(test.strings) != len(readLines) {
 			t.Errorf("number of lines mismatch (expected=%v actual=%v)",
-				len(test.strings), len(readLines))
+				test.strings, readLines)
 			continue
 		}
 		for i := range test.strings {
@@ -186,10 +200,7 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
 	codec, _ := encoding.Plain(buffer)
-	reader, err := New(buffer, codec, buffer.Len())
-	if err != nil {
-		t.Fatalf("Error initializing reader: %v", err)
-	}
+	reader := New(buffer, codec, buffer.Len())
 
 	// read lines
 	var lines [][]byte

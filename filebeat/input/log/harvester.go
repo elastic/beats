@@ -289,9 +289,17 @@ func (h *Harvester) Run() error {
 		// Get copy of state to work on
 		// This is important in case sending is not successful so on shutdown
 		// the old offset is reported
+		iBytesOffset, err := h.reader.GetState().GetValue("scanner.bytes")
+		if err != nil {
+			return fmt.Errorf("erro while getting offset info: %v", err)
+		}
+		bytesOffset, ok := iBytesOffset.(int)
+		if !ok {
+			return fmt.Errorf("cannot convert %v to int", iBytesOffset)
+		}
 		state := h.getState()
 		startingOffset := state.Offset
-		state.Offset += int64(message.Bytes)
+		state.Offset += int64(bytesOffset)
 
 		// Create state event
 		data := util.NewData()
@@ -475,6 +483,7 @@ func (h *Harvester) validateFile(f *os.File) error {
 	return nil
 }
 
+// itt mar 0 az offset
 func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
 	// continue from last known offset
 	if h.state.Offset > 0 {

@@ -161,3 +161,7 @@ func (m *mockReader) Next() (reader.Message, error) {
 		Content: message,
 	}, nil
 }
+
+func (m *mockReader) GetState() common.MapStr {
+	return common.MapStr{}
+}

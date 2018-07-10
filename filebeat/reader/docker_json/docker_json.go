@@ -148,3 +148,7 @@ func (p *Reader) Next() (reader.Message, error) {
 		return message, err
 	}
 }
+
+func (r *Reader) GetState() common.MapStr {
+	return r.reader.GetState()
+}
