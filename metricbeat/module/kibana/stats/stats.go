@@ -82,7 +82,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	if config.xpack {
 		cfgwarn.Experimental("The experimental xpack.enabled flag in kibana/stats metricset is enabled.")
-		eventMappingXPack(r, m, content)
+		intervalMs := m.Module().Config().Period.Nanoseconds() / 1000 / 1000
+		eventMappingXPack(r, intervalMs, content)
 	} else {
 		eventMapping(r, content)
 	}

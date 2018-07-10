@@ -67,7 +67,7 @@ var (
 	}
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -92,7 +92,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	event.RootFields = common.MapStr{
 		"cluster_uuid": data["cluster_uuid"].(string),
 		"timestamp":    timestamp,
-		"interval_ms":  m.Module().Config().Period.Nanoseconds() / 1000 / 1000,
+		"interval_ms":  intervalMs,
 		"type":         "kibana_stats",
 		"kibana_stats": kibanaStatsFields,
 	}
