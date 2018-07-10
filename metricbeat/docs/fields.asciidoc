@@ -3674,6 +3674,16 @@ Processed data events.
 
 --
 
+*`elasticsearch.ml.job.data_counts.invalid_date_count`*::
++
+--
+type: long
+
+The number of records with either a missing date field or a date that could not be parsed.
+
+
+--
+
 [float]
 == node fields
 

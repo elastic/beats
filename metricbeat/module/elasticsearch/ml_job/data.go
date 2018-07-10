@@ -20,6 +20,8 @@ package ml_job
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -32,6 +34,7 @@ var (
 		"state": c.Str("state"),
 		"data_counts": c.Dict("data_counts", s.Schema{
 			"processed_record_count": c.Int("processed_record_count"),
+			"invalid_date_count":     c.Int("invalid_date_count"),
 		}),
 	}
 )
@@ -40,16 +43,15 @@ type jobsStruct struct {
 	Jobs []map[string]interface{} `json:"jobs"`
 }
 
-func eventsMapping(r mb.ReporterV2, content []byte) []error {
+func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 	jobsData := &jobsStruct{}
 	err := json.Unmarshal(content, jobsData)
 	if err != nil {
-		r.Error(err)
-		return []error{err}
+		return err
 	}
 
-	var errs []error
+	var errs multierror.Errors
 	for _, job := range jobsData.Jobs {
 
 		event := mb.Event{}
@@ -63,5 +65,5 @@ func eventsMapping(r mb.ReporterV2, content []byte) []error {
 		event.RootFields.Put("service.name", "elasticsearch")
 		r.Event(event)
 	}
-	return errs
+	return errs.Err()
 }

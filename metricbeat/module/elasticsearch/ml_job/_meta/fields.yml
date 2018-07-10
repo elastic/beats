@@ -15,3 +15,9 @@
       type: long
       description: >
         Processed data events.
+    - name: data_counts.invalid_date_count
+      type: long
+      description: >
+        The number of records with either a missing date field or a date that could not be parsed.
+
+

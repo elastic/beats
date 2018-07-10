@@ -47,7 +47,8 @@ class Test(metricbeat.BaseTest):
         try:
             es.transport.perform_request('POST', "/_xpack/license/start_trial?acknowledge=true")
         except:
-            print "Trial already enabled"
+            e = sys.exc_info()[0]
+            print "Trial already enabled. Error: {}".format(e)
 
         # Check if an ml job already exists
         response = es.transport.perform_request('GET', "/_xpack/ml/anomaly_detectors/_all/")
