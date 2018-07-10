@@ -1202,17 +1202,6 @@ Log component
 
 --
 
-*`elasticsearch.server.node_name`*::
-+
---
-type: keyword
-
-example: vWNJsZ3
-
-Name of the node
-
---
-
 [float]
 == gc fields
 
@@ -1255,28 +1244,6 @@ type: long
 example: 
 
 
-
---
-
-*`elasticsearch.server.index_name`*::
-+
---
-type: keyword
-
-example: filebeat-test-input
-
-Index name
-
---
-
-*`elasticsearch.server.index_id`*::
-+
---
-type: keyword
-
-example: aOGgDwbURfCV57AScqbCgw
-
-Index id
 
 --
 
