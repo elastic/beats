@@ -31,6 +31,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 
+	"io"
+
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
@@ -223,9 +225,12 @@ func execPing(
 	defer cancel()
 
 	req = attachRequestBody(&ctx, req, body)
-	defer req.Body.Close()
+	defer closeIfPresent(&req.Body)
 
 	start, end, resp, errReason := execRequest(client, req, validator)
+	if resp != nil { // If above errors, the response will be nil
+		defer closeIfPresent(&resp.Body)
+	}
 	if errReason != nil {
 		return start, end, nil, errReason
 	}
@@ -233,6 +238,12 @@ func execPing(
 	event = makeEvent(end.Sub(start), resp)
 
 	return start, end, event, nil
+}
+
+func closeIfPresent(closer *io.ReadCloser) {
+	if *closer != nil {
+		(*closer).Close()
+	}
 }
 
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
@@ -248,7 +259,6 @@ func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *ht
 func execRequest(client *http.Client, req *http.Request, validator func(*http.Response) error) (start time.Time, end time.Time, resp *http.Response, errReason reason.Reason) {
 	start = time.Now()
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
 	end = time.Now()
 
 	if err != nil {

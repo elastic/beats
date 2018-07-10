@@ -24,11 +24,112 @@ import (
 	"reflect"
 	"testing"
 
+	"net/http/httptest"
+
+	"time"
+
+	"io/ioutil"
+
+	"io"
+
+	"fmt"
+
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/heartbeat/reason"
+	"github.com/elastic/beats/libbeat/common"
 )
 
-func TestPingExecution(t *testing.T) {
+var helloWorldBody = "hello, world!"
 
+var helloWorldHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	io.WriteString(w, helloWorldBody)
+})
+
+var badGatewayBody = "Bad Gateway"
+
+var badGatewayHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusBadGateway)
+	io.WriteString(w, badGatewayBody)
+})
+
+func testPingResponse(t *testing.T, handlerFunc http.HandlerFunc, expectedStatus int, expectedBody string) (start time.Time, end time.Time, event common.MapStr, reason reason.Reason) {
+	server := httptest.NewServer(handlerFunc)
+	defer server.Close()
+
+	client := http.DefaultClient
+	req, err := http.NewRequest("GET", server.URL, nil)
+	assert.Nil(t, err)
+
+	var validatorResp *http.Response = nil
+	var validatorBodyBytes []byte
+	validator := func(resp *http.Response) error {
+		validatorResp = resp
+		validatorBodyBytes, err = ioutil.ReadAll(resp.Body)
+		assert.Nil(t, err)
+		return nil
+	}
+
+	start, end, event, reason = execPing(client, req, nil, time.Second, validator)
+
+	assert.Equal(t, expectedStatus, validatorResp.StatusCode)
+	assert.Nil(t, err)
+	assert.Equal(t, expectedBody, string(validatorBodyBytes))
+
+	assert.Nil(t, reason)
+	assert.True(t, start.Before(end) || start.Equal(end))
+	// More robust tests of the event can go at a higher level
+	assert.NotNil(t, event)
+
+	return start, end, event, reason
+}
+
+func TestGoodResponseCode(t *testing.T) {
+	testPingResponse(t, helloWorldHandler, http.StatusOK, helloWorldBody)
+}
+
+// Non 2xx responses shouldn't create any errors
+func TestPingBadResponseCode(t *testing.T) {
+	testPingResponse(t, badGatewayHandler, http.StatusBadGateway, badGatewayBody)
+}
+
+// TestPingBadHost tests a non-routable IP to ensure an error comes back
+func TestPingBadHost(t *testing.T) {
+	client := http.DefaultClient
+	req, err := http.NewRequest("GET", "http://192.0.2.0", nil)
+	assert.Nil(t, err)
+
+	validatorDidExecute := false
+	validator := func(resp *http.Response) error {
+		validatorDidExecute = true
+		return nil
+	}
+
+	_, _, _, reason := execPing(client, req, nil, time.Second, validator)
+
+	assert.False(t, validatorDidExecute)
+	assert.NotNil(t, reason)
+}
+
+func TestPingBadValidator(t *testing.T) {
+	server := httptest.NewServer(helloWorldHandler)
+	defer server.Close()
+
+	client := http.DefaultClient
+	req, err := http.NewRequest("GET", server.URL, nil)
+	assert.Nil(t, err)
+
+	expectedError := fmt.Errorf("An Error")
+
+	validator := func(resp *http.Response) error {
+		return expectedError
+	}
+
+	_, _, _, reason := execPing(client, req, nil, time.Second, validator)
+
+	assert.NotNil(t, reason)
+	assert.Equal(t, expectedError.Error(), reason.Error())
 }
 
 func TestSplitHostnamePort(t *testing.T) {
