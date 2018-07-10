@@ -58,30 +58,58 @@
       }
     },
     "usage":{
-      "index":".kibana",
-      "dashboard":{
-        "total":0
+      "kibana":{
+        "index":".kibana",
+        "dashboard":{
+          "total":0
+        },
+        "visualization":{
+          "total":1
+        },
+        "search":{
+          "total":2
+        },
+        "index_pattern":{
+          "total":3
+        },
+        "graph_workspace":{
+          "total":0
+        },
+        "timelion_sheet":{
+          "total":0
+        }
       },
-      "visualization":{
-        "total":1
-      },
-      "search":{
-        "total":2
-      },
-      "index_pattern":{
-        "total":3
-      },
-      "graph_workspace":{
-        "total":0
-      },
-      "timelion_sheet":{
-        "total":0
-      },
-      "xpack":{
-        "reporting":{
+      "reporting":{
+        "available":true,
+        "enabled":true,
+        "browser_type":"phantom",
+        "_all":3,
+        "csv":{
           "available":true,
-          "enabled":true,
-          "browser_type":"phantom",
+          "total":3
+        },
+        "printable_pdf":{
+          "available":false,
+          "total":0
+        },
+        "status":{
+          "completed":3
+        },
+        "lastDay":{
+          "_all":0,
+          "csv":{
+            "available":true,
+            "total":0
+          },
+          "printable_pdf":{
+            "available":false,
+            "total":0
+          },
+          "status":{
+
+          }
+        },
+        "last7Days":{
           "_all":3,
           "csv":{
             "available":true,
@@ -93,34 +121,6 @@
           },
           "status":{
             "completed":3
-          },
-          "lastDay":{
-            "_all":0,
-            "csv":{
-              "available":true,
-              "total":0
-            },
-            "printable_pdf":{
-              "available":false,
-              "total":0
-            },
-            "status":{
-
-            }
-          },
-          "last7Days":{
-            "_all":3,
-            "csv":{
-              "available":true,
-              "total":3
-            },
-            "printable_pdf":{
-              "available":false,
-              "total":0
-            },
-            "status":{
-              "completed":3
-            }
           }
         }
       }
