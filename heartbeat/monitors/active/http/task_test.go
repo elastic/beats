@@ -19,7 +19,6 @@ package http
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -34,20 +33,6 @@ import (
 	"github.com/elastic/beats/heartbeat/reason"
 	"github.com/elastic/beats/libbeat/common"
 )
-
-var helloWorldBody = "hello, world!"
-
-var helloWorldHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	io.WriteString(w, helloWorldBody)
-})
-
-var badGatewayBody = "Bad Gateway"
-
-var badGatewayHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusBadGateway)
-	io.WriteString(w, badGatewayBody)
-})
 
 func testPingResponse(t *testing.T, handlerFunc http.HandlerFunc, expectedStatus int, expectedBody string) (start time.Time, end time.Time, event common.MapStr, reason reason.Reason) {
 	server := httptest.NewServer(handlerFunc)
