@@ -18,21 +18,16 @@
 package http
 
 import (
+	"fmt"
+	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"reflect"
 	"testing"
-
-	"net/http/httptest"
-
 	"time"
-
-	"io/ioutil"
-
-	"io"
-
-	"fmt"
 
 	"github.com/stretchr/testify/assert"
 
@@ -62,7 +57,7 @@ func testPingResponse(t *testing.T, handlerFunc http.HandlerFunc, expectedStatus
 	req, err := http.NewRequest("GET", server.URL, nil)
 	assert.Nil(t, err)
 
-	var validatorResp *http.Response = nil
+	var validatorResp *http.Response
 	var validatorBodyBytes []byte
 	validator := func(resp *http.Response) error {
 		validatorResp = resp
@@ -201,7 +196,7 @@ func TestSplitHostnamePort(t *testing.T) {
 	for _, test := range urlTests {
 		test := test
 
-		t.Run(test.name, func(t2 *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			url := &url.URL{
 				Scheme: test.scheme,
 				Host:   test.host,
