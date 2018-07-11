@@ -82,11 +82,6 @@
           format: bytes
           description: >
             Heap used by process in bytes
-        - name: external.bytes
-          type: long
-          format: bytes
-          description: >
-            Heap used by C++ objects bound to Javascript objects managed by V8, in bytes
         - name: size_limit.bytes
           type: long
           format: bytes

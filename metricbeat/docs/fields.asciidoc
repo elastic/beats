@@ -6846,18 +6846,6 @@ Heap used by process in bytes
 
 --
 
-*`kibana.stats.process.memory.heap.external.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-Heap used by C++ objects bound to Javascript objects managed by V8, in bytes
-
-
---
-
 *`kibana.stats.process.memory.heap.size_limit.bytes`*::
 +
 --

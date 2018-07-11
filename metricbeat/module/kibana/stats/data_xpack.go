@@ -48,10 +48,9 @@ var (
 			"event_loop_delay": c.Float("event_loop_delay_ms"),
 			"memory": c.Dict("mem", s.Schema{
 				"heap": s.Object{
-					"total_in_bytes":    c.Int("heap_max_bytes"),
-					"used_in_bytes":     c.Int("heap_used_bytes"),
-					"external_in_bytes": c.Int("external_bytes"), // TODO: new field, must update monitoring-kibana template in ES x-pack plugin
-					"size_limit":        c.Int("size_limit"),
+					"total_in_bytes": c.Int("heap_max_bytes"),
+					"used_in_bytes":  c.Int("heap_used_bytes"),
+					"size_limit":     c.Int("size_limit"),
 				},
 			}),
 			"uptime_in_millis": c.Int("uptime_ms"),

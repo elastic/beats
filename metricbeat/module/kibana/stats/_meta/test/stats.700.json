@@ -35,8 +35,7 @@
         "heap_max_bytes":344432640,
         "heap_used_bytes":184244040,
         "resident_set_size_bytes":440311808,
-        "size_limit":1501560832,
-        "external_bytes":2168139
+        "size_limit":1501560832
       },
       "pid":51785,
       "uptime_ms":34725,

@@ -65,9 +65,6 @@ var (
 					"used": s.Object{
 						"bytes": c.Int("heap_used_bytes"),
 					},
-					"external": s.Object{
-						"bytes": c.Int("external_bytes"),
-					},
 					"size_limit": s.Object{
 						"bytes": c.Int("size_limit"),
 					},
