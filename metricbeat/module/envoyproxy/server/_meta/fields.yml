@@ -228,6 +228,10 @@
               type: integer
               description: >
                 Total connections destroyed due to local close
+            - name: downstream_cx_destroy_local_active_rq
+              type: integer
+              description: >
+                Total connections destroyed locally with active requests
             - name: downstream_cx_destroy_remote
               type: integer
               description: >
