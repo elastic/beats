@@ -36,7 +36,7 @@ class Test(metricbeat.BaseTest):
         es = Elasticsearch(self.get_hosts())
         es.indices.create(index='test-index', ignore=400)
         self.check_metricset("elasticsearch", metricset, self.get_hosts(), self.FIELDS +
-                             ["service.name"], metricset_options=[{"index_recovery.active_only": "false"}])
+                             ["service.name"], extras={"index_recovery.active_only": "false"})
 
     def get_hosts(self):
         return [os.getenv('ES_HOST', 'localhost') + ':' +

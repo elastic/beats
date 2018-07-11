@@ -20,6 +20,8 @@ package index_recovery
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -31,22 +33,22 @@ var (
 	schema = s.Schema{
 		// This is all shard information and should be linked to elasticsearch.shard.*
 		// as soon as field aliases are available.
-		"id":      c.Str("id"),
+		"id":      c.Int("id"),
 		"type":    c.Str("type"),
-		"primary": c.Str("primary"),
+		"primary": c.Bool("primary"),
 		"stage":   c.Str("stage"),
 
 		// As soon as we have field alias feature available, source and target should
 		// link to elasticsearch.node.* as it's not specific information.
 		"source": c.Dict("source", s.Schema{
-			"id":   c.Str("id"),
-			"host": c.Str("host"),
-			"name": c.Str("name"),
+			"id":   c.Str("id", s.Optional),
+			"host": c.Str("host", s.Optional),
+			"name": c.Str("name", s.Optional),
 		}),
 		"target": c.Dict("target", s.Schema{
-			"id":   c.Str("id"),
-			"host": c.Str("host"),
-			"name": c.Str("name"),
+			"id":   c.Str("id", s.Optional),
+			"host": c.Str("host", s.Optional),
+			"name": c.Str("name", s.Optional),
 		}),
 	}
 )
@@ -57,20 +59,29 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		r.Error(err)
 		return err
 	}
 
+	var errs multierror.Errors
+
 	for indexName, d := range data {
-		for _, data := range d["shards"] {
+		shards, ok := d["shards"]
+		if !ok {
+			continue
+		}
+		for _, data := range shards {
 			event := mb.Event{}
 			event.ModuleFields = common.MapStr{}
-			event.ModuleFields.Put("index.name", indexName)
 			event.MetricSetFields, err = schema.Apply(data)
+			if err != nil {
+				errs = append(errs, err)
+				continue
+			}
+			event.ModuleFields.Put("index.name", indexName)
 			event.RootFields = common.MapStr{}
 			event.RootFields.Put("service.name", "elasticsearch")
 			r.Event(event)
 		}
 	}
-	return nil
+	return errs.Err()
 }
