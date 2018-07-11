@@ -47,7 +47,7 @@ func (dns *dnsPlugin) ParseUDP(pkt *protos.Packet) {
 	dnsMsg := &dnsMessage{
 		ts:           pkt.Ts,
 		tuple:        pkt.Tuple,
-		cmdlineTuple: procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple),
+		cmdlineTuple: procs.ProcWatcher.FindProcessesTupleUDP(&pkt.Tuple),
 		data:         dnsPkt,
 		length:       packetSize,
 	}

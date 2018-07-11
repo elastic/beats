@@ -312,6 +312,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - The process monitor now reports the command-line for all processes, under Linux and Windows. {pull}7135[7135]
 - Updated the TLS protocol parser with new cipher suites added to TLS 1.3. {issue}7455[7455]
 - Flows are enriched with process information using the process monitor. {pull}7507[7507]
+- Added UDP support to process monitor. {pull}7571[7571]
 
 *Winlogbeat*
 

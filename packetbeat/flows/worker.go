@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/packetbeat/procs"
+	"github.com/elastic/beats/packetbeat/protos/applayer"
 )
 
 type flowsProcessor struct {
@@ -216,6 +217,7 @@ func createEvent(
 	source := common.MapStr{}
 	dest := common.MapStr{}
 	tuple := common.IPPortTuple{}
+	var proto applayer.Transport
 
 	// add ethernet layer meta data
 	if src, dst, ok := f.id.EthAddr(); ok {
@@ -282,9 +284,11 @@ func createEvent(
 
 	// udp layer meta data
 	if src, dst, ok := f.id.UDPAddr(); ok {
-		source["port"] = binary.LittleEndian.Uint16(src)
-		dest["port"] = binary.LittleEndian.Uint16(dst)
+		tuple.SrcPort = binary.LittleEndian.Uint16(src)
+		tuple.DstPort = binary.LittleEndian.Uint16(dst)
+		source["port"], dest["port"] = tuple.SrcPort, tuple.DstPort
 		fields["transport"] = "udp"
+		proto = applayer.TransportUDP
 	}
 
 	// tcp layer meta data
@@ -293,6 +297,7 @@ func createEvent(
 		tuple.DstPort = binary.LittleEndian.Uint16(dst)
 		source["port"], dest["port"] = tuple.SrcPort, tuple.DstPort
 		fields["transport"] = "tcp"
+		proto = applayer.TransportTCP
 	}
 
 	if id := f.id.ConnectionID(); id != nil {
@@ -311,7 +316,7 @@ func createEvent(
 
 	// Set process information if it's available
 	if tuple.IPLength != 0 && tuple.SrcPort != 0 {
-		if cmdline := procs.ProcWatcher.FindProcessesTuple(&tuple); cmdline != nil {
+		if cmdline := procs.ProcWatcher.FindProcessesTuple(&tuple, proto); cmdline != nil {
 			src, dst := common.MakeEndpointPair(tuple.BaseTuple, cmdline)
 
 			for key, value := range map[string]string{

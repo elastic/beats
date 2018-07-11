@@ -24,6 +24,7 @@ import (
 )
 
 const (
+	UDP_TABLE_OWNER_PID     = 1
 	TCP_TABLE_OWNER_PID_ALL = 5
 
 	sizeOfDWORD           = 4
@@ -51,6 +52,19 @@ type TCP6RowOwnerPID struct {
 	owningPID     uint32
 }
 
+type UDPRowOwnerPID struct {
+	localAddr uint32
+	localPort uint32
+	owningPID uint32
+}
+
+type UDP6RowOwnerPID struct {
+	localAddr    [16]byte
+	localScopeID uint32
+	localPort    uint32
+	owningPID    uint32
+}
+
 // GetExtendedTableFn is the prototype for GetExtendedTcpTable and GetExtendedUdpTable
 type GetExtendedTableFn func(pTcpTable uintptr, pdwSize *uint32, bOrder bool, ulAf uint32, tableClass uint32, reserved uint32) (code syscall.Errno, err error)
 
@@ -59,3 +73,4 @@ type GetExtendedTableFn func(pTcpTable uintptr, pdwSize *uint32, bOrder bool, ul
 
 // Windows API calls
 //sys _GetExtendedTcpTable(pTcpTable uintptr, pdwSize *uint32, bOrder bool, ulAf uint32, tableClass uint32, reserved uint32) (code syscall.Errno, err error) = iphlpapi.GetExtendedTcpTable
+//sys _GetExtendedUdpTable(pTcpTable uintptr, pdwSize *uint32, bOrder bool, ulAf uint32, tableClass uint32, reserved uint32) (code syscall.Errno, err error) = iphlpapi.GetExtendedUdpTable
