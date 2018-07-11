@@ -173,8 +173,8 @@ func eventMapping(response []byte) (common.MapStr, error) {
 	return events, nil
 }
 
-func findStats(data common.MapStr, response []byte, re_name string) common.MapStr {
-	re := regexp.MustCompile(re_name)
+func findStats(data common.MapStr, response []byte, reName string) common.MapStr {
+	re := regexp.MustCompile(reName)
 	matches := re.FindAllString(string(response), -1)
 	for i := 0; i < len(matches); i++ {
 		entries := strings.Split(matches[i], ": ")
