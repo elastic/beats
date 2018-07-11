@@ -6,14 +6,16 @@
     },
     "elasticsearch": {
         "index": {
-            "name": "testindex",
+            "name": "test-index",
             "recovery": {
+                "id": 0,
+                "primary": true,
                 "source": {},
                 "stage": "DONE",
                 "target": {
                     "host": "127.0.0.1",
-                    "id": "QmIZa0qjTm6mcroyKovI-g",
-                    "name": "QmIZa0q"
+                    "id": "ODWb5m6zT9q0lf8YTPyWWg",
+                    "name": "ODWb5m6"
                 },
                 "type": "EMPTY_STORE"
             }
