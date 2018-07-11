@@ -570,7 +570,7 @@
           "severity": "I",
           "component": "CONTROL",
           "context": "initandlisten",
-          "message": """options: { config: "/etc/mongodb.conf", net: { bindIp: "127.0.0.1", unixDomainSocket: { pathPrefix: "/run/mongodb" } }, storage: { dbPath: "/var/lib/mongodb", journal: { enabled: true } }, systemLog: { destination: "file", logAppend: true, path: "/var/log/mongodb/mongodb.log" } }""",
+          "message": "options: { config: \"/etc/mongodb.conf\", net: { bindIp: \"127.0.0.1\", unixDomainSocket: { pathPrefix: \"/run/mongodb\" } }, storage: { dbPath: \"/var/lib/mongodb\", journal: { enabled: true } }, systemLog: { destination: \"file\", logAppend: true, path: \"/var/log/mongodb/mongodb.log\" } }",
           "timestamp": "2018-02-05T13:44:56.657+0100"
         }
       }
