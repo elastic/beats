@@ -224,9 +224,15 @@ func (r *reporter) snapshotLoop(namespace string, period time.Duration) {
 			continue
 		}
 
+		// Prefix for the inside the event. For backward compatibility stats is renamed to metrics.
+		prefix := namespace
+		if namespace == "stats" {
+			prefix = "metrics"
+		}
+
 		fields := common.MapStr{
-			"beat":    r.beatMeta,
-			namespace: snapshot,
+			"beat": r.beatMeta,
+			prefix: snapshot,
 		}
 		if len(r.tags) > 0 {
 			fields["tags"] = r.tags
