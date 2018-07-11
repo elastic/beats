@@ -31,13 +31,13 @@ var (
 		"cluster_uuid":           c.Str("cluster_uuid"),
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"os": c.Dict("os", s.Schema{
-			"load": s.Object{
-				"avg": c.Dict("cpu.load_average", s.Schema{
+			"load": c.Dict("cpu", s.Schema{
+				"avg": c.Dict("load_average", s.Schema{
 					"1m":  c.Float("1m"),
 					"5m":  c.Float("5m"),
 					"15m": c.Float("15m"),
 				}),
-			},
+			}),
 			"memory": c.Dict("mem", s.Schema{
 				"total": s.Object{
 					"bytes": c.Int("total_bytes"),
