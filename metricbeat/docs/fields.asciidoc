@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-docker>>
 * <<exported-fields-dropwizard>>
 * <<exported-fields-elasticsearch>>
+* <<exported-fields-envoyproxy>>
 * <<exported-fields-etcd>>
 * <<exported-fields-golang>>
 * <<exported-fields-graphite>>
@@ -4189,6 +4190,911 @@ The number of this shard.
 type: keyword
 
 The state of this shard.
+
+
+--
+
+[[exported-fields-envoyproxy]]
+== envoyproxy fields
+
+experimental[]
+envoyproxy module
+
+
+
+[float]
+== envoyproxy fields
+
+
+
+
+[float]
+== server fields
+
+Contains envoy proxy server stats
+
+
+
+
+*`envoyproxy.server.cluster_manager.active_clusters`*::
++
+--
+type: integer
+
+Number of currently active (warmed) clusters
+
+
+--
+
+*`envoyproxy.server.cluster_manager.cluster_added`*::
++
+--
+type: integer
+
+Total clusters added (either via static config or CDS)
+
+
+--
+
+*`envoyproxy.server.cluster_manager.cluster_modified`*::
++
+--
+type: integer
+
+Total clusters modified (via CDS)
+
+
+--
+
+*`envoyproxy.server.cluster_manager.cluster_removed`*::
++
+--
+type: integer
+
+Total clusters removed (via CDS)
+
+
+--
+
+*`envoyproxy.server.cluster_manager.warming_clusters`*::
++
+--
+type: integer
+
+Number of currently warming (not active) clusters
+
+
+--
+
+
+*`envoyproxy.server.filesystem.flushed_by_timer`*::
++
+--
+type: integer
+
+Total number of times internal flush buffers are written to a file due to flush timeout
+
+
+--
+
+*`envoyproxy.server.filesystem.reopen_failed`*::
++
+--
+type: integer
+
+Total number of times a file was failed to be opened
+
+
+--
+
+*`envoyproxy.server.filesystem.write_buffered`*::
++
+--
+type: integer
+
+Total number of times file data is moved to Envoys internal flush buffer
+
+
+--
+
+*`envoyproxy.server.filesystem.write_completed`*::
++
+--
+type: integer
+
+Total number of times a file was written
+
+
+--
+
+*`envoyproxy.server.filesystem.write_total_buffered`*::
++
+--
+type: integer
+
+Current total size of internal flush buffer in bytes
+
+
+--
+
+
+*`envoyproxy.server.runtime.admin_overrides_active`*::
++
+--
+type: integer
+
+--
+
+*`envoyproxy.server.runtime.load_error`*::
++
+--
+type: integer
+
+Total number of load attempts that resulted in an error
+
+
+--
+
+*`envoyproxy.server.runtime.load_success`*::
++
+--
+type: integer
+
+Total number of load attempts that were successful
+
+
+--
+
+*`envoyproxy.server.runtime.num_keys`*::
++
+--
+type: integer
+
+Number of keys currently loaded
+
+
+--
+
+*`envoyproxy.server.runtime.override_dir_exists`*::
++
+--
+type: integer
+
+Total number of loads that did use an override directory
+
+
+--
+
+*`envoyproxy.server.runtime.override_dir_not_exists`*::
++
+--
+type: integer
+
+Total number of loads that did not use an override directory
+
+
+--
+
+
+*`envoyproxy.server.listener_manager.listener_added`*::
++
+--
+type: integer
+
+Total listeners added (either via static config or LDS)
+
+
+--
+
+*`envoyproxy.server.listener_manager.listener_create_failure`*::
++
+--
+type: integer
+
+Total failed listener object additions to workers
+
+
+--
+
+*`envoyproxy.server.listener_manager.listener_create_success`*::
++
+--
+type: integer
+
+Total listener objects successfully added to workers
+
+
+--
+
+*`envoyproxy.server.listener_manager.listener_modified`*::
++
+--
+type: integer
+
+Total listeners modified (via LDS)
+
+
+--
+
+*`envoyproxy.server.listener_manager.listener_removed`*::
++
+--
+type: integer
+
+Total listeners removed (via LDS)
+
+
+--
+
+*`envoyproxy.server.listener_manager.total_listeners_active`*::
++
+--
+type: integer
+
+Number of currently active listeners
+
+
+--
+
+*`envoyproxy.server.listener_manager.total_listeners_draining`*::
++
+--
+type: integer
+
+Number of currently draining listeners
+
+
+--
+
+*`envoyproxy.server.listener_manager.total_listeners_warming`*::
++
+--
+type: integer
+
+Number of currently warming listeners
+
+
+--
+
+
+*`envoyproxy.server.stats.overflow`*::
++
+--
+type: integer
+
+Total number of times Envoy cannot allocate a statistic due to a shortage of shared memory
+
+
+--
+
+
+*`envoyproxy.server.server.days_until_first_cert_expiring`*::
++
+--
+type: integer
+
+Number of days until the next certificate being managed will expire
+
+
+--
+
+*`envoyproxy.server.server.live`*::
++
+--
+type: integer
+
+1 if the server is not currently draining, 0 otherwise
+
+
+--
+
+*`envoyproxy.server.server.memory_allocated`*::
++
+--
+type: integer
+
+Current amount of allocated memory in bytes
+
+
+--
+
+*`envoyproxy.server.server.memory_heap_size`*::
++
+--
+type: integer
+
+Current reserved heap size in bytes
+
+
+--
+
+*`envoyproxy.server.server.parent_connections`*::
++
+--
+type: integer
+
+Total connections of the old Envoy process on hot restart
+
+
+--
+
+*`envoyproxy.server.server.total_connections`*::
++
+--
+type: integer
+
+Total connections of both new and old Envoy processes
+
+
+--
+
+*`envoyproxy.server.server.uptime`*::
++
+--
+type: integer
+
+Current server uptime in seconds
+
+
+--
+
+*`envoyproxy.server.server.version`*::
++
+--
+type: integer
+
+Integer represented version number based on SCM revision
+
+
+--
+
+*`envoyproxy.server.server.watchdog_mega_miss`*::
++
+--
+type: integer
+
+--
+
+*`envoyproxy.server.server.watchdog_miss`*::
++
+--
+type: integer
+
+--
+
+
+
+*`envoyproxy.server.listener.admin.downstream_cx_active`*::
++
+--
+type: integer
+
+Total active connections
+
+
+--
+
+*`envoyproxy.server.listener.admin.downstream_cx_destroy`*::
++
+--
+type: integer
+
+Total destroyed connections
+
+
+--
+
+*`envoyproxy.server.listener.admin.downstream_cx_total`*::
++
+--
+type: integer
+
+Total connections
+
+
+--
+
+
+
+*`envoyproxy.server.listener.admin.http.admin.downstream_rq_1xx`*::
++
+--
+type: integer
+
+Total 1xx responses
+
+
+--
+
+*`envoyproxy.server.listener.admin.http.admin.downstream_rq_2xx`*::
++
+--
+type: integer
+
+Total 2xx responses
+
+
+--
+
+*`envoyproxy.server.listener.admin.http.admin.downstream_rq_3xx`*::
++
+--
+type: integer
+
+Total 3xx responses
+
+
+--
+
+*`envoyproxy.server.listener.admin.http.admin.downstream_rq_4xx`*::
++
+--
+type: integer
+
+Total 4xx responses
+
+
+--
+
+*`envoyproxy.server.listener.admin.http.admin.downstream_rq_5xx`*::
++
+--
+type: integer
+
+Total 5xx responses
+
+
+--
+
+
+
+*`envoyproxy.server.http.admin.downstream_cx_active`*::
++
+--
+type: integer
+
+Total active connections
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_destroy`*::
++
+--
+type: integer
+
+Total connections destroyed
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_destroy_active_rq`*::
++
+--
+type: integer
+
+Total connections destroyed with active requests
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_destroy_local`*::
++
+--
+type: integer
+
+Total connections destroyed due to local close
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_destroy_remote`*::
++
+--
+type: integer
+
+Total connections destroyed due to remote close
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_destroy_remote_active_rq`*::
++
+--
+type: integer
+
+Total connections destroyed remotely with active requests
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_drain_close`*::
++
+--
+type: integer
+
+Total connections closed due to draining
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_http1_active`*::
++
+--
+type: integer
+
+Total active HTTP/1.1 connections
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_http1_total`*::
++
+--
+type: integer
+
+Total HTTP/1.1 connections
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_http2_active`*::
++
+--
+type: integer
+
+Total active HTTP/2 connections
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_http2_total`*::
++
+--
+type: integer
+
+Total HTTP/2 connections
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_idle_timeout`*::
++
+--
+type: integer
+
+Total connections closed due to idle timeout
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_protocol_error`*::
++
+--
+type: integer
+
+Total protocol errors
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_rx_bytes_buffered`*::
++
+--
+type: integer
+
+Total received bytes currently buffered
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_rx_bytes_total`*::
++
+--
+type: integer
+
+Total bytes received
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_ssl_active`*::
++
+--
+type: integer
+
+Total active TLS connections
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_ssl_total`*::
++
+--
+type: integer
+
+Total TLS connections
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_total`*::
++
+--
+type: integer
+
+Total connections
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_tx_bytes_buffered`*::
++
+--
+type: integer
+
+Total bytes currently buffered to the downstream connection
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_tx_bytes_total`*::
++
+--
+type: integer
+
+Total bytes written to the downstream connection
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_websocket_active`*::
++
+--
+type: integer
+
+Total active WebSocket connections
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_cx_websocket_total`*::
++
+--
+type: integer
+
+Total WebSocket connections
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_flow_control_paused_reading_total`*::
++
+--
+type: integer
+
+Total number of times reads were disabled due to flow control
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_flow_control_resumed_reading_total`*::
++
+--
+type: integer
+
+Total number of times reads were enabled on the connection due to flow control
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_1xx`*::
++
+--
+type: integer
+
+Total 1xx responses
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_2xx`*::
++
+--
+type: integer
+
+Total 2xx responses
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_3xx`*::
++
+--
+type: integer
+
+Total 3xx responses
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_4xx`*::
++
+--
+type: integer
+
+Total 4xx responses
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_5xx`*::
++
+--
+type: integer
+
+Total 5xx responses
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_active`*::
++
+--
+type: integer
+
+Total active requests
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_http1_total`*::
++
+--
+type: integer
+
+Total HTTP/1.1 requests
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_http2_total`*::
++
+--
+type: integer
+
+Total HTTP/2 requests
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_non_relative_path`*::
++
+--
+type: integer
+
+Total requests with a non-relative HTTP path
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_response_before_rq_complete`*::
++
+--
+type: integer
+
+Total responses sent before the request was complete
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_rx_reset`*::
++
+--
+type: integer
+
+Total request resets received
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_too_large`*::
++
+--
+type: integer
+
+Total requests resulting in a 413 due to buffering an overly large body
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_total`*::
++
+--
+type: integer
+
+Total requests
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_tx_reset`*::
++
+--
+type: integer
+
+Total request resets sent
+
+
+--
+
+*`envoyproxy.server.http.admin.downstream_rq_ws_on_non_ws_route`*::
++
+--
+type: integer
+
+Total WebSocket upgrade requests rejected by non WebSocket routes
+
+
+--
+
+*`envoyproxy.server.http.admin.rs_too_large`*::
++
+--
+type: integer
+
+Total response errors due to buffering an overly large body
+
+
+--
+
+
+*`envoyproxy.server.http.async-client.no_cluster`*::
++
+--
+type: integer
+
+Total requests in which the target cluster did not exist and resulted in a 404
+
+
+--
+
+*`envoyproxy.server.http.async-client.no_route`*::
++
+--
+type: integer
+
+Total requests that had no route and resulted in a 404
+
+
+--
+
+*`envoyproxy.server.http.async-client.rq_direct_response`*::
++
+--
+type: integer
+
+Total requests that resulted in a direct response
+
+
+--
+
+*`envoyproxy.server.http.async-client.rq_redirect`*::
++
+--
+type: integer
+
+Total requests that resulted in a redirect response
+
+
+--
+
+*`envoyproxy.server.http.async-client.rq_total`*::
++
+--
+type: integer
+
+Total routed requests
 
 
 --
