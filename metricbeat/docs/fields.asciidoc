@@ -3638,6 +3638,53 @@ Total number of memory used by the segments in bytes.
 --
 
 [float]
+== ml.job fields
+
+ml
+
+
+
+*`elasticsearch.ml.job.id`*::
++
+--
+type: keyword
+
+Unique ml job id.
+
+
+--
+
+*`elasticsearch.ml.job.state`*::
++
+--
+type: keyword
+
+Job state.
+
+
+--
+
+*`elasticsearch.ml.job.data_counts.processed_record_count`*::
++
+--
+type: long
+
+Processed data events.
+
+
+--
+
+*`elasticsearch.ml.job.data_counts.invalid_date_count`*::
++
+--
+type: long
+
+The number of records with either a missing date field or a date that could not be parsed.
+
+
+--
+
+[float]
 == node fields
 
 node
