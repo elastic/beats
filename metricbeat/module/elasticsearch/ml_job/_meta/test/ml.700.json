@@ -1,0 +1,68 @@
+{
+    "count": 2,
+    "jobs": [
+        {
+            "job_id": "55",
+            "data_counts": {
+                "job_id": "55",
+                "processed_record_count": 14,
+                "processed_field_count": 28,
+                "input_bytes": 1254,
+                "input_field_count": 28,
+                "invalid_date_count": 0,
+                "missing_field_count": 0,
+                "out_of_order_timestamp_count": 0,
+                "empty_bucket_count": 0,
+                "sparse_bucket_count": 0,
+                "bucket_count": 2,
+                "earliest_record_timestamp": 1525847665298,
+                "latest_record_timestamp": 1525847795423,
+                "last_data_time": 1525848008257,
+                "input_record_count": 14
+            },
+            "model_size_stats": {
+                "job_id": "55",
+                "result_type": "model_size_stats",
+                "model_bytes": 49176,
+                "total_by_field_count": 3,
+                "total_over_field_count": 0,
+                "total_partition_field_count": 2,
+                "bucket_allocation_failures_count": 0,
+                "memory_status": "ok",
+                "log_time": 1525848008000,
+                "timestamp": 1525847700000
+            },
+            "state": "closed"
+        },
+        {
+            "job_id": "test",
+            "data_counts": {
+                "job_id": "test",
+                "processed_record_count": 0,
+                "processed_field_count": 0,
+                "input_bytes": 0,
+                "input_field_count": 0,
+                "invalid_date_count": 0,
+                "missing_field_count": 0,
+                "out_of_order_timestamp_count": 0,
+                "empty_bucket_count": 0,
+                "sparse_bucket_count": 0,
+                "bucket_count": 0,
+                "input_record_count": 0
+            },
+            "model_size_stats": {
+                "job_id": "test",
+                "result_type": "model_size_stats",
+                "model_bytes": 1280,
+                "total_by_field_count": 0,
+                "total_over_field_count": 0,
+                "total_partition_field_count": 0,
+                "bucket_allocation_failures_count": 0,
+                "memory_status": "ok",
+                "log_time": 1525847934000,
+                "timestamp": -900000
+            },
+            "state": "closed"
+        }
+    ]
+}

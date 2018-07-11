@@ -56,6 +56,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_summary"
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/ml_job"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node_stats"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/pending_tasks"

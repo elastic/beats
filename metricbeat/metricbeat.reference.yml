@@ -201,6 +201,7 @@ metricbeat.modules:
     #- index
     #- index_summary
     #- shard
+    #- ml_job
   period: 10s
   hosts: ["localhost:9200"]
 
