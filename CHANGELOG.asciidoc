@@ -31,6 +31,7 @@ https://github.com/elastic/beats/compare/v6.3.1...6.3[Check the HEAD diff]
 
 - Fix default value for logging.files.keepfiles. It was being set to 0 and now
   it's set to the documented value of 7. {issue}7494[7494]
+- Retain compatibility with older Docker server versions. {issue}7542[7542]
 
 *Auditbeat*
 
@@ -170,7 +171,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
 - Fix delays on autodiscovery events handling caused by blocking runner stops. {pull}7170[7170]
 - Do not emit Kubernetes autodiscover events for Pods without IP address. {pull}7235[7235]
-- Retain compatibility with older Docker server versions. {issue}7542[7542]
 
 *Auditbeat*
 
