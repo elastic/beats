@@ -31,6 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/heartbeat/reason"
+	"github.com/elastic/beats/heartbeat/testcommon"
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -66,12 +67,12 @@ func testPingResponse(t *testing.T, handlerFunc http.HandlerFunc, expectedStatus
 }
 
 func TestGoodResponseCode(t *testing.T) {
-	testPingResponse(t, helloWorldHandler, http.StatusOK, helloWorldBody)
+	testPingResponse(t, testcommon.HelloWorldHandler, http.StatusOK, testcommon.HelloWorldBody)
 }
 
 // Non 2xx responses shouldn't create any errors
 func TestPingBadResponseCode(t *testing.T) {
-	testPingResponse(t, badGatewayHandler, http.StatusBadGateway, badGatewayBody)
+	testPingResponse(t, testcommon.BadGatewayHandler, http.StatusBadGateway, testcommon.BadGatewayBody)
 }
 
 // TestPingBadHost tests a non-routable IP to ensure an error comes back
@@ -93,7 +94,7 @@ func TestPingBadHost(t *testing.T) {
 }
 
 func TestPingBadValidator(t *testing.T) {
-	server := httptest.NewServer(helloWorldHandler)
+	server := httptest.NewServer(testcommon.HelloWorldHandler)
 	defer server.Close()
 
 	client := http.DefaultClient
