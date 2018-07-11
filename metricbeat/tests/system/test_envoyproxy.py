@@ -2,6 +2,7 @@ import os
 import metricbeat
 import unittest
 
+
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['envoyproxy']
@@ -9,7 +10,7 @@ class Test(metricbeat.BaseTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
         """
-        EnvoyProxy module outputs an event. 
+        EnvoyProxy module outputs an event.
         """
         self.render_config_template(modules=[{
             "name": "envoyproxy",
@@ -32,5 +33,3 @@ class Test(metricbeat.BaseTest):
     def get_hosts(self):
         return [os.getenv('ENVOYPROXY_HOST', 'localhost') + ':' +
                 os.getenv('ENVOYPROXY_PORT', '9901')]
-
-    
