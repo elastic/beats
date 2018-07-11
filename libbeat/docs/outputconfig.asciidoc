@@ -39,6 +39,10 @@ security-related configuration options.
 
 endif::[]
 
+ifdef::beat-specific-output-config[]
+include::{beat-specific-output-config}[]
+endif::[]
+
 [[elasticsearch-output]]
 === Configure the Elasticsearch output
 
