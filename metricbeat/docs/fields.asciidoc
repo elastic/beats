@@ -4688,6 +4688,16 @@ Total connections destroyed due to local close
 
 --
 
+*`envoyproxy.server.http.admin.downstream_cx_destroy_local_active_rq`*::
++
+--
+type: integer
+
+Total connections destroyed locally with active requests
+
+
+--
+
 *`envoyproxy.server.http.admin.downstream_cx_destroy_remote`*::
 +
 --
