@@ -117,8 +117,14 @@
         "module": "mongodb",
         "name": "log"
       },
-      "error": {
-        "message": "Provided Grok expressions do not match field value: [2018-02-05T13:44:56.724+0100 I FTDC     [initandlisten] Initializing full-time diagnostic data capture with directory '/var/lib/mongodb/diagnostic.data']"
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "FTDC",
+          "context": "signalProcessingThread",
+          "message": "Initializing full-time diagnostic data capture with directory '/var/lib/mongodb/diagnostic.data'",
+          "timestamp": "2018-02-05T13:44:56.724+0100"
+        }
       }
     }
   },
@@ -1040,8 +1046,14 @@
         "module": "mongodb",
         "name": "log"
       },
-      "error": {
-        "message": "Provided Grok expressions do not match field value: [2018-02-05T14:49:45.605+0100 I FTDC     [signalProcessingThread] Shutting down full-time diagnostic data capture]"
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "FTDC",
+          "context": "signalProcessingThread",
+          "message": "Shutting down full-time diagnostic data capture",
+          "timestamp": "2018-02-05T14:49:45.605+0100"
+        }
       }
     }
   },
