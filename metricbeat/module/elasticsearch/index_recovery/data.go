@@ -20,8 +20,6 @@ package index_recovery
 import (
 	"encoding/json"
 
-	"github.com/joeshaw/multierror"
-
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -62,8 +60,6 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		return err
 	}
 
-	var errs multierror.Errors
-
 	for indexName, d := range data {
 		shards, ok := d["shards"]
 		if !ok {
@@ -72,16 +68,12 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		for _, data := range shards {
 			event := mb.Event{}
 			event.ModuleFields = common.MapStr{}
-			event.MetricSetFields, err = schema.Apply(data)
-			if err != nil {
-				errs = append(errs, err)
-				continue
-			}
+			event.MetricSetFields, _ = schema.Apply(data)
 			event.ModuleFields.Put("index.name", indexName)
 			event.RootFields = common.MapStr{}
 			event.RootFields.Put("service.name", "elasticsearch")
 			r.Event(event)
 		}
 	}
-	return errs.Err()
+	return nil
 }
