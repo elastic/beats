@@ -14,7 +14,7 @@ env:
     - GOX_FLAGS="-arch amd64"
     - DOCKER_COMPOSE_VERSION=1.11.1
     - GO_VERSION="$(cat .go-version)"
-    - TRAVIS_MINIKUBE_VERSION=v0.25.2
+    - TRAVIS_MINIKUBE_VERSION=v0.27.0
 
 jobs:
   include:
