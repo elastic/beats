@@ -62,6 +62,7 @@ type decoderReader struct {
 	bytesOffset int
 }
 
+// GetState returns the state of this and the previous readers
 func (r *Reader) GetState() common.MapStr {
 	return common.MapStr{
 		"decoder": common.MapStr{
@@ -126,6 +127,8 @@ func (r *decoderReader) read(buf []byte) (int, error) {
 
 // msgSize returns the size of the encoded message on the disk
 func (r *decoderReader) msgSize(symlen []int, size int) (int, []int, error) {
+	fmt.Printf("%+v\n", symlen, size)
+
 	n := 0
 	for size > 0 {
 		if len(symlen) <= n {
@@ -192,6 +195,7 @@ func (r *decoderReader) conv(in []byte, out []byte) (int, int, error) {
 	}
 
 	n, err := r.copyToOut(out)
+	fmt.Println(r.symlen)
 	return n, nProcessed, err
 }
 
@@ -263,6 +267,7 @@ func (s *lineScanner) line(i int) ([]byte, int, error) {
 		return nil, 0, err
 	}
 
+	fmt.Printf("%+v\n", s.symlen)
 	s.bytesOffset += msgSymbols
 	s.offset += i
 	s.buf.Reset()

@@ -64,6 +64,7 @@ func lineEndingChars(l []byte) int {
 	return 1
 }
 
+// GetState returns the state of this and the previous readers
 func (r *StripNewline) GetState() common.MapStr {
 	return r.reader.GetState()
 }

@@ -352,6 +352,7 @@ func genPatternMatcher(
 	return matcher, nil
 }
 
+// GetState returns the state of this and the previous readers
 func (mlr *Reader) GetState() common.MapStr {
 	return mlr.reader.GetState()
 }

@@ -56,6 +56,7 @@ func (r Reader) Next() (reader.Message, error) {
 	}, err
 }
 
+// GetState returns the state of this and the previous readers
 func (r Reader) GetState() common.MapStr {
 	return r.reader.GetState()
 }
