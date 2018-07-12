@@ -79,7 +79,7 @@ func TestQuery(t *testing.T) {
 	}
 	defer q.Close()
 
-	err = q.AddCounter(processorTimeCounter, FloatFlormat, "")
+	err = q.AddCounter(processorTimeCounter, FloatFormat, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -232,7 +232,7 @@ func TestFloatOutputFormat(t *testing.T) {
 	}
 	defer query.Close()
 
-	err = query.AddCounter(processorTimeCounter, FloatFlormat, "")
+	err = query.AddCounter(processorTimeCounter, FloatFormat, "")
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -266,7 +266,7 @@ func TestRawValues(t *testing.T) {
 	}
 	defer query.Close()
 
-	err = query.AddCounter(processorTimeCounter, FloatFlormat, "")
+	err = query.AddCounter(processorTimeCounter, FloatFormat, "")
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}

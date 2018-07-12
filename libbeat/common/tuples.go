@@ -58,12 +58,12 @@ func NewIPPortTuple(ipLength int, srcIP net.IP, srcPort uint16,
 			DstPort: dstPort,
 		},
 	}
-	tuple.ComputeHashebles()
+	tuple.ComputeHashables()
 
 	return tuple
 }
 
-func (t *IPPortTuple) ComputeHashebles() {
+func (t *IPPortTuple) ComputeHashables() {
 	copy(t.raw[0:16], t.SrcIP)
 	copy(t.raw[16:18], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
 	copy(t.raw[18:34], t.DstIP)
@@ -119,12 +119,12 @@ func TCPTupleFromIPPort(t *IPPortTuple, streamID uint32) TCPTuple {
 		},
 		StreamID: streamID,
 	}
-	tuple.ComputeHashebles()
+	tuple.ComputeHashables()
 
 	return tuple
 }
 
-func (t *TCPTuple) ComputeHashebles() {
+func (t *TCPTuple) ComputeHashables() {
 	copy(t.raw[0:16], t.SrcIP)
 	copy(t.raw[16:18], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
 	copy(t.raw[18:34], t.DstIP)

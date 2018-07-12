@@ -49,7 +49,7 @@ func (l *ackLoop) run() {
 		// Buffer up acked event counter in acked. If acked > 0, acks will be set to
 		// the broker.acks channel for sending the ACKs while potentially receiving
 		// new batches from the broker event loop.
-		// This concurrent bidirectionaly communication pattern requiring 'select'
+		// This concurrent bidirectionally communication pattern requiring 'select'
 		// ensures we can not have any deadlock between the event loop and the ack
 		// loop, as the ack loop will not block on any channel
 		acked int

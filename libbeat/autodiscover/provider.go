@@ -67,7 +67,7 @@ func (r *registry) GetProvider(name string) ProviderBuilder {
 	return r.providers[name]
 }
 
-// BuildProvider reads provider configuration and instatiate one
+// BuildProvider reads provider configuration and instantiate one
 func (r *registry) BuildProvider(bus bus.Bus, c *common.Config) (Provider, error) {
 	var config ProviderConfig
 	err := c.Unpack(&config)

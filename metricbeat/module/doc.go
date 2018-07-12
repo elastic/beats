@@ -47,7 +47,7 @@ List of standardised words and units across all metricsets. On the left are the 
 * count:
 * day: days, d
 * der: derivative
-* max: maximumg
+* max: maximum
 * min: minimum
 * pct: percentage
 * request: req

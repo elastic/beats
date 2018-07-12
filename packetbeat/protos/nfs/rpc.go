@@ -216,7 +216,7 @@ func (r *rpc) handleRPCFragment(
 	for len(st.rawData) > 0 {
 
 		if len(st.rawData) < 4 {
-			debugf("Wainting for more data")
+			debugf("Waiting for more data")
 			break
 		}
 
@@ -225,7 +225,7 @@ func (r *rpc) handleRPCFragment(
 		islast := (marker & rpcLastFrag) != 0
 
 		if len(st.rawData)-4 < size {
-			debugf("Wainting for more data")
+			debugf("Waiting for more data")
 			break
 		}
 

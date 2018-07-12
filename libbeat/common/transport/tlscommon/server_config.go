@@ -89,7 +89,7 @@ func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
 	}, nil
 }
 
-// Validate valies the TLSConfig struct making sure certificate sure we have both a certificate and
+// Validate values the TLSConfig struct making sure certificate sure we have both a certificate and
 // a key.
 func (c *ServerConfig) Validate() error {
 	return c.Certificate.Validate()

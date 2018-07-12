@@ -159,7 +159,7 @@ func (h *Harvester) Run() error {
 	return nil
 }
 
-// Stop stopps the harvester
+// Stop stops the harvester
 func (h *Harvester) Stop() {
 	close(h.done)
 }

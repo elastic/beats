@@ -33,7 +33,7 @@ const (
 type parserConfig struct {
 	maxValues        int
 	maxBytesPerValue int
-	parseUnkown      bool
+	parseUnknown     bool
 }
 
 type parser struct {

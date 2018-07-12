@@ -34,7 +34,7 @@ var (
 
 // CPU Monitor
 
-// Monitor is used to monitor the overal CPU usage of the system.
+// Monitor is used to monitor the overall CPU usage of the system.
 type Monitor struct {
 	lastSample *sigar.Cpu
 }

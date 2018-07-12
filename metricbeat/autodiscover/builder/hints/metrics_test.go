@@ -247,7 +247,7 @@ func TestGenerateHints(t *testing.T) {
 			err := cfgs[0].Unpack(&config)
 			assert.Nil(t, err, test.message)
 
-			// metricests order is random, order it for tests
+			// metricsets order is random, order it for tests
 			if v, err := config.GetValue("metricsets"); err == nil {
 				if msets, ok := v.([]interface{}); ok {
 					metricsets := make([]string, len(msets))

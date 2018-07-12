@@ -93,7 +93,7 @@ func (c *client) handle() error {
 		c.callback(scanner.Bytes(), c.metadata)
 	}
 
-	// We are out of the scanner, either we reached EOF or another fatal error occured.
+	// We are out of the scanner, either we reached EOF or another fatal error occurred.
 	// like we failed to complete the TLS handshake or we are missing the client certificate when
 	// mutual auth is on, which is the default.
 	if err := scanner.Err(); err != nil {

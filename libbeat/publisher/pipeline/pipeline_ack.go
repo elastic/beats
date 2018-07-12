@@ -249,7 +249,7 @@ func (p *pipelineEventCB) worker() {
 				return
 			}
 
-			// short circuite dropped events, but have client block until all events
+			// short circuit dropped events, but have client block until all events
 			// have been processed by pipeline ack handler
 		case msg := <-p.droppedEvents:
 			p.reportEventsData(msg.data, msg.total)

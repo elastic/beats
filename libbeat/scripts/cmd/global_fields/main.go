@@ -36,7 +36,7 @@ func main() {
 
 	err := os.MkdirAll(filepath.Join(*beatPath, "_meta"), 0744)
 	if err != nil {
-		fmt.Printf("Cannot creata _meta dir for %s: %v\n", name, err)
+		fmt.Printf("Cannot create _meta dir for %s: %v\n", name, err)
 		os.Exit(1)
 	}
 

@@ -71,7 +71,7 @@ func (r *registry) GetBuilder(name string) BuilderConstructor {
 	return r.builders[name]
 }
 
-// BuildBuilder reads provider configuration and instatiate one
+// BuildBuilder reads provider configuration and instantiate one
 func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 	var config BuilderConfig
 	err := c.Unpack(&config)
@@ -87,7 +87,7 @@ func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 	return builder(c)
 }
 
-// GetConfig creates configs for all builders initalized.
+// GetConfig creates configs for all builders initialized.
 func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	var configs []*common.Config
 
