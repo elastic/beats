@@ -135,11 +135,7 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 	}
 
 	var r reader.Reader
-	r, err = encode.New(f, enc, 4096)
-	if err != nil {
-		return nil, err
-	}
-
+	r = encode.New(f, enc, 4096)
 	r = strip_newline.New(r)
 
 	if conf.multiPattern != "" {
