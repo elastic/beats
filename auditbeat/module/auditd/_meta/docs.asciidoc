@@ -136,6 +136,11 @@ embedded in the string using `#` as a prefix. The format for rules is the same
 used by the Linux `auditctl` utility. {beatname_uc} supports adding file watches
 (`-w`) and syscall rules (`-a` or `-A`).
 
+*`audit_rule_files`*:: A list of files to load audit rules from. This files are
+loaded after the rules declared in `audit_rules` are loaded. Wildcards are
+supported and will expand in lexicographical order. The format is the same as
+that of the `audit_rules` field.
+
 [float]
 === Audit rules
 
