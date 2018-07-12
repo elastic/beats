@@ -35,10 +35,11 @@ type kubernetesConfig struct {
 
 type enricher struct {
 	sync.RWMutex
-	metadata       map[string]common.MapStr
-	index          func(common.MapStr) string
-	watcher        kubernetes.Watcher
-	watcherStarted bool
+	metadata           map[string]common.MapStr
+	index              func(common.MapStr) string
+	watcher            kubernetes.Watcher
+	watcherStarted     bool
+	watcherStartedLock sync.Mutex
 }
 
 // GetWatcher initializes a kubernetes watcher with the given
@@ -221,6 +222,8 @@ func buildMetadataEnricher(
 }
 
 func (m *enricher) Start() {
+	m.watcherStartedLock.Lock()
+	defer m.watcherStartedLock.Unlock()
 	if !m.watcherStarted {
 		err := m.watcher.Start()
 		if err != nil {
@@ -231,6 +234,8 @@ func (m *enricher) Start() {
 }
 
 func (m *enricher) Stop() {
+	m.watcherStartedLock.Lock()
+	defer m.watcherStartedLock.Unlock()
 	if m.watcherStarted {
 		m.watcher.Stop()
 		m.watcherStarted = false
