@@ -20,6 +20,8 @@ package queue
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -89,18 +91,20 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	events := []common.MapStr{}
-	errors := s.NewErrors()
-
+	var events []common.MapStr
+	var errors multierror.Errors
 	for _, queue := range queues {
-		event, errs := eventMapping(queue)
+		event, err := eventMapping(queue)
 		events = append(events, event)
-		errors.AddErrors(errs)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 
-	return events, errors
+	return events, errors.Err()
 }
 
-func eventMapping(queue map[string]interface{}) (common.MapStr, *s.Errors) {
-	return schema.Apply(queue)
+func eventMapping(queue map[string]interface{}) (common.MapStr, error) {
+	event, err := schema.Apply(queue)
+	return event, err
 }

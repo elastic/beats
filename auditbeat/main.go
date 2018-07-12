@@ -25,6 +25,9 @@ import (
 	// Register modules.
 	_ "github.com/elastic/beats/auditbeat/module/auditd"
 	_ "github.com/elastic/beats/auditbeat/module/file_integrity"
+
+	// Register includes.
+	_ "github.com/elastic/beats/auditbeat/include"
 )
 
 func main() {

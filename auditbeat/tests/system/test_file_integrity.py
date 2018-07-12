@@ -1,10 +1,5 @@
-import sys
-import os
-import shutil
 import time
-import unittest
 from auditbeat import *
-from beat.beat import INTEGRATION_TESTS
 
 
 # Escapes a path to match what's printed in the logs

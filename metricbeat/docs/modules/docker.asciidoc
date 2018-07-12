@@ -42,8 +42,8 @@ metricbeat.modules:
   period: 10s
   enabled: true
 
-  # Replace dots in labels with `_`. Set to false to keep dots
-  labels.dedot: true
+  # If set to true, replace dots in labels with `_`.
+  #labels.dedot: false
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:

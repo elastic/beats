@@ -70,7 +70,7 @@ func makeConsole(
 			return outputs.Fail(err)
 		}
 	} else {
-		enc = json.New(config.Pretty, beat.Version)
+		enc = json.New(config.Pretty, true, beat.Version)
 	}
 
 	index := beat.Beat

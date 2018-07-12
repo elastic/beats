@@ -162,7 +162,7 @@ func getDomainMemoryStatName(tag int32) string {
 	case 5:
 		return "available"
 	case 6:
-		return "actualballon"
+		return "actualballoon"
 	case 7:
 		return "rss"
 	case 8:

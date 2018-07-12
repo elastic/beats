@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/packetbeat/procs"
 )
 
 type flowsProcessor struct {
@@ -214,6 +215,7 @@ func createEvent(
 
 	source := common.MapStr{}
 	dest := common.MapStr{}
+	tuple := common.IPPortTuple{}
 
 	// add ethernet layer meta data
 	if src, dst, ok := f.id.EthAddr(); ok {
@@ -238,22 +240,44 @@ func createEvent(
 
 	// ipv4 layer meta data
 	if src, dst, ok := f.id.OutterIPv4Addr(); ok {
-		source["outer_ip"] = net.IP(src).String()
-		dest["outer_ip"] = net.IP(dst).String()
+		srcIP, dstIP := net.IP(src), net.IP(dst)
+		source["outer_ip"] = srcIP.String()
+		dest["outer_ip"] = dstIP.String()
+		tuple.SrcIP = srcIP
+		tuple.DstIP = dstIP
+		tuple.IPLength = 4
 	}
 	if src, dst, ok := f.id.IPv4Addr(); ok {
-		source["ip"] = net.IP(src).String()
-		dest["ip"] = net.IP(dst).String()
+		srcIP, dstIP := net.IP(src), net.IP(dst)
+		source["ip"] = srcIP.String()
+		dest["ip"] = dstIP.String()
+		// Save IPs for process matching if an outer layer was not present
+		if tuple.IPLength == 0 {
+			tuple.SrcIP = srcIP
+			tuple.DstIP = dstIP
+			tuple.IPLength = 4
+		}
 	}
 
 	// ipv6 layer meta data
 	if src, dst, ok := f.id.OutterIPv6Addr(); ok {
-		source["outer_ipv6"] = net.IP(src).String()
-		dest["outer_ipv6"] = net.IP(dst).String()
+		srcIP, dstIP := net.IP(src), net.IP(dst)
+		source["outer_ipv6"] = srcIP.String()
+		dest["outer_ipv6"] = dstIP.String()
+		tuple.SrcIP = srcIP
+		tuple.DstIP = dstIP
+		tuple.IPLength = 6
 	}
 	if src, dst, ok := f.id.IPv6Addr(); ok {
+		srcIP, dstIP := net.IP(src), net.IP(dst)
 		source["ipv6"] = net.IP(src).String()
 		dest["ipv6"] = net.IP(dst).String()
+		// Save IPs for process matching if an outer layer was not present
+		if tuple.IPLength == 0 {
+			tuple.SrcIP = srcIP
+			tuple.DstIP = dstIP
+			tuple.IPLength = 6
+		}
 	}
 
 	// udp layer meta data
@@ -265,8 +289,9 @@ func createEvent(
 
 	// tcp layer meta data
 	if src, dst, ok := f.id.TCPAddr(); ok {
-		source["port"] = binary.LittleEndian.Uint16(src)
-		dest["port"] = binary.LittleEndian.Uint16(dst)
+		tuple.SrcPort = binary.LittleEndian.Uint16(src)
+		tuple.DstPort = binary.LittleEndian.Uint16(dst)
+		source["port"], dest["port"] = tuple.SrcPort, tuple.DstPort
 		fields["transport"] = "tcp"
 	}
 
@@ -283,6 +308,24 @@ func createEvent(
 
 	fields["source"] = source
 	fields["dest"] = dest
+
+	// Set process information if it's available
+	if tuple.IPLength != 0 && tuple.SrcPort != 0 {
+		if cmdline := procs.ProcWatcher.FindProcessesTuple(&tuple); cmdline != nil {
+			src, dst := common.MakeEndpointPair(tuple.BaseTuple, cmdline)
+
+			for key, value := range map[string]string{
+				"client_proc":    src.Name,
+				"client_cmdline": src.Cmdline,
+				"proc":           dst.Name,
+				"cmdline":        dst.Cmdline,
+			} {
+				if len(value) != 0 {
+					fields[key] = value
+				}
+			}
+		}
+	}
 
 	return beat.Event{
 		Timestamp: timestamp,

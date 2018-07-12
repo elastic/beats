@@ -202,10 +202,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 }
 
 func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
-	rules, err := ms.config.rules()
-	if err != nil {
-		return errors.Wrap(err, "failed to add rules")
-	}
+	rules := ms.config.rules()
 
 	if len(rules) == 0 {
 		ms.log.Info("No audit_rules were specified.")
@@ -793,7 +790,7 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 		}
 		return c.SocketType, nil
 	}
-	rules, _ := c.rules()
+	rules := c.rules()
 
 	isLocked := status.Enabled == auditLocked
 	hasMulticast := hasMulticastSupport()

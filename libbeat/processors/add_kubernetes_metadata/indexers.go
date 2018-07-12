@@ -60,7 +60,7 @@ type Indexers struct {
 // IndexerConstructor builds a new indexer from its settings
 type IndexerConstructor func(config common.Config, metaGen kubernetes.MetaGenerator) (Indexer, error)
 
-// NewIndexers  builds indexers object
+// NewIndexers builds indexers object
 func NewIndexers(configs PluginConfig, metaGen kubernetes.MetaGenerator) *Indexers {
 	indexers := []Indexer{}
 	for _, pluginConfigs := range configs {
@@ -74,6 +74,7 @@ func NewIndexers(configs PluginConfig, metaGen kubernetes.MetaGenerator) *Indexe
 			indexer, err := indexFunc(pluginConfig, metaGen)
 			if err != nil {
 				logp.Warn("Unable to initialize indexing plugin %s due to error %v", name, err)
+				continue
 			}
 
 			indexers = append(indexers, indexer)
@@ -113,6 +114,8 @@ func (i *Indexers) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // Empty returns true if indexers list is empty
 func (i *Indexers) Empty() bool {
+	i.RLock()
+	defer i.RUnlock()
 	if len(i.indexers) == 0 {
 		return true
 	}

@@ -22,7 +22,17 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
+
+var (
+	moduleList *monitoring.UniqueList
+)
+
+func init() {
+	moduleList = monitoring.NewUniqueList()
+	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
+}
 
 // Runner is a facade for a Wrapper that provides a simple interface
 // for starting and stopping a Module.
@@ -61,6 +71,7 @@ func (mr *runner) Start() {
 	mr.startOnce.Do(func() {
 		output := mr.mod.Start(mr.done)
 		mr.wg.Add(1)
+		moduleList.Add(mr.mod.Name())
 		go func() {
 			defer mr.wg.Done()
 			PublishChannels(mr.client, output)
@@ -73,6 +84,7 @@ func (mr *runner) Stop() {
 		close(mr.done)
 		mr.client.Close()
 		mr.wg.Wait()
+		moduleList.Remove(mr.mod.Name())
 	})
 }
 

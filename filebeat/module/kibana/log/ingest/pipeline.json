@@ -47,6 +47,27 @@
             }
         },
         {
+            "rename": {
+                "field": "kibana.log.meta.res.statusCode",
+                "target_field": "http.response.status_code",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.res.responseTime",
+                "target_field": "http.response.elapsed_time",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.res.contentLength",
+                "target_field": "http.response.content_length",
+                "ignore_missing": true
+            }
+        },
+        {
             "date": {
                 "field": "read_timestamp",
                 "formats" : ["ISO8601"],

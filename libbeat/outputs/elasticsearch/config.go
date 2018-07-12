@@ -33,6 +33,7 @@ type elasticsearchConfig struct {
 	ProxyURL         string            `config:"proxy_url"`
 	LoadBalance      bool              `config:"loadbalance"`
 	CompressionLevel int               `config:"compression_level" validate:"min=0, max=9"`
+	EscapeHTML       bool              `config:"escape_html"`
 	TLS              *tlscommon.Config `config:"ssl"`
 	BulkMaxSize      int               `config:"bulk_max_size"`
 	MaxRetries       int               `config:"max_retries"`
@@ -60,6 +61,7 @@ var (
 		Timeout:          90 * time.Second,
 		MaxRetries:       3,
 		CompressionLevel: 0,
+		EscapeHTML:       true,
 		TLS:              nil,
 		LoadBalance:      true,
 		Backoff: Backoff{

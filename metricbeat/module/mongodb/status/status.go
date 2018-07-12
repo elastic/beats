@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
 
-	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -47,24 +46,18 @@ func init() {
 // additional entries. These variables can be used to persist data or configuration between
 // multiple fetch calls.
 type MetricSet struct {
-	mb.BaseMetricSet
-	dialInfo *mgo.DialInfo
+	*mongodb.MetricSet
 }
 
 // New creates a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	dialInfo, err := mgo.ParseURL(base.HostData().URI)
+	ms, err := mongodb.NewMetricSet(base)
 	if err != nil {
 		return nil, err
 	}
-	dialInfo.Timeout = base.Module().Config().Timeout
-
-	return &MetricSet{
-		BaseMetricSet: base,
-		dialInfo:      dialInfo,
-	}, nil
+	return &MetricSet{ms}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
@@ -73,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	// instantiate direct connections to each of the configured Mongo hosts
-	mongoSession, err := mongodb.NewDirectSession(m.dialInfo)
+	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
 		return nil, err
 	}

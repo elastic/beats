@@ -28,6 +28,7 @@ metricbeat.modules:
     #- index
     #- index_summary
     #- shard
+    #- ml_job
   period: 10s
   hosts: ["localhost:9200"]
 ----
@@ -43,6 +44,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-index_summary,index_summary>>
 
+* <<metricbeat-metricset-elasticsearch-ml_job,ml_job>>
+
 * <<metricbeat-metricset-elasticsearch-node,node>>
 
 * <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
@@ -54,6 +57,8 @@ The following metricsets are available:
 include::elasticsearch/index.asciidoc[]
 
 include::elasticsearch/index_summary.asciidoc[]
+
+include::elasticsearch/ml_job.asciidoc[]
 
 include::elasticsearch/node.asciidoc[]
 

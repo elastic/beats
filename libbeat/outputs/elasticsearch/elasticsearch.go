@@ -154,6 +154,7 @@ func makeES(
 			Timeout:          config.Timeout,
 			CompressionLevel: config.CompressionLevel,
 			Observer:         observer,
+			EscapeHTML:       config.EscapeHTML,
 		}, &connectCallbackRegistry)
 		if err != nil {
 			return outputs.Fail(err)

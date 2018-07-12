@@ -66,6 +66,7 @@ type ClientSettings struct {
 	Proxy              *url.URL
 	TLS                *transport.TLSConfig
 	Username, Password string
+	EscapeHTML         bool
 	Parameters         map[string]string
 	Headers            map[string]string
 	Index              outil.Selector
@@ -184,9 +185,9 @@ func NewClient(
 	var encoder bodyEncoder
 	compression := s.CompressionLevel
 	if compression == 0 {
-		encoder = newJSONEncoder(nil)
+		encoder = newJSONEncoder(nil, s.EscapeHTML)
 	} else {
-		encoder, err = newGzipEncoder(compression, nil)
+		encoder, err = newGzipEncoder(compression, nil, s.EscapeHTML)
 		if err != nil {
 			return nil, err
 		}
@@ -462,7 +463,7 @@ func bulkCollectPublishFails(
 	data []publisher.Event,
 ) ([]publisher.Event, bulkResultStats) {
 	if err := reader.expectDict(); err != nil {
-		logp.Err("Failed to parse bulk respose: expected JSON object")
+		logp.Err("Failed to parse bulk response: expected JSON object")
 		return nil, bulkResultStats{}
 	}
 
@@ -489,7 +490,7 @@ func bulkCollectPublishFails(
 
 	// check items field is an array
 	if err := reader.expectArray(); err != nil {
-		logp.Err("Failed to parse bulk respose: expected items array")
+		logp.Err("Failed to parse bulk response: expected items array")
 		return nil, bulkResultStats{}
 	}
 

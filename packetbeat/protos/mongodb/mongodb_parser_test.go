@@ -41,7 +41,7 @@ func TestMongodbParser_messageNotEvenStarted(t *testing.T) {
 	}
 }
 
-func TestMongodbParser_mesageNotFinished(t *testing.T) {
+func TestMongodbParser_messageNotFinished(t *testing.T) {
 	var data []byte
 	addInt32(data, 100) // length = 100
 

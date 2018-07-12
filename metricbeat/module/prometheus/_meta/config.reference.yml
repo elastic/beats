@@ -13,3 +13,8 @@
   hosts: ["localhost:9090"]
   #metrics_path: /metrics
   #namespace: example
+
+  # This can be used for service account based authorization:
+  #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt

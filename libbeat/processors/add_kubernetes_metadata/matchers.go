@@ -62,6 +62,7 @@ func NewMatchers(configs PluginConfig) *Matchers {
 			matcher, err := matchFunc(pluginConfig)
 			if err != nil {
 				logp.Warn("Unable to initialize matcher plugin %s due to error %v", name, err)
+				continue
 			}
 
 			matchers = append(matchers, matcher)
@@ -89,6 +90,8 @@ func (m *Matchers) MetadataIndex(event common.MapStr) string {
 }
 
 func (m *Matchers) Empty() bool {
+	m.RLock()
+	defer m.RUnlock()
 	if len(m.matchers) == 0 {
 		return true
 	}

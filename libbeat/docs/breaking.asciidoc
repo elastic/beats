@@ -1,3 +1,5 @@
+:see-relnotes: See the <<release-notes,release notes>> for a complete list of breaking changes, including changes to beta or experimental functionality.
+
 [[breaking-changes]]
 == Breaking changes
 
@@ -10,6 +12,8 @@ changes, but there are breaking changes between major versions (e.g. 5.x to
 See the following topics for a description of breaking changes:
 
 * <<breaking-changes-6.3>>
+* <<breaking-changes-6.2>>
+* <<breaking-changes-6.1>>
 * <<breaking-changes-6.0>>
 * {auditbeat}/auditbeat-breaking-changes.html[Breaking changes in Auditbeat 6.2]
 
@@ -17,8 +21,7 @@ See the following topics for a description of breaking changes:
 === Breaking changes in 6.3
 
 This section discusses the main changes that you should be aware of if you
-upgrade the Beats to version 6.3. Please also review the relevant
-Breaking Changes sections of the <<release-notes,release notes>>.
+upgrade the Beats to version 6.3. {see-relnotes}
 
 [[breaking-changes-mapping-conflict]]
 ==== New `host` namespace may cause mapping conflicts for Logstash
@@ -53,21 +56,32 @@ In this use case, you load the versioned template manually and use the Beats
 versioned index pattern, `%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}`,
 as recommended in the {logstash-ref}/plugins-inputs-beats.html[Beats input
 plugin] documentation. This results in a `host` field in 6.2 indices, and a
-`host.name` field in 6.3 indices. There are no mapping conflicts. Cross index
-searches in Elasticsearch still work as expected. 
+`host.name` field in 6.3 indices. There are no mapping conflicts, but
+any visualizations or searches that use `host` will no longer show results for
+6.3 indices. 
 
 *What do you need to change?*
 
-If you searched for the `host` field previously, you now need to search for the
-`host` and `host.name` fields.  
+If you searched for the `host` field previously, modify your searches to use the
+`beat.hostname` field instead. The `beat.hostname` field existed prior to 6.3
+and contains the same information as `host.name`. Using this field ensures that
+your queries and aggregations will work as expected in earlier releases and 6.3.
 
 If you have multiple visualizations in Kibana that reference the `host` field,
-you can export the objects by using the Kibana API or UI, change any aggregation
-references to use `host.name` instead of `host`, and then re-import the
-objects into Kibana.
+export the objects, modify them by changing `host` to `beat.hostname`, and then
+re-import them into Kibana. You can use the Kibana UI or API.
 
+To use the Kibana UI:
 
-//TODO: Add links to the Kibana docs for exporting/importing objects.
+. In Kibana, go to *Management > Kibana > Saved Objects* and export the objects. 
+. In the exported JSON file, change `host` to `beat.hostname`.
+. In Kibana, go to *Saved Objects* and import the modified objects. 
+
+For more information, see:
+
+* {kibana-ref}/saved-objects-api.html[Kibana Saved Objects API]
+* {kibana-ref}/managing-saved-objects.html[Managing Saved Searches, Visualizations, and Dashboards]
+
 
 [[custom-template-non-versioned-indices]]
 ===== Use case: You use a custom template and your indices are not versioned
@@ -159,12 +173,21 @@ field in the final event. The second approach drops the `host` fields from the
 Beats event, but because Logstash adds a default `host` field, there will be a
 `host` field in the final event.
 
+[[breaking-changes-6.2]]
+=== Breaking changes in 6.2
+
+{see-relnotes}
+
+[[breaking-changes-6.1]]
+=== Breaking changes in 6.1
+
+{see-relnotes}
+
 [[breaking-changes-6.0]]
 === Breaking changes in 6.0
 
 This section discusses the main changes that you should be aware of if you
-upgrade the Beats from version 5.x to 6.x. Please also review the relevant
-Breaking Changes sections of the <<release-notes,release notes>>.
+upgrade the Beats from version 5.x to 6.x. {see-relnotes}
 
 // TODO: better link to the consolidated release notes for 6.0.0.
 

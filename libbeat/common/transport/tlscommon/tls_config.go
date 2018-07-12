@@ -66,7 +66,7 @@ type TLSConfig struct {
 	ClientAuth tls.ClientAuthType
 }
 
-// BuildModuleConfig takes the TLSConfig and tranform it into a `tls.Config`.
+// BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
 func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 	if c == nil {
 		// use default TLS settings, if config is empty.

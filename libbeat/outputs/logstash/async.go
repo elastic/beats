@@ -68,7 +68,7 @@ func newAsyncClient(
 		logp.Warn(`The async Logstash client does not support the "ttl" option`)
 	}
 
-	enc := makeLogstashEventEncoder(beat, config.Index)
+	enc := makeLogstashEventEncoder(beat, config.EscapeHTML, config.Index)
 
 	queueSize := config.Pipelining - 1
 	timeout := config.Timeout

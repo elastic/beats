@@ -66,7 +66,7 @@ const (
 type matcher func(last, current []byte) bool
 
 var (
-	sigMultilineTimeout = errors.New("multline timeout")
+	sigMultilineTimeout = errors.New("multiline timeout")
 )
 
 // New creates a new multi-line reader combining stream of
@@ -206,7 +206,7 @@ func (mlr *Reader) readNext() (reader.Message, error) {
 				return msg, nil
 			}
 
-			// no match, return current multline and retry with current line on next
+			// no match, return current multiline and retry with current line on next
 			// call to readNext awaiting the error being reproduced (or resolved)
 			// in next call to Next
 			msg := mlr.finalize()

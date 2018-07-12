@@ -24,7 +24,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	s "github.com/elastic/beats/libbeat/common/schema"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
@@ -32,7 +31,7 @@ import (
 )
 
 // TestMapper tests mapping methods
-func TestMapper(t *testing.T, glob string, mapper func(mb.ReporterV2, []byte) []error) {
+func TestMapper(t *testing.T, glob string, mapper func(mb.ReporterV2, []byte) error) {
 	files, err := filepath.Glob(glob)
 	assert.NoError(t, err)
 	// Makes sure glob matches at least 1 file
@@ -44,12 +43,8 @@ func TestMapper(t *testing.T, glob string, mapper func(mb.ReporterV2, []byte) []
 			assert.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
-			errors := mapper(reporter, input)
-			for _, errs := range errors {
-				if e, ok := errs.(*s.Errors); ok {
-					assert.False(t, e.HasRequiredErrors(), "mapping error: %s", e)
-				}
-			}
+			err = mapper(reporter, input)
+			assert.NoError(t, err)
 			assert.True(t, len(reporter.GetEvents()) >= 1)
 			assert.Equal(t, 0, len(reporter.GetErrors()))
 		})
@@ -57,7 +52,7 @@ func TestMapper(t *testing.T, glob string, mapper func(mb.ReporterV2, []byte) []
 }
 
 // TestMapperWithInfo tests mapping methods with Info fields
-func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, Info, []byte) []error) {
+func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, Info, []byte) error) {
 	files, err := filepath.Glob(glob)
 	assert.NoError(t, err)
 	// Makes sure glob matches at least 1 file
@@ -74,12 +69,8 @@ func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, In
 			assert.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
-			errors := mapper(reporter, info, input)
-			for _, errs := range errors {
-				if e, ok := errs.(*s.Errors); ok {
-					assert.False(t, e.HasRequiredErrors(), "mapping error: %s", e)
-				}
-			}
+			err = mapper(reporter, info, input)
+			assert.NoError(t, err)
 			assert.True(t, len(reporter.GetEvents()) >= 1)
 			assert.Equal(t, 0, len(reporter.GetErrors()))
 		})

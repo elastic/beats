@@ -117,7 +117,7 @@ type ServiceAccessRight uint32
 const (
 	ServiceAllAccess ServiceAccessRight = 0xf01ff
 
-	ServcieChangeConfig ServiceAccessRight = 0x2
+	ServiceChangeConfig ServiceAccessRight = 0x2
 
 	ServiceEnumerateDependents ServiceAccessRight = 0x8
 

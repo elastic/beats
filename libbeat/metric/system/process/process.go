@@ -362,7 +362,7 @@ func (procStats *Stats) matchProcess(name string) bool {
 	return false
 }
 
-// Init initizalizes a Stats instance. It returns erros if the provided process regexes
+// Init initializes a Stats instance. It returns errors if the provided process regexes
 // cannot be compiled.
 func (procStats *Stats) Init() error {
 	procStats.ProcsMap = make(ProcsMap)

@@ -410,8 +410,8 @@ func (b *inBroker) stateWithTimer() bool {
 // ignored in the future.
 //
 // stateBlocked transitions:
-//   -> stateEmpty if flush was successfull and write buffer is empty
-//   -> stateWithTimer if flush was successfull, but we still have some pending events
+//   -> stateEmpty if flush was successful and write buffer is empty
+//   -> stateWithTimer if flush was successful, but we still have some pending events
 //   -> stateBlocked if flush failed (still not enough space)
 func (b *inBroker) stateBlocked() bool {
 	log := b.ctx.logger

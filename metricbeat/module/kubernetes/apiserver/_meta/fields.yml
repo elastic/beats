@@ -40,4 +40,4 @@
       type: object
       object_type: long
       description: >
-        Request latency histagram buckets
+        Request latency histogram buckets

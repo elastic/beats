@@ -55,7 +55,7 @@ var (
 	errMixOfBinaryAndText         = errors.New("mix of binary and text in one connection")
 	errResponseUnknownTransaction = errors.New("response from unknown transaction")
 	errExpectedValueForMerge      = errors.New("expected value to merge with")
-	errExpectedStatsForMerge      = errors.New("expected stat respose to merge with")
+	errExpectedStatsForMerge      = errors.New("expected stat response to merge with")
 )
 
 // internal notes to be published with transaction

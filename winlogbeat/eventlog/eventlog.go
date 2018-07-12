@@ -173,7 +173,7 @@ func addPairs(m common.MapStr, key string, pairs []sys.KeyValue) common.MapStr {
 		if !exists {
 			h[k] = sys.RemoveWindowsLineEndings(kv.Value)
 		} else {
-			debugf("Droping key/value (k=%s, v=%s) pair because key already "+
+			debugf("Dropping key/value (k=%s, v=%s) pair because key already "+
 				"exists. event=%+v", k, kv.Value, m)
 		}
 	}

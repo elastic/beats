@@ -197,7 +197,7 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg Config) reade
 
 	r, err = New(strip_newline.New(r), "\n", 1<<20, &cfg)
 	if err != nil {
-		t.Fatalf("failed to initializ reader: %v", err)
+		t.Fatalf("failed to initialize reader: %v", err)
 	}
 
 	return r

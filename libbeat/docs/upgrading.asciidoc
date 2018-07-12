@@ -33,7 +33,7 @@ changes>> doc.
 
 // TODO: link to the stack upgrade docs
 //
-// If you are planning an upgrade of the full stack (Elasticsearch, Kibama, or
+// If you are planning an upgrade of the full stack (Elasticsearch, Kibana, or
 // Logstash, in addition to Beats), please read the stack upgrade guide.
 
 We recommend that you fully upgrade Elasticsearch and Kibana to version 6.0

@@ -1,0 +1,4 @@
+- name: deprecation
+  type: group
+  description: >
+  fields:
