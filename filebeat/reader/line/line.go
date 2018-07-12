@@ -127,8 +127,6 @@ func (r *decoderReader) read(buf []byte) (int, error) {
 
 // msgSize returns the size of the encoded message on the disk
 func (r *decoderReader) msgSize(symlen []int, size int) (int, []int, error) {
-	fmt.Printf("%+v\n", symlen, size)
-
 	n := 0
 	for size > 0 {
 		if len(symlen) <= n {
@@ -267,7 +265,6 @@ func (s *lineScanner) line(i int) ([]byte, int, error) {
 		return nil, 0, err
 	}
 
-	fmt.Printf("%+v\n", s.symlen)
 	s.bytesOffset += msgSymbols
 	s.offset += i
 	s.buf.Reset()
