@@ -184,7 +184,7 @@ func (mc *memcache) onUDPMessage(
 	}
 	msg.Tuple = *tuple
 	msg.Transport = applayer.TransportUDP
-	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tuple)
+	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTupleUDP(tuple)
 
 	done := false
 	var err error

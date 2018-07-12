@@ -582,7 +582,7 @@ func handleMysql(mysql *mysqlPlugin, m *mysqlMessage, tcptuple *common.TCPTuple,
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 	m.raw = rawMsg
 
 	if m.isRequest {

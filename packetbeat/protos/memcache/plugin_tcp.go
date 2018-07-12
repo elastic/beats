@@ -191,7 +191,7 @@ func (mc *memcache) onTCPMessage(
 ) error {
 	msg.Tuple = *tuple
 	msg.Transport = applayer.TransportTCP
-	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tuple)
+	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tuple)
 
 	if msg.IsRequest {
 		return mc.onTCPRequest(conn, tuple, dir, msg)

@@ -217,7 +217,7 @@ func (mongodb *mongodbPlugin) handleMongodb(
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.isResponse {
 		debugf("MongoDB response message")
