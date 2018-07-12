@@ -106,7 +106,7 @@ func testReaderWithEncodings(t *testing.T, bufferSize int) {
 		}
 
 		// create line reader
-		reader := New(buffer, codec, bufferSize)
+		reader := New(buffer, codec, []byte("\n"), bufferSize)
 
 		// read decodec lines from buffer
 		var readLines []string
@@ -200,7 +200,7 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
 	codec, _ := encoding.Plain(buffer)
-	reader := New(buffer, codec, buffer.Len())
+	reader := New(buffer, codec, []byte("\n"), buffer.Len())
 
 	// read lines
 	var lines [][]byte

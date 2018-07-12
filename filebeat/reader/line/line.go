@@ -36,9 +36,9 @@ type Reader struct {
 }
 
 // New creates a new reader object
-func New(input io.Reader, codec encoding.Encoding, bufferSize int) *Reader {
+func New(input io.Reader, codec encoding.Encoding, separator []byte, bufferSize int) *Reader {
 	decReader := newDecoderReader(input, codec, bufferSize)
-	lineScanner := newLineScanner(decReader, bufferSize)
+	lineScanner := newLineScanner(decReader, separator, bufferSize)
 
 	return &Reader{
 		lineScanner: lineScanner,
@@ -206,6 +206,7 @@ func (r *decoderReader) copyToOut(out []byte) (int, error) {
 
 type lineScanner struct {
 	in         *decoderReader
+	separator  []byte
 	bufferSize int
 
 	symlen      []int
@@ -214,9 +215,10 @@ type lineScanner struct {
 	bytesOffset int
 }
 
-func newLineScanner(in *decoderReader, bufferSize int) *lineScanner {
+func newLineScanner(in *decoderReader, separator []byte, bufferSize int) *lineScanner {
 	return &lineScanner{
 		in:          in,
+		separator:   separator,
 		bufferSize:  bufferSize,
 		buf:         streambuf.New(nil),
 		offset:      0,
@@ -227,7 +229,7 @@ func newLineScanner(in *decoderReader, bufferSize int) *lineScanner {
 
 // Scan reads from the underlying decoder reader and returns decoded lines.
 func (s *lineScanner) scan() ([]byte, int, error) {
-	idx := s.buf.Index([]byte("\n"))
+	idx := s.buf.Index(s.separator)
 	for !separatorFound(idx) {
 		b := make([]byte, s.bufferSize)
 		n, err := s.in.read(b)
@@ -237,7 +239,7 @@ func (s *lineScanner) scan() ([]byte, int, error) {
 
 		s.buf.Append(b[:n])
 		s.symlen = append(s.symlen, s.in.symbolsLen()...)
-		idx = s.buf.Index([]byte("\n"))
+		idx = s.buf.Index(s.separator)
 	}
 
 	return s.line(idx)
@@ -250,7 +252,7 @@ func separatorFound(i int) bool {
 
 // line sets the offset of the scanner and returns a line.
 func (s *lineScanner) line(i int) ([]byte, int, error) {
-	line, err := s.buf.CollectUntilRune('\n')
+	line, err := s.buf.CollectUntil(s.separator)
 	if err != nil {
 		panic(err)
 	}
