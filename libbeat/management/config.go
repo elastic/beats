@@ -5,8 +5,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/libbeat/setup/kibana"
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
@@ -20,7 +20,7 @@ type Config struct {
 	// TODO use beat.Keystore() for access_token
 	AccessToken string
 
-	Kibana *kibana.Config
+	Kibana *kibana.ClientConfig
 
 	Configs []struct {
 		Name   string
