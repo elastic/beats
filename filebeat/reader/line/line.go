@@ -194,7 +194,6 @@ func (r *decoderReader) conv(in []byte, out []byte) (int, int, error) {
 	}
 
 	n, err := r.copyToOut(out)
-	fmt.Println(r.symlen)
 	return n, nProcessed, err
 }
 
