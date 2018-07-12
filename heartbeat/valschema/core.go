@@ -108,6 +108,9 @@ func walkFull(m common.MapStr, root common.MapStr, path []string, wo WalkObserve
 		// Walk nested maps
 		vIsMap := false
 		var mapV common.MapStr
+		// Note that we intentionally do not handle StrictMap
+		// In this branching conditional! That is handled by
+		// Initializing a whole new validation chain in a lower spot
 		if convertedMS, ok := v.(common.MapStr); ok {
 			mapV = convertedMS
 			vIsMap = true
@@ -143,7 +146,6 @@ func walkValidate(t *testing.T, expected Map, actual common.MapStr) (output *Val
 			if isVV {
 				vv(t, actualHasKey, actualV)
 			} else if sm, isStrictMap := expectedV.(StrictMap); isStrictMap {
-				// Run a strict validation on this map
 				if actualM, ok := actualV.(common.MapStr); ok {
 					Strict(Schema(Map(sm)))(t, actualM)
 				} else {
