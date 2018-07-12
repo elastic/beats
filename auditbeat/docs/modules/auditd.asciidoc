@@ -79,10 +79,11 @@ following example shows all configuration options with their default values.
 - module: auditd
   resolve_ids: true
   failure_mode: silent
-  backlog_limit: 8196
+  backlog_limit: 8192
   rate_limit: 0
   include_raw_message: false
   include_warnings: false
+  backpressure_strategy: auto
 ----
 
 *`socket_type`*:: This optional setting controls the type of
@@ -145,6 +146,28 @@ used by the Linux `auditctl` utility. {beatname_uc} supports adding file watches
 loaded after the rules declared in `audit_rules` are loaded. Wildcards are
 supported and will expand in lexicographical order. The format is the same as
 that of the `audit_rules` field.
+
+*`backpressure_strategy`*:: Specifies the strategy that {beatname_uc} uses to
+prevent backpressure from propagating to the kernel and impacting audited
+processes.
++
+--
+The possible values are:
+
+- `auto` (default): {beatname_uc} uses the `kernel` strategy, if supported, or
+falls back to the `userspace` strategy.
+- `kernel`: {beatname_uc} sets the `backlog_wait_time` in the kernel's
+audit framework to 0. This causes events to be discarded in the kernel if
+the audit backlog queue fills to capacity. Requires a 3.14 kernel or
+newer.
+- `userspace`: {beatname_uc} drops events when there is backpressure
+from the publishing pipeline. If no `rate_limit` is set, {beatname_uc} sets a rate
+limit of 5000. Users should test their setup and adjust the `rate_limit`
+option accordingly.
+- `both`: {beatname_uc} uses the `kernel` and `userspace` strategies at the same
+time.
+- `none`: No backpressure mitigation measures are enabled.
+--
 
 [float]
 === Audit rules
