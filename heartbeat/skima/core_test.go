@@ -2,40 +2,43 @@ package skima
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 )
 
 func TestFlat(t *testing.T) {
 	m := common.MapStr{
-		"foo":    "bar",
-		"baz":    1,
-		"blargh": time.Duration(100),
+		"foo": "bar",
+		"baz": 1,
 	}
 
-	validator := Schema(Map{
-		"foo":    "bar",
-		"baz":    1,
-		"blargh": IsDuration,
-	})
+	results := Schema(Map{
+		"foo": "bar",
+		"baz": IsIntGt(0),
+	})(m)
 
-	validator(t, m)
+	Test(t, results)
 }
 
 func TestBadFlat(t *testing.T) {
 	m := common.MapStr{}
-	validator := Schema(Map{
-		"notafield": IsDuration,
-	})
 
 	fakeT := new(testing.T)
-	assert.Equal(fakeT, "foo", "bar")
 
-	validator(fakeT, m)
+	results := Schema(Map{
+		"notafield": IsDuration,
+	})(m)
+
+	Test(fakeT, results)
 	assert.True(t, fakeT.Failed())
+
+	result := results["notafield"][0]
+	assert.False(t, result.valid)
+	assert.Contains(t, result.message, "Expected a time.duration")
 }
 
 func TestNested(t *testing.T) {
@@ -46,16 +49,19 @@ func TestNested(t *testing.T) {
 		},
 	}
 
-	validator := Schema(Map{
+	results := Schema(Map{
 		"foo": Map{
 			"bar": "baz",
 		},
 		"foo.dur": IsDuration,
-	})
+	})(m)
 
-	validator(t, m)
+	Test(t, results)
+
+	assert.Len(t, results, 3, "One result per matcher")
 }
 
+/*
 func TestStrictFunc(t *testing.T) {
 	m := common.MapStr{
 		"foo": "bar",
@@ -126,4 +132,4 @@ func TestComplex(t *testing.T) {
 
 	validator(t, m)
 
-}
+}*/

@@ -2,29 +2,78 @@ package skima
 
 import (
 	"strings"
+
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type ValueValidator = func(t *testing.T, keyExists bool, actual interface{}, dotPath string)
+type ValueResult struct {
+	valid   bool
+	message string // Reason this is invalid
+}
+
+var ValidValueResult = ValueResult{true, ""}
+
+type Checker func(v interface{}) ValueResult
+
+type IsDef struct {
+	name    string
+	checker Checker
+}
+
+func Is(name string, checker Checker) IsDef {
+	return IsDef{name, checker}
+}
+
+type ValueValidator = func(isdef IsDef) ValueResult
 
 type Map map[string]interface{}
 
 type StrictMap Map
 
-type Validator func(*testing.T, common.MapStr) *ValidationResult
+type Validator func(common.MapStr) MapResults
 
-type ValidationResult struct {
-	valid        bool
-	testedFields map[string]struct{}
+type MapResults map[string][]ValueResult
+
+func (r MapResults) RecordResult(path string, result ValueResult) {
+	if r[path] == nil {
+		r[path] = []ValueResult{result}
+	} else {
+		r[path] = append(r[path], result)
+	}
 }
 
-func combineResults(results []*ValidationResult) *ValidationResult {
+func (r MapResults) eachResult(f func(string, ValueResult)) {
+	for path, pathResults := range r {
+		for _, result := range pathResults {
+			f(path, result)
+		}
+	}
+}
+
+func (r MapResults) Errors() MapResults {
+	errors := MapResults{}
+	r.eachResult(func(path string, vr ValueResult) {
+		if !vr.valid {
+			errors.RecordResult(path, vr)
+		}
+	})
+	return errors
+}
+
+func (r MapResults) Valid() bool {
+	return len(r.Errors()) == 0
+}
+
+/*
+func combineResults(results []*MapResults) *MapResults {
 	// Use sets to de-dupe these
-	output := ValidationResult{testedFields: map[string]struct{}{}}
+	output := MapResult{testedFields: map[string]struct{}{}}
 
 	for _, res := range results {
 		for k, _ := range res.testedFields {
@@ -36,18 +85,18 @@ func combineResults(results []*ValidationResult) *ValidationResult {
 }
 
 func Compose(validators ...Validator) Validator {
-	return func(t *testing.T, actual common.MapStr) *ValidationResult {
-		results := make([]*ValidationResult, len(validators))
+	return func(actual common.MapStr) *MapResult {
+		results := make([]*MapResult, len(validators))
 		for idx, validator := range validators {
-			results[idx] = validator(t, actual)
+			results[idx] = validator(actual)
 		}
 		return combineResults(results)
 	}
 }
 
 func Strict(validator Validator) Validator {
-	return func(t *testing.T, actual common.MapStr) *ValidationResult {
-		res := validator(t, actual)
+	return func(actual common.MapStr) *MapResult {
+		res := validator(actual)
 
 		missed := map[string]struct{}{}
 
@@ -63,20 +112,29 @@ func Strict(validator Validator) Validator {
 			}
 		})
 
-		assert.Empty(t, missed, "Unexpected fields found during strict schema test")
+		//assert.Empty(t, missed, "Unexpected fields found during strict schema test")
 
 		return res
 	}
 }
+*/
+
+func Test(t *testing.T, r MapResults) {
+	assert.True(t, r.Valid())
+	r.Errors().eachResult(func(p string, vr ValueResult) {
+		msg := fmt.Sprintf("%s: %s", p, vr.message)
+		assert.True(t, vr.valid, msg)
+	})
+}
 
 func Schema(expected Map) Validator {
-	return func(t *testing.T, actual common.MapStr) *ValidationResult {
-		return Validate(t, expected, actual)
+	return func(actual common.MapStr) MapResults {
+		return Validate(expected, actual)
 	}
 }
 
-func Validate(t *testing.T, expected Map, actual common.MapStr) *ValidationResult {
-	return walkValidate(t, expected, actual)
+func Validate(expected Map, actual common.MapStr) MapResults {
+	return walkValidate(expected, actual)
 }
 
 type WalkObserver func(
@@ -126,8 +184,8 @@ func walkFull(m common.MapStr, root common.MapStr, path []string, wo WalkObserve
 	}
 }
 
-func walkValidate(t *testing.T, expected Map, actual common.MapStr) (output *ValidationResult) {
-	output = &ValidationResult{testedFields: map[string]struct{}{}}
+func walkValidate(expected Map, actual common.MapStr) (results MapResults) {
+	results = MapResults{}
 	walk(
 		common.MapStr(expected),
 		func(expectedK string,
@@ -136,37 +194,26 @@ func walkValidate(t *testing.T, expected Map, actual common.MapStr) (output *Val
 			rootMap common.MapStr,
 			path []string,
 			dottedPath string) {
-			actualHasKey, _ := actual.HasKey(dottedPath)
-			if actualHasKey {
-				for i := 0; i < len(path); i++ {
-					p := path[0 : i+1]
-					subP := strings.Join(p, ".")
-					output.testedFields[subP] = struct{}{}
-				}
-			}
 
 			actualV, _ := actual.GetValue(dottedPath)
 
-			vv, isVV := expectedV.(ValueValidator)
-			if isVV {
-				// We could wrap this in a t.Run, but that makes
-				// testing really hard since new(testing.T) won't
-				// do that.
-				// TODO: Fix this.
-				// For now we pass in the dotted path
-				vv(t, actualHasKey, actualV, dottedPath)
-			} else if sm, isStrictMap := expectedV.(StrictMap); isStrictMap {
-				if actualM, ok := actualV.(common.MapStr); ok {
-					Strict(Schema(Map(sm)))(t, actualM)
-				} else {
-					assert.Fail(t, "Expected %s to be a strictly defined map, but it was actually '%v'", dottedPath, actualV)
-				}
+			/*else if sm, isStrictMap := expectedV.(StrictMap); isStrictMap {
+					if actualM, ok := actualV.(common.MapStr); ok {
+						Strict(Schema(Map(sm)))(actualM)
+					} else {
+						//assert.Fail(t, "Expected %s to be a strictly defined map, but it was actually '%v'", dottedPath, actualV)
+					}
+			} */
+
+			isDef, isIsDef := expectedV.(IsDef)
+			if isIsDef {
+				results.RecordResult(dottedPath, isDef.checker(actualV))
 			} else if _, isMap := expectedV.(Map); !isMap {
-				assert.Equal(t, expectedV, actualV, "Expected %s to equal '%v', but got '%v'", dottedPath, expectedV, actualV)
+				results.RecordResult(dottedPath, IsEqual(expectedV).checker(actualV))
 			}
 		})
 
-	return output
+	return results
 }
 
 func isMapType(v interface{}) bool {
