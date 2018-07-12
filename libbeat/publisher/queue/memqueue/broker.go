@@ -101,7 +101,7 @@ func create(eventer queue.Eventer, cfg *common.Config) (queue.Queue, error) {
 func NewBroker(
 	settings Settings,
 ) *Broker {
-	// define internal channel size for procuder/client requests
+	// define internal channel size for producer/client requests
 	// to the broker
 	chanSize := 20
 

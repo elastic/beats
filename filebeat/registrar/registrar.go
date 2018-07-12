@@ -42,7 +42,7 @@ type Registrar struct {
 
 	states               *file.States // Map with all file paths inside and the corresponding state
 	gcRequired           bool         // gcRequired is set if registry state needs to be gc'ed before the next write
-	gcEnabled            bool         // gcEnabled indictes the registry contains some state that can be gc'ed in the future
+	gcEnabled            bool         // gcEnabled indicates the registry contains some state that can be gc'ed in the future
 	flushTimeout         time.Duration
 	bufferedStateUpdates int
 }

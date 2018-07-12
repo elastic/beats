@@ -42,7 +42,7 @@ import (
 // defined in https://tools.ietf.org/html/rfc3164#section-4.1.1.
 //
 // Example:
-// 2 => "Critial"
+// 2 => "Critical"
 type mapper []string
 
 var (

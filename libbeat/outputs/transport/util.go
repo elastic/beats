@@ -65,7 +65,7 @@ func DialWith(
 	//
 	// https://tools.ietf.org/html/rfc1794
 	// > "Clients, of course, may reorder this information" - with respect to
-	// > handling order of dns records in a response.orwarded. Really required?
+	// > handling order of dns records in a response.forwarded. Really required?
 	for _, i := range rand.Perm(len(addresses)) {
 		c, err = dialer.Dial(network, net.JoinHostPort(addresses[i], port))
 		if err == nil && c != nil {

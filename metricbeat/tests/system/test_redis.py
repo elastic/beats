@@ -52,7 +52,7 @@ class Test(metricbeat.BaseTest):
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_keysace(self):
+    def test_keyspace(self):
         """
         Test redis keyspace metricset
         """

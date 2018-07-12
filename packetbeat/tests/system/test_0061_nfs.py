@@ -60,7 +60,7 @@ class Test(BaseTest):
 
     def test_first_class_op(self):
         """
-        Should cerrectly detect first-class opration in a middle of
+        Should correctly detect first-class operation in a middle of
         compound call
         """
         self.render_config_template(

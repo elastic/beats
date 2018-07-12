@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - RabbitMQ node metricset only collects metrics of the instance it connects to, `node.collect: cluster` can be used to collect all nodes as before. {issue}6556[6556] {pull}6971[6971]
 - Change http/server metricset to put events by default under http.server and prefix config options with server.. {pull}7100[7100]
 - Disable dedotting in docker module configuration. This will change the out-of-the-box behaviour, but not the one of already configured instances. {pull}7485[7485]
+- Fix typo in etcd/self metricset fields from *.bandwithrate to *.bandwidthrate. {pull}7456[7456]
 
 *Packetbeat*
 
@@ -85,7 +86,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
 - Fixed parsing of AppArmor audit messages. {pull}6978[6978]
 - Allow `auditbeat setup` to run without requiring elevated privileges for the audit client. {issue}7111[7111]
-- Fix goroutine leak that occured when the auditd module was stopped. {pull}7163[7163]
+- Fix goroutine leak that occurred when the auditd module was stopped. {pull}7163[7163]
 
 *Filebeat*
 
@@ -93,7 +94,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix memory leak in log prospector when files cannot be read. {issue}6797[6797]
 - Add raw JSON to message field when JSON parsing fails. {issue}6516[6516]
 - Commit registry writes to stable storage to avoid corrupt registry files. {issue}6792[6792]
-- Fix a data race between stopping and starting of the harverters. {issue}#6879[6879]
+- Fix a data race between stopping and starting of the harvesters. {issue}#6879[6879]
 - Fix a parsing issue in the syslog input for RFC3339 timestamp and time with nanoseconds. {pull}7046[7046]
 - Comply with PostgreSQL database name format {pull}7198[7198]
 - Fix an issue with an overflowing wait group when using the TCP input. {issue}7202[7202]
@@ -153,7 +154,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add `has_fields` conditional to filter events based on the existence of all the given fields. {issue}6285[6285] {pull}6653[6653]
 - Add support for spooling to disk to the beats event publishing pipeline. {pull}6581[6581]
 - Added logging of system info at Beat startup. {issue}5946[5946]
-- Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
+- Do not log errors if X-Pack Monitoring is enabled but Elasticsearch X-Pack is not. {pull}6627[6627]
 - Add rename processor. {pull}6292[6292]
 - Add IP-addresses and MAC-addresses to add_host_metadata. {pull}6878[6878]
 - Added a seccomp (secure computing) filter on Linux that whitelists the
@@ -198,7 +199,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add Logstash module support for main log and the slow log, support the plain text or structured JSON format {pull}5481[5481]
 - Add stream filtering when using `docker` prospector. {pull}6057[6057]
 - Add support for CRI logs format. {issue}5630[5630]
-- Add json.ignore_decoding_error config to not log json decoding erors. {issue}6547[6547]
+- Add json.ignore_decoding_error config to not log json decoding errors. {issue}6547[6547]
 - Make registry file permission configurable. {pull}6455[6455]
 - Add MongoDB module. {pull}6283[6238]
 - Add Ingest pipeline loading to setup. {pull}6814[6814]
@@ -209,7 +210,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Support MySQL 5.7.19 by mysql/slowlog {pull}6969[6969]
 - Correctly join partial log lines when using `docker` input. {pull}6967[6967]
 - Add support for TLS with client authentication to the TCP input {pull}7056[7056]
-- Converted part of pipeline from treafik/access metricSet to dissect to improve efficeny. {pull}7209[7209]
+- Converted part of pipeline from treafik/access metricSet to dissect to improve efficiency. {pull}7209[7209]
 - Add GC fileset to the Elasticsearch module. {pull}7305[7305]
 - Add Audit log fileset to the Elasticsearch module. {pull}7365[7365]
 - Add Slow log fileset to the Elasticsearch module. {pull}7473[7473]
@@ -410,7 +411,7 @@ https://github.com/elastic/beats/compare/v6.1.3...v6.2.0[View commits]
 *Auditbeat*
 
 - Fixed an issue where the proctitle value was being truncated. {pull}6080[6080]
-- Fixed an issue where values were incorrectly interpretted as hex data. {pull}6080[6080]
+- Fixed an issue where values were incorrectly interpreted as hex data. {pull}6080[6080]
 - Fixed parsing of the `key` value when multiple keys are present. {pull}6080[6080]
 - Fix possible resource leak if file_integrity module is used with config
   reloading on Windows or Linux. {pull}6198[6198]
@@ -449,7 +450,7 @@ https://github.com/elastic/beats/compare/v6.1.3...v6.2.0[View commits]
 - Use structured logging for the metrics that are periodically logged via the
   `logging.metrics` feature. {pull}5915[5915]
 - Improve Elasticsearch output metrics to count number of dropped and duplicate (if event ID is given) events. {pull}5811[5811]
-- Add the abilility for the add_docker_metadata process to enrich based on process ID. {pull}6100[6100]
+- Add the ability for the add_docker_metadata process to enrich based on process ID. {pull}6100[6100]
 - The `add_docker_metadata` and `add_kubernetes_metadata` processors are now GA, instead of Beta. {pull}6105[6105]
 - Update go-ucfg library to support top level key reference and cyclic key reference for the
   keystore {pull}6098[6098]
@@ -475,7 +476,7 @@ https://github.com/elastic/beats/compare/v6.1.3...v6.2.0[View commits]
 - Update the MySQL dashboard to use the Time Series Visual Builder. {pull}5996[5996]
 - Add experimental uwsgi module. {pull}6006[6006]
 - Docker and Kubernetes modules are now GA, instead of Beta. {pull}6105[6105]
-- Support haproxy stats gathering using http (additionaly to tcp socket). {pull}5819[5819]
+- Support haproxy stats gathering using http (additionally to tcp socket). {pull}5819[5819]
 - Support to optionally 'de dot' keys in http/json metricset to prevent collisions. {pull}5957[5957]
 
 *Packetbeat*
@@ -578,7 +579,7 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 
 *Affecting all Beats*
 
-- Support dashboard loading without Elasticseach {pull}5653[5653]
+- Support dashboard loading without Elasticsearch {pull}5653[5653]
 - Changed the hashbang used in the beat helper script from `/bin/bash` to `/usr/bin/env bash`. {pull}5051[5051]
 - Changed beat helper script to use `exec` when running the beat. {pull}5051[5051]
 - Fix reloader error message to only print on actual error {pull}5066[5066]
@@ -819,7 +820,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...v6.0.0-beta2[View commit
 
 - Added missing mongodb configuration file to the `modules.d` folder. {pull}4870[4870]
 - Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
-- Add new metrics to CPU metricsset {pull}4969[4969]
+- Add new metrics to CPU metricset {pull}4969[4969]
 
 *Packetbeat*
 
@@ -1504,7 +1505,7 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - Add Filebeat modules for system, apache2, mysql, and nginx. {issue}3159[3159]
 - Add the `pipeline` config option at the prospector level, for configuring the Ingest Node pipeline ID. {pull}3433[3433]
 - Update regular expressions used for matching file names or lines (multiline, include/exclude functionality) to new matchers improving performance of simple string matches. {pull}3469[3469]
-- The `symlinks` and `harverster_limit` settings are now GA, instead of experimental. {pull}3525[3525]
+- The `symlinks` and `harvester_limit` settings are now GA, instead of experimental. {pull}3525[3525]
 - close_timeout is also applied when the output is blocking. {pull}3511[3511]
 - Improve handling of different path variants on Windows. {pull}3781[3781]
 - Add multiline.flush_pattern option, for specifying the 'end' of a multiline pattern {pull}4019[4019]
@@ -1779,7 +1780,7 @@ The list below covers the changes between 5.0.0-rc1 and 5.0.0 GA only.
 
 - Fix high CPU usage on macOS when encountering processes with long command lines. {issue}2747[2747]
 - Fix high value of `system.memory.actual.free` and `system.memory.actual.used`. {issue}2653[2653]
-- Change several `OpenProcess` calls on Windows to request the lowest possible access provilege.  {issue}1897[1897]
+- Change several `OpenProcess` calls on Windows to request the lowest possible access privilege.  {issue}1897[1897]
 - Fix system.memory.actual.free high value on Windows. {issue}2653[2653]
 
 *Filebeat*
@@ -2037,7 +2038,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...v5.0.0-alpha4[View comm
 
 *Affecting all Beats*
 
-- The topology_expire option of the Elasticserach output was removed. {pull}1907[1907]
+- The topology_expire option of the Elasticsearch output was removed. {pull}1907[1907]
 
 *Filebeat*
 
@@ -2534,7 +2535,7 @@ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
 - Add multiline support for combining multiple related lines into one event. {issue}461[461]
 - Add `exclude_lines` and `include_lines` options for regexp based line filtering. {pull}430[430]
 - Add `exclude_files` configuration option. {pull}563[563]
-- Add experimental option to enable filebeat publisher pipeline to operate asynchonrously {pull}782[782]
+- Add experimental option to enable filebeat publisher pipeline to operate asynchronously {pull}782[782]
 
 *Winlogbeat*
 
@@ -2575,7 +2576,7 @@ https://github.com/elastic/beats/compare/1.0.0-rc2...1.0.0[Check 1.0.0 diff]
 *Affecting all Beats*
 
 - Fix random panic on shutdown by calling shutdown handler only once. elastic/filebeat#204
-- Fix credentials are not send when pinging an elasticsearch host. elastic/fileabeat#287
+- Fix credentials are not send when pinging an elasticsearch host. elastic/filebeat#287
 
 *Filebeat*
 

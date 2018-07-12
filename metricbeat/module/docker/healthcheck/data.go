@@ -47,7 +47,7 @@ func eventMapping(cont *types.Container, m *MetricSet) common.MapStr {
 
 	container, err := m.dockerClient.ContainerInspect(context.TODO(), cont.ID)
 	if err != nil {
-		logp.Err("Error inpsecting container %v: %v", cont.ID, err)
+		logp.Err("Error inspecting container %v: %v", cont.ID, err)
 		return nil
 	}
 	lastEvent := len(container.State.Health.Log) - 1

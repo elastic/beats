@@ -130,7 +130,7 @@ func dnsTupleFromIPPort(t *common.IPPortTuple, trans transport, id uint16) dnsTu
 		transport: trans,
 		id:        id,
 	}
-	tuple.computeHashebles()
+	tuple.computeHashables()
 
 	return tuple
 }
@@ -151,7 +151,7 @@ func (t dnsTuple) reverse() dnsTuple {
 	}
 }
 
-func (t *dnsTuple) computeHashebles() {
+func (t *dnsTuple) computeHashables() {
 	copy(t.raw[0:16], t.SrcIP)
 	copy(t.raw[16:18], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
 	copy(t.raw[18:34], t.DstIP)

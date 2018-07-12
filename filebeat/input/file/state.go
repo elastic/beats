@@ -82,7 +82,7 @@ func (s *State) ID() string {
 	return s.Id
 }
 
-// IsEqual compares the state to an other state supporing stringer based on the unique string
+// IsEqual compares the state to an other state supporting stringer based on the unique string
 func (s *State) IsEqual(c *State) bool {
 	return s.ID() == c.ID()
 }

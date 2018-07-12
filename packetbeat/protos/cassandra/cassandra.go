@@ -43,7 +43,7 @@ type connection struct {
 	trans   transactions
 }
 
-// Uni-directioal tcp stream state for parsing messages.
+// Uni-directional tcp stream state for parsing messages.
 type stream struct {
 	parser parser
 }

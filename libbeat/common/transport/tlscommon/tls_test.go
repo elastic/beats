@@ -224,7 +224,7 @@ func TestCertificateFails(t *testing.T) {
 		},
 		{
 			"unknown version",
-			"supported_protocols: [UnknwonTLSv1.1]",
+			"supported_protocols: [UnknownTLSv1.1]",
 		},
 		{
 			"unknown curve type",

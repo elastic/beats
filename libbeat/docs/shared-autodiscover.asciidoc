@@ -184,7 +184,7 @@ In any case, this feature is controlled with two properties:
 
   * `discoveryEnabled`, to enable the feature
   * `discoveryAgentUrl`, if set, this is the URL announced by the agent when
-    being discovered, setting this parameter implicitely enables the feature
+    being discovered, setting this parameter implicitly enables the feature
 
 There are multiple ways of setting these properties, and they can vary from
 application to application, please refer to the documentation of your

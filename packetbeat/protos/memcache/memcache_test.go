@@ -84,7 +84,7 @@ func makeTransactionEvent(t *testing.T, trans *transaction) common.MapStr {
 	return event.Fields
 }
 
-func Test_TryMergeUnmergeableRespnses(t *testing.T) {
+func Test_TryMergeUnmergeableResponses(t *testing.T) {
 	mct := newMemcacheTest(defaultConfig)
 	msg1 := textParseNoFail(t, "STORED\r\n")
 	msg2 := textParseNoFail(t, "0\r\n")

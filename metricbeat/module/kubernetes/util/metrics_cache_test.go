@@ -25,7 +25,7 @@ import (
 )
 
 func TestTimeout(t *testing.T) {
-	// Mocknotonic time:
+	// Mock monotonic time:
 	fakeTimeCh := make(chan int64)
 	go func() {
 		fakeTime := time.Now().Unix()

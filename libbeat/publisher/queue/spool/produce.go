@@ -26,9 +26,9 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
-// forgetfullProducer forwards event to the inBroker. The forgetfullProducer
+// forgetfulProducer forwards event to the inBroker. The forgetfulProducer
 // provides no event ACK handling and no callbacks.
-type forgetfullProducer struct {
+type forgetfulProducer struct {
 	openState openState
 }
 
@@ -89,7 +89,7 @@ func newProducer(
 	}
 
 	if ackCB == nil {
-		return &forgetfullProducer{openState: openState}
+		return &forgetfulProducer{openState: openState}
 	}
 
 	p := &ackProducer{
@@ -103,19 +103,19 @@ func newProducer(
 	return p
 }
 
-func (p *forgetfullProducer) Publish(event publisher.Event) bool {
+func (p *forgetfulProducer) Publish(event publisher.Event) bool {
 	return p.openState.publish(p.makeRequest(event))
 }
 
-func (p *forgetfullProducer) TryPublish(event publisher.Event) bool {
+func (p *forgetfulProducer) TryPublish(event publisher.Event) bool {
 	return p.openState.tryPublish(p.makeRequest(event))
 }
 
-func (p *forgetfullProducer) makeRequest(event publisher.Event) pushRequest {
+func (p *forgetfulProducer) makeRequest(event publisher.Event) pushRequest {
 	return pushRequest{event: event}
 }
 
-func (p *forgetfullProducer) Cancel() int {
+func (p *forgetfulProducer) Cancel() int {
 	p.openState.Close()
 	return 0
 }

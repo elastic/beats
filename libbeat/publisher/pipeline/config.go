@@ -45,7 +45,7 @@ func validateClientConfig(c *beat.ClientConfig) error {
 	case beat.DropIfFull:
 		withDrop = true
 	default:
-		return fmt.Errorf("unknown publishe mode %v", m)
+		return fmt.Errorf("unknown publish mode %v", m)
 	}
 
 	fnCount := 0
