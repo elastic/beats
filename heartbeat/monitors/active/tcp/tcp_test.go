@@ -5,16 +5,16 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/elastic/beats/heartbeat/mapscheme"
 	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/valschema"
 	"github.com/elastic/beats/libbeat/common"
 )
 
 func TestUpEndpoint(t *testing.T) {
-	server := httptest.NewServer(mapscheme.HelloWorldHandler)
+	server := httptest.NewServer(valschema.HelloWorldHandler)
 	defer server.Close()
 
-	port, err := mapscheme.ServerPort(server)
+	port, err := valschema.ServerPort(server)
 	if err != nil {
 		t.FailNow()
 	}
@@ -34,6 +34,6 @@ func TestUpEndpoint(t *testing.T) {
 		t.FailNow()
 	}
 
-	mapscheme.Validate(t, mapscheme.MonitorChecks(fmt.Sprintf("tcp-tcp@localhost:%d", port), "127.0.0.1", "tcp", "up"), event.Fields)
-	mapscheme.Validate(t, mapscheme.TcpChecks(port), event.Fields)
+	valschema.Validate(t, valschema.MonitorChecks(fmt.Sprintf("tcp-tcp@localhost:%d", port), "127.0.0.1", "tcp", "up"), event.Fields)
+	valschema.Validate(t, valschema.TcpChecks(port), event.Fields)
 }
