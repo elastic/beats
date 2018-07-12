@@ -57,6 +57,8 @@ https://github.com/elastic/beats/compare/v6.3.1...6.3[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add support for bearer token files to HTTP helper. {pull}7527[7527]
+
 *Packetbeat*
 
 - Updated the TLS protocol parser with new cipher suites added to TLS 1.3. {issue}7455[7455]

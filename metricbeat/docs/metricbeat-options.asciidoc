@@ -216,3 +216,9 @@ The username to use for basic authentication.
 ==== `password`
 
 The password to use for basic authentication.
+
+[float]
+==== `bearer_token_file`
+
+If defined, Metricbeat will read the contents of the file once at initialization
+and then use the value in an HTTP Authorization header.
