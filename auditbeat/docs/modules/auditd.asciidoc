@@ -67,6 +67,55 @@ from listening to audit messages:
 systemctl mask systemd-journald-audit.socket
 -----
 
+[float]
+=== Inspect the kernel audit system status
+
+{beatname_uc} provides useful commands to query the state of the audit system
+in the Linux kernel.
+
+* See the list of installed audit rules:
++
+[source,shell]
+-----
+auditbeat show auditd-rules
+-----
++
+Prints the list of loaded rules, similar to `auditctl -l`:
++
+[source,shell]
+-----
+-a never,exit -S all -F pid=26253
+-a always,exit -F arch=b32 -S all -F key=32bit-abi
+-a always,exit -F arch=b64 -S execve,execveat -F key=exec
+-a always,exit -F arch=b64 -S connect,accept,bind -F key=external-access
+-w /etc/group -p wa -k identity
+-w /etc/passwd -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+-a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat,open_by_handle_at -F exit=-EACCES -F key=access
+-a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat,open_by_handle_at -F exit=-EPERM -F key=access
+-----
+
+* See the status of the audit system:
++
+[source,shell]
+-----
+auditbeat show auditd-status
+-----
++
+Prints the status of the kernel audit system, similar to `auditctl -s`:
++
+[source,shell]
+-----
+enabled 1
+failure 0
+pid 0
+rate_limit 0
+backlog_limit 8192
+lost 14407
+backlog 0
+backlog_wait_time 0
+features 0xf
+-----
 
 [float]
 === Configuration options
