@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package kubernetes
 
 import (
@@ -54,29 +71,29 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	annotationsMap := generateMapSubset(pod.Metadata.Annotations, g.IncludeAnnotations)
 	meta := common.MapStr{
 		"pod": common.MapStr{
-			"name": pod.Metadata.Name,
+			"name": pod.Metadata.GetName(),
 		},
 		"node": common.MapStr{
-			"name": pod.Spec.NodeName,
+			"name": pod.Spec.GetNodeName(),
 		},
-		"namespace": pod.Metadata.Namespace,
+		"namespace": pod.Metadata.GetNamespace(),
 	}
 
 	// Add Pod UID metadata if enabled
 	if g.IncludePodUID {
-		safemapstr.Put(meta, "pod.uid", pod.Metadata.UID)
+		safemapstr.Put(meta, "pod.uid", pod.Metadata.GetUid())
 	}
 
 	// Add controller metadata if present
 	if g.IncludeCreatorMetadata {
 		for _, ref := range pod.Metadata.OwnerReferences {
-			if ref.Controller {
-				switch ref.Kind {
+			if ref.GetController() {
+				switch ref.GetKind() {
 				// TODO grow this list as we keep adding more `state_*` metricsets
 				case "Deployment",
 					"ReplicaSet",
 					"StatefulSet":
-					safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
+					safemapstr.Put(meta, strings.ToLower(ref.GetKind())+".name", ref.GetName())
 				}
 			}
 		}

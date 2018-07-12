@@ -47,6 +47,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
@@ -357,6 +358,9 @@ Namespace name
 +
 --
 type: keyword
+
+Node host
+
 
 --
 
@@ -3637,6 +3641,53 @@ Total number of memory used by the segments in bytes.
 --
 
 [float]
+== ml.job fields
+
+ml
+
+
+
+*`elasticsearch.ml.job.id`*::
++
+--
+type: keyword
+
+Unique ml job id.
+
+
+--
+
+*`elasticsearch.ml.job.state`*::
++
+--
+type: keyword
+
+Job state.
+
+
+--
+
+*`elasticsearch.ml.job.data_counts.processed_record_count`*::
++
+--
+type: long
+
+Processed data events.
+
+
+--
+
+*`elasticsearch.ml.job.data_counts.invalid_date_count`*::
++
+--
+type: long
+
+The number of records with either a missing date field or a date that could not be parsed.
+
+
+--
+
+[float]
 == node fields
 
 node
@@ -4300,7 +4351,7 @@ number of append requests this node has processed
 
 --
 
-*`etcd.self.recv.bandwithrate`*::
+*`etcd.self.recv.bandwidthrate`*::
 +
 --
 type: scaled_float
@@ -4330,7 +4381,7 @@ number of requests that this node has sent
 
 --
 
-*`etcd.self.send.bandwithrate`*::
+*`etcd.self.send.bandwidthrate`*::
 +
 --
 type: scaled_float
@@ -6724,7 +6775,7 @@ Total number of client disconnects encountered by the server.
 --
 type: long
 
-Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request mulitple server assets at once, and they can re-use established connections.
+Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
 
 
 --
@@ -7065,7 +7116,7 @@ Request latency, number of requests
 --
 type: object
 
-Request latency histagram buckets
+Request latency histogram buckets
 
 
 --
@@ -10237,6 +10288,500 @@ MySQL server status metrics collected from MySQL.
 
 
 [float]
+== galera_status fields
+
+`galera_status` contains the metrics that were obtained by the status SQL query on Galera.
+
+
+
+[float]
+== apply fields
+
+Apply status fields.
+
+
+
+*`mysql.galera_status.apply.oooe`*::
++
+--
+type: double
+
+How often applier started write-set applying out-of-order (parallelization efficiency).
+
+
+--
+
+*`mysql.galera_status.apply.oool`*::
++
+--
+type: double
+
+How often write-set was so slow to apply that write-set with higher seqno's were applied earlier. Values closer to 0 refer to a greater gap between slow and fast write-sets.
+
+
+--
+
+*`mysql.galera_status.apply.window`*::
++
+--
+type: double
+
+Average distance between highest and lowest concurrently applied seqno.
+
+
+--
+
+[float]
+== cert fields
+
+Certification status fields.
+
+
+
+*`mysql.galera_status.cert.deps_distance`*::
++
+--
+type: double
+
+Average distance between highest and lowest seqno value that can be possibly applied in parallel (potential degree of parallelization).
+
+
+--
+
+*`mysql.galera_status.cert.index_size`*::
++
+--
+type: long
+
+The number of entries in the certification index.
+
+
+--
+
+*`mysql.galera_status.cert.interval`*::
++
+--
+type: double
+
+Average number of transactions received while a transaction replicates.
+
+
+--
+
+[float]
+== cluster fields
+
+Cluster status fields.
+
+
+
+*`mysql.galera_status.cluster.conf_id`*::
++
+--
+type: long
+
+Total number of cluster membership changes happened.
+
+
+--
+
+*`mysql.galera_status.cluster.size`*::
++
+--
+type: long
+
+Current number of members in the cluster.
+
+
+--
+
+*`mysql.galera_status.cluster.status`*::
++
+--
+type: keyword
+
+Status of this cluster component. That is, whether the node is part of a PRIMARY or NON_PRIMARY component.
+
+
+--
+
+[float]
+== commit fields
+
+Commit status fields.
+
+
+
+*`mysql.galera_status.commit.oooe`*::
++
+--
+type: double
+
+How often a transaction was committed out of order.
+
+
+--
+
+*`mysql.galera_status.commit.window`*::
++
+--
+type: long
+
+Average distance between highest and lowest concurrently committed seqno.
+
+
+--
+
+*`mysql.galera_status.connected`*::
++
+--
+type: keyword
+
+If the value is OFF, the node has not yet connected to any of the cluster components. This may be due to misconfiguration. Check the error log for proper diagnostics.
+
+
+--
+
+[float]
+== evs fields
+
+Evs Fields.
+
+
+
+*`mysql.galera_status.evs.evict`*::
++
+--
+type: keyword
+
+Lists the UUID's of all nodes evicted from the cluster. Evicted nodes cannot rejoin the cluster until you restart their mysqld processes.
+
+
+--
+
+*`mysql.galera_status.evs.state`*::
++
+--
+type: keyword
+
+Shows the internal state of the EVS Protocol.
+
+
+--
+
+[float]
+== flow_ctl fields
+
+Flow Control fields.
+
+
+
+*`mysql.galera_status.flow_ctl.paused`*::
++
+--
+type: double
+
+The fraction of time since the last FLUSH STATUS command that replication was paused due to flow control. In other words, how much the slave lag is slowing down the cluster.
+
+
+--
+
+*`mysql.galera_status.flow_ctl.paused_ns`*::
++
+--
+type: long
+
+The total time spent in a paused state measured in nanoseconds.
+
+
+--
+
+*`mysql.galera_status.flow_ctl.recv`*::
++
+--
+type: long
+
+Returns the number of FC_PAUSE events the node has received, including those the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
+
+
+--
+
+*`mysql.galera_status.flow_ctl.sent`*::
++
+--
+type: long
+
+Returns the number of FC_PAUSE events the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
+
+
+--
+
+*`mysql.galera_status.last_committed`*::
++
+--
+type: long
+
+The sequence number, or seqno, of the last committed transaction.
+
+
+--
+
+[float]
+== local fields
+
+Node specific Cluster status fields.
+
+
+
+*`mysql.galera_status.local.bf_aborts`*::
++
+--
+type: long
+
+Total number of local transactions that were aborted by slave transactions while in execution.
+
+
+--
+
+*`mysql.galera_status.local.cert_failures`*::
++
+--
+type: long
+
+Total number of local transactions that failed certification test.
+
+
+--
+
+*`mysql.galera_status.local.commits`*::
++
+--
+type: long
+
+Total number of local transactions committed.
+
+
+--
+
+[float]
+== recv fields
+
+Node specific recv fields.
+
+
+
+*`mysql.galera_status.local.recv.queue`*::
++
+--
+type: long
+
+Current (instantaneous) length of the recv queue.
+
+
+--
+
+*`mysql.galera_status.local.recv.queue_avg`*::
++
+--
+type: double
+
+Recv queue length averaged over interval since the last FLUSH STATUS command. Values considerably larger than 0.0 mean that the node cannot apply write-sets as fast as they are received and will generate a lot of replication throttling.
+
+
+--
+
+*`mysql.galera_status.local.recv.queue_max`*::
++
+--
+type: long
+
+The maximum length of the recv queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.recv.queue_min`*::
++
+--
+type: long
+
+The minimum length of the recv queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.replays`*::
++
+--
+type: long
+
+Total number of transaction replays due to asymmetric lock granularity.
+
+
+--
+
+[float]
+== send fields
+
+Node specific sent fields.
+
+
+
+*`mysql.galera_status.local.send.queue`*::
++
+--
+type: long
+
+Current (instantaneous) length of the send queue.
+
+
+--
+
+*`mysql.galera_status.local.send.queue_avg`*::
++
+--
+type: double
+
+Send queue length averaged over time since the last FLUSH STATUS command. Values considerably larger than 0.0 indicate replication throttling or network throughput issue.
+
+
+--
+
+*`mysql.galera_status.local.send.queue_max`*::
++
+--
+type: long
+
+The maximum length of the send queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.send.queue_min`*::
++
+--
+type: long
+
+The minimum length of the send queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.state`*::
++
+--
+type: keyword
+
+Internal Galera Cluster FSM state number.
+
+
+--
+
+*`mysql.galera_status.ready`*::
++
+--
+type: keyword
+
+Whether the server is ready to accept queries.
+
+
+--
+
+[float]
+== received fields
+
+Write-Set receive status fields.
+
+
+
+*`mysql.galera_status.received.count`*::
++
+--
+type: long
+
+Total number of write-sets received from other nodes.
+
+
+--
+
+*`mysql.galera_status.received.bytes`*::
++
+--
+type: long
+
+Total size of write-sets received from other nodes.
+
+
+--
+
+[float]
+== repl fields
+
+Replication status fields.
+
+
+
+*`mysql.galera_status.repl.data_bytes`*::
++
+--
+type: long
+
+Total size of data replicated.
+
+
+--
+
+*`mysql.galera_status.repl.keys`*::
++
+--
+type: long
+
+Total number of keys replicated.
+
+
+--
+
+*`mysql.galera_status.repl.keys_bytes`*::
++
+--
+type: long
+
+Total size of keys replicated.
+
+
+--
+
+*`mysql.galera_status.repl.other_bytes`*::
++
+--
+type: long
+
+Total size of other bits replicated.
+
+
+--
+
+*`mysql.galera_status.repl.count`*::
++
+--
+type: long
+
+Total number of write-sets replicated (sent to other nodes).
+
+
+--
+
+*`mysql.galera_status.repl.bytes`*::
++
+--
+type: long
+
+Total size of write-sets replicated.
+
+
+--
+
+[float]
 == status fields
 
 `status` contains the metrics that were obtained by the status SQL query.
@@ -13139,7 +13684,7 @@ Total number of connections rejected.
 --
 type: long
 
-Total number of commands preocessed.
+Total number of commands processed.
 
 --
 
@@ -15918,6 +16463,74 @@ type: long
 format: duration
 
 The OS uptime in milliseconds.
+
+
+--
+
+[[exported-fields-traefik]]
+== traefik fields
+
+Traefik reverse proxy / load balancer metrics
+
+
+
+[float]
+== traefik fields
+
+Traefik reverse proxy / load balancer metrics
+
+
+
+[float]
+== health fields
+
+Metrics obtained from Traefik's health API endpoint
+
+
+
+*`traefik.health.uptime.sec`*::
++
+--
+type: long
+
+Uptime of Traefik instance in seconds
+
+
+--
+
+[float]
+== response fields
+
+Response metrics
+
+
+
+*`traefik.health.response.count`*::
++
+--
+type: long
+
+Number of responses
+
+
+--
+
+*`traefik.health.response.avg_time.us`*::
++
+--
+type: long
+
+Average response time in microseconds
+
+
+--
+
+*`traefik.health.response.status_code`*::
++
+--
+type: object
+
+Number of responses per status code
 
 
 --

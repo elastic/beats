@@ -4,8 +4,13 @@ var:
   - name: paths
     default:
       - /var/log/elasticsearch/gc.log.[0-9]*
-    os.darwin: []
-    os.windows: []
+      - /var/log/elasticsearch/gc.log
+    os.darwin:
+      - /usr/local/elasticsearch/gc.log.[0-9]*
+      - /usr/local/elasticsearch/gc.log
+    os.windows:
+      - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log.*
+      - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log
 
 ingest_pipeline: ingest/pipeline.json
 input: config/gc.yml

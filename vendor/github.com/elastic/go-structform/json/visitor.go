@@ -19,6 +19,8 @@ type Visitor struct {
 
 	first   boolStack
 	inArray boolStack
+
+	escapeSet []bool
 }
 
 type boolStack struct {
@@ -29,8 +31,30 @@ type boolStack struct {
 
 var _ structform.Visitor = &Visitor{}
 
+var htmlEscapeSet = [utf8.RuneSelf]bool{}
+var jsonEscapeSet = [utf8.RuneSelf]bool{}
+
 type writer struct {
 	out io.Writer
+}
+
+func init() {
+	// control characters must be escaped
+	for i := 0; i < 32; i++ {
+		htmlEscapeSet[i] = true
+		jsonEscapeSet[i] = true
+	}
+
+	// json string required escaping
+	for _, c := range "\"\\" {
+		htmlEscapeSet[c] = true
+		jsonEscapeSet[c] = true
+	}
+
+	// html escaping
+	for _, c := range "&<>" {
+		htmlEscapeSet[c] = true
+	}
 }
 
 func (w writer) write(b []byte) error {
@@ -39,8 +63,16 @@ func (w writer) write(b []byte) error {
 }
 
 func NewVisitor(out io.Writer) *Visitor {
-	v := &Visitor{w: writer{out}}
+	v := &Visitor{w: writer{out}, escapeSet: htmlEscapeSet[:]}
 	return v
+}
+
+func (v *Visitor) SetEscapeHTML(b bool) {
+	if b {
+		v.escapeSet = htmlEscapeSet[:]
+	} else {
+		v.escapeSet = jsonEscapeSet[:]
+	}
 }
 
 func (vs *Visitor) writeByte(b byte) error {
@@ -139,14 +171,17 @@ func (vs *Visitor) OnString(s string) error {
 		return err
 	}
 
+	escapeSet := vs.escapeSet
+
 	vs.writeByte('"')
 	start := 0
 	for i := 0; i < len(s); {
 		if b := s[i]; b < utf8.RuneSelf {
-			if 0x20 <= b && b != '\\' && b != '"' && b != '<' && b != '>' && b != '&' {
+			if !escapeSet[b] {
 				i++
 				continue
 			}
+
 			if start < i {
 				vs.writeString(s[start:i])
 			}

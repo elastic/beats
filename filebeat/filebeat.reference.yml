@@ -98,6 +98,24 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+  audit:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  slowlog:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  deprecation:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Icinga Module -------------------------------
 #- module: icinga
   # Main logs
@@ -444,7 +462,7 @@ filebeat.inputs:
 
   ### Multiline options
 
-  # Mutiline can be used for log messages spanning multiple lines. This is common
+  # Multiline can be used for log messages spanning multiple lines. This is common
   # for Java Stack Traces or C-Line Continuation
 
   # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
@@ -476,7 +494,7 @@ filebeat.inputs:
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
-  # If symlinks is enabled, symlinks are opened and harvested. The harvester is openening the
+  # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
   # original for harvesting but will report the symlink name as source.
   #symlinks: false
 
@@ -977,6 +995,9 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 0
 
+  # Configure escaping html symbols in strings.
+  #escape_html: true
+
   # Optional protocol and basic auth credentials.
   #protocol: "https"
   #username: "elastic"
@@ -1081,6 +1102,9 @@ output.elasticsearch:
 
   # Set gzip compression level.
   #compression_level: 3
+
+  # Configure escaping html symbols in strings.
+  #escape_html: true
 
   # Optional maximum time to live for a connection to Logstash, after which the
   # connection will be re-established.  A value of `0s` (the default) will
@@ -1193,9 +1217,16 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version filebeat is assumed to run against. Defaults to the oldest
-  # supported stable version (currently version 0.8.2.0)
-  #version: 0.8.2
+  # Kafka version filebeat is assumed to run against. Defaults to the "1.0.0".
+  #version: '1.0.0'
+
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
 
   # Metadata update configuration. Metadata do contain leader information
   # deciding which broker to use when publishing.
@@ -1299,6 +1330,14 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
+
   # The list of Redis servers to connect to. If load balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
@@ -1400,6 +1439,14 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
+
   # Path to the directory where to save the generated files. The option is
   # mandatory.
   #path: "/tmp/filebeat"
@@ -1427,8 +1474,13 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
-  # Pretty print json event
-  #pretty: false
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
 
 #================================= Paths ======================================
 
@@ -1750,6 +1802,9 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  #metrics.period: 10s
+  #state.period: 1m
 
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security

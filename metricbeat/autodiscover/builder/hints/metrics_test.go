@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package hints
 
 import (
@@ -152,6 +169,41 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
+			message: "Module with processor config must return an module having the processor defined",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:9090",
+						"processors": common.MapStr{
+							"add_locale": common.MapStr{
+								"abbrevation": "MST",
+							},
+						},
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module":     "mockmoduledefaults",
+				"namespace":  "test",
+				"metricsets": []string{"default"},
+				"timeout":    "3s",
+				"period":     "1m",
+				"enabled":    true,
+				"hosts":      []interface{}{"1.2.3.4:9090"},
+				"processors": []interface{}{
+					map[string]interface{}{
+						"add_locale": map[string]interface{}{
+							"abbrevation": "MST",
+						},
+					},
+				},
+			},
+		},
+		{
 			message: "Module, namespace, host hint should return valid config",
 			event: bus.Event{
 				"host": "1.2.3.4",
@@ -195,7 +247,7 @@ func TestGenerateHints(t *testing.T) {
 			err := cfgs[0].Unpack(&config)
 			assert.Nil(t, err, test.message)
 
-			// metricests order is random, order it for tests
+			// metricsets order is random, order it for tests
 			if v, err := config.GetValue("metricsets"); err == nil {
 				if msets, ok := v.([]interface{}); ok {
 					metricsets := make([]string, len(msets))

@@ -20,13 +20,19 @@ package rule
 import "github.com/elastic/go-libaudit/auparse"
 
 var (
-	reverseSyscall map[string]map[string]int
-	reverseArch    map[string]uint32
+	reverseSyscall          map[string]map[string]int
+	reverseArch             map[string]uint32
+	reverseOperatorsTable   map[operator]string
+	reverseFieldsTable      map[field]string
+	reverseComparisonsTable map[comparison][2]field
 )
 
 func init() {
 	buildReverseSyscallTable()
 	buildReverseArchTable()
+	buildReverseOperatorsTable()
+	buildReverseFieldsTable()
+	buildReverseComparisonsTable()
 }
 
 func buildReverseSyscallTable() {
@@ -47,6 +53,31 @@ func buildReverseArchTable() {
 
 	for arch, name := range auparse.AuditArchNames {
 		reverseArch[name] = uint32(arch)
+	}
+}
+
+func buildReverseOperatorsTable() {
+	reverseOperatorsTable = make(map[operator]string, len(operatorsTable))
+	for k, v := range operatorsTable {
+		reverseOperatorsTable[v] = k
+	}
+}
+
+func buildReverseFieldsTable() {
+	reverseFieldsTable = make(map[field]string, len(fieldsTable))
+	for k, v := range fieldsTable {
+		reverseFieldsTable[v] = k
+	}
+}
+
+func buildReverseComparisonsTable() {
+	reverseComparisonsTable = make(map[comparison][2]field, len(comparisonsTable))
+	for lhs, table := range comparisonsTable {
+		for rhs, comp := range table {
+			if _, found := reverseComparisonsTable[comp]; !found {
+				reverseComparisonsTable[comp] = [2]field{lhs, rhs}
+			}
+		}
 	}
 }
 

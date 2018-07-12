@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package jmx
 
 import (
@@ -126,7 +143,7 @@ func buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, AttributeMapping
 
 	// At least Jolokia 1.5 responses with canonicalized MBean names when using
 	// wildcards, even when canonicalNaming is set to false, this makes mappings to fail.
-	// So use canonicalzed names everywhere.
+	// So use canonicalized names everywhere.
 	// If Jolokia returns non-canonicalized MBean names, then we'll need to canonicalize
 	// them or change our approach to mappings.
 	config := map[string]interface{}{

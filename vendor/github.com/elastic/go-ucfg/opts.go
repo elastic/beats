@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package ucfg
 
 import (
@@ -16,6 +33,8 @@ type options struct {
 	env          []*Config
 	resolvers    []func(name string) (string, error)
 	varexp       bool
+
+	configValueHandling configHandling
 
 	// temporary cache of parsed splice values for lifetime of call to
 	// Unpack/Pack/Get/...
@@ -102,6 +121,29 @@ func doResolveEnv(o *options) {
 		}
 		return value, nil
 	})
+}
+
+var (
+	// ReplacesValues option configures all merging and unpacking operations to
+	// replace old dictionaries and arrays while merging. Value merging can be
+	// overwritten in unpack by using struct tags.
+	ReplaceValues = makeOptValueHandling(cfgReplaceValue)
+
+	// AppendValues option configures all merging and unpacking operations to
+	// merge dictionaries and append arrays to existing arrays while merging.
+	// Value merging can be overwritten in unpack by using struct tags.
+	AppendValues = makeOptValueHandling(cfgArrAppend)
+
+	// PrependValues option configures all merging and unpacking operations to
+	// merge dictionaries and prepend arrays to existing arrays while merging.
+	// Value merging can be overwritten in unpack by using struct tags.
+	PrependValues = makeOptValueHandling(cfgArrPrepend)
+)
+
+func makeOptValueHandling(h configHandling) Option {
+	return func(o *options) {
+		o.configValueHandling = h
+	}
 }
 
 // VarExp option enables support for variable expansion. Resolve and Env options will only be effective if  VarExp is set.

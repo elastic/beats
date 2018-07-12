@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package main
 
 import (
@@ -14,7 +31,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const defaultGlob = "module/*/_meta/config*.yml.tpl"
+const defaultGlob = "module/*/_meta/config*.yml.tmpl"
 
 var (
 	goos      = flag.String("os", runtime.GOOS, "generate config specific to the specified operating system")
@@ -35,26 +52,29 @@ func findConfigFiles(globs []string) ([]string, error) {
 	return configFiles, nil
 }
 
+// archBits returns the number of bit width of the GOARCH architecture value.
+// This function is used by the auditd module configuration templates to
+// generate architecture specific audit rules.
+func archBits(goarch string) int {
+	switch goarch {
+	case "386", "arm":
+		return 32
+	default:
+		return 64
+	}
+}
+
 func getConfig(file string) ([]byte, error) {
 	tpl, err := template.ParseFiles(file)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed reading %v", file)
 	}
 
-	var archBits string
-	switch *goarch {
-	case "i386":
-		archBits = "32"
-	case "amd64":
-		archBits = "64"
-	default:
-		return nil, fmt.Errorf("supporting only i386 and amd64 architecture")
-	}
 	data := map[string]interface{}{
-		"goarch":    *goarch,
-		"goos":      *goos,
-		"reference": *reference,
-		"arch_bits": archBits,
+		"GOARCH":    *goarch,
+		"GOOS":      *goos,
+		"Reference": *reference,
+		"ArchBits":  archBits,
 	}
 	buf := new(bytes.Buffer)
 	if err = tpl.Execute(buf, data); err != nil {
@@ -109,7 +129,7 @@ func main() {
 		if *concat {
 			segments = append(segments, segment)
 		} else {
-			output(segment, strings.TrimSuffix(file, ".tpl"))
+			output(segment, strings.TrimSuffix(file, ".tmpl"))
 		}
 	}
 

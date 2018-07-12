@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package jolokia
 
 import (
@@ -41,14 +58,14 @@ import (
 // Message contains the information of a Jolokia Discovery message
 var messageSchema = s.Schema{
 	"agent": s.Object{
-		"id":      c.Str("agent_id"),
-		"version": c.Str("agent_version", s.Optional),
+		"id":      c.Str("agent_id", s.Required),
+		"version": c.Str("agent_version"),
 	},
-	"secured": c.Bool("secured", s.Optional),
+	"secured": c.Bool("secured"),
 	"server": s.Object{
-		"product": c.Str("server_product", s.Optional),
-		"vendor":  c.Str("server_vendor", s.Optional),
-		"version": c.Str("server_version", s.Optional),
+		"product": c.Str("server_product"),
+		"vendor":  c.Str("server_vendor"),
+		"version": c.Str("server_version"),
 	},
 	"url": c.Str("url"),
 }
@@ -228,7 +245,11 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 					logp.Err(err.Error())
 					continue
 				}
-				message, _ := messageSchema.Apply(m)
+				message, err := messageSchema.Apply(m, s.FailOnRequired)
+				if err != nil {
+					logp.Err(err.Error())
+					continue
+				}
 				d.update(config, message)
 			}
 		}()

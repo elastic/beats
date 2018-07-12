@@ -1,0 +1,34 @@
+{
+  "description": "Pipeline for parsing elasticsearch slowlog logs",
+  "processors": [
+      {
+          "rename": {
+              "field": "@timestamp",
+              "target_field": "event.created"
+          }
+      },
+      {
+          "grok": {
+              "field": "message",
+              "pattern_definitions" : {
+                  "GREEDYMULTILINE" : "(.|\n)*"
+              },
+              "patterns": [
+                  "\\[%{TIMESTAMP_ISO8601:elasticsearch.slowlog.timestamp}\\]\\[%{WORD:log.level}(\\s*)?\\](\\s*)?\\[%{DATA:elasticsearch.slowlog.logger}\\]\\s*\\[%{WORD:elasticsearch.node.name}\\]\\s*\\[%{DATA:elasticsearch.index.name}\\](\\s*)?(\\[%{DATA:elasticsearch.shard.id}\\])?\\s*(took\\[%{DATA:elasticsearch.slowlog.took}\\],)?\\s*(took_millis\\[%{NUMBER:elasticsearch.slowlog.took_millis:int}\\],)?\\s*(type\\[%{DATA:elasticsearch.slowlog.type}\\],)?\\s*(id\\[%{DATA:elasticsearch.slowlog.id}\\],)?\\s*(routing\\[%{DATA:elasticsearch.slowlog.routing}\\],)?\\s*(total_hits\\[%{NUMBER:elasticsearch.slowlog.total_hits:int}\\],)?\\s*(types\\[%{DATA:elasticsearch.slowlog.types}\\],)?\\s*(stats\\[%{DATA:elasticsearch.slowlog.stats}\\],)?\\s*(search_type\\[%{DATA:elasticsearch.slowlog.search_type}\\],)?\\s*(total_shards\\[%{NUMBER:elasticsearch.slowlog.total_shards:int}\\],)?\\s*(source\\[%{GREEDYMULTILINE:elasticsearch.slowlog.source_query}\\])?,?\\s*(extra_source\\[%{DATA:elasticsearch.slowlog.extra_source}\\])?,?"
+              ]
+          }
+      },
+      {
+          "rename": {
+              "field": "elasticsearch.slowlog.timestamp",
+              "target_field": "@timestamp"
+          }
+      }
+    ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

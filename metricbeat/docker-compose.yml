@@ -35,6 +35,7 @@ services:
       - ./module/prometheus/_meta/env
       - ./module/rabbitmq/_meta/env
       - ./module/redis/_meta/env
+      - ./module/traefik/_meta/env
       - ./module/uwsgi/_meta/env
       - ./module/zookeeper/_meta/env
 
@@ -146,6 +147,9 @@ services:
 
   redis:
     build: ./module/redis/_meta
+
+  traefik:
+    build: ./module/traefik/_meta
 
   uwsgi_tcp:
     build: ./module/uwsgi/_meta

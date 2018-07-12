@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package add_kubernetes_metadata
 
 import (
@@ -43,7 +60,7 @@ type Indexers struct {
 // IndexerConstructor builds a new indexer from its settings
 type IndexerConstructor func(config common.Config, metaGen kubernetes.MetaGenerator) (Indexer, error)
 
-// NewIndexers  builds indexers object
+// NewIndexers builds indexers object
 func NewIndexers(configs PluginConfig, metaGen kubernetes.MetaGenerator) *Indexers {
 	indexers := []Indexer{}
 	for _, pluginConfigs := range configs {
@@ -57,6 +74,7 @@ func NewIndexers(configs PluginConfig, metaGen kubernetes.MetaGenerator) *Indexe
 			indexer, err := indexFunc(pluginConfig, metaGen)
 			if err != nil {
 				logp.Warn("Unable to initialize indexing plugin %s due to error %v", name, err)
+				continue
 			}
 
 			indexers = append(indexers, indexer)
@@ -96,6 +114,8 @@ func (i *Indexers) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // Empty returns true if indexers list is empty
 func (i *Indexers) Empty() bool {
+	i.RLock()
+	defer i.RUnlock()
 	if len(i.indexers) == 0 {
 		return true
 	}
@@ -118,7 +138,7 @@ func (p *PodNameIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	data := p.metaGen.PodMetadata(pod)
 	return []MetadataIndex{
 		{
-			Index: fmt.Sprintf("%s/%s", pod.Metadata.Namespace, pod.Metadata.Name),
+			Index: fmt.Sprintf("%s/%s", pod.Metadata.GetNamespace(), pod.Metadata.GetName()),
 			Data:  data,
 		},
 	}
@@ -126,7 +146,7 @@ func (p *PodNameIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // GetIndexes returns the indexes for the given Pod
 func (p *PodNameIndexer) GetIndexes(pod *kubernetes.Pod) []string {
-	return []string{fmt.Sprintf("%s/%s", pod.Metadata.Namespace, pod.Metadata.Name)}
+	return []string{fmt.Sprintf("%s/%s", pod.Metadata.GetNamespace(), pod.Metadata.GetName())}
 }
 
 // PodUIDIndexer indexes pods based on the pod UID
@@ -144,7 +164,7 @@ func (p *PodUIDIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	data := p.metaGen.PodMetadata(pod)
 	return []MetadataIndex{
 		{
-			Index: pod.Metadata.UID,
+			Index: pod.Metadata.GetUid(),
 			Data:  data,
 		},
 	}
@@ -152,7 +172,7 @@ func (p *PodUIDIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // GetIndexes returns the indexes for the given Pod
 func (p *PodUIDIndexer) GetIndexes(pod *kubernetes.Pod) []string {
-	return []string{pod.Metadata.UID}
+	return []string{pod.Metadata.GetUid()}
 }
 
 // ContainerIndexer indexes pods based on all their containers IDs
@@ -169,13 +189,13 @@ func NewContainerIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Ind
 func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var metadata []MetadataIndex
 	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
-		cID := status.GetContainerID()
+		cID := kubernetes.ContainerID(status)
 		if cID == "" {
 			continue
 		}
 		metadata = append(metadata, MetadataIndex{
 			Index: cID,
-			Data:  c.metaGen.ContainerMetadata(pod, status.Name),
+			Data:  c.metaGen.ContainerMetadata(pod, status.GetName()),
 		})
 	}
 
@@ -186,7 +206,7 @@ func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 func (c *ContainerIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	var containers []string
 	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
-		cID := status.GetContainerID()
+		cID := kubernetes.ContainerID(status)
 		if cID == "" {
 			continue
 		}
@@ -209,23 +229,23 @@ func NewIPPortIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Indexe
 func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var metadata []MetadataIndex
 
-	if pod.Status.PodIP == "" {
+	if pod.Status.GetPodIP() == "" {
 		return metadata
 	}
 
 	// Add pod IP
 	metadata = append(metadata, MetadataIndex{
-		Index: pod.Status.PodIP,
+		Index: pod.Status.GetPodIP(),
 		Data:  h.metaGen.PodMetadata(pod),
 	})
 
 	for _, container := range pod.Spec.Containers {
 		for _, port := range container.Ports {
-			if port.ContainerPort != int64(0) {
+			if port.GetContainerPort() != 0 {
 
 				metadata = append(metadata, MetadataIndex{
-					Index: fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort),
-					Data:  h.metaGen.ContainerMetadata(pod, container.Name),
+					Index: fmt.Sprintf("%s:%d", pod.Status.GetPodIP(), port.GetContainerPort()),
+					Data:  h.metaGen.ContainerMetadata(pod, container.GetName()),
 				})
 			}
 		}
@@ -238,19 +258,19 @@ func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 func (h *IPPortIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	var hostPorts []string
 
-	if pod.Status.PodIP == "" {
+	if pod.Status.GetPodIP() == "" {
 		return hostPorts
 	}
 
 	// Add pod IP
-	hostPorts = append(hostPorts, pod.Status.PodIP)
+	hostPorts = append(hostPorts, pod.Status.GetPodIP())
 
 	for _, container := range pod.Spec.Containers {
 		ports := container.Ports
 
 		for _, port := range ports {
-			if port.ContainerPort != int64(0) {
-				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort))
+			if port.GetContainerPort() != 0 {
+				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", pod.Status.GetPodIP(), port.GetContainerPort()))
 			}
 		}
 	}
