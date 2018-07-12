@@ -28,7 +28,7 @@ func getBeat(name, version string) (*instance.Beat, error) {
 func genEnrollCmd(name, version string) *cobra.Command {
 	keystoreCmd := cobra.Command{
 		Use:   "enroll <kibana_url> <enrollment_token>",
-		Short: "Enroll Kibana for Central Management",
+		Short: "Enroll in Kibana for Central Management",
 		Args:  cobra.ExactArgs(2),
 		Run: cli.RunWith(func(cmd *cobra.Command, args []string) error {
 			beat, err := getBeat(name, version)

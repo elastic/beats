@@ -17,7 +17,6 @@ type Config struct {
 	// true when enrolled
 	Enabled bool
 
-	// TODO use beat.Keystore() for access_token
 	AccessToken string
 
 	Kibana *kibana.ClientConfig
@@ -30,7 +29,7 @@ type Config struct {
 
 // Load settings from its source file
 func (c *Config) Load() error {
-	path := paths.Resolve(paths.Data, "management.yaml")
+	path := paths.Resolve(paths.Data, "management.yml")
 	config, err := common.LoadFile(path)
 	if err != nil {
 		return err
@@ -43,9 +42,9 @@ func (c *Config) Load() error {
 	return nil
 }
 
-// Save settings to management.yaml file
+// Save settings to management.yml file
 func (c *Config) Save() error {
-	path := paths.Resolve(paths.Data, "management.yaml")
+	path := paths.Resolve(paths.Data, "management.yml")
 
 	data, err := yaml.Marshal(c)
 	if err != nil {
@@ -53,7 +52,6 @@ func (c *Config) Save() error {
 	}
 
 	// write temporary file first
-	// TODO this should be owned by the beats user, ensure that
 	tempFile := path + ".new"
 	f, err := os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
