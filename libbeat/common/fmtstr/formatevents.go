@@ -107,7 +107,7 @@ func releaseCtx(c *eventEvalContext) {
 	eventCtxPool.Put(c)
 }
 
-// MustCompileEvent copmiles an event format string into an runnable
+// MustCompileEvent compiles an event format string into an runnable
 // EventFormatString. Generates a panic if compilation fails.
 func MustCompileEvent(in string) *EventFormatString {
 	fs, err := CompileEvent(in)

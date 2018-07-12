@@ -359,6 +359,9 @@ Namespace name
 --
 type: keyword
 
+Node host
+
+
 --
 
 *`aerospike.namespace.node.name`*::
@@ -3638,6 +3641,53 @@ Total number of memory used by the segments in bytes.
 --
 
 [float]
+== ml.job fields
+
+ml
+
+
+
+*`elasticsearch.ml.job.id`*::
++
+--
+type: keyword
+
+Unique ml job id.
+
+
+--
+
+*`elasticsearch.ml.job.state`*::
++
+--
+type: keyword
+
+Job state.
+
+
+--
+
+*`elasticsearch.ml.job.data_counts.processed_record_count`*::
++
+--
+type: long
+
+Processed data events.
+
+
+--
+
+*`elasticsearch.ml.job.data_counts.invalid_date_count`*::
++
+--
+type: long
+
+The number of records with either a missing date field or a date that could not be parsed.
+
+
+--
+
+[float]
 == node fields
 
 node
@@ -4301,7 +4351,7 @@ number of append requests this node has processed
 
 --
 
-*`etcd.self.recv.bandwithrate`*::
+*`etcd.self.recv.bandwidthrate`*::
 +
 --
 type: scaled_float
@@ -4331,7 +4381,7 @@ number of requests that this node has sent
 
 --
 
-*`etcd.self.send.bandwithrate`*::
+*`etcd.self.send.bandwidthrate`*::
 +
 --
 type: scaled_float
@@ -6725,7 +6775,7 @@ Total number of client disconnects encountered by the server.
 --
 type: long
 
-Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request mulitple server assets at once, and they can re-use established connections.
+Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
 
 
 --
@@ -7066,7 +7116,7 @@ Request latency, number of requests
 --
 type: object
 
-Request latency histagram buckets
+Request latency histogram buckets
 
 
 --
@@ -13634,7 +13684,7 @@ Total number of connections rejected.
 --
 type: long
 
-Total number of commands preocessed.
+Total number of commands processed.
 
 --
 

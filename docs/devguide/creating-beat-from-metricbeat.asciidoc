@@ -86,7 +86,7 @@ This will run the beat with debug output enabled to the console to directly see 
 [float]
 ==== Step 5 - Package
 
-To create packages and binaries for different plaforms, https://www.docker.com/[docker] is required.
+To create packages and binaries for different platforms, https://www.docker.com/[docker] is required.
 The first step is to get the most recent packaging tools into your beat:
 
 [source,bash]

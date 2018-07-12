@@ -104,7 +104,7 @@ func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
 	}
 	frame.Type = frameType(data[0])
 	if frame.size == 0 {
-		//frame content is nil with hearbeat frames
+		//frame content is nil with heartbeat frames
 		frame.content = nil
 	} else {
 		frame.content = data[7 : frame.size+7]

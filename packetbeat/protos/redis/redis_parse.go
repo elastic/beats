@@ -270,7 +270,7 @@ func (p *parser) parse(buf *streambuf.Buffer) (bool, bool) {
 	content, iserror, ok, complete := p.dispatch(0, buf)
 	if !ok || !complete {
 		// on error or incomplete message drop all parsing progress, due to
-		// parse not being statefull among multiple calls
+		// parse not being stateful among multiple calls
 		// => parser needs to restart parsing all content
 		buf.Restore(snapshot)
 		return ok, complete

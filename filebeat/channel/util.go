@@ -88,7 +88,7 @@ func (o *subOutlet) OnEvent(d *util.Data) bool {
 			//  update state on 'true' response).
 			//  The state update will appear after the current event in the publisher pipeline.
 			//  That is, by returning true here, the final state update will
-			//  be presented to the reigstrar, after the last event being processed.
+			//  be presented to the registrar, after the last event being processed.
 			//  Once all messages are in the publisher pipeline, in correct order,
 			//  it depends on registrar/publisher pipeline if state is finally updated
 			//  in the registrar.

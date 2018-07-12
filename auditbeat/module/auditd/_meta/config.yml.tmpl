@@ -12,6 +12,8 @@
   include_raw_message: false
   include_warnings: false
   {{ end -}}
+  # Load audit rules from separate files. Same format as audit.rules(7).
+  audit_rule_files: [ '${path.config}/audit.rules.d/*.conf' ]
   audit_rules: |
     ## Define audit rules here.
     ## Create file watches (-w) or syscall audits (-a or -A). Uncomment these

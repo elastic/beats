@@ -230,7 +230,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 		}
 
 		// Hard coded index prefix for monitoring, no detection done for ES version at the moment
-		// It has an additonal md in the name to make it clear the data is coming from metricbeat
+		// It has an additional md in the name to make it clear the data is coming from metricbeat
 		event.Index = ".monitoring-es-6-mb"
 		r.Event(event)
 	}

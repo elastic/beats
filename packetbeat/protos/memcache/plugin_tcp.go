@@ -394,7 +394,7 @@ func (mc *memcache) GapInStream(
 		}
 	}
 
-	// need to drop TCP stream. But try to publish all cached trancsactions first
+	// need to drop TCP stream. But try to publish all cached transactions first
 	mc.pushAllTCPTrans(conn.connection)
 	return private, true
 }

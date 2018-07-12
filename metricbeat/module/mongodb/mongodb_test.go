@@ -66,7 +66,7 @@ func TestParseMongoURL(t *testing.T) {
 			ExpectedPassword: "secret",
 		},
 		{
-			Name:     "username and password do not overwride",
+			Name:     "username and password do not override",
 			URL:      "mongodb://user:secret@localhost:40001",
 			Username: "anotheruser",
 			Password: "anotherpass",

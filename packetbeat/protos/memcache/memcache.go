@@ -172,7 +172,7 @@ func (mc *memcache) setFromConfig(config *memcacheConfig) error {
 		mc.config.maxBytesPerValue = config.MaxBytesPerValue
 	}
 
-	mc.config.parseUnkown = config.ParseUnknown
+	mc.config.parseUnknown = config.ParseUnknown
 
 	mc.udpConfig.transTimeout = config.UDPTransactionTimeout
 	mc.tcpConfig.tcpTransTimeout = config.TransactionTimeout

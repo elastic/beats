@@ -800,22 +800,55 @@ elasticsearch Module
 
 
 
+*`elasticsearch.node.name`*::
++
+--
+type: keyword
+
+example: vWNJsZ3
+
+Name of the node
+
+--
+
+*`elasticsearch.index.name`*::
++
+--
+type: keyword
+
+example: filebeat-test-input
+
+Index name
+
+--
+
+*`elasticsearch.index.id`*::
++
+--
+type: keyword
+
+example: aOGgDwbURfCV57AScqbCgw
+
+Index id
+
+--
+
+*`elasticsearch.shard.id`*::
++
+--
+type: keyword
+
+example: 0
+
+Id of the shard
+
+--
+
 [float]
 == audit fields
 
 
 
-
-*`elasticsearch.audit.node_name`*::
-+
---
-type: keyword
-
-example: v_VJhjV
-
-The name of the node
-
---
 
 *`elasticsearch.audit.layer`*::
 +
@@ -1180,17 +1213,6 @@ Log component
 
 --
 
-*`elasticsearch.server.node_name`*::
-+
---
-type: keyword
-
-example: vWNJsZ3
-
-Name of the node
-
---
-
 [float]
 == gc fields
 
@@ -1236,44 +1258,11 @@ example:
 
 --
 
-*`elasticsearch.server.index_name`*::
-+
---
-type: keyword
-
-example: filebeat-test-input
-
-Index name
-
---
-
-*`elasticsearch.server.index_id`*::
-+
---
-type: keyword
-
-example: aOGgDwbURfCV57AScqbCgw
-
-Index id
-
---
-
 [float]
 == slowlog fields
 
 Slowlog events from Elasticsearch
 
-
-*`elasticsearch.slowlog.loglevel`*::
-+
---
-type: keyword
-
-example: INFO
-
-Log level
-
---
 
 *`elasticsearch.slowlog.logger`*::
 +
@@ -1283,39 +1272,6 @@ type: keyword
 example: index.search.slowlog.fetch
 
 Logger name
-
---
-
-*`elasticsearch.slowlog.node_name`*::
-+
---
-type: keyword
-
-example: v_VJhjV
-
-Name of the node
-
---
-
-*`elasticsearch.slowlog.index_name`*::
-+
---
-type: keyword
-
-example: metricbeat-6.3.0-2018.06.26
-
-Name of the index
-
---
-
-*`elasticsearch.slowlog.shard_id`*::
-+
---
-type: keyword
-
-example: 0
-
-Id of the shard
 
 --
 

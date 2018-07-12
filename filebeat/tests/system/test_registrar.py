@@ -282,7 +282,7 @@ class Test(BaseTest):
                                                 "a/b/c/registry_x")),
             max_timeout=1)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(1)
 
         filebeat.check_kill_and_wait()
@@ -477,7 +477,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=10)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(1)
 
         assert os.stat(testfile_path).st_ino == self.get_registry_entry_by_path(
@@ -547,7 +547,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=10)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(1)
 
         data = self.get_registry()
@@ -570,7 +570,7 @@ class Test(BaseTest):
                 "Updating state for renamed file"),
             max_timeout=10)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(1)
 
         data = self.get_registry()
@@ -761,7 +761,7 @@ class Test(BaseTest):
                 "Registry file updated. 2 states written.") >= 1,
             max_timeout=15)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(1)
         filebeat.kill_and_wait()
 
@@ -1468,7 +1468,7 @@ class Test(BaseTest):
                                                 "registry")),
             max_timeout=10)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(2)
 
         filebeat.check_kill_and_wait()
