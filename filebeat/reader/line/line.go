@@ -70,8 +70,9 @@ func (r *Reader) GetState() common.MapStr {
 			"bytes":  r.lineScanner.in.bytesOffset,
 		},
 		"scanner": common.MapStr{
-			"offset": r.lineScanner.offset,
-			"bytes":  r.lineScanner.bytesOffset,
+			"offset":       r.lineScanner.offset,
+			"bytes":        r.lineScanner.bytesOffset,
+			"last_message": r.lineScanner.lastMessageLen,
 		},
 	}
 }
@@ -211,10 +212,11 @@ type lineScanner struct {
 	separator  []byte
 	bufferSize int
 
-	symlen      []int
-	buf         *streambuf.Buffer
-	offset      int
-	bytesOffset int
+	symlen         []int
+	buf            *streambuf.Buffer
+	offset         int
+	bytesOffset    int
+	lastMessageLen int
 }
 
 func newLineScanner(in *decoderReader, separator []byte, bufferSize int) *lineScanner {
@@ -265,6 +267,7 @@ func (s *lineScanner) line(i int) ([]byte, int, error) {
 		return nil, 0, err
 	}
 
+	s.lastMessageLen = msgSymbols
 	s.bytesOffset += msgSymbols
 	s.offset += i
 	s.buf.Reset()
