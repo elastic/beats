@@ -1,19 +1,26 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
     "metricset":{
-        "host":"localhost",
+        "host":"mongodb:27017",
         "module":"mongodb",
         "name":"oplog",
-        "rtt":44269
+        "rtt": 44269
     },
     "mongodb":{
         "oplog":{
-            "example": "oplog"
+            "log_size": {
+                "allocated": 100,
+                "used": 24
+            },
+            "time": {
+                "first": 1531422969,
+                "last": 1531422970,
+                "diff": 1
+            }
         }
-    },
-    "type":"metricsets"
+    }
 }

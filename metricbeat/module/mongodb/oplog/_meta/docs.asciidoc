@@ -1,3 +1,1 @@
-=== mongodb oplog MetricSet
-
-This is the oplog metricset of the module mongodb.
+This is the `oplog` metricset of the module mongodb.
