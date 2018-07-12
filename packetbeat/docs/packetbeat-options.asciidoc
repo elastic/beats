@@ -1283,15 +1283,15 @@ process matching is disabled.
 When Packetbeat starts, and then periodically afterwards, it scans the process table for
 processes that match the configuration file. For each of these processes, it
 monitors which file descriptors it has opened. When a new packet is captured,
-it reads the list of active TCP connections and matches the corresponding one
+it reads the list of active TCP and UDP connections and matches the corresponding one
 with the list of file descriptors.
 
-On a Linux system, all this information is available via the `/proc`
-file system, so Packetbeat doesn't need a kernel module.
-
+All this information is available via system interfaces: The `/proc` file system
+in Linux and the IP Helper API (`iphlpapi.dll`) on Windows, so {beatname_uc}
+doesn't need a kernel module.
 
 NOTE: Process monitoring is currently only supported on
-      Linux systems. Packetbeat automatically disables
+      Linux and Windows systems. Packetbeat automatically disables
       process monitoring when it detects other operating systems.
 
 Example configuration:
@@ -1313,6 +1313,14 @@ packetbeat.procs:
     - process: app
       cmdline_grep: gunicorn
 ------------------------------------------------------------------------------
+
+When the process monitor is enabled, it will enrich all the events whose source
+or destination is a local process. The `cmdline` and/or `client_cmdline` fields
+will be added to an event, when the server side or client side of the connection
+belong to a local process, respectively. Additionally, you can specify a pattern
+using the `cmdline_grep` option, to also name those processes. This will cause
+the `proc` and `client_proc` fields to be added to an event, with the name of
+the matched process.
 
 [float]
 === Configuration options
@@ -1350,6 +1358,3 @@ Example configuration:
 -------------------------------------------------------------------------------------
 packetbeat.shutdown_timeout: 5s
 -------------------------------------------------------------------------------------
-
-
-
