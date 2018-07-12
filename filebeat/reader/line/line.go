@@ -106,7 +106,7 @@ func (r *decoderReader) read(buf []byte) (int, error) {
 			b = append(enc, b[start:]...)
 		}
 
-		nBytes, nProcessed, err := r.conv(b, buf)
+		nBytes, nProcessed, err := r.conv(b[:start+n], buf)
 		if err != nil {
 			if err == transform.ErrShortSrc {
 				r.encodedBuf.Append(b[nProcessed:])
@@ -136,7 +136,7 @@ func (r *decoderReader) msgSize(symlen []int, size int) (int, []int, error) {
 		n++
 	}
 
-	symlen = append(symlen[:0], symlen[n:]...)
+	symlen = symlen[n:]
 
 	return n, symlen, nil
 }
