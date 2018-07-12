@@ -25,30 +25,32 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMakeMonitoringIndexNameForValidProducts(t *testing.T) {
+func TestMakeMonitoringIndexName(t *testing.T) {
 	today := time.Now().UTC().Format("2006.01.02")
 
 	tests := []struct {
-		Name, Product, Expected string
+		Name     string
+		Product  Product
+		Expected string
 	}{
 		{
 			"Elasticsearch monitoring index",
-			"elasticsearch",
-			fmt.Sprintf(".monitoring-elasticsearch-6-mb-%v", today),
+			Elasticsearch,
+			fmt.Sprintf(".monitoring-es-6-mb-%v", today),
 		},
 		{
 			"Kibana monitoring index",
-			"kibana",
+			Kibana,
 			fmt.Sprintf(".monitoring-kibana-6-mb-%v", today),
 		},
 		{
 			"Logstash monitoring index",
-			"logstash",
+			Logstash,
 			fmt.Sprintf(".monitoring-logstash-6-mb-%v", today),
 		},
 		{
 			"Beats monitoring index",
-			"beats",
+			Beats,
 			fmt.Sprintf(".monitoring-beats-6-mb-%v", today),
 		},
 	}
@@ -60,8 +62,4 @@ func TestMakeMonitoringIndexNameForValidProducts(t *testing.T) {
 			assert.Equal(t, test.Expected, indexName)
 		})
 	}
-}
-
-func TestMakeMonitoringIndexNameForInvalidProduct(t *testing.T) {
-	assert.PanicsWithValue(t, "Invalid product 'unknown'", func() { MakeMonitoringIndexName("unknown") })
 }
