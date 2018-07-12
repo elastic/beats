@@ -1,4 +1,4 @@
-package hbtestutil
+package testutil
 
 import (
 	"io"
@@ -8,7 +8,7 @@ import (
 
 	"net/http/httptest"
 
-	"github.com/elastic/beats/heartbeat/valschema"
+	"github.com/elastic/beats/heartbeat/skima"
 )
 
 var HelloWorldBody = "hello, world!"
@@ -37,23 +37,23 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 	return uint16(p), nil
 }
 
-func MonitorChecks(id string, ip string, scheme string, status string) valschema.Map {
-	return valschema.Map{
-		"monitor": valschema.Map{
-			"duration.us": valschema.IsDuration,
+func MonitorChecks(id string, ip string, scheme string, status string) skima.Validator {
+	return skima.Schema(skima.Map{
+		"monitor": skima.Map{
+			"duration.us": skima.IsDuration,
 			"id":          id,
 			"ip":          ip,
 			"scheme":      scheme,
 			"status":      status,
 		},
-	}
+	})
 }
 
-func TcpChecks(port uint16) valschema.Map {
-	return valschema.Map{
-		"tcp": valschema.Map{
+func TcpChecks(port uint16) skima.Validator {
+	return skima.Schema(skima.Map{
+		"tcp": skima.Map{
 			"port":           port,
-			"rtt.connect.us": valschema.IsDuration,
+			"rtt.connect.us": skima.IsDuration,
 		},
-	}
+	})
 }

@@ -1,4 +1,4 @@
-package valschema
+package skima
 
 import (
 	"strings"
@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type ValueValidator = func(t *testing.T, keyExists bool, actual interface{})
+type ValueValidator = func(t *testing.T, keyExists bool, actual interface{}, dotPath string)
 
 type Map map[string]interface{}
 
@@ -97,9 +97,10 @@ func walk(m common.MapStr, wo WalkObserver) {
 // perform a custom validation
 func walkFull(m common.MapStr, root common.MapStr, path []string, wo WalkObserver) {
 	for k, v := range m {
-		newPath := make([]string, len(path)+1)
-		copy(newPath, path)
-		newPath[len(path)] = k // Append the key
+		splitK := strings.Split(k, ".")
+		var newPath []string
+		newPath = append(newPath, path...)
+		newPath = append(newPath, splitK...)
 
 		dottedPath := strings.Join(newPath, ".")
 
@@ -137,14 +138,23 @@ func walkValidate(t *testing.T, expected Map, actual common.MapStr) (output *Val
 			dottedPath string) {
 			actualHasKey, _ := actual.HasKey(dottedPath)
 			if actualHasKey {
-				output.testedFields[dottedPath] = struct{}{}
+				for i := 0; i < len(path); i++ {
+					p := path[0 : i+1]
+					subP := strings.Join(p, ".")
+					output.testedFields[subP] = struct{}{}
+				}
 			}
 
 			actualV, _ := actual.GetValue(dottedPath)
 
 			vv, isVV := expectedV.(ValueValidator)
 			if isVV {
-				vv(t, actualHasKey, actualV)
+				// We could wrap this in a t.Run, but that makes
+				// testing really hard since new(testing.T) won't
+				// do that.
+				// TODO: Fix this.
+				// For now we pass in the dotted path
+				vv(t, actualHasKey, actualV, dottedPath)
 			} else if sm, isStrictMap := expectedV.(StrictMap); isStrictMap {
 				if actualM, ok := actualV.(common.MapStr); ok {
 					Strict(Schema(Map(sm)))(t, actualM)

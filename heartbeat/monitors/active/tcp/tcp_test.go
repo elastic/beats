@@ -6,15 +6,16 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/heartbeat/valschema"
+	"github.com/elastic/beats/heartbeat/skima"
+	"github.com/elastic/beats/heartbeat/testutil"
 	"github.com/elastic/beats/libbeat/common"
 )
 
 func TestUpEndpoint(t *testing.T) {
-	server := httptest.NewServer(valschema.HelloWorldHandler)
+	server := httptest.NewServer(testutil.HelloWorldHandler)
 	defer server.Close()
 
-	port, err := valschema.ServerPort(server)
+	port, err := testutil.ServerPort(server)
 	if err != nil {
 		t.FailNow()
 	}
@@ -34,6 +35,13 @@ func TestUpEndpoint(t *testing.T) {
 		t.FailNow()
 	}
 
-	valschema.Validate(t, valschema.MonitorChecks(fmt.Sprintf("tcp-tcp@localhost:%d", port), "127.0.0.1", "tcp", "up"), event.Fields)
-	valschema.Validate(t, valschema.TcpChecks(port), event.Fields)
+	skima.Strict(skima.Compose(
+		testutil.MonitorChecks(
+			fmt.Sprintf("tcp-tcp@localhost:%d", port),
+			"127.0.0.1",
+			"tcp",
+			"up",
+		),
+		testutil.TcpChecks(port),
+	))(t, event.Fields)
 }
