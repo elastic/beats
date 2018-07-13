@@ -32,12 +32,12 @@ var (
 	schemaXPackMonitoring = s.Schema{
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"os": c.Dict("os", s.Schema{
-			"load": c.Dict("cpu.load_average", s.Schema{
+			"load": c.Dict("load", s.Schema{
 				"1m":  c.Float("1m"),
 				"5m":  c.Float("5m"),
 				"15m": c.Float("15m"),
 			}),
-			"memory": c.Dict("mem", s.Schema{
+			"memory": c.Dict("memory", s.Schema{
 				"total_in_bytes": c.Int("total_bytes"),
 				"free_in_bytes":  c.Int("free_bytes"),
 				"used_in_bytes":  c.Int("used_bytes"),
@@ -45,13 +45,13 @@ var (
 			"uptime_in_millis": c.Int("uptime_ms"),
 		}),
 		"process": c.Dict("process", s.Schema{
-			"event_loop_delay": c.Float("event_loop_delay_ms"),
-			"memory": c.Dict("mem", s.Schema{
-				"heap": s.Object{
-					"total_in_bytes": c.Int("heap_max_bytes"),
-					"used_in_bytes":  c.Int("heap_used_bytes"),
+			"event_loop_delay": c.Float("event_loop_delay"),
+			"memory": c.Dict("memory", s.Schema{
+				"heap": c.Dict("heap", s.Schema{
+					"total_in_bytes": c.Int("total_bytes"),
+					"used_in_bytes":  c.Int("used_bytes"),
 					"size_limit":     c.Int("size_limit"),
-				},
+				}),
 			}),
 			"uptime_in_millis": c.Int("uptime_ms"),
 		}),
@@ -81,8 +81,8 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error 
 	}
 
 	process := data["process"].(map[string]interface{})
-	mem := process["mem"].(map[string]interface{})
-	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int(mem["resident_set_size_bytes"].(float64)))
+	memory := process["memory"].(map[string]interface{})
+	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int(memory["resident_set_size_bytes"].(float64)))
 
 	timestamp := time.Now()
 	kibanaStatsFields.Put("timestamp", timestamp)

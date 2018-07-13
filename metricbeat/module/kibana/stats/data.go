@@ -31,14 +31,14 @@ var (
 		"cluster_uuid":           c.Str("cluster_uuid"),
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"os": c.Dict("os", s.Schema{
-			"load": c.Dict("cpu", s.Schema{
-				"avg": c.Dict("load_average", s.Schema{
+			"load": c.Dict("load", s.Schema{
+				"avg": s.Object{
 					"1m":  c.Float("1m"),
 					"5m":  c.Float("5m"),
 					"15m": c.Float("15m"),
-				}),
+				},
 			}),
-			"memory": c.Dict("mem", s.Schema{
+			"memory": c.Dict("memory", s.Schema{
 				"total": s.Object{
 					"bytes": c.Int("total_bytes"),
 				},
@@ -55,20 +55,20 @@ var (
 		}),
 		"process": c.Dict("process", s.Schema{
 			"event_loop_delay": s.Object{
-				"ms": c.Float("event_loop_delay_ms"),
+				"ms": c.Float("event_loop_delay"),
 			},
-			"memory": c.Dict("mem", s.Schema{
-				"heap": s.Object{
+			"memory": c.Dict("memory", s.Schema{
+				"heap": c.Dict("heap", s.Schema{
 					"total": s.Object{
-						"bytes": c.Int("heap_max_bytes"),
+						"bytes": c.Int("total_bytes"),
 					},
 					"used": s.Object{
-						"bytes": c.Int("heap_used_bytes"),
+						"bytes": c.Int("used_bytes"),
 					},
 					"size_limit": s.Object{
 						"bytes": c.Int("size_limit"),
 					},
-				},
+				}),
 			}),
 			"uptime": s.Object{
 				"ms": c.Int("uptime_ms"),

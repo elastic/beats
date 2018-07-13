@@ -1,59 +1,60 @@
 {
-    "cluster_uuid":"4Yg2A7RuT0SIZBMzTE2quA",
-    "timestamp":"2018-07-05T18:07:12.974Z",
     "kibana":{
-      "uuid":"fc5ec764-19e4-4e51-86e7-3f5a2a2b7cc0",
-      "name":"spicy.local",
-      "host":"spicy.local",
+      "uuid":"5b2de169-2785-441b-ae8c-186a1936b17d",
+      "name":"Shaunaks-MBP-2",
       "index":".kibana",
-      "transport_address":"spicy.local:5601",
+      "host":"localhost",
+      "transport_address":"localhost:5601",
       "version":"7.0.0-alpha1",
       "snapshot":false,
       "status":"green"
     },
-    "last_updated":"2018-07-05T18:14:12.574Z",
+    "last_updated":"2018-07-13T23:24:06.884Z",
     "collection_interval_ms":5000,
+    "process":{
+      "memory":{
+        "heap":{
+          "total_bytes":205746176,
+          "used_bytes":186202032,
+          "size_limit":1501560832
+        },
+        "resident_set_size_bytes":197615616
+      },
+      "event_loop_delay":0.32519304752349854,
+      "pid":5355,
+      "uptime_ms":438358
+    },
+    "os":{
+      "load":{
+        "1m":2.58544921875,
+        "5m":3.12646484375,
+        "15m":3.509765625
+      },
+      "memory":{
+        "total_bytes":17179869184,
+        "free_bytes":869421056,
+        "used_bytes":16310448128
+      },
+      "uptime_ms":1837583000
+    },
     "response_times":{
-      "avg_ms":31.666666666666668,
-      "max_ms":40
+      "avg_ms":14.25,
+      "max_ms":22
     },
     "requests":{
-      "total":220,
-      "disconnects":0
+      "total":0,
+      "disconnects":0,
+      "status_codes":{
+
+      }
     },
-    "concurrent_connections":0,
+    "concurrent_connections":7,
     "sockets":{
       "http":{
-        "total":5
+        "total":0
       },
       "https":{
         "total":0
-      }
-    },
-    "process":{
-      "mem":{
-        "heap_max_bytes":344432640,
-        "heap_used_bytes":184244040,
-        "resident_set_size_bytes":440311808,
-        "size_limit":1501560832
-      },
-      "pid":51785,
-      "uptime_ms":34725,
-      "event_loop_delay_ms":3.7904850244522095
-    },
-    "os":{
-      "uptime_ms":1151777000,
-      "cpu":{
-        "load_average":{
-          "1m":3.1123046875,
-          "5m":2.94189453125,
-          "15m":2.83349609375
-        }
-      },
-      "mem":{
-        "free_bytes":567361536,
-        "total_bytes":17179869184,
-        "used_bytes":16612507648
       }
     },
     "usage":{
@@ -63,13 +64,13 @@
           "total":0
         },
         "visualization":{
-          "total":1
+          "total":0
         },
         "search":{
-          "total":2
+          "total":0
         },
         "index_pattern":{
-          "total":3
+          "total":1
         },
         "graph_workspace":{
           "total":0
@@ -82,17 +83,25 @@
         "available":true,
         "enabled":true,
         "browser_type":"phantom",
-        "_all":3,
+        "_all":0,
         "csv":{
           "available":true,
-          "total":3
-        },
-        "printable_pdf":{
-          "available":false,
           "total":0
         },
+        "printable_pdf":{
+          "available":true,
+          "total":0,
+          "app":{
+            "visualization":0,
+            "dashboard":0
+          },
+          "layout":{
+            "print":0,
+            "preserve_layout":0
+          }
+        },
         "status":{
-          "completed":3
+
         },
         "lastDay":{
           "_all":0,
@@ -101,27 +110,44 @@
             "total":0
           },
           "printable_pdf":{
-            "available":false,
-            "total":0
+            "available":true,
+            "total":0,
+            "app":{
+              "visualization":0,
+              "dashboard":0
+            },
+            "layout":{
+              "print":0,
+              "preserve_layout":0
+            }
           },
           "status":{
 
           }
         },
         "last7Days":{
-          "_all":3,
+          "_all":0,
           "csv":{
             "available":true,
-            "total":3
-          },
-          "printable_pdf":{
-            "available":false,
             "total":0
           },
+          "printable_pdf":{
+            "available":true,
+            "total":0,
+            "app":{
+              "visualization":0,
+              "dashboard":0
+            },
+            "layout":{
+              "print":0,
+              "preserve_layout":0
+            }
+          },
           "status":{
-            "completed":3
+
           }
         }
       }
-    }
+    },
+    "cluster_uuid":"cGwLbjF8SyygI5eNqTX6qw"
   }
