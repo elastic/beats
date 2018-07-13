@@ -252,3 +252,82 @@ func TestFullFieldPathInErrors(t *testing.T) {
 		}
 	}
 }
+
+func TestNestedFieldPaths(t *testing.T) {
+	cases := []struct {
+		Description string
+		Input       map[string]interface{}
+		Schema      s.Schema
+		Expected    common.MapStr
+		ExpectError bool
+	}{
+		{
+			"nested values",
+			map[string]interface{}{
+				"root": map[string]interface{}{
+					"foo":   "bar",
+					"float": 4.5,
+					"int":   4,
+					"bool":  true,
+				},
+			},
+			s.Schema{
+				"foo":   Str("root.foo"),
+				"float": Float("root.float"),
+				"int":   Int("root.int"),
+				"bool":  Bool("root.bool"),
+			},
+			common.MapStr{
+				"foo":   "bar",
+				"float": float64(4.5),
+				"int":   int64(4),
+				"bool":  true,
+			},
+			false,
+		},
+		{
+			"not really nested values, path contains dots",
+			map[string]interface{}{
+				"root.foo": "bar",
+			},
+			s.Schema{
+				"foo": Str("root.foo"),
+			},
+			common.MapStr{
+				"foo": "bar",
+			},
+			false,
+		},
+		{
+			"nested dict",
+			map[string]interface{}{
+				"root": map[string]interface{}{
+					"dict": map[string]interface{}{
+						"foo": "bar",
+					},
+				},
+			},
+			s.Schema{
+				"dict": Dict("root.dict", s.Schema{
+					"foo": Str("foo"),
+				}),
+			},
+			common.MapStr{
+				"dict": common.MapStr{
+					"foo": "bar",
+				},
+			},
+			false,
+		},
+	}
+
+	for _, c := range cases {
+		event, err := c.Schema.Apply(c.Input)
+		if c.ExpectError {
+			assert.Error(t, err, c.Description)
+		} else {
+			assert.NoError(t, err, c.Description)
+			assert.Equal(t, c.Expected, event, c.Description)
+		}
+	}
+}

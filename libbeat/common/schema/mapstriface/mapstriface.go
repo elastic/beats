@@ -91,8 +91,8 @@ type ConvMap struct {
 
 // Map drills down in the data dictionary by using the key
 func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]interface{}) multierror.Errors {
-	d, found := data[convMap.Key]
-	if !found {
+	d, err := common.MapStr(data).GetValue(convMap.Key)
+	if err != nil {
 		err := schema.NewKeyNotFoundError(convMap.Key)
 		err.Optional = convMap.Optional
 		err.Required = convMap.Required
@@ -130,8 +130,8 @@ func Dict(key string, s schema.Schema, opts ...DictSchemaOption) ConvMap {
 }
 
 func toStrFromNum(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, exists := data[key]
-	if !exists {
+	emptyIface, err := common.MapStr(data).GetValue(key)
+	if err != nil {
 		return "", schema.NewKeyNotFoundError(key)
 	}
 	switch emptyIface.(type) {
@@ -184,8 +184,8 @@ func Ifc(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 func toBool(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, exists := data[key]
-	if !exists {
+	emptyIface, err := common.MapStr(data).GetValue(key)
+	if err != nil {
 		return false, schema.NewKeyNotFoundError(key)
 	}
 	boolean, ok := emptyIface.(bool)
@@ -202,8 +202,8 @@ func Bool(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 func toInteger(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, exists := data[key]
-	if !exists {
+	emptyIface, err := common.MapStr(data).GetValue(key)
+	if err != nil {
 		return 0, schema.NewKeyNotFoundError(key)
 	}
 	switch emptyIface.(type) {
@@ -238,8 +238,8 @@ func Float(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 func toFloat(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, exists := data[key]
-	if !exists {
+	emptyIface, err := common.MapStr(data).GetValue(key)
+	if err != nil {
 		return 0.0, schema.NewKeyNotFoundError(key)
 	}
 	switch emptyIface.(type) {
@@ -274,8 +274,8 @@ func Int(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 func toTime(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, exists := data[key]
-	if !exists {
+	emptyIface, err := common.MapStr(data).GetValue(key)
+	if err != nil {
 		return common.Time(time.Unix(0, 0)), schema.NewKeyNotFoundError(key)
 	}
 
