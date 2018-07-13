@@ -127,6 +127,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix Windows service metricset when using a 32-bit binary on a 64-bit OS. {pull}7294[7294]
 - Fix Jolokia attribute mapping when using wildcards and MBean names with multiple properties. {pull}7321[7321]
 - Do not report Metricbeat container host as hostname in Kubernetes deployment. {issue}7199[7199]
+- Ensure metadata updates don't replace existing pod metrics. {pull}7573[7573]
 
 *Packetbeat*
 
