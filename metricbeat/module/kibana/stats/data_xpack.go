@@ -82,7 +82,7 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error 
 
 	process := data["process"].(map[string]interface{})
 	mem := process["mem"].(map[string]interface{})
-	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", mem["resident_set_size_bytes"].(int))
+	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int(mem["resident_set_size_bytes"].(float64)))
 
 	timestamp := time.Now()
 	kibanaStatsFields.Put("timestamp", timestamp)
