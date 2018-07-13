@@ -65,7 +65,9 @@ endif::[]
 |=======
 |Feature | Role
 |Send data to a secured cluster   | ++{beat_default_index_prefix}_writer++
+ifeval::["{beatname_lc}"=="filebeat"]
 |Run Filebeat modules | ++{beat_default_index_prefix}_writer++
+endif::[]
 |Load index templates | ++{beat_default_index_prefix}_writer++ and `kibana_user`
 |Load {beatname_uc} dashboards into {kib} | ++{beat_default_index_prefix}_writer++ and `kibana_user`
 ifdef::has_ml_jobs[]
