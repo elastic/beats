@@ -26,5 +26,5 @@ import (
 )
 
 func TestMapper(t *testing.T) {
-	elasticsearch.TestMapperWithInfo(t, "./_meta/test/recovery.*.json", eventsMapping)
+	elasticsearch.TestMapper(t, "./_meta/test/recovery.*.json", eventsMapping)
 }
