@@ -102,7 +102,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
 - Fix offset field pointing at end of a line. {issue}6514[6514]
 - Fix an issue when parsing ISO8601 dates with timezone definition {issue}7367[7367]
-- Fix MongoDB Filebeat module. {pull}7568[7568]
+- Fix Grok pattern of MongoDB module. {pull}7568[7568]
 
 *Heartbeat*
 - Fix race due to updates of shared a map, that was not supposed to be shared between multiple go-routines. {issue}6616[6616]
