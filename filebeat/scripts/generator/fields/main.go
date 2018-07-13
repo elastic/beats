@@ -33,6 +33,10 @@ import (
 const (
 	pipelinePath  = "%s/module/%s/%s/ingest/pipeline.json"
 	fieldsYmlPath = "%s/module/%s/%s/_meta/fields.yml"
+
+	typeIdx     = 0
+	elementsIdx = 1
+	hintIdx     = 2
 )
 
 var (
@@ -96,19 +100,32 @@ func newFieldYml(name, typeName string, noDoc bool) *fieldYml {
 func newField(lp string) field {
 	lp = lp[1 : len(lp)-1]
 	ee := strings.Split(lp, ":")
-	if 2 != len(ee) && len(ee) != 3 {
+	if !isValidFormat(ee) {
 		return field{}
 	}
 
 	hint := ""
-	if len(ee) == 3 {
-		hint = ee[2]
+	if containsHint(ee) {
+		hint = ee[hintIdx]
 	}
+
 	return field{
-		Type:     ee[0],
-		Elements: strings.Split(ee[1], "."),
+		Type:     ee[typeIdx],
+		Elements: strings.Split(ee[elementsIdx], "."),
 		Hint:     hint,
 	}
+}
+
+// isValidFormat checks if the input can be split correctly
+// 1. if lenght is 2, the format is {type}:{field.elements}
+// 2. if the lenght is 3, the format is {type}:{field.elements}:{hint}
+func isValidFormat(ee []string) bool {
+	return len(ee) == 2 || len(ee) == 3
+}
+
+// the last element is the type hint
+func containsHint(ee []string) bool {
+	return len(ee) == 3
 }
 
 func readPipeline(beatsPath, module, fileset string) (*pipeline, error) {
