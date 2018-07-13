@@ -68,9 +68,9 @@ type pipeline struct {
 }
 
 type field struct {
-	Type     string
-	Elements []string
-	Hint     string
+	Syntax           string
+	SemanticElements []string
+	Type             string
 }
 
 type fieldYml struct {
@@ -98,21 +98,25 @@ func newFieldYml(name, typeName string, noDoc bool) *fieldYml {
 }
 
 func newField(lp string) field {
+	if len(lp) <= 2 {
+		return field{}
+	}
 	lp = lp[1 : len(lp)-1]
+
 	ee := strings.Split(lp, ":")
 	if !isValidFormat(ee) {
 		return field{}
 	}
 
 	hint := ""
-	if containsHint(ee) {
+	if containsType(ee) {
 		hint = ee[hintIdx]
 	}
 
 	return field{
-		Type:     ee[typeIdx],
-		Elements: strings.Split(ee[elementsIdx], "."),
-		Hint:     hint,
+		Syntax:           ee[typeIdx],
+		SemanticElements: strings.Split(ee[elementsIdx], "."),
+		Type:             hint,
 	}
 }
 
@@ -124,7 +128,7 @@ func isValidFormat(ee []string) bool {
 }
 
 // the last element is the type hint
-func containsHint(ee []string) bool {
+func containsType(ee []string) bool {
 	return len(ee) == 3
 }
 
@@ -153,7 +157,7 @@ func addNewField(fs []field, f field) []field {
 	return append(fs, f)
 }
 
-func getElementsFromPatterns(patterns []string) ([]field, error) {
+func getSemanticElementsFromPatterns(patterns []string) ([]field, error) {
 	r, err := regexp.Compile("{[\\.\\w\\:]*}")
 	if err != nil {
 		return nil, err
@@ -164,7 +168,7 @@ func getElementsFromPatterns(patterns []string) ([]field, error) {
 		pp := r.FindAllString(lp, -1)
 		for _, p := range pp {
 			f := newField(p)
-			if f.Elements == nil {
+			if f.SemanticElements == nil {
 				continue
 			}
 			fs = addNewField(fs, f)
@@ -233,16 +237,16 @@ type processors struct {
 }
 
 func (p *processors) processFields() ([]field, error) {
-	f, err := getElementsFromPatterns(p.patterns)
+	f, err := getSemanticElementsFromPatterns(p.patterns)
 	if err != nil {
 		return nil, err
 	}
 
 	for i, ff := range f {
-		fs := strings.Join(ff.Elements, ".")
+		fs := strings.Join(ff.SemanticElements, ".")
 		for k, mv := range p.rename {
 			if k == fs {
-				ff.Elements = strings.Split(mv, ".")
+				ff.SemanticElements = strings.Split(mv, ".")
 			}
 		}
 		for _, rm := range p.remove {
@@ -300,16 +304,16 @@ func insertLastField(f []*fieldYml, name string, field field, noDoc bool) []*fie
 		return f
 	}
 
-	fieldType := field.Hint
+	fieldType := field.Type
 	if fieldType == "" {
-		fieldType = types[field.Type]
+		fieldType = types[field.Syntax]
 	}
 	nf := newFieldYml(name, fieldType, noDoc)
 	return append(f, nf)
 }
 
 func insertGroup(out []*fieldYml, field field, index, count int, noDoc bool) []*fieldYml {
-	g := getFieldByName(out, field.Elements[index])
+	g := getFieldByName(out, field.SemanticElements[index])
 	if g != nil {
 		g.Fields = generateField(g.Fields, field, index+1, count, noDoc)
 		return out
@@ -317,14 +321,14 @@ func insertGroup(out []*fieldYml, field field, index, count int, noDoc bool) []*
 
 	var groupFields []*fieldYml
 	groupFields = generateField(groupFields, field, index+1, count, noDoc)
-	group := newFieldYml(field.Elements[index], "group", noDoc)
+	group := newFieldYml(field.SemanticElements[index], "group", noDoc)
 	group.Fields = groupFields
 	return append(out, group)
 }
 
 func generateField(out []*fieldYml, field field, index, count int, noDoc bool) []*fieldYml {
 	if index+1 == count {
-		return insertLastField(out, field.Elements[index], field, noDoc)
+		return insertLastField(out, field.SemanticElements[index], field, noDoc)
 	}
 	return insertGroup(out, field, index, count, noDoc)
 }
@@ -333,10 +337,10 @@ func generateFields(f []field, noDoc bool) []*fieldYml {
 	var out []*fieldYml
 	for _, ff := range f {
 		index := 1
-		if len(ff.Elements) == 1 {
+		if len(ff.SemanticElements) == 1 {
 			index = 0
 		}
-		out = generateField(out, ff, index, len(ff.Elements), noDoc)
+		out = generateField(out, ff, index, len(ff.SemanticElements), noDoc)
 	}
 	return out
 }
