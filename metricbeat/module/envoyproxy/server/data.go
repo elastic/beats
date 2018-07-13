@@ -114,7 +114,7 @@ var (
 				"downstream_cx_total":                           c.Int("downstream_cx_total"),
 				"downstream_cx_tx_bytes_buffered":               c.Int("downstream_cx_tx_bytes_buffered"),
 				"downstream_cx_tx_bytes_total":                  c.Int("downstream_cx_tx_bytes_total"),
-				"downstream_cx_websocket_active:":               c.Int("downstream_cx_websocket_active"),
+				"downstream_cx_websocket_active":                c.Int("downstream_cx_websocket_active"),
 				"downstream_cx_websocket_total":                 c.Int("downstream_cx_websocket_total"),
 				"downstream_flow_control_paused_reading_total":  c.Int("downstream_flow_control_paused_reading_total"),
 				"downstream_flow_control_resumed_reading_total": c.Int("downstream_flow_control_resumed_reading_total"),
@@ -137,7 +137,7 @@ var (
 			},
 			"async-client": s.Object{
 				"no_cluster":         c.Int("no_cluster"),
-				"no_route:":          c.Int("no_route"),
+				"no_route":           c.Int("no_route"),
 				"rq_direct_response": c.Int("rq_direct_response"),
 				"rq_redirect":        c.Int("rq_redirect"),
 				"rq_total":           c.Int("rq_total"),
@@ -145,37 +145,23 @@ var (
 		},
 	}
 )
+var reStats *regexp.Regexp = regexp.MustCompile(`cluster_manager.*|filesystem.*|runtime.*|listener_manager.*|stats.*|server.*|listener.*|http.*`)
 
 func eventMapping(response []byte) (common.MapStr, error) {
 	data := map[string]interface{}{}
 	var events common.MapStr
 	var err error
 
-	stats := []string{
-		"cluster_manager.*",
-		"filesystem.*",
-		"runtime.*",
-		"listener_manager.*",
-		"stats.*",
-		"server.*",
-		"listener.admin.*",
-		"listener.admin.http.admin.*",
-		"http.admin.*",
-		"http.async-client.*",
-	}
-	for i := 0; i < len(stats); i++ {
-		event := findStats(data, response, stats[i])
-		events, err = schema.Apply(event)
-		if err != nil && i == (len(stats)-1) {
-			return nil, err
-		}
+	data = findStats(data, response)
+	events, err = schema.Apply(data)
+	if err != nil {
+		return nil, err
 	}
 	return events, nil
 }
 
-func findStats(data common.MapStr, response []byte, reName string) common.MapStr {
-	re := regexp.MustCompile(reName)
-	matches := re.FindAllString(string(response), -1)
+func findStats(data common.MapStr, response []byte) common.MapStr {
+	matches := reStats.FindAllString(string(response), -1)
 	for i := 0; i < len(matches); i++ {
 		entries := strings.Split(matches[i], ": ")
 		if len(entries) == 2 {
