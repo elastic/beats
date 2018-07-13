@@ -29,7 +29,7 @@ git-init:
 	git init
 	git add README.md CONTRIBUTING.md
 	git commit -m "Initial commit"
-	git add LICENSE
+	git add LICENSE.txt
 	git commit -m "Add the LICENSE"
 	git add .gitignore
 	git commit -m "Add git settings"
