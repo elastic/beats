@@ -89,13 +89,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+m.recoveryPath)
-	if err != nil {
-		r.Error(fmt.Errorf("Error fetching node info: %s", err))
-		return
-	}
-
-	err = eventsMapping(r, *info, content)
+	err = eventsMapping(r, content)
 	if err != nil {
 		r.Error(err)
 	}
