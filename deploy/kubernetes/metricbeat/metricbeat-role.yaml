@@ -5,12 +5,19 @@ metadata:
   labels:
     k8s-app: metricbeat
 rules:
-- apiGroups: [""] # "" indicates the core API group
+- apiGroups: [""]
   resources:
+  - nodes
   - namespaces
   - events
   - pods
-  verbs:
-  - get
-  - watch
-  - list
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["extensions"]
+  resources:
+  - deployments
+  - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources:
+  - statefulsets
+  verbs: ["get", "list", "watch"]
