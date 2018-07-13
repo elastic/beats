@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/xpack"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -96,7 +96,7 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error 
 		"kibana_stats": kibanaStatsFields,
 	}
 
-	event.Index = helper.MakeMonitoringIndexName("kibana")
+	event.Index = xpack.MakeMonitoringIndexName(xpack.Kibana)
 	r.Event(event)
 
 	return nil
