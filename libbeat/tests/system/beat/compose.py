@@ -33,6 +33,9 @@ class ComposeMixin(object):
         if not INTEGRATION_TESTS or not cls.COMPOSE_SERVICES:
             return
 
+        if os.environ.get('NO_COMPOSE'):
+            return
+
         def print_logs(container):
             print("---- " + container.name_without_project)
             print(container.logs())

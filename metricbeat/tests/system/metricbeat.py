@@ -68,7 +68,7 @@ class BaseTest(TestCase):
     def build_log_regex(self, message):
         return re.compile(r"^.*\t(?:ERROR|WARN)\t.*" + message + r".*$", re.MULTILINE)
 
-    def check_metricset(self, module, metricset, hosts, fields=[]):
+    def check_metricset(self, module, metricset, hosts, fields=[], extras=[]):
         """
         Method to test a metricset for its fields
         """
@@ -77,6 +77,7 @@ class BaseTest(TestCase):
             "metricsets": [metricset],
             "hosts": hosts,
             "period": "1s",
+            "extras": extras,
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
