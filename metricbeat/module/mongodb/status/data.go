@@ -63,11 +63,11 @@ var schema = s.Schema{
 		"out":      s.Object{"bytes": c.Int("bytesOut")},
 		"requests": c.Int("numRequests"),
 	}),
-	"oplatencies": s.Object {
+	"oplatencies": c.Dict("opLatencies", s.Schema {
 		"reads": c.Dict("reads", opLatenciesItemSchema),
 		"writes": c.Dict("writes", opLatenciesItemSchema),
 		"commands": c.Dict("commands", opLatenciesItemSchema),
-	},
+	}, c.DictOptional),
 	"opcounters": c.Dict("opcounters", s.Schema{
 		"insert":  c.Int("insert"),
 		"query":   c.Int("query"),
