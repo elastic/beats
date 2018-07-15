@@ -19,14 +19,17 @@ package oplog
 
 import (
 	"errors"
+
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
-	"gopkg.in/mgo.v2/bson"
 )
 
 const oplogCol = "oplog.rs"
+
 var debugf = logp.MakeDebug("mongodb.oplog")
 
 func init() {
@@ -35,7 +38,6 @@ func init() {
 		mb.WithHostParser(mongodb.ParseURL),
 		mb.DefaultMetricSet())
 }
-
 
 // MetricSet type defines all fields of the MetricSet
 // As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
@@ -89,7 +91,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	collection := db.C(oplogCol)
 
 	//  oplog size
-	var oplogStatus map[string]interface{}	
+	var oplogStatus map[string]interface{}
 	if err := db.Run(bson.D{{Name: "collStats", Value: oplogCol}}, &oplogStatus); err != nil {
 		return nil, err
 	}
@@ -106,19 +108,19 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		logp.Err(err.Error())
 		return nil, err
 	}
-	
+
 	firstTs := int64(first.(bson.M)["ts"].(bson.MongoTimestamp))
 	lastTs := int64(last.(bson.M)["ts"].(bson.MongoTimestamp))
 	diff := lastTs - firstTs
 
-	result := map[string]interface{} {
-		"logSize": allocated,
-		"used": used,
-		"tFirst": firstTs,
-		"tLast": lastTs,
+	result := map[string]interface{}{
+		"logSize":  allocated,
+		"used":     used,
+		"tFirst":   firstTs,
+		"tLast":    lastTs,
 		"timeDiff": diff,
 	}
 	event, _ := schema.Apply(result)
-	
+
 	return event, nil
 }

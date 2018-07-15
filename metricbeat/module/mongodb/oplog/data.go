@@ -25,12 +25,12 @@ import (
 var schema = s.Schema{
 	"size": s.Object{
 		"allocated": c.Int("logSize"),
-		"used": c.Int("used"),
+		"used":      c.Int("used"),
 	},
-	"first": s.Object {
+	"first": s.Object{
 		"ts": c.Int("tFirst"),
 	},
-	"last": s.Object {
+	"last": s.Object{
 		"ts": c.Int("tLast"),
 	},
 	"window": c.Int("timeDiff"),
