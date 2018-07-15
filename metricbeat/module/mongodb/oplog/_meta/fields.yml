@@ -3,30 +3,31 @@
   description: >
     oplog provides an overview of replication status, which is retrieved from db.getReplicationInfo().
   fields:
-    - name: log_size
+    - name: size
       type: gorup
       fields:
         - name: allocated
           type: long
+          format: bytes
           description: >
-            The total amount of space used by the oplog in megabytes.
+            The total amount of space used by the oplog in bytes.
         - name: used
           type: long
+          format: bytes
           description: >
-            total amount of space allocated to the oplog in megabytes.
+            total amount of space allocated to the oplog in bytes.
 
-    - name: time
-      type: group
-      fields:
-        - name: first
-          type: long
-          description: >
-            Time stamp of the first (i.e. earliest) operation in the oplog
-        - name: last
-          type: long
-          description: >
-            Time stamp of the last (i.e. latest) operation in the oplog
-        - name: diff
-          type: long
-          description: >
-            The difference between the first and last operation in the oplog, represented in seconds.
+    - name: first.ts
+      type: long
+      description: >
+        Time stamp of the first (i.e. earliest) operation in the oplog
+
+    - name: last.ts
+      type: long
+      description: >
+        Time stamp of the last (i.e. latest) operation in the oplog
+
+    - name: window
+      type: long
+      description: >
+        The difference between the first and last operation in the oplog, represented in seconds.

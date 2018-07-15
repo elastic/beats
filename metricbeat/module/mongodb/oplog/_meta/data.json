@@ -12,15 +12,17 @@
     },
     "mongodb":{
         "oplog":{
-            "log_size": {
+            "size": {
                 "allocated": 100,
                 "used": 24
             },
-            "time": {
-                "first": 1531422969,
-                "last": 1531422970,
-                "diff": 1
-            }
+            "first": {
+                "ts": 1531422969
+            },
+            "last": {
+                "ts": 1531422970
+            },
+            "window": 1
         }
     }
 }
