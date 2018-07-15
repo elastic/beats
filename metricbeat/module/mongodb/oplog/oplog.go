@@ -9,8 +9,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-const oplog_col = "oplog.rs"
-
+const oplogCol = "oplog.rs"
 var debugf = logp.MakeDebug("mongodb.oplog")
 
 func init() {
@@ -20,6 +19,11 @@ func init() {
 		mb.DefaultMetricSet())
 }
 
+
+// MetricSet type defines all fields of the MetricSet
+// As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
+// additional entries. These variables can be used to persist data or configuration between
+// multiple fetch calls.
 type MetricSet struct {
 	*mongodb.MetricSet
 }
@@ -33,6 +37,9 @@ func contains(s []string, x string) bool {
 	return false
 }
 
+// New creates a new instance of the MetricSet
+// Part of new is also setting up the configuration by processing additional
+// configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms, err := mongodb.NewMetricSet(base)
 	if err != nil {
@@ -54,7 +61,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	// get oplog.rs collection
 	db := mongoSession.DB("local")
-	if collections, err := db.CollectionNames(); err != nil || !contains(collections, oplog_col) {
+	if collections, err := db.CollectionNames(); err != nil || !contains(collections, oplogCol) {
 		if err == nil {
 			err = errors.New("Collection oplog.rs was not found")
 		}
@@ -62,11 +69,11 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		logp.Err(err.Error())
 		return nil, err
 	}
-	collection := db.C(oplog_col)
+	collection := db.C(oplogCol)
 
 	//  oplog size
 	var oplogStatus map[string]interface{}	
-	if err := db.Run(bson.D{{Name: "collStats", Value: oplog_col}}, &oplogStatus); err != nil {
+	if err := db.Run(bson.D{{Name: "collStats", Value: oplogCol}}, &oplogStatus); err != nil {
 		return nil, err
 	}
 
