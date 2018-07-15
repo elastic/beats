@@ -74,10 +74,10 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	used := int64(oplogStatus["size"].(float64))
 
 	// get first and last items in the oplog
-	oplog_iter := collection.Find(nil).Sort("$natural").Iter()
-	oplog_reverse_iter := collection.Find(nil).Sort("-$natural").Iter()
+	oplogIter := collection.Find(nil).Sort("$natural").Iter()
+	oplogReverseIter := collection.Find(nil).Sort("-$natural").Iter()
 	var first, last interface{}
-	if !oplog_iter.Next(&first) || !oplog_reverse_iter.Next(&last) {
+	if !oplogIter.Next(&first) || !oplogReverseIter.Next(&last) {
 		err := errors.New("Objects not found in local.oplog.rs -- Is this a new and empty db instance?")
 		logp.Err(err.Error())
 		return nil, err

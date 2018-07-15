@@ -29,8 +29,8 @@ func TestFetch(t *testing.T) {
 	used := event["size"].(common.MapStr)["used"].(int64)
 	assert.True(t, used > 0)
 
-	first_ts := event["first"].(common.MapStr)["ts"].(int64)
-	assert.True(t, first_ts >= 0)
+	firstTs := event["first"].(common.MapStr)["ts"].(int64)
+	assert.True(t, firstTs >= 0)
 
 	window := event["window"].(int64)
 	assert.True(t, window >= 0)
