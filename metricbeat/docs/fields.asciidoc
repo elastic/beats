@@ -9423,6 +9423,50 @@ format: bytes
 --
 
 [float]
+== oplog fields
+
+oplog provides an overview of replication status, which is retrieved from db.getReplicationInfo().
+
+
+
+*`mongodb.oplog.size`*::
++
+--
+type: gorup
+
+--
+
+*`mongodb.oplog.first.ts`*::
++
+--
+type: long
+
+Time stamp of the first (i.e. earliest) operation in the oplog
+
+
+--
+
+*`mongodb.oplog.last.ts`*::
++
+--
+type: long
+
+Time stamp of the last (i.e. latest) operation in the oplog
+
+
+--
+
+*`mongodb.oplog.window`*::
++
+--
+type: long
+
+The difference between the first and last operation in the oplog.
+
+
+--
+
+[float]
 == status fields
 
 MongoDB server status metrics.

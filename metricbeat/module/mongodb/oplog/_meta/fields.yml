@@ -30,4 +30,4 @@
     - name: window
       type: long
       description: >
-        The difference between the first and last operation in the oplog, represented in seconds.
+        The difference between the first and last operation in the oplog.
