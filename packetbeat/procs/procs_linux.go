@@ -32,6 +32,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/packetbeat/protos/applayer"
 	"github.com/elastic/gosigar"
 )
 
@@ -43,22 +44,33 @@ type socketInfo struct {
 	inode uint64
 }
 
+var procFiles = map[applayer.Transport]struct {
+	ipv4, ipv6 string
+}{
+	applayer.TransportUDP: {"/proc/net/udp", "/proc/net/udp6"},
+	applayer.TransportTCP: {"/proc/net/tcp", "/proc/net/tcp6"},
+}
+
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 // that owns them.
-func (proc *ProcessesWatcher) GetLocalPortToPIDMapping() (ports map[uint16]int, err error) {
+func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[uint16]int, err error) {
+	sourceFiles, ok := procFiles[transport]
+	if !ok {
+		return nil, fmt.Errorf("unsupported transport protocol id: %d", transport)
+	}
 	var pids gosigar.ProcList
 	if err = pids.Get(); err != nil {
 		return nil, err
 	}
 	logp.Debug("procs", "getLocalPortsToPIDs()")
-	ipv4socks, err := socketsFromProc("/proc/net/tcp", false)
+	ipv4socks, err := socketsFromProc(sourceFiles.ipv4, false)
 	if err != nil {
-		logp.Err("Parse_Proc_Net_Tcp: %s", err)
+		logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv4, err)
 		return nil, err
 	}
-	ipv6socks, err := socketsFromProc("/proc/net/tcp6", true)
+	ipv6socks, err := socketsFromProc(sourceFiles.ipv6, true)
 	if err != nil {
-		logp.Err("Parse_Proc_Net_Tcp ipv6: %s", err)
+		logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv6, err)
 		return nil, err
 	}
 	socksMap := map[uint64]*socketInfo{}
@@ -126,11 +138,11 @@ func socketsFromProc(filename string, ipv6 bool) ([]*socketInfo, error) {
 		return nil, err
 	}
 	defer file.Close()
-	return parseProcNetTCP(file, ipv6)
+	return parseProcNetProto(file, ipv6)
 }
 
-// Parses the /proc/net/tcp file
-func parseProcNetTCP(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
+// Parses the /proc/net/(tcp|udp)6? file
+func parseProcNetProto(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
 	buf := bufio.NewReader(input)
 
 	sockets := []*socketInfo{}
@@ -139,7 +151,7 @@ func parseProcNetTCP(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
 	for err != io.EOF {
 		line, err = buf.ReadBytes('\n')
 		if err != nil && err != io.EOF {
-			logp.Err("Error reading proc net tcp file: %s", err)
+			logp.Err("Error reading proc net file: %s", err)
 			return nil, err
 		}
 		words := bytes.Fields(line)

@@ -102,6 +102,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
 - Fix offset field pointing at end of a line. {issue}6514[6514]
 - Fix an issue when parsing ISO8601 dates with timezone definition {issue}7367[7367]
+- Fix Grok pattern of MongoDB module. {pull}7568[7568]
 
 *Heartbeat*
 - Fix race due to updates of shared a map, that was not supposed to be shared between multiple go-routines. {issue}6616[6616]
@@ -215,6 +216,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add Audit log fileset to the Elasticsearch module. {pull}7365[7365]
 - Add Slow log fileset to the Elasticsearch module. {pull}7473[7473]
 - Add deprecation fileset to the Elasticsearch module. {pull}7474[7474]
+- Add `config_timezone` option to Kafka module to convert dates to UTC. {issue}7546[7546] {pull}7578[7578]
 
 *Heartbeat*
 
@@ -302,6 +304,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Added Traefik module with health metricset. {pull}7413[7413]
 - Add Elasticsearch ml_job metricsets. {pull}7196[7196]
 - Add support for bearer token files to HTTP helper. {pull}7527[7527]
+- Add Elasticsearch index recovery metricset. {pull}7225[7225]
 - Add `oplog` metricset to MongoDB module {pull}7604[7604]
 
 *Packetbeat*
@@ -313,6 +316,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - The process monitor now reports the command-line for all processes, under Linux and Windows. {pull}7135[7135]
 - Updated the TLS protocol parser with new cipher suites added to TLS 1.3. {issue}7455[7455]
 - Flows are enriched with process information using the process monitor. {pull}7507[7507]
+- Added UDP support to process monitor. {pull}7571[7571]
 
 *Winlogbeat*
 

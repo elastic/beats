@@ -52,5 +52,3 @@ binary is installed, and run {beatname_uc} in the foreground with the following
 options specified: +.\winlogbeat.exe test config -c .\winlogbeat.yml -e+.
 
 endif::win[]
-
-

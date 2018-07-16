@@ -15,6 +15,13 @@
   #ssl.certificate: "/etc/pki/client/cert.pem"
   #ssl.key: "/etc/pki/client/cert.key"
 
+  # Enriching parameters:
+  add_metadata: true
+  in_cluster: true
+  # When used outside the cluster:
+  #host: node_name
+  #kube_config: ~/.kube/config
+
 # State metrics from kube-state-metrics service:
 - module: kubernetes
   enabled: true
@@ -27,6 +34,13 @@
     - state_container
   period: 10s
   hosts: ["kube-state-metrics:8080"]
+
+  # Enriching parameters:
+  add_metadata: true
+  in_cluster: true
+  # When used outside the cluster:
+  #host: node_name
+  #kube_config: ~/.kube/config
 
 # Kubernetes events
 - module: kubernetes

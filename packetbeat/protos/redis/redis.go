@@ -241,7 +241,7 @@ func (redis *redisPlugin) handleRedis(
 ) {
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.isRequest {
 		conn.requests.append(m) // wait for response

@@ -415,7 +415,7 @@ func (http *httpPlugin) handleHTTP(
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 	http.hideHeaders(m)
 
 	if m.isRequest {

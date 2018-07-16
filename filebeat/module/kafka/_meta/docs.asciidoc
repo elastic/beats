@@ -57,3 +57,5 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+include::../include/var-convert-timezone.asciidoc[]

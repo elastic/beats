@@ -137,6 +137,8 @@ cd ${GOPATH}/src/github.com/{user}
 
 Run python and specify the path to the Beat generator:
 
+NOTE: Python 2 is required (Python 3 will not work).
+
 [source,shell]
 --------------------
 python $GOPATH/src/github.com/elastic/beats/script/generate.py

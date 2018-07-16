@@ -36,6 +36,13 @@ To get the manifests just run:
 curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/kubernetes/metricbeat-kubernetes.yaml
 ------------------------------------------------
 
+[WARNING]
+=======================================
+If you are using Kubernetes 1.7 or earlier: {beatname_uc} uses a hostPath volume to persist internal data, it's located
+under /var/lib/{beatname_lc}-data. The manifest uses folder autocreation (`DirectoryOrCreate`), which was introduced in
+Kubernetes 1.8. You will need to remove `type: DirectoryOrCreate` from the manifest and create the host folder yourself.
+=======================================
+
 [float]
 ==== Settings
 

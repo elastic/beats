@@ -19,8 +19,10 @@
 
 package procs
 
+import "github.com/elastic/beats/packetbeat/protos/applayer"
+
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 // that owns them.
-func (proc *ProcessesWatcher) GetLocalPortToPIDMapping() (ports map[uint16]int, err error) {
+func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[uint16]int, err error) {
 	return nil, nil
 }
