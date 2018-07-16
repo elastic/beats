@@ -34,7 +34,6 @@ const oplogCol = "oplog.rs"
 var debugf = logp.MakeDebug("mongodb.oplog")
 
 func init() {
-	logp.Info("initializing oplog")
 	mb.Registry.MustAddMetricSet("mongodb", "oplog", New,
 		mb.WithHostParser(mongodb.ParseURL),
 		mb.DefaultMetricSet())
@@ -112,8 +111,14 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
-	firstTs := int64(first.(bson.M)["ts"].(bson.MongoTimestamp))
-	lastTs := int64(last.(bson.M)["ts"].(bson.MongoTimestamp))
+	firstTsValue, firstOk := first.(bson.M)["ts"].(bson.MongoTimestamp)
+	lastTsValue, lastOk := last.(bson.M)["ts"].(bson.MongoTimestamp)
+	if !firstOk || !lastOk {
+		err := errors.New("Unexpected timestamp value found in first/last oplog item")
+		return nil, err
+	}
+	firstTs := int64(firstTsValue)
+	lastTs := int64(lastTsValue)
 	diff := lastTs - firstTs
 
 	result := map[string]interface{}{
