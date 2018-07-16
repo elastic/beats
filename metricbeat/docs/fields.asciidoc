@@ -3524,6 +3524,113 @@ Total number of memory used by the segments in bytes.
 --
 
 [float]
+== index.recovery fields
+
+index
+
+
+
+*`elasticsearch.index.recovery.id`*::
++
+--
+type: long
+
+Shard recovery id.
+
+
+--
+
+*`elasticsearch.index.recovery.type`*::
++
+--
+type: keyword
+
+Shard recovery type.
+
+
+--
+
+*`elasticsearch.index.recovery.primary`*::
++
+--
+type: boolean
+
+True if primary shard.
+
+
+--
+
+*`elasticsearch.index.recovery.stage`*::
++
+--
+type: keyword
+
+Recovery stage.
+
+
+--
+
+*`elasticsearch.index.recovery.target.id`*::
++
+--
+type: keyword
+
+Target node id.
+
+
+--
+
+*`elasticsearch.index.recovery.target.host`*::
++
+--
+type: ip
+
+Target node host address.
+
+
+--
+
+*`elasticsearch.index.recovery.target.name`*::
++
+--
+type: keyword
+
+Target node name.
+
+
+--
+
+*`elasticsearch.index.recovery.source.id`*::
++
+--
+type: keyword
+
+Source node id.
+
+
+--
+
+*`elasticsearch.index.recovery.source.host`*::
++
+--
+type: ip
+
+Source node host address.
+
+
+--
+
+*`elasticsearch.index.recovery.source.name`*::
++
+--
+type: keyword
+
+Source node name.
+
+
+--
+
+[float]
 == index.summary fields
 
 index

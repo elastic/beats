@@ -15,33 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cmd
+// +build !integration
+
+package index_recovery
 
 import (
-	"flag"
+	"testing"
 
-	"github.com/spf13/pflag"
-
-	cmd "github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/metricbeat/beater"
-	"github.com/elastic/beats/metricbeat/cmd/test"
-
-	// import modules
-	_ "github.com/elastic/beats/metricbeat/include"
-	_ "github.com/elastic/beats/metricbeat/include/fields"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-// Name of this beat
-var Name = "metricbeat"
-
-// RootCmd to handle beats cli
-var RootCmd *cmd.BeatsRootCmd
-
-func init() {
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
-	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-
-	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.DefaultCreator(), runFlags)
-	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
-	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, ""))
+func TestMapper(t *testing.T) {
+	elasticsearch.TestMapper(t, "./_meta/test/recovery.*.json", eventsMapping)
 }
