@@ -41,6 +41,8 @@ https://github.com/elastic/beats/compare/v6.3.1...6.3[Check the HEAD diff]
 
 *Metricbeat*
 
+- Ensure metadata updates don't replace existing pod metrics. {pull}7573[7573]
+
 *Packetbeat*
 
 *Winlogbeat*
@@ -207,7 +209,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Don't stop Metricbeat if aerospike server is down. {pull}6874[6874]
 - disk reads and write count metrics in RabbitMQ queue metricset made optional. {issue}6876[6876]
 - Add mapping for docker metrics per cpu. {pull}6843[6843]
-- Ensure metadata updates don't replace existing pod metrics. {pull}7573[7573]
 
 *Winlogbeat*
 
