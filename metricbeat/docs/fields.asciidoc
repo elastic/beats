@@ -9423,6 +9423,892 @@ format: bytes
 --
 
 [float]
+== metrics fields
+
+Statistics that reflect the current use and state of a running `mongod` instance for more information, take a look at https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics
+
+
+
+
+
+*`mongodb.metrics.commands.is_self.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.is_self.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.aggregate.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.aggregate.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.build_info.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.build_info.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.coll_stats.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.coll_stats.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.connection_pool_stats.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.connection_pool_stats.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.count.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.count.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.db_stats.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.db_stats.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.distinct.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.distinct.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.find.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.find.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.get_cmd_line_opts.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.get_cmd_line_opts.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.get_last_error.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.get_last_error.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.get_log.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.get_log.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.get_more.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.get_more.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.get_parameter.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.get_parameter.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.host_info.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.host_info.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.insert.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.insert.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.is_master.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.is_master.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.last_collections.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.last_collections.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.last_commands.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.last_commands.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.list_databased.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.list_databased.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.list_indexes.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.list_indexes.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.ping.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.ping.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.profile.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.profile.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.replset_get_rbid.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.replset_get_rbid.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.replset_get_status.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.replset_get_status.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.replset_heartbeat.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.replset_heartbeat.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.replset_update_position.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.replset_update_position.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.server_status.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.server_status.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.update.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.update.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.whatsmyuri.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.whatsmyuri.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.cursor.timed_out`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.cursor.open.no_timeout`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.cursor.open.pinned`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.cursor.open.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.document.deleted`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.document.inserted`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.document.returned`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.document.updated`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.get_last_error.write_wait.ms`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.get_last_error.write_wait.count`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.get_last_error.write_timeouts`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.operation.scan_and_order`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.operation.write_conflicts`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.query_executor.scanned_indexes`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.query_executor.scanned_documents`*::
++
+--
+type: long
+
+--
+
+
+
+
+*`mongodb.metrics.replication.executor.counters.event_created`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.event_wait`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.cancels`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.waits`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.replication.executor.counters.scheduled.netcmd`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.scheduled.dbwork`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.scheduled.exclusive`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.scheduled.work_at`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.scheduled.work`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.scheduled.failures`*::
++
+--
+type: long
+
+--
+
+
+
+*`mongodb.metrics.replication.executor.queues.in_progress.network`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.queues.in_progress.dbwork`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.queues.in_progress.exclusive`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.queues.sleepers`*::
++
+--
+type: int
+
+--
+
+*`mongodb.metrics.replication.executor.queues.ready`*::
++
+--
+type: int
+
+--
+
+*`mongodb.metrics.replication.executor.queues.free`*::
++
+--
+type: int
+
+--
+
+*`mongodb.metrics.replication.executor.unsignaled_events`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.event_waiters`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.shutting_down`*::
++
+--
+type: boolean
+
+--
+
+*`mongodb.metrics.replication.executor.network_interface`*::
++
+--
+type: text
+
+--
+
+
+*`mongodb.metrics.replication.apply.attempts_to_become_secondary`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.apply.batches`*::
++
+--
+type: groupt
+
+--
+
+*`mongodb.metrics.replication.apply.ops`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.replication.buffer.count`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.buffer.max_size.bytes`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.buffer.size.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.replication.initial_sync.completed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.initial_sync.failed_attempts`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.initial_sync.failures`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.replication.network.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.replication.network.getmores.count`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.network.getmores.time.ms`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.network.ops`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.network.reders_created`*::
++
+--
+type: long
+
+--
+
+
+
+*`mongodb.metrics.replication.preload.docs.count`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.preload.docs.time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.replication.preload.indexes.count`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.preload.indexes.time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.storage.free_list.search.bucket_exhausted`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.storage.free_list.search.requests`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.storage.free_list.search.scanned`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.ttl.deleted_documents`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.ttl.passes`*::
++
+--
+type: long
+
+--
+
+[float]
 == status fields
 
 MongoDB server status metrics.
