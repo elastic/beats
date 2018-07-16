@@ -55,7 +55,7 @@ type decoderReader struct {
 	buf        *streambuf.Buffer
 	encodedBuf *streambuf.Buffer
 	bufferSize int
-	symlen     []int
+	symlen     []uint8
 
 	offset      int
 	bytesOffset int
@@ -111,14 +111,14 @@ func (r *decoderReader) read(buf []byte) (int, error) {
 }
 
 // msgSize returns the size of the encoded message on the disk
-func (r *decoderReader) msgSize(symlen []int, size int) (int, []int, error) {
+func (r *decoderReader) msgSize(symlen []uint8, size int) (int, []uint8, error) {
 	n := 0
 	for size > 0 {
 		if len(symlen) <= n {
 			return 0, symlen, fmt.Errorf("error calculating size: too short symlen")
 		}
 
-		size -= symlen[n]
+		size -= int(symlen[n])
 		n++
 	}
 
@@ -127,9 +127,9 @@ func (r *decoderReader) msgSize(symlen []int, size int) (int, []int, error) {
 	return n, symlen, nil
 }
 
-func (r *decoderReader) symbolsLen() []int {
+func (r *decoderReader) symbolsLen() []uint8 {
 	s := r.symlen
-	r.symlen = []int{}
+	r.symlen = []uint8{}
 	return s
 }
 
@@ -139,7 +139,7 @@ func (r *decoderReader) conv(in []byte, out []byte) (int, int, error) {
 	var err error
 	nProcessed := 0
 	decodedChar := make([]byte, 64)
-	r.symlen = make([]int, len(in))
+	r.symlen = make([]uint8, len(in))
 
 	i := 0
 	srcLen := len(in)
@@ -169,7 +169,7 @@ func (r *decoderReader) conv(in []byte, out []byte) (int, int, error) {
 				continue
 			}
 
-			r.symlen[nProcessed] = nDst
+			r.symlen[nProcessed] = uint8(nDst)
 			r.buf.Write(decodedChar[:nDst])
 			nProcessed++
 			break
@@ -195,7 +195,7 @@ type lineScanner struct {
 	separator  []byte
 	bufferSize int
 
-	symlen         []int
+	symlen         []uint8
 	buf            *streambuf.Buffer
 	offset         int
 	bytesOffset    int
@@ -210,7 +210,7 @@ func newLineScanner(in *decoderReader, separator []byte, bufferSize int) *lineSc
 		buf:         streambuf.New(nil),
 		offset:      0,
 		bytesOffset: 0,
-		symlen:      []int{},
+		symlen:      []uint8{},
 	}
 }
 
