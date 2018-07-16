@@ -44,4 +44,3 @@ func New(input io.Reader, codec encoding.Encoding, separator []byte, bufferSize 
 func (r *Reader) Next() ([]byte, int, error) {
 	return r.lineScanner.scan()
 }
-
