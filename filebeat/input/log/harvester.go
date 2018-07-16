@@ -475,7 +475,6 @@ func (h *Harvester) validateFile(f *os.File) error {
 	return nil
 }
 
-// itt mar 0 az offset
 func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
 	// continue from last known offset
 	if h.state.Offset > 0 {
