@@ -123,13 +123,13 @@ func testReaderWithEncodings(t *testing.T, bufferSize int) {
 			}
 
 			current += sz
-			byteCounts = append(byteCounts, sz)
+			byteCounts = append(byteCounts, current)
 		}
 
 		// validate lines and byte offsets
 		if len(test.strings) != len(readLines) {
 			t.Errorf("number of lines mismatch (expected=%v actual=%v)",
-				test.strings, readLines)
+				len(test.strings), len(readLines))
 			continue
 		}
 		for i := range test.strings {
