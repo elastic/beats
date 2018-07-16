@@ -1,20 +1,3 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 // +build windows
 
 package eventlog
@@ -25,15 +8,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
-	"golang.org/x/sys/windows"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/wineventlog"
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+	"golang.org/x/sys/windows"
 )
 
 const (
@@ -109,16 +91,12 @@ func (l *winEventLog) Name() string {
 	return l.channelName
 }
 
-func (l *winEventLog) Open(state checkpoint.EventLogState) error {
-	var bookmark win.EvtHandle
+func (l *winEventLog) Open(_ uint64) error {
 	var err error
-	if len(state.Bookmark) > 0 {
-		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
-	} else {
-		bookmark, err = win.CreateBookmarkFromRecordID(l.channelName, state.RecordNumber)
-	}
-	if err != nil {
-		return err
+
+	flags := win.EvtSubscribeToFutureEvents
+	if l.config.SimpleQuery.IgnoreOlder > 0 {
+		flags = win.EvtSubscribeStartAtOldestRecord
 	}
 
 	// Using a pull subscription to receive events. See:
