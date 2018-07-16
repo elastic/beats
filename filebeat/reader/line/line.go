@@ -88,7 +88,11 @@ func (r *decoderReader) read(buf []byte) (int, error) {
 		}
 
 		if start > 0 {
-			enc, _ := r.encodedBuf.Collect(start)
+			enc, err := r.encodedBuf.Collect(start)
+			if err != nil {
+				return 0, err
+			}
+			r.encodedBuf.Reset()
 			b = append(enc, b[start:]...)
 		}
 
@@ -187,7 +191,11 @@ func (r *decoderReader) copyToOut(out []byte) (int, error) {
 		until = r.buf.Len()
 	}
 	b, err := r.buf.Collect(until)
-	return copy(out, b), err
+	if err != nil {
+		return 0, err
+	}
+	r.buf.Reset()
+	return copy(out, b), nil
 }
 
 type lineScanner struct {
