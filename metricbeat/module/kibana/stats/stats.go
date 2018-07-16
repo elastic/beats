@@ -72,7 +72,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 
 	config := struct {
-		xpack bool `config:"xpack.enabled"`
+		XPackEnabled bool `config:"xpack.enabled"`
 	}{false}
 
 	if err := m.Module().UnpackConfig(&config); err != nil {
@@ -80,7 +80,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	if config.xpack {
+	if config.XPackEnabled {
 		cfgwarn.Experimental("The experimental xpack.enabled flag in kibana/stats metricset is enabled.")
 		intervalMs := m.Module().Config().Period.Nanoseconds() / 1000 / 1000
 		eventMappingXPack(r, intervalMs, content)
