@@ -231,7 +231,7 @@ For example the filebeat registry file defaults to:
 filebeat.registry: $\{path.data}/registry
 ------------------------------------------------------------------------------
 
-With `path.data` being an implicit config setting, that is overwritable from
+With `path.data` being an implicit config setting, that is overridable from
 command line, as well as in the configuration file.
 
 Example referencing `es.host` in `output.elasticsearch.hosts`:

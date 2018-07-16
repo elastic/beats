@@ -27,6 +27,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -44,9 +46,10 @@ type HTTP struct {
 // NewHTTP creates new http helper
 func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 	config := struct {
-		TLS     *tlscommon.Config `config:"ssl"`
-		Timeout time.Duration     `config:"timeout"`
-		Headers map[string]string `config:"headers"`
+		TLS             *tlscommon.Config `config:"ssl"`
+		Timeout         time.Duration     `config:"timeout"`
+		Headers         map[string]string `config:"headers"`
+		BearerTokenFile string            `config:"bearer_token_file"`
 	}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -54,6 +57,14 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
+	}
+
+	if config.BearerTokenFile != "" {
+		header, err := getAuthHeaderFromToken(config.BearerTokenFile)
+		if err != nil {
+			return nil, err
+		}
+		config.Headers["Authorization"] = header
 	}
 
 	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
@@ -178,4 +189,23 @@ func (h *HTTP) FetchJSON() (map[string]interface{}, error) {
 	}
 
 	return data, nil
+}
+
+// getAuthHeaderFromToken reads a bearer authorizaiton token from the given file
+func getAuthHeaderFromToken(path string) (string, error) {
+	var token string
+
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", errors.Wrap(err, "reading bearer token file")
+	}
+
+	if len(b) != 0 {
+		if b[len(b)-1] == '\n' {
+			b = b[0 : len(b)-1]
+		}
+		token = fmt.Sprintf("Bearer %s", string(b))
+	}
+
+	return token, nil
 }

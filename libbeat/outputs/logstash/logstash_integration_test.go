@@ -58,17 +58,17 @@ type testOutputer struct {
 	*esConnection
 }
 
-type esSoure interface {
+type esSource interface {
 	RefreshIndex()
 }
 
 type esValueReader interface {
-	esSoure
+	esSource
 	Read() ([]map[string]interface{}, error)
 }
 
 type esCountReader interface {
-	esSoure
+	esSource
 	Count() (int, error)
 }
 

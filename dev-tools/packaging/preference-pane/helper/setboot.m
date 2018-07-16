@@ -76,7 +76,7 @@ BOOL setRunAtBoot(NSString* plistPath, BOOL runAtBoot) {
         err = [output streamError];
     }
     if (err != nil) {
-        fail([NSString stringWithFormat:@"Error writting property-list. Code=%u `%@`", (unsigned int)[err code], [err localizedDescription]]);
+        fail([NSString stringWithFormat:@"Error writing property-list. Code=%u `%@`", (unsigned int)[err code], [err localizedDescription]]);
         return NO;
     }
     [output close];
@@ -84,7 +84,7 @@ BOOL setRunAtBoot(NSString* plistPath, BOOL runAtBoot) {
     NSData *data = [output propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
     BOOL success = [data writeToFile:plistPath atomically:YES];
     if (!success) {
-        fail(@"Error overwritting plist file");
+        fail(@"Error overwriting plist file");
         return NO;
     }
     return YES;

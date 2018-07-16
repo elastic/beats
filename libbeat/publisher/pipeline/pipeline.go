@@ -39,7 +39,7 @@ import (
 // Pipeline implementation providint all beats publisher functionality.
 // The pipeline consists of clients, processors, a central queue, an output
 // controller and the actual outputs.
-// The queue implementing the queue.Queue interface is the most entral entity
+// The queue implementing the queue.Queue interface is the most central entity
 // to the pipeline, providing support for pushung, batching and pulling events.
 // The pipeline adds different ACKing strategies and wait close support on top
 // of the queue. For handling ACKs, the pipeline keeps track of filtered out events,

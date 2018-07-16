@@ -24,7 +24,9 @@ import (
 	"time"
 
 	"github.com/ericchiang/k8s"
+	appsv1 "github.com/ericchiang/k8s/apis/apps/v1beta1"
 	"github.com/ericchiang/k8s/apis/core/v1"
+	extv1 "github.com/ericchiang/k8s/apis/extensions/v1beta1"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -109,6 +111,50 @@ func NewWatcher(client *k8s.Client, resource Resource, options WatchOptions) (Wa
 			}
 			return rs
 		}
+	case *Node:
+		list := &v1.NodeList{}
+		w.resourceList = list
+		w.k8sResourceFactory = func() k8s.Resource { return &v1.Node{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
+	case *Deployment:
+		list := &appsv1.DeploymentList{}
+		w.resourceList = list
+		w.k8sResourceFactory = func() k8s.Resource { return &appsv1.Deployment{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
+	case *ReplicaSet:
+		list := &extv1.ReplicaSetList{}
+		w.resourceList = list
+		w.k8sResourceFactory = func() k8s.Resource { return &extv1.ReplicaSet{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
+	case *StatefulSet:
+		list := &appsv1.StatefulSetList{}
+		w.resourceList = list
+		w.k8sResourceFactory = func() k8s.Resource { return &appsv1.StatefulSet{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
 	default:
 		return nil, fmt.Errorf("unsupported resource type for watching %T", resource)
 	}
@@ -163,7 +209,6 @@ func (w *watcher) onDelete(obj Resource) {
 
 // Start watching pods
 func (w *watcher) Start() error {
-
 	// Make sure that events don't flow into the annotator before informer is fully set up
 	// Sync initial state:
 	err := w.sync()
@@ -209,7 +254,7 @@ func (w *watcher) watch() {
 				logp.Err("kubernetes: Watching API error %v", err)
 				watcher.Close()
 				if !(err == io.EOF || err == io.ErrUnexpectedEOF) {
-					// This is an error event which can be recovered by moving to the latest resource verison
+					// This is an error event which can be recovered by moving to the latest resource version
 					logp.Info("kubernetes: Ignoring event, moving to most recent resource version")
 					w.lastResourceVersion = ""
 				}

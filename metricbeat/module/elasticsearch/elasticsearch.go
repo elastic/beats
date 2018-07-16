@@ -118,15 +118,8 @@ func getMasterName(http *helper.HTTP, uri string) (string, error) {
 
 // GetInfo returns the data for the Elasticsearch / endpoint
 func GetInfo(http *helper.HTTP, uri string) (*Info, error) {
-	defer http.SetURI(uri)
 
-	// Parses the uri to replace the path
-	u, _ := url.Parse(uri)
-	u.Path = ""
-
-	// Http helper includes the HostData with username and password
-	http.SetURI(u.String())
-	content, err := http.FetchContent()
+	content, err := fetchPath(http, uri, "/")
 	if err != nil {
 		return nil, err
 	}
@@ -143,6 +136,7 @@ func fetchPath(http *helper.HTTP, uri, path string) ([]byte, error) {
 	// Parses the uri to replace the path
 	u, _ := url.Parse(uri)
 	u.Path = path
+	u.RawQuery = ""
 
 	// Http helper includes the HostData with username and password
 	http.SetURI(u.String())

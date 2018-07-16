@@ -53,17 +53,26 @@ After securing {beatname_uc}, make sure your users have the roles (or associated
 privileges) required to use these {beatname_uc} features. You must create the
 ++{beat_default_index_prefix}_writer++ and
 ++{beat_default_index_prefix}_reader++ roles (see <<beats-basic-auth>> and
-<<beats-user-access>>). The `machine_learning_admin` and `kibana_user` roles are
-{xpack-ref}/built-in-roles.html[built-in].
+<<beats-user-access>>).
+ifdef::has_ml_jobs[]
+The `machine_learning_admin` and `kibana_user` roles are {xpack-ref}/built-in-roles.html[built-in].
+endif::[]
+ifndef::has_ml_jobs[]
+The `kibana_user` role is {xpack-ref}/built-in-roles.html[built-in].
+endif::[]
 
 [options="header"]
 |=======
 |Feature | Role
 |Send data to a secured cluster   | ++{beat_default_index_prefix}_writer++
+ifeval::["{beatname_lc}"=="filebeat"]
 |Run Filebeat modules | ++{beat_default_index_prefix}_writer++
+endif::[]
 |Load index templates | ++{beat_default_index_prefix}_writer++ and `kibana_user`
 |Load {beatname_uc} dashboards into {kib} | ++{beat_default_index_prefix}_writer++ and `kibana_user`
+ifdef::has_ml_jobs[]
 |Load machine learning jobs | `machine_learning_admin`
+endif::[]
 |Read indices created by {beatname_uc} | ++{beat_default_index_prefix}_reader++ 
 |View {beatname_uc} dashboards in {kib} | `kibana_user`
 |=======

@@ -6,10 +6,6 @@
     description: "Log component"
     example: "o.e.c.m.MetaDataCreateIndexService"
     type: keyword
-  - name: node_name
-    description: "Name of the node"
-    example: "vWNJsZ3"
-    type: keyword
   - name: gc
     description: "GC log"
     type: group
@@ -31,11 +27,3 @@
     description: ""
     example: ""
     type: long
-  - name: index_name
-    description: "Index name"
-    example: "filebeat-test-input"
-    type: keyword
-  - name: index_id
-    description: "Index id"
-    example: "aOGgDwbURfCV57AScqbCgw"
-    type: keyword

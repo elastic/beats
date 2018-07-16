@@ -55,6 +55,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/dropwizard/collector"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index"
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_summary"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/ml_job"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node"

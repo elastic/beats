@@ -38,7 +38,7 @@ type delimiter interface {
 	// Delimiter returns the actual delimiter string.
 	Delimiter() string
 
-	// IsGreedy return true if the next key should be greedy (end of string) or when explicitely
+	// IsGreedy return true if the next key should be greedy (end of string) or when explicitly
 	// configured.
 	IsGreedy() bool
 

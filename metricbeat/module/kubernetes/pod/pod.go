@@ -19,6 +19,7 @@ package pod
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -52,7 +53,8 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	http *helper.HTTP
+	http     *helper.HTTP
+	enricher util.Enricher
 }
 
 // New create a new instance of the MetricSet
@@ -63,9 +65,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Pod{}, true),
 	}, nil
 }
 
@@ -73,6 +77,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+	m.enricher.Start()
+
 	body, err := m.http.FetchContent()
 	if err != nil {
 		return nil, err
@@ -83,5 +89,13 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
+	m.enricher.Enrich(events)
+
 	return events, nil
+}
+
+// Close stops this metricset
+func (m *MetricSet) Close() error {
+	m.enricher.Stop()
+	return nil
 }

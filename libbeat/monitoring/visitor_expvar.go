@@ -76,7 +76,7 @@ func makeExparVisitor(level int, vs Visitor) func(expvar.KeyValue) {
 }
 
 // ignore if `monitoring` variable or some other internals
-// autmoatically registered by expvar against our wishes
+// automatically registered by expvar against our wishes
 func ignoreExpvar(level int, kv expvar.KeyValue) bool {
 	switch kv.Value.(type) {
 	case makeExpvar, Var:

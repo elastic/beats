@@ -13,6 +13,10 @@ the Elastic stack:
 * <<securing-beats>>
 * <<linux-seccomp>>
 
+ifdef::beat-specific-security[]
+include::{beat-specific-security}[]
+endif::[]
+
 //sets block macro for https.asciidoc included in next section
 
 --

@@ -199,7 +199,7 @@ func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint
 		table[name] = bodyToByteArray(data[offset+1+size : offset+5+size])
 		offset += 5 + size
 	default:
-		//unkown field
+		//unknown field
 		return true
 	}
 	//advance to next field recursively
