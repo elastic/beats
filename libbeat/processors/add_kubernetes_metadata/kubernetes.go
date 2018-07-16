@@ -154,16 +154,9 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	meta := common.MapStr{}
-	metaIface, ok := event.Fields["kubernetes"]
-	if !ok {
-		event.Fields["kubernetes"] = common.MapStr{}
-	} else {
-		meta = metaIface.(common.MapStr)
-	}
-
-	meta.Update(metadata)
-	event.Fields["kubernetes"] = meta
+	event.Fields.DeepUpdate(common.MapStr{
+		"kubernetes": metadata,
+	})
 
 	return event, nil
 }
