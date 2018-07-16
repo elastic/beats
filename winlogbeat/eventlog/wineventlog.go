@@ -82,7 +82,9 @@ type winEventLog struct {
 	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
 	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
 
-	logPrefix string // String to prefix on log messages.
+	logPrefix     string               // String to prefix on log messages.
+	eventMetadata common.EventMetadata // Field and tags to add to each event.
+	evt           windows.Handle
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
@@ -101,23 +103,23 @@ func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	if err != nil {
 		return err
 	}
-	defer win.Close(bookmark)
 
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
-	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
+	l.evt, err = windows.CreateEvent(nil, 0, 0, nil)
 	if err != nil {
 		return nil
 	}
 
 	debugf("%s using subscription query=%s", l.logPrefix, l.query)
 	subscriptionHandle, err := win.Subscribe(
-		0, // Session - nil for localhost
-		signalEvent,
-		"",       // Channel - empty b/c channel is in the query
-		l.query,  // Query - nil means all events
-		bookmark, // Bookmark - for resuming from a specific event
-		win.EvtSubscribeStartAfterBookmark)
+		0,       // Session - nil for localhost
+		l.evt,   //signalEvent
+		"",      // Channel - empty b/c channel is in the query
+		l.query, // Query - nil means all events
+		0,       // Bookmark - for resuming from a specific event
+		flags,   //win.EvtSubscribeStartAfterBookmark to work with bookmarks
+	)
 	if err != nil {
 		return err
 	}
@@ -180,6 +182,8 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 func (l *winEventLog) Close() error {
 	debugf("%s Closing handle", l.logPrefix)
+	windows.SetEvent(l.evt)
+	//windows.CloseHandle(l.evt)
 	return win.Close(l.subscription)
 }
 
@@ -193,8 +197,9 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 		}
 		return handles, maxRead, nil
 	case win.ERROR_NO_MORE_ITEMS:
-		detailf("%s No more events", l.logPrefix)
-		return nil, maxRead, nil
+		detailf("%s No more events. Waiting...", l.logPrefix)
+		_, err := windows.WaitForSingleObject(l.evt, windows.INFINITE)
+		return nil, 0, err
 	case win.RPC_S_INVALID_BOUND:
 		incrementMetric(readErrors, err)
 		if err := l.Close(); err != nil {
