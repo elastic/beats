@@ -28,10 +28,10 @@ var schema = s.Schema{
 		"used":      c.Int("used"),
 	},
 	"first": s.Object{
-		"ts": c.Int("tFirst"),
+		"timestamp": c.Int("tFirst"),
 	},
 	"last": s.Object{
-		"ts": c.Int("tLast"),
+		"timestamp": c.Int("tLast"),
 	},
 	"window": c.Int("timeDiff"),
 }

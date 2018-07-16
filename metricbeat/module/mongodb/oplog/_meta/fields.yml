@@ -17,15 +17,15 @@
           description: >
             total amount of space allocated to the oplog in bytes.
 
-    - name: first.ts
+    - name: first.timestamp
       type: long
       description: >
-        Time stamp of the first (i.e. earliest) operation in the oplog
+        Timestamp of the first (i.e. earliest) operation in the oplog
 
-    - name: last.ts
+    - name: last.timestamp
       type: long
       description: >
-        Time stamp of the last (i.e. latest) operation in the oplog
+        Timestamp of the last (i.e. latest) operation in the oplog
 
     - name: window
       type: long
