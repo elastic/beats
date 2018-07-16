@@ -9543,22 +9543,22 @@ type: gorup
 
 --
 
-*`mongodb.oplog.first.ts`*::
+*`mongodb.oplog.first.timestamp`*::
 +
 --
 type: long
 
-Time stamp of the first (i.e. earliest) operation in the oplog
+Timestamp of the first (i.e. earliest) operation in the oplog
 
 
 --
 
-*`mongodb.oplog.last.ts`*::
+*`mongodb.oplog.last.timestamp`*::
 +
 --
 type: long
 
-Time stamp of the last (i.e. latest) operation in the oplog
+Timestamp of the last (i.e. latest) operation in the oplog
 
 
 --
