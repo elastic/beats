@@ -13,8 +13,11 @@
     {
       "grok": {
         "field": "kafka.log.message",
+        "pattern_definitions": {
+          "KAFKA_COMPONENT": "[^\\]]*"
+        },
         "patterns": [
-          "\\[%{DATA:kafka.log.component}\\][,:. ] +%{JAVALOGMESSAGE:kafka.log.message}"
+          "\\[%{KAFKA_COMPONENT:kafka.log.component}\\][,:.]? +%{JAVALOGMESSAGE:kafka.log.message}"
         ],
         "on_failure": [
           {
