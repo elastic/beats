@@ -34,20 +34,15 @@ type decoderReader struct {
 	encodedBuf *streambuf.Buffer
 	bufferSize int
 	symlen     []uint8
-
-	offset      int
-	bytesOffset int
 }
 
 func newDecoderReader(in io.Reader, codec encoding.Encoding, bufferSize int) *decoderReader {
 	return &decoderReader{
-		in:          in,
-		decoder:     codec.NewDecoder(),
-		buf:         streambuf.New(nil),
-		encodedBuf:  streambuf.New(nil),
-		bufferSize:  bufferSize,
-		offset:      0,
-		bytesOffset: 0,
+		in:         in,
+		decoder:    codec.NewDecoder(),
+		buf:        streambuf.New(nil),
+		encodedBuf: streambuf.New(nil),
+		bufferSize: bufferSize,
 	}
 }
 
@@ -78,16 +73,10 @@ func (r *decoderReader) read(buf []byte) (int, error) {
 		if err != nil {
 			if err == transform.ErrShortSrc {
 				r.encodedBuf.Append(b[nProcessed:])
-
-				r.offset += nBytes
-				r.bytesOffset += nProcessed
 				return nBytes, nil
 			}
 			return 0, err
 		}
-		r.offset += nBytes
-		r.bytesOffset += nProcessed
-
 		return nBytes, nil
 	}
 }

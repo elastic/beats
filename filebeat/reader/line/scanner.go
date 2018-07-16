@@ -24,22 +24,17 @@ type lineScanner struct {
 	separator  []byte
 	bufferSize int
 
-	symlen         []uint8
-	buf            *streambuf.Buffer
-	offset         int
-	bytesOffset    int
-	lastMessageLen int
+	symlen []uint8
+	buf    *streambuf.Buffer
 }
 
 func newLineScanner(in *decoderReader, separator []byte, bufferSize int) *lineScanner {
 	return &lineScanner{
-		in:          in,
-		separator:   separator,
-		bufferSize:  bufferSize,
-		buf:         streambuf.New(nil),
-		offset:      0,
-		bytesOffset: 0,
-		symlen:      []uint8{},
+		in:         in,
+		separator:  separator,
+		bufferSize: bufferSize,
+		buf:        streambuf.New(nil),
+		symlen:     []uint8{},
 	}
 }
 
@@ -79,8 +74,6 @@ func (s *lineScanner) line(i int) ([]byte, int, error) {
 		return nil, 0, err
 	}
 
-	s.bytesOffset += msgSymbols
-	s.offset += i
 	s.buf.Reset()
 
 	return line, msgSymbols, nil
