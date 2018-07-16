@@ -1,4 +1,415 @@
 - name: metrics
   type: group
   description: >
-    metrics
+    Statistics that reflect the current use and state of a running `mongod` instance
+    for more information, take a look at https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics
+  fields:
+    - name: commands
+      type: group
+      fields: 
+        - name: is_self
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: aggregate
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: build_info
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: coll_stats
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: connection_pool_stats
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: count
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: db_stats
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: distinct
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: find
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: get_cmd_line_opts
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: get_last_error
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: get_log
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: get_more
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: get_parameter
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: host_info
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: insert
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: is_master
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: last_collections
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: last_commands
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: list_databased
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: list_indexes
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: ping
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: profile
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: replset_get_rbid
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: replset_get_status
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: replset_heartbeat
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: replset_update_position
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: server_status
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: update
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: whatsmyuri
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+
+    - name: cursor
+      type: group
+      fields:
+        - name: timed_out
+          type: long
+        - name: open
+          type: group
+          fields:
+            - name: no_timeout
+              type: long
+            - name: pinned
+              type: long
+            - name: total
+              type: long
+
+    - name: document
+      type: group
+      fields:
+        - name: deleted
+          type: long
+        - name: inserted
+          type: long
+        - name: returned
+          type: long
+        - name: updated
+          type: long
+
+    - name: get_last_error
+      type: group
+      fields:
+        - name: write_wait.ms
+          type: long
+        - name: write_wait.count
+          type: long
+        - name: write_timeouts
+          type: long
+
+    - name: operation
+      type: group
+      fields:
+        - name: scan_and_order
+          type: long
+        - name: write_conflicts
+          type: long
+
+    - name: query_executor
+      type: group
+      fields:
+        - name: scanned_indexes
+          type: long
+        - name: scanned_documents
+          type: long
+
+    - name: replication
+      type: group
+      fields:
+        - name: executor
+          type: group
+          fields:
+            - name: counters
+              type: group
+              fields:
+                - name: event_created
+                  type: long
+                - name: event_wait
+                  type: long
+                - name: cancels
+                  type: long
+                - name: waits
+                  type: long
+                - name: scheduled
+                  type: group
+                  fields:
+                    - name: netcmd
+                      type: long
+                    - name: dbwork
+                      type: long
+                    - name: exclusive
+                      type: long
+                    - name: work_at
+                      type: long
+                    - name: work
+                      type: long
+                    - name: failures                  
+                      type: long
+            - name: queues
+              type: group
+              fields:
+                - name: in_progress
+                  type: group
+                  fields:
+                    - name: network
+                      type: long
+                    - name: dbwork
+                      type: long
+                    - name: exclusive                    
+                      type: long
+                - name: sleepers
+                  type: int
+                - name: ready
+                  type: int
+                - name: free
+                  type: int
+            - name: unsignaled_events
+              type: long
+            - name: event_waiters
+              type: long
+            - name: shutting_down
+              type: boolean
+            - name: network_interface          
+              type: text
+        - name: apply
+          type: group
+          fields:
+            - name: attempts_to_become_secondary
+              type: long
+            - name: batches
+              type: groupt
+              fields:
+                - name: count
+                  type: long
+                - name: time.ms
+                  type: long
+            - name: ops
+              type: long
+        - name: buffer
+          type: group
+          fields:
+            - name: count
+              type: long
+            - name: max_size.bytes
+              type: long
+            - name: size.bytes
+              type: long
+        - name: initial_sync
+          type: group
+          fields:
+            - name: completed
+              type: long
+            - name: failed_attempts
+              type: long
+            - name: failures          
+              type: long
+        - name: network
+          type: group
+          fields:
+            - name: bytes
+              type: long
+            - name: getmores
+              type: group
+              fields:
+                - name: count
+                  type: long
+                - name: time.ms
+                  type: long
+            - name: ops
+              type: long
+            - name: reders_created
+              type: long
+        - name: preload
+          type: group
+          fields:
+            - name: docs
+              type: group
+              fields:
+                - name: count
+                  type: long
+                - name: time.ms
+                  type: long
+            - name: indexes
+              type: group
+              fields:
+                - name: count
+                  type: long
+                - name: time.ms
+                  type: long
+    
+    - name: storage.free_list.search
+      type: group
+      fields:
+        - name: bucket_exhausted
+          type: long
+        - name: requests
+          type: long
+        - name: scanned
+          type: long
+    
+    - name: ttl
+      type: group
+      fields:
+        - name: deleted_documents
+          type: long
+        - name: passes
+          type: long
+      
