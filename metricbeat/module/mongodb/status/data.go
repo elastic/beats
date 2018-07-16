@@ -23,13 +23,12 @@ import (
 )
 
 var schema = s.Schema{
-	// host(str), pid(int), uptime.value(float), uptime.estimate(int), 
 	"version": c.Str("version"),
 	"process": c.Str("process"),
 	"uptime": s.Object{
 		"ms": c.Int("uptimeMillis"),
 	},
-	"local_time":         c.Time("localTime"),
+	"local_time": c.Time("localTime"),
 	"asserts": c.Dict("asserts", s.Schema{
 		"regular":   c.Int("regular"),
 		"warning":   c.Int("warning"),
@@ -48,24 +47,24 @@ var schema = s.Schema{
 	}),
 	"global_lock": c.Dict("globalLock", s.Schema{
 		"total_time.us":  c.Int("totalTime"),
-		"current_queue": c.Dict("currentQueue", globalLockItemSchema),
+		"current_queue":  c.Dict("currentQueue", globalLockItemSchema),
 		"active_clients": c.Dict("activeClients", globalLockItemSchema),
 	}),
 	"locks": c.Dict("locks", s.Schema{
-		"global": c.Dict("Global", lockItemSchema),
-		"database": c.Dict("Database", lockItemSchema),
+		"global":     c.Dict("Global", lockItemSchema),
+		"database":   c.Dict("Database", lockItemSchema),
 		"collection": c.Dict("Collection", lockItemSchema),
-		"meta_data": c.Dict("Metadata", lockItemSchema),
-		"oplog": c.Dict("oplog", lockItemSchema),
+		"meta_data":  c.Dict("Metadata", lockItemSchema),
+		"oplog":      c.Dict("oplog", lockItemSchema),
 	}),
 	"network": c.Dict("network", s.Schema{
 		"in":       s.Object{"bytes": c.Int("bytesIn")},
 		"out":      s.Object{"bytes": c.Int("bytesOut")},
 		"requests": c.Int("numRequests"),
 	}),
-	"oplatencies": c.Dict("opLatencies", s.Schema {
-		"reads": c.Dict("reads", opLatenciesItemSchema),
-		"writes": c.Dict("writes", opLatenciesItemSchema),
+	"oplatencies": c.Dict("opLatencies", s.Schema{
+		"reads":    c.Dict("reads", opLatenciesItemSchema),
+		"writes":   c.Dict("writes", opLatenciesItemSchema),
 		"commands": c.Dict("commands", opLatenciesItemSchema),
 	}, c.DictOptional),
 	"opcounters": c.Dict("opcounters", s.Schema{
@@ -84,32 +83,15 @@ var schema = s.Schema{
 		"getmore": c.Int("getmore"),
 		"command": c.Int("command"),
 	}),
-	/*
-	repl Object
-		hosts string[]
-		arbiters string[]
-		setName
-		setVersion
-		ismaster
-		secondary
-		primary
-		me
-		electionId
-		lastWrite
-			opTime
-				ts	Timestamp
-				t	long	 ??
-			lastWriteDate Time
-		rbid int ??
-	*/
+	// ToDo add `repl` field
 	"storage_engine": c.Dict("storageEngine", s.Schema{
 		"name": c.Str("name"),
 		// supportsCommitedReads boolean
 		// readOnly boolean
 		// persistent boolean
 	}),
-	// tcmalloc
-	"wired_tiger": c.Dict("wiredTiger", wiredTigerSchema, c.DictOptional),
+	// ToDo add `tcmalloc` field
+	"wired_tiger":        c.Dict("wiredTiger", wiredTigerSchema, c.DictOptional),
 	"write_backs_queued": c.Bool("writeBacksQueued", s.Optional),
 	"memory": c.Dict("mem", s.Schema{
 		"bits":                c.Int("bits"),
@@ -118,7 +100,6 @@ var schema = s.Schema{
 		"mapped":              s.Object{"mb": c.Int("mapped")},
 		"mapped_with_journal": s.Object{"mb": c.Int("mappedWithJournal")},
 	}),
-	// metrics
 
 	// MMPAV1 only
 	"background_flushing": c.Dict("backgroundFlushing", s.Schema{
@@ -193,33 +174,33 @@ var wiredTigerSchema = s.Schema{
 	}),
 }
 
-var globalLockItemSchema = s.Schema {
-	"total": c.Int("total"),
+var globalLockItemSchema = s.Schema{
+	"total":   c.Int("total"),
 	"readers": c.Int("readers"),
 	"writers": c.Int("writers"),
 }
 
-var lockItemSchema = s.Schema {
-	"acquire": s.Object {
+var lockItemSchema = s.Schema{
+	"acquire": s.Object{
 		"count": c.Dict("acquireCount", lockItemModesSchema, c.DictOptional),
 	},
-	"wait": s.Object {
+	"wait": s.Object{
 		"count": c.Dict("acquireWaitCount", lockItemModesSchema, c.DictOptional),
-		"us": c.Dict("timeAcquiringMicros", lockItemModesSchema, c.DictOptional),
+		"us":    c.Dict("timeAcquiringMicros", lockItemModesSchema, c.DictOptional),
 	},
-	"deadlock": s.Object {
+	"deadlock": s.Object{
 		"count": c.Dict("deadlockCount", lockItemModesSchema, c.DictOptional),
 	},
 }
 
-var lockItemModesSchema = s.Schema {
+var lockItemModesSchema = s.Schema{
 	"r": c.Int("r", s.Optional),
 	"w": c.Int("w", s.Optional),
 	"R": c.Int("R", s.Optional),
 	"W": c.Int("W", s.Optional),
 }
 
-var opLatenciesItemSchema = s.Schema {
+var opLatenciesItemSchema = s.Schema{
 	"latency": c.Int("latency"),
-	"count": c.Int("ops"),
+	"count":   c.Int("ops"),
 }
