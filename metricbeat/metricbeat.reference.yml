@@ -208,7 +208,7 @@ metricbeat.modules:
 
   # Set to false to fetch all entries
   #index_recovery.active_only: true
-  
+
 #----------------------------- envoyproxy Module -----------------------------
 - module: envoyproxy
   metricsets: ["server"]
