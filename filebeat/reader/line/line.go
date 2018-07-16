@@ -24,7 +24,6 @@ import (
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/transform"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 )
 
@@ -60,21 +59,6 @@ type decoderReader struct {
 
 	offset      int
 	bytesOffset int
-}
-
-// GetState returns the state of this and the previous readers
-func (r *Reader) GetState() common.MapStr {
-	return common.MapStr{
-		"decoder": common.MapStr{
-			"offset": r.lineScanner.in.offset,
-			"bytes":  r.lineScanner.in.bytesOffset,
-		},
-		"scanner": common.MapStr{
-			"offset":       r.lineScanner.offset,
-			"bytes":        r.lineScanner.bytesOffset,
-			"last_message": r.lineScanner.lastMessageLen,
-		},
-	}
 }
 
 func newDecoderReader(in io.Reader, codec encoding.Encoding, bufferSize int) *decoderReader {
@@ -271,5 +255,5 @@ func (s *lineScanner) line(i int) ([]byte, int, error) {
 	s.offset += i
 	s.buf.Reset()
 
-	return line, len(line), nil
+	return line, msgSymbols, nil
 }

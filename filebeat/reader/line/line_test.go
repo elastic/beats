@@ -111,6 +111,7 @@ func testReaderWithEncodings(t *testing.T, bufferSize int) {
 		// read decodec lines from buffer
 		var readLines []string
 		var byteCounts []int
+		current := 0
 		for {
 			bytes, sz, err := reader.Next()
 			if sz > 0 {
@@ -121,16 +122,8 @@ func testReaderWithEncodings(t *testing.T, bufferSize int) {
 				break
 			}
 
-			state := reader.GetState()
-			iMsgBytes, err := state.GetValue("scanner.bytes")
-			if err != nil {
-				t.Errorf("error wilhe getting scanner.bytes: %v", err)
-			}
-			msgBytes, ok := iMsgBytes.(int)
-			if !ok {
-				t.Errorf("error converting msg_bytes to int")
-			}
-			byteCounts = append(byteCounts, msgBytes)
+			current += sz
+			byteCounts = append(byteCounts, sz)
 		}
 
 		// validate lines and byte offsets

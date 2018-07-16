@@ -105,11 +105,6 @@ func (r *JSON) Next() (reader.Message, error) {
 	return message, nil
 }
 
-// GetState returns the state of this and the previous readers
-func (r *JSON) GetState() common.MapStr {
-	return r.reader.GetState()
-}
-
 func createJSONError(message string) common.MapStr {
 	return common.MapStr{"message": message, "type": "json"}
 }

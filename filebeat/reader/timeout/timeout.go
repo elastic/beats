@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/libbeat/common"
 )
 
 var (
@@ -86,9 +85,4 @@ func (r *Reader) Next() (reader.Message, error) {
 	case <-time.After(r.timeout):
 		return reader.Message{}, r.signal
 	}
-}
-
-// GetState returns the state of this and the previous readers
-func (r *Reader) GetState() common.MapStr {
-	return r.reader.GetState()
 }

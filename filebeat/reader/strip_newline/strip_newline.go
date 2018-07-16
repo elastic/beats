@@ -19,7 +19,6 @@ package strip_newline
 
 import (
 	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/libbeat/common"
 )
 
 // StripNewline reader removes the last trailing newline characters from
@@ -62,9 +61,4 @@ func lineEndingChars(l []byte) int {
 		return 2
 	}
 	return 1
-}
-
-// GetState returns the state of this and the previous readers
-func (r *StripNewline) GetState() common.MapStr {
-	return r.reader.GetState()
 }

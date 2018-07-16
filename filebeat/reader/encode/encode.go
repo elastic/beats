@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/filebeat/reader"
 	"github.com/elastic/beats/filebeat/reader/encode/encoding"
 	"github.com/elastic/beats/filebeat/reader/line"
-	"github.com/elastic/beats/libbeat/common"
 )
 
 // Reader produces lines by reading lines from an io.Reader
@@ -54,9 +53,4 @@ func (r Reader) Next() (reader.Message, error) {
 		Content: c,
 		Bytes:   sz,
 	}, err
-}
-
-// GetState returns the state of this and the previous readers
-func (r Reader) GetState() common.MapStr {
-	return r.reader.GetState()
 }

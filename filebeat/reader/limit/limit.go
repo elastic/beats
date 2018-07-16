@@ -19,7 +19,6 @@ package limit
 
 import (
 	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/libbeat/common"
 )
 
 // Reader sets an upper limited on line length. Lines longer
@@ -41,9 +40,4 @@ func (r *Reader) Next() (reader.Message, error) {
 		message.Content = message.Content[:r.maxBytes]
 	}
 	return message, err
-}
-
-// GetState returns the state of this and the previous readers
-func (r *Reader) GetState() common.MapStr {
-	return r.reader.GetState()
 }
