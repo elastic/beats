@@ -109,7 +109,7 @@ filebeat.inputs:
 
   ### Multiline options
 
-  # Mutiline can be used for log messages spanning multiple lines. This is common
+  # Multiline can be used for log messages spanning multiple lines. This is common
   # for Java Stack Traces or C-Line Continuation
 
   # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
@@ -141,7 +141,7 @@ filebeat.inputs:
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
-  # If symlinks is enabled, symlinks are opened and harvested. The harvester is openening the
+  # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
   # original for harvesting but will report the symlink name as source.
   #symlinks: false
 
@@ -258,6 +258,36 @@ filebeat.inputs:
   # The number of seconds of inactivity before a remote connection is closed.
   #timeout: 300s
 
+  # Use SSL settings for TCP.
+  #ssl.enabled: true
+
+  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # 1.2 are enabled.
+  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # SSL configuration. By default is off.
+  # List of root certificates for client verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL server authentication.
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Server Certificate Key,
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
+
+  # Configure cipher suites to be used for SSL connections.
+  #ssl.cipher_suites: []
+
+  # Configure curve types for ECDHE based cipher suites.
+  #ssl.curve_types: []
+
+  # Configure what types of client authentication are supported. Valid options
+  # are `none`, `optional`, and `required`. Default is required.
+  #ssl.client_authentication: "required"
+
 #------------------------------ Syslog input --------------------------------
 # Experimental: Config options for the Syslog input
 # Accept RFC3164 formatted syslog event via UDP.
@@ -286,6 +316,36 @@ filebeat.inputs:
 
     # The number of seconds of inactivity before a remote connection is closed.
     #timeout: 300s
+
+    # Use SSL settings for TCP.
+    #ssl.enabled: true
+
+    # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+    # 1.2 are enabled.
+    #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+    # SSL configuration. By default is off.
+    # List of root certificates for client verifications
+    #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+    # Certificate for SSL server authentication.
+    #ssl.certificate: "/etc/pki/client/cert.pem"
+
+    # Server Certificate Key,
+    #ssl.key: "/etc/pki/client/cert.key"
+
+    # Optional passphrase for decrypting the Certificate Key.
+    #ssl.key_passphrase: ''
+
+    # Configure cipher suites to be used for SSL connections.
+    #ssl.cipher_suites: []
+
+    # Configure curve types for ECDHE based cipher suites.
+    #ssl.curve_types: []
+
+    # Configure what types of client authentication are supported. Valid options
+    # are `none`, `optional`, and `required`. Default is required.
+    #ssl.client_authentication: "required"
 
 #------------------------------ Docker input --------------------------------
 # Experimental: Docker input reads and parses `json-file` logs from Docker

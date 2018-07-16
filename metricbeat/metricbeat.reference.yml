@@ -175,8 +175,8 @@ metricbeat.modules:
   period: 10s
   enabled: true
 
-  # Replace dots in labels with `_`. Set to false to keep dots
-  labels.dedot: true
+  # If set to true, replace dots in labels with `_`.
+  #labels.dedot: false
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:
@@ -199,10 +199,15 @@ metricbeat.modules:
     - node
     - node_stats
     #- index
+    #- index_recovery
     #- index_summary
     #- shard
+    #- ml_job
   period: 10s
   hosts: ["localhost:9200"]
+
+  # Set to false to fetch all entries
+  #index_recovery.active_only: true
 
 #-------------------------------- Etcd Module --------------------------------
 - module: etcd
@@ -263,6 +268,8 @@ metricbeat.modules:
   path: "/"
   #body: ""
   #method: "GET"
+  #username: "user"
+  #password: "secret"
   #request.enabled: false
   #response.enabled: false
   #json.is_array: false
@@ -287,6 +294,8 @@ metricbeat.modules:
   hosts: ["localhost"]
   namespace: "metrics"
   #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+  #username: "user"
+  #password: "secret"
   jmx.mappings:
     #- mbean: 'java.lang:type=Runtime'
     #  attributes:
@@ -342,7 +351,7 @@ metricbeat.modules:
   metricsets: ["status"]
   period: 10s
   hosts: ["localhost:5601"]
-  enabled: default
+  enabled: true
 
 #----------------------------- Kubernetes Module -----------------------------
 # Node metrics, from kubelet:
@@ -356,9 +365,18 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:10255"]
   enabled: true
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
   #ssl.certificate: "/etc/pki/client/cert.pem"
   #ssl.key: "/etc/pki/client/cert.key"
+
+  # Enriching parameters:
+  add_metadata: true
+  in_cluster: true
+  # When used outside the cluster:
+  #host: node_name
+  #kube_config: ~/.kube/config
 
 # State metrics from kube-state-metrics service:
 - module: kubernetes
@@ -372,6 +390,13 @@ metricbeat.modules:
     - state_container
   period: 10s
   hosts: ["kube-state-metrics:8080"]
+
+  # Enriching parameters:
+  add_metadata: true
+  in_cluster: true
+  # When used outside the cluster:
+  #host: node_name
+  #kube_config: ~/.kube/config
 
 # Kubernetes events
 - module: kubernetes
@@ -423,6 +448,21 @@ metricbeat.modules:
   # password configuration options.
   hosts: ["localhost:27017"]
 
+  # Optional SSL. By default is off.
+  #ssl.enabled: true
+
+  # Mode of verification of server certificate ('none' or 'full')
+  #ssl.verification_mode: 'full'
+
+  # List of root certificates for TLS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
   # Username to use when connecting to MongoDB. Empty by default.
   #username: user
 
@@ -439,7 +479,9 @@ metricbeat.modules:
 
 #-------------------------------- MySQL Module -------------------------------
 - module: mysql
-  metricsets: ["status"]
+  metricsets:
+    - "status"
+  #  - "galera_status"
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
@@ -520,6 +562,11 @@ metricbeat.modules:
   #metrics_path: /metrics
   #namespace: example
 
+  # This can be used for service account based authorization:
+  #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
 #------------------------------ RabbitMQ Module ------------------------------
 - module: rabbitmq
   metricsets: ["node", "queue", "connection"]
@@ -565,6 +612,12 @@ metricbeat.modules:
 
   # Redis AUTH password. Empty by default.
   #password: foobared
+
+#------------------------------- traefik Module ------------------------------
+- module: traefik
+  metricsets: ["health"]
+  period: 10s
+  hosts: ["localhost:8080"]
 
 #-------------------------------- uwsgi Module -------------------------------
 - module: uwsgi
@@ -759,6 +812,14 @@ metricbeat.modules:
 #       - from: "a"
 #         to: "b"
 #
+# The following example tokenizes the string into fields:
+#
+#processors:
+#- dissect:
+#    tokenizer: "%{key1} - %{key2}"
+#    field: "message"
+#    target_prefix: "dissect"
+#
 # The following example enriches each event with metadata from the cloud
 # provider about the host machine. It works on EC2, GCE, DigitalOcean,
 # Tencent Cloud, and Alibaba Cloud.
@@ -836,6 +897,9 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 0
 
+  # Configure escaping html symbols in strings.
+  #escape_html: true
+
   # Optional protocol and basic auth credentials.
   #protocol: "https"
   #username: "elastic"
@@ -876,7 +940,18 @@ output.elasticsearch:
   # The default is 50.
   #bulk_max_size: 50
 
-  # Configure http request timeout before failing an request to Elasticsearch.
+  # The number of seconds to wait before trying to reconnect to Elasticsearch
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Elasticsearch after a network error. The default is 60s.
+  #backoff.max: 60s
+
+  # Configure http request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
@@ -930,6 +1005,9 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 3
 
+  # Configure escaping html symbols in strings.
+  #escape_html: true
+
   # Optional maximum time to live for a connection to Logstash, after which the
   # connection will be re-established.  A value of `0s` (the default) will
   # disable this feature.
@@ -940,7 +1018,7 @@ output.elasticsearch:
   # Optional load balance the events between the Logstash hosts. Default is false.
   #loadbalance: false
 
-  # Number of batches to be sent asynchronously to logstash while processing
+  # Number of batches to be sent asynchronously to Logstash while processing
   # new batches.
   #pipelining: 2
 
@@ -948,6 +1026,17 @@ output.elasticsearch:
   # transaction.  The number of events to be sent increases up to `bulk_max_size`
   # if no error is encountered.
   #slow_start: false
+
+  # The number of seconds to wait before trying to reconnect to Logstash
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Logstash after a network error. The default is 60s.
+  #backoff.max: 60s
 
   # Optional index name. The default index name is set to metricbeat
   # in all lowercase.
@@ -1030,9 +1119,16 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version metricbeat is assumed to run against. Defaults to the oldest
-  # supported stable version (currently version 0.8.2.0)
-  #version: 0.8.2
+  # Kafka version metricbeat is assumed to run against. Defaults to the "1.0.0".
+  #version: '1.0.0'
+
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
 
   # Metadata update configuration. Metadata do contain leader information
   # deciding which broker to use when publishing.
@@ -1136,6 +1232,14 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
+
   # The list of Redis servers to connect to. If load balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
@@ -1237,6 +1341,14 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
+
   # Path to the directory where to save the generated files. The option is
   # mandatory.
   #path: "/tmp/metricbeat"
@@ -1264,8 +1376,13 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
-  # Pretty print json event
-  #pretty: false
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
 
 #================================= Paths ======================================
 
@@ -1362,6 +1479,15 @@ output.elasticsearch:
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
+
+# Enable json template loading. If this is enabled, the fields.yml is ignored.
+#setup.template.json.enabled: false
+
+# Path to the json template file
+#setup.template.json.path: "${path.config}/template.json"
+
+# Name under which the template is stored in Elasticsearch
+#setup.template.json.name: ""
 
 # Overwrite existing template
 #setup.template.overwrite: false
@@ -1578,6 +1704,9 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  #metrics.period: 10s
+  #state.period: 1m
 
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security

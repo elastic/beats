@@ -15,6 +15,9 @@ Autodiscover providers work by watching for events on the system and translating
 events with a common format. When you configure the provider, you can use fields from the autodiscover event to set
 conditions that, when met, launch specific configurations.
 
+On start, {beatname_uc} will scan existing containers and launch the proper configs for them. Then it will watch for new
+start/stop events. This ensures you don't need to worry about state, but only define your desired configs.
+
 [float]
 ===== Docker
 
@@ -61,6 +64,51 @@ Configuration templates can contain variables from the autodiscover event. They 
 For example, with the example event, "`${data.port}`" resolves to `6379`.
 
 include::../../{beatname_lc}/docs/autodiscover-docker-config.asciidoc[]
+
+
+ifeval::["{beatname_lc}"=="filebeat"]
+[WARNING]
+=======================================
+When using autodiscover, you have to be careful when defining config templates, especially if they are
+reading from places holding information for several containers. For instance, under this file structure:
+
+`/mnt/logs/<container_id>/*.log`
+
+You can define a config template like this:
+
+**Wrong settings**:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+autodiscover.providers:
+  - type: docker
+    templates:
+      - condition.contains:
+          docker.container.image: nginx
+        config:
+          - type: log
+            paths:
+              - "/mnt/logs/*/*.log"
+-------------------------------------------------------------------------------------
+
+That would read all the files under the given path several times (one per nginx container). What you really
+want is to scope your template to the container that matched the autodiscover condition. Good settings:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+autodiscover.providers:
+  - type: docker
+    templates:
+      - condition.contains:
+          docker.container.image: nginx
+        config:
+          - type: log
+            paths:
+              - "/mnt/logs/${data.docker.container.id}/*.log"
+-------------------------------------------------------------------------------------
+
+=======================================
+endif::[]
 
 [float]
 ===== Kubernetes
@@ -112,7 +160,67 @@ For example:
 The configuration of templates and conditions is similar to that of the Docker provider. Configuration templates can
 contain variables from the autodiscover event. They can be accessed under data namespace.
 
+The `kubernetes` autodiscover provider has the following configuration settings:
+
+`in_cluster`:: (Optional) Use in cluster settings for Kubernetes client, `true`
+  by default.
+`host`:: (Optional) In case `in_cluster` is false, use this host to connect to
+  Kubernetes API.
+`kube_config`:: (Optional) Use given config file as configuration for Kubernetes
+  client.
+
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
+
+[float]
+===== Jolokia (experimental)
+
+The Jolokia autodiscover provider uses Jolokia Discovery to find agents running
+in your host or your network.
+
+Jolokia Discovery mechanism is supported by any Jolokia agent since version
+1.2.0, it is enabled by default when Jolokia is included in the application as
+a JVM agent, but disabled in other cases as the OSGI or WAR (Java EE) agents.
+In any case, this feature is controlled with two properties:
+
+  * `discoveryEnabled`, to enable the feature
+  * `discoveryAgentUrl`, if set, this is the URL announced by the agent when
+    being discovered, setting this parameter implicitly enables the feature
+
+There are multiple ways of setting these properties, and they can vary from
+application to application, please refer to the documentation of your
+application to find the more suitable way to set them in your case.
+ 
+Jolokia Discovery is based on UDP multicast requests. Agents join the multicast
+group 239.192.48.84, port 24884, and discovery is done by sending queries to
+this group. You have to take into account that UDP traffic between Metricbeat
+and the Jolokia agents has to be allowed. Also notice that this multicast
+address is in the 239.0.0.0/8 range, that is reserved for private use within an
+organization, so it can only be used in private networks.
+
+These are the available fields on every event:
+
+  * jolokia.agent.id
+  * jolokia.agent.version
+  * jolokia.secured
+  * jolokia.server.product
+  * jolokia.server.vendor
+  * jolokia.server.version
+  * jolokia.url
+
+The configuration of this provider consists in a set of network interfaces, as
+well as a set of templates as in other providers. The network interfaces will be
+the ones used for discovery probes, they have these settings:
+
+`name`:: the name of the interface (e.g. `br0`), it can contain a wildcard
+  as suffix to apply the same settings to multiple network interfaces of
+  the same type (e.g. `br*`).
+`interval`:: time between probes (defaults to 10s)
+ `grace_period`:: time since the last reply to consider an instance stopped
+  (defaults to 30s)
+`probe_timeout`:: max time to wait for responses since a probe is sent
+  (defaults to 1s)
+
+include::../../{beatname_lc}/docs/autodiscover-jolokia-config.asciidoc[]
 
 [[configuration-autodiscover-hints]]
 === Hints based autodiscover

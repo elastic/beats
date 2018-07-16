@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package beater
 
 import (
@@ -92,11 +109,17 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 
 // init packetbeat components
 func (pb *packetbeat) init(b *beat.Beat) error {
+	var err error
 	cfg := &pb.config
-	err := procs.ProcWatcher.Init(cfg.Procs)
-	if err != nil {
-		logp.Critical(err.Error())
-		return err
+	// Enable the process watcher only if capturing live traffic
+	if cfg.Interfaces.File == "" {
+		err = procs.ProcWatcher.Init(cfg.Procs)
+		if err != nil {
+			logp.Critical(err.Error())
+			return err
+		}
+	} else {
+		logp.Info("Process watcher disabled when file input is used")
 	}
 
 	pb.pipeline = b.Publisher
@@ -282,7 +305,7 @@ func (pb *packetbeat) icmpConfig() (*common.Config, error) {
 		}
 
 		if icmp != nil {
-			return nil, errors.New("More then one icmp confgigurations found")
+			return nil, errors.New("More then one icmp configurations found")
 		}
 
 		icmp = cfg

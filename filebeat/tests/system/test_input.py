@@ -540,7 +540,7 @@ class Test(BaseTest):
 
         # check that not all harvesters were started
         self.wait_until(
-            lambda: self.log_contains("Harvester limit reached"))
+            lambda: self.log_contains("harvester limit reached"))
 
         self.wait_until(lambda: self.output_lines() > 0)
 

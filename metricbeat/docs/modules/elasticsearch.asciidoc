@@ -26,13 +26,18 @@ metricbeat.modules:
     - node
     - node_stats
     #- index
+    #- index_recovery
     #- index_summary
     #- shard
+    #- ml_job
   period: 10s
   hosts: ["localhost:9200"]
+
+  # Set to false to fetch all entries
+  #index_recovery.active_only: true
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>. It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets
@@ -41,21 +46,33 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-index,index>>
 
+* <<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>>
+
 * <<metricbeat-metricset-elasticsearch-index_summary,index_summary>>
+
+* <<metricbeat-metricset-elasticsearch-ml_job,ml_job>>
 
 * <<metricbeat-metricset-elasticsearch-node,node>>
 
 * <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
 
+* <<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>
+
 * <<metricbeat-metricset-elasticsearch-shard,shard>>
 
 include::elasticsearch/index.asciidoc[]
 
+include::elasticsearch/index_recovery.asciidoc[]
+
 include::elasticsearch/index_summary.asciidoc[]
+
+include::elasticsearch/ml_job.asciidoc[]
 
 include::elasticsearch/node.asciidoc[]
 
 include::elasticsearch/node_stats.asciidoc[]
+
+include::elasticsearch/pending_tasks.asciidoc[]
 
 include::elasticsearch/shard.asciidoc[]
 

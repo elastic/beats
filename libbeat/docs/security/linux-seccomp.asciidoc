@@ -1,5 +1,5 @@
 [[linux-seccomp]]
-== Using Linux Secure Computing Mode (seccomp)
+== Use Linux Secure Computing Mode (seccomp)
 
 beta[]
 

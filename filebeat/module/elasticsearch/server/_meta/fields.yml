@@ -1,0 +1,29 @@
+- name: server
+  description: "Server log file"
+  type: group
+  fields:
+  - name: component
+    description: "Log component"
+    example: "o.e.c.m.MetaDataCreateIndexService"
+    type: keyword
+  - name: gc
+    description: "GC log"
+    type: group
+    fields:
+    - name: young
+      description: "Young GC"
+      example: ""
+      type: group
+      fields:
+      - name: one
+        description: ""
+        example: ""
+        type: long
+      - name: two
+        description: ""
+        example: ""
+        type: long
+  - name: gc_overhead
+    description: ""
+    example: ""
+    type: long

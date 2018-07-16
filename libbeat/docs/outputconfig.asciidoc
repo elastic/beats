@@ -28,10 +28,19 @@ The following topics describe how to configure each supported output:
 * <<elasticsearch-output>>
 * <<logstash-output>>
 * <<kafka-output>>
+ifndef::no-redis-output[]
 * <<redis-output>>
+endif::[]
 * <<file-output>>
 * <<console-output>>
 
+If you've secured the {stack}, also read <<securing-{beatname_lc}>> for more about
+security-related configuration options.
+
+endif::[]
+
+ifdef::beat-specific-output-config[]
+include::{beat-specific-output-config}[]
 endif::[]
 
 [[elasticsearch-output]]
@@ -49,12 +58,14 @@ Example configuration:
 ------------------------------------------------------------------------------
 
 output.elasticsearch:
-  hosts: ["http://localhost:9200"]
+  hosts: ["https://localhost:9200"]
   index: "{beatname_lc}-%{[beat.version]}-%{+yyyy.MM.dd}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   ssl.certificate: "/etc/pki/client/cert.pem"
   ssl.key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
+
+//
 
 To enable SSL, just add `https` to all URLs defined under __hosts__.
 
@@ -63,8 +74,8 @@ To enable SSL, just add `https` to all URLs defined under __hosts__.
 
 output.elasticsearch:
   hosts: ["https://localhost:9200"]
-  username: "admin"
-  password: "s3cr3t"
+  username: "{beatname_lc}_internal"
+  password: "{pwd}"
 ------------------------------------------------------------------------------
 
 If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` to the yaml file.
@@ -74,10 +85,14 @@ If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` 
 output.elasticsearch:
   hosts: ["localhost"]
   protocol: "https"
-  username: "admin"
-  password: "s3cr3t"
+  username: "{beatname_lc}_internal"
+  password: "{pwd}"
 
 ------------------------------------------------------------------------------
+
+
+For more information about securing {beatname_uc}, see
+<<securing-{beatname_lc}>>.
 
 ==== Compatibility
 
@@ -128,6 +143,13 @@ The compression level must be in the range of 1 (best speed) to 9 (best compress
 Increasing the compression level will reduce the network usage but will increase the cpu usage.
 
 The default value is 0.
+
+===== `escape_html`
+
+Configure escaping of HTML in strings. Set to `false` to disable escaping.
+
+The default value is `true`.
+
 
 ===== `worker`
 
@@ -283,18 +305,23 @@ endif::[]
 
 ===== `max_retries`
 
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
+{beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
+endif::[]
+
+ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
-ifeval::["{beatname_lc}" == "filebeat"]
-Filebeat will ignore the `max_retries` setting and retry until all
-events are published.
-endif::[]
-ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
-endif::[]
 
 The default is 3.
+
+endif::[]
+
 
 ===== `bulk_max_size`
 
@@ -311,6 +338,20 @@ throughput.
 Setting `bulk_max_size` to values less than or equal to 0 disables the
 splitting of batches. When splitting is disabled, the queue decides on the
 number of events to be contained in a batch.
+
+===== `backoff.init`
+
+The number of seconds to wait before trying to reconnect to Elasticsearch after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
+
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Elasticsearch after a network error. The default is 60s.
 
 ===== `timeout`
 
@@ -438,6 +479,12 @@ Increasing the compression level will reduce the network usage but will increase
 
 The default value is 3.
 
+===== `escape_html`
+
+Configure escaping of HTML in strings. Set to `false` to disable escaping.
+
+The default value is `true`.
+
 ===== `worker`
 
 The number of workers per configured host publishing events to Logstash. This
@@ -533,18 +580,22 @@ The number of seconds to wait for responses from the Logstash server before timi
 
 ===== `max_retries`
 
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
+{beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
+endif::[]
+
+ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
-ifeval::["{beatname_lc}" == "filebeat"]
-Filebeat will ignore the `max_retries` setting and retry until all
-events are published.
-endif::[]
-ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
-endif::[]
 
 The default is 3.
+
+endif::[]
 
 ===== `bulk_max_size`
 
@@ -571,6 +622,19 @@ The number of events to be sent increases up to `bulk_max_size` if no error is e
 On error the number of events per transaction is reduced again.
 
 The default is `false`.
+
+===== `backoff.init`
+
+The number of seconds to wait before trying to reconnect to Logstash after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Logstash after a network error. The default is 60s.
 
 [[kafka-output]]
 === Configure the Kafka output
@@ -623,12 +687,11 @@ The cluster metadata contain the actual Kafka brokers events are published to.
 
 ===== `version`
 
-Kafka version ${beatname_lc} is assumed to run against. Defaults to oldest
-supported stable version (currently version 0.8.2.0).
+Kafka version ${beatname_lc} is assumed to run against. Defaults to 1.0.0.
 
 Event timestamps will be added, if version 0.10.0.0+ is enabled.
 
-Valid values are all kafka releases in between `0.8.2.0` and `0.11.0.0`.
+Valid values are all kafka releases in between `0.8.2.0` and `1.1.0`.
 
 ===== `username`
 
@@ -728,19 +791,22 @@ brokers, topics, partition, and active leaders to use for publishing.
 
 ===== `max_retries`
 
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
+{beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
+endif::[]
+
+ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
-ifeval::["{beatname_lc}" == "filebeat"]
-Filebeat will ignore the `max_retries` setting and retry until all
-events are published.
-endif::[]
-
-ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
-endif::[]
 
 The default is 3.
+
+endif::[]
 
 ===== `bulk_max_size`
 
@@ -783,6 +849,7 @@ Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silentl
 Configuration options for SSL parameters like the root CA for Kafka connections. See
 <<configuration-ssl>> for more information.
 
+ifndef::no-redis-output[]
 [[redis-output]]
 === Configure the Redis output
 
@@ -837,15 +904,12 @@ The Redis port to use if `hosts` does not contain a port number. The default is 
 
 ===== `index`
 
-deprecated[5.0.0,The `index` setting is renamed to `key`]
-
-The name of the Redis list or channel the events are published to. The default is
-"{beatname_lc}".
+The index name added to the events metadata for use by Logstash. The default is "{beatname_lc}".
 
 ===== `key`
 
-The name of the Redis list or channel the events are published to. The default is
-"{beatname_lc}".
+The name of the Redis list or channel the events are published to. If not
+configured, the value of the `index` setting is used.
 
 The redis key can be set dynamically using a format string accessing any
 fields in the event to be published.
@@ -955,18 +1019,22 @@ The Redis connection timeout in seconds. The default is 5 seconds.
 
 ===== `max_retries`
 
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+
+{beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+
+endif::[]
+
+ifeval::["{beatname_lc}"!="filebeat" and "{beatname_lc}"!="winlogbeat"]
+
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
-ifeval::["{beatname_lc}" == "filebeat"]
-Filebeat will ignore the `max_retries` setting and retry until all
-events are published.
-endif::[]
-ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
-endif::[]
 
 The default is 3.
+
+endif::[]
 
 
 ===== `bulk_max_size`
@@ -1010,6 +1078,8 @@ client. You can change this behavior by setting the
 
 This option determines whether Redis hostnames are resolved locally when using a proxy.
 The default value is false, which means that name resolution occurs on the proxy server.
+
+endif::[]
 
 [[file-output]]
 === Configure the File output
@@ -1136,6 +1206,8 @@ codec. By default the `json` codec is used.
 
 *`json.pretty`*: If `pretty` is set to true, events will be nicely formatted. The default is false.
 
+*`json.escape_html`*: If `escape_html` is set to false, html symbols will not be escaped in strings. The default is true.
+
 Example configuration that uses the `json` codec with pretty printing enabled to write events to the console:
 
 [source,yaml]
@@ -1143,6 +1215,7 @@ Example configuration that uses the `json` codec with pretty printing enabled to
 output.console:
   codec.json:
     pretty: true
+    escape_html: false
 ------------------------------------------------------------------------------
 
 *`format.string`*: Configurable format string used to create a custom formatted message.

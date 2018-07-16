@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package log
 
 import (
@@ -22,12 +39,15 @@ import (
 
 const (
 	recursiveGlobDepth = 8
+	harvesterErrMsg    = "Harvester could not be started on new file: %s, Err: %s"
 )
 
 var (
 	filesRenamed     = monitoring.NewInt(nil, "filebeat.input.log.files.renamed")
 	filesTruncated   = monitoring.NewInt(nil, "filebeat.input.log.files.truncated")
 	harvesterSkipped = monitoring.NewInt(nil, "filebeat.harvester.skipped")
+
+	errHarvesterLimit = errors.New("harvester limit reached")
 )
 
 func init() {
@@ -47,6 +67,7 @@ type Input struct {
 	stateOutlet   channel.Outleter
 	done          chan struct{}
 	numHarvesters atomic.Uint32
+	meta          map[string]string
 }
 
 // NewInput instantiates a new Log
@@ -80,6 +101,7 @@ func NewInput(
 		stateOutlet: stateOut,
 		states:      file.NewStates(),
 		done:        context.Done,
+		meta:        context.Meta,
 	}
 
 	if err := cfg.Unpack(&p.config); err != nil {
@@ -121,7 +143,7 @@ func (p *Input) loadStates(states []file.State) error {
 
 	for _, state := range states {
 		// Check if state source belongs to this input. If yes, update the state.
-		if p.matchesFile(state.Source) {
+		if p.matchesFile(state.Source) && p.matchesMeta(state.Meta) {
 			state.TTL = -1
 
 			// In case a input is tried to be started with an unfinished state matching the glob pattern
@@ -183,7 +205,7 @@ func (p *Input) Run() {
 				}
 			} else {
 				// Check if existing source on disk and state are the same. Remove if not the case.
-				newState := file.NewState(stat, state.Source, p.config.Type)
+				newState := file.NewState(stat, state.Source, p.config.Type, p.meta)
 				if !newState.FileStateOS.IsSame(state.FileStateOS) {
 					p.removeState(state)
 					logp.Debug("input", "Remove state for file as file removed or renamed: %s", state.Source)
@@ -297,6 +319,21 @@ func (p *Input) matchesFile(filePath string) bool {
 	return false
 }
 
+// matchesMeta returns true in case the given meta is equal to the one of this input, false if not
+func (p *Input) matchesMeta(meta map[string]string) bool {
+	if len(meta) != len(p.meta) {
+		return false
+	}
+
+	for k, v := range p.meta {
+		if meta[k] != v {
+			return false
+		}
+	}
+
+	return true
+}
+
 type FileSortInfo struct {
 	info os.FileInfo
 	path string
@@ -361,7 +398,7 @@ func getFileState(path string, info os.FileInfo, p *Input) (file.State, error) {
 	}
 	logp.Debug("input", "Check file for harvesting: %s", absolutePath)
 	// Create new state for comparison
-	newState := file.NewState(info, absolutePath, p.config.Type)
+	newState := file.NewState(info, absolutePath, p.config.Type, p.meta)
 	return newState, nil
 }
 
@@ -434,8 +471,12 @@ func (p *Input) scan() {
 		if lastState.IsEmpty() {
 			logp.Debug("input", "Start harvester for new file: %s", newState.Source)
 			err := p.startHarvester(newState, 0)
+			if err == errHarvesterLimit {
+				logp.Debug("input", harvesterErrMsg, newState.Source, err)
+				continue
+			}
 			if err != nil {
-				logp.Err("Harvester could not be started on new file: %s, Err: %s", newState.Source, err)
+				logp.Err(harvesterErrMsg, newState.Source, err)
 			}
 		} else {
 			p.harvestExistingFile(newState, lastState)
@@ -608,7 +649,7 @@ func (p *Input) startHarvester(state file.State, offset int64) error {
 	if p.numHarvesters.Inc() > p.config.HarvesterLimit && p.config.HarvesterLimit > 0 {
 		p.numHarvesters.Dec()
 		harvesterSkipped.Add(1)
-		return fmt.Errorf("Harvester limit reached")
+		return errHarvesterLimit
 	}
 	// Set state to "not" finished to indicate that a harvester is running
 	state.Finished = false
@@ -624,7 +665,7 @@ func (p *Input) startHarvester(state file.State, offset int64) error {
 	err = h.Setup()
 	if err != nil {
 		p.numHarvesters.Dec()
-		return fmt.Errorf("Error setting up harvester: %s", err)
+		return fmt.Errorf("error setting up harvester: %s", err)
 	}
 
 	// Update state before staring harvester

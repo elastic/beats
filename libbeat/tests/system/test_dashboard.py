@@ -38,6 +38,32 @@ class Test(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
+    def test_load_only_index_patterns(self):
+        """
+        Test loading dashboards
+        """
+        self.render_config_template()
+        beat = self.start_beat(
+            logging_args=["-e", "-d", "*"],
+            extra_args=["setup",
+                        "--dashboards",
+                        "-E", "setup.dashboards.file=" +
+                        os.path.join(self.beat_path, "tests", "files", "testbeat-dashboards.zip"),
+                        "-E", "setup.dashboards.beat=testbeat",
+                        "-E", "setup.dashboards.only_index=true",
+                        "-E", "setup.kibana.protocol=http",
+                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
+                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.file.enabled=false"]
+        )
+
+        beat.check_wait(exit_code=0)
+
+        assert self.log_contains("Kibana dashboards successfully loaded") is True
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
     def test_export_dashboard(self):
         """
         Test export dashboards and remove unsupported characters

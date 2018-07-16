@@ -1,0 +1,79 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "cluster": {
+            "id": "PKEQ1V5kT4yPng_sgiqF9g"
+        }
+    },
+    "kibana": {
+        "stats": {
+            "concurrent_connections": 17,
+            "event_loop_delay": 718.5184001922607,
+            "name": "kibana",
+            "process": {
+                "memory": {
+                    "external": {
+                        "bytes": 1969666
+                    },
+                    "heap": {
+                        "max": {
+                            "bytes": 200028160
+                        },
+                        "used": {
+                            "bytes": 138875320
+                        }
+                    },
+                    "resident_set_size": {
+                        "bytes": 247865344
+                    }
+                },
+                "pid": 1,
+                "uptime": {
+                    "ms": 260863
+                }
+            },
+            "requests": {
+                "disconnects": 0,
+                "total": 91
+            },
+            "response_times": {
+                "avg": {
+                    "ms": 1347.2500000000002
+                },
+                "max": {
+                    "ms": 4293
+                }
+            },
+            "sockets": {
+                "http": {
+                    "total": 56
+                },
+                "https": {
+                    "total": 0
+                }
+            },
+            "status": {
+                "overall": {
+                    "state": "green"
+                }
+            },
+            "uuid": "b4b34609-03b3-463c-8699-17109e72df70",
+            "version": {
+                "number": "7.0.0-alpha1"
+            }
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:5601",
+        "module": "kibana",
+        "name": "stats",
+        "rtt": 115
+    },
+    "service": {
+        "name": "kibana"
+    }
+}

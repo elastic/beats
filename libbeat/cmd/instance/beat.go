@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package instance
 
 import (
@@ -31,6 +48,7 @@ import (
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/logp/configure"
+	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
 	"github.com/elastic/beats/libbeat/monitoring/report/log"
@@ -54,9 +72,11 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/add_host_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
+	_ "github.com/elastic/beats/libbeat/processors/dissect"
 
 	// Register autodiscover providers
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
 
 	// Register default monitoring reporting
@@ -147,13 +167,23 @@ func Run(name, idxPrefix, version string, bt beat.Creator) error {
 			return err
 		}
 
-		registry := monitoring.NewRegistry()
-		monitoring.GetNamespace("state").SetRegistry(registry)
+		// Add basic info
+		registry := monitoring.GetNamespace("info").GetRegistry()
 		monitoring.NewString(registry, "version").Set(b.Info.Version)
 		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
 		monitoring.NewString(registry, "name").Set(b.Info.Name)
 		monitoring.NewString(registry, "uuid").Set(b.Info.UUID.String())
 		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
+
+		// Add additional info to state registry. This is also reported to monitoring
+		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+		serviceRegistry := stateRegistry.NewRegistry("service")
+		monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
+		monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
+		monitoring.NewString(serviceRegistry, "id").Set(b.Info.UUID.String())
+		beatRegistry := stateRegistry.NewRegistry("beat")
+		monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
+		monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
 
 		return b.launch(bt)
 	}())
@@ -173,7 +203,7 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		return nil, err
 	}
 
-	fields, err := asset.GetFields(name + "/fields.yml")
+	fields, err := asset.GetFields(name)
 	if err != nil {
 		return nil, err
 	}

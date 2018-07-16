@@ -89,7 +89,9 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 
         # HTTP helper
         if 'ssl' in get_settings(module_fields):
-            module_file += "This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.\n\n"
+            module_file += "This module supports TLS connection when using `ssl`" + \
+                           " config field, as described in <<configuration-ssl>>." + \
+                           " It also supports the options described in <<module-http-config-options>>.\n\n"
 
         # Add metricsets title as below each metricset adds its link
         module_file += "[float]\n"
@@ -134,7 +136,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 
             # Read local fields.yml
             # create title out of module and metricset set name
-            # Add relase fag
+            # Add release fag
             metricset_file += "=== {} {} metricset\n\n".format(title, metricset)
 
             release = get_release(metricset_fields)

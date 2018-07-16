@@ -3192,6 +3192,15 @@ SHA512/256 hash of the file.
 
 --
 
+*`hash.xxh64`*::
++
+--
+type: keyword
+
+XX64 hash of the file.
+
+--
+
 [[exported-fields-host-processor]]
 == Host fields
 
@@ -3303,7 +3312,7 @@ Kubernetes pod name
 --
 type: keyword
 
-Kubernetes pod uid
+Kubernetes Pod UID
 
 
 --

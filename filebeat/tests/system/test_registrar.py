@@ -282,7 +282,7 @@ class Test(BaseTest):
                                                 "a/b/c/registry_x")),
             max_timeout=1)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(1)
 
         filebeat.check_kill_and_wait()
@@ -477,7 +477,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=10)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(1)
 
         assert os.stat(testfile_path).st_ino == self.get_registry_entry_by_path(
@@ -547,7 +547,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=10)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(1)
 
         data = self.get_registry()
@@ -570,7 +570,7 @@ class Test(BaseTest):
                 "Updating state for renamed file"),
             max_timeout=10)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(1)
 
         data = self.get_registry()
@@ -761,7 +761,7 @@ class Test(BaseTest):
                 "Registry file updated. 2 states written.") >= 1,
             max_timeout=15)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(1)
         filebeat.kill_and_wait()
 
@@ -1468,7 +1468,7 @@ class Test(BaseTest):
                                                 "registry")),
             max_timeout=10)
 
-        # Wait a momemt to make sure registry is completely written
+        # Wait a moment to make sure registry is completely written
         time.sleep(2)
 
         filebeat.check_kill_and_wait()
@@ -1506,3 +1506,58 @@ class Test(BaseTest):
                 "inode": stat.st_ino,
                 "device": stat.st_dev,
             }, file_state_os)
+
+    def test_registrar_meta(self):
+        """
+        Check that multiple entries for the same file are on the registry when they have
+        different meta
+        """
+
+        self.render_config_template(
+            type='docker',
+            input_raw='''
+  containers:
+    path: {path}
+    stream: stdout
+    ids:
+      - container_id
+- type: docker
+  containers:
+    path: {path}
+    stream: stderr
+    ids:
+      - container_id
+            '''.format(path=os.path.abspath(self.working_dir) + "/log/")
+        )
+        os.mkdir(self.working_dir + "/log/")
+        os.mkdir(self.working_dir + "/log/container_id")
+        testfile_path1 = self.working_dir + "/log/container_id/test.log"
+
+        with open(testfile_path1, 'w') as f:
+            for i in range(0, 10):
+                f.write('{"log":"hello\\n","stream":"stdout","time":"2018-04-13T13:39:57.924216596Z"}\n')
+                f.write('{"log":"hello\\n","stream":"stderr","time":"2018-04-13T13:39:57.924216596Z"}\n')
+
+        filebeat = self.start_beat()
+
+        self.wait_until(
+            lambda: self.output_has(lines=20),
+            max_timeout=15)
+
+        # wait until the registry file exist. Needed to avoid a race between
+        # the logging and actual writing the file. Seems to happen on Windows.
+
+        self.wait_until(
+            lambda: os.path.isfile(os.path.join(self.working_dir,
+                                                "registry")),
+            max_timeout=1)
+
+        filebeat.check_kill_and_wait()
+
+        # Check registry contains 2 entries with meta
+        data = self.get_registry()
+        assert len(data) == 2
+        assert data[0]["source"] == data[1]["source"]
+        assert data[0]["meta"]["stream"] in ("stdout", "stderr")
+        assert data[1]["meta"]["stream"] in ("stdout", "stderr")
+        assert data[0]["meta"]["stream"] != data[1]["meta"]["stream"]

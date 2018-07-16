@@ -79,9 +79,17 @@
       description: >
         The name of the process that served the transaction.
 
+    - name: cmdline
+      description: >
+        The command-line of the process that served the transaction.
+
     - name: client_proc
       description: >
         The name of the process that initiated the transaction.
+
+    - name: client_cmdline
+      description: >
+        The command-line of the process that initiated the transaction.
 
     - name: release
       description: >
@@ -1200,6 +1208,7 @@
                 same header name are present in the message, they will be separated
                 by commas.
             - name: body
+              type: text
               description: The body of the HTTP response.
 
 - key: icmp

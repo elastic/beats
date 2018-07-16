@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // Package mlimporter contains code for loading Elastic X-Pack Machine Learning job configurations.
 package mlimporter
 
@@ -6,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -43,7 +61,7 @@ type MLLoader interface {
 
 // MLSetupper is a subset of the Kibana client API capable of setting up ML objects.
 type MLSetupper interface {
-	Request(method, path string, params url.Values, body io.Reader) (int, []byte, error)
+	Request(method, path string, params url.Values, headers http.Header, body io.Reader) (int, []byte, error)
 	GetVersion() string
 }
 
@@ -188,7 +206,7 @@ func HaveXpackML(esClient MLLoader) (bool, error) {
 func SetupModule(kibanaClient MLSetupper, module, prefix string) error {
 	setupURL := fmt.Sprintf(kibanaSetupModuleURL, module)
 	prefixPayload := fmt.Sprintf("{\"prefix\": \"%s\"}", prefix)
-	status, response, err := kibanaClient.Request("POST", setupURL, nil, strings.NewReader(prefixPayload))
+	status, response, err := kibanaClient.Request("POST", setupURL, nil, nil, strings.NewReader(prefixPayload))
 	if status != 200 {
 		return errors.Errorf("cannot set up ML with prefix: %s", prefix)
 	}

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package syslog
 
 import (
@@ -67,6 +84,37 @@ func newEvent() *event {
 		minute:   -1,
 		second:   -1,
 		year:     time.Now().Year(),
+	}
+}
+
+// SetTimeZone set the timezone offset from the string.
+func (s *event) SetTimeZone(b []byte) {
+	// We assume that we are in utc and ignore any other bytes after.
+	// This can be followed by others bytes +00, +00:00 or +0000.
+	if b[0] == 'Z' || b[0] == 'z' {
+		s.loc = time.UTC
+		return
+	}
+
+	d := 1
+	if b[0] == '-' {
+		d = -1
+	}
+
+	// +00 +00:00 or +0000
+	var h, m int
+	switch len(b[1:]) {
+	case 2:
+		h = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[1:]))))
+		s.loc = time.FixedZone("", d*h)
+	case 4:
+		h = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[1:3]))))
+		m = int(time.Minute * time.Duration(bytesToInt(skipLeadZero(b[3:5]))))
+		s.loc = time.FixedZone("", d*(h+m))
+	case 5:
+		h = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[1:3]))))
+		m = int(time.Minute * time.Duration(bytesToInt(skipLeadZero(b[4:6]))))
+		s.loc = time.FixedZone("", d*(h+m))
 	}
 }
 
@@ -237,6 +285,13 @@ func (s *event) Nanosecond() int {
 
 // Timestamp return the timestamp in UTC.
 func (s *event) Timestamp(timezone *time.Location) time.Time {
+	var t *time.Location
+	if s.loc == nil {
+		t = timezone
+	} else {
+		t = s.loc
+	}
+
 	return time.Date(
 		s.Year(),
 		s.Month(),
@@ -245,7 +300,7 @@ func (s *event) Timestamp(timezone *time.Location) time.Time {
 		s.Minute(),
 		s.Second(),
 		s.Nanosecond(),
-		timezone,
+		t,
 	).UTC()
 }
 

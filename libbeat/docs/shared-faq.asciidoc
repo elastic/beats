@@ -50,9 +50,10 @@ telnet <hostname or IP> 5044
 ----------------------------------------------------------------------
 * Verify that the config file for {beatname_uc} specifies the correct port where Logstash is running.
 * Make sure that the Elasticsearch output is commented out in the config file and the Logstash output is uncommented.
-* Confirm that the most recent Beats input plugin for Logstash is installed and configured. Note that Beats will not connect
-to the Lumberjack input plugin. See
-{libbeat}/logstash-installation.html#logstash-input-update[Updating the Beats Input Plugin for Logstash].
+* Confirm that the most recent {logstash-ref}/plugins-inputs-beats.html[Beats
+input plugin for Logstash] is installed and configured. Note that Beats will not
+connect to the Lumberjack input plugin. To learn how to install and update
+plugins, see {logstash-ref}/working-with-plugins.html[Working with plugins].
 
 [float]
 [[metadata-missing]]

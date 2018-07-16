@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package generator
 
 import (
@@ -49,7 +66,7 @@ func AppendTemplate(template, dest string, replace map[string]string) error {
 		return err
 	}
 
-	f, err := os.OpenFile(dest, os.O_WRONLY|os.O_APPEND, os.ModePerm)
+	f, err := os.OpenFile(dest, os.O_WRONLY|os.O_APPEND, 0644)
 	if err == nil {
 		_, err = f.Write(c)
 	}
@@ -66,10 +83,11 @@ func copyTemplate(template, dest string, replace map[string]string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(dest, c, os.ModePerm)
+	err = ioutil.WriteFile(dest, c, 0644)
 	if err != nil {
 		return fmt.Errorf("cannot copy template: %v", err)
 	}
+
 	return nil
 }
 
@@ -86,7 +104,7 @@ func readTemplate(template string, replace map[string]string) ([]byte, error) {
 	return c, nil
 }
 
-// RenameConfigYml renemas config.yml to the name of the fileset, otherwise Filebeat refuses to start
+// RenameConfigYml renames config.yml to the name of the fileset, otherwise Filebeat refuses to start
 func RenameConfigYml(modulesPath, module, fileset string) error {
 	old := path.Join(modulesPath, "module", module, fileset, "config", "config.yml")
 	new := path.Join(modulesPath, "module", module, fileset, "config", fileset+".yml")

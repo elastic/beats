@@ -1,0 +1,25 @@
+- key: elasticsearch
+  title: "elasticsearch"
+  description: >
+    elasticsearch Module
+  fields:
+    - name: elasticsearch
+      type: group
+      description: >
+      fields:
+        - name: node.name
+          description: "Name of the node"
+          example: "vWNJsZ3"
+          type: keyword
+        - name: index.name
+          description: "Index name"
+          example: "filebeat-test-input"
+          type: keyword
+        - name: index.id
+          description: "Index id"
+          example: "aOGgDwbURfCV57AScqbCgw"
+          type: keyword
+        - name: shard.id
+          description: "Id of the shard"
+          example: "0"
+          type: keyword

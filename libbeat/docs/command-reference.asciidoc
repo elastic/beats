@@ -20,11 +20,11 @@
 :modules-command-short-desc: Manages configured modules
 :run-command-short-desc: Runs {beatname_uc}. This command is used by default if you start {beatname_uc} without specifying a command
 
-ifeval::["{has_ml_jobs}"=="yes"]
+ifdef::has_ml_jobs[]
 :setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available), and machine learning jobs (when available)
 endif::[]
 
-ifeval::["{has_ml_jobs}"!="yes"]
+ifndef::has_ml_jobs[]
 :setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available)
 endif::[]
 
@@ -57,34 +57,20 @@ Use `sudo` to run the following commands if:
 
 endif::[]
 
-[horizontal]
-<<export-command,`export`>>::
-{export-command-short-desc}.
-
-<<help-command,`help`>>::
-{help-command-short-desc}.
-
-<<keystore-command,`keystore`>>::
-{keystore-command-short-desc}.
-
+[options="header"]
+|=======================
+|Commands | 
+|<<export-command,`export`>> |{export-command-short-desc}.
+|<<help-command,`help`>> |{help-command-short-desc}.
+|<<keystore-command,`keystore`>> |{keystore-command-short-desc}.
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
-
-<<modules-command,`modules`>>::
-{modules-command-short-desc}.
-
+|<<modules-command,`modules`>> |{modules-command-short-desc}.
 endif::[]
-
-<<run-command,`run`>>::
-{run-command-short-desc}.
-
-<<setup-command,`setup`>>::
-{setup-command-short-desc}.
-
-<<test-command,`test`>>::
-{test-command-short-desc}.
-
-<<version-command,`version`>>::
-{version-command-short-desc}.
+|<<run-command,`run`>> |{run-command-short-desc}.
+|<<setup-command,`setup`>> |{setup-command-short-desc}.
+|<<test-command,`test`>> |{test-command-short-desc}.
+|<<version-command,`version`>> |{version-command-short-desc}.
+|=======================
 
 Also see <<global-flags,Global flags>>.
 
@@ -467,7 +453,10 @@ environment without actually running {beatname_uc} and ingesting data.
 *FLAGS*
 
 *`--dashboards`*::
-Sets up the Kibana dashboards only.
+Sets up the Kibana dashboards only. This option loads the dashboards from the
+{beatname_uc} package. For more options, such as loading customized dashboards,
+see {beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards]
+in the _Beats Developer Guide_.
 
 *`-h, --help`*::
 Shows help for the `setup` command.

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package prometheus
 
 import (
@@ -16,7 +33,7 @@ import (
 
 const promMetrics = `
 # TYPE first_metric gauge
-first_metric{label1="value1",label2="value2",label3="value3"} 1
+first_metric{label1="value1",label2="value2",label3="Value3",label4="FOO"} 1
 # TYPE second_metric gauge
 second_metric{label1="value1",label3="othervalue"} 0
 # TYPE summary_metric summary
@@ -73,7 +90,9 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric": 1.0,
+					"first": common.MapStr{
+						"metric": 1.0,
+					},
 				},
 			},
 		},
@@ -90,9 +109,13 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  1.0,
-					"labels.label1": "value1",
-					"labels.label2": "value2",
+					"first": common.MapStr{
+						"metric": 1.0,
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+						"label2": "value2",
+					},
 				},
 			},
 		},
@@ -109,12 +132,20 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  1.0,
-					"labels.label3": "value3",
+					"first": common.MapStr{
+						"metric": 1.0,
+					},
+					"labels": common.MapStr{
+						"label3": "Value3",
+					},
 				},
 				common.MapStr{
-					"second.metric": 0.0,
-					"labels.label3": "othervalue",
+					"second": common.MapStr{
+						"metric": 0.0,
+					},
+					"labels": common.MapStr{
+						"label3": "othervalue",
+					},
 				},
 			},
 		},
@@ -132,10 +163,16 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  1.0,
-					"second.metric": 0.0,
-					"labels.label1": "value1",
-					"labels.label2": "value2",
+					"first": common.MapStr{
+						"metric": 1.0,
+					},
+					"second": common.MapStr{
+						"metric": 0.0,
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+						"label2": "value2",
+					},
 				},
 			},
 		},
@@ -152,8 +189,12 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  "works",
-					"labels.label1": "value1",
+					"first": common.MapStr{
+						"metric": "works",
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+					},
 				},
 			},
 		},
@@ -170,9 +211,15 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  true,
-					"second.metric": false,
-					"labels.label1": "value1",
+					"first": common.MapStr{
+						"metric": true,
+					},
+					"second": common.MapStr{
+						"metric": false,
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+					},
 				},
 			},
 		},
@@ -180,7 +227,7 @@ func TestPrometheus(t *testing.T) {
 			msg: "Label metrics",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"first_metric": LabelMetric("first.metric", "label3"),
+					"first_metric": LabelMetric("first.metric", "label3", false),
 				},
 				Labels: map[string]LabelMap{
 					"label1": Label("labels.label1"),
@@ -188,8 +235,33 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"first.metric":  "value3",
-					"labels.label1": "value1",
+					"first": common.MapStr{
+						"metric": "Value3",
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+					},
+				},
+			},
+		},
+		{
+			msg: "Label metrics, lowercase",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"first_metric": LabelMetric("first.metric", "label4", true),
+				},
+				Labels: map[string]LabelMap{
+					"label1": Label("labels.label1"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"first": common.MapStr{
+						"metric": "foo",
+					},
+					"labels": common.MapStr{
+						"label1": "value1",
+					},
 				},
 			},
 		},
@@ -202,13 +274,15 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"summary.metric": common.MapStr{
-						"sum":   234892394.0,
-						"count": uint64(44000),
-						"percentile": common.MapStr{
-							"50": 29735.0,
-							"90": 47103.0,
-							"99": 50681.0,
+					"summary": common.MapStr{
+						"metric": common.MapStr{
+							"sum":   234892394.0,
+							"count": uint64(44000),
+							"percentile": common.MapStr{
+								"50": 29735.0,
+								"90": 47103.0,
+								"99": 50681.0,
+							},
 						},
 					},
 				},
@@ -223,18 +297,20 @@ func TestPrometheus(t *testing.T) {
 			},
 			expected: []common.MapStr{
 				common.MapStr{
-					"histogram.metric": common.MapStr{
-						"count": uint64(1),
-						"bucket": common.MapStr{
-							"1000000000": uint64(1),
-							"+Inf":       uint64(1),
-							"1000":       uint64(1),
-							"10000":      uint64(1),
-							"100000":     uint64(1),
-							"1000000":    uint64(1),
-							"100000000":  uint64(1),
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"count": uint64(1),
+							"bucket": common.MapStr{
+								"1000000000": uint64(1),
+								"+Inf":       uint64(1),
+								"1000":       uint64(1),
+								"10000":      uint64(1),
+								"100000":     uint64(1),
+								"1000000":    uint64(1),
+								"100000000":  uint64(1),
+							},
+							"sum": 117.0,
 						},
-						"sum": 117.0,
 					},
 				},
 			},

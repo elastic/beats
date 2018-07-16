@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package auditd
 
 import (
@@ -16,6 +33,7 @@ import (
 
 	"github.com/elastic/beats/auditbeat/core"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/go-libaudit"
 	"github.com/elastic/go-libaudit/auparse"
@@ -56,7 +74,7 @@ func TestData(t *testing.T) {
 		// Get Status response for initClient
 		returnACK().returnStatus().
 		// Send expected ACKs for initialization
-		returnACK().returnACK().returnACK().returnACK().
+		returnACK().returnACK().returnACK().returnACK().returnACK().
 		// Send a single audit message from the kernel.
 		returnMessage(userLoginMsg)
 
@@ -67,14 +85,10 @@ func TestData(t *testing.T) {
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
-	for _, e := range events {
-		if e.Error != nil {
-			t.Fatalf("received error: %+v", e.Error)
-		}
-	}
 	if len(events) == 0 {
 		t.Fatal("received no events")
 	}
+	assertNoErrors(t, events)
 
 	beatEvent := mbtest.StandardizeEvent(ms, events[0], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, beatEvent, "")
@@ -110,23 +124,8 @@ func TestUnicastClient(t *testing.T) {
 
 	ms := mbtest.NewPushMetricSetV2(t, c)
 	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
-	for _, e := range events {
-		t.Log(e)
-
-		if e.Error != nil {
-			t.Errorf("received error: %+v", e.Error)
-		}
-	}
-
-	for _, e := range events {
-		v, err := e.MetricSetFields.GetValue("thing.primary")
-		if err == nil {
-			if exe, ok := v.(string); ok && exe == "/bin/cat" {
-				return
-			}
-		}
-	}
-	assert.Fail(t, "expected an execve event for /bin/cat")
+	assertNoErrors(t, events)
+	assertHasBinCatExecve(t, events)
 }
 
 func TestMulticastClient(t *testing.T) {
@@ -155,14 +154,8 @@ func TestMulticastClient(t *testing.T) {
 
 	ms := mbtest.NewPushMetricSetV2(t, c)
 	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
-	for _, e := range events {
-		if e.Error != nil {
-			t.Fatalf("received error: %+v", e.Error)
-		}
-	}
-
-	// The number of events is non-deterministic so there is no validation.
-	t.Logf("received %d messages via multicast", len(events))
+	assertNoErrors(t, events)
+	assertHasBinCatExecve(t, events)
 }
 
 func TestKernelVersion(t *testing.T) {
@@ -222,5 +215,31 @@ func buildSampleEvent(t testing.TB, lines []string, filename string) {
 
 	if err := ioutil.WriteFile(filename, output, 0644); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func assertHasBinCatExecve(t *testing.T, events []mb.Event) {
+	t.Helper()
+
+	for _, e := range events {
+		v, err := e.RootFields.GetValue("process.exe")
+		if err == nil {
+			if exe, ok := v.(string); ok && exe == "/bin/cat" {
+				return
+			}
+		}
+	}
+	assert.Fail(t, "expected an execve event for /bin/cat")
+}
+
+func assertNoErrors(t *testing.T, events []mb.Event) {
+	t.Helper()
+
+	for _, e := range events {
+		t.Log(e)
+
+		if e.Error != nil {
+			t.Errorf("received error: %+v", e.Error)
+		}
 	}
 }

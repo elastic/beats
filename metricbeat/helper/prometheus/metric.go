@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package prometheus
 
 import (
@@ -48,13 +65,20 @@ func BooleanMetric(field string) MetricMap {
 
 // LabelMetric maps a Prometheus metric to a Metricbeat field, stores the value
 // of a given label on it if the gauge value is 1
-func LabelMetric(field, label string) MetricMap {
+func LabelMetric(field, label string, lowercase bool) MetricMap {
 	return &labelMetric{
 		commonMetric{
 			field: field,
 		},
 		label,
+		lowercase,
 	}
+}
+
+// InfoMetric obtains info labels from the given metric and puts them
+// into events matching all the key labels present in the metric
+func InfoMetric() MetricMap {
+	return &infoMetric{}
 }
 
 type commonMetric struct {
@@ -152,13 +176,18 @@ func (m *booleanMetric) GetValue(metric *dto.Metric) interface{} {
 
 type labelMetric struct {
 	commonMetric
-	label string
+	label     string
+	lowercase bool
 }
 
 // GetValue returns the resulting value
 func (m *labelMetric) GetValue(metric *dto.Metric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil && gauge.GetValue() == 1 {
-		return strings.ToLower(getLabel(metric, m.label))
+		value := getLabel(metric, m.label)
+		if m.lowercase {
+			return strings.ToLower(value)
+		}
+		return value
 	}
 	return nil
 }
@@ -169,5 +198,17 @@ func getLabel(metric *dto.Metric, name string) string {
 			return label.GetValue()
 		}
 	}
+	return ""
+}
+
+type infoMetric struct{}
+
+// GetValue returns the resulting value
+func (m *infoMetric) GetValue(metric *dto.Metric) interface{} {
+	return ""
+}
+
+// GetField returns the resulting field name
+func (m *infoMetric) GetField() string {
 	return ""
 }

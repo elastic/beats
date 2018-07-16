@@ -16,7 +16,7 @@ test: prepare-test
 	$(MAKE) copy-vendor || exit 1  ; \
 	${PREPARE_COMMAND} \
 	$(MAKE) update || exit 1 ; \
-	$(MAKE) check || exit 1 ; \
+	$(MAKE) check CHECK_HEADERS_DISABLED=y || exit 1 ; \
 	$(MAKE) || exit 1 ; \
 	$(MAKE) unit
 

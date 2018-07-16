@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package tls
 
 import (
@@ -144,7 +161,7 @@ func (plugin *tlsPlugin) doParse(
 	st := conn.streams[dir]
 	if st == nil {
 		st = newStream(tcptuple)
-		st.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+		st.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 		conn.streams[dir] = st
 	}
 
@@ -318,19 +335,13 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	if tcptuple == nil {
 		tcptuple = server.tcptuple
 	}
-	if tcptuple != nil {
-		src.IP = tcptuple.SrcIP.String()
-		src.Port = tcptuple.SrcPort
-		dst.IP = tcptuple.DstIP.String()
-		dst.Port = tcptuple.DstPort
+	cmdlineTuple := client.cmdlineTuple
+	if cmdlineTuple == nil {
+		cmdlineTuple = server.cmdlineTuple
 	}
-
-	if client.cmdlineTuple != nil {
-		src.Proc = string(client.cmdlineTuple.Src)
-		dst.Proc = string(client.cmdlineTuple.Dst)
-	} else if server.cmdlineTuple != nil {
-		src.Proc = string(server.cmdlineTuple.Dst)
-		dst.Proc = string(server.cmdlineTuple.Src)
+	if tcptuple != nil && cmdlineTuple != nil {
+		source, destination := common.MakeEndpointPair(tcptuple.BaseTuple, cmdlineTuple)
+		src, dst = &source, &destination
 	}
 
 	if len(fingerprints) > 0 {

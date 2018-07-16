@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package add_host_metadata
 
 import (
@@ -11,6 +28,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -60,31 +78,7 @@ func (p *addHostMetadata) loadData() {
 
 	// Check if cache is expired
 	if p.lastUpdate.Add(cacheExpiration).Before(time.Now()) {
-		p.data = common.MapStr{
-			"host": common.MapStr{
-				"name":         p.info.Hostname,
-				"architecture": p.info.Architecture,
-				"os": common.MapStr{
-					"platform": p.info.OS.Platform,
-					"version":  p.info.OS.Version,
-					"family":   p.info.OS.Family,
-				},
-			},
-		}
-
-		// Optional params
-		if p.info.UniqueID != "" {
-			p.data.Put("host.id", p.info.UniqueID)
-		}
-		if p.info.Containerized != nil {
-			p.data.Put("host.containerized", *p.info.Containerized)
-		}
-		if p.info.OS.Codename != "" {
-			p.data.Put("host.os.codename", p.info.OS.Codename)
-		}
-		if p.info.OS.Build != "" {
-			p.data.Put("host.os.build", p.info.OS.Build)
-		}
+		p.data = host.MapHostInfo(p.info)
 
 		if p.config.NetInfoEnabled {
 			// IP-address and MAC-address
@@ -100,7 +94,6 @@ func (p *addHostMetadata) loadData() {
 				p.data.Put("host.mac", hwList)
 			}
 		}
-
 		p.lastUpdate = time.Now()
 	}
 }

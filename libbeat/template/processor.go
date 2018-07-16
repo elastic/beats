@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package template
 
 import (
@@ -14,6 +31,7 @@ type Processor struct {
 
 var (
 	defaultScalingFactor = 1000
+	defaultIgnoreAbove   = 1024
 )
 
 // Process recursively processes the given fields and writes the template in the given output
@@ -142,19 +160,46 @@ func (p *Processor) ip(f *common.Field) common.MapStr {
 func (p *Processor) keyword(f *common.Field) common.MapStr {
 	property := getDefaultProperties(f)
 
+	fullName := f.Name
+	if f.Path != "" {
+		fullName = f.Path + "." + f.Name
+	}
+
+	defaultFields = append(defaultFields, fullName)
+
 	property["type"] = "keyword"
-	property["ignore_above"] = 1024
+
+	switch f.IgnoreAbove {
+	case 0: // Use libbeat default
+		property["ignore_above"] = defaultIgnoreAbove
+	case -1: // Use ES default
+	default: // Use user value
+		property["ignore_above"] = f.IgnoreAbove
+	}
 
 	if p.EsVersion.IsMajor(2) {
 		property["type"] = "string"
-		property["ignore_above"] = 1024
 		property["index"] = "not_analyzed"
 	}
+
+	if len(f.MultiFields) > 0 {
+		fields := common.MapStr{}
+		p.Process(f.MultiFields, "", fields)
+		property["fields"] = fields
+	}
+
 	return property
 }
 
 func (p *Processor) text(f *common.Field) common.MapStr {
 	properties := getDefaultProperties(f)
+
+	fullName := f.Name
+	if f.Path != "" {
+		fullName = f.Path + "." + f.Name
+	}
+
+	defaultFields = append(defaultFields, fullName)
 
 	properties["type"] = "text"
 
@@ -222,7 +267,7 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 	case "keyword":
 		dynProperties["type"] = f.ObjectType
 		addDynamicTemplate(f, dynProperties, matchType("string"))
-	case "long", "double":
+	case "byte", "double", "float", "long", "short":
 		dynProperties["type"] = f.ObjectType
 		addDynamicTemplate(f, dynProperties, matchType(f.ObjectType))
 	}

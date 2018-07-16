@@ -1,37 +1,19 @@
 BEAT_NAME?=filebeat
 BEAT_TITLE?=Filebeat
-BEAT_DESCRIPTION?=Filebeat sends log files to Logstash or directly to Elasticsearch.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 ES_BEATS?=..
+FIELDS_FILE_PATH=module
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
-
-# This is called by the beats packer before building starts
-.PHONY: before-build
-before-build:
 
 # Collects all module dashboards
 .PHONY: kibana
 kibana:
-	@rm -rf _meta/kibana
-	@mkdir -p _meta/kibana
-	@-cp -r module/*/_meta/kibana _meta/
-
-# Collects all module and dataset fields
-.PHONY: fields
-fields: python-env
-	@mkdir -p _meta/
-	@cp ${ES_BEATS}/filebeat/_meta/fields.common.yml  _meta/fields.generated.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
-
-# Collects all modules files to be packaged in a temporary folder
-.PHONY: modules
-modules:
-	@mkdir -p _meta/
-	@rm -rf _meta/module.generated
-	@rsync -q -av module/ _meta/module.generated --exclude "_meta" --exclude "*/*/test"
+	@rm -rf _meta/kibana.generated
+	@mkdir -p _meta/kibana.generated
+	@-cp -pr module/*/_meta/kibana/* _meta/kibana.generated
 
 # Collects all module configs
 .PHONY: configs
@@ -60,7 +42,7 @@ imports: python-env
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields kibana modules configs collect-docs imports
+collect: fields kibana configs collect-docs imports
 
 # Creates a new module. Requires the params MODULE
 .PHONY: create-module
