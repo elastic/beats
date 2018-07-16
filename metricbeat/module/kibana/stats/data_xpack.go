@@ -59,10 +59,33 @@ var (
 		"response_times": c.Dict("response_times", s.Schema{
 			"average": c.Float("avg_ms"),
 			"max":     c.Float("max_ms"),
-		}),
+		}, c.DictOptional),
 		"sockets": SocketsDict,
 		"kibana":  KibanaDict,
-		"usage":   UsageDict,
+		"usage": c.Dict("usage", s.Schema{
+			"index": c.Str("kibana.index"),
+			"index_pattern": c.Dict("kibana.index_pattern", s.Schema{
+				"total": c.Int("total"),
+			}),
+			"search": c.Dict("kibana.search", s.Schema{
+				"total": c.Int("total"),
+			}),
+			"visualization": c.Dict("kibana.visualization", s.Schema{
+				"total": c.Int("total"),
+			}),
+			"dashboard": c.Dict("kibana.dashboard", s.Schema{
+				"total": c.Int("total"),
+			}),
+			"timelion_sheet": c.Dict("kibana.timelion_sheet", s.Schema{
+				"total": c.Int("total"),
+			}),
+			"graph_workspace": c.Dict("kibana.graph_workspace", s.Schema{
+				"total": c.Int("total"),
+			}),
+			"xpack": s.Object{
+				"reporting": ReportingUsageDict,
+			},
+		}),
 	}
 )
 

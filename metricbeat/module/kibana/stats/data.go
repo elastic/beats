@@ -85,7 +85,10 @@ var (
 		}),
 		"sockets": SocketsDict,
 		"kibana":  KibanaDict,
-		"usage":   UsageDict,
+		"usage": c.Dict("usage", s.Schema{
+			"kibana":    kibanaUsageDict,
+			"reporting": ReportingUsageDict,
+		}),
 	}
 
 	// RequestsDict defines how to convert the requests field
@@ -116,12 +119,6 @@ var (
 		"status":            c.Str("status"),
 	})
 
-	// UsageDict defines how to convert the usage field
-	UsageDict = c.Dict("usage", s.Schema{
-		"kibana":    kibanaUsageDict,
-		"reporting": reportingUsageDict,
-	})
-
 	kibanaUsageDict = c.Dict("kibana", s.Schema{
 		"index": c.Str("index"),
 		"dashboard": c.Dict("dashboard", s.Schema{
@@ -144,7 +141,8 @@ var (
 		}, c.DictOptional),
 	})
 
-	reportingUsageDict = c.Dict("reporting", s.Schema{
+	// ReportingUsageDict defines how to convert the usage.reporting field
+	ReportingUsageDict = c.Dict("reporting", s.Schema{
 		"available":     c.Bool("available"),
 		"enabled":       c.Bool("enabled"),
 		"browser_type":  c.Str("browser_type"),
