@@ -328,11 +328,11 @@
           description: >
             The total number of requests received by the server.
 
-    - name: oplatencies
+    - name: ops.latencies
       type: group
       description: >
         Operation latencies for the database as a whole.
-        Only mongod instances report this metric. 
+        Only mongod instances report this metric.
       fields:
         - name: reads.latency
           type: long
@@ -359,7 +359,7 @@
           description: >
             Total number of commands performed on the collection since startup.
 
-    - name: opcounters
+    - name: ops.counters
       type: group
       description: >
         An overview of database operations by type.
@@ -395,7 +395,7 @@
             The total number of commands issued to the database since the mongod
             instance last started.
 
-    - name: opcounters_replicated
+    - name: ops.replicated
       type: group
       description: >
         An overview of database replication operations by type.

@@ -46,7 +46,7 @@ var schema = s.Schema{
 		"page_faults": c.Int("page_faults"),
 	}),
 	"global_lock": c.Dict("globalLock", s.Schema{
-		"total_time.us":  c.Int("totalTime"),
+		"total_time":     s.Object{"us": c.Int("totalTime")},
 		"current_queue":  c.Dict("currentQueue", globalLockItemSchema),
 		"active_clients": c.Dict("activeClients", globalLockItemSchema),
 	}),
@@ -62,27 +62,29 @@ var schema = s.Schema{
 		"out":      s.Object{"bytes": c.Int("bytesOut")},
 		"requests": c.Int("numRequests"),
 	}),
-	"oplatencies": c.Dict("opLatencies", s.Schema{
-		"reads":    c.Dict("reads", opLatenciesItemSchema),
-		"writes":   c.Dict("writes", opLatenciesItemSchema),
-		"commands": c.Dict("commands", opLatenciesItemSchema),
-	}, c.DictOptional),
-	"opcounters": c.Dict("opcounters", s.Schema{
-		"insert":  c.Int("insert"),
-		"query":   c.Int("query"),
-		"update":  c.Int("update"),
-		"delete":  c.Int("delete"),
-		"getmore": c.Int("getmore"),
-		"command": c.Int("command"),
-	}),
-	"opcounters_replicated": c.Dict("opcountersRepl", s.Schema{
-		"insert":  c.Int("insert"),
-		"query":   c.Int("query"),
-		"update":  c.Int("update"),
-		"delete":  c.Int("delete"),
-		"getmore": c.Int("getmore"),
-		"command": c.Int("command"),
-	}),
+	"ops": s.Object{
+		"latencies": c.Dict("opLatencies", s.Schema{
+			"reads":    c.Dict("reads", opLatenciesItemSchema),
+			"writes":   c.Dict("writes", opLatenciesItemSchema),
+			"commands": c.Dict("commands", opLatenciesItemSchema),
+		}, c.DictOptional),
+		"counters": c.Dict("opcounters", s.Schema{
+			"insert":  c.Int("insert"),
+			"query":   c.Int("query"),
+			"update":  c.Int("update"),
+			"delete":  c.Int("delete"),
+			"getmore": c.Int("getmore"),
+			"command": c.Int("command"),
+		}),
+		"replicated": c.Dict("opcountersRepl", s.Schema{
+			"insert":  c.Int("insert"),
+			"query":   c.Int("query"),
+			"update":  c.Int("update"),
+			"delete":  c.Int("delete"),
+			"getmore": c.Int("getmore"),
+			"command": c.Int("command"),
+		}),
+	},
 	// ToDo add `repl` field
 	"storage_engine": c.Dict("storageEngine", s.Schema{
 		"name": c.Str("name"),
