@@ -9,54 +9,48 @@
       "snapshot":false,
       "status":"green"
     },
-    "last_updated":"2018-07-13T23:24:06.884Z",
+    "last_updated":"2018-07-17T00:01:00.572Z",
     "collection_interval_ms":5000,
     "process":{
       "memory":{
         "heap":{
-          "total_bytes":205746176,
-          "used_bytes":186202032,
+          "total_in_bytes":338665472,
+          "used_in_bytes":196976728,
           "size_limit":1501560832
         },
-        "resident_set_size_bytes":197615616
+        "resident_set_size_in_bytes":420392960
       },
-      "event_loop_delay":0.32519304752349854,
-      "pid":5355,
-      "uptime_ms":438358
+      "event_loop_delay":0.36263203620910645,
+      "pid":20345,
+      "uptime_ms":25647
     },
     "os":{
       "load":{
-        "1m":2.58544921875,
-        "5m":3.12646484375,
-        "15m":3.509765625
+        "1m":3.21630859375,
+        "5m":3.32568359375,
+        "15m":3.42431640625
       },
       "memory":{
-        "total_bytes":17179869184,
-        "free_bytes":869421056,
-        "used_bytes":16310448128
+        "total_in_bytes":17179869184,
+        "free_in_bytes":1907470336,
+        "used_in_bytes":15272398848
       },
-      "uptime_ms":1837583000
+      "uptime_ms":2098991000
     },
     "response_times":{
-      "avg_ms":14.25,
-      "max_ms":22
+      "avg_ms":34,
+      "max_ms":133
     },
     "requests":{
-      "total":0,
+      "total":9,
       "disconnects":0,
       "status_codes":{
-
+        "200":1,
+        "302":1,
+        "304":3
       }
     },
-    "concurrent_connections":7,
-    "sockets":{
-      "http":{
-        "total":0
-      },
-      "https":{
-        "total":0
-      }
-    },
+    "concurrent_connections":6,
     "usage":{
       "kibana":{
         "index":".kibana",
@@ -70,7 +64,7 @@
           "total":0
         },
         "index_pattern":{
-          "total":1
+          "total":0
         },
         "graph_workspace":{
           "total":0
@@ -83,65 +77,41 @@
         "available":true,
         "enabled":true,
         "browser_type":"phantom",
-        "_all":0,
+        "all":0,
         "csv":{
           "available":true,
           "total":0
         },
         "printable_pdf":{
-          "available":true,
-          "total":0,
-          "app":{
-            "visualization":0,
-            "dashboard":0
-          },
-          "layout":{
-            "print":0,
-            "preserve_layout":0
-          }
+          "available":false,
+          "total":0
         },
         "status":{
 
         },
-        "lastDay":{
-          "_all":0,
+        "last_day":{
+          "all":0,
           "csv":{
             "available":true,
             "total":0
           },
           "printable_pdf":{
-            "available":true,
-            "total":0,
-            "app":{
-              "visualization":0,
-              "dashboard":0
-            },
-            "layout":{
-              "print":0,
-              "preserve_layout":0
-            }
+            "available":false,
+            "total":0
           },
           "status":{
 
           }
         },
-        "last7Days":{
-          "_all":0,
+        "last_7_days":{
+          "all":0,
           "csv":{
             "available":true,
             "total":0
           },
           "printable_pdf":{
-            "available":true,
-            "total":0,
-            "app":{
-              "visualization":0,
-              "dashboard":0
-            },
-            "layout":{
-              "print":0,
-              "preserve_layout":0
-            }
+            "available":false,
+            "total":0
           },
           "status":{
 
@@ -149,5 +119,5 @@
         }
       }
     },
-    "cluster_uuid":"cGwLbjF8SyygI5eNqTX6qw"
+    "cluster_uuid":"iwT1u1zRQBeRab1oo8KtsA"
   }
