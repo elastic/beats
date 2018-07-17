@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// JSONReader parses JSON inputs
 type JSONReader struct {
 	reader reader.Reader
 	cfg    *Config
