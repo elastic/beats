@@ -74,8 +74,8 @@ var (
 				"ms": c.Int("uptime_ms"),
 			},
 		}),
-		"requests": RequestsDict,
-		"response_times": c.Dict("response_times", s.Schema{
+		"request": RequestsDict,
+		"response_time": c.Dict("response_times", s.Schema{
 			"avg": s.Object{
 				"ms": c.Float("avg_ms"),
 			},

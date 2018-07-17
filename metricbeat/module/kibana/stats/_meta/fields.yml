@@ -91,7 +91,7 @@
           type: long
           description: >
             Uptime of process in milliseconds
-    - name: requests
+    - name: request
       type: group
       description: >
           Request count metrics
@@ -104,7 +104,7 @@
           type: long
           description: >
             Total number of requests
-    - name: response_times
+    - name: response_time
       type: group
       description: >
         Response times metrics

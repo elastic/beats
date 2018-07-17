@@ -6869,13 +6869,13 @@ Uptime of process in milliseconds
 --
 
 [float]
-== requests fields
+== request fields
 
 Request count metrics
 
 
 
-*`kibana.stats.requests.disconnects`*::
+*`kibana.stats.request.disconnects`*::
 +
 --
 type: long
@@ -6885,7 +6885,7 @@ Number of requests that were disconnected
 
 --
 
-*`kibana.stats.requests.total`*::
+*`kibana.stats.request.total`*::
 +
 --
 type: long
@@ -6896,13 +6896,13 @@ Total number of requests
 --
 
 [float]
-== response_times fields
+== response_time fields
 
 Response times metrics
 
 
 
-*`kibana.stats.response_times.avg.ms`*::
+*`kibana.stats.response_time.avg.ms`*::
 +
 --
 type: scaled_float
@@ -6912,39 +6912,12 @@ Average response time in milliseconds
 
 --
 
-*`kibana.stats.response_times.max.ms`*::
+*`kibana.stats.response_time.max.ms`*::
 +
 --
 type: scaled_float
 
 Maximum response time in milliseconds
-
-
---
-
-[float]
-== sockets fields
-
-Socket connections metrics
-
-
-
-*`kibana.stats.sockets.http.total`*::
-+
---
-type: long
-
-Number of HTTP connections
-
-
---
-
-*`kibana.stats.sockets.https.total`*::
-+
---
-type: long
-
-Number of HTTPS connections
 
 
 --
@@ -7157,7 +7130,7 @@ Type of browser being used by Reporting for screenshots
 
 --
 
-*`kibana.stats.usage.reporting._all`*::
+*`kibana.stats.usage.reporting.all`*::
 +
 --
 type: long
@@ -7275,7 +7248,7 @@ Metrics for the last day
 
 
 
-*`kibana.stats.usage.reporting.lastDay._all`*::
+*`kibana.stats.usage.reporting.lastDay.all`*::
 +
 --
 type: long
@@ -7393,7 +7366,7 @@ Metrics for the last seven days
 
 
 
-*`kibana.stats.usage.reporting.last7Days._all`*::
+*`kibana.stats.usage.reporting.last7Days.all`*::
 +
 --
 type: long
