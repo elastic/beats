@@ -100,10 +100,16 @@
             fields:
               - name: total
                 type: long
+                description: >
+                  The total number of operations queued waiting for the lock (i.e., the sum of current_queue.readers and current_queue.writers).
               - name: readers
                 type: long
+                description: >
+                  The number of operations that are currently queued and waiting for the read lock.
               - name: writers
                 type: long
+                description: >
+                  The number of operations that are currently queued and waiting for the write lock.
           - name: active_clients
             type: group
             description: >
@@ -111,6 +117,8 @@
             fields:
               - name: total
                 type: long
+                description: >
+                  Total number of the active client connections performing read or write operations.
               - name: readers
                 type: long
                 description: >
@@ -125,7 +133,7 @@
         A document that reports for each lock <type>, data on lock <mode>s.
         The possible lock <type>s are global, database, collection, metadata and oplog.
         The possible <mode>s are r, w, R and W which respresent shared, exclusive, intent shared and intent exclusive.
-        
+
         locks.<type>.acquire.count.<mode> shows the number of times the lock was acquired in the specified mode.
         locks.<type>.wait.count.<mode> shows the number of times the locks.acquireCount lock acquisitions encountered waits
         because the locks were held in a conflicting mode.
