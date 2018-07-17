@@ -40,13 +40,13 @@ var (
 			}),
 			"memory": c.Dict("memory", s.Schema{
 				"total": s.Object{
-					"bytes": c.Int("total_bytes"),
+					"bytes": c.Int("total_in_bytes"),
 				},
 				"free": s.Object{
-					"bytes": c.Int("free_bytes"),
+					"bytes": c.Int("free_in_bytes"),
 				},
 				"used": s.Object{
-					"bytes": c.Int("used_bytes"),
+					"bytes": c.Int("used_in_bytes"),
 				},
 			}),
 			"uptime": s.Object{
@@ -60,10 +60,10 @@ var (
 			"memory": c.Dict("memory", s.Schema{
 				"heap": c.Dict("heap", s.Schema{
 					"total": s.Object{
-						"bytes": c.Int("total_bytes"),
+						"bytes": c.Int("total_in_bytes"),
 					},
 					"used": s.Object{
-						"bytes": c.Int("used_bytes"),
+						"bytes": c.Int("used_in_bytes"),
 					},
 					"size_limit": s.Object{
 						"bytes": c.Int("size_limit"),
