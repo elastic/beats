@@ -82,9 +82,43 @@ var (
 				"total": c.Int("total"),
 			}),
 			"xpack": s.Object{
-				"reporting": ReportingUsageDict,
+				"reporting": c.Dict("reporting", s.Schema{
+					"available":     c.Bool("available"),
+					"enabled":       c.Bool("enabled"),
+					"browser_type":  c.Str("browser_type"),
+					"all":           c.Int("all"),
+					"csv":           reportingCsvDict,
+					"printable_pdf": reportingPrintablePdfDict,
+					"status":        reportingStatusDict,
+					"last_day":      c.Dict("last_day", reportingPeriodSchema, c.DictOptional),
+					"last_7_days":   c.Dict("last_7_days", reportingPeriodSchema, c.DictOptional),
+				}, c.DictOptional),
 			},
 		}),
+	}
+
+	reportingCsvDict = c.Dict("csv", s.Schema{
+		"available": c.Bool("available"),
+		"total":     c.Int("total"),
+	}, c.DictOptional)
+
+	reportingPrintablePdfDict = c.Dict("printable_pdf", s.Schema{
+		"available": c.Bool("available"),
+		"total":     c.Int("total"),
+	}, c.DictOptional)
+
+	reportingStatusDict = c.Dict("status", s.Schema{
+		"completed":  c.Int("completed", s.Optional),
+		"failed":     c.Int("failed", s.Optional),
+		"processing": c.Int("processing", s.Optional),
+		"pending":    c.Int("pending", s.Optional),
+	}, c.DictOptional)
+
+	reportingPeriodSchema = s.Schema{
+		"all":           c.Int("all"),
+		"csv":           reportingCsvDict,
+		"printable_pdf": reportingPrintablePdfDict,
+		"status":        reportingStatusDict,
 	}
 )
 

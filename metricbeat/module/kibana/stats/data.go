@@ -61,10 +61,6 @@ var (
 			},
 		}),
 		"kibana": KibanaDict,
-		"usage": c.Dict("usage", s.Schema{
-			"kibana":    kibanaUsageDict,
-			"reporting": ReportingUsageDict,
-		}),
 	}
 
 	// RequestsDict defines how to convert the requests field
@@ -84,65 +80,6 @@ var (
 		"snapshot":          c.Bool("snapshot"),
 		"status":            c.Str("status"),
 	})
-
-	kibanaUsageDict = c.Dict("kibana", s.Schema{
-		"index": c.Str("index"),
-		"dashboard": c.Dict("dashboard", s.Schema{
-			"total": c.Int("total"),
-		}, c.DictOptional),
-		"visualization": c.Dict("visualization", s.Schema{
-			"total": c.Int("total"),
-		}, c.DictOptional),
-		"search": c.Dict("search", s.Schema{
-			"total": c.Int("total"),
-		}, c.DictOptional),
-		"index_pattern": c.Dict("index_pattern", s.Schema{
-			"total": c.Int("total"),
-		}, c.DictOptional),
-		"graph_workspace": c.Dict("graph_workspace", s.Schema{
-			"total": c.Int("total"),
-		}, c.DictOptional),
-		"timelion_sheet": c.Dict("timelion_sheet", s.Schema{
-			"total": c.Int("total"),
-		}, c.DictOptional),
-	})
-
-	// ReportingUsageDict defines how to convert the usage.reporting field
-	ReportingUsageDict = c.Dict("reporting", s.Schema{
-		"available":     c.Bool("available"),
-		"enabled":       c.Bool("enabled"),
-		"browser_type":  c.Str("browser_type"),
-		"all":           c.Int("all"),
-		"csv":           reportingCsvDict,
-		"printable_pdf": reportingPrintablePdfDict,
-		"status":        reportingStatusDict,
-		"last_day":      c.Dict("last_day", reportingPeriodSchema, c.DictOptional),
-		"last_7_days":   c.Dict("last_7_days", reportingPeriodSchema, c.DictOptional),
-	}, c.DictOptional)
-
-	reportingCsvDict = c.Dict("csv", s.Schema{
-		"available": c.Bool("available"),
-		"total":     c.Int("total"),
-	}, c.DictOptional)
-
-	reportingPrintablePdfDict = c.Dict("printable_pdf", s.Schema{
-		"available": c.Bool("available"),
-		"total":     c.Int("total"),
-	}, c.DictOptional)
-
-	reportingStatusDict = c.Dict("status", s.Schema{
-		"completed":  c.Int("completed", s.Optional),
-		"failed":     c.Int("failed", s.Optional),
-		"processing": c.Int("processing", s.Optional),
-		"pending":    c.Int("pending", s.Optional),
-	}, c.DictOptional)
-
-	reportingPeriodSchema = s.Schema{
-		"all":           c.Int("all"),
-		"csv":           reportingCsvDict,
-		"printable_pdf": reportingPrintablePdfDict,
-		"status":        reportingStatusDict,
-	}
 )
 
 func eventMapping(r mb.ReporterV2, content []byte) error {
