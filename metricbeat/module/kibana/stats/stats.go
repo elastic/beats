@@ -67,6 +67,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	if config.BasePath != "" {
+		http.AddBasePath(config.BasePath)
+	}
+
 	return &MetricSet{
 		base,
 		http,

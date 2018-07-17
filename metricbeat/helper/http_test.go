@@ -69,3 +69,46 @@ func TestGetAuthHeaderFromTokenNoFile(t *testing.T) {
 	assert.Equal(t, "", header)
 	assert.Error(t, err)
 }
+
+func TestAddBasePath(t *testing.T) {
+	tests := []struct {
+		Name, Content, Expected string
+	}{
+		{
+			"Test with empty basepath",
+			"",
+			"http://localhost:9999/some/path",
+		},
+		{
+			"Test with basepath with no leading or trailing slashes",
+			"foobar",
+			"http://localhost:9999/foobar/some/path",
+		},
+		{
+			"Test with basepath with a leading slash",
+			"/foobar",
+			"http://localhost:9999/foobar/some/path",
+		},
+		{
+			"Test with basepath with a trailing slash",
+			"foobar/",
+			"http://localhost:9999/foobar/some/path",
+		},
+		{
+			"Test with basepath with leading and trailing slashes",
+			"/foobar/",
+			"http://localhost:9999/foobar/some/path",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			http := HTTP{
+				uri: "http://localhost:9999/some/path",
+			}
+
+			http.AddBasePath(test.Content)
+			assert.Equal(t, test.Expected, http.GetURI())
+		})
+	}
+}
