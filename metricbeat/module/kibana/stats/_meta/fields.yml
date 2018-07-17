@@ -117,19 +117,6 @@
           type: scaled_float
           description: >
             Maximum response time in milliseconds
-    - name: sockets
-      type: group
-      description: >
-        Socket connections metrics
-      fields:
-        - name: http.total
-          type: long
-          description: >
-            Number of HTTP connections
-        - name: https.total
-          type: long
-          description: >
-            Number of HTTPS connections
     - name: kibana
       type: group
       description: >

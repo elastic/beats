@@ -83,8 +83,7 @@ var (
 				"ms": c.Float("max_ms"),
 			},
 		}),
-		"sockets": SocketsDict,
-		"kibana":  KibanaDict,
+		"kibana": KibanaDict,
 		"usage": c.Dict("usage", s.Schema{
 			"kibana":    kibanaUsageDict,
 			"reporting": ReportingUsageDict,
@@ -95,16 +94,6 @@ var (
 	RequestsDict = c.Dict("requests", s.Schema{
 		"disconnects": c.Int("disconnects", s.Optional),
 		"total":       c.Int("total", s.Optional),
-	})
-
-	// SocketsDict defines how to convert the sockets field
-	SocketsDict = c.Dict("sockets", s.Schema{
-		"http": c.Dict("http", s.Schema{
-			"total": c.Int("total"),
-		}),
-		"https": c.Dict("https", s.Schema{
-			"total": c.Int("total"),
-		}),
 	})
 
 	// KibanaDict defines how to convert the kibana field

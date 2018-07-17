@@ -60,8 +60,7 @@ var (
 			"average": c.Float("avg_ms"),
 			"max":     c.Float("max_ms"),
 		}, c.DictOptional),
-		"sockets": SocketsDict,
-		"kibana":  KibanaDict,
+		"kibana": KibanaDict,
 		"usage": c.Dict("usage", s.Schema{
 			"index": c.Str("kibana.index"),
 			"index_pattern": c.Dict("kibana.index_pattern", s.Schema{
