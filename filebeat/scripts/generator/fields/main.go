@@ -97,25 +97,25 @@ func newFieldYml(name, typeName string, noDoc bool) *fieldYml {
 	}
 }
 
-func newField(lp string) field {
-	if len(lp) <= 2 {
+func newField(pattern string) field {
+	if len(pattern) <= 2 {
 		return field{}
 	}
-	lp = lp[1 : len(lp)-1]
+	pattern = pattern[1 : len(pattern)-1]
 
-	ee := strings.Split(lp, ":")
-	if !isValidFormat(ee) {
+	elements := strings.Split(pattern, ":")
+	if !isValidFormat(elements) {
 		return field{}
 	}
 
 	hint := ""
-	if containsType(ee) {
-		hint = ee[hintIdx]
+	if containsType(elements) {
+		hint = elements[hintIdx]
 	}
 
 	return field{
-		Syntax:           ee[typeIdx],
-		SemanticElements: strings.Split(ee[elementsIdx], "."),
+		Syntax:           elements[typeIdx],
+		SemanticElements: strings.Split(elements[elementsIdx], "."),
 		Type:             hint,
 	}
 }
