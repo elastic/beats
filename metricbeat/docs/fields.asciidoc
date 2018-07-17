@@ -6702,103 +6702,6 @@ Number of client connections made to the server. Note that browsers can send mul
 --
 
 [float]
-== os fields
-
-Operating system metrics
-
-
-
-[float]
-== load.avg fields
-
-Operating system load averages
-
-
-
-*`kibana.stats.os.load.avg.1m`*::
-+
---
-type: scaled_float
-
-1 minute load average
-
-
---
-
-*`kibana.stats.os.load.avg.5m`*::
-+
---
-type: scaled_float
-
-5 minute load average
-
-
---
-
-*`kibana.stats.os.load.avg.15m`*::
-+
---
-type: scaled_float
-
-15 minute load average
-
-
---
-
-[float]
-== memory fields
-
-Operating system memory metrics
-
-
-
-*`kibana.stats.os.memory.total.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-Total operating system memory available in bytes
-
-
---
-
-*`kibana.stats.os.memory.free.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-Operating system memory free in bytes
-
-
---
-
-*`kibana.stats.os.memory.used.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-Operating system memory used in bytes
-
-
---
-
-*`kibana.stats.os.uptime.ms`*::
-+
---
-type: long
-
-Operating system uptime in seconds
-
-
---
-
-[float]
 == process fields
 
 Process metrics
@@ -7242,13 +7145,13 @@ Number of reports waiting to start processing
 --
 
 [float]
-== lastDay fields
+== last_day fields
 
 Metrics for the last day
 
 
 
-*`kibana.stats.usage.reporting.lastDay.all`*::
+*`kibana.stats.usage.reporting.last_day.all`*::
 +
 --
 type: long
@@ -7265,7 +7168,7 @@ Metrics for CSV reports
 
 
 
-*`kibana.stats.usage.reporting.lastDay.csv.available`*::
+*`kibana.stats.usage.reporting.last_day.csv.available`*::
 +
 --
 type: boolean
@@ -7275,7 +7178,7 @@ Whether CSV reporting is available
 
 --
 
-*`kibana.stats.usage.reporting.lastDay.csv.total`*::
+*`kibana.stats.usage.reporting.last_day.csv.total`*::
 +
 --
 type: long
@@ -7292,7 +7195,7 @@ Metrics for PDF reports
 
 
 
-*`kibana.stats.usage.reporting.lastDay.printable_pdf.available`*::
+*`kibana.stats.usage.reporting.last_day.printable_pdf.available`*::
 +
 --
 type: boolean
@@ -7302,7 +7205,7 @@ Whether PDF reporting is available
 
 --
 
-*`kibana.stats.usage.reporting.lastDay.printable_pdf.total`*::
+*`kibana.stats.usage.reporting.last_day.printable_pdf.total`*::
 +
 --
 type: long
@@ -7319,7 +7222,7 @@ Report status metrics
 
 
 
-*`kibana.stats.usage.reporting.lastDay.status.completed`*::
+*`kibana.stats.usage.reporting.last_day.status.completed`*::
 +
 --
 type: long
@@ -7329,7 +7232,7 @@ Number of reports completed
 
 --
 
-*`kibana.stats.usage.reporting.lastDay.status.failed`*::
+*`kibana.stats.usage.reporting.last_day.status.failed`*::
 +
 --
 type: long
@@ -7339,7 +7242,7 @@ Number of reports failed
 
 --
 
-*`kibana.stats.usage.reporting.lastDay.status.processing`*::
+*`kibana.stats.usage.reporting.last_day.status.processing`*::
 +
 --
 type: long
@@ -7349,7 +7252,7 @@ Number of reports currently processing
 
 --
 
-*`kibana.stats.usage.reporting.lastDay.status.pending`*::
+*`kibana.stats.usage.reporting.last_day.status.pending`*::
 +
 --
 type: long
@@ -7360,13 +7263,13 @@ Number of reports waiting to start processing
 --
 
 [float]
-== last7Days fields
+== last_7_days fields
 
 Metrics for the last seven days
 
 
 
-*`kibana.stats.usage.reporting.last7Days.all`*::
+*`kibana.stats.usage.reporting.last_7_days.all`*::
 +
 --
 type: long
@@ -7383,7 +7286,7 @@ Metrics for CSV reports
 
 
 
-*`kibana.stats.usage.reporting.last7Days.csv.available`*::
+*`kibana.stats.usage.reporting.last_7_days.csv.available`*::
 +
 --
 type: boolean
@@ -7393,7 +7296,7 @@ Whether CSV reporting is available
 
 --
 
-*`kibana.stats.usage.reporting.last7Days.csv.total`*::
+*`kibana.stats.usage.reporting.last_7_days.csv.total`*::
 +
 --
 type: long
@@ -7410,7 +7313,7 @@ Metrics for PDF reports
 
 
 
-*`kibana.stats.usage.reporting.last7Days.printable_pdf.available`*::
+*`kibana.stats.usage.reporting.last_7_days.printable_pdf.available`*::
 +
 --
 type: boolean
@@ -7420,7 +7323,7 @@ Whether PDF reporting is available
 
 --
 
-*`kibana.stats.usage.reporting.last7Days.printable_pdf.total`*::
+*`kibana.stats.usage.reporting.last_7_days.printable_pdf.total`*::
 +
 --
 type: long
@@ -7437,7 +7340,7 @@ Report status metrics
 
 
 
-*`kibana.stats.usage.reporting.last7Days.status.completed`*::
+*`kibana.stats.usage.reporting.last_7_days.status.completed`*::
 +
 --
 type: long
@@ -7447,7 +7350,7 @@ Number of reports completed
 
 --
 
-*`kibana.stats.usage.reporting.last7Days.status.failed`*::
+*`kibana.stats.usage.reporting.last_7_days.status.failed`*::
 +
 --
 type: long
@@ -7457,7 +7360,7 @@ Number of reports failed
 
 --
 
-*`kibana.stats.usage.reporting.last7Days.status.processing`*::
+*`kibana.stats.usage.reporting.last_7_days.status.processing`*::
 +
 --
 type: long
@@ -7467,7 +7370,7 @@ Number of reports currently processing
 
 --
 
-*`kibana.stats.usage.reporting.last7Days.status.pending`*::
+*`kibana.stats.usage.reporting.last_7_days.status.pending`*::
 +
 --
 type: long

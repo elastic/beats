@@ -12,52 +12,6 @@
       type: long
       description: >
         Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request mulitple server assets at once, and they can re-use established connections.
-    - name: os
-      type: group
-      description: >
-        Operating system metrics
-      fields:
-      - name: load.avg
-        type: group
-        description: >
-          Operating system load averages
-        fields:
-        - name: 1m
-          type: scaled_float
-          description: >
-            1 minute load average
-        - name: 5m
-          type: scaled_float
-          description: >
-            5 minute load average
-        - name: 15m
-          type: scaled_float
-          description: >
-            15 minute load average
-      - name: memory
-        type: group
-        description: >
-          Operating system memory metrics
-        fields:
-        - name: total.bytes
-          type: long
-          format: bytes
-          description: >
-            Total operating system memory available in bytes
-        - name: free.bytes
-          type: long
-          format: bytes
-          description: >
-            Operating system memory free in bytes
-        - name: used.bytes
-          type: long
-          format: bytes
-          description: >
-            Operating system memory used in bytes
-      - name: uptime.ms
-        type: long
-        description: >
-          Operating system uptime in seconds
     - name: process
       type: group
       description: >
