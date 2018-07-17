@@ -57,7 +57,7 @@ var (
 		}),
 		"requests": RequestsDict,
 		"response_times": c.Dict("response_times", s.Schema{
-			"average": c.Float("avg_ms"),
+			"average": c.Float("avg_ms", s.Optional),
 			"max":     c.Float("max_ms"),
 		}, c.DictOptional),
 		"kibana": KibanaDict,

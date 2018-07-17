@@ -77,7 +77,7 @@ var (
 		"request": RequestsDict,
 		"response_time": c.Dict("response_times", s.Schema{
 			"avg": s.Object{
-				"ms": c.Float("avg_ms"),
+				"ms": c.Float("avg_ms", s.Optional),
 			},
 			"max": s.Object{
 				"ms": c.Float("max_ms"),
