@@ -27,8 +27,8 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/reader/json"
 	"github.com/elastic/beats/filebeat/reader/multiline"
+	"github.com/elastic/beats/filebeat/reader/readjson"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
@@ -100,7 +100,7 @@ type config struct {
 	IncludeLines []match.Matcher   `config:"include_lines"`
 	MaxBytes     int               `config:"max_bytes" validate:"min=0,nonzero"`
 	Multiline    *multiline.Config `config:"multiline"`
-	JSON         *json.Config      `config:"json"`
+	JSON         *readjson.Config  `config:"json"`
 
 	// Hidden on purpose, used by the docker input:
 	DockerJSON *struct {

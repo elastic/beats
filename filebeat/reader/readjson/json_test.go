@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package json
+package readjson
 
 import (
 	"testing"
@@ -176,7 +176,7 @@ func TestDecodeJSON(t *testing.T) {
 
 	for _, test := range tests {
 
-		var p JSON
+		var p JSONReader
 		p.cfg = &test.Config
 		text, M := p.decode([]byte(test.Text))
 		assert.Equal(t, test.ExpectedText, string(text))

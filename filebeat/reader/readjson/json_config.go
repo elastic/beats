@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package json
+package readjson
 
 // Config holds the options a JSON reader.
 type Config struct {

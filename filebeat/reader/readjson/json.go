@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package json
+package readjson
 
 import (
 	"bytes"
@@ -30,19 +30,19 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type JSON struct {
+type JSONReader struct {
 	reader reader.Reader
 	cfg    *Config
 }
 
 // NewJSONReader creates a new reader that can decode JSON.
-func New(r reader.Reader, cfg *Config) *JSON {
-	return &JSON{reader: r, cfg: cfg}
+func NewJSONReader(r reader.Reader, cfg *Config) *JSONReader {
+	return &JSONReader{reader: r, cfg: cfg}
 }
 
 // decodeJSON unmarshals the text parameter into a MapStr and
 // returns the new text column if one was requested.
-func (r *JSON) decode(text []byte) ([]byte, common.MapStr) {
+func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
 	var jsonFields map[string]interface{}
 
 	err := unmarshal(text, &jsonFields)
@@ -93,7 +93,7 @@ func unmarshal(text []byte, fields *map[string]interface{}) error {
 }
 
 // Next decodes JSON and returns the filled Line object.
-func (r *JSON) Next() (reader.Message, error) {
+func (r *JSONReader) Next() (reader.Message, error) {
 	message, err := r.reader.Next()
 	if err != nil {
 		return message, err
