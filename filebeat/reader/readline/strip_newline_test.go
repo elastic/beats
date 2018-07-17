@@ -17,7 +17,7 @@
 
 // +build !integration
 
-package strip_newline
+package readline
 
 import (
 	"testing"

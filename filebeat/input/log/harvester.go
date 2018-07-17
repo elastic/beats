@@ -50,13 +50,10 @@ import (
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/filebeat/reader/docker_json"
-	"github.com/elastic/beats/filebeat/reader/encode"
-	"github.com/elastic/beats/filebeat/reader/encode/encoding"
-	"github.com/elastic/beats/filebeat/reader/json"
-	"github.com/elastic/beats/filebeat/reader/limit"
 	"github.com/elastic/beats/filebeat/reader/multiline"
-	"github.com/elastic/beats/filebeat/reader/strip_newline"
+	"github.com/elastic/beats/filebeat/reader/readjson"
+	"github.com/elastic/beats/filebeat/reader/readline"
+	"github.com/elastic/beats/filebeat/reader/readline/encoding"
 	"github.com/elastic/beats/filebeat/util"
 )
 
@@ -320,7 +317,7 @@ func (h *Harvester) Run() error {
 			}
 
 			if h.config.JSON != nil && len(jsonFields) > 0 {
-				ts := json.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
+				ts := readjson.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
 				if !ts.IsZero() {
 					// there was a `@timestamp` key in the event, so overwrite
 					// the resulting timestamp
@@ -552,21 +549,21 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = encode.New(h.log, h.encoding, h.config.BufferSize)
+	r, err = readline.NewEncodeReader(h.log, h.encoding, h.config.BufferSize)
 	if err != nil {
 		return nil, err
 	}
 
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = docker_json.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial)
+		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial)
 	}
 
 	if h.config.JSON != nil {
-		r = json.New(r, h.config.JSON)
+		r = readjson.NewJSONReader(r, h.config.JSON)
 	}
 
-	r = strip_newline.New(r)
+	r = readline.NewStripNewline(r)
 
 	if h.config.Multiline != nil {
 		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)
@@ -575,5 +572,5 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		}
 	}
 
-	return limit.New(r, h.config.MaxBytes), nil
+	return readline.NewLimitReader(r, h.config.MaxBytes), nil
 }

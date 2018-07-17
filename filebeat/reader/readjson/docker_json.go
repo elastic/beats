@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package docker_json
+package readjson
 
 import (
 	"bytes"
@@ -29,8 +29,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Reader processor renames a given field
-type Reader struct {
+// DockerJSONReader processor renames a given field
+type DockerJSONReader struct {
 	reader reader.Reader
 	// stream filter, `all`, `stderr` or `stdout`
 	stream string
@@ -52,8 +52,8 @@ type crioLog struct {
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool) *Reader {
-	return &Reader{
+func New(r reader.Reader, stream string, partial bool) *DockerJSONReader {
+	return &DockerJSONReader{
 		stream:  stream,
 		partial: partial,
 		reader:  r,
@@ -110,7 +110,7 @@ func parseDockerJSONLog(message reader.Message, msg *dockerLog) (reader.Message,
 }
 
 // Next returns the next line.
-func (p *Reader) Next() (reader.Message, error) {
+func (p *DockerJSONReader) Next() (reader.Message, error) {
 	for {
 		message, err := p.reader.Next()
 		if err != nil {
