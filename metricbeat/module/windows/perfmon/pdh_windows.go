@@ -217,7 +217,7 @@ type Query struct {
 type Format int
 
 const (
-	FloatFlormat Format = iota
+	FloatFormat Format = iota
 	LongFormat
 )
 
@@ -260,7 +260,7 @@ func (q *Query) AddCounter(counterPath string, format Format, instanceName strin
 		wildcard:     wildcard,
 	}
 	switch format {
-	case FloatFlormat:
+	case FloatFormat:
 		q.counters[counterPath].format = PdhFmtDouble
 	case LongFormat:
 		q.counters[counterPath].format = PdhFmtLarge
@@ -351,7 +351,7 @@ func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 		var format Format
 		switch counter.Format {
 		case "float":
-			format = FloatFlormat
+			format = FloatFormat
 		case "long":
 			format = LongFormat
 		}

@@ -133,7 +133,7 @@ const (
 	// Includes STANDARD_RIGHTS_REQUIRED in addition to all access rights in this table.
 	ServiceAllAccess ServiceAccessRight = C.SERVICE_ALL_ACCESS
 	// Required to call the ChangeServiceConfig or ChangeServiceConfig2 function to change the service configuration. Because this grants the caller the right to change the executable file that the system runs, it should be granted only to administrators.
-	ServcieChangeConfig ServiceAccessRight = C.SERVICE_CHANGE_CONFIG
+	ServiceChangeConfig ServiceAccessRight = C.SERVICE_CHANGE_CONFIG
 	// Required to call the EnumDependentServices function to enumerate all the services dependent on the service.
 	ServiceEnumerateDependents ServiceAccessRight = C.SERVICE_ENUMERATE_DEPENDENTS
 	// Required to call the ControlService function to ask the service to report its status immediately.

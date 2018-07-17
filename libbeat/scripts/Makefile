@@ -161,7 +161,7 @@ ci:  ## @build Shortcut for continuous integration. This should always run befor
 ### Testing ###
 # Unless stated otherwise, all tests are always run with coverage reporting enabled.
 
-# Prepration for tests
+# Preparation for tests
 .PHONY: prepare-tests
 prepare-tests:
 	mkdir -p ${COVERAGE_DIR}

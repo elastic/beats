@@ -66,7 +66,7 @@ type offsetBinWriter struct {
 var defaultTestParserConfig = parserConfig{
 	maxValues:        -1,
 	maxBytesPerValue: 2e6,
-	parseUnkown:      true,
+	parseUnknown:     true,
 }
 
 func newTestParser(tst *testing.T, state parserState) *testParser {

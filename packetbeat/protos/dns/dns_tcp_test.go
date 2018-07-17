@@ -198,7 +198,7 @@ func testTCPTuple() *common.TCPTuple {
 			SrcPort: clientPort, DstPort: serverPort,
 		},
 	}
-	t.ComputeHashebles()
+	t.ComputeHashables()
 	return t
 }
 
@@ -515,7 +515,7 @@ func TestGap_errorResponse(t *testing.T) {
 	assert.Nil(t, mapValue(t, m, "answers"))
 }
 
-// Verify that a gap/fin happening after a valid query create only one tansaction
+// Verify that a gap/fin happening after a valid query create only one transaction
 func TestGapFin_validMessage(t *testing.T) {
 	var private protos.ProtocolData
 	store := &eventStore{}

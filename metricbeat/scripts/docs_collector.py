@@ -136,7 +136,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 
             # Read local fields.yml
             # create title out of module and metricset set name
-            # Add relase fag
+            # Add release fag
             metricset_file += "=== {} {} metricset\n\n".format(title, metricset)
 
             release = get_release(metricset_fields)

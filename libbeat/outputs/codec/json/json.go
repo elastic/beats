@@ -89,7 +89,7 @@ func (e *Encoder) reset() {
 	}
 }
 
-// Encode serializies a beat event to JSON. It adds additional metadata in the
+// Encode serializes a beat event to JSON. It adds additional metadata in the
 // `@metadata` namespace.
 func (e *Encoder) Encode(index string, event *beat.Event) ([]byte, error) {
 	e.buf.Reset()

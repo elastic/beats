@@ -50,7 +50,7 @@ func TestConversions(t *testing.T) {
 		"test_obj": s.Object{
 			"test_obj_string": Str("testObjString"),
 		},
-		"test_notexistant": Str("notexistant", s.Optional),
+		"test_nonexistent": Str("nonexistent", s.Optional),
 		"test_error":       Str("testError", s.Optional),
 		"test_error_int":   Int("testErrorInt", s.Optional),
 		"test_error_float": Float("testErrorFloat", s.Optional),

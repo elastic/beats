@@ -895,7 +895,7 @@ func (thrift *thriftPlugin) messageComplete(tcptuple *common.TCPTuple, dir uint8
 	// all ok, go to next level
 	stream.message.tcpTuple = *tcptuple
 	stream.message.direction = dir
-	stream.message.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+	stream.message.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 	if stream.message.frameSize == 0 {
 		stream.message.frameSize = uint32(stream.parseOffset - stream.message.start)
 	}

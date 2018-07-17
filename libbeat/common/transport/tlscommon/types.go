@@ -178,7 +178,7 @@ func (m TLSVerificationMode) String() string {
 	return "unknown"
 }
 
-// Unpack unpacks the string into contants.
+// Unpack unpacks the string into constants.
 func (m *TLSVerificationMode) Unpack(in interface{}) error {
 	if in == nil {
 		*m = VerifyFull
@@ -235,7 +235,7 @@ func (cs tlsCipherSuite) String() string {
 	if s, found := tlsCipherSuitesInverse[cs]; found {
 		return s
 	}
-	return "unkown"
+	return "unknown"
 }
 
 type tlsCurveType tls.CurveID

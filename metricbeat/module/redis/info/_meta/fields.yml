@@ -298,7 +298,7 @@
         - name: commands_processed
           type: long
           description:
-            Total number of commands preocessed.
+            Total number of commands processed.
 
         - name: net.input.bytes
           type: long

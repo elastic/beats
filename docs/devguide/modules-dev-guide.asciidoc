@@ -74,16 +74,35 @@ is used as a title in the docs, so it's best to capitalize it.
 ==== _meta/kibana
 
 This folder contains the sample Kibana dashboards for this module. To create
-them, you can build them visually in Kibana and then run the following command:
+them, you can build them visually in Kibana and then export them with `export_dashboards`.
+
+The tool will export all of the dashboard dependencies (visualizations,
+saved searches) automatically.
+
+You can see various ways of using `export_dashboards` at <<export-dashboards>>.
+The recommended way to export them is to list your dashboards in your module's
+`module.yml` file:
+
+[source,yaml]
+----
+dashboards:
+- id: 69f5ae20-eb02-11e7-8f04-beef1daadb05
+  file: mymodule-overview.json
+- id: c0a7ce90-cafe-4242-8647-534bb4c21040
+  file: mymodule-errors.json
+----
+
+Then run `export_dashboards` like this:
 
 [source,shell]
 ----
 $ cd dev-tools/cmd/dashboards
-$ make # if export_dashboard is not built
-$ ./export_dashboards -dashboard '{dashboard-id}' -output '../../../filebeat/module/{module}/_meta/kibana/default/dashboard'
+$ make # if export_dashboard is not built yet
+$ ./export_dashboards -yml '../../../filebeat/module/{module}/module.yml'
 ----
 
-New Filebeat modules might not be compatible with Kibana 5.x. To export dashboards that are compatible with 5.x, run the following command inside the developer virtualenv:
+New Filebeat modules might not be compatible with Kibana 5.x. To export dashboards
+that are compatible with 5.x, run the following command inside the developer virtualenv:
 
 [source,shell]
 ----

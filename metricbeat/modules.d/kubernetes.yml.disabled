@@ -11,11 +11,21 @@
   #  - volume
   period: 10s
   hosts: ["localhost:10255"]
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-  #ssl.certificate: "/etc/pki/client/cert.pem"
-  #ssl.key: "/etc/pki/client/cert.key"
+
+  hosts: ["localhost:10250"]
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.certificate_authorities:
+    - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
   #username: "user"
   #password: "secret"
+
+  # Enriching parameters:
+  #add_metadata: true
+  #in_cluster: true
+  # When used outside the cluster:
+  #in_cluster: false
+  #host: node_name
+  #kube_config: ~/.kube/config
 
 # State metrics from kube-state-metrics service:
 #- module: kubernetes
@@ -28,6 +38,8 @@
 #    - state_container
 #  period: 10s
 #  hosts: ["kube-state-metrics:8080"]
+#  add_metadata: true
+#  in_cluster: true
 
 # Kubernetes events
 #- module: kubernetes

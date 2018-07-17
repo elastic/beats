@@ -203,7 +203,7 @@ func Test_buildPortsMap_portOverlapError(t *testing.T) {
 	}
 }
 
-// Verify that decideProtocol returns the protocol assocated with the
+// Verify that decideProtocol returns the protocol associated with the
 // packet's source port.
 func Test_decideProtocol_bySrcPort(t *testing.T) {
 	test := testSetup(t)
@@ -213,7 +213,7 @@ func Test_decideProtocol_bySrcPort(t *testing.T) {
 	assert.Equal(t, PROTO, test.udp.decideProtocol(&tuple))
 }
 
-// Verify that decideProtocol returns the protocol assocated with the
+// Verify that decideProtocol returns the protocol associated with the
 // packet's destination port.
 func Test_decideProtocol_byDstPort(t *testing.T) {
 	test := testSetup(t)

@@ -116,7 +116,7 @@ func dnsSaltToString(s string) string {
 	return strings.ToUpper(s)
 }
 
-// hexStringToString converts an hexadeciaml string to string. Bytes
+// hexStringToString converts an hexadecimal string to string. Bytes
 // below 32 or above 126 are represented as an escaped base10 integer (\DDD).
 // Back slashes and quotes are escaped. Tabs, carriage returns, and line feeds
 // will be converted to \t, \r and \n respectively.

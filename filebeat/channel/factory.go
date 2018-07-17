@@ -41,7 +41,7 @@ type clientEventer struct {
 }
 
 // inputOutletConfig defines common input settings
-// for the publisher pipline.
+// for the publisher pipeline.
 type inputOutletConfig struct {
 	// event processing
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.

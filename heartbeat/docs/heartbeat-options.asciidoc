@@ -112,7 +112,7 @@ If `mode` is `any`, the monitor pings only one IP address for a hostname. If
 ping every IP address for the specified hostname. The default is `any`.
 
 [float]
-[[monitor-timieout]]
+[[monitor-timeout]]
 ==== `timeout`
 
 The total running time for each ping test. This is the total time allowed for
@@ -172,7 +172,7 @@ Heartbeat checks this file periodically and starts a new monitor instance for
 each new JSON object added to the file. For example, imagine that you add
 10 new entries to the JSON file, each for a different hostname. When Heartbeat
 picks up the changes in the file, it merges the original config
-(`hearbeat.yml`) plus the JSON objects, and starts a monitor for each new host
+(`heartbeat.yml`) plus the JSON objects, and starts a monitor for each new host
 that you've configured. If you delete an object from the JSON file and it
 doesn't exist in the main config, Heartbeat stops the monitor instance running
 for that object.

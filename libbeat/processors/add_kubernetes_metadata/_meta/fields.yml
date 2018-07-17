@@ -16,7 +16,7 @@
         - name: pod.uid
           type: keyword
           description: >
-            Kubernetes pod uid
+            Kubernetes Pod UID
 
         - name: namespace
           type: keyword

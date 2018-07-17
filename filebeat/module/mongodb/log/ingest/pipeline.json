@@ -4,8 +4,9 @@
     "grok": {
       "field": "message",
       "patterns":[
+
         "%{TIMESTAMP_ISO8601:mongodb.log.timestamp} %{WORD:mongodb.log.severity} %{WORD:mongodb.log.component} \\s*\\[%{WORD:mongodb.log.context}\\] %{GREEDYDATA:mongodb.log.message}",
-	"%{TIMESTAMP_ISO8601:mongodb.log.timestamp} %{WORD:mongodb.log.severity} - \\s*\\[%{WORD:mongodb.log.context}\\] %{GREEDYDATA:mongodb.log.message}"
+        "%{TIMESTAMP_ISO8601:mongodb.log.timestamp} %{WORD:mongodb.log.severity} - \\s*\\[%{WORD:mongodb.log.context}\\] %{GREEDYDATA:mongodb.log.message}"
       ],
       "ignore_missing": true
     }

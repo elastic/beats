@@ -243,7 +243,7 @@ func findElasticBeatsDir() (string, error) {
 	return "", errors.Errorf("failed to find %v in the project's vendor", devToolsImportPath)
 }
 
-// SetElasticBeatsDir explicilty sets the location of the Elastic Beats
+// SetElasticBeatsDir explicitly sets the location of the Elastic Beats
 // directory. If not set then it will attempt to locate it.
 func SetElasticBeatsDir(dir string) {
 	elasticBeatsDirLock.Lock()

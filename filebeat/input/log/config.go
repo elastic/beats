@@ -145,7 +145,7 @@ var ValidScanSort = map[string]struct{}{
 }
 
 func (c *config) Validate() error {
-	// DEPRECATED 6.0.0: warning is already outputted on propsector level
+	// DEPRECATED 6.0.0: warning is already outputted on prospector level
 	if c.InputType != "" {
 		c.Type = c.InputType
 	}

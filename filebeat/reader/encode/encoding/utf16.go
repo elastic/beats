@@ -29,7 +29,7 @@ import (
 type endianness int8
 
 const (
-	unknownEndianess endianness = iota
+	unknownEndianness endianness = iota
 	bigEndian
 	littleEndian
 )
@@ -41,7 +41,7 @@ var ErrUnsupportedSourceTypeBOM = errors.New("source type not support by BOM bas
 // before configuring the actual decoder and encoder.
 var (
 	// BOM is required, as no fallback is specified
-	utf16BOMRequired = utf16BOM(unknownEndianess)
+	utf16BOMRequired = utf16BOM(unknownEndianness)
 
 	// BOM is optional. Falls back to BigEndian if missing
 	utf16BOMBigEndian = utf16BOM(bigEndian)
@@ -91,33 +91,33 @@ func utf16Seekable(in io.ReadSeeker, endianness endianness) (Encoding, error) {
 		return nil, transform.ErrShortSrc
 	}
 
-	// determine endianess from BOM
-	inEndiannes := unknownEndianess
+	// determine endianness from BOM
+	inEndianness := unknownEndianness
 	switch {
 	case buf[0] == 0xfe && buf[1] == 0xff:
-		inEndiannes = bigEndian
+		inEndianness = bigEndian
 	case buf[0] == 0xff && buf[1] == 0xfe:
-		inEndiannes = littleEndian
+		inEndianness = littleEndian
 	}
 
 	// restore offset if BOM is missing or this function was not
 	// called with read pointer at beginning of file
-	if !keepOffset || inEndiannes == unknownEndianess {
+	if !keepOffset || inEndianness == unknownEndianness {
 		if _, err = in.Seek(offset, os.SEEK_SET); err != nil {
 			return nil, err
 		}
 	}
 
 	// choose encoding based on BOM
-	if encoding, ok := utf16Map[inEndiannes]; ok {
+	if encoding, ok := utf16Map[inEndianness]; ok {
 		return encoding, nil
 	}
 
-	// fall back to configured endianess
+	// fall back to configured endianness
 	if encoding, ok := utf16Map[endianness]; ok {
 		return encoding, nil
 	}
 
-	// no encoding for configured endianess found => fail
+	// no encoding for configured endianness found => fail
 	return nil, unicode.ErrMissingBOM
 }
