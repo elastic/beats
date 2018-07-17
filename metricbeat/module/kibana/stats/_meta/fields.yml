@@ -260,7 +260,7 @@
             type: long
             description: >
               Number of reports waiting to start processing
-        - name: lastDay
+        - name: last_day
           type: group
           description: >
             Metrics for the last day
@@ -316,7 +316,7 @@
               type: long
               description: >
                 Number of reports waiting to start processing
-        - name: last7Days
+        - name: last_7_days
           type: group
           description: >
             Metrics for the last seven days

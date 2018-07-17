@@ -139,8 +139,8 @@ var (
 		"csv":           reportingCsvDict,
 		"printable_pdf": reportingPrintablePdfDict,
 		"status":        reportingStatusDict,
-		"lastDay":       c.Dict("lastDay", reportingPeriodSchema, c.DictOptional),
-		"last7Days":     c.Dict("last7Days", reportingPeriodSchema, c.DictOptional),
+		"last_day":      c.Dict("last_day", reportingPeriodSchema, c.DictOptional),
+		"last_7_days":   c.Dict("last_7_days", reportingPeriodSchema, c.DictOptional),
 	}, c.DictOptional)
 
 	reportingCsvDict = c.Dict("csv", s.Schema{
