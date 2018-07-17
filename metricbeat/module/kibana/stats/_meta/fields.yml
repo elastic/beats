@@ -209,7 +209,7 @@
           type: keyword
           description: >
             Type of browser being used by Reporting for screenshots
-        - name: _all
+        - name: all
           type: long
           description: >
             Total number of reports generated across all types of reports
@@ -265,7 +265,7 @@
           description: >
             Metrics for the last day
           fields:
-          - name: _all
+          - name: all
             type: long
             description: >
               Total number of reports generated across all types of reports
@@ -321,7 +321,7 @@
           description: >
             Metrics for the last seven days
           fields:
-          - name: _all
+          - name: all
             type: long
             description: >
               Total number of reports generated across all types of reports
