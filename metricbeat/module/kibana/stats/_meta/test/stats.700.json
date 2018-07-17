@@ -9,46 +9,46 @@
       "snapshot":false,
       "status":"green"
     },
-    "last_updated":"2018-07-17T11:47:04.629Z",
+    "last_updated":"2018-07-17T17:09:23.926Z",
     "collection_interval_ms":5000,
     "process":{
       "memory":{
         "heap":{
-          "total_in_bytes":253456384,
-          "used_in_bytes":190699632,
+          "total_bytes":342585344,
+          "used_bytes":192264704,
           "size_limit":1501560832
         },
-        "resident_set_size_in_bytes":341807104
+        "resident_set_size_bytes":431456256
       },
-      "event_loop_delay":0.2823359966278076,
-      "pid":27037,
-      "uptime_ms":518674.99999999994
+      "event_loop_delay":0.37530696392059326,
+      "pid":32307,
+      "uptime_ms":27353
     },
     "os":{
       "load":{
-        "1m":3.24658203125,
-        "5m":3.30322265625,
-        "15m":3.4365234375
+        "1m":2.01513671875,
+        "5m":2.0283203125,
+        "15m":2.041015625
       },
       "memory":{
-        "total_in_bytes":17179869184,
-        "free_in_bytes":1046061056,
-        "used_in_bytes":16133808128
+        "total_bytes":17179869184,
+        "free_bytes":66318336,
+        "used_bytes":17113550848
       },
-      "uptime_ms":2141353000
+      "uptime_ms":2160690000
     },
     "response_times":{
-      "avg_ms":7,
-      "max_ms":7
+      "avg_ms":15,
+      "max_ms":18
     },
     "requests":{
-      "total":1,
+      "total":4,
       "disconnects":0,
       "status_codes":{
-        "200":1
+        "200":4
       }
     },
-    "concurrent_connections":6,
+    "concurrent_connections":3,
     "usage":{
       "kibana":{
         "index":".kibana",
@@ -62,7 +62,7 @@
           "total":0
         },
         "index_pattern":{
-          "total":1
+          "total":0
         },
         "graph_workspace":{
           "total":0
@@ -117,5 +117,5 @@
         }
       }
     },
-    "cluster_uuid":"t-xQbfmPS5CZUS8yVjgLtw"
+    "cluster_uuid":"NkfU5AinRnyFnqBD36zhEw"
   }

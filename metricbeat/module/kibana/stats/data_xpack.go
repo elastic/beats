@@ -38,9 +38,9 @@ var (
 				"15m": c.Float("15m"),
 			}),
 			"memory": c.Dict("memory", s.Schema{
-				"total_in_bytes": c.Int("total_in_bytes"),
-				"free_in_bytes":  c.Int("free_in_bytes"),
-				"used_in_bytes":  c.Int("used_in_bytes"),
+				"total_in_bytes": c.Int("total_bytes"),
+				"free_in_bytes":  c.Int("free_bytes"),
+				"used_in_bytes":  c.Int("used_bytes"),
 			}),
 			"uptime_in_millis": c.Int("uptime_ms"),
 		}),
@@ -48,8 +48,8 @@ var (
 			"event_loop_delay": c.Float("event_loop_delay"),
 			"memory": c.Dict("memory", s.Schema{
 				"heap": c.Dict("heap", s.Schema{
-					"total_in_bytes": c.Int("total_in_bytes"),
-					"used_in_bytes":  c.Int("used_in_bytes"),
+					"total_in_bytes": c.Int("total_bytes"),
+					"used_in_bytes":  c.Int("used_bytes"),
 					"size_limit":     c.Int("size_limit"),
 				}),
 			}),
@@ -138,7 +138,7 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error 
 
 	process := data["process"].(map[string]interface{})
 	memory := process["memory"].(map[string]interface{})
-	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int(memory["resident_set_size_in_bytes"].(float64)))
+	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int(memory["resident_set_size_bytes"].(float64)))
 
 	timestamp := time.Now()
 	kibanaStatsFields.Put("timestamp", timestamp)

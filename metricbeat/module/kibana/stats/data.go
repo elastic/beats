@@ -37,10 +37,10 @@ var (
 			"memory": c.Dict("memory", s.Schema{
 				"heap": c.Dict("heap", s.Schema{
 					"total": s.Object{
-						"bytes": c.Int("total_in_bytes"),
+						"bytes": c.Int("total_bytes"),
 					},
 					"used": s.Object{
-						"bytes": c.Int("used_in_bytes"),
+						"bytes": c.Int("used_bytes"),
 					},
 					"size_limit": s.Object{
 						"bytes": c.Int("size_limit"),
