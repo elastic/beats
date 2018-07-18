@@ -6788,6 +6788,16 @@ Process metrics
 
 
 
+*`kibana.stats.process.pid`*::
++
+--
+type: long
+
+Process ID of the Kibana instance
+
+
+--
+
 *`kibana.stats.process.event_loop_delay.ms`*::
 +
 --

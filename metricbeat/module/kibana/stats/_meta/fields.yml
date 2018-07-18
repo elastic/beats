@@ -49,6 +49,10 @@
       description: >
         Process metrics
       fields:
+      - name: pid
+        type: long
+        description: >
+          Process ID of the Kibana instance
       - name: event_loop_delay.ms
         type: scaled_float
         description: >

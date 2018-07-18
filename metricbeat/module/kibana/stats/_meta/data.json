@@ -11,13 +11,13 @@
     },
     "kibana": {
         "stats": {
-            "concurrent_connections": 1,
+            "concurrent_connections": 0,
             "host": "localhost",
             "index": "Shaunaks-MBP-2",
             "name": "Shaunaks-MBP-2",
             "process": {
                 "event_loop_delay": {
-                    "ms": 0.3324570655822754
+                    "ms": 0.36442995071411133
                 },
                 "memory": {
                     "heap": {
@@ -25,25 +25,28 @@
                             "bytes": 1501560832
                         },
                         "total": {
-                            "bytes": 348958720
+                            "bytes": 225144832
                         },
                         "used": {
-                            "bytes": 191876376
+                            "bytes": 181993128
                         }
                     }
                 },
+                "pid": 59876,
                 "uptime": {
-                    "ms": 28184
+                    "ms": 69018
                 }
             },
             "request": {
                 "disconnects": 0,
-                "total": 0
+                "total": 1
             },
             "response_time": {
-                "avg": {},
+                "avg": {
+                    "ms": 25
+                },
                 "max": {
-                    "ms": 0
+                    "ms": 25
                 }
             },
             "snapshot": false,

@@ -39,6 +39,7 @@ var (
 		"cluster_uuid":           c.Str("cluster_uuid"),
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"process": c.Dict("process", s.Schema{
+			"pid": c.Int("pid"),
 			"event_loop_delay": s.Object{
 				"ms": c.Float("event_loop_delay"),
 			},
