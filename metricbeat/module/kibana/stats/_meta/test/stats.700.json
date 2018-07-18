@@ -9,43 +9,42 @@
       "snapshot":false,
       "status":"green"
     },
-    "last_updated":"2018-07-17T17:09:23.926Z",
+    "last_updated":"2018-07-18T00:32:00.948Z",
     "collection_interval_ms":5000,
     "process":{
       "memory":{
         "heap":{
-          "total_bytes":342585344,
-          "used_bytes":192264704,
+          "total_bytes":223391744,
+          "used_bytes":198413592,
           "size_limit":1501560832
         },
-        "resident_set_size_bytes":431456256
+        "resident_set_size_bytes":347242496
       },
-      "event_loop_delay":0.37530696392059326,
-      "pid":32307,
-      "uptime_ms":27353
+      "event_loop_delay":0.25226891040802,
+      "pid":46426,
+      "uptime_ms":1753889
     },
     "os":{
       "load":{
-        "1m":2.01513671875,
-        "5m":2.0283203125,
-        "15m":2.041015625
+        "1m":3.50634765625,
+        "5m":3.76904296875,
+        "15m":3.54833984375
       },
       "memory":{
         "total_bytes":17179869184,
-        "free_bytes":66318336,
-        "used_bytes":17113550848
+        "free_bytes":31711232,
+        "used_bytes":17148157952
       },
-      "uptime_ms":2160690000
+      "uptime_ms":2187246000
     },
     "response_times":{
-      "avg_ms":15,
-      "max_ms":18
+      "max_ms":0
     },
     "requests":{
-      "total":4,
+      "total":0,
       "disconnects":0,
       "status_codes":{
-        "200":4
+
       }
     },
     "concurrent_connections":3,
@@ -81,8 +80,16 @@
           "total":0
         },
         "printable_pdf":{
-          "available":false,
-          "total":0
+          "available":true,
+          "total":0,
+          "app":{
+            "visualization":0,
+            "dashboard":0
+          },
+          "layout":{
+            "print":0,
+            "preserve_layout":0
+          }
         },
         "status":{
 
@@ -94,8 +101,16 @@
             "total":0
           },
           "printable_pdf":{
-            "available":false,
-            "total":0
+            "available":true,
+            "total":0,
+            "app":{
+              "visualization":0,
+              "dashboard":0
+            },
+            "layout":{
+              "print":0,
+              "preserve_layout":0
+            }
           },
           "status":{
 
@@ -108,8 +123,16 @@
             "total":0
           },
           "printable_pdf":{
-            "available":false,
-            "total":0
+            "available":true,
+            "total":0,
+            "app":{
+              "visualization":0,
+              "dashboard":0
+            },
+            "layout":{
+              "print":0,
+              "preserve_layout":0
+            }
           },
           "status":{
 
