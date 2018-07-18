@@ -50,7 +50,7 @@ class Test(BaseTest):
         # test is current skipped on windows, due to FileStateOS must match the
         # current OS format.
         if os.name == "nt":
-            SkipTest
+            raise SkipTest
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*"
