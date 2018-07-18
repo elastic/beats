@@ -93,6 +93,11 @@ func NewInput(
 	// can be forwarded correctly to the registrar.
 	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), context.BeatDone)
 
+	meta := context.Meta
+	if len(meta) == 0 {
+		meta = nil
+	}
+
 	p := &Input{
 		config:      defaultConfig,
 		cfg:         cfg,
@@ -101,7 +106,7 @@ func NewInput(
 		stateOutlet: stateOut,
 		states:      file.NewStates(),
 		done:        context.Done,
-		meta:        context.Meta,
+		meta:        meta,
 	}
 
 	if err := cfg.Unpack(&p.config); err != nil {
