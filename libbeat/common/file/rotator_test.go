@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package file
+package file_test
 
 import (
 	"io/ioutil"
@@ -26,11 +26,16 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 const logMessage = "Test file rotator.\n"
 
 func TestFileRotator(t *testing.T) {
+	logp.TestingSetup()
+
 	dir, err := ioutil.TempDir("", "file_rotator")
 	if err != nil {
 		t.Fatal(err)
@@ -38,7 +43,10 @@ func TestFileRotator(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	filename := filepath.Join(dir, "sample.log")
-	r, err := NewFileRotator(filename, MaxBackups(2))
+	r, err := file.NewFileRotator(filename,
+		file.MaxBackups(2),
+		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,7 +82,7 @@ func TestFileRotatorConcurrently(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	filename := filepath.Join(dir, "sample.log")
-	r, err := NewFileRotator(filename, MaxBackups(2))
+	r, err := file.NewFileRotator(filename, file.MaxBackups(2))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +117,7 @@ func AssertDirContents(t *testing.T, dir string, files ...string) {
 	assert.EqualValues(t, files, names)
 }
 
-func WriteMsg(t *testing.T, r *Rotator) {
+func WriteMsg(t *testing.T, r *file.Rotator) {
 	t.Helper()
 
 	n, err := r.Write([]byte(logMessage))
@@ -119,7 +127,7 @@ func WriteMsg(t *testing.T, r *Rotator) {
 	assert.Equal(t, len(logMessage), n)
 }
 
-func Rotate(t *testing.T, r *Rotator) {
+func Rotate(t *testing.T, r *file.Rotator) {
 	t.Helper()
 
 	if err := r.Rotate(); err != nil {

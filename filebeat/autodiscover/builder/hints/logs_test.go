@@ -68,6 +68,7 @@ func TestGenerateHints(t *testing.T) {
 				"containers": map[string]interface{}{
 					"ids": []interface{}{"abc"},
 				},
+				"close_timeout": "true",
 			},
 		},
 		{
@@ -99,6 +100,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"include_lines": []interface{}{"^test", "^test1"},
 				"exclude_lines": []interface{}{"^test2", "^test3"},
+				"close_timeout": "true",
 			},
 		},
 		{
@@ -134,6 +136,7 @@ func TestGenerateHints(t *testing.T) {
 					"pattern": "^test",
 					"negate":  "true",
 				},
+				"close_timeout": "true",
 			},
 		},
 		{
@@ -201,6 +204,7 @@ func TestGenerateHints(t *testing.T) {
 				"containers": map[string]interface{}{
 					"ids": []interface{}{"abc"},
 				},
+				"close_timeout": "true",
 				"processors": []interface{}{
 					map[string]interface{}{
 						"dissect": map[string]interface{}{
@@ -244,6 +248,7 @@ func TestGenerateHints(t *testing.T) {
 							"stream": "all",
 							"ids":    []interface{}{"abc"},
 						},
+						"close_timeout": "true",
 					},
 				},
 				"access": map[string]interface{}{
@@ -254,6 +259,7 @@ func TestGenerateHints(t *testing.T) {
 							"stream": "all",
 							"ids":    []interface{}{"abc"},
 						},
+						"close_timeout": "true",
 					},
 				},
 			},
@@ -290,6 +296,7 @@ func TestGenerateHints(t *testing.T) {
 							"stream": "all",
 							"ids":    []interface{}{"abc"},
 						},
+						"close_timeout": "true",
 					},
 				},
 				"error": map[string]interface{}{
@@ -300,6 +307,7 @@ func TestGenerateHints(t *testing.T) {
 							"stream": "all",
 							"ids":    []interface{}{"abc"},
 						},
+						"close_timeout": "true",
 					},
 				},
 			},
@@ -337,6 +345,7 @@ func TestGenerateHints(t *testing.T) {
 							"stream": "stdout",
 							"ids":    []interface{}{"abc"},
 						},
+						"close_timeout": "true",
 					},
 				},
 				"error": map[string]interface{}{
@@ -347,6 +356,7 @@ func TestGenerateHints(t *testing.T) {
 							"stream": "stderr",
 							"ids":    []interface{}{"abc"},
 						},
+						"close_timeout": "true",
 					},
 				},
 			},
@@ -355,11 +365,14 @@ func TestGenerateHints(t *testing.T) {
 
 	for _, test := range tests {
 		cfg, _ := common.NewConfigFrom(map[string]interface{}{
-			"type": "docker",
-			"containers": map[string]interface{}{
-				"ids": []string{
-					"${data.container.id}",
+			"config": map[string]interface{}{
+				"type": "docker",
+				"containers": map[string]interface{}{
+					"ids": []string{
+						"${data.container.id}",
+					},
 				},
+				"close_timeout": "true",
 			},
 		})
 

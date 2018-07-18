@@ -120,6 +120,214 @@ func TestConversions(t *testing.T) {
 		"test_array": []string{"a", "b", "c"},
 	}
 
-	output, _ := schema.Apply(input)
-	assert.Equal(t, output, expected)
+	event, _ := schema.Apply(input)
+	assert.Equal(t, event, expected)
+}
+
+func TestOptionalField(t *testing.T) {
+	cases := []struct {
+		Description string
+		Input       map[string]interface{}
+		Schema      s.Schema
+		Expected    common.MapStr
+		ExpectError bool
+	}{
+		{
+			"missing optional field",
+			map[string]interface{}{
+				"testString": "hello",
+				"testInt":    42,
+			},
+			s.Schema{
+				"test_string": Str("testString"),
+				"test_int":    Int("testInt"),
+				"test_opt":    Bool("testOptionalInt", s.Optional),
+			},
+			common.MapStr{
+				"test_string": "hello",
+				"test_int":    int64(42),
+			},
+			false,
+		},
+		{
+			"wrong format in optional field",
+			map[string]interface{}{
+				"testInt": "hello",
+			},
+			s.Schema{
+				"test_int": Int("testInt", s.Optional),
+			},
+			common.MapStr{},
+			true,
+		},
+	}
+
+	for _, c := range cases {
+		event, err := c.Schema.Apply(c.Input)
+		if c.ExpectError {
+			assert.Error(t, err, c.Description)
+		} else {
+			assert.NoError(t, err, c.Description)
+			assert.Equal(t, c.Expected, event, c.Description)
+		}
+	}
+}
+
+func TestFullFieldPathInErrors(t *testing.T) {
+	cases := []struct {
+		Description string
+		Schema      s.Schema
+		Input       map[string]interface{}
+		Expected    string
+	}{
+		{
+			"missing nested key",
+			s.Schema{
+				"a": Dict("A", s.Schema{
+					"b": Dict("B", s.Schema{
+						"c": Bool("C"),
+					}),
+				}),
+			},
+			map[string]interface{}{
+				"A": map[string]interface{}{
+					"B": map[string]interface{}{},
+				},
+			},
+			`A.B.C`,
+		},
+		{
+			"wrong nested format key",
+			s.Schema{
+				"test_dict": Dict("testDict", s.Schema{
+					"test_bool": Bool("testBool"),
+				}),
+			},
+			map[string]interface{}{
+				"testDict": map[string]interface{}{
+					"testBool": "foo",
+				},
+			},
+			`testDict.testBool`,
+		},
+		{
+			"wrong nested sub-dictionary",
+			s.Schema{
+				"test_dict": Dict("testDict", s.Schema{
+					"test_dict": Dict("testDict", s.Schema{}),
+				}),
+			},
+			map[string]interface{}{
+				"testDict": map[string]interface{}{
+					"testDict": "foo",
+				},
+			},
+			`testDict.testDict`,
+		},
+		{
+			"empty input",
+			s.Schema{
+				"test_dict": Dict("rootDict", s.Schema{
+					"test_dict": Dict("testDict", s.Schema{}),
+				}),
+			},
+			map[string]interface{}{},
+			`rootDict`,
+		},
+	}
+
+	for _, c := range cases {
+		_, err := c.Schema.Apply(c.Input)
+		if assert.Error(t, err, c.Description) {
+			assert.Contains(t, err.Error(), c.Expected, c.Description)
+		}
+
+		_, errs := c.Schema.ApplyTo(common.MapStr{}, c.Input)
+		assert.Error(t, errs.Err(), c.Description)
+		if assert.Equal(t, 1, len(errs), c.Description) {
+			keyErr, ok := errs[0].(s.KeyError)
+			if assert.True(t, ok, c.Description) {
+				assert.Equal(t, c.Expected, keyErr.Key(), c.Description)
+			}
+		}
+	}
+}
+
+func TestNestedFieldPaths(t *testing.T) {
+	cases := []struct {
+		Description string
+		Input       map[string]interface{}
+		Schema      s.Schema
+		Expected    common.MapStr
+		ExpectError bool
+	}{
+		{
+			"nested values",
+			map[string]interface{}{
+				"root": map[string]interface{}{
+					"foo":   "bar",
+					"float": 4.5,
+					"int":   4,
+					"bool":  true,
+				},
+			},
+			s.Schema{
+				"foo":   Str("root.foo"),
+				"float": Float("root.float"),
+				"int":   Int("root.int"),
+				"bool":  Bool("root.bool"),
+			},
+			common.MapStr{
+				"foo":   "bar",
+				"float": float64(4.5),
+				"int":   int64(4),
+				"bool":  true,
+			},
+			false,
+		},
+		{
+			"not really nested values, path contains dots",
+			map[string]interface{}{
+				"root.foo": "bar",
+			},
+			s.Schema{
+				"foo": Str("root.foo"),
+			},
+			common.MapStr{
+				"foo": "bar",
+			},
+			false,
+		},
+		{
+			"nested dict",
+			map[string]interface{}{
+				"root": map[string]interface{}{
+					"dict": map[string]interface{}{
+						"foo": "bar",
+					},
+				},
+			},
+			s.Schema{
+				"dict": Dict("root.dict", s.Schema{
+					"foo": Str("foo"),
+				}),
+			},
+			common.MapStr{
+				"dict": common.MapStr{
+					"foo": "bar",
+				},
+			},
+			false,
+		},
+	}
+
+	for _, c := range cases {
+		event, err := c.Schema.Apply(c.Input)
+		if c.ExpectError {
+			assert.Error(t, err, c.Description)
+		} else {
+			assert.NoError(t, err, c.Description)
+			assert.Equal(t, c.Expected, event, c.Description)
+		}
+	}
 }

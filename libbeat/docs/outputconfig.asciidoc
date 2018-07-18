@@ -28,13 +28,19 @@ The following topics describe how to configure each supported output:
 * <<elasticsearch-output>>
 * <<logstash-output>>
 * <<kafka-output>>
+ifndef::no-redis-output[]
 * <<redis-output>>
+endif::[]
 * <<file-output>>
 * <<console-output>>
 
 If you've secured the {stack}, also read <<securing-{beatname_lc}>> for more about
 security-related configuration options.
 
+endif::[]
+
+ifdef::beat-specific-output-config[]
+include::{beat-specific-output-config}[]
 endif::[]
 
 [[elasticsearch-output]]
@@ -843,6 +849,7 @@ Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silentl
 Configuration options for SSL parameters like the root CA for Kafka connections. See
 <<configuration-ssl>> for more information.
 
+ifndef::no-redis-output[]
 [[redis-output]]
 === Configure the Redis output
 
@@ -897,15 +904,12 @@ The Redis port to use if `hosts` does not contain a port number. The default is 
 
 ===== `index`
 
-deprecated[5.0.0,The `index` setting is renamed to `key`]
-
-The name of the Redis list or channel the events are published to. The default is
-"{beatname_lc}".
+The index name added to the events metadata for use by Logstash. The default is "{beatname_lc}".
 
 ===== `key`
 
-The name of the Redis list or channel the events are published to. The default is
-"{beatname_lc}".
+The name of the Redis list or channel the events are published to. If not
+configured, the value of the `index` setting is used.
 
 The redis key can be set dynamically using a format string accessing any
 fields in the event to be published.
@@ -1074,6 +1078,8 @@ client. You can change this behavior by setting the
 
 This option determines whether Redis hostnames are resolved locally when using a proxy.
 The default value is false, which means that name resolution occurs on the proxy server.
+
+endif::[]
 
 [[file-output]]
 === Configure the File output

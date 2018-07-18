@@ -252,7 +252,7 @@ func TestStatusOutputs(t *testing.T) {
 		assert.NoError(t, err, "cannot open test file "+filename)
 		scanner := bufio.NewScanner(f)
 
-		_, errors := eventMapping(scanner, "localhost")
-		assert.False(t, errors.HasRequiredErrors(), "error mapping "+filename)
+		_, err = eventMapping(scanner, "localhost")
+		assert.NoError(t, err, "error mapping "+filename)
 	}
 }

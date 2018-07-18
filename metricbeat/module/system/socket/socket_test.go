@@ -78,7 +78,7 @@ func TestFetch(t *testing.T) {
 
 		pid, ok := getRequiredValue("process.pid", evt, t).(int)
 		if !ok {
-			t.Fatal("proess.pid is not a int")
+			t.Fatal("process.pid is not a int")
 		}
 		assert.Equal(t, os.Getpid(), pid)
 

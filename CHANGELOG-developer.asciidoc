@@ -24,6 +24,7 @@ The list below covers the major changes between 6.3.0 and master only.
 - Port fields.yml collector to Golang {pull}6911[6911]
 - Dashboards under _meta/kibana are expected to be decoded. See https://github.com/elastic/beats/pull/7224 for a conversion script. {pull}7265[7265]
 - Constructor `(github.com/elastic/beats/libbeat/output/codec/json).New` expects a new `escapeHTML` parameter. {pull}7445[7445]
+- Packaging has been refactored and updates are required. See the PR for migration details. {pull}7388[7388]
 
 ==== Bugfixes
 
@@ -32,3 +33,5 @@ The list below covers the major changes between 6.3.0 and master only.
 ==== Added
 
 - Libbeat provides a global registry for beats developer that allow to register and retrieve plugin. {pull}7392[7392]
+- Added more options to control required and optional fields in schema.Apply(), error returned is a plain nil if no error happened {pull}7335[7335]
+- Packaging on MacOS now produces a .dmg file containing an installer (.pkg) and uninstaller for the Beat. {pull}7481[7481]

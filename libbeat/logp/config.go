@@ -52,6 +52,7 @@ var defaultConfig = Config{
 	ToFiles: true,
 	Files: FileConfig{
 		MaxSize:     10 * 1024 * 1024,
+		MaxBackups:  7,
 		Permissions: 0600,
 	},
 	addCaller: true,

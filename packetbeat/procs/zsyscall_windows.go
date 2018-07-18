@@ -57,6 +57,7 @@ var (
 	modiphlpapi = windows.NewLazySystemDLL("iphlpapi.dll")
 
 	procGetExtendedTcpTable = modiphlpapi.NewProc("GetExtendedTcpTable")
+	procGetExtendedUdpTable = modiphlpapi.NewProc("GetExtendedUdpTable")
 )
 
 func _GetExtendedTcpTable(pTcpTable uintptr, pdwSize *uint32, bOrder bool, ulAf uint32, tableClass uint32, reserved uint32) (code syscall.Errno, err error) {
@@ -67,6 +68,25 @@ func _GetExtendedTcpTable(pTcpTable uintptr, pdwSize *uint32, bOrder bool, ulAf 
 		_p0 = 0
 	}
 	r0, _, e1 := syscall.Syscall6(procGetExtendedTcpTable.Addr(), 6, uintptr(pTcpTable), uintptr(unsafe.Pointer(pdwSize)), uintptr(_p0), uintptr(ulAf), uintptr(tableClass), uintptr(reserved))
+	code = syscall.Errno(r0)
+	if code == 0 {
+		if e1 != 0 {
+			err = errnoErr(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _GetExtendedUdpTable(pTcpTable uintptr, pdwSize *uint32, bOrder bool, ulAf uint32, tableClass uint32, reserved uint32) (code syscall.Errno, err error) {
+	var _p0 uint32
+	if bOrder {
+		_p0 = 1
+	} else {
+		_p0 = 0
+	}
+	r0, _, e1 := syscall.Syscall6(procGetExtendedUdpTable.Addr(), 6, uintptr(pTcpTable), uintptr(unsafe.Pointer(pdwSize)), uintptr(_p0), uintptr(ulAf), uintptr(tableClass), uintptr(reserved))
 	code = syscall.Errno(r0)
 	if code == 0 {
 		if e1 != 0 {

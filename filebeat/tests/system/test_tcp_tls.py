@@ -10,7 +10,7 @@ CURRENT_PATH = path.dirname(__file__)
 CERTPATH = path.abspath(path.join(CURRENT_PATH, "config/certificates"))
 
 
-# Self signed certificate used without mutual and failling scenario.
+# Self signed certificate used without mutual and failing scenario.
 CERTIFICATE1 = path.join(CERTPATH, "beats1.crt")
 KEY1 = path.join(CERTPATH, "beats1.key")
 

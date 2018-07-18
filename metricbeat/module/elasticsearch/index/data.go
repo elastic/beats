@@ -20,6 +20,8 @@ package index
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -49,8 +51,7 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) []error {
-
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 	var indicesStruct struct {
 		Indices map[string]map[string]interface{} `json:"indices"`
 	}
@@ -58,15 +59,16 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) []e
 	err := json.Unmarshal(content, &indicesStruct)
 	if err != nil {
 		r.Error(err)
-		return []error{err}
+		return err
 	}
 
-	var errs []error
+	var errors multierror.Errors
 	for name, index := range indicesStruct.Indices {
 		event := mb.Event{}
 		event.MetricSetFields, err = schema.Apply(index)
 		if err != nil {
-			errs = append(errs, err)
+			r.Error(err)
+			errors = append(errors, err)
 		}
 		// Write name here as full name only available as key
 		event.MetricSetFields["name"] = name
@@ -77,5 +79,6 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) []e
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
 		r.Event(event)
 	}
-	return errs
+
+	return errors.Err()
 }

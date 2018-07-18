@@ -33,8 +33,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-dropwizard,Dropwizard>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>> beta[]  
 |<<metricbeat-module-elasticsearch,Elasticsearch>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.6+| .6+|  |<<metricbeat-metricset-elasticsearch-index,index>> experimental[]  
+.8+| .8+|  |<<metricbeat-metricset-elasticsearch-index,index>> experimental[]  
+|<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>> experimental[]  
 |<<metricbeat-metricset-elasticsearch-index_summary,index_summary>> experimental[]  
+|<<metricbeat-metricset-elasticsearch-ml_job,ml_job>> experimental[]  
 |<<metricbeat-metricset-elasticsearch-node,node>> beta[]  
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>> beta[]  
 |<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>> experimental[]  
@@ -125,6 +127,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-system-raid,raid>> beta[]  
 |<<metricbeat-metricset-system-socket,socket>> beta[]  
 |<<metricbeat-metricset-system-uptime,uptime>>   
+|<<metricbeat-module-traefik,traefik>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-traefik-health,health>> experimental[]  
 |<<metricbeat-module-uwsgi,uwsgi>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-uwsgi-status,status>> beta[]  
 |<<metricbeat-module-vsphere,vSphere>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -169,6 +173,7 @@ include::modules/prometheus.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/system.asciidoc[]
+include::modules/traefik.asciidoc[]
 include::modules/uwsgi.asciidoc[]
 include::modules/vsphere.asciidoc[]
 include::modules/windows.asciidoc[]

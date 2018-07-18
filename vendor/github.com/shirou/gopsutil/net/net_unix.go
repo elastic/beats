@@ -66,7 +66,7 @@ func ConnectionsPidWithContext(ctx context.Context, kind string, pid int32) ([]C
 		return ret, common.ErrNotImplementedError
 	}
 
-	r, err := common.CallLsof(invoke, pid, args...)
+	r, err := common.CallLsofWithContext(ctx, invoke, pid, args...)
 	if err != nil {
 		return nil, err
 	}

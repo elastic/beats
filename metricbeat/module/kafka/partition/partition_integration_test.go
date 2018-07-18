@@ -131,6 +131,7 @@ func generateKafkaData(t *testing.T, topic string) {
 	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
 	if err != nil {
 		t.Errorf("%s", err)
+		t.FailNow()
 	}
 
 	producer, err := sarama.NewSyncProducerFromClient(client)
@@ -146,10 +147,13 @@ func generateKafkaData(t *testing.T, topic string) {
 
 	_, _, err = producer.SendMessage(msg)
 	if err != nil {
-		t.Errorf("FAILED to send message: %s\n", err)
+		t.Errorf("failed to send message: %s\n", err)
 	}
 
-	client.RefreshMetadata(topic)
+	err = client.RefreshMetadata(topic)
+	if err != nil {
+		t.Errorf("failed to refresh metadata for topic '%s': %s\n", topic, err)
+	}
 }
 
 func getConfig(topic string) map[string]interface{} {

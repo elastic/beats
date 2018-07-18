@@ -91,4 +91,8 @@ jenkins_setup() {
   # Workaround for Python virtualenv path being too long.
   export TEMP_PYTHON_ENV=$(mktemp -d)
   export PYTHON_ENV="${TEMP_PYTHON_ENV}/python-env"
+
+  # Write cached magefile binaries to workspace to ensure
+  # each run starts from a clean slate.
+  export MAGEFILE_CACHE="${WORKSPACE}/.magefile"
 }

@@ -104,7 +104,7 @@ func (l *directEventLoop) run() {
 		case req := <-l.events: // producer pushing new event
 			l.handleInsert(&req)
 
-		case req := <-l.pubCancel: // producer cancellig active events
+		case req := <-l.pubCancel: // producer cancelling active events
 			l.handleCancel(&req)
 
 		case req := <-l.get: // consumer asking for next batch

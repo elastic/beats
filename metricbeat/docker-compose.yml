@@ -35,6 +35,7 @@ services:
       - ./module/prometheus/_meta/env
       - ./module/rabbitmq/_meta/env
       - ./module/redis/_meta/env
+      - ./module/traefik/_meta/env
       - ./module/uwsgi/_meta/env
       - ./module/zookeeper/_meta/env
 
@@ -91,7 +92,14 @@ services:
     build: ./module/jolokia/_meta
 
   kafka:
-    build: ./module/kafka/_meta
+    build:
+      context: ./module/kafka/_meta
+      dockerfile: Dockerfile.1.1.0
+
+  kafka_0_10_2:
+    build:
+      context: ./module/kafka/_meta
+      dockerfile: Dockerfile.0.10.2
 
   kibana:
     build: ./module/kibana/_meta
@@ -146,6 +154,9 @@ services:
 
   redis:
     build: ./module/redis/_meta
+
+  traefik:
+    build: ./module/traefik/_meta
 
   uwsgi_tcp:
     build: ./module/uwsgi/_meta

@@ -122,7 +122,7 @@ func (l *Loader) Load() error {
 
 		err = l.LoadTemplate(templateName, template)
 		if err != nil {
-			return fmt.Errorf("could not load template. Elasticsearh returned: %v. Template is: %s", err, template)
+			return fmt.Errorf("could not load template. Elasticsearch returned: %v. Template is: %s", err, template)
 		}
 
 	} else {

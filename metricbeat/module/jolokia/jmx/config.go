@@ -143,7 +143,7 @@ func buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, AttributeMapping
 
 	// At least Jolokia 1.5 responses with canonicalized MBean names when using
 	// wildcards, even when canonicalNaming is set to false, this makes mappings to fail.
-	// So use canonicalzed names everywhere.
+	// So use canonicalized names everywhere.
 	// If Jolokia returns non-canonicalized MBean names, then we'll need to canonicalize
 	// them or change our approach to mappings.
 	config := map[string]interface{}{

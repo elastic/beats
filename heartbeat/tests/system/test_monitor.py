@@ -21,7 +21,7 @@ class Test(BaseTest):
         self.render_config_template(
             monitors=[{
                 "type": "http",
-                "urls": ["http://localhost:8181"],
+                "urls": ["http://localhost:8185"],
             }],
         )
 
@@ -43,8 +43,8 @@ class Test(BaseTest):
         self.assert_fields_are_documented(output[0])
 
     @parameterized.expand([
-        ("8181", "up"),
-        ("8182", "down"),
+        ("8185", "up"),
+        ("8186", "down"),
     ])
     def test_tcp(self, port, status):
         """
@@ -83,7 +83,7 @@ class Test(BaseTest):
                 self.end_headers()
                 self.wfile.write(content)
 
-        server = BaseHTTPServer.HTTPServer(('localhost', 8181), HTTPHandler)
+        server = BaseHTTPServer.HTTPServer(('localhost', 8185), HTTPHandler)
 
         thread = threading.Thread(target=server.serve_forever)
         thread.start()

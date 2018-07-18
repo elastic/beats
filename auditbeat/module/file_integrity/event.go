@@ -57,7 +57,7 @@ func (s Source) String() string {
 func (s Source) MarshalText() ([]byte, error) { return []byte(s.String()), nil }
 
 const (
-	// SourceScan identifies events triggerd by a file system scan.
+	// SourceScan identifies events triggered by a file system scan.
 	SourceScan Source = iota
 	// SourceFSNotify identifies events triggered by a notification from the
 	// file system.

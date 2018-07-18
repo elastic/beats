@@ -47,6 +47,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
@@ -357,6 +358,9 @@ Namespace name
 +
 --
 type: keyword
+
+Node host
+
 
 --
 
@@ -3520,6 +3524,113 @@ Total number of memory used by the segments in bytes.
 --
 
 [float]
+== index.recovery fields
+
+index
+
+
+
+*`elasticsearch.index.recovery.id`*::
++
+--
+type: long
+
+Shard recovery id.
+
+
+--
+
+*`elasticsearch.index.recovery.type`*::
++
+--
+type: keyword
+
+Shard recovery type.
+
+
+--
+
+*`elasticsearch.index.recovery.primary`*::
++
+--
+type: boolean
+
+True if primary shard.
+
+
+--
+
+*`elasticsearch.index.recovery.stage`*::
++
+--
+type: keyword
+
+Recovery stage.
+
+
+--
+
+*`elasticsearch.index.recovery.target.id`*::
++
+--
+type: keyword
+
+Target node id.
+
+
+--
+
+*`elasticsearch.index.recovery.target.host`*::
++
+--
+type: ip
+
+Target node host address.
+
+
+--
+
+*`elasticsearch.index.recovery.target.name`*::
++
+--
+type: keyword
+
+Target node name.
+
+
+--
+
+*`elasticsearch.index.recovery.source.id`*::
++
+--
+type: keyword
+
+Source node id.
+
+
+--
+
+*`elasticsearch.index.recovery.source.host`*::
++
+--
+type: ip
+
+Source node host address.
+
+
+--
+
+*`elasticsearch.index.recovery.source.name`*::
++
+--
+type: keyword
+
+Source node name.
+
+
+--
+
+[float]
 == index.summary fields
 
 index
@@ -3632,6 +3743,53 @@ type: long
 format: bytes
 
 Total number of memory used by the segments in bytes.
+
+
+--
+
+[float]
+== ml.job fields
+
+ml
+
+
+
+*`elasticsearch.ml.job.id`*::
++
+--
+type: keyword
+
+Unique ml job id.
+
+
+--
+
+*`elasticsearch.ml.job.state`*::
++
+--
+type: keyword
+
+Job state.
+
+
+--
+
+*`elasticsearch.ml.job.data_counts.processed_record_count`*::
++
+--
+type: long
+
+Processed data events.
+
+
+--
+
+*`elasticsearch.ml.job.data_counts.invalid_date_count`*::
++
+--
+type: long
+
+The number of records with either a missing date field or a date that could not be parsed.
 
 
 --
@@ -4300,7 +4458,7 @@ number of append requests this node has processed
 
 --
 
-*`etcd.self.recv.bandwithrate`*::
+*`etcd.self.recv.bandwidthrate`*::
 +
 --
 type: scaled_float
@@ -4330,7 +4488,7 @@ number of requests that this node has sent
 
 --
 
-*`etcd.self.send.bandwithrate`*::
+*`etcd.self.send.bandwidthrate`*::
 +
 --
 type: scaled_float
@@ -6724,7 +6882,7 @@ Total number of client disconnects encountered by the server.
 --
 type: long
 
-Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request mulitple server assets at once, and they can re-use established connections.
+Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
 
 
 --
@@ -6894,7 +7052,7 @@ Kubernetes pod name
 --
 type: keyword
 
-Kubernetes pod uid
+Kubernetes Pod UID
 
 
 --
@@ -7065,7 +7223,7 @@ Request latency, number of requests
 --
 type: object
 
-Request latency histagram buckets
+Request latency histogram buckets
 
 
 --
@@ -13633,7 +13791,7 @@ Total number of connections rejected.
 --
 type: long
 
-Total number of commands preocessed.
+Total number of commands processed.
 
 --
 
@@ -16412,6 +16570,74 @@ type: long
 format: duration
 
 The OS uptime in milliseconds.
+
+
+--
+
+[[exported-fields-traefik]]
+== traefik fields
+
+Traefik reverse proxy / load balancer metrics
+
+
+
+[float]
+== traefik fields
+
+Traefik reverse proxy / load balancer metrics
+
+
+
+[float]
+== health fields
+
+Metrics obtained from Traefik's health API endpoint
+
+
+
+*`traefik.health.uptime.sec`*::
++
+--
+type: long
+
+Uptime of Traefik instance in seconds
+
+
+--
+
+[float]
+== response fields
+
+Response metrics
+
+
+
+*`traefik.health.response.count`*::
++
+--
+type: long
+
+Number of responses
+
+
+--
+
+*`traefik.health.response.avg_time.us`*::
++
+--
+type: long
+
+Average response time in microseconds
+
+
+--
+
+*`traefik.health.response.status_code`*::
++
+--
+type: object
+
+Number of responses per status code
 
 
 --

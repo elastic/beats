@@ -118,7 +118,8 @@ func (d *Dissector) extract(s string) (positions, error) {
 		dl = dl.Next()
 	}
 
-	if offset < len(s) {
+	// If we have remaining contents and have not captured all the requested fields
+	if offset < len(s) && i < len(d.parser.fields) {
 		positions[i] = position{start: offset, end: len(s)}
 	}
 	return positions, nil

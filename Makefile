@@ -1,9 +1,8 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
-BEATS=packetbeat filebeat winlogbeat metricbeat heartbeat auditbeat
+BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat
 PROJECTS=libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
-SNAPSHOT?=yes
 PYTHON_ENV?=$(BUILD_DIR)/python-env
 VIRTUALENV_PARAMS?=
 FIND=find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
@@ -62,6 +61,7 @@ clean:
 	@rm -rf build
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) clean || exit 1;)
 	@$(MAKE) -C generator clean
+	@-mage -clean 2> /dev/null
 
 # Cleans up the vendor directory from unnecessary files
 # This should always be run after updating the dependencies
@@ -71,7 +71,7 @@ clean-vendor:
 
 .PHONY: check
 check: python-env
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
+	@$(foreach var,$(PROJECTS) dev-tools,$(MAKE) -C $(var) check || exit 1;)
 	@# Checks also python files which are not part of the beats
 	@$(FIND) -name *.py -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@# Validate that all updates were committed
@@ -94,13 +94,17 @@ add-headers:
 # Corrects spelling errors
 .PHONY: misspell
 misspell:
-	go get github.com/client9/misspell
+	go get -u github.com/client9/misspell/cmd/misspell
 	# Ignore Kibana files (.json)
-	$(FIND) -not -path "*.json" -name '*' -exec misspell -w {} \;
+	$(FIND) \
+		-not -path "*.json" \
+		-not -path "*.log" \
+		-name '*' \
+		-exec misspell -w {} \;
 
 .PHONY: fmt
 fmt: add-headers python-env
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) fmt || exit 1;)
+	@$(foreach var,$(PROJECTS) dev-tools,$(MAKE) -C $(var) fmt || exit 1;)
 	@# Cleans also python files which are not part of the beats
 	@$(FIND) -name "*.py" -exec $(PYTHON_ENV)/bin/autopep8 --in-place --max-line-length 120 {} \;
 
@@ -109,50 +113,11 @@ lint:
 	@go get $(GOLINT_REPO) $(REVIEWDOG_REPO)
 	$(REVIEWDOG) $(REVIEWDOG_OPTIONS)
 
-# Collects all dashboards and generates dashboard folder for https://github.com/elastic/beats-dashboards/tree/master/dashboards
-.PHONY: beats-dashboards
-beats-dashboards:
-	@mkdir -p build/dashboards
-	@$(foreach var,$(BEATS),cp -r $(var)/_meta/kibana.generated/ build/dashboards/$(var)  || exit 1;)
-
 # Builds the documents for each beat
 .PHONY: docs
 docs:
 	@$(foreach var,$(PROJECTS),BUILD_DIR=${BUILD_DIR} $(MAKE) -C $(var) docs || exit 1;)
 	sh ./script/build_docs.sh dev-guide github.com/elastic/beats/docs/devguide ${BUILD_DIR}
-
-.PHONY: package-all
-package-all: update beats-dashboards
-	@$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package-all || exit 1;)
-
-	@echo "Start building the dashboards package"
-	@mkdir -p build/upload/
-	@BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${BUILD_DIR}/upload SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards ${BUILD_DIR}/upload/build_id.txt
-	@mv build/upload build/dashboards-upload
-
-	@# Copy build files over to top build directory
-	@mkdir -p build/upload/
-	@$(foreach var,$(BEATS),cp -r $(var)/build/upload/ build/upload/$(var)  || exit 1;)
-	@cp -r build/dashboards-upload build/upload/dashboards
-	@# Run tests on the generated packages.
-	@go test ./dev-tools/package_test.go -files "${BUILD_DIR}/upload/*/*"
-
-# Upload nightly builds to S3
-.PHONY: upload-nightlies-s3
-upload-nightlies-s3: all
-	aws s3 cp --recursive --acl public-read build/upload s3://beats-nightlies
-
-# Run after building to sign packages and publish to APT and YUM repos.
-.PHONY: package-upload
-upload-package:
-	$(MAKE) -C dev-tools/packer deb-rpm-s3
-	# You must export AWS_ACCESS_KEY=<AWS access> and export AWS_SECRET_KEY=<secret>
-	# before running this make target.
-	dev-tools/packer/docker/deb-rpm-s3/deb-rpm-s3.sh
-
-.PHONY: release-upload
-upload-release:
-	aws s3 cp --recursive --acl public-read build/upload s3://download.elasticsearch.org/beats/
 
 .PHONY: notice
 notice: python-env
@@ -171,3 +136,40 @@ python-env:
 .PHONY: test-apm
 test-apm:
 	sh ./script/test_apm.sh
+
+### Packaging targets ####
+
+# Builds a snapshot release.
+.PHONY: snapshot
+snapshot:
+	@$(MAKE) SNAPSHOT=true release
+
+# Builds a release.
+.PHONY: release
+release: beats-dashboards
+	@$(foreach var,$(BEATS),$(MAKE) -C $(var) release || exit 1;)
+	@$(foreach var,$(BEATS), \
+      test -d $(var)/build/distributions && test -n "$$(ls $(var)/build/distributions)" || exit 0; \
+      mkdir -p build/distributions/$(var) && mv -f $(var)/build/distributions/* build/distributions/$(var)/ || exit 1;)
+
+# Builds a snapshot release. The Go version defined in .go-version will be
+# installed and used for the build.
+.PHONY: release-manager-snapshot
+release-manager-snapshot:
+	@$(MAKE) SNAPSHOT=true release-manager-release
+
+# Builds a snapshot release. The Go version defined in .go-version will be
+# installed and used for the build.
+.PHONY: release-manager-release
+release-manager-release:
+	./dev-tools/run_with_go_ver $(MAKE) release
+
+# Installs the mage build tool from the vendor directory.
+.PHONY: mage
+mage:
+	@go install github.com/elastic/beats/vendor/github.com/magefile/mage
+
+# Collects dashboards from all Beats and generates a zip file distribution.
+.PHONY: beats-dashboards
+beats-dashboards: mage update
+	@mage packageBeatDashboards

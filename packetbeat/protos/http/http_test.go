@@ -863,7 +863,7 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 
 	path, params, err := http.extractParameters(st.message)
 	if err != nil {
-		t.Errorf("Faile to parse parameters")
+		t.Errorf("Failed to parse parameters")
 	}
 	logp.Debug("httpdetailed", "parameters %s", params)
 
@@ -1253,7 +1253,7 @@ func testCreateTCPTuple() *common.TCPTuple {
 			SrcPort: 6512, DstPort: 80,
 		},
 	}
-	t.ComputeHashebles()
+	t.ComputeHashables()
 	return t
 }
 

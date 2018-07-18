@@ -36,7 +36,7 @@ func ReadInput() (string, error) {
 	return strings.TrimSuffix(input, "\n"), nil
 }
 
-// PromptYesNo Returns true if the user has enterred Y or YES, capitalization is ignored, we are
+// PromptYesNo Returns true if the user has entered Y or YES, capitalization is ignored, we are
 // matching elasticsearch behavior
 func PromptYesNo(prompt string, defaultAnswer bool) bool {
 	var defaultYNprompt string

@@ -98,6 +98,24 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+  audit:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  slowlog:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  deprecation:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Icinga Module -------------------------------
 #- module: icinga
   # Main logs
@@ -176,6 +194,8 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
 
 #------------------------------- kibana Module -------------------------------
 - module: kibana
@@ -444,7 +464,7 @@ filebeat.inputs:
 
   ### Multiline options
 
-  # Mutiline can be used for log messages spanning multiple lines. This is common
+  # Multiline can be used for log messages spanning multiple lines. This is common
   # for Java Stack Traces or C-Line Continuation
 
   # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
@@ -476,7 +496,7 @@ filebeat.inputs:
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
-  # If symlinks is enabled, symlinks are opened and harvested. The harvester is openening the
+  # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
   # original for harvesting but will report the symlink name as source.
   #symlinks: false
 
@@ -1784,6 +1804,9 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  #metrics.period: 10s
+  #state.period: 1m
 
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security

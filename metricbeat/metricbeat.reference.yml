@@ -175,8 +175,8 @@ metricbeat.modules:
   period: 10s
   enabled: true
 
-  # Replace dots in labels with `_`. Set to false to keep dots
-  labels.dedot: true
+  # If set to true, replace dots in labels with `_`.
+  #labels.dedot: false
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:
@@ -199,10 +199,15 @@ metricbeat.modules:
     - node
     - node_stats
     #- index
+    #- index_recovery
     #- index_summary
     #- shard
+    #- ml_job
   period: 10s
   hosts: ["localhost:9200"]
+
+  # Set to false to fetch all entries
+  #index_recovery.active_only: true
 
 #-------------------------------- Etcd Module --------------------------------
 - module: etcd
@@ -360,9 +365,18 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:10255"]
   enabled: true
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
   #ssl.certificate: "/etc/pki/client/cert.pem"
   #ssl.key: "/etc/pki/client/cert.key"
+
+  # Enriching parameters:
+  add_metadata: true
+  in_cluster: true
+  # When used outside the cluster:
+  #host: node_name
+  #kube_config: ~/.kube/config
 
 # State metrics from kube-state-metrics service:
 - module: kubernetes
@@ -376,6 +390,13 @@ metricbeat.modules:
     - state_container
   period: 10s
   hosts: ["kube-state-metrics:8080"]
+
+  # Enriching parameters:
+  add_metadata: true
+  in_cluster: true
+  # When used outside the cluster:
+  #host: node_name
+  #kube_config: ~/.kube/config
 
 # Kubernetes events
 - module: kubernetes
@@ -426,6 +447,21 @@ metricbeat.modules:
   # options. The credentials in the URL take precedence over the username and
   # password configuration options.
   hosts: ["localhost:27017"]
+
+  # Optional SSL. By default is off.
+  #ssl.enabled: true
+
+  # Mode of verification of server certificate ('none' or 'full')
+  #ssl.verification_mode: 'full'
+
+  # List of root certificates for TLS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
 
   # Username to use when connecting to MongoDB. Empty by default.
   #username: user
@@ -526,6 +562,11 @@ metricbeat.modules:
   #metrics_path: /metrics
   #namespace: example
 
+  # This can be used for service account based authorization:
+  #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
 #------------------------------ RabbitMQ Module ------------------------------
 - module: rabbitmq
   metricsets: ["node", "queue", "connection"]
@@ -571,6 +612,12 @@ metricbeat.modules:
 
   # Redis AUTH password. Empty by default.
   #password: foobared
+
+#------------------------------- traefik Module ------------------------------
+- module: traefik
+  metricsets: ["health"]
+  period: 10s
+  hosts: ["localhost:8080"]
 
 #-------------------------------- uwsgi Module -------------------------------
 - module: uwsgi
@@ -1657,6 +1704,9 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  #metrics.period: 10s
+  #state.period: 1m
 
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security

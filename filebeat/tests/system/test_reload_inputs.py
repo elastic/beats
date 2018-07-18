@@ -120,7 +120,7 @@ class Test(BaseTest):
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
             f.write(inputConfigTemplate.format(self.working_dir + "/logs/test2.log"))
 
-        # Update both log files, only 1 change should be picke dup
+        # Update both log files, only 1 change should be picked up
         with open(logfile1, 'a') as f:
             f.write("First log file 1\n")
         with open(logfile2, 'a') as f:
@@ -180,7 +180,7 @@ class Test(BaseTest):
             lambda: self.log_contains("Stopping runner:"),
             max_timeout=15)
 
-        # Update both log files, only 1 change should be picke dup
+        # Update both log files, only 1 change should be picked up
         with open(logfile, 'a') as f:
             f.write(second_line + "\n")
 
@@ -229,7 +229,7 @@ class Test(BaseTest):
 
         self.wait_until(lambda: self.output_lines() == 1)
 
-        # Update both log files, only 1 change should be picke dup
+        # Update both log files, only 1 change should be picked up
         with open(logfile, 'a') as f:
             f.write(second_line + "\n")
 

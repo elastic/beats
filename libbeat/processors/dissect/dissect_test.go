@@ -53,6 +53,17 @@ type dissectTest struct {
 
 var tests = []dissectTest{
 	{
+		Name: "When all the defined fields are captured by we have remaining data",
+		Tok:  "level=%{level} ts=%{timestamp} caller=%{caller} msg=\"%{message}\"",
+		Msg:  "level=info ts=2018-06-27T17:19:13.036579993Z caller=main.go:222 msg=\"Starting OK\" version=\"(version=2.3.1, branch=HEAD, revision=188ca45bd85ce843071e768d855722a9d9dabe03)\"}",
+		Expected: Map{
+			"level":     "info",
+			"timestamp": "2018-06-27T17:19:13.036579993Z",
+			"caller":    "main.go:222",
+			"message":   "Starting OK",
+		},
+	},
+	{
 		Name: "Complex stack trace",
 		Tok:  "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{message}",
 		Msg: `18-Apr-2018 06:53:20.411 INFO [http-nio-8080-exec-1] org.apache.coyote.http11.Http11Processor.service Error parsing HTTP request header
@@ -284,7 +295,7 @@ func BenchmarkDissect(b *testing.B) {
 		})
 	}
 
-	// Add a few regular expression matches agains the same string the test suite,
+	// Add a few regular expression matches against the same string the test suite,
 	// this give us a baseline to compare to, note that we only test a raw match against the string.
 	b.Run("Regular expression", func(b *testing.B) {
 		re := regexp.MustCompile("/var/log/([a-z]+)/log/([a-z]+)/apache/([a-b]+)")

@@ -191,7 +191,7 @@ func (mc *memcache) onTCPMessage(
 ) error {
 	msg.Tuple = *tuple
 	msg.Transport = applayer.TransportTCP
-	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tuple)
+	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tuple)
 
 	if msg.IsRequest {
 		return mc.onTCPRequest(conn, tuple, dir, msg)
@@ -394,7 +394,7 @@ func (mc *memcache) GapInStream(
 		}
 	}
 
-	// need to drop TCP stream. But try to publish all cached trancsactions first
+	// need to drop TCP stream. But try to publish all cached transactions first
 	mc.pushAllTCPTrans(conn.connection)
 	return private, true
 }

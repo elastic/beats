@@ -93,7 +93,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			messageSent:      strings.Join(expectedMessages, "<END>"),
 		},
 		{
-			name: "SingleCharCustomDelimiterMessageWithoutBoudaries",
+			name: "SingleCharCustomDelimiterMessageWithoutBoundaries",
 			cfg: map[string]interface{}{
 				"line_delimiter": ";",
 			},

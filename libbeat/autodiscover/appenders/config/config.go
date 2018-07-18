@@ -25,8 +25,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/conditions"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
 )
 
 func init() {
@@ -34,14 +34,14 @@ func init() {
 }
 
 type config struct {
-	ConditionConfig *processors.ConditionConfig `config:"condition"`
-	Config          *common.Config              `config:"config"`
+	ConditionConfig *conditions.Config `config:"condition"`
+	Config          *common.Config     `config:"config"`
 }
 
 type configs []config
 
 type configMap struct {
-	condition *processors.Condition
+	condition conditions.Condition
 	config    common.MapStr
 }
 
@@ -61,11 +61,10 @@ func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 
 	var configMaps []configMap
 	for _, conf := range confs {
-		// Unpack the condition
-		var cond *processors.Condition
+		var cond conditions.Condition
 
 		if conf.ConditionConfig != nil {
-			cond, err = processors.NewCondition(conf.ConditionConfig)
+			cond, err = conditions.NewCondition(conf.ConditionConfig)
 			if err != nil {
 				logp.Warn("config", "unable to create condition due to error: %v", err)
 				continue

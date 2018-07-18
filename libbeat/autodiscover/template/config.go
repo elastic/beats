@@ -20,10 +20,9 @@ package template
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/conditions"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-
-	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg"
 )
 
 // Mapper maps config templates with conditions, if a match happens on a discover event
@@ -32,21 +31,21 @@ type Mapper []*ConditionMap
 
 // ConditionMap maps a condition to the configs to use when it's triggered
 type ConditionMap struct {
-	Condition *processors.Condition
+	Condition conditions.Condition
 	Configs   []*common.Config
 }
 
 // MapperSettings holds user settings to build Mapper
 type MapperSettings []*struct {
-	ConditionConfig *processors.ConditionConfig `config:"condition"`
-	Configs         []*common.Config            `config:"config"`
+	ConditionConfig *conditions.Config `config:"condition"`
+	Configs         []*common.Config   `config:"config"`
 }
 
 // NewConfigMapper builds a template Mapper from given settings
 func NewConfigMapper(configs MapperSettings) (*Mapper, error) {
 	var mapper Mapper
 	for _, c := range configs {
-		condition, err := processors.NewCondition(c.ConditionConfig)
+		condition, err := conditions.NewCondition(c.ConditionConfig)
 		if err != nil {
 			return nil, err
 		}
