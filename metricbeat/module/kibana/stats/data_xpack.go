@@ -118,11 +118,11 @@ var (
 		"app": c.Dict("app", s.Schema{
 			"visualization": c.Int("visualization"),
 			"dashboard":     c.Int("dashboard"),
-		}),
+		}, c.DictOptional),
 		"layout": c.Dict("layout", s.Schema{
 			"print":           c.Int("print"),
 			"preserve_layout": c.Int("preserve_layout"),
-		}),
+		}, c.DictOptional),
 	}, c.DictOptional)
 
 	reportingStatusDict = c.Dict("status", s.Schema{
