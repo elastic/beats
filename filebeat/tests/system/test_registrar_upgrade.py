@@ -31,29 +31,11 @@ class Test(BaseTest):
         testfile, file_state = self.prepare_log()
 
         # prepare registry file
-        self.apply_registry_tempate(template, testfile, file_state)
+        self.apply_registry_template(template, testfile, file_state)
 
         self.run_and_validate()
 
-    def run_and_validate(self):
-        filebeat = self.start_beat()
-        self.wait_until(
-            lambda: self.output_has(lines=1),
-            max_timeout=15)
-
-        # stop filebeat and enforce one last registry update
-        filebeat.check_kill_and_wait()
-
-        data = self.get_registry()
-        assert len(data) == 1
-        assert data[0]["offset"] == 20
-
-        # check only second line has been written
-        output = self.read_output()
-        assert len(output) == 1
-        assert output[0]["message"] == "abcdefghi"
-
-    def apply_registry_tempate(self, template, testfile, file_state):
+    def apply_registry_template(self, template, testfile, file_state):
         source = self.beat_path + "/tests/files/registry/" + template
         with open(source) as f:
             registry = json.loads(f.read())
@@ -84,3 +66,22 @@ class Test(BaseTest):
         st = os.stat(testfile_path)
         file_state = {"inode": st.st_ino, "device": st.st_dev}
         return testfile_path, file_state
+
+    def run_and_validate(self):
+        filebeat = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=15)
+
+        # stop filebeat and enforce one last registry update
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+        assert len(data) == 1
+        assert data[0]["offset"] == 20
+
+        # check only second line has been written
+        output = self.read_output()
+        assert len(output) == 1
+        assert output[0]["message"] == "abcdefghi"
+
