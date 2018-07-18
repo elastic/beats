@@ -4,6 +4,38 @@
     Kibana stats and run-time metrics.
   release: beta
   fields:
+    - name: uuid
+      type: keyword
+      description: >
+        Kibana instance UUID
+    - name: name
+      type: text
+      description: >
+        Kibana instance name
+    - name: index
+      type: keyword
+      description: >
+        Name of Kibana's internal index
+    - name: host
+      type: keyword
+      description: >
+        Kibana instance hostname
+    - name: transport_address
+      type: keyword
+      description: >
+        Kibana server's hostname and port
+    - name: version
+      type: keyword
+      description: >
+        Kibana version
+    - name: snapshot
+      type: boolean
+      description: >
+        Whether the Kibana build is a snapshot build
+    - name: status
+      type: keyword
+      description: >
+        Kibana instance's health status
     - name: cluster_uuid
       type: keyword
       description: >
@@ -71,40 +103,3 @@
           type: long
           description: >
             Maximum response time in milliseconds
-    - name: kibana
-      type: group
-      description: >
-        Kibana metadata
-      fields:
-        - name: uuid
-          type: keyword
-          description: >
-            Kibana instance UUID
-        - name: name
-          type: text
-          description: >
-            Kibana instance name
-        - name: index
-          type: keyword
-          description: >
-            Name of Kibana's internal index
-        - name: host
-          type: keyword
-          description: >
-            Kibana instance hostname
-        - name: transport_address
-          type: keyword
-          description: >
-            Kibana server's hostname and port
-        - name: version
-          type: keyword
-          description: >
-            Kibana version
-        - name: snapshot
-          type: boolean
-          description: >
-            Whether the Kibana build is a snapshot build
-        - name: status
-          type: keyword
-          description: >
-            Kibana instance's health status

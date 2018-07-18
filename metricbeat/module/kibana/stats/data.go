@@ -28,6 +28,14 @@ import (
 
 var (
 	schema = s.Schema{
+		"uuid":                   c.Str("kibana.uuid"),
+		"name":                   c.Str("kibana.name"),
+		"index":                  c.Str("kibana.name"),
+		"host":                   c.Str("kibana.host"),
+		"transport_address":      c.Str("kibana.transport_address"),
+		"version":                c.Str("kibana.version"),
+		"snapshot":               c.Bool("kibana.snapshot"),
+		"status":                 c.Str("kibana.status"),
 		"cluster_uuid":           c.Str("cluster_uuid"),
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"process": c.Dict("process", s.Schema{
@@ -60,25 +68,12 @@ var (
 				"ms": c.Int("max_ms"),
 			},
 		}),
-		"kibana": KibanaDict,
 	}
 
 	// RequestsDict defines how to convert the requests field
 	RequestsDict = c.Dict("requests", s.Schema{
 		"disconnects": c.Int("disconnects", s.Optional),
 		"total":       c.Int("total", s.Optional),
-	})
-
-	// KibanaDict defines how to convert the kibana field
-	KibanaDict = c.Dict("kibana", s.Schema{
-		"uuid":              c.Str("uuid"),
-		"name":              c.Str("name"),
-		"index":             c.Str("index"),
-		"host":              c.Str("host"),
-		"transport_address": c.Str("transport_address"),
-		"version":           c.Str("version"),
-		"snapshot":          c.Bool("snapshot"),
-		"status":            c.Str("status"),
 	})
 )
 

@@ -61,7 +61,16 @@ var (
 			"average": c.Int("avg_ms", s.Optional),
 			"max":     c.Int("max_ms"),
 		}, c.DictOptional),
-		"kibana": KibanaDict,
+		"kibana": c.Dict("kibana", s.Schema{
+			"uuid":              c.Str("uuid"),
+			"name":              c.Str("name"),
+			"index":             c.Str("index"),
+			"host":              c.Str("host"),
+			"transport_address": c.Str("transport_address"),
+			"version":           c.Str("version"),
+			"snapshot":          c.Bool("snapshot"),
+			"status":            c.Str("status"),
+		}),
 		"usage": c.Dict("usage", s.Schema{
 			"index": c.Str("kibana.index"),
 			"index_pattern": c.Dict("kibana.index_pattern", s.Schema{

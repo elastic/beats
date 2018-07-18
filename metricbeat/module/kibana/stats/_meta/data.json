@@ -6,25 +6,18 @@
     },
     "elasticsearch": {
         "cluster": {
-            "id": "NkfU5AinRnyFnqBD36zhEw"
+            "id": "A0sjozJKQoSRmOe2LV9kWA"
         }
     },
     "kibana": {
         "stats": {
-            "concurrent_connections": 3,
-            "kibana": {
-                "host": "localhost",
-                "index": ".kibana",
-                "name": "Shaunaks-MBP-2",
-                "snapshot": false,
-                "status": "green",
-                "transport_address": "localhost:5601",
-                "uuid": "5b2de169-2785-441b-ae8c-186a1936b17d",
-                "version": "7.0.0-alpha1"
-            },
+            "concurrent_connections": 1,
+            "host": "localhost",
+            "index": "Shaunaks-MBP-2",
+            "name": "Shaunaks-MBP-2",
             "process": {
                 "event_loop_delay": {
-                    "ms": 0.7881790399551392
+                    "ms": 0.3324570655822754
                 },
                 "memory": {
                     "heap": {
@@ -32,29 +25,32 @@
                             "bytes": 1501560832
                         },
                         "total": {
-                            "bytes": 477569024
+                            "bytes": 348958720
                         },
                         "used": {
-                            "bytes": 205526576
+                            "bytes": 191876376
                         }
                     }
                 },
                 "uptime": {
-                    "ms": 24803
+                    "ms": 28184
                 }
             },
             "request": {
                 "disconnects": 0,
-                "total": 3
+                "total": 0
             },
             "response_time": {
-                "avg": {
-                    "ms": 39
-                },
+                "avg": {},
                 "max": {
-                    "ms": 48
+                    "ms": 0
                 }
-            }
+            },
+            "snapshot": false,
+            "status": "green",
+            "transport_address": "localhost:5601",
+            "uuid": "5b2de169-2785-441b-ae8c-186a1936b17d",
+            "version": "7.0.0-alpha1"
         }
     },
     "metricset": {

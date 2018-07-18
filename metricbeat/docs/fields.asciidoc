@@ -6681,6 +6681,86 @@ Kibana stats and run-time metrics.
 
 
 
+*`kibana.stats.uuid`*::
++
+--
+type: keyword
+
+Kibana instance UUID
+
+
+--
+
+*`kibana.stats.name`*::
++
+--
+type: text
+
+Kibana instance name
+
+
+--
+
+*`kibana.stats.index`*::
++
+--
+type: keyword
+
+Name of Kibana's internal index
+
+
+--
+
+*`kibana.stats.host`*::
++
+--
+type: keyword
+
+Kibana instance hostname
+
+
+--
+
+*`kibana.stats.transport_address`*::
++
+--
+type: keyword
+
+Kibana server's hostname and port
+
+
+--
+
+*`kibana.stats.version`*::
++
+--
+type: keyword
+
+Kibana version
+
+
+--
+
+*`kibana.stats.snapshot`*::
++
+--
+type: boolean
+
+Whether the Kibana build is a snapshot build
+
+
+--
+
+*`kibana.stats.status`*::
++
+--
+type: keyword
+
+Kibana instance's health status
+
+
+--
+
 *`kibana.stats.cluster_uuid`*::
 +
 --
@@ -6821,93 +6901,6 @@ Average response time in milliseconds
 type: long
 
 Maximum response time in milliseconds
-
-
---
-
-[float]
-== kibana fields
-
-Kibana metadata
-
-
-
-*`kibana.stats.kibana.uuid`*::
-+
---
-type: keyword
-
-Kibana instance UUID
-
-
---
-
-*`kibana.stats.kibana.name`*::
-+
---
-type: text
-
-Kibana instance name
-
-
---
-
-*`kibana.stats.kibana.index`*::
-+
---
-type: keyword
-
-Name of Kibana's internal index
-
-
---
-
-*`kibana.stats.kibana.host`*::
-+
---
-type: keyword
-
-Kibana instance hostname
-
-
---
-
-*`kibana.stats.kibana.transport_address`*::
-+
---
-type: keyword
-
-Kibana server's hostname and port
-
-
---
-
-*`kibana.stats.kibana.version`*::
-+
---
-type: keyword
-
-Kibana version
-
-
---
-
-*`kibana.stats.kibana.snapshot`*::
-+
---
-type: boolean
-
-Whether the Kibana build is a snapshot build
-
-
---
-
-*`kibana.stats.kibana.status`*::
-+
---
-type: keyword
-
-Kibana instance's health status
 
 
 --
