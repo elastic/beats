@@ -9721,6 +9721,9 @@ The number of operations queued because of a lock.
 --
 type: long
 
+The total number of operations queued waiting for the lock (i.e., the sum of current_queue.readers and current_queue.writers).
+
+
 --
 
 *`mongodb.status.global_lock.current_queue.readers`*::
@@ -9728,12 +9731,18 @@ type: long
 --
 type: long
 
+The number of operations that are currently queued and waiting for the read lock.
+
+
 --
 
 *`mongodb.status.global_lock.current_queue.writers`*::
 +
 --
 type: long
+
+The number of operations that are currently queued and waiting for the write lock.
+
 
 --
 
@@ -9748,6 +9757,9 @@ The number of connected clients and the read and write operations performed by t
 +
 --
 type: long
+
+Total number of the active client connections performing read or write operations.
+
 
 --
 
@@ -10386,13 +10398,13 @@ The total number of requests received by the server.
 --
 
 [float]
-== oplatencies fields
+== ops.latencies fields
 
-Operation latencies for the database as a whole. Only mongod instances report this metric. 
+Operation latencies for the database as a whole. Only mongod instances report this metric.
 
 
 
-*`mongodb.status.oplatencies.reads.latency`*::
+*`mongodb.status.ops.latencies.reads.latency`*::
 +
 --
 type: long
@@ -10402,7 +10414,7 @@ Total combined latency in microseconds.
 
 --
 
-*`mongodb.status.oplatencies.reads.count`*::
+*`mongodb.status.ops.latencies.reads.count`*::
 +
 --
 type: long
@@ -10412,7 +10424,7 @@ Total number of read operations performed on the collection since startup.
 
 --
 
-*`mongodb.status.oplatencies.writes.latency`*::
+*`mongodb.status.ops.latencies.writes.latency`*::
 +
 --
 type: long
@@ -10422,7 +10434,7 @@ Total combined latency in microseconds.
 
 --
 
-*`mongodb.status.oplatencies.writes.count`*::
+*`mongodb.status.ops.latencies.writes.count`*::
 +
 --
 type: long
@@ -10432,7 +10444,7 @@ Total number of write operations performed on the collection since startup.
 
 --
 
-*`mongodb.status.oplatencies.commands.latency`*::
+*`mongodb.status.ops.latencies.commands.latency`*::
 +
 --
 type: long
@@ -10442,7 +10454,7 @@ Total combined latency in microseconds.
 
 --
 
-*`mongodb.status.oplatencies.commands.count`*::
+*`mongodb.status.ops.latencies.commands.count`*::
 +
 --
 type: long
@@ -10453,13 +10465,13 @@ Total number of commands performed on the collection since startup.
 --
 
 [float]
-== opcounters fields
+== ops.counters fields
 
 An overview of database operations by type.
 
 
 
-*`mongodb.status.opcounters.insert`*::
+*`mongodb.status.ops.counters.insert`*::
 +
 --
 type: long
@@ -10469,7 +10481,7 @@ The total number of insert operations received since the mongod instance last st
 
 --
 
-*`mongodb.status.opcounters.query`*::
+*`mongodb.status.ops.counters.query`*::
 +
 --
 type: long
@@ -10479,7 +10491,7 @@ The total number of queries received since the mongod instance last started.
 
 --
 
-*`mongodb.status.opcounters.update`*::
+*`mongodb.status.ops.counters.update`*::
 +
 --
 type: long
@@ -10489,7 +10501,7 @@ The total number of update operations received since the mongod instance last st
 
 --
 
-*`mongodb.status.opcounters.delete`*::
+*`mongodb.status.ops.counters.delete`*::
 +
 --
 type: long
@@ -10499,7 +10511,7 @@ The total number of delete operations received since the mongod instance last st
 
 --
 
-*`mongodb.status.opcounters.getmore`*::
+*`mongodb.status.ops.counters.getmore`*::
 +
 --
 type: long
@@ -10509,7 +10521,7 @@ The total number of getmore operations received since the mongod instance last s
 
 --
 
-*`mongodb.status.opcounters.command`*::
+*`mongodb.status.ops.counters.command`*::
 +
 --
 type: long
@@ -10520,13 +10532,13 @@ The total number of commands issued to the database since the mongod instance la
 --
 
 [float]
-== opcounters_replicated fields
+== ops.replicated fields
 
 An overview of database replication operations by type.
 
 
 
-*`mongodb.status.opcounters_replicated.insert`*::
+*`mongodb.status.ops.replicated.insert`*::
 +
 --
 type: long
@@ -10536,7 +10548,7 @@ The total number of replicated insert operations received since the mongod insta
 
 --
 
-*`mongodb.status.opcounters_replicated.query`*::
+*`mongodb.status.ops.replicated.query`*::
 +
 --
 type: long
@@ -10546,7 +10558,7 @@ The total number of replicated queries received since the mongod instance last s
 
 --
 
-*`mongodb.status.opcounters_replicated.update`*::
+*`mongodb.status.ops.replicated.update`*::
 +
 --
 type: long
@@ -10556,7 +10568,7 @@ The total number of replicated update operations received since the mongod insta
 
 --
 
-*`mongodb.status.opcounters_replicated.delete`*::
+*`mongodb.status.ops.replicated.delete`*::
 +
 --
 type: long
@@ -10566,7 +10578,7 @@ The total number of replicated delete operations received since the mongod insta
 
 --
 
-*`mongodb.status.opcounters_replicated.getmore`*::
+*`mongodb.status.ops.replicated.getmore`*::
 +
 --
 type: long
@@ -10576,7 +10588,7 @@ The total number of replicated getmore operations received since the mongod inst
 
 --
 
-*`mongodb.status.opcounters_replicated.command`*::
+*`mongodb.status.ops.replicated.command`*::
 +
 --
 type: long
