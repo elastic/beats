@@ -20,10 +20,10 @@
                 "field": "message",
                 "pattern_definitions": {
                     "GREEDYMULTILINE": "(.|\n)*",
-                    "INDEXNAME": "[a-zA-Z0-9_-]*"
+                    "INDEXNAME": "[a-zA-Z0-9_.-]*"
                 },
                 "patterns": [
-                    "\\[%{TIMESTAMP_ISO8601:elasticsearch.server.timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}?\\]\\[%{DATA:elasticsearch.server.component}%{SPACE}*\\](%{SPACE}*)?(\\[%{DATA:elasticsearch.node.name}\\])?(%{SPACE}*)?(\\[gc\\](\\[young\\]\\[%{NUMBER:elasticsearch.server.gc.young.one}\\]\\[%{NUMBER:elasticsearch.server.gc.young.two}\\]|\\[%{NUMBER:elasticsearch.server.gc_overhead}\\]))?\\s*((\\[%{INDEXNAME:elasticsearch.index.name}\\]|\\[%{INDEXNAME:elasticsearch.index.name}\\/%{DATA:elasticsearch.index.id}\\]))?%{SPACE}*%{GREEDYMULTILINE:message}"
+                    "\\[%{TIMESTAMP_ISO8601:elasticsearch.server.timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}?\\]\\[%{DATA:elasticsearch.server.component}%{SPACE}*\\](%{SPACE}*)?(\\[%{DATA:elasticsearch.node.name}\\])?(%{SPACE}*)?(\\[gc\\](\\[young\\]\\[%{NUMBER:elasticsearch.server.gc.young.one}\\]\\[%{NUMBER:elasticsearch.server.gc.young.two}\\]|\\[%{NUMBER:elasticsearch.server.gc_overhead}\\]))?%{SPACE}*((\\[%{INDEXNAME:elasticsearch.index.name}\\]|\\[%{INDEXNAME:elasticsearch.index.name}\\/%{DATA:elasticsearch.index.id}\\]))?%{SPACE}*%{GREEDYMULTILINE:message}"
                 ]
             }
         },

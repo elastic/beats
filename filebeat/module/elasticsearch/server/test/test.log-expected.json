@@ -108,13 +108,15 @@
     }, 
     {
         "@timestamp": "2018-07-09T12:47:33,959", 
+        "elasticsearch.index.id": "3tWftqb4RLKdyCAga9syGA", 
+        "elasticsearch.index.name": ".kibana", 
         "elasticsearch.node.name": "QGY1F5P", 
         "elasticsearch.server.component": "o.e.c.m.MetaDataMappingService", 
         "fileset.module": "elasticsearch", 
         "fileset.name": "server", 
         "input.type": "log", 
         "log.level": "INFO", 
-        "message": "[.kibana/3tWftqb4RLKdyCAga9syGA] update_mapping [doc]", 
+        "message": "update_mapping [doc]", 
         "offset": 1380, 
         "prospector.type": "log", 
         "service.name": "elasticsearch"
