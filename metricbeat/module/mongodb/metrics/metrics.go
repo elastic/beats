@@ -73,6 +73,9 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
-	data, _ := schema.Apply(result)
+	data, err := schema.Apply(result)
+	if err != nil {
+		return nil, err
+	}
 	return data, nil
 }
