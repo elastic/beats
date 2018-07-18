@@ -20,6 +20,7 @@ package registrar
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sync"
@@ -132,19 +133,26 @@ func (r *Registrar) loadStates() error {
 
 	logp.Info("Loading registrar data from %s", r.registryFile)
 
-	decoder := json.NewDecoder(f)
-	states := []file.State{}
-	err = decoder.Decode(&states)
+	states, err := readStatesFrom(f)
 	if err != nil {
-		return fmt.Errorf("Error decoding states: %s", err)
+		return err
 	}
-
-	states = fixStates(states)
-	states = resetStates(states)
 	r.states.SetStates(states)
 	logp.Info("States Loaded from registrar: %+v", len(states))
 
 	return nil
+}
+
+func readStatesFrom(in io.Reader) ([]file.State, error) {
+	states := []file.State{}
+	decoder := json.NewDecoder(in)
+	if err := decoder.Decode(&states); err != nil {
+		return nil, fmt.Errorf("Error decoding states: %s", err)
+	}
+
+	states = fixStates(states)
+	states = resetStates(states)
+	return states, nil
 }
 
 // fixStates cleans up the regsitry states when updating from an older version
@@ -158,13 +166,15 @@ func fixStates(states []file.State) []file.State {
 	idx := map[string]*file.State{}
 	for i := range states {
 		state := &states[i]
+		fixState(state)
+
 		id := state.ID()
 		old, exists := idx[id]
 		if !exists {
 			idx[id] = state
+		} else {
+			mergeStates(old, state) // overwrite the entry in 'old'
 		}
-
-		mergeStates(old, state) // overwrite the entry in 'old'
 	}
 
 	if len(idx) == len(states) {
@@ -178,6 +188,14 @@ func fixStates(states []file.State) []file.State {
 		i++
 	}
 	return newStates
+}
+
+// fixState updates a read state to fullfil required invariantes:
+// - "Meta" must be nil if len(Meta) == 0
+func fixState(st *file.State) {
+	if len(st.Meta) == 0 {
+		st.Meta = nil
+	}
 }
 
 // mergeStates merges 2 states by trying to determine the 'newer' state.
