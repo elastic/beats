@@ -6,6 +6,10 @@
     },
     "memcached": {
         "stats": {
+            "bytes": {
+                "current": 0,
+                "limit": 67108864
+            },
             "cmd": {
                 "get": 0,
                 "set": 0
