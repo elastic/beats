@@ -1,2 +1,2 @@
-kafka-python==1.4.2
+kafka-python==1.4.3
 elasticsearch==6.2.0
