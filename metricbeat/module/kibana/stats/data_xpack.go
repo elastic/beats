@@ -59,7 +59,7 @@ var (
 		"requests": RequestsDict,
 		"response_times": c.Dict("response_times", s.Schema{
 			"average": c.Int("avg_ms", s.Optional),
-			"max":     c.Int("max_ms"),
+			"max":     c.Int("max_ms", s.Optional),
 		}, c.DictOptional),
 		"kibana": c.Dict("kibana", s.Schema{
 			"uuid":              c.Str("uuid"),
