@@ -86,7 +86,7 @@ var (
 					"available":     c.Bool("available"),
 					"enabled":       c.Bool("enabled"),
 					"browser_type":  c.Str("browser_type"),
-					"all":           c.Int("all"),
+					"_all":          c.Int("all"),
 					"csv":           reportingCsvDict,
 					"printable_pdf": reportingPrintablePdfDict,
 					"status":        reportingStatusDict,
@@ -115,7 +115,7 @@ var (
 	}, c.DictOptional)
 
 	reportingPeriodSchema = s.Schema{
-		"all":           c.Int("all"),
+		"_all":          c.Int("all"),
 		"csv":           reportingCsvDict,
 		"printable_pdf": reportingPrintablePdfDict,
 		"status":        reportingStatusDict,
