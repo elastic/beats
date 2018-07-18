@@ -31,12 +31,13 @@ import (
 // URLHostParserBuilder builds a tailored HostParser for used with host strings
 // that are URLs.
 type URLHostParserBuilder struct {
-	PathConfigKey   string
-	DefaultPath     string
-	DefaultUsername string
-	DefaultPassword string
-	DefaultScheme   string
-	QueryParams     string
+	BasePathConfigKey string
+	PathConfigKey     string
+	DefaultPath       string
+	DefaultUsername   string
+	DefaultPassword   string
+	DefaultScheme     string
+	QueryParams       string
 }
 
 // Build returns a new HostParser function whose behavior is influenced by the
@@ -49,7 +50,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 			return mb.HostData{}, err
 		}
 
-		var user, pass, path string
+		var user, pass, path, basePath string
 		t, ok := conf["username"]
 		if ok {
 			user, ok = t.(string)
@@ -77,8 +78,25 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		} else {
 			path = b.DefaultPath
 		}
+		// Normalize path
+		path = strings.Trim(path, "/")
 
-		return ParseURL(host, b.DefaultScheme, user, pass, path, b.QueryParams)
+		t, ok = conf[b.BasePathConfigKey]
+		if ok {
+			basePath, ok = t.(string)
+			if !ok {
+				return mb.HostData{}, errors.Errorf("'%v' config for module %v is not a string", b.BasePathConfigKey, module.Name())
+			}
+		} else {
+			basePath = ""
+		}
+		// Normalize basepath
+		basePath = strings.Trim(basePath, "/")
+
+		// Combine paths and normalize
+		fullPath := strings.Trim(basePath+"/"+path, "/")
+
+		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.QueryParams)
 	}
 }
 

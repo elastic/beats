@@ -35,10 +35,10 @@ func init() {
 
 var (
 	hostParser = parse.URLHostParserBuilder{
-		DefaultScheme: "http",
-		PathConfigKey: "path",
-		DefaultPath:   "api/stats",
-		QueryParams:   "extended=true", // make Kibana fetch the cluster_uuid
+		DefaultScheme:     "http",
+		BasePathConfigKey: "basepath",
+		DefaultPath:       "api/stats",
+		QueryParams:       "extended=true", // make Kibana fetch the cluster_uuid
 	}.Build()
 )
 
@@ -67,9 +67,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	if config.BasePath != "" {
-		http.AddBasePath(config.BasePath)
-	}
 
 	return &MetricSet{
 		base,

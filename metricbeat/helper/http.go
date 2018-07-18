@@ -25,8 +25,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"net/url"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -148,26 +146,6 @@ func (h *HTTP) SetURI(uri string) {
 // SetBody sets the body of the requests
 func (h *HTTP) SetBody(body []byte) {
 	h.body = body
-}
-
-// AddBasePath adds the given base path to the URI
-func (h *HTTP) AddBasePath(basePath string) error {
-	if basePath == "" {
-		return nil
-	}
-
-	// Normalize basepath
-	basePath = strings.Trim(basePath, "/")
-
-	url, err := url.Parse(h.GetURI())
-	if err != nil {
-		return err
-	}
-
-	url.Path = basePath + url.Path
-
-	h.SetURI(url.String())
-	return nil
 }
 
 // FetchContent makes an HTTP request to the configured url and returns the body content.
