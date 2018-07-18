@@ -20,6 +20,7 @@ package oplog
 import (
 	"errors"
 
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -45,15 +46,6 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	*mongodb.MetricSet
-}
-
-func contains(s []string, x string) bool {
-	for _, n := range s {
-		if x == n {
-			return true
-		}
-	}
-	return false
 }
 
 // New creates a new instance of the MetricSet
@@ -102,23 +94,16 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	used := int64(oplogStatus["size"].(float64))
 
 	// get first and last items in the oplog
-	oplogIter := collection.Find(nil).Sort("$natural").Iter()
-	oplogReverseIter := collection.Find(nil).Sort("-$natural").Iter()
-	var first, last interface{}
-	if !oplogIter.Next(&first) || !oplogReverseIter.Next(&last) {
-		err := errors.New("Objects not found in local.oplog.rs -- Is this a new and empty db instance?")
-		logp.Err(err.Error())
+	firstTs, err := getTimestamp(collection, "$natural")
+	if err != nil {
 		return nil, err
 	}
 
-	firstTsValue, firstOk := first.(bson.M)["ts"].(bson.MongoTimestamp)
-	lastTsValue, lastOk := last.(bson.M)["ts"].(bson.MongoTimestamp)
-	if !firstOk || !lastOk {
-		err := errors.New("Unexpected timestamp value found in first/last oplog item")
+	lastTs, err := getTimestamp(collection, "-$natural")
+	if err != nil {
 		return nil, err
 	}
-	firstTs := int64(firstTsValue)
-	lastTs := int64(lastTsValue)
+
 	diff := lastTs - firstTs
 
 	result := map[string]interface{}{
@@ -131,4 +116,38 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	event, _ := schema.Apply(result)
 
 	return event, nil
+}
+
+func contains(s []string, x string) bool {
+	for _, n := range s {
+		if x == n {
+			return true
+		}
+	}
+	return false
+}
+
+func getTimestamp(collection *mgo.Collection, sort string) (int64, error) {
+	iter := collection.Find(nil).Sort(sort).Iter()
+
+	var document interface{}
+	if !iter.Next(&document) {
+		err := errors.New("Objects not found in local.oplog.rs -- Is this a new and empty db instance?")
+		logp.Err(err.Error())
+		return 0, err
+	}
+
+	bsonDocument, bsonOk := document.(bson.M)
+	if !bsonOk {
+		err := errors.New("Unexpected bson value found in oplog collection")
+		return 0, err
+	}
+
+	timestamp, timestampOk := bsonDocument["ts"].(bson.MongoTimestamp)
+	if !timestampOk {
+		err := errors.New("Unexpected timestamp value found in oplog document")
+		return 0, err
+	}
+
+	return int64(timestamp), nil
 }
