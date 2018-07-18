@@ -6808,7 +6808,7 @@ Response times metrics
 *`kibana.stats.response_time.avg.ms`*::
 +
 --
-type: scaled_float
+type: long
 
 Average response time in milliseconds
 
@@ -6818,7 +6818,7 @@ Average response time in milliseconds
 *`kibana.stats.response_time.max.ms`*::
 +
 --
-type: scaled_float
+type: long
 
 Maximum response time in milliseconds
 

@@ -64,11 +64,11 @@
         Response times metrics
       fields:
         - name: avg.ms
-          type: scaled_float
+          type: long
           description: >
             Average response time in milliseconds
         - name: max.ms
-          type: scaled_float
+          type: long
           description: >
             Maximum response time in milliseconds
     - name: kibana
