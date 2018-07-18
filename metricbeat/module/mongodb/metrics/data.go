@@ -84,7 +84,7 @@ var schema = s.Schema{
 		"scanned_indexes":   s.Object{"count": c.Int("scanned")},
 		"scanned_documents": s.Object{"count": c.Int("scannedObjects")},
 	}),
-	"replication": c.Dict("metrics.repl", replicationSchema),
+	"replication": c.Dict("metrics.repl", replicationSchema, c.DictOptional),
 	"storage": c.Dict("free_list", s.Schema{
 		"search": c.Dict("search", s.Schema{
 			"bucket_exhausted": c.Int("bucketExhausted"),
