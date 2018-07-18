@@ -76,7 +76,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	db := mongoSession.DB("local")
 	if collections, err := db.CollectionNames(); err != nil || !contains(collections, oplogCol) {
 		if err == nil {
-			err = errors.New("Collection oplog.rs was not found")
+			err = errors.New("collection oplog.rs was not found")
 		}
 
 		logp.Err(err.Error())
@@ -132,20 +132,20 @@ func getTimestamp(collection *mgo.Collection, sort string) (int64, error) {
 
 	var document interface{}
 	if !iter.Next(&document) {
-		err := errors.New("Objects not found in local.oplog.rs -- Is this a new and empty db instance?")
+		err := errors.New("objects not found in local.oplog.rs -- Is this a new and empty db instance?")
 		logp.Err(err.Error())
 		return 0, err
 	}
 
 	bsonDocument, bsonOk := document.(bson.M)
 	if !bsonOk {
-		err := errors.New("Unexpected bson value found in oplog collection")
+		err := errors.New("unexpected bson value found in oplog collection")
 		return 0, err
 	}
 
 	timestamp, timestampOk := bsonDocument["ts"].(bson.MongoTimestamp)
 	if !timestampOk {
-		err := errors.New("Unexpected timestamp value found in oplog document")
+		err := errors.New("unexpected timestamp value found in oplog document")
 		return 0, err
 	}
 
