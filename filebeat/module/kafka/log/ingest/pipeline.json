@@ -13,8 +13,11 @@
     {
       "grok": {
         "field": "kafka.log.message",
+        "pattern_definitions": {
+          "KAFKA_COMPONENT": "[^\\]]*"
+        },
         "patterns": [
-          "\\[%{DATA:kafka.log.component}\\][,:. ] +%{JAVALOGMESSAGE:kafka.log.message}"
+          "\\[%{KAFKA_COMPONENT:kafka.log.component}\\][,:.]? +%{JAVALOGMESSAGE:kafka.log.message}"
         ],
         "on_failure": [
           {
@@ -52,7 +55,9 @@
       "date": {
         "field": "kafka.log.timestamp",
         "target_field": "@timestamp",
-        "formats": ["yyyy-MM-dd HH:mm:ss,SSS"]
+        "formats": ["yyyy-MM-dd HH:mm:ss,SSS"],
+        {< if .convert_timezone >}"timezone": "{{ beat.timezone }}",{< end >}
+        "ignore_failure": true
       }
     },
     {"remove": {"field": "kafka.log.timestamp" }}

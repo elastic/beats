@@ -22,6 +22,7 @@ import (
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
 )
 
 const (
@@ -87,6 +88,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
+	enricher   util.Enricher
 }
 
 // New create a new instance of the MetricSet
@@ -100,6 +102,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
+		enricher:      util.NewContainerMetadataEnricher(base, false),
 	}, nil
 }
 
@@ -107,11 +110,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+	m.enricher.Start()
+
 	events, err := m.prometheus.GetProcessedMetrics(mapping)
 	if err != nil {
 		return nil, err
 	}
 
+	m.enricher.Enrich(events)
+
+	// Calculate deprecated nanocores values
 	for _, event := range events {
 		if request, ok := event["cpu.request.cores"]; ok {
 			if requestCores, ok := request.(float64); ok {
@@ -127,4 +135,10 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	}
 
 	return events, err
+}
+
+// Close stops this metricset
+func (m *MetricSet) Close() error {
+	m.enricher.Stop()
+	return nil
 }

@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/elasticsearch/*_deprecation.log
+    os.darwin:
+      - /usr/local/elasticsearch/*_deprecation.log
+    os.windows:
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_deprecation.log
+
+ingest_pipeline: ingest/pipeline.json
+prospector: config/log.yml

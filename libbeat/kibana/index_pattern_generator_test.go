@@ -37,7 +37,7 @@ func TestNewGenerator(t *testing.T) {
 
 	v, _ := common.NewVersion("7.0.0")
 	// checks for fields.yml
-	generator, err := NewGenerator("beat-index", "mybeat.", filepath.Join(beatDir, "notexistent"), "7.0", *v)
+	generator, err := NewGenerator("beat-index", "mybeat.", filepath.Join(beatDir, "nonexistent"), "7.0", *v)
 	assert.Error(t, err)
 
 	generator, err = NewGenerator("beat-index", "mybeat.", beatDir, "7.0", *v)

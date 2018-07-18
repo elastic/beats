@@ -800,13 +800,282 @@ elasticsearch Module
 
 
 
+*`elasticsearch.node.name`*::
++
+--
+type: keyword
+
+example: vWNJsZ3
+
+Name of the node
+
+--
+
+*`elasticsearch.index.name`*::
++
+--
+type: keyword
+
+example: filebeat-test-input
+
+Index name
+
+--
+
+*`elasticsearch.index.id`*::
++
+--
+type: keyword
+
+example: aOGgDwbURfCV57AScqbCgw
+
+Index id
+
+--
+
+*`elasticsearch.shard.id`*::
++
+--
+type: keyword
+
+example: 0
+
+Id of the shard
+
+--
+
+[float]
+== audit fields
+
+
+
+
+*`elasticsearch.audit.layer`*::
++
+--
+type: keyword
+
+example: rest
+
+The layer from which this event originated: rest, transport or ip_filter
+
+--
+
+*`elasticsearch.audit.event_type`*::
++
+--
+type: keyword
+
+example: access_granted
+
+The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied
+
+--
+
+*`elasticsearch.audit.origin_type`*::
++
+--
+type: keyword
+
+example: local_node
+
+Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)
+
+--
+
+*`elasticsearch.audit.origin_address`*::
++
+--
+type: ip
+
+example: 192.168.1.42
+
+The IP address from which the request originated
+
+--
+
+*`elasticsearch.audit.principal`*::
++
+--
+type: keyword
+
+example: _anonymous
+
+The principal (username) that failed authentication
+
+--
+
+*`elasticsearch.audit.action`*::
++
+--
+type: keyword
+
+example: cluster:monitor/main
+
+The name of the action that was executed
+
+--
+
+*`elasticsearch.audit.uri`*::
++
+--
+type: keyword
+
+example: /_xpack/security/_authenticate
+
+The REST endpoint URI
+
+--
+
+*`elasticsearch.audit.request`*::
++
+--
+type: keyword
+
+example: ClearScrollRequest
+
+The type of request that was executed
+
+--
+
+*`elasticsearch.audit.request_body`*::
++
+--
+type: text
+
+example: body
+
+The body of the request, if enabled
+
+--
+
+[float]
+== deprecation fields
+
+
+
 [float]
 == gc fields
 
+GC fileset fields.
 
 
 
-*`elasticsearch.gc.relative_process_timestamp_secs`*::
+[float]
+== phase fields
+
+Fields specific to GC phase.
+
+
+
+*`elasticsearch.gc.phase.name`*::
++
+--
+type: keyword
+
+Name of the GC collection phase.
+
+
+--
+
+*`elasticsearch.gc.phase.duration_sec`*::
++
+--
+type: float
+
+Collection phase duration according to the Java virtual machine.
+
+
+--
+
+*`elasticsearch.gc.phase.scrub_symbol_table_time_sec`*::
++
+--
+type: float
+
+Pause time in seconds cleaning up symbol tables.
+
+
+--
+
+*`elasticsearch.gc.phase.scrub_string_table_time_sec`*::
++
+--
+type: float
+
+Pause time in seconds cleaning up string tables.
+
+
+--
+
+*`elasticsearch.gc.phase.weak_refs_processing_time_sec`*::
++
+--
+type: float
+
+Time spent processing weak references in seconds.
+
+
+--
+
+*`elasticsearch.gc.phase.parallel_rescan_time_sec`*::
++
+--
+type: float
+
+Time spent in seconds marking live objects while application is stopped.
+
+
+--
+
+*`elasticsearch.gc.phase.class_unload_time_sec`*::
++
+--
+type: float
+
+Time spent unloading unused classes in seconds.
+
+
+--
+
+[float]
+== cpu_time fields
+
+Process CPU time spent performing collections.
+
+
+
+*`elasticsearch.gc.phase.cpu_time.user_sec`*::
++
+--
+type: float
+
+CPU time spent outside the kernel.
+
+
+--
+
+*`elasticsearch.gc.phase.cpu_time.sys_sec`*::
++
+--
+type: float
+
+CPU time spent inside the kernel. 
+
+
+--
+
+*`elasticsearch.gc.phase.cpu_time.real_sec`*::
++
+--
+type: float
+
+Total elapsed CPU time spent to complete the collection from start to finish.
+
+
+--
+
+*`elasticsearch.gc.jvm_runtime_sec`*::
 +
 --
 type: float
@@ -816,7 +1085,7 @@ The time from JVM start up in seconds, as a floating point number.
 
 --
 
-*`elasticsearch.gc.threads_total_stop_time_secs`*::
+*`elasticsearch.gc.threads_total_stop_time_sec`*::
 +
 --
 type: float
@@ -826,7 +1095,7 @@ Garbage collection threads total stop time seconds.
 
 --
 
-*`elasticsearch.gc.stopping_threads_time_secs`*::
+*`elasticsearch.gc.stopping_threads_time_sec`*::
 +
 --
 type: float
@@ -847,9 +1116,90 @@ GC logging tags.
 --
 
 [float]
+== heap fields
+
+Heap allocation and total size.
+
+
+
+*`elasticsearch.gc.heap.size_kb`*::
++
+--
+type: integer
+
+Total heap size in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.heap.used_kb`*::
++
+--
+type: integer
+
+Used heap in kilobytes.
+
+
+--
+
+[float]
+== old_gen fields
+
+Old generation occupancy and total size.
+
+
+
+*`elasticsearch.gc.old_gen.size_kb`*::
++
+--
+type: integer
+
+Total size of old generation in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.old_gen.used_kb`*::
++
+--
+type: integer
+
+Old generation occupancy in kilobytes.
+
+
+--
+
+[float]
+== young_gen fields
+
+Young generation occupancy and total size.
+
+
+
+*`elasticsearch.gc.young_gen.size_kb`*::
++
+--
+type: integer
+
+Total size of young generation in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.young_gen.used_kb`*::
++
+--
+type: integer
+
+Young generation occupancy in kilobytes.
+
+
+--
+
+[float]
 == server fields
 
-
+Server log file
 
 
 *`elasticsearch.server.component`*::
@@ -857,8 +1207,203 @@ GC logging tags.
 --
 type: keyword
 
-Elasticsearch component.
+example: o.e.c.m.MetaDataCreateIndexService
 
+Log component
+
+--
+
+[float]
+== gc fields
+
+GC log
+
+
+[float]
+== young fields
+
+Young GC
+
+
+*`elasticsearch.server.gc.young.one`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+*`elasticsearch.server.gc.young.two`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+*`elasticsearch.server.gc_overhead`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+[float]
+== slowlog fields
+
+Slowlog events from Elasticsearch
+
+
+*`elasticsearch.slowlog.logger`*::
++
+--
+type: keyword
+
+example: index.search.slowlog.fetch
+
+Logger name
+
+--
+
+*`elasticsearch.slowlog.took`*::
++
+--
+type: text
+
+example: 300ms
+
+Time it took to execute the query
+
+--
+
+*`elasticsearch.slowlog.types`*::
++
+--
+type: keyword
+
+example: 
+
+Types
+
+--
+
+*`elasticsearch.slowlog.stats`*::
++
+--
+type: text
+
+example: 
+
+Statistics
+
+--
+
+*`elasticsearch.slowlog.search_type`*::
++
+--
+type: keyword
+
+example: QUERY_THEN_FETCH
+
+Search type
+
+--
+
+*`elasticsearch.slowlog.source_query`*::
++
+--
+type: text
+
+example: {"query":{"match_all":{"boost":1.0}}}
+
+Slow query
+
+--
+
+*`elasticsearch.slowlog.extra_source`*::
++
+--
+type: text
+
+example: 
+
+Extra source information
+
+--
+
+*`elasticsearch.slowlog.took_millis`*::
++
+--
+type: keyword
+
+example: 42
+
+Time took in milliseconds
+
+--
+
+*`elasticsearch.slowlog.total_hits`*::
++
+--
+type: keyword
+
+example: 42
+
+Total hits
+
+--
+
+*`elasticsearch.slowlog.total_shards`*::
++
+--
+type: keyword
+
+example: 22
+
+Total queried shards
+
+--
+
+*`elasticsearch.slowlog.routing`*::
++
+--
+type: keyword
+
+example: s01HZ2QBk9jw4gtgaFtn
+
+Routing
+
+--
+
+*`elasticsearch.slowlog.id`*::
++
+--
+type: keyword
+
+example: 
+
+Id
+
+--
+
+*`elasticsearch.slowlog.type`*::
++
+--
+type: keyword
+
+example: doc
+
+Type
 
 --
 
@@ -1798,7 +2343,7 @@ Kubernetes pod name
 --
 type: keyword
 
-Kubernetes pod uid
+Kubernetes Pod UID
 
 
 --
@@ -2072,6 +2617,38 @@ Logging level.
 type: date
 
 event.created contains the date on which the event was created. In case of log events this is when the log line was read by Filebeat. In comparison @timestamp is the processed timestamp from the log line. If both are identical only @timestamp should be used.
+
+
+--
+
+*`http.response.status_code`*::
++
+--
+type: long
+
+example: 404
+
+HTTP response status_code.
+
+
+--
+
+*`http.response.elapsed_time`*::
++
+--
+type: long
+
+Elapsed time between request and response in milli seconds.
+
+
+--
+
+*`http.response.content_length`*::
++
+--
+type: long
+
+Content length of the HTTP response body.
 
 
 --

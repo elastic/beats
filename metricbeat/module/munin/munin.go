@@ -54,14 +54,14 @@ func Connect(address string, timeout time.Duration) (*Node, error) {
 		writer: conn,
 		reader: bufio.NewReader(conn),
 	}
-	// Cosume and ignore first line returned by munin, it is a comment
+	// Consume and ignore first line returned by munin, it is a comment
 	// about the node
 	scanner := bufio.NewScanner(n.reader)
 	scanner.Scan()
 	return n, scanner.Err()
 }
 
-// Close node connection relasing its resources
+// Close node connection releasing its resources
 func (n *Node) Close() error {
 	return n.conn.Close()
 }
@@ -95,7 +95,7 @@ func (n *Node) Fetch(items ...string) (common.MapStr, error) {
 		for scanner.Scan() {
 			name := strings.TrimSpace(scanner.Text())
 
-			// Munin delimites metrics with a dot
+			// Munin delimits metrics with a dot
 			if name == "." {
 				break
 			}

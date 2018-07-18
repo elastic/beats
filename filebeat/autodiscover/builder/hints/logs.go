@@ -214,7 +214,7 @@ func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*f
 		}
 	}
 
-	// No fileseat defined, return defaults for the module, all streams to all filesets
+	// No fileset defined, return defaults for the module, all streams to all filesets
 	if !configured {
 		for _, conf := range filesets {
 			conf.Enabled = true

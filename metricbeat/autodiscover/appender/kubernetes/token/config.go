@@ -17,11 +17,13 @@
 
 package token
 
-import "github.com/elastic/beats/libbeat/processors"
+import (
+	"github.com/elastic/beats/libbeat/conditions"
+)
 
 type config struct {
-	TokenPath       string                      `config:"token_path"`
-	ConditionConfig *processors.ConditionConfig `config:"condition"`
+	TokenPath       string             `config:"token_path"`
+	ConditionConfig *conditions.Config `config:"condition"`
 }
 
 func defaultConfig() config {

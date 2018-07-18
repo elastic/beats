@@ -373,8 +373,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit
-Version: v0.3.0
-Revision: c18782ee4f957de48620718231d20ca12c8dc4e9
+Revision: 0c842c62c7c04344b204e2059eadd98c757defe0
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-libaudit/LICENSE.txt:
 --------------------------------------------------------------------
@@ -448,8 +447,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
-Version: v0.5.1
-Revision: 0ba28e36add27704e6b49a7ed8557989a8f4a635
+Version: v0.6.0
+Revision: 9c66f5c432b1d25bdb449a1e588d58b5d0cd7268
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-ucfg/LICENSE:
 --------------------------------------------------------------------
@@ -1397,6 +1396,15 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/magefile/mage
+Revision: 5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034
+License type (autodetected): Apache-2.0
+./vendor/github.com/magefile/mage/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/mattn/go-colorable
 Revision: 941b50ebc6efddf4c41c8e4537a5f68a4e686b24
 License type (autodetected): MIT
@@ -1954,8 +1962,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/shirou/gopsutil
-Version: v2.18.01
-Revision: c432be29ccce470088d07eea25b3ea7e68a8afbb
+Version: v2.18.06
+Revision: 4a180b209f5f494e5923cfce81ea30ba23915877
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/shirou/gopsutil/LICENSE:
 --------------------------------------------------------------------

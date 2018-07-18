@@ -23,8 +23,13 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/fatih/color"
 	"github.com/stretchr/testify/assert"
 )
+
+func init() {
+	color.NoColor = true
+}
 
 func TestConsoleDriverInfo(t *testing.T) {
 	buffer, output, driver := createDriver(nil)

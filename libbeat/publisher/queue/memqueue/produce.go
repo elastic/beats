@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
-type forgetfullProducer struct {
+type forgetfulProducer struct {
 	broker    *Broker
 	openState openState
 }
@@ -67,22 +67,22 @@ func newProducer(b *Broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel
 		p.state.dropCB = dropCB
 		return p
 	}
-	return &forgetfullProducer{broker: b, openState: openState}
+	return &forgetfulProducer{broker: b, openState: openState}
 }
 
-func (p *forgetfullProducer) Publish(event publisher.Event) bool {
+func (p *forgetfulProducer) Publish(event publisher.Event) bool {
 	return p.openState.publish(p.makeRequest(event))
 }
 
-func (p *forgetfullProducer) TryPublish(event publisher.Event) bool {
+func (p *forgetfulProducer) TryPublish(event publisher.Event) bool {
 	return p.openState.tryPublish(p.makeRequest(event))
 }
 
-func (p *forgetfullProducer) makeRequest(event publisher.Event) pushRequest {
+func (p *forgetfulProducer) makeRequest(event publisher.Event) pushRequest {
 	return pushRequest{event: event}
 }
 
-func (p *forgetfullProducer) Cancel() int {
+func (p *forgetfulProducer) Cancel() int {
 	p.openState.Close()
 	return 0
 }

@@ -13,7 +13,7 @@ Have a question about a community Beat? You can post questions and discuss issue
 https://discuss.elastic.co/c/beats/community-beats[Community Beats] category of the Beats discussion forum.
 
 Have you created a Beat that's not listed? Add the name and description of your Beat to the source document for
-https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/annoucements[announce] your new Beat in the Elastic
+https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/announcements[announce] your new Beat in the Elastic
 discussion forum.
 
 ifndef::dev-guide[]
@@ -60,6 +60,7 @@ https://github.com/devopsmakers/iobeat[iobeat]:: Reads IO stats from /proc/disks
 https://github.com/radoondas/jmxproxybeat[jmxproxybeat]:: Reads Tomcat JMX metrics exposed over 'JMX Proxy Servlet' to HTTP.
 https://github.com/mheese/journalbeat[journalbeat]:: Used for log shipping from systemd/journald based Linux systems.
 https://github.com/justsocialapps/kafkabeat[kafkabeat]:: Reads data from Kafka topics.
+https://github.com/arkady-emelyanov/kafkabeat[kafkabeat2]:: Reads data (json or plain) from Kafka topics.
 https://github.com/PPACI/krakenbeat[krakenbeat]:: Collect information on each transaction on the Kraken crypto platform.
 https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus).
 https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Logstash monitoring API (v5 onwards) and indexes them in Elasticsearch.
@@ -85,7 +86,7 @@ https://github.com/GoogleCloudPlatform/pubsubbeat[pubsubbeat]:: Reads data from 
 https://github.com/voigt/redditbeat[redditbeat]:: Collects new Reddit Submissions of one or multiple Subreddits.
 https://github.com/chrsblck/redisbeat[redisbeat]:: Used for Redis monitoring.
 https://github.com/consulthys/retsbeat[retsbeat]:: Collects counts of http://www.reso.org[RETS] resource/class records from https://en.wikipedia.org/wiki/Multiple_listing_service[Multiple Listing Service] (MLS) servers.
-https://github.com/yourdream/rsbeat[rsbeat]:: Ships redis slow logs to elasticsearch and anlyze by Kibana.
+https://github.com/yourdream/rsbeat[rsbeat]:: Ships redis slow logs to elasticsearch and analyze by Kibana.
 https://github.com/martinhoefling/saltbeat[saltbeat]:: Reads events from salt master event bus.
 https://github.com/benben/serialbeat[serialbeat]:: Reads from a serial device.
 https://github.com/consulthys/springbeat[springbeat]:: Collects health and metrics data from Spring Boot applications running with the actuator module.

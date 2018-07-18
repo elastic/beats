@@ -79,9 +79,17 @@
       description: >
         The name of the process that served the transaction.
 
+    - name: cmdline
+      description: >
+        The command-line of the process that served the transaction.
+
     - name: client_proc
       description: >
         The name of the process that initiated the transaction.
+
+    - name: client_cmdline
+      description: >
+        The command-line of the process that initiated the transaction.
 
     - name: release
       description: >

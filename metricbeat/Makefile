@@ -1,7 +1,6 @@
 # Name can be overwritten, as Metricbeat is also a library
 BEAT_NAME?=metricbeat
 BEAT_TITLE?=Metricbeat
-BEAT_DESCRIPTION?=Metricbeat is a lightweight shipper for metrics.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
 ES_BEATS?=..
@@ -48,20 +47,9 @@ imports: python-env
 	@mkdir -p include
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
 
-# This is called by the beats packer before building starts
-.PHONY: before-build
-before-build:
-ifeq ($(BEAT_NAME), metricbeat)
-	# disable the system/load metricset on windows
-	sed -i.bk 's/- load/#- load/' $(PREFIX)/modules.d-win/system.yml
-	rm $(PREFIX)/modules.d-win/system.yml.bk
-	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.reference.yml
-	rm $(PREFIX)/metricbeat-win.reference.yml.bk
-endif
-
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields collect-docs configs kibana imports
+collect: fields assets collect-docs configs kibana imports
 
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset
@@ -84,3 +72,10 @@ test-module: ## @testing Tests the given module. Needs $MODULE as param an run-m
 test-module: python-env update metricbeat.test
 	go test -tags=integration ${BEAT_PATH}/module/${MODULE}/... -v
 	. ${PYTHON_ENV}/bin/activate && INTEGRATION_TESTS=1 nosetests tests/system/test_${MODULE}.py
+
+.PHONY: assets
+assets: libbeat_fields
+	go run ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/metricbeat/module
+	mkdir -p include/fields
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include ${ES_BEATS}/metricbeat/_meta/fields.common.yml $(BEAT_NAME) > include/fields.go
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME) > ./include/fields/fields.go

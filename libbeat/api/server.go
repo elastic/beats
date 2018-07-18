@@ -41,6 +41,7 @@ func Start(cfg *common.Config) {
 
 		// register handlers
 		mux.HandleFunc("/", rootHandler())
+		mux.HandleFunc("/state", stateHandler)
 		mux.HandleFunc("/stats", statsHandler)
 		mux.HandleFunc("/dataset", datasetHandler)
 
@@ -61,10 +62,19 @@ func rootHandler() func(http.ResponseWriter, *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		data := monitoring.CollectStructSnapshot(monitoring.GetNamespace("state").GetRegistry(), monitoring.Full, false)
+		data := monitoring.CollectStructSnapshot(monitoring.GetNamespace("info").GetRegistry(), monitoring.Full, false)
 
 		print(w, data, r.URL)
 	}
+}
+
+// stateHandler reports state metrics
+func stateHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	data := monitoring.CollectStructSnapshot(monitoring.GetNamespace("state").GetRegistry(), monitoring.Full, false)
+
+	print(w, data, r.URL)
 }
 
 // statsHandler report expvar and all libbeat/monitoring metrics

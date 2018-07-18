@@ -104,9 +104,11 @@ func fromWireFormat(data WireFormat) (*auditRuleData, error) {
 		return nil, io.ErrUnexpectedEOF
 	}
 
-	rule.Buf = make([]byte, rule.BufLen)
-	if _, err := reader.Read(rule.Buf); err != nil {
-		return nil, err
+	if rule.BufLen > 0 {
+		rule.Buf = make([]byte, rule.BufLen)
+		if _, err := reader.Read(rule.Buf); err != nil {
+			return nil, errors.Wrap(err, "deserialization of buf failed")
+		}
 	}
 
 	return rule, nil

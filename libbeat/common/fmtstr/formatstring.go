@@ -45,7 +45,7 @@ type StringFormatter interface {
 }
 
 // VariableOp defines one expansion variable, including operator and parameter.
-// variable operations are always introduced by a collon ':'.
+// variable operations are always introduced by a colon ':'.
 // For example the format string %{x:p1:?p2} has 2 variable operations
 // (":", "p1") and (":?", "p2"). It's up to concrete format string implementation
 // to compile and interpret variable ops.
@@ -120,7 +120,7 @@ var (
 //
 // Variable expansion are enclosed in expansion braces `%{<expansion>}`.
 // The `<expansion>` can contain additional parameters separated by ops
-// introduced by collons ':'. For example the format string `%{value:v1:?v2}`
+// introduced by colons ':'. For example the format string `%{value:v1:?v2}`
 // will be parsed into variable expansion on `value` with variable ops
 // `[(":", "v1"), (":?", "v2")]`. It's up to the variable compiler to interpret
 // content and variable ops.

@@ -109,10 +109,6 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
         securityContext:
           runAsUser: 0
         resources:
@@ -155,11 +151,10 @@ spec:
         configMap:
           defaultMode: 0600
           name: metricbeat-daemonset-modules
-      # We set an `emptyDir` here to ensure the manifest will deploy correctly.
-      # It's recommended to change this to a `hostPath` folder, to ensure internal data
-      # files survive pod changes (ie: version upgrade)
       - name: data
-        emptyDir: {}
+        hostPath:
+          path: /var/lib/metricbeat-data
+          type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -198,6 +193,8 @@ spec:
         k8s-app: metricbeat
     spec:
       serviceAccountName: metricbeat
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
         image: docker.elastic.co/beats/metricbeat:6.4.0
@@ -218,10 +215,6 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
         securityContext:
           runAsUser: 0
         resources:
@@ -268,15 +261,22 @@ metadata:
   labels:
     k8s-app: metricbeat
 rules:
-- apiGroups: [""] # "" indicates the core API group
+- apiGroups: [""]
   resources:
+  - nodes
   - namespaces
   - events
   - pods
-  verbs:
-  - get
-  - watch
-  - list
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["extensions"]
+  resources:
+  - deployments
+  - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources:
+  - statefulsets
+  verbs: ["get", "list", "watch"]
 ---
 apiVersion: v1
 kind: ServiceAccount

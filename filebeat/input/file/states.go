@@ -25,7 +25,7 @@ import (
 )
 
 // States handles list of FileState. One must use NewStates to instantiate a
-// file states regisry. Using the zero-value is not safe.
+// file states registry. Using the zero-value is not safe.
 type States struct {
 	sync.RWMutex
 

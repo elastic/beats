@@ -150,7 +150,7 @@ func (dns *dnsPlugin) handleDNS(conn *dnsConnectionData, tcpTuple *common.TCPTup
 	message := conn.data[dir].message
 	dnsTuple := dnsTupleFromIPPort(&message.tuple, transportTCP, decodedData.Id)
 
-	message.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcpTuple.IPPort())
+	message.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcpTuple.IPPort())
 	message.data = decodedData
 	message.length += decodeOffset
 

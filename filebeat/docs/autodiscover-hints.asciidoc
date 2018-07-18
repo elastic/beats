@@ -119,7 +119,7 @@ annotations:
   co.elastic.logs/multiline.pattern: '^\['
   co.elastic.logs/multiline.negate: true
   co.elastic.logs/multiline.match: after
-  co.elastic.logs.sidecar/exlude_lines: '^DBG'
+  co.elastic.logs.sidecar/exclude_lines: '^DBG'
 -------------------------------------------------------------------------------------
 
 

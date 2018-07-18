@@ -595,7 +595,7 @@ func testTCPTuple() *common.TCPTuple {
 			SrcPort: 9200, DstPort: 9201,
 		},
 	}
-	t.ComputeHashebles()
+	t.ComputeHashables()
 	return t
 }
 

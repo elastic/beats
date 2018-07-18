@@ -30,17 +30,34 @@ var indentByModule = map[string]int{
 	"protos":     8,
 }
 
+// GetModules returns a the list of modules for the given modules directory
+func GetModules(modulesDir string) ([]string, error) {
+	moduleInfos, err := ioutil.ReadDir(modulesDir)
+	if err != nil {
+		return nil, err
+	}
+
+	var names []string
+	for _, info := range moduleInfos {
+		if !info.IsDir() {
+			continue
+		}
+		names = append(names, info.Name())
+	}
+	return names, nil
+}
+
 // CollectModuleFiles looks for fields.yml files under the
-// specified root directory
-func CollectModuleFiles(root string) ([]*YmlFile, error) {
-	modules, err := ioutil.ReadDir(root)
+// specified modules directory
+func CollectModuleFiles(modulesDir string) ([]*YmlFile, error) {
+	modules, err := GetModules(modulesDir)
 	if err != nil {
 		return nil, err
 	}
 
 	var files []*YmlFile
 	for _, m := range modules {
-		f, err := collectFiles(m, root)
+		f, err := CollectFiles(m, modulesDir)
 		if err != nil {
 			return nil, err
 		}
@@ -50,13 +67,11 @@ func CollectModuleFiles(root string) ([]*YmlFile, error) {
 	return files, nil
 }
 
-func collectFiles(module os.FileInfo, modulesPath string) ([]*YmlFile, error) {
-	if !module.IsDir() {
-		return nil, nil
-	}
+// CollectFiles collects all files for the given module including filesets
+func CollectFiles(module string, modulesPath string) ([]*YmlFile, error) {
 
 	var files []*YmlFile
-	fieldsYmlPath := filepath.Join(modulesPath, module.Name(), "_meta", "fields.yml")
+	fieldsYmlPath := filepath.Join(modulesPath, module, "_meta", "fields.yml")
 	if _, err := os.Stat(fieldsYmlPath); !os.IsNotExist(err) {
 		files = append(files, &YmlFile{
 			Path:   fieldsYmlPath,
@@ -67,7 +82,7 @@ func collectFiles(module os.FileInfo, modulesPath string) ([]*YmlFile, error) {
 	}
 
 	modulesRoot := filepath.Base(modulesPath)
-	sets, err := ioutil.ReadDir(filepath.Join(modulesPath, module.Name()))
+	sets, err := ioutil.ReadDir(filepath.Join(modulesPath, module))
 	if err != nil {
 		return nil, err
 	}
@@ -76,8 +91,7 @@ func collectFiles(module os.FileInfo, modulesPath string) ([]*YmlFile, error) {
 		if !s.IsDir() {
 			continue
 		}
-
-		fieldsYmlPath = filepath.Join(modulesPath, module.Name(), s.Name(), "_meta", "fields.yml")
+		fieldsYmlPath = filepath.Join(modulesPath, module, s.Name(), "_meta", "fields.yml")
 		if _, err = os.Stat(fieldsYmlPath); !os.IsNotExist(err) {
 			files = append(files, &YmlFile{
 				Path:   fieldsYmlPath,

@@ -26,6 +26,7 @@ import (
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper/xpack"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -229,9 +230,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 			"node_stats":   nodeData,
 		}
 
-		// Hard coded index prefix for monitoring, no detection done for ES version at the moment
-		// It has an additonal md in the name to make it clear the data is coming from metricbeat
-		event.Index = ".monitoring-es-6-mb"
+		event.Index = xpack.MakeMonitoringIndexName(xpack.Elasticsearch)
 		r.Event(event)
 	}
 }

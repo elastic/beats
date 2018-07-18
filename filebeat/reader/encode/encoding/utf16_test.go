@@ -36,7 +36,7 @@ func TestUtf16BOMEncodings(t *testing.T) {
 
 	var tests = []struct {
 		name             string
-		testEndianess    unicode.Endianness
+		testEndianness   unicode.Endianness
 		testBOMPolicy    unicode.BOMPolicy
 		expectedEncoding Encoding
 		expectedError    error
@@ -72,10 +72,10 @@ func TestUtf16BOMEncodings(t *testing.T) {
 
 	for _, test := range tests {
 		t.Logf("testing: codec=%v, bigendian=%v, bomPolicy=%v",
-			test.name, test.testEndianess, test.testBOMPolicy)
+			test.name, test.testEndianness, test.testBOMPolicy)
 
 		buf := bytes.NewBuffer(nil)
-		writeEncoding := unicode.UTF16(test.testEndianess, test.testBOMPolicy)
+		writeEncoding := unicode.UTF16(test.testEndianness, test.testBOMPolicy)
 		writer := transform.NewWriter(buf, writeEncoding.NewEncoder())
 		writer.Write(text)
 		writer.Close()

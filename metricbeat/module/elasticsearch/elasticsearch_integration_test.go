@@ -21,6 +21,8 @@ package elasticsearch_test
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"testing"
@@ -30,8 +32,12 @@ import (
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
+	"bytes"
+
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index"
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_summary"
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/ml_job"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node_stats"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/shard"
@@ -39,7 +45,9 @@ import (
 
 var metricSets = []string{
 	"index",
+	"index_recovery",
 	"index_summary",
+	"ml_job",
 	"node",
 	"node_stats",
 	"shard",
@@ -48,7 +56,14 @@ var metricSets = []string{
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "elasticsearch")
 
-	err := createIndex(getEnvHost() + ":" + getEnvPort())
+	host := net.JoinHostPort(getEnvHost(), getEnvPort())
+	err := createIndex(host)
+	assert.NoError(t, err)
+
+	err = enableTrialLicense(host)
+	assert.NoError(t, err)
+
+	err = createMLJob(host)
 	assert.NoError(t, err)
 
 	for _, metricSet := range metricSets {
@@ -103,6 +118,7 @@ func getConfig(metricset string) map[string]interface{} {
 		"module":     "elasticsearch",
 		"metricsets": []string{metricset},
 		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
+		"index_recovery.active_only": false,
 	}
 }
 
@@ -110,14 +126,7 @@ func getConfig(metricset string) map[string]interface{} {
 func createIndex(host string) error {
 	client := &http.Client{}
 
-	resp, err := http.Get("http://" + host + "/testindex")
-	if err != nil {
-		return err
-	}
-	resp.Body.Close()
-
-	// This means index already exists
-	if resp.StatusCode == 200 {
+	if checkExists("http://" + host + "/testindex") {
 		return nil
 	}
 
@@ -126,7 +135,7 @@ func createIndex(host string) error {
 		return err
 	}
 
-	resp, err = client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -137,4 +146,77 @@ func createIndex(host string) error {
 	}
 
 	return nil
+}
+
+// createIndex creates and elasticsearch index in case it does not exit yet
+func enableTrialLicense(host string) error {
+	client := &http.Client{}
+
+	enableXPackURL := "/_xpack/license/start_trial?acknowledge=true"
+
+	req, err := http.NewRequest("POST", "http://"+host+enableXPackURL, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func createMLJob(host string) error {
+
+	mlJob, err := ioutil.ReadFile("ml_job/_meta/test/test_job.json")
+	if err != nil {
+		return err
+	}
+
+	client := &http.Client{}
+
+	jobURL := "/_xpack/ml/anomaly_detectors/total-requests"
+
+	if checkExists("http://" + host + jobURL) {
+		return nil
+	}
+
+	req, err := http.NewRequest("PUT", "http://"+host+jobURL, bytes.NewReader(mlJob))
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("HTTP error loading ml job %d: %s, %s", resp.StatusCode, resp.Status, body)
+	}
+
+	return nil
+}
+
+func checkExists(url string) bool {
+	resp, err := http.Get(url)
+	if err != nil {
+		return false
+	}
+	resp.Body.Close()
+
+	// Entry exists
+	if resp.StatusCode == 200 {
+		return true
+	}
+	return false
 }

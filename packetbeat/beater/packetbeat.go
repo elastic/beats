@@ -305,7 +305,7 @@ func (pb *packetbeat) icmpConfig() (*common.Config, error) {
 		}
 
 		if icmp != nil {
-			return nil, errors.New("More then one icmp confgigurations found")
+			return nil, errors.New("More then one icmp configurations found")
 		}
 
 		icmp = cfg
