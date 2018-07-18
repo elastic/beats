@@ -67,7 +67,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-
 	return &MetricSet{
 		base,
 		http,
