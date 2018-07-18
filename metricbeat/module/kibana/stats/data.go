@@ -66,7 +66,7 @@ var (
 				"ms": c.Int("avg_ms", s.Optional),
 			},
 			"max": s.Object{
-				"ms": c.Int("max_ms"),
+				"ms": c.Int("max_ms", s.Optional),
 			},
 		}),
 	}
