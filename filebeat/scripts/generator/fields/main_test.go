@@ -126,6 +126,15 @@ func TestFieldsGenerator(t *testing.T) {
 				&fieldYml{Name: "message", Description: "Please add description", Example: "Please add example", Type: "text"},
 			},
 		},
+		FieldsGeneratorTestCase{
+			patterns: []string{
+				"\\[%{TIMESTAMP:timestamp}\\] %{NUMBER:idx:int}",
+			},
+			fields: []*fieldYml{
+				&fieldYml{Name: "timestamp", Description: "Please add description", Example: "Please add example", Type: "text"},
+				&fieldYml{Name: "idx", Description: "Please add description", Example: "Please add example", Type: "int"},
+			},
+		},
 	}
 
 	for _, tc := range tests {
