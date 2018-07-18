@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/filebeat/input/file"
 )
@@ -160,7 +160,9 @@ func TestRegistrarRead(t *testing.T) {
 			in := strings.NewReader(test.input)
 
 			states, err := readStatesFrom(in)
-			require.NoError(t, err)
+			if !assert.NoError(t, err) {
+				return
+			}
 
 			actual := sortedStates(states)
 			expected := sortedStates(test.expected)
