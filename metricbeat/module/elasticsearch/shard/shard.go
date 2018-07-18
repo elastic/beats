@@ -32,7 +32,6 @@ func init() {
 }
 
 const (
-	// Get the stats from the local node
 	statePath = "/_cluster/state/version,master_node,routing_table"
 )
 
