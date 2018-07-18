@@ -26,7 +26,6 @@ class Test(BaseTest):
         template = "test-2lines-registry-latest"
         self.run_with_single_registry_format(template)
 
-
     def run_with_single_registry_format(self, template):
         # prepare log file
         testfile, file_state = self.prepare_log()
@@ -35,7 +34,6 @@ class Test(BaseTest):
         self.apply_registry_tempate(template, testfile, file_state)
 
         self.run_and_validate()
-
 
     def run_and_validate(self):
         filebeat = self.start_beat()
@@ -56,7 +54,7 @@ class Test(BaseTest):
         assert output[0]["message"] == "abcdefghi"
 
     def apply_registry_tempate(self, template, testfile, file_state):
-        source = self.beat_path + "/tests/files/registry/" + template 
+        source = self.beat_path + "/tests/files/registry/" + template
         with open(source) as f:
             registry = json.loads(f.read())
 
@@ -65,7 +63,6 @@ class Test(BaseTest):
             state["FileStateOS"] = file_state
         with open(self.working_dir + "/registry", 'w') as f:
             f.write(json.dumps(registry))
-
 
     def prepare_log(self):
         # test is current skipped on windows, due to FileStateOS must match the
