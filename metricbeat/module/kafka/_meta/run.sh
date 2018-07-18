@@ -1,5 +1,7 @@
 #!/bin/bash
 
+KAFKA_ADVERTISED_HOST=$(dig +short $HOSTNAME)
+
 wait_for_port() {
     count=20
     port=$1

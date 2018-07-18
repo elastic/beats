@@ -92,7 +92,14 @@ services:
     build: ./module/jolokia/_meta
 
   kafka:
-    build: ./module/kafka/_meta
+    build:
+      context: ./module/kafka/_meta
+      dockerfile: Dockerfile.1.1.0
+
+  kafka_0_10_2:
+    build:
+      context: ./module/kafka/_meta
+      dockerfile: Dockerfile.0.10.2
 
   kibana:
     build: ./module/kibana/_meta

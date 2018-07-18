@@ -10,7 +10,7 @@ include::../include/what-happens.asciidoc[]
 [float]
 === Compatibility
 
-The +{modulename}+ module was tested with logs from versions 2.11.
+The +{modulename}+ module was tested with logs from versions 0.9 and 1.11.
 
 include::../include/running-modules.asciidoc[]
 
@@ -57,3 +57,5 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+include::../include/var-convert-timezone.asciidoc[]
