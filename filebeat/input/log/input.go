@@ -692,6 +692,10 @@ func (p *Input) updateState(state file.State) error {
 		state.TTL = p.config.CleanInactive
 	}
 
+	if len(state.Meta) == 0 {
+		state.Meta = nil
+	}
+
 	// Update first internal state
 	p.states.Update(state)
 
