@@ -105,6 +105,14 @@ var (
 	reportingPrintablePdfDict = c.Dict("printable_pdf", s.Schema{
 		"available": c.Bool("available"),
 		"total":     c.Int("total"),
+		"app": c.Dict("app", s.Schema{
+			"visualization": c.Int("visualization"),
+			"dashboard":     c.Int("dashboard"),
+		}),
+		"layout": c.Dict("layout", s.Schema{
+			"print":           c.Int("print"),
+			"preserve_layout": c.Int("preserve_layout"),
+		}),
 	}, c.DictOptional)
 
 	reportingStatusDict = c.Dict("status", s.Schema{
