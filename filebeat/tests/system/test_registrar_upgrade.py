@@ -84,4 +84,3 @@ class Test(BaseTest):
         output = self.read_output()
         assert len(output) == 1
         assert output[0]["message"] == "abcdefghi"
-
