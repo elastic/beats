@@ -2653,6 +2653,16 @@ Content length of the HTTP response body.
 
 --
 
+*`http.request.method`*::
++
+--
+type: keyword
+
+Request method.
+
+
+--
+
 [[exported-fields-logstash]]
 == logstash fields
 

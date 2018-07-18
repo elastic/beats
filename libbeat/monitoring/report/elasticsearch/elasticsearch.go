@@ -198,11 +198,12 @@ func (r *reporter) initLoop(c config) {
 	logp.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", c.StatePeriod)
-	go r.snapshotLoop("stats", c.MetricsPeriod)
+	go r.snapshotLoop("state", "state", c.StatePeriod)
+	// For backward compatibility stats is named to metrics.
+	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod)
 }
 
-func (r *reporter) snapshotLoop(namespace string, period time.Duration) {
+func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
@@ -225,8 +226,8 @@ func (r *reporter) snapshotLoop(namespace string, period time.Duration) {
 		}
 
 		fields := common.MapStr{
-			"beat":    r.beatMeta,
-			namespace: snapshot,
+			"beat": r.beatMeta,
+			prefix: snapshot,
 		}
 		if len(r.tags) > 0 {
 			fields["tags"] = r.tags
