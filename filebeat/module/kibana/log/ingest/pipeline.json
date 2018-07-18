@@ -68,6 +68,13 @@
             }
         },
         {
+            "rename": {
+                "field": "kibana.log.meta.req.method",
+                "target_field": "http.request.method",
+                "ignore_missing": true
+            }
+        },
+        {
             "date": {
                 "field": "read_timestamp",
                 "formats" : ["ISO8601"],
