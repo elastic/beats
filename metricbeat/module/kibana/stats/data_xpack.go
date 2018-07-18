@@ -19,6 +19,7 @@ package stats
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -130,6 +131,12 @@ var (
 	}
 )
 
+func reportErrorForMissingField(field string, r mb.ReporterV2) error {
+	err := fmt.Errorf("Could not find field '%v' in Kibana stats API response", field)
+	r.Error(err)
+	return err
+}
+
 func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
@@ -144,9 +151,21 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error 
 		return err
 	}
 
-	process := data["process"].(map[string]interface{})
-	memory := process["memory"].(map[string]interface{})
-	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int(memory["resident_set_size_bytes"].(float64)))
+	process, ok := data["process"].(map[string]interface{})
+	if !ok {
+		return reportErrorForMissingField("process", r)
+	}
+	memory, ok := process["memory"].(map[string]interface{})
+	if !ok {
+		return reportErrorForMissingField("process.memory", r)
+	}
+
+	rss, ok := memory["resident_set_size_bytes"].(float64)
+	if !ok {
+		return reportErrorForMissingField("process.memory.resident_set_size_bytes", r)
+	}
+
+	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int(rss))
 
 	timestamp := time.Now()
 	kibanaStatsFields.Put("timestamp", timestamp)
