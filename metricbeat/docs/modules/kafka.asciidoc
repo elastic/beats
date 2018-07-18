@@ -11,6 +11,8 @@ This is the Kafka module.
 
 The default metricsets are `consumergroup` and `partition`.
 
+This module is tested with Kafka 0.10.2 and 1.1.0.
+
 
 [float]
 === Example configuration
