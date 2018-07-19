@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	p "path"
 	"strings"
 
 	"github.com/elastic/beats/metricbeat/mb"
@@ -92,7 +93,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		basePath = strings.Trim(basePath, "/")
 
 		// Combine paths and normalize
-		fullPath := strings.Trim(basePath+"/"+path, "/")
+		fullPath := strings.Trim(p.Join(basePath, path), "/")
 
 		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.QueryParams)
 	}
