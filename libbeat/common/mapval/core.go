@@ -50,10 +50,10 @@ func Compose(validators ...Validator) Validator {
 			results[idx] = validator(actual)
 		}
 
-		combined := Results{}
+		combined := MakeResults(actual)
 		for _, r := range results {
 			r.EachResult(func(path string, vr ValueResult) bool {
-				combined.recordResult(path, vr)
+				combined.record(path, vr)
 				return true
 			})
 		}
@@ -64,7 +64,7 @@ func Compose(validators ...Validator) Validator {
 // Strict is used when you want any unspecified keys that are encountered to be considered errors.
 func Strict(laxValidator Validator) Validator {
 	return func(actual common.MapStr) Results {
-		validatedResults := laxValidator(actual)
+		results := laxValidator(actual)
 
 		// The inner workings of this are a little weird
 		// We use a hash of dotted paths to track the results
@@ -78,13 +78,13 @@ func Strict(laxValidator Validator) Validator {
 		// It's a little weird, but is fairly efficient. We could stop using the flattened map as a datastructure, but
 		// that would add complexity elsewhere. Probably a good refactor at some point, but not worth it now.
 		validatedPaths := []string{}
-		for k := range validatedResults {
+		for k := range results.Validations {
 			validatedPaths = append(validatedPaths, k)
 		}
 		sort.Strings(validatedPaths)
 
 		walk(actual, func(woi walkObserverInfo) {
-			_, validatedExactly := validatedResults[woi.dottedPath]
+			_, validatedExactly := results.Validations[woi.dottedPath]
 			if validatedExactly {
 				return // This key was tested, passes strict test
 			}
@@ -96,10 +96,10 @@ func Strict(laxValidator Validator) Validator {
 				return
 			}
 
-			validatedResults.recordResult(woi.dottedPath, StrictFailureVR)
+			results.record(woi.dottedPath, StrictFailureVR)
 		})
 
-		return validatedResults
+		return results
 	}
 }
 
@@ -111,7 +111,7 @@ func Schema(expected Map) Validator {
 }
 
 func walkValidate(expected Map, actual common.MapStr) (results Results) {
-	results = Results{}
+	results = MakeResults(actual)
 	walk(
 		common.MapStr(expected),
 		func(expInfo walkObserverInfo) {
@@ -132,7 +132,7 @@ func walkValidate(expected Map, actual common.MapStr) (results Results) {
 			}
 
 			if !isDef.optional || isDef.optional && actualKeyExists {
-				results.recordResult(
+				results.record(
 					expInfo.dottedPath,
 					isDef.check(actualV, actualKeyExists),
 				)

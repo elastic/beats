@@ -22,13 +22,20 @@ import "fmt"
 // Results the results of executing a schema.
 // They are a flattened map (using dotted paths) of all the values []ValueResult representing the results
 // of the IsDefs.
-type Results map[string][]ValueResult
+type Results struct {
+	Source      map[string]interface{}
+	Validations map[string][]ValueResult
+}
 
-func (r Results) recordResult(path string, result ValueResult) {
-	if r[path] == nil {
-		r[path] = []ValueResult{result}
+func MakeResults(source map[string]interface{}) Results {
+	return Results{Source: source, Validations: make(map[string][]ValueResult)}
+}
+
+func (r Results) record(path string, result ValueResult) {
+	if r.Validations[path] == nil {
+		r.Validations[path] = []ValueResult{result}
 	} else {
-		r[path] = append(r[path], result)
+		r.Validations[path] = append(r.Validations[path], result)
 	}
 }
 
@@ -36,7 +43,7 @@ func (r Results) recordResult(path string, result ValueResult) {
 // The provided callback can return true to keep iterating, or false
 // to stop.
 func (r Results) EachResult(f func(string, ValueResult) bool) {
-	for path, pathResults := range r {
+	for path, pathResults := range r.Validations {
 		for _, result := range pathResults {
 			if !f(path, result) {
 				return
@@ -47,10 +54,10 @@ func (r Results) EachResult(f func(string, ValueResult) bool) {
 
 // DetailedErrors returns a new Results object consisting only of error data.
 func (r Results) DetailedErrors() Results {
-	errors := Results{}
+	errors := MakeResults(r.Source)
 	r.EachResult(func(path string, vr ValueResult) bool {
 		if !vr.Valid {
-			errors.recordResult(path, vr)
+			errors.record(path, vr)
 		}
 
 		return true

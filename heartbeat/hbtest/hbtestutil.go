@@ -78,13 +78,28 @@ func MonitorChecks(id string, host string, ip string, scheme string, status stri
 	})
 }
 
-// TCPChecks creates a skima.Validator that represents the "tcp" field present
-// in all heartbeat events that use a Tcp connection as part of their DialChain
-func TCPChecks(port uint16) mapval.Validator {
+// TCPBaseChecks checks the minimum TCP response, which is only issued
+// without further fields when the endpoint does not respond.
+func TCPBaseChecks(port uint16) mapval.Validator {
+	return mapval.Schema(mapval.Map{"tcp.port": port})
+}
+
+// ErrorChecks checks the standard heartbeat error hierarchy, which should
+// consist of a message and a type under the error key.
+func ErrorChecks(msg string, errType string) mapval.Validator {
 	return mapval.Schema(mapval.Map{
-		"tcp": mapval.Map{
-			"port":           port,
-			"rtt.connect.us": mapval.IsDuration,
+		"error": mapval.Map{
+			"message": msg,
+			"type":    errType,
 		},
 	})
+}
+
+// RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
+// in all heartbeat events that use a Tcp connection as part of their DialChain
+func RespondingTCPChecks(port uint16) mapval.Validator {
+	return mapval.Compose(
+		TCPBaseChecks(port),
+		mapval.Schema(mapval.Map{"tcp.rtt.connect.us": mapval.IsDuration}),
+	)
 }

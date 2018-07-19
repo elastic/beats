@@ -24,6 +24,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"fmt"
+
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
@@ -32,12 +34,10 @@ import (
 	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
-func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, beat.Event) {
-	server := httptest.NewServer(handlerFunc)
-	defer server.Close()
-
+func testRequest(t *testing.T, url string) beat.Event {
 	config := common.NewConfig()
-	config.SetString("urls", 0, server.URL)
+	config.SetString("timeout", 0, "1")
+	config.SetString("urls", 0, url)
 
 	jobs, err := create(monitors.Info{}, config)
 	require.NoError(t, err)
@@ -47,30 +47,40 @@ func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, 
 	event, _, err := job.Run()
 	require.NoError(t, err)
 
+	return event
+}
+
+func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, beat.Event) {
+	server := httptest.NewServer(handlerFunc)
+	defer server.Close()
+
+	event := testRequest(t, server.URL)
+
 	return server, event
 }
 
-func httpChecks(urlStr string, statusCode int) mapval.Validator {
+// The minimum response is just the URL. Only to be used for unreachable server
+// tests.
+func httpBaseChecks(url string) mapval.Validator {
 	return mapval.Schema(mapval.Map{
-		"http": mapval.Map{
-			"url": urlStr,
-			"response.status_code":   statusCode,
-			"rtt.content.us":         mapval.IsDuration,
-			"rtt.response_header.us": mapval.IsDuration,
-			"rtt.total.us":           mapval.IsDuration,
-			"rtt.validate.us":        mapval.IsDuration,
-			"rtt.write_request.us":   mapval.IsDuration,
-		},
+		"http.url": url,
 	})
 }
 
-func badGatewayChecks() mapval.Validator {
-	return mapval.Schema(mapval.Map{
-		"error": mapval.Map{
-			"message": "502 Bad Gateway",
-			"type":    "validate",
-		},
-	})
+func respondingHTTPChecks(url string, statusCode int) mapval.Validator {
+	return mapval.Compose(
+		httpBaseChecks(url),
+		mapval.Schema(mapval.Map{
+			"http": mapval.Map{
+				"response.status_code":   statusCode,
+				"rtt.content.us":         mapval.IsDuration,
+				"rtt.response_header.us": mapval.IsDuration,
+				"rtt.total.us":           mapval.IsDuration,
+				"rtt.validate.us":        mapval.IsDuration,
+				"rtt.write_request.us":   mapval.IsDuration,
+			},
+		}),
+	)
 }
 
 func TestOKJob(t *testing.T) {
@@ -82,8 +92,8 @@ func TestOKJob(t *testing.T) {
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "up"),
-			hbtest.TCPChecks(port),
-			httpChecks(server.URL, http.StatusOK),
+			hbtest.RespondingTCPChecks(port),
+			respondingHTTPChecks(server.URL, http.StatusOK),
 		))(event.Fields),
 	)
 }
@@ -97,9 +107,31 @@ func TestBadGatewayJob(t *testing.T) {
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "down"),
-			hbtest.TCPChecks(port),
-			httpChecks(server.URL, http.StatusBadGateway),
-			badGatewayChecks(),
+			hbtest.RespondingTCPChecks(port),
+			respondingHTTPChecks(server.URL, http.StatusBadGateway),
+			hbtest.ErrorChecks("502 Bad Gateway", "validate"),
+		))(event.Fields),
+	)
+}
+
+func TestUnreachableJob(t *testing.T) {
+	// 203.0.113.0/24 is reserved for documentation so should not be routable
+	// See: https://tools.ietf.org/html/rfc6890
+	ip := "203.0.113.1"
+	url := "http://" + ip
+
+	event := testRequest(t, url)
+
+	mapvaltest.Test(
+		t,
+		mapval.Strict(mapval.Compose(
+			hbtest.MonitorChecks("http@"+url, url, ip, "http", "down"),
+			hbtest.TCPBaseChecks(80),
+			hbtest.ErrorChecks(
+				fmt.Sprintf(
+					"Get http://%s: dial tcp %s:80: i/o timeout (Client.Timeout exceeded while awaiting headers)", ip, ip),
+				"io"),
+			httpBaseChecks(url),
 		))(event.Fields),
 	)
 }
