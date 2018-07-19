@@ -87,8 +87,6 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 			if !ok {
 				return mb.HostData{}, errors.Errorf("'%v' config for module %v is not a string", b.BasePathConfigKey, module.Name())
 			}
-		} else {
-			basePath = ""
 		}
 		// Normalize basepath
 		basePath = strings.Trim(basePath, "/")
