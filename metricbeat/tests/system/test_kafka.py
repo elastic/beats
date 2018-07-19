@@ -5,8 +5,7 @@ from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 
 
-class Test(metricbeat.BaseTest):
-
+class KafkaTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['kafka']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -35,13 +34,16 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def create_topic(self):
-
         from kafka import KafkaProducer
 
-        producer = KafkaProducer(bootstrap_servers=self.get_hosts()[
-            0], retries=20, retry_backoff_ms=500, api_version=("0.10"))
+        producer = KafkaProducer(bootstrap_servers=self.get_hosts()[0],
+                                 retries=20, retry_backoff_ms=500)
         producer.send('foobar', b'some_message_bytes')
 
     def get_hosts(self):
-        return [os.getenv('KAFKA_HOST', 'localhost') + ':' +
+        return [self.compose_hosts()[0] + ':' +
                 os.getenv('KAFKA_PORT', '9092')]
+
+
+class Kafka_0_10_2_Test(KafkaTest):
+    COMPOSE_SERVICES = ['kafka_0_10_2']

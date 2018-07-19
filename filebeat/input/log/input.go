@@ -93,6 +93,11 @@ func NewInput(
 	// can be forwarded correctly to the registrar.
 	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), context.BeatDone)
 
+	meta := context.Meta
+	if len(meta) == 0 {
+		meta = nil
+	}
+
 	p := &Input{
 		config:      defaultConfig,
 		cfg:         cfg,
@@ -101,7 +106,7 @@ func NewInput(
 		stateOutlet: stateOut,
 		states:      file.NewStates(),
 		done:        context.Done,
-		meta:        context.Meta,
+		meta:        meta,
 	}
 
 	if err := cfg.Unpack(&p.config); err != nil {
@@ -685,6 +690,10 @@ func (p *Input) updateState(state file.State) error {
 	// Add ttl if cleanOlder is enabled and TTL is not already 0
 	if p.config.CleanInactive > 0 && state.TTL != 0 {
 		state.TTL = p.config.CleanInactive
+	}
+
+	if len(state.Meta) == 0 {
+		state.Meta = nil
 	}
 
 	// Update first internal state
