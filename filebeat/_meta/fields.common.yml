@@ -131,3 +131,7 @@
       description: >
         Content length of the HTTP response body.
 
+    - name: http.request.method
+      type: keyword
+      description: >
+        Request method.

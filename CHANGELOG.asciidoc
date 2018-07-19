@@ -103,6 +103,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix offset field pointing at end of a line. {issue}6514[6514]
 - Fix an issue when parsing ISO8601 dates with timezone definition {issue}7367[7367]
 - Fix Grok pattern of MongoDB module. {pull}7568[7568]
+- Fix registry duplicates and log resending on upgrade. {issue}7634[7634]
 
 *Heartbeat*
 - Fix race due to updates of shared a map, that was not supposed to be shared between multiple go-routines. {issue}6616[6616]
@@ -127,6 +128,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix Windows service metricset when using a 32-bit binary on a 64-bit OS. {pull}7294[7294]
 - Fix Jolokia attribute mapping when using wildcards and MBean names with multiple properties. {pull}7321[7321]
 - Do not report Metricbeat container host as hostname in Kubernetes deployment. {issue}7199[7199]
+- Ensure metadata updates don't replace existing pod metrics. {pull}7573[7573]
 
 *Packetbeat*
 
@@ -217,6 +219,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add Slow log fileset to the Elasticsearch module. {pull}7473[7473]
 - Add deprecation fileset to the Elasticsearch module. {pull}7474[7474]
 - Add `config_timezone` option to Kafka module to convert dates to UTC. {issue}7546[7546] {pull}7578[7578]
+- Add patterns for kafka 1.1 logs. {pull}7608[7608]
 
 *Heartbeat*
 
@@ -305,6 +308,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add Elasticsearch ml_job metricsets. {pull}7196[7196]
 - Add support for bearer token files to HTTP helper. {pull}7527[7527]
 - Add Elasticsearch index recovery metricset. {pull}7225[7225]
+- Run Kafka integration tests on version 1.1.0 {pull}7616[7616]
 - Add envoyproxy module. {pull}7569[7569]
 
 *Packetbeat*
