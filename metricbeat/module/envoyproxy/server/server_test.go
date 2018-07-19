@@ -40,7 +40,7 @@ func TestEventMapping(t *testing.T) {
 	event, err := eventMapping(content)
 	assert.NoError(t, err, "error mapping "+testFile)
 
-	assert.Len(t, event, 8, "got wrong number of event")
+	assert.Len(t, event, 7, "got wrong number of event")
 
 	clusterManager := event["cluster_manager"].(common.MapStr)
 	assert.Equal(t, int64(1), clusterManager["active_clusters"])

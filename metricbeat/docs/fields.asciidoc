@@ -4428,13 +4428,6 @@ Current total size of internal flush buffer in bytes
 --
 
 
-*`envoyproxy.server.runtime.admin_overrides_active`*::
-+
---
-type: integer
-
---
-
 *`envoyproxy.server.runtime.load_error`*::
 +
 --
@@ -4482,6 +4475,13 @@ type: integer
 
 Total number of loads that did not use an override directory
 
+
+--
+
+*`envoyproxy.server.runtime.admin_overrides_active`*::
++
+--
+type: integer
 
 --
 
@@ -4672,549 +4672,83 @@ type: integer
 
 --
 
-
-
-*`envoyproxy.server.listener.admin.downstream_cx_active`*::
+*`envoyproxy.server.server.hot_restart_epoch`*::
 +
 --
 type: integer
 
-Total active connections
+Current hot restart epoch
 
 
 --
 
-*`envoyproxy.server.listener.admin.downstream_cx_destroy`*::
+
+*`envoyproxy.server.http2.header_overflow`*::
 +
 --
 type: integer
 
-Total destroyed connections
+Total number of connections reset due to the headers being larger than Envoy::Http::Http2::ConnectionImpl::StreamImpl::MAX_HEADER_SIZE (63k)
 
 
 --
 
-*`envoyproxy.server.listener.admin.downstream_cx_total`*::
+*`envoyproxy.server.http2.headers_cb_no_stream`*::
 +
 --
 type: integer
 
-Total connections
+Total number of errors where a header callback is called without an associated stream. This tracks an unexpected occurrence due to an as yet undiagnosed bug
 
 
 --
 
-
-
-*`envoyproxy.server.listener.admin.http.admin.downstream_rq_1xx`*::
+*`envoyproxy.server.http2.rx_messaging_error`*::
 +
 --
 type: integer
 
-Total 1xx responses
+Total number of invalid received frames that violated section 8 of the HTTP/2 spec. This will result in a tx_reset
 
 
 --
 
-*`envoyproxy.server.listener.admin.http.admin.downstream_rq_2xx`*::
+*`envoyproxy.server.http2.rx_reset`*::
 +
 --
 type: integer
 
-Total 2xx responses
+Total number of reset stream frames received by Envoy
 
 
 --
 
-*`envoyproxy.server.listener.admin.http.admin.downstream_rq_3xx`*::
+*`envoyproxy.server.http2.too_many_header_frames`*::
 +
 --
 type: integer
 
-Total 3xx responses
+Total number of times an HTTP2 connection is reset due to receiving too many headers frames. Envoy currently supports proxying at most one header frame for 100-Continue one non-100 response code header frame and one frame with trailers
 
 
 --
 
-*`envoyproxy.server.listener.admin.http.admin.downstream_rq_4xx`*::
+*`envoyproxy.server.http2.trailers`*::
 +
 --
 type: integer
 
-Total 4xx responses
+Total number of trailers seen on requests coming from downstream
 
 
 --
 
-*`envoyproxy.server.listener.admin.http.admin.downstream_rq_5xx`*::
+*`envoyproxy.server.http2.tx_reset`*::
 +
 --
 type: integer
 
-Total 5xx responses
-
-
---
-
-
-
-*`envoyproxy.server.http.admin.downstream_cx_active`*::
-+
---
-type: integer
-
-Total active connections
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_destroy`*::
-+
---
-type: integer
-
-Total connections destroyed
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_destroy_active_rq`*::
-+
---
-type: integer
-
-Total connections destroyed with active requests
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_destroy_local`*::
-+
---
-type: integer
-
-Total connections destroyed due to local close
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_destroy_local_active_rq`*::
-+
---
-type: integer
-
-Total connections destroyed locally with active requests
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_destroy_remote`*::
-+
---
-type: integer
-
-Total connections destroyed due to remote close
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_destroy_remote_active_rq`*::
-+
---
-type: integer
-
-Total connections destroyed remotely with active requests
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_drain_close`*::
-+
---
-type: integer
-
-Total connections closed due to draining
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_http1_active`*::
-+
---
-type: integer
-
-Total active HTTP/1.1 connections
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_http1_total`*::
-+
---
-type: integer
-
-Total HTTP/1.1 connections
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_http2_active`*::
-+
---
-type: integer
-
-Total active HTTP/2 connections
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_http2_total`*::
-+
---
-type: integer
-
-Total HTTP/2 connections
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_idle_timeout`*::
-+
---
-type: integer
-
-Total connections closed due to idle timeout
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_protocol_error`*::
-+
---
-type: integer
-
-Total protocol errors
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_rx_bytes_buffered`*::
-+
---
-type: integer
-
-Total received bytes currently buffered
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_rx_bytes_total`*::
-+
---
-type: integer
-
-Total bytes received
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_ssl_active`*::
-+
---
-type: integer
-
-Total active TLS connections
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_ssl_total`*::
-+
---
-type: integer
-
-Total TLS connections
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_total`*::
-+
---
-type: integer
-
-Total connections
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_tx_bytes_buffered`*::
-+
---
-type: integer
-
-Total bytes currently buffered to the downstream connection
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_tx_bytes_total`*::
-+
---
-type: integer
-
-Total bytes written to the downstream connection
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_websocket_active`*::
-+
---
-type: integer
-
-Total active WebSocket connections
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_cx_websocket_total`*::
-+
---
-type: integer
-
-Total WebSocket connections
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_flow_control_paused_reading_total`*::
-+
---
-type: integer
-
-Total number of times reads were disabled due to flow control
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_flow_control_resumed_reading_total`*::
-+
---
-type: integer
-
-Total number of times reads were enabled on the connection due to flow control
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_1xx`*::
-+
---
-type: integer
-
-Total 1xx responses
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_2xx`*::
-+
---
-type: integer
-
-Total 2xx responses
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_3xx`*::
-+
---
-type: integer
-
-Total 3xx responses
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_4xx`*::
-+
---
-type: integer
-
-Total 4xx responses
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_5xx`*::
-+
---
-type: integer
-
-Total 5xx responses
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_active`*::
-+
---
-type: integer
-
-Total active requests
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_http1_total`*::
-+
---
-type: integer
-
-Total HTTP/1.1 requests
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_http2_total`*::
-+
---
-type: integer
-
-Total HTTP/2 requests
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_non_relative_path`*::
-+
---
-type: integer
-
-Total requests with a non-relative HTTP path
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_response_before_rq_complete`*::
-+
---
-type: integer
-
-Total responses sent before the request was complete
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_rx_reset`*::
-+
---
-type: integer
-
-Total request resets received
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_too_large`*::
-+
---
-type: integer
-
-Total requests resulting in a 413 due to buffering an overly large body
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_total`*::
-+
---
-type: integer
-
-Total requests
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_tx_reset`*::
-+
---
-type: integer
-
-Total request resets sent
-
-
---
-
-*`envoyproxy.server.http.admin.downstream_rq_ws_on_non_ws_route`*::
-+
---
-type: integer
-
-Total WebSocket upgrade requests rejected by non WebSocket routes
-
-
---
-
-*`envoyproxy.server.http.admin.rs_too_large`*::
-+
---
-type: integer
-
-Total response errors due to buffering an overly large body
-
-
---
-
-
-*`envoyproxy.server.http.async-client.no_cluster`*::
-+
---
-type: integer
-
-Total requests in which the target cluster did not exist and resulted in a 404
-
-
---
-
-*`envoyproxy.server.http.async-client.no_route`*::
-+
---
-type: integer
-
-Total requests that had no route and resulted in a 404
-
-
---
-
-*`envoyproxy.server.http.async-client.rq_direct_response`*::
-+
---
-type: integer
-
-Total requests that resulted in a direct response
-
-
---
-
-*`envoyproxy.server.http.async-client.rq_redirect`*::
-+
---
-type: integer
-
-Total requests that resulted in a redirect response
-
-
---
-
-*`envoyproxy.server.http.async-client.rq_total`*::
-+
---
-type: integer
-
-Total routed requests
+Total number of reset stream frames transmitted by Envoy
 
 
 --
