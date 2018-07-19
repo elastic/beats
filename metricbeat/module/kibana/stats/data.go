@@ -24,6 +24,7 @@ import (
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/kibana"
 )
 
 var (
@@ -34,15 +35,10 @@ var (
 		"host": s.Object{
 			"name": c.Str("kibana.host"),
 		},
-		"transport_address": c.Str("kibana.transport_address"),
-		"version":           c.Str("kibana.version"),
-		"snapshot":          c.Bool("kibana.snapshot"),
-		"status":            c.Str("kibana.status"),
-		"elasticsearch": s.Object{
-			"cluster": s.Object{
-				"id": c.Str("cluster_uuid"),
-			},
-		},
+		"transport_address":      c.Str("kibana.transport_address"),
+		"version":                c.Str("kibana.version"),
+		"snapshot":               c.Bool("kibana.snapshot"),
+		"status":                 c.Str("kibana.status"),
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"process": c.Dict("process", s.Schema{
 			"pid": c.Int("pid"),
@@ -102,10 +98,11 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	event.RootFields.Put("service.name", "kibana")
 
 	// Set elasticsearch cluster id
-	if clusterID, ok := dataFields["cluster_uuid"]; ok {
-		delete(dataFields, "cluster_uuid")
-		event.RootFields.Put("elasticsearch.cluster.id", clusterID)
+	elasticsearchClusterID, ok := data["cluster_uuid"]
+	if !ok {
+		return kibana.ReportErrorForMissingField("cluster_uuid", r)
 	}
+	event.RootFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	event.MetricSetFields = dataFields
 

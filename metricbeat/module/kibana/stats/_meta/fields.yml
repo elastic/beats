@@ -36,10 +36,6 @@
       type: keyword
       description: >
         Kibana instance's health status
-    - name: elasticsearch.cluster.id
-      type: keyword
-      description: >
-        UUID of the Elasticsearch cluster to which Kibana connects.
     - name: concurrent_connections
       type: long
       description: >

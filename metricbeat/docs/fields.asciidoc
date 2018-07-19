@@ -6761,16 +6761,6 @@ Kibana instance's health status
 
 --
 
-*`kibana.stats.elasticsearch.cluster.id`*::
-+
---
-type: keyword
-
-UUID of the Elasticsearch cluster to which Kibana connects.
-
-
---
-
 *`kibana.stats.concurrent_connections`*::
 +
 --
