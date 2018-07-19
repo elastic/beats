@@ -3,6 +3,7 @@ package registrar
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sync"
@@ -115,18 +116,109 @@ func (r *Registrar) loadStates() error {
 
 	logp.Info("Loading registrar data from %s", r.registryFile)
 
-	decoder := json.NewDecoder(f)
-	states := []file.State{}
-	err = decoder.Decode(&states)
+	states, err := readStatesFrom(f)
 	if err != nil {
-		return fmt.Errorf("Error decoding states: %s", err)
+		return err
 	}
-
-	states = resetStates(states)
 	r.states.SetStates(states)
 	logp.Info("States Loaded from registrar: %+v", len(states))
 
 	return nil
+}
+
+func readStatesFrom(in io.Reader) ([]file.State, error) {
+	states := []file.State{}
+	decoder := json.NewDecoder(in)
+	if err := decoder.Decode(&states); err != nil {
+		return nil, fmt.Errorf("Error decoding states: %s", err)
+	}
+
+	states = fixStates(states)
+	states = resetStates(states)
+	return states, nil
+}
+
+// fixStates cleans up the regsitry states when updating from an older version
+// of filebeat potentially writing invalid entries.
+func fixStates(states []file.State) []file.State {
+	if len(states) == 0 {
+		return states
+	}
+
+	// we use a map of states here, so to identify and merge duplicate entries.
+	idx := map[string]*file.State{}
+	for i := range states {
+		state := &states[i]
+		fixState(state)
+
+		id := state.ID()
+		old, exists := idx[id]
+		if !exists {
+			idx[id] = state
+		} else {
+			mergeStates(old, state) // overwrite the entry in 'old'
+		}
+	}
+
+	if len(idx) == len(states) {
+		return states
+	}
+
+	i := 0
+	newStates := make([]file.State, len(idx))
+	for _, state := range idx {
+		newStates[i] = *state
+		i++
+	}
+	return newStates
+}
+
+// fixState updates a read state to fullfil required invariantes:
+// - "Meta" must be nil if len(Meta) == 0
+func fixState(st *file.State) {
+	if len(st.Meta) == 0 {
+		st.Meta = nil
+	}
+}
+
+// mergeStates merges 2 states by trying to determine the 'newer' state.
+// The st state is overwritten with the updated fields.
+func mergeStates(st, other *file.State) {
+	st.Finished = st.Finished || other.Finished
+	if st.Offset < other.Offset { // always select the higher offset
+		st.Offset = other.Offset
+	}
+
+	// update file meta-data. As these are updated concurrently by the
+	// prospectors, select the newer state based on the update timestamp.
+	var meta, metaOld, metaNew map[string]string
+	if st.Timestamp.Before(other.Timestamp) {
+		st.Source = other.Source
+		st.Timestamp = other.Timestamp
+		st.TTL = other.TTL
+		st.FileStateOS = other.FileStateOS
+
+		metaOld, metaNew = st.Meta, other.Meta
+	} else {
+		metaOld, metaNew = other.Meta, st.Meta
+	}
+
+	if len(metaOld) == 0 || len(metaNew) == 0 {
+		meta = metaNew
+	} else {
+		meta = map[string]string{}
+		for k, v := range metaOld {
+			meta[k] = v
+		}
+		for k, v := range metaNew {
+			meta[k] = v
+		}
+	}
+
+	if len(meta) == 0 {
+		meta = nil
+	}
+	st.Meta = meta
 }
 
 // resetStates sets all states to finished and disable TTL on restart
