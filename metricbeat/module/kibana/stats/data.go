@@ -34,11 +34,15 @@ var (
 		"host": s.Object{
 			"name": c.Str("kibana.host"),
 		},
-		"transport_address":      c.Str("kibana.transport_address"),
-		"version":                c.Str("kibana.version"),
-		"snapshot":               c.Bool("kibana.snapshot"),
-		"status":                 c.Str("kibana.status"),
-		"cluster_uuid":           c.Str("cluster_uuid"),
+		"transport_address": c.Str("kibana.transport_address"),
+		"version":           c.Str("kibana.version"),
+		"snapshot":          c.Bool("kibana.snapshot"),
+		"status":            c.Str("kibana.status"),
+		"elasticsearch": s.Object{
+			"cluster": s.Object{
+				"id": c.Str("cluster_uuid"),
+			},
+		},
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"process": c.Dict("process", s.Schema{
 			"pid": c.Int("pid"),

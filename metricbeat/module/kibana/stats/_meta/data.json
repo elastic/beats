@@ -4,14 +4,14 @@
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
-    "elasticsearch": {
-        "cluster": {
-            "id": "njqU4EQaTROIDlWPeUMQyw"
-        }
-    },
     "kibana": {
         "stats": {
-            "concurrent_connections": 0,
+            "concurrent_connections": 3,
+            "elasticsearch": {
+                "cluster": {
+                    "id": "njqU4EQaTROIDlWPeUMQyw"
+                }
+            },
             "host": {
                 "name": "localhost"
             },
@@ -19,7 +19,7 @@
             "name": "Shaunaks-MBP-2",
             "process": {
                 "event_loop_delay": {
-                    "ms": 0.2747599985450506
+                    "ms": 0.55409200116992
                 },
                 "memory": {
                     "heap": {
@@ -27,22 +27,29 @@
                             "bytes": 1501560832
                         },
                         "total": {
-                            "bytes": 235712512
+                            "bytes": 213430272
                         },
                         "used": {
-                            "bytes": 186280616
+                            "bytes": 184037288
                         }
                     }
                 },
-                "pid": 13671,
+                "pid": 16920,
                 "uptime": {
-                    "ms": 795301
+                    "ms": 2414293
                 }
             },
-            "request": {},
+            "request": {
+                "disconnects": 0,
+                "total": 3
+            },
             "response_time": {
-                "avg": {},
-                "max": {}
+                "avg": {
+                    "ms": 9
+                },
+                "max": {
+                    "ms": 12
+                }
             },
             "snapshot": false,
             "status": "green",

@@ -6761,7 +6761,7 @@ Kibana instance's health status
 
 --
 
-*`kibana.stats.cluster_uuid`*::
+*`kibana.stats.elasticsearch.cluster.id`*::
 +
 --
 type: keyword
