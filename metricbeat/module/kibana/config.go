@@ -19,14 +19,12 @@ package kibana
 
 // Config defines the structure for the Kibana module configuration options
 type Config struct {
-	XPackEnabled bool   `config:"xpack.enabled"`
-	BasePath     string `config:"basepath"`
+	XPackEnabled bool `config:"xpack.enabled"`
 }
 
 // DefaultConfig returns the default configuration for the Kibana module
 func DefaultConfig() Config {
 	return Config{
 		XPackEnabled: false,
-		BasePath:     "",
 	}
 }
