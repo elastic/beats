@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/kibana"
 )
 
 // init registers the MetricSet with the central registry.
@@ -34,30 +35,42 @@ func init() {
 
 var (
 	hostParser = parse.URLHostParserBuilder{
-		DefaultScheme: "http",
-		PathConfigKey: "path",
-		DefaultPath:   "api/stats",
-		QueryParams:   "extended=true", // make Kibana fetch the cluster_uuid
+		DefaultScheme:     "http",
+		BasePathConfigKey: "basepath",
+		DefaultPath:       "api/stats",
+		QueryParams:       "extended=true", // make Kibana fetch the cluster_uuid
 	}.Build()
 )
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	http *helper.HTTP
+	http         *helper.HTTP
+	xPackEnabled bool
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The kibana stats metricset is experimental")
 
+	config := kibana.DefaultConfig()
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	if config.XPackEnabled {
+		cfgwarn.Experimental("The experimental xpack.enabled flag in kibana/stats metricset is enabled.")
+	}
+
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
 	}
+
 	return &MetricSet{
 		base,
 		http,
+		config.XPackEnabled,
 	}, nil
 }
 
@@ -71,5 +84,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	eventMapping(r, content)
+	if m.xPackEnabled {
+		intervalMs := m.Module().Config().Period.Nanoseconds() / 1000 / 1000
+		eventMappingXPack(r, intervalMs, content)
+	} else {
+		eventMapping(r, content)
+	}
+
 }

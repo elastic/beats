@@ -6681,12 +6681,12 @@ Kibana stats and run-time metrics.
 
 
 
-*`kibana.stats.cluster_uuid`*::
+*`kibana.stats.uuid`*::
 +
 --
 type: keyword
 
-UUID of the Elasticsearch cluster to which Kibana connects.
+Kibana instance UUID
 
 
 --
@@ -6694,185 +6694,69 @@ UUID of the Elasticsearch cluster to which Kibana connects.
 *`kibana.stats.name`*::
 +
 --
-type: keyword
+type: text
 
-Kibana instance name.
+Kibana instance name
 
 
 --
 
-*`kibana.stats.uuid`*::
+*`kibana.stats.index`*::
 +
 --
 type: keyword
 
-Kibana instance uuid.
+Name of Kibana's internal index
 
 
 --
 
-*`kibana.stats.version.number`*::
+*`kibana.stats.host.name`*::
 +
 --
 type: keyword
 
-Kibana version number.
+Kibana instance hostname
 
 
 --
 
-*`kibana.stats.status.overall.state`*::
+*`kibana.stats.transport_address`*::
 +
 --
 type: keyword
 
-Kibana overall state.
+Kibana server's hostname and port
 
 
 --
 
-[float]
-== process fields
-
-Kibana process metrics.
-
-
-
-[float]
-== mem fields
-
-Memory usage metrics of the Kibana instance.
-
-
-
-*`kibana.stats.process.mem.heap.max.bytes`*::
+*`kibana.stats.version`*::
 +
 --
-type: long
+type: keyword
 
-format: bytes
-
-Total amount of heap memory used by V8.
+Kibana version
 
 
 --
 
-*`kibana.stats.process.mem.heap.used.bytes`*::
+*`kibana.stats.snapshot`*::
 +
 --
-type: long
+type: boolean
 
-format: bytes
-
-Amount of memory in use by V8.
+Whether the Kibana build is a snapshot build
 
 
 --
 
-*`kibana.stats.process.mem.resident_set_size.bytes`*::
+*`kibana.stats.status`*::
 +
 --
-type: long
+type: keyword
 
-format: bytes
-
-The amount of space occupied in main memory for the process. Includes heap, code segment, and stack.
-
-
---
-
-*`kibana.stats.process.mem.external.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-Memory usage of C++ objects bound to JavaScript objects managed by V8.
-
-
---
-
-*`kibana.stats.process.pid`*::
-+
---
-type: long
-
-Process ID of the Kibana instance.
-
-
---
-
-*`kibana.stats.process.uptime.ms`*::
-+
---
-type: long
-
-Amount of time that the Kibana process has been running in milliseconds.
-
-
---
-
-[float]
-== response_times fields
-
-HTTP Server response time metrics
-
-
-
-*`kibana.stats.response_times.avg.ms`*::
-+
---
-type: long
-
-Accumulated averages for response times, for all responses in a 5-second time window.
-
-
---
-
-*`kibana.stats.response_times.max.ms`*::
-+
---
-type: long
-
-Accumulated maximums for response times, for all responses in a 5-second time window.
-
-
---
-
-[float]
-== requests fields
-
-HTTP Server request metrics
-
-
-
-*`kibana.stats.requests.status_codes`*::
-+
---
-type: object
-
-Key-value pairs for each status code sent by the server, and the number of times it sent that code.
-
-
---
-
-*`kibana.stats.requests.total`*::
-+
---
-type: long
-
-Total number of requests sent by the server.
-
-
---
-
-*`kibana.stats.requests.disconnects`*::
-+
---
-type: long
-
-Total number of client disconnects encountered by the server.
+Kibana instance's health status
 
 
 --
@@ -6882,58 +6766,131 @@ Total number of client disconnects encountered by the server.
 --
 type: long
 
-Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
+Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request mulitple server assets at once, and they can re-use established connections.
 
 
 --
 
 [float]
-== sockets fields
+== process fields
 
-HTTP Web Sockets metrics
-
-
-
-[float]
-== http fields
-
-Web Sockets over plaintext HTTP
+Process metrics
 
 
 
-*`kibana.stats.sockets.http.total`*::
+*`kibana.stats.process.event_loop_delay.ms`*::
 +
 --
-type: long
+type: scaled_float
 
-Number of HTTP web socket connections established
+Event loop delay in milliseconds
 
 
 --
 
 [float]
-== https fields
+== memory.heap fields
 
-Web Sockets over encrypted HTTPS
+Process heap metrics
 
 
 
-*`kibana.stats.sockets.https.total`*::
+*`kibana.stats.process.memory.heap.total.bytes`*::
 +
 --
 type: long
 
-Number of HTTPS web socket connections established
+format: bytes
+
+Total heap allocated to process in bytes
 
 
 --
 
-*`kibana.stats.event_loop_delay`*::
+*`kibana.stats.process.memory.heap.used.bytes`*::
 +
 --
 type: long
 
-Node event loop delay calculated with internal benchmarking.
+format: bytes
+
+Heap used by process in bytes
+
+
+--
+
+*`kibana.stats.process.memory.heap.size_limit.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Max. old space size allocated to Node.js process, in bytes
+
+
+--
+
+*`kibana.stats.process.memory.heap.uptime.ms`*::
++
+--
+type: long
+
+Uptime of process in milliseconds
+
+
+--
+
+[float]
+== request fields
+
+Request count metrics
+
+
+
+*`kibana.stats.request.disconnects`*::
++
+--
+type: long
+
+Number of requests that were disconnected
+
+
+--
+
+*`kibana.stats.request.total`*::
++
+--
+type: long
+
+Total number of requests
+
+
+--
+
+[float]
+== response_time fields
+
+Response times metrics
+
+
+
+*`kibana.stats.response_time.avg.ms`*::
++
+--
+type: long
+
+Average response time in milliseconds
+
+
+--
+
+*`kibana.stats.response_time.max.ms`*::
++
+--
+type: long
+
+Maximum response time in milliseconds
 
 
 --

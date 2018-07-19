@@ -15,33 +15,38 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
-
-package stats
+package kibana
 
 import (
-	"io/ioutil"
-	"path/filepath"
+	"fmt"
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func TestEventMapping(t *testing.T) {
+type MockReporterV2 struct {
+	mb.ReporterV2
+}
 
-	files, err := filepath.Glob("./_meta/test/stats.*.json")
-	assert.NoError(t, err)
+func (MockReporterV2) Event(event mb.Event) bool {
+	return true
+}
 
-	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
-		assert.NoError(t, err)
+var currentErr error // This hack is necessary because the Error method below cannot receive the type *MockReporterV2
 
-		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input)
-		assert.NoError(t, err, f)
-		assert.True(t, len(reporter.GetEvents()) >= 1, f)
-		assert.Equal(t, 0, len(reporter.GetErrors()), f)
-	}
+func (m MockReporterV2) Error(err error) bool {
+	currentErr = err
+	return true
+}
+
+func TestReportErrorForMissingField(t *testing.T) {
+	field := "some.missing.field"
+	r := MockReporterV2{}
+	err := ReportErrorForMissingField(field, r)
+
+	expectedError := fmt.Errorf("Could not find field '%v' in Kibana stats API response", field)
+	assert.Equal(t, expectedError, err)
+	assert.Equal(t, expectedError, currentErr)
 }

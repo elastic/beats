@@ -15,33 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
-
-package stats
+package kibana
 
 import (
-	"io/ioutil"
-	"path/filepath"
-	"testing"
+	"fmt"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func TestEventMapping(t *testing.T) {
-
-	files, err := filepath.Glob("./_meta/test/stats.*.json")
-	assert.NoError(t, err)
-
-	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
-		assert.NoError(t, err)
-
-		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input)
-		assert.NoError(t, err, f)
-		assert.True(t, len(reporter.GetEvents()) >= 1, f)
-		assert.Equal(t, 0, len(reporter.GetErrors()), f)
-	}
+// ReportErrorForMissingField reports and returns an error message for the given
+// field being missing in API response received from Kibana
+func ReportErrorForMissingField(field string, r mb.ReporterV2) error {
+	err := fmt.Errorf("Could not find field '%v' in Kibana stats API response", field)
+	r.Error(err)
+	return err
 }
