@@ -6711,7 +6711,7 @@ Name of Kibana's internal index
 
 --
 
-*`kibana.stats.host`*::
+*`kibana.stats.host.name`*::
 +
 --
 type: keyword

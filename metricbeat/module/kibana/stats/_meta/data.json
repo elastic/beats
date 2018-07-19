@@ -6,18 +6,20 @@
     },
     "elasticsearch": {
         "cluster": {
-            "id": "A0sjozJKQoSRmOe2LV9kWA"
+            "id": "njqU4EQaTROIDlWPeUMQyw"
         }
     },
     "kibana": {
         "stats": {
             "concurrent_connections": 0,
-            "host": "localhost",
+            "host": {
+                "name": "localhost"
+            },
             "index": "Shaunaks-MBP-2",
             "name": "Shaunaks-MBP-2",
             "process": {
                 "event_loop_delay": {
-                    "ms": 0.36442995071411133
+                    "ms": 0.2747599985450506
                 },
                 "memory": {
                     "heap": {
@@ -25,29 +27,22 @@
                             "bytes": 1501560832
                         },
                         "total": {
-                            "bytes": 225144832
+                            "bytes": 235712512
                         },
                         "used": {
-                            "bytes": 181993128
+                            "bytes": 186280616
                         }
                     }
                 },
-                "pid": 59876,
+                "pid": 13671,
                 "uptime": {
-                    "ms": 69018
+                    "ms": 795301
                 }
             },
-            "request": {
-                "disconnects": 0,
-                "total": 1
-            },
+            "request": {},
             "response_time": {
-                "avg": {
-                    "ms": 25
-                },
-                "max": {
-                    "ms": 25
-                }
+                "avg": {},
+                "max": {}
             },
             "snapshot": false,
             "status": "green",

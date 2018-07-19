@@ -16,7 +16,7 @@
       type: keyword
       description: >
         Name of Kibana's internal index
-    - name: host
+    - name: host.name
       type: keyword
       description: >
         Kibana instance hostname
