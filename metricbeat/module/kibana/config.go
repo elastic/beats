@@ -15,33 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
+package kibana
 
-package stats
+// Config defines the structure for the Kibana module configuration options
+type Config struct {
+	XPackEnabled bool `config:"xpack.enabled"`
+}
 
-import (
-	"io/ioutil"
-	"path/filepath"
-	"testing"
-
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	"github.com/stretchr/testify/assert"
-)
-
-func TestEventMapping(t *testing.T) {
-
-	files, err := filepath.Glob("./_meta/test/stats.*.json")
-	assert.NoError(t, err)
-
-	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
-		assert.NoError(t, err)
-
-		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input)
-		assert.NoError(t, err, f)
-		assert.True(t, len(reporter.GetEvents()) >= 1, f)
-		assert.Equal(t, 0, len(reporter.GetErrors()), f)
+// DefaultConfig returns the default configuration for the Kibana module
+func DefaultConfig() Config {
+	return Config{
+		XPackEnabled: false,
 	}
 }

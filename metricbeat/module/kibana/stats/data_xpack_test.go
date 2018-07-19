@@ -29,7 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEventMapping(t *testing.T) {
+func TestEventMappingXPack(t *testing.T) {
 
 	files, err := filepath.Glob("./_meta/test/stats.*.json")
 	assert.NoError(t, err)
@@ -39,7 +39,7 @@ func TestEventMapping(t *testing.T) {
 		assert.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input)
+		err = eventMappingXPack(reporter, 10000, input)
 		assert.NoError(t, err, f)
 		assert.True(t, len(reporter.GetEvents()) >= 1, f)
 		assert.Equal(t, 0, len(reporter.GetErrors()), f)
