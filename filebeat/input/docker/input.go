@@ -52,6 +52,9 @@ func NewInput(
 
 	// Add stream to meta to ensure different state per stream
 	if config.Containers.Stream != "all" {
+		if context.Meta == nil {
+			context.Meta = map[string]string{}
+		}
 		context.Meta["stream"] = config.Containers.Stream
 	}
 
