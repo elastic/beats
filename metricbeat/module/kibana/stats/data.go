@@ -41,7 +41,6 @@ var (
 		"status":                 c.Str("kibana.status"),
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"process": c.Dict("process", s.Schema{
-			"pid": c.Int("pid"),
 			"event_loop_delay": s.Object{
 				"ms": c.Float("event_loop_delay"),
 			},
@@ -103,6 +102,17 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return kibana.ReportErrorForMissingField("cluster_uuid", r)
 	}
 	event.RootFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
+
+	// Set process PID
+	process, ok := data["process"].(map[string]interface{})
+	if !ok {
+		return kibana.ReportErrorForMissingField("process", r)
+	}
+	pid, ok := process["pid"].(float64)
+	if !ok {
+		return kibana.ReportErrorForMissingField("process.pid", r)
+	}
+	event.RootFields.Put("process.pid", int(pid))
 
 	event.MetricSetFields = dataFields
 
