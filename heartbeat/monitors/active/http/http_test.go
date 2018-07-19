@@ -36,7 +36,6 @@ import (
 
 func testRequest(t *testing.T, url string) beat.Event {
 	config := common.NewConfig()
-	config.SetString("timeout", 0, "1")
 	config.SetString("urls", 0, url)
 
 	jobs, err := create(monitors.Info{}, config)
@@ -94,7 +93,8 @@ func TestOKJob(t *testing.T) {
 			hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "up"),
 			hbtest.RespondingTCPChecks(port),
 			respondingHTTPChecks(server.URL, http.StatusOK),
-		))(event.Fields),
+		)),
+		(event.Fields),
 	)
 }
 
@@ -110,7 +110,8 @@ func TestBadGatewayJob(t *testing.T) {
 			hbtest.RespondingTCPChecks(port),
 			respondingHTTPChecks(server.URL, http.StatusBadGateway),
 			hbtest.ErrorChecks("502 Bad Gateway", "validate"),
-		))(event.Fields),
+		)),
+		(event.Fields),
 	)
 }
 
@@ -132,6 +133,7 @@ func TestUnreachableJob(t *testing.T) {
 					"Get http://%s: dial tcp %s:80: i/o timeout (Client.Timeout exceeded while awaiting headers)", ip, ip),
 				"io"),
 			httpBaseChecks(url),
-		))(event.Fields),
+		)),
+		(event.Fields),
 	)
 }

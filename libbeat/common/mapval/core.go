@@ -50,7 +50,7 @@ func Compose(validators ...Validator) Validator {
 			results[idx] = validator(actual)
 		}
 
-		combined := MakeResults(actual)
+		combined := MakeResults()
 		for _, r := range results {
 			r.EachResult(func(path string, vr ValueResult) bool {
 				combined.record(path, vr)
@@ -78,13 +78,13 @@ func Strict(laxValidator Validator) Validator {
 		// It's a little weird, but is fairly efficient. We could stop using the flattened map as a datastructure, but
 		// that would add complexity elsewhere. Probably a good refactor at some point, but not worth it now.
 		validatedPaths := []string{}
-		for k := range results.Validations {
+		for k := range results.Fields {
 			validatedPaths = append(validatedPaths, k)
 		}
 		sort.Strings(validatedPaths)
 
 		walk(actual, func(woi walkObserverInfo) {
-			_, validatedExactly := results.Validations[woi.dottedPath]
+			_, validatedExactly := results.Fields[woi.dottedPath]
 			if validatedExactly {
 				return // This key was tested, passes strict test
 			}
@@ -111,7 +111,7 @@ func Schema(expected Map) Validator {
 }
 
 func walkValidate(expected Map, actual common.MapStr) (results Results) {
-	results = MakeResults(actual)
+	results = MakeResults()
 	walk(
 		common.MapStr(expected),
 		func(expInfo walkObserverInfo) {

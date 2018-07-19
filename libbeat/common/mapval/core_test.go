@@ -60,7 +60,7 @@ func TestBadFlat(t *testing.T) {
 	assertResults(fakeT, results)
 	assert.True(t, fakeT.Failed())
 
-	result := results["notafield"][0]
+	result := results.Fields["notafield"][0]
 	assert.False(t, result.Valid)
 	assert.Equal(t, result.Message, KeyMissingVR.Message)
 }
@@ -144,9 +144,9 @@ func TestStrictFunc(t *testing.T) {
 	assertResults(t, partialValidator(m))
 
 	res := Strict(partialValidator)(m)
-	assert.Equal(t, []ValueResult{StrictFailureVR}, res.DetailedErrors()["baz"])
-	assert.Equal(t, []ValueResult{StrictFailureVR}, res.DetailedErrors()["nest.very.deep"])
-	assert.Nil(t, res.DetailedErrors()["bar"])
+	assert.Equal(t, []ValueResult{StrictFailureVR}, res.DetailedErrors().Fields["baz"])
+	assert.Equal(t, []ValueResult{StrictFailureVR}, res.DetailedErrors().Fields["nest.very.deep"])
+	assert.Nil(t, res.DetailedErrors().Fields["bar"])
 	assert.False(t, res.Valid())
 }
 

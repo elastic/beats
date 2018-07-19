@@ -80,7 +80,8 @@ func TestUpEndpoint(t *testing.T) {
 					"rtt.us": mapval.IsDuration,
 				},
 			}),
-		))(event.Fields),
+		)),
+		event.Fields,
 	)
 }
 
@@ -95,6 +96,7 @@ func TestUnreachableEndpoint(t *testing.T) {
 			tcpMonitorChecks(ip, ip, port, "down"),
 			hbtest.ErrorChecks(fmt.Sprintf("dial tcp %s:%d: i/o timeout", ip, port), "io"),
 			hbtest.TCPBaseChecks(port),
-		))(event.Fields),
+		)),
+		event.Fields,
 	)
 }

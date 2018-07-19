@@ -19,23 +19,32 @@ package mapval
 
 import "fmt"
 
+type resultsCache struct {
+	valid  *bool
+	errors *[]error
+}
+
 // Results the results of executing a schema.
 // They are a flattened map (using dotted paths) of all the values []ValueResult representing the results
 // of the IsDefs.
 type Results struct {
-	Source      map[string]interface{}
-	Validations map[string][]ValueResult
+	Fields map[string][]ValueResult
+	// Lazy cache to prevent repeat computation
+	cache *resultsCache
 }
 
-func MakeResults(source map[string]interface{}) Results {
-	return Results{Source: source, Validations: make(map[string][]ValueResult)}
+func MakeResults() Results {
+	return Results{
+		Fields: make(map[string][]ValueResult),
+		cache:  new(resultsCache),
+	}
 }
 
 func (r Results) record(path string, result ValueResult) {
-	if r.Validations[path] == nil {
-		r.Validations[path] = []ValueResult{result}
+	if r.Fields[path] == nil {
+		r.Fields[path] = []ValueResult{result}
 	} else {
-		r.Validations[path] = append(r.Validations[path], result)
+		r.Fields[path] = append(r.Fields[path], result)
 	}
 }
 
@@ -43,7 +52,7 @@ func (r Results) record(path string, result ValueResult) {
 // The provided callback can return true to keep iterating, or false
 // to stop.
 func (r Results) EachResult(f func(string, ValueResult) bool) {
-	for path, pathResults := range r.Validations {
+	for path, pathResults := range r.Fields {
 		for _, result := range pathResults {
 			if !f(path, result) {
 				return
@@ -54,7 +63,7 @@ func (r Results) EachResult(f func(string, ValueResult) bool) {
 
 // DetailedErrors returns a new Results object consisting only of error data.
 func (r Results) DetailedErrors() Results {
-	errors := MakeResults(r.Source)
+	errors := MakeResults()
 	r.EachResult(func(path string, vr ValueResult) bool {
 		if !vr.Valid {
 			errors.record(path, vr)
@@ -78,23 +87,34 @@ func (vre ValueResultError) Error() string {
 
 // Errors returns a list of error objects, one per failed value validation.
 func (r Results) Errors() []error {
-	var errors []error
+	if r.cache.errors != nil {
+		return *r.cache.errors
+	}
+	r.cache.errors = &[]error{}
 
 	r.EachResult(func(path string, vr ValueResult) bool {
 		if !vr.Valid {
-			errors = append(errors, ValueResultError{path, vr})
+			*r.cache.errors = append(*r.cache.errors, ValueResultError{path, vr})
 		}
 		return true
 	})
 
-	return errors
+	return *r.cache.errors
 }
 
 // Valid returns true if there are no errors.
 func (r Results) Valid() bool {
+	if r.cache.valid != nil {
+		return *r.cache.valid
+	}
+
+	isValid := true
 	r.EachResult(func(_ string, vr ValueResult) bool {
-		return vr.Valid
+		isValid = vr.Valid // Use last seen valid as return
+		return vr.Valid    // Stop traversing if invalid result is seen
 	})
-	// TODO: this is a pretty slow way to do this.
-	return len(r.Errors()) == 0
+
+	r.cache.valid = &isValid
+
+	return isValid
 }
