@@ -28,7 +28,6 @@ import (
 
 type MockReporterV2 struct {
 	mb.ReporterV2
-	err error
 }
 
 func (MockReporterV2) Event(event mb.Event) bool {
