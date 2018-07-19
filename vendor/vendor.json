@@ -1125,6 +1125,18 @@
 			"revisionTime": "2014-10-17T20:07:13Z"
 		},
 		{
+			"checksumSHA1": "5qaMTb8eLAwaTeCqSHYMVyb4BSM=",
+			"path": "github.com/insomniacslk/dhcp/dhcpv4",
+			"revision": "633285ba52b2a67b98a3026eb87ee1a76ab60f3c",
+			"revisionTime": "2018-07-16T14:52:14Z"
+		},
+		{
+			"checksumSHA1": "AyBWbH2Ra2aFOO6tSk4aQaVqfBQ=",
+			"path": "github.com/insomniacslk/dhcp/iana",
+			"revision": "633285ba52b2a67b98a3026eb87ee1a76ab60f3c",
+			"revisionTime": "2018-07-16T14:52:14Z"
+		},
+		{
 			"checksumSHA1": "l9wW52CYGbmO/NGwYZ/Op2QTmaA=",
 			"path": "github.com/joeshaw/multierror",
 			"revision": "69b34d4ec901851247ae7e77d33909caf9df99ed",
