@@ -34,7 +34,7 @@ func (MockReporterV2) Event(event mb.Event) bool {
 	return true
 }
 
-var currentErr error
+var currentErr error // This hack is necessary because the Error method below cannot receive the type *MockReporterV2
 
 func (m MockReporterV2) Error(err error) bool {
 	currentErr = err
