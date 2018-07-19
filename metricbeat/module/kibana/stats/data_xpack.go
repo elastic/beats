@@ -173,8 +173,7 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error 
 	if !ok {
 		return reportErrorForMissingField("process.memory.resident_set_size_bytes", r)
 	}
-
-	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int(rss))
+	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int64(rss))
 
 	timestamp := time.Now()
 	kibanaStatsFields.Put("timestamp", timestamp)
