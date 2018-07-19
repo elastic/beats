@@ -87,6 +87,10 @@ func TestProcessor(t *testing.T) {
 			expected: common.MapStr{"index": false, "type": "keyword"},
 		},
 		{
+			output:   p.alias(&common.Field{Type: "alias", AliasPath: "a.b"}),
+			expected: common.MapStr{"path": "a.b", "type": "alias"},
+		},
+		{
 			output: p.object(&common.Field{Type: "object", Enabled: &falseVar}),
 			expected: common.MapStr{
 				"type":    "object",
