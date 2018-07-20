@@ -95,7 +95,7 @@ func defaultConfig() kafkaConfig {
 		RequiredACKs:     nil, // use library default
 		BrokerTimeout:    10 * time.Second,
 		Compression:      "gzip",
-		CompressionLevel: sarama.CompressionLevelDefault,
+		CompressionLevel: 4,
 		Version:          "1.0.0",
 		MaxRetries:       3,
 		ClientID:         "beats",
