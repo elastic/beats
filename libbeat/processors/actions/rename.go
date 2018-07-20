@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -51,8 +50,6 @@ func init() {
 }
 
 func newRenameFields(c *common.Config) (processors.Processor, error) {
-
-	cfgwarn.Beta("Beta rename processor is used.")
 	config := renameFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
