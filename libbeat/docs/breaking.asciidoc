@@ -23,6 +23,10 @@ See the following topics for a description of breaking changes:
 This section discusses the main changes that you should be aware of if you
 upgrade the Beats to version 6.3. {see-relnotes}
 
+[[breaking-changes-monitoring]]
+=== Filebeat monitoring schema changes
+Filebeat monitoring data from Filebaet version <6.3.0 could not be sent to an Elasticsearch cluster version >= 6.3.0 due to renaming of `beat.cpu.*.time metrics` to `beat.cpu.*.time.ms`. {see-relnotes}
+
 [[breaking-changes-mapping-conflict]]
 ==== New `host` namespace may cause mapping conflicts for Logstash
 
