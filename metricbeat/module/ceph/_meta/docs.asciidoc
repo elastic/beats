@@ -1,2 +1,13 @@
-The Ceph module collects metrics by submitting HTTP GET requests to
-the http://docs.ceph.com/docs/master/man/8/ceph-rest-api/[ceph-rest-api]. The default metricsets are `cluster_disk`, `cluster_health`, `monitor_health`, `pool_disk`, `osd_tree`.
+The Ceph module collects metrics from a https://ceph.com/[Ceph server].
+
+
+The metrics are collected by accessing the data from the https://ceph.com/geen-categorie/documentation-for-ceph-rest-api/[ceph-rest-api].
+
+To enabled the Ceph module in Metricbeat the following command has to be run:
+
+[source,sh]
+----
+./metricbeat modules enable ceph
+----
+
+This will enable the Ceph module with it's default configuration. In case <<metricbeat-configuration-reloading,live config reloading>> is not enabled, Metricbeat must be restarted.

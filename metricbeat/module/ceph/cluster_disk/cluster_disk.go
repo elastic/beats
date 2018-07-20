@@ -19,7 +19,6 @@ package cluster_disk
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -50,8 +49,6 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The ceph cluster_disk metricset is beta")
-
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err

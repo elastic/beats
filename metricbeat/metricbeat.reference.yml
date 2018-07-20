@@ -148,7 +148,14 @@ metricbeat.modules:
 
 #-------------------------------- Ceph Module --------------------------------
 - module: ceph
-  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
+  metricsets:
+    - cluster_disk
+    - cluster_health
+    - cluster_status
+    - monitor_health
+    - osd_df
+    - osd_tree
+    - pool_disk
   period: 10s
   hosts: ["localhost:5000"]
   enabled: true
