@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.3.1...6.3[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.3.2...6.3[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -29,10 +29,6 @@ https://github.com/elastic/beats/compare/v6.3.1...6.3[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix default value for logging.files.keepfiles. It was being set to 0 and now
-  it's set to the documented value of 7. {issue}7494[7494]
-- Retain compatibility with older Docker server versions. {issue}7542[7542]
-
 *Auditbeat*
 
 *Filebeat*
@@ -40,9 +36,6 @@ https://github.com/elastic/beats/compare/v6.3.1...6.3[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
-- Fix missing hosts config option in Ceph module. {pull}7596[7596]
-
-- Ensure metadata updates don't replace existing pod metrics. {pull}7573[7573]
 
 *Packetbeat*
 
@@ -60,11 +53,7 @@ https://github.com/elastic/beats/compare/v6.3.1...6.3[Check the HEAD diff]
 
 *Metricbeat*
 
-- Add support for bearer token files to HTTP helper. {pull}7527[7527]
-
 *Packetbeat*
-
-- Updated the TLS protocol parser with new cipher suites added to TLS 1.3. {issue}7455[7455]
 
 *Winlogbeat*
 
@@ -86,6 +75,35 @@ https://github.com/elastic/beats/compare/v6.3.1...6.3[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.3.2]]
+=== Beats version 6.3.2
+https://github.com/elastic/beats/compare/v6.3.1...v6.3.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix registry duplicates and log resending on upgrade. {issue}7634[7634]
+- Fix default value for logging.files.keepfiles. It was being set to 0 and now
+  it's set to the documented value of 7. {issue}7494[7494]
+- Retain compatibility with older Docker server versions. {issue}7542[7542]
+
+*Metricbeat*
+
+- Fix missing hosts config option in Ceph module. {pull}7596[7596]
+- Ensure metadata updates don't replace existing pod metrics. {pull}7573[7573]
+
+==== Added
+
+*Metricbeat*
+
+- Add support for bearer token files to HTTP helper. {pull}7527[7527]
+
+*Packetbeat*
+
+- Updated the TLS protocol parser with new cipher suites added to TLS 1.3. {issue}7455[7455]
+
 
 [[release-notes-6.3.1]]
 === Beats version 6.3.1
@@ -190,7 +208,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Commit registry writes to stable storage to avoid corrupt registry files. {pull}6877[6877]
 - Fix a parsing issue in the syslog input for RFC3339 timestamp and time with nanoseconds. {pull}7046[7046]
 - Fix an issue with an overflowing wait group when using the TCP input. {issue}7202[7202]
-- Fix registry duplicates and log resending on upgrade. {issue}7634[7634]
 
 *Heartbeat*
 
