@@ -190,6 +190,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
   Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
 - Added XXH64 hash option for file integrity checks. {pull}7311[7311]
 - Added the `show auditd-rules` and `show auditd-status` commands to show kernel rules and status. {pull}7114[7114]
+- Add kubernetes specs for auditbeat file integrity monitoring {pull}7642[7642]
 
 *Filebeat*
 
