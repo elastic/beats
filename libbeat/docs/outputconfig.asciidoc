@@ -667,7 +667,8 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 
 ==== Compatibility
 
-This output works with Kafka 0.8, 0.9, and 0.10.
+This output works with all Kafka in between 0.11 and 1.1.1. Older versions
+might work as well, but are not supported.
 
 ==== Configuration options
 
@@ -691,7 +692,7 @@ Kafka version ${beatname_lc} is assumed to run against. Defaults to 1.0.0.
 
 Event timestamps will be added, if version 0.10.0.0+ is enabled.
 
-Valid values are all kafka releases in between `0.8.2.0` and `1.1.0`.
+Valid values are all kafka releases in between `0.8.2.0` and `1.1.1`.
 
 ===== `username`
 
