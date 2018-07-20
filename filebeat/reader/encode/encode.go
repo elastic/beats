@@ -37,10 +37,11 @@ type Reader struct {
 func New(
 	r io.Reader,
 	codec encoding.Encoding,
+	name string,
 	bufferSize int,
-) Reader {
-	eReader := line.New(r, codec, []byte("\n"), bufferSize)
-	return Reader{eReader}
+) (Reader, error) {
+	eReader, err := line.New(r, codec, name, []byte("\n"), bufferSize)
+	return Reader{eReader}, err
 }
 
 // Next reads the next line from it's initial io.Reader

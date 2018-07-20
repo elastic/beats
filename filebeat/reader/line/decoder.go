@@ -18,39 +18,47 @@
 package line
 
 import (
-	"fmt"
 	"io"
 
-	"golang.org/x/text/encoding"
 	"golang.org/x/text/transform"
 
+	"github.com/elastic/beats/filebeat/reader/encode/encoding"
+	"github.com/elastic/beats/filebeat/reader/line/converter"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 )
 
 type decoderReader struct {
 	in         io.Reader
-	decoder    transform.Transformer
-	buf        *streambuf.Buffer
+	converter  converter.Converter
 	encodedBuf *streambuf.Buffer
 	bufferSize int
-	symlen     []uint8
 }
 
-func newDecoderReader(in io.Reader, codec encoding.Encoding, bufferSize int) *decoderReader {
+func newDecoderReader(in io.Reader, codec encoding.Encoding, name string, bufferSize int) (*decoderReader, error) {
+	f, err := converter.GetFactory(name)
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := f(codec.NewDecoder(), bufferSize)
+	if err != nil {
+		return nil, err
+	}
+
 	return &decoderReader{
 		in:         in,
-		decoder:    codec.NewDecoder(),
-		buf:        streambuf.New(nil),
+		converter:  c,
 		encodedBuf: streambuf.New(nil),
 		bufferSize: bufferSize,
-	}
+	}, nil
 }
 
 func (r *decoderReader) read(buf []byte) (int, error) {
 	b := make([]byte, r.bufferSize)
 
-	if r.buf.Len() != 0 {
-		return r.copyToOut(buf)
+	n, err := r.converter.Collect(buf)
+	if n != 0 {
+		return n, err
 	}
 
 	for {
@@ -69,7 +77,7 @@ func (r *decoderReader) read(buf []byte) (int, error) {
 			b = append(enc, b[start:]...)
 		}
 
-		nBytes, nProcessed, err := r.conv(b[:start+n], buf)
+		nBytes, nProcessed, err := r.converter.Convert(b[:start+n], buf)
 		if err != nil {
 			if err == transform.ErrShortSrc {
 				r.encodedBuf.Append(b[nProcessed:])
@@ -81,86 +89,10 @@ func (r *decoderReader) read(buf []byte) (int, error) {
 	}
 }
 
-// msgSize returns the size of the encoded message on the disk
 func (r *decoderReader) msgSize(symlen []uint8, size int) (int, []uint8, error) {
-	n := 0
-	for size > 0 {
-		if len(symlen) <= n {
-			return 0, symlen, fmt.Errorf("error calculating size: too short symlen")
-		}
-
-		size -= int(symlen[n])
-		n++
-	}
-
-	symlen = symlen[n:]
-
-	return n, symlen, nil
+	return r.converter.MsgSize(symlen, size)
 }
 
-func (r *decoderReader) symbolsLen() []uint8 {
-	s := r.symlen
-	r.symlen = []uint8{}
-	return s
-}
-
-// conv converts encoded bytes into UTF-8 and produces a symlen array which
-// records the size of the encoded bytes and its converted size
-func (r *decoderReader) conv(in []byte, out []byte) (int, int, error) {
-	var err error
-	nProcessed := 0
-	decodedChar := make([]byte, 64)
-	r.symlen = make([]uint8, len(in))
-
-	i := 0
-	srcLen := len(in)
-	for i < srcLen {
-		j := i + 1
-
-		for j <= srcLen {
-			nDst, nSrc, err := r.decoder.Transform(decodedChar, in[i:j], false)
-			if err != nil {
-				// if no char is decoded, try increasing the input buffer
-				if err == transform.ErrShortSrc {
-					j++
-
-					// if the buffer size cannot be increased, return what's been decoded and an error
-					if srcLen < j {
-						n, _ := r.copyToOut(out)
-						r.symlen = r.symlen[:nProcessed]
-						return n, nProcessed, err
-					}
-				}
-				err = nil
-			}
-
-			// move in the symlen buffer if no char is decoded
-			if nDst == 0 && nSrc == 0 {
-				nProcessed++
-				continue
-			}
-
-			r.symlen[nProcessed] = uint8(nDst)
-			r.buf.Write(decodedChar[:nDst])
-			nProcessed++
-			break
-		}
-		i = j
-	}
-
-	n, err := r.copyToOut(out)
-	return n, nProcessed, err
-}
-
-func (r *decoderReader) copyToOut(out []byte) (int, error) {
-	until := len(out)
-	if r.buf.Len() < until {
-		until = r.buf.Len()
-	}
-	b, err := r.buf.Collect(until)
-	if err != nil {
-		return 0, err
-	}
-	r.buf.Reset()
-	return copy(out, b), nil
+func (r *decoderReader) GetSymLen() []uint8 {
+	return r.converter.GetSymLen()
 }

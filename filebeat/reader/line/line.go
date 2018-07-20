@@ -20,7 +20,7 @@ package line
 import (
 	"io"
 
-	"golang.org/x/text/encoding"
+	"github.com/elastic/beats/filebeat/reader/encode/encoding"
 )
 
 // lineReader reads lines from underlying reader, decoding the input stream
@@ -31,13 +31,17 @@ type Reader struct {
 }
 
 // New creates a new reader object
-func New(input io.Reader, codec encoding.Encoding, separator []byte, bufferSize int) *Reader {
-	decReader := newDecoderReader(input, codec, bufferSize)
+func New(input io.Reader, encoding encoding.Encoding, name string, separator []byte, bufferSize int) (*Reader, error) {
+	decReader, err := newDecoderReader(input, encoding, name, bufferSize)
+	if err != nil {
+		return nil, err
+	}
+
 	lineScanner := newLineScanner(decReader, separator, bufferSize)
 
 	return &Reader{
 		lineScanner: lineScanner,
-	}
+	}, nil
 }
 
 // Next reads the next line until the new line character

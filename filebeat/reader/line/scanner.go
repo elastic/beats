@@ -49,7 +49,7 @@ func (s *lineScanner) scan() ([]byte, int, error) {
 		}
 
 		s.buf.Append(b[:n])
-		s.symlen = append(s.symlen, s.in.symbolsLen()...)
+		s.symlen = append(s.symlen, s.in.GetSymLen()...)
 		idx = s.buf.Index(s.separator)
 	}
 
