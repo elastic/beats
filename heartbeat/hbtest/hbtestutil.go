@@ -33,20 +33,17 @@ const HelloWorldBody = "hello, world!"
 
 // HelloWorldHandler is a handler for an http server that returns
 // HelloWorldBody and a 200 OK status.
-var HelloWorldHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	io.WriteString(w, HelloWorldBody)
-})
-
-// BadGatewayBody is the body of the BadGatewayHandler.
-const BadGatewayBody = "Bad Gateway"
-
-// BadGatewayHandler is a handler for an http server that returns
-// BadGatewayBody and a 200 OK status.
-var BadGatewayHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusBadGateway)
-	io.WriteString(w, BadGatewayBody)
-})
+func HelloWorldHandler(status int) http.HandlerFunc {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if status >= 301 && status <= 303 {
+				w.Header().Set("Location", "/somewhere")
+			}
+			w.WriteHeader(status)
+			io.WriteString(w, HelloWorldBody)
+		},
+	)
+}
 
 // ServerPort takes an httptest.Server and returns its port as a uint16.
 func ServerPort(server *httptest.Server) (uint16, error) {
@@ -85,8 +82,8 @@ func TCPBaseChecks(port uint16) mapval.Validator {
 }
 
 // ErrorChecks checks the standard heartbeat error hierarchy, which should
-// consist of a message and a type under the error key.
-func ErrorChecks(msg string, errType string) mapval.Validator {
+// consist of a message (or a mapval isdef that can match the message) and a type under the error key.
+func ErrorChecks(msg interface{}, errType string) mapval.Validator {
 	return mapval.Schema(mapval.Map{
 		"error": mapval.Map{
 			"message": msg,

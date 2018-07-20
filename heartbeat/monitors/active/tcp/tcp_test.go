@@ -24,6 +24,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/phayes/freeport"
+
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
@@ -53,7 +55,7 @@ func tcpMonitorChecks(host string, ip string, port uint16, status string) mapval
 	return hbtest.MonitorChecks(id, host, ip, "tcp", status)
 }
 
-func TestUpEndpoint(t *testing.T) {
+func TestUpEndpointJob(t *testing.T) {
 	server := httptest.NewServer(hbtest.HelloWorldHandler)
 	defer server.Close()
 
@@ -85,7 +87,23 @@ func TestUpEndpoint(t *testing.T) {
 	)
 }
 
-func TestUnreachableEndpoint(t *testing.T) {
+func TestConnectionRefusedEndpointJob(t *testing.T) {
+	ip := "127.0.0.1"
+	port := uint16(freeport.GetPort())
+	event := testTCPCheck(t, ip, port)
+
+	mapvaltest.Test(
+		t,
+		mapval.Strict(mapval.Compose(
+			tcpMonitorChecks(ip, ip, port, "down"),
+			hbtest.ErrorChecks(fmt.Sprintf("dial tcp %s:%d: connect: connection refused", ip, port), "io"),
+			hbtest.TCPBaseChecks(port),
+		)),
+		event.Fields,
+	)
+}
+
+func TestUnreachableEndpointJob(t *testing.T) {
 	ip := "203.0.113.1"
 	port := uint16(1234)
 	event := testTCPCheck(t, ip, port)

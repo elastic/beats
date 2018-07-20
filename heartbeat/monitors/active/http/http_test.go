@@ -26,6 +26,8 @@ import (
 
 	"fmt"
 
+	"github.com/phayes/freeport"
+
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
@@ -82,36 +84,140 @@ func respondingHTTPChecks(url string, statusCode int) mapval.Validator {
 	)
 }
 
-func TestOKJob(t *testing.T) {
-	server, event := checkServer(t, hbtest.HelloWorldHandler)
-	port, err := hbtest.ServerPort(server)
-	require.NoError(t, err)
-
-	mapvaltest.Test(
-		t,
-		mapval.Strict(mapval.Compose(
-			hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "up"),
-			hbtest.RespondingTCPChecks(port),
-			respondingHTTPChecks(server.URL, http.StatusOK),
-		)),
-		(event.Fields),
-	)
+var upStatuses = []int{
+	// 1xx
+	http.StatusContinue,
+	http.StatusSwitchingProtocols,
+	http.StatusProcessing,
+	// 2xx
+	http.StatusOK,
+	http.StatusCreated,
+	http.StatusAccepted,
+	http.StatusNonAuthoritativeInfo,
+	http.StatusNoContent,
+	http.StatusResetContent,
+	http.StatusPartialContent,
+	http.StatusMultiStatus,
+	http.StatusAlreadyReported,
+	http.StatusIMUsed,
+	// 3xx
+	http.StatusMultipleChoices,
+	http.StatusMovedPermanently,
+	http.StatusFound,
+	http.StatusSeeOther,
+	http.StatusNotModified,
+	http.StatusUseProxy,
+	http.StatusTemporaryRedirect,
+	http.StatusPermanentRedirect,
 }
 
-func TestBadGatewayJob(t *testing.T) {
-	server, event := checkServer(t, hbtest.BadGatewayHandler)
-	port, err := hbtest.ServerPort(server)
-	require.NoError(t, err)
+var downStatuses = []int{
+	//4xx
+	http.StatusBadRequest,
+	http.StatusUnauthorized,
+	http.StatusPaymentRequired,
+	http.StatusForbidden,
+	http.StatusNotFound,
+	http.StatusMethodNotAllowed,
+	http.StatusNotAcceptable,
+	http.StatusProxyAuthRequired,
+	http.StatusRequestTimeout,
+	http.StatusConflict,
+	http.StatusGone,
+	http.StatusLengthRequired,
+	http.StatusPreconditionFailed,
+	http.StatusRequestEntityTooLarge,
+	http.StatusRequestURITooLong,
+	http.StatusUnsupportedMediaType,
+	http.StatusRequestedRangeNotSatisfiable,
+	http.StatusExpectationFailed,
+	http.StatusTeapot,
+	http.StatusUnprocessableEntity,
+	http.StatusLocked,
+	http.StatusFailedDependency,
+	http.StatusUpgradeRequired,
+	http.StatusPreconditionRequired,
+	http.StatusTooManyRequests,
+	http.StatusRequestHeaderFieldsTooLarge,
+	http.StatusUnavailableForLegalReasons,
+	//5xx,
+	http.StatusInternalServerError,
+	http.StatusNotImplemented,
+	http.StatusBadGateway,
+	http.StatusServiceUnavailable,
+	http.StatusGatewayTimeout,
+	http.StatusHTTPVersionNotSupported,
+	http.StatusVariantAlsoNegotiates,
+	http.StatusInsufficientStorage,
+	http.StatusLoopDetected,
+	http.StatusNotExtended,
+	http.StatusNetworkAuthenticationRequired,
+}
+
+func TestUpStatuses(t *testing.T) {
+	for _, status := range upStatuses {
+		status := status
+		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
+			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
+			port, err := hbtest.ServerPort(server)
+			require.NoError(t, err)
+
+			mapvaltest.Test(
+				t,
+				mapval.Strict(mapval.Compose(
+					hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "up"),
+					hbtest.RespondingTCPChecks(port),
+					respondingHTTPChecks(server.URL, status),
+				)),
+				event.Fields,
+			)
+		})
+	}
+}
+
+func TestDownStatuses(t *testing.T) {
+	for _, status := range downStatuses {
+		status := status
+		t.Run(fmt.Sprintf("test down status %d", status), func(t *testing.T) {
+			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
+			port, err := hbtest.ServerPort(server)
+			require.NoError(t, err)
+
+			errMsgCheck := mapval.IsStringContaining(fmt.Sprintf("%d", status))
+
+			mapvaltest.Test(
+				t,
+				mapval.Strict(mapval.Compose(
+					hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "down"),
+					hbtest.RespondingTCPChecks(port),
+					respondingHTTPChecks(server.URL, status),
+					hbtest.ErrorChecks(errMsgCheck, "validate"),
+				)),
+				event.Fields,
+			)
+		})
+	}
+}
+
+func TestConnRefusedJob(t *testing.T) {
+	ip := "127.0.0.1"
+	port := uint16(freeport.GetPort())
+	url := fmt.Sprintf("http://%s:%d", ip, port)
+
+	event := testRequest(t, url)
 
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "down"),
-			hbtest.RespondingTCPChecks(port),
-			respondingHTTPChecks(server.URL, http.StatusBadGateway),
-			hbtest.ErrorChecks("502 Bad Gateway", "validate"),
+			hbtest.MonitorChecks("http@"+url, url, ip, "http", "down"),
+			hbtest.TCPBaseChecks(port),
+			hbtest.ErrorChecks(
+				fmt.Sprintf(
+					"Get http://%s:%d: dial tcp %s:%d: connect: connection refused", ip, port, ip, port),
+				"io"),
+			httpBaseChecks(url),
 		)),
-		(event.Fields),
+		event.Fields,
 	)
 }
 
@@ -134,6 +240,6 @@ func TestUnreachableJob(t *testing.T) {
 				"io"),
 			httpBaseChecks(url),
 		)),
-		(event.Fields),
+		event.Fields,
 	)
 }
