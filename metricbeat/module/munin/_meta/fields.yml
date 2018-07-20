@@ -1,7 +1,7 @@
 - key: munin
   title: "Munin"
   description: >
-    experimental[]
+    beta[]
 
     Munin node metrics exporter
   release: experimental
