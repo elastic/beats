@@ -2,7 +2,7 @@
   type: group
   description: >
     ceph osd tree info
-  release: beta
+  release: ga
   fields:
     - name: id
       type: long
