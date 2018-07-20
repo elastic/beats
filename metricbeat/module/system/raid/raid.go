@@ -24,7 +24,6 @@ import (
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
@@ -44,8 +43,6 @@ type MetricSet struct {
 
 // New creates a new instance of the raid metricset.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The system raid metricset is beta")
-
 	systemModule, ok := base.Module().(*system.Module)
 	if !ok {
 		return nil, errors.New("unexpected module type")
