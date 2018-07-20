@@ -833,6 +833,15 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 Sets the output compression codec. Must be one of `none`, `snappy`, `lz4` and `gzip`. The default is `gzip`.
 
+===== `compression_level`
+
+Sets the compression level used by gzip. Setting this value to 0 disables compression.
+The compression level must be in the range of 1 (best speed) to 9 (best compression).
+
+Increasing the compression level will reduce the network usage but will increase the cpu usage.
+
+The default value is 4.
+
 [[kafka-max_message_bytes]]
 ===== `max_message_bytes`
 
