@@ -181,6 +181,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Refactor error handing in schema.Apply(). {pull}7335[7335]
 - Add additional types to kubernetes metadata {pull}7457[7457]
 - Add module state reporting for X-Pack Monitoring. {pull}7075[7075]
+- Release the rename processor as GA. {pull}7656[7656]
 
 *Auditbeat*
 
