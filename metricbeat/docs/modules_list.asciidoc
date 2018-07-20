@@ -124,8 +124,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-system-network,network>>   
 |<<metricbeat-metricset-system-process,process>>   
 |<<metricbeat-metricset-system-process_summary,process_summary>>   
-|<<metricbeat-metricset-system-raid,raid>> beta[]  
-|<<metricbeat-metricset-system-socket,socket>> beta[]  
+|<<metricbeat-metricset-system-raid,raid>>   
+|<<metricbeat-metricset-system-socket,socket>>   
 |<<metricbeat-metricset-system-uptime,uptime>>   
 |<<metricbeat-module-traefik,traefik>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-traefik-health,health>> experimental[]  
