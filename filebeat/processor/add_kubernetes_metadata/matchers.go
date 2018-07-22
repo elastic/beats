@@ -92,7 +92,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 		if f.ResourceType == "pod" {
 			// Specify a pod resource type when manually mounting log volumes and they end up under "/var/lib/kubelet/pods/"
 			// This will extract only the pod UID, which offers less granularity of metadata when compared to the container ID
-			if strings.HasPrefix(f.LogsPath, "/var/lib/kubelet/pods/") && strings.HasSuffix(source, ".log") {
+			if strings.HasPrefix(f.LogsPath, "/var/lib/kubelet/pods/") {
 				pathDirs := strings.Split(source, "/")
 				if len(pathDirs) > podUIDPos {
 					podUID := strings.Split(source, "/")[podUIDPos]
