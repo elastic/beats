@@ -116,11 +116,10 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-Dependency: github.com/boltdb/bolt
-Version: v1.3.1
-Revision: 2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8
+Dependency: github.com/coreos/bbolt
+Revision: af9db2027c98c61ecd8e17caa5bd265792b9b9a2
 License type (autodetected): MIT
-./vendor/github.com/boltdb/bolt/LICENSE:
+./vendor/github.com/coreos/bbolt/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
