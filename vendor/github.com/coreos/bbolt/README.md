@@ -1,5 +1,15 @@
-Bolt [![Coverage Status](https://coveralls.io/repos/boltdb/bolt/badge.svg?branch=master)](https://coveralls.io/r/boltdb/bolt?branch=master) [![GoDoc](https://godoc.org/github.com/boltdb/bolt?status.svg)](https://godoc.org/github.com/boltdb/bolt) ![Version](https://img.shields.io/badge/version-1.2.1-green.svg)
+bbolt
 ====
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/coreos/bbolt?style=flat-square)](https://goreportcard.com/report/github.com/coreos/bbolt)
+[![Coverage](https://codecov.io/gh/coreos/bbolt/branch/master/graph/badge.svg)](https://codecov.io/gh/coreos/bbolt)
+[![Godoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/coreos/bbolt)
+
+bbolt is a fork of [Ben Johnson's][gh_ben] [Bolt][bolt] key/value
+store. The purpose of this fork is to provide the Go community with an active
+maintenance and development target for Bolt; the goal is improved reliability
+and stability. bbolt includes bug fixes, performance enhancements, and features
+not found in Bolt while preserving backwards compatibility with the Bolt API.
 
 Bolt is a pure Go key/value store inspired by [Howard Chu's][hyc_symas]
 [LMDB project][lmdb]. The goal of the project is to provide a simple,
@@ -10,6 +20,8 @@ Since Bolt is meant to be used as such a low-level piece of functionality,
 simplicity is key. The API will be small and only focus on getting values
 and setting values. That's it.
 
+[gh_ben]: https://github.com/benbjohnson
+[bolt]: https://github.com/boltdb/bolt
 [hyc_symas]: https://twitter.com/hyc_symas
 [lmdb]: http://symas.com/mdb/
 
@@ -59,7 +71,7 @@ Shopify and Heroku use Bolt-backed services every day.
 To start using Bolt, install Go and run `go get`:
 
 ```sh
-$ go get github.com/boltdb/bolt/...
+$ go get github.com/coreos/bbolt/...
 ```
 
 This will retrieve the library and install the `bolt` command line utility into
@@ -79,7 +91,7 @@ package main
 import (
 	"log"
 
-	"github.com/boltdb/bolt"
+	bolt "github.com/coreos/bbolt"
 )
 
 func main() {
@@ -522,7 +534,7 @@ this from a read-only transaction, it will perform a hot backup and not block
 your other database reads and writes.
 
 By default, it will use a regular file handle which will utilize the operating
-system's page cache. See the [`Tx`](https://godoc.org/github.com/boltdb/bolt#Tx)
+system's page cache. See the [`Tx`](https://godoc.org/github.com/coreos/bbolt#Tx)
 documentation for information about optimizing for larger-than-RAM datasets.
 
 One common use case is to backup over HTTP so you can use tools like `cURL` to
@@ -811,7 +823,7 @@ Here are a few things to note when evaluating and using Bolt:
 
 ## Reading the Source
 
-Bolt is a relatively small code base (<3KLOC) for an embedded, serializable,
+Bolt is a relatively small code base (<5KLOC) for an embedded, serializable,
 transactional key/value database so it can be a good starting point for people
 interested in how databases work.
 
@@ -907,10 +919,10 @@ Below is a list of public, open source projects that use Bolt:
 * [torrent](https://github.com/anacrolix/torrent) - Full-featured BitTorrent client package and utilities in Go. BoltDB is a storage backend in development.
 * [gopherpit](https://github.com/gopherpit/gopherpit) - A web service to manage Go remote import paths with custom domains
 * [bolter](https://github.com/hasit/bolter) - Command-line app for viewing BoltDB file in your terminal.
+* [boltcli](https://github.com/spacewander/boltcli) - the redis-cli for boltdb with Lua script support.
 * [btcwallet](https://github.com/btcsuite/btcwallet) - A bitcoin wallet.
 * [dcrwallet](https://github.com/decred/dcrwallet) - A wallet for the Decred cryptocurrency.
 * [Ironsmith](https://github.com/timshannon/ironsmith) - A simple, script-driven continuous integration (build - > test -> release) tool, with no external dependencies
 * [BoltHold](https://github.com/timshannon/bolthold) - An embeddable NoSQL store for Go types built on BoltDB
-* [Ponzu CMS](https://ponzu-cms.org) - Headless CMS + automatic JSON API with auto-HTTPS, HTTP/2 Server Push, and flexible server framework.
 
 If you are using Bolt in a project please send a pull request to add it to the list.
