@@ -10,8 +10,6 @@
   #  - container
   #  - volume
   period: 10s
-  hosts: ["localhost:10255"]
-
   hosts: ["localhost:10250"]
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   ssl.certificate_authorities:
