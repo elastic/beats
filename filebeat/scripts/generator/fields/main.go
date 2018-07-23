@@ -121,8 +121,8 @@ func newField(pattern string) field {
 }
 
 // isValidFormat checks if the input can be split correctly
-// 1. if lenght is 2, the format is {type}:{field.elements}
-// 2. if the lenght is 3, the format is {type}:{field.elements}:{hint}
+// 1. if length is 2, the format is {type}:{field.elements}
+// 2. if the length is 3, the format is {type}:{field.elements}:{hint}
 func isValidFormat(ee []string) bool {
 	return len(ee) == 2 || len(ee) == 3
 }
