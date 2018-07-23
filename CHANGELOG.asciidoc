@@ -312,6 +312,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add Elasticsearch index recovery metricset. {pull}7225[7225]
 - Run Kafka integration tests on version 1.1.0 {pull}7616[7616]
 - Release raid and socket metricset from system module as GA. {pull}7658[7658]
+- Release elasticsearch module and all its metricsets as beta. {pull}7662[7662]
 
 *Packetbeat*
 
