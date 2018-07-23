@@ -2,6 +2,7 @@
   type: group
   description: >
     index
+  release: beta
   fields:
     - name: id
       type: long

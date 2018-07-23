@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-elasticsearch-ml_job]]
 === Elasticsearch ml_job metricset
 
-experimental[]
+beta[]
 
 include::../../../module/elasticsearch/ml_job/_meta/docs.asciidoc[]
 

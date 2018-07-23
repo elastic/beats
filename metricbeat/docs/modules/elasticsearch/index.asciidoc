@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-elasticsearch-index]]
 === Elasticsearch index metricset
 
-experimental[]
+beta[]
 
 include::../../../module/elasticsearch/index/_meta/docs.asciidoc[]
 
