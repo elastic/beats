@@ -1638,8 +1638,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/OneOfOne/xxhash
-Version: v1.2.2
-Revision: 6def279d2ce6c81a79dd1c1be580f03bb216fb8a
+Revision: 2c166c65de755bdafa6ae2959c10ea9df6e8b3e5
 License type (autodetected): Apache-2.0
 ./vendor/github.com/OneOfOne/xxhash/LICENSE:
 --------------------------------------------------------------------
