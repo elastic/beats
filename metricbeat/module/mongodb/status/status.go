@@ -28,7 +28,6 @@ import (
 
 /*
 TODOs:
-	* add metricset for "locks" data
 	* add a metricset for "metrics" data
 */
 
