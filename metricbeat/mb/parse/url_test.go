@@ -128,3 +128,59 @@ func TestURLHostParserBuilder(t *testing.T) {
 		assert.Equal(t, test.url, hp.URI)
 	}
 }
+
+func TestURLHostParserBuilderWithBasePath(t *testing.T) {
+	const rawURL = "http://example.com/foo"
+
+	var cases = []struct {
+		config  map[string]interface{}
+		builder URLHostParserBuilder
+		url     string
+	}{
+		{map[string]interface{}{"path": "/path"}, URLHostParserBuilder{PathConfigKey: "path", DefaultPath: "/default"}, "http://example.com/foo/path"},
+		{map[string]interface{}{}, URLHostParserBuilder{PathConfigKey: "path", DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{"username": "guest"}, URLHostParserBuilder{}, "http://guest@example.com/foo"},
+		{map[string]interface{}{"username": "guest", "password": "secret"}, URLHostParserBuilder{}, "http://guest:secret@example.com/foo"},
+	}
+
+	for _, test := range cases {
+		m := mbtest.NewTestModule(t, test.config)
+		hostParser := test.builder.Build()
+
+		hp, err := hostParser(m, rawURL)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, test.url, hp.URI)
+	}
+}
+
+func TestURLHostParserBuilderWithBasePathUsingTrailingSlash(t *testing.T) {
+	const rawURL = "http://example.com/foo/"
+
+	var cases = []struct {
+		config  map[string]interface{}
+		builder URLHostParserBuilder
+		url     string
+	}{
+		{map[string]interface{}{"path": "/path"}, URLHostParserBuilder{PathConfigKey: "path", DefaultPath: "/default"}, "http://example.com/foo/path"},
+		{map[string]interface{}{}, URLHostParserBuilder{PathConfigKey: "path", DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{"username": "guest"}, URLHostParserBuilder{}, "http://guest@example.com/foo/"},
+		{map[string]interface{}{"username": "guest", "password": "secret"}, URLHostParserBuilder{}, "http://guest:secret@example.com/foo/"},
+	}
+
+	for _, test := range cases {
+		m := mbtest.NewTestModule(t, test.config)
+		hostParser := test.builder.Build()
+
+		hp, err := hostParser(m, rawURL)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, test.url, hp.URI)
+	}
+}
