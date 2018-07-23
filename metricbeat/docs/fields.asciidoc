@@ -6766,7 +6766,7 @@ Kibana instance's health status
 --
 type: long
 
-Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request mulitple server assets at once, and they can re-use established connections.
+Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
 
 
 --
