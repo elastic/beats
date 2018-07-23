@@ -9,12 +9,11 @@
 			"revisionTime": "2017-05-24T00:36:31Z"
 		},
 		{
-			"checksumSHA1": "wshQ6/MnQx8nH6pgufu4kJEX6JI=",
+			"checksumSHA1": "rDoYEddGYvQT73l9V8Uqjk7SHAY=",
+			"origin": "github.com/andrewkroh/xxhash",
 			"path": "github.com/OneOfOne/xxhash",
-			"revision": "6def279d2ce6c81a79dd1c1be580f03bb216fb8a",
-			"revisionTime": "2018-05-30T13:49:54Z",
-			"version": "v1.2.2",
-			"versionExact": "v1.2.2"
+			"revision": "2c166c65de755bdafa6ae2959c10ea9df6e8b3e5",
+			"revisionTime": "2018-07-23T14:32:41Z"
 		},
 		{
 			"checksumSHA1": "xSwVjXDGIMoADDte4hBjra6ldGk=",
