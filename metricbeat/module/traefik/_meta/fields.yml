@@ -2,6 +2,7 @@
   title: "traefik"
   description: >
     Traefik reverse proxy / load balancer metrics
+  release: beta
   fields:
     - name: traefik
       type: group

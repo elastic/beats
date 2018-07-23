@@ -11066,7 +11066,6 @@ The amount of time spent for commits that occurred while a write lock was held.
 [[exported-fields-munin]]
 == Munin fields
 
-experimental[]
 Munin node metrics exporter
 
 
