@@ -19,7 +19,6 @@ package xpack
 
 import (
 	"fmt"
-	"time"
 )
 
 // Product supported by X-Pack Monitoring
@@ -57,8 +56,7 @@ func (p Product) String() string {
 // MakeMonitoringIndexName method returns the name of the monitoring index for
 // a given product { elasticsearch, kibana, logstash, beats }
 func MakeMonitoringIndexName(product Product) string {
-	today := time.Now().UTC().Format("2006.01.02")
 	const version = "6"
 
-	return fmt.Sprintf(".monitoring-%v-%v-mb-%v", product, version, today)
+	return fmt.Sprintf(".monitoring-%v-%v-mb", product, version)
 }

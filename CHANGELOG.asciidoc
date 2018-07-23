@@ -181,6 +181,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Refactor error handing in schema.Apply(). {pull}7335[7335]
 - Add additional types to kubernetes metadata {pull}7457[7457]
 - Add module state reporting for X-Pack Monitoring. {pull}7075[7075]
+- Release the rename processor as GA. {pull}7656[7656]
 
 *Auditbeat*
 
@@ -190,6 +191,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
   Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
 - Added XXH64 hash option for file integrity checks. {pull}7311[7311]
 - Added the `show auditd-rules` and `show auditd-status` commands to show kernel rules and status. {pull}7114[7114]
+- Add kubernetes specs for auditbeat file integrity monitoring {pull}7642[7642]
 
 *Filebeat*
 
@@ -309,6 +311,8 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add support for bearer token files to HTTP helper. {pull}7527[7527]
 - Add Elasticsearch index recovery metricset. {pull}7225[7225]
 - Run Kafka integration tests on version 1.1.0 {pull}7616[7616]
+- Release raid and socket metricset from system module as GA. {pull}7658[7658]
+- Release elasticsearch module and all its metricsets as beta. {pull}7662[7662]
 - Add envoyproxy module. {pull}7569[7569]
 
 *Packetbeat*
