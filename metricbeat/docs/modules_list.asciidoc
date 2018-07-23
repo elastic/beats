@@ -58,7 +58,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-kibana,Kibana>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-kibana-status,status>> beta[]  
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.12+| .12+|  |<<metricbeat-metricset-kubernetes-container,container>>   
+.13+| .13+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>> beta[]  
+|<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-event,event>> beta[]  
 |<<metricbeat-metricset-kubernetes-node,node>>   
 |<<metricbeat-metricset-kubernetes-pod,pod>>   
