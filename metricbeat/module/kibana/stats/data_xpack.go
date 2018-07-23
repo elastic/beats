@@ -70,40 +70,6 @@ var (
 			"snapshot":          c.Bool("snapshot"),
 			"status":            c.Str("status"),
 		}),
-		// "usage": c.Dict("usage", s.Schema{
-		// 	"index": c.Str("kibana.index"),
-		// 	"index_pattern": c.Dict("kibana.index_pattern", s.Schema{
-		// 		"total": c.Int("total"),
-		// 	}),
-		// 	"search": c.Dict("kibana.search", s.Schema{
-		// 		"total": c.Int("total"),
-		// 	}),
-		// 	"visualization": c.Dict("kibana.visualization", s.Schema{
-		// 		"total": c.Int("total"),
-		// 	}),
-		// 	"dashboard": c.Dict("kibana.dashboard", s.Schema{
-		// 		"total": c.Int("total"),
-		// 	}),
-		// 	"timelion_sheet": c.Dict("kibana.timelion_sheet", s.Schema{
-		// 		"total": c.Int("total"),
-		// 	}),
-		// 	"graph_workspace": c.Dict("kibana.graph_workspace", s.Schema{
-		// 		"total": c.Int("total"),
-		// 	}),
-		// 	"xpack": s.Object{
-		// 		"reporting": c.Dict("reporting", s.Schema{
-		// 			"available":     c.Bool("available"),
-		// 			"enabled":       c.Bool("enabled"),
-		// 			"browser_type":  c.Str("browser_type"),
-		// 			"_all":          c.Int("all"),
-		// 			"csv":           reportingCsvDict,
-		// 			"printable_pdf": reportingPrintablePdfDict,
-		// 			"status":        reportingStatusDict,
-		// 			"lastDay":       c.Dict("last_day", reportingPeriodSchema, c.DictOptional),
-		// 			"last7Days":     c.Dict("last_7_days", reportingPeriodSchema, c.DictOptional),
-		// 		}, c.DictOptional),
-		// 	},
-		// }),
 	}
 
 	reportingCsvDict = c.Dict("csv", s.Schema{
