@@ -129,6 +129,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix Jolokia attribute mapping when using wildcards and MBean names with multiple properties. {pull}7321[7321]
 - Do not report Metricbeat container host as hostname in Kubernetes deployment. {issue}7199[7199]
 - Ensure metadata updates don't replace existing pod metrics. {pull}7573[7573]
+- Fix kubernetes pct fields reporting. {pull}7677[7677]
 
 *Packetbeat*
 
