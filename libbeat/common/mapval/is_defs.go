@@ -31,6 +31,30 @@ var KeyPresent = IsDef{name: "check key present"}
 // KeyMissing checks that the given key is not present defined.
 var KeyMissing = IsDef{name: "check key not present", checkKeyMissing: true}
 
+// IsAny takes a variable number of IsDef's and combines them with a logical OR. If any single definition
+// matches the key will be marked as valid.
+func IsAny(of ...IsDef) IsDef {
+	names := make([]string, len(of))
+	for i, def := range of {
+		names[i] = def.name
+	}
+	isName := fmt.Sprintf("either %#v", names)
+
+	return Is(isName, func(v interface{}) ValueResult {
+		for _, def := range of {
+			vr := def.check(v, true)
+			if vr.Valid {
+				return vr
+			}
+		}
+
+		return ValueResult{
+			false,
+			fmt.Sprintf("Value was none of %#v, actual value was %#v", names, v),
+		}
+	})
+}
+
 // IsStringContaining validates that the the actual value contains the specified substring.
 func IsStringContaining(needle string) IsDef {
 	return Is("is string containing", func(v interface{}) ValueResult {
