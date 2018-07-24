@@ -32,13 +32,12 @@ import (
 // URLHostParserBuilder builds a tailored HostParser for used with host strings
 // that are URLs.
 type URLHostParserBuilder struct {
-	BasePathConfigKey string
-	PathConfigKey     string
-	DefaultPath       string
-	DefaultUsername   string
-	DefaultPassword   string
-	DefaultScheme     string
-	QueryParams       string
+	PathConfigKey   string
+	DefaultPath     string
+	DefaultUsername string
+	DefaultPassword string
+	DefaultScheme   string
+	QueryParams     string
 }
 
 // Build returns a new HostParser function whose behavior is influenced by the
@@ -51,7 +50,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 			return mb.HostData{}, err
 		}
 
-		var user, pass, path, basePath string
+		var user, pass, path string
 		t, ok := conf["username"]
 		if ok {
 			user, ok = t.(string)
@@ -79,23 +78,8 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		} else {
 			path = b.DefaultPath
 		}
-		// Normalize path
-		path = strings.Trim(path, "/")
 
-		t, ok = conf[b.BasePathConfigKey]
-		if ok {
-			basePath, ok = t.(string)
-			if !ok {
-				return mb.HostData{}, errors.Errorf("'%v' config for module %v is not a string", b.BasePathConfigKey, module.Name())
-			}
-		}
-		// Normalize basepath
-		basePath = strings.Trim(basePath, "/")
-
-		// Combine paths and normalize
-		fullPath := strings.Trim(p.Join(basePath, path), "/")
-
-		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.QueryParams)
+		return ParseURL(host, b.DefaultScheme, user, pass, path, b.QueryParams)
 	}
 }
 
@@ -200,13 +184,15 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 		}
 	}
 
-	if u.Path == "" && path != "" {
+	if path != "" {
 		// The path given in the host config takes precedence over the
 		// default path.
-		if !strings.HasPrefix(path, "/") {
-			path = "/" + path
-		}
-		u.Path = path
+
+		// Normalize paths
+		u.Path = strings.TrimRight(u.Path, "/")
+		path = strings.TrimLeft(path, "/")
+
+		u.Path = p.Join(u.Path, path)
 	}
 
 	// Add the query params to existing query parameters overwriting any
