@@ -23,10 +23,13 @@ import (
 	"net/url"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSplitHostnamePort(t *testing.T) {
 	var urlTests = []struct {
+		name          string
 		scheme        string
 		host          string
 		expectedHost  string
@@ -34,6 +37,7 @@ func TestSplitHostnamePort(t *testing.T) {
 		expectedError error
 	}{
 		{
+			"plain",
 			"http",
 			"foo",
 			"foo",
@@ -41,6 +45,7 @@ func TestSplitHostnamePort(t *testing.T) {
 			nil,
 		},
 		{
+			"dotted domain",
 			"http",
 			"www.foo.com",
 			"www.foo.com",
@@ -48,6 +53,7 @@ func TestSplitHostnamePort(t *testing.T) {
 			nil,
 		},
 		{
+			"dotted domain, custom port",
 			"http",
 			"www.foo.com:8080",
 			"www.foo.com",
@@ -55,6 +61,7 @@ func TestSplitHostnamePort(t *testing.T) {
 			nil,
 		},
 		{
+			"https plain",
 			"https",
 			"foo",
 			"foo",
@@ -62,6 +69,7 @@ func TestSplitHostnamePort(t *testing.T) {
 			nil,
 		},
 		{
+			"custom port",
 			"http",
 			"foo:81",
 			"foo",
@@ -69,6 +77,7 @@ func TestSplitHostnamePort(t *testing.T) {
 			nil,
 		},
 		{
+			"https custom port",
 			"https",
 			"foo:444",
 			"foo",
@@ -76,6 +85,7 @@ func TestSplitHostnamePort(t *testing.T) {
 			nil,
 		},
 		{
+			"bad scheme",
 			"httpz",
 			"foo",
 			"foo",
@@ -84,27 +94,63 @@ func TestSplitHostnamePort(t *testing.T) {
 		},
 	}
 	for _, test := range urlTests {
-		url := &url.URL{
-			Scheme: test.scheme,
-			Host:   test.host,
-		}
-		request := &http.Request{
-			URL: url,
-		}
-		host, port, err := splitHostnamePort(request)
-		if err != nil {
-			if test.expectedError == nil {
-				t.Error(err)
-			} else if reflect.TypeOf(err) != reflect.TypeOf(test.expectedError) {
-				t.Errorf("Expected %T but got %T", err, test.expectedError)
+		test := test
+
+		t.Run(test.name, func(t *testing.T) {
+			url := &url.URL{
+				Scheme: test.scheme,
+				Host:   test.host,
 			}
-			continue
-		}
-		if host != test.expectedHost {
-			t.Errorf("Unexpected host for %#v: expected %q, got %q", request, test.expectedHost, host)
-		}
-		if port != test.expectedPort {
-			t.Errorf("Unexpected port for %#v: expected %q, got %q", request, test.expectedPort, port)
-		}
+			request := &http.Request{
+				URL: url,
+			}
+			host, port, err := splitHostnamePort(request)
+
+			if err != nil {
+				if test.expectedError == nil {
+					t.Error(err)
+				} else if reflect.TypeOf(err) != reflect.TypeOf(test.expectedError) {
+					t.Errorf("Expected %T but got %T", err, test.expectedError)
+				}
+			} else {
+				if host != test.expectedHost {
+					t.Errorf("Unexpected host for %#v: expected %q, got %q", request, test.expectedHost, host)
+				}
+				if port != test.expectedPort {
+					t.Errorf("Unexpected port for %#v: expected %q, got %q", request, test.expectedPort, port)
+				}
+			}
+
+		})
 	}
+}
+
+func makeTestHTTPRequest(t *testing.T) *http.Request {
+	req, err := http.NewRequest("GET", "http://example.net", nil)
+	assert.Nil(t, err)
+	return req
+}
+
+func TestZeroMaxRedirectShouldError(t *testing.T) {
+	checker := makeCheckRedirect(0)
+	req := makeTestHTTPRequest(t)
+
+	res := checker(req, nil)
+	assert.Equal(t, http.ErrUseLastResponse, res)
+}
+
+func TestNonZeroRedirect(t *testing.T) {
+	limit := 5
+	checker := makeCheckRedirect(limit)
+
+	var via []*http.Request
+	// Test requests within the limit
+	for i := 0; i < limit; i++ {
+		req := makeTestHTTPRequest(t)
+		assert.Nil(t, checker(req, via))
+		via = append(via, req)
+	}
+
+	// We are now at the limit, this request should fail
+	assert.Equal(t, http.ErrUseLastResponse, checker(makeTestHTTPRequest(t), via))
 }

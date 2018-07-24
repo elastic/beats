@@ -216,10 +216,16 @@ The index name to write events to. The default is
 +"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-2017.04.26"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
-(see <<configuration-template>>). If you are using the pre-built Kibana
-dashboards, you also need to set the `setup.dashboards.index` option (see
-<<configuration-dashboards>>).
+(see <<configuration-template>>).
 
+If you are using the pre-built Kibana dashboards,
+you also need to set the `setup.dashboards.index` option (see <<configuration-dashboards>>).
+
+ifdef::deprecate_dashboard_loading[]
+
+deprecated[{deprecate_dashboard_loading}]
+
+endif::[]
 
 ===== `indices`
 
@@ -378,7 +384,7 @@ The Logstash output sends events directly to Logstash by using the lumberjack
 protocol, which runs over TCP. Logstash allows for additional processing and routing of
 generated events.
 
-include::../../libbeat/docs/shared-logstash-config.asciidoc[]
+include::./shared-logstash-config.asciidoc[]
 
 ==== Accessing metadata fields
 
@@ -667,7 +673,8 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 
 ==== Compatibility
 
-This output works with Kafka 0.8, 0.9, and 0.10.
+This output works with all Kafka in between 0.11 and 1.1.1. Older versions
+might work as well, but are not supported.
 
 ==== Configuration options
 
@@ -691,7 +698,7 @@ Kafka version ${beatname_lc} is assumed to run against. Defaults to 1.0.0.
 
 Event timestamps will be added, if version 0.10.0.0+ is enabled.
 
-Valid values are all kafka releases in between `0.8.2.0` and `1.1.0`.
+Valid values are all kafka releases in between `0.8.2.0` and `1.1.1`.
 
 ===== `username`
 
@@ -832,6 +839,15 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 ===== `compression`
 
 Sets the output compression codec. Must be one of `none`, `snappy`, `lz4` and `gzip`. The default is `gzip`.
+
+===== `compression_level`
+
+Sets the compression level used by gzip. Setting this value to 0 disables compression.
+The compression level must be in the range of 1 (best speed) to 9 (best compression).
+
+Increasing the compression level will reduce the network usage but will increase the cpu usage.
+
+The default value is 4.
 
 [[kafka-max_message_bytes]]
 ===== `max_message_bytes`

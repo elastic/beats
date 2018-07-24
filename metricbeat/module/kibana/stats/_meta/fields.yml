@@ -4,122 +4,98 @@
     Kibana stats and run-time metrics.
   release: beta
   fields:
-    - name: cluster_uuid
-      type: keyword
-      description: >
-        UUID of the Elasticsearch cluster to which Kibana connects.
-    - name: name
-      type: keyword
-      description: >
-        Kibana instance name.
     - name: uuid
       type: keyword
       description: >
-        Kibana instance uuid.
-    - name: version.number
+        Kibana instance UUID
+    - name: name
+      type: text
+      description: >
+        Kibana instance name
+    - name: index
       type: keyword
       description: >
-        Kibana version number.
-    - name: status.overall.state
+        Name of Kibana's internal index
+    - name: host.name
       type: keyword
       description: >
-        Kibana overall state.
-    - name: process
-      type: group
+        Kibana instance hostname
+    - name: transport_address
+      type: keyword
       description: >
-        Kibana process metrics.
-      fields:
-        - name: mem
-          type: group
-          description: >
-            Memory usage metrics of the Kibana instance.
-          fields:
-            - name: heap.max.bytes
-              type: long
-              format: bytes
-              description: >
-                Total amount of heap memory used by V8.
-            - name: heap.used.bytes
-              type: long
-              format: bytes
-              description: >
-                Amount of memory in use by V8.
-            - name: resident_set_size.bytes
-              type: long
-              format: bytes
-              description: >
-                The amount of space occupied in main memory for the process. Includes heap, code segment, and stack.
-            - name: external.bytes
-              type: long
-              format: bytes
-              description: >
-                Memory usage of C++ objects bound to JavaScript objects managed by V8.
-        - name: pid
-          type: long
-          description: >
-            Process ID of the Kibana instance.
-        - name: uptime.ms
-          type: long
-          description: >
-            Amount of time that the Kibana process has been running in milliseconds.
-    - name: response_times
-      type: group
+        Kibana server's hostname and port
+    - name: version
+      type: keyword
       description: >
-        HTTP Server response time metrics
-      fields:
-        - name: avg.ms
-          type: long
-          description: >
-            Accumulated averages for response times, for all responses in a 5-second time window.
-        - name: max.ms
-          type: long
-          description: >
-            Accumulated maximums for response times, for all responses in a 5-second time window.
-    - name: requests
-      type: group
+        Kibana version
+    - name: snapshot
+      type: boolean
       description: >
-        HTTP Server request metrics
-      fields:
-        - name: status_codes
-          type: object
-          description: >
-            Key-value pairs for each status code sent by the server, and the number of times it sent that code.
-        - name: total
-          type: long
-          description: >
-            Total number of requests sent by the server.
-        - name: disconnects
-          type: long
-          description: >
-            Total number of client disconnects encountered by the server.
+        Whether the Kibana build is a snapshot build
+    - name: status
+      type: keyword
+      description: >
+        Kibana instance's health status
     - name: concurrent_connections
       type: long
       description: >
         Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
-    - name: sockets
+    - name: process
       type: group
       description: >
-        HTTP Web Sockets metrics
+        Process metrics
       fields:
-        - name: http
-          type: group
+      - name: event_loop_delay.ms
+        type: scaled_float
+        description: >
+          Event loop delay in milliseconds
+      - name: memory.heap
+        type: group
+        description: >
+          Process heap metrics
+        fields:
+        - name: total.bytes
+          type: long
+          format: bytes
           description: >
-            Web Sockets over plaintext HTTP
-          fields:
-            - name: total
-              type: long
-              description: >
-                Number of HTTP web socket connections established
-        - name: https
-          type: group
+            Total heap allocated to process in bytes
+        - name: used.bytes
+          type: long
+          format: bytes
           description: >
-            Web Sockets over encrypted HTTPS
-          fields:
-            - name: total
-              type: long
-              description: >
-                Number of HTTPS web socket connections established
-    - name: event_loop_delay
-      type: long
+            Heap used by process in bytes
+        - name: size_limit.bytes
+          type: long
+          format: bytes
+          description: >
+            Max. old space size allocated to Node.js process, in bytes
+        - name: uptime.ms
+          type: long
+          description: >
+            Uptime of process in milliseconds
+    - name: request
+      type: group
       description: >
-        Node event loop delay calculated with internal benchmarking.
+          Request count metrics
+      fields:
+        - name: disconnects
+          type: long
+          description: >
+            Number of requests that were disconnected
+        - name: total
+          type: long
+          description: >
+            Total number of requests
+    - name: response_time
+      type: group
+      description: >
+        Response times metrics
+      fields:
+        - name: avg.ms
+          type: long
+          description: >
+            Average response time in milliseconds
+        - name: max.ms
+          type: long
+          description: >
+            Maximum response time in milliseconds

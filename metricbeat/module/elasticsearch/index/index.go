@@ -43,7 +43,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The elasticsearch index metricset is experimental")
+	cfgwarn.Beta("The elasticsearch index metricset is beta")
 
 	// TODO: This currently gets index data for all indices. Make it configurable.
 	ms, err := elasticsearch.NewMetricSet(base, statsPath)

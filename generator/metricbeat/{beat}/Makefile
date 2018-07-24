@@ -13,7 +13,7 @@ MAGE_IMPORT_PATH=${BEAT_PATH}/vendor/github.com/magefile/mage
 
 # Initial beat setup
 .PHONY: setup
-setup: copy-vendor create-metricset collect git-init
+setup: copy-vendor git-init create-metricset collect git-add
 
 # Copy beats into vendor directory
 .PHONY: copy-vendor
@@ -28,5 +28,8 @@ copy-vendor:
 .PHONY: git-init
 git-init:
 	git init
-	git add --all
-	git commit -m 'Initial add by Beat generator'
+
+.PHONY: git-add
+git-add:
+	git add -A
+	git commit -m "Add generated {beat} files"

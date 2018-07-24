@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -51,8 +50,6 @@ func init() {
 }
 
 func newRenameFields(c *common.Config) (processors.Processor, error) {
-
-	cfgwarn.Beta("Beta rename processor is used.")
 	config := renameFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -100,7 +97,7 @@ func (f *renameFields) renameField(from string, to string, fields common.MapStr)
 		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
 			return nil
 		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %s", to, err)
+		return fmt.Errorf("could not fetch value for key: %s, Error: %s", from, err)
 	}
 
 	// Deletion must happen first to support cases where a becomes a.b

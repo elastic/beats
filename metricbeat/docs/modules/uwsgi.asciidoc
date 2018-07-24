@@ -7,8 +7,6 @@ This file is generated! See scripts/docs_collector.py
 
 beta[]
 
-== uwsgi module
-
 This is the uwsgi module. By default collects the `stats` metricset, using
 http://uwsgi-docs.readthedocs.io/en/latest/StatsServer.html[StatsServer].
 

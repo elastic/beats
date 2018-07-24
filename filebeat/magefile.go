@@ -91,6 +91,11 @@ func Update() error {
 	return sh.Run("make", "update")
 }
 
+// Fields generates a fields.yml for the Beat.
+func Fields() error {
+	return mage.GenerateFieldsYAML("module")
+}
+
 // -----------------------------------------------------------------------------
 // Customizations specific to Filebeat.
 // - Include modules directory in packages (minus _meta and test files).
