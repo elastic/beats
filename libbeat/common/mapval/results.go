@@ -19,32 +19,30 @@ package mapval
 
 import "fmt"
 
-type resultsCache struct {
-	valid  *bool
-	errors *[]error
-}
-
 // Results the results of executing a schema.
 // They are a flattened map (using dotted paths) of all the values []ValueResult representing the results
 // of the IsDefs.
 type Results struct {
 	Fields map[string][]ValueResult
-	// Lazy cache to prevent repeat computation
-	cache *resultsCache
+	Valid  bool
 }
 
-func MakeResults() Results {
-	return Results{
+func NewResults() *Results {
+	return &Results{
 		Fields: make(map[string][]ValueResult),
-		cache:  new(resultsCache),
+		Valid:  true,
 	}
 }
 
-func (r Results) record(path string, result ValueResult) {
+func (r *Results) record(path string, result ValueResult) {
 	if r.Fields[path] == nil {
 		r.Fields[path] = []ValueResult{result}
 	} else {
 		r.Fields[path] = append(r.Fields[path], result)
+	}
+
+	if !result.Valid {
+		r.Valid = false
 	}
 }
 
@@ -62,8 +60,8 @@ func (r Results) EachResult(f func(string, ValueResult) bool) {
 }
 
 // DetailedErrors returns a new Results object consisting only of error data.
-func (r Results) DetailedErrors() Results {
-	errors := MakeResults()
+func (r *Results) DetailedErrors() *Results {
+	errors := NewResults()
 	r.EachResult(func(path string, vr ValueResult) bool {
 		if !vr.Valid {
 			errors.record(path, vr)
@@ -87,34 +85,14 @@ func (vre ValueResultError) Error() string {
 
 // Errors returns a list of error objects, one per failed value validation.
 func (r Results) Errors() []error {
-	if r.cache.errors != nil {
-		return *r.cache.errors
-	}
-	r.cache.errors = &[]error{}
+	errors := make([]error, 0)
 
 	r.EachResult(func(path string, vr ValueResult) bool {
 		if !vr.Valid {
-			*r.cache.errors = append(*r.cache.errors, ValueResultError{path, vr})
+			errors = append(errors, ValueResultError{path, vr})
 		}
 		return true
 	})
 
-	return *r.cache.errors
-}
-
-// Valid returns true if there are no errors.
-func (r Results) Valid() bool {
-	if r.cache.valid != nil {
-		return *r.cache.valid
-	}
-
-	isValid := true
-	r.EachResult(func(_ string, vr ValueResult) bool {
-		isValid = vr.Valid // Use last seen valid as return
-		return vr.Valid    // Stop traversing if invalid result is seen
-	})
-
-	r.cache.valid = &isValid
-
-	return isValid
+	return errors
 }

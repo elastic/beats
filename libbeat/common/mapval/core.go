@@ -40,17 +40,17 @@ func Optional(id IsDef) IsDef {
 type Map map[string]interface{}
 
 // Validator is the result of Schema and is run against the map you'd like to test.
-type Validator func(common.MapStr) Results
+type Validator func(common.MapStr) *Results
 
 // Compose combines multiple SchemaValidators into a single one.
 func Compose(validators ...Validator) Validator {
-	return func(actual common.MapStr) Results {
-		results := make([]Results, len(validators))
+	return func(actual common.MapStr) *Results {
+		results := make([]*Results, len(validators))
 		for idx, validator := range validators {
 			results[idx] = validator(actual)
 		}
 
-		combined := MakeResults()
+		combined := NewResults()
 		for _, r := range results {
 			r.EachResult(func(path string, vr ValueResult) bool {
 				combined.record(path, vr)
@@ -63,7 +63,7 @@ func Compose(validators ...Validator) Validator {
 
 // Strict is used when you want any unspecified keys that are encountered to be considered errors.
 func Strict(laxValidator Validator) Validator {
-	return func(actual common.MapStr) Results {
+	return func(actual common.MapStr) *Results {
 		results := laxValidator(actual)
 
 		// The inner workings of this are a little weird
@@ -105,13 +105,13 @@ func Strict(laxValidator Validator) Validator {
 
 // Schema takes a Map and returns an executable Validator function.
 func Schema(expected Map) Validator {
-	return func(actual common.MapStr) Results {
+	return func(actual common.MapStr) *Results {
 		return walkValidate(expected, actual)
 	}
 }
 
-func walkValidate(expected Map, actual common.MapStr) (results Results) {
-	results = MakeResults()
+func walkValidate(expected Map, actual common.MapStr) (results *Results) {
+	results = NewResults()
 	walk(
 		common.MapStr(expected),
 		func(expInfo walkObserverInfo) {
