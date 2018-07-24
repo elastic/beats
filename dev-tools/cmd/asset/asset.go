@@ -50,13 +50,13 @@ func main() {
 
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Invalid file path: %s", args[0])
+		fmt.Fprintf(os.Stderr, "Invalid file path: %s\n", args[0])
 		os.Exit(1)
 	}
 
 	encData, err := asset.EncodeData(string(data))
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error encoding the data: %s", err)
+		fmt.Fprintf(os.Stderr, "Error encoding the data: %s\n", err)
 		os.Exit(1)
 	}
 
