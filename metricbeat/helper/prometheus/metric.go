@@ -41,6 +41,7 @@ type MetricMap interface {
 
 // MetricOption adds settings to Metric objects behavior
 type MetricOption interface {
+	// Process a tuple of field, value and labels from a metric, return the same tuple updated
 	Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr)
 }
 
@@ -247,6 +248,7 @@ type opFilter struct {
 	labels map[string]string
 }
 
+// Process will return nil if labels don't match the filter
 func (o opFilter) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
 	for k, v := range o.labels {
 		if labels[k] != v {
@@ -258,6 +260,7 @@ func (o opFilter) Process(field string, value interface{}, labels common.MapStr)
 
 type opLowercaseValue struct{}
 
+// Process will lowercase the given value if it's a string
 func (o opLowercaseValue) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
 	if val, ok := value.(string); ok {
 		value = strings.ToLower(val)
