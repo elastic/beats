@@ -32,6 +32,7 @@ var KeyPresent = IsDef{name: "check key present"}
 // KeyMissing checks that the given key is not present defined.
 var KeyMissing = IsDef{name: "check key not present", checkKeyMissing: true}
 
+// IsStringContaining validates that the the actual value contains the specified substring.
 func IsStringContaining(needle string) IsDef {
 	return Is("is string containing", func(v interface{}) ValueResult {
 		strV, ok := v.(string)

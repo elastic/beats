@@ -27,6 +27,7 @@ type Results struct {
 	Valid  bool
 }
 
+// NewResults creates a new Results object.
 func NewResults() *Results {
 	return &Results{
 		Fields: make(map[string][]ValueResult),
