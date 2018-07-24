@@ -36,25 +36,26 @@ import (
 )
 
 type kafkaConfig struct {
-	Hosts           []string                  `config:"hosts"               validate:"required"`
-	TLS             *tlscommon.Config         `config:"ssl"`
-	Timeout         time.Duration             `config:"timeout"             validate:"min=1"`
-	Metadata        metaConfig                `config:"metadata"`
-	Key             *fmtstr.EventFormatString `config:"key"`
-	Partition       map[string]*common.Config `config:"partition"`
-	KeepAlive       time.Duration             `config:"keep_alive"          validate:"min=0"`
-	MaxMessageBytes *int                      `config:"max_message_bytes"   validate:"min=1"`
-	RequiredACKs    *int                      `config:"required_acks"       validate:"min=-1"`
-	BrokerTimeout   time.Duration             `config:"broker_timeout"      validate:"min=1"`
-	Compression     string                    `config:"compression"`
-	Version         string                    `config:"version"`
-	BulkMaxSize     int                       `config:"bulk_max_size"`
-	MaxRetries      int                       `config:"max_retries"         validate:"min=-1,nonzero"`
-	ClientID        string                    `config:"client_id"`
-	ChanBufferSize  int                       `config:"channel_buffer_size" validate:"min=1"`
-	Username        string                    `config:"username"`
-	Password        string                    `config:"password"`
-	Codec           codec.Config              `config:"codec"`
+	Hosts            []string                  `config:"hosts"               validate:"required"`
+	TLS              *tlscommon.Config         `config:"ssl"`
+	Timeout          time.Duration             `config:"timeout"             validate:"min=1"`
+	Metadata         metaConfig                `config:"metadata"`
+	Key              *fmtstr.EventFormatString `config:"key"`
+	Partition        map[string]*common.Config `config:"partition"`
+	KeepAlive        time.Duration             `config:"keep_alive"          validate:"min=0"`
+	MaxMessageBytes  *int                      `config:"max_message_bytes"   validate:"min=1"`
+	RequiredACKs     *int                      `config:"required_acks"       validate:"min=-1"`
+	BrokerTimeout    time.Duration             `config:"broker_timeout"      validate:"min=1"`
+	Compression      string                    `config:"compression"`
+	CompressionLevel int                       `config:"compression_level"`
+	Version          string                    `config:"version"`
+	BulkMaxSize      int                       `config:"bulk_max_size"`
+	MaxRetries       int                       `config:"max_retries"         validate:"min=-1,nonzero"`
+	ClientID         string                    `config:"client_id"`
+	ChanBufferSize   int                       `config:"channel_buffer_size" validate:"min=1"`
+	Username         string                    `config:"username"`
+	Password         string                    `config:"password"`
+	Codec            codec.Config              `config:"codec"`
 }
 
 type metaConfig struct {
@@ -89,17 +90,18 @@ func defaultConfig() kafkaConfig {
 			},
 			RefreshFreq: 10 * time.Minute,
 		},
-		KeepAlive:       0,
-		MaxMessageBytes: nil, // use library default
-		RequiredACKs:    nil, // use library default
-		BrokerTimeout:   10 * time.Second,
-		Compression:     "gzip",
-		Version:         "1.0.0",
-		MaxRetries:      3,
-		ClientID:        "beats",
-		ChanBufferSize:  256,
-		Username:        "",
-		Password:        "",
+		KeepAlive:        0,
+		MaxMessageBytes:  nil, // use library default
+		RequiredACKs:     nil, // use library default
+		BrokerTimeout:    10 * time.Second,
+		Compression:      "gzip",
+		CompressionLevel: 4,
+		Version:          "1.0.0",
+		MaxRetries:       3,
+		ClientID:         "beats",
+		ChanBufferSize:   256,
+		Username:         "",
+		Password:         "",
 	}
 }
 
@@ -120,6 +122,13 @@ func (c *kafkaConfig) Validate() error {
 		return fmt.Errorf("password must be set when username is configured")
 	}
 
+	if c.Compression == "gzip" {
+		lvl := c.CompressionLevel
+		if lvl != sarama.CompressionLevelDefault && !(0 <= lvl && lvl <= 9) {
+			return fmt.Errorf("compression_level must be between 0 and 9")
+		}
+	}
+
 	return nil
 }
 
@@ -138,6 +147,7 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k.Net.WriteTimeout = timeout
 	k.Net.KeepAlive = config.KeepAlive
 	k.Producer.Timeout = config.BrokerTimeout
+	k.Producer.CompressionLevel = config.CompressionLevel
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
