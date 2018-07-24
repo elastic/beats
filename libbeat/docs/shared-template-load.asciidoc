@@ -94,6 +94,8 @@ that you specify should include the root name of the index plus version and
 date information. You also need to configure the `setup.template.name` and
 `setup.template.pattern` options to match the new name. For example:
 +
+ifndef::deprecate_dashboard_loading[]
+
 ["source","sh",subs="attributes,callouts"]
 -----
 output.elasticsearch.index: "customname-%{[beat.version]}-%{+yyyy.MM.dd}"
@@ -101,10 +103,27 @@ setup.template.name: "customname"
 setup.template.pattern: "customname-*"
 setup.dashboards.index: "customname-*" <1>
 -----
+
 <1> If you plan to
 <<load-kibana-dashboards, set up the Kibana dashboards>>, also set
 this option to overwrite the index name defined in the dashboards and index
 pattern.
+
+endif::[]
+
+ifdef::deprecate_dashboard_loading[]
+
+["source","sh",subs="attributes,callouts"]
+-----
+output.elasticsearch.index: "customname-%{[beat.version]}-%{+yyyy.MM.dd}"
+setup.template.name: "customname"
+setup.template.pattern: "customname-*"
+-----
++
+Also ensure to change the index name accordingly in the Kibana dashboards,
+when loading via the Kibana UI.
+
+endif::[]
 
 See <<configuration-template>> for the full list of configuration options.
 
