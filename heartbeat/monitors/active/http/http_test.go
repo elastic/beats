@@ -234,8 +234,8 @@ func TestUnreachableJob(t *testing.T) {
 			hbtest.MonitorChecks("http@"+url, url, ip, "http", "down"),
 			hbtest.TCPBaseChecks(80),
 			hbtest.ErrorChecks(
-				fmt.Sprintf(
-					"Get http://%s: dial tcp %s:80: i/o timeout (Client.Timeout exceeded while awaiting headers)", ip, ip),
+				mapval.IsStringContaining(fmt.Sprintf(
+					"Get http://%s: dial tcp %s:80: i/o timeout", ip, ip)),
 				"io"),
 			httpBaseChecks(url),
 		)),
