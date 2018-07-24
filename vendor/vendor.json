@@ -9,22 +9,20 @@
 			"revisionTime": "2017-05-24T00:36:31Z"
 		},
 		{
-			"checksumSHA1": "wshQ6/MnQx8nH6pgufu4kJEX6JI=",
+			"checksumSHA1": "rDoYEddGYvQT73l9V8Uqjk7SHAY=",
 			"path": "github.com/OneOfOne/xxhash",
-			"revision": "6def279d2ce6c81a79dd1c1be580f03bb216fb8a",
-			"revisionTime": "2018-05-30T13:49:54Z",
-			"version": "v1.2.2",
-			"versionExact": "v1.2.2"
+			"revision": "74ace4fe5525ef62ce28d5093d6b0faaa6a575f3",
+			"revisionTime": "2018-07-23T16:30:02Z"
 		},
 		{
-			"checksumSHA1": "pH1jOw5Kfigc2tteo6KlaU9+JE8=",
+			"checksumSHA1": "xSwVjXDGIMoADDte4hBjra6ldGk=",
 			"origin": "github.com/urso/sarama",
 			"path": "github.com/Shopify/sarama",
-			"revision": "32b4ad5c9537ed14e471779b76713ff65420db39",
+			"revision": "d1575e4abe04acbbe8ac766320585cdf271dd189",
 			"revisionTime": "2016-11-23T00:27:23Z",
 			"tree": true,
-			"version": "v1.16.0/enh/offset-replica-id",
-			"versionExact": "v1.16.0/enh/offset-replica-id"
+			"version": "v1.17.0/enh/offset-replica-id",
+			"versionExact": "v1.17.0/enh/offset-replica-id"
 		},
 		{
 			"checksumSHA1": "DYv6Q1+VfnUVxMwvk5IshAClLvw=",
@@ -117,12 +115,10 @@
 			"revisionTime": "2016-09-02T18:42:37Z"
 		},
 		{
-			"checksumSHA1": "R1Q34Pfnt197F/nCOO9kG8c+Z90=",
-			"path": "github.com/boltdb/bolt",
-			"revision": "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8",
-			"revisionTime": "2017-07-17T17:11:48Z",
-			"version": "v1.3.1",
-			"versionExact": "v1.3.1"
+			"checksumSHA1": "qFaKrhSla38BRAyaGz2UaZvH/Dk=",
+			"path": "github.com/coreos/bbolt",
+			"revision": "af9db2027c98c61ecd8e17caa5bd265792b9b9a2",
+			"revisionTime": "2018-03-18T00:15:26Z"
 		},
 		{
 			"checksumSHA1": "dvabztWVQX8f6oMLRyv4dLH+TGY=",
@@ -496,22 +492,10 @@
 			"versionExact": "v0.0.4"
 		},
 		{
-			"path": "github.com/elastic/go-structform/internal/ubjson",
-			"revision": "v0.0.4",
-			"version": "v0.0.4",
-			"versionExact": "v0.0.4"
-		},
-		{
 			"checksumSHA1": "s7k0vEuuqkoPXU0FtrD6Y0jxd7U=",
 			"path": "github.com/elastic/go-structform/internal/unsafe",
 			"revision": "0ea09ff9b43c387dd183a4088f6d573bf823e4ed",
 			"revisionTime": "2018-06-27T12:43:37Z",
-			"version": "v0.0.4",
-			"versionExact": "v0.0.4"
-		},
-		{
-			"path": "github.com/elastic/go-structform/internal/visitors",
-			"revision": "v0.0.4",
 			"version": "v0.0.4",
 			"versionExact": "v0.0.4"
 		},
@@ -638,52 +622,52 @@
 			"versionExact": "v0.0.1"
 		},
 		{
-			"checksumSHA1": "d0qibYdQy5G1YqI5H+xNC0QJ66g=",
+			"checksumSHA1": "MK8/w0Idj7kRBUiBabARPdm9hOo=",
 			"path": "github.com/elastic/go-ucfg",
-			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
-			"revisionTime": "2018-07-04T14:42:58Z",
-			"version": "v0.6.0",
-			"versionExact": "v0.6.0"
+			"revision": "581f7b1fe9d84f4c18ef0694d6e0eb944a925dae",
+			"revisionTime": "2018-07-13T14:04:29Z",
+			"version": "v0.6.1",
+			"versionExact": "v0.6.1"
 		},
 		{
 			"checksumSHA1": "X+R/CD8SokJrmlxFTx2nSevRDhQ=",
 			"path": "github.com/elastic/go-ucfg/cfgutil",
-			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
-			"revisionTime": "2018-07-04T14:42:58Z",
-			"version": "v0.6.0",
-			"versionExact": "v0.6.0"
+			"revision": "581f7b1fe9d84f4c18ef0694d6e0eb944a925dae",
+			"revisionTime": "2018-07-13T14:04:29Z",
+			"version": "v0.6.1",
+			"versionExact": "v0.6.1"
 		},
 		{
-			"checksumSHA1": "dShGF53hLUufO70RAjju+RT0fHY=",
+			"checksumSHA1": "zC8mCPW/pPPNcuHQOc/B/Ej1W1U=",
 			"path": "github.com/elastic/go-ucfg/flag",
-			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
-			"revisionTime": "2018-07-04T14:42:58Z",
-			"version": "v0.6.0",
-			"versionExact": "v0.6.0"
+			"revision": "581f7b1fe9d84f4c18ef0694d6e0eb944a925dae",
+			"revisionTime": "2018-07-13T14:04:29Z",
+			"version": "v0.6.1",
+			"versionExact": "v0.6.1"
 		},
 		{
 			"checksumSHA1": "esXpiQlEvTOUwsE0nNesso8albo=",
 			"path": "github.com/elastic/go-ucfg/internal/parse",
-			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
-			"revisionTime": "2018-07-04T14:42:58Z",
-			"version": "v0.6.0",
-			"versionExact": "v0.6.0"
+			"revision": "581f7b1fe9d84f4c18ef0694d6e0eb944a925dae",
+			"revisionTime": "2018-07-13T14:04:29Z",
+			"version": "v0.6.1",
+			"versionExact": "v0.6.1"
 		},
 		{
 			"checksumSHA1": "5mXUhhlPdvcAFKiQENInTJWrtQM=",
 			"path": "github.com/elastic/go-ucfg/json",
-			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
-			"revisionTime": "2018-07-04T14:42:58Z",
-			"version": "v0.6.0",
-			"versionExact": "v0.6.0"
+			"revision": "581f7b1fe9d84f4c18ef0694d6e0eb944a925dae",
+			"revisionTime": "2018-07-13T14:04:29Z",
+			"version": "v0.6.1",
+			"versionExact": "v0.6.1"
 		},
 		{
 			"checksumSHA1": "Bg6vistPQLftv2fEYB7GWwSExv8=",
 			"path": "github.com/elastic/go-ucfg/yaml",
-			"revision": "9c66f5c432b1d25bdb449a1e588d58b5d0cd7268",
-			"revisionTime": "2018-07-04T14:42:58Z",
-			"version": "v0.6.0",
-			"versionExact": "v0.6.0"
+			"revision": "581f7b1fe9d84f4c18ef0694d6e0eb944a925dae",
+			"revisionTime": "2018-07-13T14:04:29Z",
+			"version": "v0.6.1",
+			"versionExact": "v0.6.1"
 		},
 		{
 			"checksumSHA1": "yu/X+qHftvfQlAnjPdYLwrDn2nI=",
@@ -1360,6 +1344,12 @@
 			"revisionTime": "2017-12-30T17:54:59Z",
 			"version": "v1.2.0",
 			"versionExact": "v1.2.0"
+		},
+		{
+			"checksumSHA1": "wnEANt4k5X/KGwoFyfSSnpxULm4=",
+			"path": "github.com/stretchr/testify/require",
+			"revision": "f35b8ab0b5a2cef36673838d662e249dd9c94686",
+			"revisionTime": "2018-05-06T18:05:49Z"
 		},
 		{
 			"checksumSHA1": "CpcG17Q/0k1g2uy8AL26Uu7TouU=",

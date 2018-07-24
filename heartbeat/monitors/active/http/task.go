@@ -218,29 +218,58 @@ func execPing(
 	body []byte,
 	timeout time.Duration,
 	validator func(*http.Response) error,
-) (time.Time, time.Time, common.MapStr, reason.Reason) {
+) (start, end time.Time, event common.MapStr, errReason reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	req = req.WithContext(ctx)
+	req = attachRequestBody(&ctx, req, body)
+	start, end, resp, errReason := execRequest(client, req, validator)
+
+	if errReason != nil {
+		if resp != nil {
+			return start, end, makeEvent(end.Sub(start), resp), errReason
+		}
+		return start, end, nil, errReason
+	}
+
+	event = makeEvent(end.Sub(start), resp)
+
+	return start, end, event, nil
+}
+
+func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
+	req = req.WithContext(*ctx)
 	if len(body) > 0 {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 		req.ContentLength = int64(len(body))
 	}
 
-	start := time.Now()
+	return req
+}
+
+func execRequest(client *http.Client, req *http.Request, validator func(*http.Response) error) (start time.Time, end time.Time, resp *http.Response, errReason reason.Reason) {
+	start = time.Now()
 	resp, err := client.Do(req)
-	end := time.Now()
+	if resp != nil { // If above errors, the response will be nil
+		defer resp.Body.Close()
+	}
+	end = time.Now()
+
 	if err != nil {
 		return start, end, nil, reason.IOFailed(err)
 	}
-	defer resp.Body.Close()
 
 	err = validator(resp)
 	end = time.Now()
+	if err != nil {
+		return start, end, resp, reason.ValidateFailed(err)
+	}
 
-	rtt := end.Sub(start)
-	event := common.MapStr{"http": common.MapStr{
+	return start, end, resp, nil
+}
+
+func makeEvent(rtt time.Duration, resp *http.Response) common.MapStr {
+	return common.MapStr{"http": common.MapStr{
 		"response": common.MapStr{
 			"status_code": resp.StatusCode,
 		},
@@ -248,11 +277,6 @@ func execPing(
 			"total": look.RTT(rtt),
 		},
 	}}
-
-	if err != nil {
-		return start, end, event, reason.ValidateFailed(err)
-	}
-	return start, end, event, nil
 }
 
 func splitHostnamePort(requ *http.Request) (string, uint16, error) {

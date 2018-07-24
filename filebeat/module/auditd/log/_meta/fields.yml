@@ -77,3 +77,7 @@
           type: geo_point
           description: >
             The longitude and latitude.
+        - name: region_iso_code
+          type: keyword
+          description: >
+            Region ISO code.

@@ -1,0 +1,4 @@
+[
+  {"source":"test.log","offset":10,"timestamp":"2018-07-18T21:51:43.529893808+02:00","ttl":-1,"type":"log","meta":{},"FileStateOS":{"inode":8604592318,"device":16777220}},
+  {"source":"test.log","offset":0,"timestamp":"2018-07-18T21:51:43.529893808+02:00","ttl":-1,"type":"log","meta":null,"FileStateOS":{"inode":8604592318,"device":16777220}}
+]

@@ -25,6 +25,10 @@ The list below covers the major changes between 6.3.0 and master only.
 - Dashboards under _meta/kibana are expected to be decoded. See https://github.com/elastic/beats/pull/7224 for a conversion script. {pull}7265[7265]
 - Constructor `(github.com/elastic/beats/libbeat/output/codec/json).New` expects a new `escapeHTML` parameter. {pull}7445[7445]
 - Packaging has been refactored and updates are required. See the PR for migration details. {pull}7388[7388]
+- `make fields` has been modified to use Mage (https://magefile.org/) in an effort to make
+  the building a Beat more cross-platform friendly (e.g. Windows). This requires that your Beat
+  has a magefile.go with a fields target. The `FIELDS_FILE_PATH` make variable is no longer
+  used because the value is specified in magefile.go. {pull}7670[7670]
 
 ==== Bugfixes
 

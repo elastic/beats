@@ -69,7 +69,7 @@
       type: scaled_float
       format: percent
       description: >
-        The percentage of CPU time spent in non-idle state.
+        The percentage of CPU time spent in states other than Idle and IOWait.
 
     # Normalized Percentages
     - name: user.norm.pct
@@ -126,14 +126,7 @@
       type: scaled_float
       format: percent
       description: >
-        The percentage of CPU time spent in non-idle state.
-
-
-    # Total
-    - name: total.value
-      type: long
-      description: >
-        The value of CPU usage since starting the process.
+        The percentage of CPU time in states other than Idle and IOWait, normalised by the number of cores.
 
 
     # Ticks

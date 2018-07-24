@@ -6,65 +6,53 @@
     },
     "elasticsearch": {
         "cluster": {
-            "id": "PKEQ1V5kT4yPng_sgiqF9g"
+            "id": "njqU4EQaTROIDlWPeUMQyw"
         }
     },
     "kibana": {
         "stats": {
-            "concurrent_connections": 17,
-            "event_loop_delay": 718.5184001922607,
-            "name": "kibana",
+            "concurrent_connections": 6,
+            "host": {
+                "name": "localhost"
+            },
+            "index": "Shaunaks-MBP-2",
+            "name": "Shaunaks-MBP-2",
             "process": {
+                "event_loop_delay": {
+                    "ms": 0.23628300055861473
+                },
                 "memory": {
-                    "external": {
-                        "bytes": 1969666
-                    },
                     "heap": {
-                        "max": {
-                            "bytes": 200028160
+                        "size_limit": {
+                            "bytes": 1501560832
+                        },
+                        "total": {
+                            "bytes": 215003136
                         },
                         "used": {
-                            "bytes": 138875320
+                            "bytes": 185343400
                         }
-                    },
-                    "resident_set_size": {
-                        "bytes": 247865344
                     }
                 },
-                "pid": 1,
                 "uptime": {
-                    "ms": 260863
+                    "ms": 1343714
                 }
             },
-            "requests": {
+            "request": {
                 "disconnects": 0,
-                "total": 91
+                "total": 0
             },
-            "response_times": {
-                "avg": {
-                    "ms": 1347.2500000000002
-                },
+            "response_time": {
+                "avg": {},
                 "max": {
-                    "ms": 4293
+                    "ms": 0
                 }
             },
-            "sockets": {
-                "http": {
-                    "total": 56
-                },
-                "https": {
-                    "total": 0
-                }
-            },
-            "status": {
-                "overall": {
-                    "state": "green"
-                }
-            },
-            "uuid": "b4b34609-03b3-463c-8699-17109e72df70",
-            "version": {
-                "number": "7.0.0-alpha1"
-            }
+            "snapshot": false,
+            "status": "green",
+            "transport_address": "localhost:5601",
+            "uuid": "5b2de169-2785-441b-ae8c-186a1936b17d",
+            "version": "7.0.0-alpha1"
         }
     },
     "metricset": {
@@ -72,6 +60,9 @@
         "module": "kibana",
         "name": "stats",
         "rtt": 115
+    },
+    "process": {
+        "pid": 20173
     },
     "service": {
         "name": "kibana"

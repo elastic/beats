@@ -128,10 +128,16 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 				continue
 			}
 
+			// Apply extra options
+			allLabels := getLabels(metric)
+			for _, option := range m.GetOptions() {
+				field, value, allLabels = option.Process(field, value, allLabels)
+			}
+
 			// Convert labels
 			labels := common.MapStr{}
 			keyLabels := common.MapStr{}
-			for k, v := range getLabels(metric) {
+			for k, v := range allLabels {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
 						keyLabels.Put(l.GetField(), v)
@@ -151,10 +157,12 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 				continue
 			}
 
-			// Put it in the event if it's a common metric
-			event := getEvent(eventsMap, keyLabels)
-			event.Put(field, value)
-			event.DeepUpdate(labels)
+			if field != "" {
+				// Put it in the event if it's a common metric
+				event := getEvent(eventsMap, keyLabels)
+				event.Put(field, value)
+				event.DeepUpdate(labels)
+			}
 		}
 	}
 

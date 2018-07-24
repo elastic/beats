@@ -11,6 +11,11 @@
 
 [[configuration-dashboards]]
 == Load the Kibana dashboards
+ifdef::deprecate_dashboard_loading[]
+
+deprecated[{deprecate_dashboard_loading}]
+
+endif::[]
 
 {beatname_uc} comes packaged with example Kibana dashboards, visualizations,
 and searches for visualizing {beatname_uc} data in Kibana.

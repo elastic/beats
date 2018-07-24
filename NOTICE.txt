@@ -116,11 +116,10 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-Dependency: github.com/boltdb/bolt
-Version: v1.3.1
-Revision: 2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8
+Dependency: github.com/coreos/bbolt
+Revision: af9db2027c98c61ecd8e17caa5bd265792b9b9a2
 License type (autodetected): MIT
-./vendor/github.com/boltdb/bolt/LICENSE:
+./vendor/github.com/coreos/bbolt/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -447,8 +446,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
-Version: v0.6.0
-Revision: 9c66f5c432b1d25bdb449a1e588d58b5d0cd7268
+Version: v0.6.1
+Revision: 581f7b1fe9d84f4c18ef0694d6e0eb944a925dae
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-ucfg/LICENSE:
 --------------------------------------------------------------------
@@ -1084,6 +1083,49 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
+Dependency: github.com/gogo/protobuf
+Revision: 636bf0302bc95575d69441b25a2603156ffdddf1
+License type (autodetected): BSD-3-Clause
+./metricbeat/vendor/github.com/gogo/protobuf/LICENSE:
+--------------------------------------------------------------------
+Protocol Buffers for Go with Gadgets
+
+Copyright (c) 2013, The GoGo Authors. All rights reserved.
+http://github.com/gogo/protobuf
+
+Go support for Protocol Buffers - Google's data interchange format
+
+Copyright 2010 The Go Authors.  All rights reserved.
+https://github.com/golang/protobuf
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+--------------------------------------------------------------------
 Dependency: github.com/golang/protobuf
 Revision: 2bba0603135d7d7f5cb73b2125beeda19c09f4ef
 License type (autodetected): BSD-3-Clause
@@ -1381,6 +1423,16 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/kubernetes/apimachinery
+Version: kubernetes-1.11.1
+Revision: 103fd098999dc9c0c88536f5c9ad2e5da39373ae
+License type (autodetected): Apache-2.0
+./metricbeat/vendor/github.com/kubernetes/apimachinery/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/lib/pq
 Revision: 2704adc878c21e1329f46f6e56a1c387d788ff94
 License type (autodetected): MIT
@@ -1585,8 +1637,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/OneOfOne/xxhash
-Version: v1.2.2
-Revision: 6def279d2ce6c81a79dd1c1be580f03bb216fb8a
+Revision: 74ace4fe5525ef62ce28d5093d6b0faaa6a575f3
 License type (autodetected): Apache-2.0
 ./vendor/github.com/OneOfOne/xxhash/LICENSE:
 --------------------------------------------------------------------
@@ -2030,12 +2081,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
-Version: v1.16.0/enh/offset-replica-id
-Revision: 32b4ad5c9537ed14e471779b76713ff65420db39
+Version: v1.17.0/enh/offset-replica-id
+Revision: d1575e4abe04acbbe8ac766320585cdf271dd189
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------
-Copyright (c) 2013 Evan Huus
+Copyright (c) 2013 Shopify
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -2663,6 +2714,41 @@ Dependency: gopkg.in/inf.v0
 Revision: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 License type (autodetected): BSD-3-Clause
 ./vendor/gopkg.in/inf.v0/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2012 Péter Surányi. Portions Copyright (c) 2009 The Go
+Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: gopkg.in/inf.v0
+Revision: d2d2541c53f18d2a059457998ce2876cc8e67cbf
+License type (autodetected): BSD-3-Clause
+./metricbeat/vendor/gopkg.in/inf.v0/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 Péter Surányi. Portions Copyright (c) 2009 The Go
 Authors. All rights reserved.
