@@ -26,6 +26,8 @@ import (
 
 	"github.com/phayes/freeport"
 
+	"net/http"
+
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
@@ -56,7 +58,7 @@ func tcpMonitorChecks(host string, ip string, port uint16, status string) mapval
 }
 
 func TestUpEndpointJob(t *testing.T) {
-	server := httptest.NewServer(hbtest.HelloWorldHandler)
+	server := httptest.NewServer(hbtest.HelloWorldHandler(http.StatusOK))
 	defer server.Close()
 
 	port, err := hbtest.ServerPort(server)
