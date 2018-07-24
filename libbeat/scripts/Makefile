@@ -309,13 +309,9 @@ coverage-report:
 fields: mage
 	mage -v fields
 
-.PHONY: libbeat_fields
-libbeat_fields:
-	@$(MAKE) -C ${ES_BEATS}/libbeat fields
-
 .PHONY: update
 update: ## @build Update expects the most recent version of libbeat in the GOPATH
-update: python-env libbeat_fields collect
+update: python-env collect
 	@echo "Updating generated files for ${BEAT_NAME}"
 
 	@# Update config files.

@@ -39,40 +39,33 @@ func main() {
 		os.Exit(1)
 	}
 
-	err := os.MkdirAll(filepath.Join(*beatPath, "_meta"), 0755)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Cannot create _meta dir for %s: %+v\n", name, err)
-		os.Exit(1)
-	}
-
-	if len(beatFieldsPaths) == 0 {
+	if len(beatFieldsPaths) == 0 && *esBeatsPath == *beatPath {
 		fmt.Println("No field files to collect")
-		err = fields.AppendFromLibbeat(*esBeatsPath, *beatPath)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Cannot generate global fields.yml for %s: %+v\n", name, err)
-			os.Exit(2)
-		}
 		return
 	}
 
 	var fieldsFiles []*fields.YmlFile
 	for _, fieldsFilePath := range beatFieldsPaths {
-		pathToModules := filepath.Join(*beatPath, fieldsFilePath)
-
-		fieldsFile, err := fields.CollectModuleFiles(pathToModules)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
-			os.Exit(2)
-		}
-
-		fieldsFiles = append(fieldsFiles, fieldsFile...)
+		fieldsFiles = collectFilesFromDir(*beatPath, fieldsFilePath, fieldsFiles)
 	}
 
-	err = fields.Generate(*esBeatsPath, *beatPath, fieldsFiles)
+	err := fields.Generate(*esBeatsPath, *beatPath, fieldsFiles)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot generate global fields.yml file for %s: %+v\n", name, err)
 		os.Exit(3)
 	}
 
 	fmt.Printf("Generated fields.yml for %s\n", name)
+}
+
+func collectFilesFromDir(beatPath, fieldsFilePath string, fieldsFiles []*fields.YmlFile) []*fields.YmlFile {
+	pathToModules := filepath.Join(beatPath, fieldsFilePath)
+
+	fieldsFile, err := fields.CollectModuleFiles(pathToModules)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
+		os.Exit(2)
+	}
+
+	return append(fieldsFiles, fieldsFile...)
 }

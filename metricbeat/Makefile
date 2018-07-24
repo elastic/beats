@@ -73,7 +73,7 @@ test-module: python-env update metricbeat.test
 	. ${PYTHON_ENV}/bin/activate && INTEGRATION_TESTS=1 nosetests tests/system/test_${MODULE}.py
 
 .PHONY: assets
-assets: libbeat_fields
+assets:
 	go run ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/metricbeat/module
 	mkdir -p include/fields
 	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include ${ES_BEATS}/metricbeat/_meta/fields.common.yml $(BEAT_NAME) > include/fields.go
