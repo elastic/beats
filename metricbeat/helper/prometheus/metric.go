@@ -51,6 +51,11 @@ func OpFilter(filter map[string]string) MetricOption {
 	}
 }
 
+// OpLowercaseValue lowercases the value if it's a string
+func OpLowercaseValue() MetricOption {
+	return opLowercaseValue{}
+}
+
 // Metric directly maps a Prometheus metric to a Metricbeat field
 func Metric(field string, options ...MetricOption) MetricMap {
 	return &commonMetric{
@@ -83,14 +88,13 @@ func BooleanMetric(field string, options ...MetricOption) MetricMap {
 
 // LabelMetric maps a Prometheus metric to a Metricbeat field, stores the value
 // of a given label on it if the gauge value is 1
-func LabelMetric(field, label string, lowercase bool, options ...MetricOption) MetricMap {
+func LabelMetric(field, label string, options ...MetricOption) MetricMap {
 	return &labelMetric{
 		commonMetric{
 			field:   field,
 			options: options,
 		},
 		label,
-		lowercase,
 	}
 }
 
@@ -205,18 +209,13 @@ func (m *booleanMetric) GetValue(metric *dto.Metric) interface{} {
 
 type labelMetric struct {
 	commonMetric
-	label     string
-	lowercase bool
+	label string
 }
 
 // GetValue returns the resulting value
 func (m *labelMetric) GetValue(metric *dto.Metric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil && gauge.GetValue() == 1 {
-		value := getLabel(metric, m.label)
-		if m.lowercase {
-			return strings.ToLower(value)
-		}
-		return value
+		return getLabel(metric, m.label)
 	}
 	return nil
 }
@@ -253,6 +252,15 @@ func (o opFilter) Process(field string, value interface{}, labels, keyLabels com
 		if labels[k] != v && keyLabels[k] != v {
 			return "", nil, nil, nil
 		}
+	}
+	return field, value, labels, keyLabels
+}
+
+type opLowercaseValue struct{}
+
+func (o opLowercaseValue) Process(field string, value interface{}, labels, keyLabels common.MapStr) (string, interface{}, common.MapStr, common.MapStr) {
+	if val, ok := value.(string); ok {
+		value = strings.ToLower(val)
 	}
 	return field, value, labels, keyLabels
 }
