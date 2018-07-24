@@ -15459,7 +15459,7 @@ type: scaled_float
 
 format: percent
 
-The percentage of CPU time spent in non-idle state.
+The percentage of CPU time spent in states other than Idle and IOWait.
 
 
 --
@@ -15567,17 +15567,7 @@ type: scaled_float
 
 format: percent
 
-The percentage of CPU time spent in non-idle state.
-
-
---
-
-*`system.cpu.total.value`*::
-+
---
-type: long
-
-The value of CPU usage since starting the process.
+The percentage of CPU time in states other than Idle and IOWait, normalised by the number of cores.
 
 
 --
