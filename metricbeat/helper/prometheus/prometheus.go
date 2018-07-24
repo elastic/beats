@@ -128,10 +128,16 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 				continue
 			}
 
+			// Apply extra options
+			allLabels := getLabels(metric)
+			for _, option := range m.GetOptions() {
+				field, value, allLabels = option.Process(field, value, allLabels)
+			}
+
 			// Convert labels
 			labels := common.MapStr{}
 			keyLabels := common.MapStr{}
-			for k, v := range getLabels(metric) {
+			for k, v := range allLabels {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
 						keyLabels.Put(l.GetField(), v)
@@ -139,11 +145,6 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 						labels.Put(l.GetField(), v)
 					}
 				}
-			}
-
-			// Apply extra options
-			for _, option := range m.GetOptions() {
-				field, value, labels, keyLabels = option.Process(field, value, labels, keyLabels)
 			}
 
 			// Keep a info document if it's an infoMetric
