@@ -38,7 +38,7 @@ func (b *Bundle) Filter(stabilities ...Stability) *Bundle {
 
 	for _, feature := range b.features {
 		for _, stability := range stabilities {
-			if feature.Stability() == stability {
+			if feature.Description().Stability() == stability {
 				filtered = append(filtered, feature)
 				break
 			}
