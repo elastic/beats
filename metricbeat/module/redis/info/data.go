@@ -108,6 +108,9 @@ var (
 					"current_time": s.Object{
 						"sec": c.Int("aof_current_rewrite_time_sec"),
 					},
+					"buffer": s.Object{
+						"size": c.Int("aof_rewrite_buffer_length"),
+					},
 				},
 				"bgrewrite": s.Object{
 					"last_status": c.Str("aof_last_bgrewrite_status"),
@@ -118,12 +121,23 @@ var (
 				"copy_on_write": s.Object{
 					"last_size": c.Int("aof_last_cow_size"),
 				},
+				"buffer": s.Object{
+					"size": c.Int("aof_buffer_length"),
+				},
+				"size": s.Object{
+					"current": c.Int("aof_current_size"),
+					"base":    c.Int("aof_base_size"),
+				},
+				"fsync": s.Object{
+					"pending": c.Int("aof_pending_bio_fsync"),
+					"delayed": c.Int("aof_delayed_fsync"),
+				},
 			},
 		},
 		"replication": s.Object{
 			"role":             c.Str("role"),
 			"connected_slaves": c.Int("connected_slaves"),
-			"master_offset":    c.Int("master_repl_offset"), // Keep this for backward compatibility
+			"master_offset":    c.Int("master_repl_offset"), // ToDo Should be deprectad as master.offset introduced
 			"backlog": s.Object{
 				"active":            c.Int("repl_backlog_active"),
 				"size":              c.Int("repl_backlog_size"),
@@ -132,6 +146,7 @@ var (
 			},
 			"master": s.Object{
 				"offset":              c.Int("master_repl_offset"),
+				"second_offset":       c.Int("second_repl_offset"),
 				"link_status":         c.Str("master_link_status", s.Optional),
 				"last_io_seconds_ago": c.Int("master_last_io_seconds_ago", s.Optional),
 				"sync": s.Object{
