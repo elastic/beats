@@ -20,14 +20,11 @@ package xpack
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMakeMonitoringIndexName(t *testing.T) {
-	today := time.Now().UTC().Format("2006.01.02")
-
 	tests := []struct {
 		Name     string
 		Product  Product
@@ -36,22 +33,22 @@ func TestMakeMonitoringIndexName(t *testing.T) {
 		{
 			"Elasticsearch monitoring index",
 			Elasticsearch,
-			fmt.Sprintf(".monitoring-es-6-mb-%v", today),
+			".monitoring-es-6-mb",
 		},
 		{
 			"Kibana monitoring index",
 			Kibana,
-			fmt.Sprintf(".monitoring-kibana-6-mb-%v", today),
+			".monitoring-kibana-6-mb",
 		},
 		{
 			"Logstash monitoring index",
 			Logstash,
-			fmt.Sprintf(".monitoring-logstash-6-mb-%v", today),
+			".monitoring-logstash-6-mb",
 		},
 		{
 			"Beats monitoring index",
 			Beats,
-			fmt.Sprintf(".monitoring-beats-6-mb-%v", today),
+			".monitoring-beats-6-mb",
 		},
 	}
 

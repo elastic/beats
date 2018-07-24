@@ -52,7 +52,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The elasticsearch index_summary metricset is experimental")
+	cfgwarn.Beta("The elasticsearch index_summary metricset is beta")
 
 	// Get the stats from the local node
 	ms, err := elasticsearch.NewMetricSet(base, statsPath)

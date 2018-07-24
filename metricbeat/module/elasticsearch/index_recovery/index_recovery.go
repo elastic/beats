@@ -45,7 +45,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The elasticsearch index_recovery metricset is experimental")
+	cfgwarn.Beta("The elasticsearch index_recovery metricset is beta")
 
 	config := struct {
 		ActiveOnly bool `config:"index_recovery.active_only"`

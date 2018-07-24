@@ -31,41 +31,46 @@ func main() {
 	beatPath := flag.String("beat_path", ".", "Path to your Beat")
 	flag.Parse()
 
-	beatFieldsPath := flag.Args()
+	beatFieldsPaths := flag.Args()
 	name := filepath.Base(*beatPath)
 
-	err := os.MkdirAll(filepath.Join(*beatPath, "_meta"), 0744)
-	if err != nil {
-		fmt.Printf("Cannot create _meta dir for %s: %v\n", name, err)
+	if *beatPath == "" {
+		fmt.Fprintf(os.Stderr, "beat_path cannot be empty")
 		os.Exit(1)
 	}
 
-	if len(beatFieldsPath) == 0 {
+	err := os.MkdirAll(filepath.Join(*beatPath, "_meta"), 0755)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Cannot create _meta dir for %s: %+v\n", name, err)
+		os.Exit(1)
+	}
+
+	if len(beatFieldsPaths) == 0 {
 		fmt.Println("No field files to collect")
 		err = fields.AppendFromLibbeat(*esBeatsPath, *beatPath)
 		if err != nil {
-			fmt.Printf("Cannot generate global fields.yml for %s: %v\n", name, err)
+			fmt.Fprintf(os.Stderr, "Cannot generate global fields.yml for %s: %+v\n", name, err)
 			os.Exit(2)
 		}
 		return
 	}
 
-	if *beatPath == "" {
-		fmt.Println("beat_path cannot be empty")
-		os.Exit(1)
+	var fieldsFiles []*fields.YmlFile
+	for _, fieldsFilePath := range beatFieldsPaths {
+		pathToModules := filepath.Join(*beatPath, fieldsFilePath)
+
+		fieldsFile, err := fields.CollectModuleFiles(pathToModules)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
+			os.Exit(2)
+		}
+
+		fieldsFiles = append(fieldsFiles, fieldsFile...)
 	}
 
-	pathToModules := filepath.Join(*beatPath, beatFieldsPath[0])
-	fieldFiles, err := fields.CollectModuleFiles(pathToModules)
+	err = fields.Generate(*esBeatsPath, *beatPath, fieldsFiles)
 	if err != nil {
-		fmt.Printf("Cannot collect fields.yml files: %v\n", err)
-		os.Exit(2)
-
-	}
-
-	err = fields.Generate(*esBeatsPath, *beatPath, fieldFiles)
-	if err != nil {
-		fmt.Printf("Cannot generate global fields.yml file for %s: %v\n", name, err)
+		fmt.Fprintf(os.Stderr, "Cannot generate global fields.yml file for %s: %+v\n", name, err)
 		os.Exit(3)
 	}
 

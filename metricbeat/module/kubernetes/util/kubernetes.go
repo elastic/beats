@@ -22,6 +22,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kubernetes/apimachinery/pkg/api/resource"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
@@ -95,10 +97,10 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 // NewResourceMetadataEnricher returns an Enricher configured for kubernetes resource events
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
-	resource kubernetes.Resource,
+	res kubernetes.Resource,
 	nodeScope bool) Enricher {
 
-	watcher, err := GetWatcher(base, resource, nodeScope)
+	watcher, err := GetWatcher(base, res, nodeScope)
 	if err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
@@ -123,6 +125,23 @@ func NewResourceMetadataEnricher(
 			switch r := r.(type) {
 			case *kubernetes.Pod:
 				m[id] = metaGen.PodMetadata(r)
+
+			case *kubernetes.Node:
+				// Report node allocatable resources to PerfMetrics cache
+				name := r.GetMetadata().GetName()
+				if cpu, ok := r.GetStatus().GetCapacity()["cpu"]; ok {
+					if q, err := resource.ParseQuantity(cpu.GetString_()); err == nil {
+						PerfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
+					}
+				}
+				if memory, ok := r.GetStatus().GetCapacity()["memory"]; ok {
+					if q, err := resource.ParseQuantity(memory.GetString_()); err == nil {
+						PerfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
+					}
+				}
+
+				m[id] = metaGen.ResourceMetadata(r)
+
 			default:
 				m[id] = metaGen.ResourceMetadata(r)
 			}
@@ -169,7 +188,22 @@ func NewContainerMetadataEnricher(
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
 			pod := r.(*kubernetes.Pod)
 			meta := metaGen.PodMetadata(pod)
+
 			for _, container := range append(pod.GetSpec().GetContainers(), pod.GetSpec().GetInitContainers()...) {
+				cuid := ContainerUID(pod.GetMetadata().GetNamespace(), r.GetMetadata().GetName(), container.GetName())
+
+				// Report container limits to PerfMetrics cache
+				if cpu, ok := container.GetResources().GetLimits()["cpu"]; ok {
+					if q, err := resource.ParseQuantity(cpu.GetString_()); err == nil {
+						PerfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
+					}
+				}
+				if memory, ok := container.GetResources().GetLimits()["memory"]; ok {
+					if q, err := resource.ParseQuantity(memory.GetString_()); err == nil {
+						PerfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
+					}
+				}
+
 				id := join(r.GetMetadata().GetNamespace(), r.GetMetadata().GetName(), container.GetName())
 				m[id] = meta
 			}

@@ -20,12 +20,13 @@ package fields
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -152,7 +153,7 @@ func createIfNotExists(inPath, outPath string) error {
 	if os.IsNotExist(err) {
 		err := copyFileWithFlag(inPath, outPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC)
 		if err != nil {
-			fmt.Println("Cannot find _meta/fields.yml")
+			return err
 		}
 		return nil
 	}
@@ -162,12 +163,17 @@ func createIfNotExists(inPath, outPath string) error {
 func copyFileWithFlag(in, out string, flag int) error {
 	input, err := ioutil.ReadFile(in)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to read source in copy")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(out), 0755); err != nil {
+		return errors.Wrapf(err, "failed to create destination dir for copy "+
+			"at %v", filepath.Dir(out))
 	}
 
 	output, err := os.OpenFile(out, flag, 0644)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to open destination file for copy")
 	}
 	defer output.Close()
 
