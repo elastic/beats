@@ -209,6 +209,12 @@ metricbeat.modules:
   # Set to false to fetch all entries
   #index_recovery.active_only: true
 
+#----------------------------- envoyproxy Module -----------------------------
+- module: envoyproxy
+  metricsets: ["server"]
+  period: 10s
+  hosts: ["localhost:9901"]
+
 #-------------------------------- Etcd Module --------------------------------
 - module: etcd
   metricsets: ["leader", "self", "store"]

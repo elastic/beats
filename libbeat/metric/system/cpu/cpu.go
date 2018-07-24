@@ -116,7 +116,9 @@ func cpuPercentages(s0, s1 *sigar.Cpu, numCPU int) Percentages {
 	}
 
 	calculateTotalPct := func() float64 {
-		return common.Round(float64(numCPU)-calculatePct(s0.Idle, s1.Idle), common.DefaultDecimalPlacesCount)
+		// IOWait time is excluded from the total as per #7627.
+		idle := calculatePct(s0.Idle, s1.Idle) + calculatePct(s0.Wait, s1.Wait)
+		return common.Round(float64(numCPU)-idle, common.DefaultDecimalPlacesCount)
 	}
 
 	return Percentages{

@@ -15,48 +15,5 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package xpack
-
-import (
-	"fmt"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-)
-
-func TestMakeMonitoringIndexName(t *testing.T) {
-	tests := []struct {
-		Name     string
-		Product  Product
-		Expected string
-	}{
-		{
-			"Elasticsearch monitoring index",
-			Elasticsearch,
-			".monitoring-es-6-mb",
-		},
-		{
-			"Kibana monitoring index",
-			Kibana,
-			".monitoring-kibana-6-mb",
-		},
-		{
-			"Logstash monitoring index",
-			Logstash,
-			".monitoring-logstash-6-mb",
-		},
-		{
-			"Beats monitoring index",
-			Beats,
-			".monitoring-beats-6-mb",
-		},
-	}
-
-	for _, test := range tests {
-		name := fmt.Sprintf("Test naming %v", test.Name)
-		t.Run(name, func(t *testing.T) {
-			indexName := MakeMonitoringIndexName(test.Product)
-			assert.Equal(t, test.Expected, indexName)
-		})
-	}
-}
+// Package envoyproxy is a Metricbeat module that contains MetricSets.
+package envoyproxy
