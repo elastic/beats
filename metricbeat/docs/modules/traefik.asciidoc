@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-traefik]]
 == traefik module
 
-experimental[]
+beta[]
 
 This module periodically fetches metrics from a https://traefik.io/[Traefik]
 instance. The Traefik instance must be configured to expose it's HTTP API.

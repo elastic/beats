@@ -6,7 +6,6 @@ GOX_OS?=linux windows ## @Building List of all OS to be supported by "make cross
 DEV_OS?=linux
 TESTING_ENVIRONMENT?=latest
 ES_BEATS?=..
-FIELDS_FILE_PATH=module
 
 # Path to the libbeat Makefile
 include ${ES_BEATS}/libbeat/scripts/Makefile

@@ -70,6 +70,7 @@ class Test(BaseTest):
             "offset": iterations * line_len,
         }, record)
         self.assertTrue("FileStateOS" in record)
+        self.assertIsNone(record["meta"])
         file_state_os = record["FileStateOS"]
 
         if os.name == "nt":

@@ -50,7 +50,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The kafka partition metricset is beta")
+	cfgwarn.Beta("The Kibana status metricset is beta")
 
 	http, err := helper.NewHTTP(base)
 	if err != nil {
