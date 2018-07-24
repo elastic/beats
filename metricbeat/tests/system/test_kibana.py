@@ -2,6 +2,8 @@ import os
 import metricbeat
 import unittest
 from nose.plugins.skip import SkipTest
+import urllib2
+import json
 
 
 class Test(metricbeat.BaseTest):
@@ -14,11 +16,20 @@ class Test(metricbeat.BaseTest):
         """
         kibana status metricset test
         """
+        # FIXME: Need to skip conditionally for Kibana versions < 6.4.0 (see commented out
+        # code below)
+        raise SkipTest
+
         env = os.environ.get('TESTING_ENVIRONMENT')
 
         if env == "2x" or env == "5x":
             # Skip for 5.x and 2.x tests as Kibana endpoint not available
             raise SkipTest
+
+        # version = self.get_version()
+        # if semver.compare(version, "6.4.0") == -1:
+        #     # Skip for Kibana versions < 6.4.0 as Kibana endpoint not available
+        #     raise SkipTest
 
         self.render_config_template(modules=[{
             "name": "kibana",
@@ -41,3 +52,12 @@ class Test(metricbeat.BaseTest):
     def get_hosts(self):
         return [os.getenv('KIBANA_HOST', 'localhost') + ':' +
                 os.getenv('KIBANA_PORT', '5601')]
+
+    def get_version(self):
+        host = self.get_hosts()[0]
+        res = urllib2.urlopen(host + "/api/status").read()
+
+        body = json.loads(res)
+        version = body["version"]["number"]
+
+        return version
