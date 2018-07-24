@@ -20,7 +20,3 @@
     - name: array_disabled
       type: array
       enabled: false
-
-    - name: alias
-      type: alias
-      path: keyword
