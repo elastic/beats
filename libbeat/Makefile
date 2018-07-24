@@ -1,7 +1,6 @@
 BEAT_NAME=libbeat
 TEST_ENVIRONMENT?=true
 SYSTEM_TESTS=true
-FIELDS_FILE_PATH=processors
 
 include scripts/Makefile
 
