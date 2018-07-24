@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kibana
+package elastic
 
 import (
 	"fmt"
@@ -25,6 +25,43 @@ import (
 
 	"github.com/elastic/beats/metricbeat/mb"
 )
+
+func TestMakeXPackMonitoringIndexName(t *testing.T) {
+	tests := []struct {
+		Name     string
+		Product  Product
+		Expected string
+	}{
+		{
+			"Elasticsearch monitoring index",
+			Elasticsearch,
+			".monitoring-es-6-mb",
+		},
+		{
+			"Kibana monitoring index",
+			Kibana,
+			".monitoring-kibana-6-mb",
+		},
+		{
+			"Logstash monitoring index",
+			Logstash,
+			".monitoring-logstash-6-mb",
+		},
+		{
+			"Beats monitoring index",
+			Beats,
+			".monitoring-beats-6-mb",
+		},
+	}
+
+	for _, test := range tests {
+		name := fmt.Sprintf("Test naming %v", test.Name)
+		t.Run(name, func(t *testing.T) {
+			indexName := MakeXPackMonitoringIndexName(test.Product)
+			assert.Equal(t, test.Expected, indexName)
+		})
+	}
+}
 
 type MockReporterV2 struct {
 	mb.ReporterV2
@@ -44,9 +81,9 @@ func (m MockReporterV2) Error(err error) bool {
 func TestReportErrorForMissingField(t *testing.T) {
 	field := "some.missing.field"
 	r := MockReporterV2{}
-	err := ReportErrorForMissingField(field, r)
+	err := ReportErrorForMissingField(field, Elasticsearch, r)
 
-	expectedError := fmt.Errorf("Could not find field '%v' in Kibana stats API response", field)
+	expectedError := fmt.Errorf("Could not find field '%v' in Elasticsearch stats API response", field)
 	assert.Equal(t, expectedError, err)
 	assert.Equal(t, expectedError, currentErr)
 }
