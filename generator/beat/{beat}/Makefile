@@ -13,7 +13,7 @@ MAGE_IMPORT_PATH=${BEAT_PATH}/vendor/github.com/magefile/mage
 
 # Initial beat setup
 .PHONY: setup
-setup: copy-vendor update git-init
+setup: copy-vendor git-init update git-add
 
 # Copy beats into vendor directory
 .PHONY: copy-vendor
@@ -27,17 +27,11 @@ copy-vendor:
 .PHONY: git-init
 git-init:
 	git init
-	git add README.md CONTRIBUTING.md
-	git commit -m "Initial commit"
-	git add LICENSE.txt
-	git commit -m "Add the LICENSE"
-	git add .gitignore
-	git commit -m "Add git settings"
-	git add .
-	git reset -- .travis.yml
-	git commit -m "Add {beat}"
-	git add .travis.yml
-	git commit -m "Add Travis CI"
+
+.PHONY: git-add
+git-add:
+	git add -A
+	git commit -m "Add generated {beat} files"
 
 # Collects all dependencies and then calls update
 .PHONY: collect
