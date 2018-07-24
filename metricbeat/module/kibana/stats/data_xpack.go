@@ -26,10 +26,11 @@ import (
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/kibana"
 )
 
 var (
-	schemaXPackMonitoring = s.Schema{
+	schemaXPackMonitoringStats = s.Schema{
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"os": c.Dict("os", s.Schema{
 			"load": c.Dict("load", s.Schema{
@@ -105,7 +106,50 @@ var (
 	}
 )
 
-func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error {
+type dataParser func(mb.ReporterV2, common.MapStr, time.Time) (string, common.MapStr, error)
+
+func statsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string, common.MapStr, error) {
+	kibanaStatsFields, err := schemaXPackMonitoringStats.Apply(data)
+	if err != nil {
+		return "", nil, err
+	}
+
+	process, ok := data["process"].(map[string]interface{})
+	if !ok {
+		return "", nil, kibana.ReportErrorForMissingField("process", r)
+	}
+	memory, ok := process["memory"].(map[string]interface{})
+	if !ok {
+		return "", nil, kibana.ReportErrorForMissingField("process.memory", r)
+	}
+	rss, ok := memory["resident_set_size_bytes"].(float64)
+	if !ok {
+		return "", nil, kibana.ReportErrorForMissingField("process.memory.resident_set_size_bytes", r)
+	}
+	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int64(rss))
+
+	kibanaStatsFields.Put("timestamp", now)
+
+	// Make usage field passthrough as-is
+	usage, ok := data["usage"].(map[string]interface{})
+	if !ok {
+		return "", nil, elastic.ReportErrorForMissingField("usage", elastic.Kibana, r)
+	}
+	kibanaStatsFields.Put("usage", usage)
+
+	return "kibana_stats", kibanaStatsFields, nil
+}
+
+func settingsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string, common.MapStr, error) {
+	kibanaSettingsFields, ok := data["settings"]
+	if !ok {
+		return "", nil, kibana.ReportErrorForMissingField("settiings", r)
+	}
+
+	return "kibana_settings", kibanaSettingsFields.(map[string]interface{}), nil
+}
+
+func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte, dataParserFunc dataParser) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -113,53 +157,35 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error 
 		return err
 	}
 
-	kibanaStatsFields, err := schemaXPackMonitoring.Apply(data)
-	if err != nil {
-		r.Error(err)
-		return err
-	}
-
-	process, ok := data["process"].(map[string]interface{})
-	if !ok {
-		return elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
-	}
-	memory, ok := process["memory"].(map[string]interface{})
-	if !ok {
-		return elastic.ReportErrorForMissingField("process.memory", elastic.Kibana, r)
-	}
-
-	rss, ok := memory["resident_set_size_bytes"].(float64)
-	if !ok {
-		return elastic.ReportErrorForMissingField("process.memory.resident_set_size_bytes", elastic.Kibana, r)
-	}
-	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int64(rss))
-
-	timestamp := time.Now()
-	kibanaStatsFields.Put("timestamp", timestamp)
-
-	// Make usage field passthrough as-is
-	usage, ok := data["usage"].(map[string]interface{})
-	if !ok {
-		return elastic.ReportErrorForMissingField("usage", elastic.Kibana, r)
-	}
-	kibanaStatsFields.Put("usage", usage)
-
 	clusterUUID, ok := data["clusterUuid"].(string)
 	if !ok {
 		return elastic.ReportErrorForMissingField("clusterUuid", elastic.Kibana, r)
 	}
 
+	t, fields, err := dataParserFunc(r, data, now)
+	if err != nil {
+		return err
+	}
+
 	var event mb.Event
 	event.RootFields = common.MapStr{
 		"cluster_uuid": clusterUUID,
-		"timestamp":    timestamp,
+		"timestamp":    now,
 		"interval_ms":  intervalMs,
-		"type":         "kibana_stats",
-		"kibana_stats": kibanaStatsFields,
+		"type":         t,
+		t:              fields,
 	}
 
 	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Kibana)
-	r.Event(event)
 
+	r.Event(event)
 	return nil
+}
+
+func eventMappingStatsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte) error {
+	return eventMappingXPack(r, intervalMs, now, content, statsDataParser)
+}
+
+func eventMappingSettingsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte) error {
+	return eventMappingXPack(r, intervalMs, now, content, settingsDataParser)
 }

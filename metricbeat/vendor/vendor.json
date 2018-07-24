@@ -3,6 +3,12 @@
 	"ignore": "test github.com/elastic/beats",
 	"package": [
 		{
+			"checksumSHA1": "97BsbXOiZ8+Kr+LIuZkQFtSj7H4=",
+			"path": "github.com/coreos/go-semver/semver",
+			"revision": "e214231b295a8ea9479f11b70b35d5acf3556d9b",
+			"revisionTime": "2018-01-08T23:09:05Z"
+		},
+		{
 			"checksumSHA1": "GYschMPw/Zi5C4QnGKRfgljnx/c=",
 			"path": "github.com/gogo/protobuf/proto",
 			"revision": "636bf0302bc95575d69441b25a2603156ffdddf1",
