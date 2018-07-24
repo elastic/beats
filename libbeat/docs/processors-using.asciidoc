@@ -404,6 +404,7 @@ The following cloud providers are supported:
 - https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
 - Alibaba Cloud (ECS)
 - Azure Virtual Machine
+- Openstack Nova
 
 The simple configuration below enables the processor.
 
@@ -521,6 +522,23 @@ _Azure Virtual Machine_
       "instance_name": "test-az-vm",
       "machine_type": "Standard_D3_v2",
       "region": "eastus2"
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+_Openstack Nova_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "meta": {
+    "cloud": {
+      "provider": "openstack",
+      "instance_name": "test-998d932195.mycloud.tld",
+      "availability_zone": "xxxx-az-c",
+      "instance_id": "i-00011a84",
+      "machine_type": "m2.large"
     }
   }
 }

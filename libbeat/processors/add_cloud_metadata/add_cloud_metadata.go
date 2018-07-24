@@ -281,6 +281,10 @@ func setupFetchers(c *common.Config) ([]*metadataFetcher, error) {
 	if err != nil {
 		return fetchers, err
 	}
+	osFetcher, err := newOpenstackNovaMetadataFetcher(c)
+	if err != nil {
+		return fetchers, err
+	}
 
 	fetchers = []*metadataFetcher{
 		doFetcher,
@@ -289,6 +293,7 @@ func setupFetchers(c *common.Config) ([]*metadataFetcher, error) {
 		qcloudFetcher,
 		ecsFetcher,
 		azFetcher,
+		osFetcher,
 	}
 	return fetchers, nil
 }
