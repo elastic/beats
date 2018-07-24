@@ -79,6 +79,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix default value for logging.files.keepfiles. It was being set to 0 and now
   it's set to the documented value of 7. {issue}7494[7494]
 - Retain compatibility with older Docker server versions. {issue}7542[7542]
+- Fix errors unpacking configs modified via CLI by ignoring `-E key=value` pairs with missing value. {pull}7599[7599]
 
 *Auditbeat*
 
