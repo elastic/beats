@@ -19,9 +19,8 @@ package mapval
 
 import (
 	"fmt"
-	"time"
-
 	"strings"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
