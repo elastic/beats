@@ -32,13 +32,12 @@ import (
 // URLHostParserBuilder builds a tailored HostParser for used with host strings
 // that are URLs.
 type URLHostParserBuilder struct {
-	BasePathConfigKey string
-	PathConfigKey     string
-	DefaultPath       string
-	DefaultUsername   string
-	DefaultPassword   string
-	DefaultScheme     string
-	QueryParams       string
+	PathConfigKey   string
+	DefaultPath     string
+	DefaultUsername string
+	DefaultPassword string
+	DefaultScheme   string
+	QueryParams     string
 }
 
 // Build returns a new HostParser function whose behavior is influenced by the
@@ -82,11 +81,11 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		// Normalize path
 		path = strings.Trim(path, "/")
 
-		t, ok = conf[b.BasePathConfigKey]
+		t, ok = conf["basepath"]
 		if ok {
 			basePath, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, errors.Errorf("'%v' config for module %v is not a string", b.BasePathConfigKey, module.Name())
+				return mb.HostData{}, errors.Errorf("'basepath' config for module %v is not a string", module.Name())
 			}
 		}
 		// Normalize basepath
