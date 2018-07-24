@@ -113,7 +113,6 @@ func (s *Server) run() {
 			s.config.Timeout,
 		)
 
-		s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount())
 		s.wg.Add(1)
 		go func() {
 			defer logp.Recover("recovering from a tcp client crash")
@@ -122,13 +121,14 @@ func (s *Server) run() {
 
 			s.registerClient(client)
 			defer s.unregisterClient(client)
+			s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount())
 
 			err := client.handle()
 			if err != nil {
 				s.log.Debugw("Client error", "error", err)
 			}
 
-			s.log.Debugw(
+			defer s.log.Debugw(
 				"Client disconnected",
 				"remote_address",
 				conn.RemoteAddr(),
