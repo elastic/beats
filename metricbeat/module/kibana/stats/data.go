@@ -23,8 +23,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/kibana"
 )
 
 var (
@@ -99,18 +99,18 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	// Set elasticsearch cluster id
 	elasticsearchClusterID, ok := data["cluster_uuid"]
 	if !ok {
-		return kibana.ReportErrorForMissingField("cluster_uuid", r)
+		return elastic.ReportErrorForMissingField("cluster_uuid", elastic.Kibana, r)
 	}
 	event.RootFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	// Set process PID
 	process, ok := data["process"].(map[string]interface{})
 	if !ok {
-		return kibana.ReportErrorForMissingField("process", r)
+		return elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
 	}
 	pid, ok := process["pid"].(float64)
 	if !ok {
-		return kibana.ReportErrorForMissingField("process.pid", r)
+		return elastic.ReportErrorForMissingField("process.pid", elastic.Kibana, r)
 	}
 	event.RootFields.Put("process.pid", int(pid))
 

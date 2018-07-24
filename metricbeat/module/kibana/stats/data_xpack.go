@@ -24,9 +24,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/metricbeat/helper/xpack"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/kibana"
 )
 
 var (
@@ -156,16 +155,16 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error 
 
 	process, ok := data["process"].(map[string]interface{})
 	if !ok {
-		return kibana.ReportErrorForMissingField("process", r)
+		return elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
 	}
 	memory, ok := process["memory"].(map[string]interface{})
 	if !ok {
-		return kibana.ReportErrorForMissingField("process.memory", r)
+		return elastic.ReportErrorForMissingField("process.memory", elastic.Kibana, r)
 	}
 
 	rss, ok := memory["resident_set_size_bytes"].(float64)
 	if !ok {
-		return kibana.ReportErrorForMissingField("process.memory.resident_set_size_bytes", r)
+		return elastic.ReportErrorForMissingField("process.memory.resident_set_size_bytes", elastic.Kibana, r)
 	}
 	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int64(rss))
 
@@ -181,7 +180,7 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error 
 		"kibana_stats": kibanaStatsFields,
 	}
 
-	event.Index = xpack.MakeMonitoringIndexName(xpack.Kibana)
+	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Kibana)
 	r.Event(event)
 
 	return nil

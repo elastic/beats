@@ -15,10 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package xpack
+package elastic
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 // Product supported by X-Pack Monitoring
@@ -38,7 +41,7 @@ const (
 	Beats
 )
 
-func (p Product) String() string {
+func (p Product) xPackMonitoringIndexString() string {
 	indexProductNames := []string{
 		"es",
 		"kibana",
@@ -53,10 +56,33 @@ func (p Product) String() string {
 	return indexProductNames[p]
 }
 
-// MakeMonitoringIndexName method returns the name of the monitoring index for
+func (p Product) String() string {
+	productNames := []string{
+		"elasticsearch",
+		"kibana",
+		"logstash",
+		"beats",
+	}
+
+	if int(p) < 0 || int(p) > len(productNames) {
+		panic("Unknown product")
+	}
+
+	return productNames[p]
+}
+
+// MakeXPackMonitoringIndexName method returns the name of the monitoring index for
 // a given product { elasticsearch, kibana, logstash, beats }
-func MakeMonitoringIndexName(product Product) string {
+func MakeXPackMonitoringIndexName(product Product) string {
 	const version = "6"
 
-	return fmt.Sprintf(".monitoring-%v-%v-mb", product, version)
+	return fmt.Sprintf(".monitoring-%v-%v-mb", product.xPackMonitoringIndexString(), version)
+}
+
+// ReportErrorForMissingField reports and returns an error message for the given
+// field being missing in API response received from a given product
+func ReportErrorForMissingField(field string, product Product, r mb.ReporterV2) error {
+	err := fmt.Errorf("Could not find field '%v' in %v stats API response", field, strings.Title(product.String()))
+	r.Error(err)
+	return err
 }
