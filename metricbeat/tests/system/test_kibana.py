@@ -6,6 +6,7 @@ import urllib2
 import json
 import semver
 
+
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['elasticsearch', 'kibana']
