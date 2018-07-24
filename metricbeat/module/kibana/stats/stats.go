@@ -35,10 +35,9 @@ func init() {
 
 var (
 	hostParser = parse.URLHostParserBuilder{
-		DefaultScheme:     "http",
-		BasePathConfigKey: "basepath",
-		DefaultPath:       "api/stats",
-		QueryParams:       "extended=true", // make Kibana fetch the cluster_uuid
+		DefaultScheme: "http",
+		DefaultPath:   "api/stats",
+		QueryParams:   "extended=true", // make Kibana fetch the cluster_uuid
 	}.Build()
 )
 
