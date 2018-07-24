@@ -323,6 +323,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add envoyproxy module. {pull}7569[7569]
 - Release prometheus collector metricset as GA. {pull}7660[7660]
 - Add Elasticsearch `cluster_stats` metricset. {pull}7638[7638]
+- Added `basepath` setting for HTTP-based metricsets {pull}7700[7700]
 
 *Packetbeat*
 

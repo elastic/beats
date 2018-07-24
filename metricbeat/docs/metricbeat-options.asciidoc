@@ -222,3 +222,9 @@ The password to use for basic authentication.
 
 If defined, Metricbeat will read the contents of the file once at initialization
 and then use the value in an HTTP Authorization header.
+
+[float]
+==== `basepath`
+
+An optional base path to be used in HTTP URIs. If defined, Metricbeat will insert this value
+as the first segment in the HTTP URI path.
