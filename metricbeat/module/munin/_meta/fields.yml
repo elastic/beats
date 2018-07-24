@@ -1,10 +1,8 @@
 - key: munin
   title: "Munin"
   description: >
-    experimental[]
-
     Munin node metrics exporter
-  release: experimental
+  release: beta
   fields:
     - name: munin
       type: group

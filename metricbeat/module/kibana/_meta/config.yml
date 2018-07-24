@@ -3,5 +3,6 @@
   #  - status
   period: 10s
   hosts: ["localhost:5601"]
+  #basepath: ""
   #username: "user"
   #password: "secret"

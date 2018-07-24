@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-munin-node]]
 === Munin node metricset
 
-experimental[]
+beta[]
 
 include::../../../module/munin/node/_meta/docs.asciidoc[]
 

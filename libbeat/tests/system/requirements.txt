@@ -28,3 +28,4 @@ texttable==0.9.1
 urllib3==1.22
 websocket-client==0.47.0
 parameterized==0.6.1
+jsondiff==1.1.2

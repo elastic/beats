@@ -51,7 +51,7 @@ type MetricSet struct {
 
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The traefik health metricset is experimental.")
+	cfgwarn.Beta("The traefik health metricset is beta.")
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err

@@ -17,7 +17,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Rename beat.cpu.*.time metrics to beat.cpu.*.time.ms. {pull}6449[6449]
 - Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
 - Allow override of dynamic template `match_mapping_type` for fields with object_type. {pull}6691[6691]
-- Set default kafka version to 1.0.0 in kafka output. Older versions are still supported by configuring the `version` setting. {pull}7025[7025]
+- Set default kafka version to 1.0.0 in kafka output. Older versions are still supported by configuring the `version` setting. Minimally supported version is 0.11 (older versions might work, but are untested). {pull}7025[7025]
 - Add `host.name` field to all events, to avoid mapping conflicts. This could be breaking Logstash configs if you rely on the `host` field being a string. {pull}7051[7051]
 
 *Auditbeat*
@@ -49,6 +49,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Change http/server metricset to put events by default under http.server and prefix config options with server.. {pull}7100[7100]
 - Disable dedotting in docker module configuration. This will change the out-of-the-box behaviour, but not the one of already configured instances. {pull}7485[7485]
 - Fix typo in etcd/self metricset fields from *.bandwithrate to *.bandwidthrate. {pull}7456[7456]
+- Changed the definition of the `system.cpu.total.pct` and `system.cpu.total.norm.cou` fields to exclude the IOWait time. {pull}7691[7691]
 
 *Packetbeat*
 
@@ -79,6 +80,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix default value for logging.files.keepfiles. It was being set to 0 and now
   it's set to the documented value of 7. {issue}7494[7494]
 - Retain compatibility with older Docker server versions. {issue}7542[7542]
+- Fix errors unpacking configs modified via CLI by ignoring `-E key=value` pairs with missing value. {pull}7599[7599]
 
 *Auditbeat*
 
@@ -103,6 +105,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix offset field pointing at end of a line. {issue}6514[6514]
 - Fix an issue when parsing ISO8601 dates with timezone definition {issue}7367[7367]
 - Fix Grok pattern of MongoDB module. {pull}7568[7568]
+- Fix registry duplicates and log resending on upgrade. {issue}7634[7634]
 
 *Heartbeat*
 - Fix race due to updates of shared a map, that was not supposed to be shared between multiple go-routines. {issue}6616[6616]
@@ -128,6 +131,8 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix Jolokia attribute mapping when using wildcards and MBean names with multiple properties. {pull}7321[7321]
 - Do not report Metricbeat container host as hostname in Kubernetes deployment. {issue}7199[7199]
 - Ensure metadata updates don't replace existing pod metrics. {pull}7573[7573]
+- Fix kubernetes pct fields reporting. {pull}7677[7677]
+- Add support for new `kube_node_status_condition` in Kubernetes `state_node`. {pull}7699[7699]
 
 *Packetbeat*
 
@@ -180,6 +185,8 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Refactor error handing in schema.Apply(). {pull}7335[7335]
 - Add additional types to kubernetes metadata {pull}7457[7457]
 - Add module state reporting for X-Pack Monitoring. {pull}7075[7075]
+- Release the rename processor as GA. {pull}7656[7656]
+- Add support for Openstack Nova in add_cloud_metadata processor. {pull}7663[7663]
 
 *Auditbeat*
 
@@ -189,6 +196,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
   Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
 - Added XXH64 hash option for file integrity checks. {pull}7311[7311]
 - Added the `show auditd-rules` and `show auditd-status` commands to show kernel rules and status. {pull}7114[7114]
+- Add kubernetes specs for auditbeat file integrity monitoring {pull}7642[7642]
 
 *Filebeat*
 
@@ -219,6 +227,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add deprecation fileset to the Elasticsearch module. {pull}7474[7474]
 - Add `config_timezone` option to Kafka module to convert dates to UTC. {issue}7546[7546] {pull}7578[7578]
 - Add patterns for kafka 1.1 logs. {pull}7608[7608]
+- Move debug messages in tcp input source {pull}7712[7712]
 
 *Heartbeat*
 
@@ -307,7 +316,15 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add Elasticsearch ml_job metricsets. {pull}7196[7196]
 - Add support for bearer token files to HTTP helper. {pull}7527[7527]
 - Add Elasticsearch index recovery metricset. {pull}7225[7225]
+- Add `locks`, `global_locks`, `oplatencies` and `process` fields to `status` metricset of MongoDB module. {pull}7613[7613]
 - Run Kafka integration tests on version 1.1.0 {pull}7616[7616]
+- Release raid and socket metricset from system module as GA. {pull}7658[7658]
+- Release elasticsearch module and all its metricsets as beta. {pull}7662[7662]
+- Release munin and traefik module as beta. {pull}7660[7660]
+- Add envoyproxy module. {pull}7569[7569]
+- Release prometheus collector metricset as GA. {pull}7660[7660]
+- Add Elasticsearch `cluster_stats` metricset. {pull}7638[7638]
+- Added `basepath` setting for HTTP-based metricsets {pull}7700[7700]
 
 *Packetbeat*
 

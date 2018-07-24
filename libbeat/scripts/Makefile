@@ -20,7 +20,9 @@ ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
 SECCOMP_BINARY?=${BEAT_NAME}
 SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
+MAGE_PRESENT := $(shell command -v mage 2> /dev/null)
 MAGE_IMPORT_PATH?=github.com/elastic/beats/vendor/github.com/magefile/mage
+export MAGE_IMPORT_PATH
 
 space:=$() #
 comma:=,
@@ -304,9 +306,8 @@ coverage-report:
 
 
 .PHONY: fields
-fields:
-	@go run ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go --es_beats_path $(ES_BEATS) --beat_path $(PWD) $(FIELDS_FILE_PATH)
-
+fields: mage
+	mage -v fields
 
 .PHONY: libbeat_fields
 libbeat_fields:
@@ -442,7 +443,9 @@ seccomp-package:
 
 .PHONY: mage
 mage:
-	@go install ${MAGE_IMPORT_PATH}
+ifndef MAGE_PRESENT
+	go install ${MAGE_IMPORT_PATH}
+endif
 
 .PHONY: release
 release: mage

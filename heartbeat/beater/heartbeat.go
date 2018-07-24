@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/heartbeat/config"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/scheduler"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 )
 
 type Heartbeat struct {
@@ -38,7 +39,7 @@ type Heartbeat struct {
 }
 
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
-	logp.Warn("Beta: Heartbeat is beta software")
+	cfgwarn.Beta("Heartbeat is beta software")
 
 	config := config.DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {

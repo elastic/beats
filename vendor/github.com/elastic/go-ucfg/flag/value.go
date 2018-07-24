@@ -62,6 +62,10 @@ func NewFlagKeyValue(cfg *ucfg.Config, autoBool bool, opts ...ucfg.Option) *Flag
 			val = true
 		} else {
 			key = args[0]
+			if args[1] == "" {
+				return nil, nil, nil
+			}
+
 			val, err = parse.Value(args[1])
 			if err != nil {
 				return nil, err, err

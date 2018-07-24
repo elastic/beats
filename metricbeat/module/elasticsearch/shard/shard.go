@@ -18,7 +18,10 @@
 package shard
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -32,7 +35,6 @@ func init() {
 }
 
 const (
-	// Get the stats from the local node
 	statePath = "/_cluster/state/version,master_node,routing_table"
 )
 
@@ -55,6 +57,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods implements the data gathering and data conversion to the right format
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
+	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statePath)
+	if err != nil {
+		r.Error(fmt.Errorf("Error fetch master info: %s", err))
+		return
+	}
+
+	// Not master, no event sent
+	if !isMaster {
+		logp.Debug("elasticsearch", "Trying to fetch shard stats from a non master node.")
+		return
+	}
+
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		r.Error(err)
