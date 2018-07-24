@@ -39,3 +39,21 @@ func defaultConfig() config {
 		Config: cfg,
 	}
 }
+
+func (c *config) Unpack(from *common.Config) error {
+	tmpConfig := struct {
+		Key string `config:"key"`
+	}{
+		Key: c.Key,
+	}
+	if err := from.Unpack(&tmpConfig); err != nil {
+		return err
+	}
+
+	if config, err := from.Child("config", -1); err == nil {
+		c.Config = config
+	}
+
+	c.Key = tmpConfig.Key
+	return nil
+}
