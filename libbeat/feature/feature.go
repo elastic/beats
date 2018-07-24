@@ -110,12 +110,11 @@ func RegisterBundle(bundle *Bundle) error {
 }
 
 // MustRegisterBundle register a new bundle and panic on error.
-func MustRegisterBundle(bundle *Bundle) error {
+func MustRegisterBundle(bundle *Bundle) {
 	err := RegisterBundle(bundle)
 	if err != nil {
 		panic(err)
 	}
-	return nil
 }
 
 // OverwriteBundle register a bundle of feature and replace any existing feature with a new
@@ -132,12 +131,11 @@ func OverwriteBundle(bundle *Bundle) error {
 
 // MustOverwriteBundle register a bundle of feature, replace any existing feature with a new
 // implementation and panic on error.
-func MustOverwriteBundle(bundle *Bundle) error {
+func MustOverwriteBundle(bundle *Bundle) {
 	err := OverwriteBundle(bundle)
 	if err != nil {
 		panic(err)
 	}
-	return nil
 }
 
 // Register register a new feature on the global registry.
