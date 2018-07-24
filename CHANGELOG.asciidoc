@@ -49,6 +49,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Change http/server metricset to put events by default under http.server and prefix config options with server.. {pull}7100[7100]
 - Disable dedotting in docker module configuration. This will change the out-of-the-box behaviour, but not the one of already configured instances. {pull}7485[7485]
 - Fix typo in etcd/self metricset fields from *.bandwithrate to *.bandwidthrate. {pull}7456[7456]
+- Changed the definition of the `system.cpu.total.pct` and `system.cpu.total.norm.cou` fields to exclude the IOWait time. {pull}7691[7691]
 
 *Packetbeat*
 
