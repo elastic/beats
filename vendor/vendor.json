@@ -10,10 +10,9 @@
 		},
 		{
 			"checksumSHA1": "rDoYEddGYvQT73l9V8Uqjk7SHAY=",
-			"origin": "github.com/andrewkroh/xxhash",
 			"path": "github.com/OneOfOne/xxhash",
-			"revision": "2c166c65de755bdafa6ae2959c10ea9df6e8b3e5",
-			"revisionTime": "2018-07-23T14:32:41Z"
+			"revision": "74ace4fe5525ef62ce28d5093d6b0faaa6a575f3",
+			"revisionTime": "2018-07-23T16:30:02Z"
 		},
 		{
 			"checksumSHA1": "xSwVjXDGIMoADDte4hBjra6ldGk=",
