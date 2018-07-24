@@ -31,7 +31,7 @@ func TestData(t *testing.T) {
 	t.Skip("Skipping until we find a way to conditionally skip this for Kibana < 6.4.0") // FIXME
 	compose.EnsureUp(t, "kibana")
 
-	f := mbtest.NewReportgiingMetricSetV2(t, mtest.GetConfig("stats"))
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("stats"))
 
 	// FIXME! See skip above
 	// version, err := kibana.GetVersion(f.http, "api/stats")
