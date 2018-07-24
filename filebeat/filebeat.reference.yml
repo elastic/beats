@@ -1276,6 +1276,10 @@ output.elasticsearch:
   # default is gzip.
   #compression: gzip
 
+  # Set the compression level. Currently only gzip provides a compression level
+  # between 0 and 9. The default value is chosen by the compression algorithm.
+  #compression_level: 4
+
   # The maximum permitted size of JSON-encoded messages. Bigger messages will be
   # dropped. The default value is 1000000 (bytes). This value should be equal to
   # or less than the broker's message.max.bytes.

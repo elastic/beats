@@ -22,7 +22,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/boltdb/bolt"
+	bolt "github.com/coreos/bbolt"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/auditbeat/datastore"

@@ -118,6 +118,11 @@ func Update() error {
 	return sh.Run("make", "update")
 }
 
+// Fields generates a fields.yml for the Beat.
+func Fields() error {
+	return mage.GenerateFieldsYAML("protos")
+}
+
 // -----------------------------------------------------------------------------
 // Customizations specific to Packetbeat.
 // - Config file contains an OS specific device name (affects darwin, windows).

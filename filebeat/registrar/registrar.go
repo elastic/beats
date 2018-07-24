@@ -155,7 +155,7 @@ func readStatesFrom(in io.Reader) ([]file.State, error) {
 	return states, nil
 }
 
-// fixStates cleans up the regsitry states when updating from an older version
+// fixStates cleans up the registry states when updating from an older version
 // of filebeat potentially writing invalid entries.
 func fixStates(states []file.State) []file.State {
 	if len(states) == 0 {

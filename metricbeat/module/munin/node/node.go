@@ -49,7 +49,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The munin node metricset is experimental.")
+	cfgwarn.Beta("The munin node metricset is beta.")
 
 	config := struct {
 		Namespace string `config:"node.namespace" validate:"required"`
