@@ -266,6 +266,20 @@ func TestPrometheus(t *testing.T) {
 			},
 		},
 		{
+			msg: "Label metrics, filter",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"first_metric": LabelMetric("first.metric", "label4", false, OpFilter(map[string]string{
+						"foo": "filtered",
+					})),
+				},
+				Labels: map[string]LabelMap{
+					"label1": Label("labels.label1"),
+				},
+			},
+			expected: []common.MapStr{},
+		},
+		{
 			msg: "Summary metric",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
@@ -326,6 +340,7 @@ func TestPrometheus(t *testing.T) {
 		sort.Slice(res, func(i, j int) bool {
 			return res[i].MetricSetFields.String() < res[j].MetricSetFields.String()
 		})
+		assert.Equal(t, len(test.expected), len(res))
 		for j, ev := range res {
 			assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
 		}

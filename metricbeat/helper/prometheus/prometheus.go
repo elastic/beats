@@ -141,6 +141,11 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 				}
 			}
 
+			// Apply extra options
+			for _, option := range m.GetOptions() {
+				field, value, labels, keyLabels = option.Process(field, value, labels, keyLabels)
+			}
+
 			// Keep a info document if it's an infoMetric
 			if _, ok = m.(*infoMetric); ok {
 				labels.DeepUpdate(keyLabels)
@@ -151,10 +156,12 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 				continue
 			}
 
-			// Put it in the event if it's a common metric
-			event := getEvent(eventsMap, keyLabels)
-			event.Put(field, value)
-			event.DeepUpdate(labels)
+			if field != "" {
+				// Put it in the event if it's a common metric
+				event := getEvent(eventsMap, keyLabels)
+				event.Put(field, value)
+				event.DeepUpdate(labels)
+			}
 		}
 	}
 
