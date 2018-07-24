@@ -117,7 +117,7 @@ func TestUnreachableEndpointJob(t *testing.T) {
 			hbtest.ErrorChecks(
 				mapval.IsAny(
 					mapval.IsEqual(fmt.Sprintf("dial tcp %s:%d: i/o timeout", ip, port)),
-					mapval.IsEqual(fmt.Sprintf("dial tcp 203.0.113.1:1234: connect: network is unreachable", ip, port)),
+					mapval.IsEqual(fmt.Sprintf("dial tcp %s:%d: connect: network is unreachable", ip, port)),
 				),
 				"io"),
 			hbtest.TCPBaseChecks(port),
