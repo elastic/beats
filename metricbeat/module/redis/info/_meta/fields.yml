@@ -298,6 +298,7 @@
 
         - name: master_offset
           type: long
+          deprecated: true
           description: >
             The server's current replication offset
         
