@@ -30,6 +30,7 @@ collect-docs: python-env
 # Collects all module configs
 .PHONY: configs
 configs: python-env
+	@mkdir -p _meta
 	@cp ${ES_BEATS}/metricbeat/_meta/common.yml _meta/beat.yml
 	@cat ${ES_BEATS}/metricbeat/_meta/setup.yml >> _meta/beat.yml
 	@cat ${ES_BEATS}/metricbeat/_meta/common.reference.yml > _meta/beat.reference.yml
