@@ -130,7 +130,7 @@ var quiet = false
 
 func main() {
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
-	dashboard := flag.String("dashboard", "", "Dashboard ID")
+	id := flag.String("id", "", "Dashboard ID")
 	fileOutput := flag.String("output", "output.json", "Output file")
 	ymlFile := flag.String("yml", "", "Path to the module.yml file containing the dashboards")
 	flag.BoolVar(&indexPattern, "indexPattern", false, "include index-pattern in output")
@@ -144,7 +144,7 @@ func main() {
 
 	client := &http.Client{Transport: transCfg}
 
-	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
+	if len(*ymlFile) == 0 && len(*id) == 0 {
 		fmt.Printf("Please specify a dashboard ID (-dashboard) or a manifest file (-yml)\n\n")
 		flag.Usage()
 		os.Exit(0)
@@ -172,8 +172,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	if len(*dashboard) > 0 {
-		err := Export(client, *kibanaURL, *dashboard, *fileOutput)
+	if len(*id) > 0 {
+		err := Export(client, *kibanaURL, *id, *fileOutput)
 		if err != nil {
 			fmt.Printf("ERROR: fail to export the dashboards: %s\n", err)
 		}

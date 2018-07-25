@@ -71,14 +71,14 @@ class Test(BaseTest):
 
         self.test_load_dashboard()
 
-        command = self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards -kibana http://" + \
+        command = self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards.go -kibana http://" + \
             self.get_kibana_host() + ":" + self.get_kibana_port()
 
         if os.name == "nt":
-            command = self.beat_path + "\..\dev-tools\cmd\dashboards\export_dashboards -kibana http://" + \
+            command = self.beat_path + "\..\dev-tools\cmd\dashboards\export_dashboards.go -kibana http://" + \
                 self.get_kibana_host() + ":" + self.get_kibana_port()
 
-        command = command + " -dashboard Metricbeat-system-overview"
+        command = "go run " + command + " -id Metricbeat-system-overview"
 
         print(command)
 
