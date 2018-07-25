@@ -224,6 +224,7 @@ func TestUnreachableJob(t *testing.T) {
 	// 203.0.113.0/24 is reserved for documentation so should not be routable
 	// See: https://tools.ietf.org/html/rfc6890
 	ip := "203.0.113.1"
+	port := 80
 	url := "http://" + ip
 
 	event := testRequest(t, url)
@@ -232,10 +233,10 @@ func TestUnreachableJob(t *testing.T) {
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.MonitorChecks("http@"+url, url, ip, "http", "down"),
-			hbtest.TCPBaseChecks(80),
+			hbtest.TCPBaseChecks(uint16(port)),
 			hbtest.ErrorChecks(
 				mapval.IsStringContaining(fmt.Sprintf(
-					"Get http://%s: dial tcp %s:80: i/o timeout", ip, ip)),
+					"Get http://%s:%d dial tcp %s:%d: i/o timeout", ip, port, ip, port)),
 				"io"),
 			httpBaseChecks(url),
 		)),
