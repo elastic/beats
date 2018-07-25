@@ -19,6 +19,7 @@ package mapval
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -29,6 +30,53 @@ var KeyPresent = IsDef{name: "check key present"}
 
 // KeyMissing checks that the given key is not present defined.
 var KeyMissing = IsDef{name: "check key not present", checkKeyMissing: true}
+
+// IsAny takes a variable number of IsDef's and combines them with a logical OR. If any single definition
+// matches the key will be marked as valid.
+func IsAny(of ...IsDef) IsDef {
+	names := make([]string, len(of))
+	for i, def := range of {
+		names[i] = def.name
+	}
+	isName := fmt.Sprintf("either %#v", names)
+
+	return Is(isName, func(v interface{}) ValueResult {
+		for _, def := range of {
+			vr := def.check(v, true)
+			if vr.Valid {
+				return vr
+			}
+		}
+
+		return ValueResult{
+			false,
+			fmt.Sprintf("Value was none of %#v, actual value was %#v", names, v),
+		}
+	})
+}
+
+// IsStringContaining validates that the the actual value contains the specified substring.
+func IsStringContaining(needle string) IsDef {
+	return Is("is string containing", func(v interface{}) ValueResult {
+		strV, ok := v.(string)
+
+		if !ok {
+			return ValueResult{
+				false,
+				fmt.Sprintf("Unable to convert '%v' to string", v),
+			}
+		}
+
+		if !strings.Contains(strV, needle) {
+			return ValueResult{
+				false,
+				fmt.Sprintf("String '%s' did not contain substring '%s'", strV, needle),
+			}
+		}
+
+		return ValidVR
+	})
+}
 
 // IsDuration tests that the given value is a duration.
 var IsDuration = Is("is a duration", func(v interface{}) ValueResult {
@@ -49,7 +97,7 @@ func IsEqual(to interface{}) IsDef {
 		}
 		return ValueResult{
 			false,
-			fmt.Sprintf("objects not equal: %v != %v", v, to),
+			fmt.Sprintf("objects not equal: actual(%v) != expected(%v)", v, to),
 		}
 	})
 }
@@ -62,7 +110,7 @@ func IsEqualToValue(to interface{}) IsDef {
 		}
 		return ValueResult{
 			false,
-			fmt.Sprintf("values not equal: %v != %v", v, to),
+			fmt.Sprintf("values not equal: actual(%v) != expected(%v)", v, to),
 		}
 	})
 }

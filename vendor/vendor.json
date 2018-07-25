@@ -1253,6 +1253,12 @@
 			"revisionTime": "2017-03-27T18:58:03Z"
 		},
 		{
+			"checksumSHA1": "kZRhErakejBG0U2e8D+Ap/Djje8=",
+			"path": "github.com/phayes/freeport",
+			"revision": "e27662a4a9d6b2083dfd7e7b5d0e30985daca925",
+			"revisionTime": "2017-10-02T18:52:19Z"
+		},
+		{
 			"checksumSHA1": "WmrPO1ovmQ7t7hs9yZGbr2SAoM4=",
 			"path": "github.com/pierrec/lz4",
 			"revision": "90290f74b1b4d9c097f0a3b3c7eba2ef3875c699",

@@ -22,13 +22,28 @@ import "fmt"
 // Results the results of executing a schema.
 // They are a flattened map (using dotted paths) of all the values []ValueResult representing the results
 // of the IsDefs.
-type Results map[string][]ValueResult
+type Results struct {
+	Fields map[string][]ValueResult
+	Valid  bool
+}
 
-func (r Results) recordResult(path string, result ValueResult) {
-	if r[path] == nil {
-		r[path] = []ValueResult{result}
+// NewResults creates a new Results object.
+func NewResults() *Results {
+	return &Results{
+		Fields: make(map[string][]ValueResult),
+		Valid:  true,
+	}
+}
+
+func (r *Results) record(path string, result ValueResult) {
+	if r.Fields[path] == nil {
+		r.Fields[path] = []ValueResult{result}
 	} else {
-		r[path] = append(r[path], result)
+		r.Fields[path] = append(r.Fields[path], result)
+	}
+
+	if !result.Valid {
+		r.Valid = false
 	}
 }
 
@@ -36,7 +51,7 @@ func (r Results) recordResult(path string, result ValueResult) {
 // The provided callback can return true to keep iterating, or false
 // to stop.
 func (r Results) EachResult(f func(string, ValueResult) bool) {
-	for path, pathResults := range r {
+	for path, pathResults := range r.Fields {
 		for _, result := range pathResults {
 			if !f(path, result) {
 				return
@@ -46,11 +61,11 @@ func (r Results) EachResult(f func(string, ValueResult) bool) {
 }
 
 // DetailedErrors returns a new Results object consisting only of error data.
-func (r Results) DetailedErrors() Results {
-	errors := Results{}
+func (r *Results) DetailedErrors() *Results {
+	errors := NewResults()
 	r.EachResult(func(path string, vr ValueResult) bool {
 		if !vr.Valid {
-			errors.recordResult(path, vr)
+			errors.record(path, vr)
 		}
 
 		return true
@@ -71,7 +86,7 @@ func (vre ValueResultError) Error() string {
 
 // Errors returns a list of error objects, one per failed value validation.
 func (r Results) Errors() []error {
-	var errors []error
+	errors := make([]error, 0)
 
 	r.EachResult(func(path string, vr ValueResult) bool {
 		if !vr.Valid {
@@ -81,13 +96,4 @@ func (r Results) Errors() []error {
 	})
 
 	return errors
-}
-
-// Valid returns true if there are no errors.
-func (r Results) Valid() bool {
-	r.EachResult(func(_ string, vr ValueResult) bool {
-		return vr.Valid
-	})
-	// TODO: this is a pretty slow way to do this.
-	return len(r.Errors()) == 0
 }
