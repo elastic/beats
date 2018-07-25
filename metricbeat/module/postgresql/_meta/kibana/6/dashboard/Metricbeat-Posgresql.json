@@ -1,0 +1,616 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "globalState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "metricbeat-*",
+                  "key": "metricset.module",
+                  "negate": false,
+                  "params": {
+                    "query": "postgresql",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "postgresql"
+                },
+                "query": {
+                  "match": {
+                    "metricset.module": {
+                      "query": "postgresql",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "index": "metricbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Postgres - Active query",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "postgresql.activity.query",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "showMeticsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Postgres - Active query",
+          "type": "table"
+        }
+      },
+      "id": "7fcc1200-8ff5-11e8-b5fb-8dfb48699a75",
+      "type": "visualization",
+      "updated_at": "2018-07-25T10:28:40.864Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "globalState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "metricbeat-*",
+                  "key": "metricset.module",
+                  "negate": false,
+                  "params": {
+                    "query": "postgresql",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "postgresql"
+                },
+                "query": {
+                  "match": {
+                    "metricset.module": {
+                      "query": "postgresql",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "index": "metricbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Postgres -Active applications",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "postgresql.activity.application_name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "stacked",
+                "show": "true",
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Postgres -Active applications",
+          "type": "histogram"
+        }
+      },
+      "id": "29479770-8ff4-11e8-b5fb-8dfb48699a75",
+      "type": "visualization",
+      "updated_at": "2018-07-25T10:19:06.215Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "globalState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "metricbeat-*",
+                  "key": "metricset.module",
+                  "negate": false,
+                  "params": {
+                    "query": "postgresql",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "postgresql"
+                },
+                "query": {
+                  "match": {
+                    "metricset.module": {
+                      "query": "postgresql",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "index": "metricbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Postgres active applications",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "postgresql.activity.application_name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "maxFontSize": 72,
+            "minFontSize": 18,
+            "orientation": "single",
+            "scale": "linear",
+            "showLabel": true
+          },
+          "title": "Postgres active applications",
+          "type": "tagcloud"
+        }
+      },
+      "id": "e48231d0-8ff4-11e8-b5fb-8dfb48699a75",
+      "type": "visualization",
+      "updated_at": "2018-07-25T10:24:20.333Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "globalState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "metricbeat-*",
+                  "key": "metricset.module",
+                  "negate": false,
+                  "params": {
+                    "query": "postgresql",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "postgresql"
+                },
+                "query": {
+                  "match": {
+                    "metricset.module": {
+                      "query": "postgresql",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "index": "metricbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Postgres-Number of deadlocks",
+        "uiStateJSON": {
+          "vis": {
+            "defaultColors": {
+              "0 - 300": "rgb(0,104,55)",
+              "1000 - 5000": "rgb(165,0,38)",
+              "300 - 1000": "rgb(255,255,190)"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "postgresql.database.deadlocks",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "asc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "gauge": {
+              "backStyle": "Full",
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 300
+                },
+                {
+                  "from": 300,
+                  "to": 1000
+                },
+                {
+                  "from": 1000,
+                  "to": 5000
+                }
+              ],
+              "extendRange": true,
+              "gaugeColorMode": "Labels",
+              "gaugeStyle": "Full",
+              "gaugeType": "Arc",
+              "invertColors": false,
+              "labels": {
+                "color": "black",
+                "show": true
+              },
+              "orientation": "vertical",
+              "percentageMode": false,
+              "scale": {
+                "color": "#333",
+                "labels": false,
+                "show": true
+              },
+              "style": {
+                "bgColor": false,
+                "bgFill": "#eee",
+                "bgMask": false,
+                "bgWidth": 0.9,
+                "fontSize": 60,
+                "labelColor": true,
+                "mask": false,
+                "maskBars": 50,
+                "subText": "",
+                "width": 0.9
+              },
+              "type": "meter",
+              "verticalSplit": false
+            },
+            "isDisplayWarning": false,
+            "type": "gauge"
+          },
+          "title": "Postgres-Number of deadlocks",
+          "type": "gauge"
+        }
+      },
+      "id": "d310f950-8ff3-11e8-b5fb-8dfb48699a75",
+      "type": "visualization",
+      "updated_at": "2018-07-25T10:16:41.573Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "globalState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "metricbeat-*",
+                  "key": "metricset.module",
+                  "negate": false,
+                  "params": {
+                    "query": "postgresql",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "postgresql"
+                },
+                "query": {
+                  "match": {
+                    "metricset.module": {
+                      "query": "postgresql",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "index": "metricbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Postgres - Users",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "postgresql.activity.user.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "maxFontSize": 72,
+            "minFontSize": 18,
+            "orientation": "single",
+            "scale": "linear",
+            "showLabel": true
+          },
+          "title": "Postgres - Users",
+          "type": "tagcloud"
+        }
+      },
+      "id": "086aef40-8ff7-11e8-b5fb-8dfb48699a75",
+      "type": "visualization",
+      "updated_at": "2018-07-25T10:39:39.572Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "globalState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "metricbeat-*",
+                  "key": "metricset.module",
+                  "negate": false,
+                  "params": {
+                    "query": "postgresql",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "postgresql"
+                },
+                "query": {
+                  "match": {
+                    "metricset.module": {
+                      "query": "postgresql",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlightAll": true,
+            "query": {
+              "language": "lucene",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": null,
+        "timeRestore": false,
+        "title": "Postgres db",
+        "version": 1
+      },
+      "id": "2ff01f40-8ff7-11e8-b5fb-8dfb48699a75",
+      "type": "dashboard",
+      "updated_at": "2018-07-25T10:40:45.876Z",
+      "version": 1
+    }
+  ],
+  "version": "6.3.0"
+}
