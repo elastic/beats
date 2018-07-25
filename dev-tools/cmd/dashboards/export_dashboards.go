@@ -92,6 +92,13 @@ func Export(client *http.Client, conn string, dashboard string, out string) erro
 	}
 
 	data["objects"] = objects
+
+	// Create all missing directories
+	err = os.MkdirAll(path.Dir(out), os.ModePerm)
+	if err != nil {
+		return err
+	}
+
 	err = ioutil.WriteFile(out, []byte(data.StringToPrint()), 0666)
 	if !quiet {
 		fmt.Printf("The dashboard %s was exported under the %s file\n", dashboard, out)
@@ -130,7 +137,7 @@ var quiet = false
 
 func main() {
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
-	id := flag.String("id", "", "Dashboard ID")
+	dashboard := flag.String("dashboard", "", "Dashboard ID")
 	fileOutput := flag.String("output", "output.json", "Output file")
 	ymlFile := flag.String("yml", "", "Path to the module.yml file containing the dashboards")
 	flag.BoolVar(&indexPattern, "indexPattern", false, "include index-pattern in output")
@@ -144,16 +151,16 @@ func main() {
 
 	client := &http.Client{Transport: transCfg}
 
-	if len(*ymlFile) == 0 && len(*id) == 0 {
-		fmt.Printf("Please specify a dashboard ID (-dashboard) or a manifest file (-yml)\n\n")
+	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
+		fmt.Fprintf(os.Stderr, "Please specify a dashboard ID (-dashboard) or a manifest file (-yml)\n\n")
 		flag.Usage()
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	if len(*ymlFile) > 0 {
 		dashboards, err := ReadManifest(*ymlFile)
 		if err != nil {
-			fmt.Printf("ERROR: %s\n", err)
+			fmt.Fprintf(os.Stderr, "ERROR: %s\n", err)
 			os.Exit(1)
 		}
 
@@ -162,20 +169,23 @@ func main() {
 			directory := path.Join(path.Dir(*ymlFile), "_meta/kibana/6/dashboard")
 			err := os.MkdirAll(directory, 0755)
 			if err != nil {
-				fmt.Printf("ERROR: fail to create directory %s: %v", directory, err)
+				fmt.Fprintf(os.Stderr, "ERROR: fail to create directory %s: %v", directory, err)
+				os.Exit(1)
 			}
 			err = Export(client, *kibanaURL, dashboard["id"], path.Join(directory, dashboard["file"]))
 			if err != nil {
-				fmt.Printf("ERROR: fail to export the dashboards: %s\n", err)
+				fmt.Fprintf(os.Stderr, "ERROR: fail to export the dashboards: %s\n", err)
+				os.Exit(1)
 			}
 		}
 		os.Exit(0)
 	}
 
-	if len(*id) > 0 {
-		err := Export(client, *kibanaURL, *id, *fileOutput)
+	if len(*dashboard) > 0 {
+		err := Export(client, *kibanaURL, *dashboard, *fileOutput)
 		if err != nil {
 			fmt.Printf("ERROR: fail to export the dashboards: %s\n", err)
+			os.Exit(1)
 		}
 	}
 }
