@@ -83,10 +83,11 @@ func TCPBaseChecks(port uint16) mapval.Validator {
 
 // ErrorChecks checks the standard heartbeat error hierarchy, which should
 // consist of a message (or a mapval isdef that can match the message) and a type under the error key.
-func ErrorChecks(msg interface{}, errType string) mapval.Validator {
+// The message is checked only as a substring since exact string matches can be fragile due to platform differences.
+func ErrorChecks(msgSubstr string, errType string) mapval.Validator {
 	return mapval.Schema(mapval.Map{
 		"error": mapval.Map{
-			"message": msg,
+			"message": mapval.IsStringContaining(msgSubstr),
 			"type":    errType,
 		},
 	})

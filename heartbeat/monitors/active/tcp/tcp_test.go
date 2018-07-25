@@ -94,11 +94,12 @@ func TestConnectionRefusedEndpointJob(t *testing.T) {
 	port := uint16(freeport.GetPort())
 	event := testTCPCheck(t, ip, port)
 
+	dialErr := fmt.Sprintf("dial tcp %s:%d", ip, port)
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
 			tcpMonitorChecks(ip, ip, port, "down"),
-			hbtest.ErrorChecks(fmt.Sprintf("dial tcp %s:%d: connect: connection refused", ip, port), "io"),
+			hbtest.ErrorChecks(dialErr, "io"),
 			hbtest.TCPBaseChecks(port),
 		)),
 		event.Fields,
@@ -110,16 +111,12 @@ func TestUnreachableEndpointJob(t *testing.T) {
 	port := uint16(1234)
 	event := testTCPCheck(t, ip, port)
 
+	dialErr := fmt.Sprintf("dial tcp %s:%d", ip, port)
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
 			tcpMonitorChecks(ip, ip, port, "down"),
-			hbtest.ErrorChecks(
-				mapval.IsAny(
-					mapval.IsEqual(fmt.Sprintf("dial tcp %s:%d: i/o timeout", ip, port)),
-					mapval.IsEqual(fmt.Sprintf("dial tcp %s:%d: connect: network is unreachable", ip, port)),
-				),
-				"io"),
+			hbtest.ErrorChecks(dialErr, "io"),
 			hbtest.TCPBaseChecks(port),
 		)),
 		event.Fields,

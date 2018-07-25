@@ -182,15 +182,13 @@ func TestDownStatuses(t *testing.T) {
 			port, err := hbtest.ServerPort(server)
 			require.NoError(t, err)
 
-			errMsgCheck := mapval.IsStringContaining(fmt.Sprintf("%d", status))
-
 			mapvaltest.Test(
 				t,
 				mapval.Strict(mapval.Compose(
 					hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "down"),
 					hbtest.RespondingTCPChecks(port),
 					respondingHTTPChecks(server.URL, status),
-					hbtest.ErrorChecks(errMsgCheck, "validate"),
+					hbtest.ErrorChecks(fmt.Sprintf("%d", status), "validate"),
 				)),
 				event.Fields,
 			)
@@ -210,10 +208,7 @@ func TestConnRefusedJob(t *testing.T) {
 		mapval.Strict(mapval.Compose(
 			hbtest.MonitorChecks("http@"+url, url, ip, "http", "down"),
 			hbtest.TCPBaseChecks(port),
-			hbtest.ErrorChecks(
-				fmt.Sprintf(
-					"Get http://%s:%d: dial tcp %s:%d: connect: connection refused", ip, port, ip, port),
-				"io"),
+			hbtest.ErrorChecks(url, "io"),
 			httpBaseChecks(url),
 		)),
 		event.Fields,
@@ -224,8 +219,9 @@ func TestUnreachableJob(t *testing.T) {
 	// 203.0.113.0/24 is reserved for documentation so should not be routable
 	// See: https://tools.ietf.org/html/rfc6890
 	ip := "203.0.113.1"
-	port := 80
-	url := "http://" + ip
+	// Port 80 is sometimes omitted in logs a non-standard one is easier to validate
+	port := 1234
+	url := fmt.Sprintf("http://%s:%d", ip, port)
 
 	event := testRequest(t, url)
 
@@ -234,19 +230,7 @@ func TestUnreachableJob(t *testing.T) {
 		mapval.Strict(mapval.Compose(
 			hbtest.MonitorChecks("http@"+url, url, ip, "http", "down"),
 			hbtest.TCPBaseChecks(uint16(port)),
-			hbtest.ErrorChecks(
-				mapval.IsAny(
-					mapval.IsStringContaining(
-						fmt.Sprintf(
-							"Get http://%s: dial tcp %s:%d: i/o timeout", ip, ip, port),
-					),
-					mapval.IsStringContaining(
-						fmt.Sprintf(
-							"Get http://%s: dial tcp %s:%d: connect: network is unreachable", ip, ip, port),
-					),
-				),
-
-				"io"),
+			hbtest.ErrorChecks(url, "io"),
 			httpBaseChecks(url),
 		)),
 		event.Fields,
