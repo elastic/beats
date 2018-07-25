@@ -62,7 +62,9 @@ func main() {
 	}
 
 	if len(beatFieldsPaths) == 0 && os.SameFile(esBeatsInfo, beatInfo) {
-		fmt.Println("No field files to collect")
+		if !*toStdout {
+			fmt.Println("No field files to collect")
+		}
 		return
 	}
 
@@ -85,5 +87,7 @@ func main() {
 		os.Exit(3)
 	}
 
-	fmt.Printf("Generated fields.yml for %s\n", name)
+	if !*toStdout {
+		fmt.Printf("Generated fields.yml for %s\n", name)
+	}
 }
