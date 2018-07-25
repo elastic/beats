@@ -20,6 +20,8 @@ package slowlog
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -48,6 +50,8 @@ type MetricSet struct {
 
 // New creates new instance of MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	cfgwarn.Experimental("Redis slowlog metricset is experimental")
+
 	// Unpack additional configuration options.
 	config := struct {
 		IdleTimeout time.Duration `config:"idle_timeout"`
