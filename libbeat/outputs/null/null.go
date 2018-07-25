@@ -47,9 +47,6 @@ func makeNullout(
 		return outputs.Fail(err)
 	}
 
-	// disable bulk support in publisher pipeline
-	cfg.SetInt("bulk_max_size", -1, -1)
-
 	no := &null{
 		beat:     beat,
 		observer: observer,
@@ -58,7 +55,7 @@ func makeNullout(
 		return outputs.Fail(err)
 	}
 
-	return outputs.Success(-1, 0, no)
+	return outputs.Success(config.BulkMaxSize, 0, no)
 }
 
 func (n *null) init(beat beat.Info, c config) error {

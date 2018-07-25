@@ -22,9 +22,12 @@ import (
 )
 
 type config struct {
-	Codec codec.Config `config:"codec"`
+	Codec       codec.Config `config:"codec"`
+	BulkMaxSize int          `config:"bulk_max_size"`
 }
 
 var (
-	defaultConfig = config{}
+	defaultConfig = config{
+		BulkMaxSize: -1,
+	}
 )
