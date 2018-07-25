@@ -19,23 +19,70 @@ package slowlog
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/beats/libbeat/logp"
+	rd "github.com/garyburd/redigo/redis"
 )
 
-var (
-	schema = s.Schema{
-		"example": c.Bool("example"),
-	}
-)
+// log contains all data related to one slowlog entry
+type log struct {
+	id            int64
+	timestamp     int64
+	duration      int
+	cmd           string
+	key           string
+	args          []string
+	clientAddress string
+	clientName    string
+}
 
 // Map data to MapStr
-func eventMapping(info map[string]string) common.MapStr {
-	// Full mapping from info
-	source := map[string]interface{}{}
-	for key, val := range info {
-		source[key] = val
+func eventMapping(slowlogs []interface{}) []common.MapStr {
+	var events []common.MapStr
+	for _, item := range slowlogs {
+		entry, err := rd.Values(item, nil)
+		if err != nil {
+			logp.Err("Error loading slowlog values: %s", err)
+			continue
+		}
+
+		var log log
+		var args []string
+		rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args, &log.clientAddress, &log.clientName)
+
+		// This splits up the args into cmd, key, args.
+		argsLen := len(args)
+		if argsLen > 0 {
+			log.cmd = args[0]
+		}
+		if argsLen > 1 {
+			log.key = args[1]
+		}
+
+		// This could contain confidential data, processors should be used to drop it if needed
+		if argsLen > 2 {
+			log.args = args[2:]
+		}
+
+		event := common.MapStr{
+			"id":      log.id,
+			"command": log.cmd,
+			"key":     log.key,
+			"duration": common.MapStr{
+				"us": log.duration,
+			},
+			"timestamp": log.timestamp,
+			"client": common.MapStr{
+				"name":    log.clientName,
+				"address": log.clientAddress,
+			},
+		}
+
+		if log.args != nil {
+			event["args"] = log.args
+		}
+
+		events = append(events, event)
 	}
-	data, _ := schema.Apply(source)
-	return data
+
+	return events
 }
