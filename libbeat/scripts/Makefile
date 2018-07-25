@@ -311,7 +311,7 @@ fields: mage
 
 .PHONY: update
 update: ## @build Update expects the most recent version of libbeat in the GOPATH
-update: python-env collect
+update: python-env fields collect
 	@echo "Updating generated files for ${BEAT_NAME}"
 
 	@mkdir -p _meta

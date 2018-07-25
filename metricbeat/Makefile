@@ -49,7 +49,7 @@ imports: python-env
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields assets collect-docs configs kibana imports
+collect: assets collect-docs configs kibana imports
 
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset
