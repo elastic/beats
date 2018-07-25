@@ -28,11 +28,6 @@ echo "Fetching testing dependencies"
 exec { go get github.com/docker/libcompose }
 exec { go get github.com/jstemmer/go-junit-report }
 
-echo "Building libbeat fields.yml"
-cd libbeat
-exec { mage fields }
-cd ..
-
 if (Test-Path "$env:beat") {
     cd "$env:beat"
 } else {

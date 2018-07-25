@@ -307,7 +307,7 @@ coverage-report:
 
 .PHONY: fields
 fields: mage
-	mage -v fields
+	@mage fields
 
 .PHONY: update
 update: ## @build Update expects the most recent version of libbeat in the GOPATH
