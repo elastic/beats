@@ -2,6 +2,7 @@
   type: group
   description: >
     shard fields
+  release: beta
   fields:
     - name: primary
       type: boolean

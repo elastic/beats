@@ -21,6 +21,18 @@ $env:PATH = "$env:GOPATH\bin;C:\tools\mingw64\bin;$env:PATH"
 # each run starts from a clean slate.
 $env:MAGEFILE_CACHE = "$env:WORKSPACE\.magefile"
 
+exec { go install github.com/elastic/beats/vendor/github.com/magefile/mage }
+
+echo "Fetching testing dependencies"
+# TODO (elastic/beats#5050): Use a vendored copy of this.
+exec { go get github.com/docker/libcompose }
+exec { go get github.com/jstemmer/go-junit-report }
+
+echo "Building libbeat fields.yml"
+cd libbeat
+exec { mage fields }
+cd ..
+
 if (Test-Path "$env:beat") {
     cd "$env:beat"
 } else {
@@ -35,28 +47,17 @@ New-Item -ItemType directory -Path build\coverage | Out-Null
 New-Item -ItemType directory -Path build\system-tests | Out-Null
 New-Item -ItemType directory -Path build\system-tests\run | Out-Null
 
-exec { go get -u github.com/jstemmer/go-junit-report }
+echo "Building fields.yml"
+exec { mage fields }
 
 echo "Building $env:beat"
-exec { go build } "Build FAILURE"
-
-# always build the libbeat fields
-cp ..\libbeat\_meta\fields.common.yml ..\libbeat\_meta\fields.generated.yml
-cat ..\libbeat\processors\*\_meta\fields.yml | Out-File -append -encoding UTF8 -filepath ..\libbeat\_meta\fields.generated.yml
-cp ..\libbeat\_meta\fields.generated.yml ..\libbeat\fields.yml
-
-if ($env:beat -eq "metricbeat") {
-    cp .\_meta\fields.common.yml .\_meta\fields.generated.yml
-    python .\scripts\fields_collector.py | out-file -append -encoding UTF8 -filepath .\_meta\fields.generated.yml
-}
+exec { mage build } "Build FAILURE"
 
 echo "Unit testing $env:beat"
 go test -v $(go list ./... | select-string -Pattern "vendor" -NotMatch) 2>&1 | Out-File -encoding UTF8 build/TEST-go-unit.out
 exec { Get-Content build/TEST-go-unit.out | go-junit-report.exe -set-exit-code | Out-File -encoding UTF8 build/TEST-go-unit.xml } "Unit test FAILURE"
 
 echo "System testing $env:beat"
-# TODO (elastic/beats#5050): Use a vendored copy of this.
-exec { go get github.com/docker/libcompose }
 # Get a CSV list of package names.
 $packages = $(go list ./... | select-string -Pattern "/vendor/" -NotMatch | select-string -Pattern "/scripts/cmd/" -NotMatch)
 $packages = ($packages|group|Select -ExpandProperty Name) -join ","

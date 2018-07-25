@@ -33,14 +33,17 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-dropwizard,Dropwizard>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>> beta[]  
 |<<metricbeat-module-elasticsearch,Elasticsearch>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.8+| .8+|  |<<metricbeat-metricset-elasticsearch-index,index>> experimental[]  
-|<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>> experimental[]  
-|<<metricbeat-metricset-elasticsearch-index_summary,index_summary>> experimental[]  
-|<<metricbeat-metricset-elasticsearch-ml_job,ml_job>> experimental[]  
+.9+| .9+|  |<<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>> beta[]  
+|<<metricbeat-metricset-elasticsearch-index,index>> beta[]  
+|<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>> beta[]  
+|<<metricbeat-metricset-elasticsearch-index_summary,index_summary>> beta[]  
+|<<metricbeat-metricset-elasticsearch-ml_job,ml_job>> beta[]  
 |<<metricbeat-metricset-elasticsearch-node,node>> beta[]  
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>> beta[]  
-|<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>> experimental[]  
-|<<metricbeat-metricset-elasticsearch-shard,shard>> experimental[]  
+|<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>> beta[]  
+|<<metricbeat-metricset-elasticsearch-shard,shard>> beta[]  
+|<<metricbeat-module-envoyproxy,envoyproxy>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>> experimental[]  
 |<<metricbeat-module-etcd,Etcd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .3+| .3+|  |<<metricbeat-metricset-etcd-leader,leader>> beta[]  
 |<<metricbeat-metricset-etcd-self,self>> beta[]  
@@ -65,7 +68,8 @@ This file is generated! See scripts/docs_collector.py
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>> beta[]  
 |<<metricbeat-metricset-kibana-status,status>> beta[]  
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.12+| .12+|  |<<metricbeat-metricset-kubernetes-container,container>>   
+.13+| .13+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>> beta[]  
+|<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-event,event>> beta[]  
 |<<metricbeat-metricset-kubernetes-node,node>>   
 |<<metricbeat-metricset-kubernetes-pod,pod>>   
@@ -88,8 +92,8 @@ This file is generated! See scripts/docs_collector.py
 .3+| .3+|  |<<metricbeat-metricset-mongodb-collstats,collstats>>   
 |<<metricbeat-metricset-mongodb-dbstats,dbstats>>   
 |<<metricbeat-metricset-mongodb-status,status>>   
-|<<metricbeat-module-munin,Munin>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-munin-node,node>> experimental[]  
+|<<metricbeat-module-munin,Munin>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-munin-node,node>> beta[]  
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> experimental[]  
 |<<metricbeat-metricset-mysql-status,status>>   
@@ -102,8 +106,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-postgresql-bgwriter,bgwriter>>   
 |<<metricbeat-metricset-postgresql-database,database>>   
 |<<metricbeat-metricset-postgresql-statement,statement>> beta[]  
-|<<metricbeat-module-prometheus,Prometheus>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.2+| .2+|  |<<metricbeat-metricset-prometheus-collector,collector>> beta[]  
+|<<metricbeat-module-prometheus,Prometheus>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.2+| .2+|  |<<metricbeat-metricset-prometheus-collector,collector>>   
 |<<metricbeat-metricset-prometheus-stats,stats>> beta[]  
 |<<metricbeat-module-rabbitmq,RabbitMQ>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-rabbitmq-connection,connection>> beta[]  
@@ -124,10 +128,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-system-network,network>>   
 |<<metricbeat-metricset-system-process,process>>   
 |<<metricbeat-metricset-system-process_summary,process_summary>>   
-|<<metricbeat-metricset-system-raid,raid>> beta[]  
-|<<metricbeat-metricset-system-socket,socket>> beta[]  
+|<<metricbeat-metricset-system-raid,raid>>   
+|<<metricbeat-metricset-system-socket,socket>>   
 |<<metricbeat-metricset-system-uptime,uptime>>   
-|<<metricbeat-module-traefik,traefik>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-traefik,traefik>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-traefik-health,health>> experimental[]  
 |<<metricbeat-module-uwsgi,uwsgi>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-uwsgi-status,status>> beta[]  
@@ -151,6 +155,7 @@ include::modules/couchbase.asciidoc[]
 include::modules/docker.asciidoc[]
 include::modules/dropwizard.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
+include::modules/envoyproxy.asciidoc[]
 include::modules/etcd.asciidoc[]
 include::modules/golang.asciidoc[]
 include::modules/graphite.asciidoc[]

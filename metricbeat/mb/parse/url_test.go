@@ -114,6 +114,10 @@ func TestURLHostParserBuilder(t *testing.T) {
 		{map[string]interface{}{}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/default"},
 		{map[string]interface{}{"username": "guest"}, URLHostParserBuilder{}, "http://guest@example.com"},
 		{map[string]interface{}{"username": "guest", "password": "secret"}, URLHostParserBuilder{}, "http://guest:secret@example.com"},
+		{map[string]interface{}{"basepath": "/foo"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{"basepath": "foo/"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{"basepath": "/foo/"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{"basepath": "foo"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
 	}
 
 	for _, test := range cases {

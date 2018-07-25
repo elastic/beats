@@ -26,7 +26,7 @@ import (
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper/xpack"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -230,7 +230,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 			"node_stats":   nodeData,
 		}
 
-		event.Index = xpack.MakeMonitoringIndexName(xpack.Elasticsearch)
+		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 		r.Event(event)
 	}
 }

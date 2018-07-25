@@ -28,9 +28,24 @@ import (
 )
 
 func TestData(t *testing.T) {
+	t.Skip("Skipping until we find a way to conditionally skip this for Kibana < 6.4.0") // FIXME
 	compose.EnsureUp(t, "kibana")
 
 	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("stats"))
+
+	// FIXME! See skip above
+	// version, err := kibana.GetVersion(f.http, "api/stats")
+	// if err != nil {
+	// 	t.Fatal("getting kibana version", err)
+	// }
+
+	// isStatsAPIAvailable, err := kibana.IsStatsAPIAvailable(version)
+	// if err != nil {
+	// 	t.Fatal("checking if kibana stats API is available", err)
+	// }
+
+	// t.Skip("Kibana stats API is not available until 6.4.0")
+
 	err := mbtest.WriteEventsReporterV2(f, t, "")
 	if err != nil {
 		t.Fatal("write", err)

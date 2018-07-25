@@ -27,7 +27,8 @@ var (
 	v0_11_0_1 = parseKafkaVersion("0.11.0.1")
 	v0_11_0_2 = parseKafkaVersion("0.11.0.2")
 	v1_0_1    = parseKafkaVersion("1.0.1")
-	v1_1_0    = parseKafkaVersion("1.1.0")
+	v1_0_2    = parseKafkaVersion("1.0.2")
+	v1_1_1    = parseKafkaVersion("1.1.1")
 
 	kafkaVersions = map[string]sarama.KafkaVersion{
 		"": sarama.V1_0_0_0,
@@ -61,10 +62,12 @@ var (
 
 		"1.0.0": sarama.V1_0_0_0,
 		"1.0.1": v1_0_1,
-		"1.0":   v1_0_1,
-		"1.1.0": v1_1_0,
-		"1.1":   v1_1_0,
-		"1":     v1_1_0,
+		"1.0.2": v1_0_2,
+		"1.0":   v1_0_2,
+		"1.1.0": sarama.V1_1_0_0,
+		"1.1.1": v1_1_1,
+		"1.1":   v1_1_1,
+		"1":     v1_1_1,
 	}
 )
 

@@ -52,6 +52,7 @@ type Field struct {
 	DocValues             *bool       `config:"doc_values"`
 	CopyTo                string      `config:"copy_to"`
 	IgnoreAbove           int         `config:"ignore_above"`
+	AliasPath             string      `config:"path"`
 
 	// Kibana specific
 	Analyzed     *bool  `config:"analyzed"`

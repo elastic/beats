@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	p "path"
 	"strings"
 
 	"github.com/elastic/beats/metricbeat/mb"
@@ -49,7 +50,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 			return mb.HostData{}, err
 		}
 
-		var user, pass, path string
+		var user, pass, path, basePath string
 		t, ok := conf["username"]
 		if ok {
 			user, ok = t.(string)
@@ -77,8 +78,23 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		} else {
 			path = b.DefaultPath
 		}
+		// Normalize path
+		path = strings.Trim(path, "/")
 
-		return ParseURL(host, b.DefaultScheme, user, pass, path, b.QueryParams)
+		t, ok = conf["basepath"]
+		if ok {
+			basePath, ok = t.(string)
+			if !ok {
+				return mb.HostData{}, errors.Errorf("'basepath' config for module %v is not a string", module.Name())
+			}
+		}
+		// Normalize basepath
+		basePath = strings.Trim(basePath, "/")
+
+		// Combine paths and normalize
+		fullPath := strings.Trim(p.Join(basePath, path), "/")
+
+		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.QueryParams)
 	}
 }
 

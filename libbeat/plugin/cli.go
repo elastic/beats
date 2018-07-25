@@ -24,6 +24,7 @@ import (
 	"flag"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -54,7 +55,7 @@ func init() {
 
 func Initialize() error {
 	if len(plugins.paths) > 0 {
-		logp.Warn("EXPERIMENTAL: loadable plugin support is experimental")
+		cfgwarn.Experimental("loadable plugin support is experimental")
 	}
 
 	for _, path := range plugins.paths {

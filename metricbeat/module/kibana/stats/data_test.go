@@ -29,7 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStats(t *testing.T) {
+func TestEventMapping(t *testing.T) {
 
 	files, err := filepath.Glob("./_meta/test/stats.*.json")
 	assert.NoError(t, err)

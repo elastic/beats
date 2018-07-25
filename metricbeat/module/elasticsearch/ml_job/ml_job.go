@@ -43,7 +43,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The elasticsearch ml_job metricset is experimental.")
+	cfgwarn.Beta("The elasticsearch ml_job metricset is beta.")
 
 	// Get the stats from the local node
 	ms, err := elasticsearch.NewMetricSet(base, jobPath)

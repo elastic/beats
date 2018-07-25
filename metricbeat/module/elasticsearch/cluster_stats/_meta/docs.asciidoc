@@ -1,0 +1,3 @@
+This is the `cluster_stats` metricset of the Elasticsearch module. It interrogates the
+https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-stats.html[Cluster Stats API endpoint]
+to fetch information about the Elasticsearch cluster.

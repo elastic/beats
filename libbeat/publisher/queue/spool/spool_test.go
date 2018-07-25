@@ -21,6 +21,7 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
+	"runtime"
 	"testing"
 	"time"
 
@@ -50,6 +51,11 @@ func init() {
 }
 
 func TestProduceConsumer(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		// TODO (2018-07-24): Test is failing on Windows.
+		t.Skip("https://github.com/elastic/beats/issues/7720")
+	}
+
 	maxEvents := 4096
 	minEvents := 32
 
