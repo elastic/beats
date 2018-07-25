@@ -83,7 +83,11 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-redis-keyspace,keyspace>>
 
+* <<metricbeat-metricset-redis-slowlog,slowlog>>
+
 include::redis/info.asciidoc[]
 
 include::redis/keyspace.asciidoc[]
+
+include::redis/slowlog.asciidoc[]
 
