@@ -49,5 +49,5 @@ var defaultConfig = Config{
 	},
 }
 var (
-	defaultDirectory = "kibana"
+	defaultDirectory = "kibana.generated"
 )
