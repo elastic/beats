@@ -314,6 +314,7 @@ update: ## @build Update expects the most recent version of libbeat in the GOPAT
 update: python-env collect
 	@echo "Updating generated files for ${BEAT_NAME}"
 
+	@mkdir -p _meta
 	@# Update config files.
 	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.yml
 	@chmod 0640 ${BEAT_NAME}.yml
