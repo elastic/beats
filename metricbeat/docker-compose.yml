@@ -130,6 +130,52 @@ services:
 
   mongodb:
     build: ./module/mongodb/_meta
+    container_name: mongodb
+    expose:
+      - 27017
+    command: mongod --replSet beats
+    links:
+      - mongodb_secondary1
+      - mongodb_secondary2
+
+  mongodb_secondary1:
+    build: ./module/mongodb/_meta
+    container_name: mongodb_secondary1
+    depends_on: mongodb
+    ports:
+      - "27018:27017"
+    links:
+      - mongodb
+      - mongodb_secondary2
+    command: mongod --replSet beats
+  
+  mongodb_secondary2:
+    build: ./module/mongodb/_meta
+    container_name: mongodb_secondary2
+    depends_on: mongodb
+    ports:
+      - "27019:27017"
+    links:
+      - mongodb
+      - mongodb_secondary1
+    command: mongod --replSet beats
+
+  mongodb_replicasetup:
+    build:
+      context: ./module/mongodb/_meta
+      dockerfile: Dockerfile.replicasetup
+    container_name: mongodb_replicasetup
+    depends_on:
+      - mongodb
+      - mongodb_secondary1
+      - mongodb_secondary2
+    ports:
+      - "27020:27017"
+    links:
+      - mongodb
+      - mongodb_secondary1
+      - mongodb_secondary2
+    entrypoint: [ "bash", "/replicaset.sh" ]
 
   munin:
     build: ./module/munin/_meta
