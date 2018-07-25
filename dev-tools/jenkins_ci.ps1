@@ -22,7 +22,11 @@ $env:PATH = "$env:GOPATH\bin;C:\tools\mingw64\bin;$env:PATH"
 $env:MAGEFILE_CACHE = "$env:WORKSPACE\.magefile"
 
 exec { go install github.com/elastic/beats/vendor/github.com/magefile/mage }
-exec { go get -u github.com/jstemmer/go-junit-report }
+
+echo "Fetching testing dependencies"
+# TODO (elastic/beats#5050): Use a vendored copy of this.
+exec { go get github.com/docker/libcompose }
+exec { go get github.com/jstemmer/go-junit-report }
 
 echo "Building libbeat fields.yml"
 cd libbeat
@@ -42,10 +46,6 @@ if (Test-Path "build") { Remove-Item -Recurse -Force build }
 New-Item -ItemType directory -Path build\coverage | Out-Null
 New-Item -ItemType directory -Path build\system-tests | Out-Null
 New-Item -ItemType directory -Path build\system-tests\run | Out-Null
-
-# TODO (elastic/beats#5050): Use a vendored copy of this.
-echo "Fetching testing dependencies"
-exec { go get github.com/docker/libcompose }
 
 echo "Building fields.yml"
 exec { mage fields }
