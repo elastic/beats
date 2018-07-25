@@ -135,32 +135,6 @@ services:
   mongodb:
     build: ./module/mongodb/_meta
     container_name: mongodb
-    networks:
-      - mongonet
-    expose:
-      - 27017
-    command: mongod --replSet beats
-
-  mongodb_secondary1:
-    build: ./module/mongodb/_meta
-    container_name: mongodb_secondary1
-    networks:
-      - mongonet
-    depends_on:
-      - mongodb
-    ports:
-      - "27018:27017"
-    command: mongod --replSet beats
-  
-  mongodb_secondary2:
-    build: ./module/mongodb/_meta
-    container_name: mongodb_secondary2
-    networks:
-      - mongonet
-    depends_on:
-      - mongodb
-    ports:
-      - "27019:27017"
     command: mongod --replSet beats
 
   mongodb_replicasetup:
@@ -168,14 +142,12 @@ services:
       context: ./module/mongodb/_meta
       dockerfile: Dockerfile.replicasetup
     container_name: mongodb_replicasetup
-    networks:
-      - mongonet
+    links:
+      - mongodb
     depends_on:
       - mongodb
-      - mongodb_secondary1
-      - mongodb_secondary2
     ports:
-      - "27020:27017"
+      - "27018:27017"
     entrypoint: [ "bash", "/replicaset.sh" ]
 
   munin:
@@ -215,7 +187,3 @@ services:
 
   zookeeper:
     build: ./module/zookeeper/_meta
-
-networks:
-  mongonet:
-    driver: bridge
