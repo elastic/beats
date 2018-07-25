@@ -1,0 +1,9 @@
+- name: slowlog
+  type: group
+  description: >
+    slowlog
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
