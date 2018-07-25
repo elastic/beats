@@ -101,7 +101,7 @@
     - name: iostat.await
       type: float
       description: >
-          The average time spent for requests issued to the device to be served.
+          The average time spent (in milliseconds) for requests issued to the device to be served.
 
     - name: iostat.service_time
       type: float
