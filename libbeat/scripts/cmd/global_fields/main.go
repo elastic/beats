@@ -52,7 +52,7 @@ func main() {
 	}
 	esBeatsInfo, err := esBeats.Stat()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error getting file info of elastic/beat: %+v\n", err)
+		fmt.Fprintf(os.Stderr, "Error getting file info of elastic/beats: %+v\n", err)
 		os.Exit(1)
 	}
 	beatInfo, err := beat.Stat()
