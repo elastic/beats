@@ -235,8 +235,17 @@ func TestUnreachableJob(t *testing.T) {
 			hbtest.MonitorChecks("http@"+url, url, ip, "http", "down"),
 			hbtest.TCPBaseChecks(uint16(port)),
 			hbtest.ErrorChecks(
-				mapval.IsStringContaining(fmt.Sprintf(
-					"Get http://%s:%d dial tcp %s:%d: i/o timeout", ip, port, ip, port)),
+				mapval.IsAny(
+					mapval.IsStringContaining(
+						fmt.Sprintf(
+							"Get http://%s: dial tcp %s:%d: i/o timeout", ip, ip, port),
+					),
+					mapval.IsStringContaining(
+						fmt.Sprintf(
+							"Get http://%s: dial tcp %s:%d: connect: network is unreachable", ip, ip, port),
+					),
+				),
+
 				"io"),
 			httpBaseChecks(url),
 		)),
