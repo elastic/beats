@@ -65,6 +65,30 @@ func FetchRedisInfo(stat string, c rd.Conn) (map[string]string, error) {
 	return ParseRedisInfo(out), nil
 }
 
+// FetchSlowLog returns slow operations on redis
+func FetchSlowLog(c rd.Conn) ([]interface{}, error) {
+	defer c.Close()
+
+	logs, err := rd.Values(c.Do("SLOWLOG", "get"))
+	if err != nil {
+		logp.Err("Error retrieving slowlog: %v", err)
+		return nil, err
+	}
+
+	return logs, nil
+}
+
+// FetchSlowLogLength returns count of slow operations
+func FetchSlowLogLength(c rd.Conn) (int64, error) {
+	count, err := rd.Int64(c.Do("SLOWLOG", "len"))
+	if err != nil {
+		logp.Err("Error retrieving slowlog len: %v", err)
+		return 0, err
+	}
+
+	return count, nil
+}
+
 // CreatePool creates a redis connection pool
 func CreatePool(
 	host, password, network string,
