@@ -39,33 +39,50 @@ func main() {
 		os.Exit(1)
 	}
 
-	if len(beatFieldsPaths) == 0 && *esBeatsPath == *beatPath {
+	esBeats, err := os.Open(*esBeatsPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error opening elastic/beats: %+v\n", err)
+		os.Exit(1)
+	}
+	beat, err := os.Open(*beatPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error opening target Beat: %+v\n", err)
+		os.Exit(1)
+	}
+	esBeatsInfo, err := esBeats.Stat()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error getting file info of elastic/beat: %+v\n", err)
+		os.Exit(1)
+	}
+	beatInfo, err := beat.Stat()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error getting file info of target Beat: %+v\n", err)
+		os.Exit(1)
+	}
+
+	if len(beatFieldsPaths) == 0 && os.SameFile(esBeatsInfo, beatInfo) {
 		fmt.Println("No field files to collect")
 		return
 	}
 
 	var fieldsFiles []*fields.YmlFile
 	for _, fieldsFilePath := range beatFieldsPaths {
-		fieldsFiles = collectFilesFromDir(*beatPath, fieldsFilePath, fieldsFiles)
+		pathToModules := filepath.Join(*beatPath, fieldsFilePath)
+
+		fieldsFile, err := fields.CollectModuleFiles(pathToModules)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
+			os.Exit(2)
+		}
+
+		fieldsFiles = append(fieldsFiles, fieldsFile...)
 	}
 
-	err := fields.Generate(*esBeatsPath, *beatPath, fieldsFiles)
+	err = fields.Generate(*esBeatsPath, *beatPath, fieldsFiles)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot generate global fields.yml file for %s: %+v\n", name, err)
 		os.Exit(3)
 	}
 
 	fmt.Printf("Generated fields.yml for %s\n", name)
-}
-
-func collectFilesFromDir(beatPath, fieldsFilePath string, fieldsFiles []*fields.YmlFile) []*fields.YmlFile {
-	pathToModules := filepath.Join(beatPath, fieldsFilePath)
-
-	fieldsFile, err := fields.CollectModuleFiles(pathToModules)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
-		os.Exit(2)
-	}
-
-	return append(fieldsFiles, fieldsFile...)
 }
