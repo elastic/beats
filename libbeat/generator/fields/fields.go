@@ -40,12 +40,8 @@ func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]
 	var libbeatFieldFiles []*YmlFile
 	var err error
 	if !isLibbeat(beatPath) {
-		commonFields = append(
-			[]string{
-				filepath.Join(esBeatsPath, "libbeat", "_meta", "fields.common.yml"),
-				filepath.Join(beatPath, "_meta", "fields.yml"),
-			},
-			commonFields...,
+		commonFields = append(commonFields,
+			filepath.Join(esBeatsPath, "libbeat", "_meta", "fields.common.yml"),
 		)
 
 		libbeatModulesPath := filepath.Join(esBeatsPath, "libbeat", "processors")
