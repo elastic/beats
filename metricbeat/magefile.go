@@ -117,6 +117,15 @@ func GoTestIntegration(ctx context.Context) error {
 	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
 }
 
+// ExportDashboard exports a dashboard and writes it into the correct directory
+//
+// Required ENV variables:
+// * MODULE: Name of the module
+// * ID: Dashboard id
+func ExportDashboard() error {
+	return mage.ExportDashboard()
+}
+
 // -----------------------------------------------------------------------------
 // Customizations specific to Metricbeat.
 // - Include modules.d directory in packages.
