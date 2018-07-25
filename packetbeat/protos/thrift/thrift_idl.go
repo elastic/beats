@@ -19,7 +19,8 @@ package thrift
 
 import (
 	"fmt"
-
+	"path/filepath"
+	
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/samuel/go-thrift/parser"
@@ -106,12 +107,13 @@ func (thriftidl *thriftIdl) findMethod(name string) *thriftIdlMethod {
 	return thriftidl.methodsByName[name]
 }
 
-func newThriftIdl(idlFiles []string) (*thriftIdl, error) {
-	if len(idlFiles) == 0 {
+func newThriftIdl(idlFilePaths []string) (*thriftIdl, error) {
+	if len(idlFilePaths) == 0 {
 		return nil, nil
 	}
-	thriftFiles, err := readFiles(idlFiles)
-	if err != nil {
+	allIdlFiles := findAllFiles(idlFilePaths)
+	thriftFiles, err := readFiles(allIdlFiles)
+	if err != nil { //or no thrift file found?
 		return nil, err
 	}
 
@@ -119,3 +121,17 @@ func newThriftIdl(idlFiles []string) (*thriftIdl, error) {
 		methodsByName: buildMethodsMap(thriftFiles),
 	}, nil
 }
+
+func findAllFiles(paths []string)(thriftIdl []string){
+	var filesToReturn = []string{}
+	for _, path := range paths {
+		files, err := filepath.Glob(path)
+		if err != nil {
+			logp.Warn("Unable to find path %s error: %s", path, err)
+			continue
+		}
+		filesToReturn = append(filesToReturn,files...)
+	}
+	return filesToReturn
+}
+
