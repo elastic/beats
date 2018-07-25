@@ -77,4 +77,4 @@ assets:
 	go run ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/metricbeat/module
 	mkdir -p include/fields
 	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include ${ES_BEATS}/metricbeat/_meta/fields.common.yml $(BEAT_NAME) > include/fields.go
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME) > ./include/fields/fields.go
+	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -stdout -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -stdin -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME) > ./include/fields/fields.go
