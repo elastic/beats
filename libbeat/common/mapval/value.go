@@ -62,7 +62,7 @@ var ValidVR = ValueResult{true, ""}
 // KeyMissingVR is emitted when a key was expected, but was not present.
 var KeyMissingVR = ValueResult{
 	false,
-	"expected to see a key here",
+	"expected this key to be present",
 }
 
 // StrictFailureVR is emitted when Strict() is used, and an unexpected field is found.
