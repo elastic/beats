@@ -34,6 +34,7 @@ import (
 
 	"bytes"
 
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/cluster_stats"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_summary"
@@ -44,6 +45,7 @@ import (
 )
 
 var metricSets = []string{
+	"cluster_stats",
 	"index",
 	"index_recovery",
 	"index_summary",

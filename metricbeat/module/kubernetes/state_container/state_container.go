@@ -53,8 +53,8 @@ var (
 			"kube_pod_container_status_running":                 p.KeywordMetric("status.phase", "running"),
 			"kube_pod_container_status_terminated":              p.KeywordMetric("status.phase", "terminated"),
 			"kube_pod_container_status_waiting":                 p.KeywordMetric("status.phase", "waiting"),
-			"kube_pod_container_status_terminated_reason":       p.LabelMetric("status.reason", "reason", false),
-			"kube_pod_container_status_waiting_reason":          p.LabelMetric("status.reason", "reason", false),
+			"kube_pod_container_status_terminated_reason":       p.LabelMetric("status.reason", "reason"),
+			"kube_pod_container_status_waiting_reason":          p.LabelMetric("status.reason", "reason"),
 		},
 
 		Labels: map[string]p.LabelMap{

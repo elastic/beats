@@ -3,7 +3,6 @@ BEAT_TITLE?=Packetbeat
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT=false
 ES_BEATS?=..
-FIELDS_FILE_PATH=protos
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 

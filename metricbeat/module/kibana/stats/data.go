@@ -23,67 +23,60 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
 var (
 	schema = s.Schema{
-		"cluster_uuid": c.Str("cluster_uuid"),
-		"name":         c.Str("name"),
-		"uuid":         c.Str("uuid"),
-		"version": c.Dict("version", s.Schema{
-			"number": c.Str("number"),
-		}),
-		"status": c.Dict("status", s.Schema{
-			"overall": c.Dict("overall", s.Schema{
-				"state": c.Str("state"),
-			}),
-		}),
-		"response_times": c.Dict("response_times", s.Schema{
-			"avg": s.Object{
-				"ms": c.Float("avg_in_millis"),
-			},
-			"max": s.Object{
-				"ms": c.Int("max_in_millis"),
-			},
-		}),
-		"requests": c.Dict("requests", s.Schema{
-			"total":       c.Int("total", s.Optional),
-			"disconnects": c.Int("disconnects", s.Optional),
-		}),
+		"uuid":  c.Str("kibana.uuid"),
+		"name":  c.Str("kibana.name"),
+		"index": c.Str("kibana.name"),
+		"host": s.Object{
+			"name": c.Str("kibana.host"),
+		},
+		"transport_address":      c.Str("kibana.transport_address"),
+		"version":                c.Str("kibana.version"),
+		"snapshot":               c.Bool("kibana.snapshot"),
+		"status":                 c.Str("kibana.status"),
 		"concurrent_connections": c.Int("concurrent_connections"),
-		"sockets": c.Dict("sockets", s.Schema{
-			"http": c.Dict("http", s.Schema{
-				"total": c.Int("total"),
-			}),
-			"https": c.Dict("https", s.Schema{
-				"total": c.Int("total"),
-			}),
-		}),
-		"event_loop_delay": c.Float("event_loop_delay"),
 		"process": c.Dict("process", s.Schema{
-			"memory": c.Dict("mem", s.Schema{
-				"heap": s.Object{
-					"max": s.Object{
-						"bytes": c.Int("heap_max_in_bytes"),
+			"event_loop_delay": s.Object{
+				"ms": c.Float("event_loop_delay"),
+			},
+			"memory": c.Dict("memory", s.Schema{
+				"heap": c.Dict("heap", s.Schema{
+					"total": s.Object{
+						"bytes": c.Int("total_bytes"),
 					},
 					"used": s.Object{
-						"bytes": c.Int("heap_used_in_bytes"),
+						"bytes": c.Int("used_bytes"),
 					},
-				},
-				"resident_set_size": s.Object{
-					"bytes": c.Int("resident_set_size_in_bytes"),
-				},
-				"external": s.Object{
-					"bytes": c.Int("external_in_bytes"),
-				},
+					"size_limit": s.Object{
+						"bytes": c.Int("size_limit"),
+					},
+				}),
 			}),
-			"pid": c.Int("pid"),
 			"uptime": s.Object{
 				"ms": c.Int("uptime_ms"),
 			},
 		}),
+		"request": RequestsDict,
+		"response_time": c.Dict("response_times", s.Schema{
+			"avg": s.Object{
+				"ms": c.Int("avg_ms", s.Optional),
+			},
+			"max": s.Object{
+				"ms": c.Int("max_ms", s.Optional),
+			},
+		}),
 	}
+
+	// RequestsDict defines how to convert the requests field
+	RequestsDict = c.Dict("requests", s.Schema{
+		"disconnects": c.Int("disconnects", s.Optional),
+		"total":       c.Int("total", s.Optional),
+	})
 )
 
 func eventMapping(r mb.ReporterV2, content []byte) error {
@@ -104,10 +97,22 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	event.RootFields.Put("service.name", "kibana")
 
 	// Set elasticsearch cluster id
-	if clusterID, ok := dataFields["cluster_uuid"]; ok {
-		delete(dataFields, "cluster_uuid")
-		event.RootFields.Put("elasticsearch.cluster.id", clusterID)
+	elasticsearchClusterID, ok := data["cluster_uuid"]
+	if !ok {
+		return elastic.ReportErrorForMissingField("cluster_uuid", elastic.Kibana, r)
 	}
+	event.RootFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
+
+	// Set process PID
+	process, ok := data["process"].(map[string]interface{})
+	if !ok {
+		return elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
+	}
+	pid, ok := process["pid"].(float64)
+	if !ok {
+		return elastic.ReportErrorForMissingField("process.pid", elastic.Kibana, r)
+	}
+	event.RootFields.Put("process.pid", int(pid))
 
 	event.MetricSetFields = dataFields
 

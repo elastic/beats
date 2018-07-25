@@ -2,7 +2,6 @@ BEAT_NAME=heartbeat
 BEAT_TITLE=Heartbeat
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
-FIELDS_FILE_PATH=monitors/active
 
 # Path to the libbeat Makefile
 -include ../libbeat/scripts/Makefile

@@ -29,6 +29,9 @@ import (
 
 // MetricMap defines the mapping from Prometheus metric to a Metricbeat field
 type MetricMap interface {
+	// GetOptions returns the list of metric options
+	GetOptions() []MetricOption
+
 	// GetField returns the resulting field name
 	GetField() string
 
@@ -36,53 +39,84 @@ type MetricMap interface {
 	GetValue(m *dto.Metric) interface{}
 }
 
+// MetricOption adds settings to Metric objects behavior
+type MetricOption interface {
+	// Process a tuple of field, value and labels from a metric, return the same tuple updated
+	Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr)
+}
+
+// OpFilter only processes metrics matching the given filter
+func OpFilter(filter map[string]string) MetricOption {
+	return opFilter{
+		labels: filter,
+	}
+}
+
+// OpLowercaseValue lowercases the value if it's a string
+func OpLowercaseValue() MetricOption {
+	return opLowercaseValue{}
+}
+
 // Metric directly maps a Prometheus metric to a Metricbeat field
-func Metric(field string) MetricMap {
+func Metric(field string, options ...MetricOption) MetricMap {
 	return &commonMetric{
-		field: field,
+		field:   field,
+		options: options,
 	}
 }
 
 // KeywordMetric maps a Prometheus metric to a Metricbeat field, stores the
 // given keyword when source metric value is 1
-func KeywordMetric(field, keyword string) MetricMap {
+func KeywordMetric(field, keyword string, options ...MetricOption) MetricMap {
 	return &keywordMetric{
 		commonMetric{
-			field: field,
+			field:   field,
+			options: options,
 		},
 		keyword,
 	}
 }
 
 // BooleanMetric maps a Prometheus metric to a Metricbeat field of bool type
-func BooleanMetric(field string) MetricMap {
+func BooleanMetric(field string, options ...MetricOption) MetricMap {
 	return &booleanMetric{
 		commonMetric{
-			field: field,
+			field:   field,
+			options: options,
 		},
 	}
 }
 
 // LabelMetric maps a Prometheus metric to a Metricbeat field, stores the value
 // of a given label on it if the gauge value is 1
-func LabelMetric(field, label string, lowercase bool) MetricMap {
+func LabelMetric(field, label string, options ...MetricOption) MetricMap {
 	return &labelMetric{
 		commonMetric{
-			field: field,
+			field:   field,
+			options: options,
 		},
 		label,
-		lowercase,
 	}
 }
 
 // InfoMetric obtains info labels from the given metric and puts them
 // into events matching all the key labels present in the metric
-func InfoMetric() MetricMap {
-	return &infoMetric{}
+func InfoMetric(options ...MetricOption) MetricMap {
+	return &infoMetric{
+		commonMetric{
+			options: options,
+		},
+	}
 }
 
 type commonMetric struct {
-	field string
+	field   string
+	options []MetricOption
+}
+
+// GetOptions returns the list of metric options
+func (m *commonMetric) GetOptions() []MetricOption {
+	return m.options
 }
 
 // GetField returns the resulting field name
@@ -176,18 +210,13 @@ func (m *booleanMetric) GetValue(metric *dto.Metric) interface{} {
 
 type labelMetric struct {
 	commonMetric
-	label     string
-	lowercase bool
+	label string
 }
 
 // GetValue returns the resulting value
 func (m *labelMetric) GetValue(metric *dto.Metric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil && gauge.GetValue() == 1 {
-		value := getLabel(metric, m.label)
-		if m.lowercase {
-			return strings.ToLower(value)
-		}
-		return value
+		return getLabel(metric, m.label)
 	}
 	return nil
 }
@@ -201,7 +230,9 @@ func getLabel(metric *dto.Metric, name string) string {
 	return ""
 }
 
-type infoMetric struct{}
+type infoMetric struct {
+	commonMetric
+}
 
 // GetValue returns the resulting value
 func (m *infoMetric) GetValue(metric *dto.Metric) interface{} {
@@ -211,4 +242,28 @@ func (m *infoMetric) GetValue(metric *dto.Metric) interface{} {
 // GetField returns the resulting field name
 func (m *infoMetric) GetField() string {
 	return ""
+}
+
+type opFilter struct {
+	labels map[string]string
+}
+
+// Process will return nil if labels don't match the filter
+func (o opFilter) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+	for k, v := range o.labels {
+		if labels[k] != v {
+			return "", nil, nil
+		}
+	}
+	return field, value, labels
+}
+
+type opLowercaseValue struct{}
+
+// Process will lowercase the given value if it's a string
+func (o opLowercaseValue) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+	if val, ok := value.(string); ok {
+		value = strings.ToLower(val)
+	}
+	return field, value, labels
 }

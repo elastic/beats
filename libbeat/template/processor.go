@@ -62,6 +62,8 @@ func (p *Processor) Process(fields common.Fields, path string, output common.Map
 			mapping = p.object(&field)
 		case "array":
 			mapping = p.array(&field)
+		case "alias":
+			mapping = p.alias(&field)
 		case "group":
 			var newPath string
 			if path == "" {
@@ -239,6 +241,13 @@ func (p *Processor) array(f *common.Field) common.MapStr {
 	if f.ObjectType != "" {
 		properties["type"] = f.ObjectType
 	}
+	return properties
+}
+
+func (p *Processor) alias(f *common.Field) common.MapStr {
+	properties := getDefaultProperties(f)
+	properties["type"] = "alias"
+	properties["path"] = f.AliasPath
 	return properties
 }
 

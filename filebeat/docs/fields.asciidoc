@@ -307,6 +307,16 @@ The city name.
 
 --
 
+*`apache2.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
 [float]
 == error fields
 
@@ -554,6 +564,16 @@ Country ISO code.
 type: geo_point
 
 The longitude and latitude.
+
+
+--
+
+*`auditd.log.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
 
 
 --
@@ -2002,6 +2022,16 @@ The city name.
 
 --
 
+*`iis.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
 [float]
 == error fields
 
@@ -2164,6 +2194,16 @@ The region name.
 type: keyword
 
 The city name.
+
+
+--
+
+*`iis.error.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
 
 
 --
@@ -3355,6 +3395,16 @@ The city name.
 
 --
 
+*`nginx.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
 [float]
 == error fields
 
@@ -3892,6 +3942,16 @@ The longitude and latitude.
 
 --
 
+*`system.auth.ssh.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
 [float]
 == sudo fields
 
@@ -4331,6 +4391,16 @@ The region name.
 type: keyword
 
 The city name.
+
+
+--
+
+*`traefik.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
 
 
 --

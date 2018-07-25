@@ -44,6 +44,9 @@ type State struct {
 
 // NewState creates a new file state
 func NewState(fileInfo os.FileInfo, path string, t string, meta map[string]string) State {
+	if len(meta) == 0 {
+		meta = nil
+	}
 	return State{
 		Fileinfo:    fileInfo,
 		Source:      path,
@@ -60,7 +63,7 @@ func NewState(fileInfo os.FileInfo, path string, t string, meta map[string]strin
 func (s *State) ID() string {
 	// Generate id on first request. This is needed as id is not set when converting back from json
 	if s.Id == "" {
-		if s.Meta == nil {
+		if len(s.Meta) == 0 {
 			s.Id = s.FileStateOS.String()
 		} else {
 			hashValue, _ := hashstructure.Hash(s.Meta, nil)
@@ -91,6 +94,6 @@ func (s *State) IsEqual(c *State) bool {
 func (s *State) IsEmpty() bool {
 	return s.FileStateOS == file.StateOS{} &&
 		s.Source == "" &&
-		s.Meta == nil &&
+		len(s.Meta) == 0 &&
 		s.Timestamp.IsZero()
 }

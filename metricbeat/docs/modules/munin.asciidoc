@@ -5,9 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-munin]]
 == Munin module
 
-experimental[]
-
-== munin module
+beta[]
 
 This is the munin module.
 
