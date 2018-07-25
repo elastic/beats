@@ -26,12 +26,25 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/davecgh/go-spew/spew"
+
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
 )
 
 // Test takes the output from a Validator invocation and runs test assertions on the result.
-// If you are using this library for testing you will probably want to run Test(t, Schema(Map{...})(actual)) as a pattern.
-func Test(t *testing.T, r mapval.Results) mapval.Results {
+// If you are using this library for testing you will probably want to run Test(t, Schema(Map{...}), actual) as a pattern.
+func Test(t *testing.T, v mapval.Validator, m common.MapStr) *mapval.Results {
+	r := v(m)
+
+	if !r.Valid {
+		assert.Fail(
+			t,
+			"mapval could not validate map",
+			"%d errors validating source: \n%s", len(r.Errors()), spew.Sdump(m),
+		)
+	}
+
 	for _, err := range r.Errors() {
 		assert.NoError(t, err)
 	}

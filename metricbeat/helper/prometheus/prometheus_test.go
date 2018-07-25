@@ -227,7 +227,7 @@ func TestPrometheus(t *testing.T) {
 			msg: "Label metrics",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"first_metric": LabelMetric("first.metric", "label3", false),
+					"first_metric": LabelMetric("first.metric", "label3"),
 				},
 				Labels: map[string]LabelMap{
 					"label1": Label("labels.label1"),
@@ -248,7 +248,7 @@ func TestPrometheus(t *testing.T) {
 			msg: "Label metrics, lowercase",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"first_metric": LabelMetric("first.metric", "label4", true),
+					"first_metric": LabelMetric("first.metric", "label4", OpLowercaseValue()),
 				},
 				Labels: map[string]LabelMap{
 					"label1": Label("labels.label1"),
@@ -264,6 +264,20 @@ func TestPrometheus(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			msg: "Label metrics, filter",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"first_metric": LabelMetric("first.metric", "label4", OpLowercaseValue(), OpFilter(map[string]string{
+						"foo": "filtered",
+					})),
+				},
+				Labels: map[string]LabelMap{
+					"label1": Label("labels.label1"),
+				},
+			},
+			expected: []common.MapStr{},
 		},
 		{
 			msg: "Summary metric",
@@ -318,16 +332,19 @@ func TestPrometheus(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		reporter := &mbtest.CapturingReporterV2{}
-		p.ReportProcessedMetrics(test.mapping, reporter)
-		assert.Nil(t, reporter.GetErrors(), test.msg)
-		// Sort slice to avoid randomness
-		res := reporter.GetEvents()
-		sort.Slice(res, func(i, j int) bool {
-			return res[i].MetricSetFields.String() < res[j].MetricSetFields.String()
+		t.Run(test.msg, func(t *testing.T) {
+			reporter := &mbtest.CapturingReporterV2{}
+			p.ReportProcessedMetrics(test.mapping, reporter)
+			assert.Nil(t, reporter.GetErrors(), test.msg)
+			// Sort slice to avoid randomness
+			res := reporter.GetEvents()
+			sort.Slice(res, func(i, j int) bool {
+				return res[i].MetricSetFields.String() < res[j].MetricSetFields.String()
+			})
+			assert.Equal(t, len(test.expected), len(res))
+			for j, ev := range res {
+				assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
+			}
 		})
-		for j, ev := range res {
-			assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
-		}
 	}
 }

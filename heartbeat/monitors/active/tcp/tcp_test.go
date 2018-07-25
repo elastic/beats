@@ -24,22 +24,21 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/phayes/freeport"
+
+	"net/http"
+
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
 	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
-func TestUpEndpoint(t *testing.T) {
-	server := httptest.NewServer(hbtest.HelloWorldHandler)
-	defer server.Close()
-
-	port, err := hbtest.ServerPort(server)
-	require.NoError(t, err)
-
+func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 	config := common.NewConfig()
-	config.SetString("hosts", 0, "localhost")
+	config.SetString("hosts", 0, host)
 	config.SetInt("ports", 0, int64(port))
 
 	jobs, err := create(monitors.Info{}, config)
@@ -49,6 +48,23 @@ func TestUpEndpoint(t *testing.T) {
 
 	event, _, err := job.Run()
 	require.NoError(t, err)
+
+	return &event
+}
+
+func tcpMonitorChecks(host string, ip string, port uint16, status string) mapval.Validator {
+	id := fmt.Sprintf("tcp-tcp@%s:%d", host, port)
+	return hbtest.MonitorChecks(id, host, ip, "tcp", status)
+}
+
+func TestUpEndpointJob(t *testing.T) {
+	server := httptest.NewServer(hbtest.HelloWorldHandler(http.StatusOK))
+	defer server.Close()
+
+	port, err := hbtest.ServerPort(server)
+	require.NoError(t, err)
+
+	event := testTCPCheck(t, "localhost", port)
 
 	mapvaltest.Test(
 		t,
@@ -60,7 +76,7 @@ func TestUpEndpoint(t *testing.T) {
 				"tcp",
 				"up",
 			),
-			hbtest.TCPChecks(port),
+			hbtest.RespondingTCPChecks(port),
 			mapval.Schema(mapval.Map{
 				"resolve": mapval.Map{
 					"host":   "localhost",
@@ -68,6 +84,44 @@ func TestUpEndpoint(t *testing.T) {
 					"rtt.us": mapval.IsDuration,
 				},
 			}),
-		))(event.Fields),
+		)),
+		event.Fields,
+	)
+}
+
+func TestConnectionRefusedEndpointJob(t *testing.T) {
+	ip := "127.0.0.1"
+	port := uint16(freeport.GetPort())
+	event := testTCPCheck(t, ip, port)
+
+	mapvaltest.Test(
+		t,
+		mapval.Strict(mapval.Compose(
+			tcpMonitorChecks(ip, ip, port, "down"),
+			hbtest.ErrorChecks(fmt.Sprintf("dial tcp %s:%d: connect: connection refused", ip, port), "io"),
+			hbtest.TCPBaseChecks(port),
+		)),
+		event.Fields,
+	)
+}
+
+func TestUnreachableEndpointJob(t *testing.T) {
+	ip := "203.0.113.1"
+	port := uint16(1234)
+	event := testTCPCheck(t, ip, port)
+
+	mapvaltest.Test(
+		t,
+		mapval.Strict(mapval.Compose(
+			tcpMonitorChecks(ip, ip, port, "down"),
+			hbtest.ErrorChecks(
+				mapval.IsAny(
+					mapval.IsEqual(fmt.Sprintf("dial tcp %s:%d: i/o timeout", ip, port)),
+					mapval.IsEqual(fmt.Sprintf("dial tcp %s:%d: connect: network is unreachable", ip, port)),
+				),
+				"io"),
+			hbtest.TCPBaseChecks(port),
+		)),
+		event.Fields,
 	)
 }

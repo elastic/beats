@@ -15,16 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package xpack
+package elastic
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func TestMakeMonitoringIndexName(t *testing.T) {
+func TestMakeXPackMonitoringIndexName(t *testing.T) {
 	tests := []struct {
 		Name     string
 		Product  Product
@@ -55,8 +57,33 @@ func TestMakeMonitoringIndexName(t *testing.T) {
 	for _, test := range tests {
 		name := fmt.Sprintf("Test naming %v", test.Name)
 		t.Run(name, func(t *testing.T) {
-			indexName := MakeMonitoringIndexName(test.Product)
+			indexName := MakeXPackMonitoringIndexName(test.Product)
 			assert.Equal(t, test.Expected, indexName)
 		})
 	}
+}
+
+type MockReporterV2 struct {
+	mb.ReporterV2
+}
+
+func (MockReporterV2) Event(event mb.Event) bool {
+	return true
+}
+
+var currentErr error // This hack is necessary because the Error method below cannot receive the type *MockReporterV2
+
+func (m MockReporterV2) Error(err error) bool {
+	currentErr = err
+	return true
+}
+
+func TestReportErrorForMissingField(t *testing.T) {
+	field := "some.missing.field"
+	r := MockReporterV2{}
+	err := ReportErrorForMissingField(field, Elasticsearch, r)
+
+	expectedError := fmt.Errorf("Could not find field '%v' in Elasticsearch stats API response", field)
+	assert.Equal(t, expectedError, err)
+	assert.Equal(t, expectedError, currentErr)
 }

@@ -33,7 +33,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-dropwizard,Dropwizard>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>> beta[]  
 |<<metricbeat-module-elasticsearch,Elasticsearch>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.8+| .8+|  |<<metricbeat-metricset-elasticsearch-index,index>> beta[]  
+.9+| .9+|  |<<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>> beta[]  
+|<<metricbeat-metricset-elasticsearch-index,index>> beta[]  
 |<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>> beta[]  
 |<<metricbeat-metricset-elasticsearch-index_summary,index_summary>> beta[]  
 |<<metricbeat-metricset-elasticsearch-ml_job,ml_job>> beta[]  
@@ -105,8 +106,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-postgresql-bgwriter,bgwriter>>   
 |<<metricbeat-metricset-postgresql-database,database>>   
 |<<metricbeat-metricset-postgresql-statement,statement>> beta[]  
-|<<metricbeat-module-prometheus,Prometheus>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.2+| .2+|  |<<metricbeat-metricset-prometheus-collector,collector>> beta[]  
+|<<metricbeat-module-prometheus,Prometheus>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.2+| .2+|  |<<metricbeat-metricset-prometheus-collector,collector>>   
 |<<metricbeat-metricset-prometheus-stats,stats>> beta[]  
 |<<metricbeat-module-rabbitmq,RabbitMQ>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-rabbitmq-connection,connection>> beta[]  

@@ -15,48 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package xpack
+package mapval
 
 import (
-	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// Product supported by X-Pack Monitoring
-type Product int
-
-const (
-	// Elasticsearch product
-	Elasticsearch Product = iota
-
-	// Kibana product
-	Kibana
-
-	// Logstash product
-	Logstash
-
-	// Beats product
-	Beats
-)
-
-func (p Product) String() string {
-	indexProductNames := []string{
-		"es",
-		"kibana",
-		"logstash",
-		"beats",
-	}
-
-	if int(p) < 0 || int(p) > len(indexProductNames) {
-		panic("Unknown product")
-	}
-
-	return indexProductNames[p]
+func TestEmpty(t *testing.T) {
+	r := NewResults()
+	assert.True(t, r.Valid)
+	assert.Empty(t, r.DetailedErrors().Fields)
+	assert.Empty(t, r.Errors())
 }
 
-// MakeMonitoringIndexName method returns the name of the monitoring index for
-// a given product { elasticsearch, kibana, logstash, beats }
-func MakeMonitoringIndexName(product Product) string {
-	const version = "6"
+func TestWithError(t *testing.T) {
+	r := NewResults()
+	r.record("foo", KeyMissingVR)
+	r.record("bar", ValidVR)
 
-	return fmt.Sprintf(".monitoring-%v-%v-mb", product, version)
+	assert.False(t, r.Valid)
+
+	assert.Equal(t, KeyMissingVR, r.Fields["foo"][0])
+	assert.Equal(t, ValidVR, r.Fields["bar"][0])
+
+	assert.Equal(t, KeyMissingVR, r.DetailedErrors().Fields["foo"][0])
+	assert.NotContains(t, r.DetailedErrors().Fields, "bar")
+
+	assert.False(t, r.DetailedErrors().Valid)
+	assert.NotEmpty(t, r.Errors())
 }

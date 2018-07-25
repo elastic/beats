@@ -3453,6 +3453,114 @@ Elasticsearch state id.
 --
 
 [float]
+== cluster.stats fields
+
+Cluster stats
+
+
+
+*`elasticsearch.cluster.stats.status`*::
++
+--
+type: keyword
+
+Cluster status (green, yellow, red).
+
+
+--
+
+[float]
+== nodes fields
+
+Nodes statistics.
+
+
+
+*`elasticsearch.cluster.stats.nodes.count`*::
++
+--
+type: long
+
+Total number of nodes in cluster.
+
+
+--
+
+*`elasticsearch.cluster.stats.nodes.master`*::
++
+--
+type: long
+
+Number of master-eligible nodes in cluster.
+
+
+--
+
+*`elasticsearch.cluster.stats.nodes.data`*::
++
+--
+type: long
+
+Number of data nodes in cluster.
+
+
+--
+
+[float]
+== indices fields
+
+Indices statistics.
+
+
+
+*`elasticsearch.cluster.stats.indices.count`*::
++
+--
+type: long
+
+Total number of indices in cluster.
+
+
+--
+
+[float]
+== shards fields
+
+Shard statistics.
+
+
+
+*`elasticsearch.cluster.stats.indices.shards.count`*::
++
+--
+type: long
+
+Total number of shards in cluster.
+
+
+--
+
+*`elasticsearch.cluster.stats.indices.shards.primaries`*::
++
+--
+type: long
+
+Total number of primary shards in cluster.
+
+
+--
+
+*`elasticsearch.cluster.stats.indices.fielddata.memory.bytes`*::
++
+--
+type: long
+
+Memory used for fielddata.
+
+
+--
+
+[float]
 == index fields
 
 index
