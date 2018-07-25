@@ -18,6 +18,9 @@
 package stats
 
 import (
+	"fmt"
+
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -33,12 +36,16 @@ func init() {
 	)
 }
 
+const (
+	statsPath                      = "api/stats"
+	kibanaStatsAPIAvailableVersion = "6.4.0"
+)
+
 var (
 	hostParser = parse.URLHostParserBuilder{
-		DefaultScheme:     "http",
-		BasePathConfigKey: "basepath",
-		DefaultPath:       "api/stats",
-		QueryParams:       "extended=true", // make Kibana fetch the cluster_uuid
+		DefaultScheme: "http",
+		DefaultPath:   statsPath,
+		QueryParams:   "extended=true", // make Kibana fetch the cluster_uuid
 	}.Build()
 )
 
@@ -47,6 +54,20 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	http         *helper.HTTP
 	xPackEnabled bool
+}
+
+func isKibanaStatsAPIAvailable(kibanaVersion string) (bool, error) {
+	currentVersion, err := common.NewVersion(kibanaVersion)
+	if err != nil {
+		return false, err
+	}
+
+	wantVersion, err := common.NewVersion(kibanaStatsAPIAvailableVersion)
+	if err != nil {
+		return false, err
+	}
+
+	return !currentVersion.LessThan(wantVersion), nil
 }
 
 // New create a new instance of the MetricSet
@@ -65,6 +86,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
+	}
+
+	kibanaVersion, err := kibana.GetVersion(http, statsPath)
+	if err != nil {
+		return nil, err
+	}
+
+	isAPIAvailable, err := isKibanaStatsAPIAvailable(kibanaVersion)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isAPIAvailable {
+		const errorMsg = "The kibana stats metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
+		return nil, fmt.Errorf(errorMsg, kibanaStatsAPIAvailableVersion, kibanaVersion)
 	}
 
 	return &MetricSet{

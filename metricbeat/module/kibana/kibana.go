@@ -18,8 +18,14 @@
 package kibana
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/url"
+	"strings"
 
+	"github.com/elastic/beats/libbeat/common"
+
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -29,4 +35,49 @@ func ReportErrorForMissingField(field string, r mb.ReporterV2) error {
 	err := fmt.Errorf("Could not find field '%v' in Kibana stats API response", field)
 	r.Error(err)
 	return err
+}
+
+// GetVersion returns the version of the Kibana instance
+func GetVersion(http *helper.HTTP, currentPath string) (string, error) {
+	const statusPath = "api/status"
+	content, err := fetchPath(http, currentPath, statusPath)
+	if err != nil {
+		return "", err
+	}
+
+	var data common.MapStr
+	err = json.Unmarshal(content, &data)
+	if err != nil {
+		return "", err
+	}
+
+	version, err := data.GetValue("version.number")
+	if err != nil {
+		return "", err
+	}
+
+	versionStr, ok := version.(string)
+	if !ok {
+		return "", fmt.Errorf("Could not parse Kibana version in status API response")
+	}
+
+	return versionStr, nil
+}
+
+func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {
+	currentURI := http.GetURI()
+	defer http.SetURI(currentURI) // Reset after this request
+
+	// Parse the URI to replace the path
+	u, err := url.Parse(currentURI)
+	if err != nil {
+		return nil, err
+	}
+
+	u.Path = strings.Replace(u.Path, currentPath, newPath, 1) // HACK: to account for base paths
+	u.RawQuery = ""
+
+	// Http helper includes the HostData with username and password
+	http.SetURI(u.String())
+	return http.FetchContent()
 }

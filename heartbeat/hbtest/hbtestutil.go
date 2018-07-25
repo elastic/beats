@@ -33,20 +33,17 @@ const HelloWorldBody = "hello, world!"
 
 // HelloWorldHandler is a handler for an http server that returns
 // HelloWorldBody and a 200 OK status.
-var HelloWorldHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	io.WriteString(w, HelloWorldBody)
-})
-
-// BadGatewayBody is the body of the BadGatewayHandler.
-const BadGatewayBody = "Bad Gateway"
-
-// BadGatewayHandler is a handler for an http server that returns
-// BadGatewayBody and a 200 OK status.
-var BadGatewayHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusBadGateway)
-	io.WriteString(w, BadGatewayBody)
-})
+func HelloWorldHandler(status int) http.HandlerFunc {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if status >= 301 && status <= 303 {
+				w.Header().Set("Location", "/somewhere")
+			}
+			w.WriteHeader(status)
+			io.WriteString(w, HelloWorldBody)
+		},
+	)
+}
 
 // ServerPort takes an httptest.Server and returns its port as a uint16.
 func ServerPort(server *httptest.Server) (uint16, error) {
@@ -78,13 +75,28 @@ func MonitorChecks(id string, host string, ip string, scheme string, status stri
 	})
 }
 
-// TCPChecks creates a skima.Validator that represents the "tcp" field present
-// in all heartbeat events that use a Tcp connection as part of their DialChain
-func TCPChecks(port uint16) mapval.Validator {
+// TCPBaseChecks checks the minimum TCP response, which is only issued
+// without further fields when the endpoint does not respond.
+func TCPBaseChecks(port uint16) mapval.Validator {
+	return mapval.Schema(mapval.Map{"tcp.port": port})
+}
+
+// ErrorChecks checks the standard heartbeat error hierarchy, which should
+// consist of a message (or a mapval isdef that can match the message) and a type under the error key.
+func ErrorChecks(msg interface{}, errType string) mapval.Validator {
 	return mapval.Schema(mapval.Map{
-		"tcp": mapval.Map{
-			"port":           port,
-			"rtt.connect.us": mapval.IsDuration,
+		"error": mapval.Map{
+			"message": msg,
+			"type":    errType,
 		},
 	})
+}
+
+// RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
+// in all heartbeat events that use a Tcp connection as part of their DialChain
+func RespondingTCPChecks(port uint16) mapval.Validator {
+	return mapval.Compose(
+		TCPBaseChecks(port),
+		mapval.Schema(mapval.Map{"tcp.rtt.connect.us": mapval.IsDuration}),
+	)
 }

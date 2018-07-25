@@ -216,10 +216,16 @@ The index name to write events to. The default is
 +"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-2017.04.26"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
-(see <<configuration-template>>). If you are using the pre-built Kibana
-dashboards, you also need to set the `setup.dashboards.index` option (see
-<<configuration-dashboards>>).
+(see <<configuration-template>>).
 
+If you are using the pre-built Kibana dashboards,
+you also need to set the `setup.dashboards.index` option (see <<configuration-dashboards>>).
+
+ifdef::deprecate_dashboard_loading[]
+
+deprecated[{deprecate_dashboard_loading}]
+
+endif::[]
 
 ===== `indices`
 
@@ -378,7 +384,7 @@ The Logstash output sends events directly to Logstash by using the lumberjack
 protocol, which runs over TCP. Logstash allows for additional processing and routing of
 generated events.
 
-include::../../libbeat/docs/shared-logstash-config.asciidoc[]
+include::./shared-logstash-config.asciidoc[]
 
 ==== Accessing metadata fields
 

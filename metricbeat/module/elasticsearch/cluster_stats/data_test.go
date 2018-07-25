@@ -15,48 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package xpack
+// +build !integration
+
+package cluster_stats
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-func TestMakeMonitoringIndexName(t *testing.T) {
-	tests := []struct {
-		Name     string
-		Product  Product
-		Expected string
-	}{
-		{
-			"Elasticsearch monitoring index",
-			Elasticsearch,
-			".monitoring-es-6-mb",
-		},
-		{
-			"Kibana monitoring index",
-			Kibana,
-			".monitoring-kibana-6-mb",
-		},
-		{
-			"Logstash monitoring index",
-			Logstash,
-			".monitoring-logstash-6-mb",
-		},
-		{
-			"Beats monitoring index",
-			Beats,
-			".monitoring-beats-6-mb",
-		},
-	}
-
-	for _, test := range tests {
-		name := fmt.Sprintf("Test naming %v", test.Name)
-		t.Run(name, func(t *testing.T) {
-			indexName := MakeMonitoringIndexName(test.Product)
-			assert.Equal(t, test.Expected, indexName)
-		})
-	}
+func TestMapper(t *testing.T) {
+	elasticsearch.TestMapper(t, "./_meta/test/cluster_stats.*.json", eventMapping)
 }

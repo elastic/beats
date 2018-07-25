@@ -43,11 +43,11 @@ class WriteReadTest(BaseTest):
 
     def tearDown(self):
         super(WriteReadTest, self).tearDown()
+        self.clear_event_log()
         win32evtlogutil.RemoveSourceFromRegistry(
             self.applicationName, self.providerName)
         win32evtlogutil.RemoveSourceFromRegistry(
             self.otherAppName, self.providerName)
-        self.clear_event_log()
 
     def clear_event_log(self):
         hlog = win32evtlog.OpenEventLog(None, self.providerName)
