@@ -20,6 +20,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
@@ -31,9 +32,11 @@ import (
 )
 
 var pkg *string
+var stdin *bool
 
 func init() {
 	pkg = flag.String("pkg", "", "Package name")
+	stdin = flag.Bool("stdin", false, "Read from stdin")
 }
 
 func main() {
@@ -48,10 +51,21 @@ func main() {
 	file := args[0]
 	beatName := args[1]
 
-	data, err := ioutil.ReadFile(file)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Invalid file path: %s\n", args[0])
-		os.Exit(1)
+	var data []byte
+	var err error
+	if !*stdin {
+		data, err = ioutil.ReadFile(file)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Invalid file path: %s\n", args[0])
+			os.Exit(1)
+		}
+	} else {
+		r := bufio.NewReader(os.Stdin)
+		data, err = ioutil.ReadAll(r)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error while reading from stdin: %v\n", err)
+			os.Exit(1)
+		}
 	}
 
 	encData, err := asset.EncodeData(string(data))
