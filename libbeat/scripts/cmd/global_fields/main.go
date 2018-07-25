@@ -29,6 +29,7 @@ import (
 func main() {
 	esBeatsPath := flag.String("es_beats_path", "..", "Path to elastic/beats")
 	beatPath := flag.String("beat_path", ".", "Path to your Beat")
+	toStdout := flag.Bool("stdout", false, "Write output to stdout")
 	flag.Parse()
 
 	beatFieldsPaths := flag.Args()
@@ -78,7 +79,7 @@ func main() {
 		fieldsFiles = append(fieldsFiles, fieldsFile...)
 	}
 
-	err = fields.Generate(*esBeatsPath, *beatPath, fieldsFiles)
+	err = fields.Generate(*esBeatsPath, *beatPath, fieldsFiles, *toStdout)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot generate global fields.yml file for %s: %+v\n", name, err)
 		os.Exit(3)
