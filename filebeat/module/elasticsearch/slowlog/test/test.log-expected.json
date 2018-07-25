@@ -93,7 +93,8 @@
     }, 
     {
         "@timestamp": "2018-07-04T13:48:07,452", 
-        "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04/VLKxBLvUSYuIMKzpacGjRg", 
+        "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg", 
+        "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04", 
         "elasticsearch.node.name": "v_VJhjV", 
         "elasticsearch.slowlog.id": "KUyMZWQBk9jw4gtg2y5-", 
         "elasticsearch.slowlog.logger": "index.indexing.slowlog.index", 
@@ -113,7 +114,8 @@
     }, 
     {
         "@timestamp": "2018-07-04T21:51:30,411", 
-        "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04/VLKxBLvUSYuIMKzpacGjRg", 
+        "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg", 
+        "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04", 
         "elasticsearch.node.name": "v_VJhjV", 
         "elasticsearch.slowlog.id": "s01HZ2QBk9jw4gtgaFtn", 
         "elasticsearch.slowlog.logger": "index.indexing.slowlog.index", 
