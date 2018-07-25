@@ -21,7 +21,6 @@ import (
 	"bufio"
 	"bytes"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 )
@@ -74,19 +73,19 @@ func isLibbeat(beatPath string) bool {
 	return filepath.Base(beatPath) == "libbeat"
 }
 
-func writeGeneratedFieldsYml(beatsPath string, fieldFiles []*YmlFile, toStdout bool) error {
+func writeGeneratedFieldsYml(beatPath string, fieldFiles []*YmlFile, output string) error {
 	data, err := GenerateFieldsYml(fieldFiles)
 	if err != nil {
 		return err
 	}
 
-	if toStdout {
+	if output == "-" {
 		fw := bufio.NewWriter(os.Stdout)
 		fw.Write(data)
 		return fw.Flush()
 	}
 
-	outPath := path.Join(beatsPath, "fields.yml")
+	outPath := filepath.Join(beatPath, output)
 	f, err := os.Create(outPath)
 	if err != nil {
 		return err
@@ -129,11 +128,11 @@ func writeIndentedLine(buf *bytes.Buffer, line string, indent int) error {
 }
 
 // Generate collects fields.yml files and concatenates them into one global file.
-func Generate(esBeatsPath, beatPath string, files []*YmlFile, toStdout bool) error {
+func Generate(esBeatsPath, beatPath string, files []*YmlFile, output string) error {
 	files, err := collectCommonFiles(esBeatsPath, beatPath, files)
 	if err != nil {
 		return err
 	}
 
-	return writeGeneratedFieldsYml(beatPath, files, toStdout)
+	return writeGeneratedFieldsYml(beatPath, files, output)
 }

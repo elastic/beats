@@ -32,38 +32,44 @@ import (
 )
 
 var pkg *string
-var stdin *bool
+var input *string
+var output *string
 
 func init() {
 	pkg = flag.String("pkg", "", "Package name")
-	stdin = flag.Bool("stdin", false, "Read from stdin")
+	input = flag.String("in", "-", "Source of input. \"-\" means reading from stdin")
+	output = flag.String("out", "-", "Output path. \"-\" means writing to stdout")
 }
 
 func main() {
 	flag.Parse()
-
 	args := flag.Args()
-	if len(args) != 2 {
-		fmt.Fprintln(os.Stderr, "File path must be set")
-		os.Exit(1)
-	}
 
-	file := args[0]
-	beatName := args[1]
-
-	var data []byte
-	var err error
-	if !*stdin {
-		data, err = ioutil.ReadFile(file)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Invalid file path: %s\n", args[0])
+	var (
+		file, beatName string
+		data           []byte
+		err            error
+	)
+	if *input == "-" {
+		if len(args) != 2 {
+			fmt.Fprintln(os.Stderr, "File path must be set")
 			os.Exit(1)
 		}
-	} else {
+		file = args[0]
+		beatName = args[1]
+
 		r := bufio.NewReader(os.Stdin)
 		data, err = ioutil.ReadAll(r)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error while reading from stdin: %v\n", err)
+			os.Exit(1)
+		}
+	} else {
+		file = *input
+		beatName = args[0]
+		data, err = ioutil.ReadFile(*input)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Invalid file path: %s\n", *input)
 			os.Exit(1)
 		}
 	}
@@ -87,5 +93,9 @@ func main() {
 		panic(err)
 	}
 
-	os.Stdout.Write(bs)
+	if *output == "-" {
+		os.Stdout.Write(bs)
+	} else {
+		ioutil.WriteFile(*output, bs, 0640)
+	}
 }

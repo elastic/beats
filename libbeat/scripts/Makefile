@@ -332,7 +332,7 @@ endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include fields.yml $(BEAT_NAME) > include/fields.go
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME) 
 endif
 
 	@# Update docs
