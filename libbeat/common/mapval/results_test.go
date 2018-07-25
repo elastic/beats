@@ -15,23 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mapvaltest
+package mapval
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/mapval"
 )
 
-func TestTest(t *testing.T) {
-	// Should pass
-	Test(t, mapval.Schema(mapval.Map{}), common.MapStr{})
+func TestEmpty(t *testing.T) {
+	r := NewResults()
+	assert.True(t, r.Valid)
+	assert.Empty(t, r.DetailedErrors().Fields)
+	assert.Empty(t, r.Errors())
+}
 
-	fakeT := new(testing.T)
-	Test(fakeT, mapval.Schema(mapval.Map{"foo": "bar"}), common.MapStr{})
+func TestWithError(t *testing.T) {
+	r := NewResults()
+	r.record("foo", KeyMissingVR)
+	r.record("bar", ValidVR)
 
-	assert.True(t, fakeT.Failed())
+	assert.False(t, r.Valid)
+
+	assert.Equal(t, KeyMissingVR, r.Fields["foo"][0])
+	assert.Equal(t, ValidVR, r.Fields["bar"][0])
+
+	assert.Equal(t, KeyMissingVR, r.DetailedErrors().Fields["foo"][0])
+	assert.NotContains(t, r.DetailedErrors().Fields, "bar")
+
+	assert.False(t, r.DetailedErrors().Valid)
+	assert.NotEmpty(t, r.Errors())
 }
