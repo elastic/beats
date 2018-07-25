@@ -228,6 +228,9 @@ var (
 				"key_misses": c.Int("active_defrag_key_misses"),
 			},
 		},
+		"slowlog": s.Object{
+			"count": c.Int("slowlog_len"),
+		},
 	}
 )
 
