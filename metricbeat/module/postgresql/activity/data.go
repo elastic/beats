@@ -27,19 +27,19 @@ import (
 // Based on: https://www.postgresql.org/docs/9.2/static/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW
 var schema = s.Schema{
 	"database": s.Object{
-		"oid":  c.Int("datid"),
+		"oid":  c.Int("datid", s.Optional),
 		"name": c.Str("datname"),
 	},
 	"pid": c.Int("pid"),
 	"user": s.Object{
-		"id":   c.Int("usesysid"),
+		"id":   c.Int("usesysid", s.Optional),
 		"name": c.Str("usename"),
 	},
 	"application_name": c.Str("application_name"),
 	"client": s.Object{
 		"address":  c.Str("client_addr"),
 		"hostname": c.Str("client_hostname"),
-		"port":     c.Int("client_port"),
+		"port":     c.Int("client_port", s.Optional),
 	},
 	"backend_start":     c.Time(time.RFC3339Nano, "backend_start"),
 	"transaction_start": c.Time(time.RFC3339Nano, "xact_start", s.Optional),
