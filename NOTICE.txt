@@ -421,7 +421,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-sysinfo
-Revision: fda017eee28b7420d931e08c7361c1c17f516aa2
+Revision: b603f0b7f2050dbc69b053eb5c796be0f3ac9fd2
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-sysinfo/LICENSE.txt:
 --------------------------------------------------------------------
@@ -456,7 +456,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-windows
-Revision: a730c8b4e08aef7e1ebb642928bf862996ad2383
+Revision: f11b8c9a625322edbca44926f9c0e4dc4916c9ac
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-windows/LICENSE.txt:
 --------------------------------------------------------------------
