@@ -26,16 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/mb"
 )
-
-// ReportErrorForMissingField reports and returns an error message for the given
-// field being missing in API response received from Kibana
-func ReportErrorForMissingField(field string, r mb.ReporterV2) error {
-	err := fmt.Errorf("Could not find field '%v' in Kibana stats API response", field)
-	r.Error(err)
-	return err
-}
 
 // GetVersion returns the version of the Kibana instance
 func GetVersion(http *helper.HTTP, currentPath string) (string, error) {
