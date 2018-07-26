@@ -208,6 +208,16 @@ The modules and metricsets for which the host is defined as a HTTP URL, also
 support the following options:
 
 [float]
+==== `username`
+
+The username to use for basic authentication.
+
+[float]
+==== `password`
+
+The password to use for basic authentication.
+
+[float]
 ==== `headers`
 
 A list of headers to use with the HTTP request. For example:
@@ -218,16 +228,6 @@ headers:
   Cookie: abcdef=123456
   My-Custom-Header: my-custom-value
 ----
-
-[float]
-==== `username`
-
-The username to use for basic authentication.
-
-[float]
-==== `password`
-
-The password to use for basic authentication.
 
 [float]
 ==== `bearer_token_file`
