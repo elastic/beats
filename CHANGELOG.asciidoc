@@ -29,6 +29,8 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fixed `add_host_metadata` not initializing correctly on Windows. {issue}7715[7715]
+
 *Auditbeat*
 
 - Fixed a crash in the file_integrity module under Linux. {issue}7753[7753]
