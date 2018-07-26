@@ -66,6 +66,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	// If a community Beat does not have its own fields.yml file, it still requires
+	// the fields coming from libbeat to generate e.g assets. In case of Elastic Beats,
+	// it's not a problem because all of them has unique fields.yml files somewhere.
 	if len(beatFieldsPaths) == 0 && os.SameFile(esBeatsInfo, beatInfo) {
 		if output != "-" {
 			fmt.Println("No field files to collect")
