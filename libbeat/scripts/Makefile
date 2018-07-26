@@ -451,4 +451,3 @@ release: mage
 .PHONY: package
 snapshot: mage
 	@SNAPSHOT=true mage package
-
