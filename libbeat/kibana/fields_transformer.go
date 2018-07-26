@@ -80,7 +80,7 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
 		}
 
 		if t.keys[f.Path] != nil {
-			msg := fmt.Sprintf("ERROR: Field <%s> is duplicated. Please update and try again.", f.Path)
+			msg := fmt.Sprintf("ERROR: Field <%s> is duplicated. Please update and try again.\n", f.Path)
 			panic(errors.New(msg))
 		}
 

@@ -8,7 +8,7 @@ include ${ES_BEATS}/libbeat/scripts/Makefile
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: fields imports
+collect: imports
 
 .PHONY: benchmark
 benchmark:
