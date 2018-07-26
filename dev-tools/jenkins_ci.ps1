@@ -24,11 +24,6 @@ $env:MAGEFILE_CACHE = "$env:WORKSPACE\.magefile"
 exec { go install github.com/elastic/beats/vendor/github.com/magefile/mage }
 exec { go get -u github.com/jstemmer/go-junit-report }
 
-echo "Building libbeat fields.yml"
-cd libbeat
-exec { mage fields }
-cd ..
-
 if (Test-Path "$env:beat") {
     cd "$env:beat"
 } else {

@@ -10,5 +10,4 @@ prepare-test:: python-env
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: fields
-
+collect:

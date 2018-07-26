@@ -8,7 +8,7 @@ TEST_ENVIRONMENT=false
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: fields imports kibana
+collect: imports kibana
 
 # Generate imports for all monitors
 .PHONY: imports

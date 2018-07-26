@@ -71,7 +71,7 @@ func CollectModuleFiles(modulesDir string) ([]*YmlFile, error) {
 func CollectFiles(module string, modulesPath string) ([]*YmlFile, error) {
 
 	var files []*YmlFile
-	fieldsYmlPath := filepath.Join(modulesPath, module, "_meta", "fields.yml")
+	fieldsYmlPath := filepath.Join(modulesPath, module, "_meta/fields.yml")
 	if _, err := os.Stat(fieldsYmlPath); !os.IsNotExist(err) {
 		files = append(files, &YmlFile{
 			Path:   fieldsYmlPath,
@@ -91,7 +91,7 @@ func CollectFiles(module string, modulesPath string) ([]*YmlFile, error) {
 		if !s.IsDir() {
 			continue
 		}
-		fieldsYmlPath = filepath.Join(modulesPath, module, s.Name(), "_meta", "fields.yml")
+		fieldsYmlPath = filepath.Join(modulesPath, module, s.Name(), "_meta/fields.yml")
 		if _, err = os.Stat(fieldsYmlPath); !os.IsNotExist(err) {
 			files = append(files, &YmlFile{
 				Path:   fieldsYmlPath,
