@@ -34,8 +34,6 @@ type Describable interface {
 	// FullName is the human readable name of the feature.
 	// Example: Jolokia Discovery
 	FullName() string
-
-	String() string
 }
 
 // Details minimal information that you must provide when creating a feature.
