@@ -43,7 +43,7 @@ type Featurable interface {
 	Factory() interface{}
 
 	// Description return the avaiable information for a specific feature.
-	Description() Describable
+	Description() Describer
 
 	String() string
 }
@@ -53,7 +53,7 @@ type Feature struct {
 	namespace   string
 	name        string
 	factory     interface{}
-	description Describable
+	description Describer
 }
 
 // Namespace return the namespace of the feature.
@@ -72,7 +72,7 @@ func (f *Feature) Factory() interface{} {
 }
 
 // Description return the avaiable information for a specific feature.
-func (f *Feature) Description() Describable {
+func (f *Feature) Description() Describer {
 	return f.description
 }
 
@@ -87,7 +87,7 @@ func (f *Feature) String() string {
 }
 
 // New returns a new Feature.
-func New(namespace, name string, factory interface{}, description Describable) *Feature {
+func New(namespace, name string, factory interface{}, description Describer) *Feature {
 	return &Feature{
 		namespace:   namespace,
 		name:        name,

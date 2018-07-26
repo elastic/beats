@@ -45,6 +45,6 @@ func FindFactory(name string) Factory {
 }
 
 // Feature creates a new type of queue.
-func Feature(name string, factory Factory, description feature.Describable) *feature.Feature {
+func Feature(name string, factory Factory, description feature.Describer) *feature.Feature {
 	return feature.New(Namespace, name, factory, description)
 }

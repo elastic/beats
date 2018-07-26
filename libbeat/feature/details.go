@@ -19,9 +19,9 @@ package feature
 
 import "fmt"
 
-// Describable contains general information for a specific feature, the fields will be used to report
+// Describer contains general information for a specific feature, the fields will be used to report
 // useful information by the factories or any future CLI.
-type Describable interface {
+type Describer interface {
 	// Stability is the stability of the Feature, this allow the user to filter embedded functionality
 	// by their maturity at runtime.
 	// Example: Beta, Experimental, Stable or Undefined.
