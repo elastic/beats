@@ -140,7 +140,7 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error 
 	// Make usage field passthrough as-is
 	usage, ok := data["usage"].(map[string]interface{})
 	if !ok {
-		return kibana.ReportErrorForMissingField("usage", r)
+		return elastic.ReportErrorForMissingField("usage", elastic.Kibana, r)
 	}
 	kibanaStatsFields.Put("usage", usage)
 
