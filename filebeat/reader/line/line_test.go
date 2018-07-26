@@ -35,10 +35,40 @@ var tests = []struct {
 	encoding string
 	strings  []string
 }{
+	{"plain", []string{""}},
+	{"plain", []string{"", ""}},
+	{"plain", []string{"I can"}},
 	{"plain", []string{"I can", "eat glass"}},
+
+	{"latin1", []string{""}},
+	{"latin1", []string{"I can"}},
+	{"latin1", []string{"I kå Glas frässa"}},
 	{"latin1", []string{"I kå Glas frässa", "ond des macht mr nix!"}},
+
+	{"utf-8", []string{""}},
+	{"utf-8", []string{"I can"}},
+	{"utf-8", []string{"árvíztűrő tükörfúrógép"}},
+	{"utf-8", []string{"A nap tüze, látod,", "a fürge diákot", "a hegyre kicsalta: a csúcsra kiállt."}},
+
+	{"utf-16", []string{""}},
+	{"utf-16", []string{"I can"}},
+	{"utf-16", []string{"I can", "eat glass"}},
+	{"utf-16", []string{"Pot să mănânc sticlă"}},
+	{"utf-16", []string{"Pot să mănânc sticlă", "și ea nu mă rănește."}},
+	{"utf-16", []string{"\u0001234", "\u0000", "\u3453"}},
+
+	{"utf-16be", []string{""}},
+	{"utf-16be", []string{"I can"}},
+	{"utf-16be", []string{"I can", "eat glass"}},
+	{"utf-16be", []string{"Pot să mănânc sticlă"}},
 	{"utf-16be", []string{"Pot să mănânc sticlă", "și ea nu mă rănește."}},
+
+	{"utf-16le", []string{""}},
+	{"utf-16le", []string{"I can"}},
+	{"utf-16le", []string{"I can", "eat glass"}},
+	{"utf-16le", []string{"काचं शक्नोम्यत्तुम् ।"}},
 	{"utf-16le", []string{"काचं शक्नोम्यत्तुम् ।", "नोपहिनस्ति माम् ॥"}},
+
 	{"big5", []string{"我能吞下玻", "璃而不傷身體。"}},
 	{"gb18030", []string{"我能吞下玻璃", "而不傷身。體"}},
 	{"euc-kr", []string{" 나는 유리를 먹을 수 있어요.", " 그래도 아프지 않아요"}},
@@ -46,6 +76,14 @@ var tests = []struct {
 }
 
 func TestReaderEncodings(t *testing.T) {
+	testReaderWithEncodings(t, 1024)
+}
+
+func TestReaderEncodingsWithSmallBuffer(t *testing.T) {
+	testReaderWithEncodings(t, 3)
+}
+
+func testReaderWithEncodings(t *testing.T, bufferSize int) {
 	for _, test := range tests {
 		t.Logf("test codec: %v", test.encoding)
 
@@ -68,11 +106,7 @@ func TestReaderEncodings(t *testing.T) {
 		}
 
 		// create line reader
-		reader, err := New(buffer, codec, 1024)
-		if err != nil {
-			t.Errorf("failed to initialize reader: %v", err)
-			continue
-		}
+		reader := New(buffer, codec, []byte("\n"), bufferSize)
 
 		// read decodec lines from buffer
 		var readLines []string
@@ -159,10 +193,7 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
 	codec, _ := encoding.Plain(buffer)
-	reader, err := New(buffer, codec, buffer.Len())
-	if err != nil {
-		t.Fatalf("Error initializing reader: %v", err)
-	}
+	reader := New(buffer, codec, []byte("\n"), buffer.Len())
 
 	// read lines
 	var lines [][]byte

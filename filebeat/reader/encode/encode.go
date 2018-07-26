@@ -37,9 +37,10 @@ type Reader struct {
 func New(
 	r io.Reader,
 	codec encoding.Encoding,
+	name string,
 	bufferSize int,
 ) (Reader, error) {
-	eReader, err := line.New(r, codec, bufferSize)
+	eReader, err := line.New(r, codec, name, []byte("\n"), bufferSize)
 	return Reader{eReader}, err
 }
 
