@@ -12,4 +12,4 @@ gen:
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: fields
+collect:

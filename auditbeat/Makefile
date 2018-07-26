@@ -12,7 +12,7 @@ include ${ES_BEATS}/libbeat/scripts/Makefile
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: fields collect-docs configs kibana
+collect: collect-docs configs kibana
 
 # Collects all module configs
 .PHONY: configs

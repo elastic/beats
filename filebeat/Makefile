@@ -42,7 +42,7 @@ imports: python-env
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields kibana configs collect-docs imports
+collect: kibana configs collect-docs imports
 
 # Creates a new module. Requires the params MODULE
 .PHONY: create-module
