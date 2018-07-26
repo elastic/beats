@@ -27,7 +27,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -96,7 +95,7 @@ func Export(client *http.Client, conn string, dashboard string, out string) erro
 	data["objects"] = objects
 
 	// Create all missing directories
-	err = os.MkdirAll(path.Dir(out), 0755)
+	err = os.MkdirAll(filepath.Dir(out), 0755)
 	if err != nil {
 		return err
 	}
