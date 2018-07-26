@@ -218,6 +218,18 @@ The username to use for basic authentication.
 The password to use for basic authentication.
 
 [float]
+==== `headers`
+
+A list of headers to use with the HTTP request. For example:
+
+[source,yaml]
+----
+headers:
+  Cookie: abcdef=123456
+  My-Custom-Header: my-custom-value
+----
+
+[float]
 ==== `bearer_token_file`
 
 If defined, Metricbeat will read the contents of the file once at initialization
