@@ -15240,6 +15240,94 @@ type: long
 
 --
 
+[float]
+== slowlog fields
+
+An entry in the Redis slow queries log.
+
+
+
+*`redis.slowlog.id`*::
++
+--
+type: long
+
+A unique progressive identifier for every slow log entry.
+
+
+--
+
+*`redis.slowlog.command`*::
++
+--
+type: keyword
+
+The command
+
+
+--
+
+*`redis.slowlog.key`*::
++
+--
+type: keyword
+
+--
+
+*`redis.slowlog.args`*::
++
+--
+type: array
+
+The array composing the arguments of the command.
+
+
+--
+
+*`redis.slowlog.duration.us`*::
++
+--
+type: long
+
+format: duration
+
+The amount of time needed for its execution, in microseconds.
+
+
+--
+
+*`redis.slowlog.timestamp`*::
++
+--
+type: date
+
+format: epoch_millis
+
+The unix timestamp at which the logged command was processed.
+
+
+--
+
+*`redis.slowlog.client.name`*::
++
+--
+type: keyword
+
+Client IP address and port (4.0 only).
+
+
+--
+
+*`redis.slowlog.client.address`*::
++
+--
+type: keyword
+
+Client name if set via the `CLIENT SETNAME` command (4.0 only).
+
+
+--
+
 [[exported-fields-system]]
 == System fields
 

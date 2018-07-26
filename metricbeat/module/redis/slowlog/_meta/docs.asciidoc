@@ -1,0 +1,2 @@
+The Redis `slowlog` metricset collects slowlog from Redis by running the
+http://redis.io/commands/slowlog[`SLOWLOG`] command and parsing the returned result.

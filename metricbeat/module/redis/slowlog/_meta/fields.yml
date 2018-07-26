@@ -1,0 +1,39 @@
+- name: slowlog
+  type: group
+  description: >
+    An entry in the Redis slow queries log.
+  fields:
+    - name: id
+      type: long
+      description: >
+        A unique progressive identifier for every slow log entry.
+    - name: command
+      type: keyword
+      description: >
+        The command
+    - name: key
+      type: keyword
+      descirption: >
+        The key affected by the command
+    - name: args
+      type: array
+      description: >
+        The array composing the arguments of the command.
+    - name: duration.us
+      type: long
+      format: duration
+      description: >
+        The amount of time needed for its execution, in microseconds.
+    - name: timestamp
+      type: date
+      format: epoch_millis
+      description: >
+        The unix timestamp at which the logged command was processed.
+    - name: client.name
+      type: keyword
+      description: >
+        Client IP address and port (4.0 only).
+    - name: client.address
+      type: keyword
+      description: >
+        Client name if set via the `CLIENT SETNAME` command (4.0 only).
