@@ -27,9 +27,10 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
-	"path/filepath"
+	"log"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/kibana"
@@ -135,8 +136,8 @@ func ReadManifest(file string) ([]map[string]string, error) {
 }
 
 func exitWithError(format string, a ...interface{}) {
-	fmt.Fprintf(os.Stderr, "ERROR: "+format+"\n", a)
-	os.Exit(1)
+	log.SetFlags(0)
+	log.Fatalf("ERROR: "+format, a)
 }
 
 var indexPattern = false
@@ -171,12 +172,12 @@ func main() {
 
 		for _, dashboard := range dashboards {
 			fmt.Printf("id=%s, name=%s\n", dashboard["id"], dashboard["file"])
-			directory := path.Join(filepath.Dir(*ymlFile), "_meta/kibana/6/dashboard")
+			directory := filepath.Join(filepath.Dir(*ymlFile), "_meta/kibana/6/dashboard")
 			err := os.MkdirAll(directory, 0755)
 			if err != nil {
 				exitWithError("fail to create directory %s: %v", directory, err)
 			}
-			err = Export(client, *kibanaURL, dashboard["id"], path.Join(directory, dashboard["file"]))
+			err = Export(client, *kibanaURL, dashboard["id"], filepath.Join(directory, dashboard["file"]))
 			if err != nil {
 				exitWithError("fail to export the dashboards: %s", err)
 			}
