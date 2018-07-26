@@ -27,25 +27,30 @@ import (
 )
 
 func main() {
-	esBeatsPath := flag.String("es_beats_path", "..", "Path to elastic/beats")
-	beatPath := flag.String("beat_path", ".", "Path to your Beat")
-	output := flag.String("out", "-", "Path to output. Default: stdout")
+	var (
+		esBeatsPath string
+		beatPath    string
+		output      string
+	)
+	flag.StringVar(&esBeatsPath, "es_beats_path", "..", "Path to elastic/beats")
+	flag.StringVar(&beatPath, "beat_path", ".", "Path to your Beat")
+	flag.StringVar(&output, "out", "-", "Path to output. Default: stdout")
 	flag.Parse()
 
 	beatFieldsPaths := flag.Args()
-	name := filepath.Base(*beatPath)
+	name := filepath.Base(beatPath)
 
-	if *beatPath == "" {
+	if beatPath == "" {
 		fmt.Fprintf(os.Stderr, "beat_path cannot be empty")
 		os.Exit(1)
 	}
 
-	esBeats, err := os.Open(*esBeatsPath)
+	esBeats, err := os.Open(esBeatsPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error opening elastic/beats: %+v\n", err)
 		os.Exit(1)
 	}
-	beat, err := os.Open(*beatPath)
+	beat, err := os.Open(beatPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error opening target Beat: %+v\n", err)
 		os.Exit(1)
@@ -62,7 +67,7 @@ func main() {
 	}
 
 	if len(beatFieldsPaths) == 0 && os.SameFile(esBeatsInfo, beatInfo) {
-		if *output != "-" {
+		if output != "-" {
 			fmt.Println("No field files to collect")
 		}
 		return
@@ -70,7 +75,7 @@ func main() {
 
 	var fieldsFiles []*fields.YmlFile
 	for _, fieldsFilePath := range beatFieldsPaths {
-		pathToModules := filepath.Join(*beatPath, fieldsFilePath)
+		pathToModules := filepath.Join(beatPath, fieldsFilePath)
 
 		fieldsFile, err := fields.CollectModuleFiles(pathToModules)
 		if err != nil {
@@ -81,13 +86,13 @@ func main() {
 		fieldsFiles = append(fieldsFiles, fieldsFile...)
 	}
 
-	err = fields.Generate(*esBeatsPath, *beatPath, fieldsFiles, *output)
+	err = fields.Generate(esBeatsPath, beatPath, fieldsFiles, output)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot generate global fields.yml file for %s: %+v\n", name, err)
 		os.Exit(3)
 	}
 
-	if *output != "-" {
+	if output != "-" {
 		fmt.Printf("Generated fields.yml for %s\n", name)
 	}
 }
