@@ -30,6 +30,7 @@ collect-docs: python-env
 # Collects all module configs
 .PHONY: configs
 configs: python-env
+	@mkdir -p _meta
 	@cp ${ES_BEATS}/metricbeat/_meta/common.yml _meta/beat.yml
 	@cat ${ES_BEATS}/metricbeat/_meta/setup.yml >> _meta/beat.yml
 	@cat ${ES_BEATS}/metricbeat/_meta/common.reference.yml > _meta/beat.reference.yml
@@ -48,7 +49,7 @@ imports: python-env
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields assets collect-docs configs kibana imports
+collect: assets collect-docs configs kibana imports
 
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset
@@ -73,8 +74,8 @@ test-module: python-env update metricbeat.test
 	. ${PYTHON_ENV}/bin/activate && INTEGRATION_TESTS=1 nosetests tests/system/test_${MODULE}.py
 
 .PHONY: assets
-assets: libbeat_fields
+assets:
 	go run ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/metricbeat/module
 	mkdir -p include/fields
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include ${ES_BEATS}/metricbeat/_meta/fields.common.yml $(BEAT_NAME) > include/fields.go
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME) > ./include/fields/fields.go
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in ${ES_BEATS}/metricbeat/_meta/fields.common.yml -out include/fields.go $(BEAT_NAME)
+	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -out ./include/fields/fields.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
