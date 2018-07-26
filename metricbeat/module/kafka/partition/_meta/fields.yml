@@ -25,6 +25,7 @@
       fields:
         - name: id
           type: long
+          deprecated: true
           description: >
             Partition id.
 
@@ -46,6 +47,11 @@
           description: >
             Indicates if replica is included in the in-sync replicate set (ISR).
 
+        - name: is_leader
+          type: boolean
+          description: >
+            Indicates if replica is the leader
+
         - name: error.code
           type: long
           description: >
@@ -53,19 +59,23 @@
 
     - name: topic.error.code
       type: long
+      deprecated: true
       description: >
         topic error code.
     - name: topic.name
       type: keyword
+      deprecated: true
       description: >
         Topic name
 
     - name: broker.id
       type: long
+      deprecated: true
       description: >
         Broker id
     - name: broker.address
       type: keyword
+      deprecated: true
       description: >
         Broker address
 

@@ -6956,6 +6956,63 @@ Kafka module
 
 
 [float]
+== broker fields
+
+Broker Consumer Group Information have been read from (Broker handling the consumer group).
+
+
+
+*`kafka.broker.id`*::
++
+--
+type: long
+
+Broker id
+
+
+--
+
+*`kafka.broker.address`*::
++
+--
+type: keyword
+
+Broker address
+
+
+--
+
+*`kafka.topic.name`*::
++
+--
+type: keyword
+
+Topic name
+
+
+--
+
+*`kafka.topic.error.code`*::
++
+--
+type: long
+
+Topic error code.
+
+
+--
+
+*`kafka.partition.id`*::
++
+--
+type: long
+
+Partition id.
+
+
+--
+
+[float]
 == consumergroup fields
 
 consumergroup
@@ -7165,6 +7222,16 @@ Replica id (broker).
 type: boolean
 
 Indicates if replica is included in the in-sync replicate set (ISR).
+
+
+--
+
+*`kafka.partition.partition.is_leader`*::
++
+--
+type: boolean
+
+Indicates if replica is the leader
 
 
 --
