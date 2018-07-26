@@ -7,49 +7,19 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
-- De dot keys of labels and annotations in kubernetes meta processors to prevent collisions. {pull}6203[6203]
-- Rename beat.cpu.*.time metrics to beat.cpu.*.time.ms. {pull}6449[6449]
-- Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
-- Allow override of dynamic template `match_mapping_type` for fields with object_type. {pull}6691[6691]
-- Set default kafka version to 1.0.0 in kafka output. Older versions are still supported by configuring the `version` setting. Minimally supported version is 0.11 (older versions might work, but are untested). {pull}7025[7025]
-- Add `host.name` field to all events, to avoid mapping conflicts. This could be breaking Logstash configs if you rely on the `host` field being a string. {pull}7051[7051]
-
 *Auditbeat*
 
 *Filebeat*
 
-- Remove the undefined `username` option from the Redis input and clarify the documentation. {pull}6662[6662]
-- Add validation for Stdin, when Filebeat is configured with Stdin and any other inputs, Filebeat
-  will now refuses to start. {pull}6463[6463]
-
 *Heartbeat*
 
-- Made the URL field of heartbeat aggregatable. {pull}6263[6263]
-- Use `match.Matcher` for checking heartbeat response bodies with regular expressions. {pull}6539[6539]
-- Rename http.response.status to http.response.status_code to align with ECS. {pull}7274[7274]
-- Remove `type` field as not needed. {pull}7307[7307]
-
 *Metricbeat*
-
-- Kubernetes deployment: Add ServiceAccount config to system metricbeat. {pull}6824[6824]
-- Kubernetes deployment: Add DNS Policy to system metricbeat. {pull}6656[6656]
-- De dot keys in kubernetes/event metricset to prevent collisions. {pull}6203[6203]
-- Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
-- Refactor docker CPU calculations to be more consistent with `docker stats`. {pull}6608[6608]
-- Update logstash.node_stats metricset to write data under `logstash.node.stats.*`. {pull}6714[6714]
-- Fixed typo in values for `state_container` `status.phase`, from `terminate` to `terminated`. {pull}6916[6916]
-- RabbitMQ management plugin path is now configured at the module level instead of having to do it in each of the metricsets. New `management_path_prefix` option should be used now {pull}7074[7074]
-- RabbitMQ node metricset only collects metrics of the instance it connects to, `node.collect: cluster` can be used to collect all nodes as before. {issue}6556[6556] {pull}6971[6971]
-- Change http/server metricset to put events by default under http.server and prefix config options with server.. {pull}7100[7100]
-- Disable dedotting in docker module configuration. This will change the out-of-the-box behaviour, but not the one of already configured instances. {pull}7485[7485]
-- Fix typo in etcd/self metricset fields from *.bandwithrate to *.bandwidthrate. {pull}7456[7456]
-- Changed the definition of the `system.cpu.total.pct` and `system.cpu.total.norm.cou` fields to exclude the IOWait time. {pull}7691[7691]
 
 *Packetbeat*
 
@@ -59,22 +29,86 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix panic when Events containing a float32 value are normalized. {pull}6129[6129]
-- Fix `setup.dashboards.always_kibana` when using Kibana 5.6. {issue}6090[6090]
-- Fix for kafka logger. {pull}6430[6430]
-- Remove double slashes in Windows service script. {pull}6491[6491]
-- Ensure Kubernetes labels/annotations don't break mapping {pull}6490[6490]
-- Ensure that the dashboard zip files can't contain files outside of the kibana directory. {pull}6921[6921]
-- Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
-- Fix error if lz4 compression is used with the kafka output. {pull}7025[7025]
-- Preserve the event when source matching fails in `add_docker_metadata`. {pull}7133[7133]
-- Negotiate Docker API version from our client instead of using a hardcoded one. {pull}7165[7165]
-- Fix delays on autodiscovery events handling caused by blocking runner stops. {pull}7170[7170]
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+==== Added
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Known Issue
+
+
+////////////////////////////////////////////////////////////
+
+[[release-notes-6.4.0]]
+=== Beats version 6.4.0
+https://github.com/elastic/beats/compare/v6.3.1...v6.4.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Set default kafka version to 1.0.0 in kafka output. Older versions are still supported by configuring the `version` setting. Minimally supported version is 0.11 (older versions might work, but are untested). {pull}7025[7025]
+
+*Heartbeat*
+
+- Rename http.response.status to http.response.status_code to align with ECS. {pull}7274[7274]
+- Remove `type` field as not needed. {pull}7307[7307]
+
+*Metricbeat*
+
+- Fixed typo in values for `state_container` `status.phase`, from `terminate` to `terminated`. {pull}6916[6916]
+- RabbitMQ management plugin path is now configured at the module level instead of having to do it in each of the metricsets. New `management_path_prefix` option should be used now {pull}7074[7074]
+- RabbitMQ node metricset only collects metrics of the instance it connects to, `node.collect: cluster` can be used to collect all nodes as before. {issue}6556[6556] {pull}6971[6971]
+- Change http/server metricset to put events by default under http.server and prefix config options with server.. {pull}7100[7100]
+- Disable dedotting in docker module configuration. This will change the out-of-the-box behaviour, but not the one of already configured instances. {pull}7485[7485]
+- Fix typo in etcd/self metricset fields from *.bandwithrate to *.bandwidthrate. {pull}7456[7456]
+- Changed the definition of the `system.cpu.total.pct` and `system.cpu.total.norm.cou` fields to exclude the IOWait time. {pull}7691[7691]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
 - Error out on invalid Autodiscover template conditions settings. {pull}7200[7200]
-- Do not emit Kubernetes autodiscover events for Pods without IP address. {pull}7235[7235]
 - Allow to override the `ignore_above` option when defining new field with the type keyword. {pull}7238[7238]
-- Allow index-pattern only setup when setup.dashboards.only_index=true. {pull}7285[7285]
-- Fix duplicating dynamic_fields in template when overwriting the template. {pull}7352[7352]
 - Fix a panic on the Dissect processor when we have data remaining after the last delimiter. {pull}7449[7449]
 - When we fail to build a Kubernetes' indexer or matcher we produce a warning but we don't add them to the execution. {pull}7466[7466]
 - Fix default value for logging.files.keepfiles. It was being set to 0 and now
@@ -84,30 +118,221 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 
 *Auditbeat*
 
-- Add hex decoding for the name field in audit path records. {pull}6687[6687]
-- Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
-- Fixed parsing of AppArmor audit messages. {pull}6978[6978]
 - Allow `auditbeat setup` to run without requiring elevated privileges for the audit client. {issue}7111[7111]
 - Fix goroutine leak that occurred when the auditd module was stopped. {pull}7163[7163]
+
+*Filebeat*
+
+- Fix a data race between stopping and starting of the harvesters. {issue}#6879[6879]
+- Fix an issue when parsing ISO8601 dates with timezone definition {issue}7367[7367]
+- Fix Grok pattern of MongoDB module. {pull}7568[7568]
+- Fix registry duplicates and log resending on upgrade. {issue}7634[7634]
+
+*Metricbeat*
+
+- Fix Windows service metricset when using a 32-bit binary on a 64-bit OS. {pull}7294[7294]
+- Do not report Metricbeat container host as hostname in Kubernetes deployment. {issue}7199[7199]
+- Ensure metadata updates don't replace existing pod metrics. {pull}7573[7573]
+- Fix kubernetes pct fields reporting. {pull}7677[7677]
+- Add support for new `kube_node_status_condition` in Kubernetes `state_node`. {pull}7699[7699]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add dissect processor. {pull}6925[6925]
+- Add IP-addresses and MAC-addresses to add_host_metadata. {pull}6878[6878]
+- Added a seccomp (secure computing) filter on Linux that whitelists the
+  necessary system calls used by each Beat. {issue}5213[5213]
+- Ship fields.yml as part of the binary {pull}4834[4834]
+- Added options to dev-tools/cmd/dashboards/export_dashboard.go: -indexPattern to include index-pattern in output, -quiet to be quiet. {pull}7101[7101]
+- Add Indexer indexing by pod uid. Enable pod uid metadata gathering in add_kubernetes_metadata. Extended Matcher log_path matching to support volume mounts {pull}7072[7072]
+- Add default_fields to Elasticsearch template when connecting to Elasticsearch >= 7.0. {pull}7015[7015]
+- Add support for loading a template.json file directly instead of using fields.yml. {pull}7039[7039]
+- Add support for keyword multifields in field.yml. {pull}7131[7131]
+- Add experimental Jolokia Discovery autodiscover provider. {pull}7141[7141]
+- Add owner object info to Kubernetes metadata. {pull}7231[7231]
+- Add Beat export dashboard command. {pull}7239[7239]
+- Add support for docker autodiscover to monitor containers on host network {pull}6708[6708]
+- Add ability to define input configuration as stringified JSON for autodiscover. {pull}7372[7372]
+- Add processor definition support for hints builder {pull}7386[7386]
+- Add support to disable html escaping in outputs. {pull}7445[7445]
+- Refactor error handing in schema.Apply(). {pull}7335[7335]
+- Add additional types to Kubernetes metadata {pull}7457[7457]
+- Add module state reporting for Beats Monitoring. {pull}7075[7075]
+- Release the `rename` processor as GA. {pull}7656[7656]
+- Add support for Openstack Nova in `add_cloud_metadata` processor. {pull}7663[7663]
+
+*Auditbeat*
+
+- Added XXH64 hash option for file integrity checks. {pull}7311[7311]
+- Added the `show auditd-rules` and `show auditd-status` commands to show kernel rules and status. {pull}7114[7114]
+- Add Kubernetes specs for auditbeat file integrity monitoring {pull}7642[7642]
+
+*Filebeat*
+
+- Add Kibana module with log fileset. {pull}7052[7052]
+- Support MySQL 5.7.19 by mysql/slowlog {pull}6969[6969]
+- Correctly join partial log lines when using `docker` input. {pull}6967[6967]
+- Add support for TLS with client authentication to the TCP input {pull}7056[7056]
+- Converted part of pipeline from treafik/access metricSet to dissect to improve efficiency. {pull}7209[7209]
+- Add GC fileset to the Elasticsearch module. {pull}7305[7305]
+- Add Audit log fileset to the Elasticsearch module. {pull}7365[7365]
+- Add Slow log fileset to the Elasticsearch module. {pull}7473[7473]
+- Add deprecation fileset to the Elasticsearch module. {pull}7474[7474]
+- Add `config_timezone` option to Kafka module to convert dates to UTC. {issue}7546[7546] {pull}7578[7578]
+- Add patterns for kafka 1.1 logs. {pull}7608[7608]
+- Move debug messages in tcp input source {pull}7712[7712]
+
+*Metricbeat*
+
+- Add experimental Elasticsearch index metricset. {pull}6881[6881]
+- Add dashboards and visualizations for haproxy metrics. {pull}6934[6934]
+- Add Jolokia agent in proxy mode. {pull}6475[6475]
+- Add message rates to the RabbitMQ queue metricset {issue}6442[6442] {pull}6606[6606]
+- Add exchanges metricset to the RabbitMQ module {issue}6442[6442] {pull}6607[6607]
+- Add Elasticsearch index_summary metricset. {pull}6918[6918]
+- Add shard metricset to Elasticsearch module. {pull}7006[7006]
+- Add apiserver metricset to Kubernetes module. {pull}7059[7059]
+- Add maxmemory to redis info metricset. {pull}7127[7127]
+- Set guest as default user in RabbitMQ module. {pull}7107[7107]
+- Add postgresql statement metricset. {issue}7048[7048] {pull}7060[7060]
+- Update `state_container` metricset to support latest `kube-state-metrics` version. {pull}7216[7216]
+- Add TLS support to MongoDB module. {pull}7401[7401]
+- Added Traefik module with health metricset. {pull}7413[7413]
+- Add Elasticsearch ml_job metricsets. {pull}7196[7196]
+- Add support for bearer token files to HTTP helper. {pull}7527[7527]
+- Add Elasticsearch index recovery metricset. {pull}7225[7225]
+- Add `locks`, `global_locks`, `oplatencies` and `process` fields to `status` metricset of MongoDB module. {pull}7613[7613]
+- Run Kafka integration tests on version 1.1.0 {pull}7616[7616]
+- Release raid and socket metricset from system module as GA. {pull}7658[7658]
+- Release elasticsearch module and all its metricsets as beta. {pull}7662[7662]
+- Release munin and traefik module as beta. {pull}7660[7660]
+- Add envoyproxy module. {pull}7569[7569]
+- Release prometheus collector metricset as GA. {pull}7660[7660]
+- Add Elasticsearch `cluster_stats` metricset. {pull}7638[7638]
+- Added `basepath` setting for HTTP-based metricsets {pull}7700[7700]
+
+*Packetbeat*
+
+- The process monitor now reports the command-line for all processes, under Linux and Windows. {pull}7135[7135]
+- Updated the TLS protocol parser with new cipher suites added to TLS 1.3. {issue}7455[7455]
+- Flows are enriched with process information using the process monitor. {pull}7507[7507]
+- Added UDP support to process monitor. {pull}7571[7571]
+
+==== Deprecated
+
+*Metricbeat*
+
+- Kubernetes `state_container` `cpu.limit.nanocores` and `cpu.request.nanocores` have been
+deprecated in favor of `cpu.*.cores`. {pull}6916[6916]
+
+[[release-notes-6.3.1]]
+=== Beats version 6.3.1
+https://github.com/elastic/beats/compare/v6.3.0...v6.3.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Allow index-pattern only setup when setup.dashboards.only_index=true. {pull}7285[7285]
+- Preserve the event when source matching fails in `add_docker_metadata`. {pull}7133[7133]
+- Negotiate Docker API version from our client instead of using a hardcoded one. {pull}7165[7165]
+- Fix duplicating dynamic_fields in template when overwriting the template. {pull}7352[7352]
+
+*Auditbeat*
+
+- Fixed parsing of AppArmor audit messages. {pull}6978[6978]
+
+*Filebeat*
+
+- Comply with PostgreSQL database name format {pull}7198[7198]
+- Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
+- Keep different registry entry per container stream to avoid wrong offsets. {issue}7281[7281]
+- Fix offset field pointing at end of a line. {issue}6514[6514]
+- Commit registry writes to stable storage to avoid corrupt registry files. {issue}6792[6792]
+
+*Metricbeat*
+
+- Fix field mapping for the system process CPU ticks fields. {pull}7230[7230]
+- Ensure canonical naming for JMX beans is disabled in Jolokia module. {pull}7047[7047]
+- Fix Jolokia attribute mapping when using wildcards and MBean names with multiple properties. {pull}7321[7321]
+
+*Packetbeat*
+
+- Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
+- Fix missing type for `http.response.body` field. {pull}7169[7169]
+
+==== Added
+
+*Auditbeat*
+
+- Added caching of UID and GID values to auditd module. {pull}6978[6978]
+- Updated syscall tables for Linux 4.16. {pull}6978[6978]
+- Added better error messages for when the auditd module fails due to the
+  Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
+
+*Metricbeat*
+
+- Collect accumulated docker network metrics and mark old ones as deprecated. {pull}7253[7253]
+
+
+
+[[release-notes-6.3.0]]
+=== Beats version 6.3.0
+https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- De dot keys of labels and annotations in kubernetes meta processors to prevent collisions. {pull}6203[6203]
+- Rename `beat.cpu.*.time metrics` to `beat.cpu.*.time.ms`. {pull}6449[6449]
+- Add `host.name` field to all events, to avoid mapping conflicts. This could be breaking Logstash configs if you rely on the `host` field being a string. {pull}7051[7051]
+
+*Filebeat*
+
+- Add validation for Stdin, when Filebeat is configured with Stdin and any other inputs, Filebeat
+  will now refuse to start. {pull}6463[6463]
+- Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
+
+*Metricbeat*
+
+- De dot keys in kubernetes/event metricset to prevent collisions. {pull}6203[6203]
+- Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
+- Refactor docker CPU calculations to be more consistent with `docker stats`. {pull}6608[6608]
+- Update logstash.node_stats metricset to write data under `logstash.node.stats.*`. {pull}6714[6714]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix panic when Events containing a float32 value are normalized. {pull}6129[6129]
+- Fix `setup.dashboards.always_kibana` when using Kibana 5.6. {issue}6090[6090]
+- Fix for Kafka logger. {pull}6430[6430]
+- Remove double slashes in Windows service script. {pull}6491[6491]
+- Ensure Kubernetes labels/annotations don't break mapping {pull}6490[6490]
+- Ensure that the dashboard zip files can't contain files outside of the kibana directory. {pull}6921[6921]
+- Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
+- Fix delays on autodiscovery events handling caused by blocking runner stops. {pull}7170[7170]
+- Do not emit Kubernetes autodiscover events for Pods without IP address. {pull}7235[7235]
+
+*Auditbeat*
+
+- Add hex decoding for the name field in audit path records. {pull}6687[6687]
+- Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
 
 *Filebeat*
 
 - Fix panic when log prospector configuration fails to load. {issue}6800[6800]
 - Fix memory leak in log prospector when files cannot be read. {issue}6797[6797]
 - Add raw JSON to message field when JSON parsing fails. {issue}6516[6516]
-- Commit registry writes to stable storage to avoid corrupt registry files. {issue}6792[6792]
-- Fix a data race between stopping and starting of the harvesters. {issue}#6879[6879]
+- Commit registry writes to stable storage to avoid corrupt registry files. {pull}6877[6877]
 - Fix a parsing issue in the syslog input for RFC3339 timestamp and time with nanoseconds. {pull}7046[7046]
-- Comply with PostgreSQL database name format {pull}7198[7198]
 - Fix an issue with an overflowing wait group when using the TCP input. {issue}7202[7202]
-- Keep different registry entry per container stream to avoid wrong offsets. {issue}7281[7281]
-- Optimize PostgreSQL ingest pipeline to use anchored regexp and merge multiple regexp into a single expression. {pull}7269[7269]
-- Fix offset field pointing at end of a line. {issue}6514[6514]
-- Fix an issue when parsing ISO8601 dates with timezone definition {issue}7367[7367]
-- Fix Grok pattern of MongoDB module. {pull}7568[7568]
-- Fix registry duplicates and log resending on upgrade. {issue}7634[7634]
 
 *Heartbeat*
+
 - Fix race due to updates of shared a map, that was not supposed to be shared between multiple go-routines. {issue}6616[6616]
 
 *Metricbeat*
@@ -125,19 +350,6 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Don't stop Metricbeat if aerospike server is down. {pull}6874[6874]
 - disk reads and write count metrics in RabbitMQ queue metricset made optional. {issue}6876[6876]
 - Add mapping for docker metrics per cpu. {pull}6843[6843]
-- Ensure canonical naming for JMX beans is disabled in Jolokia module. {pull}7047[7047]
-- Fix field mapping for the system process CPU ticks fields. {pull}7230[7230]
-- Fix Windows service metricset when using a 32-bit binary on a 64-bit OS. {pull}7294[7294]
-- Fix Jolokia attribute mapping when using wildcards and MBean names with multiple properties. {pull}7321[7321]
-- Do not report Metricbeat container host as hostname in Kubernetes deployment. {issue}7199[7199]
-- Ensure metadata updates don't replace existing pod metrics. {pull}7573[7573]
-- Fix kubernetes pct fields reporting. {pull}7677[7677]
-- Add support for new `kube_node_status_condition` in Kubernetes `state_node`. {pull}7699[7699]
-
-*Packetbeat*
-
-- Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
-- Fix missing type for `http.response.body` field. {pull}7169[7169]
 
 *Winlogbeat*
 
@@ -149,7 +361,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 
 - Update Golang 1.9.4 {pull}6326[6326]
 - Add the ability to log to the Windows Event Log. {pull}5913[5913]
-- The node name can be discovered automatically by machine-id matching when beat deployed outside kubernetes cluster. {pull}6146[6146]
+- The node name can be discovered automatically by machine-id matching when beat deployed outside Kubernetes cluster. {pull}6146[6146]
 - Panics will be written to the logger before exiting. {pull}6199[6199]
 - Add builder support for autodiscover and annotations builder {pull}6408[6408]
 - Add plugin support for autodiscover builders, providers {pull}6457[6457]
@@ -161,42 +373,9 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add `has_fields` conditional to filter events based on the existence of all the given fields. {issue}6285[6285] {pull}6653[6653]
 - Add support for spooling to disk to the beats event publishing pipeline. {pull}6581[6581]
 - Added logging of system info at Beat startup. {issue}5946[5946]
-- Do not log errors if X-Pack Monitoring is enabled but Elasticsearch X-Pack is not. {pull}6627[6627]
+- Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
 - Add rename processor. {pull}6292[6292]
-- Add IP-addresses and MAC-addresses to add_host_metadata. {pull}6878[6878]
-- Added a seccomp (secure computing) filter on Linux that whitelists the
-  necessary system calls used by each Beat. {issue}5213[5213]
-- Update Sarama to v1.16.0, adding better support for kafka 0.11, 1.0, and 1.1 {pull}7025[7025]
-- Ship fields.yml as part of the binary {pull}4834[4834]
-- Added options to dev-tools/cmd/dashboards/export_dashboard.go: -indexPattern to include index-pattern in output, -quiet to be quiet. {pull}7101[7101]
-- Add Indexer indexing by pod uid. Enable pod uid metadata gathering in add_kubernetes_metadata. Extended Matcher log_path matching to support volume mounts {pull}7072[7072]
-- Add Kibana module with log fileset. {pull}7052[7052]
-- Add default_fields to Elasticsearch template when connecting to Elasticsearch >= 7.0. {pull}7015[7015]
-- Add support for loading a template.json file directly instead of using fields.yml. {pull}7039[7039]
-- Add support for keyword multifields in field.yml. {pull}7131[7131]
-- Add dissect processor. {pull}6925[6925]
-- Add experimental Jolokia Discovery autodiscover provider. {pull}7141[7141]
-- Add owner object info to Kubernetes metadata. {pull}7231[7231]
-- Add beat export dashboard command. {pull}7239[7239]
-- Add support for docker autodiscover to monitor containers on host network {pull}6708[6708]
-- Add ability to define input configuration as stringified JSON for autodiscover. {pull}7372[7372]
-- Add processor definition support for hints builder {pull}7386[7386]
-- Add support to disable html escaping in outputs. {pull}7445[7445]
-- Refactor error handing in schema.Apply(). {pull}7335[7335]
-- Add additional types to kubernetes metadata {pull}7457[7457]
-- Add module state reporting for X-Pack Monitoring. {pull}7075[7075]
-- Release the rename processor as GA. {pull}7656[7656]
-- Add support for Openstack Nova in add_cloud_metadata processor. {pull}7663[7663]
-
-*Auditbeat*
-
-- Added caching of UID and GID values to auditd module. {pull}6978[6978]
-- Updated syscall tables for Linux 4.16. {pull}6978[6978]
-- Added better error messages for when the auditd module fails due to the
-  Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
-- Added XXH64 hash option for file integrity checks. {pull}7311[7311]
-- Added the `show auditd-rules` and `show auditd-status` commands to show kernel rules and status. {pull}7114[7114]
-- Add kubernetes specs for auditbeat file integrity monitoring {pull}7642[7642]
+- Allow override of dynamic template `match_mapping_type` for fields with object_type. {pull}6691[6691]
 
 *Filebeat*
 
@@ -209,27 +388,20 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add Logstash module support for main log and the slow log, support the plain text or structured JSON format {pull}5481[5481]
 - Add stream filtering when using `docker` prospector. {pull}6057[6057]
 - Add support for CRI logs format. {issue}5630[5630]
-- Add json.ignore_decoding_error config to not log json decoding errors. {issue}6547[6547]
+- Add json.ignore_decoding_error config to not log json decoding erors. {issue}6547[6547]
 - Make registry file permission configurable. {pull}6455[6455]
 - Add MongoDB module. {pull}6283[6238]
 - Add Ingest pipeline loading to setup. {pull}6814[6814]
 - Add support of log_format combined to NGINX access logs. {pull}6858[6858]
-- Release config reloading feature as GA. {pull}6891[6891]
+- Release config reloading feature as GA.
 - Add support human friendly size for the UDP input. {pull}6886[6886]
 - Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
-- Support MySQL 5.7.19 by mysql/slowlog {pull}6969[6969]
-- Correctly join partial log lines when using `docker` input. {pull}6967[6967]
-- Add support for TLS with client authentication to the TCP input {pull}7056[7056]
-- Converted part of pipeline from treafik/access metricSet to dissect to improve efficiency. {pull}7209[7209]
-- Add GC fileset to the Elasticsearch module. {pull}7305[7305]
-- Add Audit log fileset to the Elasticsearch module. {pull}7365[7365]
-- Add Slow log fileset to the Elasticsearch module. {pull}7473[7473]
-- Add deprecation fileset to the Elasticsearch module. {pull}7474[7474]
-- Add `config_timezone` option to Kafka module to convert dates to UTC. {issue}7546[7546] {pull}7578[7578]
-- Add patterns for kafka 1.1 logs. {pull}7608[7608]
-- Move debug messages in tcp input source {pull}7712[7712]
+- Remove the undefined `username` option from the Redis input and clarify the documentation. {pull}6662[6662]
 
 *Heartbeat*
+
+- Made the URL field of Heartbeat aggregateable. {pull}6263[6263]
+- Use `match.Matcher` for checking Heartbeat response bodies with regular expressions. {pull}6539[6539]
 
 *Metricbeat*
 
@@ -297,34 +469,8 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add accumulated I/O stats to diskio in the line of `docker stats`. {pull}6701[6701]
 - Ignore virtual filesystem types by default in system module. {pull}6819[6819]
 - Release config reloading feature as GA. {pull}6891[6891]
-- Add experimental Elasticsearch index metricset. {pull}6881[6881]
-- Add dashboards and visualizations for haproxy metrics. {pull}6934[6934]
-- Add Jolokia agent in proxy mode. {pull}6475[6475]
-- Add message rates to the RabbitMQ queue metricset {issue}6442[6442] {pull}6606[6606]
-- Add exchanges metricset to the RabbitMQ module {issue}6442[6442] {pull}6607[6607]
-- Add Elasticsearch index_summary metricset. {pull}6918[6918]
-- Add config option `management_path_prefix` for RabbitMQ module to configure management plugin path prefix {issue}6875[6875] {pull}7074[7074]
-- Add shard metricset to Elasticsearch module. {pull}7006[7006]
-- Add apiserver metricset to Kubernetes module. {pull}7059[7059]
-- Add maxmemory to redis info metricset. {pull}7127[7127]
-- Set guest as default user in RabbitMQ module. {pull}7107[7107]
-- Add postgresql statement metricset. {issue}7048[7048] {pull}7060[7060]
-- Update `state_container` metricset to support latest `kube-state-metrics` version. {pull}7216[7216]
-- Collect accumulated docker network metrics and mark old ones as deprecated. {pull}7253[7253]
-- Add TLS support to MongoDB module. {pull}7401[7401]
-- Added Traefik module with health metricset. {pull}7413[7413]
-- Add Elasticsearch ml_job metricsets. {pull}7196[7196]
-- Add support for bearer token files to HTTP helper. {pull}7527[7527]
-- Add Elasticsearch index recovery metricset. {pull}7225[7225]
-- Add `locks`, `global_locks`, `oplatencies` and `process` fields to `status` metricset of MongoDB module. {pull}7613[7613]
-- Run Kafka integration tests on version 1.1.0 {pull}7616[7616]
-- Release raid and socket metricset from system module as GA. {pull}7658[7658]
-- Release elasticsearch module and all its metricsets as beta. {pull}7662[7662]
-- Release munin and traefik module as beta. {pull}7660[7660]
-- Add envoyproxy module. {pull}7569[7569]
-- Release prometheus collector metricset as GA. {pull}7660[7660]
-- Add Elasticsearch `cluster_stats` metricset. {pull}7638[7638]
-- Added `basepath` setting for HTTP-based metricsets {pull}7700[7700]
+- Kubernetes deployment: Add ServiceAccount config to system metricbeat. {pull}6824[6824]
+- Kubernetes deployment: Add DNS Policy to system metricbeat. {pull}6656[6656]
 
 *Packetbeat*
 
@@ -332,36 +478,10 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix high memory usage on HTTP body if body is not published. {pull}6680[6680]
 - Allow to capture the HTTP request or response bodies independently. {pull}6784[6784]
 - HTTP publishes an Error event for unmatched requests or responses. {pull}6794[6794]
-- The process monitor now reports the command-line for all processes, under Linux and Windows. {pull}7135[7135]
-- Updated the TLS protocol parser with new cipher suites added to TLS 1.3. {issue}7455[7455]
-- Flows are enriched with process information using the process monitor. {pull}7507[7507]
-- Added UDP support to process monitor. {pull}7571[7571]
 
 *Winlogbeat*
 
 - Use bookmarks to persist the last published event. {pull}6150[6150]
-
-==== Deprecated
-
-*Affecting all Beats*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Metricbeat*
-
-- Kubernetes `state_container` `cpu.limit.nanocores` and `cpu.request.nanocores` have been
-deprecated in favor of `cpu.*.cores`. {pull}6916[6916]
-
-*Packetbeat*
-
-*Winlogbeat*
-
-==== Known Issue
-
-
-////////////////////////////////////////////////////////////
 
 [[release-notes-6.2.3]]
 === Beats version 6.2.3
