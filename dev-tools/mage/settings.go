@@ -47,11 +47,13 @@ const (
 
 // Common settings with defaults derived from files, CWD, and environment.
 var (
-	GOOS      = build.Default.GOOS
-	GOARCH    = build.Default.GOARCH
-	GOARM     = EnvOr("GOARM", "")
-	Platform  = MakePlatformAttributes(GOOS, GOARCH, GOARM)
-	BinaryExt = ""
+	GOOS         = build.Default.GOOS
+	GOARCH       = build.Default.GOARCH
+	GOARM        = EnvOr("GOARM", "")
+	Platform     = MakePlatformAttributes(GOOS, GOARCH, GOARM)
+	BinaryExt    = ""
+	RaceDetector = false
+	TestCoverage = false
 
 	BeatName        = EnvOr("BEAT_NAME", filepath.Base(CWD()))
 	BeatServiceName = EnvOr("BEAT_SERVICE_NAME", BeatName)
@@ -82,9 +84,19 @@ func init() {
 	}
 
 	var err error
+	RaceDetector, err = strconv.ParseBool(EnvOr("RACE_DETECTOR", "false"))
+	if err != nil {
+		panic(errors.Wrap(err, "failed to parse RACE_DETECTOR env value"))
+	}
+
+	TestCoverage, err = strconv.ParseBool(EnvOr("TEST_COVERAGE", "false"))
+	if err != nil {
+		panic(errors.Wrap(err, "failed to parse TEST_COVERAGE env value"))
+	}
+
 	Snapshot, err = strconv.ParseBool(EnvOr("SNAPSHOT", "false"))
 	if err != nil {
-		panic(errors.Errorf("failed to parse SNAPSHOT value", err))
+		panic(errors.Errorf("failed to parse SNAPSHOT env value", err))
 	}
 }
 
