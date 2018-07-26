@@ -26,7 +26,6 @@ import (
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/kibana"
 )
 
 var (
@@ -116,15 +115,15 @@ func statsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string
 
 	process, ok := data["process"].(map[string]interface{})
 	if !ok {
-		return "", nil, kibana.ReportErrorForMissingField("process", r)
+		return "", nil, elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
 	}
 	memory, ok := process["memory"].(map[string]interface{})
 	if !ok {
-		return "", nil, kibana.ReportErrorForMissingField("process.memory", r)
+		return "", nil, elastic.ReportErrorForMissingField("process.memory", elastic.Kibana, r)
 	}
 	rss, ok := memory["resident_set_size_bytes"].(float64)
 	if !ok {
-		return "", nil, kibana.ReportErrorForMissingField("process.memory.resident_set_size_bytes", r)
+		return "", nil, elastic.ReportErrorForMissingField("process.memory.resident_set_size_bytes", elastic.Kibana, r)
 	}
 	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int64(rss))
 
@@ -143,7 +142,7 @@ func statsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string
 func settingsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string, common.MapStr, error) {
 	kibanaSettingsFields, ok := data["settings"]
 	if !ok {
-		return "", nil, kibana.ReportErrorForMissingField("settiings", r)
+		return "", nil, elastic.ReportErrorForMissingField("settings", elastic.Kibana, r)
 	}
 
 	return "kibana_settings", kibanaSettingsFields.(map[string]interface{}), nil
