@@ -29,7 +29,7 @@ import (
 )
 
 // Syscalls
-//sys   _GetNativeSystemInfo(systemInfo *SystemInfo) (err error) = kernel32.GetNativeSystemInfo
+//sys   _GetNativeSystemInfo(systemInfo *SystemInfo) = kernel32.GetNativeSystemInfo
 //sys   _GetTickCount64() (millis uint64, err error) = kernel32.GetTickCount64
 //sys   _GetSystemTimes(idleTime *syscall.Filetime, kernelTime *syscall.Filetime, userTime *syscall.Filetime) (err error) = kernel32.GetSystemTimes
 //sys   _GlobalMemoryStatusEx(buffer *MemoryStatusEx) (err error) = kernel32.GlobalMemoryStatusEx
@@ -133,9 +133,7 @@ type MemoryStatusEx struct {
 // https://msdn.microsoft.com/en-us/library/ms724340%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
 func GetNativeSystemInfo() (SystemInfo, error) {
 	var systemInfo SystemInfo
-	if err := _GetNativeSystemInfo(&systemInfo); err != nil {
-		return SystemInfo{}, errors.Wrap(err, "GetNativeSystemInfo failed")
-	}
+	_GetNativeSystemInfo(&systemInfo)
 	return systemInfo, nil
 }
 
