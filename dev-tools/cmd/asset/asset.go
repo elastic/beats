@@ -31,14 +31,16 @@ import (
 	"github.com/elastic/beats/libbeat/asset"
 )
 
-var pkg *string
-var input *string
-var output *string
+var (
+	pkg    string
+	input  string
+	output string
+)
 
 func init() {
-	pkg = flag.String("pkg", "", "Package name")
-	input = flag.String("in", "-", "Source of input. \"-\" means reading from stdin")
-	output = flag.String("out", "-", "Output path. \"-\" means writing to stdout")
+	flag.StringVar(&pkg, "pkg", "", "Package name")
+	flag.StringVar(&input, "in", "-", "Source of input. \"-\" means reading from stdin")
+	flag.StringVar(&output, "out", "-", "Output path. \"-\" means writing to stdout")
 }
 
 func main() {
@@ -50,7 +52,7 @@ func main() {
 		data           []byte
 		err            error
 	)
-	if *input == "-" {
+	if input == "-" {
 		if len(args) != 2 {
 			fmt.Fprintln(os.Stderr, "File path must be set")
 			os.Exit(1)
@@ -65,11 +67,11 @@ func main() {
 			os.Exit(1)
 		}
 	} else {
-		file = *input
+		file = input
 		beatName = args[0]
-		data, err = ioutil.ReadFile(*input)
+		data, err = ioutil.ReadFile(input)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Invalid file path: %s\n", *input)
+			fmt.Fprintf(os.Stderr, "Invalid file path: %s\n", input)
 			os.Exit(1)
 		}
 	}
@@ -85,7 +87,7 @@ func main() {
 		Beat:    beatName,
 		Name:    file,
 		Data:    encData,
-		Package: *pkg,
+		Package: pkg,
 	})
 
 	bs, err := format.Source(buf.Bytes())
@@ -93,9 +95,9 @@ func main() {
 		panic(err)
 	}
 
-	if *output == "-" {
+	if output == "-" {
 		os.Stdout.Write(bs)
 	} else {
-		ioutil.WriteFile(*output, bs, 0640)
+		ioutil.WriteFile(output, bs, 0640)
 	}
 }
