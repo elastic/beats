@@ -34,10 +34,6 @@ var Feature = queue.Feature("spool", create,
 		feature.Beta),
 )
 
-func init() {
-	queue.RegisterType("spool", create)
-}
-
 func create(eventer queue.Eventer, cfg *common.Config) (queue.Queue, error) {
 	cfgwarn.Beta("Spooling to disk is beta")
 

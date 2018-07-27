@@ -83,10 +83,6 @@ type chanList struct {
 	tail *ackChan
 }
 
-func init() {
-	queue.RegisterType("mem", create)
-}
-
 func create(eventer queue.Eventer, cfg *common.Config) (queue.Queue, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
