@@ -21,10 +21,12 @@ package consumergroup
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"testing"
+	"time"
 
-	"github.com/Shopify/sarama"
+	saramacluster "github.com/bsm/sarama-cluster"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -39,87 +41,27 @@ const (
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "kafka")
 
-	stop, err := startConsumer(t, "metricbeat-test")
+	c, err := startConsumer(t, "metricbeat-test")
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 	}
-	defer stop()
+	defer c.Close()
 
 	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err = mbtest.WriteEventsReporterV2(ms, t, "")
-	if err != nil {
-		t.Fatal("write", err)
+	for retries := 0; retries < 3; retries++ {
+		err = mbtest.WriteEventsReporterV2(ms, t, "")
+		if err == nil {
+			return
+		}
+		time.Sleep(500 * time.Millisecond)
 	}
+	t.Fatal("write", err)
 }
 
-func startConsumer(t *testing.T, topic string) (func(), error) {
-	config := sarama.NewConfig()
-	config.Version = sarama.V0_10_2_1
-	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
-	if err != nil {
-		t.Errorf("%s", err)
-		t.FailNow()
-	}
-
-	groupID := "test-group"
-	broker, err := client.Coordinator(groupID)
-	if err != nil {
-		return nil, errors.Wrap(err, "getting coordinator")
-	}
-
-	req := sarama.JoinGroupRequest{
-		GroupId:        groupID,
-		ProtocolType:   "consumer",
-		SessionTimeout: 30000, // milliseconds
-	}
-	strategy := "range"
-	err = req.AddGroupProtocolMetadata(strategy, &sarama.ConsumerGroupMemberMetadata{
-		Version: 1,
-		Topics:  []string{topic},
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "adding protocol metadata")
-	}
-	resp, err := broker.JoinGroup(&req)
-	if err != nil {
-		return nil, errors.Wrap(err, "joining consumer group")
-	}
-	if resp.Err != sarama.ErrNoError {
-		return nil, errors.Wrap(resp.Err, "joining consumer group, response error")
-	}
-	t.Logf("Joined consumer group %s with member ID %s", groupID, resp.MemberId)
-
-	consumer, err := sarama.NewConsumerFromClient(client)
-	if err != nil {
-		return nil, errors.Wrap(err, "new consumer")
-	}
-
-	partitions, err := consumer.Partitions(topic)
-	if err != nil {
-		consumer.Close()
-		return nil, err
-	}
-
-	consumerPartition, err := consumer.ConsumePartition(topic, partitions[0], sarama.OffsetNewest)
-	if err != nil {
-		consumer.Close()
-		return nil, err
-	}
-
-	cleanup := func() {
-		_, err := broker.LeaveGroup(&sarama.LeaveGroupRequest{
-			GroupId:  groupID,
-			MemberId: resp.MemberId,
-		})
-		if err != nil {
-			t.Log(errors.Wrap(err, "leaving group"))
-		}
-		broker.Close()
-		consumerPartition.Close()
-		consumer.Close()
-	}
-
-	return cleanup, nil
+func startConsumer(t *testing.T, topic string) (io.Closer, error) {
+	brokers := []string{getTestKafkaHost()}
+	topics := []string{topic}
+	return saramacluster.NewConsumer(brokers, "test-group", topics, nil)
 }
 
 func getConfig() map[string]interface{} {
