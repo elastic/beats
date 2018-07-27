@@ -55,7 +55,7 @@ func Export(client *http.Client, conn string, dashboard string, out string) erro
 
 	fullURL := makeURL(conn, exportAPI, params)
 	if !quiet {
-		fmt.Printf("Calling HTTP GET %v\n", fullURL)
+		log.Printf("Calling HTTP GET %v\n", fullURL)
 	}
 
 	req, err := http.NewRequest("GET", fullURL, nil)
@@ -102,7 +102,7 @@ func Export(client *http.Client, conn string, dashboard string, out string) erro
 
 	err = ioutil.WriteFile(out, []byte(data.StringToPrint()), 0666)
 	if !quiet {
-		fmt.Printf("The dashboard %s was exported under the %s file\n", dashboard, out)
+		log.Printf("The dashboard %s was exported under the %s file\n", dashboard, out)
 	}
 	return err
 }
@@ -133,11 +133,6 @@ func ReadManifest(file string) ([]map[string]string, error) {
 	return manifest.Dashboards, nil
 }
 
-func exitWithError(format string, a ...interface{}) {
-	log.SetFlags(0)
-	log.Fatalf("ERROR: "+format, a)
-}
-
 var indexPattern = false
 var quiet = false
 
@@ -150,6 +145,7 @@ func main() {
 	flag.BoolVar(&quiet, "quiet", false, "be quiet")
 
 	flag.Parse()
+	log.SetFlags(0)
 
 	transCfg := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
@@ -159,25 +155,25 @@ func main() {
 
 	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
 		flag.Usage()
-		exitWithError("Please specify a dashboard ID (-dashboard) or a manifest file (-yml)")
+		log.Fatalf("Please specify a dashboard ID (-dashboard) or a manifest file (-yml)")
 	}
 
 	if len(*ymlFile) > 0 {
 		dashboards, err := ReadManifest(*ymlFile)
 		if err != nil {
-			exitWithError("%s", err)
+			log.Fatalf("%s", err)
 		}
 
 		for _, dashboard := range dashboards {
-			fmt.Printf("id=%s, name=%s\n", dashboard["id"], dashboard["file"])
+			log.Printf("id=%s, name=%s\n", dashboard["id"], dashboard["file"])
 			directory := filepath.Join(filepath.Dir(*ymlFile), "_meta/kibana/6/dashboard")
 			err := os.MkdirAll(directory, 0755)
 			if err != nil {
-				exitWithError("fail to create directory %s: %v", directory, err)
+				log.Fatalf("fail to create directory %s: %v", directory, err)
 			}
 			err = Export(client, *kibanaURL, dashboard["id"], filepath.Join(directory, dashboard["file"]))
 			if err != nil {
-				exitWithError("fail to export the dashboards: %s", err)
+				log.Fatalf("fail to export the dashboards: %s", err)
 			}
 		}
 		os.Exit(0)
@@ -186,7 +182,7 @@ func main() {
 	if len(*dashboard) > 0 {
 		err := Export(client, *kibanaURL, *dashboard, *fileOutput)
 		if err != nil {
-			exitWithError("fail to export the dashboards: %s", err)
+			log.Fatalf("fail to export the dashboards: %s", err)
 		}
 	}
 }
