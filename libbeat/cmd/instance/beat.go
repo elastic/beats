@@ -81,6 +81,9 @@ import (
 
 	// Register default monitoring reporting
 	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
+
+	// Include default plugins
+	_ "github.com/elastic/beats/libbeat/include"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
