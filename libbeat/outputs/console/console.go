@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/codec"
@@ -48,9 +49,14 @@ type consoleEvent struct {
 	Fields interface{} `struct:",inline"`
 }
 
-func init() {
-	outputs.RegisterType("console", makeConsole)
-}
+// Feature expose the console output.
+var Feature = outputs.Feature("console",
+	makeConsole,
+	feature.NewDetails(
+		"Console",
+		"Send events to STDOUT.",
+		feature.Stable,
+	))
 
 func makeConsole(
 	beat beat.Info,
