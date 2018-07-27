@@ -50,7 +50,13 @@ type consoleEvent struct {
 }
 
 // Feature expose the console output.
-var Feature = outputs.Feature("console", makeConsole, feature.Stable)
+var Feature = outputs.Feature("console",
+	makeConsole,
+	feature.NewDetails(
+		"Console",
+		"Send events to STDOUT.",
+		feature.Stable,
+	))
 
 func makeConsole(
 	beat beat.Info,

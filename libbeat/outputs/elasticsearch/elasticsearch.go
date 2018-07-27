@@ -32,7 +32,13 @@ import (
 )
 
 // Feature expose the elasticsearch output.
-var Feature = outputs.Feature("elasticsearch", makeES, feature.Stable)
+var Feature = outputs.Feature("elasticsearch",
+	makeES,
+	feature.NewDetails(
+		"Elasticsearch",
+		"Send events to Elasticsearch.",
+		feature.Stable,
+	))
 
 var (
 	debugf = logp.MakeDebug("elasticsearch")

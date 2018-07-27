@@ -35,7 +35,13 @@ const (
 var debugf = logp.MakeDebug("logstash")
 
 // Feature exposes the logstash output.
-var Feature = outputs.Feature("logstash", makeLogstash, feature.Stable)
+var Feature = outputs.Feature("logstash",
+	makeLogstash,
+	feature.NewDetails(
+		"Logstash",
+		"Send events to Logstash.",
+		feature.Stable,
+	))
 
 func makeLogstash(
 	beat beat.Info,

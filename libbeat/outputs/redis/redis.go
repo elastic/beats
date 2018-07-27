@@ -44,7 +44,13 @@ const (
 )
 
 // Feature expose the redis output.
-var Feature = outputs.Feature("redis", makeRedis, feature.Stable)
+var Feature = outputs.Feature("redis",
+	makeRedis,
+	feature.NewDetails(
+		"Redis",
+		"Send events to Redis. ",
+		feature.Stable,
+	))
 
 func makeRedis(
 	beat beat.Info,

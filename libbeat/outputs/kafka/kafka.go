@@ -35,7 +35,13 @@ import (
 )
 
 // Feature exposes the kafka output.
-var Feature = outputs.Feature("kafka", makeKafka, feature.Stable)
+var Feature = outputs.Feature("kafka",
+	makeKafka,
+	feature.NewDetails(
+		"Kafka",
+		"Send events to Kafka.",
+		feature.Stable,
+	))
 
 type kafka struct {
 	config kafkaConfig

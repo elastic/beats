@@ -32,7 +32,13 @@ import (
 )
 
 // Feature expose the file output.
-var Feature = outputs.Feature("file", makeFileout, feature.Stable)
+var Feature = outputs.Feature("file",
+	makeFileout,
+	feature.NewDetails(
+		"File",
+		"Send events to a file.",
+		feature.Stable,
+	))
 
 type fileOutput struct {
 	beat     beat.Info

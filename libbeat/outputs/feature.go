@@ -43,9 +43,9 @@ type Group struct {
 	Retry     int
 }
 
-// RegisterType registers a new output type.
-func RegisterType(name string, f Factory) {
-	feature.MustRegister(Feature(name, f, feature.Undefined))
+// Plugin exposes the output as an external plugin.
+func Plugin(name string, f Factory) *feature.Feature {
+	return Feature(name, f, feature.NewDetails(name, "", feature.Undefined))
 }
 
 // FindFactory finds an output type its factory if available.
@@ -81,6 +81,6 @@ func Load(info beat.Info, stats Observer, name string, config *common.Config) (G
 }
 
 // Feature creates a new output.
-func Feature(name string, factory Factory, stability feature.Stability) *feature.Feature {
-	return feature.New(Namespace, name, factory, stability)
+func Feature(name string, factory Factory, description feature.Describer) *feature.Feature {
+	return feature.New(Namespace, name, factory, description)
 }
