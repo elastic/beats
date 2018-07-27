@@ -56,8 +56,8 @@ For more details about the `setup` command, run the following:
 
 [source,shell]
 -------------------------
-./metricbeat help setup   
-                                                                                                                                                             
+./metricbeat help setup
+
 This command does initial setup of the environment:
 
  * Index mapping template in Elasticsearch to ensure fields are mapped.
@@ -171,13 +171,13 @@ default is `metricbeat-*`, you can change it to `custombeat-*`.
 [[build-dashboards]]
 === Building Your Own Beat Dashboards
 
-NOTE: If you want to modify a dashboard that comes with a Beat, it's better to modify a copy of the dashboard because the Beat overwrites the dashboards during the setup phase in order to have the latest version. For duplicating a dashboard, just use the `Clone` button from the top of the page. 
+NOTE: If you want to modify a dashboard that comes with a Beat, it's better to modify a copy of the dashboard because the Beat overwrites the dashboards during the setup phase in order to have the latest version. For duplicating a dashboard, just use the `Clone` button from the top of the page.
 
 
 Before building your own dashboards or customizing the existing ones, you need to load:
 
 * the Beat index pattern, which specifies how Kibana should display the Beat fields
-* the Beat dashboards that you want to customize  
+* the Beat dashboards that you want to customize
 
 For the Elastic Beats, the index pattern is available in the Beat package under
 `kibana/*/index-pattern`. The index-pattern is automatically generated from the `fields.yml` file, available in the Beat package. For more details
@@ -209,7 +209,7 @@ make update
 
 To export all the dashboards for any Elastic Beat or any community Beat, including any new or modified dashboards and all dependencies such as
 visualizations, searches, you can use the Golang script `export_dashboards.go` from
-https://github.com/elastic/beats/tree/master/dev-tools/cmd/dashboards[dev-tools] for exporting Kibana 6.0 dashboards or later, and the Python script `export_5x_dashboards.py` 
+https://github.com/elastic/beats/tree/master/dev-tools/cmd/dashboards[dev-tools] for exporting Kibana 6.0 dashboards or later, and the Python script `export_5x_dashboards.py`
 for exporting Kibana 5.x dashboards. See the dev-tools
 https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.
 
@@ -234,7 +234,7 @@ ES_URL="http://192.168.3.206:9200" make export-dashboards
 
 ==== Exporting Kibana 6.0 dashboards and newer
 
-The `dev-tools/cmd/export_dashboards.go` script helps you export your customized Kibana 6.0 dashboards and newer. You might need to export a single dashboard or all the dashboards available for a module or Beat. 
+The `dev-tools/cmd/export_dashboards.go` script helps you export your customized Kibana 6.0 dashboards and newer. You might need to export a single dashboard or all the dashboards available for a module or Beat.
 
 
 ===== Export a single Kibana dashboard
@@ -247,15 +247,15 @@ NOTE: The dashboard ID is available in the dashboard URL. For example, in case t
 [source,shell]
 ---------------
 cd filebeat/module/redis/_meta/kibana/default/dashboard
-go run ../../../../../../../dev-tools/cmd/dashboards/export_dashboards.go -dashboard 7fea2930-478e-11e7-b1f0-cb29bac6bf8b -output Filebeat-redis.json
+go run ../../../../../../../dev-tools/cmd/dashboards/export_dashboards.go -id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b -output Filebeat-redis.json
 ---------------
 
-This generates the `Filebeat-redis.json` file that contains the dashboard for the Redis module of Filebeat, including the dependencies (visualizations and searches). 
+This generates the `Filebeat-redis.json` file that contains the dashboard for the Redis module of Filebeat, including the dependencies (visualizations and searches).
 
 ===== Export all module/Beat dashboards
- 
-Each module should contain a `module.yml` file with a list of all the dashboards available for the module. For the Beats that don't have support for modules (e.g. Packetbeat), 
-there is a `dashboards.yml` file that defines all the Packetbeat dashboards. 
+
+Each module should contain a `module.yml` file with a list of all the dashboards available for the module. For the Beats that don't have support for modules (e.g. Packetbeat),
+there is a `dashboards.yml` file that defines all the Packetbeat dashboards.
 
 Below, it's an example of the `module.yml` file for the system module in Metricbeat:
 
@@ -273,7 +273,7 @@ dashboards:
 ---------------
 
 
-Each dashboard is defined by an `id` and the name of json `file` where the dashboard is saved locally. 
+Each dashboard is defined by an `id` and the name of json `file` where the dashboard is saved locally.
 
 By passing the yml file to the `export_dashboards.go` script, you can export all the dashboards defined:
 
