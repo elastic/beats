@@ -2,22 +2,40 @@
 [id="running-{modulename}-modules"]
 === Set up and run the module
 
-IMPORTANT: If you’ve secured Elasticsearch and Kibana, you need to configure the
-`username` and `password` options in the Elasticsearch output before setting up
-and running the module. See
-<<elasticsearch-output,Configure the Elasticsearch output>>.
+// REVIEWERS: Should we include docker commands here, too?
 
-Before doing these steps, verify that Elasticsearch and Kibana are running and
-that Elasticsearch is ready to receive data from {beatname_uc}.
+IMPORTANT: If you’ve secured {es} and {kib}, you need to configure the
+`username` and `password` options in the {es} output before setting up
+and running the module. See
+<<elasticsearch-output,Configure the {es} output>>.
+
+Before doing these steps, verify that {es} and {kib} are running and
+that {es} is ready to receive data from {beatname_uc}.
 
 To set up and run the module:
 
 . Enable the module:
 +
+*deb and rpm:*
++
 ["source","sh",subs="attributes"]
-----------------------------------------------------------------------
+----
+{beatname_lc} modules enable {modulename}
+----
++
+*mac:*
++
+["source","sh",subs="attributes"]
+----
 ./{beatname_lc} modules enable {modulename}
-----------------------------------------------------------------------
+----
++
+*win:*
++
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe modules enable {modulename}
+----
 +
 The <<modules-command,`modules enable`>> command enables the +{modulename}+
 config defined in the `modules.d` directory. See
@@ -25,31 +43,78 @@ config defined in the `modules.d` directory. See
 +
 To see a list of enabled and disabled modules, run:
 +
+*deb and rpm:*
++
 ["source","sh",subs="attributes"]
------
+----
+{beatname_lc} modules list
+----
++
+*mac:*
++
+["source","sh",subs="attributes"]
+----
 ./{beatname_lc} modules list
------
-
+----
++
+*win:*
++
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe modules list
+----
 
 . Set up the initial environment:
 +
+*deb and rpm:*
++
 ["source","sh",subs="attributes"]
-----------------------------------------------------------------------
+----
+{beatname_lc} setup -e
+----
++
+*mac:*
++
+["source","sh",subs="attributes"]
+----
 ./{beatname_lc} setup -e
-----------------------------------------------------------------------
+----
++
+*win:*
++
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe setup -e
+----
 +
 The <<setup-command,`setup`>> command loads the recommended index template for
-writing to Elasticsearch and deploys the sample dashboards for visualizing the
-data in Kibana. This is a one-time setup step. 
+writing to {es} and deploys the sample dashboards for visualizing the
+data in {kib}. This is a one-time setup step. 
 +
 The `-e` flag is optional and sends output to standard error instead of syslog.
 
 . Run {beatname_uc}:
 +
+*deb and rpm:*
++
 ["source","sh",subs="attributes"]
------
+----
+service {beatname_lc} start
+----
++
+*mac:*
++
+["source","sh",subs="attributes"]
+----
 ./{beatname_lc} -e
------
+----
++
+*win:*
++
+["source","sh",subs="attributes"]
+----
+PS > Start-Service {beatname_lc}
+----
 +
 If the module is configured correctly, you'll see
 `INFO Harvester started` messages for each file specified in the config.
@@ -64,14 +129,15 @@ See {libbeat}/config-file-permissions.html[Config File Ownership and Permissions
 in the _Beats Platform Reference_ if you encounter errors related to file
 ownership or permissions. 
 
-. Explore your data in Kibana:
-.. Open your browser and navigate to the *Dashboard* overview in Kibana:
+. Explore your data in {kib}:
+.. Open your browser and navigate to the *Dashboard* overview in {kib}:
 http://localhost:5601/app/kibana#/dashboards[http://localhost:5601/app/kibana#/dashboards].
-Replace `localhost` with the name of the Kibana host.
-.. If security is enabled, log in with the Kibana username and password that you
-used when you set up security.
+Replace `localhost` with the name of the {kib} host. If you're using an
+https://cloud.elastic.co/[Elastic Cloud] instance, log in to your cloud account,
+then navigate to the {kib} endpoint in your deployment.
+.. If necessary, log in with your {kib} username and password.
 .. Enter *{modulename}* in the search box, then open a dashboard and explore
 the visualizations for your parsed logs.
 +
-TIP: If you don’t see data in Kibana, try changing the date range to a larger
-range. By default, Kibana shows the last 15 minutes.
+TIP: If you don’t see data in {kib}, try changing the date range to a larger
+range. By default, {kib} shows the last 15 minutes.

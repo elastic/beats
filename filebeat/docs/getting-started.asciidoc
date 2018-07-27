@@ -130,11 +130,9 @@ endif::[]
 === Step 2: Configure Filebeat
 
 TIP: <<filebeat-modules-overview,Filebeat modules>> provide the fastest getting
-started experience for common log formats. See <<filebeat-modules-quickstart>>
-to learn how to get started with modules. If you use Filebeat modules to get
-started, you can skip the content in this section, including the remaining
-getting started steps, and go directly to the <<filebeat-modules-quickstart>>
-page.
+started experience for common log formats. If you want use Filebeat modules,
+skip this section, including the remaining getting started steps, and go
+directly to <<filebeat-modules-quickstart>>.
 
 include::../../libbeat/docs/shared-configuring.asciidoc[]
 
@@ -175,17 +173,7 @@ To fetch all files from a predefined level of subdirectories, the following patt
 fetch log files from the `/var/log` folder itself. Currently it is not possible to recursively
 fetch all files in all subdirectories of a directory.
 
-. If you are sending output directly to Elasticsearch (and not using Logstash),
-set the IP address and port where Filebeat can find the Elasticsearch installation:
-+
-[source,yaml]
-----------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["192.168.1.42:9200"]
-----------------------------------------------------------------------
-+
-If you are sending output to Logstash, make sure you
-configure the Logstash output in <<config-filebeat-logstash>>.
+include::../../libbeat/docs/step-configure-output.asciidoc[]
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
