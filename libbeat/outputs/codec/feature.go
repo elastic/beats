@@ -22,23 +22,40 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 )
 
+// Namespace exposes the namespace of the codec to the registry.
+var Namespace = "libbeat.output.codec"
+
+// Factory is the function type returned by the global registry.
 type Factory func(beat.Info, *common.Config) (Codec, error)
 
+// Config codec configuration.
 type Config struct {
 	Namespace common.ConfigNamespace `config:",inline"`
 }
 
-var codecs = map[string]Factory{}
-
-func RegisterType(name string, gen Factory) {
-	if _, exists := codecs[name]; exists {
-		panic(fmt.Sprintf("output codec '%v' already registered ", name))
-	}
-	codecs[name] = gen
+// Plugin accepts a codec to be registered as a plugin.
+func Plugin(name string, f Factory) *feature.Feature {
+	return Feature(name, f, feature.NewDetails(name, "", feature.Undefined))
 }
 
+// FindFactory find, assert and return the factory to create a specific codec.
+func FindFactory(name string) (Factory, error) {
+	f, err := feature.Registry.Lookup(Namespace, name)
+	if err != nil {
+		return nil, err
+	}
+
+	factory, ok := f.Factory().(Factory)
+	if !ok {
+		return nil, fmt.Errorf("invalid codec type, received: %T", f.Factory())
+	}
+	return factory, nil
+}
+
+// CreateEncoder creates a new encoder from the provided configuration.
 func CreateEncoder(info beat.Info, cfg Config) (Codec, error) {
 	// default to json codec
 	codec := "json"
@@ -46,9 +63,14 @@ func CreateEncoder(info beat.Info, cfg Config) (Codec, error) {
 		codec = name
 	}
 
-	factory := codecs[codec]
-	if factory == nil {
-		return nil, fmt.Errorf("'%v' output codec is not available", codec)
+	factory, err := FindFactory(codec)
+	if err != nil {
+		return nil, err
 	}
 	return factory(info, cfg.Namespace.Config())
+}
+
+// Feature creates a new codec.
+func Feature(name string, f Factory, description feature.Describer) *feature.Feature {
+	return feature.New(Namespace, name, f, description)
 }

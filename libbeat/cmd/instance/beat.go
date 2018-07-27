@@ -82,7 +82,7 @@ import (
 	// Register default monitoring reporting
 	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
 
-	// Include default plugins
+	// Register features
 	_ "github.com/elastic/beats/libbeat/include"
 )
 
