@@ -48,7 +48,13 @@ const (
 var debugf = logp.MakeDebug("filters")
 
 // Feature exposes add_cloud_metadata.
-var Feature = processors.Feature("add_cloud_metadata", newCloudMetadata, feature.Stable)
+var (
+	Feature = processors.Feature("add_cloud_metadata", newCloudMetadata, feature.NewDetails(
+		"Add cloud metadata",
+		"Add metadata to the event from the cloud environment.",
+		feature.Stable,
+	))
+)
 
 type schemaConv func(m map[string]interface{}) common.MapStr
 

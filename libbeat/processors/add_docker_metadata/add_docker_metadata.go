@@ -48,7 +48,13 @@ const (
 var processCgroupPaths = cgroup.ProcessCgroupPaths
 
 // Feature expose new add_docker_metadata.
-var Feature = processors.Feature(processorName, newDockerMetadataProcessor, feature.Stable)
+var Feature = processors.Feature(processorName, newDockerMetadataProcessor,
+	feature.NewDetails(
+		"Add docker metadata",
+		"Add metadata to the event from the running docker container.",
+		feature.Stable,
+	),
+)
 
 type addDockerMetadata struct {
 	log             *logp.Logger

@@ -41,7 +41,13 @@ const (
 )
 
 // Feature exposes add_host_metadata.
-var Feature = processors.Feature(processorName, newHostMetadataProcessor, feature.Stable)
+var Feature = processors.Feature(processorName,
+	newHostMetadataProcessor,
+	feature.NewDetails(
+		"Add host metadata",
+		"Add metadata to the event from the running host.",
+		feature.Stable,
+	))
 
 type addHostMetadata struct {
 	info       types.HostInfo

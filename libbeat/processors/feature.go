@@ -27,17 +27,17 @@ import (
 // Namespace exposes the processor type.
 var Namespace = "libbeat.processor"
 
-type processorPlugin struct {
-	name   string
-	constr Constructor
+// Plugin exposes the processor as an external plugin.
+func Plugin(name string, c Constructor) *feature.Feature {
+	return Feature(name, c, feature.NewDetails(name, "", feature.Undefined))
 }
 
 // Constructor is the factory method to create a new processor.
 type Constructor func(config *common.Config) (Processor, error)
 
 // Feature define a new feature.
-func Feature(name string, factory Constructor, stability feature.Stability) *feature.Feature {
-	return feature.New(Namespace, name, factory, stability)
+func Feature(name string, factory Constructor, description feature.Describer) *feature.Feature {
+	return feature.New(Namespace, name, factory, description)
 }
 
 // Find returns the processor factory and wrap it into a NewConditonal.

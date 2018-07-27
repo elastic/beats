@@ -28,7 +28,13 @@ type dropEvent struct{}
 
 // DropEventFeature exposes the drop event processor.
 var DropEventFeature = processors.Feature("drop_event",
-	configChecked(newDropEvent, allowedFields("when")), feature.Stable)
+	configChecked(newDropEvent, allowedFields("when")),
+	feature.NewDetails(
+		"Drop Event",
+		"Drop an event based on a condition.",
+		feature.Stable,
+	),
+)
 
 var dropEventsSingleton = (*dropEvent)(nil)
 

@@ -49,7 +49,13 @@ var timezoneFormats = map[TimezoneFormat]string{
 }
 
 // Feature exposes add_locale.
-var Feature = processors.Feature("add_locale", newAddLocale, feature.Stable)
+var Feature = processors.Feature("add_locale",
+	newAddLocale,
+	feature.NewDetails(
+		"Add locale",
+		"Add the system locale to the event.",
+		feature.Stable,
+	))
 
 func (t TimezoneFormat) String() string {
 	return timezoneFormats[t]

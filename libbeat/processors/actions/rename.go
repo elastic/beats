@@ -47,7 +47,13 @@ type fromTo struct {
 // RenameFeature expose the feature.
 var RenameFeature = processors.Feature("rename",
 	configChecked(newRenameFields,
-		requireFields("fields")), feature.Stable)
+		requireFields("fields")),
+	feature.NewDetails(
+		"Rename",
+		"Rename a field.",
+		feature.Stable,
+	),
+)
 
 func newRenameFields(c *common.Config) (processors.Processor, error) {
 	config := renameFieldsConfig{

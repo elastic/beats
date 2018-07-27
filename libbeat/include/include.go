@@ -40,6 +40,7 @@ var Bundle = feature.MustBundle(
 
 	// Processors
 	feature.MustBundle(actions.Bundle,
+		actions.Bundle,
 		add_cloud_metadata.Feature,
 		add_docker_metadata.Feature,
 		add_host_metadata.Feature,

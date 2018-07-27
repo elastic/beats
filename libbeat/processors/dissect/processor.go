@@ -33,7 +33,13 @@ type processor struct {
 }
 
 // Feature exposes dissect.
-var Feature = processors.Feature("dissect", newProcessor, feature.Stable)
+var Feature = processors.Feature("dissect",
+	newProcessor,
+	feature.NewDetails(
+		"Dissect",
+		"Tokenize a string based on a dissect pattern.",
+		feature.Stable,
+	))
 
 func newProcessor(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig

@@ -37,7 +37,11 @@ type includeFields struct {
 var IncludeFieldsFeature = processors.Feature("include_fields",
 	configChecked(newIncludeFields,
 		requireFields("fields"),
-		allowedFields("fields", "when")), feature.Stable)
+		allowedFields("fields", "when")), feature.NewDetails(
+		"Include fields",
+		"Define which fields to include in the event based on a condition.",
+		feature.Stable,
+	))
 
 func newIncludeFields(c *common.Config) (processors.Processor, error) {
 	config := struct {

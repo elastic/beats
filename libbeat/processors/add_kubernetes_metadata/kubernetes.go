@@ -42,7 +42,13 @@ type kubernetesAnnotator struct {
 }
 
 // Feature exposes add_kubernetes_metadata.
-var Feature = processors.Feature("add_kubernetes_metadata", newKubernetesAnnotator, feature.Stable)
+var Feature = processors.Feature("add_kubernetes_metadata",
+	newKubernetesAnnotator,
+	feature.NewDetails(
+		"Add kubernetes metadata",
+		"Add metadata to the event from Kubernetes.",
+		feature.Stable,
+	))
 
 func init() {
 	// Register default indexers

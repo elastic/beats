@@ -62,7 +62,12 @@ var DecodeJSONFieldsFeature = processors.Feature("decode_json_fields",
 	configChecked(newDecodeJSONFields,
 		requireFields("fields"),
 		allowedFields("fields", "max_depth", "overwrite_keys", "process_array", "target", "when")),
-	feature.Stable)
+	feature.NewDetails(
+		"Decode JSON Fields",
+		"Decode JSON encoded data from a specific field.",
+		feature.Stable,
+	),
+)
 
 func newDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig
