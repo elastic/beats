@@ -144,9 +144,14 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error 
 	}
 	kibanaStatsFields.Put("usage", usage)
 
+	clusterUUID, ok := data["clusterUuid"].(string)
+	if !ok {
+		return elastic.ReportErrorForMissingField("clusterUuid", elastic.Kibana, r)
+	}
+
 	var event mb.Event
 	event.RootFields = common.MapStr{
-		"cluster_uuid": data["cluster_uuid"].(string),
+		"cluster_uuid": clusterUUID,
 		"timestamp":    timestamp,
 		"interval_ms":  intervalMs,
 		"type":         "kibana_stats",
