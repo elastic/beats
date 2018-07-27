@@ -201,7 +201,7 @@ integration-tests-environment: prepare-tests build-image
 # Runs the system tests
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
-system-tests: prepare-tests ${BEAT_NAME}.test python-env ${ES_BEATS}/dev-tools/cmd/dashboards/export_dashboards
+system-tests: prepare-tests ${BEAT_NAME}.test python-env
 	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} nosetests ${PYTHON_TEST_FILES} ${NOSETESTS_OPTIONS}
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
@@ -307,17 +307,14 @@ coverage-report:
 
 .PHONY: fields
 fields: mage
-	mage -v fields
-
-.PHONY: libbeat_fields
-libbeat_fields:
-	@$(MAKE) -C ${ES_BEATS}/libbeat fields
+	@mage fields
 
 .PHONY: update
 update: ## @build Update expects the most recent version of libbeat in the GOPATH
-update: python-env libbeat_fields collect
+update: python-env fields collect
 	@echo "Updating generated files for ${BEAT_NAME}"
 
+	@mkdir -p _meta
 	@# Update config files.
 	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.yml
 	@chmod 0640 ${BEAT_NAME}.yml
@@ -335,7 +332,7 @@ endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include fields.yml $(BEAT_NAME) > include/fields.go
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME) 
 endif
 
 	@# Update docs
@@ -364,9 +361,6 @@ docs-preview:  ## @build Preview the documents for the beat in the browser
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200
 KIBANA_URL?=http://localhost:5601
-
-${ES_BEATS}/dev-tools/cmd/dashboards/export_dashboards:
-	$(MAKE) -C ${ES_BEATS}/dev-tools/cmd/dashboards export_dashboards
 
 .PHONY: import-dashboards
 import-dashboards: update ${BEAT_NAME}

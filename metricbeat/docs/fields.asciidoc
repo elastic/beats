@@ -9686,6 +9686,26 @@ Number of objects removed from the cache to free up memory for new items because
 
 --
 
+*`memcached.stats.bytes.current`*::
++
+--
+type: long
+
+Number of bytes currently used for caching items.
+
+
+--
+
+*`memcached.stats.bytes.limit`*::
++
+--
+type: long
+
+Number of bytes this server is allowed to use for storage.
+
+
+--
+
 [[exported-fields-mongodb]]
 == MongoDB fields
 

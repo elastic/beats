@@ -103,7 +103,11 @@ func (r *reader) consumeEvents(done <-chan struct{}) {
 
 			r.eventC <- e
 		case err := <-r.watcher.ErrorChannel():
-			r.log.Warnw("fsnotify watcher error", "error", err)
+			// a bug in fsnotify can cause spurious nil errors to be sent
+			// on the error channel.
+			if err != nil {
+				r.log.Warnw("fsnotify watcher error", "error", err)
+			}
 		}
 	}
 }

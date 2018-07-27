@@ -27,7 +27,12 @@ import (
 )
 
 // Feature exposes a spooling to disk queue.
-var Feature = queue.Feature("spool", create, feature.Beta)
+var Feature = queue.Feature("spool", create,
+	feature.NewDetails(
+		"Memory queue",
+		"Buffer events in memory before sending to the output.",
+		feature.Beta),
+)
 
 func init() {
 	queue.RegisterType("spool", create)

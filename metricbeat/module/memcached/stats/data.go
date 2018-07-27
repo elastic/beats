@@ -52,5 +52,9 @@ var (
 			"total":   c.Int("total_items"),
 		},
 		"evictions": c.Int("evictions"),
+		"bytes": s.Object{
+			"current": c.Int("bytes"),
+			"limit":   c.Int("limit_maxbytes"),
+		},
 	}
 )
