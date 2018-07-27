@@ -546,3 +546,8 @@
           type: long
           description: >
             Number of keys that were skipped by the active defragmentation process
+    - name: slowlog.count
+      type: long
+      description: >
+        Count of slow operations
+

@@ -9686,26 +9686,6 @@ Number of objects removed from the cache to free up memory for new items because
 
 --
 
-*`memcached.stats.bytes.current`*::
-+
---
-type: long
-
-Number of bytes currently used for caching items.
-
-
---
-
-*`memcached.stats.bytes.limit`*::
-+
---
-type: long
-
-Number of bytes this server is allowed to use for storage.
-
-
---
-
 [[exported-fields-mongodb]]
 == MongoDB fields
 
@@ -14597,7 +14577,7 @@ Redis memory stats.
 --
 type: long
 
-format: bytes Total number of bytes allocated by Redis.
+format: bytes Used memory.
 
 
 
@@ -14610,7 +14590,7 @@ type: long
 
 format: bytes
 
-Number of bytes that Redis allocated as seen by the operating system (a.k.a resident set size).
+Used memory rss.
 
 
 --
@@ -14622,7 +14602,7 @@ type: long
 
 format: bytes
 
-Peak memory consumed by Redis.
+Used memory peak.
 
 
 --
@@ -14634,19 +14614,7 @@ type: long
 
 format: bytes
 
-Used memory by the Lua engine.        
-
-
---
-
-*`redis.info.memory.used.dataset`*::
-+
---
-type: long
-
-format: bytes
-
-The size in bytes of the dataset 
+Used memory lua.
 
 
 --
@@ -14670,37 +14638,6 @@ type: keyword
 
 Eviction policy to use when memory limit is reached.
 
-
---
-
-*`redis.info.memory.fragmentation.ratio`*::
-+
---
-type: float
-
-Ratio between used_memory_rss and used_memory
-
-
---
-
-*`redis.info.memory.fragmentation.bytes`*::
-+
---
-type: bytes
-
-Bytes between used_memory_rss and used_memory
-
-
---
-
-*`redis.info.memory.active_defrag.is_running`*::
-+
---
-type: boolean
-
-Flag indicating if active defragmentation is active
-
-
 --
 
 *`redis.info.memory.allocator`*::
@@ -14709,87 +14646,6 @@ Flag indicating if active defragmentation is active
 type: keyword
 
 Memory allocator.
-
-
---
-
-
-*`redis.info.memory.allocator_stats.allocated`*::
-+
---
-type: long
-
-format: bytes
-
-Allocated memory
-
-
---
-
-*`redis.info.memory.allocator_stats.active`*::
-+
---
-type: long
-
-format: bytes
-
-Active memeory
-
-
---
-
-*`redis.info.memory.allocator_stats.resident`*::
-+
---
-type: long
-
-format: bytes
-
-Resident memory
-
-
---
-
-*`redis.info.memory.allocator_stats.fragmentation.ratio`*::
-+
---
-type: float
-
-Fragmentation ratio
-
-
---
-
-*`redis.info.memory.allocator_stats.fragmentation.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-Fragmented bytes
-
-
---
-
-*`redis.info.memory.allocator_stats.rss.ratio`*::
-+
---
-type: float
-
-Resident ratio
-
-
---
-
-*`redis.info.memory.allocator_stats.rss.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-Resident bytes
 
 
 --
@@ -14806,16 +14662,14 @@ Redis CPU stats.
 --
 type: boolean
 
-Flag indicating if the load of a dump file is on-going
-
+None
 
 --
 
 [float]
 == rdb fields
 
-Provides information about RDB persistence
-
+None
 
 
 *`redis.info.persistence.rdb.last_save.changes_since`*::
@@ -14823,18 +14677,7 @@ Provides information about RDB persistence
 --
 type: long
 
-Number of changes since the last dump
-
-
---
-
-*`redis.info.persistence.rdb.last_save.time`*::
-+
---
-type: long
-
-Epoch-based timestamp of last successful RDB save
-
+None
 
 --
 
@@ -14843,8 +14686,16 @@ Epoch-based timestamp of last successful RDB save
 --
 type: boolean
 
-Flag indicating a RDB save is on-going
+None
 
+--
+
+*`redis.info.persistence.rdb.last_save.time`*::
++
+--
+type: long
+
+None
 
 --
 
@@ -14853,8 +14704,7 @@ Flag indicating a RDB save is on-going
 --
 type: keyword
 
-Status of the last RDB save operation
-
+None
 
 --
 
@@ -14863,10 +14713,7 @@ Status of the last RDB save operation
 --
 type: long
 
-format: duration
-
-Duration of the last RDB save operation in seconds
-
+None
 
 --
 
@@ -14875,30 +14722,14 @@ Duration of the last RDB save operation in seconds
 --
 type: long
 
-format: duration
-
-Duration of the on-going RDB save operation if any
-
-
---
-
-*`redis.info.persistence.rdb.copy_on_write.last_size`*::
-+
---
-type: long
-
-format: bytes
-
-The size in bytes of copy-on-write allocations during the last RBD save operation                
-
+None
 
 --
 
 [float]
 == aof fields
 
-Provides information about AOF persitence
-
+None
 
 
 *`redis.info.persistence.aof.enabled`*::
@@ -14906,8 +14737,7 @@ Provides information about AOF persitence
 --
 type: boolean
 
-Flag indicating AOF logging is activated
-
+None
 
 --
 
@@ -14916,8 +14746,7 @@ Flag indicating AOF logging is activated
 --
 type: boolean
 
-Flag indicating a AOF rewrite operation is on-going
-
+None
 
 --
 
@@ -14926,8 +14755,7 @@ Flag indicating a AOF rewrite operation is on-going
 --
 type: boolean
 
-Flag indicating an AOF rewrite operation will be scheduled once the on-going RDB save is complete.
-
+None
 
 --
 
@@ -14936,10 +14764,7 @@ Flag indicating an AOF rewrite operation will be scheduled once the on-going RDB
 --
 type: long
 
-format: duration
-
-Duration of the last AOF rewrite operation in seconds
-
+None
 
 --
 
@@ -14948,22 +14773,7 @@ Duration of the last AOF rewrite operation in seconds
 --
 type: long
 
-format: duration
-
-Duration of the on-going AOF rewrite operation if any
-
-
---
-
-*`redis.info.persistence.aof.rewrite.buffer.size`*::
-+
---
-type: long
-
-format: bytes
-
-Size of the AOF rewrite buffer
-
+None
 
 --
 
@@ -14972,8 +14782,7 @@ Size of the AOF rewrite buffer
 --
 type: keyword
 
-Status of the last AOF rewrite operatio
-
+None
 
 --
 
@@ -14982,76 +14791,7 @@ Status of the last AOF rewrite operatio
 --
 type: keyword
 
-Status of the last write operation to the AOF
-
-
---
-
-*`redis.info.persistence.aof.copy_on_write.last_size`*::
-+
---
-type: long
-
-format: bytes
-
-The size in bytes of copy-on-write allocations during the last RBD save operation
-
-
---
-
-*`redis.info.persistence.aof.buffer.size`*::
-+
---
-type: long
-
-format: bytes
-
-Size of the AOF buffer
-
-
---
-
-*`redis.info.persistence.aof.size.current`*::
-+
---
-type: long
-
-format: bytes
-
-AOF current file size             
-
-
---
-
-*`redis.info.persistence.aof.size.base`*::
-+
---
-type: long
-
-format: bytes
-
-AOF file size on latest startup or rewrite
-
-
---
-
-*`redis.info.persistence.aof.fsync.pending`*::
-+
---
-type: long
-
-Number of fsync pending jobs in background I/O queue
-
-
---
-
-*`redis.info.persistence.aof.fsync.delayed`*::
-+
---
-type: long
-
-Delayed fsync counter
-
+None
 
 --
 
@@ -15067,8 +14807,7 @@ Replication
 --
 type: keyword
 
-Role of the instance (can be "master", or "slave").
-
+None
 
 --
 
@@ -15077,8 +14816,7 @@ Role of the instance (can be "master", or "slave").
 --
 type: long
 
-Number of connected slaves
-
+None
 
 --
 
@@ -15087,8 +14825,7 @@ Number of connected slaves
 --
 type: long
 
-The server's current replication offset
-
+None
 
 --
 
@@ -15097,8 +14834,7 @@ The server's current replication offset
 --
 type: long
 
-Flag indicating replication backlog is active
-
+None
 
 --
 
@@ -15107,10 +14843,7 @@ Flag indicating replication backlog is active
 --
 type: long
 
-format: bytes
-
-Total size in bytes of the replication backlog buffer
-
+None
 
 --
 
@@ -15119,8 +14852,7 @@ Total size in bytes of the replication backlog buffer
 --
 type: long
 
-The master offset of the replication backlog buffer          
-
+None
 
 --
 
@@ -15129,114 +14861,7 @@ The master offset of the replication backlog buffer
 --
 type: long
 
-Size in bytes of the data in the replication backlog buffer
-
-
---
-
-*`redis.info.replication.master.offest`*::
-+
---
-type: long
-
-The server's current replication offset
-
-
---
-
-*`redis.info.replication.master.second_offset`*::
-+
---
-type: long
-
-The offset up to which replication IDs are accepted
-
-
---
-
-*`redis.info.replication.master.link_status`*::
-+
---
-type: keyword
-
-Status of the link (up/down)
-
-
---
-
-*`redis.info.replication.master.last_io_seconds_ago`*::
-+
---
-type: long
-
-format: duration
-
-Number of seconds since the last interaction with master
-
-
---
-
-*`redis.info.replication.master.sync.in_progress`*::
-+
---
-type: boolean
-
-Indicate the master is syncing to the slave
-
-
---
-
-*`redis.info.replication.master.sync.left_bytes`*::
-+
---
-type: long
-
-format: bytes
-
-Number of bytes left before syncing is complete
-
-
---
-
-*`redis.info.replication.master.sync.last_io_seconds_ago`*::
-+
---
-type: long
-
-format: duration
-
-Number of seconds since last transfer I/O during a SYNC operation
-
-
---
-
-*`redis.info.replication.slave.offset`*::
-+
---
-type: long
-
-The replication offset of the slave instance
-
-
---
-
-*`redis.info.replication.slave.priority`*::
-+
---
-type: long
-
-The priority of the instance as a candidate for failover
-
-
---
-
-*`redis.info.replication.slave.is_readonly`*::
-+
---
-type: boolean
-
-Flag indicating if the slave is read-only
-
+None
 
 --
 
@@ -15448,8 +15073,7 @@ Total network output in bytes.
 --
 type: long
 
-Number of commands processed per second
-
+None
 
 --
 
@@ -15458,8 +15082,7 @@ Number of commands processed per second
 --
 type: scaled_float
 
-The network's read rate per second in KB/sec
-
+None
 
 --
 
@@ -15468,8 +15091,7 @@ The network's read rate per second in KB/sec
 --
 type: scaled_float
 
-The network's write rate per second in KB/sec
-
+None
 
 --
 
@@ -15478,8 +15100,7 @@ The network's write rate per second in KB/sec
 --
 type: long
 
-The number of full resyncs with slaves
-
+None
 
 --
 
@@ -15488,8 +15109,7 @@ The number of full resyncs with slaves
 --
 type: long
 
-The number of accepted partial resync requests
-
+None
 
 --
 
@@ -15498,8 +15118,7 @@ The number of accepted partial resync requests
 --
 type: long
 
-The number of denied partial resync requests
-
+None
 
 --
 
@@ -15508,8 +15127,7 @@ The number of denied partial resync requests
 --
 type: long
 
-Total number of key expiration events
-
+None
 
 --
 
@@ -15518,8 +15136,7 @@ Total number of key expiration events
 --
 type: long
 
-Number of evicted keys due to maxmemory limit
-
+None
 
 --
 
@@ -15528,8 +15145,7 @@ Number of evicted keys due to maxmemory limit
 --
 type: long
 
-Number of successful lookup of keys in the main dictionary
-
+None
 
 --
 
@@ -15538,8 +15154,7 @@ Number of successful lookup of keys in the main dictionary
 --
 type: long
 
-Number of failed lookup of keys in the main dictionary
-
+None
 
 --
 
@@ -15548,8 +15163,7 @@ Number of failed lookup of keys in the main dictionary
 --
 type: long
 
-Global number of pub/sub channels with client subscriptions
-
+None
 
 --
 
@@ -15558,8 +15172,7 @@ Global number of pub/sub channels with client subscriptions
 --
 type: long
 
-Global number of pub/sub pattern with client subscriptions
-
+None
 
 --
 
@@ -15568,8 +15181,7 @@ Global number of pub/sub pattern with client subscriptions
 --
 type: long
 
-Duration of the latest fork operation in microseconds
-
+None
 
 --
 
@@ -15578,58 +15190,7 @@ Duration of the latest fork operation in microseconds
 --
 type: long
 
-The number of sockets open for MIGRATE purposes
-
-
---
-
-*`redis.info.stats.slave_expires_tracked_keys`*::
-+
---
-type: long
-
-The number of keys tracked for expiry purposes (applicable only to writable slaves)
-
-
---
-
-*`redis.info.stats.active_defrag.hits`*::
-+
---
-type: long
-
-Number of value reallocations performed by active the defragmentation process
-
-
---
-
-*`redis.info.stats.active_defrag.misses`*::
-+
---
-type: long
-
-Number of aborted value reallocations started by the active defragmentation process
-
-
---
-
-*`redis.info.stats.active_defrag.key_hits`*::
-+
---
-type: long
-
-Number of keys that were actively defragmented
-
-
---
-
-*`redis.info.stats.active_defrag.key_misses`*::
-+
---
-type: long
-
-Number of keys that were skipped by the active defragmentation process
-
+None
 
 --
 
@@ -15675,6 +15236,94 @@ Number of keys in the keyspace.
 --
 type: long
 
+
+
+--
+
+[float]
+== slowlog fields
+
+An entry in the Redis slow queries log.
+
+
+
+*`redis.slowlog.id`*::
++
+--
+type: long
+
+A unique progressive identifier for every slow log entry.
+
+
+--
+
+*`redis.slowlog.command`*::
++
+--
+type: keyword
+
+The command
+
+
+--
+
+*`redis.slowlog.key`*::
++
+--
+type: keyword
+
+--
+
+*`redis.slowlog.args`*::
++
+--
+type: array
+
+The array composing the arguments of the command.
+
+
+--
+
+*`redis.slowlog.duration.us`*::
++
+--
+type: long
+
+format: duration
+
+The amount of time needed for its execution, in microseconds.
+
+
+--
+
+*`redis.slowlog.timestamp`*::
++
+--
+type: date
+
+format: epoch_millis
+
+The unix timestamp at which the logged command was processed.
+
+
+--
+
+*`redis.slowlog.client.name`*::
++
+--
+type: keyword
+
+Client IP address and port (4.0 only).
+
+
+--
+
+*`redis.slowlog.client.address`*::
++
+--
+type: keyword
+
+Client name if set via the `CLIENT SETNAME` command (4.0 only).
 
 
 --
