@@ -36,9 +36,9 @@ type Config struct {
 	Namespace common.ConfigNamespace `config:",inline"`
 }
 
-// RegisterType register a new codec.
-func RegisterType(name string, factory Factory) {
-	feature.MustRegister(Feature(name, factory, feature.Undefined))
+// Plugin accepts a codec to be registered as a plugin.
+func Plugin(name string, f Factory) *feature.Feature {
+	return Feature(name, f, feature.NewDetails(name, "", feature.Undefined))
 }
 
 // FindFactory find, assert and return the factory to create a specific codec.
@@ -71,6 +71,6 @@ func CreateEncoder(info beat.Info, cfg Config) (Codec, error) {
 }
 
 // Feature creates a new codec.
-func Feature(name string, f Factory, stability feature.Stability) *feature.Feature {
-	return feature.New(Namespace, name, f, stability)
+func Feature(name string, f Factory, description feature.Describer) *feature.Feature {
+	return feature.New(Namespace, name, f, description)
 }

@@ -28,7 +28,13 @@ import (
 )
 
 // Feature exposes the format codec.
-var Feature = codec.Feature("format", makeFormat, feature.Stable)
+var Feature = codec.Feature("format",
+	makeFormat,
+	feature.NewDetails(
+		"Format codec",
+		"Encode field values into a string.",
+		feature.Stable,
+	))
 
 type Encoder struct {
 	Format *fmtstr.EventFormatString

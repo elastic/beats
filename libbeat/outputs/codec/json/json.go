@@ -50,7 +50,13 @@ var defaultConfig = config{
 }
 
 // Feature expose the json codec.
-var Feature = codec.Feature("json", makeJSON, feature.Stable)
+var Feature = codec.Feature("json",
+	makeJSON,
+	feature.NewDetails(
+		"JSON Codec",
+		"Encode events to JSON.",
+		feature.Stable,
+	))
 
 func makeJSON(info beat.Info, cfg *common.Config) (codec.Codec, error) {
 	config := defaultConfig
