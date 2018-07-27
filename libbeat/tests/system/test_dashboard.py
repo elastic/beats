@@ -71,16 +71,9 @@ class Test(BaseTest):
 
         self.test_load_dashboard()
 
-        command = self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards -kibana http://" + \
-            self.get_kibana_host() + ":" + self.get_kibana_port()
-
-        if os.name == "nt":
-            command = self.beat_path + "\..\dev-tools\cmd\dashboards\export_dashboards -kibana http://" + \
-                self.get_kibana_host() + ":" + self.get_kibana_port()
-
-        command = command + " -dashboard Metricbeat-system-overview"
-
-        print(command)
+        path = os.path.normpath(self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards.go")
+        command = path + " -kibana http://" + self.get_kibana_host() + ":" + self.get_kibana_port()
+        command = "go run " + command + " -dashboard Metricbeat-system-overview"
 
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         content, err = p.communicate()
