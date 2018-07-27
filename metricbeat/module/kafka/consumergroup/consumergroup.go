@@ -97,6 +97,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
+// Fetch consumer group metrics from kafka
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	if err := m.broker.Connect(); err != nil {
 		r.Error(errors.Wrap(err, "broker connection failed"))
