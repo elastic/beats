@@ -8,7 +8,6 @@
 
 === Beats version HEAD
 https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
-https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 ==== Breaking changes
 
