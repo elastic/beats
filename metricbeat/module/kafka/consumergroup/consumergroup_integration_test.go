@@ -21,7 +21,6 @@ package consumergroup
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"testing"
 
@@ -40,11 +39,11 @@ const (
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "kafka")
 
-	c, err := startConsumer(t, "metricbeat-test")
+	stop, err := startConsumer(t, "metricbeat-test")
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 	}
-	defer c.Close()
+	defer stop()
 
 	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
 	err = mbtest.WriteEventsReporterV2(ms, t, "")
@@ -53,7 +52,7 @@ func TestData(t *testing.T) {
 	}
 }
 
-func startConsumer(t *testing.T, topic string) (io.Closer, error) {
+func startConsumer(t *testing.T, topic string) (func(), error) {
 	config := sarama.NewConfig()
 	config.Version = sarama.V0_10_2_1
 	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
@@ -68,17 +67,27 @@ func startConsumer(t *testing.T, topic string) (io.Closer, error) {
 		return nil, errors.Wrap(err, "getting coordinator")
 	}
 
-	resp, err := broker.JoinGroup(&sarama.JoinGroupRequest{
+	req := sarama.JoinGroupRequest{
 		GroupId:        groupID,
 		ProtocolType:   "consumer",
 		SessionTimeout: 30000, // milliseconds
+	}
+	strategy := "range"
+	err = req.AddGroupProtocolMetadata(strategy, &sarama.ConsumerGroupMemberMetadata{
+		Version: 1,
+		Topics:  []string{topic},
 	})
+	if err != nil {
+		return nil, errors.Wrap(err, "adding protocol metadata")
+	}
+	resp, err := broker.JoinGroup(&req)
 	if err != nil {
 		return nil, errors.Wrap(err, "joining consumer group")
 	}
 	if resp.Err != sarama.ErrNoError {
 		return nil, errors.Wrap(resp.Err, "joining consumer group, response error")
 	}
+	t.Logf("Joined consumer group %s with member ID %s", groupID, resp.MemberId)
 
 	consumer, err := sarama.NewConsumerFromClient(client)
 	if err != nil {
@@ -91,16 +100,26 @@ func startConsumer(t *testing.T, topic string) (io.Closer, error) {
 		return nil, err
 	}
 
-	_, err = consumer.ConsumePartition(topic, partitions[0], sarama.OffsetNewest)
+	consumerPartition, err := consumer.ConsumePartition(topic, partitions[0], sarama.OffsetNewest)
 	if err != nil {
 		consumer.Close()
 		return nil, err
 	}
 
-	//m := <-c.Messages()
-	//t.Log(string(m.Value))
+	cleanup := func() {
+		_, err := broker.LeaveGroup(&sarama.LeaveGroupRequest{
+			GroupId:  groupID,
+			MemberId: resp.MemberId,
+		})
+		if err != nil {
+			t.Log(errors.Wrap(err, "leaving group"))
+		}
+		broker.Close()
+		consumerPartition.Close()
+		consumer.Close()
+	}
 
-	return consumer, nil
+	return cleanup, nil
 }
 
 func getConfig() map[string]interface{} {
