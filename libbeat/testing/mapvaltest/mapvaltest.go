@@ -28,6 +28,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
 )
@@ -35,7 +37,8 @@ import (
 // Test takes the output from a Validator invocation and runs test assertions on the result.
 // If you are using this library for testing you will probably want to run Test(t, Schema(Map{...}), actual) as a pattern.
 func Test(t *testing.T, v mapval.Validator, m common.MapStr) *mapval.Results {
-	r := v(m)
+	r, err := v(m)
+	require.NoError(t, err)
 
 	if !r.Valid {
 		assert.Fail(

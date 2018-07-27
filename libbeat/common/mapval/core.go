@@ -18,6 +18,7 @@
 package mapval
 
 import (
+	"reflect"
 	"sort"
 	"strings"
 
@@ -39,32 +40,41 @@ func Optional(id IsDef) IsDef {
 // Map is the type used to define schema definitions for Schema.
 type Map map[string]interface{}
 
+// Slice is a convenience []interface{} used to declare schema defs.
+type Slice []interface{}
+
 // Validator is the result of Schema and is run against the map you'd like to test.
-type Validator func(common.MapStr) *Results
+type Validator func(common.MapStr) (*Results, error)
 
 // Compose combines multiple SchemaValidators into a single one.
 func Compose(validators ...Validator) Validator {
-	return func(actual common.MapStr) *Results {
+	return func(actual common.MapStr) (r *Results, err error) {
 		results := make([]*Results, len(validators))
 		for idx, validator := range validators {
-			results[idx] = validator(actual)
+			results[idx], err = validator(actual)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		combined := NewResults()
 		for _, r := range results {
-			r.EachResult(func(path string, vr ValueResult) bool {
+			r.EachResult(func(path Path, vr ValueResult) bool {
 				combined.record(path, vr)
 				return true
 			})
 		}
-		return combined
+		return combined, err
 	}
 }
 
 // Strict is used when you want any unspecified keys that are encountered to be considered errors.
 func Strict(laxValidator Validator) Validator {
-	return func(actual common.MapStr) *Results {
-		results := laxValidator(actual)
+	return func(actual common.MapStr) (*Results, error) {
+		results, err := laxValidator(actual)
+		if err != nil {
+			return results, err
+		}
 
 		// The inner workings of this are a little weird
 		// We use a hash of dotted paths to track the results
@@ -83,61 +93,69 @@ func Strict(laxValidator Validator) Validator {
 		}
 		sort.Strings(validatedPaths)
 
-		walk(actual, func(woi walkObserverInfo) {
-			_, validatedExactly := results.Fields[woi.dottedPath]
+		err = walk(actual, func(woi walkObserverInfo) {
+			_, validatedExactly := results.Fields[woi.path.String()]
 			if validatedExactly {
 				return // This key was tested, passes strict test
 			}
 
 			// Search returns the point just before an actual match (since we ruled out an exact match with the cheaper
 			// hash check above. We have to validate the actual match with a prefix check as well
-			matchIdx := sort.SearchStrings(validatedPaths, woi.dottedPath)
-			if matchIdx < len(validatedPaths) && strings.HasPrefix(validatedPaths[matchIdx], woi.dottedPath) {
+			matchIdx := sort.SearchStrings(validatedPaths, woi.path.String())
+			if matchIdx < len(validatedPaths) && strings.HasPrefix(validatedPaths[matchIdx], woi.path.String()) {
 				return
 			}
 
-			results.record(woi.dottedPath, StrictFailureVR)
+			results.merge(StrictFailureResult(woi.path))
 		})
 
-		return results
+		return results, err
 	}
 }
 
 // Schema takes a Map and returns an executable Validator function.
 func Schema(expected Map) Validator {
-	return func(actual common.MapStr) *Results {
+	return func(actual common.MapStr) (*Results, error) {
 		return walkValidate(expected, actual)
 	}
 }
 
-func walkValidate(expected Map, actual common.MapStr) (results *Results) {
+func walkValidate(expected Map, actual common.MapStr) (results *Results, err error) {
 	results = NewResults()
-	walk(
+	err = walk(
 		common.MapStr(expected),
 		func(expInfo walkObserverInfo) {
-
-			actualKeyExists, _ := actual.HasKey(expInfo.dottedPath)
-			actualV, _ := actual.GetValue(expInfo.dottedPath)
+			actualKeyExists, actualV := expInfo.path.GetFrom(actual)
 
 			// If this is a definition use it, if not, check exact equality
 			isDef, isIsDef := expInfo.value.(IsDef)
 			if !isIsDef {
-				// We don't check maps for equality, we check their properties
-				// individual via our own traversal, so bail early
-				if _, isMS := actualV.(common.MapStr); isMS {
-					return
-				}
 
-				isDef = IsEqual(expInfo.value)
+				if !interfaceIsCollection(expInfo.value) {
+					isDef = IsEqual(expInfo.value)
+				} else if interfaceIsCollection(actualV) {
+					// We don't check collections for equality, we check their properties
+					// individual via our own traversal, so bail early unless the collection
+					// is empty. The one exception
+					if reflect.ValueOf(actualV).Len() > 0 {
+						return
+					}
+
+					isDef = IsEqual(expInfo.value)
+				}
 			}
 
 			if !isDef.optional || isDef.optional && actualKeyExists {
-				results.record(
-					expInfo.dottedPath,
-					isDef.check(actualV, actualKeyExists),
-				)
+				var checkRes *Results
+				checkRes, err = isDef.check(expInfo.path, actualV, actualKeyExists)
+				results.merge(checkRes)
 			}
 		})
 
-	return results
+	return results, err
+}
+
+func interfaceIsCollection(o interface{}) bool {
+	kind := reflect.ValueOf(o).Kind()
+	return kind == reflect.Map || kind == reflect.Slice
 }
