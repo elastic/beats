@@ -21,8 +21,10 @@
 package plugin
 
 import (
-	"errors"
+	"fmt"
 	goplugin "plugin"
+
+	"github.com/elastic/beats/libbeat/feature"
 )
 
 func loadPlugins(path string) error {
@@ -36,24 +38,10 @@ func loadPlugins(path string) error {
 		return err
 	}
 
-	ptr, ok := sym.(*map[string][]interface{})
+	bundle, ok := sym.(**feature.Bundle)
 	if !ok {
-		return errors.New("invalid bundle type")
+		return fmt.Errorf("invalid bundle type, received '%T'", sym)
 	}
 
-	bundle := *ptr
-	for name, plugins := range bundle {
-		loader := registry[name]
-		if loader == nil {
-			continue
-		}
-
-		for _, plugin := range plugins {
-			if err := loader(plugin); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
+	return feature.RegisterBundle(*bundle)
 }
