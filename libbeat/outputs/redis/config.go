@@ -40,6 +40,12 @@ type redisConfig struct {
 	Codec       codec.Config          `config:"codec"`
 	Db          int                   `config:"db"`
 	DataType    string                `config:"datatype"`
+	Backoff     Backoff               `config:"backoff"`
+}
+
+type Backoff struct {
+	Init time.Duration
+	Max  time.Duration
 }
 
 var (
@@ -52,6 +58,10 @@ var (
 		TLS:         nil,
 		Db:          0,
 		DataType:    "list",
+		Backoff: Backoff{
+			Init: 1 * time.Second,
+			Max:  60 * time.Second,
+		},
 	}
 )
 
