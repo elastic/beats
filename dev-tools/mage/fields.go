@@ -42,6 +42,7 @@ func GenerateFieldsYAML(fieldsFiles ...string) error {
 		filepath.Join(beatsDir, globalFieldsCmdPath),
 		"-es_beats_path", beatsDir,
 		"-beat_path", CWD(),
+		"-out", "fields.yml",
 	)
 
 	return globalFieldsCmd(fieldsFiles...)

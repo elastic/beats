@@ -23,10 +23,11 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -54,7 +55,7 @@ func Export(client *http.Client, conn string, dashboard string, out string) erro
 
 	fullURL := makeURL(conn, exportAPI, params)
 	if !quiet {
-		fmt.Printf("Calling HTTP GET %v\n", fullURL)
+		log.Printf("Calling HTTP GET %v\n", fullURL)
 	}
 
 	req, err := http.NewRequest("GET", fullURL, nil)
@@ -92,9 +93,16 @@ func Export(client *http.Client, conn string, dashboard string, out string) erro
 	}
 
 	data["objects"] = objects
+
+	// Create all missing directories
+	err = os.MkdirAll(filepath.Dir(out), 0755)
+	if err != nil {
+		return err
+	}
+
 	err = ioutil.WriteFile(out, []byte(data.StringToPrint()), 0666)
 	if !quiet {
-		fmt.Printf("The dashboard %s was exported under the %s file\n", dashboard, out)
+		log.Printf("The dashboard %s was exported under the %s file\n", dashboard, out)
 	}
 	return err
 }
@@ -137,6 +145,7 @@ func main() {
 	flag.BoolVar(&quiet, "quiet", false, "be quiet")
 
 	flag.Parse()
+	log.SetFlags(0)
 
 	transCfg := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
@@ -145,28 +154,26 @@ func main() {
 	client := &http.Client{Transport: transCfg}
 
 	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
-		fmt.Printf("Please specify a dashboard ID (-dashboard) or a manifest file (-yml)\n\n")
 		flag.Usage()
-		os.Exit(0)
+		log.Fatalf("Please specify a dashboard ID (-dashboard) or a manifest file (-yml)")
 	}
 
 	if len(*ymlFile) > 0 {
 		dashboards, err := ReadManifest(*ymlFile)
 		if err != nil {
-			fmt.Printf("ERROR: %s\n", err)
-			os.Exit(1)
+			log.Fatalf("%s", err)
 		}
 
 		for _, dashboard := range dashboards {
-			fmt.Printf("id=%s, name=%s\n", dashboard["id"], dashboard["file"])
-			directory := path.Join(path.Dir(*ymlFile), "_meta/kibana/6/dashboard")
+			log.Printf("id=%s, name=%s\n", dashboard["id"], dashboard["file"])
+			directory := filepath.Join(filepath.Dir(*ymlFile), "_meta/kibana/6/dashboard")
 			err := os.MkdirAll(directory, 0755)
 			if err != nil {
-				fmt.Printf("ERROR: fail to create directory %s: %v", directory, err)
+				log.Fatalf("fail to create directory %s: %v", directory, err)
 			}
-			err = Export(client, *kibanaURL, dashboard["id"], path.Join(directory, dashboard["file"]))
+			err = Export(client, *kibanaURL, dashboard["id"], filepath.Join(directory, dashboard["file"]))
 			if err != nil {
-				fmt.Printf("ERROR: fail to export the dashboards: %s\n", err)
+				log.Fatalf("fail to export the dashboards: %s", err)
 			}
 		}
 		os.Exit(0)
@@ -175,7 +182,7 @@ func main() {
 	if len(*dashboard) > 0 {
 		err := Export(client, *kibanaURL, *dashboard, *fileOutput)
 		if err != nil {
-			fmt.Printf("ERROR: fail to export the dashboards: %s\n", err)
+			log.Fatalf("fail to export the dashboards: %s", err)
 		}
 	}
 }

@@ -6,4 +6,4 @@ include scripts/Makefile
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: libbeat_fields
+collect:

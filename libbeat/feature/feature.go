@@ -42,20 +42,18 @@ type Featurable interface {
 	// of the method is type checked by the 'FindFactory' of each namespace.
 	Factory() interface{}
 
-	// Stability is the stability of the Feature, this allow the user to filter embedded functionality
-	// by their maturity at runtime.
-	// Example: Beta, Experimental, Stable or Undefined.
-	Stability() Stability
+	// Description return the avaiable information for a specific feature.
+	Description() Describer
 
 	String() string
 }
 
 // Feature contains the information for a specific feature
 type Feature struct {
-	namespace string
-	name      string
-	factory   interface{}
-	stability Stability
+	namespace   string
+	name        string
+	factory     interface{}
+	description Describer
 }
 
 // Namespace return the namespace of the feature.
@@ -73,9 +71,9 @@ func (f *Feature) Factory() interface{} {
 	return f.factory
 }
 
-// Stability returns the stability level of the feature, current: stable, beta, experimental.
-func (f *Feature) Stability() Stability {
-	return f.stability
+// Description return the avaiable information for a specific feature.
+func (f *Feature) Description() Describer {
+	return f.description
 }
 
 // Features return the current feature as a slice to be compatible with Bundle merging and filtering.
@@ -85,16 +83,16 @@ func (f *Feature) Features() []Featurable {
 
 // String return the debug information
 func (f *Feature) String() string {
-	return fmt.Sprintf("%s/%s (stability: %s)", f.namespace, f.name, f.stability)
+	return fmt.Sprintf("%s/%s (description: %s)", f.namespace, f.name, f.description)
 }
 
 // New returns a new Feature.
-func New(namespace, name string, factory interface{}, stability Stability) *Feature {
+func New(namespace, name string, factory interface{}, description Describer) *Feature {
 	return &Feature{
-		namespace: namespace,
-		name:      name,
-		factory:   factory,
-		stability: stability,
+		namespace:   namespace,
+		name:        name,
+		factory:     factory,
+		description: description,
 	}
 }
 

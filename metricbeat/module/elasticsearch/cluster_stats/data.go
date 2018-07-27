@@ -19,7 +19,8 @@ package cluster_stats
 
 import (
 	"encoding/json"
-	"fmt"
+
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 
 	"github.com/elastic/beats/libbeat/common"
 
@@ -51,14 +52,6 @@ var (
 	}
 )
 
-// TODO: Remove this function and use the one implemented (currently) in the kibana
-// module, after extracting it into the metricbeat helper package
-func reportErrorForMissingField(field string, r mb.ReporterV2) error {
-	err := fmt.Errorf("Could not find field '%v' in Kibana stats API response", field)
-	r.Error(err)
-	return err
-}
-
 func eventMapping(r mb.ReporterV2, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
@@ -75,7 +68,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 
 	clusterName, ok := data["cluster_name"]
 	if !ok {
-		return reportErrorForMissingField("cluster_name", r)
+		return elastic.ReportErrorForMissingField("cluster_name", elastic.Elasticsearch, r)
 	}
 
 	var event mb.Event
