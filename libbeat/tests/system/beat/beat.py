@@ -460,7 +460,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
 
         if fields_doc is None:
-            fields_doc = self.beat_path + "/_meta/fields.generated.yml"
+            fields_doc = self.beat_path + "/fields.yml"
 
         def extract_fields(doc_list, name):
             fields = []
@@ -491,15 +491,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
                         dictfields.append(newName)
             return fields, dictfields
 
-        # Not all beats have a fields.generated.yml. Fall back to fields.yml
-        if not os.path.isfile(fields_doc):
-            fields_doc = self.beat_path + "/_meta/fields.yml"
-
         global yaml_cache
 
         # TODO: Make fields_doc path more generic to work with beat-generator
         with open(fields_doc, "r") as f:
-            path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.generated.yml")
+            path = os.path.abspath(os.path.dirname(__file__) + "../../../../fields.yml")
             if not os.path.isfile(path):
                 path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")
             with open(path) as f2:

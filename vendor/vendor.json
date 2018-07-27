@@ -524,10 +524,10 @@
 			"versionExact": "v0.0.3"
 		},
 		{
-			"checksumSHA1": "FlkQkMcsKpnsm/o4b245uHPmYiM=",
+			"checksumSHA1": "eaOh9C2JtpuVCvnY3xm83WG5vyc=",
 			"path": "github.com/elastic/go-sysinfo",
-			"revision": "fda017eee28b7420d931e08c7361c1c17f516aa2",
-			"revisionTime": "2018-04-05T17:40:33Z"
+			"revision": "b603f0b7f2050dbc69b053eb5c796be0f3ac9fd2",
+			"revisionTime": "2018-07-25T16:42:48Z"
 		},
 		{
 			"checksumSHA1": "n8Lx7ibyOcLxoEOjA5WF05mZAzo=",
@@ -670,10 +670,10 @@
 			"versionExact": "v0.6.1"
 		},
 		{
-			"checksumSHA1": "yu/X+qHftvfQlAnjPdYLwrDn2nI=",
+			"checksumSHA1": "QI3FBMcEs/Tl4qkZCgUorywdz88=",
 			"path": "github.com/elastic/go-windows",
-			"revision": "a730c8b4e08aef7e1ebb642928bf862996ad2383",
-			"revisionTime": "2018-04-05T16:13:57Z"
+			"revision": "f11b8c9a625322edbca44926f9c0e4dc4916c9ac",
+			"revisionTime": "2018-07-25T15:32:17Z"
 		},
 		{
 			"checksumSHA1": "RPOLNUpw00QUUaA/U4YbPVf6WlA=",
