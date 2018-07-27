@@ -37,6 +37,7 @@ func errnoErr(e syscall.Errno) error {
 var (
 	modkernel32 = syscall.NewLazyDLL("kernel32.dll")
 	modversion  = syscall.NewLazyDLL("version.dll")
+	modpsapi    = syscall.NewLazyDLL("psapi.dll")
 
 	procGetNativeSystemInfo     = modkernel32.NewProc("GetNativeSystemInfo")
 	procGetTickCount64          = modkernel32.NewProc("GetTickCount64")
@@ -45,17 +46,11 @@ var (
 	procGetFileVersionInfoW     = modversion.NewProc("GetFileVersionInfoW")
 	procGetFileVersionInfoSizeW = modversion.NewProc("GetFileVersionInfoSizeW")
 	procVerQueryValueW          = modversion.NewProc("VerQueryValueW")
+	procGetProcessMemoryInfo    = modpsapi.NewProc("GetProcessMemoryInfo")
 )
 
-func _GetNativeSystemInfo(systemInfo *SystemInfo) (err error) {
-	r1, _, e1 := syscall.Syscall(procGetNativeSystemInfo.Addr(), 1, uintptr(unsafe.Pointer(systemInfo)), 0, 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = errnoErr(e1)
-		} else {
-			err = syscall.EINVAL
-		}
-	}
+func _GetNativeSystemInfo(systemInfo *SystemInfo) {
+	syscall.Syscall(procGetNativeSystemInfo.Addr(), 1, uintptr(unsafe.Pointer(systemInfo)), 0, 0)
 	return
 }
 
@@ -153,6 +148,18 @@ func __VerQueryValueW(data *byte, subBlock *uint16, pBuffer *uintptr, len *uint3
 	r0, _, e1 := syscall.Syscall6(procVerQueryValueW.Addr(), 4, uintptr(unsafe.Pointer(data)), uintptr(unsafe.Pointer(subBlock)), uintptr(unsafe.Pointer(pBuffer)), uintptr(unsafe.Pointer(len)), 0, 0)
 	success = r0 != 0
 	if !success {
+		if e1 != 0 {
+			err = errnoErr(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _GetProcessMemoryInfo(handle syscall.Handle, psmemCounters *ProcessMemoryCountersEx, cb uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procGetProcessMemoryInfo.Addr(), 3, uintptr(handle), uintptr(unsafe.Pointer(psmemCounters)), uintptr(cb))
+	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
 		} else {

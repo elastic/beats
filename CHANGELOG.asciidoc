@@ -8,6 +8,7 @@
 
 === Beats version HEAD
 https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -29,7 +30,11 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fixed `add_host_metadata` not initializing correctly on Windows. {issue}7715[7715]
+
 *Auditbeat*
+
+- Fixed a crash in the file_integrity module under Linux. {issue}7753[7753]
 
 *Filebeat*
 
@@ -53,6 +58,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
+
+- Add metrics about cache size to memcached module {pull}7740[7740]
 
 *Packetbeat*
 

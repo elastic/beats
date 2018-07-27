@@ -22,20 +22,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
 )
 
 func TestTest(t *testing.T) {
 	// Should pass
-	Test(t, mapval.Results{
-		"foo": []mapval.ValueResult{mapval.ValidVR},
-	})
+	Test(t, mapval.Schema(mapval.Map{}), common.MapStr{})
 
 	fakeT := new(testing.T)
-	Test(fakeT, mapval.Results{
-		"foo": []mapval.ValueResult{mapval.KeyMissingVR},
-	})
+	Test(fakeT, mapval.Schema(mapval.Map{"foo": "bar"}), common.MapStr{})
 
 	assert.True(t, fakeT.Failed())
-
 }

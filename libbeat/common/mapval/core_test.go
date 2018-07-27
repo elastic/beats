@@ -27,7 +27,7 @@ import (
 )
 
 // assertResults validates the schema passed successfully.
-func assertResults(t *testing.T, r Results) Results {
+func assertResults(t *testing.T, r *Results) *Results {
 	for _, err := range r.Errors() {
 		assert.NoError(t, err)
 	}
@@ -58,9 +58,10 @@ func TestBadFlat(t *testing.T) {
 	})(m)
 
 	assertResults(fakeT, results)
+
 	assert.True(t, fakeT.Failed())
 
-	result := results["notafield"][0]
+	result := results.Fields["notafield"][0]
 	assert.False(t, result.Valid)
 	assert.Equal(t, result.Message, KeyMissingVR.Message)
 }
@@ -82,7 +83,7 @@ func TestNested(t *testing.T) {
 
 	assertResults(t, results)
 
-	assert.Len(t, results, 2, "One result per matcher")
+	assert.Len(t, results.Fields, 2, "One result per matcher")
 }
 
 func TestComposition(t *testing.T) {
@@ -102,14 +103,14 @@ func TestComposition(t *testing.T) {
 	// Test that the composition of them works
 	assertResults(t, composed(m))
 
-	assert.Len(t, composed(m), 2)
+	assert.Len(t, composed(m).Fields, 2)
 
 	badValidator := Schema(Map{"notakey": "blah"})
 	badComposed := Compose(badValidator, composed)
 
 	fakeT := new(testing.T)
 	assertResults(fakeT, badComposed(m))
-	assert.Len(t, badComposed(m), 3)
+	assert.Len(t, badComposed(m).Fields, 3)
 	assert.True(t, fakeT.Failed())
 }
 
@@ -144,10 +145,10 @@ func TestStrictFunc(t *testing.T) {
 	assertResults(t, partialValidator(m))
 
 	res := Strict(partialValidator)(m)
-	assert.Equal(t, []ValueResult{StrictFailureVR}, res.DetailedErrors()["baz"])
-	assert.Equal(t, []ValueResult{StrictFailureVR}, res.DetailedErrors()["nest.very.deep"])
-	assert.Nil(t, res.DetailedErrors()["bar"])
-	assert.False(t, res.Valid())
+	assert.Equal(t, []ValueResult{StrictFailureVR}, res.DetailedErrors().Fields["baz"])
+	assert.Equal(t, []ValueResult{StrictFailureVR}, res.DetailedErrors().Fields["nest.very.deep"])
+	assert.Nil(t, res.DetailedErrors().Fields["bar"])
+	assert.False(t, res.Valid)
 }
 
 func TestOptional(t *testing.T) {
