@@ -17,6 +17,9 @@
 
 package feature
 
+// FilterFunc is the function use to filter elements from a bundle.
+type FilterFunc = func(Featurable) bool
+
 // Bundleable merges featurable and bundle interface together.
 type bundleable interface {
 	Features() []Featurable
@@ -32,19 +35,21 @@ func NewBundle(features ...Featurable) *Bundle {
 	return &Bundle{features: features}
 }
 
-// Filter creates a new bundle with only the feature matching the requested stability.
-func (b *Bundle) Filter(stabilities ...Stability) *Bundle {
+// FilterWith takes a predicate and return a list of filtered bundle matching the predicate.
+func (b *Bundle) FilterWith(pred FilterFunc) *Bundle {
 	var filtered []Featurable
 
 	for _, feature := range b.features {
-		for _, stability := range stabilities {
-			if feature.Stability() == stability {
-				filtered = append(filtered, feature)
-				break
-			}
+		if pred(feature) {
+			filtered = append(filtered, feature)
 		}
 	}
 	return NewBundle(filtered...)
+}
+
+// Filter creates a new bundle with only the feature matching the requested stability.
+func (b *Bundle) Filter(stabilities ...Stability) *Bundle {
+	return b.FilterWith(HasStabilityPred(stabilities...))
 }
 
 // Features returns the interface features slice so
@@ -59,4 +64,16 @@ func MustBundle(bundle ...bundleable) *Bundle {
 		merged = append(merged, feature.Features()...)
 	}
 	return NewBundle(merged...)
+}
+
+// HasStabilityPred returns true if the feature match any of the provided stabilities.
+func HasStabilityPred(stabilities ...Stability) FilterFunc {
+	return func(f Featurable) bool {
+		for _, s := range stabilities {
+			if s == f.Description().Stability() {
+				return true
+			}
+		}
+		return false
+	}
 }
