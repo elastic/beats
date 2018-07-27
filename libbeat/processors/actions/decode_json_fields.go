@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/jsontransform"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -56,12 +57,17 @@ var (
 
 var debug = logp.MakeDebug("filters")
 
-func init() {
-	processors.RegisterPlugin("decode_json_fields",
-		configChecked(newDecodeJSONFields,
-			requireFields("fields"),
-			allowedFields("fields", "max_depth", "overwrite_keys", "process_array", "target", "when")))
-}
+// DecodeJSONFieldsFeature exposes decode json field.
+var DecodeJSONFieldsFeature = processors.Feature("decode_json_fields",
+	configChecked(newDecodeJSONFields,
+		requireFields("fields"),
+		allowedFields("fields", "max_depth", "overwrite_keys", "process_array", "target", "when")),
+	feature.NewDetails(
+		"Decode JSON Fields",
+		"Decode JSON encoded data from a specific field.",
+		feature.Stable,
+	),
+)
 
 func newDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig

@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
@@ -46,9 +47,14 @@ const (
 // unit testing by allowing us to stub the OS interface.
 var processCgroupPaths = cgroup.ProcessCgroupPaths
 
-func init() {
-	processors.RegisterPlugin(processorName, newDockerMetadataProcessor)
-}
+// Feature expose new add_docker_metadata.
+var Feature = processors.Feature(processorName, newDockerMetadataProcessor,
+	feature.NewDetails(
+		"Add docker metadata",
+		"Add metadata to the event from the running docker container.",
+		feature.Stable,
+	),
+)
 
 type addDockerMetadata struct {
 	log             *logp.Logger

@@ -17,34 +17,13 @@
 
 package actions
 
-import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/processors"
+import "github.com/elastic/beats/libbeat/feature"
+
+// Bundle bundles all the actions feature.
+var Bundle = feature.MustBundle(
+	DecodeJSONFieldsFeature,
+	DropEventFeature,
+	IncludeFieldsFeature,
+	RenameFeature,
+	DropFieldsFeature,
 )
-
-type dropEvent struct{}
-
-// DropEventFeature exposes the drop event processor.
-var DropEventFeature = processors.Feature("drop_event",
-	configChecked(newDropEvent, allowedFields("when")),
-	feature.NewDetails(
-		"Drop Event",
-		"Drop an event based on a condition.",
-		feature.Stable,
-	),
-)
-
-var dropEventsSingleton = (*dropEvent)(nil)
-
-func newDropEvent(c *common.Config) (processors.Processor, error) {
-	return dropEventsSingleton, nil
-}
-
-func (*dropEvent) Run(_ *beat.Event) (*beat.Event, error) {
-	// return event=nil to delete the entire event
-	return nil, nil
-}
-
-func (*dropEvent) String() string { return "drop_event" }

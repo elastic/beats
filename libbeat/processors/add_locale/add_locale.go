@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
@@ -47,12 +48,17 @@ var timezoneFormats = map[TimezoneFormat]string{
 	Offset:       "offset",
 }
 
+// Feature exposes add_locale.
+var Feature = processors.Feature("add_locale",
+	newAddLocale,
+	feature.NewDetails(
+		"Add locale",
+		"Add the system locale to the event.",
+		feature.Stable,
+	))
+
 func (t TimezoneFormat) String() string {
 	return timezoneFormats[t]
-}
-
-func init() {
-	processors.RegisterPlugin("add_locale", newAddLocale)
 }
 
 func newAddLocale(c *common.Config) (processors.Processor, error) {

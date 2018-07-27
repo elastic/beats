@@ -18,44 +18,39 @@
 package processors
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	p "github.com/elastic/beats/libbeat/plugin"
+	"github.com/elastic/beats/libbeat/feature"
 )
 
-type processorPlugin struct {
-	name   string
-	constr Constructor
+// Namespace exposes the processor type.
+var Namespace = "libbeat.processor"
+
+// Plugin exposes the processor as an external plugin.
+func Plugin(name string, c Constructor) *feature.Feature {
+	return Feature(name, c, feature.NewDetails(name, "", feature.Undefined))
 }
 
-var pluginKey = "libbeat.processor"
-
-func Plugin(name string, c Constructor) map[string][]interface{} {
-	return p.MakePlugin(pluginKey, processorPlugin{name, c})
-}
-
-func init() {
-	p.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
-		p, ok := ifc.(processorPlugin)
-		if !ok {
-			return errors.New("plugin does not match processor plugin type")
-		}
-
-		return registry.Register(p.name, p.constr)
-	})
-}
-
+// Constructor is the factory method to create a new processor.
 type Constructor func(config *common.Config) (Processor, error)
 
-var registry = NewNamespace()
+// Feature define a new feature.
+func Feature(name string, factory Constructor, description feature.Describer) *feature.Feature {
+	return feature.New(Namespace, name, factory, description)
+}
 
-func RegisterPlugin(name string, constructor Constructor) {
-	logp.Debug("processors", "Register plugin %s", name)
-
-	err := registry.Register(name, constructor)
+// Find returns the processor factory and wrap it into a NewConditonal.
+func Find(name string) (Constructor, error) {
+	f, err := feature.Registry.Lookup(Namespace, name)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
+
+	factory, ok := f.Factory().(Constructor)
+	if !ok {
+		return nil, fmt.Errorf("invalid processor type, received: %T", f.Factory())
+	}
+
+	return NewConditional(factory), nil
 }
