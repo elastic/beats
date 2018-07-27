@@ -28,7 +28,13 @@ import (
 )
 
 // Feature exposes a memory queue.
-var Feature = queue.Feature("mem", create, feature.Stable)
+var Feature = queue.Feature("mem",
+	create,
+	feature.NewDetails(
+		"Memory queue",
+		"Buffer events in memory before sending to the output.",
+		feature.Stable),
+)
 
 type Broker struct {
 	done chan struct{}
