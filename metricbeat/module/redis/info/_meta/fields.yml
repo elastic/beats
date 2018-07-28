@@ -320,7 +320,7 @@
           description: >
             Size in bytes of the data in the replication backlog buffer
 
-        - name: master.offest
+        - name: master.offset
           type: long
           description: >
             The server's current replication offset

@@ -15134,7 +15134,7 @@ Size in bytes of the data in the replication backlog buffer
 
 --
 
-*`redis.info.replication.master.offest`*::
+*`redis.info.replication.master.offset`*::
 +
 --
 type: long
