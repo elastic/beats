@@ -90,8 +90,8 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
-	allocated := oplogStatus["maxSize"].(int64)
-	used := int64(oplogStatus["size"].(float64))
+        allocated := oplogStatus["maxSize"].(int)
+	used := oplogStatus["size"].(int)
 
 	// get first and last items in the oplog
 	firstTs, err := getTimestamp(collection, "$natural")
