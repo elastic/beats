@@ -134,20 +134,18 @@ services:
 
   mongodb:
     build: ./module/mongodb/_meta
-    container_name: mongodb
     command: mongod --replSet beats
+    ports:
+      - "27017:27017"
 
-  mongodb_replicasetup:
+  mongodbreplica:
     build:
       context: ./module/mongodb/_meta
       dockerfile: Dockerfile.replicasetup
-    container_name: mongodb_replicasetup
     links:
-      - mongodb
+      - "mongodb:mongodb"
     depends_on:
       - mongodb
-    ports:
-      - "27018:27017"
     entrypoint: [ "bash", "/replicaset.sh" ]
 
   munin:

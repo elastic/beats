@@ -31,7 +31,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "mongodb_replicasetup")
+	compose.EnsureUp(t, "mongodbreplica")
 
 	f := mbtest.NewEventFetcher(t, getConfig())
 	event, err := f.Fetch()
@@ -56,7 +56,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "mongodb")
+	compose.EnsureUp(t, "mongodbreplica")
 
 	f := mbtest.NewEventFetcher(t, getConfig())
 	err := mbtest.WriteEvent(f, t)
