@@ -32,7 +32,7 @@ import (
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "mongodb")
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
+	f := mbtest.NewEventFetcher(t, getConfig())
 	event, err := f.Fetch()
 	if !assert.NoError(t, err) {
 		t.FailNow()
