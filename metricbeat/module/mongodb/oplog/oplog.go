@@ -90,8 +90,17 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
-        allocated := oplogStatus["maxSize"].(int)
-	used := oplogStatus["size"].(int)
+        allocated, ok := oplogStatus["maxSize"].(int)
+        if !ok {
+        	err := errors.New("unexpected maxSize value found in oplog collStats")
+        	return nil, err
+        }
+
+	used, ok := oplogStatus["size"].(int)
+        if !ok {
+        	err := errors.New("unexpected size value found in oplog collStats")
+        	return nil, err
+        }
 
 	// get first and last items in the oplog
 	firstTs, err := getTimestamp(collection, "$natural")
