@@ -1,3 +1,4 @@
 FROM mongo:3.4
 RUN apt-get update && apt-get install -y netcat
 COPY replicaset.sh /replicaset.sh
+HEALTHCHECK --interval=1s --retries=10 CMD true
