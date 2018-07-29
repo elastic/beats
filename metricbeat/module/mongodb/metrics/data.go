@@ -85,7 +85,7 @@ var schema = s.Schema{
 		"scanned_documents": s.Object{"count": c.Int("scannedObjects")},
 	}),
 	"replication": c.Dict("metrics.repl", replicationSchema, c.DictOptional),
-	"storage": c.Dict("free_list", s.Schema{
+	"storage": c.Dict("metrics.storage.freelist", s.Schema{
 		"search": c.Dict("search", s.Schema{
 			"bucket_exhausted": c.Int("bucketExhausted"),
 			"requests":         c.Int("requests"),
@@ -142,7 +142,7 @@ var replicationSchema = s.Schema{
 	"buffer": c.Dict("buffer", s.Schema{
 		"count":    c.Int("count"),
 		"max_size": s.Object{"bytes": c.Int("maxSizeBytes")},
-		"size":     s.Object{"bytes": c.Int("Bytes")},
+		"size":     s.Object{"bytes": c.Int("sizeBytes")},
 	}),
 	"initial_sync": c.Dict("initialSync", s.Schema{
 		"completed":       c.Int("completed"),
