@@ -62,9 +62,6 @@ import (
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 
-	// Register publisher pipeline modules
-	_ "github.com/elastic/beats/libbeat/publisher/includes"
-
 	// Register features
 	_ "github.com/elastic/beats/libbeat/include"
 

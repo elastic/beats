@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 )
 
@@ -48,17 +49,24 @@ var defaultConfig = config{
 	EscapeHTML: true,
 }
 
-func init() {
-	codec.RegisterType("json", func(info beat.Info, cfg *common.Config) (codec.Codec, error) {
-		config := defaultConfig
-		if cfg != nil {
-			if err := cfg.Unpack(&config); err != nil {
-				return nil, err
-			}
-		}
+// Feature expose the json codec.
+var Feature = codec.Feature("json",
+	makeJSON,
+	feature.NewDetails(
+		"JSON Codec",
+		"Encode events to JSON.",
+		feature.Stable,
+	))
 
-		return New(config.Pretty, config.EscapeHTML, info.Version), nil
-	})
+func makeJSON(info beat.Info, cfg *common.Config) (codec.Codec, error) {
+	config := defaultConfig
+	if cfg != nil {
+		if err := cfg.Unpack(&config); err != nil {
+			return nil, err
+		}
+	}
+
+	return New(config.Pretty, config.EscapeHTML, info.Version), nil
 }
 
 // New creates a new json Encoder.

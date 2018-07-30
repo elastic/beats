@@ -23,6 +23,14 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
 	"github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/libbeat/feature"
+	"github.com/elastic/beats/libbeat/outputs/codec/format"
+	"github.com/elastic/beats/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/libbeat/outputs/console"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/outputs/fileout"
+	"github.com/elastic/beats/libbeat/outputs/kafka"
+	"github.com/elastic/beats/libbeat/outputs/logstash"
+	"github.com/elastic/beats/libbeat/outputs/redis"
 	"github.com/elastic/beats/libbeat/processors/actions"
 	"github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_docker_metadata"
@@ -32,13 +40,6 @@ import (
 	"github.com/elastic/beats/libbeat/processors/dissect"
 	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/libbeat/publisher/queue/spool"
-
-	"github.com/elastic/beats/libbeat/outputs/console"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/fileout"
-	"github.com/elastic/beats/libbeat/outputs/kafka"
-	"github.com/elastic/beats/libbeat/outputs/logstash"
-	"github.com/elastic/beats/libbeat/outputs/redis"
 )
 
 // Bundle expose the main features.
@@ -70,6 +71,11 @@ var Bundle = feature.MustBundle(
 		fileout.Feature,
 		console.Feature,
 	),
+	// codecs
+	feature.MustBundle(
+		format.Feature,
+		json.Feature,
+	),
 
 	// Processors
 	feature.MustBundle(actions.Bundle,
@@ -84,5 +90,6 @@ var Bundle = feature.MustBundle(
 )
 
 func init() {
+	// Register main bundle
 	feature.RegisterBundle(Bundle)
 }
