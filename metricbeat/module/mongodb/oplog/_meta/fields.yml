@@ -4,7 +4,7 @@
     oplog provides an overview of replication status, which is retrieved from db.getReplicationInfo().
   fields:
     - name: size
-      type: gorup
+      type: group
       fields:
         - name: allocated
           type: long

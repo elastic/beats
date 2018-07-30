@@ -10071,10 +10071,28 @@ oplog provides an overview of replication status, which is retrieved from db.get
 
 
 
-*`mongodb.oplog.size`*::
+
+*`mongodb.oplog.size.allocated`*::
 +
 --
-type: gorup
+type: long
+
+format: bytes
+
+The total amount of space used by the oplog in bytes.
+
+
+--
+
+*`mongodb.oplog.size.used`*::
++
+--
+type: long
+
+format: bytes
+
+total amount of space allocated to the oplog in bytes.
+
 
 --
 
