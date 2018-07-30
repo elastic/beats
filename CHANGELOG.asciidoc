@@ -79,6 +79,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 - Add experimental socket summary metricset to system module {pull}6782[6782]
 - Move common kafka fields (broker, topic and partition.id) to the module level to facilitate events correlation {pull}7767[7767]
+- Add fields for memory fragmentation, memory allocator stats, copy on write, master-slave status, and active defragmentation to `info` metricset of Redis module. {pull}7695[7695]
+
 
 *Packetbeat*
 
@@ -94,6 +96,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
+- Redis `info` `replication.master_offset` has been deprecated in favor of `replication.master.offset`.{pull}7695[7695]
 
 - Move common kafka fields (broker, topic and partition.id) to the module level {pull}7767[7767].
 
