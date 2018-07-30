@@ -26,7 +26,19 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/mb"
 )
+
+// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
+const StatsAPIAvailableVersion = "6.4.0"
+
+// ReportErrorForMissingField reports and returns an error message for the given
+// field being missing in API response received from Kibana
+func ReportErrorForMissingField(field string, r mb.ReporterV2) error {
+	err := fmt.Errorf("Could not find field '%v' in Kibana stats API response", field)
+	r.Error(err)
+	return err
+}
 
 // GetVersion returns the version of the Kibana instance
 func GetVersion(http *helper.HTTP, currentPath string) (string, error) {
@@ -53,6 +65,21 @@ func GetVersion(http *helper.HTTP, currentPath string) (string, error) {
 	}
 
 	return versionStr, nil
+}
+
+// IsStatsAPIAvailable returns whether the stats API is available in the given version of Kibana
+func IsStatsAPIAvailable(kibanaVersion string) (bool, error) {
+	currentVersion, err := common.NewVersion(kibanaVersion)
+	if err != nil {
+		return false, err
+	}
+
+	wantVersion, err := common.NewVersion(StatsAPIAvailableVersion)
+	if err != nil {
+		return false, err
+	}
+
+	return !currentVersion.LessThan(wantVersion), nil
 }
 
 func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {

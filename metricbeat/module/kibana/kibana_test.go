@@ -15,45 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package hints
+package kibana
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"testing"
 
-type config struct {
-	Key    string         `config:"key"`
-	Config *common.Config `config:"config"`
-}
+	"github.com/stretchr/testify/assert"
+)
 
-func defaultConfig() config {
-	rawCfg := map[string]interface{}{
-		"type": "docker",
-		"containers": map[string]interface{}{
-			"ids": []string{
-				"${data.container.id}",
-			},
-		},
-	}
-	cfg, _ := common.NewConfigFrom(rawCfg)
-	return config{
-		Key:    "logs",
-		Config: cfg,
-	}
-}
-
-func (c *config) Unpack(from *common.Config) error {
-	tmpConfig := struct {
-		Key string `config:"key"`
+func TestIsStatsAPIAvailable(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
 	}{
-		Key: c.Key,
-	}
-	if err := from.Unpack(&tmpConfig); err != nil {
-		return err
-	}
-
-	if config, err := from.Child("config", -1); err == nil {
-		c.Config = config
+		{"6.3.1", false},
+		{"6.4.0", true},
+		{"6.5.0", true},
+		{"7.0.0-alpha1", true},
 	}
 
-	c.Key = tmpConfig.Key
-	return nil
+	for _, test := range tests {
+		actual, err := IsStatsAPIAvailable(test.input)
+		assert.NoError(t, err)
+		assert.Equal(t, test.expected, actual)
+	}
 }

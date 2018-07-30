@@ -201,7 +201,7 @@ integration-tests-environment: prepare-tests build-image
 # Runs the system tests
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
-system-tests: prepare-tests ${BEAT_NAME}.test python-env ${ES_BEATS}/dev-tools/cmd/dashboards/export_dashboards
+system-tests: prepare-tests ${BEAT_NAME}.test python-env
 	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} nosetests ${PYTHON_TEST_FILES} ${NOSETESTS_OPTIONS}
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
@@ -361,9 +361,6 @@ docs-preview:  ## @build Preview the documents for the beat in the browser
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200
 KIBANA_URL?=http://localhost:5601
-
-${ES_BEATS}/dev-tools/cmd/dashboards/export_dashboards:
-	$(MAKE) -C ${ES_BEATS}/dev-tools/cmd/dashboards export_dashboards
 
 .PHONY: import-dashboards
 import-dashboards: update ${BEAT_NAME}
