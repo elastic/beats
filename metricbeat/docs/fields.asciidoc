@@ -10833,21 +10833,21 @@ type: long
 *`mongodb.metrics.replication.executor.queues.sleepers`*::
 +
 --
-type: int
+type: long
 
 --
 
 *`mongodb.metrics.replication.executor.queues.ready`*::
 +
 --
-type: int
+type: long
 
 --
 
 *`mongodb.metrics.replication.executor.queues.free`*::
 +
 --
-type: int
+type: long
 
 --
 

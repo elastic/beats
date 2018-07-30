@@ -371,11 +371,11 @@
                     - name: exclusive
                       type: long
                 - name: sleepers
-                  type: int
+                  type: long
                 - name: ready
-                  type: int
+                  type: long
                 - name: free
-                  type: int
+                  type: long
             - name: unsignaled_events
               type: long
             - name: event_waiters
