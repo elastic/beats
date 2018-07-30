@@ -32,13 +32,25 @@ var Registry = newRegistryWrapper{}
 type newRegistryWrapper struct{}
 
 func (n *newRegistryWrapper) AddAppender(name string, factory appenders.Factory) {
-	feature.MustRegister(appenders.Feature(name, factory, feature.NewDetails(name, "", feature.Beta)))
+	feature.MustRegister(appenders.Feature(
+		name,
+		factory,
+		feature.NewDetails(name, "", feature.Undefined),
+	))
 }
 
 func (n *newRegistryWrapper) AddBuilder(name string, factory builder.Factory) {
-	feature.MustRegister(builder.Feature(name, factory, feature.NewDetails(name, "", feature.Beta)))
+	feature.MustRegister(builder.Feature(
+		name,
+		factory,
+		feature.NewDetails(name, "", feature.Undefined),
+	))
 }
 
 func (n *newRegistryWrapper) AddProvider(name string, factory providers.Factory) {
-	feature.MustRegister(providers.Feature(name, factory, feature.NewDetails(name, "", feature.Beta)))
+	feature.MustRegister(providers.Feature(name, factory, feature.NewDetails(
+		name,
+		"",
+		feature.Undefined,
+	)))
 }
