@@ -29,6 +29,8 @@ import (
 type config struct {
 	tcp.Config                `config:",inline"`
 	harvester.ForwarderConfig `config:",inline"`
+
+	LineDelimiter string `config:"line_delimiter" validate:"nonzero"`
 }
 
 var defaultConfig = config{
@@ -36,8 +38,8 @@ var defaultConfig = config{
 		Type: "tcp",
 	},
 	Config: tcp.Config{
-		LineDelimiter:  "\n",
 		Timeout:        time.Minute * 5,
 		MaxMessageSize: 20 * humanize.MiByte,
 	},
+	LineDelimiter: "\n",
 }
