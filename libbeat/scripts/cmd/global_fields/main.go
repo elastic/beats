@@ -71,7 +71,7 @@ func main() {
 	// it's not a problem because all of them has unique fields.yml files somewhere.
 	if len(beatFieldsPaths) == 0 && os.SameFile(esBeatsInfo, beatInfo) {
 		if output != "-" {
-			fmt.Println("No field files to collect")
+			fmt.Fprintln(os.Stderr, "No field files to collect")
 		}
 		return
 	}
@@ -95,7 +95,5 @@ func main() {
 		os.Exit(3)
 	}
 
-	if output != "-" {
-		fmt.Printf("Generated fields.yml for %s\n", name)
-	}
+	fmt.Fprintf(os.Stderr, "Generated fields.yml for %s to %s\n", name, filepath.Join(beatPath, output))
 }

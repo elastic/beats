@@ -11,7 +11,7 @@
         Network interface name.
     - name: in
       type: group
-      deprecated: true
+      deprecated: 6.4
       description: >
         Incoming network stats per second.
       fields:
@@ -34,7 +34,7 @@
             Total number of incoming packets.
     - name: out
       type: group
-      deprecated: true
+      deprecated: 6.4
       description: >
         Outgoing network stats per second.
       fields:
@@ -57,7 +57,7 @@
             Total number of outgoing packets.
     - name: inbound
       type: group
-      deprecated: true
+      deprecated: 6.4
       description: >
         Incoming network stats since the container started.
       fields:
@@ -80,7 +80,7 @@
             Total number of incoming packets.
     - name: outbound
       type: group
-      deprecated: true
+      deprecated: 6.4
       description: >
         Outgoing network stats since the container started.
       fields:

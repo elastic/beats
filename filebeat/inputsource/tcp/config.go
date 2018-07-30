@@ -33,7 +33,6 @@ type size uint64
 // Config exposes the tcp configuration.
 type Config struct {
 	Host           string                  `config:"host"`
-	LineDelimiter  string                  `config:"line_delimiter" validate:"nonzero"`
 	Timeout        time.Duration           `config:"timeout" validate:"nonzero,positive"`
 	MaxMessageSize cfgtype.ByteSize        `config:"max_message_size" validate:"nonzero,positive"`
 	TLS            *tlscommon.ServerConfig `config:"ssl"`
