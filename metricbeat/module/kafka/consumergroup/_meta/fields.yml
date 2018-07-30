@@ -6,7 +6,7 @@
   fields:
     - name: broker
       type: group
-      deprecated: true
+      deprecated: 6.5
       description: >
         Broker Consumer Group Information have been read from (Broker handling
         the consumer group).
@@ -27,12 +27,12 @@
 
     - name: topic
       type: keyword
-      deprecated: true
+      deprecated: 6.5
       description: Topic name
 
     - name: partition
       type: long
-      deprecated: true
+      deprecated: 6.5
       description: Partition ID
 
     - name: offset

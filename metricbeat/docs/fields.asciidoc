@@ -7067,6 +7067,9 @@ Consumer Group ID
 *`kafka.consumergroup.topic`*::
 +
 --
+
+deprecated[6.5]
+
 type: keyword
 
 Topic name
@@ -7076,6 +7079,9 @@ Topic name
 *`kafka.consumergroup.partition`*::
 +
 --
+
+deprecated[6.5]
+
 type: long
 
 Partition ID
@@ -7188,6 +7194,9 @@ Partition data.
 *`kafka.partition.partition.id`*::
 +
 --
+
+deprecated[6.5]
+
 type: long
 
 Partition id.
@@ -7258,6 +7267,9 @@ Error code from fetching partition.
 *`kafka.partition.topic.error.code`*::
 +
 --
+
+deprecated[6.5]
+
 type: long
 
 topic error code.
@@ -7268,6 +7280,9 @@ topic error code.
 *`kafka.partition.topic.name`*::
 +
 --
+
+deprecated[6.5]
+
 type: keyword
 
 Topic name
@@ -7278,6 +7293,9 @@ Topic name
 *`kafka.partition.broker.id`*::
 +
 --
+
+deprecated[6.5]
+
 type: long
 
 Broker id
@@ -7288,6 +7306,9 @@ Broker id
 *`kafka.partition.broker.address`*::
 +
 --
+
+deprecated[6.5]
+
 type: keyword
 
 Broker address
