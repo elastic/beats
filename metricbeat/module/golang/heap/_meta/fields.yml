@@ -33,7 +33,7 @@
           description: >
              Next collection will happen when HeapAlloc > this amount.
         - name: cpu_fraction
-          type: long
+          type: float
           description: >
              Fraction of CPU time used by GC.
         - name: pause
