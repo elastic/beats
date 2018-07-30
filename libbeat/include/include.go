@@ -23,6 +23,13 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
 	"github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/libbeat/feature"
+	"github.com/elastic/beats/libbeat/processors/actions"
+	"github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
+	"github.com/elastic/beats/libbeat/processors/add_docker_metadata"
+	"github.com/elastic/beats/libbeat/processors/add_host_metadata"
+	"github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
+	"github.com/elastic/beats/libbeat/processors/add_locale"
+	"github.com/elastic/beats/libbeat/processors/dissect"
 	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/libbeat/publisher/queue/spool"
 
@@ -62,6 +69,17 @@ var Bundle = feature.MustBundle(
 		kafka.Feature,
 		fileout.Feature,
 		console.Feature,
+	),
+
+	// Processors
+	feature.MustBundle(actions.Bundle,
+		actions.Bundle,
+		add_cloud_metadata.Feature,
+		add_docker_metadata.Feature,
+		add_host_metadata.Feature,
+		add_kubernetes_metadata.Feature,
+		add_locale.Feature,
+		dissect.Feature,
 	),
 )
 

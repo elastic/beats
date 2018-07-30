@@ -31,6 +31,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -46,10 +47,14 @@ const (
 
 var debugf = logp.MakeDebug("filters")
 
-// init registers the add_cloud_metadata processor.
-func init() {
-	processors.RegisterPlugin("add_cloud_metadata", newCloudMetadata)
-}
+// Feature exposes add_cloud_metadata.
+var (
+	Feature = processors.Feature("add_cloud_metadata", newCloudMetadata, feature.NewDetails(
+		"Add cloud metadata",
+		"Add metadata to the event from the cloud environment.",
+		feature.Stable,
+	))
+)
 
 type schemaConv func(m map[string]interface{}) common.MapStr
 

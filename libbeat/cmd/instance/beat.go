@@ -65,23 +65,11 @@ import (
 	// Register publisher pipeline modules
 	_ "github.com/elastic/beats/libbeat/publisher/includes"
 
-	// Register default processors.
-	_ "github.com/elastic/beats/libbeat/processors/actions"
-	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_docker_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_host_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_locale"
-	_ "github.com/elastic/beats/libbeat/processors/dissect"
-
 	// Register features
 	_ "github.com/elastic/beats/libbeat/include"
 
 	// Register default monitoring reporting
 	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
-
-	// Register features
-	_ "github.com/elastic/beats/libbeat/include"
 )
 
 // Beat provides the runnable and configurable instance of a beat.

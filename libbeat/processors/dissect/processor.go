@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
@@ -31,9 +32,14 @@ type processor struct {
 	config config
 }
 
-func init() {
-	processors.RegisterPlugin("dissect", newProcessor)
-}
+// Feature exposes dissect.
+var Feature = processors.Feature("dissect",
+	newProcessor,
+	feature.NewDetails(
+		"Dissect",
+		"Tokenize a string based on a dissect pattern.",
+		feature.Stable,
+	))
 
 func newProcessor(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig
