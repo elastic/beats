@@ -48,7 +48,7 @@ func Plugin(name string, f Factory) *feature.Feature {
 	return Feature(name, f, feature.NewDetails(name, "", feature.Undefined))
 }
 
-// FindFactory finds an output type its factory if available.
+// FindFactory finds an output type factory if available.
 func FindFactory(name string) (Factory, error) {
 	f, err := feature.Registry.Lookup(Namespace, name)
 	if err != nil {

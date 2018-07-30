@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/feature"
 )
 
 type Context struct {
@@ -37,29 +37,29 @@ type Context struct {
 // Factory is used to register functions creating new Input instances.
 type Factory = func(config *common.Config, connector channel.Connector, context Context) (Input, error)
 
-var registry = make(map[string]Factory)
+var namespace = "filebeat.input"
 
+// Register registers a new feature with the registry.
 func Register(name string, factory Factory) error {
-	logp.Info("Registering input factory")
-	if name == "" {
-		return fmt.Errorf("Error registering input: name cannot be empty")
-	}
-	if factory == nil {
-		return fmt.Errorf("Error registering input '%v': factory cannot be empty", name)
-	}
-	if _, exists := registry[name]; exists {
-		return fmt.Errorf("Error registering input '%v': already registered", name)
-	}
-
-	registry[name] = factory
-	logp.Info("Successfully registered input")
-
-	return nil
+	return feature.Register(Feature(name, factory, feature.NewDetails(name, "", feature.Undefined)))
 }
 
+// GetFactory find an input type factory if available.
 func GetFactory(name string) (Factory, error) {
-	if _, exists := registry[name]; !exists {
-		return nil, fmt.Errorf("Error creating input. No such input type exist: '%v'", name)
+	f, err := feature.Registry.Lookup(namespace, name)
+	if err != nil {
+		return nil, err
 	}
-	return registry[name], nil
+
+	factory, ok := f.Factory().(Factory)
+	if !ok {
+		return nil, fmt.Errorf("invalid input type, received: %T", f.Factory())
+	}
+
+	return factory, nil
+}
+
+// Feature return a new input feature.
+func Feature(name string, factory Factory, description feature.Describer) *feature.Feature {
+	return feature.New(namespace, name, factory, description)
 }
