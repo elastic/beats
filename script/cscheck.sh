@@ -28,7 +28,9 @@ EXIT_CODE=0
 
 if [ "$(cat /tmp/comments.json)" != "[]" ]; then
     # Get exists comments, diff them with exists same comments and send comments as review
-    curl -s https://api.github.com/repos/$TRAVIS_REPO_SLUG/pulls/$TRAVIS_PULL_REQUEST/comments > /tmp/pr_comments.json
+    curl -vvv https://api.github.com/repos/$TRAVIS_REPO_SLUG/pulls/$TRAVIS_PULL_REQUEST/comments > /tmp/pr_comments.json
+
+    cat /tmp/pr_comments.json
 
     github_comments_diff -comments /tmp/comments.json -exists-comments /tmp/pr_comments.json > /tmp/send_comments.json
 
