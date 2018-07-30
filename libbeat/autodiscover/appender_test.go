@@ -39,7 +39,11 @@ func newFakeAppender(_ *common.Config) (Appender, error) {
 }
 
 func TestAppenderRegistry(t *testing.T) {
-	feature.MustRegister(appenders.Feature("fake", newFakeAppender, feature.Stable))
+	feature.MustRegister(appenders.Feature("fake", newFakeAppender, feature.NewDetails(
+		"fake appender",
+		"",
+		feature.Stable,
+	)))
 	defer feature.Registry.Unregister(appenders.Namespace, "fake")
 
 	// Generate a config with type fake

@@ -34,7 +34,13 @@ import (
 )
 
 // Feature exposes the kubernetes autodiscovery provider.
-var Feature = providers.Feature("kubernetes", AutodiscoverBuilder, feature.Beta)
+var Feature = providers.Feature("kubernetes",
+	AutodiscoverBuilder,
+	feature.NewDetails(
+		"Kubernetes Autodiscover",
+		"Update the configuration based on Kubernetes events.",
+		feature.Beta,
+	))
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {

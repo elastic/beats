@@ -39,9 +39,14 @@ type Config struct {
 	Type string `config:"type"`
 }
 
+// Plugin accepts a builder to be registered as a plugin
+func Plugin(name string, factory Factory) *feature.Feature {
+	return Feature(name, factory, feature.NewDetails(name, "", feature.Undefined))
+}
+
 // Feature defines a new builder feature.
-func Feature(name string, factory Factory, stability feature.Stability) *feature.Feature {
-	return feature.New(Namespace, name, factory, stability)
+func Feature(name string, factory Factory, description feature.Describer) *feature.Feature {
+	return feature.New(Namespace, name, factory, description)
 }
 
 // Factory is a func used to generate a Builder object

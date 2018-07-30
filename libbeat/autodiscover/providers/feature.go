@@ -36,6 +36,11 @@ type Config struct {
 	Type string `config:"type"`
 }
 
+// Plugin accepts a provider to be registered as a plugin.
+func Plugin(name string, provider Factory) *feature.Feature {
+	return Feature(name, provider, feature.NewDetails(name, "", feature.Undefined))
+}
+
 // Factory creates a new provider based on the given config and returns it
 type Factory func(bus.Bus, *common.Config) (Provider, error)
 
@@ -43,8 +48,8 @@ type Factory func(bus.Bus, *common.Config) (Provider, error)
 var Namespace = "libbeat.autodiscover.provider"
 
 // Feature defines a new provider feature.
-func Feature(name string, factory Factory, stability feature.Stability) *feature.Feature {
-	return feature.New(Namespace, name, factory, stability)
+func Feature(name string, factory Factory, description feature.Describer) *feature.Feature {
+	return feature.New(Namespace, name, factory, description)
 }
 
 // FindFactory find, assert and return a provider factory.

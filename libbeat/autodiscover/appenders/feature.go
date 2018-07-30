@@ -22,8 +22,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/conditions"
 	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/processors"
 )
 
 // Namespace is the registry namespace for autodiscover appenders.
@@ -37,13 +37,18 @@ type Appender interface {
 
 // Config settings
 type Config struct {
-	Type            string                      `config:"type"`
-	ConditionConfig *processors.ConditionConfig `config:"condition"`
+	Type            string             `config:"type"`
+	ConditionConfig *conditions.Config `config:"condition"`
+}
+
+// Plugin accepts a AppenderBuilder to be registered as a plugin.
+func Plugin(name string, appender Factory) *feature.Feature {
+	return Feature(name, appender, feature.NewDetails(name, "", feature.Undefined))
 }
 
 // Feature defines a new appender feature.
-func Feature(name string, factory Factory, stability feature.Stability) *feature.Feature {
-	return feature.New(Namespace, name, factory, stability)
+func Feature(name string, factory Factory, description feature.Describer) *feature.Feature {
+	return feature.New(Namespace, name, factory, description)
 }
 
 // Factory is a func used to generate a Appender object

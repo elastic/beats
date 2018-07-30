@@ -39,7 +39,11 @@ func newFakeBuilder(_ *common.Config) (Builder, error) {
 }
 
 func TestBuilderRegistry(t *testing.T) {
-	feature.MustRegister(builder.Feature("fake", newFakeBuilder, feature.Beta))
+	feature.MustRegister(builder.Feature("fake", newFakeBuilder, feature.NewDetails(
+		"fake builder",
+		"",
+		feature.Beta,
+	)))
 	defer feature.Registry.Unregister(builder.Namespace, "fake")
 
 	// Generate a config with type fake

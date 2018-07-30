@@ -32,7 +32,13 @@ import (
 )
 
 // Feature exposes the docker autodiscovery provider.
-var Feature = providers.Feature("docker", AutodiscoverBuilder, feature.Beta)
+var Feature = providers.Feature("docker",
+	AutodiscoverBuilder,
+	feature.NewDetails(
+		"Docker Autodiscover",
+		"Update the configuration based on Docker events.",
+		feature.Beta,
+	))
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {

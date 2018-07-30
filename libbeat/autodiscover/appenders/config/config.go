@@ -32,7 +32,13 @@ import (
 )
 
 // Feature exposes a config appender.
-var Feature = appenders.Feature("config", NewConfigAppender, feature.Beta)
+var Feature = appenders.Feature("config",
+	NewConfigAppender,
+	feature.NewDetails(
+		"Config",
+		"Add new appenders based on the configuration.",
+		feature.Beta,
+	))
 
 type config struct {
 	ConditionConfig *conditions.Config `config:"condition"`

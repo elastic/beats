@@ -133,7 +133,7 @@ func TestAutodiscover(t *testing.T) {
 			busChan <- b
 
 			return &mockProvider{}, nil
-		}, feature.Stable),
+		}, feature.NewDetails("mock autodiscover", "", feature.Stable)),
 	)
 	defer feature.Registry.Unregister(providers.Namespace, "mock")
 
@@ -241,7 +241,7 @@ func TestAutodiscoverHash(t *testing.T) {
 			busChan <- b
 
 			return &mockProvider{}, nil
-		}, feature.Stable),
+		}, feature.NewDetails("mock Autodiscover", "", feature.Stable)),
 	)
 	defer feature.Registry.Unregister(providers.Namespace, "mock")
 

@@ -28,7 +28,13 @@ import (
 )
 
 // Feature exposes the Jolokia autodiscovery provider.
-var Feature = providers.Feature("jolokia", AutodiscoverBuilder, feature.Experimental)
+var Feature = providers.Feature("jolokia",
+	AutodiscoverBuilder,
+	feature.NewDetails(
+		"Jolokia Autodiscover",
+		"Update configuration based on Jolokia events.",
+		feature.Experimental,
+	))
 
 // DiscoveryProber implements discovery probes
 type DiscoveryProber interface {
