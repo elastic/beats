@@ -35,11 +35,15 @@ type indexerPlugin struct {
 	Factory IndexerConstructor
 }
 
+type indexerFunc func() *indexerPlugin
+
 type matcherPlugin struct {
 	Default bool
 	Config  *common.Config
 	Factory MatcherConstructor
 }
+
+type matcherFunc func() *matcherPlugin
 
 // IndexerFeature creates a new Indexer for kubernetes metadata.
 func IndexerFeature(
@@ -49,10 +53,12 @@ func IndexerFeature(
 	config *common.Config,
 	description feature.Describer,
 ) *feature.Feature {
-	return feature.New(indexerNamespace, name, indexerPlugin{
-		Default: d,
-		Config:  config,
-		Factory: factory,
+	return feature.New(indexerNamespace, name, func() *indexerPlugin {
+		return &indexerPlugin{
+			Default: d,
+			Config:  config,
+			Factory: factory,
+		}
 	}, description)
 }
 
@@ -64,10 +70,12 @@ func MatcherFeature(
 	config *common.Config,
 	description feature.Describer,
 ) *feature.Feature {
-	return feature.New(matcherNamespace, name, matcherPlugin{
-		Default: d,
-		Config:  config,
-		Factory: factory,
+	return feature.New(matcherNamespace, name, func() *matcherPlugin {
+		return &matcherPlugin{
+			Default: d,
+			Config:  config,
+			Factory: factory,
+		}
 	}, description)
 }
 
@@ -78,12 +86,13 @@ func FindIndexerFactory(name string) (IndexerConstructor, error) {
 		return nil, err
 	}
 
-	plugin, ok := f.Factory().(indexerPlugin)
+	pluginFactory, ok := f.Factory().(indexerFunc)
 
 	if !ok {
 		return nil, fmt.Errorf("invalid indexer type, received: %T", f.Factory())
 	}
 
+	plugin := pluginFactory()
 	return plugin.Factory, nil
 }
 
@@ -95,11 +104,13 @@ func FindDefaultIndexersConfigs() (configs []map[string]common.Config, err error
 	}
 
 	for _, f := range features {
-		plugin, ok := f.Factory().(indexerPlugin)
+		pluginFactory, ok := f.Factory().(indexerFunc)
 
 		if !ok {
 			return nil, fmt.Errorf("invalid indexer type, received: %T", f.Factory())
 		}
+
+		plugin := pluginFactory()
 
 		if plugin.Default {
 			configs = append(configs, map[string]common.Config{f.Name(): *plugin.Config})
@@ -116,12 +127,13 @@ func FindMatcherFactory(name string) (MatcherConstructor, error) {
 		return nil, err
 	}
 
-	plugin, ok := f.Factory().(matcherPlugin)
+	pluginFactory, ok := f.Factory().(matcherFunc)
 
 	if !ok {
 		return nil, fmt.Errorf("invalid matcher type, received: %T", f.Factory())
 	}
 
+	plugin := pluginFactory()
 	return plugin.Factory, nil
 }
 
@@ -133,11 +145,13 @@ func FindDefaultMatchersConfigs() (configs []map[string]common.Config, err error
 	}
 
 	for _, f := range features {
-		plugin, ok := f.Factory().(indexerPlugin)
+		pluginFactory, ok := f.Factory().(matcherFunc)
 
 		if !ok {
-			return nil, fmt.Errorf("invalid indexer type, received: %T", f.Factory())
+			return nil, fmt.Errorf("invalid matcher type, received: %T", f.Factory())
 		}
+
+		plugin := pluginFactory()
 
 		if plugin.Default {
 			configs = append(configs, map[string]common.Config{f.Name(): *plugin.Config})
