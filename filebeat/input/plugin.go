@@ -17,39 +17,33 @@
 
 package input
 
-import (
-	"errors"
+// type inputPlugin struct {
+// 	name    string
+// 	factory Factory
+// }
 
-	"github.com/elastic/beats/libbeat/plugin"
-)
+// const pluginKey = "filebeat.input"
 
-type inputPlugin struct {
-	name    string
-	factory Factory
-}
+// func init() {
+// 	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+// 		p, ok := ifc.(inputPlugin)
+// 		if !ok {
+// 			return errors.New("plugin does not match filebeat input plugin type")
+// 		}
 
-const pluginKey = "filebeat.input"
+// 		if p.factory != nil {
+// 			if err := Register(p.name, p.factory); err != nil {
+// 				return err
+// 			}
+// 		}
 
-func init() {
-	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
-		p, ok := ifc.(inputPlugin)
-		if !ok {
-			return errors.New("plugin does not match filebeat input plugin type")
-		}
+// 		return nil
+// 	})
+// }
 
-		if p.factory != nil {
-			if err := Register(p.name, p.factory); err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
-}
-
-func Plugin(
-	module string,
-	factory Factory,
-) map[string][]interface{} {
-	return plugin.MakePlugin(pluginKey, inputPlugin{module, factory})
-}
+// func Plugin(
+// 	module string,
+// 	factory Factory,
+// ) map[string][]interface{} {
+// 	return plugin.MakePlugin(pluginKey, inputPlugin{module, factory})
+// }
