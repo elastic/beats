@@ -144,11 +144,10 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		return elastic.ReportErrorForMissingField("cluster_name", elastic.Elasticsearch, r)
 	}
 
-	version := "TODO: Fetch from ES (where?) and parse"
-	licenseFields := "TODO: Fetch from ES (where?) and parse"
-	nodesFields := "TODO: Fetch from ES (where?) and parse"
-	clusterStateFields := "TODO: Fetch from ES (where?) and parse"
-	stackStatsFields := "TODO: Fetch from ES (where?) and parse"
+	version := "TODO: Fetch from http://localhost:9200/ and parse"
+	licenseFields := "TODO: Fetch from http://localhost:9200/_xpack/license and parse"
+	clusterStateFields := "TODO: Fetch from http://localhost:9200/_cluster/state (with response filtering) + http://localhost:9200/_cluster/health (for status field) and parse"
+	stackStatsFields := "TODO: Fetch from http://localhost:9200/_xpack/usage + apm (from cluster state if apm-* indices exist) + and parse"
 
 	event := mb.Event{}
 	event.RootFields = common.MapStr{
@@ -160,7 +159,6 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		"license":       licenseFields,
 		"version":       version,
 		"cluster_stats": clusterStatsFields,
-		"nodes":         nodesFields,
 		"cluster_state": clusterStateFields,
 		"stack_stats":   stackStatsFields,
 	}
