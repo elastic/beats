@@ -15102,6 +15102,9 @@ Number of connected slaves
 *`redis.info.replication.master_offset`*::
 +
 --
+
+deprecated[6.5]
+
 type: long
 
 The server's current replication offset
