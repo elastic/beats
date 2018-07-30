@@ -26,15 +26,16 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/input/log"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-func init() {
-	err := input.Register("stdin", NewInput)
-	if err != nil {
-		panic(err)
-	}
-}
+// Feature expose the redis input as a feature.
+var Feature = input.Feature("stdin", NewInput, feature.NewDetails(
+	"Stdin input",
+	"Read logs from stdin.",
+	feature.Stable,
+))
 
 // Input is an input for stdin
 type Input struct {

@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -85,12 +86,12 @@ var (
 	}
 )
 
-func init() {
-	err := input.Register("syslog", NewInput)
-	if err != nil {
-		panic(err)
-	}
-}
+// Feature expose the syslog input as a feature.
+var Feature = input.Feature("syslog", NewInput, feature.NewDetails(
+	"Syslog input",
+	"Receive syslog events over TCP or UDP",
+	feature.Experimental,
+))
 
 // Input define a syslog input
 type Input struct {

@@ -18,12 +18,33 @@
 package include
 
 import (
+	"github.com/elastic/beats/filebeat/input/docker"
+	"github.com/elastic/beats/filebeat/input/log"
+	"github.com/elastic/beats/filebeat/input/redis"
+	"github.com/elastic/beats/filebeat/input/stdin"
+	"github.com/elastic/beats/filebeat/input/syslog"
+	"github.com/elastic/beats/filebeat/input/tcp"
+	"github.com/elastic/beats/filebeat/input/udp"
 	"github.com/elastic/beats/filebeat/processor/add_kubernetes_metadata"
 	"github.com/elastic/beats/libbeat/feature"
 )
 
 var bundle = feature.MustBundle(
-	add_kubernetes_metadata.Feature,
+	// inputs
+	feature.MustBundle(
+		docker.Feature,
+		log.Feature,
+		redis.Feature,
+		stdin.Feature,
+		syslog.Feature,
+		tcp.Feature,
+		udp.Feature,
+	),
+
+	// processors
+	feature.MustBundle(
+		add_kubernetes_metadata.Feature,
+	),
 )
 
 func init() {

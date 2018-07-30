@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
@@ -50,12 +51,12 @@ var (
 	errHarvesterLimit = errors.New("harvester limit reached")
 )
 
-func init() {
-	err := input.Register("log", NewInput)
-	if err != nil {
-		panic(err)
-	}
-}
+// Feature expose the log input as a feature.
+var Feature = input.Feature("log", NewInput, feature.NewDetails(
+	"log input",
+	"Read logs from the filesystem.",
+	feature.Stable,
+))
 
 // Input contains the input and its config
 type Input struct {

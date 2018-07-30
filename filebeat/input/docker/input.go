@@ -26,16 +26,17 @@ import (
 	"github.com/elastic/beats/filebeat/input/log"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/feature"
 
 	"github.com/pkg/errors"
 )
 
-func init() {
-	err := input.Register("docker", NewInput)
-	if err != nil {
-		panic(err)
-	}
-}
+// Feature expose the docker input as a feature.
+var Feature = input.Feature("docker", NewInput, feature.NewDetails(
+	"Docker input",
+	"Read logs from a docker container.",
+	feature.Stable,
+))
 
 // NewInput creates a new docker input
 func NewInput(

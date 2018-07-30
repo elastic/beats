@@ -28,15 +28,16 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-func init() {
-	err := input.Register("redis", NewInput)
-	if err != nil {
-		panic(err)
-	}
-}
+// Feature expose the redis input as a feature.
+var Feature = input.Feature("redis", NewInput, feature.NewDetails(
+	"Redis input",
+	"Read logs from redis.",
+	feature.Stable,
+))
 
 // Input is a input for redis
 type Input struct {

@@ -30,15 +30,16 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-func init() {
-	err := input.Register("tcp", NewInput)
-	if err != nil {
-		panic(err)
-	}
-}
+// Feature expose the TCP input as a feature.
+var Feature = input.Feature("tcp", NewInput, feature.NewDetails(
+	"TCP input",
+	"Receive events over TCP.",
+	feature.Experimental,
+))
 
 // Input for TCP connection
 type Input struct {
