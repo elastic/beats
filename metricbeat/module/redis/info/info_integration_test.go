@@ -49,7 +49,7 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check fields
-	assert.Equal(t, 8, len(event))
+	assert.Equal(t, 9, len(event))
 	server := event["server"].(common.MapStr)
 	assert.Equal(t, "standalone", server["mode"])
 }
