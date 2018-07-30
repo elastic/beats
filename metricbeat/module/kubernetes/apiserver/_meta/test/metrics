@@ -135,7 +135,7 @@ apiserver_client_certificate_expiration_seconds_bucket{le="3.1104e+07"} 0
 apiserver_client_certificate_expiration_seconds_bucket{le="+Inf"} 733059
 apiserver_client_certificate_expiration_seconds_sum 1.1534874692275488e+14
 apiserver_client_certificate_expiration_seconds_count 733059
-# HELP apiserver_current_inflight_requests Maximal mumber of currently used inflight request limit of this apiserver per request kind in last second.
+# HELP apiserver_current_inflight_requests Maximal number of currently used inflight request limit of this apiserver per request kind in last second.
 # TYPE apiserver_current_inflight_requests gauge
 apiserver_current_inflight_requests{requestKind="mutating"} 1
 apiserver_current_inflight_requests{requestKind="readOnly"} 1

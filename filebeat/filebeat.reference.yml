@@ -92,6 +92,30 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+  gc:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  audit:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  slowlog:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  deprecation:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Icinga Module -------------------------------
 #- module: icinga
   # Main logs
@@ -170,6 +194,8 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
 
 #------------------------------- kibana Module -------------------------------
 - module: kibana
@@ -438,7 +464,7 @@ filebeat.inputs:
 
   ### Multiline options
 
-  # Mutiline can be used for log messages spanning multiple lines. This is common
+  # Multiline can be used for log messages spanning multiple lines. This is common
   # for Java Stack Traces or C-Line Continuation
 
   # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
@@ -470,7 +496,7 @@ filebeat.inputs:
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
-  # If symlinks is enabled, symlinks are opened and harvested. The harvester is openening the
+  # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
   # original for harvesting but will report the symlink name as source.
   #symlinks: false
 
@@ -971,6 +997,9 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 0
 
+  # Configure escaping html symbols in strings.
+  #escape_html: true
+
   # Optional protocol and basic auth credentials.
   #protocol: "https"
   #username: "elastic"
@@ -1011,7 +1040,18 @@ output.elasticsearch:
   # The default is 50.
   #bulk_max_size: 50
 
-  # Configure http request timeout before failing an request to Elasticsearch.
+  # The number of seconds to wait before trying to reconnect to Elasticsearch
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Elasticsearch after a network error. The default is 60s.
+  #backoff.max: 60s
+
+  # Configure http request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
@@ -1065,6 +1105,9 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 3
 
+  # Configure escaping html symbols in strings.
+  #escape_html: true
+
   # Optional maximum time to live for a connection to Logstash, after which the
   # connection will be re-established.  A value of `0s` (the default) will
   # disable this feature.
@@ -1075,7 +1118,7 @@ output.elasticsearch:
   # Optional load balance the events between the Logstash hosts. Default is false.
   #loadbalance: false
 
-  # Number of batches to be sent asynchronously to logstash while processing
+  # Number of batches to be sent asynchronously to Logstash while processing
   # new batches.
   #pipelining: 2
 
@@ -1083,6 +1126,17 @@ output.elasticsearch:
   # transaction.  The number of events to be sent increases up to `bulk_max_size`
   # if no error is encountered.
   #slow_start: false
+
+  # The number of seconds to wait before trying to reconnect to Logstash
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Logstash after a network error. The default is 60s.
+  #backoff.max: 60s
 
   # Optional index name. The default index name is set to filebeat
   # in all lowercase.
@@ -1165,9 +1219,16 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version filebeat is assumed to run against. Defaults to the oldest
-  # supported stable version (currently version 0.8.2.0)
-  #version: 0.8.2
+  # Kafka version filebeat is assumed to run against. Defaults to the "1.0.0".
+  #version: '1.0.0'
+
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
 
   # Metadata update configuration. Metadata do contain leader information
   # deciding which broker to use when publishing.
@@ -1214,6 +1275,10 @@ output.elasticsearch:
   # Sets the output compression codec. Must be one of none, snappy and gzip. The
   # default is gzip.
   #compression: gzip
+
+  # Set the compression level. Currently only gzip provides a compression level
+  # between 0 and 9. The default value is chosen by the compression algorithm.
+  #compression_level: 4
 
   # The maximum permitted size of JSON-encoded messages. Bigger messages will be
   # dropped. The default value is 1000000 (bytes). This value should be equal to
@@ -1270,6 +1335,14 @@ output.elasticsearch:
 #output.redis:
   # Boolean flag to enable or disable the output module.
   #enabled: true
+
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
 
   # The list of Redis servers to connect to. If load balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
@@ -1372,6 +1445,14 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
+
   # Path to the directory where to save the generated files. The option is
   # mandatory.
   #path: "/tmp/filebeat"
@@ -1399,8 +1480,13 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
-  # Pretty print json event
-  #pretty: false
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping html symbols in strings.
+    #escape_html: true
 
 #================================= Paths ======================================
 
@@ -1722,6 +1808,9 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  #metrics.period: 10s
+  #state.period: 1m
 
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security

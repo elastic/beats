@@ -11,7 +11,7 @@
 # Usage and Features:
 #   - Two users exist: Administrator and Vagrant. Both have the password: vagrant
 #   - Use 'vagrant ssh' to open a Windows command prompt.
-#   - Use 'vagrant rdp' to open a Windows Remote Deskop session. Mac users must
+#   - Use 'vagrant rdp' to open a Windows Remote Desktop session. Mac users must
 #     install the Microsoft Remote Desktop Client from the App Store.
 #   - There is a desktop shortcut labeled "Beats Shell" that opens a command prompt
 #     to C:\Gopath\src\github.com\elastic\beats where the code is mounted.
@@ -54,9 +54,9 @@ $Shortcut.WorkingDirectory = "C:\\Gopath\\src\\github.com\\elastic\\beats"
 $Shortcut.Save()
 
 echo "Disable automatic updates"
-$AUSettigns = (New-Object -com "Microsoft.Update.AutoUpdate").Settings
-$AUSettigns.NotificationLevel = 1
-$AUSettigns.Save()
+$AUSettings = (New-Object -com "Microsoft.Update.AutoUpdate").Settings
+$AUSettings.NotificationLevel = 1
+$AUSettings.Save()
 SCRIPT
 
 # Provisioning for Unix/Linux
@@ -198,6 +198,16 @@ Vagrant.configure(2) do |config|
     c.vm.provision "shell", inline: "pip install virtualenv"
 
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
+  # Windows Server 2016
+  config.vm.define "win2016", primary: true do |machine|
+    machine.vm.box = "elastic/windows-2016-x86_64"
+    machine.vm.provision "shell", inline: $winPsProvision
+
+    machine.vm.provider "virtualbox" do |v|
+      v.memory = 4096
+    end
   end
 
 end

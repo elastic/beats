@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package docker
 
 import (
@@ -76,6 +93,7 @@ type Container struct {
 // Client for docker interface
 type Client interface {
 	ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)
+	ContainerInspect(ctx context.Context, container string) (types.ContainerJSON, error)
 	Events(ctx context.Context, options types.EventsOptions) (<-chan events.Message, <-chan error)
 }
 
@@ -290,7 +308,20 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 	for _, c := range containers {
 		var ipaddresses []string
 		for _, net := range c.NetworkSettings.Networks {
-			ipaddresses = append(ipaddresses, net.IPAddress)
+			if net.IPAddress != "" {
+				ipaddresses = append(ipaddresses, net.IPAddress)
+			}
+		}
+
+		// If there are no network interfaces, assume that the container is on host network
+		// Inspect the container directly and use the hostname as the IP address in order
+		if len(ipaddresses) == 0 {
+			info, err := w.client.ContainerInspect(w.ctx, c.ID)
+			if err == nil {
+				ipaddresses = append(ipaddresses, info.Config.Hostname)
+			} else {
+				logp.Warn("unable to inspect container %s due to error %v", c.ID, err)
+			}
 		}
 		result = append(result, &Container{
 			ID:          c.ID,

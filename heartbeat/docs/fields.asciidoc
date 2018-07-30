@@ -483,7 +483,7 @@ Service response parameters.
 
 
 
-*`http.response.status`*::
+*`http.response.status_code`*::
 +
 --
 type: integer
@@ -573,6 +573,15 @@ Duration in microseconds
 
 --
 
+*`http.rtt.content.us`*::
++
+--
+type: long
+
+Time required to retrieved the content in micro seconds.
+
+--
+
 [float]
 == total fields
 
@@ -655,7 +664,7 @@ Kubernetes pod name
 --
 type: keyword
 
-Kubernetes pod uid
+Kubernetes Pod UID
 
 
 --

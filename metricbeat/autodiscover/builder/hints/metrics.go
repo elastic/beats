@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package hints
 
 import (
@@ -65,6 +82,20 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		return config
 	}
 
+	modulesConfig := m.getModules(hints)
+	if modulesConfig != nil {
+		configs := []*common.Config{}
+		for _, cfg := range modulesConfig {
+			if config, err := common.NewConfigFrom(cfg); err == nil {
+				configs = append(configs, config)
+			}
+		}
+		logp.Debug("hints.builder", "generated config %+v", configs)
+		// Apply information in event to the template to generate the final config
+		return template.ApplyConfigTemplate(event, configs)
+
+	}
+
 	mod := m.getModule(hints)
 	if mod == "" {
 		return config
@@ -76,6 +107,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	tout := m.getTimeout(hints)
 	ival := m.getPeriod(hints)
 	sslConf := m.getSSLConfig(hints)
+	procs := m.getProcessors(hints)
 
 	moduleConfig := common.MapStr{
 		"module":     mod,
@@ -85,6 +117,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		"period":     ival,
 		"enabled":    true,
 		"ssl":        sslConf,
+		"processors": procs,
 	}
 
 	if ns != "" {
@@ -98,14 +131,13 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	if err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: %v", *cfg)
+	logp.Debug("hints.builder", "generated config: +%v", *cfg)
 	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
 	// This especially helps in a scenario where endpoints are configured as:
 	// co.elastic.metrics/hosts= "${data.host}:9090"
-	config = template.ApplyConfigTemplate(event, config)
-	return config
+	return template.ApplyConfigTemplate(event, config)
 }
 
 func (m *metricHints) getModule(hints common.MapStr) string {
@@ -167,4 +199,13 @@ func (m *metricHints) getTimeout(hints common.MapStr) string {
 
 func (m *metricHints) getSSLConfig(hints common.MapStr) common.MapStr {
 	return builder.GetHintMapStr(hints, m.Key, ssl)
+}
+
+func (m *metricHints) getModules(hints common.MapStr) []common.MapStr {
+	return builder.GetHintAsConfigs(hints, m.Key)
+}
+
+func (m *metricHints) getProcessors(hints common.MapStr) []common.MapStr {
+	return builder.GetProcessors(hints, m.Key)
+
 }

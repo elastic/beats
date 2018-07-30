@@ -1,8 +1,23 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package fileset
 
 import (
-	"github.com/mitchellh/hashstructure"
-
 	"github.com/elastic/beats/filebeat/channel"
 	input "github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
@@ -10,8 +25,19 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+
+	"github.com/mitchellh/hashstructure"
 )
+
+var (
+	moduleList = monitoring.NewUniqueList()
+)
+
+func init() {
+	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
+}
 
 // Factory for modules
 type Factory struct {
@@ -110,10 +136,20 @@ func (p *inputsRunner) Start() {
 	for _, input := range p.inputs {
 		input.Start()
 	}
+
+	// Loop through and add modules, only 1 normally
+	for m := range p.moduleRegistry.registry {
+		moduleList.Add(m)
+	}
 }
 func (p *inputsRunner) Stop() {
 	for _, input := range p.inputs {
 		input.Stop()
+	}
+
+	// Loop through and remove modules, only 1 normally
+	for m := range p.moduleRegistry.registry {
+		moduleList.Remove(m)
 	}
 }
 

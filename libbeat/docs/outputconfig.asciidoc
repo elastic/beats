@@ -28,10 +28,19 @@ The following topics describe how to configure each supported output:
 * <<elasticsearch-output>>
 * <<logstash-output>>
 * <<kafka-output>>
+ifndef::no-redis-output[]
 * <<redis-output>>
+endif::[]
 * <<file-output>>
 * <<console-output>>
 
+If you've secured the {stack}, also read <<securing-{beatname_lc}>> for more about
+security-related configuration options.
+
+endif::[]
+
+ifdef::beat-specific-output-config[]
+include::{beat-specific-output-config}[]
 endif::[]
 
 [[elasticsearch-output]]
@@ -49,12 +58,14 @@ Example configuration:
 ------------------------------------------------------------------------------
 
 output.elasticsearch:
-  hosts: ["http://localhost:9200"]
+  hosts: ["https://localhost:9200"]
   index: "{beatname_lc}-%{[beat.version]}-%{+yyyy.MM.dd}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   ssl.certificate: "/etc/pki/client/cert.pem"
   ssl.key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
+
+//
 
 To enable SSL, just add `https` to all URLs defined under __hosts__.
 
@@ -63,8 +74,8 @@ To enable SSL, just add `https` to all URLs defined under __hosts__.
 
 output.elasticsearch:
   hosts: ["https://localhost:9200"]
-  username: "admin"
-  password: "s3cr3t"
+  username: "{beatname_lc}_internal"
+  password: "{pwd}"
 ------------------------------------------------------------------------------
 
 If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` to the yaml file.
@@ -74,10 +85,14 @@ If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` 
 output.elasticsearch:
   hosts: ["localhost"]
   protocol: "https"
-  username: "admin"
-  password: "s3cr3t"
+  username: "{beatname_lc}_internal"
+  password: "{pwd}"
 
 ------------------------------------------------------------------------------
+
+
+For more information about securing {beatname_uc}, see
+<<securing-{beatname_lc}>>.
 
 ==== Compatibility
 
@@ -128,6 +143,13 @@ The compression level must be in the range of 1 (best speed) to 9 (best compress
 Increasing the compression level will reduce the network usage but will increase the cpu usage.
 
 The default value is 0.
+
+===== `escape_html`
+
+Configure escaping of HTML in strings. Set to `false` to disable escaping.
+
+The default value is `true`.
+
 
 ===== `worker`
 
@@ -194,10 +216,16 @@ The index name to write events to. The default is
 +"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-2017.04.26"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
-(see <<configuration-template>>). If you are using the pre-built Kibana
-dashboards, you also need to set the `setup.dashboards.index` option (see
-<<configuration-dashboards>>).
+(see <<configuration-template>>).
 
+If you are using the pre-built Kibana dashboards,
+you also need to set the `setup.dashboards.index` option (see <<configuration-dashboards>>).
+
+ifdef::deprecate_dashboard_loading[]
+
+deprecated[{deprecate_dashboard_loading}]
+
+endif::[]
 
 ===== `indices`
 
@@ -317,6 +345,20 @@ Setting `bulk_max_size` to values less than or equal to 0 disables the
 splitting of batches. When splitting is disabled, the queue decides on the
 number of events to be contained in a batch.
 
+===== `backoff.init`
+
+The number of seconds to wait before trying to reconnect to Elasticsearch after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
+
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Elasticsearch after a network error. The default is 60s.
+
 ===== `timeout`
 
 The http request timeout in seconds for the Elasticsearch request. The default is 90.
@@ -342,7 +384,7 @@ The Logstash output sends events directly to Logstash by using the lumberjack
 protocol, which runs over TCP. Logstash allows for additional processing and routing of
 generated events.
 
-include::../../libbeat/docs/shared-logstash-config.asciidoc[]
+include::./shared-logstash-config.asciidoc[]
 
 ==== Accessing metadata fields
 
@@ -442,6 +484,12 @@ The compression level must be in the range of 1 (best speed) to 9 (best compress
 Increasing the compression level will reduce the network usage but will increase the cpu usage.
 
 The default value is 3.
+
+===== `escape_html`
+
+Configure escaping of HTML in strings. Set to `false` to disable escaping.
+
+The default value is `true`.
 
 ===== `worker`
 
@@ -581,6 +629,19 @@ On error the number of events per transaction is reduced again.
 
 The default is `false`.
 
+===== `backoff.init`
+
+The number of seconds to wait before trying to reconnect to Logstash after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Logstash after a network error. The default is 60s.
+
 [[kafka-output]]
 === Configure the Kafka output
 
@@ -612,7 +673,8 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 
 ==== Compatibility
 
-This output works with Kafka 0.8, 0.9, and 0.10.
+This output works with all Kafka in between 0.11 and 1.1.1. Older versions
+might work as well, but are not supported.
 
 ==== Configuration options
 
@@ -632,12 +694,11 @@ The cluster metadata contain the actual Kafka brokers events are published to.
 
 ===== `version`
 
-Kafka version ${beatname_lc} is assumed to run against. Defaults to oldest
-supported stable version (currently version 0.8.2.0).
+Kafka version ${beatname_lc} is assumed to run against. Defaults to 1.0.0.
 
 Event timestamps will be added, if version 0.10.0.0+ is enabled.
 
-Valid values are all kafka releases in between `0.8.2.0` and `0.11.0.0`.
+Valid values are all kafka releases in between `0.8.2.0` and `1.1.1`.
 
 ===== `username`
 
@@ -779,6 +840,15 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 Sets the output compression codec. Must be one of `none`, `snappy`, `lz4` and `gzip`. The default is `gzip`.
 
+===== `compression_level`
+
+Sets the compression level used by gzip. Setting this value to 0 disables compression.
+The compression level must be in the range of 1 (best speed) to 9 (best compression).
+
+Increasing the compression level will reduce the network usage but will increase the cpu usage.
+
+The default value is 4.
+
 [[kafka-max_message_bytes]]
 ===== `max_message_bytes`
 
@@ -795,6 +865,7 @@ Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silentl
 Configuration options for SSL parameters like the root CA for Kafka connections. See
 <<configuration-ssl>> for more information.
 
+ifndef::no-redis-output[]
 [[redis-output]]
 === Configure the Redis output
 
@@ -849,15 +920,12 @@ The Redis port to use if `hosts` does not contain a port number. The default is 
 
 ===== `index`
 
-deprecated[5.0.0,The `index` setting is renamed to `key`]
-
-The name of the Redis list or channel the events are published to. The default is
-"{beatname_lc}".
+The index name added to the events metadata for use by Logstash. The default is "{beatname_lc}".
 
 ===== `key`
 
-The name of the Redis list or channel the events are published to. The default is
-"{beatname_lc}".
+The name of the Redis list or channel the events are published to. If not
+configured, the value of the `index` setting is used.
 
 The redis key can be set dynamically using a format string accessing any
 fields in the event to be published.
@@ -1027,6 +1095,8 @@ client. You can change this behavior by setting the
 This option determines whether Redis hostnames are resolved locally when using a proxy.
 The default value is false, which means that name resolution occurs on the proxy server.
 
+endif::[]
+
 [[file-output]]
 === Configure the File output
 
@@ -1152,6 +1222,8 @@ codec. By default the `json` codec is used.
 
 *`json.pretty`*: If `pretty` is set to true, events will be nicely formatted. The default is false.
 
+*`json.escape_html`*: If `escape_html` is set to false, html symbols will not be escaped in strings. The default is true.
+
 Example configuration that uses the `json` codec with pretty printing enabled to write events to the console:
 
 [source,yaml]
@@ -1159,6 +1231,7 @@ Example configuration that uses the `json` codec with pretty printing enabled to
 output.console:
   codec.json:
     pretty: true
+    escape_html: false
 ------------------------------------------------------------------------------
 
 *`format.string`*: Configurable format string used to create a custom formatted message.

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package template
 
 import (
@@ -45,6 +62,8 @@ func (p *Processor) Process(fields common.Fields, path string, output common.Map
 			mapping = p.object(&field)
 		case "array":
 			mapping = p.array(&field)
+		case "alias":
+			mapping = p.alias(&field)
 		case "group":
 			var newPath string
 			if path == "" {
@@ -151,9 +170,12 @@ func (p *Processor) keyword(f *common.Field) common.MapStr {
 	defaultFields = append(defaultFields, fullName)
 
 	property["type"] = "keyword"
-	if f.IgnoreAbove == 0 {
+
+	switch f.IgnoreAbove {
+	case 0: // Use libbeat default
 		property["ignore_above"] = defaultIgnoreAbove
-	} else {
+	case -1: // Use ES default
+	default: // Use user value
 		property["ignore_above"] = f.IgnoreAbove
 	}
 
@@ -222,6 +244,13 @@ func (p *Processor) array(f *common.Field) common.MapStr {
 	return properties
 }
 
+func (p *Processor) alias(f *common.Field) common.MapStr {
+	properties := getDefaultProperties(f)
+	properties["type"] = "alias"
+	properties["path"] = f.AliasPath
+	return properties
+}
+
 func (p *Processor) object(f *common.Field) common.MapStr {
 	dynProperties := getDefaultProperties(f)
 
@@ -247,7 +276,7 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 	case "keyword":
 		dynProperties["type"] = f.ObjectType
 		addDynamicTemplate(f, dynProperties, matchType("string"))
-	case "long", "double":
+	case "byte", "double", "float", "long", "short":
 		dynProperties["type"] = f.ObjectType
 		addDynamicTemplate(f, dynProperties, matchType(f.ObjectType))
 	}

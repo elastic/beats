@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-docker>>
 * <<exported-fields-dropwizard>>
 * <<exported-fields-elasticsearch>>
+* <<exported-fields-envoyproxy>>
 * <<exported-fields-etcd>>
 * <<exported-fields-golang>>
 * <<exported-fields-graphite>>
@@ -47,6 +48,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
@@ -357,6 +359,9 @@ Namespace name
 +
 --
 type: keyword
+
+Node host
+
 
 --
 
@@ -2731,6 +2736,9 @@ Number of current reads per second
 *`docker.diskio.reads`*::
 +
 --
+
+deprecated[6.4]
+
 type: scaled_float
 
 Number of current reads per second
@@ -2780,6 +2788,9 @@ Number of current writes per second
 *`docker.diskio.writes`*::
 +
 --
+
+deprecated[6.4]
+
 type: scaled_float
 
 Number of current writes per second
@@ -2829,6 +2840,9 @@ Number of current operations per second
 *`docker.diskio.total`*::
 +
 --
+
+deprecated[6.4]
+
 type: scaled_float
 
 Number of reads and writes per second
@@ -3198,7 +3212,7 @@ Network interface name.
 [float]
 == in fields
 
-Incoming network stats.
+Incoming network stats per second.
 
 
 
@@ -3247,7 +3261,7 @@ Total number of incoming packets.
 [float]
 == out fields
 
-Outgoing network stats.
+Outgoing network stats per second.
 
 
 
@@ -3284,6 +3298,104 @@ Total errors on outgoing packets.
 --
 
 *`docker.network.out.packets`*::
++
+--
+type: long
+
+Total number of outgoing packets.
+
+
+--
+
+[float]
+== inbound fields
+
+Incoming network stats since the container started.
+
+
+
+*`docker.network.inbound.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of incoming bytes.
+
+
+--
+
+*`docker.network.inbound.dropped`*::
++
+--
+type: long
+
+Total number of dropped incoming packets.
+
+
+--
+
+*`docker.network.inbound.errors`*::
++
+--
+type: long
+
+Total errors on incoming packets.
+
+
+--
+
+*`docker.network.inbound.packets`*::
++
+--
+type: long
+
+Total number of incoming packets.
+
+
+--
+
+[float]
+== outbound fields
+
+Outgoing network stats since the container started.
+
+
+
+*`docker.network.outbound.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of outgoing bytes.
+
+
+--
+
+*`docker.network.outbound.dropped`*::
++
+--
+type: long
+
+Total number of dropped outgoing packets.
+
+
+--
+
+*`docker.network.outbound.errors`*::
++
+--
+type: long
+
+Total errors on outgoing packets.
+
+
+--
+
+*`docker.network.outbound.packets`*::
 +
 --
 type: long
@@ -3345,6 +3457,114 @@ Elasticsearch cluster id.
 type: keyword
 
 Elasticsearch state id.
+
+
+--
+
+[float]
+== cluster.stats fields
+
+Cluster stats
+
+
+
+*`elasticsearch.cluster.stats.status`*::
++
+--
+type: keyword
+
+Cluster status (green, yellow, red).
+
+
+--
+
+[float]
+== nodes fields
+
+Nodes statistics.
+
+
+
+*`elasticsearch.cluster.stats.nodes.count`*::
++
+--
+type: long
+
+Total number of nodes in cluster.
+
+
+--
+
+*`elasticsearch.cluster.stats.nodes.master`*::
++
+--
+type: long
+
+Number of master-eligible nodes in cluster.
+
+
+--
+
+*`elasticsearch.cluster.stats.nodes.data`*::
++
+--
+type: long
+
+Number of data nodes in cluster.
+
+
+--
+
+[float]
+== indices fields
+
+Indices statistics.
+
+
+
+*`elasticsearch.cluster.stats.indices.count`*::
++
+--
+type: long
+
+Total number of indices in cluster.
+
+
+--
+
+[float]
+== shards fields
+
+Shard statistics.
+
+
+
+*`elasticsearch.cluster.stats.indices.shards.count`*::
++
+--
+type: long
+
+Total number of shards in cluster.
+
+
+--
+
+*`elasticsearch.cluster.stats.indices.shards.primaries`*::
++
+--
+type: long
+
+Total number of primary shards in cluster.
+
+
+--
+
+*`elasticsearch.cluster.stats.indices.fielddata.memory.bytes`*::
++
+--
+type: long
+
+Memory used for fielddata.
 
 
 --
@@ -3417,6 +3637,113 @@ type: long
 format: bytes
 
 Total number of memory used by the segments in bytes.
+
+
+--
+
+[float]
+== index.recovery fields
+
+index
+
+
+
+*`elasticsearch.index.recovery.id`*::
++
+--
+type: long
+
+Shard recovery id.
+
+
+--
+
+*`elasticsearch.index.recovery.type`*::
++
+--
+type: keyword
+
+Shard recovery type.
+
+
+--
+
+*`elasticsearch.index.recovery.primary`*::
++
+--
+type: boolean
+
+True if primary shard.
+
+
+--
+
+*`elasticsearch.index.recovery.stage`*::
++
+--
+type: keyword
+
+Recovery stage.
+
+
+--
+
+*`elasticsearch.index.recovery.target.id`*::
++
+--
+type: keyword
+
+Target node id.
+
+
+--
+
+*`elasticsearch.index.recovery.target.host`*::
++
+--
+type: ip
+
+Target node host address.
+
+
+--
+
+*`elasticsearch.index.recovery.target.name`*::
++
+--
+type: keyword
+
+Target node name.
+
+
+--
+
+*`elasticsearch.index.recovery.source.id`*::
++
+--
+type: keyword
+
+Source node id.
+
+
+--
+
+*`elasticsearch.index.recovery.source.host`*::
++
+--
+type: ip
+
+Source node host address.
+
+
+--
+
+*`elasticsearch.index.recovery.source.name`*::
++
+--
+type: keyword
+
+Source node name.
 
 
 --
@@ -3534,6 +3861,53 @@ type: long
 format: bytes
 
 Total number of memory used by the segments in bytes.
+
+
+--
+
+[float]
+== ml.job fields
+
+ml
+
+
+
+*`elasticsearch.ml.job.id`*::
++
+--
+type: keyword
+
+Unique ml job id.
+
+
+--
+
+*`elasticsearch.ml.job.state`*::
++
+--
+type: keyword
+
+Job state.
+
+
+--
+
+*`elasticsearch.ml.job.data_counts.processed_record_count`*::
++
+--
+type: long
+
+Processed data events.
+
+
+--
+
+*`elasticsearch.ml.job.data_counts.invalid_date_count`*::
++
+--
+type: long
+
+The number of records with either a missing date field or a date that could not be parsed.
 
 
 --
@@ -4047,6 +4421,455 @@ The state of this shard.
 
 --
 
+[[exported-fields-envoyproxy]]
+== envoyproxy fields
+
+experimental[]
+envoyproxy module
+
+
+
+[float]
+== envoyproxy fields
+
+
+
+
+[float]
+== server fields
+
+Contains envoy proxy server stats
+
+
+
+
+*`envoyproxy.server.cluster_manager.active_clusters`*::
++
+--
+type: integer
+
+Number of currently active (warmed) clusters
+
+
+--
+
+*`envoyproxy.server.cluster_manager.cluster_added`*::
++
+--
+type: integer
+
+Total clusters added (either via static config or CDS)
+
+
+--
+
+*`envoyproxy.server.cluster_manager.cluster_modified`*::
++
+--
+type: integer
+
+Total clusters modified (via CDS)
+
+
+--
+
+*`envoyproxy.server.cluster_manager.cluster_removed`*::
++
+--
+type: integer
+
+Total clusters removed (via CDS)
+
+
+--
+
+*`envoyproxy.server.cluster_manager.warming_clusters`*::
++
+--
+type: integer
+
+Number of currently warming (not active) clusters
+
+
+--
+
+
+*`envoyproxy.server.filesystem.flushed_by_timer`*::
++
+--
+type: integer
+
+Total number of times internal flush buffers are written to a file due to flush timeout
+
+
+--
+
+*`envoyproxy.server.filesystem.reopen_failed`*::
++
+--
+type: integer
+
+Total number of times a file was failed to be opened
+
+
+--
+
+*`envoyproxy.server.filesystem.write_buffered`*::
++
+--
+type: integer
+
+Total number of times file data is moved to Envoys internal flush buffer
+
+
+--
+
+*`envoyproxy.server.filesystem.write_completed`*::
++
+--
+type: integer
+
+Total number of times a file was written
+
+
+--
+
+*`envoyproxy.server.filesystem.write_total_buffered`*::
++
+--
+type: integer
+
+Current total size of internal flush buffer in bytes
+
+
+--
+
+
+*`envoyproxy.server.runtime.load_error`*::
++
+--
+type: integer
+
+Total number of load attempts that resulted in an error
+
+
+--
+
+*`envoyproxy.server.runtime.load_success`*::
++
+--
+type: integer
+
+Total number of load attempts that were successful
+
+
+--
+
+*`envoyproxy.server.runtime.num_keys`*::
++
+--
+type: integer
+
+Number of keys currently loaded
+
+
+--
+
+*`envoyproxy.server.runtime.override_dir_exists`*::
++
+--
+type: integer
+
+Total number of loads that did use an override directory
+
+
+--
+
+*`envoyproxy.server.runtime.override_dir_not_exists`*::
++
+--
+type: integer
+
+Total number of loads that did not use an override directory
+
+
+--
+
+*`envoyproxy.server.runtime.admin_overrides_active`*::
++
+--
+type: integer
+
+--
+
+
+*`envoyproxy.server.listener_manager.listener_added`*::
++
+--
+type: integer
+
+Total listeners added (either via static config or LDS)
+
+
+--
+
+*`envoyproxy.server.listener_manager.listener_create_failure`*::
++
+--
+type: integer
+
+Total failed listener object additions to workers
+
+
+--
+
+*`envoyproxy.server.listener_manager.listener_create_success`*::
++
+--
+type: integer
+
+Total listener objects successfully added to workers
+
+
+--
+
+*`envoyproxy.server.listener_manager.listener_modified`*::
++
+--
+type: integer
+
+Total listeners modified (via LDS)
+
+
+--
+
+*`envoyproxy.server.listener_manager.listener_removed`*::
++
+--
+type: integer
+
+Total listeners removed (via LDS)
+
+
+--
+
+*`envoyproxy.server.listener_manager.total_listeners_active`*::
++
+--
+type: integer
+
+Number of currently active listeners
+
+
+--
+
+*`envoyproxy.server.listener_manager.total_listeners_draining`*::
++
+--
+type: integer
+
+Number of currently draining listeners
+
+
+--
+
+*`envoyproxy.server.listener_manager.total_listeners_warming`*::
++
+--
+type: integer
+
+Number of currently warming listeners
+
+
+--
+
+
+*`envoyproxy.server.stats.overflow`*::
++
+--
+type: integer
+
+Total number of times Envoy cannot allocate a statistic due to a shortage of shared memory
+
+
+--
+
+
+*`envoyproxy.server.server.days_until_first_cert_expiring`*::
++
+--
+type: integer
+
+Number of days until the next certificate being managed will expire
+
+
+--
+
+*`envoyproxy.server.server.live`*::
++
+--
+type: integer
+
+1 if the server is not currently draining, 0 otherwise
+
+
+--
+
+*`envoyproxy.server.server.memory_allocated`*::
++
+--
+type: integer
+
+Current amount of allocated memory in bytes
+
+
+--
+
+*`envoyproxy.server.server.memory_heap_size`*::
++
+--
+type: integer
+
+Current reserved heap size in bytes
+
+
+--
+
+*`envoyproxy.server.server.parent_connections`*::
++
+--
+type: integer
+
+Total connections of the old Envoy process on hot restart
+
+
+--
+
+*`envoyproxy.server.server.total_connections`*::
++
+--
+type: integer
+
+Total connections of both new and old Envoy processes
+
+
+--
+
+*`envoyproxy.server.server.uptime`*::
++
+--
+type: integer
+
+Current server uptime in seconds
+
+
+--
+
+*`envoyproxy.server.server.version`*::
++
+--
+type: integer
+
+Integer represented version number based on SCM revision
+
+
+--
+
+*`envoyproxy.server.server.watchdog_mega_miss`*::
++
+--
+type: integer
+
+--
+
+*`envoyproxy.server.server.watchdog_miss`*::
++
+--
+type: integer
+
+--
+
+*`envoyproxy.server.server.hot_restart_epoch`*::
++
+--
+type: integer
+
+Current hot restart epoch
+
+
+--
+
+
+*`envoyproxy.server.http2.header_overflow`*::
++
+--
+type: integer
+
+Total number of connections reset due to the headers being larger than Envoy::Http::Http2::ConnectionImpl::StreamImpl::MAX_HEADER_SIZE (63k)
+
+
+--
+
+*`envoyproxy.server.http2.headers_cb_no_stream`*::
++
+--
+type: integer
+
+Total number of errors where a header callback is called without an associated stream. This tracks an unexpected occurrence due to an as yet undiagnosed bug
+
+
+--
+
+*`envoyproxy.server.http2.rx_messaging_error`*::
++
+--
+type: integer
+
+Total number of invalid received frames that violated section 8 of the HTTP/2 spec. This will result in a tx_reset
+
+
+--
+
+*`envoyproxy.server.http2.rx_reset`*::
++
+--
+type: integer
+
+Total number of reset stream frames received by Envoy
+
+
+--
+
+*`envoyproxy.server.http2.too_many_header_frames`*::
++
+--
+type: integer
+
+Total number of times an HTTP2 connection is reset due to receiving too many headers frames. Envoy currently supports proxying at most one header frame for 100-Continue one non-100 response code header frame and one frame with trailers
+
+
+--
+
+*`envoyproxy.server.http2.trailers`*::
++
+--
+type: integer
+
+Total number of trailers seen on requests coming from downstream
+
+
+--
+
+*`envoyproxy.server.http2.tx_reset`*::
++
+--
+type: integer
+
+Total number of reset stream frames transmitted by Envoy
+
+
+--
+
 [[exported-fields-etcd]]
 == Etcd fields
 
@@ -4202,7 +5025,7 @@ number of append requests this node has processed
 
 --
 
-*`etcd.self.recv.bandwithrate`*::
+*`etcd.self.recv.bandwidthrate`*::
 +
 --
 type: scaled_float
@@ -4232,7 +5055,7 @@ number of requests that this node has sent
 
 --
 
-*`etcd.self.send.bandwithrate`*::
+*`etcd.self.send.bandwidthrate`*::
 +
 --
 type: scaled_float
@@ -4487,7 +5310,7 @@ Next collection will happen when HeapAlloc > this amount.
 *`golang.heap.gc.cpu_fraction`*::
 +
 --
-type: long
+type: float
 
 Fraction of CPU time used by GC.
 
@@ -6425,12 +7248,12 @@ Kibana stats and run-time metrics.
 
 
 
-*`kibana.stats.cluster_uuid`*::
+*`kibana.stats.uuid`*::
 +
 --
 type: keyword
 
-UUID of the Elasticsearch cluster to which Kibana connects.
+Kibana instance UUID
 
 
 --
@@ -6438,185 +7261,69 @@ UUID of the Elasticsearch cluster to which Kibana connects.
 *`kibana.stats.name`*::
 +
 --
-type: keyword
+type: text
 
-Kibana instance name.
+Kibana instance name
 
 
 --
 
-*`kibana.stats.uuid`*::
+*`kibana.stats.index`*::
 +
 --
 type: keyword
 
-Kibana instance uuid.
+Name of Kibana's internal index
 
 
 --
 
-*`kibana.stats.version.number`*::
+*`kibana.stats.host.name`*::
 +
 --
 type: keyword
 
-Kibana version number.
+Kibana instance hostname
 
 
 --
 
-*`kibana.stats.status.overall.state`*::
+*`kibana.stats.transport_address`*::
 +
 --
 type: keyword
 
-Kibana overall state.
+Kibana server's hostname and port
 
 
 --
 
-[float]
-== process fields
-
-Kibana process metrics.
-
-
-
-[float]
-== mem fields
-
-Memory usage metrics of the Kibana instance.
-
-
-
-*`kibana.stats.process.mem.heap.max.bytes`*::
+*`kibana.stats.version`*::
 +
 --
-type: long
+type: keyword
 
-format: bytes
-
-Total amount of heap memory used by V8.
+Kibana version
 
 
 --
 
-*`kibana.stats.process.mem.heap.used.bytes`*::
+*`kibana.stats.snapshot`*::
 +
 --
-type: long
+type: boolean
 
-format: bytes
-
-Amount of memory in use by V8.
+Whether the Kibana build is a snapshot build
 
 
 --
 
-*`kibana.stats.process.mem.resident_set_size.bytes`*::
+*`kibana.stats.status`*::
 +
 --
-type: long
+type: keyword
 
-format: bytes
-
-The amount of space occupied in main memory for the process. Includes heap, code segment, and stack.
-
-
---
-
-*`kibana.stats.process.mem.external.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-Memory usage of C++ objects bound to JavaScript objects managed by V8.
-
-
---
-
-*`kibana.stats.process.pid`*::
-+
---
-type: long
-
-Process ID of the Kibana instance.
-
-
---
-
-*`kibana.stats.process.uptime.ms`*::
-+
---
-type: long
-
-Amount of time that the Kibana process has been running in milliseconds.
-
-
---
-
-[float]
-== response_times fields
-
-HTTP Server response time metrics
-
-
-
-*`kibana.stats.response_times.avg.ms`*::
-+
---
-type: long
-
-Accumulated averages for response times, for all responses in a 5-second time window.
-
-
---
-
-*`kibana.stats.response_times.max.ms`*::
-+
---
-type: long
-
-Accumulated maximums for response times, for all responses in a 5-second time window.
-
-
---
-
-[float]
-== requests fields
-
-HTTP Server request metrics
-
-
-
-*`kibana.stats.requests.status_codes`*::
-+
---
-type: object
-
-Key-value pairs for each status code sent by the server, and the number of times it sent that code.
-
-
---
-
-*`kibana.stats.requests.total`*::
-+
---
-type: long
-
-Total number of requests sent by the server.
-
-
---
-
-*`kibana.stats.requests.disconnects`*::
-+
---
-type: long
-
-Total number of client disconnects encountered by the server.
+Kibana instance's health status
 
 
 --
@@ -6626,58 +7333,131 @@ Total number of client disconnects encountered by the server.
 --
 type: long
 
-Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request mulitple server assets at once, and they can re-use established connections.
+Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
 
 
 --
 
 [float]
-== sockets fields
+== process fields
 
-HTTP Web Sockets metrics
-
-
-
-[float]
-== http fields
-
-Web Sockets over plaintext HTTP
+Process metrics
 
 
 
-*`kibana.stats.sockets.http.total`*::
+*`kibana.stats.process.event_loop_delay.ms`*::
 +
 --
-type: long
+type: scaled_float
 
-Number of HTTP web socket connections established
+Event loop delay in milliseconds
 
 
 --
 
 [float]
-== https fields
+== memory.heap fields
 
-Web Sockets over encrypted HTTPS
+Process heap metrics
 
 
 
-*`kibana.stats.sockets.https.total`*::
+*`kibana.stats.process.memory.heap.total.bytes`*::
 +
 --
 type: long
 
-Number of HTTPS web socket connections established
+format: bytes
+
+Total heap allocated to process in bytes
 
 
 --
 
-*`kibana.stats.event_loop_delay`*::
+*`kibana.stats.process.memory.heap.used.bytes`*::
 +
 --
 type: long
 
-Node event loop delay calculated with internal benchmarking.
+format: bytes
+
+Heap used by process in bytes
+
+
+--
+
+*`kibana.stats.process.memory.heap.size_limit.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Max. old space size allocated to Node.js process, in bytes
+
+
+--
+
+*`kibana.stats.process.memory.heap.uptime.ms`*::
++
+--
+type: long
+
+Uptime of process in milliseconds
+
+
+--
+
+[float]
+== request fields
+
+Request count metrics
+
+
+
+*`kibana.stats.request.disconnects`*::
++
+--
+type: long
+
+Number of requests that were disconnected
+
+
+--
+
+*`kibana.stats.request.total`*::
++
+--
+type: long
+
+Total number of requests
+
+
+--
+
+[float]
+== response_time fields
+
+Response times metrics
+
+
+
+*`kibana.stats.response_time.avg.ms`*::
++
+--
+type: long
+
+Average response time in milliseconds
+
+
+--
+
+*`kibana.stats.response_time.max.ms`*::
++
+--
+type: long
+
+Maximum response time in milliseconds
 
 
 --
@@ -6796,7 +7576,7 @@ Kubernetes pod name
 --
 type: keyword
 
-Kubernetes pod uid
+Kubernetes Pod UID
 
 
 --
@@ -6967,7 +7747,7 @@ Request latency, number of requests
 --
 type: object
 
-Request latency histagram buckets
+Request latency histogram buckets
 
 
 --
@@ -7942,6 +8722,9 @@ Container CPU requested cores
 *`kubernetes.container.cpu.limit.nanocores`*::
 +
 --
+
+deprecated[6.4]
+
 type: long
 
 Container CPU nanocores limit
@@ -7952,6 +8735,9 @@ Container CPU nanocores limit
 *`kubernetes.container.cpu.request.nanocores`*::
 +
 --
+
+deprecated[6.4]
+
 type: long
 
 Container CPU requested nanocores
@@ -8915,6 +9701,26 @@ Number of objects removed from the cache to free up memory for new items because
 
 --
 
+*`memcached.stats.bytes.current`*::
++
+--
+type: long
+
+Number of bytes currently used for caching items.
+
+
+--
+
+*`memcached.stats.bytes.limit`*::
++
+--
+type: long
+
+Number of bytes this server is allowed to use for storage.
+
+
+--
+
 [[exported-fields-mongodb]]
 == MongoDB fields
 
@@ -9290,6 +10096,16 @@ Instance version.
 
 --
 
+*`mongodb.status.process`*::
++
+--
+type: keyword
+
+The current MongoDB process. Possible values are mongos or mongod.
+
+
+--
+
 *`mongodb.status.uptime.ms`*::
 +
 --
@@ -9361,63 +10177,6 @@ Number of rollovers assertions produced by the server.
 --
 
 [float]
-== background_flushing fields
-
-Data about the process MongoDB uses to write data to disk. This data is only available for instances that use the MMAPv1 storage engine.
-
-
-
-*`mongodb.status.background_flushing.flushes`*::
-+
---
-type: long
-
-A counter that collects the number of times the database has flushed all writes to disk.
-
-
---
-
-*`mongodb.status.background_flushing.total.ms`*::
-+
---
-type: long
-
-The total number of milliseconds (ms) that the mongod processes have spent writing (i.e. flushing) data to disk. Because this is an absolute value, consider the value of `flushes` and `average_ms` to provide better context for this datum.
-
-
---
-
-*`mongodb.status.background_flushing.average.ms`*::
-+
---
-type: long
-
-The average time spent flushing to disk per flush event.
-
-
---
-
-*`mongodb.status.background_flushing.last.ms`*::
-+
---
-type: long
-
-The amount of time, in milliseconds, that the last flush operation took to complete.
-
-
---
-
-*`mongodb.status.background_flushing.last_finished`*::
-+
---
-type: date
-
-A timestamp of the last completed flush operation.
-
-
---
-
-[float]
 == connections fields
 
 Data regarding the current status of incoming connections and availability of the database server.
@@ -9455,150 +10214,6 @@ A count of all incoming connections created to the server. This number includes 
 --
 
 [float]
-== journaling fields
-
-Data about the journaling-related operations and performance. Journaling information only appears for mongod instances that use the MMAPv1 storage engine and have journaling enabled.
-
-
-
-*`mongodb.status.journaling.commits`*::
-+
---
-type: long
-
-The number of transactions written to the journal during the last journal group commit interval.
-
-
---
-
-*`mongodb.status.journaling.journaled.mb`*::
-+
---
-type: long
-
-The amount of data in megabytes (MB) written to journal during the last journal group commit interval.
-
-
---
-
-*`mongodb.status.journaling.write_to_data_files.mb`*::
-+
---
-type: long
-
-The amount of data in megabytes (MB) written from journal to the data files during the last journal group commit interval.
-
-
---
-
-*`mongodb.status.journaling.compression`*::
-+
---
-type: long
-
-The compression ratio of the data written to the journal.
-
-
---
-
-*`mongodb.status.journaling.commits_in_write_lock`*::
-+
---
-type: long
-
-Count of the commits that occurred while a write lock was held. Commits in a write lock indicate a MongoDB node under a heavy write load and call for further diagnosis.
-
-
---
-
-*`mongodb.status.journaling.early_commits`*::
-+
---
-type: long
-
-The number of times MongoDB requested a commit before the scheduled journal group commit interval.
-
-
---
-
-[float]
-== times fields
-
-Information about the performance of the mongod instance during the various phases of journaling in the last journal group commit interval.
-
-
-
-*`mongodb.status.journaling.times.dt.ms`*::
-+
---
-type: long
-
-The amount of time over which MongoDB collected the times data. Use this field to provide context to the other times field values.
-
-
---
-
-*`mongodb.status.journaling.times.prep_log_buffer.ms`*::
-+
---
-type: long
-
-The amount of time spent preparing to write to the journal. Smaller values indicate better journal performance.
-
-
---
-
-*`mongodb.status.journaling.times.write_to_journal.ms`*::
-+
---
-type: long
-
-The amount of time spent actually writing to the journal. File system speeds and device interfaces can affect performance.
-
-
---
-
-*`mongodb.status.journaling.times.write_to_data_files.ms`*::
-+
---
-type: long
-
-The amount of time spent writing to data files after journaling. File system speeds and device interfaces can affect performance.
-
-
---
-
-*`mongodb.status.journaling.times.remap_private_view.ms`*::
-+
---
-type: long
-
-The amount of time spent remapping copy-on-write memory mapped views. Smaller values indicate better journal performance.
-
-
---
-
-*`mongodb.status.journaling.times.commits.ms`*::
-+
---
-type: long
-
-The amount of time spent for commits.
-
-
---
-
-*`mongodb.status.journaling.times.commits_in_write_lock.ms`*::
-+
---
-type: long
-
-The amount of time spent for commits that occurred while a write lock was held.
-
-
---
-
-[float]
 == extra_info fields
 
 Platform specific data.
@@ -9624,6 +10239,670 @@ type: long
 
 The total number of page faults that require disk operations. Page faults refer to operations that require the database server to access data that isn't available in active memory.
 
+
+--
+
+[float]
+== global_lock fields
+
+Reports on lock state of the database.
+
+
+
+*`mongodb.status.global_lock.total_time.us`*::
++
+--
+type: long
+
+The time, in microseconds, since the database last started and created the globalLock. This is roughly equivalent to total server uptime.
+
+
+--
+
+[float]
+== current_queue fields
+
+The number of operations queued because of a lock.
+
+
+
+*`mongodb.status.global_lock.current_queue.total`*::
++
+--
+type: long
+
+The total number of operations queued waiting for the lock (i.e., the sum of current_queue.readers and current_queue.writers).
+
+
+--
+
+*`mongodb.status.global_lock.current_queue.readers`*::
++
+--
+type: long
+
+The number of operations that are currently queued and waiting for the read lock.
+
+
+--
+
+*`mongodb.status.global_lock.current_queue.writers`*::
++
+--
+type: long
+
+The number of operations that are currently queued and waiting for the write lock.
+
+
+--
+
+[float]
+== active_clients fields
+
+The number of connected clients and the read and write operations performed by these clients.
+
+
+
+*`mongodb.status.global_lock.active_clients.total`*::
++
+--
+type: long
+
+Total number of the active client connections performing read or write operations.
+
+
+--
+
+*`mongodb.status.global_lock.active_clients.readers`*::
++
+--
+type: long
+
+The number of the active client connections performing read operations.
+
+
+--
+
+*`mongodb.status.global_lock.active_clients.writers`*::
++
+--
+type: long
+
+The number of the active client connections performing write operations.
+
+
+--
+
+[float]
+== locks fields
+
+A document that reports for each lock <type>, data on lock <mode>s. The possible lock <type>s are global, database, collection, metadata and oplog. The possible <mode>s are r, w, R and W which respresent shared, exclusive, intent shared and intent exclusive.
+locks.<type>.acquire.count.<mode> shows the number of times the lock was acquired in the specified mode. locks.<type>.wait.count.<mode> shows the number of times the locks.acquireCount lock acquisitions encountered waits because the locks were held in a conflicting mode. locks.<type>.wait.us.<mode> shows the cumulative wait time in microseconds for the lock acquisitions. locks.<type>.deadlock.count.<mode> shows the number of times the lock acquisitions encountered deadlocks.
+
+
+
+
+*`mongodb.status.locks.global.acquire.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.acquire.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.acquire.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.acquire.count.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.wait.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.wait.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.wait.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.wait.count.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.wait.us.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.wait.us.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.wait.us.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.wait.us.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.deadlock.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.deadlock.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.deadlock.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.global.deadlock.count.W`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.status.locks.database.acquire.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.acquire.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.acquire.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.acquire.count.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.wait.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.wait.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.wait.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.wait.count.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.wait.us.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.wait.us.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.wait.us.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.wait.us.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.deadlock.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.deadlock.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.deadlock.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.database.deadlock.count.W`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.status.locks.collection.acquire.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.acquire.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.acquire.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.acquire.count.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.wait.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.wait.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.wait.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.wait.count.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.wait.us.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.wait.us.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.wait.us.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.wait.us.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.deadlock.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.deadlock.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.deadlock.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.collection.deadlock.count.W`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.status.locks.meta_data.acquire.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.acquire.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.acquire.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.acquire.count.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.wait.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.wait.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.wait.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.wait.count.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.wait.us.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.wait.us.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.wait.us.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.wait.us.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.deadlock.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.deadlock.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.deadlock.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.meta_data.deadlock.count.W`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.status.locks.oplog.acquire.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.acquire.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.acquire.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.acquire.count.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.wait.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.wait.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.wait.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.wait.count.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.wait.us.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.wait.us.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.wait.us.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.wait.us.W`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.deadlock.count.r`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.deadlock.count.w`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.deadlock.count.R`*::
++
+--
+type: long
+
+--
+
+*`mongodb.status.locks.oplog.deadlock.count.W`*::
++
+--
+type: long
 
 --
 
@@ -9669,13 +10948,80 @@ The total number of requests received by the server.
 --
 
 [float]
-== opcounters fields
+== ops.latencies fields
+
+Operation latencies for the database as a whole. Only mongod instances report this metric.
+
+
+
+*`mongodb.status.ops.latencies.reads.latency`*::
++
+--
+type: long
+
+Total combined latency in microseconds.
+
+
+--
+
+*`mongodb.status.ops.latencies.reads.count`*::
++
+--
+type: long
+
+Total number of read operations performed on the collection since startup.
+
+
+--
+
+*`mongodb.status.ops.latencies.writes.latency`*::
++
+--
+type: long
+
+Total combined latency in microseconds.
+
+
+--
+
+*`mongodb.status.ops.latencies.writes.count`*::
++
+--
+type: long
+
+Total number of write operations performed on the collection since startup.
+
+
+--
+
+*`mongodb.status.ops.latencies.commands.latency`*::
++
+--
+type: long
+
+Total combined latency in microseconds.
+
+
+--
+
+*`mongodb.status.ops.latencies.commands.count`*::
++
+--
+type: long
+
+Total number of commands performed on the collection since startup.
+
+
+--
+
+[float]
+== ops.counters fields
 
 An overview of database operations by type.
 
 
 
-*`mongodb.status.opcounters.insert`*::
+*`mongodb.status.ops.counters.insert`*::
 +
 --
 type: long
@@ -9685,7 +11031,7 @@ The total number of insert operations received since the mongod instance last st
 
 --
 
-*`mongodb.status.opcounters.query`*::
+*`mongodb.status.ops.counters.query`*::
 +
 --
 type: long
@@ -9695,7 +11041,7 @@ The total number of queries received since the mongod instance last started.
 
 --
 
-*`mongodb.status.opcounters.update`*::
+*`mongodb.status.ops.counters.update`*::
 +
 --
 type: long
@@ -9705,7 +11051,7 @@ The total number of update operations received since the mongod instance last st
 
 --
 
-*`mongodb.status.opcounters.delete`*::
+*`mongodb.status.ops.counters.delete`*::
 +
 --
 type: long
@@ -9715,7 +11061,7 @@ The total number of delete operations received since the mongod instance last st
 
 --
 
-*`mongodb.status.opcounters.getmore`*::
+*`mongodb.status.ops.counters.getmore`*::
 +
 --
 type: long
@@ -9725,7 +11071,7 @@ The total number of getmore operations received since the mongod instance last s
 
 --
 
-*`mongodb.status.opcounters.command`*::
+*`mongodb.status.ops.counters.command`*::
 +
 --
 type: long
@@ -9736,13 +11082,13 @@ The total number of commands issued to the database since the mongod instance la
 --
 
 [float]
-== opcounters_replicated fields
+== ops.replicated fields
 
 An overview of database replication operations by type.
 
 
 
-*`mongodb.status.opcounters_replicated.insert`*::
+*`mongodb.status.ops.replicated.insert`*::
 +
 --
 type: long
@@ -9752,7 +11098,7 @@ The total number of replicated insert operations received since the mongod insta
 
 --
 
-*`mongodb.status.opcounters_replicated.query`*::
+*`mongodb.status.ops.replicated.query`*::
 +
 --
 type: long
@@ -9762,7 +11108,7 @@ The total number of replicated queries received since the mongod instance last s
 
 --
 
-*`mongodb.status.opcounters_replicated.update`*::
+*`mongodb.status.ops.replicated.update`*::
 +
 --
 type: long
@@ -9772,7 +11118,7 @@ The total number of replicated update operations received since the mongod insta
 
 --
 
-*`mongodb.status.opcounters_replicated.delete`*::
+*`mongodb.status.ops.replicated.delete`*::
 +
 --
 type: long
@@ -9782,7 +11128,7 @@ The total number of replicated delete operations received since the mongod insta
 
 --
 
-*`mongodb.status.opcounters_replicated.getmore`*::
+*`mongodb.status.ops.replicated.getmore`*::
 +
 --
 type: long
@@ -9792,7 +11138,7 @@ The total number of replicated getmore operations received since the mongod inst
 
 --
 
-*`mongodb.status.opcounters_replicated.command`*::
+*`mongodb.status.ops.replicated.command`*::
 +
 --
 type: long
@@ -10109,10 +11455,210 @@ Number of sync operations.
 
 --
 
+[float]
+== background_flushing fields
+
+Data about the process MongoDB uses to write data to disk. This data is only available for instances that use the MMAPv1 storage engine.
+
+
+
+*`mongodb.status.background_flushing.flushes`*::
++
+--
+type: long
+
+A counter that collects the number of times the database has flushed all writes to disk.
+
+
+--
+
+*`mongodb.status.background_flushing.total.ms`*::
++
+--
+type: long
+
+The total number of milliseconds (ms) that the mongod processes have spent writing (i.e. flushing) data to disk. Because this is an absolute value, consider the value of `flushes` and `average_ms` to provide better context for this datum.
+
+
+--
+
+*`mongodb.status.background_flushing.average.ms`*::
++
+--
+type: long
+
+The average time spent flushing to disk per flush event.
+
+
+--
+
+*`mongodb.status.background_flushing.last.ms`*::
++
+--
+type: long
+
+The amount of time, in milliseconds, that the last flush operation took to complete.
+
+
+--
+
+*`mongodb.status.background_flushing.last_finished`*::
++
+--
+type: date
+
+A timestamp of the last completed flush operation.
+
+
+--
+
+[float]
+== journaling fields
+
+Data about the journaling-related operations and performance. Journaling information only appears for mongod instances that use the MMAPv1 storage engine and have journaling enabled.
+
+
+
+*`mongodb.status.journaling.commits`*::
++
+--
+type: long
+
+The number of transactions written to the journal during the last journal group commit interval.
+
+
+--
+
+*`mongodb.status.journaling.journaled.mb`*::
++
+--
+type: long
+
+The amount of data in megabytes (MB) written to journal during the last journal group commit interval.
+
+
+--
+
+*`mongodb.status.journaling.write_to_data_files.mb`*::
++
+--
+type: long
+
+The amount of data in megabytes (MB) written from journal to the data files during the last journal group commit interval.
+
+
+--
+
+*`mongodb.status.journaling.compression`*::
++
+--
+type: long
+
+The compression ratio of the data written to the journal.
+
+
+--
+
+*`mongodb.status.journaling.commits_in_write_lock`*::
++
+--
+type: long
+
+Count of the commits that occurred while a write lock was held. Commits in a write lock indicate a MongoDB node under a heavy write load and call for further diagnosis.
+
+
+--
+
+*`mongodb.status.journaling.early_commits`*::
++
+--
+type: long
+
+The number of times MongoDB requested a commit before the scheduled journal group commit interval.
+
+
+--
+
+[float]
+== times fields
+
+Information about the performance of the mongod instance during the various phases of journaling in the last journal group commit interval.
+
+
+
+*`mongodb.status.journaling.times.dt.ms`*::
++
+--
+type: long
+
+The amount of time over which MongoDB collected the times data. Use this field to provide context to the other times field values.
+
+
+--
+
+*`mongodb.status.journaling.times.prep_log_buffer.ms`*::
++
+--
+type: long
+
+The amount of time spent preparing to write to the journal. Smaller values indicate better journal performance.
+
+
+--
+
+*`mongodb.status.journaling.times.write_to_journal.ms`*::
++
+--
+type: long
+
+The amount of time spent actually writing to the journal. File system speeds and device interfaces can affect performance.
+
+
+--
+
+*`mongodb.status.journaling.times.write_to_data_files.ms`*::
++
+--
+type: long
+
+The amount of time spent writing to data files after journaling. File system speeds and device interfaces can affect performance.
+
+
+--
+
+*`mongodb.status.journaling.times.remap_private_view.ms`*::
++
+--
+type: long
+
+The amount of time spent remapping copy-on-write memory mapped views. Smaller values indicate better journal performance.
+
+
+--
+
+*`mongodb.status.journaling.times.commits.ms`*::
++
+--
+type: long
+
+The amount of time spent for commits.
+
+
+--
+
+*`mongodb.status.journaling.times.commits_in_write_lock.ms`*::
++
+--
+type: long
+
+The amount of time spent for commits that occurred while a write lock was held.
+
+
+--
+
 [[exported-fields-munin]]
 == Munin fields
 
-experimental[]
 Munin node metrics exporter
 
 
@@ -10137,6 +11683,500 @@ MySQL server status metrics collected from MySQL.
 `mysql` contains the metrics that were obtained from MySQL query.
 
 
+
+[float]
+== galera_status fields
+
+`galera_status` contains the metrics that were obtained by the status SQL query on Galera.
+
+
+
+[float]
+== apply fields
+
+Apply status fields.
+
+
+
+*`mysql.galera_status.apply.oooe`*::
++
+--
+type: double
+
+How often applier started write-set applying out-of-order (parallelization efficiency).
+
+
+--
+
+*`mysql.galera_status.apply.oool`*::
++
+--
+type: double
+
+How often write-set was so slow to apply that write-set with higher seqno's were applied earlier. Values closer to 0 refer to a greater gap between slow and fast write-sets.
+
+
+--
+
+*`mysql.galera_status.apply.window`*::
++
+--
+type: double
+
+Average distance between highest and lowest concurrently applied seqno.
+
+
+--
+
+[float]
+== cert fields
+
+Certification status fields.
+
+
+
+*`mysql.galera_status.cert.deps_distance`*::
++
+--
+type: double
+
+Average distance between highest and lowest seqno value that can be possibly applied in parallel (potential degree of parallelization).
+
+
+--
+
+*`mysql.galera_status.cert.index_size`*::
++
+--
+type: long
+
+The number of entries in the certification index.
+
+
+--
+
+*`mysql.galera_status.cert.interval`*::
++
+--
+type: double
+
+Average number of transactions received while a transaction replicates.
+
+
+--
+
+[float]
+== cluster fields
+
+Cluster status fields.
+
+
+
+*`mysql.galera_status.cluster.conf_id`*::
++
+--
+type: long
+
+Total number of cluster membership changes happened.
+
+
+--
+
+*`mysql.galera_status.cluster.size`*::
++
+--
+type: long
+
+Current number of members in the cluster.
+
+
+--
+
+*`mysql.galera_status.cluster.status`*::
++
+--
+type: keyword
+
+Status of this cluster component. That is, whether the node is part of a PRIMARY or NON_PRIMARY component.
+
+
+--
+
+[float]
+== commit fields
+
+Commit status fields.
+
+
+
+*`mysql.galera_status.commit.oooe`*::
++
+--
+type: double
+
+How often a transaction was committed out of order.
+
+
+--
+
+*`mysql.galera_status.commit.window`*::
++
+--
+type: long
+
+Average distance between highest and lowest concurrently committed seqno.
+
+
+--
+
+*`mysql.galera_status.connected`*::
++
+--
+type: keyword
+
+If the value is OFF, the node has not yet connected to any of the cluster components. This may be due to misconfiguration. Check the error log for proper diagnostics.
+
+
+--
+
+[float]
+== evs fields
+
+Evs Fields.
+
+
+
+*`mysql.galera_status.evs.evict`*::
++
+--
+type: keyword
+
+Lists the UUID's of all nodes evicted from the cluster. Evicted nodes cannot rejoin the cluster until you restart their mysqld processes.
+
+
+--
+
+*`mysql.galera_status.evs.state`*::
++
+--
+type: keyword
+
+Shows the internal state of the EVS Protocol.
+
+
+--
+
+[float]
+== flow_ctl fields
+
+Flow Control fields.
+
+
+
+*`mysql.galera_status.flow_ctl.paused`*::
++
+--
+type: double
+
+The fraction of time since the last FLUSH STATUS command that replication was paused due to flow control. In other words, how much the slave lag is slowing down the cluster.
+
+
+--
+
+*`mysql.galera_status.flow_ctl.paused_ns`*::
++
+--
+type: long
+
+The total time spent in a paused state measured in nanoseconds.
+
+
+--
+
+*`mysql.galera_status.flow_ctl.recv`*::
++
+--
+type: long
+
+Returns the number of FC_PAUSE events the node has received, including those the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
+
+
+--
+
+*`mysql.galera_status.flow_ctl.sent`*::
++
+--
+type: long
+
+Returns the number of FC_PAUSE events the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
+
+
+--
+
+*`mysql.galera_status.last_committed`*::
++
+--
+type: long
+
+The sequence number, or seqno, of the last committed transaction.
+
+
+--
+
+[float]
+== local fields
+
+Node specific Cluster status fields.
+
+
+
+*`mysql.galera_status.local.bf_aborts`*::
++
+--
+type: long
+
+Total number of local transactions that were aborted by slave transactions while in execution.
+
+
+--
+
+*`mysql.galera_status.local.cert_failures`*::
++
+--
+type: long
+
+Total number of local transactions that failed certification test.
+
+
+--
+
+*`mysql.galera_status.local.commits`*::
++
+--
+type: long
+
+Total number of local transactions committed.
+
+
+--
+
+[float]
+== recv fields
+
+Node specific recv fields.
+
+
+
+*`mysql.galera_status.local.recv.queue`*::
++
+--
+type: long
+
+Current (instantaneous) length of the recv queue.
+
+
+--
+
+*`mysql.galera_status.local.recv.queue_avg`*::
++
+--
+type: double
+
+Recv queue length averaged over interval since the last FLUSH STATUS command. Values considerably larger than 0.0 mean that the node cannot apply write-sets as fast as they are received and will generate a lot of replication throttling.
+
+
+--
+
+*`mysql.galera_status.local.recv.queue_max`*::
++
+--
+type: long
+
+The maximum length of the recv queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.recv.queue_min`*::
++
+--
+type: long
+
+The minimum length of the recv queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.replays`*::
++
+--
+type: long
+
+Total number of transaction replays due to asymmetric lock granularity.
+
+
+--
+
+[float]
+== send fields
+
+Node specific sent fields.
+
+
+
+*`mysql.galera_status.local.send.queue`*::
++
+--
+type: long
+
+Current (instantaneous) length of the send queue.
+
+
+--
+
+*`mysql.galera_status.local.send.queue_avg`*::
++
+--
+type: double
+
+Send queue length averaged over time since the last FLUSH STATUS command. Values considerably larger than 0.0 indicate replication throttling or network throughput issue.
+
+
+--
+
+*`mysql.galera_status.local.send.queue_max`*::
++
+--
+type: long
+
+The maximum length of the send queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.send.queue_min`*::
++
+--
+type: long
+
+The minimum length of the send queue since the last FLUSH STATUS command.
+
+
+--
+
+*`mysql.galera_status.local.state`*::
++
+--
+type: keyword
+
+Internal Galera Cluster FSM state number.
+
+
+--
+
+*`mysql.galera_status.ready`*::
++
+--
+type: keyword
+
+Whether the server is ready to accept queries.
+
+
+--
+
+[float]
+== received fields
+
+Write-Set receive status fields.
+
+
+
+*`mysql.galera_status.received.count`*::
++
+--
+type: long
+
+Total number of write-sets received from other nodes.
+
+
+--
+
+*`mysql.galera_status.received.bytes`*::
++
+--
+type: long
+
+Total size of write-sets received from other nodes.
+
+
+--
+
+[float]
+== repl fields
+
+Replication status fields.
+
+
+
+*`mysql.galera_status.repl.data_bytes`*::
++
+--
+type: long
+
+Total size of data replicated.
+
+
+--
+
+*`mysql.galera_status.repl.keys`*::
++
+--
+type: long
+
+Total number of keys replicated.
+
+
+--
+
+*`mysql.galera_status.repl.keys_bytes`*::
++
+--
+type: long
+
+Total size of keys replicated.
+
+
+--
+
+*`mysql.galera_status.repl.other_bytes`*::
++
+--
+type: long
+
+Total size of other bits replicated.
+
+
+--
+
+*`mysql.galera_status.repl.count`*::
++
+--
+type: long
+
+Total number of write-sets replicated (sent to other nodes).
+
+
+--
+
+*`mysql.galera_status.repl.bytes`*::
++
+--
+type: long
+
+Total size of write-sets replicated.
+
+
+--
 
 [float]
 == status fields
@@ -12572,7 +14612,7 @@ Redis memory stats.
 --
 type: long
 
-format: bytes Used memory.
+format: bytes Total number of bytes allocated by Redis.
 
 
 
@@ -12585,7 +14625,7 @@ type: long
 
 format: bytes
 
-Used memory rss.
+Number of bytes that Redis allocated as seen by the operating system (a.k.a resident set size).
 
 
 --
@@ -12597,7 +14637,7 @@ type: long
 
 format: bytes
 
-Used memory peak.
+Peak memory consumed by Redis.
 
 
 --
@@ -12609,7 +14649,19 @@ type: long
 
 format: bytes
 
-Used memory lua.
+Used memory by the Lua engine.        
+
+
+--
+
+*`redis.info.memory.used.dataset`*::
++
+--
+type: long
+
+format: bytes
+
+The size in bytes of the dataset 
 
 
 --
@@ -12633,6 +14685,39 @@ type: keyword
 
 Eviction policy to use when memory limit is reached.
 
+
+--
+
+*`redis.info.memory.fragmentation.ratio`*::
++
+--
+type: float
+
+Ratio between used_memory_rss and used_memory
+
+
+--
+
+*`redis.info.memory.fragmentation.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Bytes between used_memory_rss and used_memory
+
+
+--
+
+*`redis.info.memory.active_defrag.is_running`*::
++
+--
+type: boolean
+
+Flag indicating if active defragmentation is active
+
+
 --
 
 *`redis.info.memory.allocator`*::
@@ -12641,6 +14726,87 @@ Eviction policy to use when memory limit is reached.
 type: keyword
 
 Memory allocator.
+
+
+--
+
+
+*`redis.info.memory.allocator_stats.allocated`*::
++
+--
+type: long
+
+format: bytes
+
+Allocated memory
+
+
+--
+
+*`redis.info.memory.allocator_stats.active`*::
++
+--
+type: long
+
+format: bytes
+
+Active memeory
+
+
+--
+
+*`redis.info.memory.allocator_stats.resident`*::
++
+--
+type: long
+
+format: bytes
+
+Resident memory
+
+
+--
+
+*`redis.info.memory.allocator_stats.fragmentation.ratio`*::
++
+--
+type: float
+
+Fragmentation ratio
+
+
+--
+
+*`redis.info.memory.allocator_stats.fragmentation.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Fragmented bytes
+
+
+--
+
+*`redis.info.memory.allocator_stats.rss.ratio`*::
++
+--
+type: float
+
+Resident ratio
+
+
+--
+
+*`redis.info.memory.allocator_stats.rss.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Resident bytes
 
 
 --
@@ -12657,14 +14823,16 @@ Redis CPU stats.
 --
 type: boolean
 
-None
+Flag indicating if the load of a dump file is on-going
+
 
 --
 
 [float]
 == rdb fields
 
-None
+Provides information about RDB persistence
+
 
 
 *`redis.info.persistence.rdb.last_save.changes_since`*::
@@ -12672,16 +14840,8 @@ None
 --
 type: long
 
-None
+Number of changes since the last dump
 
---
-
-*`redis.info.persistence.rdb.bgsave.in_progress`*::
-+
---
-type: boolean
-
-None
 
 --
 
@@ -12690,7 +14850,18 @@ None
 --
 type: long
 
-None
+Epoch-based timestamp of last successful RDB save
+
+
+--
+
+*`redis.info.persistence.rdb.bgsave.in_progress`*::
++
+--
+type: boolean
+
+Flag indicating a RDB save is on-going
+
 
 --
 
@@ -12699,7 +14870,8 @@ None
 --
 type: keyword
 
-None
+Status of the last RDB save operation
+
 
 --
 
@@ -12708,7 +14880,10 @@ None
 --
 type: long
 
-None
+format: duration
+
+Duration of the last RDB save operation in seconds
+
 
 --
 
@@ -12717,14 +14892,30 @@ None
 --
 type: long
 
-None
+format: duration
+
+Duration of the on-going RDB save operation if any
+
+
+--
+
+*`redis.info.persistence.rdb.copy_on_write.last_size`*::
++
+--
+type: long
+
+format: bytes
+
+The size in bytes of copy-on-write allocations during the last RBD save operation                
+
 
 --
 
 [float]
 == aof fields
 
-None
+Provides information about AOF persitence
+
 
 
 *`redis.info.persistence.aof.enabled`*::
@@ -12732,7 +14923,8 @@ None
 --
 type: boolean
 
-None
+Flag indicating AOF logging is activated
+
 
 --
 
@@ -12741,7 +14933,8 @@ None
 --
 type: boolean
 
-None
+Flag indicating a AOF rewrite operation is on-going
+
 
 --
 
@@ -12750,7 +14943,8 @@ None
 --
 type: boolean
 
-None
+Flag indicating an AOF rewrite operation will be scheduled once the on-going RDB save is complete.
+
 
 --
 
@@ -12759,7 +14953,10 @@ None
 --
 type: long
 
-None
+format: duration
+
+Duration of the last AOF rewrite operation in seconds
+
 
 --
 
@@ -12768,7 +14965,22 @@ None
 --
 type: long
 
-None
+format: duration
+
+Duration of the on-going AOF rewrite operation if any
+
+
+--
+
+*`redis.info.persistence.aof.rewrite.buffer.size`*::
++
+--
+type: long
+
+format: bytes
+
+Size of the AOF rewrite buffer
+
 
 --
 
@@ -12777,7 +14989,8 @@ None
 --
 type: keyword
 
-None
+Status of the last AOF rewrite operatio
+
 
 --
 
@@ -12786,7 +14999,76 @@ None
 --
 type: keyword
 
-None
+Status of the last write operation to the AOF
+
+
+--
+
+*`redis.info.persistence.aof.copy_on_write.last_size`*::
++
+--
+type: long
+
+format: bytes
+
+The size in bytes of copy-on-write allocations during the last RBD save operation
+
+
+--
+
+*`redis.info.persistence.aof.buffer.size`*::
++
+--
+type: long
+
+format: bytes
+
+Size of the AOF buffer
+
+
+--
+
+*`redis.info.persistence.aof.size.current`*::
++
+--
+type: long
+
+format: bytes
+
+AOF current file size             
+
+
+--
+
+*`redis.info.persistence.aof.size.base`*::
++
+--
+type: long
+
+format: bytes
+
+AOF file size on latest startup or rewrite
+
+
+--
+
+*`redis.info.persistence.aof.fsync.pending`*::
++
+--
+type: long
+
+Number of fsync pending jobs in background I/O queue
+
+
+--
+
+*`redis.info.persistence.aof.fsync.delayed`*::
++
+--
+type: long
+
+Delayed fsync counter
+
 
 --
 
@@ -12802,7 +15084,8 @@ Replication
 --
 type: keyword
 
-None
+Role of the instance (can be "master", or "slave").
+
 
 --
 
@@ -12811,16 +15094,21 @@ None
 --
 type: long
 
-None
+Number of connected slaves
+
 
 --
 
 *`redis.info.replication.master_offset`*::
 +
 --
+
+deprecated[6.5]
+
 type: long
 
-None
+The server's current replication offset
+
 
 --
 
@@ -12829,7 +15117,8 @@ None
 --
 type: long
 
-None
+Flag indicating replication backlog is active
+
 
 --
 
@@ -12838,7 +15127,10 @@ None
 --
 type: long
 
-None
+format: bytes
+
+Total size in bytes of the replication backlog buffer
+
 
 --
 
@@ -12847,7 +15139,8 @@ None
 --
 type: long
 
-None
+The master offset of the replication backlog buffer          
+
 
 --
 
@@ -12856,7 +15149,114 @@ None
 --
 type: long
 
-None
+Size in bytes of the data in the replication backlog buffer
+
+
+--
+
+*`redis.info.replication.master.offset`*::
++
+--
+type: long
+
+The server's current replication offset
+
+
+--
+
+*`redis.info.replication.master.second_offset`*::
++
+--
+type: long
+
+The offset up to which replication IDs are accepted
+
+
+--
+
+*`redis.info.replication.master.link_status`*::
++
+--
+type: keyword
+
+Status of the link (up/down)
+
+
+--
+
+*`redis.info.replication.master.last_io_seconds_ago`*::
++
+--
+type: long
+
+format: duration
+
+Number of seconds since the last interaction with master
+
+
+--
+
+*`redis.info.replication.master.sync.in_progress`*::
++
+--
+type: boolean
+
+Indicate the master is syncing to the slave
+
+
+--
+
+*`redis.info.replication.master.sync.left_bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Number of bytes left before syncing is complete
+
+
+--
+
+*`redis.info.replication.master.sync.last_io_seconds_ago`*::
++
+--
+type: long
+
+format: duration
+
+Number of seconds since last transfer I/O during a SYNC operation
+
+
+--
+
+*`redis.info.replication.slave.offset`*::
++
+--
+type: long
+
+The replication offset of the slave instance
+
+
+--
+
+*`redis.info.replication.slave.priority`*::
++
+--
+type: long
+
+The priority of the instance as a candidate for failover
+
+
+--
+
+*`redis.info.replication.slave.is_readonly`*::
++
+--
+type: boolean
+
+Flag indicating if the slave is read-only
+
 
 --
 
@@ -13041,7 +15441,7 @@ Total number of connections rejected.
 --
 type: long
 
-Total number of commands preocessed.
+Total number of commands processed.
 
 --
 
@@ -13068,7 +15468,8 @@ Total network output in bytes.
 --
 type: long
 
-None
+Number of commands processed per second
+
 
 --
 
@@ -13077,7 +15478,8 @@ None
 --
 type: scaled_float
 
-None
+The network's read rate per second in KB/sec
+
 
 --
 
@@ -13086,7 +15488,8 @@ None
 --
 type: scaled_float
 
-None
+The network's write rate per second in KB/sec
+
 
 --
 
@@ -13095,7 +15498,8 @@ None
 --
 type: long
 
-None
+The number of full resyncs with slaves
+
 
 --
 
@@ -13104,7 +15508,8 @@ None
 --
 type: long
 
-None
+The number of accepted partial resync requests
+
 
 --
 
@@ -13113,7 +15518,8 @@ None
 --
 type: long
 
-None
+The number of denied partial resync requests
+
 
 --
 
@@ -13122,7 +15528,8 @@ None
 --
 type: long
 
-None
+Total number of key expiration events
+
 
 --
 
@@ -13131,7 +15538,8 @@ None
 --
 type: long
 
-None
+Number of evicted keys due to maxmemory limit
+
 
 --
 
@@ -13140,7 +15548,8 @@ None
 --
 type: long
 
-None
+Number of successful lookup of keys in the main dictionary
+
 
 --
 
@@ -13149,7 +15558,8 @@ None
 --
 type: long
 
-None
+Number of failed lookup of keys in the main dictionary
+
 
 --
 
@@ -13158,7 +15568,8 @@ None
 --
 type: long
 
-None
+Global number of pub/sub channels with client subscriptions
+
 
 --
 
@@ -13167,7 +15578,8 @@ None
 --
 type: long
 
-None
+Global number of pub/sub pattern with client subscriptions
+
 
 --
 
@@ -13176,7 +15588,8 @@ None
 --
 type: long
 
-None
+Duration of the latest fork operation in microseconds
+
 
 --
 
@@ -13185,7 +15598,68 @@ None
 --
 type: long
 
-None
+The number of sockets open for MIGRATE purposes
+
+
+--
+
+*`redis.info.stats.slave_expires_tracked_keys`*::
++
+--
+type: long
+
+The number of keys tracked for expiry purposes (applicable only to writable slaves)
+
+
+--
+
+*`redis.info.stats.active_defrag.hits`*::
++
+--
+type: long
+
+Number of value reallocations performed by active the defragmentation process
+
+
+--
+
+*`redis.info.stats.active_defrag.misses`*::
++
+--
+type: long
+
+Number of aborted value reallocations started by the active defragmentation process
+
+
+--
+
+*`redis.info.stats.active_defrag.key_hits`*::
++
+--
+type: long
+
+Number of keys that were actively defragmented
+
+
+--
+
+*`redis.info.stats.active_defrag.key_misses`*::
++
+--
+type: long
+
+Number of keys that were skipped by the active defragmentation process
+
+
+--
+
+*`redis.info.slowlog.count`*::
++
+--
+type: long
+
+Count of slow operations
+
 
 --
 
@@ -13562,7 +16036,7 @@ type: scaled_float
 
 format: percent
 
-The percentage of CPU time spent in non-idle state.
+The percentage of CPU time spent in states other than Idle and IOWait.
 
 
 --
@@ -13670,17 +16144,7 @@ type: scaled_float
 
 format: percent
 
-The percentage of CPU time spent in non-idle state.
-
-
---
-
-*`system.cpu.total.value`*::
-+
---
-type: long
-
-The value of CPU usage since starting the process.
+The percentage of CPU time in states other than Idle and IOWait, normalised by the number of cores.
 
 
 --
@@ -15820,6 +18284,74 @@ type: long
 format: duration
 
 The OS uptime in milliseconds.
+
+
+--
+
+[[exported-fields-traefik]]
+== traefik fields
+
+Traefik reverse proxy / load balancer metrics
+
+
+
+[float]
+== traefik fields
+
+Traefik reverse proxy / load balancer metrics
+
+
+
+[float]
+== health fields
+
+Metrics obtained from Traefik's health API endpoint
+
+
+
+*`traefik.health.uptime.sec`*::
++
+--
+type: long
+
+Uptime of Traefik instance in seconds
+
+
+--
+
+[float]
+== response fields
+
+Response metrics
+
+
+
+*`traefik.health.response.count`*::
++
+--
+type: long
+
+Number of responses
+
+
+--
+
+*`traefik.health.response.avg_time.us`*::
++
+--
+type: long
+
+Average response time in microseconds
+
+
+--
+
+*`traefik.health.response.status_code`*::
++
+--
+type: object
+
+Number of responses per status code
 
 
 --

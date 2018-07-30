@@ -1,9 +1,28 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package add_kubernetes_metadata
 
 import (
 	"fmt"
 	"testing"
 
+	v1 "github.com/ericchiang/k8s/apis/core/v1"
+	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -20,16 +39,17 @@ func TestPodIndexer(t *testing.T) {
 
 	podName := "testpod"
 	ns := "testns"
+	nodeName := "testnode"
 	pod := kubernetes.Pod{
-		Metadata: kubernetes.ObjectMeta{
-			Name:      podName,
-			Namespace: ns,
+		Metadata: &metav1.ObjectMeta{
+			Name:      &podName,
+			Namespace: &ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: kubernetes.PodSpec{
-			NodeName: "testnode",
+		Spec: &v1.PodSpec{
+			NodeName: &nodeName,
 		},
 	}
 
@@ -69,17 +89,18 @@ func TestPodUIDIndexer(t *testing.T) {
 	podName := "testpod"
 	ns := "testns"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	nodeName := "testnode"
 	pod := kubernetes.Pod{
-		Metadata: kubernetes.ObjectMeta{
-			Name:      podName,
-			Namespace: ns,
-			UID:       uid,
+		Metadata: &metav1.ObjectMeta{
+			Name:      &podName,
+			Namespace: &ns,
+			Uid:       &uid,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: kubernetes.PodSpec{
-			NodeName: "testnode",
+		Spec: &v1.PodSpec{
+			NodeName: &nodeName,
 		},
 	}
 
@@ -117,19 +138,21 @@ func TestContainerIndexer(t *testing.T) {
 	ns := "testns"
 	container := "container"
 	initContainer := "initcontainer"
+	nodeName := "testnode"
 
 	pod := kubernetes.Pod{
-		Metadata: kubernetes.ObjectMeta{
-			Name:      podName,
-			Namespace: ns,
+		Metadata: &metav1.ObjectMeta{
+			Name:      &podName,
+			Namespace: &ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Status: kubernetes.PodStatus{
-			ContainerStatuses:     make([]kubernetes.PodContainerStatus, 0),
-			InitContainerStatuses: make([]kubernetes.PodContainerStatus, 0),
+		Status: &v1.PodStatus{
+			ContainerStatuses:     make([]*kubernetes.PodContainerStatus, 0),
+			InitContainerStatuses: make([]*kubernetes.PodContainerStatus, 0),
 		},
+		Spec: &v1.PodSpec{},
 	}
 
 	indexers := conIndexer.GetMetadata(&pod)
@@ -148,17 +171,19 @@ func TestContainerIndexer(t *testing.T) {
 			"name": "testnode",
 		},
 	}
-	pod.Spec.NodeName = "testnode"
-	pod.Status.ContainerStatuses = []kubernetes.PodContainerStatus{
+	container1 := "docker://abcde"
+	pod.Spec.NodeName = &nodeName
+	pod.Status.ContainerStatuses = []*kubernetes.PodContainerStatus{
 		{
-			Name:        container,
-			ContainerID: "docker://abcde",
+			Name:        &container,
+			ContainerID: &container1,
 		},
 	}
-	pod.Status.InitContainerStatuses = []kubernetes.PodContainerStatus{
+	container2 := "docker://fghij"
+	pod.Status.InitContainerStatuses = []*kubernetes.PodContainerStatus{
 		{
-			Name:        initContainer,
-			ContainerID: "docker://fghij",
+			Name:        &initContainer,
+			ContainerID: &container2,
 		},
 	}
 
@@ -192,9 +217,9 @@ func TestFilteredGenMeta(t *testing.T) {
 	podName := "testpod"
 	ns := "testns"
 	pod := kubernetes.Pod{
-		Metadata: kubernetes.ObjectMeta{
-			Name:      podName,
-			Namespace: ns,
+		Metadata: &metav1.ObjectMeta{
+			Name:      &podName,
+			Namespace: &ns,
 			Labels: map[string]string{
 				"foo": "bar",
 				"x":   "y",
@@ -204,7 +229,7 @@ func TestFilteredGenMeta(t *testing.T) {
 				"c": "d",
 			},
 		},
-		Spec: kubernetes.PodSpec{},
+		Spec: &v1.PodSpec{},
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
@@ -273,9 +298,9 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	podName := "testpod"
 	ns := "testns"
 	pod := kubernetes.Pod{
-		Metadata: kubernetes.ObjectMeta{
-			Name:      podName,
-			Namespace: ns,
+		Metadata: &metav1.ObjectMeta{
+			Name:      &podName,
+			Namespace: &ns,
 			Labels: map[string]string{
 				"foo": "bar",
 				"x":   "y",
@@ -285,7 +310,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 				"c": "d",
 			},
 		},
-		Spec: kubernetes.PodSpec{},
+		Spec: &v1.PodSpec{},
 	}
 
 	assert.Nil(t, err)
@@ -317,21 +342,21 @@ func TestIpPortIndexer(t *testing.T) {
 	ns := "testns"
 	container := "container"
 	ip := "1.2.3.4"
-	port := int64(80)
+	port := int32(80)
 	pod := kubernetes.Pod{
-		Metadata: kubernetes.ObjectMeta{
-			Name:      podName,
-			Namespace: ns,
+		Metadata: &metav1.ObjectMeta{
+			Name:      &podName,
+			Namespace: &ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: kubernetes.PodSpec{
-			Containers: make([]kubernetes.Container, 0),
+		Spec: &v1.PodSpec{
+			Containers: make([]*kubernetes.Container, 0),
 		},
 
-		Status: kubernetes.PodStatus{
-			PodIP: ip,
+		Status: &v1.PodStatus{
+			PodIP: &ip,
 		},
 	}
 
@@ -360,18 +385,20 @@ func TestIpPortIndexer(t *testing.T) {
 		},
 	}
 
-	pod.Spec.Containers = []kubernetes.Container{
+	pod.Spec.Containers = []*v1.Container{
 		{
-			Name: container,
-			Ports: []kubernetes.ContainerPort{
+			Name: &container,
+			Ports: []*v1.ContainerPort{
 				{
-					Name:          container,
-					ContainerPort: port,
+					Name:          &container,
+					ContainerPort: &port,
 				},
 			},
 		},
 	}
-	pod.Spec.NodeName = "testnode"
+
+	nodeName := "testnode"
+	pod.Spec.NodeName = &nodeName
 
 	indexers = ipIndexer.GetMetadata(&pod)
 	assert.Equal(t, 2, len(indexers))

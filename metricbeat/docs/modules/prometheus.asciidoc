@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-prometheus]]
 == Prometheus module
 
-beta[]
-
 This module periodically fetches metrics from
 https://prometheus.io/docs/[Prometheus].
 
@@ -37,6 +35,11 @@ metricbeat.modules:
   hosts: ["localhost:9090"]
   #metrics_path: /metrics
   #namespace: example
+
+  # This can be used for service account based authorization:
+  #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>. It also supports the options described in <<module-http-config-options>>.

@@ -31,6 +31,7 @@
 
     - name: prospector.type
       required: true
+      deprecated: 6.3
       description: >
         The input type from which the event was generated. This field is set to the value specified
         for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `input.type`)
@@ -114,3 +115,24 @@
         log events this is when the log line was read by Filebeat. In comparison
         @timestamp is the processed timestamp from the log line. If both are identical
         only @timestamp should be used.
+
+    - name: http.response.status_code
+      type: long
+      description: >
+        HTTP response status_code.
+      example: 404
+
+    - name: http.response.elapsed_time
+      type: long
+      description: >
+        Elapsed time between request and response in milli seconds.
+
+    - name: http.response.content_length
+      type: long
+      description: >
+        Content length of the HTTP response body.
+
+    - name: http.request.method
+      type: keyword
+      description: >
+        Request method.

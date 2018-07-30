@@ -22,9 +22,20 @@ The list below covers the major changes between 6.3.0 and master only.
 - The beat.Pipeline is now passed to cfgfile.RunnerFactory. Beats using libbeat for module reloading or autodiscovery need to be adapted. {pull}7018[7017]
 - Moving of TLS helper functions and structs from `output/tls` to `tlscommon`. {pull}7054[7054]
 - Port fields.yml collector to Golang {pull}6911[6911]
+- Dashboards under _meta/kibana are expected to be decoded. See https://github.com/elastic/beats/pull/7224 for a conversion script. {pull}7265[7265]
+- Constructor `(github.com/elastic/beats/libbeat/output/codec/json).New` expects a new `escapeHTML` parameter. {pull}7445[7445]
+- Packaging has been refactored and updates are required. See the PR for migration details. {pull}7388[7388]
+- `make fields` has been modified to use Mage (https://magefile.org/) in an effort to make
+  the building a Beat more cross-platform friendly (e.g. Windows). This requires that your Beat
+  has a magefile.go with a fields target. The `FIELDS_FILE_PATH` make variable is no longer
+  used because the value is specified in magefile.go. {pull}7670[7670]
 
 ==== Bugfixes
 
 - Fix permissions of generated Filebeat filesets. {pull}7140[7140]
 
 ==== Added
+
+- Libbeat provides a global registry for beats developer that allow to register and retrieve plugin. {pull}7392[7392]
+- Added more options to control required and optional fields in schema.Apply(), error returned is a plain nil if no error happened {pull}7335[7335]
+- Packaging on MacOS now produces a .dmg file containing an installer (.pkg) and uninstaller for the Beat. {pull}7481[7481]

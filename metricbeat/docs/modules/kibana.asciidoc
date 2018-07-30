@@ -25,7 +25,8 @@ metricbeat.modules:
   metricsets: ["status"]
   period: 10s
   hosts: ["localhost:5601"]
-  enabled: default
+  basepath: ""
+  enabled: true
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>. It also supports the options described in <<module-http-config-options>>.

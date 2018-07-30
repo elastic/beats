@@ -17,6 +17,7 @@ services:
       - ./module/couchbase/_meta/env
       - ./module/dropwizard/_meta/env
       - ./module/elasticsearch/_meta/env
+      - ./module/envoyproxy/_meta/env
       - ./module/etcd/_meta/env
       - ./module/haproxy/_meta/env
       - ./module/http/_meta/env
@@ -35,6 +36,7 @@ services:
       - ./module/prometheus/_meta/env
       - ./module/rabbitmq/_meta/env
       - ./module/redis/_meta/env
+      - ./module/traefik/_meta/env
       - ./module/uwsgi/_meta/env
       - ./module/zookeeper/_meta/env
 
@@ -68,6 +70,9 @@ services:
       - "http.host=0.0.0.0"
       - "xpack.security.enabled=false"
 
+  envoyproxy:
+    build: ./module/envoyproxy/_meta
+
   etcd:
     build: ./module/etcd/_meta
 
@@ -91,7 +96,14 @@ services:
     build: ./module/jolokia/_meta
 
   kafka:
-    build: ./module/kafka/_meta
+    build:
+      context: ./module/kafka/_meta
+      dockerfile: Dockerfile.1.1.0
+
+  kafka_0_10_2:
+    build:
+      context: ./module/kafka/_meta
+      dockerfile: Dockerfile.0.10.2
 
   kibana:
     build: ./module/kibana/_meta
@@ -146,6 +158,9 @@ services:
 
   redis:
     build: ./module/redis/_meta
+
+  traefik:
+    build: ./module/traefik/_meta
 
   uwsgi_tcp:
     build: ./module/uwsgi/_meta

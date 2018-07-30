@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package dissect
 
 import (
@@ -35,6 +52,17 @@ type dissectTest struct {
 }
 
 var tests = []dissectTest{
+	{
+		Name: "When all the defined fields are captured by we have remaining data",
+		Tok:  "level=%{level} ts=%{timestamp} caller=%{caller} msg=\"%{message}\"",
+		Msg:  "level=info ts=2018-06-27T17:19:13.036579993Z caller=main.go:222 msg=\"Starting OK\" version=\"(version=2.3.1, branch=HEAD, revision=188ca45bd85ce843071e768d855722a9d9dabe03)\"}",
+		Expected: Map{
+			"level":     "info",
+			"timestamp": "2018-06-27T17:19:13.036579993Z",
+			"caller":    "main.go:222",
+			"message":   "Starting OK",
+		},
+	},
 	{
 		Name: "Complex stack trace",
 		Tok:  "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{message}",
@@ -267,7 +295,7 @@ func BenchmarkDissect(b *testing.B) {
 		})
 	}
 
-	// Add a few regular expression matches agains the same string the test suite,
+	// Add a few regular expression matches against the same string the test suite,
 	// this give us a baseline to compare to, note that we only test a raw match against the string.
 	b.Run("Regular expression", func(b *testing.B) {
 		re := regexp.MustCompile("/var/log/([a-z]+)/log/([a-z]+)/apache/([a-b]+)")

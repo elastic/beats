@@ -112,4 +112,7 @@
           type: keyword
           description: >
             The city name.
-
+        - name: region_iso_code
+          type: keyword
+          description: >
+            Region ISO code.

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package asset
 
 import (
@@ -11,22 +28,24 @@ import (
 // As each entry is an array of bytes multiple fields.yml can be added under one path.
 // This can become useful as we don't have to generate anymore the fields.yml but can
 // package each local fields.yml from things like processors.
-var FieldsRegistry = map[string][]string{}
+var FieldsRegistry = map[string]map[string]string{}
 
-// SetFields sets the fields for a given path
-func SetFields(path string, asset func() string) error {
+// SetFields sets the fields for a given beat and asset name
+func SetFields(beat, name string, asset func() string) error {
 	data := asset()
 
-	FieldsRegistry[path] = append(FieldsRegistry[path], data)
+	if _, ok := FieldsRegistry[beat]; !ok {
+		FieldsRegistry[beat] = map[string]string{}
+	}
+	FieldsRegistry[beat][name] = data
 
 	return nil
 }
 
-// GetFields returns a byte array contains all fields for the given path
-func GetFields(path string) ([]byte, error) {
+// GetFields returns a byte array contains all fields for the given beat
+func GetFields(beat string) ([]byte, error) {
 	var fields []byte
-	for _, data := range FieldsRegistry[path] {
-
+	for _, data := range FieldsRegistry[beat] {
 		output, err := DecodeData(data)
 		if err != nil {
 			return nil, err

@@ -20,7 +20,7 @@ following the numbered steps under <<filebeat-getting-started>>.
 Before running Filebeat modules, you need to:
 
 * Install and configure the Elastic stack. See
-{libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack].
+{stack-ov}/get-started-elastic-stack.html[Getting started with the {stack}].
 
 * Complete the Filebeat installation instructions described in
 <<filebeat-installation>>. After installing Filebeat, return to this

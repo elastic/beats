@@ -1,0 +1,16 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/elasticsearch/*_index_search_slowlog.log
+      - /var/log/elasticsearch/*_index_indexing_slowlog.log
+    os.darwin:
+      - /usr/local/elasticsearch/*_index_search_slowlog.log
+      - /usr/local/elasticsearch/*_index_indexing_slowlog.log
+    os.windows:
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_index_search_slowlog.log
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_index_indexing_slowlog.log
+
+ingest_pipeline: ingest/pipeline.json
+input: config/slowlog.yml

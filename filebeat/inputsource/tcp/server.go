@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package tcp
 
 import (
@@ -31,25 +48,24 @@ type Server struct {
 // New creates a new tcp server
 func New(
 	config *Config,
+	splitFunc bufio.SplitFunc,
 	callback inputsource.NetworkFunc,
 ) (*Server, error) {
-
-	if len(config.LineDelimiter) == 0 {
-		return nil, fmt.Errorf("empty line delimiter")
-	}
-
 	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
 
-	sf := splitFunc([]byte(config.LineDelimiter))
+	if splitFunc == nil {
+		return nil, fmt.Errorf("SplitFunc can't be empty")
+	}
+
 	return &Server{
 		config:    config,
 		callback:  callback,
 		clients:   make(map[*client]struct{}, 0),
 		done:      make(chan struct{}),
-		splitFunc: sf,
+		splitFunc: splitFunc,
 		log:       logp.NewLogger("tcp").With("address", config.Host),
 		tlsConfig: tlsConfig,
 	}, nil
@@ -96,7 +112,6 @@ func (s *Server) run() {
 			s.config.Timeout,
 		)
 
-		s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount())
 		s.wg.Add(1)
 		go func() {
 			defer logp.Recover("recovering from a tcp client crash")
@@ -105,13 +120,14 @@ func (s *Server) run() {
 
 			s.registerClient(client)
 			defer s.unregisterClient(client)
+			s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount())
 
 			err := client.handle()
 			if err != nil {
 				s.log.Debugw("Client error", "error", err)
 			}
 
-			s.log.Debugw(
+			defer s.log.Debugw(
 				"Client disconnected",
 				"remote_address",
 				conn.RemoteAddr(),
@@ -173,7 +189,8 @@ func (s *Server) clientsCount() int {
 	return len(s.clients)
 }
 
-func splitFunc(lineDelimiter []byte) bufio.SplitFunc {
+// SplitFunc allows to create a `bufio.SplitFunc` based on a delimiter provided.
+func SplitFunc(lineDelimiter []byte) bufio.SplitFunc {
 	ld := []byte(lineDelimiter)
 	if bytes.Equal(ld, []byte("\n")) {
 		// This will work for most usecases and will also strip \r if present.

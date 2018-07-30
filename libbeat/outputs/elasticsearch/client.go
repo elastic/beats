@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package elasticsearch
 
 import (
@@ -49,6 +66,7 @@ type ClientSettings struct {
 	Proxy              *url.URL
 	TLS                *transport.TLSConfig
 	Username, Password string
+	EscapeHTML         bool
 	Parameters         map[string]string
 	Headers            map[string]string
 	Index              outil.Selector
@@ -167,9 +185,9 @@ func NewClient(
 	var encoder bodyEncoder
 	compression := s.CompressionLevel
 	if compression == 0 {
-		encoder = newJSONEncoder(nil)
+		encoder = newJSONEncoder(nil, s.EscapeHTML)
 	} else {
-		encoder, err = newGzipEncoder(compression, nil)
+		encoder, err = newGzipEncoder(compression, nil, s.EscapeHTML)
 		if err != nil {
 			return nil, err
 		}
@@ -300,7 +318,7 @@ func (client *Client) publishEvents(
 		return data, sendErr
 	}
 
-	debugf("PublishEvents: %d events have been  published to elasticsearch in %v.",
+	debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
 		len(data),
 		time.Now().Sub(begin))
 
@@ -445,7 +463,7 @@ func bulkCollectPublishFails(
 	data []publisher.Event,
 ) ([]publisher.Event, bulkResultStats) {
 	if err := reader.expectDict(); err != nil {
-		logp.Err("Failed to parse bulk respose: expected JSON object")
+		logp.Err("Failed to parse bulk response: expected JSON object")
 		return nil, bulkResultStats{}
 	}
 
@@ -472,7 +490,7 @@ func bulkCollectPublishFails(
 
 	// check items field is an array
 	if err := reader.expectArray(); err != nil {
-		logp.Err("Failed to parse bulk respose: expected items array")
+		logp.Err("Failed to parse bulk response: expected items array")
 		return nil, bulkResultStats{}
 	}
 

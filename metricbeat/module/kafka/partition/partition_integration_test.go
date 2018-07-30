@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build integration
 
 package partition
@@ -114,6 +131,7 @@ func generateKafkaData(t *testing.T, topic string) {
 	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
 	if err != nil {
 		t.Errorf("%s", err)
+		t.FailNow()
 	}
 
 	producer, err := sarama.NewSyncProducerFromClient(client)
@@ -129,10 +147,13 @@ func generateKafkaData(t *testing.T, topic string) {
 
 	_, _, err = producer.SendMessage(msg)
 	if err != nil {
-		t.Errorf("FAILED to send message: %s\n", err)
+		t.Errorf("failed to send message: %s\n", err)
 	}
 
-	client.RefreshMetadata(topic)
+	err = client.RefreshMetadata(topic)
+	if err != nil {
+		t.Errorf("failed to refresh metadata for topic '%s': %s\n", topic, err)
+	}
 }
 
 func getConfig(topic string) map[string]interface{} {

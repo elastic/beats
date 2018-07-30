@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package auditd
 
 import (
@@ -130,7 +147,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		return
 	}
 
-	out, statusC, err := ms.receiveEvents(reporter.Done())
+	out, err := ms.receiveEvents(reporter.Done())
 	if err != nil {
 		reporter.Error(err)
 		ms.log.Errorw("Failure receiving audit events", "error", err)
@@ -138,7 +155,13 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 	}
 
 	if ms.kernelLost.enabled {
+		client, err := libaudit.NewAuditClient(nil)
+		if err != nil {
+			reporter.Error(err)
+			ms.log.Errorw("Failure creating audit monitoring client", "error", err)
+		}
 		go func() {
+			defer client.Close()
 			timer := time.NewTicker(lostEventsUpdateInterval)
 			defer timer.Stop()
 			for {
@@ -146,11 +169,11 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 				case <-reporter.Done():
 					return
 				case <-timer.C:
-					if _, err := ms.client.GetStatusAsync(false); err != nil {
-						ms.log.Error("get async status request failed:", err)
+					if status, err := client.GetStatus(); err == nil {
+						ms.updateKernelLostMetric(status.Lost)
+					} else {
+						ms.log.Error("get status request failed:", err)
 					}
-				case status := <-statusC:
-					ms.updateKernelLostMetric(status.Lost)
 				}
 			}
 		}()
@@ -185,10 +208,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 }
 
 func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
-	rules, err := ms.config.rules()
-	if err != nil {
-		return errors.Wrap(err, "failed to add rules")
-	}
+	rules := ms.config.rules()
 
 	if len(rules) == 0 {
 		ms.log.Info("No audit_rules were specified.")
@@ -346,13 +366,12 @@ func (ms *MetricSet) updateKernelLostMetric(lost uint32) {
 	ms.kernelLost.counter = lost
 }
 
-func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.AuditMessage, <-chan *libaudit.AuditStatus, error) {
+func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.AuditMessage, error) {
 	if err := ms.initClient(); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	out := make(chan []*auparse.AuditMessage, ms.config.StreamBufferQueueSize)
-	statusC := make(chan *libaudit.AuditStatus, 8)
 
 	var st libaudit.Stream = &stream{done, out}
 	if ms.backpressureStrategy&bsUserSpace != 0 {
@@ -365,14 +384,13 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 	}
 	reassembler, err := libaudit.NewReassembler(int(ms.config.ReassemblerMaxInFlight), ms.config.ReassemblerTimeout, st)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "failed to create Reassembler")
+		return nil, errors.Wrap(err, "failed to create Reassembler")
 	}
 	go maintain(done, reassembler)
 
 	go func() {
 		defer ms.log.Debug("receiveEvents goroutine exited")
 		defer close(out)
-		defer close(statusC)
 		defer reassembler.Close()
 
 		for {
@@ -381,19 +399,6 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 				if errors.Cause(err) == syscall.EBADF {
 					// Client has been closed.
 					break
-				}
-				continue
-			}
-			if raw.Type == auparse.AUDIT_GET {
-				status := &libaudit.AuditStatus{}
-				if err := status.FromWireFormat([]byte(raw.Data)); err == nil {
-					select {
-					case statusC <- status:
-					default:
-						ms.log.Debugf("Dropped audit status reply (channel busy)")
-					}
-				} else {
-					ms.log.Error("Decoding status message:", err)
 				}
 				continue
 			}
@@ -412,7 +417,7 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 		}
 	}()
 
-	return out, statusC, nil
+	return out, nil
 }
 
 // maintain periodically evicts timed-out events from the Reassembler. This
@@ -776,7 +781,7 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 		}
 		return c.SocketType, nil
 	}
-	rules, _ := c.rules()
+	rules := c.rules()
 
 	isLocked := status.Enabled == auditLocked
 	hasMulticast := hasMulticastSupport()

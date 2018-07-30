@@ -4,7 +4,7 @@ ENV KAFKA_HOME /kafka
 # The advertised host is kafka. This means it will not work if container is started locally and connected from localhost to it
 ENV KAFKA_ADVERTISED_HOST kafka
 ENV KAFKA_LOGS_DIR="/kafka-logs"
-ENV KAFKA_VERSION 1.0.0
+ENV KAFKA_VERSION 1.1.1
 ENV _JAVA_OPTIONS "-Djava.net.preferIPv4Stack=true"
 ENV TERM=linux
 
@@ -20,7 +20,7 @@ ADD healthcheck.sh /healthcheck.sh
 EXPOSE 9092
 EXPOSE 2181
 
-# Healtcheck creates an empty topic foo. As soon as a topic is created, it assumes broke is available
+# Healthcheck creates an empty topic foo. As soon as a topic is created, it assumes broke is available
 HEALTHCHECK --interval=1s --retries=600 CMD /healthcheck.sh
 
 ENTRYPOINT ["/run.sh"]

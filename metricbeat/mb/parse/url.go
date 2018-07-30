@@ -1,9 +1,27 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package parse
 
 import (
 	"fmt"
 	"net"
 	"net/url"
+	p "path"
 	"strings"
 
 	"github.com/elastic/beats/metricbeat/mb"
@@ -32,7 +50,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 			return mb.HostData{}, err
 		}
 
-		var user, pass, path string
+		var user, pass, path, basePath string
 		t, ok := conf["username"]
 		if ok {
 			user, ok = t.(string)
@@ -60,8 +78,23 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		} else {
 			path = b.DefaultPath
 		}
+		// Normalize path
+		path = strings.Trim(path, "/")
 
-		return ParseURL(host, b.DefaultScheme, user, pass, path, b.QueryParams)
+		t, ok = conf["basepath"]
+		if ok {
+			basePath, ok = t.(string)
+			if !ok {
+				return mb.HostData{}, errors.Errorf("'basepath' config for module %v is not a string", module.Name())
+			}
+		}
+		// Normalize basepath
+		basePath = strings.Trim(basePath, "/")
+
+		// Combine paths and normalize
+		fullPath := strings.Trim(p.Join(basePath, path), "/")
+
+		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.QueryParams)
 	}
 }
 

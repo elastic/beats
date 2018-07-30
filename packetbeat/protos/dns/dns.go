@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // Package dns provides support for parsing DNS messages and reporting the
 // results. This package supports the DNS protocol as defined by RFC 1034
 // and RFC 1035. It does not have any special support for RFC 2671 (EDNS) or
@@ -113,7 +130,7 @@ func dnsTupleFromIPPort(t *common.IPPortTuple, trans transport, id uint16) dnsTu
 		transport: trans,
 		id:        id,
 	}
-	tuple.computeHashebles()
+	tuple.computeHashables()
 
 	return tuple
 }
@@ -134,7 +151,7 @@ func (t dnsTuple) reverse() dnsTuple {
 	}
 }
 
-func (t *dnsTuple) computeHashebles() {
+func (t *dnsTuple) computeHashables() {
 	copy(t.raw[0:16], t.SrcIP)
 	copy(t.raw[16:18], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
 	copy(t.raw[18:34], t.DstIP)

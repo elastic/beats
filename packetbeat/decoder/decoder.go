@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package decoder
 
 import (
@@ -265,7 +282,7 @@ func (d *Decoder) process(
 func (d *Decoder) onICMPv4(packet *protos.Packet) {
 	if d.icmp4Proc != nil {
 		packet.Payload = d.icmp4.Payload
-		packet.Tuple.ComputeHashebles()
+		packet.Tuple.ComputeHashables()
 		d.icmp4Proc.ProcessICMPv4(d.flowID, &d.icmp4, packet)
 	}
 }
@@ -273,7 +290,7 @@ func (d *Decoder) onICMPv4(packet *protos.Packet) {
 func (d *Decoder) onICMPv6(packet *protos.Packet) {
 	if d.icmp6Proc != nil {
 		packet.Payload = d.icmp6.Payload
-		packet.Tuple.ComputeHashebles()
+		packet.Tuple.ComputeHashables()
 		d.icmp6Proc.ProcessICMPv6(d.flowID, &d.icmp6, packet)
 	}
 }
@@ -290,7 +307,7 @@ func (d *Decoder) onUDP(packet *protos.Packet) {
 	packet.Tuple.SrcPort = src
 	packet.Tuple.DstPort = dst
 	packet.Payload = d.udp.Payload
-	packet.Tuple.ComputeHashebles()
+	packet.Tuple.ComputeHashables()
 
 	d.udpProc.Process(id, packet)
 }
@@ -313,6 +330,6 @@ func (d *Decoder) onTCP(packet *protos.Packet) {
 		debugf("Ignore empty non-FIN packet")
 		return
 	}
-	packet.Tuple.ComputeHashebles()
+	packet.Tuple.ComputeHashables()
 	d.tcpProc.Process(id, &d.tcp, packet)
 }
