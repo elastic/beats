@@ -17,37 +17,132 @@
 
 package add_kubernetes_metadata
 
-import "github.com/elastic/beats/libbeat/feature"
+import (
+	"fmt"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
+)
 
 var (
 	indexerNamespace = "libbeat.processor.add_kubernetes_metadata.indexer"
 	matcherNamespace = "libbeat.processor.add_kubernetes_metadata.matcher"
 )
 
-// IndexerPlugin is a backward compatible method to create a new indexer.
-func IndexerPlugin(name string, c IndexerConstructor) *feature.Feature {
-	return IndexerFeature(name, c, feature.NewDetails(name, "", feature.Undefined))
+type indexerPlugin struct {
+	Default bool
+	Config  *common.Config
+	Factory IndexerConstructor
 }
 
-// MatcherPlugin is a backward compatible method to create a new matcher.
-func MatcherPlugin(name string, m MatcherConstructor) *feature.Feature {
-	return MatcherFeature(name, m, feature.NewDetails(name, "", feature.Undefined))
+type matcherPlugin struct {
+	Default bool
+	Config  *common.Config
+	Factory MatcherConstructor
 }
 
 // IndexerFeature creates a new Indexer for kubernetes metadata.
 func IndexerFeature(
 	name string,
 	factory IndexerConstructor,
+	d bool,
+	config *common.Config,
 	description feature.Describer,
 ) *feature.Feature {
-	return feature.New(indexerNamespace, name, factory, description)
+	return feature.New(indexerNamespace, name, indexerPlugin{
+		Default: d,
+		Config:  config,
+		Factory: factory,
+	}, description)
 }
 
 // MatcherFeature creates a new Matcher for kubernetes metadata.
 func MatcherFeature(
 	name string,
 	factory MatcherConstructor,
+	d bool,
+	config *common.Config,
 	description feature.Describer,
 ) *feature.Feature {
-	return feature.New(matcherNamespace, name, factory, description)
+	return feature.New(matcherNamespace, name, matcherPlugin{
+		Default: d,
+		Config:  config,
+		Factory: factory,
+	}, description)
+}
+
+// FindIndexerFactory returns the factory for a specific indexer.
+func FindIndexerFactory(name string) (IndexerConstructor, error) {
+	f, err := feature.Registry.Lookup(indexerNamespace, name)
+	if err != nil {
+		return nil, err
+	}
+
+	plugin, ok := f.Factory().(indexerPlugin)
+
+	if !ok {
+		return nil, fmt.Errorf("invalid indexer type, received: %T", f.Factory())
+	}
+
+	return plugin.Factory, nil
+}
+
+// FindDefaultIndexersConfigs returns the list of the default indexers and their config.
+func FindDefaultIndexersConfigs() (configs []map[string]common.Config, err error) {
+	features, err := feature.Registry.LookupAll(indexerNamespace)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, f := range features {
+		plugin, ok := f.Factory().(indexerPlugin)
+
+		if !ok {
+			return nil, fmt.Errorf("invalid indexer type, received: %T", f.Factory())
+		}
+
+		if plugin.Default {
+			configs = append(configs, map[string]common.Config{f.Name(): *plugin.Config})
+		}
+	}
+
+	return configs, nil
+}
+
+// FindMatcherFactory returns the factory for a specific indexer.
+func FindMatcherFactory(name string) (MatcherConstructor, error) {
+	f, err := feature.Registry.Lookup(matcherNamespace, name)
+	if err != nil {
+		return nil, err
+	}
+
+	plugin, ok := f.Factory().(matcherPlugin)
+
+	if !ok {
+		return nil, fmt.Errorf("invalid matcher type, received: %T", f.Factory())
+	}
+
+	return plugin.Factory, nil
+}
+
+// FindDefaultMatchersConfigs return the default matchers and their default config.
+func FindDefaultMatchersConfigs() (configs []map[string]common.Config, err error) {
+	features, err := feature.Registry.LookupAll(indexerNamespace)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, f := range features {
+		plugin, ok := f.Factory().(indexerPlugin)
+
+		if !ok {
+			return nil, fmt.Errorf("invalid indexer type, received: %T", f.Factory())
+		}
+
+		if plugin.Default {
+			configs = append(configs, map[string]common.Config{f.Name(): *plugin.Config})
+		}
+	}
+
+	return configs, nil
 }

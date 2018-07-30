@@ -41,24 +41,72 @@ type kubernetesAnnotator struct {
 	cache    *cache
 }
 
-// Feature exposes add_kubernetes_metadata.
-var Feature = processors.Feature("add_kubernetes_metadata",
-	newKubernetesAnnotator,
-	feature.NewDetails(
-		"Add kubernetes metadata",
-		"Add metadata to the event from Kubernetes.",
-		feature.Stable,
-	))
-
-func init() {
-	// Register default indexers
-	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
-	Indexing.AddIndexer(PodUIDIndexerName, NewPodUIDIndexer)
-	Indexing.AddIndexer(ContainerIndexerName, NewContainerIndexer)
-	Indexing.AddIndexer(IPPortIndexerName, NewIPPortIndexer)
-	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
-	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
-}
+// Feature exposes add_kubernetes_metadata and include default Matcher and Indexer.
+var Feature = feature.MustBundle(
+	processors.Feature("add_kubernetes_metadata",
+		newKubernetesAnnotator,
+		feature.NewDetails(
+			"Add kubernetes metadata",
+			"Add metadata to the event from Kubernetes.",
+			feature.Stable,
+		)),
+	IndexerFeature(PodNameIndexerName, NewPodNameIndexer,
+		false,
+		common.NewConfig(),
+		feature.NewDetails(
+			"Pod name Indexer",
+			"Name indexer.",
+			feature.Stable,
+		)),
+	IndexerFeature(PodUIDIndexerName, NewPodUIDIndexer,
+		false,
+		common.NewConfig(),
+		feature.NewDetails(
+			"Pod UID Indexer",
+			"UID indexer.",
+			feature.Stable,
+		)),
+	IndexerFeature(ContainerIndexerName, NewContainerIndexer,
+		false,
+		common.NewConfig(),
+		feature.NewDetails(
+			"Pod container Indexer",
+			"Container indexer.",
+			feature.Stable,
+		)),
+	IndexerFeature(IPPortIndexerName, NewIPPortIndexer,
+		false,
+		common.NewConfig(),
+		feature.NewDetails(
+			"Pod IP and port Indexer",
+			"IP and Port indexer.",
+			feature.Stable,
+		)),
+	IndexerFeature(IPPortIndexerName, NewIPPortIndexer,
+		false,
+		common.NewConfig(),
+		feature.NewDetails(
+			"Pod IP and port Indexer",
+			"IP and Port indexer.",
+			feature.Stable,
+		)),
+	MatcherFeature(FieldMatcherName, NewFieldMatcher,
+		false,
+		common.NewConfig(),
+		feature.NewDetails(
+			"Field matcher",
+			"Match using a field.",
+			feature.Stable,
+		)),
+	MatcherFeature(FieldFormatMatcherName, NewFieldFormatMatcher,
+		false,
+		common.NewConfig(),
+		feature.NewDetails(
+			"Field format matcher",
+			"Match using a field format.",
+			feature.Stable,
+		)),
+)
 
 func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	config := defaultKubernetesAnnotatorConfig()
@@ -75,20 +123,21 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 
 	//Load default indexer configs
 	if config.DefaultIndexers.Enabled == true {
-		Indexing.RLock()
-		for key, cfg := range Indexing.GetDefaultIndexerConfigs() {
-			config.Indexers = append(config.Indexers, map[string]common.Config{key: cfg})
+		indexersConfig, err := FindDefaultIndexersConfigs()
+		if err != nil {
+			return nil, err
 		}
-		Indexing.RUnlock()
+		config.Indexers = append(config.Indexers, indexersConfig...)
 	}
 
 	//Load default matcher configs
 	if config.DefaultMatchers.Enabled == true {
-		Indexing.RLock()
-		for key, cfg := range Indexing.GetDefaultMatcherConfigs() {
-			config.Matchers = append(config.Matchers, map[string]common.Config{key: cfg})
+		matchersConfig, err := FindDefaultMatchersConfigs()
+		if err != nil {
+			return nil, err
 		}
-		Indexing.RUnlock()
+
+		config.Matchers = append(config.Matchers, matchersConfig...)
 	}
 
 	metaGen, err := kubernetes.NewMetaGenerator(cfg)

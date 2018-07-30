@@ -65,9 +65,9 @@ func NewIndexers(configs PluginConfig, metaGen kubernetes.MetaGenerator) *Indexe
 	indexers := []Indexer{}
 	for _, pluginConfigs := range configs {
 		for name, pluginConfig := range pluginConfigs {
-			indexFunc := Indexing.GetIndexer(name)
-			if indexFunc == nil {
-				logp.Warn("Unable to find indexing plugin %s", name)
+			indexFunc, err := FindIndexerFactory(name)
+			if err != nil {
+				logp.Warn("Unable to find indexing plugin: %s, error: %s", name, err)
 				continue
 			}
 

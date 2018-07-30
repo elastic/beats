@@ -53,9 +53,9 @@ func NewMatchers(configs PluginConfig) *Matchers {
 	matchers := []Matcher{}
 	for _, pluginConfigs := range configs {
 		for name, pluginConfig := range pluginConfigs {
-			matchFunc := Indexing.GetMatcher(name)
-			if matchFunc == nil {
-				logp.Warn("Unable to find matcher plugin %s", name)
+			matchFunc, err := FindMatcherFactory(name)
+			if err != nil {
+				logp.Warn("Unable to find matcher plugin: %s, error: %s", name, err)
 				continue
 			}
 
