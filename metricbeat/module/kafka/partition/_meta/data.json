@@ -6,12 +6,12 @@
     },
     "kafka": {
         "broker": {
-            "address": "kafka:9092",
+            "address": "172.18.0.2:9092",
             "id": 0
         },
         "partition": {
             "broker": {
-                "address": "kafka:9092",
+                "address": "172.18.0.2:9092",
                 "id": 0
             },
             "offset": {
@@ -26,11 +26,11 @@
                 "replica": 0
             },
             "topic": {
-                "name": "foo-1532617151-366482757"
+                "name": "foo-1532945633-185372965"
             }
         },
         "topic": {
-            "name": "foo-1532617151-366482757"
+            "name": "foo-1532945633-185372965"
         }
     },
     "metricset": {

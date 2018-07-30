@@ -114,7 +114,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	evtBroker := common.MapStr{
 		"id":      b.ID(),
-		"address": b.Addr(),
+		"address": b.AdvertisedAddr(),
 	}
 
 	for _, topic := range topics {

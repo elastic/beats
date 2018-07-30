@@ -6977,7 +6977,7 @@ Broker id
 --
 type: keyword
 
-Broker address
+Broker advertised address
 
 
 --

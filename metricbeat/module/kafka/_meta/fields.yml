@@ -23,7 +23,7 @@
             - name: address
               type: keyword
               description: >
-                Broker address
+                Broker advertised address
 
         - name: topic.name
           type: keyword
