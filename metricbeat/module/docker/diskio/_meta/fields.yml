@@ -24,7 +24,7 @@
             Number of current reads per second
     - name: reads
       type: scaled_float
-      deprecated: true
+      deprecated: 6.4
       description: >
         Number of current reads per second
     - name: write
@@ -47,7 +47,7 @@
             Number of current writes per second
     - name: writes
       type: scaled_float
-      deprecated: true
+      deprecated: 6.4
       description: >
         Number of current writes per second
     - name: summary
@@ -70,6 +70,6 @@
             Number of current operations per second
     - name: total
       type: scaled_float
-      deprecated: true
+      deprecated: 6.4
       description: >
         Number of reads and writes per second

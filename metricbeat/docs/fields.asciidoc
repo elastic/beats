@@ -2736,6 +2736,9 @@ Number of current reads per second
 *`docker.diskio.reads`*::
 +
 --
+
+deprecated[6.4]
+
 type: scaled_float
 
 Number of current reads per second
@@ -2785,6 +2788,9 @@ Number of current writes per second
 *`docker.diskio.writes`*::
 +
 --
+
+deprecated[6.4]
+
 type: scaled_float
 
 Number of current writes per second
@@ -2834,6 +2840,9 @@ Number of current operations per second
 *`docker.diskio.total`*::
 +
 --
+
+deprecated[6.4]
+
 type: scaled_float
 
 Number of reads and writes per second
@@ -8713,6 +8722,9 @@ Container CPU requested cores
 *`kubernetes.container.cpu.limit.nanocores`*::
 +
 --
+
+deprecated[6.4]
+
 type: long
 
 Container CPU nanocores limit
@@ -8723,6 +8735,9 @@ Container CPU nanocores limit
 *`kubernetes.container.cpu.request.nanocores`*::
 +
 --
+
+deprecated[6.4]
+
 type: long
 
 Container CPU requested nanocores

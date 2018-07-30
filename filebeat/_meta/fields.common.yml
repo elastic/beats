@@ -31,6 +31,7 @@
 
     - name: prospector.type
       required: true
+      deprecated: 6.3
       description: >
         The input type from which the event was generated. This field is set to the value specified
         for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `input.type`)
