@@ -54,6 +54,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add metrics about cache size to memcached module {pull}7740[7740]
+
 *Packetbeat*
 
 *Winlogbeat*
