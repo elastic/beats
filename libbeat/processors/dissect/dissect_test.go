@@ -53,7 +53,7 @@ type dissectTest struct {
 var tests []dissectTest
 
 func init() {
-	content, err := ioutil.ReadFile("dissect_tests.json")
+	content, err := ioutil.ReadFile("testdata/dissect_tests.json")
 	if err != nil {
 		fmt.Printf("could not read the content of 'dissect_tests', error: %s", err)
 		os.Exit(1)
