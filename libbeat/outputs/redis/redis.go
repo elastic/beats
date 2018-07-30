@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/codec"
@@ -42,9 +43,14 @@ const (
 	defaultMaxWaitRetry = 60 * time.Second
 )
 
-func init() {
-	outputs.RegisterType("redis", makeRedis)
-}
+// Feature expose the redis output.
+var Feature = outputs.Feature("redis",
+	makeRedis,
+	feature.NewDetails(
+		"Redis",
+		"Send events to Redis. ",
+		feature.Stable,
+	))
 
 func makeRedis(
 	beat beat.Info,

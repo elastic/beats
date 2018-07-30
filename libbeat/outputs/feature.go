@@ -23,9 +23,11 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/feature"
 )
 
-var outputReg = map[string]Factory{}
+// Namespace exposes the output type.
+var Namespace = "libbeat.output"
 
 // Factory is used by output plugins to build an output instance
 type Factory func(
@@ -41,24 +43,31 @@ type Group struct {
 	Retry     int
 }
 
-// RegisterType registers a new output type.
-func RegisterType(name string, f Factory) {
-	if outputReg[name] != nil {
-		panic(fmt.Errorf("output type  '%v' exists already", name))
-	}
-	outputReg[name] = f
+// Plugin exposes the output as an external plugin.
+func Plugin(name string, f Factory) *feature.Feature {
+	return Feature(name, f, feature.NewDetails(name, "", feature.Undefined))
 }
 
 // FindFactory finds an output type its factory if available.
-func FindFactory(name string) Factory {
-	return outputReg[name]
+func FindFactory(name string) (Factory, error) {
+	f, err := feature.Registry.Lookup(Namespace, name)
+	if err != nil {
+		return nil, err
+	}
+
+	factory, ok := f.Factory().(Factory)
+	if !ok {
+		return nil, fmt.Errorf("invalid output type, received: %T", f.Factory())
+	}
+
+	return factory, nil
 }
 
 // Load creates and configures a output Group using a configuration object..
 func Load(info beat.Info, stats Observer, name string, config *common.Config) (Group, error) {
-	factory := FindFactory(name)
-	if factory == nil {
-		return Group{}, fmt.Errorf("output type %v undefined", name)
+	factory, err := FindFactory(name)
+	if err != nil {
+		return Group{}, err
 	}
 
 	if err := cfgwarn.CheckRemoved5xSetting(config, "flush_interval"); err != nil {
@@ -69,4 +78,9 @@ func Load(info beat.Info, stats Observer, name string, config *common.Config) (G
 		stats = NewNilObserver()
 	}
 	return factory(info, stats, config)
+}
+
+// Feature creates a new output.
+func Feature(name string, factory Factory, description feature.Describer) *feature.Feature {
+	return feature.New(Namespace, name, factory, description)
 }

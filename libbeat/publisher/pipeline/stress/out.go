@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher"
 )
@@ -50,7 +51,12 @@ var defaultTestOutputConfig = testOutputConfig{
 }
 
 func init() {
-	outputs.RegisterType("test", makeTestOutput)
+	f := outputs.Feature(
+		"test",
+		makeTestOutput,
+		feature.NewDetails("test", "", feature.Stable),
+	)
+	feature.MustRegister(f)
 }
 
 func makeTestOutput(beat beat.Info, observer outputs.Observer, cfg *common.Config) (outputs.Group, error) {
