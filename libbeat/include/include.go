@@ -71,6 +71,7 @@ var Bundle = feature.MustBundle(
 		fileout.Feature,
 		console.Feature,
 	),
+
 	// codecs
 	feature.MustBundle(
 		format.Feature,
