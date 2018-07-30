@@ -36,7 +36,7 @@ func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "mongodb")
 
 	err := initiateReplicaSet()
-	if err != nil {
+	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
 
