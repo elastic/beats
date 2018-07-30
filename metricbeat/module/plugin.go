@@ -17,56 +17,48 @@
 
 package module
 
-import (
-	"errors"
+// type modulePlugin struct {
+// 	name       string
+// 	factory    mb.ModuleFactory
+// 	metricsets map[string]mb.MetricSetFactory
+// }
 
-	"github.com/elastic/beats/libbeat/plugin"
+// const pluginKey = "metricbeat.module"
 
-	"github.com/elastic/beats/metricbeat/mb"
-)
+// func init() {
+// 	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+// 		p, ok := ifc.(modulePlugin)
+// 		if !ok {
+// 			return errors.New("plugin does not match metricbeat module plugin type")
+// 		}
 
-type modulePlugin struct {
-	name       string
-	factory    mb.ModuleFactory
-	metricsets map[string]mb.MetricSetFactory
-}
+// 		if p.factory != nil {
+// 			if err := mb.Registry.AddModule(p.name, p.factory); err != nil {
+// 				return err
+// 			}
+// 		}
 
-const pluginKey = "metricbeat.module"
+// 		for name, factory := range p.metricsets {
+// 			if err := mb.Registry.AddMetricSet(p.name, name, factory); err != nil {
+// 				return err
+// 			}
+// 		}
 
-func init() {
-	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
-		p, ok := ifc.(modulePlugin)
-		if !ok {
-			return errors.New("plugin does not match metricbeat module plugin type")
-		}
+// 		return nil
+// 	})
+// }
 
-		if p.factory != nil {
-			if err := mb.Registry.AddModule(p.name, p.factory); err != nil {
-				return err
-			}
-		}
+// func Plugin(
+// 	module string,
+// 	factory mb.ModuleFactory,
+// 	metricsets map[string]mb.MetricSetFactory,
+// ) map[string][]interface{} {
+// 	return plugin.MakePlugin(pluginKey, modulePlugin{module, factory, metricsets})
+// }
 
-		for name, factory := range p.metricsets {
-			if err := mb.Registry.AddMetricSet(p.name, name, factory); err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
-}
-
-func Plugin(
-	module string,
-	factory mb.ModuleFactory,
-	metricsets map[string]mb.MetricSetFactory,
-) map[string][]interface{} {
-	return plugin.MakePlugin(pluginKey, modulePlugin{module, factory, metricsets})
-}
-
-func MetricSetsPlugin(
-	module string,
-	metricsets map[string]mb.MetricSetFactory,
-) map[string][]interface{} {
-	return Plugin(module, nil, metricsets)
-}
+// func MetricSetsPlugin(
+// 	module string,
+// 	metricsets map[string]mb.MetricSetFactory,
+// ) map[string][]interface{} {
+// 	return Plugin(module, nil, metricsets)
+// }
