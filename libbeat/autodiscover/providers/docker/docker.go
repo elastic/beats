@@ -20,18 +20,25 @@ package docker
 import (
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/libbeat/autodiscover/providers"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/docker"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-func init() {
-	autodiscover.Registry.AddProvider("docker", AutodiscoverBuilder)
-}
+// Feature exposes the docker autodiscovery provider.
+var Feature = providers.Feature("docker",
+	AutodiscoverBuilder,
+	feature.NewDetails(
+		"Docker Autodiscover",
+		"Update the configuration based on Docker events.",
+		feature.Beta,
+	))
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {

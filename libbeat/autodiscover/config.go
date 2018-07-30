@@ -18,8 +18,10 @@
 package autodiscover
 
 import (
+	"github.com/elastic/beats/libbeat/autodiscover/appenders"
+	"github.com/elastic/beats/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/libbeat/autodiscover/providers"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/conditions"
 )
 
 // Config settings for Autodiscover
@@ -28,17 +30,10 @@ type Config struct {
 }
 
 // ProviderConfig settings
-type ProviderConfig struct {
-	Type string `config:"type"`
-}
+type ProviderConfig = providers.Config
 
 // BuilderConfig settings
-type BuilderConfig struct {
-	Type string `config:"type"`
-}
+type BuilderConfig = builder.Config
 
 // AppenderConfig settings
-type AppenderConfig struct {
-	Type            string             `config:"type"`
-	ConditionConfig *conditions.Config `config:"condition"`
-}
+type AppenderConfig = appenders.Config

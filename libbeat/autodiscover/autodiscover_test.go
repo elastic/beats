@@ -22,10 +22,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/autodiscover/providers"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/feature"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -125,13 +127,15 @@ func TestNilAutodiscover(t *testing.T) {
 func TestAutodiscover(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
-	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
-		// intercept bus to mock events
-		busChan <- b
+	feature.MustRegister(
+		providers.Feature("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
+			// intercept bus to mock events
+			busChan <- b
 
-		return &mockProvider{}, nil
-	})
+			return &mockProvider{}, nil
+		}, feature.NewDetails("mock autodiscover", "", feature.Stable)),
+	)
+	defer feature.Registry.Unregister(providers.Namespace, "mock")
 
 	// Create a mock adapter
 	runnerConfig, _ := common.NewConfigFrom(map[string]string{
@@ -231,14 +235,15 @@ func TestAutodiscover(t *testing.T) {
 func TestAutodiscoverHash(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
+	feature.MustRegister(
+		providers.Feature("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
+			// intercept bus to mock events
+			busChan <- b
 
-	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
-		// intercept bus to mock events
-		busChan <- b
-
-		return &mockProvider{}, nil
-	})
+			return &mockProvider{}, nil
+		}, feature.NewDetails("mock Autodiscover", "", feature.Stable)),
+	)
+	defer feature.Registry.Unregister(providers.Namespace, "mock")
 
 	// Create a mock adapter
 	runnerConfig1, _ := common.NewConfigFrom(map[string]string{

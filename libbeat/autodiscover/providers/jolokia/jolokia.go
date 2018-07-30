@@ -19,15 +19,22 @@ package jolokia
 
 import (
 	"github.com/elastic/beats/libbeat/autodiscover"
+	"github.com/elastic/beats/libbeat/autodiscover/providers"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/feature"
 )
 
-func init() {
-	autodiscover.Registry.AddProvider("jolokia", AutodiscoverBuilder)
-}
+// Feature exposes the Jolokia autodiscovery provider.
+var Feature = providers.Feature("jolokia",
+	AutodiscoverBuilder,
+	feature.NewDetails(
+		"Jolokia Autodiscover",
+		"Update configuration based on Jolokia events.",
+		feature.Experimental,
+	))
 
 // DiscoveryProber implements discovery probes
 type DiscoveryProber interface {

@@ -21,17 +21,24 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
+	"github.com/elastic/beats/libbeat/autodiscover/appenders"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/conditions"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-func init() {
-	autodiscover.Registry.AddAppender("config", NewConfigAppender)
-}
+// Feature exposes a config appender.
+var Feature = appenders.Feature("config",
+	NewConfigAppender,
+	feature.NewDetails(
+		"Config",
+		"Add new appenders based on the configuration.",
+		feature.Beta,
+	))
 
 type config struct {
 	ConditionConfig *conditions.Config `config:"condition"`

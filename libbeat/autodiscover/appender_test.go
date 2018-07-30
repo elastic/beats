@@ -22,8 +22,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/autodiscover/appenders"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/feature"
 )
 
 type fakeAppender struct{}
@@ -37,13 +39,12 @@ func newFakeAppender(_ *common.Config) (Appender, error) {
 }
 
 func TestAppenderRegistry(t *testing.T) {
-	// Add a new builder
-	reg := NewRegistry()
-	reg.AddAppender("fake", newFakeAppender)
-
-	// Check if that appender is available in registry
-	b := reg.GetAppender("fake")
-	assert.NotNil(t, b)
+	feature.MustRegister(appenders.Feature("fake", newFakeAppender, feature.NewDetails(
+		"fake appender",
+		"",
+		feature.Stable,
+	)))
+	defer feature.Registry.Unregister(appenders.Namespace, "fake")
 
 	// Generate a config with type fake
 	config := AppenderConfig{
@@ -54,12 +55,11 @@ func TestAppenderRegistry(t *testing.T) {
 
 	// Make sure that config building doesn't fail
 	assert.Nil(t, err)
-	appender, err := reg.BuildAppender(cfg)
+	appender, err := appenders.Build(cfg)
 	assert.Nil(t, err)
 	assert.NotNil(t, appender)
 
 	// Attempt to build using an array of configs
-	Registry.AddAppender("fake", newFakeAppender)
 	cfgs := []*common.Config{cfg}
 	appenders, err := NewAppenders(cfgs)
 	assert.Nil(t, err)
