@@ -27,7 +27,7 @@ var Registry = newRegistry()
 
 // Featurable implements the description of a feature.
 type Featurable interface {
-	bundleable
+	Bundleable
 
 	// Namespace is the kind of plugin or functionality we want to expose as a feature.
 	// Examples: Autodiscover's provider, processors, outputs.
