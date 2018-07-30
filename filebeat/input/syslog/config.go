@@ -41,10 +41,17 @@ var defaultConfig = config{
 	},
 }
 
-var defaultTCP = tcp.Config{
-	LineDelimiter:  "\n",
-	Timeout:        time.Minute * 5,
-	MaxMessageSize: 20 * humanize.MiByte,
+type syslogTCP struct {
+	tcp.Config    `config:",inline"`
+	LineDelimiter string `config:"line_delimiter" validate:"nonzero"`
+}
+
+var defaultTCP = syslogTCP{
+	Config: tcp.Config{
+		Timeout:        time.Minute * 5,
+		MaxMessageSize: 20 * humanize.MiByte,
+	},
+	LineDelimiter: "\n",
 }
 
 var defaultUDP = udp.Config{
@@ -64,7 +71,13 @@ func factory(
 		if err := cfg.Unpack(&config); err != nil {
 			return nil, err
 		}
-		return tcp.New(&config, cb)
+
+		splitFunc := tcp.SplitFunc([]byte(config.LineDelimiter))
+		if splitFunc == nil {
+			return nil, fmt.Errorf("error creating splitFunc from delimiter %s", config.LineDelimiter)
+		}
+
+		return tcp.New(&config.Config, splitFunc, cb)
 	case udp.Name:
 		config := defaultUDP
 		if err := cfg.Unpack(&config); err != nil {
