@@ -104,7 +104,8 @@
           description: >
             Ratio between used_memory_rss and used_memory
         - name: fragmentation.bytes
-          type: bytes
+          type: long
+          format: bytes
           description: >
             Bytes between used_memory_rss and used_memory
 

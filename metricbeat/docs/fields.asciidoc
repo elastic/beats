@@ -14686,7 +14686,9 @@ Ratio between used_memory_rss and used_memory
 *`redis.info.memory.fragmentation.bytes`*::
 +
 --
-type: bytes
+type: long
+
+format: bytes
 
 Bytes between used_memory_rss and used_memory
 
