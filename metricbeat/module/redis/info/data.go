@@ -44,16 +44,37 @@ var (
 		},
 		"memory": s.Object{
 			"used": s.Object{
-				"value": c.Int("used_memory"), // As it is a top key, this goes into value
-				"rss":   c.Int("used_memory_rss"),
-				"peak":  c.Int("used_memory_peak"),
-				"lua":   c.Int("used_memory_lua"),
+				"value":   c.Int("used_memory"), // As it is a top key, this goes into value
+				"rss":     c.Int("used_memory_rss"),
+				"peak":    c.Int("used_memory_peak"),
+				"lua":     c.Int("used_memory_lua"),
+				"dataset": c.Int("used_memory_dataset"),
 			},
 			"max": s.Object{
 				"value":  c.Int("maxmemory"),
 				"policy": c.Str("maxmemory_policy"),
 			},
+			"fragmentation": s.Object{
+				"ratio": c.Float("mem_fragmentation_ratio"),
+				"bytes": c.Int("mem_fragmentation_bytes"),
+			},
+			"active_defrag": s.Object{
+				"is_running": c.Bool("active_defrag_running"),
+			},
 			"allocator": c.Str("mem_allocator"), // Could be moved to server as it rarely changes
+			"allocator_stats": s.Object{
+				"allocated": c.Int("allocator_allocated"),
+				"active":    c.Int("allocator_active"),
+				"resident":  c.Int("allocator_resident"),
+				"fragmentation": s.Object{
+					"ratio": c.Float("allocator_frag_ratio"),
+					"bytes": c.Int("allocator_frag_bytes"),
+				},
+				"rss": s.Object{
+					"ratio": c.Float("allocator_rss_ratio"),
+					"bytes": c.Int("allocator_rss_bytes"),
+				},
+			},
 		},
 		"persistence": s.Object{
 			"loading": c.Bool("loading"),
@@ -72,6 +93,9 @@ var (
 						"sec": c.Int("rdb_current_bgsave_time_sec"),
 					},
 				},
+				"copy_on_write": s.Object{
+					"last_size": c.Int("rdb_last_cow_size"),
+				},
 			},
 			"aof": s.Object{
 				"enabled": c.Bool("aof_enabled"),
@@ -84,6 +108,9 @@ var (
 					"current_time": s.Object{
 						"sec": c.Int("aof_current_rewrite_time_sec"),
 					},
+					"buffer": s.Object{
+						"size": c.Int("aof_rewrite_buffer_length"),
+					},
 				},
 				"bgrewrite": s.Object{
 					"last_status": c.Str("aof_last_bgrewrite_status"),
@@ -91,18 +118,49 @@ var (
 				"write": s.Object{
 					"last_status": c.Str("aof_last_write_status"),
 				},
+				"copy_on_write": s.Object{
+					"last_size": c.Int("aof_last_cow_size"),
+				},
+				"buffer": s.Object{
+					"size": c.Int("aof_buffer_length"),
+				},
+				"size": s.Object{
+					"current": c.Int("aof_current_size"),
+					"base":    c.Int("aof_base_size"),
+				},
+				"fsync": s.Object{
+					"pending": c.Int("aof_pending_bio_fsync"),
+					"delayed": c.Int("aof_delayed_fsync"),
+				},
 			},
 		},
 		"replication": s.Object{
 			"role":             c.Str("role"),
 			"connected_slaves": c.Int("connected_slaves"),
-			"master_offset":    c.Int("master_repl_offset"),
+			"master_offset":    c.Int("master_repl_offset"), // ToDo Should be deprectad as master.offset introduced
 			"backlog": s.Object{
 				"active":            c.Int("repl_backlog_active"),
 				"size":              c.Int("repl_backlog_size"),
 				"first_byte_offset": c.Int("repl_backlog_first_byte_offset"),
 				"histlen":           c.Int("repl_backlog_histlen"),
 			},
+			"master": s.Object{
+				"offset":              c.Int("master_repl_offset"),
+				"second_offset":       c.Int("second_repl_offset"),
+				"link_status":         c.Str("master_link_status", s.Optional),
+				"last_io_seconds_ago": c.Int("master_last_io_seconds_ago", s.Optional),
+				"sync": s.Object{
+					"in_progress":         c.Bool("master_sync_in_progress", s.Optional),
+					"left_bytes":          c.Int("master_sync_left_bytes", s.Optional),
+					"last_io_seconds_ago": c.Int("master_sync_last_io_seconds_ago", s.Optional),
+				},
+			},
+			"slave": s.Object{
+				"offset":      c.Int("slave_repl_offset", s.Optional),
+				"priority":    c.Int("slave_priority", s.Optional),
+				"is_readonly": c.Bool("slave_read_only", s.Optional),
+			},
+			// ToDo find a way to add dynamic object of slaves: "slaves": s.Str("slaveXXX")
 		},
 		"server": s.Object{
 			"version":          c.Str("redis_version"),
@@ -160,8 +218,18 @@ var (
 				"channels": c.Int("pubsub_channels"),
 				"patterns": c.Int("pubsub_patterns"),
 			},
-			"latest_fork_usec":       c.Int("latest_fork_usec"),
-			"migrate_cached_sockets": c.Int("migrate_cached_sockets"),
+			"latest_fork_usec":           c.Int("latest_fork_usec"),
+			"migrate_cached_sockets":     c.Int("migrate_cached_sockets"),
+			"slave_expires_tracked_keys": c.Int("slave_expires_tracked_keys"),
+			"active_defrag": s.Object{
+				"hits":       c.Int("active_defrag_hits"),
+				"misses":     c.Int("active_defrag_misses"),
+				"key_hits":   c.Int("active_defrag_key_hits"),
+				"key_misses": c.Int("active_defrag_key_misses"),
+			},
+		},
+		"slowlog": s.Object{
+			"count": c.Int("slowlog_len"),
 		},
 	}
 )

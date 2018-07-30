@@ -7,7 +7,7 @@ from nose.plugins.attrib import attr
 REDIS_FIELDS = metricbeat.COMMON_FIELDS + ["redis"]
 
 REDIS_INFO_FIELDS = ["clients", "cluster", "cpu", "memory",
-                     "persistence", "replication", "server", "stats"]
+                     "persistence", "replication", "server", "stats", "slowlog"]
 
 REDIS_KEYSPACE_FIELDS = ["keys", "expires", "id", "avg_ttl"]
 
