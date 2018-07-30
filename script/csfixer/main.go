@@ -1,14 +1,15 @@
 package main
 
 import (
-	"os"
-	"fmt"
+	"encoding/json"
 	"flag"
+	"fmt"
+	"os"
+	"os/exec"
+
 	"github.com/ewgRa/ci-utils/src/diff_liner"
 	"github.com/ewgRa/gocsfixer"
 	"github.com/google/go-github/github"
-	"encoding/json"
-	"os/exec"
 )
 
 func main() {
@@ -27,7 +28,6 @@ func main() {
 	var comments []*github.PullRequestComment
 
 	csFixerComments, err := gocsfixer.ReadResults(*csFixerCommentsFile)
-
 	if err != nil {
 		panic(err)
 	}
@@ -43,7 +43,6 @@ func main() {
 
 		cmd := exec.Command("git", "log", "--pretty=format:%H", "-1", fixerComment.File)
 		output, err := cmd.Output()
-
 		if err != nil {
 			panic(err)
 		}
@@ -51,9 +50,9 @@ func main() {
 		commit := string(output)
 
 		comments = append(comments, &github.PullRequestComment{
-			Body: &body,
+			Body:     &body,
 			CommitID: &commit,
-			Path: &fixerComment.File,
+			Path:     &fixerComment.File,
 			Position: &prLine,
 		})
 
@@ -61,7 +60,6 @@ func main() {
 
 	if len(comments) > 0 {
 		jsonData, err := json.Marshal(comments)
-
 		if err != nil {
 			panic(err)
 		}
