@@ -392,7 +392,7 @@
             - name: attempts_to_become_secondary
               type: long
             - name: batches
-              type: groupt
+              type: group
               description: >
                 Reports on the oplog application process on secondaries members of replica sets.
               fields:

@@ -10893,12 +10893,29 @@ type: long
 
 --
 
-*`mongodb.metrics.replication.apply.batches`*::
-+
---
-type: groupt
+[float]
+== batches fields
 
 Reports on the oplog application process on secondaries members of replica sets.
+
+
+
+*`mongodb.metrics.replication.apply.batches.count`*::
++
+--
+type: long
+
+The total number of batches applied across all databases.
+
+
+--
+
+*`mongodb.metrics.replication.apply.batches.time.ms`*::
++
+--
+type: long
+
+The total amount of time in milliseconds the mongod has spent applying operations from the oplog.
 
 
 --
