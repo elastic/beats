@@ -423,6 +423,16 @@ OS family (e.g. redhat, debian, freebsd, windows).
 
 --
 
+*`host.os.kernel`*::
++
+--
+type: keyword
+
+The operating system's kernel version.
+
+
+--
+
 *`host.ip`*::
 +
 --

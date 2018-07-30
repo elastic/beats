@@ -39,16 +39,22 @@ func TestConfigDefault(t *testing.T) {
 	assert.NoError(t, err)
 
 	p, err := newHostMetadataProcessor(testConfig)
-	if runtime.GOOS != "windows" && runtime.GOOS != "darwin" && runtime.GOOS != "linux" {
+	switch runtime.GOOS {
+	case "windows", "darwin", "linux":
+		assert.NoError(t, err)
+	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
 		return
 	}
-	assert.NoError(t, err)
 
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
 
 	v, err := newEvent.GetValue("host.os.family")
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
+
+	v, err = newEvent.GetValue("host.os.kernel")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
@@ -72,16 +78,22 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	assert.NoError(t, err)
 
 	p, err := newHostMetadataProcessor(testConfig)
-	if runtime.GOOS != "windows" && runtime.GOOS != "darwin" && runtime.GOOS != "linux" {
+	switch runtime.GOOS {
+	case "windows", "darwin", "linux":
+		assert.NoError(t, err)
+	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
 		return
 	}
-	assert.NoError(t, err)
 
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
 
 	v, err := newEvent.GetValue("host.os.family")
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
+
+	v, err = newEvent.GetValue("host.os.kernel")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
