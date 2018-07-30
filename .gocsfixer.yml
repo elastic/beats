@@ -1,5 +1,30 @@
 fixers:
    no_new_line_before_error_check:
+       type: no_new_line_before_error_check
        recommend: true
        lint: false
        fix: false
+
+   use_path_join:
+       type: use_path_join
+       recommend: true
+       lint: false
+       fix: false
+
+   group_std_imports:
+       type: group_import
+       recommend: true
+       lint: false
+       fix: false
+       options:
+            stdLib: true
+            lintText: Group stdLib imports
+
+   log_err_instead_log_warn:
+       type: alternative_call
+       recommend: true
+       lint: false
+       fix: false
+       options:
+            selector: logp.Warn
+            alternative: logp.Err
