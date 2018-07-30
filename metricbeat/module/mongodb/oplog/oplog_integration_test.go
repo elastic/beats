@@ -34,7 +34,7 @@ import (
 
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "mongodb")
-	
+
 	err := initiateReplicaSet()
 	if err != nil {
 		t.FailNow()
@@ -81,7 +81,7 @@ func getConfig() map[string]interface{} {
 }
 
 func initiateReplicaSet() error {
-        url := mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()
+	url := mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()
 	mongoSession, err := mgo.Dial(url)
 	if err != nil {
 		return err
@@ -110,4 +110,3 @@ type Host struct {
 	id   int    `bson:_id`
 	host string `bson:host`
 }
-
