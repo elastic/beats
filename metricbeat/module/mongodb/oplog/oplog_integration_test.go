@@ -23,6 +23,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -31,7 +33,12 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "mongodb", "mongodbreplica")
+	compose.EnsureUp(t, "mongodb")
+	
+	err := initiateReplicaSet()
+	if err != nil {
+		t.FailNow()
+	}
 
 	f := mbtest.NewEventFetcher(t, getConfig())
 	event, err := f.Fetch()
@@ -56,7 +63,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "mongodb", "mongodbreplica")
+	compose.EnsureUp(t, "mongodb")
 
 	f := mbtest.NewEventFetcher(t, getConfig())
 	err := mbtest.WriteEvent(f, t)
@@ -72,3 +79,35 @@ func getConfig() map[string]interface{} {
 		"hosts":      []string{mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()},
 	}
 }
+
+func initiateReplicaSet() error {
+        url := mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()
+	mongoSession, err := mgo.Dial(url)
+	if err != nil {
+		return err
+	}
+	defer mongoSession.Close()
+
+	// get oplog.rs collection
+	db := mongoSession.DB("admin")
+	config := ReplicaConfig{"beats", []Host{{0, url}}}
+	var initiateResult map[string]interface{}
+	if err := db.Run(bson.M{"replSetInitiate": config}, &initiateResult); err != nil {
+		if err.Error() != "already initialized" {
+			return err
+		}
+	}
+
+	return nil
+}
+
+type ReplicaConfig struct {
+	id      string `bson:_id`
+	members []Host `bson:hosts`
+}
+
+type Host struct {
+	id   int    `bson:_id`
+	host string `bson:host`
+}
+
