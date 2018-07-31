@@ -27,6 +27,7 @@ import (
 )
 
 type mapper map[string]map[string]Featurable
+type LookupFunc func(namespace string) bool
 
 // Registry implements a global registry for any kind of feature in beats.
 // feature are grouped by namespace, a namespace is a kind of plugin like outputs, inputs, or queue.
@@ -159,7 +160,8 @@ func (r *registry) LookupAll(namespace string) ([]Featurable, error) {
 	return list, nil
 }
 
-func (r *registry) LookupWithFilter(predicate func(namespace string) bool) []Featurable {
+// LookupWithFilter returns features that the namespace match the predicate.
+func (r *registry) LookupWithFilter(predicate LookupFunc) []Featurable {
 	var features []Featurable
 	for s, m := range r.namespaces {
 		if predicate(s) {
@@ -171,6 +173,7 @@ func (r *registry) LookupWithFilter(predicate func(namespace string) bool) []Fea
 	return features
 }
 
+// LookupWithPrefix search features matching the provided namespace prefix.
 func (r *registry) LookupWithPrefix(prefix string) []Featurable {
 	return r.LookupWithFilter(func(s string) bool {
 		return strings.HasPrefix(s, prefix)
