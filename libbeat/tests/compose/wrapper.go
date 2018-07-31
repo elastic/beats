@@ -31,6 +31,11 @@ import (
 	"github.com/docker/docker/client"
 )
 
+const (
+	labelComposeService = "com.docker.compose.service"
+	labelComposeProject = "com.docker.compose.project"
+)
+
 type wrapperDriver struct {
 	Name  string
 	Files []string
@@ -41,7 +46,7 @@ type wrapperContainer struct {
 }
 
 func (c *wrapperContainer) ServiceName() string {
-	return c.info.Labels["com.docker.compose.service"]
+	return c.info.Labels[labelComposeService]
 }
 
 func (c *wrapperContainer) Healthy() bool {
@@ -165,10 +170,10 @@ func makeFilter(project, service string, projectFilter Filter) filters.Args {
 	fmt.Println(project, service, projectFilter)
 
 	f := filters.NewArgs()
-	f.Add("label", fmt.Sprintf("com.docker.compose.project=%s", project))
+	f.Add("label", fmt.Sprintf("%s=%s", labelComposeProject, project))
 
 	if service == "" {
-		f.Add("label", fmt.Sprintf("com.docker.compose.service=%s", service))
+		f.Add("label", fmt.Sprintf("%s=%s", labelComposeService, service))
 	}
 
 	switch projectFilter.State {
