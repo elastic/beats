@@ -227,7 +227,10 @@ func (r *Register) DefaultMetricSets(module string) (defaults []string, err erro
 	// metricbeat.module.happroxy.
 	// Retrieve:
 	// metricbeat.module.happroxy.stats
-	features := r.registry.LookupWithPrefix(moduleNamespace + ".")
+	features, err := r.registry.LookupAll(r.namespace(module))
+	if err != nil {
+		return nil, err
+	}
 
 	if len(features) == 0 {
 		return nil, fmt.Errorf("module '%s' not found", module)
