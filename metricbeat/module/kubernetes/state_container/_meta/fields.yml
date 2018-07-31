@@ -41,11 +41,11 @@
             Container CPU requested cores
         - name: limit.nanocores
           type: long
-          deprecated: true
+          deprecated: 6.4
           description: >
             Container CPU nanocores limit
         - name: request.nanocores
-          deprecated: true
+          deprecated: 6.4
           type: long
           description: >
             Container CPU requested nanocores
