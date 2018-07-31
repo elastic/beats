@@ -27,6 +27,8 @@ import (
 )
 
 type mapper map[string]map[string]Featurable
+
+// LookupFunc function signature used as a predicate for LookupWithFilter.
 type LookupFunc func(namespace string) bool
 
 // Registry implements a global registry for any kind of feature in beats.
