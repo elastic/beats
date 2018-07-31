@@ -445,6 +445,6 @@ endif
 release: mage
 	@mage package
 
-.PHONY: package
+.PHONY: snapshot
 snapshot: mage
 	@SNAPSHOT=true mage package
