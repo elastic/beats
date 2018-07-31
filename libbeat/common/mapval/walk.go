@@ -31,15 +31,18 @@ type walkObserverInfo struct {
 }
 
 // walkObserver functions run once per object in the tree.
-type walkObserver func(info walkObserverInfo)
+type walkObserver func(info walkObserverInfo) error
 
 // walk is a shorthand way to walk a tree.
 func walk(m common.MapStr, wo walkObserver) error {
 	return walkFullMap(m, m, Path{}, wo)
 }
 
-func walkFull(o interface{}, root common.MapStr, path Path, wo walkObserver) error {
-	wo(walkObserverInfo{path.Last(), o, root, path})
+func walkFull(o interface{}, root common.MapStr, path Path, wo walkObserver) (err error) {
+	err = wo(walkObserverInfo{path.Last(), o, root, path})
+	if err != nil {
+		return err
+	}
 
 	switch reflect.TypeOf(o).Kind() {
 	case reflect.Map:
@@ -73,7 +76,10 @@ func walkFullMap(m common.MapStr, root common.MapStr, path Path, wo walkObserver
 		}
 		newPath := path.Concat(additionalPath)
 
-		walkFull(v, root, newPath, wo)
+		err = walkFull(v, root, newPath, wo)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

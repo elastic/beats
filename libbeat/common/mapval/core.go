@@ -93,20 +93,22 @@ func Strict(laxValidator Validator) Validator {
 		}
 		sort.Strings(validatedPaths)
 
-		err = walk(actual, func(woi walkObserverInfo) {
+		err = walk(actual, func(woi walkObserverInfo) error {
 			_, validatedExactly := results.Fields[woi.path.String()]
 			if validatedExactly {
-				return // This key was tested, passes strict test
+				return nil // This key was tested, passes strict test
 			}
 
 			// Search returns the point just before an actual match (since we ruled out an exact match with the cheaper
 			// hash check above. We have to validate the actual match with a prefix check as well
 			matchIdx := sort.SearchStrings(validatedPaths, woi.path.String())
 			if matchIdx < len(validatedPaths) && strings.HasPrefix(validatedPaths[matchIdx], woi.path.String()) {
-				return
+				return nil
 			}
 
 			results.merge(StrictFailureResult(woi.path))
+
+			return nil
 		})
 
 		return results, err
@@ -124,7 +126,7 @@ func walkValidate(expected Map, actual common.MapStr) (results *Results, err err
 	results = NewResults()
 	err = walk(
 		common.MapStr(expected),
-		func(expInfo walkObserverInfo) {
+		func(expInfo walkObserverInfo) (walkErr error) {
 			actualKeyExists, actualV := expInfo.path.GetFrom(actual)
 
 			// If this is a definition use it, if not, check exact equality
@@ -138,7 +140,7 @@ func walkValidate(expected Map, actual common.MapStr) (results *Results, err err
 					// individual via our own traversal, so bail early unless the collection
 					// is empty. The one exception
 					if reflect.ValueOf(actualV).Len() > 0 {
-						return
+						return nil
 					}
 
 					isDef = IsEqual(expInfo.value)
@@ -147,9 +149,13 @@ func walkValidate(expected Map, actual common.MapStr) (results *Results, err err
 
 			if !isDef.optional || isDef.optional && actualKeyExists {
 				var checkRes *Results
-				checkRes, err = isDef.check(expInfo.path, actualV, actualKeyExists)
+				checkRes, walkErr = isDef.check(expInfo.path, actualV, actualKeyExists)
+				if walkErr != nil {
+					return walkErr
+				}
 				results.merge(checkRes)
 			}
+			return nil
 		})
 
 	return results, err

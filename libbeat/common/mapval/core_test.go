@@ -25,6 +25,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -381,4 +383,30 @@ func TestMatchArrayAsValue(t *testing.T) {
 	for _, f := range badRes.Fields["b"] {
 		assert.True(t, f.Valid)
 	}
+}
+
+func TestErroringIsDef(t *testing.T) {
+	m := common.MapStr{"foo": "bar"}
+
+	expectedErr := fmt.Errorf("blahblah")
+
+	v := Schema(Map{
+		"foo": Is("This breaks", func(path Path, v interface{}) (*Results, error) {
+			return nil, expectedErr
+		}),
+	})
+
+	_, err := v(m)
+	assert.Equal(t, expectedErr, err)
+}
+
+func TestInvalidPathIsdef(t *testing.T) {
+	badPath := "foo...bar"
+	m := common.MapStr{"foo": "bar"}
+	v := Schema(Map{
+		badPath: "invalid",
+	})
+
+	_, err := v(m)
+	assert.Equal(t, InvalidPathString(badPath), err)
 }
