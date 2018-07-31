@@ -22,37 +22,65 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
+	"path/filepath"
 	"time"
 )
 
+// CreateOptions are the options when containers are created
 type CreateOptions struct {
 	ForceBuild bool
 }
 
+// UpOptions are the options when containers are started
 type UpOptions struct {
 	Create CreateOptions
 }
 
-type Filter map[string]string
+// Filter options for services
+type Filter struct {
+	State State
+}
 
+// State of a service for filtering
+type State string
+
+// Possible states of a service for filtering
+const (
+	AnyState     = State("")
+	RunningState = State("running")
+	StoppedState = State("stopped")
+)
+
+// Driver is the interface of docker compose implementations
 type Driver interface {
 	Up(ctx context.Context, opts UpOptions, service string) error
 	Kill(ctx context.Context, signal string, service string) error
-	Ps(ctx context.Context, filter ...string) ([]map[string]string, error)
-	Containers(ctx context.Context, projectFilter Filter, filter ...string) ([]string, error)
+	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
+	// Containers(ctx context.Context, projectFilter Filter, filter ...string) ([]string, error)
 
 	LockFile() string
 }
 
-// docker-compose project wrapper
+// ContainerStatus is an interface to obtain the status of a container
+type ContainerStatus interface {
+	ServiceName() string
+	Healthy() bool
+	Running() bool
+	Old() bool
+}
+
+// Project is a docker-compose project
 type Project struct {
 	Driver
 }
 
+// NewProject creates a new docker-compose project
 func NewProject(name string, files []string) (*Project, error) {
 	if len(files) == 0 {
 		return nil, errors.New("project needs at least one file")
+	}
+	if name == "" {
+		name = filepath.Base(filepath.Dir(files[0]))
 	}
 	return &Project{
 		&wrapperDriver{
@@ -86,7 +114,7 @@ func (c *Project) Start(service string) error {
 	}, service)
 }
 
-// Ensure all wanted services are healthy. Wait loop (60s timeout)
+// Wait ensures all wanted services are healthy. Wait loop (60s timeout)
 func (c *Project) Wait(seconds int, services ...string) error {
 	healthy := false
 	for !healthy && seconds > 0 {
@@ -114,6 +142,7 @@ func (c *Project) Wait(seconds int, services ...string) error {
 	return nil
 }
 
+// Kill a container
 func (c *Project) Kill(service string) error {
 	c.Lock()
 	defer c.Unlock()
@@ -121,6 +150,7 @@ func (c *Project) Kill(service string) error {
 	return c.Driver.Kill(context.Background(), "KILL", service)
 }
 
+// KillOld kills old containers
 func (c *Project) KillOld(except []string) error {
 	// Do not kill ourselves ;)
 	except = append(except, "beat")
@@ -173,6 +203,7 @@ func (c *Project) Lock() {
 	panic(errors.New("Timeout waiting for lock, please remove docker-compose.yml.lock"))
 }
 
+// Unlock releases the project lock
 func (c *Project) Unlock() {
 	os.Remove(c.LockFile())
 }
@@ -196,13 +227,9 @@ func (c *Project) getServices(filter ...string) (map[string]*serviceInfo, error)
 		return nil, err
 	}
 
-	containers, err := c.Driver.Containers(context.Background(), Filter{"State": "Running"}, filter...)
-	if err != nil {
-		return nil, err
-	}
-
 	for _, c := range services {
-		name := strings.Split(c["Name"], "_")[1]
+		name := c.ServiceName()
+
 		// In case of several (stopped) containers, always prefer info about running ones
 		if result[name] != nil {
 			if result[name].Running {
@@ -214,10 +241,10 @@ func (c *Project) getServices(filter ...string) (map[string]*serviceInfo, error)
 			Name: name,
 		}
 		// fill details:
-		service.Healthy = strings.Contains(c["State"], "(healthy)")
-		service.Running = contains(containers, c["Id"])
+		service.Healthy = c.Healthy()
+		service.Running = c.Running()
 		if service.Healthy {
-			service.Old = oldRegexp.MatchString(c["State"])
+			service.Old = c.Old()
 		}
 		result[name] = service
 	}

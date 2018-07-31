@@ -21,13 +21,9 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"testing"
 )
-
-// Regexp matching state to flag container as old
-var oldRegexp = regexp.MustCompile("minute")
 
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
 // with a default timeout of 300 seconds
