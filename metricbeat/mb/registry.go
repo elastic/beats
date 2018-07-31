@@ -157,15 +157,12 @@ func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, o
 	}
 
 	// Set the options.
-	msInfo := MetricSetRegistration{Name: name, Factory: factory}
-	for _, opt := range options {
-		opt(&msInfo)
-	}
+	msInfo := NewMetricSetRegistration(name, factory, options...)
 
 	f := feature.New(
 		r.namespace(module),
 		name,
-		&msInfo,
+		msInfo,
 		feature.NewDetails(name, "", feature.Undefined),
 	)
 
@@ -296,4 +293,18 @@ func (r *Register) MetricSets(module string) (modules []string) {
 func (r *Register) String() string {
 	// TODO
 	return "TODO"
+}
+
+// NewMetricSetRegistration takes a metricset definition and transform the information into a
+// format that will be compatible with the registry.
+func NewMetricSetRegistration(
+	name string,
+	factory MetricSetFactory,
+	options ...MetricSetOption,
+) *MetricSetRegistration {
+	ms := MetricSetRegistration{Name: name, Factory: factory}
+	for _, opt := range options {
+		opt(&ms)
+	}
+	return &ms
 }

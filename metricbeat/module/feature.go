@@ -8,9 +8,11 @@ import (
 // MetricSetFeature creates a new MetricSet feature.
 func MetricSetFeature(
 	module, name string,
-	ms *mb.MetricSetRegistration,
+	factory mb.MetricSetFactory,
 	description feature.Describer,
+	options ...mb.MetricSetOption,
 ) *feature.Feature {
+	ms := mb.NewMetricSetRegistration(name, factory, options...)
 	return feature.New(namespace(module), name, ms, description)
 }
 
