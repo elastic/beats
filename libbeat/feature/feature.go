@@ -23,7 +23,7 @@ import (
 
 // Registry is the global plugin registry, this variable is meant to be temporary to move all the
 // internal factory to receive a context that include the current beat registry.
-var Registry = newRegistry()
+var Registry = NewRegistry()
 
 // Featurable implements the description of a feature.
 type Featurable interface {
