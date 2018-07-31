@@ -75,7 +75,7 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "mongodb",
-		"metricsets": []string{"oplog"},
+		"metricsets": []string{"replstatus"},
 		"hosts":      []string{mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()},
 	}
 }

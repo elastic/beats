@@ -23,15 +23,17 @@ import (
 )
 
 var schema = s.Schema{
-	"size": s.Object{
-		"allocated": c.Int("logSize"),
-		"used":      c.Int("used"),
+	"oplog": s.Object{
+		"size": s.Object{
+			"allocated": c.Int("logSize"),
+			"used":      c.Int("used"),
+		},
+		"first": s.Object{
+			"timestamp": c.Int("tFirst"),
+		},
+		"last": s.Object{
+			"timestamp": c.Int("tLast"),
+		},
+		"window": c.Int("timeDiff"),
 	},
-	"first": s.Object{
-		"timestamp": c.Int("tFirst"),
-	},
-	"last": s.Object{
-		"timestamp": c.Int("tLast"),
-	},
-	"window": c.Int("timeDiff"),
 }

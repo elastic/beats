@@ -1,0 +1,35 @@
+- name: replstatus
+  type: group
+  description: >
+    replstatus provides an overview of replica set status
+  fields:
+    - name: oplog
+      type: group
+      description: >
+        oplog provides an overview of replication oplog status, which is retrieved from db.getReplicationInfo().
+      fields:
+        - name: size.allocated
+          type: long
+          format: bytes
+          description: >
+            The total amount of space used by the replstatus in bytes.
+        - name: size.used
+          type: long
+          format: bytes
+          description: >
+            total amount of space allocated to the replstatus in bytes.
+
+        - name: first.timestamp
+          type: long
+          description: >
+            Timestamp of the first (i.e. earliest) operation in the replstatus
+
+        - name: last.timestamp
+          type: long
+          description: >
+            Timestamp of the last (i.e. latest) operation in the replstatus
+
+        - name: window
+          type: long
+          description: >
+            The difference between the first and last operation in the replstatus.

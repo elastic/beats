@@ -1,0 +1,30 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset":{
+        "host":"mongodb:27017",
+        "module":"mongodb",
+        "name":"replstatus",
+        "rtt": 44269
+    },
+    "mongodb":{
+        "replstatus":{
+            "oplog":{
+                "size": {
+                    "allocated": 100,
+                    "used": 24
+                },
+                "first": {
+                    "timestamp": 1531422969
+                },
+                "last": {
+                    "timestamp": 1531422970
+                },
+                "window": 1
+            }
+        }
+    }
+}

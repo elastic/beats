@@ -1,1 +1,0 @@
-This is the `oplog` metricset of the module mongodb.

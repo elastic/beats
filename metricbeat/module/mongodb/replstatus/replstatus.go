@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package oplog
+package replstatus
 
 import (
 	"errors"
@@ -32,10 +32,10 @@ import (
 
 const oplogCol = "oplog.rs"
 
-var debugf = logp.MakeDebug("mongodb.oplog")
+var debugf = logp.MakeDebug("mongodb.replstatus")
 
 func init() {
-	mb.Registry.MustAddMetricSet("mongodb", "oplog", New,
+	mb.Registry.MustAddMetricSet("mongodb", "replstatus", New,
 		mb.WithHostParser(mongodb.ParseURL),
 		mb.DefaultMetricSet())
 }
@@ -52,7 +52,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The mongodb oplog metricset is experimental.")
+	cfgwarn.Experimental("The mongodb replstatus metricset is experimental.")
 
 	ms, err := mongodb.NewMetricSet(base)
 	if err != nil {
