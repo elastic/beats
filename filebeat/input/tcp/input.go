@@ -18,6 +18,7 @@
 package tcp
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -76,7 +77,12 @@ func NewInput(
 		forwarder.Send(event)
 	}
 
-	server, err := tcp.New(&config.Config, cb)
+	splitFunc := tcp.SplitFunc([]byte(config.LineDelimiter))
+	if splitFunc == nil {
+		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
+	}
+
+	server, err := tcp.New(&config.Config, splitFunc, cb)
 	if err != nil {
 		return nil, err
 	}

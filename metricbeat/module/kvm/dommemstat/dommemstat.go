@@ -18,17 +18,18 @@
 package dommemstat
 
 import (
-	"errors"
 	"net"
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/pkg/errors"
 
 	"github.com/digitalocean/go-libvirt"
 	"github.com/digitalocean/go-libvirt/libvirttest"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 const (
@@ -101,30 +102,40 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
 		c, err = net.DialTimeout(u.Scheme, address, m.Timeout)
 		if err != nil {
-			report.Error(err)
+			report.Error(errors.Wrapf(err, "cannot connect to %v", u))
+			return
 		}
 	}
 
 	defer c.Close()
 
 	l := libvirt.New(c)
-	if err := l.Connect(); err != nil {
-		report.Error(err)
+	if err = l.Connect(); err != nil {
+		report.Error(errors.Wrap(err, "error connecting to libvirtd"))
+		return
 	}
+	defer func() {
+		if err = l.Disconnect(); err != nil {
+			report.Error(errors.Wrap(err, "failed to disconnect"))
+		}
+	}()
 
 	domains, err := l.Domains()
 	if err != nil {
-		report.Error(err)
+		report.Error(errors.Wrap(err, "error listing domains"))
+		return
 	}
 
 	for _, d := range domains {
 		gotDomainMemoryStats, err := l.DomainMemoryStats(d, maximumStats, flags)
 		if err != nil {
-			report.Error(err)
+			report.Error(errors.Wrapf(err, "error fetching memory stats for domain %s", d.Name))
+			continue
 		}
 
 		if len(gotDomainMemoryStats) == 0 {
-			report.Error(errors.New("no domain memory stats found"))
+			report.Error(errors.Errorf("no memory stats for domain %s", d.Name))
+			continue
 		}
 
 		for i := range gotDomainMemoryStats {
@@ -139,10 +150,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 				},
 			})
 		}
-	}
-
-	if err := l.Disconnect(); err != nil {
-		report.Error(errors.New("failed to disconnect"))
 	}
 }
 
