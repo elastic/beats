@@ -10080,63 +10080,69 @@ format: bytes
 --
 
 [float]
+== replstatus fields
+
+replstatus provides an overview of replica set status
+
+
+
+[float]
 == oplog fields
 
-oplog provides an overview of replication status, which is retrieved from db.getReplicationInfo().
+oplog provides an overview of replication oplog status, which is retrieved from db.getReplicationInfo().
 
 
 
-
-*`mongodb.oplog.size.allocated`*::
+*`mongodb.replstatus.oplog.size.allocated`*::
 +
 --
 type: long
 
 format: bytes
 
-The total amount of space used by the oplog in bytes.
+The total amount of space used by the replstatus in bytes.
 
 
 --
 
-*`mongodb.oplog.size.used`*::
+*`mongodb.replstatus.oplog.size.used`*::
 +
 --
 type: long
 
 format: bytes
 
-total amount of space allocated to the oplog in bytes.
+total amount of space allocated to the replstatus in bytes.
 
 
 --
 
-*`mongodb.oplog.first.timestamp`*::
+*`mongodb.replstatus.oplog.first.timestamp`*::
 +
 --
 type: long
 
-Timestamp of the first (i.e. earliest) operation in the oplog
+Timestamp of the first (i.e. earliest) operation in the replstatus
 
 
 --
 
-*`mongodb.oplog.last.timestamp`*::
+*`mongodb.replstatus.oplog.last.timestamp`*::
 +
 --
 type: long
 
-Timestamp of the last (i.e. latest) operation in the oplog
+Timestamp of the last (i.e. latest) operation in the replstatus
 
 
 --
 
-*`mongodb.oplog.window`*::
+*`mongodb.replstatus.oplog.window`*::
 +
 --
 type: long
 
-The difference between the first and last operation in the oplog.
+The difference between the first and last operation in the replstatus.
 
 
 --

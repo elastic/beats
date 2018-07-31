@@ -91,7 +91,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-mongodb,MongoDB>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-mongodb-collstats,collstats>>   
 |<<metricbeat-metricset-mongodb-dbstats,dbstats>>   
-|<<metricbeat-metricset-mongodb-oplog,oplog>> experimental[]  
+|<<metricbeat-metricset-mongodb-replstatus,replstatus>> experimental[]  
 |<<metricbeat-metricset-mongodb-status,status>>   
 |<<metricbeat-module-munin,Munin>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>> beta[]  
