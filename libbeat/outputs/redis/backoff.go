@@ -37,8 +37,8 @@ type backoffClient struct {
 
 // failReason is used to track the cause of an error.
 // The redis client forces us to reconnect on any error (even for redis
-// internal errors). The backoff timer must not be reset on a successfully
-// reconnect after publishing failed with  a redis internal
+// internal errors). The backoff timer must not be reset on a successful
+// reconnect after publishing failed with a redis internal
 // error (e.g. OutOfMemory), so we can still guarantee the backoff duration
 // increases exponentially.
 type failReason uint8
@@ -65,7 +65,7 @@ func (b *backoffClient) Connect() error {
 		// give the client a chance to promote an internal error to a network error.
 		b.updateFailReason(err)
 		b.backoff.Wait()
-	} else if b.reason != failRedis { // Only reset backoff durartion if failure was due to IO errors.
+	} else if b.reason != failRedis { // Only reset backoff duration if failure was due to IO errors.
 		b.resetFail()
 	}
 
