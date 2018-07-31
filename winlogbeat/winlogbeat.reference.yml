@@ -614,6 +614,17 @@ output.elasticsearch:
   # until all events are published. The default is 3.
   #max_retries: 3
 
+  # The number of seconds to wait before trying to reconnect to Redis
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Redis after a network error. The default is 60s.
+  #backoff.max: 60s
+
   # The maximum number of events to bulk in a single Redis request or pipeline.
   # The default is 2048.
   #bulk_max_size: 2048

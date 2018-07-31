@@ -44,6 +44,8 @@ https://github.com/elastic/beats/compare/v6.3.2...6.3[Check the HEAD diff]
 ==== Added
 
 *Affecting all Beats*
+- Add backoff on error support to redis output. {pull}7781[7781]
+
 
 *Auditbeat*
 
