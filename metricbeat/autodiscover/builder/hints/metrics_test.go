@@ -230,39 +230,40 @@ func TestGenerateHints(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		mockRegister := mb.NewRegister(feature.NewRegistry())
-		mockRegister.MustAddMetricSet("mockmodule", "one", NewMockMetricSet, mb.DefaultMetricSet())
-		mockRegister.MustAddMetricSet("mockmodule", "two", NewMockMetricSet, mb.DefaultMetricSet())
-		mockRegister.MustAddMetricSet("mockmoduledefaults", "default", NewMockMetricSet, mb.DefaultMetricSet())
-		mockRegister.MustAddMetricSet("mockmoduledefaults", "other", NewMockMetricSet)
+		t.Run(test.message, func(t *testing.T) {
+			mockRegister := mb.NewRegister(feature.NewRegistry())
+			mockRegister.MustAddMetricSet("mockmodule", "one", NewMockMetricSet, mb.DefaultMetricSet())
+			mockRegister.MustAddMetricSet("mockmodule", "two", NewMockMetricSet, mb.DefaultMetricSet())
+			mockRegister.MustAddMetricSet("mockmoduledefaults", "default", NewMockMetricSet, mb.DefaultMetricSet())
+			mockRegister.MustAddMetricSet("mockmoduledefaults", "other", NewMockMetricSet)
 
-		m := metricHints{
-			Key:      defaultConfig().Key,
-			Registry: mockRegister,
-		}
-		cfgs := m.CreateConfig(test.event)
-		assert.Equal(t, len(cfgs), test.len)
-
-		if len(cfgs) != 0 {
-			config := common.MapStr{}
-			err := cfgs[0].Unpack(&config)
-			assert.Nil(t, err, test.message)
-
-			// metricsets order is random, order it for tests
-			if v, err := config.GetValue("metricsets"); err == nil {
-				if msets, ok := v.([]interface{}); ok {
-					metricsets := make([]string, len(msets))
-					for i, v := range msets {
-						metricsets[i] = v.(string)
-					}
-					sort.Strings(metricsets)
-					config["metricsets"] = metricsets
-				}
+			m := metricHints{
+				Key:      defaultConfig().Key,
+				Registry: mockRegister,
 			}
+			cfgs := m.CreateConfig(test.event)
+			assert.Equal(t, len(cfgs), test.len)
 
-			assert.Equal(t, test.result, config, test.message)
-		}
+			if len(cfgs) != 0 {
+				config := common.MapStr{}
+				err := cfgs[0].Unpack(&config)
+				assert.Nil(t, err, test.message)
 
+				// metricsets order is random, order it for tests
+				if v, err := config.GetValue("metricsets"); err == nil {
+					if msets, ok := v.([]interface{}); ok {
+						metricsets := make([]string, len(msets))
+						for i, v := range msets {
+							metricsets[i] = v.(string)
+						}
+						sort.Strings(metricsets)
+						config["metricsets"] = metricsets
+					}
+				}
+
+				assert.Equal(t, test.result, config)
+			}
+		})
 	}
 }
 
