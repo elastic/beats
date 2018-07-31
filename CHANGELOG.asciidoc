@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v6.4.1...6.4[Check the HEAD diff]
 
 - Recover metrics for old apache versions removed by mistake on #6450. {pull}7871[7871]
 - Avoid mapping issues in kubernetes module. {pull}8487[8487]
+- Fixed a panic when the kvm module cannot establish a connection to libvirtd. {issue}7792[7792].
 
 *Packetbeat*
 
