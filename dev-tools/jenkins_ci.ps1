@@ -25,7 +25,6 @@ exec { go install github.com/elastic/beats/vendor/github.com/magefile/mage }
 
 echo "Fetching testing dependencies"
 # TODO (elastic/beats#5050): Use a vendored copy of this.
-exec { go get github.com/docker/libcompose }
 exec { go get github.com/jstemmer/go-junit-report }
 
 if (Test-Path "$env:beat") {
