@@ -2,6 +2,8 @@
   #metricsets:
   #  - dbstats
   #  - status
+  #  - collstats
+  #  - metrics
   period: 10s
 
   # The hosts must be passed as MongoDB URLs in the format:

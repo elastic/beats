@@ -66,7 +66,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: mongodb
-  metricsets: ["dbstats", "status"]
+  metricsets: ["dbstats", "status", "collstats", "metrics"]
   period: 10s
   enabled: true
 
@@ -110,11 +110,15 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-mongodb-dbstats,dbstats>>
 
+* <<metricbeat-metricset-mongodb-metrics,metrics>>
+
 * <<metricbeat-metricset-mongodb-status,status>>
 
 include::mongodb/collstats.asciidoc[]
 
 include::mongodb/dbstats.asciidoc[]
+
+include::mongodb/metrics.asciidoc[]
 
 include::mongodb/status.asciidoc[]
 
