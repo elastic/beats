@@ -140,6 +140,11 @@ func TestLookup(t *testing.T) {
 
 		assert.Equal(t, 1, len(features))
 	})
+
+	t.Run("lookup with prefix", func(t *testing.T) {
+		features := r.LookupWithPrefix("proc")
+		assert.Equal(t, 2, len(features))
+	})
 }
 
 func TestUnregister(t *testing.T) {

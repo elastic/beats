@@ -159,6 +159,24 @@ func (r *registry) LookupAll(namespace string) ([]Featurable, error) {
 	return list, nil
 }
 
+func (r *registry) LookupWithFilter(predicate func(namespace string) bool) []Featurable {
+	var features []Featurable
+	for s, m := range r.namespaces {
+		if predicate(s) {
+			for _, feature := range m {
+				features = append(features, feature)
+			}
+		}
+	}
+	return features
+}
+
+func (r *registry) LookupWithPrefix(prefix string) []Featurable {
+	return r.LookupWithFilter(func(s string) bool {
+		return strings.HasPrefix(s, prefix)
+	})
+}
+
 // Overwrite allow to replace an existing feature with a new implementation.
 func (r *registry) Overwrite(feature Featurable) error {
 	_, err := r.Lookup(feature.Namespace(), feature.Name())
