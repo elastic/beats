@@ -24,7 +24,8 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-const moduleNamespace = "metricbeat.module"
+// Namespace features namespace for metricbeat modules.
+var Namespace = "metricbeat.module"
 
 // Registry is the singleton Register instance where all ModuleFactory's and
 // MetricSetFactory's should be registered.
@@ -111,7 +112,7 @@ func NewRegister(registry *feature.FeatureRegistry) *Register {
 // name is empty, factory is nil, or if a factory has already been registered
 // under the name.
 func (r *Register) AddModule(name string, factory ModuleFactory) error {
-	f := feature.New(moduleNamespace, name, factory, feature.NewDetails(name, "", feature.Undefined))
+	f := feature.New(Namespace, name, factory, feature.NewDetails(name, "", feature.Undefined))
 	err := r.registry.Register(f)
 	if err != nil {
 		return err
@@ -144,7 +145,7 @@ func (r *Register) MustAddMetricSet(module, name string, factory MetricSetFactor
 }
 
 func (r *Register) namespace(name string) string {
-	return moduleNamespace + "." + name
+	return Namespace + "." + name
 }
 
 // addMetricSet registers a new MetricSetFactory. An error is returned if any
@@ -180,7 +181,7 @@ func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, o
 // moduleFactory returns the registered ModuleFactory associated with the
 // given name. It returns nil if no ModuleFactory is registered.
 func (r *Register) moduleFactory(name string) ModuleFactory {
-	f, err := r.registry.Lookup(moduleNamespace, name)
+	f, err := r.registry.Lookup(Namespace, name)
 	if err != nil {
 		return nil
 	}
@@ -257,7 +258,7 @@ func (r *Register) DefaultMetricSets(module string) (defaults []string, err erro
 
 // Modules returns the list of module names that are registered
 func (r *Register) Modules() []string {
-	allModules, err := r.registry.LookupAll(moduleNamespace)
+	allModules, err := r.registry.LookupAll(Namespace)
 	if err != nil {
 		return []string{}
 	}
