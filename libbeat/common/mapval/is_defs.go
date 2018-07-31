@@ -35,22 +35,21 @@ var KeyMissing = IsDef{name: "check key not present", checkKeyMissing: true}
 // IsArrayOf validates that the array at the given key is an array of objects all validatable
 // via the given Validator.
 func IsArrayOf(validator Validator) IsDef {
-	return Is("array of maps", func(path Path, v interface{}) (*Results, error) {
+	return Is("array of maps", func(path Path, v interface{}) *Results {
 		vArr, isArr := v.([]common.MapStr)
 		if !isArr {
-			return SimpleResult(path, false, "Expected array at given path"), nil
+			return SimpleResult(path, false, "Expected array at given path")
 		}
 
 		results := NewResults()
 
-		var err error
 		for idx, curMap := range vArr {
 			var validatorRes *Results
-			validatorRes, err = validator(curMap)
+			validatorRes = validator(curMap)
 			results.mergeUnderPrefix(path.ExtendSlice(idx), validatorRes)
 		}
 
-		return results, err
+		return results
 	})
 }
 
@@ -63,12 +62,11 @@ func IsAny(of ...IsDef) IsDef {
 	}
 	isName := fmt.Sprintf("either %#v", names)
 
-	return Is(isName, func(path Path, v interface{}) (*Results, error) {
+	return Is(isName, func(path Path, v interface{}) *Results {
 		for _, def := range of {
-			var err error
-			vr, err := def.check(path, v, true)
+			vr := def.check(path, v, true)
 			if vr.Valid {
-				return vr, err
+				return vr
 			}
 		}
 
@@ -76,13 +74,13 @@ func IsAny(of ...IsDef) IsDef {
 			path,
 			false,
 			fmt.Sprintf("Value was none of %#v, actual value was %#v", names, v),
-		), nil
+		)
 	})
 }
 
 // IsStringContaining validates that the the actual value contains the specified substring.
 func IsStringContaining(needle string) IsDef {
-	return Is("is string containing", func(path Path, v interface{}) (*Results, error) {
+	return Is("is string containing", func(path Path, v interface{}) *Results {
 		strV, ok := v.(string)
 
 		if !ok {
@@ -90,7 +88,7 @@ func IsStringContaining(needle string) IsDef {
 				path,
 				false,
 				fmt.Sprintf("Unable to convert '%v' to string", v),
-			), nil
+			)
 		}
 
 		if !strings.Contains(strV, needle) {
@@ -98,68 +96,68 @@ func IsStringContaining(needle string) IsDef {
 				path,
 				false,
 				fmt.Sprintf("String '%s' did not contain substring '%s'", strV, needle),
-			), nil
+			)
 		}
 
-		return ValidResult(path), nil
+		return ValidResult(path)
 	})
 }
 
 // IsDuration tests that the given value is a duration.
-var IsDuration = Is("is a duration", func(path Path, v interface{}) (*Results, error) {
+var IsDuration = Is("is a duration", func(path Path, v interface{}) *Results {
 	if _, ok := v.(time.Duration); ok {
-		return ValidResult(path), nil
+		return ValidResult(path)
 	}
 	return SimpleResult(
 		path,
 		false,
 		fmt.Sprintf("Expected a time.duration, got '%v' which is a %T", v, v),
-	), nil
+	)
 })
 
 // IsEqual tests that the given object is equal to the actual object.
 func IsEqual(to interface{}) IsDef {
-	return Is("equals", func(path Path, v interface{}) (*Results, error) {
+	return Is("equals", func(path Path, v interface{}) *Results {
 		if reflect.DeepEqual(v, to) {
-			return ValidResult(path), nil
+			return ValidResult(path)
 		}
 		return SimpleResult(
 			path,
 			false,
 			fmt.Sprintf("objects not equal: actual(%v) != expected(%v)", v, to),
-		), nil
+		)
 	})
 }
 
 // IsNil tests that a value is nil.
-var IsNil = Is("is nil", func(path Path, v interface{}) (*Results, error) {
+var IsNil = Is("is nil", func(path Path, v interface{}) *Results {
 	if v == nil {
-		return ValidResult(path), nil
+		return ValidResult(path)
 	}
 	return SimpleResult(
 		path,
 		false,
 		fmt.Sprintf("Value %v is not nil", v),
-	), nil
+	)
 })
 
 func intGtChecker(than int) ValueValidator {
-	return func(path Path, v interface{}) (*Results, error) {
+	return func(path Path, v interface{}) *Results {
 		n, ok := v.(int)
 		if !ok {
 			msg := fmt.Sprintf("%v is a %T, but was expecting an int!", v, v)
-			return SimpleResult(path, false, msg), nil
+			return SimpleResult(path, false, msg)
 		}
 
 		if n > than {
-			return ValidResult(path), nil
+			return ValidResult(path)
 		}
 
 		return SimpleResult(
 			path,
 			false,
 			fmt.Sprintf("%v is not greater than %v", n, than),
-		), nil
+		)
 	}
 }
 

@@ -24,7 +24,7 @@ type ValueResult struct {
 }
 
 // A ValueValidator is used to validate a value in a Map.
-type ValueValidator func(path Path, v interface{}) (*Results, error)
+type ValueValidator func(path Path, v interface{}) *Results
 
 // An IsDef defines the type of check to do.
 // Generally only name and checker are set. optional and checkKeyMissing are
@@ -36,24 +36,24 @@ type IsDef struct {
 	checkKeyMissing bool
 }
 
-func (id IsDef) check(path Path, v interface{}, keyExists bool) (*Results, error) {
+func (id IsDef) check(path Path, v interface{}, keyExists bool) *Results {
 	if id.checkKeyMissing {
 		if !keyExists {
-			return ValidResult(path), nil
+			return ValidResult(path)
 		}
 
-		return SimpleResult(path, false, "this key should not exist"), nil
+		return SimpleResult(path, false, "this key should not exist")
 	}
 
 	if !id.optional && !keyExists {
-		return KeyMissingResult(path), nil
+		return KeyMissingResult(path)
 	}
 
 	if id.checker != nil {
 		return id.checker(path, v)
 	}
 
-	return ValidResult(path), nil
+	return ValidResult(path)
 }
 
 // ValidResult is a convenience value for Valid results.

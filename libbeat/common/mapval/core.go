@@ -37,24 +37,21 @@ func Optional(id IsDef) IsDef {
 	return id
 }
 
-// Map is the type used to define schema definitions for Schema.
+// Map is the type used to define schema definitions for Compile.
 type Map map[string]interface{}
 
 // Slice is a convenience []interface{} used to declare schema defs.
 type Slice []interface{}
 
-// Validator is the result of Schema and is run against the map you'd like to test.
-type Validator func(common.MapStr) (*Results, error)
+// Validator is the result of Compile and is run against the map you'd like to test.
+type Validator func(common.MapStr) *Results
 
 // Compose combines multiple SchemaValidators into a single one.
 func Compose(validators ...Validator) Validator {
-	return func(actual common.MapStr) (r *Results, err error) {
+	return func(actual common.MapStr) *Results {
 		results := make([]*Results, len(validators))
 		for idx, validator := range validators {
-			results[idx], err = validator(actual)
-			if err != nil {
-				return nil, err
-			}
+			results[idx] = validator(actual)
 		}
 
 		combined := NewResults()
@@ -64,17 +61,14 @@ func Compose(validators ...Validator) Validator {
 				return true
 			})
 		}
-		return combined, err
+		return combined
 	}
 }
 
 // Strict is used when you want any unspecified keys that are encountered to be considered errors.
 func Strict(laxValidator Validator) Validator {
-	return func(actual common.MapStr) (*Results, error) {
-		results, err := laxValidator(actual)
-		if err != nil {
-			return results, err
-		}
+	return func(actual common.MapStr) *Results {
+		results := laxValidator(actual)
 
 		// The inner workings of this are a little weird
 		// We use a hash of dotted paths to track the results
@@ -93,7 +87,7 @@ func Strict(laxValidator Validator) Validator {
 		}
 		sort.Strings(validatedPaths)
 
-		err = walk(actual, func(woi walkObserverInfo) error {
+		walk(actual, false, func(woi walkObserverInfo) error {
 			_, validatedExactly := results.Fields[woi.path.String()]
 			if validatedExactly {
 				return nil // This key was tested, passes strict test
@@ -111,57 +105,45 @@ func Strict(laxValidator Validator) Validator {
 			return nil
 		})
 
-		return results, err
+		return results
 	}
 }
 
-// Schema takes a Map and returns an executable Validator function.
-func Schema(expected Map) Validator {
-	return func(actual common.MapStr) (*Results, error) {
-		return walkValidate(expected, actual)
-	}
-}
+// Compile takes the given map, validates the paths within it, and returns
+// a Validator that can check real data.
+func Compile(in Map) (validator Validator, err error) {
+	compiled := make(CompiledSchema, 0)
+	err = walk(common.MapStr(in), true, func(current walkObserverInfo) error {
 
-func walkValidate(expected Map, actual common.MapStr) (results *Results, err error) {
-	results = NewResults()
-	err = walk(
-		common.MapStr(expected),
-		func(expInfo walkObserverInfo) (walkErr error) {
-			actualKeyExists, actualV := expInfo.path.GetFrom(actual)
+		// Determine whether we should test this value
+		// We want to test all values except collections that contain a value
+		// If a collection contains a value, we check those 'leaf' values instead
+		rv := reflect.ValueOf(current.value)
+		kind := rv.Kind()
+		isCollection := kind == reflect.Map || kind == reflect.Slice
+		isNonEmptyCollection := isCollection && rv.Len() > 0
 
-			// If this is a definition use it, if not, check exact equality
-			isDef, isIsDef := expInfo.value.(IsDef)
+		if !isNonEmptyCollection {
+			isDef, isIsDef := current.value.(IsDef)
 			if !isIsDef {
-
-				if !interfaceIsCollection(expInfo.value) {
-					isDef = IsEqual(expInfo.value)
-				} else if interfaceIsCollection(actualV) {
-					// We don't check collections for equality, we check their properties
-					// individual via our own traversal, so bail early unless the collection
-					// is empty. The one exception
-					if reflect.ValueOf(actualV).Len() > 0 {
-						return nil
-					}
-
-					isDef = IsEqual(expInfo.value)
-				}
+				isDef = IsEqual(current.value)
 			}
 
-			if !isDef.optional || isDef.optional && actualKeyExists {
-				var checkRes *Results
-				checkRes, walkErr = isDef.check(expInfo.path, actualV, actualKeyExists)
-				if walkErr != nil {
-					return walkErr
-				}
-				results.merge(checkRes)
-			}
-			return nil
-		})
+			compiled = append(compiled, flatValidator{current.path, isDef})
+		}
+		return nil
+	})
 
-	return results, err
+	return func(actual common.MapStr) *Results {
+		return compiled.Check(actual)
+	}, err
 }
 
-func interfaceIsCollection(o interface{}) bool {
-	kind := reflect.ValueOf(o).Kind()
-	return kind == reflect.Map || kind == reflect.Slice
+// MustCompile compiles the given map, panic-ing if that map is invalid.
+func MustCompile(in Map) Validator {
+	compiled, err := Compile(in)
+	if err != nil {
+		panic(err)
+	}
+	return compiled
 }

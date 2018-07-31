@@ -61,7 +61,7 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 // MonitorChecks creates a skima.Validator that represents the "monitor" field present
 // in all heartbeat events.
 func MonitorChecks(id string, host string, ip string, scheme string, status string) mapval.Validator {
-	return mapval.Schema(mapval.Map{
+	return mapval.MustCompile(mapval.Map{
 		"monitor": mapval.Map{
 			// TODO: This is only optional because, for some reason, TCP returns
 			// this value, but HTTP does not. We should fix this
@@ -78,14 +78,14 @@ func MonitorChecks(id string, host string, ip string, scheme string, status stri
 // TCPBaseChecks checks the minimum TCP response, which is only issued
 // without further fields when the endpoint does not respond.
 func TCPBaseChecks(port uint16) mapval.Validator {
-	return mapval.Schema(mapval.Map{"tcp.port": port})
+	return mapval.MustCompile(mapval.Map{"tcp.port": port})
 }
 
 // ErrorChecks checks the standard heartbeat error hierarchy, which should
 // consist of a message (or a mapval isdef that can match the message) and a type under the error key.
 // The message is checked only as a substring since exact string matches can be fragile due to platform differences.
 func ErrorChecks(msgSubstr string, errType string) mapval.Validator {
-	return mapval.Schema(mapval.Map{
+	return mapval.MustCompile(mapval.Map{
 		"error": mapval.Map{
 			"message": mapval.IsStringContaining(msgSubstr),
 			"type":    errType,
@@ -98,6 +98,6 @@ func ErrorChecks(msgSubstr string, errType string) mapval.Validator {
 func RespondingTCPChecks(port uint16) mapval.Validator {
 	return mapval.Compose(
 		TCPBaseChecks(port),
-		mapval.Schema(mapval.Map{"tcp.rtt.connect.us": mapval.IsDuration}),
+		mapval.MustCompile(mapval.Map{"tcp.rtt.connect.us": mapval.IsDuration}),
 	)
 }

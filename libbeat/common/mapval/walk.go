@@ -34,11 +34,11 @@ type walkObserverInfo struct {
 type walkObserver func(info walkObserverInfo) error
 
 // walk is a shorthand way to walk a tree.
-func walk(m common.MapStr, wo walkObserver) error {
-	return walkFullMap(m, m, Path{}, wo)
+func walk(m common.MapStr, expandPaths bool, wo walkObserver) error {
+	return walkFullMap(m, m, Path{}, expandPaths, wo)
 }
 
-func walkFull(o interface{}, root common.MapStr, path Path, wo walkObserver) (err error) {
+func walkFull(o interface{}, root common.MapStr, path Path, expandPaths bool, wo walkObserver) (err error) {
 	err = wo(walkObserverInfo{path.Last(), o, root, path})
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func walkFull(o interface{}, root common.MapStr, path Path, wo walkObserver) (er
 	switch reflect.TypeOf(o).Kind() {
 	case reflect.Map:
 		converted := interfaceToMapStr(o)
-		err := walkFullMap(converted, root, path, wo)
+		err := walkFullMap(converted, root, path, expandPaths, wo)
 		if err != nil {
 			return err
 		}
@@ -56,7 +56,7 @@ func walkFull(o interface{}, root common.MapStr, path Path, wo walkObserver) (er
 
 		for idx, v := range converted {
 			newPath := path.ExtendSlice(idx)
-			err := walkFull(v, root, newPath, wo)
+			err := walkFull(v, root, newPath, expandPaths, wo)
 			if err != nil {
 				return err
 			}
@@ -67,16 +67,20 @@ func walkFull(o interface{}, root common.MapStr, path Path, wo walkObserver) (er
 }
 
 // walkFullMap walks the given MapStr tree.
-func walkFullMap(m common.MapStr, root common.MapStr, path Path, wo walkObserver) error {
+func walkFullMap(m common.MapStr, root common.MapStr, path Path, expandPaths bool, wo walkObserver) (err error) {
 	for k, v := range m {
-		//TODO: Handle this error
-		additionalPath, err := ParsePath(k)
-		if err != nil {
-			return err
+		var newPath Path
+		if !expandPaths {
+			newPath = path.ExtendMap(k)
+		} else {
+			additionalPath, err := ParsePath(k)
+			if err != nil {
+				return err
+			}
+			newPath = path.Concat(additionalPath)
 		}
-		newPath := path.Concat(additionalPath)
 
-		err = walkFull(v, root, newPath, wo)
+		err = walkFull(v, root, newPath, expandPaths, wo)
 		if err != nil {
 			return err
 		}

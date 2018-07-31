@@ -22,14 +22,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
 )
 
 func assertIsDefValid(t *testing.T, id IsDef, value interface{}) *Results {
-	res, err := id.check(MustParsePath("p"), value, true)
-	require.NoError(t, err)
+	res := id.check(MustParsePath("p"), value, true)
 
 	if !res.Valid {
 		assert.Fail(
@@ -42,8 +40,7 @@ func assertIsDefValid(t *testing.T, id IsDef, value interface{}) *Results {
 }
 
 func assertIsDefInvalid(t *testing.T, id IsDef, value interface{}) *Results {
-	res, err := id.check(MustParsePath("p"), value, true)
-	require.NoError(t, err)
+	res := id.check(MustParsePath("p"), value, true)
 
 	if res.Valid {
 		assert.Fail(
@@ -58,7 +55,7 @@ func assertIsDefInvalid(t *testing.T, id IsDef, value interface{}) *Results {
 }
 
 func TestIsArrayOf(t *testing.T) {
-	validator := Schema(Map{"foo": "bar"})
+	validator := MustCompile(Map{"foo": "bar"})
 
 	id := IsArrayOf(validator)
 

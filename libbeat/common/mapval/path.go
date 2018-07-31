@@ -96,7 +96,7 @@ func (p Path) Last() PathComponent {
 }
 
 // GetFrom takes a map and fetches the given path from it.
-func (p Path) GetFrom(m common.MapStr) (exists bool, value interface{}) {
+func (p Path) GetFrom(m common.MapStr) (value interface{}, exists bool) {
 	value = m
 	exists = true
 	for _, pc := range p {
@@ -118,11 +118,11 @@ func (p Path) GetFrom(m common.MapStr) (exists bool, value interface{}) {
 		}
 
 		if exists == false {
-			return exists, nil
+			return nil, exists
 		}
 	}
 
-	return exists, value
+	return value, exists
 }
 
 var arrMatcher = regexp.MustCompile("\\[(\\d+)\\]")

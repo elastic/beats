@@ -15,23 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mapvaltest
+package mapval
 
-import (
-	"testing"
+import "github.com/elastic/beats/libbeat/common"
 
-	"github.com/stretchr/testify/assert"
+type flatValidator struct {
+	path  Path
+	isDef IsDef
+}
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/mapval"
-)
+// CompiledSchema represents a compiled definition for driving a Validator.
+type CompiledSchema []flatValidator
 
-func TestTest(t *testing.T) {
-	// Should pass
-	Test(t, mapval.MustCompile(mapval.Map{}), common.MapStr{})
+// Check executes the the checks within the CompiledSchema
+func (cs CompiledSchema) Check(actual common.MapStr) *Results {
+	results := NewResults()
+	for _, pv := range cs {
+		actualV, actualKeyExists := pv.path.GetFrom(actual)
 
-	fakeT := new(testing.T)
-	Test(fakeT, mapval.MustCompile(mapval.Map{"foo": "bar"}), common.MapStr{})
+		if !pv.isDef.optional || pv.isDef.optional && actualKeyExists {
+			var checkRes *Results
+			checkRes = pv.isDef.check(pv.path, actualV, actualKeyExists)
+			results.merge(checkRes)
+		}
+	}
 
-	assert.True(t, fakeT.Failed())
+	return results
 }

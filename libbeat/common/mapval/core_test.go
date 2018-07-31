@@ -23,17 +23,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/stretchr/testify/require"
-
-	"fmt"
-
 	"github.com/elastic/beats/libbeat/common"
 )
 
 func assertValidator(t *testing.T, validator Validator, input common.MapStr) {
-	res, err := validator(input)
-	require.NoError(t, err)
-
+	res := validator(input)
 	assertResults(t, res)
 }
 
@@ -51,11 +45,10 @@ func TestFlat(t *testing.T) {
 		"baz": 1,
 	}
 
-	results, err := Schema(Map{
+	results := MustCompile(Map{
 		"foo": "bar",
 		"baz": IsIntGt(0),
 	})(m)
-	require.NoError(t, err)
 
 	assertResults(t, results)
 }
@@ -65,10 +58,9 @@ func TestBadFlat(t *testing.T) {
 
 	fakeT := new(testing.T)
 
-	results, err := Schema(Map{
+	results := MustCompile(Map{
 		"notafield": IsDuration,
 	})(m)
-	require.NoError(t, err)
 
 	assertResults(fakeT, results)
 
@@ -87,14 +79,12 @@ func TestNested(t *testing.T) {
 		},
 	}
 
-	results, err := Schema(Map{
+	results := MustCompile(Map{
 		"foo": Map{
 			"bar": "baz",
 		},
 		"foo.dur": IsDuration,
 	})(m)
-
-	require.NoError(t, err)
 
 	assertResults(t, results)
 
@@ -107,8 +97,8 @@ func TestComposition(t *testing.T) {
 		"baz": "bot",
 	}
 
-	fooValidator := Schema(Map{"foo": "bar"})
-	bazValidator := Schema(Map{"baz": "bot"})
+	fooValidator := MustCompile(Map{"foo": "bar"})
+	bazValidator := MustCompile(Map{"baz": "bot"})
 	composed := Compose(fooValidator, bazValidator)
 
 	// Test that the validators work individually
@@ -118,15 +108,15 @@ func TestComposition(t *testing.T) {
 	// Test that the composition of them works
 	assertValidator(t, composed, m)
 
-	composedRes, _ := composed(m)
+	composedRes := composed(m)
 	assert.Len(t, composedRes.Fields, 2)
 
-	badValidator := Schema(Map{"notakey": "blah"})
+	badValidator := MustCompile(Map{"notakey": "blah"})
 	badComposed := Compose(badValidator, composed)
 
 	fakeT := new(testing.T)
 	assertValidator(fakeT, badComposed, m)
-	badComposedRes, _ := badComposed(m)
+	badComposedRes := badComposed(m)
 
 	assert.Len(t, badComposedRes.Fields, 3)
 	assert.True(t, fakeT.Failed())
@@ -143,7 +133,7 @@ func TestStrictFunc(t *testing.T) {
 		},
 	}
 
-	validValidator := Schema(Map{
+	validValidator := MustCompile(Map{
 		"foo": "bar",
 		"baz": "bot",
 		"nest": Map{
@@ -155,15 +145,14 @@ func TestStrictFunc(t *testing.T) {
 
 	assertValidator(t, validValidator, m)
 
-	partialValidator := Schema(Map{
+	partialValidator := MustCompile(Map{
 		"foo": "bar",
 	})
 
 	// Should pass, since this is not a strict check
 	assertValidator(t, partialValidator, m)
 
-	res, err := Strict(partialValidator)(m)
-	require.NoError(t, err)
+	res := Strict(partialValidator)(m)
 
 	assert.Equal(t, []ValueResult{StrictFailureVR}, res.DetailedErrors().Fields["baz"])
 	assert.Equal(t, []ValueResult{StrictFailureVR}, res.DetailedErrors().Fields["nest.very.deep"])
@@ -176,7 +165,7 @@ func TestOptional(t *testing.T) {
 		"foo": "bar",
 	}
 
-	validator := Schema(Map{
+	validator := MustCompile(Map{
 		"non": Optional(IsEqual("foo")),
 	})
 
@@ -188,7 +177,7 @@ func TestExistence(t *testing.T) {
 		"exists": "foo",
 	}
 
-	validator := Schema(Map{
+	validator := MustCompile(Map{
 		"exists": KeyPresent,
 		"non":    KeyMissing,
 	})
@@ -211,7 +200,7 @@ func TestComplex(t *testing.T) {
 		"arr":   []common.MapStr{{"foo": "bar"}, {"foo": "baz"}},
 	}
 
-	validator := Schema(Map{
+	validator := MustCompile(Map{
 		"foo": "bar",
 		"hash": Map{
 			"baz": 1,
@@ -223,7 +212,7 @@ func TestComplex(t *testing.T) {
 		"slice":        []string{"pizza", "pasta", "and more"},
 		"empty":        KeyPresent,
 		"doesNotExist": KeyMissing,
-		"arr":          IsArrayOf(Schema(Map{"foo": IsStringContaining("a")})),
+		"arr":          IsArrayOf(MustCompile(Map{"foo": IsStringContaining("a")})),
 	})
 
 	assertValidator(t, validator, m)
@@ -238,7 +227,7 @@ func TestLiteralArray(t *testing.T) {
 		},
 	}
 
-	validator := Schema(Map{
+	validator := MustCompile(Map{
 		"a": []interface{}{
 			[]interface{}{1, 2, 3},
 			[]interface{}{"foo", "bar"},
@@ -246,8 +235,7 @@ func TestLiteralArray(t *testing.T) {
 		},
 	})
 
-	goodRes, err := validator(m)
-	require.NoError(t, err)
+	goodRes := validator(m)
 
 	assertResults(t, goodRes)
 	// We evaluate multidimensional slice as a single field for now
@@ -260,12 +248,11 @@ func TestStringSlice(t *testing.T) {
 		"a": []string{"a", "b"},
 	}
 
-	validator := Schema(Map{
+	validator := MustCompile(Map{
 		"a": []string{"a", "b"},
 	})
 
-	goodRes, err := validator(m)
-	require.NoError(t, err)
+	goodRes := validator(m)
 
 	assertResults(t, goodRes)
 	// We evaluate multidimensional slices as a single field for now
@@ -283,13 +270,12 @@ func TestEmptySlice(t *testing.T) {
 		"b": []string{},
 	}
 
-	validator := Schema(Map{
+	validator := MustCompile(Map{
 		"a": []interface{}{},
 		"b": []string{},
 	})
 
-	goodRes, err := validator(m)
-	require.NoError(t, err)
+	goodRes := validator(m)
 
 	assertResults(t, goodRes)
 	assert.Len(t, goodRes.Fields, 2)
@@ -303,29 +289,27 @@ func TestLiteralMdSlice(t *testing.T) {
 		},
 	}
 
-	validator := Schema(Map{
+	validator := MustCompile(Map{
 		"a": [][]int{
 			{1, 2, 3},
 			{4, 5, 6},
 		},
 	})
 
-	goodRes, err := validator(m)
-	require.NoError(t, err)
+	goodRes := validator(m)
 
 	assertResults(t, goodRes)
 	// We evaluate multidimensional slices as a single field for now
 	// This is kind of easier, but maybe we should do our own traversal later.
 	assert.Len(t, goodRes.Fields, 6)
 
-	badValidator := Strict(Schema(Map{
+	badValidator := Strict(MustCompile(Map{
 		"a": [][]int{
 			{1, 2, 3},
 		},
 	}))
 
-	badRes, err := badValidator(m)
-	require.NoError(t, err)
+	badRes := badValidator(m)
 
 	assert.False(t, badRes.Valid)
 	assert.Len(t, badRes.Fields, 7)
@@ -339,19 +323,18 @@ func TestSliceOfIsDefs(t *testing.T) {
 		"b": []interface{}{"foo", "bar", 3},
 	}
 
-	goodV := Schema(Map{
+	goodV := MustCompile(Map{
 		"a": []interface{}{IsIntGt(0), IsIntGt(1), 3},
 		"b": []interface{}{IsStringContaining("o"), "bar", IsIntGt(2)},
 	})
 
 	assertValidator(t, goodV, m)
 
-	badV := Schema(Map{
+	badV := MustCompile(Map{
 		"a": []interface{}{IsIntGt(100), IsIntGt(1), 3},
 		"b": []interface{}{IsStringContaining("X"), "bar", IsIntGt(2)},
 	})
-	badRes, err := badV(m)
-	require.NoError(t, err)
+	badRes := badV(m)
 
 	assert.False(t, badRes.Valid)
 	assert.Len(t, badRes.Errors(), 2)
@@ -363,20 +346,19 @@ func TestMatchArrayAsValue(t *testing.T) {
 		"b": []interface{}{"foo", "bar", 3},
 	}
 
-	goodV := Schema(Map{
+	goodV := MustCompile(Map{
 		"a": []int{1, 2, 3},
 		"b": []interface{}{"foo", "bar", 3},
 	})
 
 	assertValidator(t, goodV, m)
 
-	badV := Schema(Map{
+	badV := MustCompile(Map{
 		"a": "robot",
 		"b": []interface{}{"foo", "bar", 3},
 	})
 
-	badRes, err := badV(m)
-	require.NoError(t, err)
+	badRes := badV(m)
 
 	assert.False(t, badRes.Valid)
 	assert.False(t, badRes.Fields["a"][0].Valid)
@@ -385,28 +367,11 @@ func TestMatchArrayAsValue(t *testing.T) {
 	}
 }
 
-func TestErroringIsDef(t *testing.T) {
-	m := common.MapStr{"foo": "bar"}
-
-	expectedErr := fmt.Errorf("blahblah")
-
-	v := Schema(Map{
-		"foo": Is("This breaks", func(path Path, v interface{}) (*Results, error) {
-			return nil, expectedErr
-		}),
-	})
-
-	_, err := v(m)
-	assert.Equal(t, expectedErr, err)
-}
-
 func TestInvalidPathIsdef(t *testing.T) {
 	badPath := "foo...bar"
-	m := common.MapStr{"foo": "bar"}
-	v := Schema(Map{
+	_, err := Compile(Map{
 		badPath: "invalid",
 	})
 
-	_, err := v(m)
 	assert.Equal(t, InvalidPathString(badPath), err)
 }
