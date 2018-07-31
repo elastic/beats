@@ -1,5 +1,5 @@
 - module: mongodb
-  metricsets: ["dbstats", "status"]
+  metricsets: ["dbstats", "status", "collstats", "metrics"]
   period: 10s
   enabled: true
 

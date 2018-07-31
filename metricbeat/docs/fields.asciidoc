@@ -10168,6 +10168,1117 @@ format: bytes
 --
 
 [float]
+== metrics fields
+
+Statistics that reflect the current use and state of a running `mongod` instance for more information, take a look at https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics
+
+
+
+[float]
+== commands fields
+
+Reports on the use of database commands. The fields in metrics.commands are the names of database commands and each value is a document that reports the total number of commands executed as well as the number of failed executions.
+metrics.commands.<command>.failed shows the number of times <command> failed on this mongod. metrics.commands.<command>.total shows the number of times <command> executed on this mongod.
+
+
+
+
+*`mongodb.metrics.commands.is_self.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.is_self.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.aggregate.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.aggregate.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.build_info.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.build_info.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.coll_stats.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.coll_stats.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.connection_pool_stats.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.connection_pool_stats.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.count.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.count.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.db_stats.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.db_stats.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.distinct.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.distinct.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.find.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.find.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.get_cmd_line_opts.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.get_cmd_line_opts.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.get_last_error.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.get_last_error.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.get_log.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.get_log.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.get_more.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.get_more.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.get_parameter.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.get_parameter.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.host_info.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.host_info.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.insert.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.insert.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.is_master.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.is_master.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.last_collections.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.last_collections.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.last_commands.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.last_commands.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.list_databased.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.list_databased.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.list_indexes.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.list_indexes.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.ping.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.ping.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.profile.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.profile.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.replset_get_rbid.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.replset_get_rbid.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.replset_get_status.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.replset_get_status.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.replset_heartbeat.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.replset_heartbeat.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.replset_update_position.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.replset_update_position.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.server_status.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.server_status.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.update.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.update.total`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.commands.whatsmyuri.failed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.commands.whatsmyuri.total`*::
++
+--
+type: long
+
+--
+
+[float]
+== cursor fields
+
+Contains data regarding cursor state and use.
+
+
+
+*`mongodb.metrics.cursor.timed_out`*::
++
+--
+type: long
+
+The total number of cursors that have timed out since the server process started.
+
+
+--
+
+[float]
+== open fields
+
+Contains data regarding open cursors.
+
+
+
+*`mongodb.metrics.cursor.open.no_timeout`*::
++
+--
+type: long
+
+The number of open cursors with the option DBQuery.Option.noTimeout set to prevent timeout.
+
+
+--
+
+*`mongodb.metrics.cursor.open.pinned`*::
++
+--
+type: long
+
+The number of `pinned` open cursors.
+
+
+--
+
+*`mongodb.metrics.cursor.open.total`*::
++
+--
+type: long
+
+The number of cursors that MongoDB is maintaining for clients.
+
+
+--
+
+[float]
+== document fields
+
+Reflects document access and modification patterns.
+
+
+
+*`mongodb.metrics.document.deleted`*::
++
+--
+type: long
+
+The total number of documents deleted.
+
+
+--
+
+*`mongodb.metrics.document.inserted`*::
++
+--
+type: long
+
+The total number of documents inserted.
+
+
+--
+
+*`mongodb.metrics.document.returned`*::
++
+--
+type: long
+
+The total number of documents returned by queries.
+
+
+--
+
+*`mongodb.metrics.document.updated`*::
++
+--
+type: long
+
+The total number of documents updated.
+
+
+--
+
+[float]
+== get_last_error fields
+
+Returns the error status of the preceding write operation on the current connection.
+
+
+
+*`mongodb.metrics.get_last_error.write_wait.ms`*::
++
+--
+type: long
+
+The total amount of time in milliseconds that the mongod has spent performing getLastError operations with write concern (i.e. w) greater than 1.
+
+
+--
+
+*`mongodb.metrics.get_last_error.write_wait.count`*::
++
+--
+type: long
+
+The total number of getLastError operations with a specified write concern (i.e. w) greater than 1.
+
+
+--
+
+*`mongodb.metrics.get_last_error.write_timeouts`*::
++
+--
+type: long
+
+The number of times that write concern operations have timed out as a result of the wtimeout threshold to getLastError.
+
+
+--
+
+[float]
+== operation fields
+
+Holds counters for several types of update and query operations that MongoDB handles using special operation types.
+
+
+
+*`mongodb.metrics.operation.scan_and_order`*::
++
+--
+type: long
+
+The total number of queries that return sorted numbers that cannot perform the sort operation using an index.
+
+
+--
+
+*`mongodb.metrics.operation.write_conflicts`*::
++
+--
+type: long
+
+The total number of queries that encountered write conflicts.
+
+
+--
+
+[float]
+== query_executor fields
+
+Reports data from the query execution system.
+
+
+
+*`mongodb.metrics.query_executor.scanned_indexes`*::
++
+--
+type: long
+
+The total number of index items scanned during queries and query-plan evaluation.
+
+
+--
+
+*`mongodb.metrics.query_executor.scanned_documents`*::
++
+--
+type: long
+
+The total number of documents scanned during queries and query-plan evaluation.
+
+
+--
+
+[float]
+== replication fields
+
+Reports metrics related to the replication process. metrics.replication appears on all mongod instances, even those that aren't members of replica sets.
+
+
+
+[float]
+== executor fields
+
+Reports on various statistics for the replication executor.
+
+
+
+
+*`mongodb.metrics.replication.executor.counters.event_created`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.event_wait`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.cancels`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.waits`*::
++
+--
+type: long
+
+--
+
+
+*`mongodb.metrics.replication.executor.counters.scheduled.netcmd`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.scheduled.dbwork`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.scheduled.exclusive`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.scheduled.work_at`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.scheduled.work`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.counters.scheduled.failures`*::
++
+--
+type: long
+
+--
+
+
+
+*`mongodb.metrics.replication.executor.queues.in_progress.network`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.queues.in_progress.dbwork`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.queues.in_progress.exclusive`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.queues.sleepers`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.queues.ready`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.queues.free`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.unsignaled_events`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.event_waiters`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.executor.shutting_down`*::
++
+--
+type: boolean
+
+--
+
+*`mongodb.metrics.replication.executor.network_interface`*::
++
+--
+type: text
+
+--
+
+[float]
+== apply fields
+
+Reports on the application of operations from the replication oplog.
+
+
+
+*`mongodb.metrics.replication.apply.attempts_to_become_secondary`*::
++
+--
+type: long
+
+--
+
+[float]
+== batches fields
+
+Reports on the oplog application process on secondaries members of replica sets.
+
+
+
+*`mongodb.metrics.replication.apply.batches.count`*::
++
+--
+type: long
+
+The total number of batches applied across all databases.
+
+
+--
+
+*`mongodb.metrics.replication.apply.batches.time.ms`*::
++
+--
+type: long
+
+The total amount of time in milliseconds the mongod has spent applying operations from the oplog.
+
+
+--
+
+*`mongodb.metrics.replication.apply.ops`*::
++
+--
+type: long
+
+The total number of oplog operations applied.
+
+
+--
+
+[float]
+== buffer fields
+
+MongoDB buffers oplog operations from the replication sync source buffer before applying oplog entries in a batch. metrics.replication.buffer provides a way to track the oplog buffer.
+
+
+
+*`mongodb.metrics.replication.buffer.count`*::
++
+--
+type: long
+
+The current number of operations in the oplog buffer.
+
+
+--
+
+*`mongodb.metrics.replication.buffer.max_size.bytes`*::
++
+--
+type: long
+
+The maximum size of the buffer. This value is a constant setting in the mongod, and is not configurable.
+
+
+--
+
+*`mongodb.metrics.replication.buffer.size.bytes`*::
++
+--
+type: long
+
+The current size of the contents of the oplog buffer.
+
+
+--
+
+[float]
+== initial_sync fields
+
+Report initial sync status
+
+
+
+*`mongodb.metrics.replication.initial_sync.completed`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.initial_sync.failed_attempts`*::
++
+--
+type: long
+
+--
+
+*`mongodb.metrics.replication.initial_sync.failures`*::
++
+--
+type: long
+
+--
+
+[float]
+== network fields
+
+Reports network use by the replication process.
+
+
+
+*`mongodb.metrics.replication.network.bytes`*::
++
+--
+type: long
+
+The total amount of data read from the replication sync source.
+
+
+--
+
+[float]
+== getmores fields
+
+Reports on the getmore operations, which are requests for additional results from the oplog cursor as part of the oplog replication process.
+
+
+
+*`mongodb.metrics.replication.network.getmores.count`*::
++
+--
+type: long
+
+The total number of getmore operations
+
+
+--
+
+*`mongodb.metrics.replication.network.getmores.time.ms`*::
++
+--
+type: long
+
+The total amount of time required to collect data from getmore operations.
+
+
+--
+
+*`mongodb.metrics.replication.network.ops`*::
++
+--
+type: long
+
+The total number of operations read from the replication source.
+
+
+--
+
+*`mongodb.metrics.replication.network.reders_created`*::
++
+--
+type: long
+
+The total number of oplog query processes created.
+
+
+--
+
+[float]
+== preload fields
+
+Reports on the `pre-fetch` stage, where MongoDB loads documents and indexes into RAM to improve replication throughput.
+
+
+
+[float]
+== docs fields
+
+Reports on the documents loaded into memory during the pre-fetch stage.
+
+
+
+*`mongodb.metrics.replication.preload.docs.count`*::
++
+--
+type: long
+
+The total number of documents loaded during the pre-fetch stage of replication.
+
+
+--
+
+*`mongodb.metrics.replication.preload.docs.time.ms`*::
++
+--
+type: long
+
+--
+
+[float]
+== indexes fields
+
+Reports on the index items loaded into memory during the pre-fetch stage of replication.
+
+
+
+*`mongodb.metrics.replication.preload.indexes.count`*::
++
+--
+type: long
+
+The total number of index entries loaded by members before updating documents as part of the pre-fetch stage of replication.
+
+
+--
+
+*`mongodb.metrics.replication.preload.indexes.time.ms`*::
++
+--
+type: long
+
+The total amount of time, in milliseconds, spent loading index entries as part of the pre-fetch stage of replication.
+
+
+--
+
+
+*`mongodb.metrics.storage.free_list.search.bucket_exhausted`*::
++
+--
+type: long
+
+The number of times that mongod has checked the free list without finding a suitably large record allocation.
+
+
+--
+
+*`mongodb.metrics.storage.free_list.search.requests`*::
++
+--
+type: long
+
+The number of times mongod has searched for available record allocations.
+
+
+--
+
+*`mongodb.metrics.storage.free_list.search.scanned`*::
++
+--
+type: long
+
+The number of available record allocations mongod has searched.
+
+
+--
+
+[float]
+== ttl fields
+
+Reports on the operation of the resource use of the ttl index process.
+
+
+
+*`mongodb.metrics.ttl.deleted_documents`*::
++
+--
+type: long
+
+The total number of documents deleted from collections with a ttl index.
+
+
+--
+
+*`mongodb.metrics.ttl.passes`*::
++
+--
+type: long
+
+The number of times the background process removes documents from collections with a ttl index.
+
+
+--
+
+[float]
 == status fields
 
 MongoDB server status metrics.
