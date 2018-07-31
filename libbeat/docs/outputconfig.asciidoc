@@ -1033,6 +1033,19 @@ to another host if the currently selected one becomes unreachable. The default v
 
 The Redis connection timeout in seconds. The default is 5 seconds.
 
+===== `backoff.init`
+
+The number of seconds to wait before trying to reconnect to Redis after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Redis after a network error. The default is 60s.
+
 ===== `max_retries`
 
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
