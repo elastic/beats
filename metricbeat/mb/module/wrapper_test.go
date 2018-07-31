@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
 
@@ -105,7 +106,7 @@ func newFakePushMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // test utilities
 
 func newTestRegistry(t testing.TB) *mb.Register {
-	r := mb.NewRegister()
+	r := mb.NewRegister(feature.NewRegistry())
 
 	if err := r.AddMetricSet(moduleName, eventFetcherName, newFakeEventFetcher); err != nil {
 		t.Fatal(err)

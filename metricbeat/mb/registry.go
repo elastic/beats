@@ -28,7 +28,7 @@ const moduleNamespace = "metricbeat.module"
 
 // Registry is the singleton Register instance where all ModuleFactory's and
 // MetricSetFactory's should be registered.
-var Registry = NewRegister()
+var Registry = NewRegister(feature.Registry)
 
 // DefaultModuleFactory returns the given BaseModule and never returns an error.
 // If a MetricSets are registered without an associated ModuleFactory, then
@@ -97,11 +97,14 @@ func WithNamespace(namespace string) MetricSetOption {
 // Register contains the factory functions for creating new Modules and new
 // MetricSets. Registers are thread safe for concurrent usage.
 type Register struct {
+	registry *feature.FeatureRegistry
 }
 
 // NewRegister creates and returns a new Register.
-func NewRegister() *Register {
-	return &Register{}
+func NewRegister(registry *feature.FeatureRegistry) *Register {
+	return &Register{
+		registry: registry,
+	}
 }
 
 // AddModule registers a new ModuleFactory. An error is returned if the
@@ -109,7 +112,7 @@ func NewRegister() *Register {
 // under the name.
 func (r *Register) AddModule(name string, factory ModuleFactory) error {
 	f := feature.New(moduleNamespace, name, factory, feature.NewDetails(name, "", feature.Undefined))
-	err := feature.Registry.Register(f)
+	err := r.registry.Register(f)
 	if err != nil {
 		return err
 	}
@@ -165,7 +168,7 @@ func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, o
 		feature.NewDetails(name, "", feature.Undefined),
 	)
 
-	err := feature.Registry.Register(f)
+	err := r.registry.Register(f)
 	if err != nil {
 		return err
 	}
@@ -177,7 +180,7 @@ func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, o
 // moduleFactory returns the registered ModuleFactory associated with the
 // given name. It returns nil if no ModuleFactory is registered.
 func (r *Register) moduleFactory(name string) ModuleFactory {
-	f, err := feature.Registry.Lookup(moduleNamespace, name)
+	f, err := r.registry.Lookup(moduleNamespace, name)
 	if err != nil {
 		return nil
 	}
@@ -193,7 +196,7 @@ func (r *Register) moduleFactory(name string) ModuleFactory {
 // metricSetRegistration returns the registration data associated with the given
 // metricset name. It returns an error if no metricset is registered.
 func (r *Register) metricSetRegistration(module, name string) (MetricSetRegistration, error) {
-	ms, err := feature.Registry.Lookup(r.namespace(module), name)
+	ms, err := r.registry.Lookup(r.namespace(module), name)
 	if err != nil {
 		return MetricSetRegistration{}, fmt.Errorf(
 			"metricset '%s/%s' is not registered, metricset not found",
@@ -224,7 +227,7 @@ func (r *Register) DefaultMetricSets(module string) (defaults []string, err erro
 	// metricbeat.module.happroxy.
 	// Retrieve:
 	// metricbeat.module.happroxy.stats
-	features := feature.Registry.LookupWithPrefix(moduleNamespace + ".")
+	features := r.registry.LookupWithPrefix(moduleNamespace + ".")
 
 	if len(features) == 0 {
 		return nil, fmt.Errorf("module '%s' not found", module)
@@ -251,7 +254,7 @@ func (r *Register) DefaultMetricSets(module string) (defaults []string, err erro
 
 // Modules returns the list of module names that are registered
 func (r *Register) Modules() []string {
-	allModules, err := feature.Registry.LookupAll(moduleNamespace)
+	allModules, err := r.registry.LookupAll(moduleNamespace)
 	if err != nil {
 		return []string{}
 	}
@@ -266,7 +269,7 @@ func (r *Register) Modules() []string {
 
 // MetricSets returns the list of MetricSets registered for a given module
 func (r *Register) MetricSets(module string) (modules []string) {
-	features := feature.Registry.LookupWithPrefix(r.namespace(module) + ".")
+	features := r.registry.LookupWithPrefix(r.namespace(module) + ".")
 
 	if len(features) == 0 {
 		return modules

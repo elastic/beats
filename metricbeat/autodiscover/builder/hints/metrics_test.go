@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -229,7 +230,7 @@ func TestGenerateHints(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		mockRegister := mb.NewRegister()
+		mockRegister := mb.NewRegister(feature.NewRegistry())
 		mockRegister.MustAddMetricSet("mockmodule", "one", NewMockMetricSet, mb.DefaultMetricSet())
 		mockRegister.MustAddMetricSet("mockmodule", "two", NewMockMetricSet, mb.DefaultMetricSet())
 		mockRegister.MustAddMetricSet("mockmoduledefaults", "default", NewMockMetricSet, mb.DefaultMetricSet())
