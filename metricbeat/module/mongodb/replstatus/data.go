@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package oplog
+package replstatus
 
 import (
 	s "github.com/elastic/beats/libbeat/common/schema"
