@@ -9,114 +9,136 @@
       "snapshot":false,
       "status":"green"
     },
-    "last_updated":"2018-07-31T17:53:38.890Z",
+    "last_updated":"2018-07-31T23:26:21.525Z",
     "collection_interval_ms":5000,
     "process":{
       "memory":{
         "heap":{
-          "total_bytes":219418624,
-          "used_bytes":189963144,
+          "total_bytes":281325568,
+          "used_bytes":204034136,
           "size_limit":1501560832
         },
-        "resident_set_size_bytes":267689984
+        "resident_set_size_bytes":260308992
       },
-      "event_loop_delay":0.4890279769897461,
-      "pid":23445,
-      "uptime_ms":749417
+      "event_loop_delay":0.34590399265289307,
+      "pid":33785,
+      "uptime_ms":304874
     },
     "os":{
       "load":{
-        "1m":5.03515625,
-        "5m":3.56787109375,
-        "15m":3.45654296875
+        "1m":3.37841796875,
+        "5m":3.22314453125,
+        "15m":2.9501953125
       },
       "memory":{
         "total_bytes":17179869184,
-        "free_bytes":32022528,
-        "used_bytes":17147846656
+        "free_bytes":759586816,
+        "used_bytes":16420282368
       },
-      "uptime_ms":1115347000
+      "uptime_ms":1135312000
     },
     "response_times":{
-      "avg_ms":16,
-      "max_ms":19
+      "max_ms":0
     },
     "requests":{
-      "total":2,
+      "total":0,
       "disconnects":0,
       "status_codes":{
-        "200":1,
-        "404":1
+
       }
     },
-    "concurrent_connections":5,
+    "concurrent_connections":6,
     "usage":{
-      "index":".kibana",
-      "dashboard":{
-        "total":0
+      "kibana":{
+        "index":".kibana",
+        "dashboard":{
+          "total":0
+        },
+        "visualization":{
+          "total":0
+        },
+        "search":{
+          "total":0
+        },
+        "index_pattern":{
+          "total":1
+        },
+        "graph_workspace":{
+          "total":0
+        },
+        "timelion_sheet":{
+          "total":0
+        }
       },
-      "visualization":{
-        "total":0
-      },
-      "search":{
-        "total":0
-      },
-      "index_pattern":{
-        "total":0
-      },
-      "graph_workspace":{
-        "total":0
-      },
-      "timelion_sheet":{
-        "total":0
-      },
-      "xpack":{
-        "reporting":{
+      "reporting":{
+        "available":true,
+        "enabled":true,
+        "browser_type":"phantom",
+        "all":0,
+        "csv":{
           "available":true,
-          "enabled":true,
-          "browser_type":"phantom",
-          "_all":0,
+          "total":0
+        },
+        "printable_pdf":{
+          "available":true,
+          "total":0,
+          "app":{
+            "visualization":0,
+            "dashboard":0
+          },
+          "layout":{
+            "print":0,
+            "preserve_layout":0
+          }
+        },
+        "status":{
+
+        },
+        "last_day":{
+          "all":0,
           "csv":{
             "available":true,
             "total":0
           },
           "printable_pdf":{
-            "available":false,
-            "total":0
+            "available":true,
+            "total":0,
+            "app":{
+              "visualization":0,
+              "dashboard":0
+            },
+            "layout":{
+              "print":0,
+              "preserve_layout":0
+            }
           },
           "status":{
 
+          }
+        },
+        "last_7_days":{
+          "all":0,
+          "csv":{
+            "available":true,
+            "total":0
           },
-          "lastDay":{
-            "_all":0,
-            "csv":{
-              "available":true,
-              "total":0
+          "printable_pdf":{
+            "available":true,
+            "total":0,
+            "app":{
+              "visualization":0,
+              "dashboard":0
             },
-            "printable_pdf":{
-              "available":false,
-              "total":0
-            },
-            "status":{
-
+            "layout":{
+              "print":0,
+              "preserve_layout":0
             }
           },
-          "last7Days":{
-            "_all":0,
-            "csv":{
-              "available":true,
-              "total":0
-            },
-            "printable_pdf":{
-              "available":false,
-              "total":0
-            },
-            "status":{
+          "status":{
 
-            }
           }
         }
       }
     },
-    "clusterUuid":"cCe7_34NRpuCug1ZX1l3ug"
+    "cluster_uuid":"cCe7_34NRpuCug1ZX1l3ug"
   }
