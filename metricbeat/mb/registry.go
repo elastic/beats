@@ -19,14 +19,12 @@ package mb
 
 import (
 	"fmt"
-	"sort"
-	"strings"
-	"sync"
 
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-const initialSize = 20 // initialSize specifies the initial size of the Register.
+const moduleNamespace = "metricbeat.module"
 
 // Registry is the singleton Register instance where all ModuleFactory's and
 // MetricSetFactory's should be registered.
@@ -99,45 +97,23 @@ func WithNamespace(namespace string) MetricSetOption {
 // Register contains the factory functions for creating new Modules and new
 // MetricSets. Registers are thread safe for concurrent usage.
 type Register struct {
-	// Lock to control concurrent read/writes
-	lock sync.RWMutex
-	// A map of module name to ModuleFactory.
-	modules map[string]ModuleFactory
-	// A map of module name to nested map of MetricSet name to MetricSetRegistration.
-	metricSets map[string]map[string]MetricSetRegistration
 }
 
 // NewRegister creates and returns a new Register.
 func NewRegister() *Register {
-	return &Register{
-		modules:    make(map[string]ModuleFactory, initialSize),
-		metricSets: make(map[string]map[string]MetricSetRegistration, initialSize),
-	}
+	return &Register{}
 }
 
 // AddModule registers a new ModuleFactory. An error is returned if the
 // name is empty, factory is nil, or if a factory has already been registered
 // under the name.
 func (r *Register) AddModule(name string, factory ModuleFactory) error {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-
-	if name == "" {
-		return fmt.Errorf("module name is required")
+	f := feature.New(moduleNamespace, name, factory, feature.NewDetails(name, "", feature.Undefined))
+	err := feature.Registry.Register(f)
+	if err != nil {
+		return err
 	}
 
-	name = strings.ToLower(name)
-
-	_, exists := r.modules[name]
-	if exists {
-		return fmt.Errorf("module '%s' is already registered", name)
-	}
-
-	if factory == nil {
-		return fmt.Errorf("module '%s' cannot be registered with a nil factory", name)
-	}
-
-	r.modules[name] = factory
 	logp.Info("Module registered: %s", name)
 	return nil
 }
@@ -164,30 +140,14 @@ func (r *Register) MustAddMetricSet(module, name string, factory MetricSetFactor
 	}
 }
 
+func (r *Register) namespace(name string) string {
+	return moduleNamespace + "." + name
+}
+
 // addMetricSet registers a new MetricSetFactory. An error is returned if any
 // parameter is empty or nil or if a factory has already been registered under
 // the name.
 func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, options ...MetricSetOption) error {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-
-	if module == "" {
-		return fmt.Errorf("module name is required")
-	}
-
-	if name == "" {
-		return fmt.Errorf("metricset name is required")
-	}
-
-	module = strings.ToLower(module)
-	name = strings.ToLower(name)
-
-	if metricsets, ok := r.metricSets[module]; !ok {
-		r.metricSets[module] = map[string]MetricSetRegistration{}
-	} else if _, exists := metricsets[name]; exists {
-		return fmt.Errorf("metricset '%s/%s' is already registered", module, name)
-	}
-
 	if factory == nil {
 		return fmt.Errorf("metricset '%s/%s' cannot be registered with a nil factory", module, name)
 	}
@@ -198,7 +158,18 @@ func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, o
 		opt(&msInfo)
 	}
 
-	r.metricSets[module][name] = msInfo
+	f := feature.New(
+		r.namespace(module),
+		name,
+		&msInfo,
+		feature.NewDetails(name, "", feature.Undefined),
+	)
+
+	err := feature.Registry.Register(f)
+	if err != nil {
+		return err
+	}
+
 	logp.Info("MetricSet registered: %s/%s", module, name)
 	return nil
 }
@@ -206,112 +177,116 @@ func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, o
 // moduleFactory returns the registered ModuleFactory associated with the
 // given name. It returns nil if no ModuleFactory is registered.
 func (r *Register) moduleFactory(name string) ModuleFactory {
-	r.lock.RLock()
-	defer r.lock.RUnlock()
+	f, err := feature.Registry.Lookup(moduleNamespace, name)
+	if err != nil {
+		return nil
+	}
 
-	return r.modules[strings.ToLower(name)]
+	factory, ok := f.Factory().(ModuleFactory)
+	if !ok {
+		return nil
+	}
+
+	return factory
 }
 
 // metricSetRegistration returns the registration data associated with the given
 // metricset name. It returns an error if no metricset is registered.
 func (r *Register) metricSetRegistration(module, name string) (MetricSetRegistration, error) {
-	r.lock.RLock()
-	defer r.lock.RUnlock()
-
-	module = strings.ToLower(module)
-	name = strings.ToLower(name)
-
-	metricSets, exists := r.metricSets[module]
-	if !exists {
-		return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' is not registered, module not found", module, name)
+	ms, err := feature.Registry.Lookup(r.namespace(module), name)
+	if err != nil {
+		return MetricSetRegistration{}, fmt.Errorf(
+			"metricset '%s/%s' is not registered, metricset not found",
+			module,
+			name,
+		)
 	}
 
-	registration, exists := metricSets[name]
-	if !exists {
-		return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' is not registered, metricset not found", module, name)
+	registration, ok := ms.Factory().(*MetricSetRegistration)
+	if !ok {
+		return MetricSetRegistration{}, fmt.Errorf(
+			"incompatible type for metricset '%s/%s', type received %T",
+			module,
+			name,
+			ms.Factory(),
+		)
 	}
 
-	return registration, nil
+	return *registration, nil
 }
 
 // DefaultMetricSets returns the names of the default MetricSets for a module.
 // An error is returned if no default MetricSet is declared or the module does
 // not exist.
-func (r *Register) DefaultMetricSets(module string) ([]string, error) {
-	r.lock.RLock()
-	defer r.lock.RUnlock()
+func (r *Register) DefaultMetricSets(module string) (defaults []string, err error) {
+	// Retrieve all the active metricset under a specific module.
+	// Key:
+	// metricbeat.module.happroxy.
+	// Retrieve:
+	// metricbeat.module.happroxy.stats
+	features := feature.Registry.LookupWithPrefix(moduleNamespace + ".")
 
-	module = strings.ToLower(module)
-
-	metricSets, exists := r.metricSets[module]
-	if !exists {
+	if len(features) == 0 {
 		return nil, fmt.Errorf("module '%s' not found", module)
 	}
 
-	var defaults []string
-	for _, reg := range metricSets {
-		if reg.IsDefault {
-			defaults = append(defaults, reg.Name)
+	for _, feature := range features {
+		ms, ok := feature.Factory().(*MetricSetRegistration)
+		if !ok {
+			return nil, fmt.Errorf(
+				"incompatible type for metricset '%s/%s', type received %T",
+				module,
+				feature.Name(),
+				feature.Factory(),
+			)
+		}
+
+		if ms.IsDefault {
+			defaults = append(defaults, ms.Name)
 		}
 	}
 
-	if len(defaults) == 0 {
-		return nil, fmt.Errorf("no default metricset exists for module '%s'", module)
-	}
 	return defaults, nil
 }
 
 // Modules returns the list of module names that are registered
 func (r *Register) Modules() []string {
-	r.lock.RLock()
-	defer r.lock.RUnlock()
+	allModules, err := feature.Registry.LookupAll(moduleNamespace)
+	if err != nil {
+		return []string{}
+	}
 
-	modules := make([]string, 0, len(r.modules))
-	for module := range r.modules {
-		modules = append(modules, module)
+	modules := make([]string, 0, len(allModules))
+	for _, module := range allModules {
+		modules = append(modules, module.Name())
 	}
 
 	return modules
 }
 
 // MetricSets returns the list of MetricSets registered for a given module
-func (r *Register) MetricSets(module string) []string {
-	r.lock.RLock()
-	defer r.lock.RUnlock()
+func (r *Register) MetricSets(module string) (modules []string) {
+	features := feature.Registry.LookupWithPrefix(r.namespace(module) + ".")
 
-	var metricsets []string
-
-	sets, ok := r.metricSets[strings.ToLower(module)]
-	if ok {
-		metricsets = make([]string, 0, len(sets))
-		for name := range sets {
-			metricsets = append(metricsets, name)
-		}
+	if len(features) == 0 {
+		return modules
 	}
 
-	return metricsets
+	for _, feature := range features {
+		ms, ok := feature.Factory().(*MetricSetRegistration)
+		if !ok {
+			continue
+		}
+
+		modules = append(modules, ms.Name)
+	}
+
+	return modules
 }
 
 // String return a string representation of the registered ModuleFactory's and
 // MetricSetFactory's.
 func (r *Register) String() string {
-	r.lock.RLock()
-	defer r.lock.RUnlock()
-
-	var modules []string
-	for module := range r.modules {
-		modules = append(modules, module)
-	}
-	sort.Strings(modules)
-
-	var metricSets []string
-	for module, m := range r.metricSets {
-		for name := range m {
-			metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
-		}
-	}
-	sort.Strings(metricSets)
-
-	return fmt.Sprintf("Register [ModuleFactory:[%s], MetricSetFactory:[%s]]",
-		strings.Join(modules, ", "), strings.Join(metricSets, ", "))
+	// TODO
+	return "TODO"
 }

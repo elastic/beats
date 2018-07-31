@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -340,6 +341,10 @@ func TestNewBaseModuleFromModuleConfigStruct(t *testing.T) {
 
 func newTestRegistry(t testing.TB, metricSetOptions ...MetricSetOption) *Register {
 	r := NewRegister()
+
+	// The registry is still a global, so we need to cleanup.
+	feature.Registry.Unregister(moduleNamespace, moduleName)
+	feature.Registry.Unregister(r.namespace(moduleName), metricSetName)
 
 	if err := r.AddModule(moduleName, DefaultModuleFactory); err != nil {
 		t.Fatal(err)
