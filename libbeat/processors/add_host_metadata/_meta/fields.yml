@@ -31,6 +31,10 @@
           type: keyword
           description: >
             OS family (e.g. redhat, debian, freebsd, windows).
+        - name: os.kernel
+          type: keyword
+          description: >
+            The operating system's kernel version.
         - name: ip
           type: ip
           description: >
