@@ -423,7 +423,10 @@ metricbeat.modules:
   metricsets: ["dommemstat"]
   enabled: true
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["unix:///var/run/libvirt/libvirt-sock"]
+  # For remote hosts, setup network access in libvirtd.conf
+  # and use the tcp scheme:
+  # hosts: [ "tcp://<host>:16509" ]
 
   # Timeout to connect to Libvirt server
   #timeout: 1s
@@ -444,7 +447,7 @@ metricbeat.modules:
 
 #------------------------------- MongoDB Module ------------------------------
 - module: mongodb
-  metricsets: ["dbstats", "status"]
+  metricsets: ["dbstats", "status", "collstats", "metrics"]
   period: 10s
   enabled: true
 
@@ -1297,6 +1300,17 @@ output.elasticsearch:
   # all events are published. Set max_retries to a value less than 0 to retry
   # until all events are published. The default is 3.
   #max_retries: 3
+
+  # The number of seconds to wait before trying to reconnect to Redis
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Redis after a network error. The default is 60s.
+  #backoff.max: 60s
 
   # The maximum number of events to bulk in a single Redis request or pipeline.
   # The default is 2048.
