@@ -119,7 +119,7 @@ func (d *wrapperDriver) Ps(ctx context.Context, filter ...string) ([]ContainerSt
 	for i, c := range containers {
 		ps[i] = &wrapperContainer{info: c}
 	}
-	return nil, nil
+	return ps, nil
 }
 
 func (d *wrapperDriver) Containers(ctx context.Context, projectFilter Filter, filter ...string) ([]string, error) {
@@ -168,12 +168,10 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 }
 
 func makeFilter(project, service string, projectFilter Filter) filters.Args {
-	fmt.Println(project, service, projectFilter)
-
 	f := filters.NewArgs()
 	f.Add("label", fmt.Sprintf("%s=%s", labelComposeProject, project))
 
-	if service == "" {
+	if service != "" {
 		f.Add("label", fmt.Sprintf("%s=%s", labelComposeService, service))
 	}
 
@@ -185,5 +183,6 @@ func makeFilter(project, service string, projectFilter Filter) filters.Args {
 	case StoppedState:
 		f.Add("status", "exited")
 	}
+
 	return f
 }

@@ -117,12 +117,17 @@ func (c *Project) Start(service string) error {
 // Wait ensures all wanted services are healthy. Wait loop (60s timeout)
 func (c *Project) Wait(seconds int, services ...string) error {
 	healthy := false
-	for !healthy && seconds > 0 {
+	timeout := time.Now().Add(time.Duration(seconds) * time.Second)
+	for !healthy && time.Now().Before(timeout) {
 		healthy = true
 
 		servicesStatus, err := c.getServices(services...)
 		if err != nil {
 			return err
+		}
+
+		if len(servicesStatus) == 0 {
+			healthy = false
 		}
 
 		for _, s := range servicesStatus {
@@ -133,7 +138,6 @@ func (c *Project) Wait(seconds int, services ...string) error {
 		}
 
 		time.Sleep(1 * time.Second)
-		seconds--
 	}
 
 	if !healthy {
@@ -248,6 +252,7 @@ func (c *Project) getServices(filter ...string) (map[string]*serviceInfo, error)
 		}
 		result[name] = service
 	}
+
 	return result, nil
 }
 
