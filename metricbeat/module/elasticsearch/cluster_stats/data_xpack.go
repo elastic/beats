@@ -103,11 +103,41 @@ var (
 				"master":            c.Int("master"),
 				"ingest":            c.Int("ingest"),
 			}),
-			// TODO: os
-			// TODO: process
-			// TODO: jvm
-			// TODO: fs
-			// TODO: network_types
+			"os": c.Dict("os", s.Schema{
+				"available_processors": c.Int("available_processors"),
+				"allocated_processors": c.Int("allocated_processors"),
+				"mem": c.Dict("mem", s.Schema{
+					"total_in_bytes": c.Int("total_in_bytes"),
+					"free_in_bytes":  c.Int("free_in_bytes"),
+					"used_in_bytes":  c.Int("used_in_bytes"),
+					"free_percent":   c.Int("free_percent"),
+					"used_percent":   c.Int("used_percent"),
+				}),
+			}),
+			"process": c.Dict("process", s.Schema{
+				"cpu": c.Dict("cpu", s.Schema{
+					"percent": c.Int("percent"),
+				}),
+				"open_file_descriptors": c.Dict("open_file_descriptors", s.Schema{
+					"min": c.Int("min"),
+					"max": c.Int("max"),
+					"avg": c.Int("avg"),
+				}),
+			}),
+			"jvm": c.Dict("jvm", s.Schema{
+				"max_uptime_in_millis": c.Int("max_uptime_in_millis"),
+				"mem": c.Dict("mem", s.Schema{
+					"heap_used_in_bytes": c.Int("heap_used_in_bytes"),
+					"heap_max_in_bytes":  c.Int("heap_max_in_bytes"),
+				}),
+				"threads": c.Int("threads"),
+			}),
+			"fs": c.Dict("fs", s.Schema{
+				"total_in_bytes":     c.Int("total_in_bytes"),
+				"free_in_bytes":      c.Int("free_in_bytes"),
+				"available_in_bytes": c.Int("available_in_bytes"),
+			}),
+			// TODO: "network_types"
 		}),
 	}
 )
