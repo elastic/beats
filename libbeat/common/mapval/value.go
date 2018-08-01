@@ -24,7 +24,7 @@ type ValueResult struct {
 }
 
 // A ValueValidator is used to validate a value in a Map.
-type ValueValidator func(v interface{}) ValueResult
+type ValueValidator func(path Path, v interface{}) *Results
 
 // An IsDef defines the type of check to do.
 // Generally only name and checker are set. optional and checkKeyMissing are
@@ -36,28 +36,38 @@ type IsDef struct {
 	checkKeyMissing bool
 }
 
-func (id IsDef) check(v interface{}, keyExists bool) ValueResult {
+func (id IsDef) check(path Path, v interface{}, keyExists bool) *Results {
 	if id.checkKeyMissing {
 		if !keyExists {
-			return ValidVR
+			return ValidResult(path)
 		}
 
-		return ValueResult{false, "key should not exist!"}
+		return SimpleResult(path, false, "this key should not exist")
 	}
 
 	if !id.optional && !keyExists {
-		return KeyMissingVR
+		return KeyMissingResult(path)
 	}
 
 	if id.checker != nil {
-		return id.checker(v)
+		return id.checker(path, v)
 	}
 
-	return ValidVR
+	return ValidResult(path)
+}
+
+// ValidResult is a convenience value for Valid results.
+func ValidResult(path Path) *Results {
+	return SimpleResult(path, true, "is valid")
 }
 
 // ValidVR is a convenience value for Valid results.
-var ValidVR = ValueResult{true, ""}
+var ValidVR = ValueResult{true, "is valid"}
+
+// KeyMissingResult is emitted when a key was expected, but was not present.
+func KeyMissingResult(path Path) *Results {
+	return SingleResult(path, KeyMissingVR)
+}
 
 // KeyMissingVR is emitted when a key was expected, but was not present.
 var KeyMissingVR = ValueResult{
@@ -65,5 +75,13 @@ var KeyMissingVR = ValueResult{
 	"expected this key to be present",
 }
 
+// StrictFailureResult is emitted when Strict() is used, and an unexpected field is found.
+func StrictFailureResult(path Path) *Results {
+	return SingleResult(path, StrictFailureVR)
+}
+
 // StrictFailureVR is emitted when Strict() is used, and an unexpected field is found.
-var StrictFailureVR = ValueResult{false, "unexpected field encountered during strict validation"}
+var StrictFailureVR = ValueResult{
+	false,
+	"unexpected field encountered during strict validation",
+}

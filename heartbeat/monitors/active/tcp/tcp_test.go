@@ -77,7 +77,7 @@ func TestUpEndpointJob(t *testing.T) {
 				"up",
 			),
 			hbtest.RespondingTCPChecks(port),
-			mapval.Schema(mapval.Map{
+			mapval.MustCompile(mapval.Map{
 				"resolve": mapval.Map{
 					"host":   "localhost",
 					"ip":     "127.0.0.1",
