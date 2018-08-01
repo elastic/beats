@@ -1,143 +1,43 @@
+:has_module_steps:
+
 [float]
 [id="running-{modulename}-modules"]
 === Set up and run the module
 
-// REVIEWERS: Should we include docker commands here, too?
-
-IMPORTANT: If you’ve secured {es} and {kib}, you need to configure the
-`username` and `password` options in the {es} output before setting up
-and running the module. See
-<<elasticsearch-output,Configure the {es} output>>.
-
 Before doing these steps, verify that {es} and {kib} are running and
 that {es} is ready to receive data from {beatname_uc}.
+
+If you're running our
+https://www.elastic.co/cloud/elasticsearch-service[hosted {es} Service] on
+Elastic Cloud, or you've enabled security in {es} and {kib}, you need to specify
+additional connection information before setting up and running the module. See
+<<filebeat-modules-quickstart>> for the complete setup.
 
 To set up and run the module:
 
 . Enable the module:
 +
-*deb and rpm:*
+include::./enable-modules-command.asciidoc[]
 +
-["source","sh",subs="attributes"]
-----
-{beatname_lc} modules enable {modulename}
-----
-+
-*mac:*
-+
-["source","sh",subs="attributes"]
-----
-./{beatname_lc} modules enable {modulename}
-----
-+
-*win:*
-+
-["source","sh",subs="attributes"]
-----
-PS > .{backslash}{beatname_lc}.exe modules enable {modulename}
-----
-+
-The <<modules-command,`modules enable`>> command enables the +{modulename}+
-config defined in the `modules.d` directory. See
+This command enables the module config defined in the `modules.d` directory. See
 <<configuration-{beatname_lc}-modules>> for other ways to enable modules.
 +
 To see a list of enabled and disabled modules, run:
 +
-*deb and rpm:*
-+
-["source","sh",subs="attributes"]
-----
-{beatname_lc} modules list
-----
-+
-*mac:*
-+
-["source","sh",subs="attributes"]
-----
-./{beatname_lc} modules list
-----
-+
-*win:*
-+
-["source","sh",subs="attributes"]
-----
-PS > .{backslash}{beatname_lc}.exe modules list
-----
+include::./list-modules-command.asciidoc[]
 
 . Set up the initial environment:
 +
-*deb and rpm:*
-+
-["source","sh",subs="attributes"]
-----
-{beatname_lc} setup -e
-----
-+
-*mac:*
-+
-["source","sh",subs="attributes"]
-----
-./{beatname_lc} setup -e
-----
-+
-*win:*
-+
-["source","sh",subs="attributes"]
-----
-PS > .{backslash}{beatname_lc}.exe setup -e
-----
-+
-The <<setup-command,`setup`>> command loads the recommended index template for
-writing to {es} and deploys the sample dashboards for visualizing the
-data in {kib}. This is a one-time setup step. 
-+
-The `-e` flag is optional and sends output to standard error instead of syslog.
+include::./setup-command.asciidoc[]
 
-. Run {beatname_uc}:
-+
-*deb and rpm:*
-+
-["source","sh",subs="attributes"]
-----
-service {beatname_lc} start
-----
-+
-*mac:*
-+
-["source","sh",subs="attributes"]
-----
-./{beatname_lc} -e
-----
-+
-*win:*
-+
-["source","sh",subs="attributes"]
-----
-PS > Start-Service {beatname_lc}
-----
-+
-If the module is configured correctly, you'll see
-`INFO Harvester started` messages for each file specified in the config.
+. Run {beatname_uc}.
 +
 If your logs aren't in the default location, see
 <<configuring-{modulename}-module>>, then run {beatname_uc} after you've
-configured the module.
+set the paths variable.
 +
-NOTE: Depending on how you've installed Filebeat, you might see errors
-related to file ownership or permissions when you try to run Filebeat modules.
-See {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
-in the _Beats Platform Reference_ if you encounter errors related to file
-ownership or permissions. 
+include::./run-command.asciidoc[]
 
-. Explore your data in {kib}:
-.. Open your browser and navigate to the *Dashboard* overview in {kib}:
-http://localhost:5601/app/kibana#/dashboards[http://localhost:5601/app/kibana#/dashboards].
-Replace `localhost` with the name of the {kib} host. If you're using an
-https://cloud.elastic.co/[Elastic Cloud] instance, log in to your cloud account,
-then navigate to the {kib} endpoint in your deployment.
-.. If necessary, log in with your {kib} username and password.
-.. Enter *{modulename}* in the search box, then open a dashboard and explore
-the visualizations for your parsed logs.
-+
-TIP: If you don’t see data in {kib}, try changing the date range to a larger
-range. By default, {kib} shows the last 15 minutes.
+include::./visualize-data.asciidoc[]
+
+:has_module_steps!:
