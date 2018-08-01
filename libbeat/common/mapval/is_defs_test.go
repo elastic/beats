@@ -19,25 +19,29 @@ package mapval
 
 import (
 	"testing"
-
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
-func assertIsDefValid(t *testing.T, id IsDef, value interface{}) {
-	res := id.check(value, true)
+func assertIsDefValid(t *testing.T, id IsDef, value interface{}) *Results {
+	res := id.check(MustParsePath("p"), value, true)
+
 	if !res.Valid {
 		assert.Fail(
 			t,
 			"Expected Valid IsDef",
-			"Isdef %#v was not valid for value %#v with error: ", id, value, res.Message,
+			"Isdef %#v was not valid for value %#v with error: ", id, value, res.Errors(),
 		)
 	}
+	return res
 }
 
-func assertIsDefInvalid(t *testing.T, id IsDef, value interface{}) {
-	res := id.check(value, true)
+func assertIsDefInvalid(t *testing.T, id IsDef, value interface{}) *Results {
+	res := id.check(MustParsePath("p"), value, true)
+
 	if res.Valid {
 		assert.Fail(
 			t,
@@ -47,6 +51,30 @@ func assertIsDefInvalid(t *testing.T, id IsDef, value interface{}) {
 			value,
 		)
 	}
+	return res
+}
+
+func TestIsArrayOf(t *testing.T) {
+	validator := MustCompile(Map{"foo": "bar"})
+
+	id := IsArrayOf(validator)
+
+	goodMap := common.MapStr{"foo": "bar"}
+	goodMapArr := []common.MapStr{goodMap, goodMap}
+
+	goodRes := assertIsDefValid(t, id, goodMapArr)
+	goodFields := goodRes.Fields
+	assert.Len(t, goodFields, 2)
+	assert.Contains(t, goodFields, "p.[0].foo")
+	assert.Contains(t, goodFields, "p.[1].foo")
+
+	badMap := common.MapStr{"foo": "bot"}
+	badMapArr := []common.MapStr{badMap}
+
+	badRes := assertIsDefInvalid(t, id, badMapArr)
+	badFields := badRes.Fields
+	assert.Len(t, badFields, 1)
+	assert.Contains(t, badFields, "p.[0].foo")
 }
 
 func TestIsAny(t *testing.T) {

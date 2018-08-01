@@ -28,10 +28,10 @@ import (
 
 func TestTest(t *testing.T) {
 	// Should pass
-	Test(t, mapval.Schema(mapval.Map{}), common.MapStr{})
+	Test(t, mapval.MustCompile(mapval.Map{}), common.MapStr{})
 
 	fakeT := new(testing.T)
-	Test(fakeT, mapval.Schema(mapval.Map{"foo": "bar"}), common.MapStr{})
+	Test(fakeT, mapval.MustCompile(mapval.Map{"foo": "bar"}), common.MapStr{})
 
 	assert.True(t, fakeT.Failed())
 }

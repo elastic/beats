@@ -33,7 +33,7 @@ import (
 )
 
 // Test takes the output from a Validator invocation and runs test assertions on the result.
-// If you are using this library for testing you will probably want to run Test(t, Schema(Map{...}), actual) as a pattern.
+// If you are using this library for testing you will probably want to run Test(t, Compile(Map{...}), actual) as a pattern.
 func Test(t *testing.T, v mapval.Validator, m common.MapStr) *mapval.Results {
 	r := v(m)
 

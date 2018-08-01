@@ -62,7 +62,7 @@ func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, 
 // The minimum response is just the URL. Only to be used for unreachable server
 // tests.
 func httpBaseChecks(url string) mapval.Validator {
-	return mapval.Schema(mapval.Map{
+	return mapval.MustCompile(mapval.Map{
 		"http.url": url,
 	})
 }
@@ -70,7 +70,7 @@ func httpBaseChecks(url string) mapval.Validator {
 func respondingHTTPChecks(url string, statusCode int) mapval.Validator {
 	return mapval.Compose(
 		httpBaseChecks(url),
-		mapval.Schema(mapval.Map{
+		mapval.MustCompile(mapval.Map{
 			"http": mapval.Map{
 				"response.status_code":   statusCode,
 				"rtt.content.us":         mapval.IsDuration,

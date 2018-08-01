@@ -17,32 +17,28 @@
 
 package mapval
 
-import (
-	"testing"
+import "github.com/elastic/beats/libbeat/common"
 
-	"github.com/stretchr/testify/assert"
-)
-
-func TestEmpty(t *testing.T) {
-	r := NewResults()
-	assert.True(t, r.Valid)
-	assert.Empty(t, r.DetailedErrors().Fields)
-	assert.Empty(t, r.Errors())
+type flatValidator struct {
+	path  Path
+	isDef IsDef
 }
 
-func TestWithError(t *testing.T) {
-	r := NewResults()
-	r.record(MustParsePath("foo"), KeyMissingVR)
-	r.record(MustParsePath("bar"), ValidVR)
+// CompiledSchema represents a compiled definition for driving a Validator.
+type CompiledSchema []flatValidator
 
-	assert.False(t, r.Valid)
+// Check executes the the checks within the CompiledSchema
+func (cs CompiledSchema) Check(actual common.MapStr) *Results {
+	results := NewResults()
+	for _, pv := range cs {
+		actualV, actualKeyExists := pv.path.GetFrom(actual)
 
-	assert.Equal(t, KeyMissingVR, r.Fields["foo"][0])
-	assert.Equal(t, ValidVR, r.Fields["bar"][0])
+		if !pv.isDef.optional || pv.isDef.optional && actualKeyExists {
+			var checkRes *Results
+			checkRes = pv.isDef.check(pv.path, actualV, actualKeyExists)
+			results.merge(checkRes)
+		}
+	}
 
-	assert.Equal(t, KeyMissingVR, r.DetailedErrors().Fields["foo"][0])
-	assert.NotContains(t, r.DetailedErrors().Fields, "bar")
-
-	assert.False(t, r.DetailedErrors().Valid)
-	assert.NotEmpty(t, r.Errors())
+	return results
 }
