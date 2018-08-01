@@ -30,8 +30,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/filebeat/reader/readline"
-	"github.com/elastic/beats/filebeat/reader/readline/encoding"
+	"github.com/elastic/beats/filebeat/reader/readfile"
+	"github.com/elastic/beats/filebeat/reader/readfile/encoding"
 	"github.com/elastic/beats/libbeat/common/match"
 )
 
@@ -189,12 +189,12 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg Config) reade
 	}
 
 	var r reader.Reader
-	r, err = readline.NewEncodeReader(in, enc, 4096)
+	r, err = readfile.NewEncodeReader(in, enc, 4096)
 	if err != nil {
 		t.Fatalf("Failed to initialize line reader: %v", err)
 	}
 
-	r, err = New(readline.NewStripNewline(r), "\n", 1<<20, &cfg)
+	r, err = New(readfile.NewStripNewline(r), "\n", 1<<20, &cfg)
 	if err != nil {
 		t.Fatalf("failed to initialize reader: %v", err)
 	}

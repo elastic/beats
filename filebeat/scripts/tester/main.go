@@ -31,8 +31,8 @@ import (
 
 	"github.com/elastic/beats/filebeat/reader"
 	"github.com/elastic/beats/filebeat/reader/multiline"
-	"github.com/elastic/beats/filebeat/reader/readline"
-	"github.com/elastic/beats/filebeat/reader/readline/encoding"
+	"github.com/elastic/beats/filebeat/reader/readfile"
+	"github.com/elastic/beats/filebeat/reader/readfile/encoding"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 )
@@ -133,12 +133,12 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 	}
 
 	var r reader.Reader
-	r, err = readline.NewEncodeReader(f, enc, 4096)
+	r, err = readfile.NewEncodeReader(f, enc, 4096)
 	if err != nil {
 		return nil, err
 	}
 
-	r = readline.NewStripNewline(r)
+	r = readfile.NewStripNewline(r)
 
 	if conf.multiPattern != "" {
 		p, err := match.Compile(conf.multiPattern)
@@ -156,7 +156,7 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 			return nil, err
 		}
 	}
-	r = readline.NewLimitReader(r, conf.maxBytes)
+	r = readfile.NewLimitReader(r, conf.maxBytes)
 
 	var logs []string
 	for {
