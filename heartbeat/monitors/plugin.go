@@ -17,25 +17,9 @@
 
 package monitors
 
-// type monitorPlugin struct {
-// 	name    string
-// 	typ     Type
-// 	builder ActiveBuilder
-// }
+import "github.com/elastic/beats/libbeat/feature"
 
-// var pluginKey = "heartbeat.monitor"
-
-// func ActivePlugin(name string, b ActiveBuilder) map[string][]interface{} {
-// 	return plugin.MakePlugin(pluginKey, monitorPlugin{name, ActiveMonitor, b})
-// }
-
-// func init() {
-// 	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
-// 		p, ok := ifc.(monitorPlugin)
-// 		if !ok {
-// 			return errors.New("plugin does not match monitor plugin type")
-// 		}
-
-// 		return Registry.Register(p.name, p.typ, p.builder)
-// 	})
-// }
+// ActivePlugin return a new plugin active monitor
+func ActivePlugin(name string, builder ActiveBuilder) *feature.Feature {
+	return ActiveFeature(name, builder, feature.NewDetails(name, "", feature.Undefined))
+}
