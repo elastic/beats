@@ -2,7 +2,7 @@ BEAT_NAME?=beatless
 BEAT_TITLE?=Beatless
 SYSTEM_TESTS?=true
 BEAT_PATH?=github.com/elastic/beats/x-pack/${BEAT_NAME}
-TEST_ENVIRONMENT?=true
+TEST_ENVIRONMENT?=false
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 ES_BEATS?=../../
 FIELDS_FILE_PATH=module
