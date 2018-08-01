@@ -19,21 +19,36 @@ package add_kubernetes_metadata
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	kubernetes "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 )
 
-func init() {
-	// Register default indexers
-	cfg := common.NewConfig()
+// Feature expose add_kubernetes_metadata feature and overwrite the default set of configs.
+var Feature = feature.MustBundle(
+	kubernetes.IndexerFeature(
+		kubernetes.IPPortIndexerName,
+		kubernetes.NewIPPortIndexer,
+		true, nil,
+		feature.NewDetails(
+			"IP and Port matcher",
+			"Match data using the IP and Port.",
+			feature.Stable,
+		)),
+	kubernetes.MatcherFeature(
+		kubernetes.FieldFormatMatcherName,
+		kubernetes.NewFieldFormatMatcher,
+		true, mustNewFomConfig(map[string]interface{}{"format": "%{[ip]}:%{[port]}"}),
+		feature.NewDetails(
+			"Pod container Indexer",
+			"Container indexer.",
+			feature.Stable,
+		)),
+)
 
-	//Add IP Port Indexer as a default indexer
-	kubernetes.Indexing.AddDefaultIndexerConfig(kubernetes.IPPortIndexerName, *cfg)
-
-	formatCfg, err := common.NewConfigFrom(map[string]interface{}{
-		"format": "%{[ip]}:%{[port]}",
-	})
-	if err == nil {
-		//Add field matcher with field to lookup as metricset.host
-		kubernetes.Indexing.AddDefaultMatcherConfig(kubernetes.FieldFormatMatcherName, *formatCfg)
+func mustNewFomConfig(m map[string]interface{}) *common.Config {
+	c, err := common.NewConfigFrom(m)
+	if err != nil {
+		panic(err)
 	}
+	return c
 }
