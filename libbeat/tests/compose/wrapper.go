@@ -67,8 +67,9 @@ func (d *wrapperDriver) LockFile() string {
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
 	var args []string
+	args = append(args, "--project-name", d.Name)
 	for _, f := range d.Files {
-		args = append(args, "-f", f)
+		args = append(args, "--file", f)
 	}
 	args = append(args, command)
 	args = append(args, arg...)
