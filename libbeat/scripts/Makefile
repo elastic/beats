@@ -360,13 +360,17 @@ docs:  ## @build Builds the documents for the beat
 docs-preview:  ## @build Preview the documents for the beat in the browser
 	PREVIEW=1 $(MAKE) docs
 
-### KIBANA FILES HANDLING ###
+### SETUP commands ###
 ES_URL?=http://localhost:9200
 KIBANA_URL?=http://localhost:5601
 
 .PHONY: import-dashboards
 import-dashboards: update ${BEAT_NAME}
 	${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME} setup -E setup.dashboards.directory=${PWD}/_meta/kibana.generated -E setup.kibana.host=${KIBANA_URL} --dashboards
+
+.PHONY: register-pipelines
+register-pipelines: update ${BEAT_NAME}
+	${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME} setup --pipelines
 
 ### CONTAINER ENVIRONMENT ####
 
