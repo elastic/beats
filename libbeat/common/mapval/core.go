@@ -18,6 +18,7 @@
 package mapval
 
 import (
+	"reflect"
 	"sort"
 	"strings"
 
@@ -36,10 +37,13 @@ func Optional(id IsDef) IsDef {
 	return id
 }
 
-// Map is the type used to define schema definitions for Schema.
+// Map is the type used to define schema definitions for Compile.
 type Map map[string]interface{}
 
-// Validator is the result of Schema and is run against the map you'd like to test.
+// Slice is a convenience []interface{} used to declare schema defs.
+type Slice []interface{}
+
+// Validator is the result of Compile and is run against the map you'd like to test.
 type Validator func(common.MapStr) *Results
 
 // Compose combines multiple SchemaValidators into a single one.
@@ -52,7 +56,7 @@ func Compose(validators ...Validator) Validator {
 
 		combined := NewResults()
 		for _, r := range results {
-			r.EachResult(func(path string, vr ValueResult) bool {
+			r.EachResult(func(path Path, vr ValueResult) bool {
 				combined.record(path, vr)
 				return true
 			})
@@ -83,61 +87,63 @@ func Strict(laxValidator Validator) Validator {
 		}
 		sort.Strings(validatedPaths)
 
-		walk(actual, func(woi walkObserverInfo) {
-			_, validatedExactly := results.Fields[woi.dottedPath]
+		walk(actual, false, func(woi walkObserverInfo) error {
+			_, validatedExactly := results.Fields[woi.path.String()]
 			if validatedExactly {
-				return // This key was tested, passes strict test
+				return nil // This key was tested, passes strict test
 			}
 
 			// Search returns the point just before an actual match (since we ruled out an exact match with the cheaper
 			// hash check above. We have to validate the actual match with a prefix check as well
-			matchIdx := sort.SearchStrings(validatedPaths, woi.dottedPath)
-			if matchIdx < len(validatedPaths) && strings.HasPrefix(validatedPaths[matchIdx], woi.dottedPath) {
-				return
+			matchIdx := sort.SearchStrings(validatedPaths, woi.path.String())
+			if matchIdx < len(validatedPaths) && strings.HasPrefix(validatedPaths[matchIdx], woi.path.String()) {
+				return nil
 			}
 
-			results.record(woi.dottedPath, StrictFailureVR)
+			results.merge(StrictFailureResult(woi.path))
+
+			return nil
 		})
 
 		return results
 	}
 }
 
-// Schema takes a Map and returns an executable Validator function.
-func Schema(expected Map) Validator {
+// Compile takes the given map, validates the paths within it, and returns
+// a Validator that can check real data.
+func Compile(in Map) (validator Validator, err error) {
+	compiled := make(CompiledSchema, 0)
+	err = walk(common.MapStr(in), true, func(current walkObserverInfo) error {
+
+		// Determine whether we should test this value
+		// We want to test all values except collections that contain a value
+		// If a collection contains a value, we check those 'leaf' values instead
+		rv := reflect.ValueOf(current.value)
+		kind := rv.Kind()
+		isCollection := kind == reflect.Map || kind == reflect.Slice
+		isNonEmptyCollection := isCollection && rv.Len() > 0
+
+		if !isNonEmptyCollection {
+			isDef, isIsDef := current.value.(IsDef)
+			if !isIsDef {
+				isDef = IsEqual(current.value)
+			}
+
+			compiled = append(compiled, flatValidator{current.path, isDef})
+		}
+		return nil
+	})
+
 	return func(actual common.MapStr) *Results {
-		return walkValidate(expected, actual)
-	}
+		return compiled.Check(actual)
+	}, err
 }
 
-func walkValidate(expected Map, actual common.MapStr) (results *Results) {
-	results = NewResults()
-	walk(
-		common.MapStr(expected),
-		func(expInfo walkObserverInfo) {
-
-			actualKeyExists, _ := actual.HasKey(expInfo.dottedPath)
-			actualV, _ := actual.GetValue(expInfo.dottedPath)
-
-			// If this is a definition use it, if not, check exact equality
-			isDef, isIsDef := expInfo.value.(IsDef)
-			if !isIsDef {
-				// We don't check maps for equality, we check their properties
-				// individual via our own traversal, so bail early
-				if _, isMS := actualV.(common.MapStr); isMS {
-					return
-				}
-
-				isDef = IsEqual(expInfo.value)
-			}
-
-			if !isDef.optional || isDef.optional && actualKeyExists {
-				results.record(
-					expInfo.dottedPath,
-					isDef.check(actualV, actualKeyExists),
-				)
-			}
-		})
-
-	return results
+// MustCompile compiles the given map, panic-ing if that map is invalid.
+func MustCompile(in Map) Validator {
+	compiled, err := Compile(in)
+	if err != nil {
+		panic(err)
+	}
+	return compiled
 }
