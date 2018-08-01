@@ -40,6 +40,7 @@ func Start(cfg *common.Config) {
 		mux := http.NewServeMux()
 
 		// register handlers
+		// TODO: make these dynamic based on namespaces
 		mux.HandleFunc("/", rootHandler())
 		mux.HandleFunc("/state", stateHandler)
 		mux.HandleFunc("/stats", statsHandler)

@@ -19,9 +19,11 @@ package elasticsearch
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"math/rand"
 	"net/url"
+	"reflect"
 	"strings"
 	"time"
 
@@ -197,10 +199,21 @@ func (r *reporter) initLoop(c config) {
 
 	logp.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
-	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", "state", c.StatePeriod)
-	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod)
+	// TODO: Can we avoid the reflection here?
+	s := reflect.ValueOf(&c).Elem()
+	namespaces := monitoring.GetNamespaces()
+	for name, namespace := range namespaces.GetAll() {
+		prefix := namespace.GetPrefix()
+		periodConfigKey := namespace.GetPeriodConfigKey()
+
+		f := s.FieldByName(periodConfigKey)
+		fmt.Println(periodConfigKey, s, f)
+
+		period := f.Interface().(time.Duration)
+
+		// Start collector and send loop if monitoring endpoint has been found.
+		go r.snapshotLoop(name, prefix, period)
+	}
 }
 
 func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) {
