@@ -335,9 +335,11 @@ ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && ec
 	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME) 
 endif
 
+ifneq ($(shell [[ $(BEAT_NAME) == libbeat ]] && echo true ),true)
 	@# Update docs
 	@mkdir -p docs
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_TITLE} ${ES_BEATS}
+endif
 
 	@mkdir -p $(PWD)/_meta/kibana.generated
 	@# Generate Kibana index pattern and copy dashboard files
