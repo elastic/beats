@@ -17,14 +17,25 @@
 
 package monitoring
 
-import "sync"
+import (
+	"strings"
+	"sync"
+)
 
 var namespaces = NewNamespaces()
 
+// GetNamespaces returns the list of namespaces
+func GetNamespaces() *Namespaces {
+	return namespaces
+}
+
 // Namespace contains the name of the namespace and it's registry
 type Namespace struct {
-	name     string
-	registry *Registry
+	name            string
+	registry        *Registry
+	enableReporting bool
+	prefix          string // Defaults to namespace name
+	periodConfigKey string // Defaults to title-cased prefix + "Period"
 }
 
 func newNamespace(name string) *Namespace {
@@ -53,6 +64,49 @@ func (n *Namespace) GetRegistry() *Registry {
 	return n.registry
 }
 
+// EnableReporting enables reporting this namespace to monitoring
+func (n *Namespace) EnableReporting() {
+	n.enableReporting = true
+}
+
+// DisableReporting disables reporting this namespace to monitoring
+func (n *Namespace) DisableReporting() {
+	n.enableReporting = false
+}
+
+// IsReportingEnabled returns whether this namespace will be reported to monitoring or not
+func (n *Namespace) IsReportingEnabled() bool {
+	return n.enableReporting
+}
+
+// SetPrefix sets the prefix for the namespace, to be used in monitoring documents
+func (n *Namespace) SetPrefix(prefix string) {
+	n.prefix = prefix
+}
+
+// GetPrefix returns the prefix for the namespace
+func (n *Namespace) GetPrefix() string {
+	if n.prefix != "" {
+		return n.prefix
+	}
+
+	return n.name
+}
+
+// SetPeriodConfigKey sets the name of the configuration key that determines the reporting period for the namespace
+func (n *Namespace) SetPeriodConfigKey(periodConfigKey string) {
+	n.periodConfigKey = periodConfigKey
+}
+
+// GetPeriodConfigKey returns the period configuration key for the namespace
+func (n *Namespace) GetPeriodConfigKey() string {
+	if n.periodConfigKey != "" {
+		return n.periodConfigKey
+	}
+
+	return strings.Title(n.GetPrefix()) + "Period"
+}
+
 // Namespaces is a list of Namespace structs
 type Namespaces struct {
 	sync.Mutex
@@ -76,4 +130,9 @@ func (n *Namespaces) Get(key string) *Namespace {
 
 	n.namespaces[key] = newNamespace(key)
 	return n.namespaces[key]
+}
+
+// GetAll returns all namespaces and their names
+func (n *Namespaces) GetAll() map[string]*Namespace {
+	return n.namespaces
 }
