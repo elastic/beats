@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package readline
+package readfile
 
 import (
 	"github.com/elastic/beats/filebeat/reader"

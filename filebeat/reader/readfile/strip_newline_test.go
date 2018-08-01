@@ -17,7 +17,7 @@
 
 // +build !integration
 
-package readline
+package readfile
 
 import (
 	"testing"

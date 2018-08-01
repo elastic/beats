@@ -17,7 +17,7 @@
 
 // +build !integration
 
-package readline
+package readfile
 
 import (
 	"bytes"
@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/transform"
 
-	"github.com/elastic/beats/filebeat/reader/readline/encoding"
+	"github.com/elastic/beats/filebeat/reader/readfile/encoding"
 )
 
 // Sample texts are from http://www.columbia.edu/~kermit/utf8.html
