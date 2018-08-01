@@ -28,7 +28,7 @@ var fakeModuleFactory = func(b BaseModule) (Module, error) { return nil, nil }
 var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil, nil }
 
 // func TestAddModuleEmptyName(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	err := registry.AddModule("", fakeModuleFactory)
 // 	if assert.Error(t, err) {
 // 		assert.Equal(t, "module name is required", err.Error())
@@ -36,7 +36,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestAddModuleNilFactory(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	err := registry.AddModule(moduleName, nil)
 // 	if assert.Error(t, err) {
 // 		assert.Equal(t, "module 'mymodule' cannot be registered with a nil factory", err.Error())
@@ -44,7 +44,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestAddModuleDuplicateName(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	err := registry.AddModule(moduleName, fakeModuleFactory)
 // 	if err != nil {
 // 		t.Fatal(err)
@@ -57,7 +57,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestAddModule(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	err := registry.AddModule(moduleName, fakeModuleFactory)
 // 	if err != nil {
 // 		t.Fatal(err)
@@ -68,7 +68,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestAddMetricSetEmptyModuleName(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	err := registry.AddMetricSet("", metricSetName, fakeMetricSetFactory)
 // 	if assert.Error(t, err) {
 // 		assert.Equal(t, "module name is required", err.Error())
@@ -76,7 +76,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestAddMetricSetEmptyName(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	err := registry.AddMetricSet(moduleName, "", fakeMetricSetFactory)
 // 	if assert.Error(t, err) {
 // 		assert.Equal(t, "metricset name is required", err.Error())
@@ -84,7 +84,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestAddMetricSetNilFactory(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	err := registry.AddMetricSet(moduleName, metricSetName, nil)
 // 	if assert.Error(t, err) {
 // 		assert.Equal(t, "metricset 'mymodule/mymetricset' cannot be registered with a nil factory", err.Error())
@@ -92,7 +92,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestAddMetricSetDuplicateName(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
 // 	if err != nil {
 // 		t.Fatal(err)
@@ -105,7 +105,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestAddMetricSet(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
 // 	if err != nil {
 // 		t.Fatal(err)
@@ -116,7 +116,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestModuleFactory(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	registry.modules[moduleName] = fakeModuleFactory
 
 // 	module := registry.moduleFactory(moduleName)
@@ -124,14 +124,14 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestModuleFactoryUnknownModule(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	module := registry.moduleFactory("unknown")
 // 	assert.Nil(t, module)
 // }
 
 // func TestMetricSetFactory(t *testing.T) {
 // 	t.Run("without HostParser", func(t *testing.T) {
-// 		registry := NewRegister()
+// 		registry := NewRegister(feature.NewRegistry())
 // 		err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
 // 		if err != nil {
 // 			t.Fatal(err)
@@ -149,7 +149,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // 	})
 
 // 	t.Run("with HostParser", func(t *testing.T) {
-// 		registry := NewRegister()
+// 		registry := NewRegister(feature.NewRegistry())
 // 		hostParser := func(Module, string) (HostData, error) { return HostData{}, nil }
 // 		err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory, hostParser)
 // 		if err != nil {
@@ -164,7 +164,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // 	})
 
 // 	t.Run("with options HostParser", func(t *testing.T) {
-// 		registry := NewRegister()
+// 		registry := NewRegister(feature.NewRegistry())
 // 		hostParser := func(Module, string) (HostData, error) { return HostData{}, nil }
 // 		err := registry.addMetricSet(moduleName, metricSetName, fakeMetricSetFactory, WithHostParser(hostParser))
 // 		if err != nil {
@@ -181,7 +181,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // 	t.Run("with namespace", func(t *testing.T) {
 // 		const ns = moduleName + "foo.bar"
 
-// 		registry := NewRegister()
+// 		registry := NewRegister(feature.NewRegistry())
 // 		err := registry.addMetricSet(moduleName, metricSetName, fakeMetricSetFactory, WithNamespace(ns))
 // 		if err != nil {
 // 			t.Fatal(err)
@@ -200,7 +200,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestDefaultMetricSet(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	err := registry.addMetricSet(moduleName, metricSetName, fakeMetricSetFactory, DefaultMetricSet())
 // 	if err != nil {
 // 		t.Fatal(err)
@@ -214,7 +214,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestMetricSetQuery(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
 // 	if err != nil {
 // 		t.Fatal(err)
@@ -229,7 +229,7 @@ var fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return nil
 // }
 
 // func TestModuleQuery(t *testing.T) {
-// 	registry := NewRegister()
+// 	registry := NewRegister(feature.NewRegistry())
 // 	registry.modules[moduleName] = fakeModuleFactory
 
 // 	modules := registry.Modules()
