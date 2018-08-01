@@ -49,7 +49,8 @@
         },
         {
             "remove": {
-                "field": "traefik.access.agent"
+                "field": "traefik.access.agent",
+                "target_field": "traefik.access.user_agent_raw"
             }
         },
         {
