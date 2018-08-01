@@ -15,41 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package readline
+package readfile
 
 import (
-	"io"
-	"time"
-
 	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/filebeat/reader/readline/encoding"
 )
 
-// Reader produces lines by reading lines from an io.Reader
-// through a decoder converting the reader it's encoding to utf-8.
-type EncoderReader struct {
-	reader *LineReader
+// Reader sets an upper limited on line length. Lines longer
+// then the max configured line length will be snapped short.
+type LimitReader struct {
+	reader   reader.Reader
+	maxBytes int
 }
 
-// New creates a new Encode reader from input reader by applying
-// the given codec.
-func NewEncodeReader(
-	r io.Reader,
-	codec encoding.Encoding,
-	bufferSize int,
-) (EncoderReader, error) {
-	eReader, err := NewLineReader(r, codec, bufferSize)
-	return EncoderReader{eReader}, err
+// New creates a new reader limiting the line length.
+func NewLimitReader(r reader.Reader, maxBytes int) *LimitReader {
+	return &LimitReader{reader: r, maxBytes: maxBytes}
 }
 
-// Next reads the next line from it's initial io.Reader
-// This converts a io.Reader to a reader.reader
-func (r EncoderReader) Next() (reader.Message, error) {
-	c, sz, err := r.reader.Next()
-	// Creating message object
-	return reader.Message{
-		Ts:      time.Now(),
-		Content: c,
-		Bytes:   sz,
-	}, err
+// Next returns the next line.
+func (r *LimitReader) Next() (reader.Message, error) {
+	message, err := r.reader.Next()
+	if len(message.Content) > r.maxBytes {
+		message.Content = message.Content[:r.maxBytes]
+	}
+	return message, err
 }

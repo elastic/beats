@@ -31,7 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/filebeat/reader/readline/encoding"
+	"github.com/elastic/beats/filebeat/reader/readfile/encoding"
 	"github.com/elastic/beats/libbeat/common"
 )
 
