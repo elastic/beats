@@ -39,14 +39,11 @@ const (
 	statsPath = "api/stats"
 )
 
-// make Kibana fetch the cluster_uuid and return usage data in the same format as expected by Monitoring
-const queryParams = "extended=true"
-
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
 		DefaultPath:   statsPath,
-		QueryParams:   queryParams,
+		QueryParams:   "extended=true", // make Kibana fetch the cluster_uuid
 	}.Build()
 )
 

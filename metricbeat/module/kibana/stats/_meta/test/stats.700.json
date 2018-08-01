@@ -9,33 +9,33 @@
       "snapshot":false,
       "status":"green"
     },
-    "last_updated":"2018-07-31T23:26:21.525Z",
+    "last_updated":"2018-07-18T00:32:00.948Z",
     "collection_interval_ms":5000,
     "process":{
       "memory":{
         "heap":{
-          "total_bytes":281325568,
-          "used_bytes":204034136,
+          "total_bytes":223391744,
+          "used_bytes":198413592,
           "size_limit":1501560832
         },
-        "resident_set_size_bytes":260308992
+        "resident_set_size_bytes":347242496
       },
-      "event_loop_delay":0.34590399265289307,
-      "pid":33785,
-      "uptime_ms":304874
+      "event_loop_delay":0.25226891040802,
+      "pid":46426,
+      "uptime_ms":1753889
     },
     "os":{
       "load":{
-        "1m":3.37841796875,
-        "5m":3.22314453125,
-        "15m":2.9501953125
+        "1m":3.50634765625,
+        "5m":3.76904296875,
+        "15m":3.54833984375
       },
       "memory":{
         "total_bytes":17179869184,
-        "free_bytes":759586816,
-        "used_bytes":16420282368
+        "free_bytes":31711232,
+        "used_bytes":17148157952
       },
-      "uptime_ms":1135312000
+      "uptime_ms":2187246000
     },
     "response_times":{
       "max_ms":0
@@ -47,7 +47,7 @@
 
       }
     },
-    "concurrent_connections":6,
+    "concurrent_connections":3,
     "usage":{
       "kibana":{
         "index":".kibana",
@@ -61,7 +61,7 @@
           "total":0
         },
         "index_pattern":{
-          "total":1
+          "total":0
         },
         "graph_workspace":{
           "total":0
@@ -140,5 +140,5 @@
         }
       }
     },
-    "cluster_uuid":"cCe7_34NRpuCug1ZX1l3ug"
+    "cluster_uuid":"NkfU5AinRnyFnqBD36zhEw"
   }
