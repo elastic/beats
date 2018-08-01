@@ -19,17 +19,39 @@ package monitors
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 )
 
-type Factory func(*common.Config) ([]Job, error)
+// Type of Monitor used by Heartbeat, currently only supporting ActiveMonitor.
+//go:generate stringer -type=Type -linecomment=true
+type Type uint8
 
-type ActiveBuilder func(Info, *common.Config) ([]Job, error)
+// Namespace return the registry namespace for the current monitor type.
+func (t Type) Namespace() string {
+	return fmt.Sprintf("heartbeat.%s", strings.ToLower(t.String()))
+}
 
+// Type of supported monitor.
+const (
+	ActiveMonitor Type = iota + 1
+)
+
+type entry struct {
+	info    Info
+	builder ActiveBuilder
+}
+
+// Info contains the generatl information about a monitor.
+type Info struct {
+	Name string
+	Type Type
+}
+
+// Job interface is the interface that a monitor need to implements to be executed by the scheduler.
 type Job interface {
 	Name() string
 	Run() (beat.Event, []JobRunner, error)
@@ -41,91 +63,75 @@ type TaskRunner interface {
 	Run() (common.MapStr, []TaskRunner, error)
 }
 
-type Type uint8
+// ActiveBuilder is the factory signature to create a new active monitor.
+type ActiveBuilder func(Info, *common.Config) ([]Job, error)
 
-type Info struct {
-	Name string
-	Type Type
-}
+// Factory is the type returning by the find factory linking the ActiveBuilder and returning the jobs
+// that need to be executed by the scheduler.
+type Factory func(*common.Config) ([]Job, error)
 
-const (
-	ActiveMonitor Type = iota + 1
-	PassiveMonitor
-)
-
-var Registry = newRegistrar()
-
-type Registrar struct {
-	modules map[string]entry
-}
-
-type entry struct {
-	info    Info
-	builder ActiveBuilder
-}
-
-func newRegistrar() *Registrar {
-	return &Registrar{
-		modules: map[string]entry{},
+// ActiveFeature creates a new Active monitor.
+func ActiveFeature(name string, factory ActiveBuilder, description feature.Describer) *feature.Feature {
+	entry := entry{
+		info: Info{
+			Name: name,
+			Type: ActiveMonitor,
+		},
+		builder: factory,
 	}
+	return feature.New(ActiveMonitor.Namespace(), name, entry, description)
 }
 
+// RegisterActive is a backward compatible shim to make the old api work with the new global registry.
 func RegisterActive(name string, builder ActiveBuilder) {
-	if err := Registry.AddActive(name, builder); err != nil {
-		panic(err)
+	f := ActiveFeature(name, builder, feature.NewDetails(name, "", feature.Undefined))
+	feature.MustRegister(f)
+}
+
+// Registry wraps the global registry.
+var Registry = newRegistrar(feature.Registry)
+
+// Registrar wrapper around the registry.
+type Registrar struct {
+	registry *feature.FeatureRegistry
+}
+
+func newRegistrar(registry *feature.FeatureRegistry) *Registrar {
+	return &Registrar{registry: registry}
+}
+
+// GetFactory return an monitor for the request type and name or an error.
+func (r *Registrar) GetFactory(name string) (Factory, error) {
+	e, err := r.getEntry(name)
+	if err != nil {
+		return nil, err
 	}
+	return e.Create, nil
 }
 
-func (r *Registrar) Register(name string, t Type, builder ActiveBuilder) error {
-	if _, found := r.modules[name]; found {
-		return fmt.Errorf("monitor type %v already exists", name)
+// Query returns general information about a monitor.
+func (r *Registrar) Query(name string) (*Info, error) {
+	e, err := r.getEntry(name)
+	if err != nil {
+		return nil, err
+	}
+	return &e.info, nil
+}
+
+func (r *Registrar) getEntry(name string) (*entry, error) {
+	f, err := r.registry.Lookup(ActiveMonitor.Namespace(), name)
+	if err != nil {
+		return nil, err
 	}
 
-	info := Info{Name: name, Type: t}
-	r.modules[name] = entry{info: info, builder: builder}
-
-	return nil
-}
-
-func (r *Registrar) Query(name string) (Info, bool) {
-	e, found := r.modules[name]
-	return e.info, found
-}
-
-func (r *Registrar) GetFactory(name string) Factory {
-	e, found := r.modules[name]
-	if !found {
-		return nil
+	e, ok := f.Factory().(entry)
+	if !ok {
+		return nil, fmt.Errorf("incompatible type for %s, expect entry, received: %T", name, f)
 	}
-	return e.Create
-}
 
-func (r *Registrar) AddActive(name string, builder ActiveBuilder) error {
-	return r.Register(name, ActiveMonitor, builder)
-}
-
-func (r *Registrar) String() string {
-	var monitors []string
-	for m := range r.modules {
-		monitors = append(monitors, m)
-	}
-	sort.Strings(monitors)
-
-	return fmt.Sprintf("Registry, monitors: %v",
-		strings.Join(monitors, ", "))
+	return &e, nil
 }
 
 func (e *entry) Create(cfg *common.Config) ([]Job, error) {
 	return e.builder(e.info, cfg)
-}
-
-func (t Type) String() string {
-	switch t {
-	case ActiveMonitor:
-		return "active"
-	case PassiveMonitor:
-		return "passive"
-	default:
-		return "unknown type"
-	}
 }

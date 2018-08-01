@@ -17,31 +17,25 @@
 
 package monitors
 
-import (
-	"errors"
+// type monitorPlugin struct {
+// 	name    string
+// 	typ     Type
+// 	builder ActiveBuilder
+// }
 
-	"github.com/elastic/beats/libbeat/plugin"
-)
+// var pluginKey = "heartbeat.monitor"
 
-type monitorPlugin struct {
-	name    string
-	typ     Type
-	builder ActiveBuilder
-}
+// func ActivePlugin(name string, b ActiveBuilder) map[string][]interface{} {
+// 	return plugin.MakePlugin(pluginKey, monitorPlugin{name, ActiveMonitor, b})
+// }
 
-var pluginKey = "heartbeat.monitor"
+// func init() {
+// 	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+// 		p, ok := ifc.(monitorPlugin)
+// 		if !ok {
+// 			return errors.New("plugin does not match monitor plugin type")
+// 		}
 
-func ActivePlugin(name string, b ActiveBuilder) map[string][]interface{} {
-	return plugin.MakePlugin(pluginKey, monitorPlugin{name, ActiveMonitor, b})
-}
-
-func init() {
-	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
-		p, ok := ifc.(monitorPlugin)
-		if !ok {
-			return errors.New("plugin does not match monitor plugin type")
-		}
-
-		return Registry.Register(p.name, p.typ, p.builder)
-	})
-}
+// 		return Registry.Register(p.name, p.typ, p.builder)
+// 	})
+// }

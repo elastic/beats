@@ -118,15 +118,15 @@ func newMonitorManager(
 			continue
 		}
 
-		info, found := registry.Query(plugin.Type)
-		if !found {
-			return nil, fmt.Errorf("Monitor type '%v' does not exist", plugin.Type)
+		info, err := registry.Query(plugin.Type)
+		if err != nil {
+			return nil, fmt.Errorf("cannot retrieve the monitor: %s, error: %s", plugin.Type, err)
 		}
 		logp.Info("Select (%v) monitor %v", info.Type, info.Name)
 
-		factory := registry.GetFactory(plugin.Type)
-		if factory == nil {
-			return nil, fmt.Errorf("Found non-runnable monitor %v", plugin.Type)
+		factory, err := registry.GetFactory(plugin.Type)
+		if err != nil {
+			return nil, fmt.Errorf("cannot create the plugin builder, error: %s", err)
 		}
 
 		m.monitors = append(m.monitors, monitor{
