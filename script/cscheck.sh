@@ -5,6 +5,7 @@ if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
 fi
 
 go get github.com/ewgRa/gocsfixer/cmd/gocsfixer
+go get github.com/ewgRa/gocsfixer/cmd/github_comments_compile
 go get github.com/ewgRa/ci-utils/cmd/diff_liner
 go get github.com/ewgRa/ci-utils/cmd/github_comments_diff
 
@@ -20,7 +21,7 @@ fi
 curl -sH "Accept: application/vnd.github.v3.diff.json" https://api.github.com/repos/$TRAVIS_REPO_SLUG/pulls/$TRAVIS_PULL_REQUEST > /tmp/pr.diff
 cat /tmp/pr.diff | diff_liner > /tmp/pr_liner.json
 
-go run script/csfixer/main.go -pr-liner /tmp/pr_liner.json -csfixer-comments /tmp/gocsfixer.json > /tmp/comments.json
+github_comments_compile -pr-liner /tmp/pr_liner.json -csfixer-comments /tmp/gocsfixer.json > /tmp/comments.json
 
 cat /tmp/comments.json
 
