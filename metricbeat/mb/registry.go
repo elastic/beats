@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Namespaces for metricbeat modules and their metricsets.
+// Namespace features namespace for metricbeat modules and their metricsets.
 var (
 	ModuleNamespace    = "metricbeat.module"
 	MetricSetNamespace = "metricbeat.metricset"
@@ -117,8 +117,8 @@ func NewRegister(registry *feature.FeatureRegistry) *Register {
 // AddModule registers a new ModuleFactory. An error is returned if the
 // name is empty, factory is nil, or if a factory has already been registered
 // under the name.
-func (r *Register) AddModule(name string, factory ModuleFactory) error {
-	f := feature.New(ModuleNamespace, name, factory, feature.NewDetails(name, "", feature.Undefined))
+func (r *Register) AddModule(name string, mf ModuleFactory) error {
+	f := feature.New(ModuleNamespace, name, mf, feature.NewDetails(name, "", feature.Undefined))
 	err := r.registry.Register(f)
 	if err != nil {
 		return err
@@ -158,6 +158,10 @@ func (r *Register) namespace(module string) string {
 // parameter is empty or nil or if a factory has already been registered under
 // the name.
 func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, options ...MetricSetOption) error {
+	if module == "" {
+		return fmt.Errorf("module name is required")
+	}
+
 	if factory == nil {
 		return fmt.Errorf("metricset '%s/%s' cannot be registered with a nil factory", module, name)
 	}

@@ -57,6 +57,10 @@ func (r *FeatureRegistry) Register(feature Featurable) error {
 	ns := normalize(feature.Namespace())
 	name := normalize(feature.Name())
 
+	if feature.Name() == "" {
+		return fmt.Errorf("feature '%s' cannot be registered with an empty name ", name)
+	}
+
 	if feature.Factory() == nil {
 		return fmt.Errorf("feature '%s' cannot be registered with a nil factory", name)
 	}
@@ -149,7 +153,7 @@ func (r *FeatureRegistry) LookupAll(namespace string) ([]Featurable, error) {
 
 	v, found := r.namespaces[ns]
 	if !found {
-		return nil, fmt.Errorf("unknown namespace named '%s'", ns)
+		return []Featurable{}, fmt.Errorf("unknown namespace named '%s'", ns)
 	}
 
 	list := make([]Featurable, len(v))
