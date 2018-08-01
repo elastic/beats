@@ -57,6 +57,10 @@ func (r *FeatureRegistry) Register(feature Featurable) error {
 	ns := normalize(feature.Namespace())
 	name := normalize(feature.Name())
 
+	if feature.Namespace() == "" {
+		return fmt.Errorf("feature '%s' cannot be registered with an empty namespace", name)
+	}
+
 	if feature.Name() == "" {
 		return fmt.Errorf("feature '%s' cannot be registered with an empty name ", name)
 	}
