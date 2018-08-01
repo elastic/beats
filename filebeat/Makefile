@@ -35,10 +35,11 @@ collect-docs: python-env
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/filebeat/scripts/docs_collector.py --beat ${BEAT_NAME}
 
 # Generate imports for prospectors
-.PHONY: imports
-imports: python-env
-	@mkdir -p include
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
+# Disabled until the move to feature is complete.
+# .PHONY: imports
+# imports: python-env
+# 	@mkdir -p include
+# 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
