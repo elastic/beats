@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package strip_newline
+package readfile
 
 import (
 	"github.com/elastic/beats/filebeat/reader"
@@ -28,7 +28,7 @@ type StripNewline struct {
 }
 
 // New creates a new line reader stripping the last tailing newline.
-func New(r reader.Reader) *StripNewline {
+func NewStripNewline(r reader.Reader) *StripNewline {
 	return &StripNewline{r}
 }
 

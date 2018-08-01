@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package timeout
+package readfile
 
 import (
 	"errors"
@@ -30,7 +30,7 @@ var (
 
 // timeoutProcessor will signal some configurable timeout error if no
 // new line can be returned in time.
-type Reader struct {
+type TimeoutReader struct {
 	reader  reader.Reader
 	timeout time.Duration
 	signal  error
@@ -44,12 +44,12 @@ type lineMessage struct {
 }
 
 // New returns a new timeout reader from an input line reader.
-func New(reader reader.Reader, signal error, t time.Duration) *Reader {
+func NewTimeoutReader(reader reader.Reader, signal error, t time.Duration) *TimeoutReader {
 	if signal == nil {
 		signal = errTimeout
 	}
 
-	return &Reader{
+	return &TimeoutReader{
 		reader:  reader,
 		signal:  signal,
 		timeout: t,
@@ -62,7 +62,7 @@ func New(reader reader.Reader, signal error, t time.Duration) *Reader {
 // For handline timeouts a goroutine is started for reading lines from
 // configured line reader. Only when underlying reader returns an error, the
 // goroutine will be finished.
-func (r *Reader) Next() (reader.Message, error) {
+func (r *TimeoutReader) Next() (reader.Message, error) {
 	if !r.running {
 		r.running = true
 		go func() {

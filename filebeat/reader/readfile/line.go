@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package line
+package readfile
 
 import (
 	"io"
@@ -30,7 +30,7 @@ import (
 // lineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
-type Reader struct {
+type LineReader struct {
 	reader     io.Reader
 	codec      encoding.Encoding
 	bufferSize int
@@ -43,7 +43,7 @@ type Reader struct {
 }
 
 // New creates a new reader object
-func New(input io.Reader, codec encoding.Encoding, bufferSize int) (*Reader, error) {
+func NewLineReader(input io.Reader, codec encoding.Encoding, bufferSize int) (*LineReader, error) {
 	encoder := codec.NewEncoder()
 
 	// Create newline char based on encoding
@@ -52,7 +52,7 @@ func New(input io.Reader, codec encoding.Encoding, bufferSize int) (*Reader, err
 		return nil, err
 	}
 
-	return &Reader{
+	return &LineReader{
 		reader:     input,
 		codec:      codec,
 		bufferSize: bufferSize,
@@ -64,7 +64,7 @@ func New(input io.Reader, codec encoding.Encoding, bufferSize int) (*Reader, err
 }
 
 // Next reads the next line until the new line character
-func (r *Reader) Next() ([]byte, int, error) {
+func (r *LineReader) Next() ([]byte, int, error) {
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
 	for {
@@ -108,7 +108,7 @@ func (r *Reader) Next() ([]byte, int, error) {
 
 // Reads from the buffer until a new line character is detected
 // Returns an error otherwise
-func (r *Reader) advance() error {
+func (r *LineReader) advance() error {
 	// Initial check if buffer has already a newLine character
 	idx := r.inBuffer.IndexFrom(r.inOffset, r.nl)
 
@@ -163,7 +163,7 @@ func (r *Reader) advance() error {
 	return err
 }
 
-func (r *Reader) decode(end int) (int, error) {
+func (r *LineReader) decode(end int) (int, error) {
 	var err error
 	buffer := make([]byte, 1024)
 	inBytes := r.inBuffer.Bytes()
