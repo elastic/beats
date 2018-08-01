@@ -11,4 +11,5 @@ package config
 type Config struct {
 }
 
+// DefaultConfig is the default configuration for Beatless.
 var DefaultConfig = Config{}
