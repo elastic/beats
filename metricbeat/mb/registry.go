@@ -19,13 +19,18 @@ package mb
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Namespace features namespace for metricbeat modules.
-var Namespace = "metricbeat.module"
+// Namespaces for metricbeat modules and their metricsets.
+var (
+	ModuleNamespace    = "metricbeat.module"
+	MetricSetNamespace = "metricbeat.metricset"
+)
 
 // Registry is the singleton Register instance where all ModuleFactory's and
 // MetricSetFactory's should be registered.
@@ -58,6 +63,7 @@ type HostParser func(module Module, host string) (HostData, error)
 // a MetricSet.
 type MetricSetRegistration struct {
 	Name    string
+	Module  string
 	Factory MetricSetFactory
 
 	// Options
@@ -112,7 +118,7 @@ func NewRegister(registry *feature.FeatureRegistry) *Register {
 // name is empty, factory is nil, or if a factory has already been registered
 // under the name.
 func (r *Register) AddModule(name string, factory ModuleFactory) error {
-	f := feature.New(Namespace, name, factory, feature.NewDetails(name, "", feature.Undefined))
+	f := feature.New(ModuleNamespace, name, factory, feature.NewDetails(name, "", feature.Undefined))
 	err := r.registry.Register(f)
 	if err != nil {
 		return err
@@ -144,8 +150,8 @@ func (r *Register) MustAddMetricSet(module, name string, factory MetricSetFactor
 	}
 }
 
-func (r *Register) namespace(name string) string {
-	return Namespace + "." + name
+func (r *Register) namespace(module string) string {
+	return MetricSetNamespace + "." + module
 }
 
 // addMetricSet registers a new MetricSetFactory. An error is returned if any
@@ -157,7 +163,7 @@ func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, o
 	}
 
 	// Set the options.
-	msInfo := NewMetricSetRegistration(name, factory, options...)
+	msInfo := NewMetricSetRegistration(name, module, factory, options...)
 
 	f := feature.New(
 		r.namespace(module),
@@ -178,7 +184,7 @@ func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, o
 // moduleFactory returns the registered ModuleFactory associated with the
 // given name. It returns nil if no ModuleFactory is registered.
 func (r *Register) moduleFactory(name string) ModuleFactory {
-	f, err := r.registry.Lookup(Namespace, name)
+	f, err := r.registry.Lookup(ModuleNamespace, name)
 	if err != nil {
 		return nil
 	}
@@ -255,7 +261,7 @@ func (r *Register) DefaultMetricSets(module string) (defaults []string, err erro
 
 // Modules returns the list of module names that are registered
 func (r *Register) Modules() []string {
-	allModules, err := r.registry.LookupAll(Namespace)
+	allModules, err := r.registry.LookupAll(ModuleNamespace)
 	if err != nil {
 		return []string{}
 	}
@@ -268,12 +274,12 @@ func (r *Register) Modules() []string {
 	return modules
 }
 
-// MetricSets returns the list of MetricSets registered for a given module
-func (r *Register) MetricSets(module string) (modules []string) {
-	features := r.registry.LookupWithPrefix(r.namespace(module) + ".")
-
-	if len(features) == 0 {
-		return modules
+// MetricSets returns the list of MetricSets registered for a given module.
+// The representation should be 'metricbeat.metricsect.haproxy
+func (r *Register) MetricSets(module string) (list []string) {
+	features, err := r.registry.LookupAll(r.namespace(module))
+	if err != nil || len(features) == 0 {
+		return list
 	}
 
 	for _, feature := range features {
@@ -282,27 +288,49 @@ func (r *Register) MetricSets(module string) (modules []string) {
 			continue
 		}
 
-		modules = append(modules, ms.Name)
+		list = append(list, ms.Name)
 	}
 
-	return modules
+	return list
 }
 
 // String return a string representation of the registered ModuleFactory's and
 // MetricSetFactory's.
 func (r *Register) String() string {
-	// TODO
-	return "TODO"
+	modulesFeature, _ := r.registry.LookupAll(ModuleNamespace)
+
+	var modules []string
+	for _, module := range modulesFeature {
+		modules = append(modules, module.Name())
+	}
+	sort.Strings(modules)
+
+	var metricSets []string
+	features := r.registry.LookupWithPrefix(MetricSetNamespace + ".")
+	for _, feature := range features {
+		ms, ok := feature.Factory().(*MetricSetRegistration)
+		if !ok {
+			continue
+		}
+
+		metricSets = append(metricSets, fmt.Sprintf("%s/%s", ms.Module, ms.Name))
+	}
+
+	sort.Strings(metricSets)
+
+	return fmt.Sprintf("Register [ModuleFactory:[%s], MetricSetFactory:[%s]]",
+		strings.Join(modules, ", "), strings.Join(metricSets, ", "))
 }
 
 // NewMetricSetRegistration takes a metricset definition and transform the information into a
 // format that will be compatible with the registry.
 func NewMetricSetRegistration(
 	name string,
+	module string,
 	factory MetricSetFactory,
 	options ...MetricSetOption,
 ) *MetricSetRegistration {
-	ms := MetricSetRegistration{Name: name, Factory: factory}
+	ms := MetricSetRegistration{Name: name, Module: module, Factory: factory}
 	for _, opt := range options {
 		opt(&ms)
 	}

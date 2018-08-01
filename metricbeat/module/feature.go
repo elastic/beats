@@ -29,8 +29,9 @@ func MetricSetFeature(
 	description feature.Describer,
 	options ...mb.MetricSetOption,
 ) *feature.Feature {
-	ms := mb.NewMetricSetRegistration(name, factory, options...)
-	return feature.New(namespace(module), name, ms, description)
+	ns := mb.MetricSetNamespace + "." + module
+	ms := mb.NewMetricSetRegistration(name, module, factory, options...)
+	return feature.New(ns, name, ms, description)
 }
 
 // Feature creates a new Module feature.
@@ -39,9 +40,5 @@ func Feature(
 	factory mb.ModuleFactory,
 	description feature.Describer,
 ) *feature.Feature {
-	return feature.New(mb.Namespace, module, factory, description)
-}
-
-func namespace(module string) string {
-	return mb.Namespace + "." + module
+	return feature.New(mb.ModuleNamespace, module, factory, description)
 }
