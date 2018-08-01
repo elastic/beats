@@ -20,10 +20,11 @@ package compose
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // CreateOptions are the options when containers are created
@@ -190,15 +191,21 @@ func (c *Project) KillOld(except []string) error {
 // Lock acquires the lock (300s) timeout
 // Normally it should only be seconds that the lock is used, but in some cases it can take longer.
 func (c *Project) Lock() {
-	seconds := 300
-	for seconds > 0 {
+	timeout := time.Now().Add(300 * time.Second)
+	infoShown := false
+	for time.Now().Before(timeout) {
 		file, err := os.OpenFile(c.LockFile(), os.O_CREATE|os.O_EXCL, 0500)
 		file.Close()
 		if err != nil {
-			fmt.Println("docker-compose.yml is locked, waiting")
+			if !infoShown {
+				logp.Info("docker-compose.yml is locked, waiting")
+				infoShown = true
+			}
 			time.Sleep(1 * time.Second)
-			seconds--
 			continue
+		}
+		if infoShown {
+			logp.Info("docker-compose.yml lock acquired")
 		}
 		return
 	}
