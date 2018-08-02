@@ -53,8 +53,8 @@ Linux.
   - '(?i)\.sw[nop]$'
   - '~$'
   - '/\.git($|/)'
-   include_files:
-  - '.ssh/'
+  include_files:
+  - []
   scan_at_start: true
   scan_rate_per_sec: 50 MiB
   max_file_size: 100 MiB

@@ -86,8 +86,8 @@ auditbeat.modules:
 
   # List of regular expressions used to explicitly include files. When configured,
   # Auditbeat will ignore files unless they match a pattern.
-  include_files:
-  - '.ssh/'
+  #include_files:
+  #- '/\.ssh($|/)'
 
   # Scan over the configured file paths at startup and send events for new or
   # modified files since the last time Auditbeat was running.
