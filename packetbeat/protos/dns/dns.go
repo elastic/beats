@@ -527,11 +527,9 @@ func optToMapStr(rrOPT *mkdns.OPT) common.MapStr {
 		case *mkdns.EDNS0_NSID:
 			optMapStr["nsid"] = o.String()
 		case *mkdns.EDNS0_SUBNET:
-			var draft string
-			if o.(*mkdns.EDNS0_SUBNET).DraftOption {
-				draft = " draft"
-			}
-			optMapStr["subnet"] = o.String() + draft
+			optMapStr["subnet"] = o.String()
+		case *mkdns.EDNS0_COOKIE:
+			optMapStr["cookie"] = o.String()
 		case *mkdns.EDNS0_UL:
 			optMapStr["ul"] = o.String()
 		}
