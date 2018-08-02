@@ -150,7 +150,7 @@ func (c *Config) IsExcludedPath(path string) bool {
 
 // IsIncludedPath checks if a path matches the include_files regular expressions.
 func (c *Config) IsIncludedPath(path string) bool {
-	if c.IncludeFiles == nil {
+	if len(c.IncludeFiles) == 0 {
 		return true
 	}
 
