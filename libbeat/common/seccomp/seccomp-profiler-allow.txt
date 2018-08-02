@@ -11,6 +11,7 @@ stat
 
 # cgo tsg/gopacket
 poll
+fcntl64
 
 # system testing binaries w/ race detector
 clock_gettime
