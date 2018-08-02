@@ -30,8 +30,7 @@ type Info struct {
 
 	// Monitoring-related fields
 	Monitoring struct {
-		DefaultUsername  string // The default username to be used to connect to Elasticsearch Monitoring
-		SystemID         string // The system_id to pass to Elasticsearch Monitoring
-		SystemAPIVersion string // The system_api_version to pass to Elasticsearch Monitoring
+		DefaultUsername string // The default username to be used to connect to Elasticsearch Monitoring
+		SystemID        string // The system_id to pass to Elasticsearch Monitoring
 	}
 }

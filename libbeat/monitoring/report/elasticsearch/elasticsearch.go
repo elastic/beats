@@ -85,10 +85,6 @@ func overrideParamsFromBeat(params map[string]interface{}, beat beat.Info) {
 	if beat.Monitoring.SystemID != "" {
 		params["system_id"] = beat.Monitoring.SystemID
 	}
-
-	if beat.Monitoring.SystemAPIVersion != "" {
-		params["system_api_version"] = beat.Monitoring.SystemAPIVersion
-	}
 }
 
 func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
