@@ -66,7 +66,6 @@ var debugf = logp.MakeDebug(selector)
 var errNoMonitoring = errors.New("xpack monitoring not available")
 
 // default monitoring api parameters
-// TODO: allow any beat to override
 var defaultParams = map[string]string{
 	"system_id":          "beats",
 	"system_api_version": "6",
@@ -76,10 +75,27 @@ func init() {
 	report.RegisterReporterFactory("elasticsearch", makeReporter)
 }
 
+func overrideConfigFromBeat(config *config, beat beat.Info) {
+	if beat.Monitoring.DefaultUsername != "" {
+		config.Username = beat.Monitoring.DefaultUsername
+	}
+}
+
+func overrideParamsFromBeat(params map[string]interface{}, beat beat.Info) {
+	if beat.Monitoring.SystemID != "" {
+		params["system_id"] = beat.Monitoring.SystemID
+	}
+
+	if beat.Monitoring.SystemAPIVersion != "" {
+		params["system_api_version"] = beat.Monitoring.SystemAPIVersion
+	}
+}
+
 func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	log := logp.L().Named(selector)
 
 	config := defaultConfig
+	overrideConfigFromBeat(&config, beat)
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
@@ -103,6 +119,7 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 		return nil, err
 	}
 
+	overrideParamsFromBeat(defaultParams, beat)
 	params := map[string]string{}
 	for k, v := range defaultParams {
 		params[k] = v

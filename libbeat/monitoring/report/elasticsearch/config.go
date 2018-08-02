@@ -55,7 +55,7 @@ var defaultConfig = config{
 	Protocol:         "http",
 	Params:           nil,
 	Headers:          nil,
-	Username:         "beats_system", // TODO: allow any beat to override this default
+	Username:         "beats_system",
 	Password:         "",
 	ProxyURL:         "",
 	CompressionLevel: 0,

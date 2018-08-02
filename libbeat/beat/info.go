@@ -27,4 +27,11 @@ type Info struct {
 	Name        string    // configured beat name
 	Hostname    string    // hostname
 	UUID        uuid.UUID // ID assigned to beat instance
+
+	// Monitoring-related fields
+	Monitoring struct {
+		DefaultUsername  string // The default username to be used to connect to Elasticsearch Monitoring
+		SystemID         string // The system_id to pass to Elasticsearch Monitoring
+		SystemAPIVersion string // The system_api_version to pass to Elasticsearch Monitoring
+	}
 }
