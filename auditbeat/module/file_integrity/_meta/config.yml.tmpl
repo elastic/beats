@@ -48,7 +48,7 @@
   # Auditbeat will ignore files unless they match a pattern.
   {{ if eq .GOOS "windows" -}}
   #include_files:
-  #- '\\\.ssh($|\)'
+  #- '\\\.ssh($|\\)'
   {{ else -}}
   #include_files:
   #- '/\.ssh($|/)'
