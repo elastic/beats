@@ -81,7 +81,7 @@ func overrideConfigFromBeat(config *config, beat beat.Info) {
 	}
 }
 
-func overrideParamsFromBeat(params map[string]interface{}, beat beat.Info) {
+func overrideParamsFromBeat(params map[string]string, beat beat.Info) {
 	if beat.Monitoring.SystemID != "" {
 		params["system_id"] = beat.Monitoring.SystemID
 	}
