@@ -80,6 +80,9 @@ import (
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
 
+	// Register autodiscover appenders
+	_ "github.com/elastic/beats/libbeat/autodiscover/appenders/config"
+
 	// Register default monitoring reporting
 	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
 )
