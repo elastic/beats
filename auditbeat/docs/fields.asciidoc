@@ -51,7 +51,14 @@ The audit record's type.
 --
 
 
-*`user.auid`*::
+[float]
+== id fields
+
+Ids of actors
+
+
+
+*`user.id.auid`*::
 +
 --
 type: keyword
@@ -60,7 +67,7 @@ login user ID
 
 --
 
-*`user.uid`*::
+*`user.id.uid`*::
 +
 --
 type: keyword
@@ -69,7 +76,7 @@ user ID
 
 --
 
-*`user.euid`*::
+*`user.id.euid`*::
 +
 --
 type: keyword
@@ -78,7 +85,7 @@ effective user ID
 
 --
 
-*`user.fsuid`*::
+*`user.id.fsuid`*::
 +
 --
 type: keyword
@@ -87,7 +94,7 @@ file system user ID
 
 --
 
-*`user.suid`*::
+*`user.id.suid`*::
 +
 --
 type: keyword
@@ -96,7 +103,7 @@ sent user ID
 
 --
 
-*`user.gid`*::
+*`user.id.gid`*::
 +
 --
 type: keyword
@@ -105,7 +112,7 @@ group ID
 
 --
 
-*`user.egid`*::
+*`user.id.egid`*::
 +
 --
 type: keyword
@@ -114,7 +121,7 @@ effective group ID
 
 --
 
-*`user.sgid`*::
+*`user.id.sgid`*::
 +
 --
 type: keyword
@@ -123,7 +130,7 @@ set group ID
 
 --
 
-*`user.fsgid`*::
+*`user.id.fsgid`*::
 +
 --
 type: keyword
@@ -133,13 +140,13 @@ file system group ID
 --
 
 [float]
-== name_map fields
+== name fields
 
-If `resolve_ids` is set to true in the configuration then `name_map` will contain a mapping of uid field names to the resolved name (e.g. auid -> root).
+If `resolve_ids` is set to true in the configuration then `name` will contain a mapping of uid field names to the resolved name (e.g. auid -> root).
 
 
 
-*`user.name_map.auid`*::
+*`user.name.auid`*::
 +
 --
 type: keyword
@@ -148,7 +155,7 @@ login user name
 
 --
 
-*`user.name_map.uid`*::
+*`user.name.uid`*::
 +
 --
 type: keyword
@@ -157,7 +164,7 @@ user name
 
 --
 
-*`user.name_map.euid`*::
+*`user.name.euid`*::
 +
 --
 type: keyword
@@ -166,7 +173,7 @@ effective user name
 
 --
 
-*`user.name_map.fsuid`*::
+*`user.name.fsuid`*::
 +
 --
 type: keyword
@@ -175,7 +182,7 @@ file system user name
 
 --
 
-*`user.name_map.suid`*::
+*`user.name.suid`*::
 +
 --
 type: keyword
@@ -184,7 +191,7 @@ sent user name
 
 --
 
-*`user.name_map.gid`*::
+*`user.name.gid`*::
 +
 --
 type: keyword
@@ -193,7 +200,7 @@ group name
 
 --
 
-*`user.name_map.egid`*::
+*`user.name.egid`*::
 +
 --
 type: keyword
@@ -202,7 +209,7 @@ effective group name
 
 --
 
-*`user.name_map.sgid`*::
+*`user.name.sgid`*::
 +
 --
 type: keyword
@@ -211,7 +218,7 @@ set group name
 
 --
 
-*`user.name_map.fsgid`*::
+*`user.name.fsgid`*::
 +
 --
 type: keyword

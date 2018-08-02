@@ -534,18 +534,17 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 }
 
 func addUser(u aucoalesce.User, m common.MapStr) {
-	user := make(common.MapStr, len(u.IDs))
-	m.Put("user", user)
+	user := make(common.MapStr, 3)
+	user["id"] = u.IDs
 
-	for id, value := range u.IDs {
-		user[id] = value
-		if len(u.SELinux) > 0 {
-			user["selinux"] = u.SELinux
-		}
-		if len(u.Names) > 0 {
-			user["name_map"] = u.Names
-		}
+	if len(u.SELinux) > 0 {
+		user["selinux"] = u.SELinux
 	}
+	if len(u.Names) > 0 {
+		user["name"] = u.Names
+	}
+
+	m.Put("user", user)
 }
 
 func addProcess(p aucoalesce.Process, m common.MapStr) {
