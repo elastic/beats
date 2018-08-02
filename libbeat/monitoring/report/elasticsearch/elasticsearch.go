@@ -66,6 +66,7 @@ var debugf = logp.MakeDebug(selector)
 var errNoMonitoring = errors.New("xpack monitoring not available")
 
 // default monitoring api parameters
+// TODO: allow any beat to override
 var defaultParams = map[string]string{
 	"system_id":          "beats",
 	"system_api_version": "6",
