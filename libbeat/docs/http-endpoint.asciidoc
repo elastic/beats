@@ -14,25 +14,31 @@
 
 experimental[]
 
-{beatname_uc} can expose internal metrics through a HTTP endpoint. For security
-reasons the endpoint is disabled by default.
+{beatname_uc} can expose internal metrics through an HTTP endpoint. These are useful to
+monitor the internal state of the beat. For security reasons the endpoint is disabled
+by default, as users may want to avoid leaking some of this info.
 
 The HTTP endpoint has the following configuration settings:
 
-`http.enabled`:: (Optional) Enable the http endpoint. Default is `false`.
+`http.enabled`:: (Optional) Enable the HTTP endpoint. Default is `false`.
 `http.host`:: (Optional) Bind to this hostname or IP address.
 It is recommended to use only localhost. Default is `localhost`
 `http.port`:: (Optional) Port on which the HTTP endpoint will bind. Default is `5066`.
 
-[float]
-=== Paths
-
 This is the list of paths you can access. For pretty JSON output append ?pretty to the URL.
 
 
+[float]
+=== Info
+
 `/` provides basic info from the {beatname_uc}. Example:
 
-[source,json]
+[source,js]
+----
+curl -XGET 'localhost:5066/?pretty'
+----
+
+[source,js,subs="attributes"]
 ----
 {
   "beat": "metricbeat",
@@ -43,9 +49,17 @@ This is the list of paths you can access. For pretty JSON output append ?pretty 
 }
 ----
 
+[float]
+=== Stats
+
 `/stats` reports internal metrics. Example:
 
-[source,json]
+[source,js]
+----
+curl -XGET 'localhost:5066/stats?pretty'
+----
+
+[source,js,subs="attributes"]
 ----
 {
   "beat": {
