@@ -46,8 +46,8 @@ func TestData(t *testing.T) {
 
 	generateKafkaData(t, "metricbeat-generate-data")
 
-	f := mbtest.NewEventsFetcher(t, getConfig(""))
-	err := mbtest.WriteEvents(f, t)
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig(""))
+	err := mbtest.WriteEventsReporterV2(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -65,8 +65,8 @@ func TestTopic(t *testing.T) {
 	// Create initial topic
 	generateKafkaData(t, testTopic)
 
-	f := mbtest.NewEventsFetcher(t, getConfig(testTopic))
-	dataBefore, err := f.Fetch()
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(testTopic))
+	dataBefore, err := mbtest.ReportingFetchV2(f)
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -82,7 +82,7 @@ func TestTopic(t *testing.T) {
 		generateKafkaData(t, testTopic)
 	}
 
-	dataAfter, err := f.Fetch()
+	dataAfter, err := mbtest.ReportingFetchV2(f)
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -99,14 +99,14 @@ func TestTopic(t *testing.T) {
 
 	// Its possible that other topics exists -> select the right data
 	for _, data := range dataBefore {
-		if data["topic"].(common.MapStr)["name"] == testTopic {
-			offsetBefore = data["offset"].(common.MapStr)["newest"].(int64)
+		if data.ModuleFields["topic"].(common.MapStr)["name"] == testTopic {
+			offsetBefore = data.MetricSetFields["offset"].(common.MapStr)["newest"].(int64)
 		}
 	}
 
 	for _, data := range dataAfter {
-		if data["topic"].(common.MapStr)["name"] == testTopic {
-			offsetAfter = data["offset"].(common.MapStr)["newest"].(int64)
+		if data.ModuleFields["topic"].(common.MapStr)["name"] == testTopic {
+			offsetAfter = data.MetricSetFields["offset"].(common.MapStr)["newest"].(int64)
 		}
 	}
 
