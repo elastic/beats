@@ -27,6 +27,9 @@ import (
 	"github.com/elastic/beats/libbeat/common/streambuf"
 )
 
+// decoderReader reads from an input file and converts its content into UTF-8.
+// It stores the size of the original bytes, so offset can be calculated later in
+// the line scanner.
 type decoderReader struct {
 	in         io.Reader
 	decoder    transform.Transformer
@@ -47,55 +50,55 @@ func newDecoderReader(in io.Reader, codec encoding.Encoding, bufferSize int) *de
 }
 
 func (r *decoderReader) read(buf []byte) (int, error) {
-	b := make([]byte, r.bufferSize)
-
+	// TODO add to the beginning of buf and then start decoding
+	// instead of returning
 	if r.buf.Len() != 0 {
 		return r.copyToOut(buf)
 	}
 
-	for {
-		start := r.encodedBuf.Len()
-		n, err := r.in.Read(b[start:])
-		if err != nil {
-			return len(buf[:n]), err
-		}
+	b := make([]byte, r.bufferSize)
+	start := r.encodedBuf.Len()
+	n, err := r.in.Read(b[start:])
+	if err != nil {
+		return 0, err
+	}
 
-		if start > 0 {
-			enc, err := r.encodedBuf.Collect(start)
-			if err != nil {
-				return 0, err
-			}
-			r.encodedBuf.Reset()
-			b = append(enc, b[start:]...)
-		}
-
-		nBytes, nProcessed, err := r.conv(b[:start+n], buf)
+	if start > 0 {
+		enc, err := r.encodedBuf.Collect(start)
 		if err != nil {
-			if err == transform.ErrShortSrc {
-				r.encodedBuf.Append(b[nProcessed:])
-				return nBytes, nil
-			}
 			return 0, err
 		}
-		return nBytes, nil
+		r.encodedBuf.Reset()
+		b = append(enc, b[start:]...)
 	}
+
+	nBytes, nProcessed, err := r.conv(b[:start+n], buf)
+	if err != nil {
+		if err == transform.ErrShortSrc {
+			r.encodedBuf.Append(b[nProcessed:])
+			return nBytes, nil
+		}
+		return 0, err
+	}
+	return nBytes, nil
 }
 
 // msgSize returns the size of the encoded message on the disk
-func (r *decoderReader) msgSize(symlen []uint8, size int) (int, []uint8, error) {
-	n := 0
-	for size > 0 {
-		if len(symlen) <= n {
+// sizeInUTF8 is the lenght of the converted UTF-8 line
+func (r *decoderReader) msgSize(symlen []uint8, sizeInUTF8 uint) (int, []uint8, error) {
+	nEncodedBytes := 0
+	for sizeInUTF8 > 0 {
+		if len(symlen) <= nEncodedBytes {
 			return 0, symlen, fmt.Errorf("error calculating size: too short symlen")
 		}
 
-		size -= int(symlen[n])
-		n++
+		sizeInUTF8 -= uint(symlen[nEncodedBytes])
+		nEncodedBytes++
 	}
 
-	symlen = symlen[n:]
+	symlen = symlen[nEncodedBytes:]
 
-	return n, symlen, nil
+	return nEncodedBytes, symlen, nil
 }
 
 func (r *decoderReader) symbolsLen() []uint8 {

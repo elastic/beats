@@ -44,12 +44,12 @@ func (s *lineScanner) scan() ([]byte, int, error) {
 	for !separatorFound(idx) {
 		b := make([]byte, s.bufferSize)
 		n, err := s.in.read(b)
+		s.buf.Append(b[:n])
+		s.symlen = append(s.symlen, s.in.symbolsLen()...)
 		if err != nil {
 			return nil, 0, err
 		}
 
-		s.buf.Append(b[:n])
-		s.symlen = append(s.symlen, s.in.symbolsLen()...)
 		idx = s.buf.Index(s.separator)
 	}
 
@@ -69,7 +69,7 @@ func (s *lineScanner) line(i int) ([]byte, int, error) {
 	}
 
 	var msgSymbols int
-	msgSymbols, s.symlen, err = s.in.msgSize(s.symlen, len(line))
+	msgSymbols, s.symlen, err = s.in.msgSize(s.symlen, uint(len(line)))
 	if err != nil {
 		return nil, 0, err
 	}
