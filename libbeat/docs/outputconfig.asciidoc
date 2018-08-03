@@ -1114,8 +1114,8 @@ rotated. The default value is 10240 KB.
 ===== `number_of_files`
 
 The maximum number of files to save under <<path,`path`>>. When this number of files is reached, the
-oldest file is deleted, and the rest of the files are shifted from last to first. The default
-is 7 files.
+oldest file is deleted, and the rest of the files are shifted from last to first.
+The number of files must be between 2 and 1024. The default is 7.
 
 ===== `permissions`
 
