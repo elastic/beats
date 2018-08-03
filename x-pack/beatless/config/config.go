@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// Config is put into a different package to prevent cyclic imports in case
-// it is needed in several locations
-
 package config
 
 // Config default configuration for Beatless.
