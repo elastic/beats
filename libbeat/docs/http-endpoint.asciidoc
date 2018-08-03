@@ -15,8 +15,8 @@
 experimental[]
 
 {beatname_uc} can expose internal metrics through an HTTP endpoint. These are useful to
-monitor the internal state of the beat. For security reasons the endpoint is disabled
-by default, as users may want to avoid leaking some of this info.
+monitor the internal state of the Beat. For security reasons the endpoint is disabled
+by default, as you may want to avoid exposing this info.
 
 The HTTP endpoint has the following configuration settings:
 
@@ -38,14 +38,14 @@ This is the list of paths you can access. For pretty JSON output append ?pretty 
 curl -XGET 'localhost:5066/?pretty'
 ----
 
-[source,js,subs="attributes"]
+["source","js",subs="attributes"]
 ----
 {
   "beat": "metricbeat",
   "hostname": "example.lan",
   "name": "example.lan",
   "uuid": "34f6c6e1-45a8-4b12-9125-11b3e6e89866",
-  "version": "6.4.0"
+  "version": "{version}"
 }
 ----
 
@@ -59,7 +59,7 @@ curl -XGET 'localhost:5066/?pretty'
 curl -XGET 'localhost:5066/stats?pretty'
 ----
 
-[source,js,subs="attributes"]
+["source","js",subs="attributes"]
 ----
 {
   "beat": {
