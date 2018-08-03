@@ -3,6 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
+			"path": "filebeat/x/sys/windows/svc/eventlog",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "AzjRkOQtVBTwIw4RJLTygFhJs3s=",
 			"path": "github.com/Microsoft/go-winio",
 			"revision": "f533f7a102197536779ea3a8cb881d639e21ec5a",
@@ -1704,34 +1708,34 @@
 			"versionExact": "release-branch.go1.9"
 		},
 		{
-			"checksumSHA1": "CNHEeGnucEUlTHJrLS2kHtfNbws=",
+			"checksumSHA1": "nc3RG2Qgzn2aup/3/4RusWr+X0g=",
 			"path": "golang.org/x/sys/unix",
-			"revision": "37707fdb30a5b38865cfb95e5aab41707daec7fd",
-			"revisionTime": "2018-02-02T13:35:31Z"
+			"revision": "0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe",
+			"revisionTime": "2018-08-02T19:25:30Z"
 		},
 		{
-			"checksumSHA1": "eQq+ZoTWPjyizS9XalhZwfGjQao=",
+			"checksumSHA1": "Hi7BmkvZh4plNNLGDHfPnCKy3i8=",
 			"path": "golang.org/x/sys/windows",
-			"revision": "37707fdb30a5b38865cfb95e5aab41707daec7fd",
-			"revisionTime": "2018-02-02T13:35:31Z"
+			"revision": "0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe",
+			"revisionTime": "2018-08-02T19:25:30Z"
 		},
 		{
-			"checksumSHA1": "ZdFZFaXmCgEEaEhVPkyXrnhKhsg=",
+			"checksumSHA1": "P9OIhD26uWlIST/me4TYnvseCoY=",
 			"path": "golang.org/x/sys/windows/registry",
-			"revision": "37707fdb30a5b38865cfb95e5aab41707daec7fd",
-			"revisionTime": "2018-02-02T13:35:31Z"
+			"revision": "0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe",
+			"revisionTime": "2018-08-02T19:25:30Z"
 		},
 		{
-			"checksumSHA1": "VNlkHemg81Ba7ElHfKKUU1h+U1U=",
+			"checksumSHA1": "Fes9OIPy6lS/ghzodqAbMlZZTTQ=",
 			"path": "golang.org/x/sys/windows/svc",
-			"revision": "37707fdb30a5b38865cfb95e5aab41707daec7fd",
-			"revisionTime": "2018-02-02T13:35:31Z"
+			"revision": "0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe",
+			"revisionTime": "2018-08-02T19:25:30Z"
 		},
 		{
-			"checksumSHA1": "lZi+t2ilFyYSpqL1ThwNf8ot3WQ=",
+			"checksumSHA1": "e9KJPWrdqg5PMkbE2w60Io8rY4M=",
 			"path": "golang.org/x/sys/windows/svc/debug",
-			"revision": "37707fdb30a5b38865cfb95e5aab41707daec7fd",
-			"revisionTime": "2018-02-02T13:35:31Z"
+			"revision": "0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe",
+			"revisionTime": "2018-08-02T19:25:30Z"
 		},
 		{
 			"checksumSHA1": "uVlUSSKplihZG7N+QJ6fzDZ4Kh8=",
