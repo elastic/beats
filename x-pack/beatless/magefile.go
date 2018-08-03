@@ -17,8 +17,6 @@ import (
 )
 
 func init() {
-	mage.SetBuildVariableSources(mage.DefaultBeatBuildVariableSources)
-
 	mage.BeatDescription = "Beatless is a beat implementation for a serverless architecture."
 }
 
@@ -59,8 +57,6 @@ func Clean() error {
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
-
-	mage.UseCommunityBeatPackaging()
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
