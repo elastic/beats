@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package pq
 
 import (
@@ -10,6 +27,8 @@ type Reader struct {
 	accessor *access
 	state    readState
 	active   bool
+
+	tx *txfile.Tx
 }
 
 type readState struct {
@@ -20,7 +39,7 @@ type readState struct {
 	cursor cursor
 }
 
-func newReader(accessor *access) (*Reader, error) {
+func newReader(accessor *access) *Reader {
 	return &Reader{
 		active:   true,
 		accessor: accessor,
@@ -30,7 +49,7 @@ func newReader(accessor *access) (*Reader, error) {
 				pageSize: accessor.PageSize(),
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *Reader) close() {
@@ -38,30 +57,75 @@ func (r *Reader) close() {
 }
 
 // Available returns the number of unread events that can be read.
-func (r *Reader) Available() uint {
-	if !r.active {
-		return 0
+func (r *Reader) Available() (uint, error) {
+	const op = "pq/reader-available"
+
+	if err := r.canRead(); err != NoError {
+		return 0, r.errOf(op, err)
 	}
 
+	var err reason
 	func() {
-		tx := r.accessor.BeginRead()
-		defer tx.Close()
-		r.updateQueueState(tx)
+		var tx *txfile.Tx
+		tx, err = r.beginTx()
+		if err == nil {
+			defer tx.Close()
+			err = r.updateQueueState(tx)
+		}
 	}()
+	if err != nil {
+		return 0, r.errWrap(op, err)
+	}
 
 	if r.state.cursor.Nil() {
-		return 0
+		return 0, nil
 	}
 
-	return uint(r.state.endID - r.state.id)
+	return uint(r.state.endID - r.state.id), nil
+}
+
+// Begin starts a new read transaction, shared between multiple read calls.
+// User must execute Done, to close the file transaction.
+func (r *Reader) Begin() error {
+	const op = "pq/reader-begin"
+
+	if r.tx != nil {
+		r.tx.Close()
+	}
+
+	if err := r.canRead(); err != NoError {
+		return r.errOf(op, err)
+	}
+
+	tx, err := r.beginTx()
+	if err != nil {
+		return r.errWrap(op, err)
+	}
+
+	r.tx = tx
+	return nil
+}
+
+// Done closes the active read transaction.
+func (r *Reader) Done() {
+	if r.tx == nil {
+		return
+	}
+
+	r.tx.Close()
+	r.tx = nil
 }
 
 // Read reads the contents of the current event into the buffer.
 // Returns 0 without reading if end of the current event has been reached.
 // Use `Next` to skip/continue reading the next event.
+// If Begin is not been called before Read, a temporary read transaction is
+// created.
 func (r *Reader) Read(b []byte) (int, error) {
-	if !r.active {
-		return -1, errClosed
+	const op = "pq/read-event"
+
+	if err := r.canRead(); err != NoError {
+		return -1, r.errOf(op, err)
 	}
 
 	if r.state.eventBytes <= 0 {
@@ -69,12 +133,24 @@ func (r *Reader) Read(b []byte) (int, error) {
 	}
 
 	to, err := r.readInto(b)
-	return len(b) - len(to), err
+	n := len(b) - len(to)
+	if err != nil {
+		return n, r.errWrap(op, err)
+	}
+	return len(b) - len(to), nil
 }
 
-func (r *Reader) readInto(to []byte) ([]byte, error) {
-	tx := r.accessor.BeginRead()
-	defer tx.Close()
+func (r *Reader) readInto(to []byte) ([]byte, reason) {
+	tx := r.tx
+	if tx == nil {
+		t, err := r.beginTx()
+		if err != nil {
+			return nil, err
+		}
+
+		tx = t
+		defer tx.Close()
+	}
 
 	n := r.state.eventBytes
 	if L := len(to); L < n {
@@ -94,7 +170,7 @@ func (r *Reader) readInto(to []byte) ([]byte, error) {
 	}
 
 	// end of event -> advance to next event
-	var err error
+	var err reason
 	if r.state.eventBytes == 0 {
 		r.state.eventBytes = -1
 		r.state.id++
@@ -102,7 +178,7 @@ func (r *Reader) readInto(to []byte) ([]byte, error) {
 		// As page is already in memory, use current transaction to try to skip to
 		// next page if no more new event fits into current page.
 		if cursor.PageBytes() < szEventHeader {
-			cursor.AdvancePage()
+			_, err = cursor.AdvancePage()
 		}
 	}
 
@@ -112,13 +188,25 @@ func (r *Reader) readInto(to []byte) ([]byte, error) {
 // Next advances to the next event to be read. The event size in bytes is
 // returned.  A size of 0 is reported if no more event is available in the
 // queue.
+// If Begin is not been called before Next, a temporary read transaction is
+// created.
 func (r *Reader) Next() (int, error) {
-	if !r.active {
-		return -1, errClosed
+	const op = "op/reader-next"
+
+	if err := r.canRead(); err != NoError {
+		return -1, r.errOf(op, err)
 	}
 
-	tx := r.accessor.BeginRead()
-	defer tx.Close()
+	tx := r.tx
+	if tx == nil {
+		t, err := r.beginTx()
+		if err != nil {
+			return -1, r.errWrap(op, err)
+		}
+
+		tx = t
+		defer tx.Close()
+	}
 
 	cursor := makeTxCursor(tx, r.accessor, &r.state.cursor)
 
@@ -126,7 +214,7 @@ func (r *Reader) Next() (int, error) {
 	if r.state.eventBytes > 0 {
 		err := cursor.Skip(r.state.eventBytes)
 		if err != nil {
-			return 0, err
+			return 0, r.errWrap(op, err)
 		}
 
 		r.state.eventBytes = -1
@@ -138,7 +226,7 @@ func (r *Reader) Next() (int, error) {
 	if cursor.Nil() || !idLess(r.state.id, r.state.endID) {
 		err := r.updateQueueState(tx)
 		if err != nil {
-			return 0, err
+			return 0, r.errWrap(op, err)
 		}
 
 		// end of queue
@@ -160,7 +248,7 @@ func (r *Reader) Next() (int, error) {
 
 		hdr, err := cursor.PageHeader()
 		if err != nil {
-			return 0, err
+			return 0, r.errWrap(op, err)
 		}
 
 		id := hdr.first.Get()
@@ -173,17 +261,19 @@ func (r *Reader) Next() (int, error) {
 	// Initialize next event read by determining event size.
 	hdr, err := cursor.ReadEventHeader()
 	if err != nil {
-		return 0, err
+		return 0, r.errWrap(op, err)
 	}
 	L := int(hdr.sz.Get())
 	r.state.eventBytes = L
 	return L, nil
 }
 
-func (r *Reader) updateQueueState(tx *txfile.Tx) error {
+func (r *Reader) updateQueueState(tx *txfile.Tx) reason {
+	const op = "pq/reader-update-queue-state"
+
 	root, err := r.accessor.RootHdr(tx)
 	if err != nil {
-		return err
+		return r.errWrap(op, err)
 	}
 
 	// Initialize cursor, if queue was empty on previous (without any pages).
@@ -207,4 +297,35 @@ func (r *Reader) findReadStart(root *queuePage) position {
 		return head
 	}
 	return r.accessor.ParsePosition(&root.head)
+}
+
+func (r *Reader) beginTx() (*txfile.Tx, reason) {
+	tx, err := r.accessor.BeginRead()
+	if err != nil {
+		return nil, r.errWrap("", err).report("failed to start read transaction")
+	}
+	return tx, nil
+}
+
+func (r *Reader) canRead() ErrKind {
+	if !r.active {
+		return ReaderClosed
+	}
+	return NoError
+}
+
+func (r *Reader) err(op string) *Error {
+	return &Error{op: op, ctx: r.errCtx()}
+}
+
+func (r *Reader) errOf(op string, kind ErrKind) *Error {
+	return r.err(op).of(kind)
+}
+
+func (r *Reader) errWrap(op string, cause error) *Error {
+	return r.err(op).causedBy(cause)
+}
+
+func (r *Reader) errCtx() errorCtx {
+	return r.accessor.errCtx()
 }

@@ -1,6 +1,24 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package txfile
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/elastic/go-txfile/internal/invariant"
@@ -99,9 +117,12 @@ type allocCommitState struct {
 	tx            *txAllocState
 	updated       bool       // set if updates to allocator within current transaction
 	allocRegions  regionList // meta pages allocated to write new freelist too
+	dataEndMarker PageID     // new data area end marker after cleaning the data free list
+	metaEndMarker PageID     // new meta area end marker after cleaning the data free list
 	metaList      regionList // new meta area freelist
 	dataList      regionList // new data area freelist
-	overflowFreed uint       // number of pages in overflow region to be returned
+	dataFreed     uint       // number of pages in the data region removed from the free list
+	overflowFreed uint       // number of pages in overflow region removed from the free list
 }
 
 // noLimit indicates the data/meta-area can grow without any limits.
@@ -136,15 +157,21 @@ func (a *allocator) makeTxAllocState(withOverflow bool, growPercentage int) txAl
 	}
 }
 
-func (a *allocator) fileCommitPrepare(st *allocCommitState, tx *txAllocState) {
+func (a *allocator) fileCommitPrepare(
+	st *allocCommitState,
+	tx *txAllocState,
+	forceUpdate bool,
+) {
 	st.tx = tx
-	st.updated = tx.Updated()
+	st.updated = forceUpdate || tx.Updated()
 	if st.updated {
 		a.MetaAllocator().FreeRegions(tx, a.freelistPages)
 	}
 }
 
-func (a *allocator) fileCommitAlloc(st *allocCommitState) error {
+func (a *allocator) fileCommitAlloc(st *allocCommitState) reason {
+	const op = "txfile/commit-alloc-meta"
+
 	if !st.updated {
 		return nil
 	}
@@ -177,7 +204,8 @@ func (a *allocator) fileCommitAlloc(st *allocCommitState) error {
 	if n := prediction.count; n > 0 {
 		allocRegions = a.MetaAllocator().AllocRegions(st.tx, n)
 		if allocRegions == nil {
-			return errOutOfMemory
+			return a.err(op).of(OutOfMemory).
+				report("not enough space to allocate freelist meta pages")
 		}
 	}
 
@@ -187,10 +215,34 @@ func (a *allocator) fileCommitAlloc(st *allocCommitState) error {
 	newMetaList := mergeRegionLists(a.meta.freelist.regions, metaFreed)
 
 	st.allocRegions = allocRegions
-	st.dataList = newDataList
 
-	// remove pages from end of overflow area from meta freelist + adjust end marker
-	st.metaList, st.overflowFreed = releaseOverflowPages(newMetaList, a.maxPages, a.meta.endMarker)
+	dataEndMarker := a.data.endMarker
+	metaEndMarker := a.meta.endMarker
+
+	// Remove pages from end of overflow area from meta freelist + adjust end marker
+	st.metaList, st.overflowFreed = releaseOverflowPages(newMetaList, a.maxPages, metaEndMarker)
+	if st.overflowFreed > 0 {
+		newEnd := metaEndMarker - PageID(st.overflowFreed)
+		if metaEndMarker > dataEndMarker { // shrink overflow area, which was allocated from data area
+			dataEndMarker = newEnd
+		}
+		metaEndMarker = newEnd
+	}
+
+	// Remove pages from end of data area. Pages are removed from the data area
+	// only if the file size has been decreased.
+	st.dataList, st.dataFreed = releaseOverflowPages(newDataList, a.maxPages, dataEndMarker)
+	if st.dataFreed > 0 {
+		dataEndMarker -= PageID(st.dataFreed)
+		if metaEndMarker >= dataEndMarker {
+			metaEndMarker = dataEndMarker
+		}
+	}
+
+	// Update new allocator end markers if regions have been removed from the free lists.
+	st.dataEndMarker = dataEndMarker
+	st.metaEndMarker = metaEndMarker
+
 	return nil
 }
 
@@ -226,17 +278,27 @@ func releaseOverflowPages(
 		}
 	}
 
+	if len(list) == 0 {
+		list = nil
+	}
 	return list, freed
 }
 
 func (a *allocator) fileCommitSerialize(
 	st *allocCommitState,
-	onPage func(id PageID, buf []byte) error,
-) error {
+	onPage func(id PageID, buf []byte) reason,
+) reason {
+	const op = "txfile/commit-serialize-alloc"
+
 	if !st.updated || len(st.allocRegions) == 0 {
 		return nil
 	}
-	return writeFreeLists(st.allocRegions, a.pageSize, st.metaList, st.dataList, onPage)
+
+	err := writeFreeLists(st.allocRegions, a.pageSize, st.metaList, st.dataList, onPage)
+	if err != nil {
+		return a.errWrap(op, err).report("failed to serialize allocator state")
+	}
+	return nil
 }
 
 func (a *allocator) fileCommitMeta(meta *metaPage, st *allocCommitState) {
@@ -247,17 +309,8 @@ func (a *allocator) fileCommitMeta(meta *metaPage, st *allocCommitState) {
 		}
 		meta.freelist.Set(freelistRoot)
 
-		dataEndMarker := a.data.endMarker
-		metaEndMarker := a.meta.endMarker
-		if st.overflowFreed > 0 {
-			metaEndMarker -= PageID(st.overflowFreed)
-			if metaEndMarker > dataEndMarker {
-				dataEndMarker = metaEndMarker
-			}
-		}
-
-		meta.dataEndMarker.Set(dataEndMarker)
-		meta.metaEndMarker.Set(metaEndMarker)
+		meta.dataEndMarker.Set(st.dataEndMarker)
+		meta.metaEndMarker.Set(st.metaEndMarker)
 		meta.metaTotal.Set(uint64(a.metaTotal - st.overflowFreed))
 	}
 }
@@ -271,8 +324,8 @@ func (a *allocator) Commit(st *allocCommitState) {
 			a.freelistRoot = 0
 		}
 
-		a.data.commit(st.dataList)
-		a.meta.commit(st.metaList)
+		a.data.commit(st.dataEndMarker, st.dataList)
+		a.meta.commit(st.metaEndMarker, st.metaList)
 		a.metaTotal -= st.overflowFreed
 	}
 }
@@ -293,7 +346,16 @@ func (a *allocator) Rollback(st *txAllocState) {
 	a.data.rollback(&st.data)
 }
 
-func (a *allocArea) commit(regions regionList) {
+func (a *allocator) err(op string) *Error {
+	return &Error{op: op}
+}
+
+func (a *allocator) errWrap(op string, err error) *Error {
+	return a.err(op).causedBy(err)
+}
+
+func (a *allocArea) commit(endMarker PageID, regions regionList) {
+	a.endMarker = endMarker
 	a.freelist.regions = regions
 	a.freelist.avail = regions.CountPages()
 }
@@ -361,12 +423,9 @@ func (mm *metaManager) Ensure(st *txAllocState, n uint) bool {
 	// Can not grow until 'requiredMax' -> try to grow up to requiredMin,
 	// potentially allocating pages from the overflow area
 	requiredMin := szMinMeta - total
-	if mm.tryGrow(st, requiredMin, st.options.overflowAreaEnabled) {
-		return true
-	}
 
-	// out of memory
-	return false
+	// returns false if we are out of memory
+	return mm.tryGrow(st, requiredMin, st.options.overflowAreaEnabled)
 }
 
 func (mm *metaManager) tryGrow(
@@ -473,7 +532,12 @@ func (a *dataAllocator) Avail(_ *txAllocState) uint {
 	if a.maxPages == 0 {
 		return noLimit
 	}
-	return a.maxPages - uint(a.data.endMarker) + a.data.freelist.Avail()
+
+	avail := a.data.freelist.Avail()
+	if end := uint(a.data.endMarker); end < a.maxPages {
+		avail += a.maxPages - end
+	}
+	return avail
 }
 
 func (a *dataAllocator) AllocContinuousRegion(
@@ -532,7 +596,7 @@ func (a *dataAllocator) Free(st *txAllocState, id PageID) {
 	traceln("free page:", id)
 
 	if id < 2 || id >= a.data.endMarker {
-		panic(errOutOfBounds)
+		panic(fmt.Sprintf("freed page ID %v out of bounds", id))
 	}
 
 	if !st.data.new.Has(id) {
@@ -669,7 +733,7 @@ func (s *txAllocArea) Updated() bool {
 // allocator state (de-)serialization
 // ----------------------------------
 
-func readAllocatorState(a *allocator, f *File, meta *metaPage, opts Options) error {
+func readAllocatorState(a *allocator, f *File, meta *metaPage, opts Options) reason {
 	if a.maxSize > 0 {
 		a.maxPages = a.maxSize / a.pageSize
 	}
