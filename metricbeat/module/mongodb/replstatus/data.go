@@ -23,7 +23,7 @@ import (
 )
 
 var schema = s.Schema{
-	"oplog": s.Object{
+	"oplog": c.Dict("oplog", s.Schema{
 		"size": s.Object{
 			"allocated": c.Int("logSize"),
 			"used":      c.Int("used"),
@@ -35,5 +35,5 @@ var schema = s.Schema{
 			"timestamp": c.Int("tLast"),
 		},
 		"window": c.Int("timeDiff"),
-	},
+	}),
 }

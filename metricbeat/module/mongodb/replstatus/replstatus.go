@@ -72,6 +72,26 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 	defer mongoSession.Close()
 
+	oplog, err := getReplicationInfo(mongoSession)
+	if err != nil {
+		return nil, err
+	}
+
+	result := map[string]interface{}{
+		"oplog": map[string]interface{}{
+			"logSize":  oplog.allocated,
+			"used":     oplog.used,
+			"tFirst":   oplog.firstTs,
+			"tLast":    oplog.lastTs,
+			"timeDiff": oplog.diff,
+		},
+	}
+	event, _ := schema.Apply(result)
+
+	return event, nil
+}
+
+func getReplicationInfo(mongoSession *mgo.Session) (*oplog, error) {
 	// get oplog.rs collection
 	db := mongoSession.DB("local")
 	if collections, err := db.CollectionNames(); err != nil || !contains(collections, oplogCol) {
@@ -115,16 +135,21 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	diff := lastTs - firstTs
 
-	result := map[string]interface{}{
-		"logSize":  allocated,
-		"used":     used,
-		"tFirst":   firstTs,
-		"tLast":    lastTs,
-		"timeDiff": diff,
-	}
-	event, _ := schema.Apply(result)
+	return &oplog{
+		allocated: allocated,
+		used:      used,
+		firstTs:   firstTs,
+		lastTs:    lastTs,
+		diff:      diff,
+	}, nil
+}
 
-	return event, nil
+type oplog struct {
+	allocated int
+	used      int
+	firstTs   int64
+	lastTs    int64
+	diff      int64
 }
 
 func contains(s []string, x string) bool {
