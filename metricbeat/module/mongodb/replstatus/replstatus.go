@@ -19,6 +19,7 @@ package replstatus
 
 import (
 	"errors"
+	"time"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -77,6 +78,11 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
+	replStatus, err := getReplicationStatus(mongoSession)
+	if err != nil {
+		return nil, err
+	}
+
 	result := map[string]interface{}{
 		"oplog": map[string]interface{}{
 			"logSize":  oplog.allocated,
@@ -85,6 +91,8 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 			"tLast":    oplog.lastTs,
 			"timeDiff": oplog.diff,
 		},
+
+		"headroom": replStatus.maxReplicationLag - oplog.diff,
 	}
 	event, _ := schema.Apply(result)
 
@@ -144,12 +152,58 @@ func getReplicationInfo(mongoSession *mgo.Session) (*oplog, error) {
 	}, nil
 }
 
+func getReplicationStatus(mongoSession *mgo.Session) (*replStatus, error) {
+	db := mongoSession.DB("admin")
+
+	//  oplog size
+	var replStatusMap map[string]interface{}
+	if err := db.Run(bson.M{"replSetGetStatus": 1}, &replStatusMap); err != nil {
+		return nil, err
+	}
+
+	var replStatus replStatus
+	replStatus.setName = replStatusMap["set"].(string)
+	replStatus.serverDate = replStatusMap["date"].(time.Time)
+	replStatus.operationTimes = opTimes{
+		// ToDo find actual timestamps
+		lastCommited: replStatusMap["optimes"].(map[string]interface{})["lastCommittedOpTime"].(map[string]interface{})["ts"].(int64),
+		applied:      replStatusMap["optimes"].(map[string]interface{})["appliedOpTime"].(map[string]interface{})["ts"].(int64),
+		durable:      replStatusMap["optimes"].(map[string]interface{})["durableOpTime"].(map[string]interface{})["ts"].(int64),
+	}
+	replStatus.numSecondary = len(findHostsByState(replStatusMap["members"].([]member), "SECONDARY"))
+
+	return nil, nil
+}
+
+type member map[string]interface{}
+
+func findHostsByState(members []member, state string) []string {
+	for 
+}
+
 type oplog struct {
 	allocated int
 	used      int
 	firstTs   int64
 	lastTs    int64
 	diff      int64
+}
+
+type opTimes struct {
+	lastCommited int64
+	applied      int64
+	durable      int64
+}
+
+type replStatus struct {
+	setName           string
+	serverDate        time.Time
+	operationTimes    opTimes
+	unhealthyHosts    []string
+	maxReplicationLag int64
+	numSecondary      int
+	riskyStateHosts   []string
+	riskyStateCount   int
 }
 
 func contains(s []string, x string) bool {
