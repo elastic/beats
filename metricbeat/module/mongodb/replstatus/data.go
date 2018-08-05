@@ -18,22 +18,63 @@
 package replstatus
 
 import (
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/libbeat/common"
 )
 
-var schema = s.Schema{
-	"oplog": c.Dict("oplog", s.Schema{
-		"size": s.Object{
-			"allocated": c.Int("logSize"),
-			"used":      c.Int("used"),
-		},
-		"first": s.Object{
-			"timestamp": c.Int("tFirst"),
-		},
-		"last": s.Object{
-			"timestamp": c.Int("tLast"),
-		},
-		"window": c.Int("timeDiff"),
-	}),
+// var schema = s.Schema{
+// 	"oplog": c.Dict("oplog", s.Schema{
+// 		"size": s.Object{
+// 			"allocated": c.Int("logSize"),
+// 			"used":      c.Int("used"),
+// 		},
+// 		"first": s.Object{
+// 			"timestamp": c.Int("tFirst"),
+// 		},
+// 		"last": s.Object{
+// 			"timestamp": c.Int("tLast"),
+// 		},
+// 		"window": c.Int("timeDiff"),
+// 	}),
+// 	"set_name":    c.Str("setName"),
+// 	"server_date": c.Int("serverDate"),
+// 	"operation_times": c.Dict("operationTimes", s.Schema{
+// 		"last_committed": c.Int("lastCommitted"),
+// 		"applied":        c.Int("applied"),
+// 		"durable":        c.Int("durable"),
+// 	}),
+// 	"states": c.Dict("stateCount", s.Schema{
+// 		"secondary": s.Object{
+// 			"count": c.Int("secondary"),
+// 		},
+// 	}),
+// 	// ToDo add []string
+// 	// "unhealthy": s.Object {
+// 	// 	"hosts": c.Str()
+// 	// }
+// }
+
+func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
+	var result common.MapStr
+
+	result["oplog"] = map[string]interface{}{
+		"logSize":  oplog.allocated,
+		"used":     oplog.used,
+		"tFirst":   oplog.firstTs,
+		"tLast":    oplog.lastTs,
+		"timeDiff": oplog.diff,
+	}
+	result["set_name"] = replStatus.Set
+	result["server_date"] = replStatus.Date.Unix()
+	result["optimes"] = map[string]interface{}{
+		// ToDo find actual timestamps
+		"lastCommitted": replStatus.OpTimes.LastCommitted.Ts,
+		"applied":       replStatus.OpTimes.Applied.Ts,
+		"durable":       replStatus.OpTimes.Durable.Ts,
+	}
+	result["members"] = map[string]interface{}{
+		"secondary": map[string]interface{}{"count": len(findHostsByState(replStatus.Members, SECONDARY))},
+		"unhealthy": findUnhealthyHosts(replStatus.Members),
+	}
+
+	return result
 }
