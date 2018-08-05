@@ -131,6 +131,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-socket,socket>>
 
+* <<metricbeat-metricset-system-socket_summary,socket_summary>>
+
 * <<metricbeat-metricset-system-uptime,uptime>>
 
 include::system/core.asciidoc[]
@@ -156,6 +158,8 @@ include::system/process_summary.asciidoc[]
 include::system/raid.asciidoc[]
 
 include::system/socket.asciidoc[]
+
+include::system/socket_summary.asciidoc[]
 
 include::system/uptime.asciidoc[]
 

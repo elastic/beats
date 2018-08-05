@@ -17836,6 +17836,98 @@ Name of the user running the process.
 --
 
 [float]
+== socket.summary fields
+
+Summary metrics of open sockets in the host system
+
+
+
+[float]
+== all fields
+
+All connections
+
+
+
+*`system.socket.summary.all.count`*::
++
+--
+type: integer
+
+All open connections
+
+
+--
+
+*`system.socket.summary.all.listening`*::
++
+--
+type: integer
+
+All listening ports
+
+
+--
+
+[float]
+== tcp fields
+
+All TCP connections
+
+
+
+[float]
+== all fields
+
+All TCP connections
+
+
+
+*`system.socket.summary.tcp.all.count`*::
++
+--
+type: integer
+
+All open TCP connections
+
+
+--
+
+*`system.socket.summary.tcp.all.listening`*::
++
+--
+type: integer
+
+All TCP listening ports
+
+
+--
+
+[float]
+== udp fields
+
+All UDP connections
+
+
+
+[float]
+== all fields
+
+All UDP connections
+
+
+
+*`system.socket.summary.udp.all.count`*::
++
+--
+type: integer
+
+All open TCP connections
+
+
+--
+
+[float]
 == uptime fields
 
 `uptime` contains the operating system uptime metric.
