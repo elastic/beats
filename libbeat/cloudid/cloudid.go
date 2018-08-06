@@ -126,9 +126,18 @@ func decodeCloudID(cloudID string) (string, string, error) {
 		return "", "", errors.Errorf("Expected at least 3 parts in %s", string(decoded))
 	}
 
-	// 4. form the URLs
-	esURL := url.URL{Scheme: "https", Host: fmt.Sprintf("%s.%s:443", words[1], words[0])}
-	kibanaURL := url.URL{Scheme: "https", Host: fmt.Sprintf("%s.%s:443", words[2], words[0])}
+	// 4. extract port from the host
+	host := words[0]
+	port := "443"
+	idx = strings.LastIndex(host, ":")
+	if idx >= 0 {
+		port = host[idx+1:]
+		host = host[:idx]
+	}
+
+	// 5. form the URLs
+	esURL := url.URL{Scheme: "https", Host: fmt.Sprintf("%s.%s:%s", words[1], host, port)}
+	kibanaURL := url.URL{Scheme: "https", Host: fmt.Sprintf("%s.%s:%s", words[2], host, port)}
 
 	return esURL.String(), kibanaURL.String(), nil
 }
