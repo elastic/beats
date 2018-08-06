@@ -263,11 +263,11 @@ metricbeat.autodiscover:
     - type: kubernetes
       templates:
         ...
-  appenders:
-    - type: config
-      condition.equals:
-        kubernetes.labels.app: "prometheus"
-      config:
-        fields:
-          type: monitoring
+      appenders:
+        - type: config
+          condition.equals:
+            kubernetes.namespace: "prometheus"
+          config:
+            fields:
+              type: monitoring
 -------------------------------------------------------------------------------------
