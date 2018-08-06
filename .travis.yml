@@ -5,12 +5,6 @@ services:
 
 language: go
 
-# Python seems broken since 2018/07/31
-# - https://blog.travis-ci.com/2018-07-19-xcode9-4-default-announce
-# - https://github.com/travis-ci/travis-ci/issues/9929
-# (TODO) Remove when fixed
-osx_image: xcode9.3
-
 # Make sure project can also be built on travis for clones of the repo
 go_import_path: github.com/elastic/beats
 
@@ -158,6 +152,8 @@ before_install:
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
+  - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv; fi
+
 
 # Skips installations step
 install: true
