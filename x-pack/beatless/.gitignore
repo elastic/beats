@@ -1,0 +1,9 @@
+.idea
+.vagrant
+.vscode
+/*/_meta/kibana.generated
+beatless
+build
+data
+fields.yml
+logs
