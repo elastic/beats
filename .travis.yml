@@ -99,6 +99,16 @@ jobs:
       go: $GO_VERSION
       stage: test
 
+    # Beatless
+    - os: linux
+      env: TARGETS="-C x-pack/beatless testsuite"
+      go: $GO_VERSION
+      stage: test
+    - os: osx
+      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/beatless testsuite"
+      go: $GO_VERSION
+      stage: test
+
     # Generators
     - os: linux
       env: TARGETS="-C generator/metricbeat test"
