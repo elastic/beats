@@ -331,4 +331,5 @@ include::../../libbeat/docs/opendashboards.asciidoc[]
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
+[role="screenshot"]
 image:./images/packetbeat-statistics.png[Packetbeat statistics]
