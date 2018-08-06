@@ -73,9 +73,12 @@ func TestFetch(t *testing.T) {
 			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
 			events, errs := mbtest.ReportingFetchV2(f)
 
-			assert.NotNil(t, events)
-			assert.Nil(t, errs)
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0].BeatEvent("elasticsearch", metricSet).Fields.StringToPrint())
+			assert.Empty(t, errs)
+			if !assert.NotEmpty(t, events) {
+				t.FailNow()
+			}
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+				events[0].BeatEvent("elasticsearch", metricSet).Fields.StringToPrint())
 		})
 	}
 }
