@@ -201,18 +201,7 @@ settings.
 See <<configuration-{beatname_lc}>> if you want to add the module configs to the
 +{beatname_lc}.yml+ file rather than using the `modules.d` directory.
 
-. If you are sending output directly to Elasticsearch (and not using Logstash),
-set the IP address and port where {beatname_uc} can find the Elasticsearch
-installation. For example:
-+
-[source,yaml]
-----------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["192.168.1.42:9200"]
-----------------------------------------------------------------------
-+
-If you are sending output to Logstash, make sure you
-<<logstash-output,Configure the Logstash output>> instead.
+include::../../libbeat/docs/step-configure-output.asciidoc[]
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
@@ -273,7 +262,7 @@ sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
 ----------------------------------------------------------------------
 <1> You'll be running {beatname_uc} as root, so you need to change ownership of the
 configuration file and any configurations enabled in the `modules.d` directory,
-or run {beatname_uc} with `-strict.perms=false` specified. See
+or run {beatname_uc} with `--strict.perms=false` specified. See
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 

@@ -95,19 +95,7 @@ To obtain a list of available event logs, run `Get-EventLog *` in PowerShell.
 For more information about this command, see the configuration details for
 <<configuration-winlogbeat-options-event_logs-name,event_logs.name>>.
 
-. If you are sending output directly to Elasticsearch (and not using Logstash),
-set the IP address and port where Winlogbeat can find the Elasticsearch
-installation:
-+
-[source,yaml]
-----------------------------------------------------------------------
-output.elasticsearch:
-  hosts:
-    - localhost:9200
-----------------------------------------------------------------------
-+
-If you are sending output to Logstash, make sure you
-<<config-winlogbeat-logstash,Configure the Logstash output>> instead.
+include::../../libbeat/docs/step-configure-output.asciidoc[]
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 

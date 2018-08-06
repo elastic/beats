@@ -62,7 +62,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "logstash.log.var.paths=[/path/to/log/logstash/logstash-server.log*]" -M "logstash.slowlog.var.paths=[/path/to/log/logstash/logstash-slowlog.log*]"
+-M "logstash.log.var.paths=[/path/to/log/logstash/logstash-server.log*]" -M "logstash.slowlog.var.paths=[/path/to/log/logstash/logstash-slowlog.log*]"
 -----
 
 
