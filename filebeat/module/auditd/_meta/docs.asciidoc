@@ -45,7 +45,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "auditd.log.var.paths=[/path/to/log/audit/audit.log*]"
+-M "auditd.log.var.paths=[/path/to/log/audit/audit.log*]"
 -----
 
 

@@ -54,7 +54,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "postgresql.log.var.paths=[/path/to/log/postgres/*.log*]"
+-M "postgresql.log.var.paths=[/path/to/log/postgres/*.log*]"
 -----
 
 
