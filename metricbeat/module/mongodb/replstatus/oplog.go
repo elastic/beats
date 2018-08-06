@@ -9,8 +9,8 @@ import (
 )
 
 type oplog struct {
-	allocated int
-	used      int
+	allocated int64
+	used      float64
 	firstTs   int64
 	lastTs    int64
 	diff      int64
@@ -37,13 +37,13 @@ func getReplicationInfo(mongoSession *mgo.Session) (*oplog, error) {
 		return nil, err
 	}
 
-	allocated, ok := oplogStatus["maxSize"].(int)
+	allocated, ok := oplogStatus["maxSize"].(int64)
 	if !ok {
 		err := errors.New("unexpected maxSize value found in oplog collStats")
 		return nil, err
 	}
 
-	used, ok := oplogStatus["size"].(int)
+	used, ok := oplogStatus["size"].(float64)
 	if !ok {
 		err := errors.New("unexpected size value found in oplog collStats")
 		return nil, err
