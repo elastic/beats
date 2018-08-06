@@ -86,12 +86,52 @@ output.elasticsearch:
   protocol: "https"
   username: "{beatname_lc}_internal"
   password: "{pwd}"
-
 ------------------------------------------------------------------------------
 
 
 For more information about securing {beatname_uc}, see
 <<securing-{beatname_lc}>>.
+
+
+To configure the Elasticsearch with index lifecycle management feature configure it as following:
+
+// TODO: Add link to ILM in Elasticsearch
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["localhost"]
+  ilm.enabled: true
+------------------------------------------------------------------------------
+
+This will overwrite your index settings and adjust the Beats template to contain the correct settings.
+
+Note: If you have loaded a template before into Elasticsearch with the same version you must overwrite the template.
+Note: This feature only works with X-Pack Basic.
+
+The default `rollover_alias` used is `{beatname_lc}-{beat.version}`. It's not possible to remove the `{beat.version}`
+from the rollover_alias name but the prefix part can be adjusted. This will also directly affect the name of the
+rollover indices. The default pattern used for the rollover index is `00001`. It can be adjusted with the
+`ilm.pattern` config. See config below for an example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["localhost"]
+  ilm.enabled: true
+  ilm.rollover_alias: "metricbeat"
+  ilm.pattern: "00001"
+------------------------------------------------------------------------------
+
+Note: If you modify the rollover_alias or the pattern you have to overwrite the index template again as the settings
+`index.lifecycle.name` and `index.lifecycle.rollover_alias` change automatically in the template.
+
+To load the default policy you can run `{beatname_lc} setup --ilm-policy`. It will load the default policy
+directly into Elasticsearch. If you want to modify the default policy and load it manually in Elasticsearch, you
+can run `{beatname_lc} export ilm-policy` which will print the policy to stdout. You can modify it and then upload
+it to Elasticsearch. Alternative you can load the default policy and modify it in Kibana.
+
+// TOOD: Add links to Kibana ILM docs
 
 ==== Compatibility
 
