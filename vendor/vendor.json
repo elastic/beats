@@ -1189,10 +1189,12 @@
 			"revisionTime": "2017-03-22T23:44:13Z"
 		},
 		{
-			"checksumSHA1": "Y89CHl2URaBbobeyCOr4kzbLwYE=",
+			"checksumSHA1": "VsImZoqjaqgwK+u/4eIEzQhuRNM=",
 			"path": "github.com/miekg/dns",
-			"revision": "5d001d020961ae1c184f9f8152fdc73810481677",
-			"revisionTime": "2016-06-14T16:21:01Z"
+			"revision": "5a2b9fab83ff0f8bfc99684bd5f43a37abe560f1",
+			"revisionTime": "2018-06-04T21:06:13Z",
+			"version": "v1.0.8",
+			"versionExact": "v1.0.8"
 		},
 		{
 			"checksumSHA1": "sWdAYPKyaT4SW8hNQNpRS0sU4lU=",
@@ -1528,6 +1530,18 @@
 			"path": "golang.org/x/crypto/blake2b",
 			"revision": "5119cf507ed5294cc409c092980c7497ee5d6fd2",
 			"revisionTime": "2018-01-22T10:39:14Z"
+		},
+		{
+			"checksumSHA1": "2LpxYGSf068307b7bhAuVjvzLLc=",
+			"path": "golang.org/x/crypto/ed25519",
+			"revision": "c126467f60eb25f8f27e5a981f32a87e3965053f",
+			"revisionTime": "2018-07-23T15:26:11Z"
+		},
+		{
+			"checksumSHA1": "0JTAFXPkankmWcZGQJGScLDiaN8=",
+			"path": "golang.org/x/crypto/ed25519/internal/edwards25519",
+			"revision": "c126467f60eb25f8f27e5a981f32a87e3965053f",
+			"revisionTime": "2018-07-23T15:26:11Z"
 		},
 		{
 			"checksumSHA1": "1MGpGDQqnUoRpv7VEcQrXOBydXE=",

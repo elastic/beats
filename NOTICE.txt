@@ -1598,7 +1598,8 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/miekg/dns
-Revision: 5d001d020961ae1c184f9f8152fdc73810481677
+Version: v1.0.8
+Revision: 5a2b9fab83ff0f8bfc99684bd5f43a37abe560f1
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/miekg/dns/LICENSE:
 --------------------------------------------------------------------
