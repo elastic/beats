@@ -324,7 +324,7 @@ to the same ownership and file permission checks.
 ==== Disabling strict permission checks
 
 You can disable strict permission checks from the command line by using
-`-strict.perms=false`, but we strongly encourage you to leave the checks enabled.
+`--strict.perms=false`, but we strongly encourage you to leave the checks enabled.
 
 [[config-file-format-cli]]
 === Command line arguments

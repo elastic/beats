@@ -47,7 +47,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules traefik -M "traefik.access.var.paths=[/path/to/traefik/access.log*]"
+-M "traefik.access.var.paths=[/path/to/traefik/access.log*]"
 -----
 
 

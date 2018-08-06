@@ -192,18 +192,7 @@ was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 See <<configuring-howto-heartbeat>> for a full description of each
 configuration option.
 
-. If you are sending output directly to Elasticsearch (and not using Logstash),
-set the IP address and port where Heartbeat can find the Elasticsearch
-installation:
-+
-[source,yaml]
-----------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["192.168.1.42:9200"]
-----------------------------------------------------------------------
-+
-If you are sending output to Logstash, make sure you
-<<logstash-output,Configure the Logstash output>> instead.
+include::../../libbeat/docs/step-configure-output.asciidoc[]
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
@@ -258,7 +247,7 @@ sudo chown root heartbeat.yml <1>
 sudo ./heartbeat -e -c heartbeat.yml -d "publish"
 ----------------------------------------------------------------------
 <1> You'll be running Heartbeat as root, so you need to change ownership of the
-configuration file, or run Heartbeat with `-strict.perms=false` specified. See
+configuration file, or run Heartbeat with `--strict.perms=false` specified. See
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
