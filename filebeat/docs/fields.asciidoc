@@ -250,7 +250,7 @@ The name of the operating system.
 
 --
 
-*`apache2.access.user_agent_raw`*::
+*`apache2.access.user_agent.raw`*::
 +
 --
 type: text
@@ -1985,7 +1985,7 @@ The name of the operating system.
 
 --
 
-*`iis.access.user_agent_raw`*::
+*`iis.access.user_agent.raw`*::
 +
 --
 type: text
@@ -3371,7 +3371,7 @@ The name of the operating system.
 
 --
 
-*`nginx.access.user_agent_raw`*::
+*`nginx.access.user_agent.raw`*::
 +
 --
 type: text
@@ -4381,7 +4381,7 @@ The name of the operating system.
 
 --
 
-*`traefik.access.user_agent_raw`*::
+*`traefik.access.user_agent.raw`*::
 +
 --
 type: text
