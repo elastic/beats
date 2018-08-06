@@ -18,7 +18,10 @@
 package socket_summary
 
 import (
+	"runtime"
 	"syscall"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 
@@ -50,6 +53,9 @@ type MetricSet struct {
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The socket_summary metricset is experimental.")
+	if runtime.GOOS == "windows" {
+		return nil, errors.New("socket_summary metricset is not supported in Windows")
+	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
