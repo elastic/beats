@@ -31,7 +31,7 @@ import (
 
 func TestEventMappingXPack(t *testing.T) {
 
-	files, err := filepath.Glob("./_meta/test/stats.*.json")
+	files, err := filepath.Glob("./_meta/test/stats-legacy.*.json")
 	assert.NoError(t, err)
 
 	for _, f := range files {

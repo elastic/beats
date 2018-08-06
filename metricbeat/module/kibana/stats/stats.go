@@ -63,10 +63,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	if config.XPackEnabled {
-		cfgwarn.Experimental("The experimental xpack.enabled flag in kibana/stats metricset is enabled.")
-	}
-
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
@@ -85,6 +81,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !isAPIAvailable {
 		const errorMsg = "The kibana stats metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
 		return nil, fmt.Errorf(errorMsg, kibana.StatsAPIAvailableVersion, kibanaVersion)
+	}
+
+	if config.XPackEnabled {
+		cfgwarn.Experimental("The experimental xpack.enabled flag in kibana/stats metricset is enabled.")
+
+		// Use legacy API response so we can passthru usage as-is
+		http.SetURI(http.GetURI() + "&legacy=true")
 	}
 
 	return &MetricSet{
