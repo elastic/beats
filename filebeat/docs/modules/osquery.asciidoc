@@ -53,7 +53,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "osquery.result.var.paths=[/path/to/osqueryd.results.log*]"
+-M "osquery.result.var.paths=[/path/to/osqueryd.results.log*]"
 -----
 
 include::../include/config-option-intro.asciidoc[]

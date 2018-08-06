@@ -221,19 +221,7 @@ packetbeat.protocols:
 
 ----------------------------------------------------------------------
 +
-. If you are sending output directly to Elasticsearch (and not using Logstash),
-set the IP address and port where Packetbeat can find the Elasticsearch
-installation:
-+
-[source,yaml]
-----------------------------------------------------------------------
-#-------------------------- Elasticsearch output ------------------------------
-output.elasticsearch:
-  hosts: ["192.168.1.42:9200"]
-----------------------------------------------------------------------
-+
-If you are sending output to Logstash, make sure you
-<<logstash-output,Configure the Logstash output>> instead.
+include::../../libbeat/docs/step-configure-output.asciidoc[]
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
@@ -298,7 +286,7 @@ sudo chown root packetbeat.yml <1>
 sudo ./packetbeat -e -c packetbeat.yml -d "publish"
 ----------------------------------------------------------------------
 <1> You'll be running Packetbeat as root, so you need to change ownership of the
-configuration file, or run Packetbeat with `-strict.perms=false` specified. See
+configuration file, or run Packetbeat with `--strict.perms=false` specified. See
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]in
 the _Beats Platform Reference_.
 

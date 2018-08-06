@@ -168,17 +168,7 @@ If you accept the default configuration without specifying additional modules,
 +
 See <<configuring-howto-{beatname_lc}>> for more details about configuring modules.
 
-. If you are sending output to Elasticsearch (and not using Logstash), set the
-IP address and port where {beatname_uc} can find the Elasticsearch installation:
-+
-[source,yaml]
-----------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["127.0.0.1:9200"]
-----------------------------------------------------------------------
-+
-If you are sending output to Logstash, make sure you
-<<logstash-output,Configure the Logstash output>> instead.
+include::../../libbeat/docs/step-configure-output.asciidoc[]
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
@@ -189,13 +179,13 @@ include::../../libbeat/docs/step-test-config.asciidoc[]
 include::../../libbeat/docs/step-look-at-config.asciidoc[]
 
 [id="{beatname_lc}-template"]
-=== Step 3: Load the index template in Elasticsearch
+=== Step 3: Load the index template in {es}
 
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
-=== Step 4: Set up the Kibana dashboards
+=== Step 4: Set up the {kib} dashboards
 
 :allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]
@@ -204,8 +194,8 @@ include::../../libbeat/docs/dashboards.asciidoc[]
 === Step 5: Start {beatname_uc}
 
 Run {beatname_uc} by issuing the appropriate command for your platform. If you
-are accessing a secured Elasticsearch cluster, make sure you've configured
-credentials as described in <<{beatname_lc}-configuration>>.
+are accessing a secured {es} cluster, make sure you've configured credentials as
+described in <<{beatname_lc}-configuration>>.
 
 NOTE: If you use an init.d script to start {beatname_uc} on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
@@ -234,7 +224,7 @@ sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
 ----------------------------------------------------------------------
 <1> To monitor system files, you'll be running {beatname_uc} as root, so you
 need to change ownership of the configuration file, or run {beatname_uc} with
-`-strict.perms=false` specified. See
+`--strict.perms=false` specified. See
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
@@ -252,22 +242,22 @@ By default the log files are stored in +C:{backslash}ProgramData{backslash}{beat
 
 ==== Test the {beatname_uc} installation
 
-To verify that your server's statistics are present in Elasticsearch, issue
-the following command:
+To verify that your server's statistics are present in {es}, issue the following
+command:
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 curl -XGET 'http://localhost:9200/{beatname_lc}-*/_search?pretty'
 ----------------------------------------------------------------------
 
-Make sure that you replace `localhost:9200` with the address of your
-Elasticsearch instance.
+Make sure that you replace `localhost:9200` with the address of your {es}
+instance.
 
 On Windows, if you don't have cURL installed, simply point your browser to the
 URL.
 
 [[view-kibana-dashboards]]
-=== Step 6: View the sample Kibana dashboards
+=== Step 6: View the sample {kib} dashboards
 
 To make it easier for you to start auditing the activities of users and
 processes on your system, we have created example {beatname_uc} dashboards.
