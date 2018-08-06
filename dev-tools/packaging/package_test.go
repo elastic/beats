@@ -47,10 +47,11 @@ const (
 )
 
 var (
-	configFilePattern   = regexp.MustCompile(`.*beat\.yml|apm-server\.yml`)
-	manifestFilePattern = regexp.MustCompile(`manifest.yml`)
-	modulesDirPattern   = regexp.MustCompile(`modules.d/$`)
-	modulesFilePattern  = regexp.MustCompile(`modules.d/.+`)
+	configFilePattern      = regexp.MustCompile(`.*beat\.yml|apm-server\.yml`)
+	manifestFilePattern    = regexp.MustCompile(`manifest.yml`)
+	modulesDirPattern      = regexp.MustCompile(`modules.d/$`)
+	modulesFilePattern     = regexp.MustCompile(`modules.d/.+`)
+	systemdUnitFilePattern = regexp.MustCompile(`/lib/systemd/system/.*\.service`)
 )
 
 var (
@@ -101,6 +102,7 @@ func checkRPM(t *testing.T, file string) {
 	checkManifestOwner(t, p)
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p)
+	checkSystemdUnitPermissions(t, p)
 }
 
 func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
@@ -116,6 +118,7 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	checkManifestOwner(t, p)
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p)
+	checkSystemdUnitPermissions(t, p)
 }
 
 func checkTar(t *testing.T, file string) {
@@ -243,6 +246,25 @@ func checkModulesOwner(t *testing.T, p *packageFile) {
 				}
 			}
 		}
+	})
+}
+
+// Verify that the systemd unit file has a mode of 0644. It should not be
+// executable.
+func checkSystemdUnitPermissions(t *testing.T, p *packageFile) {
+	const expectedMode = os.FileMode(0644)
+	t.Run(p.Name+" systemd unit file permissions", func(t *testing.T) {
+		for _, entry := range p.Contents {
+			if systemdUnitFilePattern.MatchString(entry.File) {
+				mode := entry.Mode.Perm()
+				if expectedMode != mode {
+					t.Errorf("file %v has wrong permissions: expected=%v actual=%v",
+						entry.File, expectedMode, mode)
+				}
+				return
+			}
+		}
+		t.Errorf("no systemd unit file found matching %v", configFilePattern)
 	})
 }
 
