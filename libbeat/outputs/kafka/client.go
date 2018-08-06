@@ -49,11 +49,13 @@ type client struct {
 }
 
 type msgRef struct {
-	client *client
-	count  int32
-	total  int
-	failed []publisher.Event
-	batch  publisher.Batch
+	client  *client
+	count   int32
+	total   int
+	failed  []publisher.Event
+	batch   publisher.Batch
+	success chan interface{}
+	error   chan error
 
 	err error
 }
@@ -116,13 +118,16 @@ func (c *client) Publish(batch publisher.Batch) error {
 	c.observer.NewBatch(len(events))
 
 	ref := &msgRef{
-		client: c,
-		count:  int32(len(events)),
-		total:  len(events),
-		failed: nil,
-		batch:  batch,
+		client:  c,
+		count:   int32(len(events)),
+		total:   len(events),
+		failed:  nil,
+		batch:   batch,
+		success: make(chan interface{}),
+		error:   make(chan error),
 	}
 
+	var publishError error
 	ch := c.producer.Input()
 	for i := range events {
 		d := &events[i]
@@ -137,9 +142,16 @@ func (c *client) Publish(batch publisher.Batch) error {
 		msg.ref = ref
 		msg.initProducerMessage()
 		ch <- &msg.msg
+		select {
+		case publishError = <-ref.error:
+			ref.batch.RetryEvents(ref.failed)
+			break
+		case _ = <-ref.success:
+			// do nothing
+		}
 	}
 
-	return nil
+	return publishError
 }
 
 func (c *client) String() string {
@@ -244,6 +256,7 @@ func (r *msgRef) fail(msg *message, err error) {
 func (r *msgRef) dec() {
 	i := atomic.AddInt32(&r.count, -1)
 	if i > 0 {
+		r.success <- i
 		return
 	}
 
@@ -254,7 +267,6 @@ func (r *msgRef) dec() {
 	if err != nil {
 		failed := len(r.failed)
 		success := r.total - failed
-		r.batch.RetryEvents(r.failed)
 
 		stats.Failed(failed)
 		if success > 0 {
@@ -262,8 +274,10 @@ func (r *msgRef) dec() {
 		}
 
 		debugf("Kafka publish failed with: %v", err)
+		r.error <- err
 	} else {
 		r.batch.ACK()
 		stats.Acked(r.total)
+		r.success <- r.total
 	}
 }
