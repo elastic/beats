@@ -46,7 +46,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "mongodb.log.var.paths=[/path/to/log/mongodb/*.log*]"
+-M "mongodb.log.var.paths=[/path/to/log/mongodb/*.log*]"
 -----
 
 
