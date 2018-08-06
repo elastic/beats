@@ -664,6 +664,10 @@ func (client *Client) Test(d testing.Driver) {
 	})
 }
 
+func (client *Client) String() string {
+	return "elasticsearch(" + client.Connection.URL + ")"
+}
+
 // Connect connects the client.
 func (conn *Connection) Connect() error {
 	var err error

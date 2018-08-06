@@ -106,3 +106,7 @@ func (t *testOutput) Publish(batch publisher.Batch) error {
 
 	return nil
 }
+
+func (t *testOutput) String() string {
+	return "test"
+}

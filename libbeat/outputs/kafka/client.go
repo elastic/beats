@@ -20,6 +20,7 @@ package kafka
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -139,6 +140,10 @@ func (c *client) Publish(batch publisher.Batch) error {
 	}
 
 	return nil
+}
+
+func (c *client) String() string {
+	return "kafka(" + strings.Join(c.hosts, ",") + ")"
 }
 
 func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
