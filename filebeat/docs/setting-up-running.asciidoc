@@ -4,7 +4,7 @@
 // that is unique to each beat.
 /////
 
-[[seting-up-and-running]]
+[[setting-up-and-running]]
 == Setting up and running {beatname_uc}
 
 Before reading this section, see the
