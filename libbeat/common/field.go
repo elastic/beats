@@ -119,6 +119,15 @@ func (f Fields) HasKey(key string) bool {
 	return f.hasKey(keys)
 }
 
+// HasKey checks if inside fields the given key exists
+// The key can be in the form of a.b.c and it will check if the nested field exist
+// In case the key is `a` and there is a value `a.b` false is return as it only
+// returns true if it's a leave node
+func (f Fields) GetKey(key string) *Field {
+	keys := strings.Split(key, ".")
+	return f.getKey(keys)
+}
+
 // HasNode checks if inside fields the given node exists
 // In contrast to HasKey it not only compares the leaf nodes but
 // every single key it traverses.
@@ -193,6 +202,32 @@ func (f Fields) hasKey(keys []string) bool {
 	return false
 }
 
+func (f Fields) getKey(keys []string) *Field {
+	// Nothing to compare anymore
+	if len(keys) == 0 {
+		return nil
+	}
+
+	key := keys[0]
+	keys = keys[1:]
+
+	for _, field := range f {
+		if field.Name == key {
+
+			if len(field.Fields) > 0 {
+				return field.Fields.getKey(keys)
+			}
+			// Last entry in the tree but still more keys
+			if len(keys) > 0 {
+				return nil
+			}
+
+			return &field
+		}
+	}
+	return nil
+}
+
 // GetKeys returns a flat list of keys this Fields contains
 func (f Fields) GetKeys() []string {
 	return f.getKeys("")
@@ -215,4 +250,45 @@ func (f Fields) getKeys(namespace string) []string {
 	}
 
 	return keys
+}
+
+// GetKeys returns a flat list of keys this Fields contains
+func (f Fields) GetFlatFields() map[string]Field {
+	return f.getFlatFields("")
+}
+
+func (f Fields) getFlatFields(namespace string) map[string]Field {
+
+	var fields = map[string]Field{}
+
+	for _, field := range f {
+		fieldName := namespace + "." + field.Name
+		if namespace == "" {
+			fieldName = field.Name
+		}
+		if len(field.Fields) == 0 {
+			fields[fieldName] = field
+		} else {
+			f := field.Fields.getFlatFields(fieldName)
+			// Iterate through all of them and add them
+			for k, ff := range f {
+				fields[k] = ff
+			}
+		}
+	}
+
+	return fields
+}
+
+func (f Fields) Flatten() map[string]Field {
+	keys := f.getKeys("")
+
+	fields := map[string]Field{}
+	for _, k := range keys {
+		field := f.GetKey(k)
+		field.Name = k
+		fields[k] = *field
+	}
+
+	return fields
 }

@@ -75,6 +75,9 @@ func (l *Loader) Load() error {
 	if l.config.JSON.Enabled {
 		templateName = l.config.JSON.Name
 	}
+
+	tmpl.LoadBytes(l.fields)
+
 	// Check if template already exist or should be overwritten
 	exists := l.CheckTemplate(templateName)
 	if !exists || l.config.Overwrite {

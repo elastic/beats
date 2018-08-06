@@ -28,12 +28,16 @@ import (
 	"net/url"
 	"time"
 
+	"strings"
+
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/testing"
 )
 
@@ -497,6 +501,10 @@ func bulkCollectPublishFails(
 	count := len(data)
 	failed := data[:0]
 	stats := bulkResultStats{}
+
+	// Collecting all keys in events which failed because of strict mapping. Makes sure every key exists only once.
+	var fieldKeys = map[string]struct{}{}
+
 	for i := 0; i < count; i++ {
 		status, msg, err := itemStatus(reader)
 		if err != nil {
@@ -515,7 +523,17 @@ func bulkCollectPublishFails(
 			continue // ok
 		}
 
-		if status < 500 && status != 429 {
+		if status == 400 && strings.Contains(string(msg), "strict_dynamic_mapping_exception") {
+			// Unfortunately the error contains only the first missing field, means we must add all fields for the mapping again.
+			logp.Err("dynamic mapping excpetion: %+v, %s", data[i].Content.Fields.Flatten(), string(msg))
+
+			keys := data[i].Content.Fields.Flatten()
+			// Collect all keys of the event. Existing fields are just overwritten.
+			for k := range keys {
+				fieldKeys[k] = struct{}{}
+			}
+
+		} else if status < 500 && status != 429 {
 			// hard failure, don't collect
 			logp.Warn("Cannot index event %#v (status=%v): %s", data[i], status, msg)
 			stats.nonIndexable++
@@ -525,6 +543,63 @@ func bulkCollectPublishFails(
 		debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
 		stats.fails++
 		failed = append(failed, data[i])
+	}
+
+	// Load all missing fields to the index
+	if len(fieldKeys) > 0 {
+		var fields common.Fields
+
+		fieldsMap := template.Fields.GetFlatFields()
+		for k := range fieldKeys {
+
+			if field, ok := fieldsMap[k]; ok {
+				logp.Err("%s, %v", k, field.Type)
+				field.Name = k
+				fields = append(fields, field)
+			} else {
+				// Is it dynamic mapping keys that we don't find here?
+				logp.Err("nil field: %s", k)
+			}
+		}
+
+		// @timestamp field needs to be added manually because it's not in the fields list
+		fields = append(fields, fieldsMap["@timestamp"])
+
+		// TODO: how do we deal with dynamic mappings in indices? Can they be overlaoded too?
+
+		conf := map[string]interface{}{
+			"hosts": []string{"localhost:9200"},
+		}
+
+		cfg, _ := common.NewConfigFrom(conf)
+
+		esClient, err := NewConnectedClient(cfg)
+		if err != nil {
+			logp.Err("connected client: %s", err)
+		}
+		logp.Err("Version: %s", esClient.GetVersion())
+
+		// TODO: fetch elasticsearch version to define how fields are processed
+		version, _ := common.NewVersion(esClient.GetVersion())
+		properties := common.MapStr{}
+		processor := template.Processor{EsVersion: *version}
+		if err := processor.Process(fields, "", properties); err != nil {
+			logp.Err("Procesing issue: %s", err)
+		}
+
+		logp.Err("Properties: %s", properties)
+
+		// TODO: create mapping based on elasticsearch version
+
+		// Send missing mapping
+		body := common.MapStr{"properties": properties}
+		_, _, err = esClient.Request("PUT", "/metricbeat-7.0.0-alpha1-2018.08.15/_mapping/doc", "", nil, body)
+		if err != nil {
+			// TODO: we should check error and if index not exist error, we should create the index and resend mapping
+			logp.Err("Error loading index mapping: %s", err)
+		}
+
+		// Data is now resent but mapping should exist.
 	}
 
 	return failed, stats

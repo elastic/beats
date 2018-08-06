@@ -39,6 +39,8 @@ var (
 	dynamicTemplates []common.MapStr
 
 	defaultFields []string
+
+	Fields common.Fields
 )
 
 type Template struct {
@@ -119,6 +121,8 @@ func (t *Template) load(fields common.Fields) (common.MapStr, error) {
 	// Locking to make sure dynamicTemplates and defaultFields is not accessed in parallel
 	t.Lock()
 	defer t.Unlock()
+
+	Fields = fields
 
 	dynamicTemplates = nil
 	defaultFields = nil
