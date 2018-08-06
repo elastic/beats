@@ -54,7 +54,7 @@ import (
 // }
 
 func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
-	var result common.MapStr
+	var result common.MapStr = make(common.MapStr)
 
 	result["oplog"] = map[string]interface{}{
 		"logSize":  oplog.allocated,
