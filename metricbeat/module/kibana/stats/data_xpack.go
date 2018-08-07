@@ -105,25 +105,30 @@ var (
 	}
 )
 
-type dataParser func(mb.ReporterV2, common.MapStr, time.Time) (string, common.MapStr, error)
+type dataParser func(mb.ReporterV2, common.MapStr, time.Time) (string, string, common.MapStr, error)
 
-func statsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string, common.MapStr, error) {
+func statsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string, string, common.MapStr, error) {
+	clusterUUID, ok := data["clusterUuid"].(string)
+	if !ok {
+		return "", "", nil, elastic.ReportErrorForMissingField("clusterUuid", elastic.Kibana, r)
+	}
+
 	kibanaStatsFields, err := schemaXPackMonitoringStats.Apply(data)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, err
 	}
 
 	process, ok := data["process"].(map[string]interface{})
 	if !ok {
-		return "", nil, elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
 	}
 	memory, ok := process["memory"].(map[string]interface{})
 	if !ok {
-		return "", nil, elastic.ReportErrorForMissingField("process.memory", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("process.memory", elastic.Kibana, r)
 	}
 	rss, ok := memory["resident_set_size_bytes"].(float64)
 	if !ok {
-		return "", nil, elastic.ReportErrorForMissingField("process.memory.resident_set_size_bytes", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("process.memory.resident_set_size_bytes", elastic.Kibana, r)
 	}
 	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int64(rss))
 
@@ -132,20 +137,25 @@ func statsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string
 	// Make usage field passthrough as-is
 	usage, ok := data["usage"].(map[string]interface{})
 	if !ok {
-		return "", nil, elastic.ReportErrorForMissingField("usage", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("usage", elastic.Kibana, r)
 	}
 	kibanaStatsFields.Put("usage", usage)
 
-	return "kibana_stats", kibanaStatsFields, nil
+	return "kibana_stats", clusterUUID, kibanaStatsFields, nil
 }
 
-func settingsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string, common.MapStr, error) {
-	kibanaSettingsFields, ok := data["settings"]
+func settingsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string, string, common.MapStr, error) {
+	clusterUUID, ok := data["cluster_uuid"].(string)
 	if !ok {
-		return "", nil, elastic.ReportErrorForMissingField("settings", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("cluster_uuid", elastic.Kibana, r)
 	}
 
-	return "kibana_settings", kibanaSettingsFields.(map[string]interface{}), nil
+	kibanaSettingsFields, ok := data["settings"]
+	if !ok {
+		return "", "", nil, elastic.ReportErrorForMissingField("settings", elastic.Kibana, r)
+	}
+
+	return "kibana_settings", clusterUUID, kibanaSettingsFields.(map[string]interface{}), nil
 }
 
 func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte, dataParserFunc dataParser) error {
@@ -156,12 +166,7 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content
 		return err
 	}
 
-	clusterUUID, ok := data["clusterUuid"].(string)
-	if !ok {
-		return elastic.ReportErrorForMissingField("clusterUuid", elastic.Kibana, r)
-	}
-
-	t, fields, err := dataParserFunc(r, data, now)
+	t, clusterUUID, fields, err := dataParserFunc(r, data, now)
 	if err != nil {
 		return err
 	}
