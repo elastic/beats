@@ -21,38 +21,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// var schema = s.Schema{
-// 	"oplog": c.Dict("oplog", s.Schema{
-// 		"size": s.Object{
-// 			"allocated": c.Int("logSize"),
-// 			"used":      c.Int("used"),
-// 		},
-// 		"first": s.Object{
-// 			"timestamp": c.Int("tFirst"),
-// 		},
-// 		"last": s.Object{
-// 			"timestamp": c.Int("tLast"),
-// 		},
-// 		"window": c.Int("timeDiff"),
-// 	}),
-// 	"set_name":    c.Str("setName"),
-// 	"server_date": c.Int("serverDate"),
-// 	"operation_times": c.Dict("operationTimes", s.Schema{
-// 		"last_committed": c.Int("lastCommitted"),
-// 		"applied":        c.Int("applied"),
-// 		"durable":        c.Int("durable"),
-// 	}),
-// 	"states": c.Dict("stateCount", s.Schema{
-// 		"secondary": s.Object{
-// 			"count": c.Int("secondary"),
-// 		},
-// 	}),
-// 	// ToDo add []string
-// 	// "unhealthy": s.Object {
-// 	// 	"hosts": c.Str()
-// 	// }
-// }
-
 func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
 	var result common.MapStr = make(common.MapStr)
 
@@ -70,7 +38,7 @@ func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
 		"window": oplog.diff,
 	}
 	result["set_name"] = replStatus.Set
-	result["server_date"] = replStatus.Date.Unix()
+	result["server_date"] = replStatus.Date
 	result["optimes"] = map[string]interface{}{
 		// ToDo find actual timestamps
 		"last_committed": replStatus.OpTimes.LastCommitted.Ts,
@@ -90,7 +58,7 @@ func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
 		secondaryHosts = findHostsByState(replStatus.Members, SECONDARY)
 	 	recoveringHosts = findHostsByState(replStatus.Members, RECOVERING)
 	 	unknownHosts = findHostsByState(replStatus.Members, UNKNOWN)
-	 	startupHosts = findHostsByState(replStatus.Members, STARTUP2)
+	 	startup2Hosts = findHostsByState(replStatus.Members, STARTUP2)
 	 	arbiterHosts = findHostsByState(replStatus.Members, ARBITER)
 	 	downHosts = findHostsByState(replStatus.Members, DOWN)
 	 	rollbackHosts = findHostsByState(replStatus.Members, ROLLBACK)
@@ -111,9 +79,9 @@ func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
 			"hosts": unknownHosts,
 			"count": len(unknownHosts),
 		},
-		"startup": map[string]interface{}{
-			"hosts": startupHosts,
-			"count": len(startupHosts),
+		"startup2": map[string]interface{}{
+			"hosts": startup2Hosts,
+			"count": len(startup2Hosts),
 		},
 		"arbiter": map[string]interface{}{
 			"hosts": arbiterHosts,
