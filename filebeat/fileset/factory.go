@@ -46,6 +46,7 @@ type Factory struct {
 	beatVersion           string
 	pipelineLoaderFactory PipelineLoaderFactory
 	overwritePipelines    bool
+	pipelineCallbackId    int
 	beatDone              chan struct{}
 }
 
@@ -55,6 +56,7 @@ type inputsRunner struct {
 	moduleRegistry        *ModuleRegistry
 	inputs                []*input.Runner
 	pipelineLoaderFactory PipelineLoaderFactory
+	pipelineCallbackId    int
 	overwritePipelines    bool
 }
 
@@ -67,6 +69,7 @@ func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVers
 		beatVersion:           beatVersion,
 		beatDone:              beatDone,
 		pipelineLoaderFactory: pipelineLoaderFactory,
+		pipelineCallbackId:    -1,
 		overwritePipelines:    overwritePipelines,
 	}
 }
@@ -107,6 +110,7 @@ func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 		moduleRegistry:        m,
 		inputs:                inputs,
 		pipelineLoaderFactory: f.pipelineLoaderFactory,
+		pipelineCallbackId:    f.pipelineCallbackId,
 		overwritePipelines:    f.overwritePipelines,
 	}, nil
 }
@@ -130,7 +134,7 @@ func (p *inputsRunner) Start() {
 		callback := func(esClient *elasticsearch.Client) error {
 			return p.moduleRegistry.LoadPipelines(esClient, p.overwritePipelines)
 		}
-		elasticsearch.RegisterConnectCallback(callback)
+		p.pipelineCallbackId = elasticsearch.RegisterConnectCallback(callback)
 	}
 
 	for _, input := range p.inputs {
@@ -143,6 +147,10 @@ func (p *inputsRunner) Start() {
 	}
 }
 func (p *inputsRunner) Stop() {
+	if p.pipelineCallbackId != -1 {
+		elasticsearch.DeregisterConnectCallback(p.pipelineCallbackId)
+	}
+
 	for _, input := range p.inputs {
 		input.Stop()
 	}

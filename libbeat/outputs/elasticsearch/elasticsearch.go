@@ -50,19 +50,40 @@ var (
 )
 
 type callbacksRegistry struct {
-	callbacks []connectCallback
+	callbacks map[int]connectCallback
+	nextKey   int
 	mutex     sync.Mutex
 }
 
 // XXX: it would be fantastic to do this without a package global
-var connectCallbackRegistry callbacksRegistry
+var connectCallbackRegistry = newCallbacksRegistry()
+
+func newCallbacksRegistry() callbacksRegistry {
+	return callbacksRegistry{
+		callbacks: make(map[int]connectCallback),
+	}
+}
 
 // RegisterConnectCallback registers a callback for the elasticsearch output
 // The callback is called each time the client connects to elasticsearch.
-func RegisterConnectCallback(callback connectCallback) {
+// It returns the key of the newly added callback, so it can be deregistered later.
+func RegisterConnectCallback(callback connectCallback) int {
 	connectCallbackRegistry.mutex.Lock()
 	defer connectCallbackRegistry.mutex.Unlock()
-	connectCallbackRegistry.callbacks = append(connectCallbackRegistry.callbacks, callback)
+
+	key := connectCallbackRegistry.nextKey
+	connectCallbackRegistry.callbacks[key] = callback
+	connectCallbackRegistry.nextKey++
+	return key
+}
+
+// DeregisterConnectCallback deregisters a callback for the elasticsearch output
+// specified by its key. If a callback does not exist, nothing happens.
+func DeregisterConnectCallback(key int) {
+	connectCallbackRegistry.mutex.Lock()
+	defer connectCallbackRegistry.mutex.Unlock()
+
+	delete(connectCallbackRegistry.callbacks, key)
 }
 
 func makeES(
