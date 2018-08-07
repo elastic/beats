@@ -31,6 +31,8 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+const DefaultCloudPort = "443"
+
 // OverwriteSettings modifies the received config object by overwriting the
 // output.elasticsearch.hosts, output.elasticsearch.username, output.elasticsearch.password,
 // setup.kibana.host settings based on values derived from the cloud.id and cloud.auth
@@ -128,7 +130,7 @@ func decodeCloudID(cloudID string) (string, string, error) {
 
 	// 4. extract port from the host
 	host := words[0]
-	port := "443"
+	port := DefaultCloudPort
 	idx = strings.LastIndex(host, ":")
 	if idx >= 0 {
 		port = host[idx+1:]
