@@ -76,7 +76,7 @@
     - name: headroom
       type: group
       description: >
-        Difference between the primary’s oplog window and the replication lag of the secondary
+        Difference between the primary's oplog window and the replication lag of the secondary
       fields:
         - name: max
           type: long
