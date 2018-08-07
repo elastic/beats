@@ -114,12 +114,28 @@ func TestIngest(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	exists, err := client.PipelineExists(pipeline)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if exists == true {
+		t.Fatalf("Test expected PipelineExists to return false for %v", pipeline)
+	}
+
 	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if !resp.Acknowledged {
 		t.Fatalf("Test pipeline %v not created", pipeline)
+	}
+
+	exists, err = client.PipelineExists(pipeline)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if exists == false {
+		t.Fatalf("Test expected PipelineExists to return true for %v", pipeline)
 	}
 
 	params := map[string]string{"refresh": "true"}
