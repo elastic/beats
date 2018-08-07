@@ -155,7 +155,7 @@ beat_path [github.com/{github id}]:
 full_name [Firstname Lastname]: {Full Name}
 ---------
 
-The Beat generator creates a directory called `countbeat` inside of your project folder.
+The Beat generator creates a directory called `countbeat` inside of your project folder (e.g. {project folder}/github.com/{github id}/countbeat).
 
 You now have a raw template of the Beat, but you still need to <<setting-up-beat,fetch dependencies and set up the Beat>>.
 
