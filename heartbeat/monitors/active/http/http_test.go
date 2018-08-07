@@ -25,13 +25,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/phayes/freeport"
-
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
+	btesting "github.com/elastic/beats/libbeat/testing"
 	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
@@ -198,7 +197,9 @@ func TestDownStatuses(t *testing.T) {
 
 func TestConnRefusedJob(t *testing.T) {
 	ip := "127.0.0.1"
-	port := uint16(freeport.GetPort())
+	port, err := btesting.AvailableTCP4Port()
+	require.NoError(t, err)
+
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
 	event := testRequest(t, url)
