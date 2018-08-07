@@ -56,6 +56,21 @@ func TestDecode(t *testing.T) {
 			expectedEsURL:     "https://ac31ebb90241773157043c34fd26fd46.us-central1.gcp.cloud.es.io:9243",
 			expectedKibanaURL: "https://a4c06230e48c8fce7be88a074a3bb3e0.us-central1.gcp.cloud.es.io:9243",
 		},
+		{
+			cloudID:           "different-es-kb-port:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJGFjMzFlYmI5MDI0MTc3MzE1NzA0M2MzNGZkMjZmZDQ2OjkyNDMkYTRjMDYyMzBlNDhjOGZjZTdiZTg4YTA3NGEzYmIzZTA6OTI0NA==",
+			expectedEsURL:     "https://ac31ebb90241773157043c34fd26fd46.us-central1.gcp.cloud.es.io:9243",
+			expectedKibanaURL: "https://a4c06230e48c8fce7be88a074a3bb3e0.us-central1.gcp.cloud.es.io:9244",
+		},
+		{
+			cloudID:           "only-kb-set:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJGFjMzFlYmI5MDI0MTc3MzE1NzA0M2MzNGZkMjZmZDQ2JGE0YzA2MjMwZTQ4YzhmY2U3YmU4OGEwNzRhM2JiM2UwOjkyNDQ=",
+			expectedEsURL:     "https://ac31ebb90241773157043c34fd26fd46.us-central1.gcp.cloud.es.io:443",
+			expectedKibanaURL: "https://a4c06230e48c8fce7be88a074a3bb3e0.us-central1.gcp.cloud.es.io:9244",
+		},
+		{
+			cloudID:           "host-and-kb-set:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjkyNDMkYWMzMWViYjkwMjQxNzczMTU3MDQzYzM0ZmQyNmZkNDYkYTRjMDYyMzBlNDhjOGZjZTdiZTg4YTA3NGEzYmIzZTA6OTI0NA==",
+			expectedEsURL:     "https://ac31ebb90241773157043c34fd26fd46.us-central1.gcp.cloud.es.io:9243",
+			expectedKibanaURL: "https://a4c06230e48c8fce7be88a074a3bb3e0.us-central1.gcp.cloud.es.io:9244",
+		},
 	}
 
 	for _, test := range tests {
