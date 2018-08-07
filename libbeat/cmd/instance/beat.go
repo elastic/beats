@@ -392,10 +392,7 @@ func (b *Beat) TestConfig(bt beat.Creator) error {
 	}())
 }
 
-// *registers ES index template
-// *loads kibana dashboards
-// *setup machine learning job config
-// *registers pipelines
+// Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
 func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pipelines bool) error {
 	return handleError(func() error {
 		err := b.Init()

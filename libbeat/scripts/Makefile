@@ -368,10 +368,6 @@ KIBANA_URL?=http://localhost:5601
 import-dashboards: update ${BEAT_NAME}
 	${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME} setup -E setup.dashboards.directory=${PWD}/_meta/kibana.generated -E setup.kibana.host=${KIBANA_URL} --dashboards
 
-.PHONY: register-pipelines
-register-pipelines: update ${BEAT_NAME}
-	${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME} setup --pipelines
-
 ### CONTAINER ENVIRONMENT ####
 
 # Builds the environment to test beat
