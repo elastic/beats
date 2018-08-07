@@ -27,7 +27,7 @@ type Not struct {
 // NewNotCondition builds a new Not condition that negates the provided Condition.
 func NewNotCondition(c Condition) (Not, error) {
 	if c == nil {
-		return Not{}, fmt.Errorf("Empty not conditions are not allowed")
+		return Not{}, fmt.Errorf("empty not conditions are not allowed")
 	}
 	return Not{c}, nil
 }

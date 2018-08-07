@@ -57,7 +57,7 @@ func NewRangeCondition(config map[string]interface{}) (c Range, err error) {
 		case "lte":
 			rv.lte = &value
 		default:
-			return fmt.Errorf("unexpected field %s", op)
+			return fmt.Errorf("unexpected range operator %s", op)
 		}
 		c[field] = rv
 		return nil
@@ -137,7 +137,7 @@ func (c Range) Check(event ValuesMap) bool {
 			}
 
 		default:
-			logp.Warn("unexpected type %T in range condition. ", value)
+			logp.L().Named(logName).Warnf("unexpected type %T in range condition.", value)
 			return false
 		}
 

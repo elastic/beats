@@ -55,7 +55,7 @@ func NewEqualsCondition(fields map[string]interface{}) (c Equals, err error) {
 			continue
 		}
 
-		return nil, fmt.Errorf("condition attempted to set '%v' -> '%v' and encountered unexpected type '%T', only strings ints, and bools are allowed", field, value, value)
+		return nil, fmt.Errorf("condition attempted to set '%v' -> '%v' and encountered unexpected type '%T', only strings, ints, and booleans are allowed", field, value, value)
 	}
 
 	return c, nil
@@ -97,7 +97,7 @@ func (c Equals) Check(event ValuesMap) bool {
 			continue
 		}
 
-		logp.Err("unexpected type %T in equals condition as it accepts only integers, strings or bools. ", value)
+		logp.L().Named(logName).Warnf("unexpected type %T in equals condition as it accepts only integers, strings, or booleans.", value)
 		return false
 	}
 
