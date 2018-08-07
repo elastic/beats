@@ -1,7 +1,6 @@
 package replstatus
 
 import (
-	"math"
 	"time"
 
 	mgo "gopkg.in/mgo.v2"
