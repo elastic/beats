@@ -59,6 +59,7 @@ import (
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
+	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 
 	// Register publisher pipeline modules
