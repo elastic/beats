@@ -14,6 +14,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.0.3]
+
+### Fixed
+- Fix build for *BSD. PR #20
+
 
 ## [0.0.2]
 
@@ -37,5 +42,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Windows Fix: Max mmaped area must not exceed actual file size on windows. PR #11
 
 
-[Unreleased]: https://github.com/elastic/go-txfile/compare/v0.0.2...HEAD
+[Unreleased]: https://github.com/elastic/go-txfile/compare/v0.0.3...HEAD
+[0.0.3]: https://github.com/elastic/go-txfile/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/elastic/go-txfile/compare/v0.0.1...v0.0.2

@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/go-txfile/internal/vfs"
 )
 
+type syncState struct{}
+
 // Sync uses fsync, for flushing and syncing a file to disk.  If the OS, file
 // system, or disk drivers do not enforce a flush on all the intermediate
 // caches and the drive itself, there is a chance of data loss and file
