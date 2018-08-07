@@ -113,9 +113,8 @@ func extractPortFromName(word string, defaultPort string) (id, port string) {
 	idx := strings.LastIndex(word, ":")
 	if idx >= 0 {
 		return word[:idx], word[idx+1:]
-	} else {
-		return word, defaultPort
 	}
+	return word, defaultPort
 }
 
 // decodeCloudID decodes the cloud.id into elasticsearch-URL and kibana-URL
