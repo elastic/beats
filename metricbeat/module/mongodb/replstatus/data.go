@@ -77,6 +77,10 @@ func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
 		"applied":       replStatus.OpTimes.Applied.Ts,
 		"durable":       replStatus.OpTimes.Durable.Ts,
 	}
+	result["lag"] = map[string]interface{} {
+		"max": findMaxLag(replStatus.Members),
+		"min": findMinLag(replStatus.Members),
+	}
 
 	var (
 		secondaryHosts = findHostsByState(replStatus.Members, SECONDARY)
@@ -88,7 +92,7 @@ func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
 	 	rollbackHosts = findHostsByState(replStatus.Members, ROLLBACK)
 		unhealthyHosts = findUnhealthyHosts(replStatus.Members)
 	)
-	
+
 	result["members"] = map[string]interface{}{
 		"primary": findHostsByState(replStatus.Members, PRIMARY)[0],
 		"secondary": map[string]interface{}{
