@@ -21,6 +21,7 @@ import (
 	"math"
 	"os/user"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -44,6 +45,7 @@ func (i *stringItem) isExpired() bool {
 type UserCache struct {
 	expiration time.Duration
 	data       map[string]stringItem
+	mutex      sync.Mutex
 }
 
 // NewUserCache returns a new UserCache. UserCache is not thread-safe.
@@ -59,10 +61,13 @@ func NewUserCache(expiration time.Duration) UserCache {
 // LookupUID looks up a UID and returns the username associated with it. If
 // no username could be found an empty string is returned. The value will be
 // cached for a minute. This requires cgo on Linux.
-func (c UserCache) LookupUID(uid string) string {
+func (c *UserCache) LookupUID(uid string) string {
 	if uid == "" || uid == "unset" {
 		return ""
 	}
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
 	if item, found := c.data[uid]; found && !item.isExpired() {
 		return item.value
@@ -83,6 +88,7 @@ func (c UserCache) LookupUID(uid string) string {
 type GroupCache struct {
 	expiration time.Duration
 	data       map[string]stringItem
+	mutex      sync.Mutex
 }
 
 // NewGroupCache returns a new GroupCache. GroupCache is not thread-safe.
@@ -98,10 +104,13 @@ func NewGroupCache(expiration time.Duration) GroupCache {
 // LookupGID looks up a GID and returns the group associated with it. If
 // no group could be found an empty string is returned. The value will be
 // cached for a minute. This requires cgo on Linux.
-func (c GroupCache) LookupGID(gid string) string {
+func (c *GroupCache) LookupGID(gid string) string {
 	if gid == "" || gid == "unset" {
 		return ""
 	}
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
 	if item, found := c.data[gid]; found && !item.isExpired() {
 		return item.value
