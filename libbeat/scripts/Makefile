@@ -355,7 +355,7 @@ docs:  ## @build Builds the documents for the beat
 docs-preview:  ## @build Preview the documents for the beat in the browser
 	PREVIEW=1 $(MAKE) docs
 
-### KIBANA FILES HANDLING ###
+### SETUP commands ###
 ES_URL?=http://localhost:9200
 KIBANA_URL?=http://localhost:5601
 

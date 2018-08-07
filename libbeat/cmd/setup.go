@@ -55,6 +55,7 @@ func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cob
 				template = true
 				dashboards = true
 				machineLearning = true
+				pipelines = true
 			}
 
 			if err = beat.Setup(beatCreator, template, dashboards, machineLearning, pipelines); err != nil {
@@ -63,10 +64,10 @@ func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cob
 		},
 	}
 
-	setup.Flags().Bool("template", false, "Setup index template only")
-	setup.Flags().Bool("dashboards", false, "Setup dashboards only")
-	setup.Flags().Bool("machine-learning", false, "Setup machine learning job configurations only")
-	setup.Flags().Bool("pipelines", false, "Setup Ingest pipelines only")
+	setup.Flags().Bool("template", false, "Setup index template")
+	setup.Flags().Bool("dashboards", false, "Setup dashboards")
+	setup.Flags().Bool("machine-learning", false, "Setup machine learning job configurations")
+	setup.Flags().Bool("pipelines", false, "Setup Ingest pipelines")
 
 	return &setup
 }

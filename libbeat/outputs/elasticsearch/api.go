@@ -163,6 +163,16 @@ func (es *Connection) Delete(index string, docType string, id string, params map
 	return withQueryResult(es.apiCall("DELETE", index, docType, id, "", params, nil))
 }
 
+// PipelineExists checks if a pipeline with name id already exists.
+// Using: https://www.elastic.co/guide/en/elasticsearch/reference/current/get-pipeline-api.html
+func (es *Connection) PipelineExists(id string) (bool, error) {
+	status, _, err := es.apiCall("GET", "_ingest", "pipeline", id, "", nil, nil)
+	if status == 404 {
+		return false, nil
+	}
+	return status == 200, err
+}
+
 // CreatePipeline create a new ingest pipeline with name id.
 // Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/put-pipeline-api.html
 func (es *Connection) CreatePipeline(
