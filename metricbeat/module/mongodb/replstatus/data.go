@@ -57,23 +57,72 @@ func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
 	var result common.MapStr = make(common.MapStr)
 
 	result["oplog"] = map[string]interface{}{
-		"logSize":  oplog.allocated,
-		"used":     oplog.used,
-		"tFirst":   oplog.firstTs,
-		"tLast":    oplog.lastTs,
-		"timeDiff": oplog.diff,
+		"size":  map[string]interface{} {
+			"allocated": oplog.allocated,
+			"used":     oplog.used,
+		},
+		"first": map[string]interface{} {
+			"timestamp": oplog.firstTs,
+		},
+		"last":  map[string]interface{} {
+			"timestamp": oplog.lastTs,
+		},
+		"window": oplog.diff,
 	}
 	result["set_name"] = replStatus.Set
 	result["server_date"] = replStatus.Date.Unix()
 	result["optimes"] = map[string]interface{}{
 		// ToDo find actual timestamps
-		"lastCommitted": replStatus.OpTimes.LastCommitted.Ts,
+		"last_committed": replStatus.OpTimes.LastCommitted.Ts,
 		"applied":       replStatus.OpTimes.Applied.Ts,
 		"durable":       replStatus.OpTimes.Durable.Ts,
 	}
+
+	var (
+		secondaryHosts = findHostsByState(replStatus.Members, SECONDARY)
+	 	recoveringHosts = findHostsByState(replStatus.Members, RECOVERING)
+	 	unknownHosts = findHostsByState(replStatus.Members, UNKNOWN)
+	 	startupHosts = findHostsByState(replStatus.Members, STARTUP2)
+	 	arbiterHosts = findHostsByState(replStatus.Members, ARBITER)
+	 	downHosts = findHostsByState(replStatus.Members, DOWN)
+	 	rollbackHosts = findHostsByState(replStatus.Members, ROLLBACK)
+		unhealthyHosts = findUnhealthyHosts(replStatus.Members)
+	)
+	
 	result["members"] = map[string]interface{}{
-		"secondary": map[string]interface{}{"count": len(findHostsByState(replStatus.Members, SECONDARY))},
-		"unhealthy": findUnhealthyHosts(replStatus.Members),
+		"primary": findHostsByState(replStatus.Members, PRIMARY)[0],
+		"secondary": map[string]interface{}{
+			"hosts": secondaryHosts,
+			"count": len(secondaryHosts),
+		},
+		"recovering": map[string]interface{}{
+			"hosts": recoveringHosts,
+			"count": len(recoveringHosts),
+		},
+		"unknown": map[string]interface{}{
+			"hosts": unknownHosts,
+			"count": len(unknownHosts),
+		},
+		"startup": map[string]interface{}{
+			"hosts": startupHosts,
+			"count": len(startupHosts),
+		},
+		"arbiter": map[string]interface{}{
+			"hosts": arbiterHosts,
+			"count": len(arbiterHosts),
+		},
+		"down": map[string]interface{}{
+			"hosts": downHosts,
+			"count": len(downHosts),
+		},
+		"rollback": map[string]interface{}{
+			"hosts": rollbackHosts,
+			"count": len(rollbackHosts),
+		},
+		"unhealthy": map[string]interface{} {
+			"hosts": unhealthyHosts,
+			"count": len(unhealthyHosts),
+		},
 	}
 
 	return result
