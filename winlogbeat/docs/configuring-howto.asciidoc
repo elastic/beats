@@ -31,6 +31,7 @@ The following topics describe how to configure Winlogbeat:
 * <<configuration-logging>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
+* <<http-endpoint>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -64,5 +65,7 @@ include::../../libbeat/docs/shared-env-vars.asciidoc[]
 :standalone:
 :win:
 include::../../libbeat/docs/yaml.asciidoc[]
+
+include::../../libbeat/docs/http-endpoint.asciidoc[]
 
 include::../../libbeat/docs/reference-yml.asciidoc[]
