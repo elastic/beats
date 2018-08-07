@@ -81,6 +81,10 @@ func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
 		"max": findMaxLag(replStatus.Members),
 		"min": findMinLag(replStatus.Members),
 	}
+	result["headroom"] = map[string]interface{} {
+		"max": oplog.diff - findMinLag(replStatus.Members),
+		"min": oplog.diff - findMaxLag(replStatus.Members),
+	}
 
 	var (
 		secondaryHosts = findHostsByState(replStatus.Members, SECONDARY)
