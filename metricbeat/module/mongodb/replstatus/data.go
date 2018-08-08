@@ -41,9 +41,9 @@ func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
 	result["server_date"] = replStatus.Date
 	result["optimes"] = map[string]interface{}{
 		// ToDo find actual timestamps
-		"last_committed": replStatus.OpTimes.LastCommitted.Ts,
-		"applied":       replStatus.OpTimes.Applied.Ts,
-		"durable":       replStatus.OpTimes.Durable.Ts,
+		"last_committed": replStatus.OpTimes.LastCommitted.getTimeStamp(),
+		"applied":       replStatus.OpTimes.Applied.getTimeStamp(),
+		"durable":       replStatus.OpTimes.Durable.getTimeStamp(),
 	}
 	result["lag"] = map[string]interface{} {
 		"max": findMaxLag(replStatus.Members),

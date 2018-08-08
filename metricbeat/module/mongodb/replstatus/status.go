@@ -57,6 +57,9 @@ const (
 	REMOVED    MemberState = 10
 )
 
+func (optime *OpTime) getTimeStamp() int64{
+	return optime.Ts >> 32
+}
 func getReplicationStatus(mongoSession *mgo.Session) (*ReplStatusRaw, error) {
 	db := mongoSession.DB("admin")
 

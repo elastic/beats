@@ -50,12 +50,12 @@ func getReplicationInfo(mongoSession *mgo.Session) (*oplog, error) {
 	}
 
 	// get first and last items in the oplog
-	firstTs, err := getTimestamp(collection, "$natural")
+	firstTs, err := getOpTimestamp(collection, "$natural")
 	if err != nil {
 		return nil, err
 	}
 
-	lastTs, err := getTimestamp(collection, "-$natural")
+	lastTs, err := getOpTimestamp(collection, "-$natural")
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func getReplicationInfo(mongoSession *mgo.Session) (*oplog, error) {
 	}, nil
 }
 
-func getTimestamp(collection *mgo.Collection, sort string) (int64, error) {
+func getOpTimestamp(collection *mgo.Collection, sort string) (int64, error) {
 	iter := collection.Find(nil).Sort(sort).Iter()
 
 	var opTime OpTime
@@ -81,7 +81,7 @@ func getTimestamp(collection *mgo.Collection, sort string) (int64, error) {
 		return 0, err
 	}
 
-	return opTime.Ts, nil
+	return opTime.getTimeStamp(), nil
 }
 
 func contains(s []string, x string) bool {
