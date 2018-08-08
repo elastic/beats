@@ -44,6 +44,7 @@ type inBroker struct {
 
 	// queue state
 	queue        *pq.Queue
+	writer       *pq.Writer
 	clientStates clientStates
 
 	// Event contents, that still needs to be send to the queue. An event is
@@ -83,6 +84,11 @@ func newInBroker(
 		return nil, err
 	}
 
+	writer, err := qu.Writer()
+	if err != nil {
+		return nil, err
+	}
+
 	b := &inBroker{
 		ctx:     ctx,
 		eventer: eventer,
@@ -97,6 +103,7 @@ func newInBroker(
 
 		// queue state
 		queue:          qu,
+		writer:         writer,
 		clientStates:   clientStates{},
 		pending:        nil,
 		bufferedEvents: 0,
@@ -214,6 +221,7 @@ func (b *inBroker) eventLoop() {
 
 	// notify ackLoop to stop only after eventLoop has finished (after last flush)
 	defer close(b.ackDone)
+	defer b.eventloopShutdown()
 
 	for {
 		ok := b.state(b)
@@ -221,23 +229,24 @@ func (b *inBroker) eventLoop() {
 			break
 		}
 	}
+}
 
+func (b *inBroker) eventloopShutdown() {
 	// try to flush events/buffers on shutdown.
 	if b.bufferedEvents == 0 {
 		return
 	}
 
-	// try to append pending events
+	// Try to flush pending events.
+	w := b.writer
 	for len(b.pending) > 0 {
-		n, err := b.queue.Writer().Write(b.pending)
+		n, err := w.Write(b.pending)
 		b.pending = b.pending[n:]
 		if err != nil {
 			return
 		}
 	}
-
-	// final flush
-	b.queue.Writer().Flush()
+	w.Flush()
 }
 
 // stateEmpty is the brokers active state if the write buffer is empty and the
@@ -442,7 +451,7 @@ func (b *inBroker) stateBlocked() bool {
 			b.pending = nil
 			err := b.writeEvent(tmp)
 			if err != nil || len(b.pending) > 0 {
-				log.Debug("writing pending event failed: ", err)
+				log.Debugf("writing pending event failed: %+v", err)
 				break
 			}
 		}
@@ -503,7 +512,7 @@ func (b *inBroker) addEvent(buf []byte, st clientState) error {
 	log.Debug("  add event -> active:", count)
 
 	err := b.writeEvent(buf)
-	log.Debug("  inbroker write ->", err, b.bufferedEvents)
+	log.Debugf("  inbroker write -> events=%v, err=%+v ", b.bufferedEvents, err)
 
 	return err
 }
@@ -512,28 +521,27 @@ func (b *inBroker) writeEvent(buf []byte) error {
 	log := b.ctx.logger
 
 	// append event to queue
-	queueWriter := b.queue.Writer()
-	n, err := queueWriter.Write(buf)
+	w := b.writer
+	n, err := w.Write(buf)
 	buf = buf[n:]
 	if len(buf) > 0 {
 		b.pending = buf
 	} else if err == nil {
 		log.Debug("writer: finalize event in buffer")
-		err = queueWriter.Next()
+		err = w.Next()
 	}
 
 	if err != nil {
-		log := b.ctx.logger
-		log.Debugf("appending event content to write buffer failed with %v", err)
+		log.Debugf("Appending event content to write buffer failed with %+v", err)
 	}
 	return err
 }
 
 func (b *inBroker) flushBuffer() error {
-	err := b.queue.Writer().Flush()
+	err := b.writer.Flush()
 	if err != nil {
 		log := b.ctx.logger
-		log.Debugf("spool flush failed with: %v", err)
+		log.Errorf("Spool flush failed with: %+v", err)
 	}
 	return err
 }

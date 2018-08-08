@@ -1,6 +1,25 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package txfile
 
-import "unsafe"
+import (
+	"unsafe"
+)
 
 // waLog (write-ahead-log) mapping page ids to overwrite page ids in
 // the write-ahead-log.
@@ -69,7 +88,9 @@ func (l *waLog) fileCommitPrepare(st *walCommitState, tx *txWalState) {
 	st.mapping = newWal
 }
 
-func (l *waLog) fileCommitAlloc(tx *Tx, st *walCommitState) error {
+func (l *waLog) fileCommitAlloc(tx *Tx, st *walCommitState) reason {
+	const op = "txfile/commit-alloc-wal"
+
 	if !st.updated {
 		return nil
 	}
@@ -78,7 +99,8 @@ func (l *waLog) fileCommitAlloc(tx *Tx, st *walCommitState) error {
 	if pages > 0 {
 		st.allocRegions = tx.metaAllocator().AllocRegions(&tx.alloc, pages)
 		if st.allocRegions == nil {
-			return errOutOfMemory
+			return errOp(op).of(OutOfMemory).
+				report("not enough space to allocate write ahead meta pages")
 		}
 	}
 	return nil
@@ -87,8 +109,8 @@ func (l *waLog) fileCommitAlloc(tx *Tx, st *walCommitState) error {
 func (l *waLog) fileCommitSerialize(
 	st *walCommitState,
 	pageSize uint,
-	onPage func(id PageID, buf []byte) error,
-) error {
+	onPage func(id PageID, buf []byte) reason,
+) reason {
 	if !st.updated {
 		return nil
 	}
@@ -171,10 +193,10 @@ func readWALMapping(
 	wal *waLog,
 	access func(PageID) []byte,
 	root PageID,
-) error {
+) reason {
 	mapping, ids, err := readWAL(access, root)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	wal.mapping = mapping
@@ -185,7 +207,9 @@ func readWALMapping(
 func readWAL(
 	access func(PageID) []byte,
 	root PageID,
-) (walMapping, idList, error) {
+) (walMapping, idList, reason) {
+	const op = "txfile/read-wal"
+
 	if root == 0 {
 		return walMapping{}, nil, nil
 	}
@@ -196,7 +220,9 @@ func readWAL(
 		metaPages.Add(pageID)
 		node, data := castWalPage(access(pageID))
 		if node == nil {
-			return nil, nil, errOutOfBounds
+			return nil, nil, errOp(op).of(InvalidMetaPage).
+				causedBy(raiseOutOfBounds(pageID)).
+				report("write ahead metadata corrupted")
 		}
 
 		count := int(node.count.Get())
@@ -220,8 +246,8 @@ func writeWAL(
 	to regionList,
 	pageSize uint,
 	mapping walMapping,
-	onPage func(id PageID, buf []byte) error,
-) error {
+	onPage func(id PageID, buf []byte) reason,
+) reason {
 	allocPages := to.PageIDs()
 	writer := newPagingWriter(allocPages, pageSize, 0, onPage)
 	for id, walID := range mapping {
