@@ -46,6 +46,7 @@ func init() {
 					"fchmod",
 					"fchown32",
 					"fcntl",
+					"fcntl64",
 					"fdatasync",
 					"flock",
 					"fstat64",
