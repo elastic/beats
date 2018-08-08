@@ -40,6 +40,8 @@ https://github.com/elastic/beats/compare/v6.3.2...6.3[Check the HEAD diff]
 
 *Metricbeat*
 
+- Recover metrics for old apache versions removed by mistake on #6450. {pull}7871[7871]
+
 *Packetbeat*
 
 *Winlogbeat*
