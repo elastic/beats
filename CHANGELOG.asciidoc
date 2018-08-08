@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 - Fix golang.heap.gc.cpu_fraction type from long to float in Golang module. {pull}7789[7789]
 - Fixed a panic when the kvm module cannot establish a connection to libvirtd. {issue}7792[7792].
+- Recover metrics for old apache versions removed by mistake on #6450. {pull}7871[7871]
 - Add missing namespace field in http server metricset {pull}7890[7890]
 
 *Packetbeat*
