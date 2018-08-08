@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
+	mgo "gopkg.in/mgo.v2"
 )
 
 var debugf = logp.MakeDebug("mongodb.replstatus")
@@ -64,6 +65,8 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 	defer mongoSession.Close()
+
+	mongoSession.SetMode(mgo.Strong, true)
 
 	oplogInfo, err := getReplicationInfo(mongoSession)
 	if err != nil {
