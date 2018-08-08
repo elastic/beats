@@ -17,7 +17,7 @@
 
 // +build integration
 
-package oplog
+package replstatus
 
 import (
 	"testing"
@@ -49,16 +49,16 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check event fields
-	allocated := event["size"].(common.MapStr)["allocated"].(int64)
+	allocated := event["oplog"].(common.MapStr)["size"].(common.MapStr)["allocated"].(int64)
 	assert.True(t, allocated >= 0)
 
-	used := event["size"].(common.MapStr)["used"].(int64)
+	used := event["oplog"].(common.MapStr)["size"].(common.MapStr)["used"].(float64)
 	assert.True(t, used > 0)
 
-	firstTs := event["first"].(common.MapStr)["timestamp"].(int64)
+	firstTs := event["oplog"].(common.MapStr)["first"].(common.MapStr)["timestamp"].(int64)
 	assert.True(t, firstTs >= 0)
 
-	window := event["window"].(int64)
+	window := event["oplog"].(common.MapStr)["window"].(int64)
 	assert.True(t, window >= 0)
 }
 
