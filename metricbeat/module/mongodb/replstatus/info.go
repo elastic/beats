@@ -20,9 +20,10 @@ package replstatus
 import (
 	"errors"
 
-	"github.com/elastic/beats/libbeat/logp"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type oplogInfo struct {
