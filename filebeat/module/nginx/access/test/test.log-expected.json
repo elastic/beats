@@ -24,6 +24,7 @@
         "nginx.access.user_agent.os_major": "10", 
         "nginx.access.user_agent.os_minor": "12", 
         "nginx.access.user_agent.os_name": "Mac OS X", 
+        "nginx.access.user_agent.raw": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0", 
         "nginx.access.user_name": "-", 
         "offset": 0, 
         "prospector.type": "log"
@@ -50,6 +51,7 @@
         "nginx.access.user_agent.os": "Windows 7", 
         "nginx.access.user_agent.os_name": "Windows 7", 
         "nginx.access.user_agent.patch": "a2", 
+        "nginx.access.user_agent.raw": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2", 
         "nginx.access.user_name": "-", 
         "offset": 183, 
         "prospector.type": "log"
@@ -86,6 +88,7 @@
         "nginx.access.user_agent.os_major": "10", 
         "nginx.access.user_agent.os_minor": "12", 
         "nginx.access.user_agent.os_name": "Mac OS X", 
+        "nginx.access.user_agent.raw": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0", 
         "nginx.access.user_name": "-", 
         "offset": 341, 
         "prospector.type": "log"
@@ -120,6 +123,7 @@
         "nginx.access.user_agent.os_major": "10", 
         "nginx.access.user_agent.os_minor": "12", 
         "nginx.access.user_agent.os_name": "Mac OS X", 
+        "nginx.access.user_agent.raw": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0", 
         "nginx.access.user_name": "-", 
         "offset": 527, 
         "prospector.type": "log"
@@ -153,6 +157,7 @@
         "nginx.access.user_agent.name": "Other", 
         "nginx.access.user_agent.os": "Other", 
         "nginx.access.user_agent.os_name": "Other", 
+        "nginx.access.user_agent.raw": "Amazon CloudFront", 
         "nginx.access.user_name": "-", 
         "offset": 693, 
         "prospector.type": "log"
@@ -184,6 +189,7 @@
         "nginx.access.user_agent.name": "Facebot", 
         "nginx.access.user_agent.os": "Other", 
         "nginx.access.user_agent.os_name": "Other", 
+        "nginx.access.user_agent.raw": "Mozilla/5.0 (compatible; Facebot 1.0; https://developers.facebook.com/docs/sharing/webmasters/crawler)", 
         "nginx.access.user_name": "-", 
         "offset": 845, 
         "prospector.type": "log"
@@ -204,6 +210,7 @@
         "nginx.access.user_agent.name": "Other", 
         "nginx.access.user_agent.os": "Other", 
         "nginx.access.user_agent.os_name": "Other", 
+        "nginx.access.user_agent.raw": "-", 
         "nginx.access.user_name": "-", 
         "offset": 1085, 
         "prospector.type": "log"
