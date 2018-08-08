@@ -71,16 +71,20 @@ var (
 
 	// Schema used till apache 2.4.12
 	schemaOld = s.Schema{
-		"total_accesses":   c.Int("Total Accesses"),
-		"total_kbytes":     c.Int("Total kBytes"),
-		"requests_per_sec": c.Float("ReqPerSec", s.Optional),
-		"bytes_per_sec":    c.Float("BytesPerSec", s.Optional),
+		"total_accesses":    c.Int("Total Accesses"),
+		"total_kbytes":      c.Int("Total kBytes"),
+		"requests_per_sec":  c.Float("ReqPerSec", s.Optional),
+		"bytes_per_sec":     c.Float("BytesPerSec", s.Optional),
+		"bytes_per_request": c.Float("BytesPerReq", s.Optional),
 		"workers": s.Object{
 			"busy": c.Int("BusyWorkers"),
 			"idle": c.Int("IdleWorkers"),
 		},
 		"uptime": s.Object{
 			"uptime": c.Int("Uptime"),
+		},
+		"cpu": s.Object{
+			"load": c.Float("CPULoad", s.Optional),
 		},
 		"connections": s.Object{
 			"total": c.Int("ConnsTotal", s.Optional),
