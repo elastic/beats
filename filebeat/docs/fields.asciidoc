@@ -3335,6 +3335,23 @@ type: keyword
 
 --
 
+[float]
+== url fields
+
+URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
+
+
+
+*`url.hostname`*::
++
+--
+type: keyword
+
+Hostname of the request, such as "elastic.co". In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `hostname` field.
+
+
+--
+
 [[exported-fields-logstash]]
 == logstash fields
 
