@@ -290,7 +290,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	debugf("Initializing output plugins")
 	pipeline, err := pipeline.Load(b.Info, reg, b.Config.Pipeline, b.Config.Output)
 	if err != nil {
-		return nil, fmt.Errorf("error initializing publisher: %v", err)
+		return nil, fmt.Errorf("error initializing publisher: %+v", err)
 	}
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
