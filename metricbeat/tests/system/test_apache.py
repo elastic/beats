@@ -16,8 +16,8 @@ APACHE_STATUS_FIELDS = [
 
 APACHE_OLD_STATUS_FIELDS = [
     "hostname", "total_accesses", "total_kbytes",
-    "requests_per_sec", "bytes_per_sec",
-    "workers.busy", "workers.idle", "uptime",
+    "requests_per_sec", "bytes_per_sec", "bytes_per_request",
+    "workers.busy", "workers.idle", "uptime", "cpu",
     "connections", "scoreboard"
 ]
 

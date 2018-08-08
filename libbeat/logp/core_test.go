@@ -54,9 +54,11 @@ func TestLogger(t *testing.T) {
 }
 
 func TestLoggerSelectors(t *testing.T) {
-	if err := DevelopmentSetup(WithSelectors("good"), ToObserverOutput()); err != nil {
+	if err := DevelopmentSetup(WithSelectors("good", " padded "), ToObserverOutput()); err != nil {
 		t.Fatal(err)
 	}
+
+	assert.True(t, HasSelector("padded"))
 
 	good := NewLogger("good")
 	bad := NewLogger("bad")

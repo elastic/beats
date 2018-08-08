@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/filebeat/reader/timeout"
+	"github.com/elastic/beats/filebeat/reader/readfile"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -112,7 +112,7 @@ func New(
 	}
 
 	if tout > 0 {
-		r = timeout.New(r, sigMultilineTimeout, tout)
+		r = readfile.NewTimeoutReader(r, sigMultilineTimeout, tout)
 	}
 
 	mlr := &Reader{

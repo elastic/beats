@@ -35,6 +35,7 @@ The following topics describe how to configure {beatname_uc}:
 * <<using-environ-vars>>
 * <<yaml-tips>>
 * <<regexp-support>>
+* <<http-endpoint>>
 * <<{beatname_lc}-reference-yml>>
 
 After changing configuration settings, you need to restart {beatname_uc} to
@@ -75,5 +76,7 @@ include::../../libbeat/docs/shared-env-vars.asciidoc[]
 include::../../libbeat/docs/yaml.asciidoc[]
 
 include::../../libbeat/docs/regexp.asciidoc[]
+
+include::../../libbeat/docs/http-endpoint.asciidoc[]
 
 include::../../libbeat/docs/reference-yml.asciidoc[]

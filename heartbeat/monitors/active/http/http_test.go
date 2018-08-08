@@ -25,13 +25,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/phayes/freeport"
-
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
+	btesting "github.com/elastic/beats/libbeat/testing"
 	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
@@ -62,7 +61,7 @@ func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, 
 // The minimum response is just the URL. Only to be used for unreachable server
 // tests.
 func httpBaseChecks(url string) mapval.Validator {
-	return mapval.Schema(mapval.Map{
+	return mapval.MustCompile(mapval.Map{
 		"http.url": url,
 	})
 }
@@ -70,7 +69,7 @@ func httpBaseChecks(url string) mapval.Validator {
 func respondingHTTPChecks(url string, statusCode int) mapval.Validator {
 	return mapval.Compose(
 		httpBaseChecks(url),
-		mapval.Schema(mapval.Map{
+		mapval.MustCompile(mapval.Map{
 			"http": mapval.Map{
 				"response.status_code":   statusCode,
 				"rtt.content.us":         mapval.IsDuration,
@@ -198,7 +197,9 @@ func TestDownStatuses(t *testing.T) {
 
 func TestConnRefusedJob(t *testing.T) {
 	ip := "127.0.0.1"
-	port := uint16(freeport.GetPort())
+	port, err := btesting.AvailableTCP4Port()
+	require.NoError(t, err)
+
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
 	event := testRequest(t, url)

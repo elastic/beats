@@ -176,6 +176,71 @@ func TestExcludedFiles(t *testing.T) {
 	}
 }
 
+func TestIncludedExcludedFiles(t *testing.T) {
+	defer setup(t)()
+
+	bucket, err := datastore.OpenBucket(bucketName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bucket.Close()
+
+	dir, err := ioutil.TempDir("", "audit-file")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	dir, err = filepath.EvalSymlinks(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = os.Mkdir(filepath.Join(dir, ".ssh"), 0700)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	config := getConfig(dir)
+	config["include_files"] = []string{`\.ssh/`}
+	config["recursive"] = true
+	ms := mbtest.NewPushMetricSetV2(t, config)
+
+	go func() {
+		for _, f := range []string{"FILE.TXT", ".ssh/known_hosts", ".ssh/known_hosts.swp"} {
+			file := filepath.Join(dir, f)
+			err := ioutil.WriteFile(file, []byte("hello world"), 0600)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+	}()
+
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
+	for _, e := range events {
+		if e.Error != nil {
+			t.Fatalf("received error: %+v", e.Error)
+		}
+	}
+
+	wanted := map[string]bool{
+		dir: true,
+		filepath.Join(dir, ".ssh"):             true,
+		filepath.Join(dir, ".ssh/known_hosts"): true,
+	}
+	if !assert.Len(t, events, len(wanted)) {
+		return
+	}
+	for _, e := range events {
+		event := e.MetricSetFields
+		path, err := event.GetValue("file.path")
+		if assert.NoError(t, err) {
+			_, ok := wanted[path.(string)]
+			assert.True(t, ok)
+		}
+	}
+}
+
 func setup(t testing.TB) func() {
 	// path.data should be set so that the DB is written to a predictable location.
 	var err error

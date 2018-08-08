@@ -449,6 +449,40 @@ class Test(metricbeat.BaseTest):
         assert isinstance(output["system.process.cpu.start_time"], six.string_types)
         self.check_username(output["system.process.username"])
 
+    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    def test_socket_summary(self):
+        """
+        Test system/socket_summary output.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["socket_summary"],
+            "period": "5s",
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+
+            summary = evt["system"]["socket"]["summary"]
+            a = summary["all"]
+            tcp = summary["tcp"]
+            udp = summary["udp"]
+
+            assert isinstance(a["count"], int)
+            assert isinstance(a["listening"], int)
+
+            assert isinstance(tcp["all"]["count"], int)
+            assert isinstance(tcp["all"]["listening"], int)
+
+            assert isinstance(udp["all"]["count"], int)
+
     def check_username(self, observed, expected=None):
         if expected == None:
             expected = getpass.getuser()

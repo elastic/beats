@@ -85,7 +85,7 @@ func ExtractInt(unk interface{}) (uint64, error) {
 	case uint:
 		return uint64(i), nil
 	default:
-		return 0, fmt.Errorf("unknown type %T passed to extractInt", unk)
+		return 0, fmt.Errorf("unknown type %T passed to ExtractInt", unk)
 	}
 }
 

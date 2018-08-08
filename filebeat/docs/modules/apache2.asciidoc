@@ -56,7 +56,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "apache2.access.var.paths=[/path/to/apache2/access.log*]" -M "apache2.error.var.paths=[/path/to/log/apache2/error.log*]"
+-M "apache2.access.var.paths=[/path/to/apache2/access.log*]" -M "apache2.error.var.paths=[/path/to/log/apache2/error.log*]"
 -----
 
 

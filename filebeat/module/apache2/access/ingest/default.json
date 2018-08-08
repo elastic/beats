@@ -35,8 +35,9 @@
       "ignore_failure": true
     }
   }, {
-    "remove": {
+    "rename": {
       "field": "apache2.access.agent",
+      "target_field": "apache2.access.user_agent.raw",
       "ignore_failure": true
     }
   }, {

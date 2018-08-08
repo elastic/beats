@@ -79,6 +79,7 @@ type Config struct {
 	ScanRateBytesPerSec uint64          `config:",ignore"`
 	Recursive           bool            `config:"recursive"` // Recursive enables recursive monitoring of directories.
 	ExcludeFiles        []match.Matcher `config:"exclude_files"`
+	IncludeFiles        []match.Matcher `config:"include_files"`
 }
 
 // Validate validates the config data and return an error explaining all the
@@ -140,6 +141,20 @@ func deduplicate(in []string) []string {
 // IsExcludedPath checks if a path matches the exclude_files regular expressions.
 func (c *Config) IsExcludedPath(path string) bool {
 	for _, matcher := range c.ExcludeFiles {
+		if matcher.MatchString(path) {
+			return true
+		}
+	}
+	return false
+}
+
+// IsIncludedPath checks if a path matches the include_files regular expressions.
+func (c *Config) IsIncludedPath(path string) bool {
+	if len(c.IncludeFiles) == 0 {
+		return true
+	}
+
+	for _, matcher := range c.IncludeFiles {
 		if matcher.MatchString(path) {
 			return true
 		}
