@@ -436,8 +436,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-txfile
-Version: v0.0.1
-Revision: 7e7e33cc236f30fff545f3ee2c35ada5b70b6b13
+Version: v0.0.3
+Revision: 389b527ad365f6fc6cf5fa7e0ba5a2294ad2f3ed
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-txfile/LICENSE:
 --------------------------------------------------------------------
@@ -2574,7 +2574,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: 37707fdb30a5b38865cfb95e5aab41707daec7fd
+Revision: 0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
