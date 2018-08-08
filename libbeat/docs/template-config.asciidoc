@@ -116,7 +116,7 @@ setup.template.append_fields:
   type: long
 ----
 
-*`setup.template.json.enabled`* experimental[]:: Set to `true` to load a
+*`setup.template.json.enabled`*:: Set to `true` to load a
 JSON-based template file. Specify the path to your {es} index template file and
 set the name of the template. 
 +
