@@ -52,6 +52,9 @@ https://github.com/elastic/beats/compare/v6.4.0...6.4[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fixed a seccomp related error where the `fcntl64` syscall was not permitted
+  on 32-bit Linux and the sniffer failed to start. {issue}7839[7839]
+
 *Winlogbeat*
 
 ==== Added
