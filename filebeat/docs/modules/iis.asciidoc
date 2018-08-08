@@ -51,7 +51,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "iis.access.var.paths=[C:/inetpub/logs/LogFiles/*/*.log]" -M "iis.error.var.paths=[C:/Windows/System32/LogFiles/HTTPERR/*.log]"
+-M "iis.access.var.paths=[C:/inetpub/logs/LogFiles/*/*.log]" -M "iis.error.var.paths=[C:/Windows/System32/LogFiles/HTTPERR/*.log]"
 -----
 
 

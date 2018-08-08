@@ -152,6 +152,10 @@ func (c *client) Publish(batch publisher.Batch) error {
 	return err
 }
 
+func (c *client) String() string {
+	return "redis(" + c.Client.String() + ")"
+}
+
 func (c *client) makePublish(
 	conn redis.Conn,
 ) (publishFn, error) {

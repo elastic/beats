@@ -55,7 +55,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "system.syslog.var.paths=[/path/to/log/syslog*]" -M "system.auth.var.paths=[/path/to/log/auth.log*]"
+-M "system.syslog.var.paths=[/path/to/log/syslog*]" -M "system.auth.var.paths=[/path/to/log/auth.log*]"
 -----
 
 

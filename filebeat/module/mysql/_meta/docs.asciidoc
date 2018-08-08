@@ -46,7 +46,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "mysql.error.var.paths=[/path/to/log/mysql/error.log*]" -M "mysql.slowlog.var.paths=[/path/to/log/mysql/mysql-slow.log*]"
+-M "mysql.error.var.paths=[/path/to/log/mysql/error.log*]" -M "mysql.slowlog.var.paths=[/path/to/log/mysql/mysql-slow.log*]"
 -----
 
  

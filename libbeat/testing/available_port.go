@@ -15,30 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package conditions
+package testing
 
-import (
-	"testing"
+import "net"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/logp"
-)
-
-func TestNOTCondition(t *testing.T) {
-	logp.TestingSetup()
-
-	configs := []Config{
-		{
-			NOT: &Config{
-				Equals: &Fields{fields: map[string]interface{}{
-					"method": "GET",
-				}},
-			},
-		},
+// AvailableTCP4Port returns an unused TCP port for 127.0.0.1.
+func AvailableTCP4Port() (uint16, error) {
+	resolved, err := net.ResolveTCPAddr("tcp4", "127.0.0.1:0")
+	if err != nil {
+		return 0, err
 	}
 
-	conds := GetConditions(t, configs)
+	listener, err := net.ListenTCP("tcp4", resolved)
+	if err != nil {
+		return 0, err
+	}
+	defer listener.Close()
 
-	assert.False(t, conds[0].Check(httpResponseTestEvent))
+	tcpAddr := uint16(listener.Addr().(*net.TCPAddr).Port)
+
+	return tcpAddr, nil
 }

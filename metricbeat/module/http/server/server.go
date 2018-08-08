@@ -18,7 +18,8 @@
 package server
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	serverhelper "github.com/elastic/beats/metricbeat/helper/server"
 	"github.com/elastic/beats/metricbeat/helper/server/http"
@@ -83,10 +84,13 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 				reporter.Error(err)
 			} else {
 				event := mb.Event{}
-				event.ModuleFields = common.MapStr{}
-				metricSetName := fields[mb.NamespaceKey].(string)
-				delete(fields, mb.NamespaceKey)
-				event.ModuleFields.Put(metricSetName, fields)
+				ns, ok := fields[mb.NamespaceKey].(string)
+				if ok {
+					ns = fmt.Sprintf("http.%s", ns)
+					delete(fields, mb.NamespaceKey)
+				}
+				event.MetricSetFields = fields
+				event.Namespace = ns
 				reporter.Event(event)
 			}
 

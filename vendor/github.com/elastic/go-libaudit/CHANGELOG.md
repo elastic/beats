@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- aucoalesce - Made the user/group ID cache thread-safe. #42
+
 ### Deprecated
 
 ### Removed

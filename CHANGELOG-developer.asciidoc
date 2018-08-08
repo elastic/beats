@@ -29,6 +29,7 @@ The list below covers the major changes between 6.3.0 and master only.
   the building a Beat more cross-platform friendly (e.g. Windows). This requires that your Beat
   has a magefile.go with a fields target. The `FIELDS_FILE_PATH` make variable is no longer
   used because the value is specified in magefile.go. {pull}7670[7670]
+- Outputs must implement String. {pull}6404[6404]
 
 ==== Bugfixes
 

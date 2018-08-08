@@ -31,6 +31,8 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+const defaultCloudPort = "443"
+
 // OverwriteSettings modifies the received config object by overwriting the
 // output.elasticsearch.hosts, output.elasticsearch.username, output.elasticsearch.password,
 // setup.kibana.host settings based on values derived from the cloud.id and cloud.auth
@@ -105,6 +107,16 @@ func OverwriteSettings(cfg *common.Config) error {
 	return nil
 }
 
+// extractPortFromName takes a string in the form `id:port` and returns the
+// ID and the port. If there's no `:`, the default port is returned
+func extractPortFromName(word string, defaultPort string) (id, port string) {
+	idx := strings.LastIndex(word, ":")
+	if idx >= 0 {
+		return word[:idx], word[idx+1:]
+	}
+	return word, defaultPort
+}
+
 // decodeCloudID decodes the cloud.id into elasticsearch-URL and kibana-URL
 func decodeCloudID(cloudID string) (string, string, error) {
 
@@ -126,9 +138,14 @@ func decodeCloudID(cloudID string) (string, string, error) {
 		return "", "", errors.Errorf("Expected at least 3 parts in %s", string(decoded))
 	}
 
-	// 4. form the URLs
-	esURL := url.URL{Scheme: "https", Host: fmt.Sprintf("%s.%s:443", words[1], words[0])}
-	kibanaURL := url.URL{Scheme: "https", Host: fmt.Sprintf("%s.%s:443", words[2], words[0])}
+	// 4. extract port from the ES and Kibana host, or use 443 as the default
+	host, port := extractPortFromName(words[0], defaultCloudPort)
+	esID, esPort := extractPortFromName(words[1], port)
+	kbID, kbPort := extractPortFromName(words[2], port)
+
+	// 5. form the URLs
+	esURL := url.URL{Scheme: "https", Host: fmt.Sprintf("%s.%s:%s", esID, host, esPort)}
+	kibanaURL := url.URL{Scheme: "https", Host: fmt.Sprintf("%s.%s:%s", kbID, host, kbPort)}
 
 	return esURL.String(), kibanaURL.String(), nil
 }
