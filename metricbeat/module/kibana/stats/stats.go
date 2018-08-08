@@ -131,16 +131,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	intervalMs := m.Module().Config().Period.Nanoseconds() / 1000 / 1000
 	now := time.Now()
 
-	m.fetchStats(r, intervalMs, now)
+	m.fetchStats(r, now)
 	if m.xPackEnabled {
-		m.fetchSettings(r, intervalMs, now)
+		m.fetchSettings(r, now)
 	}
 }
 
-func (m *MetricSet) fetchStats(r mb.ReporterV2, intervalMs int64, now time.Time) {
+func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
 	content, err := m.statsHTTP.FetchContent()
 	if err != nil {
 		r.Error(err)
@@ -148,17 +147,23 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, intervalMs int64, now time.Time)
 	}
 
 	if m.xPackEnabled {
+		intervalMs := m.calculateIntervalMs()
 		eventMappingStatsXPack(r, intervalMs, now, content)
 	} else {
 		eventMapping(r, content)
 	}
 }
 
-func (m *MetricSet) fetchSettings(r mb.ReporterV2, intervalMs int64, now time.Time) {
+func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
 	content, err := m.settingsHTTP.FetchContent()
 	if err != nil {
 		return
 	}
 
+	intervalMs := m.calculateIntervalMs()
 	eventMappingSettingsXPack(r, intervalMs, now, content)
+}
+
+func (m *MetricSet) calculateIntervalMs() int64 {
+	return m.Module().Config().Period.Nanoseconds() / 1000 / 1000
 }
