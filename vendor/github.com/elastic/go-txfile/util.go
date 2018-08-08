@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package txfile
 
 import (
@@ -12,7 +29,7 @@ type pagingWriter struct {
 	pageSize    uint
 	extraHeader uint
 
-	onPage func(id PageID, buf []byte) error
+	onPage func(id PageID, buf []byte) reason
 
 	// current page state
 	i       int
@@ -29,7 +46,7 @@ func newPagingWriter(
 	ids idList,
 	pageSize uint,
 	extraHeader uint,
-	onPage func(id PageID, buf []byte) error,
+	onPage func(id PageID, buf []byte) reason,
 ) *pagingWriter {
 	if len(ids) == 0 {
 		return nil
@@ -52,17 +69,19 @@ func newPagingWriter(
 		extraHeader: extraHeader,
 		onPage:      onPage,
 	}
-	w.prepareNext()
+	w.prepareNext("")
 	return w
 }
 
-func (w *pagingWriter) Write(entry []byte) error {
+func (w *pagingWriter) Write(entry []byte) reason {
+	const op = "txfile/write-meta-list"
+
 	if w == nil {
 		return nil
 	}
 
 	if len(w.payload) < len(entry) {
-		if err := w.flushCurrent(); err != nil {
+		if err := w.flushCurrent(op); err != nil {
 			return err
 		}
 	}
@@ -73,7 +92,9 @@ func (w *pagingWriter) Write(entry []byte) error {
 	return nil
 }
 
-func (w *pagingWriter) Flush() error {
+func (w *pagingWriter) Flush() reason {
+	const op = "txfile/flush-meta-list"
+
 	if w == nil {
 		return nil
 	}
@@ -84,10 +105,7 @@ func (w *pagingWriter) Flush() error {
 
 	for w.i < len(w.ids) {
 		// update to next page
-		if err := w.prepareNext(); err != nil {
-			return err
-		}
-
+		w.prepareNext(op)
 		if err := w.finalizePage(); err != nil {
 			return err
 		}
@@ -96,14 +114,14 @@ func (w *pagingWriter) Flush() error {
 	return nil
 }
 
-func (w *pagingWriter) flushCurrent() (err error) {
+func (w *pagingWriter) flushCurrent(op string) (err reason) {
 	if err = w.finalizePage(); err == nil {
-		err = w.prepareNext()
+		err = w.prepareNext(op)
 	}
 	return
 }
 
-func (w *pagingWriter) finalizePage() error {
+func (w *pagingWriter) finalizePage() reason {
 	w.hdr.count.Set(w.count)
 	if w.onPage != nil {
 		if err := w.onPage(w.ids[w.i], w.page); err != nil {
@@ -117,10 +135,11 @@ func (w *pagingWriter) finalizePage() error {
 	return nil
 }
 
-func (w *pagingWriter) prepareNext() error {
+func (w *pagingWriter) prepareNext(op string) reason {
 	if w.i >= len(w.ids) {
-		return errOutOfMemory
+		return errOp(op).of(InternalError).report("Not enough pages pre-allocated")
 	}
+
 	w.page = w.buf[w.off : w.off+w.pageSize]
 	w.hdr, w.payload = castListPage(w.page)
 	w.payload = w.payload[w.extraHeader:]
@@ -138,4 +157,8 @@ func isPowerOf2(v uint64) bool {
 func nextPowerOf2(u uint64) uint64 {
 	b := uint64(bits.LeadingZeros64(u))
 	return uint64(1) << (64 - b)
+}
+
+func ignoreReason(fn func() reason) func() {
+	return func() { _ = fn() }
 }

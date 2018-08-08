@@ -20,6 +20,7 @@ package spool
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"sync"
 	"time"
 
@@ -92,14 +93,14 @@ func NewSpool(logger logger, path string, settings Settings) (*Spool, error) {
 		if !os.IsNotExist(err) {
 			return nil, err
 		}
-	} else {
+	} else if runtime.GOOS != "windows" {
 		perm := info.Mode().Perm()
 		cfgPerm := settings.Mode.Perm()
 
 		// check if file has permissions set, that must not be set via config
 		if (perm | cfgPerm) != cfgPerm {
-			return nil, fmt.Errorf("file permissions must be more strict (required permissions: %v, actual permissions: %v)",
-				cfgPerm, perm)
+			return nil, fmt.Errorf("file permissions for '%v' must be more strict (required permissions: %v, actual permissions: %v)",
+				path, cfgPerm, perm)
 		}
 	}
 
