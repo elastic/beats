@@ -21,48 +21,48 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
+func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr {
 	var result common.MapStr = make(common.MapStr)
 
 	result["oplog"] = map[string]interface{}{
-		"size":  map[string]interface{} {
-			"allocated": oplog.allocated,
-			"used":     oplog.used,
+		"size": map[string]interface{}{
+			"allocated": oplogInfo.allocated,
+			"used":      oplogInfo.used,
 		},
-		"first": map[string]interface{} {
-			"timestamp": oplog.firstTs,
+		"first": map[string]interface{}{
+			"timestamp": oplogInfo.firstTs,
 		},
-		"last":  map[string]interface{} {
-			"timestamp": oplog.lastTs,
+		"last": map[string]interface{}{
+			"timestamp": oplogInfo.lastTs,
 		},
-		"window": oplog.diff,
+		"window": oplogInfo.diff,
 	}
 	result["set_name"] = replStatus.Set
 	result["server_date"] = replStatus.Date
 	result["optimes"] = map[string]interface{}{
 		// ToDo find actual timestamps
 		"last_committed": replStatus.OpTimes.LastCommitted.getTimeStamp(),
-		"applied":       replStatus.OpTimes.Applied.getTimeStamp(),
-		"durable":       replStatus.OpTimes.Durable.getTimeStamp(),
+		"applied":        replStatus.OpTimes.Applied.getTimeStamp(),
+		"durable":        replStatus.OpTimes.Durable.getTimeStamp(),
 	}
-	result["lag"] = map[string]interface{} {
+	result["lag"] = map[string]interface{}{
 		"max": findMaxLag(replStatus.Members),
 		"min": findMinLag(replStatus.Members),
 	}
-	result["headroom"] = map[string]interface{} {
-		"max": oplog.diff - findMinLag(replStatus.Members),
-		"min": oplog.diff - findMaxLag(replStatus.Members),
+	result["headroom"] = map[string]interface{}{
+		"max": oplogInfo.diff - findMinLag(replStatus.Members),
+		"min": oplogInfo.diff - findMaxLag(replStatus.Members),
 	}
 
 	var (
-		secondaryHosts = findHostsByState(replStatus.Members, SECONDARY)
-	 	recoveringHosts = findHostsByState(replStatus.Members, RECOVERING)
-	 	unknownHosts = findHostsByState(replStatus.Members, UNKNOWN)
-	 	startup2Hosts = findHostsByState(replStatus.Members, STARTUP2)
-	 	arbiterHosts = findHostsByState(replStatus.Members, ARBITER)
-	 	downHosts = findHostsByState(replStatus.Members, DOWN)
-	 	rollbackHosts = findHostsByState(replStatus.Members, ROLLBACK)
-		unhealthyHosts = findUnhealthyHosts(replStatus.Members)
+		secondaryHosts  = findHostsByState(replStatus.Members, SECONDARY)
+		recoveringHosts = findHostsByState(replStatus.Members, RECOVERING)
+		unknownHosts    = findHostsByState(replStatus.Members, UNKNOWN)
+		startup2Hosts   = findHostsByState(replStatus.Members, STARTUP2)
+		arbiterHosts    = findHostsByState(replStatus.Members, ARBITER)
+		downHosts       = findHostsByState(replStatus.Members, DOWN)
+		rollbackHosts   = findHostsByState(replStatus.Members, ROLLBACK)
+		unhealthyHosts  = findUnhealthyHosts(replStatus.Members)
 	)
 
 	result["members"] = map[string]interface{}{
@@ -95,7 +95,7 @@ func eventMapping(oplog oplog, replStatus ReplStatusRaw) common.MapStr {
 			"hosts": rollbackHosts,
 			"count": len(rollbackHosts),
 		},
-		"unhealthy": map[string]interface{} {
+		"unhealthy": map[string]interface{}{
 			"hosts": unhealthyHosts,
 			"count": len(unhealthyHosts),
 		},

@@ -8,7 +8,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type oplog struct {
+type oplogInfo struct {
 	allocated int64
 	used      float64
 	firstTs   int64
@@ -16,9 +16,15 @@ type oplog struct {
 	diff      int64
 }
 
+// Contains data about collection size
+type CollSize struct {
+	MaxSize int64   `bson:"maxSize"` // Shows the maximum size of the collection.
+	Size    float64 `bson:"size"`    // The total size in memory of all records in a collection.
+}
+
 const oplogCol = "oplog.rs"
 
-func getReplicationInfo(mongoSession *mgo.Session) (*oplog, error) {
+func getReplicationInfo(mongoSession *mgo.Session) (*oplogInfo, error) {
 	// get oplog.rs collection
 	db := mongoSession.DB("local")
 	if collections, err := db.CollectionNames(); err != nil || !contains(collections, oplogCol) {
@@ -31,21 +37,9 @@ func getReplicationInfo(mongoSession *mgo.Session) (*oplog, error) {
 	}
 	collection := db.C(oplogCol)
 
-	//  oplog size
-	var oplogStatus map[string]interface{}
-	if err := db.Run(bson.D{{Name: "collStats", Value: oplogCol}}, &oplogStatus); err != nil {
-		return nil, err
-	}
-
-	allocated, ok := oplogStatus["maxSize"].(int64)
-	if !ok {
-		err := errors.New("unexpected maxSize value found in oplog collStats")
-		return nil, err
-	}
-
-	used, ok := oplogStatus["size"].(float64)
-	if !ok {
-		err := errors.New("unexpected size value found in oplog collStats")
+	// get oplog size
+	var oplogSize CollSize
+	if err := db.Run(bson.D{{Name: "collStats", Value: oplogCol}}, &oplogSize); err != nil {
 		return nil, err
 	}
 
@@ -62,9 +56,9 @@ func getReplicationInfo(mongoSession *mgo.Session) (*oplog, error) {
 
 	diff := lastTs - firstTs
 
-	return &oplog{
-		allocated: allocated,
-		used:      used,
+	return &oplogInfo{
+		allocated: oplogSize.MaxSize,
+		used:      oplogSize.Size,
 		firstTs:   firstTs,
 		lastTs:    lastTs,
 		diff:      diff,

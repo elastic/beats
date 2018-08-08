@@ -65,7 +65,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 	defer mongoSession.Close()
 
-	oplog, err := getReplicationInfo(mongoSession)
+	oplogInfo, err := getReplicationInfo(mongoSession)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
-	event := eventMapping(*oplog, *replStatus)
+	event := eventMapping(*oplogInfo, *replStatus)
 
 	return event, nil
 }
