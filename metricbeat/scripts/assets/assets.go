@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/generator/fields"
+	"github.com/elastic/beats/licenses"
 )
 
 func main() {
@@ -69,6 +70,7 @@ func main() {
 
 		var buf bytes.Buffer
 		asset.Template.Execute(&buf, asset.Data{
+			License: licenses.ASL2,
 			Beat:    "metricbeat",
 			Name:    module,
 			Data:    encData,
