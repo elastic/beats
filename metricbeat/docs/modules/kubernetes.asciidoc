@@ -68,8 +68,6 @@ This module supports TLS connection when using `ssl` config field, as described 
 
 The following metricsets are available:
 
-* <<metricbeat-metricset-kubernetes-apiserver,apiserver>>
-
 * <<metricbeat-metricset-kubernetes-container,container>>
 
 * <<metricbeat-metricset-kubernetes-event,event>>
@@ -93,8 +91,6 @@ The following metricsets are available:
 * <<metricbeat-metricset-kubernetes-system,system>>
 
 * <<metricbeat-metricset-kubernetes-volume,volume>>
-
-include::kubernetes/apiserver.asciidoc[]
 
 include::kubernetes/container.asciidoc[]
 
