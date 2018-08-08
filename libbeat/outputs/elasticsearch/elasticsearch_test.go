@@ -20,8 +20,6 @@ package elasticsearch
 import (
 	"fmt"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestConnectCallbacksManagement(t *testing.T) {
@@ -29,13 +27,9 @@ func TestConnectCallbacksManagement(t *testing.T) {
 	f1 := func(client *Client) error { fmt.Println("i am function #1"); return nil }
 	f2 := func(client *Client) error { fmt.Println("i am function #2"); return nil }
 
-	id0 := RegisterConnectCallback(f0)
+	_ = RegisterConnectCallback(f0)
 	id1 := RegisterConnectCallback(f1)
 	id2 := RegisterConnectCallback(f2)
-
-	assert.Equal(t, 0, id0)
-	assert.Equal(t, 1, id1)
-	assert.Equal(t, 2, id2)
 
 	t.Logf("removing second callback")
 	DeregisterConnectCallback(id1)

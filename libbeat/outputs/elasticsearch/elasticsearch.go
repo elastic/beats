@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"sync"
 
+	uuid "github.com/satori/go.uuid"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
@@ -50,8 +52,7 @@ var (
 )
 
 type callbacksRegistry struct {
-	callbacks map[int]connectCallback
-	nextKey   int
+	callbacks map[uuid.UUID]connectCallback
 	mutex     sync.Mutex
 }
 
@@ -60,26 +61,25 @@ var connectCallbackRegistry = newCallbacksRegistry()
 
 func newCallbacksRegistry() callbacksRegistry {
 	return callbacksRegistry{
-		callbacks: make(map[int]connectCallback),
+		callbacks: make(map[uuid.UUID]connectCallback),
 	}
 }
 
 // RegisterConnectCallback registers a callback for the elasticsearch output
 // The callback is called each time the client connects to elasticsearch.
 // It returns the key of the newly added callback, so it can be deregistered later.
-func RegisterConnectCallback(callback connectCallback) int {
+func RegisterConnectCallback(callback connectCallback) uuid.UUID {
 	connectCallbackRegistry.mutex.Lock()
 	defer connectCallbackRegistry.mutex.Unlock()
 
-	key := connectCallbackRegistry.nextKey
+	key := uuid.NewV4()
 	connectCallbackRegistry.callbacks[key] = callback
-	connectCallbackRegistry.nextKey++
 	return key
 }
 
 // DeregisterConnectCallback deregisters a callback for the elasticsearch output
 // specified by its key. If a callback does not exist, nothing happens.
-func DeregisterConnectCallback(key int) {
+func DeregisterConnectCallback(key uuid.UUID) {
 	connectCallbackRegistry.mutex.Lock()
 	defer connectCallbackRegistry.mutex.Unlock()
 

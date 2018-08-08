@@ -18,6 +18,8 @@
 package fileset
 
 import (
+	uuid "github.com/satori/go.uuid"
+
 	"github.com/elastic/beats/filebeat/channel"
 	input "github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
@@ -46,7 +48,7 @@ type Factory struct {
 	beatVersion           string
 	pipelineLoaderFactory PipelineLoaderFactory
 	overwritePipelines    bool
-	pipelineCallbackID    int
+	pipelineCallbackID    uuid.UUID
 	beatDone              chan struct{}
 }
 
@@ -56,7 +58,7 @@ type inputsRunner struct {
 	moduleRegistry        *ModuleRegistry
 	inputs                []*input.Runner
 	pipelineLoaderFactory PipelineLoaderFactory
-	pipelineCallbackID    int
+	pipelineCallbackID    uuid.UUID
 	overwritePipelines    bool
 }
 
@@ -69,7 +71,7 @@ func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVers
 		beatVersion:           beatVersion,
 		beatDone:              beatDone,
 		pipelineLoaderFactory: pipelineLoaderFactory,
-		pipelineCallbackID:    -1,
+		pipelineCallbackID:    uuid.Nil,
 		overwritePipelines:    overwritePipelines,
 	}
 }
@@ -147,7 +149,7 @@ func (p *inputsRunner) Start() {
 	}
 }
 func (p *inputsRunner) Stop() {
-	if p.pipelineCallbackID != -1 {
+	if p.pipelineCallbackID != uuid.Nil {
 		elasticsearch.DeregisterConnectCallback(p.pipelineCallbackID)
 	}
 
