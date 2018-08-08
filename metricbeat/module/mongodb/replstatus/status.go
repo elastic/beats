@@ -7,7 +7,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// The status of the replica set from the point of view of the server that processed the command.
+// MongoReplStatus cointains the status of the replica set from the point of view of the server that processed the command.
 type MongoReplStatus struct {
 	Ok                      bool      `bson:"ok"`
 	Set                     string    `bson:"set"`
@@ -23,7 +23,7 @@ type MongoReplStatus struct {
 	} `bson:"optimes"`
 }
 
-// Provides information about a member in the replica set.
+// Member provides information about a member in the replica set.
 type Member struct {
 	Health        bool      `bson:"health"`
 	Name          string    `bson:"name"`
@@ -38,13 +38,13 @@ type Member struct {
 	Self          bool      `bson:"self"`
 }
 
-// Information regarding the operation from the operation log
+// OpTime holds information regarding the operation from the operation log
 type OpTime struct {
 	Ts int64 `bson:"ts"` // The timestamp of the last operation applied to this member of the replica set
 	T  int   `bson:"t"`  // The term in which the last applied operation was originally generated on the primary.
 }
 
-// State of a member in replica set
+// MemberState shows the state of a member in the replica set
 type MemberState int
 
 const (

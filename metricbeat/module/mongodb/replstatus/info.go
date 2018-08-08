@@ -16,7 +16,7 @@ type oplogInfo struct {
 	diff      int64
 }
 
-// Contains data about collection size
+// CollSize contains data about collection size
 type CollSize struct {
 	MaxSize int64   `bson:"maxSize"` // Shows the maximum size of the collection.
 	Size    float64 `bson:"size"`    // The total size in memory of all records in a collection.
