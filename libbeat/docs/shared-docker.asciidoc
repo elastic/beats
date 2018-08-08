@@ -74,7 +74,7 @@ ifeval::["{beatname_lc}"!="auditbeat"]
 FROM {dockerimage}
 COPY {beatname_lc}.yml /usr/share/{beatname_lc}/{beatname_lc}.yml
 USER root
-RUN chown {beatname_lc} /usr/share/{beatname_lc}/{beatname_lc}.yml
+RUN chown root:{beatname_lc} /usr/share/{beatname_lc}/{beatname_lc}.yml
 USER {beatname_lc}
 --------------------------------------------
 
