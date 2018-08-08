@@ -120,7 +120,12 @@ func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 func (p *inputsRunner) Start() {
 	// Load pipelines
 	if p.pipelineLoaderFactory != nil {
-		// Load pipelines instantly and then setup a callback for reconnections:
+		// Attempt to load pipelines instantly when starting or after reload.
+		// Thus, if ES was not available previously, it could be loaded this time.
+		// If the function below fails, it means that ES is not available
+		// at the moment, so the pipeline loader cannot be created.
+		// Registering a callback regardless of the availability of ES
+		// makes it possible to try to load pipeline when ES becomes reachable.
 		pipelineLoader, err := p.pipelineLoaderFactory()
 		if err != nil {
 			logp.Err("Error loading pipeline: %s", err)
@@ -132,7 +137,7 @@ func (p *inputsRunner) Start() {
 			}
 		}
 
-		// Callback:
+		// Register callback to try to load pipelines when connecting to ES.
 		callback := func(esClient *elasticsearch.Client) error {
 			return p.moduleRegistry.LoadPipelines(esClient, p.overwritePipelines)
 		}

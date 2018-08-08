@@ -51,6 +51,8 @@ var (
 	ErrResponseRead = errors.New("bulk item status parse failed")
 )
 
+// Callbacks must not depend on the result of a previous one,
+// because the ordering is not fixed.
 type callbacksRegistry struct {
 	callbacks map[uuid.UUID]connectCallback
 	mutex     sync.Mutex
@@ -72,7 +74,14 @@ func RegisterConnectCallback(callback connectCallback) uuid.UUID {
 	connectCallbackRegistry.mutex.Lock()
 	defer connectCallbackRegistry.mutex.Unlock()
 
-	key := uuid.NewV4()
+	// find the next unique key
+	var key uuid.UUID
+	exists := true
+	for exists {
+		key = uuid.NewV4()
+		_, exists = connectCallbackRegistry.callbacks[key]
+	}
+
 	connectCallbackRegistry.callbacks[key] = callback
 	return key
 }
