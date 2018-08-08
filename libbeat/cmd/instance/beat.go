@@ -73,6 +73,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
 	_ "github.com/elastic/beats/libbeat/processors/dissect"
+	_ "github.com/elastic/beats/libbeat/processors/dns"
 
 	// Register autodiscover providers
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
