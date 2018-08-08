@@ -162,7 +162,6 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		r.Error(err)
 		return err
 	}
 

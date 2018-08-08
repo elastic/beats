@@ -157,7 +157,6 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, intervalMs int64, now time.Time)
 func (m *MetricSet) fetchSettings(r mb.ReporterV2, intervalMs int64, now time.Time) {
 	content, err := m.settingsHTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
 		return
 	}
 
