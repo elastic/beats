@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package pq
 
 import (
@@ -38,10 +55,12 @@ func newWriter(
 	writeBuffer uint,
 	end position,
 	flushCB func(uint),
-) (*Writer, error) {
+) (*Writer, reason) {
+	const op = "pq/create-writer"
+
 	pageSize := accessor.PageSize()
 	if pageSize <= 0 {
-		return nil, errInvalidPagesize
+		return nil, &Error{op: op, kind: InvalidPageSize}
 	}
 
 	pages := int(writeBuffer) / pageSize
@@ -56,10 +75,10 @@ func newWriter(
 		page := end.page
 		off := end.off
 
-		var err error
-		tail, err = readPageByID(accessor, pagePool, page)
+		var err reason
+		tail, err = accessor.readPageByID(pagePool, page)
 		if err != nil {
-			return nil, err
+			return nil, (&Error{op: op}).causedBy(err)
 		}
 
 		tail.Meta.EndOff = uint32(off)
@@ -81,13 +100,15 @@ func newWriter(
 }
 
 func (w *Writer) close() error {
+	const op = "pq/writer-close"
+
 	if !w.active {
 		return nil
 	}
 
 	err := w.doFlush()
 	if err != nil {
-		return err
+		return w.errWrap(op, err)
 	}
 
 	w.active = false
@@ -96,13 +117,15 @@ func (w *Writer) close() error {
 }
 
 func (w *Writer) Write(p []byte) (int, error) {
-	if !w.active {
-		return 0, errClosed
+	const op = "pq/write"
+
+	if err := w.canWrite(); err != NoError {
+		return 0, w.errOf(op, err)
 	}
 
 	if w.state.buf.Avail() <= len(p) {
 		if err := w.doFlush(); err != nil {
-			return 0, err
+			return 0, w.errWrap(op, err)
 		}
 	}
 
@@ -117,8 +140,10 @@ func (w *Writer) Write(p []byte) (int, error) {
 // of the actual writer must be flushed before calling Next on this writer.
 // Upon next, the queue writer will add the event framing header and footer.
 func (w *Writer) Next() error {
-	if !w.active {
-		return errClosed
+	const op = "pq/writer-next"
+
+	if err := w.canWrite(); err != NoError {
+		return w.errOf(op, err)
 	}
 
 	// finalize current event in buffer and prepare next event
@@ -133,7 +158,7 @@ func (w *Writer) Next() error {
 	// check if we need to flush
 	if w.state.buf.Avail() <= szEventHeader {
 		if err := w.doFlush(); err != nil {
-			return err
+			return w.errWrap(op, err)
 		}
 	}
 
@@ -143,10 +168,17 @@ func (w *Writer) Next() error {
 // Flush flushes the write buffer. Returns an error if the queue is closed,
 // some error occurred or no more space is available in the file.
 func (w *Writer) Flush() error {
-	if !w.active {
-		return errClosed
+	const op = "pq/writer-flush"
+
+	if err := w.canWrite(); err != NoError {
+		return w.errOf(op, err)
 	}
-	return w.doFlush()
+
+	if err := w.doFlush(); err != nil {
+		return w.errWrap(op, err)
+	}
+
+	return nil
 }
 
 func (w *Writer) doFlush() error {
@@ -167,37 +199,40 @@ func (w *Writer) doFlush() error {
 		}
 	}
 
-	tx := w.accessor.BeginWrite()
+	tx, txErr := w.accessor.BeginWrite()
+	if txErr != nil {
+		return w.errWrap("", txErr)
+	}
 	defer tx.Close()
 
 	rootPage, queueHdr, err := w.accessor.LoadRootPage(tx)
 	if err != nil {
-		return err
+		return w.errWrap("", err)
 	}
 
 	traceQueueHeader(queueHdr)
 
 	ok := false
-	allocN, err := allocatePages(tx, unallocated, end)
-	if err != nil {
-		return err
+	allocN, txErr := allocatePages(tx, unallocated, end)
+	if txErr != nil {
+		return w.errWrap("", txErr)
 	}
 	linkPages(start, end)
 	defer cleanup.IfNot(&ok, func() { unassignPages(unallocated, end) })
 
 	traceln("write queue pages")
-	last, err := flushPages(tx, start, end)
-	if err != nil {
-		return err
+	last, txErr := flushPages(tx, start, end)
+	if txErr != nil {
+		return w.errWrap("", txErr)
 	}
 
 	// update queue root
 	w.updateRootHdr(queueHdr, start, last, allocN)
 	rootPage.MarkDirty()
 
-	err = tx.Commit()
-	if err != nil {
-		return err
+	txErr = tx.Commit()
+	if txErr != nil {
+		return w.errWrap("", txErr)
 	}
 
 	// mark write as success -> no error-cleanup required
@@ -250,6 +285,32 @@ func (w *Writer) updateRootHdr(hdr *queuePage, start, last *page, allocated int)
 
 	traceln("writer: update queue header")
 	traceQueueHeader(hdr)
+}
+
+func (w *Writer) canWrite() ErrKind {
+	if !w.active {
+		return WriterClosed
+	}
+	return NoError
+}
+
+func (w *Writer) err(op string) *Error { return w.errPage(op, 0) }
+func (w *Writer) errPage(op string, page txfile.PageID) *Error {
+	return &Error{op: op, ctx: w.errPageCtx(page)}
+}
+
+func (w *Writer) errOf(op string, kind ErrKind) *Error {
+	return w.err(op).of(kind)
+}
+
+func (w *Writer) errWrap(op string, cause error) *Error { return w.errWrapPage(op, cause, 0) }
+func (w *Writer) errWrapPage(op string, cause error, page txfile.PageID) *Error {
+	return w.errPage(op, page).causedBy(cause)
+}
+
+func (w *Writer) errCtx() errorCtx { return w.errPageCtx(0) }
+func (w *Writer) errPageCtx(id txfile.PageID) errorCtx {
+	return w.accessor.errPageCtx(id)
 }
 
 func allocatePages(tx *txfile.Tx, start, end *page) (int, error) {

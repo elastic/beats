@@ -30,6 +30,12 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 *Affecting all Beats*
 
 - Fixed `add_host_metadata` not initializing correctly on Windows. {issue}7715[7715]
+- Fixed missing file unlock in spool file on Windows, so file can be reopened and locked. {pull}7859[7859]
+- Fix spool file opening/creation failing due to file locking on Windows. {pull}7859[7859]
+- Fix size of maximum mmaped read area in spool file on Windows. {pull}7859[7859]
+- Fix potential data loss on OS X in spool file by using fcntl with F_FULLFSYNC. {pull}7859[7859]
+- Improve fsync on linux, by assuming the kernel resets error flags of failed writes. {pull}7859[7859]
+- Remove unix-like permission checks on Windows, so files can be opened. {issue}7849[7849]
 
 *Auditbeat*
 
@@ -52,6 +58,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 - Add backoff on error support to redis output. {pull}7781[7781]
 - Allow for cloud-id to specify a custom port. This makes cloud-id work in ECE contexts. {pull}7887[7887]
+- Add support to grow or shrink an existing spool file between restarts. {pull}7859[7859]
 
 *Auditbeat*
 
