@@ -48,16 +48,26 @@ type OpTime struct {
 type MemberState int
 
 const (
-	STARTUP    MemberState = 0  // STARTUP state
-	PRIMARY    MemberState = 1  // PRIMARY state
-	SECONDARY  MemberState = 2  // SECONDARY state
-	RECOVERING MemberState = 3  // RECOVERING state
-	STARTUP2   MemberState = 5  // STARTUP2 state
-	UNKNOWN    MemberState = 6  // UNKNOWN state
-	ARBITER    MemberState = 7  // ARBITER state
-	DOWN       MemberState = 8  // DOWN state
-	ROLLBACK   MemberState = 9  // ROLLBACK state
-	REMOVED    MemberState = 10 // REMOVED state
+	// STARTUP state
+	STARTUP MemberState = 0
+	// PRIMARY state
+	PRIMARY MemberState = 1
+	// SECONDARY state
+	SECONDARY MemberState = 2
+	// RECOVERING state
+	RECOVERING MemberState = 3
+	// STARTUP2 state
+	STARTUP2 MemberState = 5
+	// UNKNOWN state
+	UNKNOWN MemberState = 6
+	// ARBITER state
+	ARBITER MemberState = 7
+	// DOWN state
+	DOWN MemberState = 8
+	// ROLLBACK state
+	ROLLBACK MemberState = 9
+	// REMOVED state
+	REMOVED MemberState = 10
 )
 
 func (optime *OpTime) getTimeStamp() int64 {
