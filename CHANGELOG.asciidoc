@@ -15,6 +15,8 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 *Auditbeat*
 
+- Use `initial_scan` action for new paths. {pull}7954[7954]
+
 *Filebeat*
 
 *Heartbeat*

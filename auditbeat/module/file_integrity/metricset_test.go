@@ -18,6 +18,7 @@
 package file_integrity
 
 import (
+	"crypto/sha1"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -59,7 +60,7 @@ func TestData(t *testing.T) {
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
-func TestDetectDeletedFiles(t *testing.T) {
+func TestActions(t *testing.T) {
 	defer setup(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
@@ -68,6 +69,7 @@ func TestDetectDeletedFiles(t *testing.T) {
 	}
 	defer bucket.Close()
 
+	// First directory
 	dir, err := ioutil.TempDir("", "audit-file")
 	if err != nil {
 		t.Fatal(err)
@@ -79,46 +81,91 @@ func TestDetectDeletedFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Second directory (to be reported with "initial_scan")
+	newDir, err := ioutil.TempDir("", "audit-file-new")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(newDir)
+
+	newDir, err = filepath.EvalSymlinks(newDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	createdFilepath := filepath.Join(dir, "created.txt")
+	updatedFilepath := filepath.Join(dir, "updated.txt")
+	deletedFilepath := filepath.Join(dir, "deleted.txt")
+
+	// Add first directory to db (so that files in it are not reported with "initial_scan")
 	e := &Event{
 		Timestamp: time.Now().UTC(),
-		Path:      filepath.Join(dir, "ghost.file"),
-		Action:    Created,
+		Path:      dir,
+		Action:    InitialScan,
 	}
 	if err = store(bucket, e); err != nil {
 		t.Fatal(err)
 	}
 
-	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 2, ms)
-	for _, e := range events {
-		if e.Error != nil {
-			t.Fatalf("received error: %+v", e.Error)
+	// Add fake event for non-existing file to db to simulate when a file has been deleted
+	deletedFileEvent := &Event{
+		Timestamp: time.Now().UTC(),
+		Path:      deletedFilepath,
+		Action:    Created,
+	}
+	if err = store(bucket, deletedFileEvent); err != nil {
+		t.Fatal(err)
+	}
+
+	// Insert fake file event into db to simulate when a file has changed
+	digest := sha1.New().Sum([]byte("different string"))
+	updatedFileEvent := &Event{
+		Timestamp: time.Now().UTC(),
+		Path:      updatedFilepath,
+		Action:    Created,
+		Hashes:    map[HashType]Digest{SHA1: digest},
+	}
+	if err = store(bucket, updatedFileEvent); err != nil {
+		t.Fatal(err)
+	}
+
+	// Create some files in first directory
+	go func() {
+		ioutil.WriteFile(createdFilepath, []byte("hello world"), 0600)
+		ioutil.WriteFile(updatedFilepath, []byte("hello world"), 0600)
+	}()
+
+	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir, newDir))
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 5, ms)
+	assert.Len(t, events, 5)
+
+	for _, event := range events {
+		if event.Error != nil {
+			t.Fatalf("received error: %+v", event.Error)
 		}
-	}
 
-	if !assert.Len(t, events, 2) {
-		return
-	}
-	event := events[0].MetricSetFields
-	path, err := event.GetValue("file.path")
-	if assert.NoError(t, err) {
-		assert.Equal(t, dir, path)
-	}
-
-	action, err := event.GetValue("event.action")
-	if assert.NoError(t, err) {
-		assert.Equal(t, []string{"created"}, action)
-	}
-
-	event = events[1].MetricSetFields
-	path, err = event.GetValue("file.path")
-	if assert.NoError(t, err) {
-		assert.Equal(t, e.Path, path)
-	}
-
-	action, err = event.GetValue("event.action")
-	if assert.NoError(t, err) {
-		assert.Equal(t, []string{"deleted"}, action)
+		actions, err := event.MetricSetFields.GetValue("event.action")
+		path, err2 := event.MetricSetFields.GetValue("file.path")
+		if assert.NoError(t, err) && assert.NoError(t, err2) {
+			// Note: Actions reported for a file or directory will be different
+			// depending on whether the scanner or the platform-dependent
+			// filesystem event listener reported it. The subset of actions we test
+			// for here should be consistent across all cases though.
+			switch path.(string) {
+			case newDir:
+				assert.Contains(t, actions, "initial_scan")
+			case dir:
+				assert.Contains(t, actions, "attributes_modified")
+			case deletedFilepath:
+				assert.Contains(t, actions, "deleted")
+			case createdFilepath:
+				assert.Contains(t, actions, "created")
+			case updatedFilepath:
+				assert.Contains(t, actions, "updated")
+			default:
+				assert.Fail(t, "unexpected path", "path %v", path)
+			}
+		}
 	}
 }
 
@@ -251,10 +298,10 @@ func setup(t testing.TB) func() {
 	return func() { os.RemoveAll(paths.Paths.Data) }
 }
 
-func getConfig(path string) map[string]interface{} {
+func getConfig(path ...string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":        "file_integrity",
-		"paths":         []string{path},
+		"paths":         path,
 		"exclude_files": []string{`(?i)\.sw[nop]$`, `[/\\]\.git([/\\]|$)`},
 	}
 }
