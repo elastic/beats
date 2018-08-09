@@ -38,7 +38,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.4[Check the HEAD diff]
 - Fix potential data loss on OS X in spool file by using fcntl with F_FULLFSYNC. {pull}7859[7859]
 - Improve fsync on linux, by assuming the kernel resets error flags of failed writes. {pull}7859[7859]
 - Remove unix-like permission checks on Windows, so files can be opened. {issue}7849[7849]
-- Deregister pipeline loader callback when inputsRunner is stopped. {pull}[7893][7893]
+- Deregister pipeline loader callback when inputsRunner is stopped. {pull}7893[7893]
+- Replace index patterns in TSVB visualizations. {pull}7929[7929]
 
 *Auditbeat*
 
