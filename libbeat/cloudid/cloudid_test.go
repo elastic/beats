@@ -71,6 +71,11 @@ func TestDecode(t *testing.T) {
 			expectedEsURL:     "https://ac31ebb90241773157043c34fd26fd46.us-central1.gcp.cloud.es.io:9243",
 			expectedKibanaURL: "https://a4c06230e48c8fce7be88a074a3bb3e0.us-central1.gcp.cloud.es.io:9244",
 		},
+		{
+			cloudID:           "extra-items:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJGFjMzFlYmI5MDI0MTc3MzE1NzA0M2MzNGZkMjZmZDQ2JGE0YzA2MjMwZTQ4YzhmY2U3YmU4OGEwNzRhM2JiM2UwJGFub3RoZXJpZCRhbmRhbm90aGVy",
+			expectedEsURL:     "https://ac31ebb90241773157043c34fd26fd46.us-central1.gcp.cloud.es.io:443",
+			expectedKibanaURL: "https://a4c06230e48c8fce7be88a074a3bb3e0.us-central1.gcp.cloud.es.io:443",
+		},
 	}
 
 	for _, test := range tests {
