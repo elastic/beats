@@ -332,10 +332,6 @@ output.elasticsearch:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
 
-  # The Logstash port to use if hosts does not contain a port number. The default
-  # is 5044.
-  #port: 5044
-  
   # Number of workers per Logstash host.
   #worker: 1
 
