@@ -249,7 +249,7 @@ func getSRedisAddr() string {
 		getEnv("SREDIS_PORT", SRedisDefaultPort))
 }
 
-func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *client {
+func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Client {
 	config, err := common.NewConfigFrom(cfg)
 	if err != nil {
 		t.Fatalf("Error reading config: %v", err)
@@ -265,7 +265,7 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *client {
 		t.Fatalf("Failed to initialize redis output: %v", err)
 	}
 
-	client := out.Clients[0].(*client)
+	client := out.Clients[0].(outputs.NetworkClient)
 	if err := client.Connect(); err != nil {
 		t.Fatalf("Failed to connect to redis host: %v", err)
 	}
@@ -273,7 +273,7 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *client {
 	return client
 }
 
-func sendTestEvents(out *client, batches, N int) error {
+func sendTestEvents(out outputs.Client, batches, N int) error {
 	i := 1
 	for b := 0; b < batches; b++ {
 		events := make([]beat.Event, N)

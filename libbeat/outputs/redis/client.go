@@ -211,7 +211,7 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 		// RPUSH returns total length of list -> fail and retry all on error
 		_, err := conn.Do(command, args...)
 		if err != nil {
-			logp.Err("Failed to %v to redis list with %v", command, err)
+			logp.Err("Failed to %v to redis list with: %v", command, err)
 			return okEvents, err
 
 		}

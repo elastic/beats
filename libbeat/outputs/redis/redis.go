@@ -104,8 +104,9 @@ func makeRedis(
 			return outputs.Fail(err)
 		}
 
-		clients[i] = newClient(conn, observer, config.Timeout,
+		client := newClient(conn, observer, config.Timeout,
 			config.Password, config.Db, key, dataType, config.Index, enc)
+		clients[i] = newBackoffClient(client, config.Backoff.Init, config.Backoff.Max)
 	}
 
 	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
