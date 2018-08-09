@@ -19,6 +19,8 @@ package stats
 
 import (
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -37,8 +39,8 @@ func init() {
 }
 
 const (
-	statsPath                      = "api/stats"
-	kibanaStatsAPIAvailableVersion = "6.4.0"
+	statsPath    = "api/stats"
+	settingsPath = "api/settings"
 )
 
 var (
@@ -52,7 +54,8 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	http         *helper.HTTP
+	statsHTTP    *helper.HTTP
+	settingsHTTP *helper.HTTP
 	xPackEnabled bool
 }
 
@@ -62,7 +65,7 @@ func isKibanaStatsAPIAvailable(kibanaVersion string) (bool, error) {
 		return false, err
 	}
 
-	wantVersion, err := common.NewVersion(kibanaStatsAPIAvailableVersion)
+	wantVersion, err := common.NewVersion(kibana.StatsAPIAvailableVersion)
 	if err != nil {
 		return false, err
 	}
@@ -79,36 +82,62 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	http, err := helper.NewHTTP(base)
+	statsHTTP, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
 	}
 
-	kibanaVersion, err := kibana.GetVersion(http, statsPath)
+	kibanaVersion, err := kibana.GetVersion(statsHTTP, statsPath)
 	if err != nil {
 		return nil, err
 	}
 
-	isAPIAvailable, err := isKibanaStatsAPIAvailable(kibanaVersion)
+	isStatsAPIAvailable, err := kibana.IsStatsAPIAvailable(kibanaVersion)
 	if err != nil {
 		return nil, err
 	}
 
-	if !isAPIAvailable {
+	if !isStatsAPIAvailable {
 		const errorMsg = "The kibana stats metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
-		return nil, fmt.Errorf(errorMsg, kibanaStatsAPIAvailableVersion, kibanaVersion)
+		return nil, fmt.Errorf(errorMsg, kibana.StatsAPIAvailableVersion, kibanaVersion)
 	}
 
 	if config.XPackEnabled {
 		cfgwarn.Experimental("The experimental xpack.enabled flag in kibana/stats metricset is enabled.")
 
 		// Use legacy API response so we can passthru usage as-is
-		http.SetURI(http.GetURI() + "&legacy=true")
+		statsHTTP.SetURI(statsHTTP.GetURI() + "&legacy=true")
+	}
+
+	var settingsHTTP *helper.HTTP
+	if config.XPackEnabled {
+		cfgwarn.Experimental("The experimental xpack.enabled flag in kibana/stats metricset is enabled.")
+
+		isSettingsAPIAvailable, err := kibana.IsSettingsAPIAvailable(kibanaVersion)
+		if err != nil {
+			return nil, err
+		}
+
+		if !isSettingsAPIAvailable {
+			const errorMsg = "The kibana stats metricset with X-Pack enabled is only supported with Kibana >= %v. You are currently running Kibana %v"
+			return nil, fmt.Errorf(errorMsg, kibana.SettingsAPIAvailableVersion, kibanaVersion)
+		}
+
+		settingsHTTP, err = helper.NewHTTP(base)
+		if err != nil {
+			return nil, err
+		}
+
+		// HACK! We need to do this because there might be a basepath involved, so we
+		// only search/replace the actual API paths
+		settingsURI := strings.Replace(statsHTTP.GetURI(), statsPath, settingsPath, 1)
+		settingsHTTP.SetURI(settingsURI)
 	}
 
 	return &MetricSet{
 		base,
-		http,
+		statsHTTP,
+		settingsHTTP,
 		config.XPackEnabled,
 	}, nil
 }
@@ -117,17 +146,39 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	content, err := m.http.FetchContent()
+	now := time.Now()
+
+	m.fetchStats(r, now)
+	if m.xPackEnabled {
+		m.fetchSettings(r, now)
+	}
+}
+
+func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
+	content, err := m.statsHTTP.FetchContent()
 	if err != nil {
 		r.Error(err)
 		return
 	}
 
 	if m.xPackEnabled {
-		intervalMs := m.Module().Config().Period.Nanoseconds() / 1000 / 1000
-		eventMappingXPack(r, intervalMs, content)
+		intervalMs := m.calculateIntervalMs()
+		eventMappingStatsXPack(r, intervalMs, now, content)
 	} else {
 		eventMapping(r, content)
 	}
+}
 
+func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
+	content, err := m.settingsHTTP.FetchContent()
+	if err != nil {
+		return
+	}
+
+	intervalMs := m.calculateIntervalMs()
+	eventMappingSettingsXPack(r, intervalMs, now, content)
+}
+
+func (m *MetricSet) calculateIntervalMs() int64 {
+	return m.Module().Config().Period.Nanoseconds() / 1000 / 1000
 }
