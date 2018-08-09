@@ -42,24 +42,29 @@ type JSONFormat struct {
 }
 
 func ReplaceIndexInIndexPattern(index string, content common.MapStr) common.MapStr {
-
-	if index != "" {
-		// change index pattern name
-		if objects, ok := content["objects"].([]interface{}); ok {
-			for i, object := range objects {
-				if objectMap, ok := object.(map[string]interface{}); ok {
-					objectMap["id"] = index
-
-					if attributes, ok := objectMap["attributes"].(map[string]interface{}); ok {
-						attributes["title"] = index
-						objectMap["attributes"] = attributes
-					}
-					objects[i] = objectMap
-				}
-			}
-			content["objects"] = objects
-		}
+	if index == "" {
+		return content
 	}
+
+	objects, ok := content["objects"].([]interface{})
+	if !ok {
+		return content
+	}
+
+	// change index pattern name
+	for i, object := range objects {
+		objectMap, ok := object.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		objectMap["id"] = index
+		if attributes, ok := objectMap["attributes"].(map[string]interface{}); ok {
+			attributes["title"] = index
+		}
+		objects[i] = objectMap
+	}
+	content["objects"] = objects
 
 	return content
 }
@@ -97,28 +102,71 @@ func ReplaceIndexInSavedObject(index string, kibanaSavedObject map[string]interf
 	return kibanaSavedObject
 }
 
-func ReplaceIndexInDashboardObject(index string, content common.MapStr) common.MapStr {
+// ReplaceIndexInVisState replaces index appearing in visState params objects
+func ReplaceIndexInVisState(index string, visStateJSON string) string {
 
+	var visState map[string]interface{}
+	err := json.Unmarshal([]byte(visStateJSON), &visState)
+	if err != nil {
+		logp.Err("Fail to unmarshal visState: %v", err)
+		return visStateJSON
+	}
+
+	params, ok := visState["params"].(map[string]interface{})
+	if !ok {
+		return visStateJSON
+	}
+
+	// Don't set it if it was not set before
+	if pattern, ok := params["index_pattern"].(string); !ok || len(pattern) == 0 {
+		return visStateJSON
+	}
+
+	params["index_pattern"] = index
+
+	d, err := json.Marshal(visState)
+	if err != nil {
+		logp.Err("Fail to marshal visState: %v", err)
+		return visStateJSON
+	}
+
+	return string(d)
+}
+
+// ReplaceIndexInDashboardObject replaces references to the index pattern in dashboard objects
+func ReplaceIndexInDashboardObject(index string, content common.MapStr) common.MapStr {
 	if index == "" {
 		return content
 	}
-	if objects, ok := content["objects"].([]interface{}); ok {
-		for i, object := range objects {
-			if objectMap, ok := object.(map[string]interface{}); ok {
-				if attributes, ok := objectMap["attributes"].(map[string]interface{}); ok {
 
-					if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
-
-						attributes["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(index, kibanaSavedObject)
-					}
-
-					objectMap["attributes"] = attributes
-				}
-				objects[i] = objectMap
-			}
-		}
-		content["objects"] = objects
+	objects, ok := content["objects"].([]interface{})
+	if !ok {
+		return content
 	}
+
+	for i, object := range objects {
+		objectMap, ok := object.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		attributes, ok := objectMap["attributes"].(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
+			attributes["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(index, kibanaSavedObject)
+		}
+
+		if visState, ok := attributes["visState"].(string); ok {
+			attributes["visState"] = ReplaceIndexInVisState(index, visState)
+		}
+
+		objects[i] = objectMap
+	}
+	content["objects"] = objects
+
 	return content
 }
 
