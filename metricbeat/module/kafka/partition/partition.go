@@ -98,22 +98,23 @@ func (m *MetricSet) connect() (*kafka.Broker, error) {
 }
 
 // Fetch partition stats list from kafka
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	b, err := m.connect()
 	if err != nil {
-		return nil, err
+		r.Error(err)
+		return
 	}
 
 	defer b.Close()
 	topics, err := b.GetTopicsMetadata(m.topics...)
 	if err != nil {
-		return nil, err
+		r.Error(err)
+		return
 	}
 
-	events := []common.MapStr{}
 	evtBroker := common.MapStr{
 		"id":      b.ID(),
-		"address": b.Addr(),
+		"address": b.AdvertisedAddr(),
 	}
 
 	for _, topic := range topics {
@@ -155,6 +156,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 					"id":             partition.ID,
 					"leader":         partition.Leader,
 					"replica":        id,
+					"is_leader":      partition.Leader == id,
 					"insync_replica": hasID(id, partition.Isr),
 				}
 
@@ -175,12 +177,20 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 					},
 				}
 
-				events = append(events, event)
+				// TODO (deprecation): Remove fields from MetricSetFields moved to ModuleFields
+				r.Event(mb.Event{
+					ModuleFields: common.MapStr{
+						"broker": evtBroker,
+						"topic":  evtTopic,
+						"partition": common.MapStr{
+							"id": partition.ID,
+						},
+					},
+					MetricSetFields: event,
+				})
 			}
 		}
 	}
-
-	return events, nil
 }
 
 // queryOffsetRange queries the broker for the oldest and the newest offsets in

@@ -6965,6 +6965,63 @@ Kafka module
 
 
 [float]
+== broker fields
+
+Broker Consumer Group Information have been read from (Broker handling the consumer group).
+
+
+
+*`kafka.broker.id`*::
++
+--
+type: long
+
+Broker id
+
+
+--
+
+*`kafka.broker.address`*::
++
+--
+type: keyword
+
+Broker advertised address
+
+
+--
+
+*`kafka.topic.name`*::
++
+--
+type: keyword
+
+Topic name
+
+
+--
+
+*`kafka.topic.error.code`*::
++
+--
+type: long
+
+Topic error code.
+
+
+--
+
+*`kafka.partition.id`*::
++
+--
+type: long
+
+Partition id.
+
+
+--
+
+[float]
 == consumergroup fields
 
 consumergroup
@@ -7010,6 +7067,9 @@ Consumer Group ID
 *`kafka.consumergroup.topic`*::
 +
 --
+
+deprecated[6.5]
+
 type: keyword
 
 Topic name
@@ -7019,6 +7079,9 @@ Topic name
 *`kafka.consumergroup.partition`*::
 +
 --
+
+deprecated[6.5]
+
 type: long
 
 Partition ID
@@ -7131,6 +7194,9 @@ Partition data.
 *`kafka.partition.partition.id`*::
 +
 --
+
+deprecated[6.5]
+
 type: long
 
 Partition id.
@@ -7178,6 +7244,16 @@ Indicates if replica is included in the in-sync replicate set (ISR).
 
 --
 
+*`kafka.partition.partition.is_leader`*::
++
+--
+type: boolean
+
+Indicates if replica is the leader
+
+
+--
+
 *`kafka.partition.partition.error.code`*::
 +
 --
@@ -7191,6 +7267,9 @@ Error code from fetching partition.
 *`kafka.partition.topic.error.code`*::
 +
 --
+
+deprecated[6.5]
+
 type: long
 
 topic error code.
@@ -7201,6 +7280,9 @@ topic error code.
 *`kafka.partition.topic.name`*::
 +
 --
+
+deprecated[6.5]
+
 type: keyword
 
 Topic name
@@ -7211,6 +7293,9 @@ Topic name
 *`kafka.partition.broker.id`*::
 +
 --
+
+deprecated[6.5]
+
 type: long
 
 Broker id
@@ -7221,6 +7306,9 @@ Broker id
 *`kafka.partition.broker.address`*::
 +
 --
+
+deprecated[6.5]
+
 type: keyword
 
 Broker address
