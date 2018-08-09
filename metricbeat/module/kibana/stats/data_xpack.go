@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	schemaXPackMonitoring = s.Schema{
+	schemaXPackMonitoringStats = s.Schema{
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"os": c.Dict("os", s.Schema{
 			"load": c.Dict("load", s.Schema{
@@ -105,61 +105,90 @@ var (
 	}
 )
 
-func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error {
-	var data map[string]interface{}
-	err := json.Unmarshal(content, &data)
-	if err != nil {
-		r.Error(err)
-		return err
+type dataParser func(mb.ReporterV2, common.MapStr, time.Time) (string, string, common.MapStr, error)
+
+func statsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string, string, common.MapStr, error) {
+	clusterUUID, ok := data["clusterUuid"].(string)
+	if !ok {
+		return "", "", nil, elastic.ReportErrorForMissingField("clusterUuid", elastic.Kibana, r)
 	}
 
-	kibanaStatsFields, err := schemaXPackMonitoring.Apply(data)
+	kibanaStatsFields, err := schemaXPackMonitoringStats.Apply(data)
 	if err != nil {
-		r.Error(err)
-		return err
+		return "", "", nil, err
 	}
 
 	process, ok := data["process"].(map[string]interface{})
 	if !ok {
-		return elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
 	}
 	memory, ok := process["memory"].(map[string]interface{})
 	if !ok {
-		return elastic.ReportErrorForMissingField("process.memory", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("process.memory", elastic.Kibana, r)
 	}
-
 	rss, ok := memory["resident_set_size_bytes"].(float64)
 	if !ok {
-		return elastic.ReportErrorForMissingField("process.memory.resident_set_size_bytes", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("process.memory.resident_set_size_bytes", elastic.Kibana, r)
 	}
 	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int64(rss))
 
-	timestamp := time.Now()
-	kibanaStatsFields.Put("timestamp", timestamp)
+	kibanaStatsFields.Put("timestamp", now)
 
 	// Make usage field passthrough as-is
 	usage, ok := data["usage"].(map[string]interface{})
 	if !ok {
-		return elastic.ReportErrorForMissingField("usage", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("usage", elastic.Kibana, r)
 	}
 	kibanaStatsFields.Put("usage", usage)
 
-	clusterUUID, ok := data["clusterUuid"].(string)
+	return "kibana_stats", clusterUUID, kibanaStatsFields, nil
+}
+
+func settingsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string, string, common.MapStr, error) {
+	clusterUUID, ok := data["cluster_uuid"].(string)
 	if !ok {
-		return elastic.ReportErrorForMissingField("clusterUuid", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("cluster_uuid", elastic.Kibana, r)
+	}
+
+	kibanaSettingsFields, ok := data["settings"]
+	if !ok {
+		return "", "", nil, elastic.ReportErrorForMissingField("settings", elastic.Kibana, r)
+	}
+
+	return "kibana_settings", clusterUUID, kibanaSettingsFields.(map[string]interface{}), nil
+}
+
+func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte, dataParserFunc dataParser) error {
+	var data map[string]interface{}
+	err := json.Unmarshal(content, &data)
+	if err != nil {
+		return err
+	}
+
+	t, clusterUUID, fields, err := dataParserFunc(r, data, now)
+	if err != nil {
+		return err
 	}
 
 	var event mb.Event
 	event.RootFields = common.MapStr{
 		"cluster_uuid": clusterUUID,
-		"timestamp":    timestamp,
+		"timestamp":    now,
 		"interval_ms":  intervalMs,
-		"type":         "kibana_stats",
-		"kibana_stats": kibanaStatsFields,
+		"type":         t,
+		t:              fields,
 	}
 
 	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Kibana)
-	r.Event(event)
 
+	r.Event(event)
 	return nil
+}
+
+func eventMappingStatsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte) error {
+	return eventMappingXPack(r, intervalMs, now, content, statsDataParser)
+}
+
+func eventMappingSettingsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte) error {
+	return eventMappingXPack(r, intervalMs, now, content, settingsDataParser)
 }
