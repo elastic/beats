@@ -217,8 +217,11 @@ func (loader ElasticsearchLoader) importVisualization(file string) error {
 
 	if loader.config.Index != "" {
 		if savedObject, ok := vizContent["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
-
 			vizContent["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(loader.config.Index, savedObject)
+		}
+
+		if visState, ok := vizContent["visState"].(string); ok {
+			vizContent["visState"] = ReplaceIndexInVisState(loader.config.Index, visState)
 		}
 	}
 

@@ -69,3 +69,45 @@ func TestReplaceStringInDashboard(t *testing.T) {
 		assert.Equal(t, test.expected, result)
 	}
 }
+
+func TestReplaceIndexInDashboardObject(t *testing.T) {
+	tests := []struct {
+		dashboard common.MapStr
+		pattern   string
+		expected  common.MapStr
+	}{
+		{
+			common.MapStr{"objects": []interface{}{map[string]interface{}{
+				"attributes": map[string]interface{}{
+					"kibanaSavedObjectMeta": map[string]interface{}{
+						"searchSourceJSON": "{\"index\":\"metricbeat-*\"}",
+					},
+				}}}},
+			"otherindex-*",
+			common.MapStr{"objects": []interface{}{map[string]interface{}{
+				"attributes": map[string]interface{}{
+					"kibanaSavedObjectMeta": map[string]interface{}{
+						"searchSourceJSON": "{\"index\":\"otherindex-*\"}",
+					},
+				}}}},
+		},
+		{
+			common.MapStr{"objects": []interface{}{map[string]interface{}{
+				"attributes": map[string]interface{}{
+					"kibanaSavedObjectMeta": map[string]interface{}{},
+					"visState":              "{\"params\":{\"index_pattern\":\"metricbeat-*\"}}",
+				}}}},
+			"otherindex-*",
+			common.MapStr{"objects": []interface{}{map[string]interface{}{
+				"attributes": map[string]interface{}{
+					"kibanaSavedObjectMeta": map[string]interface{}{},
+					"visState":              "{\"params\":{\"index_pattern\":\"otherindex-*\"}}",
+				}}}},
+		},
+	}
+
+	for _, test := range tests {
+		result := ReplaceIndexInDashboardObject(test.pattern, test.dashboard)
+		assert.Equal(t, test.expected, result)
+	}
+}
