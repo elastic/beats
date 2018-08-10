@@ -4,4 +4,4 @@ the http://docs.ceph.com/docs/master/man/8/ceph-rest-api/[ceph-rest-api]. The de
 [float]
 === Compatibility
 
-The Ceph module is tested with Ceph Jewel
+The Ceph module is tested with Ceph Jewel (10.2.10).

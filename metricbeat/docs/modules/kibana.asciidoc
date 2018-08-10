@@ -14,7 +14,7 @@ The default metricset is `status`.
 [float]
 === Compatibility
 
-The Kibana module is tested with Kibana 6.3
+The Kibana module is tested with Kibana 6.3.
 
 
 [float]
