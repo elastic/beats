@@ -21,6 +21,7 @@ package readfile
 
 import (
 	"bytes"
+	"fmt"
 	"math/rand"
 	"testing"
 
@@ -75,6 +76,123 @@ var tests = []struct {
 	{"euc-jp", []string{"私はガラスを食べられます。", "それは私を傷つけません。"}},
 }
 
+var testsWithOffset = []struct {
+	encoding string
+	input    []string
+	state    State
+	expected []string
+}{
+	{
+		"plain",
+		[]string{"to read", "to read"},
+		State{
+			EncodedOffset:          0,
+			ConvertedSegmentOffset: 0,
+			ConvertedStreamOffset:  0,
+		},
+		[]string{"to read", "to read"},
+	},
+	{
+		"plain",
+		[]string{"already encountered", "already encountered", "to read"},
+		State{
+			EncodedOffset:          0,
+			ConvertedSegmentOffset: 40,
+			ConvertedStreamOffset:  40,
+		},
+		[]string{"to read"},
+	},
+	{
+		"plain",
+		[]string{"already encountered", "to read", "to read"},
+		State{
+			EncodedOffset:          0,
+			ConvertedSegmentOffset: 20,
+			ConvertedStreamOffset:  20,
+		},
+		[]string{"to read", "to read"},
+	},
+	{
+		"plain",
+		[]string{"already encountered", "already encountered", "to read"},
+		State{
+			EncodedOffset:          20,
+			ConvertedSegmentOffset: 20,
+			ConvertedStreamOffset:  40,
+		},
+		[]string{"to read"},
+	},
+	{
+		"plain",
+		[]string{"already encountered", "already encountered", "to read"},
+		State{
+			EncodedOffset:          24,
+			ConvertedSegmentOffset: 16,
+			ConvertedStreamOffset:  40,
+		},
+		[]string{"to read"},
+	},
+	{
+		"latin1",
+		[]string{"to réad", "to réad"},
+		State{
+			EncodedOffset:          0,
+			ConvertedSegmentOffset: 0,
+			ConvertedStreamOffset:  0,
+		},
+		[]string{"to réad", "to réad"},
+	},
+	{
+		"latin1",
+		[]string{"alréady éncountered", "alréady éncountered", "to réad"},
+		State{
+			EncodedOffset:          0,
+			ConvertedSegmentOffset: 44,
+			ConvertedStreamOffset:  44,
+		},
+		[]string{"to réad"},
+	},
+	{
+		"latin1",
+		[]string{"alréady éncountered", "to réad", "to réad"},
+		State{
+			EncodedOffset:          0,
+			ConvertedSegmentOffset: 22,
+			ConvertedStreamOffset:  22,
+		},
+		[]string{"to réad", "to réad"},
+	},
+	{
+		"latin1",
+		[]string{"alréady éncountered", "alréady éncountered", "to réad"},
+		State{
+			EncodedOffset:          20,
+			ConvertedSegmentOffset: 22,
+			ConvertedStreamOffset:  44,
+		},
+		[]string{"to réad"},
+	},
+	{
+		"utf-16",
+		[]string{"alréady éncountered", "alréady éncountered", "to réad"},
+		State{
+			EncodedOffset:          40,
+			ConvertedSegmentOffset: 22,
+			ConvertedStreamOffset:  44,
+		},
+		[]string{"to réad"},
+	},
+	{
+		"utf-16",
+		[]string{"alréady éncountered", "alréady éncountered", "to réad"},
+		State{
+			EncodedOffset:          30,
+			ConvertedSegmentOffset: 27,
+			ConvertedStreamOffset:  44,
+		},
+		[]string{"to réad"},
+	},
+}
 
 func TestReaderEncodings(t *testing.T) {
 	testReaderWithEncodings(t, 1024)
@@ -124,15 +242,25 @@ func testReaderWithEncodings(t *testing.T, bufferSize int) {
 		}
 	}
 }
+
+func TestReaderWithOffset(t *testing.T) {
+	for _, test := range testsWithOffset {
+		t.Logf("test codec: %v", test.encoding)
+
+		reader, expectedCount, err := newTestReader(test.encoding, test.input, 1024)
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
+			continue
+		}
+		err = reader.SetState(test.state)
+		if err != nil {
+			t.Errorf("failed to set the state of reader: %v", err)
 			continue
 		}
 
 		// read decodec lines from buffer
 		var readLines []string
 		var byteCounts []int
-		current := 0
 		for {
 			bytes, sz, err := reader.Next()
 			if sz > 0 {
@@ -143,21 +271,20 @@ func testReaderWithEncodings(t *testing.T, bufferSize int) {
 				break
 			}
 
-			current += sz
-			byteCounts = append(byteCounts, current)
+			byteCounts = append(byteCounts, sz)
 		}
 
 		// validate lines and byte offsets
-		if len(test.strings) != len(readLines) {
+		if len(test.expected) != len(readLines) {
 			t.Errorf("number of lines mismatch (expected=%v actual=%v)",
-				len(test.strings), len(readLines))
+				len(test.expected), len(readLines))
 			continue
 		}
-		for i := range test.strings {
-			expected := test.strings[i]
+		for i := range test.expected {
+			expected := test.expected[i]
 			actual := readLines[i]
 			assert.Equal(t, expected, actual)
-			assert.Equal(t, expectedCount[i], byteCounts[i])
+			assert.Equal(t, expectedCount[len(test.input)-1-i], byteCounts[i])
 		}
 	}
 
@@ -243,7 +370,12 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
 	codec, _ := encoding.Plain(buffer)
-	reader, err := NewLineReader(buffer, codec, buffer.Len())
+	config := Config{
+		Codec:      codec,
+		Separator:  []byte("\n"),
+		BufferSize: buffer.Len(),
+	}
+	reader, err := NewLineReader(buffer, config)
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}
