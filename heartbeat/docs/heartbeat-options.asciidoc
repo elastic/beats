@@ -479,7 +479,7 @@ contains JSON:
       'X-API-Key': '12345-mykey-67890'
   check.response:
     status: 200
-    body: '{"status": "ok"}'
+    body: {"status": "ok"}
 -------------------------------------------------------------------------------
 
 The following configuration shows how to check the response for multiple regex
