@@ -20,7 +20,7 @@
           type: long
           description: >
             Average response time in microseconds
-        - name: status_code
+        - name: status_codes.*
           type: object
           object_type: long
           description: >
