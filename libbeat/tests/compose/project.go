@@ -29,7 +29,8 @@ import (
 
 // CreateOptions are the options when containers are created
 type CreateOptions struct {
-	ForceBuild bool
+	ForceBuild    bool
+	ForceRecreate bool
 }
 
 // UpOptions are the options when containers are started
@@ -110,7 +111,8 @@ func (c *Project) Start(service string) error {
 
 	return c.Driver.Up(context.Background(), UpOptions{
 		Create: CreateOptions{
-			ForceBuild: true,
+			ForceBuild:    true,
+			ForceRecreate: true,
 		},
 	}, service)
 }

@@ -88,6 +88,10 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		args = append(args, "--build")
 	}
 
+	if opts.Create.ForceRecreate {
+		args = append(args, "--force-recreate")
+	}
+
 	if service != "" {
 		args = append(args, service)
 	}
