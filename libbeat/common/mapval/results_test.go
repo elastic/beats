@@ -32,8 +32,8 @@ func TestEmpty(t *testing.T) {
 
 func TestWithError(t *testing.T) {
 	r := NewResults()
-	r.record(MustParsePath("foo"), KeyMissingVR)
-	r.record(MustParsePath("bar"), ValidVR)
+	r.record(mustParsePath("foo"), KeyMissingVR)
+	r.record(mustParsePath("bar"), ValidVR)
 
 	assert.False(t, r.Valid)
 
