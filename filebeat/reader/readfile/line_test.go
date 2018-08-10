@@ -75,30 +75,55 @@ var tests = []struct {
 	{"euc-jp", []string{"私はガラスを食べられます。", "それは私を傷つけません。"}},
 }
 
+
 func TestReaderEncodings(t *testing.T) {
+	testReaderWithEncodings(t, 1024)
+}
+
+func TestReaderEncodingsWithSmallBuffer(t *testing.T) {
+	testReaderWithEncodings(t, 3)
+}
+
+func testReaderWithEncodings(t *testing.T, bufferSize int) {
 	for _, test := range tests {
 		t.Logf("test codec: %v", test.encoding)
 
-		codecFactory, ok := encoding.FindEncoding(test.encoding)
-		if !ok {
-			t.Errorf("can not find encoding '%v'", test.encoding)
+		reader, expectedCount, err := newTestReader(test.encoding, test.strings, bufferSize)
+		if err != nil {
+			t.Errorf("failed to initialize reader: %v", err)
 			continue
 		}
 
-		buffer := bytes.NewBuffer(nil)
-		codec, _ := codecFactory(buffer)
+		// read decodec lines from buffer
+		var readLines []string
+		var byteCounts []int
+		for {
+			bytes, sz, err := reader.Next()
+			if sz > 0 {
+				readLines = append(readLines, string(bytes[:len(bytes)-1]))
+			}
 
-		// write with encoding to buffer
-		writer := transform.NewWriter(buffer, codec.NewEncoder())
-		var expectedCount []int
-		for _, line := range test.strings {
-			writer.Write([]byte(line))
-			writer.Write([]byte{'\n'})
-			expectedCount = append(expectedCount, buffer.Len())
+			if err != nil {
+				break
+			}
+
+			byteCounts = append(byteCounts, sz)
 		}
 
-		// create line reader
-		reader, err := NewLineReader(buffer, codec, 1024)
+		// validate lines and byte offsets
+		if len(test.strings) != len(readLines) {
+			t.Errorf("number of lines mismatch (expected=%v actual=%v)",
+				len(test.strings), len(readLines))
+			continue
+		}
+		for i := range test.strings {
+			expected := test.strings[i]
+			actual := readLines[i]
+			assert.Equal(t, expected, actual)
+			assert.Equal(t, expectedCount[i], byteCounts[i])
+		}
+	}
+}
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
 			continue
@@ -135,6 +160,35 @@ func TestReaderEncodings(t *testing.T) {
 			assert.Equal(t, expectedCount[i], byteCounts[i])
 		}
 	}
+
+}
+
+func newTestReader(enc string, input []string, bufferSize int) (*LineReader, []int, error) {
+	codecFactory, ok := encoding.FindEncoding(enc)
+	if !ok {
+		return nil, nil, fmt.Errorf("can not find encoding '%v'", enc)
+	}
+
+	buffer := bytes.NewBuffer(nil)
+	codec, _ := codecFactory(buffer)
+
+	// write with encoding to buffer
+	writer := transform.NewWriter(buffer, codec.NewEncoder())
+	var expectedCount []int
+	for _, line := range input {
+		writer.Write([]byte(line))
+		writer.Write([]byte{'\n'})
+		expectedCount = append(expectedCount, len(line)+1)
+	}
+
+	// create line reader
+	config := Config{
+		Codec:      codec,
+		Separator:  []byte("\n"),
+		BufferSize: 1024,
+	}
+	r, err := NewLineReader(buffer, config)
+	return r, expectedCount, err
 }
 
 func TestReadSingleLongLine(t *testing.T) {
