@@ -779,13 +779,13 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 1
 
-    def test_decode_error(self):
+    def test_encoding_can_be_set(self):
         """
-        Tests that in case of a decoding error it is handled gracefully
+        Tests that encoding is applied correctly
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            encoding="utf-16be",
+            encoding="utf-16",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -793,14 +793,9 @@ class Test(BaseTest):
         logfile = self.working_dir + "/log/test.log"
 
         with io.open(logfile, 'w', encoding="utf-16") as file:
-            file.write(u'hello world1')
-            file.write(u"\n")
-        with io.open(logfile, 'a', encoding="utf-16") as file:
-            file.write(u"\U00012345=Ra")
-        with io.open(logfile, 'a', encoding="utf-16") as file:
-            file.write(u"\n")
-            file.write(u"hello world2")
-            file.write(u"\n")
+            file.write(u'hello world1\n')
+            file.write(u"hello world2\n")
+            file.write(u"hello world3\n")
 
         filebeat = self.start_beat()
 
@@ -809,11 +804,6 @@ class Test(BaseTest):
             lambda: self.output_has(lines=3),
             max_timeout=10)
 
-        # Wait until error shows up
-        self.wait_until(
-            lambda: self.log_contains("Error decoding line: transform: short source buffer"),
-            max_timeout=5)
-
         filebeat.check_kill_and_wait()
 
         # Check that only 1 registry entry as original was only truncated
@@ -821,4 +811,4 @@ class Test(BaseTest):
         assert len(data) == 1
 
         output = self.read_output_json()
-        assert output[2]["message"] == "hello world2"
+        assert output[2]["message"] == "hello world3"
