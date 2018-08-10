@@ -10,7 +10,6 @@ experimental[]
 This is the kvm module.
 
 
-
 [float]
 === Example configuration
 
