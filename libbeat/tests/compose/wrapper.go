@@ -84,7 +84,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 
 	args = append(args, "-d")
 
-	if opts.Create.ForceBuild {
+	if opts.Create.Build {
 		args = append(args, "--build")
 	}
 
