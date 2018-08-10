@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	schemaXPackMonitoring = s.Schema{
+	schemaXPackMonitoringStats = s.Schema{
 		"concurrent_connections": c.Int("concurrent_connections"),
 		"os": c.Dict("os", s.Schema{
 			"load": c.Dict("load", s.Schema{
@@ -70,40 +70,6 @@ var (
 			"snapshot":          c.Bool("snapshot"),
 			"status":            c.Str("status"),
 		}),
-		"usage": c.Dict("usage", s.Schema{
-			"index": c.Str("kibana.index"),
-			"index_pattern": c.Dict("kibana.index_pattern", s.Schema{
-				"total": c.Int("total"),
-			}),
-			"search": c.Dict("kibana.search", s.Schema{
-				"total": c.Int("total"),
-			}),
-			"visualization": c.Dict("kibana.visualization", s.Schema{
-				"total": c.Int("total"),
-			}),
-			"dashboard": c.Dict("kibana.dashboard", s.Schema{
-				"total": c.Int("total"),
-			}),
-			"timelion_sheet": c.Dict("kibana.timelion_sheet", s.Schema{
-				"total": c.Int("total"),
-			}),
-			"graph_workspace": c.Dict("kibana.graph_workspace", s.Schema{
-				"total": c.Int("total"),
-			}),
-			"xpack": s.Object{
-				"reporting": c.Dict("reporting", s.Schema{
-					"available":     c.Bool("available"),
-					"enabled":       c.Bool("enabled"),
-					"browser_type":  c.Str("browser_type"),
-					"_all":          c.Int("all"),
-					"csv":           reportingCsvDict,
-					"printable_pdf": reportingPrintablePdfDict,
-					"status":        reportingStatusDict,
-					"lastDay":       c.Dict("last_day", reportingPeriodSchema, c.DictOptional),
-					"last7Days":     c.Dict("last_7_days", reportingPeriodSchema, c.DictOptional),
-				}, c.DictOptional),
-			},
-		}),
 	}
 
 	reportingCsvDict = c.Dict("csv", s.Schema{
@@ -139,49 +105,90 @@ var (
 	}
 )
 
-func eventMappingXPack(r mb.ReporterV2, intervalMs int64, content []byte) error {
-	var data map[string]interface{}
-	err := json.Unmarshal(content, &data)
-	if err != nil {
-		r.Error(err)
-		return err
+type dataParser func(mb.ReporterV2, common.MapStr, time.Time) (string, string, common.MapStr, error)
+
+func statsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string, string, common.MapStr, error) {
+	clusterUUID, ok := data["clusterUuid"].(string)
+	if !ok {
+		return "", "", nil, elastic.ReportErrorForMissingField("clusterUuid", elastic.Kibana, r)
 	}
 
-	kibanaStatsFields, err := schemaXPackMonitoring.Apply(data)
+	kibanaStatsFields, err := schemaXPackMonitoringStats.Apply(data)
 	if err != nil {
-		r.Error(err)
-		return err
+		return "", "", nil, err
 	}
 
 	process, ok := data["process"].(map[string]interface{})
 	if !ok {
-		return elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
 	}
 	memory, ok := process["memory"].(map[string]interface{})
 	if !ok {
-		return elastic.ReportErrorForMissingField("process.memory", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("process.memory", elastic.Kibana, r)
 	}
-
 	rss, ok := memory["resident_set_size_bytes"].(float64)
 	if !ok {
-		return elastic.ReportErrorForMissingField("process.memory.resident_set_size_bytes", elastic.Kibana, r)
+		return "", "", nil, elastic.ReportErrorForMissingField("process.memory.resident_set_size_bytes", elastic.Kibana, r)
 	}
 	kibanaStatsFields.Put("process.memory.resident_set_size_in_bytes", int64(rss))
 
-	timestamp := time.Now()
-	kibanaStatsFields.Put("timestamp", timestamp)
+	kibanaStatsFields.Put("timestamp", now)
+
+	// Make usage field passthrough as-is
+	usage, ok := data["usage"].(map[string]interface{})
+	if !ok {
+		return "", "", nil, elastic.ReportErrorForMissingField("usage", elastic.Kibana, r)
+	}
+	kibanaStatsFields.Put("usage", usage)
+
+	return "kibana_stats", clusterUUID, kibanaStatsFields, nil
+}
+
+func settingsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (string, string, common.MapStr, error) {
+	clusterUUID, ok := data["cluster_uuid"].(string)
+	if !ok {
+		return "", "", nil, elastic.ReportErrorForMissingField("cluster_uuid", elastic.Kibana, r)
+	}
+
+	kibanaSettingsFields, ok := data["settings"]
+	if !ok {
+		return "", "", nil, elastic.ReportErrorForMissingField("settings", elastic.Kibana, r)
+	}
+
+	return "kibana_settings", clusterUUID, kibanaSettingsFields.(map[string]interface{}), nil
+}
+
+func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte, dataParserFunc dataParser) error {
+	var data map[string]interface{}
+	err := json.Unmarshal(content, &data)
+	if err != nil {
+		return err
+	}
+
+	t, clusterUUID, fields, err := dataParserFunc(r, data, now)
+	if err != nil {
+		return err
+	}
 
 	var event mb.Event
 	event.RootFields = common.MapStr{
-		"cluster_uuid": data["cluster_uuid"].(string),
-		"timestamp":    timestamp,
+		"cluster_uuid": clusterUUID,
+		"timestamp":    now,
 		"interval_ms":  intervalMs,
-		"type":         "kibana_stats",
-		"kibana_stats": kibanaStatsFields,
+		"type":         t,
+		t:              fields,
 	}
 
 	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Kibana)
-	r.Event(event)
 
+	r.Event(event)
 	return nil
+}
+
+func eventMappingStatsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte) error {
+	return eventMappingXPack(r, intervalMs, now, content, statsDataParser)
+}
+
+func eventMappingSettingsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte) error {
+	return eventMappingXPack(r, intervalMs, now, content, settingsDataParser)
 }

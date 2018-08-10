@@ -28,6 +28,7 @@ import (
 	_ "github.com/elastic/beats/packetbeat/protos/amqp"
 	_ "github.com/elastic/beats/packetbeat/protos/applayer"
 	_ "github.com/elastic/beats/packetbeat/protos/cassandra"
+	_ "github.com/elastic/beats/packetbeat/protos/dhcpv4"
 	_ "github.com/elastic/beats/packetbeat/protos/dns"
 	_ "github.com/elastic/beats/packetbeat/protos/http"
 	_ "github.com/elastic/beats/packetbeat/protos/icmp"

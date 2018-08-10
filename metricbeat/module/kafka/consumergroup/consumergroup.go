@@ -20,6 +20,8 @@ package consumergroup
 import (
 	"crypto/tls"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
@@ -95,25 +97,37 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch consumer group metrics from kafka
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	if err := m.broker.Connect(); err != nil {
-		logp.Err("broker connect failed: %v", err)
-		return nil, err
+		r.Error(errors.Wrap(err, "broker connection failed"))
+		return
 	}
-
-	b := m.broker
-	defer b.Close()
+	defer m.broker.Close()
 
 	brokerInfo := common.MapStr{
-		"id":      b.ID(),
-		"address": b.AdvertisedAddr(),
+		"id":      m.broker.ID(),
+		"address": m.broker.AdvertisedAddr(),
 	}
 
-	var events []common.MapStr
 	emitEvent := func(event common.MapStr) {
+		// TODO (deprecation): Remove fields from MetricSetFields moved to ModuleFields
 		event["broker"] = brokerInfo
-		events = append(events, event)
+		r.Event(mb.Event{
+			ModuleFields: common.MapStr{
+				"broker": brokerInfo,
+				"topic": common.MapStr{
+					"name": event["topic"],
+				},
+				"partition": common.MapStr{
+					"id": event["partition"],
+				},
+			},
+			MetricSetFields: event,
+		})
 	}
-	err := fetchGroupInfo(emitEvent, b, m.groups.pred(), m.topics.pred())
-	return events, err
+	err := fetchGroupInfo(emitEvent, m.broker, m.groups.pred(), m.topics.pred())
+	if err != nil {
+		r.Error(err)
+	}
 }

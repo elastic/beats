@@ -290,7 +290,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	debugf("Initializing output plugins")
 	pipeline, err := pipeline.Load(b.Info, reg, b.Config.Pipeline, b.Config.Output)
 	if err != nil {
-		return nil, fmt.Errorf("error initializing publisher: %v", err)
+		return nil, fmt.Errorf("error initializing publisher: %+v", err)
 	}
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
@@ -392,7 +392,7 @@ func (b *Beat) TestConfig(bt beat.Creator) error {
 	}())
 }
 
-// Setup registers ES index template and kibana dashboards
+// Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
 func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pipelines bool) error {
 	return handleError(func() error {
 		err := b.Init()
@@ -666,7 +666,6 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // the elasticsearch output. It is important the the registration happens before
 // the publisher is created.
 func (b *Beat) registerTemplateLoading() error {
-
 	var cfg template.TemplateConfig
 
 	// Check if outputting to file is enabled, and output to file if it is

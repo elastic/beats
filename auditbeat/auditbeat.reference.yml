@@ -84,6 +84,11 @@ auditbeat.modules:
   - '~$'
   - '/\.git($|/)'
 
+  # List of regular expressions used to explicitly include files. When configured,
+  # Auditbeat will ignore files unless they match a pattern.
+  #include_files:
+  #- '/\.ssh($|/)'
+
   # Scan over the configured file paths at startup and send events for new or
   # modified files since the last time Auditbeat was running.
   scan_at_start: true
@@ -934,6 +939,13 @@ output.elasticsearch:
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
+
+# A list of fields to be added to the template and Kibana index pattern. Also
+# specify setup.template.overwrite: true to overwrite the existing template.
+# This setting is experimental.
+#setup.template.append_fields:
+#- name: field_name
+#  type: field_type
 
 # Enable json template loading. If this is enabled, the fields.yml is ignored.
 #setup.template.json.enabled: false

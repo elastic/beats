@@ -1,0 +1,163 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/http-endpoint.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+[[http-endpoint]]
+== HTTP Endpoint
+
+experimental[]
+
+{beatname_uc} can expose internal metrics through an HTTP endpoint. These are useful to
+monitor the internal state of the Beat. For security reasons the endpoint is disabled
+by default, as you may want to avoid exposing this info.
+
+The HTTP endpoint has the following configuration settings:
+
+`http.enabled`:: (Optional) Enable the HTTP endpoint. Default is `false`.
+`http.host`:: (Optional) Bind to this hostname or IP address.
+It is recommended to use only localhost. Default is `localhost`
+`http.port`:: (Optional) Port on which the HTTP endpoint will bind. Default is `5066`.
+
+This is the list of paths you can access. For pretty JSON output append ?pretty to the URL.
+
+
+[float]
+=== Info
+
+`/` provides basic info from the {beatname_uc}. Example:
+
+[source,js]
+----
+curl -XGET 'localhost:5066/?pretty'
+----
+
+["source","js",subs="attributes"]
+----
+{
+  "beat": "metricbeat",
+  "hostname": "example.lan",
+  "name": "example.lan",
+  "uuid": "34f6c6e1-45a8-4b12-9125-11b3e6e89866",
+  "version": "{version}"
+}
+----
+
+[float]
+=== Stats
+
+`/stats` reports internal metrics. Example:
+
+[source,js]
+----
+curl -XGET 'localhost:5066/stats?pretty'
+----
+
+["source","js",subs="attributes"]
+----
+{
+  "beat": {
+    "cpu": {
+      "system": {
+        "ticks": 1710,
+        "time": {
+          "ms": 1712
+        }
+      },
+      "total": {
+        "ticks": 3420,
+        "time": {
+          "ms": 3424
+        },
+        "value": 3420
+      },
+      "user": {
+        "ticks": 1710,
+        "time": {
+          "ms": 1712
+        }
+      }
+    },
+    "info": {
+      "ephemeral_id": "ab4287c4-d907-4d9d-b074-d8c3cec4a577",
+      "uptime": {
+        "ms": 195547
+      }
+    },
+    "memstats": {
+      "gc_next": 17855152,
+      "memory_alloc": 9433384,
+      "memory_total": 492478864,
+      "rss": 50405376
+    }
+  },
+  "libbeat": {
+    "config": {
+      "module": {
+        "running": 0,
+        "starts": 0,
+        "stops": 0
+      },
+      "reloads": 1
+    },
+    "output": {
+      "events": {
+        "acked": 0,
+        "active": 0,
+        "batches": 0,
+        "dropped": 0,
+        "duplicates": 0,
+        "failed": 0,
+        "total": 0
+      },
+      "read": {
+        "bytes": 0,
+        "errors": 0
+      },
+      "type": "elasticsearch",
+      "write": {
+        "bytes": 0,
+        "errors": 0
+      }
+    },
+    "pipeline": {
+      "clients": 6,
+      "events": {
+        "active": 716,
+        "dropped": 0,
+        "failed": 0,
+        "filtered": 0,
+        "published": 716,
+        "retry": 278,
+        "total": 716
+      },
+      "queue": {
+        "acked": 0
+      }
+    }
+  },
+  "system": {
+    "cpu": {
+      "cores": 4
+    },
+    "load": {
+      "1": 2.22,
+      "15": 1.8,
+      "5": 1.74,
+      "norm": {
+        "1": 0.555,
+        "15": 0.45,
+        "5": 0.435
+      }
+    }
+  }
+}
+----
+
+The actual output may contain more metrics specific to {beatname_uc}
