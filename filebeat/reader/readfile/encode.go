@@ -38,7 +38,12 @@ func NewEncodeReader(
 	codec encoding.Encoding,
 	bufferSize int,
 ) (EncoderReader, error) {
-	eReader, err := NewLineReader(r, codec, bufferSize)
+	config := Config{
+		Codec:      codec,
+		Separator:  []byte("\n"),
+		BufferSize: bufferSize,
+	}
+	eReader, err := NewLineReader(r, config)
 	return EncoderReader{eReader}, err
 }
 

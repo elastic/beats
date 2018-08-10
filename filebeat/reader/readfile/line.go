@@ -27,168 +27,60 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+type Config struct {
+	Codec      encoding.Encoding
+	Separator  []byte
+	BufferSize int
+}
+
+// State stores the offsets of the reader.
+type State struct {
+	EncodedOffset          int // offset in the encoded file
+	ConvertedSegmentOffset int // offset in the UTF-8 segment returned by the decoderReader
+	ConvertedStreamOffset  int // number of total processed UTF-8 bytes
+}
 // lineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
 type LineReader struct {
-	reader     io.Reader
-	codec      encoding.Encoding
-	bufferSize int
-	nl         []byte
-	inBuffer   *streambuf.Buffer
-	outBuffer  *streambuf.Buffer
-	inOffset   int // input buffer read offset
-	byteCount  int // number of bytes decoded from input buffer into output buffer
-	decoder    transform.Transformer
+	lineScanner *lineScanner
 }
 
 // New creates a new reader object
-func NewLineReader(input io.Reader, codec encoding.Encoding, bufferSize int) (*LineReader, error) {
-	encoder := codec.NewEncoder()
-
-	// Create newline char based on encoding
-	nl, _, err := transform.Bytes(encoder, []byte{'\n'})
+func NewLineReader(input io.Reader, c Config) (*LineReader, error) {
+	decReader, err := newDecoderReader(input, c.Codec, c.BufferSize)
 	if err != nil {
 		return nil, err
 	}
 
+	lineScanner := newLineScanner(decReader, c.Separator, c.BufferSize)
+
 	return &LineReader{
-		reader:     input,
-		codec:      codec,
-		bufferSize: bufferSize,
-		nl:         nl,
-		decoder:    codec.NewDecoder(),
-		inBuffer:   streambuf.New(nil),
-		outBuffer:  streambuf.New(nil),
+		lineScanner: lineScanner,
 	}, nil
+}
+
+// InitState initizalizas the state of the reader
+// TODO update when registry is refactored
+func (r *LineReader) SetState(s State) error {
+	if s.ConvertedStreamOffset < s.ConvertedSegmentOffset {
+		return fmt.Errorf("invalid state, converted stream offset cannot be lower than converted segment offset")
+	}
+
+	r.lineScanner.in.offset = s.EncodedOffset
+	r.lineScanner.segmentOffset = s.ConvertedSegmentOffset
+	r.lineScanner.streamOffset = s.ConvertedStreamOffset
+
+	// TODO rm when registry is refactored
+	err := r.lineScanner.in.seekToLastRead()
+	if err != nil {
+		return err
+	}
+	return r.lineScanner.seekToLastRead()
 }
 
 // Next reads the next line until the new line character
 func (r *LineReader) Next() ([]byte, int, error) {
-	// This loop is need in case advance detects an line ending which turns out
-	// not to be one when decoded. If that is the case, reading continues.
-	for {
-		// read next 'potential' line from input buffer/reader
-		err := r.advance()
-		if err != nil {
-			return nil, 0, err
-		}
-
-		// Check last decoded byte really being '\n' also unencoded
-		// if not, continue reading
-		buf := r.outBuffer.Bytes()
-
-		// This can happen if something goes wrong during decoding
-		if len(buf) == 0 {
-			logp.Err("Empty buffer returned by advance")
-			continue
-		}
-
-		if buf[len(buf)-1] == '\n' {
-			break
-		} else {
-			logp.Debug("line", "Line ending char found which wasn't one: %s", buf[len(buf)-1])
-		}
-	}
-
-	// output buffer contains complete line ending with '\n'. Extract
-	// byte slice from buffer and reset output buffer.
-	bytes, err := r.outBuffer.Collect(r.outBuffer.Len())
-	r.outBuffer.Reset()
-	if err != nil {
-		// This should never happen as otherwise we have a broken state
-		panic(err)
-	}
-
-	// return and reset consumed bytes count
-	sz := r.byteCount
-	r.byteCount = 0
-	return bytes, sz, nil
-}
-
-// Reads from the buffer until a new line character is detected
-// Returns an error otherwise
-func (r *LineReader) advance() error {
-	// Initial check if buffer has already a newLine character
-	idx := r.inBuffer.IndexFrom(r.inOffset, r.nl)
-
-	// fill inBuffer until '\n' sequence has been found in input buffer
-	for idx == -1 {
-		// increase search offset to reduce iterations on buffer when looping
-		newOffset := r.inBuffer.Len() - len(r.nl)
-		if newOffset > r.inOffset {
-			r.inOffset = newOffset
-		}
-
-		buf := make([]byte, r.bufferSize)
-
-		// try to read more bytes into buffer
-		n, err := r.reader.Read(buf)
-
-		// Appends buffer also in case of err
-		r.inBuffer.Append(buf[:n])
-		if err != nil {
-			return err
-		}
-
-		// empty read => return buffer error (more bytes required error)
-		if n == 0 {
-			return streambuf.ErrNoMoreBytes
-		}
-
-		// Check if buffer has newLine character
-		idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
-	}
-
-	// found encoded byte sequence for '\n' in buffer
-	// -> decode input sequence into outBuffer
-	sz, err := r.decode(idx + len(r.nl))
-	if err != nil {
-		logp.Err("Error decoding line: %s", err)
-		// In case of error increase size by unencoded length
-		sz = idx + len(r.nl)
-	}
-
-	// consume transformed bytes from input buffer
-	err = r.inBuffer.Advance(sz)
-	r.inBuffer.Reset()
-
-	// continue scanning input buffer from last position + 1
-	r.inOffset = idx + 1 - sz
-	if r.inOffset < 0 {
-		// fix inOffset if '\n' has encoding > 8bits + firl line has been decoded
-		r.inOffset = 0
-	}
-
-	return err
-}
-
-func (r *LineReader) decode(end int) (int, error) {
-	var err error
-	buffer := make([]byte, 1024)
-	inBytes := r.inBuffer.Bytes()
-	start := 0
-
-	for start < end {
-		var nDst, nSrc int
-
-		nDst, nSrc, err = r.decoder.Transform(buffer, inBytes[start:end], false)
-		if err != nil {
-			// Check if error is different from destination buffer too short
-			if err != transform.ErrShortDst {
-				r.outBuffer.Write(inBytes[0:end])
-				start = end
-				break
-			}
-
-			// Reset error as decoding continues
-			err = nil
-		}
-
-		start += nSrc
-		r.outBuffer.Write(buffer[:nDst])
-	}
-
-	r.byteCount += start
-	return start, err
+	return r.lineScanner.scan()
+	// TODO send state
 }
