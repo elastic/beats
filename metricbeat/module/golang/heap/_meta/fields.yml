@@ -1,13 +1,13 @@
 - name: heap
   type: group
   description: >
-    The golang program heap information exposed by expvar.
+    The Go program heap information exposed by expvar.
   release: beta
   fields:
     - name: cmdline
       type: keyword
       description: >
-        The cmdline of this golang program start with.
+        The cmdline of this Go program start with.
 
     - name: gc
       type: group

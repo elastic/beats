@@ -145,8 +145,8 @@ It's important to also add tests for your metricset. There are three different t
 * system tests
 
 We recommend that you use all three when you create a metricset. Unit tests are
-written in Golang and have no dependencies. Integration tests are also written
-in Golang but require the service from which the module collects metrics to also be running.
+written in Go and have no dependencies. Integration tests are also written
+in Go but require the service from which the module collects metrics to also be running.
 System tests for Metricbeat also require the service to be running in most cases and are
 written in Python based on our small Python test framework.
 We use `virtualenv` to deal with Python dependencies.

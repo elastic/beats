@@ -260,7 +260,7 @@ input configuration are documented in the
 the Filebeat documentation.
 
 The template files use the templating language defined by the
-https://golang.org/pkg/text/template/[Golang standard library].
+https://golang.org/pkg/text/template/[Go standard library].
 
 Here is another example that also configures multiline stitching:
 
