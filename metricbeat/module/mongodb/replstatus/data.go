@@ -18,6 +18,7 @@
 package replstatus
 
 import (
+	"math"
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -40,18 +41,33 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr
 	result["set_name"] = replStatus.Set
 	result["server_date"] = replStatus.Date
 	result["optimes"] = map[string]interface{}{
-		// ToDo find actual timestamps
 		"last_committed": replStatus.OpTimes.LastCommitted.getTimeStamp(),
 		"applied":        replStatus.OpTimes.Applied.getTimeStamp(),
 		"durable":        replStatus.OpTimes.Durable.getTimeStamp(),
 	}
-	result["lag"] = map[string]interface{}{
-		"max": findMaxLag(replStatus.Members),
-		"min": findMinLag(replStatus.Members),
-	}
-	result["headroom"] = map[string]interface{}{
-		"max": oplogInfo.diff - findMinLag(replStatus.Members),
-		"min": oplogInfo.diff - findMaxLag(replStatus.Members),
+
+	// find lag and headroom
+	minLag, maxLag, lagIsOk := findLag(replStatus.Members)
+	if lagIsOk {
+		result["lag"] = map[string]interface{}{
+			"max": maxLag,
+			"min": minLag,
+		}
+
+		result["headroom"] = map[string]interface{}{
+			"max": oplogInfo.diff - minLag,
+			"min": oplogInfo.diff - maxLag,
+		}
+	} else {
+		result["lag"] = map[string]interface{}{
+			"max": math.NaN,
+			"min": math.NaN,
+		}
+
+		result["headroom"] = map[string]interface{}{
+			"max": math.NaN,
+			"min": math.NaN,
+		}
 	}
 
 	var (

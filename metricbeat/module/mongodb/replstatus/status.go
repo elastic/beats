@@ -127,30 +127,20 @@ func findHostsByState(members []Member, state MemberState) []string {
 	return hosts
 }
 
-func findMaxLag(members []Member) int64 {
-	var minOptime, primaryOptime int64 = 1<<63 - 1, 0
+func findLag(members []Member) (minLag int64 , maxLag int64, hasSecondary bool) {
+	var minOptime, maxOptime, primaryOptime int64 = 1 << 63 - 1, 0, 0
+	hasSecondary = false
 
 	for _, member := range members {
 		memberState := MemberState(member.State)
 		if memberState == SECONDARY {
-			if minOptime > member.OpTime.Ts {
+			hasSecondary = true
+
+			if  minOptime > member.OpTime.Ts {
 				minOptime = member.OpTime.Ts
 			}
-		} else if memberState == PRIMARY {
-			primaryOptime = member.OpTime.Ts
-		}
-	}
 
-	return primaryOptime - minOptime
-}
-
-func findMinLag(members []Member) int64 {
-	var maxOptime, primaryOptime int64 = 0, 0
-
-	for _, member := range members {
-		memberState := MemberState(member.State)
-		if memberState == SECONDARY {
-			if member.OpTime.Ts > maxOptime {
+			if   member.OpTime.Ts > maxOptime {
 				maxOptime = member.OpTime.Ts
 			}
 		} else if memberState == PRIMARY {
@@ -158,5 +148,7 @@ func findMinLag(members []Member) int64 {
 		}
 	}
 
-	return primaryOptime - maxOptime
+	minLag = primaryOptime - maxOptime
+	maxLag = primaryOptime - minOptime
+	return minLag, maxLag, hasSecondary
 }
