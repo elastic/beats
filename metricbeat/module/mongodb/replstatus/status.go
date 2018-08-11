@@ -127,8 +127,8 @@ func findHostsByState(members []Member, state MemberState) []string {
 	return hosts
 }
 
-func findLag(members []Member) (minLag int64 , maxLag int64, hasSecondary bool) {
-	var minOptime, maxOptime, primaryOptime int64 = 1 << 63 - 1, 0, 0
+func findLag(members []Member) (minLag int64, maxLag int64, hasSecondary bool) {
+	var minOptime, maxOptime, primaryOptime int64 = 1<<63 - 1, 0, 0
 	hasSecondary = false
 
 	for _, member := range members {
@@ -136,11 +136,11 @@ func findLag(members []Member) (minLag int64 , maxLag int64, hasSecondary bool) 
 		if memberState == SECONDARY {
 			hasSecondary = true
 
-			if  minOptime > member.OpTime.getTimeStamp() {
+			if minOptime > member.OpTime.getTimeStamp() {
 				minOptime = member.OpTime.getTimeStamp()
 			}
 
-			if   member.OpTime.getTimeStamp() > maxOptime {
+			if member.OpTime.getTimeStamp() > maxOptime {
 				maxOptime = member.OpTime.getTimeStamp()
 			}
 		} else if memberState == PRIMARY {

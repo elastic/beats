@@ -11419,6 +11419,8 @@ Delay between a write operation on the primary and its copy to a secondary
 --
 type: long
 
+format: duration
+
 Difference between optime of primary and slowest secondary
 
 
@@ -11427,7 +11429,12 @@ Difference between optime of primary and slowest secondary
 *`mongodb.replstatus.lag.min`*::
 +
 --
-type: long Difference between optime of primary and fastest secondary
+type: long
+
+format: duration
+
+Difference between optime of primary and fastest secondary
+
 
 --
 
@@ -11443,6 +11450,8 @@ Difference between the primary's oplog window and the replication lag of the sec
 --
 type: long
 
+format: duration
+
 Difference between primary's oplog window and the replication lag of the fastest secondary
 
 
@@ -11452,6 +11461,8 @@ Difference between primary's oplog window and the replication lag of the fastest
 +
 --
 type: long
+
+format: duration
 
 Difference between primary's oplog window and the replication lag of the slowest secondary
 
@@ -11475,12 +11486,32 @@ Host address of the primary
 
 --
 
+*`mongodb.replstatus.members.primary.optime`*::
++
+--
+type: keyword
+
+Optime of primary
+
+
+--
+
 *`mongodb.replstatus.members.secondary.hosts`*::
 +
 --
 type: array
 
 List of secondary hosts
+
+
+--
+
+*`mongodb.replstatus.members.secondary.optimes`*::
++
+--
+type: keyword
+
+Optimes of secondaries
 
 
 --

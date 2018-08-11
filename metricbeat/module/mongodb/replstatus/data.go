@@ -19,6 +19,7 @@ package replstatus
 
 import (
 	"math"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -82,13 +83,13 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr
 	)
 
 	result["members"] = map[string]interface{}{
-		"primary": map[string]interface{} {
-			"host": findHostsByState(replStatus.Members, PRIMARY)[0],
+		"primary": map[string]interface{}{
+			"host":   findHostsByState(replStatus.Members, PRIMARY)[0],
 			"optime": findOptimesByState(replStatus.Members, PRIMARY),
 		},
 		"secondary": map[string]interface{}{
-			"hosts": secondaryHosts,
-			"count": len(secondaryHosts),
+			"hosts":   secondaryHosts,
+			"count":   len(secondaryHosts),
 			"optimes": findOptimesByState(replStatus.Members, SECONDARY),
 		},
 		"recovering": map[string]interface{}{
