@@ -136,15 +136,15 @@ func findLag(members []Member) (minLag int64 , maxLag int64, hasSecondary bool) 
 		if memberState == SECONDARY {
 			hasSecondary = true
 
-			if  minOptime > member.OpTime.Ts {
-				minOptime = member.OpTime.Ts
+			if  minOptime > member.OpTime.getTimeStamp() {
+				minOptime = member.OpTime.getTimeStamp()
 			}
 
-			if   member.OpTime.Ts > maxOptime {
-				maxOptime = member.OpTime.Ts
+			if   member.OpTime.getTimeStamp() > maxOptime {
+				maxOptime = member.OpTime.getTimeStamp()
 			}
 		} else if memberState == PRIMARY {
-			primaryOptime = member.OpTime.Ts
+			primaryOptime = member.OpTime.getTimeStamp()
 		}
 	}
 
@@ -159,7 +159,7 @@ func findOptimesByState(members []Member, state MemberState) []int64 {
 	for _, member := range members {
 		memberState := MemberState(member.State)
 		if memberState == state {
-			optimes = append(optimes, member.OpTime.Ts)
+			optimes = append(optimes, member.OpTime.getTimeStamp())
 		}
 	}
 
