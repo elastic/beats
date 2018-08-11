@@ -152,3 +152,16 @@ func findLag(members []Member) (minLag int64 , maxLag int64, hasSecondary bool) 
 	maxLag = primaryOptime - minOptime
 	return minLag, maxLag, hasSecondary
 }
+
+func findOptimesByState(members []Member, state MemberState) []int64 {
+	var optimes []int64
+
+	for _, member := range members {
+		memberState := MemberState(member.State)
+		if memberState == state {
+			optimes = append(optimes, member.OpTime.Ts)
+		}
+	}
+
+	return optimes
+}

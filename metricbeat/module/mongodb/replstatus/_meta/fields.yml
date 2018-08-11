@@ -67,10 +67,13 @@
       fields:
         - name: max
           type: long
+          format: duration
           description: >
             Difference between optime of primary and slowest secondary
         - name: min
           type: long
+          format: duration
+          description: >
             Difference between optime of primary and fastest secondary
 
     - name: headroom
@@ -80,10 +83,12 @@
       fields:
         - name: max
           type: long
+          format: duration
           description: >
             Difference between primary's oplog window and the replication lag of the fastest secondary
         - name: min
           type: long
+          format: duration
           description: >
             Difference between primary's oplog window and the replication lag of the slowest secondary
 

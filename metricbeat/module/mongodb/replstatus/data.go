@@ -82,10 +82,14 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr
 	)
 
 	result["members"] = map[string]interface{}{
-		"primary": findHostsByState(replStatus.Members, PRIMARY)[0],
+		"primary": map[string]interface{} {
+			"host": findHostsByState(replStatus.Members, PRIMARY)[0],
+			"optimes": findOptimesByState(replStatus.Members, PRIMARY),
+		},
 		"secondary": map[string]interface{}{
 			"hosts": secondaryHosts,
 			"count": len(secondaryHosts),
+			"optimes": findOptimesByState(replStatus.Members, SECONDARY),
 		},
 		"recovering": map[string]interface{}{
 			"hosts": recoveringHosts,
