@@ -101,10 +101,18 @@
           type: keyword
           description: >
             Host address of the primary
+        - name: primary.optime
+          type: keyword
+          description: >
+            Optime of primary
         - name: secondary.hosts
           type: array
           description: >
             List of secondary hosts
+        - name: secondary.optimes
+          type: keyword
+          description: >
+            Optimes of secondaries
         - name: secondary.count
           type: long
           descriprtion: >
