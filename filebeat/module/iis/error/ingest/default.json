@@ -4,7 +4,7 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "%{TIMESTAMP_ISO8601:iis.error.time} %{IPORHOST:iis.error.remote_ip} %{NUMBER:iis.error.remote_port} %{IPORHOST:iis.error.server_ip} %{IPORHOST:iis.error.server_port} (?:HTTP/%{NUMBER:iis.error.http_version}|-) (?:%{WORD:iis.error.method}|-) (?:%{URIPATHPARAM:iis.error.url}|-)(?: -)? (?:%{NUMBER:iis.error.response_code}|-) (?:%{NUMBER}|-) (?:%{NOTSPACE:iis.error.reason_phrase}|-) (?:%{NOTSPACE:iis.error.queue_name}|-)"
+        "%{TIMESTAMP_ISO8601:iis.error.time} %{IPORHOST:iis.error.remote_ip} %{NUMBER:iis.error.remote_port} %{IPORHOST:iis.error.server_ip} %{IPORHOST:iis.error.server_port} (?:HTTP/%{NUMBER:iis.error.http_version}|-) (?:%{WORD:iis.error.method}|-) (?:%{NOTSPACE:iis.error.url}|-)(?: -)? (?:%{NUMBER:iis.error.response_code}|-) (?:%{NUMBER}|-) (?:%{NOTSPACE:iis.error.reason_phrase}|-) (?:%{NOTSPACE:iis.error.queue_name}|-)"
       ],
       "ignore_missing": true
     }
