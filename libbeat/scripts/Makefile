@@ -439,6 +439,7 @@ seccomp-package:
 mage:
 ifndef MAGE_PRESENT
 	go install ${MAGE_IMPORT_PATH}
+	@-mage -clean 2> /dev/null
 endif
 
 .PHONY: release
