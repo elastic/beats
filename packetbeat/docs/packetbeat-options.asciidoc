@@ -681,7 +681,14 @@ packetbeat.protocols:
   include_body_for: ["text/html"]
 ------------------------------------------------------------------------------
 
+===== `decode_body`
 
+A boolean flag that controls decoding of HTTP payload. It interprets the
+`Content-Encoding` and `Transfer-Encoding` headers and uncompresses the entity
+body. Supported encodings are `gzip` and `deflate`. This option is only
+applicable in the cases where the HTTP payload is exported, that is, when
+one of the `include_*_body_for` options is specified or a POST request
+contains url-encoded parameters.
 
 ===== `split_cookie`
 

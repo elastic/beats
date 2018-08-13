@@ -195,6 +195,10 @@ packetbeat.protocols:
   # response payload.
   #include_response_body_for: []
 
+  # Whether the body of a request must be decoded when a content-encoding
+  # or transfer-encoding has been applied.
+  #decode_body: true
+
   # If the Cookie or Set-Cookie headers are sent, this option controls whether
   # they are split into individual values.
   #split_cookie: false
