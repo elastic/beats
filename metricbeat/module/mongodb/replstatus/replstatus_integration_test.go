@@ -81,8 +81,15 @@ func getConfig() map[string]interface{} {
 }
 
 func initiateReplicaSet() error {
-	url := mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()
-	mongoSession, err := mgo.Dial(url)
+	url := getConfig()["hosts"].([]string)[0]
+
+	dialInfo, err := mgo.ParseURL(url)
+	if err != nil {
+		return err
+	}
+	dialInfo.Direct = true
+
+	mongoSession, err := mongodb.NewDirectSession(dialInfo)
 	if err != nil {
 		return err
 	}
