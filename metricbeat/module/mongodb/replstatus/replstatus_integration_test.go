@@ -49,17 +49,26 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check event fields
-	allocated := event["oplog"].(common.MapStr)["size"].(common.MapStr)["allocated"].(int64)
+        oplog := event["oplog"].(common.MapStr)
+	allocated := oplog["size"].(common.MapStr)["allocated"].(int64)
 	assert.True(t, allocated >= 0)
 
-	used := event["oplog"].(common.MapStr)["size"].(common.MapStr)["used"].(float64)
+	used := oplog["size"].(common.MapStr)["used"].(float64)
 	assert.True(t, used > 0)
 
-	firstTs := event["oplog"].(common.MapStr)["first"].(common.MapStr)["timestamp"].(int64)
+	firstTs := oplog["first"].(common.MapStr)["timestamp"].(int64)
 	assert.True(t, firstTs >= 0)
 
-	window := event["oplog"].(common.MapStr)["window"].(int64)
+	window := oplog["window"].(int64)
 	assert.True(t, window >= 0)
+
+        members := event["members"].(common.MapStr)
+        primary := members["primary"].(common.MapStr)
+        assert.NotEmpty(t, primary["host"].(string))
+	assert.True(t, primary["optime"].(int64) > 0)
+
+        set := event["set_name"].(string)
+        assert.Equal(t, set, "beats")
 }
 
 func TestData(t *testing.T) {
