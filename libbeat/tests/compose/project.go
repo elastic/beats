@@ -94,18 +94,6 @@ func NewProject(name string, files []string) (*Project, error) {
 
 // Start the container, unless it's running already
 func (c *Project) Start(service string) error {
-	servicesStatus, err := c.getServices(service)
-	if err != nil {
-		return err
-	}
-
-	if servicesStatus[service] != nil {
-		if servicesStatus[service].Running {
-			// Someone is running it
-			return nil
-		}
-	}
-
 	c.Lock()
 	defer c.Unlock()
 

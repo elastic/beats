@@ -33,29 +33,50 @@ import (
 
 var host = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
 
+var allVersions = []string{
+	"3.2.4",
+	"4.0.11",
+	"5.0-rc",
+}
+
+var allOS = []string{
+	"alpine",
+	"stretch",
+}
+
+var runner = compose.TestRunner{
+	Service: "redis",
+	Options: map[string][]string{
+		"REDIS_VERSION": allVersions,
+		"IMAGE_OS":      allOS,
+	},
+	Parallel: true,
+}
+
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	runner.Run(t, func(t *testing.T) {
+		addEntry(t)
 
-	addEntry(t)
+		// Fetch data
+		f := mbtest.NewEventsFetcher(t, getConfig())
+		events, err := f.Fetch()
+		if err != nil {
+			t.Fatal("fetch", err)
+		}
 
-	// Fetch data
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	events, err := f.Fetch()
-	if err != nil {
-		t.Fatal("fetch", err)
-	}
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
+		// Make sure at least 1 db keyspace exists
+		assert.True(t, len(events) > 0)
 
-	// Make sure at least 1 db keyspace exists
-	assert.True(t, len(events) > 0)
+		keyspace := events[0]
 
-	keyspace := events[0]
-
-	assert.True(t, keyspace["avg_ttl"].(int64) >= 0)
-	assert.True(t, keyspace["expires"].(int64) >= 0)
-	assert.True(t, keyspace["keys"].(int64) >= 0)
-	assert.True(t, strings.Contains(keyspace["id"].(string), "db"))
+		assert.True(t, keyspace["avg_ttl"].(int64) >= 0)
+		assert.True(t, keyspace["expires"].(int64) >= 0)
+		assert.True(t, keyspace["keys"].(int64) >= 0)
+		assert.True(t, strings.Contains(keyspace["id"].(string), "db"))
+	},
+	)
 }
 
 func TestData(t *testing.T) {
