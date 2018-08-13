@@ -539,7 +539,7 @@ configured. The default value is 2.
 deprecated[5.0.0]
 
 The default port to use if the port number is not given in <<hosts,`hosts`>>. The default port number
-is 10200.
+is 5044.
 
 ===== `proxy_url`
 
