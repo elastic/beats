@@ -70,12 +70,8 @@ func (r *LineReader) SetState(s State) error {
 	r.lineScanner.segmentOffset = s.ConvertedSegmentOffset
 	r.lineScanner.streamOffset = s.ConvertedStreamOffset
 
-	// TODO rm when registry is refactored
-	err := r.lineScanner.in.seekToLastRead()
-	if err != nil {
-		return err
-	}
-	return r.lineScanner.seekToLastRead()
+	// TODO refactor when registry is refactored
+	return r.lineScanner.in.seekToLastRead(s.ConvertedSegmentOffset)
 }
 
 // Next reads the next line until the new line character

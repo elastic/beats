@@ -18,8 +18,6 @@
 package readfile
 
 import (
-	"io"
-
 	"github.com/elastic/beats/libbeat/common/streambuf"
 )
 
@@ -43,41 +41,12 @@ func newLineScanner(in *decoderReader, separator []byte, bufferSize int) *lineSc
 	}
 }
 
-// seekToLastRead moves the fp to the last read position.
-// The number of bytes which needs to be read is the size of the
-// configured harvester_buffer_size when the state was written.
-func (s *lineScanner) seekToLastRead() error {
-	if s.streamOffset == 0 {
-		return nil
-	}
-
-	remaining := s.segmentOffset
-	for remaining > 0 {
-		size := s.bufferSize
-		if remaining < size {
-			size = remaining
-		}
-
-		b := make([]byte, size)
-		n, err := s.in.read(b)
-		remaining -= n
-		if err != nil {
-			if err == io.EOF {
-				return nil
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 // Scan reads from the underlying decoder reader and returns decoded lines.
 func (s *lineScanner) scan() ([]byte, int, error) {
 	idx := s.buf.Index(s.separator)
 	for !separatorFound(idx) {
 		b := make([]byte, s.bufferSize)
-		n, err := s.in.read(b)
+		n, err := s.in.Read(b)
 		s.buf.Append(b[:n])
 		if err != nil {
 			return nil, 0, err

@@ -55,20 +55,31 @@ func newDecoderReader(in io.Reader, codec encoding.Encoding, bufferSize int) (*d
 // seekToLastRead reads from the input file until the saved offset is reached.
 // It is the substitution of seeking in the file.
 // This function is no longer required after registry refactoring is done.
-func (r *decoderReader) seekToLastRead() error {
-	if r.offset == 0 {
+func (r *decoderReader) seekToLastRead(convertedOffset int) error {
+	// TODO move seeking in encoded stream to harvester `file.Seek`
+	err := r.seekInReader(r.offset, r.in)
+	if err != nil {
+		return err
+	}
+
+	return r.seekInReader(convertedOffset, r)
+}
+
+// this is a temp function to simplify seekToLastRead
+func (r *decoderReader) seekInReader(offset int, reader io.Reader) error {
+	if offset == 0 {
 		return nil
 	}
 
-	remaining := r.offset
+	b := make([]byte, r.bufferSize)
+	remaining := offset
 	for remaining > 0 {
 		s := r.bufferSize
 		if remaining < s {
 			s = remaining
 		}
 
-		b := make([]byte, s)
-		n, err := r.in.Read(b)
+		n, err := reader.Read(b[:s])
 		remaining -= n
 		if err != nil {
 			if err == io.EOF {
@@ -82,7 +93,7 @@ func (r *decoderReader) seekToLastRead() error {
 }
 
 // read reads from an underlying file and converts it into UTF-8.
-func (r *decoderReader) read(buf []byte) (int, error) {
+func (r *decoderReader) Read(buf []byte) (int, error) {
 	// collect leftover converted bytes
 	nb := 0
 	var err error
