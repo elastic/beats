@@ -56,9 +56,12 @@ const (
 // Driver is the interface of docker compose implementations
 type Driver interface {
 	Up(ctx context.Context, opts UpOptions, service string) error
+	Down(ctx context.Context) error
 	Kill(ctx context.Context, signal string, service string) error
 	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
 	// Containers(ctx context.Context, projectFilter Filter, filter ...string) ([]string, error)
+
+	SetParameters(map[string]string)
 
 	LockFile() string
 }
@@ -69,6 +72,7 @@ type ContainerStatus interface {
 	Healthy() bool
 	Running() bool
 	Old() bool
+	Host() string
 }
 
 // Project is a docker-compose project
@@ -137,6 +141,25 @@ func (c *Project) Wait(seconds int, services ...string) error {
 	return nil
 }
 
+// Host gets the host and port of a service
+func (c *Project) Host(service string) (string, error) {
+	servicesStatus, err := c.getServices(service)
+	if err != nil {
+		return "", err
+	}
+
+	if len(servicesStatus) == 0 {
+		return "", errors.New("no container running for service")
+	}
+
+	status, ok := servicesStatus[service]
+	if !ok || status.Host == "" {
+		return "", errors.New("unknown host:port for service")
+	}
+
+	return status.Host, nil
+}
+
 // Kill a container
 func (c *Project) Kill(service string) error {
 	c.Lock()
@@ -178,6 +201,14 @@ func (c *Project) KillOld(except []string) error {
 	return nil
 }
 
+// Down removes all resources of a project
+func (c *Project) Down() error {
+	c.Lock()
+	defer c.Unlock()
+
+	return c.Driver.Down(context.Background())
+}
+
 // Lock acquires the lock (300s) timeout
 // Normally it should only be seconds that the lock is used, but in some cases it can take longer.
 func (c *Project) Lock() {
@@ -214,6 +245,8 @@ type serviceInfo struct {
 	Running bool
 	Healthy bool
 
+	Host string
+
 	// Has been up for too long?:
 	Old bool
 }
@@ -247,6 +280,7 @@ func (c *Project) getServices(filter ...string) (map[string]*serviceInfo, error)
 		if service.Healthy {
 			service.Old = c.Old()
 		}
+		service.Host = c.Host()
 		result[name] = service
 	}
 

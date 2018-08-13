@@ -18,6 +18,7 @@
 package compose
 
 import (
+	"crypto/sha1"
 	"fmt"
 	"os"
 	"sort"
@@ -29,6 +30,7 @@ type TestRunner struct {
 	Service  string
 	Options  map[string][]string
 	Parallel bool
+	Timeout  int
 }
 
 func (r *TestRunner) scenarios() []map[string]string {
@@ -53,7 +55,12 @@ func (r *TestRunner) scenarios() []map[string]string {
 	return scenarios
 }
 
-func (r *TestRunner) Run(t *testing.T, tests ...func(t *testing.T)) {
+func (r *TestRunner) Run(t *testing.T, tests ...func(t *testing.T, host string)) {
+	timeout := r.Timeout
+	if timeout == 0 {
+		timeout = 300
+	}
+
 	for _, s := range r.scenarios() {
 		var vars []string
 		for k, v := range s {
@@ -63,12 +70,37 @@ func (r *TestRunner) Run(t *testing.T, tests ...func(t *testing.T)) {
 		sort.Strings(vars)
 		desc := strings.Join(vars, ",")
 
+		name := fmt.Sprintf("%s_%x", r.Service, sha1.Sum([]byte(desc)))
+		project, err := getComposeProject(name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		project.SetParameters(s)
+
 		t.Run(desc, func(t *testing.T) {
-			EnsureUp(t, r.Service)
-			for _, test := range tests {
-				t.Run(desc, test)
+			if r.Parallel {
+				t.Parallel()
 			}
-			// Down(t, r.Service)
+
+			err := project.Start(r.Service)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer project.Down()
+
+			err = project.Wait(timeout, r.Service)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			host, err := project.Host(r.Service)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			for _, test := range tests {
+				test(t, host)
+			}
 		})
 
 	}

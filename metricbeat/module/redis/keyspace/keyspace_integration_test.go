@@ -25,40 +25,33 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/redis"
 
 	rd "github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
 )
 
-var host = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
-
-var allVersions = []string{
-	"3.2.4",
-	"4.0.11",
-	"5.0-rc",
-}
-
-var allOS = []string{
-	"alpine",
-	"stretch",
-}
-
 var runner = compose.TestRunner{
 	Service: "redis",
 	Options: map[string][]string{
-		"REDIS_VERSION": allVersions,
-		"IMAGE_OS":      allOS,
+		"REDIS_VERSION": []string{
+			"3.2.4",
+			"4.0.11",
+			"5.0-rc",
+		},
+		"IMAGE_OS": []string{
+			"alpine",
+			"stretch",
+		},
 	},
 	Parallel: true,
 }
 
 func TestFetch(t *testing.T) {
-	runner.Run(t, func(t *testing.T) {
-		addEntry(t)
+	runner.Run(t, func(t *testing.T, host string) {
+		addEntry(t, host)
 
 		// Fetch data
-		f := mbtest.NewEventsFetcher(t, getConfig())
+		f := mbtest.NewEventsFetcher(t, getConfig(host))
 		events, err := f.Fetch()
 		if err != nil {
 			t.Fatal("fetch", err)
@@ -75,25 +68,37 @@ func TestFetch(t *testing.T) {
 		assert.True(t, keyspace["expires"].(int64) >= 0)
 		assert.True(t, keyspace["keys"].(int64) >= 0)
 		assert.True(t, strings.Contains(keyspace["id"].(string), "db"))
-	},
-	)
+	})
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "redis")
-
-	addEntry(t)
-
-	f := mbtest.NewEventsFetcher(t, getConfig())
-
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
-		t.Fatal("write", err)
+	// TODO: Fix EnsureUp
+	runner := compose.TestRunner{
+		Service: "redis",
+		Options: map[string][]string{
+			"REDIS_VERSION": []string{
+				"4.0.11",
+			},
+			"IMAGE_OS": []string{
+				"alpine",
+			},
+		},
+		Parallel: true,
 	}
+	runner.Run(t, func(t *testing.T, host string) {
+		addEntry(t, host)
+
+		f := mbtest.NewEventsFetcher(t, getConfig(host))
+
+		err := mbtest.WriteEvents(f, t)
+		if err != nil {
+			t.Fatal("write", err)
+		}
+	})
 }
 
 // addEntry adds an entry to redis
-func addEntry(t *testing.T) {
+func addEntry(t *testing.T, host string) {
 	// Insert at least one event to make sure db exists
 	c, err := rd.Dial("tcp", host)
 	if err != nil {
@@ -106,7 +111,7 @@ func addEntry(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "redis",
 		"metricsets": []string{"keyspace"},

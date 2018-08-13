@@ -20,8 +20,10 @@ package compose
 import (
 	"context"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -39,6 +41,8 @@ const (
 type wrapperDriver struct {
 	Name  string
 	Files []string
+
+	Environment []string
 }
 
 type wrapperContainer struct {
@@ -61,8 +65,27 @@ func (c *wrapperContainer) Old() bool {
 	return strings.Contains(c.info.Status, "minute")
 }
 
+func (c *wrapperContainer) Host() string {
+	// TODO: Support multiple networks/ports
+	var ip string
+	for _, net := range c.info.NetworkSettings.Networks {
+		if len(net.IPAddress) > 0 {
+			ip = net.IPAddress
+			break
+		}
+	}
+	if len(ip) == 0 {
+		return ""
+	}
+
+	for _, port := range c.info.Ports {
+		return net.JoinHostPort(ip, strconv.Itoa(int(port.PrivatePort)))
+	}
+	return ""
+}
+
 func (d *wrapperDriver) LockFile() string {
-	return d.Files[0] + ".lock"
+	return d.Files[0] + "." + d.Name + ".lock"
 }
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
@@ -76,7 +99,18 @@ func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) 
 	cmd := exec.CommandContext(ctx, "docker-compose", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	if len(d.Environment) > 0 {
+		cmd.Env = d.Environment
+	}
 	return cmd
+}
+
+func (d *wrapperDriver) SetParameters(params map[string]string) {
+	var env []string
+	for k, v := range params {
+		env = append(env, fmt.Sprintf("%s=%s", k, v))
+	}
+	d.Environment = env
 }
 
 func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) error {
@@ -97,6 +131,10 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 	}
 
 	return d.cmd(ctx, "up", args...).Run()
+}
+
+func (d *wrapperDriver) Down(ctx context.Context) error {
+	return d.cmd(ctx, "down", "-v").Run()
 }
 
 func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string) error {

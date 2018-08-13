@@ -40,7 +40,8 @@ func EnsureUpWithTimeout(t *testing.T, timeout int, services ...string) {
 		return
 	}
 
-	compose, err := getComposeProject()
+	name := os.Getenv("DOCKER_COMPOSE_PROJECT_NAME")
+	compose, err := getComposeProject(name)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -65,28 +66,37 @@ func EnsureUpWithTimeout(t *testing.T, timeout int, services ...string) {
 	}
 }
 
-func getComposeProject() (*Project, error) {
+func findComposePath() (string, error) {
 	// find docker-compose
 	path, err := os.Getwd()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	for {
 		if path == "/" {
-			return nil, errors.New("docker-compose.yml not found")
-		}
-
-		if _, err = os.Stat(filepath.Join(path, "docker-compose.yml")); err != nil {
-			path = filepath.Dir(path)
-		} else {
 			break
 		}
+
+		composePath := filepath.Join(path, "docker-compose.yml")
+		if _, err = os.Stat(composePath); err == nil {
+			return composePath, nil
+		}
+		path = filepath.Dir(path)
+	}
+
+	return "", errors.New("docker-compose.yml not found")
+}
+
+func getComposeProject(name string) (*Project, error) {
+	path, err := findComposePath()
+	if err != nil {
+		return nil, err
 	}
 
 	return NewProject(
-		os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"),
+		name,
 		[]string{
-			filepath.Join(path, "docker-compose.yml"),
+			path,
 		},
 	)
 }

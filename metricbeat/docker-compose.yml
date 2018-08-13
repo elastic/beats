@@ -1,4 +1,4 @@
-version: "2.4"
+version: "2"
 
 services:
   beat:
@@ -156,16 +156,6 @@ services:
 
   rabbitmq:
     build: ./module/rabbitmq/_meta
-
-  redis:
-    image: redis:${REDIS_VERSION:-4.0.11}-${IMAGE_OS:-alpine}
-    build: ./module/redis/_meta
-    healthcheck:
-      test:
-      - "CMD-SHELL"
-      - "nc -z localhost 6379"
-      interval: 1s
-      retries: 90
 
   traefik:
     build: ./module/traefik/_meta
