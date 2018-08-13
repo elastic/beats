@@ -37,7 +37,7 @@ func Package() error {
 
 	if len(Packages) == 0 {
 		return errors.New("no package specs are registered. Call " +
-			"UseCommunityBeatPackaging or UseElasticBeatPackaging first.")
+			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first.")
 	}
 
 	var tasks []interface{}

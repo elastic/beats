@@ -84,12 +84,14 @@ check: python-env
 .PHONY: check-headers
 check-headers:
 	@go get github.com/elastic/go-licenser
-	@go-licenser -d
+	@go-licenser -d -exclude x-pack
+	@go-licenser -d -license Elastic x-pack
 
 .PHONY: add-headers
 add-headers:
 	@go get github.com/elastic/go-licenser
-	@go-licenser
+	@go-licenser -exclude x-pack
+	@go-licenser -license Elastic x-pack
 
 # Corrects spelling errors
 .PHONY: misspell
