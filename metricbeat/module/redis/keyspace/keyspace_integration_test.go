@@ -47,6 +47,8 @@ var runner = compose.TestRunner{
 }
 
 func TestFetch(t *testing.T) {
+	t.Parallel()
+
 	runner.Run(t, func(t *testing.T, host string) {
 		addEntry(t, host)
 
@@ -72,6 +74,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	t.Parallel()
+
 	// TODO: Fix EnsureUp
 	runner := compose.TestRunner{
 		Service: "redis",
