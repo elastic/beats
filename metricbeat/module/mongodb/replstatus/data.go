@@ -18,30 +18,28 @@
 package replstatus
 
 import (
-	"math"
-
 	"github.com/elastic/beats/libbeat/common"
 )
 
 func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr {
 	var result common.MapStr = make(common.MapStr)
 
-	result["oplog"] = map[string]interface{}{
-		"size": map[string]interface{}{
+	result["oplog"] = common.MapStr {
+		"size": common.MapStr {
 			"allocated": oplogInfo.allocated,
 			"used":      oplogInfo.used,
 		},
-		"first": map[string]interface{}{
+		"first": common.MapStr {
 			"timestamp": oplogInfo.firstTs,
 		},
-		"last": map[string]interface{}{
+		"last": common.MapStr {
 			"timestamp": oplogInfo.lastTs,
 		},
 		"window": oplogInfo.diff,
 	}
 	result["set_name"] = replStatus.Set
 	result["server_date"] = replStatus.Date
-	result["optimes"] = map[string]interface{}{
+	result["optimes"] = common.MapStr {
 		"last_committed": replStatus.OpTimes.LastCommitted.getTimeStamp(),
 		"applied":        replStatus.OpTimes.Applied.getTimeStamp(),
 		"durable":        replStatus.OpTimes.Durable.getTimeStamp(),
@@ -50,24 +48,24 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr
 	// find lag and headroom
 	minLag, maxLag, lagIsOk := findLag(replStatus.Members)
 	if lagIsOk {
-		result["lag"] = map[string]interface{}{
+		result["lag"] = common.MapStr {
 			"max": maxLag,
 			"min": minLag,
 		}
 
-		result["headroom"] = map[string]interface{}{
+		result["headroom"] = common.MapStr {
 			"max": oplogInfo.diff - minLag,
 			"min": oplogInfo.diff - maxLag,
 		}
 	} else {
-		result["lag"] = map[string]interface{}{
-			"max": math.NaN,
-			"min": math.NaN,
+		result["lag"] = common.MapStr {
+			"max": nil,
+			"min": nil,
 		}
 
-		result["headroom"] = map[string]interface{}{
-			"max": math.NaN,
-			"min": math.NaN,
+		result["headroom"] = common.MapStr {
+			"max": nil,
+			"min": nil,
 		}
 	}
 
@@ -82,41 +80,41 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr
 		unhealthyHosts  = findUnhealthyHosts(replStatus.Members)
 	)
 
-	result["members"] = map[string]interface{}{
-		"primary": map[string]interface{}{
+	result["members"] = common.MapStr {
+		"primary": common.MapStr {
 			"host":   findHostsByState(replStatus.Members, PRIMARY)[0],
-			"optime": findOptimesByState(replStatus.Members, PRIMARY),
+			"optime": findOptimesByState(replStatus.Members, PRIMARY)[0],
 		},
-		"secondary": map[string]interface{}{
+		"secondary": common.MapStr {
 			"hosts":   secondaryHosts,
 			"count":   len(secondaryHosts),
 			"optimes": findOptimesByState(replStatus.Members, SECONDARY),
 		},
-		"recovering": map[string]interface{}{
+		"recovering": common.MapStr {
 			"hosts": recoveringHosts,
 			"count": len(recoveringHosts),
 		},
-		"unknown": map[string]interface{}{
+		"unknown": common.MapStr {
 			"hosts": unknownHosts,
 			"count": len(unknownHosts),
 		},
-		"startup2": map[string]interface{}{
+		"startup2": common.MapStr {
 			"hosts": startup2Hosts,
 			"count": len(startup2Hosts),
 		},
-		"arbiter": map[string]interface{}{
+		"arbiter": common.MapStr {
 			"hosts": arbiterHosts,
 			"count": len(arbiterHosts),
 		},
-		"down": map[string]interface{}{
+		"down": common.MapStr {
 			"hosts": downHosts,
 			"count": len(downHosts),
 		},
-		"rollback": map[string]interface{}{
+		"rollback": common.MapStr {
 			"hosts": rollbackHosts,
 			"count": len(rollbackHosts),
 		},
-		"unhealthy": map[string]interface{}{
+		"unhealthy": common.MapStr {
 			"hosts": unhealthyHosts,
 			"count": len(unhealthyHosts),
 		},
