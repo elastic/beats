@@ -49,7 +49,7 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check event fields
-        oplog := event["oplog"].(common.MapStr)
+	oplog := event["oplog"].(common.MapStr)
 	allocated := oplog["size"].(common.MapStr)["allocated"].(int64)
 	assert.True(t, allocated >= 0)
 
@@ -62,13 +62,13 @@ func TestFetch(t *testing.T) {
 	window := oplog["window"].(int64)
 	assert.True(t, window >= 0)
 
-        members := event["members"].(common.MapStr)
-        primary := members["primary"].(common.MapStr)
-        assert.NotEmpty(t, primary["host"].(string))
+	members := event["members"].(common.MapStr)
+	primary := members["primary"].(common.MapStr)
+	assert.NotEmpty(t, primary["host"].(string))
 	assert.True(t, primary["optime"].(int64) > 0)
 
-        set := event["set_name"].(string)
-        assert.Equal(t, set, "beats")
+	set := event["set_name"].(string)
+	assert.Equal(t, set, "beats")
 }
 
 func TestData(t *testing.T) {
