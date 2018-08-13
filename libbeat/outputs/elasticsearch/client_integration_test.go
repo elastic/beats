@@ -242,6 +242,15 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	assert.Equal(t, 1, getCount("testfield:0")) // no pipeline
 }
 
+func TestGetLicense(t *testing.T) {
+	_, client := connectTestEs(t, nil)
+	license, err := client.GetLicense()
+	assert.NoError(t, err)
+
+	// We expect a platinum license because we tests against a trial license
+	assert.Equal(t, LicensePlatinum, license)
+}
+
 func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"hosts":            internal.GetEsHost(),

@@ -37,6 +37,13 @@ import (
 	"github.com/elastic/beats/libbeat/testing"
 )
 
+const (
+	LicenseApache = iota
+	LicenseBasic
+	LicenseGold
+	LicensePlatinum
+)
+
 // Client is an elasticsearch client.
 type Client struct {
 	Connection
@@ -804,6 +811,43 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 
 func (conn *Connection) GetVersion() string {
 	return conn.version
+}
+
+func (conn *Connection) GetLicense() (int, error) {
+
+	status, body, err := conn.RequestURL("GET", conn.URL+"/_xpack/license", nil)
+	// In case apache license is used, API endpoint does not exist.
+	if status == 405 {
+		return LicenseBasic, nil
+	}
+
+	if err != nil {
+		return -1, err
+	}
+
+	var response struct {
+		License struct {
+			Type string
+		}
+	}
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return -1, fmt.Errorf("failed to parse JSON response for xpack license check: %v", err)
+	}
+
+	// TODO: Should we also check expiration?
+	switch response.License.Type {
+	case "basic":
+		return LicenseBasic, nil
+	case "gold":
+		return LicenseGold, nil
+	case "platinum":
+		return LicensePlatinum, nil
+	case "trial":
+		return LicensePlatinum, nil
+	default:
+		return -1, fmt.Errorf("invalid license type: %s", response.License.Type)
+	}
 }
 
 func closing(c io.Closer) {
