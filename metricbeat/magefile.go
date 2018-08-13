@@ -47,6 +47,11 @@ func GolangCrossBuild() error {
 	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
 }
 
+// CrossBuildXPack cross-builds the beat with XPack for all target platforms.
+func CrossBuildXPack() error {
+	return mage.CrossBuildXPack()
+}
+
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
 func BuildGoDaemon() error {
 	return mage.BuildGoDaemon()
@@ -78,7 +83,7 @@ func Package() {
 	customizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
 
