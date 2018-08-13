@@ -18,15 +18,13 @@
 package readfile
 
 import (
+	"fmt"
 	"io"
 
 	"golang.org/x/text/encoding"
-	"golang.org/x/text/transform"
-
-	"github.com/elastic/beats/libbeat/common/streambuf"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
+// Config stores the options of a LineReader
 type Config struct {
 	Codec      encoding.Encoding
 	Separator  []byte
@@ -39,6 +37,7 @@ type State struct {
 	ConvertedSegmentOffset int // offset in the UTF-8 segment returned by the decoderReader
 	ConvertedStreamOffset  int // number of total processed UTF-8 bytes
 }
+
 // lineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
@@ -60,7 +59,7 @@ func NewLineReader(input io.Reader, c Config) (*LineReader, error) {
 	}, nil
 }
 
-// InitState initizalizas the state of the reader
+// SetState initizalizas the state of the reader
 // TODO update when registry is refactored
 func (r *LineReader) SetState(s State) error {
 	if s.ConvertedStreamOffset < s.ConvertedSegmentOffset {
