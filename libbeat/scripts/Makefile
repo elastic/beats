@@ -44,7 +44,6 @@ COVERAGE_DIR?=${BUILD_DIR}/coverage
 COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify/assert
-LIBCOMPOSE_TOOL_REPO?=github.com/docker/libcompose
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 GOBUILD_FLAGS?=-i -ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 GOIMPORTS=goimports
@@ -171,8 +170,6 @@ prepare-tests:
 	go get ${COVERAGE_TOOL_REPO}
 	# testify is needed for unit and integration tests
 	go get ${TESTIFY_TOOL_REPO}
-	# libcompose is needed for integration tests
-	go get ${LIBCOMPOSE_TOOL_REPO}
 
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
