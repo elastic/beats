@@ -1423,6 +1423,238 @@ func TestHttp_includeBodies(t *testing.T) {
 	}
 }
 
+func TestHTTP_Encodings(t *testing.T) {
+	const req = "GET / HTTP/1.1\r\n" +
+		"Host: server\r\n" +
+		"\r\n"
+	const payload = "hola\n"
+
+	deflateBody := string([]byte{0xcb, 0xc8, 0xcf, 0x49, 0xe4, 0x02, 0x00})
+
+	gzipBody := string([]byte{0x1f, 0x8b, 0x08, 0x00, 0x68, 0xc4, 0x6a, 0x5b, 0x00, 0x03}) +
+		deflateBody +
+		string([]byte{0x78, 0xad, 0xdb, 0xd1, 0x05, 0x00, 0x00, 0x00})
+
+	gzipDeflateBody := string([]byte{
+		0x1f, 0x8b, 0x08, 0x00, 0x65, 0xdb, 0x6a, 0x5b, 0x00, 0x03, 0x3b, 0x7d,
+		0xe2, 0xbc, 0xe7, 0x13, 0x26, 0x06, 0x00, 0x95, 0xfa, 0x49, 0xbf, 0x07,
+		0x00, 0x00, 0x00})
+
+	var store eventStore
+	http := httpModForTests(&store)
+	config := defaultConfig
+	config.IncludeResponseBodyFor = []string{""}
+	http.setFromConfig(&config)
+
+	tcptuple := testCreateTCPTuple()
+
+	for testNum, testData := range []struct{ resp, expectedBody, note string }{
+		// Test case #0
+		// A chunked request
+		{
+			resp: "HTTP/1.1 200 OK\r\n" +
+				"Transfer-Encoding: chunked\r\n" +
+				"\r\n" +
+				"4\r\n" +
+				"ABCD\r\n" +
+				"0\r\n",
+			expectedBody: "ABCD",
+		},
+		// Test case #1
+		// gzip Transfer-Encoding
+		{
+			resp: fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+				"Transfer-Encoding: gzip\r\n"+
+				"Content-Length: %d\r\n"+
+				"\r\n"+
+				"%s", len(gzipBody), gzipBody),
+			expectedBody: payload,
+		},
+		// Test case #2
+		// gzip Content-Encoding, the difference with #1 is purely semantic
+		{
+			resp: fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+				"Content-Encoding: gzip\r\n"+
+				"Content-Length: %d\r\n"+
+				"\r\n"+
+				"%s", len(gzipBody), gzipBody),
+			expectedBody: payload,
+		},
+		// Test case #3
+		// gzip Content-Encoding, chunked Transfer encoding.
+		// Should first de-chunk and then apply gzip
+		{
+			resp: fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+				"Content-Encoding: gzip\r\n"+
+				"Transfer-Encoding: chunked\r\n"+
+				"\r\n"+
+				"%x\r\n"+
+				"%s\r\n"+
+				"0\r\n", len(gzipBody), gzipBody),
+			expectedBody: payload,
+		},
+		// Test case #4
+		// gzip, chunked Transfer encoding.
+		// Same as #3
+		{
+			resp: fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+				"Transfer-Encoding: gzip, chunked\r\n"+
+				"\r\n"+
+				"%x\r\n"+
+				"%s\r\n"+
+				"0\r\n", len(gzipBody), gzipBody),
+			expectedBody: payload,
+		},
+		// Test case #5
+		// Deflate transfer encoding
+		{
+			resp: fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+				"Transfer-Encoding: deflate\r\n"+
+				"Content-Length: %d\r\n"+
+				"\r\n"+
+				"%s", len(deflateBody), deflateBody),
+			expectedBody: payload,
+		},
+		// Test case #6
+		// Deflate content encoding, x-gzip(=gzip) transfer encoding
+		// First gzip, then deflate
+		{
+			resp: fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+				"Transfer-Encoding: x-gzip\r\n"+
+				"Content-Encoding: deflate\r\n"+
+				"Content-Length: %d\r\n"+
+				"\r\n"+
+				"%s", len(gzipDeflateBody), gzipDeflateBody),
+			expectedBody: payload,
+		},
+		// Test case #7
+		// First deflate, then gzip
+		{
+			resp: fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+				"Transfer-Encoding: x-deflate, gzip\r\n"+
+				"Content-Length: %d\r\n"+
+				"\r\n"+
+				"%s", len(gzipDeflateBody), gzipDeflateBody),
+			expectedBody: payload,
+		},
+		// Test case #8
+		// Same behavior as #7
+		{
+			resp: fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+				"Content-Encoding: deflate, gzip\r\n"+
+				"Content-Length: %d\r\n"+
+				"\r\n"+
+				"%s", len(gzipDeflateBody), gzipDeflateBody),
+			expectedBody: payload,
+		},
+		// Test case #9
+		// First de-chunk, then gzip, then deflate
+		{
+			resp: fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+				"Content-Encoding: x-deflate, x-gzip\r\n"+
+				"Transfer-Encoding: chunked\r\n"+
+				"\r\n"+
+				"%x\r\n"+
+				"%s\r\n"+
+				"0\r\n", len(gzipDeflateBody), gzipDeflateBody),
+			expectedBody: payload,
+		},
+		// Test case #10
+		// Same behavior as #9
+		{
+			resp: fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+				"Content-Encoding: deflate, identity\r\n"+
+				"Transfer-Encoding: gzip, chunked\r\n"+
+				"\r\n"+
+				"%x\r\n"+
+				"%s\r\n"+
+				"0\r\n", len(gzipDeflateBody), gzipDeflateBody),
+			expectedBody: payload,
+		},
+		// Test case #11
+		// Unsupported encoding
+		{
+			resp: fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+				"Content-Encoding: sdch\r\n"+
+				"Transfer-Encoding: chunked\r\n"+
+				"\r\n"+
+				"%x\r\n"+
+				"%s\r\n"+
+				"0\r\n", len(gzipDeflateBody), gzipDeflateBody),
+			note: "unable to decode body using sdch encoding: decoder not found",
+		},
+	} {
+		msg := fmt.Sprintf("test case #%d: %+v", testNum, testData)
+		packet := protos.Packet{Payload: []byte(req)}
+		private := protos.ProtocolData(&httpConnectionData{})
+		private = http.Parse(&packet, tcptuple, 0, private)
+
+		packet.Payload = []byte(testData.resp)
+		private = http.Parse(&packet, tcptuple, 1, private)
+
+		http.ReceivedFin(tcptuple, 1, private)
+
+		trans := expectTransaction(t, &store)
+		assert.NotNil(t, trans, msg)
+		body, err := trans.GetValue("http.response.body")
+		if err == nil {
+			assert.Equal(t, testData.expectedBody, body, msg)
+		} else {
+			if len(testData.expectedBody) == 0 && len(testData.note) > 0 {
+				note, err := trans.GetValue("notes")
+				if !assert.Nil(t, err, msg) {
+					t.Fatal(err)
+				}
+				assert.Equal(t, []string{testData.note}, note)
+			} else {
+				t.Fatal(err)
+			}
+		}
+	}
+}
+
+func TestHTTP_Decoding_disabled(t *testing.T) {
+	const req = "GET / HTTP/1.1\r\n" +
+		"Host: server\r\n" +
+		"\r\n"
+
+	deflateBody := string([]byte{0xcb, 0xc8, 0xcf, 0x49, 0xe4, 0x02, 0x00})
+
+	var store eventStore
+	http := httpModForTests(&store)
+	config := defaultConfig
+	config.IncludeResponseBodyFor = []string{""}
+	config.DecodeBody = false
+
+	http.setFromConfig(&config)
+
+	tcptuple := testCreateTCPTuple()
+
+	resp := fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+		"Transfer-Encoding: deflate\r\n"+
+		"Content-Length: %d\r\n"+
+		"\r\n"+
+		"%s", len(deflateBody), deflateBody)
+
+	packet := protos.Packet{Payload: []byte(req)}
+	private := protos.ProtocolData(&httpConnectionData{})
+	private = http.Parse(&packet, tcptuple, 0, private)
+
+	packet.Payload = []byte(resp)
+	private = http.Parse(&packet, tcptuple, 1, private)
+
+	http.ReceivedFin(tcptuple, 1, private)
+
+	trans := expectTransaction(t, &store)
+	assert.NotNil(t, trans)
+	body, err := trans.GetValue("http.response.body")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, deflateBody, body)
+}
+
 func benchmarkHTTPMessage(b *testing.B, data []byte) {
 	http := httpModForTests(nil)
 	parser := newParser(&http.parserConfig)

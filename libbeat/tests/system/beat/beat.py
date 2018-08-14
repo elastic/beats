@@ -584,8 +584,27 @@ class TestCase(unittest.TestCase, ComposeMixin):
         expected_fields, dict_fields = self.load_fields()
         flat = self.flatten_object(evt, dict_fields)
 
+        def field_pattern_match(pattern, key):
+            pattern_fields = pattern.split(".")
+            key_fields = key.split(".")
+            if len(pattern_fields) != len(key_fields):
+                return False
+            for i in range(len(pattern_fields)):
+                if pattern_fields[i] == "*":
+                    continue
+                if pattern_fields[i] != key_fields[i]:
+                    return False
+            return True
+
+        def is_documented(key):
+            if key in expected_fields:
+                return True
+            for pattern in (f for f in expected_fields if "*" in f):
+                if field_pattern_match(pattern, key):
+                    return True
+            return False
+
         for key in flat.keys():
-            documented = key in expected_fields
             metaKey = key.startswith('@metadata.')
-            if not(documented or metaKey):
+            if not(is_documented(key) or metaKey):
                 raise Exception("Key '{}' found in event is not documented!".format(key))

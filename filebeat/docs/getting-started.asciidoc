@@ -166,7 +166,7 @@ filebeat.inputs:
 +
 The input in this example harvests all files in the path `/var/log/*.log`, which means
 that Filebeat will harvest all files in the directory `/var/log/` that end with `.log`. All patterns supported
-by https://golang.org/pkg/path/filepath/#Glob[Golang Glob] are also supported here.
+by https://golang.org/pkg/path/filepath/#Glob[Go Glob] are also supported here.
 +
 To fetch all files from a predefined level of subdirectories, the following pattern can be used:
 `/var/log/*/*.log`. This fetches all `.log` files from the subfolders of `/var/log`. It does not

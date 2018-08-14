@@ -53,12 +53,12 @@ type message struct {
 	realIP       common.NetString
 
 	// Http Headers
-	contentLength    int
-	contentType      common.NetString
-	transferEncoding common.NetString
-	isChunked        bool
-	headers          map[string]common.NetString
-	size             uint64
+	contentLength int
+	contentType   common.NetString
+	encodings     []string
+	isChunked     bool
+	headers       map[string]common.NetString
+	size          uint64
 
 	rawHeaders []byte
 
@@ -94,7 +94,7 @@ type parserConfig struct {
 }
 
 var (
-	transferEncodingChunked = []byte("chunked")
+	transferEncodingChunked = "chunked"
 
 	constCRLF = []byte("\r\n")
 
@@ -105,6 +105,7 @@ var (
 	nameContentLength    = []byte("content-length")
 	nameContentType      = []byte("content-type")
 	nameTransferEncoding = []byte("transfer-encoding")
+	nameContentEncoding  = []byte("content-encoding")
 	nameConnection       = []byte("connection")
 )
 
@@ -366,7 +367,24 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 			} else if bytes.Equal(headerName, nameContentType) {
 				m.contentType = headerVal
 			} else if bytes.Equal(headerName, nameTransferEncoding) {
-				m.isChunked = bytes.Equal(common.NetString(headerVal), transferEncodingChunked)
+				encodings := parseCommaSeparatedList(headerVal)
+				// 'chunked' can only appear at the end
+				if n := len(encodings); n > 0 && encodings[n-1] == transferEncodingChunked {
+					m.isChunked = true
+					encodings = encodings[:n-1]
+				}
+				if len(encodings) > 0 {
+					// Append at the end of encodings. If a content-encoding
+					// header is also present, it was applied by sender before
+					// transfer-encoding.
+					m.encodings = append(m.encodings, encodings...)
+				}
+
+			} else if bytes.Equal(headerName, nameContentEncoding) {
+				encodings := parseCommaSeparatedList(headerVal)
+				// Append at the beginning of m.encodings, as Content-Encoding
+				// is supposed to be applied before Transfer-Encoding.
+				m.encodings = append(encodings, m.encodings...)
 			} else if bytes.Equal(headerName, nameConnection) {
 				m.connection = headerVal
 			}
@@ -400,6 +418,15 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 	}
 
 	return true, false, len(data)
+}
+
+func parseCommaSeparatedList(s common.NetString) (list []string) {
+	values := bytes.Split(s, []byte(","))
+	list = make([]string, len(values))
+	for idx := range values {
+		list[idx] = string(bytes.ToLower(bytes.Trim(values[idx], " ")))
+	}
+	return list
 }
 
 func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
