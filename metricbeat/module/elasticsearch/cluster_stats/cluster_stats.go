@@ -73,5 +73,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	eventMapping(r, content)
+	if m.MetricSet.XPack {
+		eventMappingXPack(r, m, content)
+	} else {
+		eventMapping(r, content)
+	}
 }
