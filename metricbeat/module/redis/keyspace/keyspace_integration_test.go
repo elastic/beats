@@ -23,6 +23,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/redis/mtest"
 
@@ -30,30 +31,32 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFetch(t *testing.T) {
+func TestKeyspace(t *testing.T) {
 	t.Parallel()
 
-	mtest.Runner.Run(t, func(t *testing.T, host string) {
-		addEntry(t, host)
+	mtest.Runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, host string) {
+			addEntry(t, host)
 
-		// Fetch data
-		f := mbtest.NewEventsFetcher(t, getConfig(host))
-		events, err := f.Fetch()
-		if err != nil {
-			t.Fatal("fetch", err)
-		}
+			// Fetch data
+			f := mbtest.NewEventsFetcher(t, getConfig(host))
+			events, err := f.Fetch()
+			if err != nil {
+				t.Fatal("fetch", err)
+			}
 
-		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
 
-		// Make sure at least 1 db keyspace exists
-		assert.True(t, len(events) > 0)
+			// Make sure at least 1 db keyspace exists
+			assert.True(t, len(events) > 0)
 
-		keyspace := events[0]
+			keyspace := events[0]
 
-		assert.True(t, keyspace["avg_ttl"].(int64) >= 0)
-		assert.True(t, keyspace["expires"].(int64) >= 0)
-		assert.True(t, keyspace["keys"].(int64) >= 0)
-		assert.True(t, strings.Contains(keyspace["id"].(string), "db"))
+			assert.True(t, keyspace["avg_ttl"].(int64) >= 0)
+			assert.True(t, keyspace["expires"].(int64) >= 0)
+			assert.True(t, keyspace["keys"].(int64) >= 0)
+			assert.True(t, strings.Contains(keyspace["id"].(string), "db"))
+		},
 	})
 }
 
@@ -61,7 +64,7 @@ func TestData(t *testing.T) {
 	t.Parallel()
 
 	// TODO: Fix EnsureUp for this kind of scenarios
-	mtest.DataRunner.Run(t, func(t *testing.T, host string) {
+	mtest.DataRunner.Run(t, compose.Suite{"Data": func(t *testing.T, host string) {
 		addEntry(t, host)
 
 		f := mbtest.NewEventsFetcher(t, getConfig(host))
@@ -70,7 +73,7 @@ func TestData(t *testing.T) {
 		if err != nil {
 			t.Fatal("write", err)
 		}
-	})
+	}})
 }
 
 // addEntry adds an entry to redis

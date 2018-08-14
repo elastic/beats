@@ -40,6 +40,8 @@ type TestRunner struct {
 	Timeout  int
 }
 
+type Suite map[string]func(t *testing.T, host string)
+
 func (r *TestRunner) scenarios() []map[string]string {
 	n := 1
 	for _, values := range r.Options {
@@ -62,7 +64,7 @@ func (r *TestRunner) scenarios() []map[string]string {
 	return scenarios
 }
 
-func (r *TestRunner) Run(t *testing.T, tests ...func(t *testing.T, host string)) {
+func (r *TestRunner) Run(t *testing.T, tests Suite) {
 	timeout := r.Timeout
 	if timeout == 0 {
 		timeout = 300
@@ -108,8 +110,8 @@ func (r *TestRunner) Run(t *testing.T, tests ...func(t *testing.T, host string))
 				t.Fatal(errors.Wrapf(err, "getting host for %s/%s", r.Service, desc))
 			}
 
-			for _, test := range tests {
-				test(t, host)
+			for name, test := range tests {
+				t.Run(name, func(t *testing.T) { test(t, host) })
 			}
 		})
 

@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/redis/mtest"
 
@@ -34,22 +35,57 @@ const (
 	password = "foobared"
 )
 
-func TestFetch(t *testing.T) {
+func TestInfo(t *testing.T) {
 	t.Parallel()
 
-	mtest.Runner.Run(t, func(t *testing.T, host string) {
-		f := mbtest.NewEventFetcher(t, getConfig("", host))
-		event, err := f.Fetch()
-		if err != nil {
-			t.Fatal("fetch", err)
-		}
+	mtest.Runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, host string) {
+			f := mbtest.NewEventFetcher(t, getConfig("", host))
+			event, err := f.Fetch()
+			if err != nil {
+				t.Fatal("fetch", err)
+			}
 
-		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-		// Check fields
-		assert.Equal(t, 9, len(event))
-		server := event["server"].(common.MapStr)
-		assert.Equal(t, "standalone", server["mode"])
+			// Check fields
+			assert.Equal(t, 9, len(event))
+			server := event["server"].(common.MapStr)
+			assert.Equal(t, "standalone", server["mode"])
+		},
+		"Passwords": func(t *testing.T, redisHost string) {
+			// Add password and ensure it gets reset
+			defer func() {
+				err := resetPassword(redisHost, password)
+				if err != nil {
+					t.Fatal("resetting password", err)
+				}
+			}()
+
+			err := addPassword(redisHost, password)
+			if err != nil {
+				t.Fatal("adding password", err)
+			}
+
+			// Test Fetch metrics with missing password
+			f := mbtest.NewEventFetcher(t, getConfig("", redisHost))
+			_, err = f.Fetch()
+			if assert.Error(t, err, "missing password") {
+				assert.Contains(t, err, "NOAUTH Authentication required.")
+			}
+
+			// Config redis and metricset with an invalid password
+			f = mbtest.NewEventFetcher(t, getConfig("blah", redisHost))
+			_, err = f.Fetch()
+			if assert.Error(t, err, "invalid password") {
+				assert.Contains(t, err, "ERR invalid password")
+			}
+
+			// Config redis and metricset with a valid password
+			f = mbtest.NewEventFetcher(t, getConfig(password, redisHost))
+			_, err = f.Fetch()
+			assert.NoError(t, err, "valid password")
+		},
 	})
 }
 
@@ -57,52 +93,14 @@ func TestData(t *testing.T) {
 	t.Parallel()
 
 	// TODO: Fix EnsureUp for this kind of scenarios
-	mtest.DataRunner.Run(t, func(t *testing.T, host string) {
+	mtest.DataRunner.Run(t, compose.Suite{"Data": func(t *testing.T, host string) {
 		f := mbtest.NewEventFetcher(t, getConfig("", host))
 
 		err := mbtest.WriteEvent(f, t)
 		if err != nil {
 			t.Fatal("write", err)
 		}
-	})
-}
-
-func TestPasswords(t *testing.T) {
-	t.Parallel()
-
-	mtest.Runner.Run(t, func(t *testing.T, redisHost string) {
-		// Add password and ensure it gets reset
-		defer func() {
-			err := resetPassword(redisHost, password)
-			if err != nil {
-				t.Fatal("resetting password", err)
-			}
-		}()
-
-		err := addPassword(redisHost, password)
-		if err != nil {
-			t.Fatal("adding password", err)
-		}
-
-		// Test Fetch metrics with missing password
-		f := mbtest.NewEventFetcher(t, getConfig("", redisHost))
-		_, err = f.Fetch()
-		if assert.Error(t, err, "missing password") {
-			assert.Contains(t, err, "NOAUTH Authentication required.")
-		}
-
-		// Config redis and metricset with an invalid password
-		f = mbtest.NewEventFetcher(t, getConfig("blah", redisHost))
-		_, err = f.Fetch()
-		if assert.Error(t, err, "invalid password") {
-			assert.Contains(t, err, "ERR invalid password")
-		}
-
-		// Config redis and metricset with a valid password
-		f = mbtest.NewEventFetcher(t, getConfig(password, redisHost))
-		_, err = f.Fetch()
-		assert.NoError(t, err, "valid password")
-	})
+	}})
 }
 
 // addPassword will add a password to redis.
