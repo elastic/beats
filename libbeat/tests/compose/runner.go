@@ -18,12 +18,14 @@
 package compose
 
 import (
-	"crypto/sha1"
 	"fmt"
+	"math/rand"
 	"os"
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/pkg/errors"
 )
 
 type TestRunner struct {
@@ -70,7 +72,10 @@ func (r *TestRunner) Run(t *testing.T, tests ...func(t *testing.T, host string))
 		sort.Strings(vars)
 		desc := strings.Join(vars, ",")
 
-		name := fmt.Sprintf("%s_%x", r.Service, sha1.Sum([]byte(desc)))
+		seq := make([]byte, 16)
+		rand.Read(seq)
+		name := fmt.Sprintf("%s_%x", r.Service, seq)
+
 		project, err := getComposeProject(name)
 		if err != nil {
 			t.Fatal(err)
@@ -90,12 +95,12 @@ func (r *TestRunner) Run(t *testing.T, tests ...func(t *testing.T, host string))
 
 			err = project.Wait(timeout, r.Service)
 			if err != nil {
-				t.Fatal(err)
+				t.Fatal(errors.Wrapf(err, "waiting for %s/%s", r.Service, desc))
 			}
 
 			host, err := project.Host(r.Service)
 			if err != nil {
-				t.Fatal(err)
+				t.Fatal(errors.Wrapf(err, "getting host for %s/%s", r.Service, desc))
 			}
 
 			for _, test := range tests {
