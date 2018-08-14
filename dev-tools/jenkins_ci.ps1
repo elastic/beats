@@ -28,10 +28,6 @@ $env:RACE_DETECTOR = "true"
 # Install mage from vendor.
 exec { go install github.com/elastic/beats/vendor/github.com/magefile/mage }
 
-echo "Fetching testing dependencies"
-# TODO (elastic/beats#5050): Use a vendored copy of this.
-exec { go get github.com/docker/libcompose }
-
 if (Test-Path "$env:beat") {
     cd "$env:beat"
 } else {
