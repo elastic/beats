@@ -14,7 +14,7 @@
 
 :global-flags: Also see <<global-flags,Global flags>>.
 
-:export-command-short-desc: Exports the configuration,index template or a dashboard to stdout
+:export-command-short-desc: Exports the configuration, index template or a dashboard to stdout
 :help-command-short-desc: Shows help for any command
 :keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
 :modules-command-short-desc: Manages configured modules
@@ -118,22 +118,22 @@ command exports the configuration that's defined in the specified file.
 *`dashboard`*::
 Exporting a dashboard allows to store a dashboard on disk in a
 module and load it automatically. The following command can be used:
-
-[source,shell]
++
+["source","shell",subs="attributes"]
 ----
 $ {beatname_lc} export dashboard --id="dashboard-id" > dashboard.json
 ----
-
++
 The `dashboard-id` can be found in the Kibana URL. By default `export dashboard`
 will write the dashboard to stdout. Above it's written into `dashboard.json` so
 it can later imported again. The file contains the dashboard with all
 visualizations and searches. The index pattern is removed as it is
 expected to be loaded separately for {beatname_uc}.
-
++
 The generated `dashboard.json` file can be copied into the `kibana/6/dashboard`
 directory of {beatname_lc} and next time `{beatname_lc} setup dashboards` is
 run the dashboard will be imported.
-
++
 In case Kibana is not running on `localhost:5061` the {beatname_uc}
 configuration under `setup.kibana` must be adjusted.
 
