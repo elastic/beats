@@ -32,6 +32,9 @@ var clusterIDCache = map[string]string{}
 type Info struct {
 	ClusterName string `json:"cluster_name"`
 	ClusterID   string `json:"cluster_uuid"`
+	Version     struct {
+		Number string `json:"number"`
+	} `json:"version"`
 }
 
 // NodeInfo struct cotains data about the node
@@ -166,4 +169,28 @@ func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error
 		}
 	}
 	return nil, fmt.Errorf("no node matched id %s", nodeID)
+}
+
+// GetLicense returns license information
+func GetLicense(http *helper.HTTP, resetURI string) (map[string]interface{}, error) {
+	content, err := fetchPath(http, resetURI, "_xpack/license")
+	if err != nil {
+		return nil, err
+	}
+
+	var license map[string]interface{}
+	err = json.Unmarshal(content, &license)
+	return license, err
+}
+
+// GetClusterState returns cluster state information
+func GetClusterState(http *helper.HTTP, resetURI string) (map[string]interface{}, error) {
+	content, err := fetchPath(http, resetURI, "_cluster/state")
+	if err != nil {
+		return nil, err
+	}
+
+	var clusterState map[string]interface{}
+	err = json.Unmarshal(content, &clusterState)
+	return clusterState, err
 }

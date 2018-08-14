@@ -22,12 +22,12 @@ import (
 	"time"
 
 	"github.com/elastic/beats/metricbeat/helper/elastic"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 var (
@@ -137,60 +137,70 @@ var (
 				"free_in_bytes":      c.Int("free_in_bytes"),
 				"available_in_bytes": c.Int("available_in_bytes"),
 			}),
-			// TODO: "network_types"
 		}),
 	}
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		r.Error(err)
 		return err
 	}
 
 	clusterStatsFields, err := clusterStatsSchema.Apply(data)
 	if err != nil {
-		r.Error(err)
 		return err
 	}
 
+	dataMS := common.MapStr(data)
+
+	value, err := dataMS.GetValue("nodes.versions")
+	if err != nil {
+		return elastic.MakeErrorForMissingField("nodes.versions", elastic.Elasticsearch)
+	}
+	clusterStatsFields.Put("nodes.versions", value)
+
 	// TODO: handle cluster stats fields:
-	// - nodes.versions (array of strings)
 	// - nodes.os.names (array of objects)
 	// - nodes.jvm.versions (array of objects)
-	// - nodes.plugins (array of ??)
-	// - nodes.network_types.transport_types (is this an object with dynamic keys?)
-	// - nodes.network_types.http_types (is this an object with dynamic keys?)
-
-	clusterUUID, ok := data["cluster_uuid"].(string)
-	if !ok {
-		return elastic.ReportErrorForMissingField("cluster_uuid", elastic.Elasticsearch, r)
-	}
+	// - nodes.plugins (array of objects)
+	// - nodes.network_types (object with dynamic keys)
 
 	clusterName, ok := data["cluster_name"].(string)
 	if !ok {
-		return elastic.ReportErrorForMissingField("cluster_name", elastic.Elasticsearch, r)
+		return elastic.MakeErrorForMissingField("cluster_name", elastic.Elasticsearch)
 	}
 
-	version := "TODO: Fetch from http://localhost:9200/ and parse"
-	licenseFields := "TODO: Fetch from http://localhost:9200/_xpack/license and parse"
-	clusterStateFields := "TODO: Fetch from http://localhost:9200/_cluster/state (with response filtering) + http://localhost:9200/_cluster/health (for status field) and parse"
-	stackStatsFields := "TODO: Fetch from http://localhost:9200/_xpack/usage + apm (from cluster state if apm-* indices exist) + and parse"
+	info, err := elasticsearch.GetInfo(m.HTTP, m.HTTP.GetURI())
+	if err != nil {
+		return err
+	}
+
+	license, err := elasticsearch.GetLicense(m.HTTP, m.HTTP.GetURI())
+	if err != nil {
+		return err
+	}
+
+	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI())
+	if err != nil {
+		return err
+	}
+
+	// stackStatsFields := "TODO: Fetch from http://localhost:9200/_xpack/usage + apm (from cluster state if apm-* indices exist) + and parse"
 
 	event := mb.Event{}
 	event.RootFields = common.MapStr{
-		"cluster_uuid":  clusterUUID, // TODO: In New(), error out if ES version < 6.5.0 and xpack.enabled = true
+		"cluster_uuid":  info.ClusterID,
 		"cluster_name":  clusterName,
 		"timestamp":     common.Time(time.Now()),
 		"interval_ms":   m.Module().Config().Period / time.Millisecond,
 		"type":          "cluster_stats",
-		"license":       licenseFields,
-		"version":       version,
+		"license":       license,
+		"version":       info.Version.Number,
 		"cluster_stats": clusterStatsFields,
-		"cluster_state": clusterStateFields,
-		"stack_stats":   stackStatsFields,
+		"cluster_state": clusterState,
+		// "stack_stats":   stackStatsFields,
 	}
 
 	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
