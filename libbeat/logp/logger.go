@@ -19,6 +19,7 @@ package logp
 
 import (
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // LogOption configures a Logger.
@@ -94,6 +95,11 @@ func (l *Logger) Panic(args ...interface{}) {
 // logger then panics.
 func (l *Logger) DPanic(args ...interface{}) {
 	l.sugar.DPanic(args...)
+}
+
+// IsDebug checks to see if the given logger is Debug enabled.
+func (l *Logger) IsDebug() bool {
+	return l.sugar.Desugar().Check(zapcore.DebugLevel, "") != nil
 }
 
 // Sprintf
