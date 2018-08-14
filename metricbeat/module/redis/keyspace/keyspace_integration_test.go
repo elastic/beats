@@ -23,33 +23,17 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/redis/mtest"
 
 	rd "github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
 )
 
-var runner = compose.TestRunner{
-	Service: "redis",
-	Options: map[string][]string{
-		"REDIS_VERSION": []string{
-			"3.2.4",
-			"4.0.11",
-			"5.0-rc",
-		},
-		"IMAGE_OS": []string{
-			"alpine",
-			"stretch",
-		},
-	},
-	Parallel: true,
-}
-
 func TestFetch(t *testing.T) {
 	t.Parallel()
 
-	runner.Run(t, func(t *testing.T, host string) {
+	mtest.Runner.Run(t, func(t *testing.T, host string) {
 		addEntry(t, host)
 
 		// Fetch data
@@ -76,20 +60,8 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	t.Parallel()
 
-	// TODO: Fix EnsureUp
-	runner := compose.TestRunner{
-		Service: "redis",
-		Options: map[string][]string{
-			"REDIS_VERSION": []string{
-				"4.0.11",
-			},
-			"IMAGE_OS": []string{
-				"alpine",
-			},
-		},
-		Parallel: true,
-	}
-	runner.Run(t, func(t *testing.T, host string) {
+	// TODO: Fix EnsureUp for this kind of scenarios
+	mtest.DataRunner.Run(t, func(t *testing.T, host string) {
 		addEntry(t, host)
 
 		f := mbtest.NewEventsFetcher(t, getConfig(host))

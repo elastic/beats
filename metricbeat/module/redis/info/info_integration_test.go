@@ -23,9 +23,8 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/redis"
+	"github.com/elastic/beats/metricbeat/module/redis/mtest"
 
 	rd "github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
@@ -35,70 +34,75 @@ const (
 	password = "foobared"
 )
 
-var redisHost = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
-
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	t.Parallel()
 
-	f := mbtest.NewEventFetcher(t, getConfig(""))
-	event, err := f.Fetch()
-	if err != nil {
-		t.Fatal("fetch", err)
-	}
+	mtest.Runner.Run(t, func(t *testing.T, host string) {
+		f := mbtest.NewEventFetcher(t, getConfig("", host))
+		event, err := f.Fetch()
+		if err != nil {
+			t.Fatal("fetch", err)
+		}
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	// Check fields
-	assert.Equal(t, 9, len(event))
-	server := event["server"].(common.MapStr)
-	assert.Equal(t, "standalone", server["mode"])
+		// Check fields
+		assert.Equal(t, 9, len(event))
+		server := event["server"].(common.MapStr)
+		assert.Equal(t, "standalone", server["mode"])
+	})
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	t.Parallel()
 
-	f := mbtest.NewEventFetcher(t, getConfig(""))
+	// TODO: Fix EnsureUp for this kind of scenarios
+	mtest.DataRunner.Run(t, func(t *testing.T, host string) {
+		f := mbtest.NewEventFetcher(t, getConfig("", host))
 
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
+		err := mbtest.WriteEvent(f, t)
+		if err != nil {
+			t.Fatal("write", err)
+		}
+	})
 }
 
 func TestPasswords(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	t.Parallel()
 
-	// Add password and ensure it gets reset
-	defer func() {
-		err := resetPassword(redisHost, password)
+	mtest.Runner.Run(t, func(t *testing.T, redisHost string) {
+		// Add password and ensure it gets reset
+		defer func() {
+			err := resetPassword(redisHost, password)
+			if err != nil {
+				t.Fatal("resetting password", err)
+			}
+		}()
+
+		err := addPassword(redisHost, password)
 		if err != nil {
-			t.Fatal("resetting password", err)
+			t.Fatal("adding password", err)
 		}
-	}()
 
-	err := addPassword(redisHost, password)
-	if err != nil {
-		t.Fatal("adding password", err)
-	}
+		// Test Fetch metrics with missing password
+		f := mbtest.NewEventFetcher(t, getConfig("", redisHost))
+		_, err = f.Fetch()
+		if assert.Error(t, err, "missing password") {
+			assert.Contains(t, err, "NOAUTH Authentication required.")
+		}
 
-	// Test Fetch metrics with missing password
-	f := mbtest.NewEventFetcher(t, getConfig(""))
-	_, err = f.Fetch()
-	if assert.Error(t, err, "missing password") {
-		assert.Contains(t, err, "NOAUTH Authentication required.")
-	}
+		// Config redis and metricset with an invalid password
+		f = mbtest.NewEventFetcher(t, getConfig("blah", redisHost))
+		_, err = f.Fetch()
+		if assert.Error(t, err, "invalid password") {
+			assert.Contains(t, err, "ERR invalid password")
+		}
 
-	// Config redis and metricset with an invalid password
-	f = mbtest.NewEventFetcher(t, getConfig("blah"))
-	_, err = f.Fetch()
-	if assert.Error(t, err, "invalid password") {
-		assert.Contains(t, err, "ERR invalid password")
-	}
-
-	// Config redis and metricset with a valid password
-	f = mbtest.NewEventFetcher(t, getConfig(password))
-	_, err = f.Fetch()
-	assert.NoError(t, err, "valid password")
+		// Config redis and metricset with a valid password
+		f = mbtest.NewEventFetcher(t, getConfig(password, redisHost))
+		_, err = f.Fetch()
+		assert.NoError(t, err, "valid password")
+	})
 }
 
 // addPassword will add a password to redis.
@@ -142,7 +146,7 @@ func writeToRedis(host string) error {
 	return err
 }
 
-func getConfig(password string) map[string]interface{} {
+func getConfig(password, redisHost string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "redis",
 		"metricsets": []string{"info"},
