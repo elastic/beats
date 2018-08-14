@@ -5239,7 +5239,7 @@ expvar
 --
 type: keyword
 
-The cmdline of this golang program start with.
+The cmdline of this Go program start with.
 
 
 --
@@ -5247,7 +5247,7 @@ The cmdline of this golang program start with.
 [float]
 == heap fields
 
-The golang program heap information exposed by expvar.
+The Go program heap information exposed by expvar.
 
 
 
@@ -5256,7 +5256,7 @@ The golang program heap information exposed by expvar.
 --
 type: keyword
 
-The cmdline of this golang program start with.
+The cmdline of this Go program start with.
 
 
 --
