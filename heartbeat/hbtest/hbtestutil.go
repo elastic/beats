@@ -18,14 +18,20 @@
 package hbtest
 
 import (
+	"crypto/x509"
 	"io"
+	"io/ioutil"
 	"net/http"
-	"net/url"
-	"strconv"
-
 	"net/http/httptest"
+	"net/url"
+	"os"
+	"strconv"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common/mapval"
+	"github.com/elastic/beats/libbeat/common/x509util"
 )
 
 // HelloWorldBody is the body of the HelloWorldHandler.
@@ -56,6 +62,19 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 		return 0, err
 	}
 	return uint16(p), nil
+}
+
+// TLSChecks validates the given x509 cert at the given position.
+func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) mapval.Validator {
+	certPEMString := x509util.CertToPEMString(certificate)
+	return mapval.MustCompile(mapval.Map{
+		"tls": mapval.Map{
+			"rtt.handshake.us":             mapval.IsDuration,
+			"certificates":                 mapval.Slice{certPEMString},
+			"certificate_not_valid_before": certificate.NotBefore,
+			"certificate_not_valid_after":  certificate.NotAfter,
+		},
+	})
 }
 
 // MonitorChecks creates a skima.Validator that represents the "monitor" field present
@@ -100,4 +119,18 @@ func RespondingTCPChecks(port uint16) mapval.Validator {
 		TCPBaseChecks(port),
 		mapval.MustCompile(mapval.Map{"tcp.rtt.connect.us": mapval.IsDuration}),
 	)
+}
+
+// CertToTempFile takes a certificate and returns an *os.File with a PEM encoded
+// x.509 representation of that cert. Note that this takes tls.Certificate
+// objects from a server like httptest. This doesn't take x509 certs.
+// We never parse the x509 data in this case, we just transpose the bytes.
+// This is a little confusing, but is actually less work and less code.
+func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
+	// Write the certificate to a tempFile. Heartbeat would normally read certs from
+	// disk, not memory, so this little bit of extra work is worthwhile
+	certFile, err := ioutil.TempFile("", "sslcert")
+	require.NoError(t, err)
+	certFile.WriteString(x509util.CertToPEMString(cert))
+	return certFile
 }
