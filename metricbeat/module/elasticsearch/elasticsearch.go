@@ -206,7 +206,7 @@ func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error
 }
 
 // GetLicense returns license information
-func GetLicense(http *helper.HTTP, resetURI string) (map[string]interface{}, error) {
+func GetLicense(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	// First, check the cache
 	license := licenseCache.get()
 
@@ -230,7 +230,7 @@ func GetLicense(http *helper.HTTP, resetURI string) (map[string]interface{}, err
 }
 
 // GetClusterState returns cluster state information
-func GetClusterState(http *helper.HTTP, resetURI string) (map[string]interface{}, error) {
+func GetClusterState(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	content, err := fetchPath(http, resetURI, "_cluster/state/version,master_node,nodes")
 	if err != nil {
 		return nil, err
@@ -242,7 +242,7 @@ func GetClusterState(http *helper.HTTP, resetURI string) (map[string]interface{}
 }
 
 // GetStackStats returns stack stats (usage) information
-func GetStackStats(http *helper.HTTP, resetURI string) (map[string]interface{}, error) {
+func GetStackStats(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	content, err := fetchPath(http, resetURI, "_xpack/usage")
 	if err != nil {
 		return nil, err

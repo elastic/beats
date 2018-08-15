@@ -19,6 +19,7 @@ package cluster_stats
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/metricbeat/helper/elastic"
@@ -154,6 +155,51 @@ func passthruField(fieldPath string, sourceData, targetData common.MapStr) error
 	return nil
 }
 
+func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
+	// TLS does not need to be enabled if license type is something other than trial
+	value, err := license.GetValue("license.type")
+	if err != nil {
+		return false, err
+	}
+
+	licenseType, ok := value.(string)
+	if !ok {
+		return false, fmt.Errorf("License type is not a string")
+	}
+
+	if licenseType != "trial" {
+		return false, nil
+	}
+
+	// TLS does not need to be enabled if security is not enabled
+	value, err = stackStats.GetValue("security.enabled")
+	if err != nil {
+		return false, err
+	}
+
+	isSecurityEnabled, ok := value.(bool)
+	if !ok {
+		return false, fmt.Errorf("Security enabled flag is not a boolean")
+	}
+
+	if !isSecurityEnabled {
+		return false, nil
+	}
+
+	// TLS does not need to be enabled if TLS is already enabled on the transport protocol
+	value, err = stackStats.GetValue("security.ssl.transport.enabled")
+	if err != nil {
+		return false, err
+	}
+
+	isTLSAlreadyEnabled, ok := value.(bool)
+	if !ok {
+		return false, fmt.Errorf("Transport protocol SSL enabled flag is not a boolean")
+	}
+
+	return !isTLSAlreadyEnabled, nil
+}
+
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
@@ -197,8 +243,6 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return err
 	}
 
-	// TODO: Inject `cluster_needs_tls` field under license object
-
 	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
 		return err
@@ -216,6 +260,12 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	}
 
 	// TODO: Inject `apm.found` field under stackStats object
+
+	clusterNeedsTLS, err := clusterNeedsTLSEnabled(license, stackStats)
+	if err != nil {
+		return err
+	}
+	license.Put("cluster_needs_tls", clusterNeedsTLS) // This powers a cluster alert for enabling TLS on the ES transport protocol
 
 	event := mb.Event{}
 	event.RootFields = common.MapStr{
