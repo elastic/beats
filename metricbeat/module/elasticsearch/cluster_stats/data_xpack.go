@@ -170,11 +170,11 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 
 	passthruFields := []string{
 		"indices.segments.file_sizes", // object with dynamic keys
-		"nodes.versions", // array of strings
-		"nodes.os.names", // array of objects
-		"nodes.jvm.versions", // array of objects
-		"nodes.plugins", // array of objects
-		"nodes.network_types", // object with dynamic keys
+		"nodes.versions",              // array of strings
+		"nodes.os.names",              // array of objects
+		"nodes.jvm.versions",          // array of objects
+		"nodes.plugins",               // array of objects
+		"nodes.network_types",         // object with dynamic keys
 	}
 	for _, fieldPath := range passthruFields {
 		if err = passthruField(fieldPath, dataMS, clusterStats); err != nil {
