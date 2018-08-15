@@ -92,6 +92,16 @@ func TestIsEqual(t *testing.T) {
 	assertIsDefInvalid(t, id, "bar")
 }
 
+func TestRegisteredIsEqual(t *testing.T) {
+	// Time equality comes from a registered function
+	// so this is a quick way to test registered functions
+	now := time.Now()
+	id := IsEqual(now)
+
+	assertIsDefValid(t, id, now)
+	assertIsDefInvalid(t, id, now.Add(100))
+}
+
 func TestIsStringContaining(t *testing.T) {
 	id := IsStringContaining("foo")
 

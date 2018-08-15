@@ -24,12 +24,12 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/hex"
-	"encoding/pem"
 	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/common/x509util"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -543,6 +543,8 @@ func getKeySize(key interface{}) int {
 	return 0
 }
 
+// certToMap takes an x509 cert and converts it into a map. If includeRaw is set
+// to true a PEM encoded copy of the cert is encoded into the map as well.
 func certToMap(cert *x509.Certificate, includeRaw bool) common.MapStr {
 	certMap := common.MapStr{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
@@ -566,11 +568,7 @@ func certToMap(cert *x509.Certificate, includeRaw bool) common.MapStr {
 		certMap["alternative_names"] = san
 	}
 	if includeRaw {
-		block := pem.Block{
-			Type:  "CERTIFICATE",
-			Bytes: cert.Raw,
-		}
-		certMap["raw"] = string(pem.EncodeToMemory(&block))
+		certMap["raw"] = x509util.CertToPEMString(cert)
 	}
 	return certMap
 }

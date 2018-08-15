@@ -18,9 +18,11 @@
 package http
 
 import (
+	"crypto/x509"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -34,9 +36,24 @@ import (
 	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
-func testRequest(t *testing.T, url string) beat.Event {
-	config := common.NewConfig()
-	config.SetString("urls", 0, url)
+func testRequest(t *testing.T, testURL string) beat.Event {
+	return testTLSRequest(t, testURL, "")
+}
+
+// testTLSRequest tests the given request. certPath is optional, if given
+// an empty string no cert will be set.
+func testTLSRequest(t *testing.T, testURL string, certPath string) beat.Event {
+	configSrc := map[string]interface{}{
+		"urls":    testURL,
+		"timeout": "1s",
+	}
+
+	if certPath != "" {
+		configSrc["ssl.certificate_authorities"] = certPath
+	}
+
+	config, err := common.NewConfigFrom(configSrc)
+	require.NoError(t, err)
 
 	jobs, err := create(monitors.Info{}, config)
 	require.NoError(t, err)
@@ -52,7 +69,6 @@ func testRequest(t *testing.T, url string) beat.Event {
 func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, beat.Event) {
 	server := httptest.NewServer(handlerFunc)
 	defer server.Close()
-
 	event := testRequest(t, server.URL)
 
 	return server, event
@@ -193,6 +209,34 @@ func TestDownStatuses(t *testing.T) {
 			)
 		})
 	}
+}
+
+func TestHTTPSServer(t *testing.T) {
+	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
+	port, err := hbtest.ServerPort(server)
+	require.NoError(t, err)
+
+	// Parse the cert so we can test against it.
+	cert, err := x509.ParseCertificate(server.TLS.Certificates[0].Certificate[0])
+	require.NoError(t, err)
+
+	// Write the cert to a tempfile so heartbeat can use it in its config.
+	certFile := hbtest.CertToTempFile(t, cert)
+	require.NoError(t, certFile.Close())
+	defer os.Remove(certFile.Name())
+
+	event := testTLSRequest(t, server.URL, certFile.Name())
+
+	mapvaltest.Test(
+		t,
+		mapval.Strict(mapval.Compose(
+			hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "https", "up"),
+			hbtest.RespondingTCPChecks(port),
+			hbtest.TLSChecks(0, 0, cert),
+			respondingHTTPChecks(server.URL, http.StatusOK),
+		)),
+		event.Fields,
+	)
 }
 
 func TestConnRefusedJob(t *testing.T) {

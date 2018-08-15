@@ -32,6 +32,104 @@ var KeyPresent = IsDef{name: "check key present"}
 // KeyMissing checks that the given key is not present defined.
 var KeyMissing = IsDef{name: "check key not present", checkKeyMissing: true}
 
+func init() {
+	MustRegisterEqual(IsEqualToTime)
+}
+
+// InvalidEqualFnError is the error type returned by RegisterEqual when
+// there is an issue with the given function.
+type InvalidEqualFnError struct{ msg string }
+
+func (e InvalidEqualFnError) Error() string {
+	return fmt.Sprintf("Function is not a valid equal function: %s", e.msg)
+}
+
+// MustRegisterEqual is the panic-ing equivalent of RegisterEqual.
+func MustRegisterEqual(fn interface{}) {
+	if err := RegisterEqual(fn); err != nil {
+		panic(fmt.Sprintf("Could not register fn as equal! %v", err))
+	}
+}
+
+var equalChecks = map[reflect.Type]reflect.Value{}
+
+// RegisterEqual takes a function of the form fn(v someType) IsDef
+// and registers it to check equality for that type.
+func RegisterEqual(fn interface{}) error {
+	fnV := reflect.ValueOf(fn)
+	fnT := fnV.Type()
+
+	if fnT.Kind() != reflect.Func {
+		return InvalidEqualFnError{"Provided value is not a function"}
+	}
+	if fnT.NumIn() != 1 {
+		return InvalidEqualFnError{"Equal FN should take one argument"}
+	}
+	if fnT.NumOut() != 1 {
+		return InvalidEqualFnError{"Equal FN should return one value"}
+	}
+	if fnT.Out(0) != reflect.TypeOf(IsDef{}) {
+		return InvalidEqualFnError{"Equal FN should return an IsDef"}
+	}
+
+	inT := fnT.In(0)
+	if _, ok := equalChecks[inT]; ok {
+		return InvalidEqualFnError{fmt.Sprintf("Duplicate Equal FN for type %v encountered!", inT)}
+	}
+
+	equalChecks[inT] = fnV
+
+	return nil
+}
+
+// IsEqual tests that the given object is equal to the actual object.
+func IsEqual(to interface{}) IsDef {
+	toV := reflect.ValueOf(to)
+	isDefFactory, ok := equalChecks[toV.Type()]
+
+	// If there are no handlers declared explicitly for this type we perform a deep equality check
+	if !ok {
+		return IsDeepEqual(to)
+	}
+
+	// We know this is an isdef due to the Register check previously
+	checker := isDefFactory.Call([]reflect.Value{toV})[0].Interface().(IsDef).checker
+
+	return Is("equals", func(path Path, v interface{}) *Results {
+		return checker(path, v)
+	})
+}
+
+// IsEqualToTime ensures that the actual value is the given time, regardless of zone.
+func IsEqualToTime(to time.Time) IsDef {
+	return Is("equal to time", func(path Path, v interface{}) *Results {
+		actualTime, ok := v.(time.Time)
+		if !ok {
+			return SimpleResult(path, false, "Value %t was not a time.Time", v)
+		}
+
+		if actualTime.Equal(to) {
+			return ValidResult(path)
+		}
+
+		return SimpleResult(path, false, "actual(%v) != expected(%v)", actualTime, to)
+	})
+}
+
+// IsDeepEqual checks equality using reflect.DeepEqual.
+func IsDeepEqual(to interface{}) IsDef {
+	return Is("equals", func(path Path, v interface{}) *Results {
+		if reflect.DeepEqual(v, to) {
+			return ValidResult(path)
+		}
+		return SimpleResult(
+			path,
+			false,
+			fmt.Sprintf("objects not equal: actual(%v) != expected(%v)", v, to),
+		)
+	})
+}
+
 // IsArrayOf validates that the array at the given key is an array of objects all validatable
 // via the given Validator.
 func IsArrayOf(validator Validator) IsDef {
@@ -114,20 +212,6 @@ var IsDuration = Is("is a duration", func(path Path, v interface{}) *Results {
 		fmt.Sprintf("Expected a time.duration, got '%v' which is a %T", v, v),
 	)
 })
-
-// IsEqual tests that the given object is equal to the actual object.
-func IsEqual(to interface{}) IsDef {
-	return Is("equals", func(path Path, v interface{}) *Results {
-		if reflect.DeepEqual(v, to) {
-			return ValidResult(path)
-		}
-		return SimpleResult(
-			path,
-			false,
-			fmt.Sprintf("objects not equal: actual(%v) != expected(%v)", v, to),
-		)
-	})
-}
 
 // IsNil tests that a value is nil.
 var IsNil = Is("is nil", func(path Path, v interface{}) *Results {

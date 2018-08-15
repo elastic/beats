@@ -888,6 +888,33 @@ TLS layer related fields.
 
 
 
+*`tls.certificates`*::
++
+--
+type: keyword
+
+List of PEM encoded x509 certificates.
+
+--
+
+*`tls.certificate_not_valid_before`*::
++
+--
+type: date
+
+Earliest time at which the connection's certificates are valid.
+
+--
+
+*`tls.certificate_not_valid_after`*::
++
+--
+type: date
+
+Latest time at which the connection's certificates are valid.
+
+--
+
 [float]
 == rtt fields
 
