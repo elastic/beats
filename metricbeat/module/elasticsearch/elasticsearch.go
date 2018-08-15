@@ -21,12 +21,46 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"sync"
+	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 )
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id
 var clusterIDCache = map[string]string{}
+
+// Global cache for license information. Assumption is that license information changes infrequently
+type _licenseCache struct {
+	sync.RWMutex
+	license  common.MapStr
+	cachedOn time.Time
+	ttl      time.Duration
+}
+
+var licenseCache = &_licenseCache{}
+
+func (c *_licenseCache) get() common.MapStr {
+	c.Lock()
+	defer c.Unlock()
+
+	if time.Since(c.cachedOn) > c.ttl {
+		// We are past the TTL, so invalidate cache
+		c.license = nil
+	}
+
+	return c.license
+}
+
+func (c *_licenseCache) set(license common.MapStr, ttl time.Duration) {
+	c.Lock()
+	defer c.Unlock()
+
+	c.license = license
+	c.ttl = ttl
+	c.cachedOn = time.Now()
+}
 
 // Info construct contains the data from the Elasticsearch / endpoint
 type Info struct {
@@ -173,14 +207,26 @@ func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error
 
 // GetLicense returns license information
 func GetLicense(http *helper.HTTP, resetURI string) (map[string]interface{}, error) {
-	content, err := fetchPath(http, resetURI, "_xpack/license")
-	if err != nil {
-		return nil, err
+	// First, check the cache
+	license := licenseCache.get()
+
+	// Not cached, fetch license from Elasticsearch
+	if license == nil {
+		content, err := fetchPath(http, resetURI, "_xpack/license")
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(content, &license)
+		if err != nil {
+			return nil, err
+		}
+
+		// Cache license for a minute
+		licenseCache.set(license, time.Minute)
 	}
 
-	var license map[string]interface{}
-	err = json.Unmarshal(content, &license)
-	return license, err
+	return licenseCache.get(), nil
 }
 
 // GetClusterState returns cluster state information
