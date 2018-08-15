@@ -32,7 +32,9 @@ import (
 
 var (
 	clusterStatsSchema = s.Schema{
-		"status": c.Str("status"),
+		"cluster_uuid": c.Str("cluster_uuid"),
+		"timestamp":    c.Int("timestamp"),
+		"status":       c.Str("status"),
 		"indices": c.Dict("indices", s.Schema{
 			"count": c.Int("count"),
 			"shards": c.Dict("shards", s.Schema{
@@ -75,6 +77,7 @@ var (
 				"miss_count":           c.Int("miss_count"),
 				"cache_size":           c.Int("cache_size"),
 				"cache_count":          c.Int("cache_count"),
+				"evictions":            c.Int("evictions"),
 			}),
 			"completion": c.Dict("completion", s.Schema{
 				"size_in_bytes": c.Int("size_in_bytes"),
@@ -141,6 +144,16 @@ var (
 	}
 )
 
+func passthruField(fieldPath string, sourceData, targetData common.MapStr) error {
+	fieldValue, err := sourceData.GetValue(fieldPath)
+	if err != nil {
+		return elastic.MakeErrorForMissingField(fieldPath, elastic.Elasticsearch)
+	}
+
+	targetData.Put(fieldPath, fieldValue)
+	return nil
+}
+
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
@@ -148,24 +161,26 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return err
 	}
 
-	clusterStatsFields, err := clusterStatsSchema.Apply(data)
+	clusterStats, err := clusterStatsSchema.Apply(data)
 	if err != nil {
 		return err
 	}
 
 	dataMS := common.MapStr(data)
 
-	value, err := dataMS.GetValue("nodes.versions")
-	if err != nil {
-		return elastic.MakeErrorForMissingField("nodes.versions", elastic.Elasticsearch)
+	passthruFields := []string{
+		"indices.segments.file_sizes",
+		"nodes.versions",
+		"nodes.os.names",
+		"nodes.jvm.versions",
+		"nodes.plugins",
+		"nodes.network_types",
 	}
-	clusterStatsFields.Put("nodes.versions", value)
-
-	// TODO: handle cluster stats fields:
-	// - nodes.os.names (array of objects)
-	// - nodes.jvm.versions (array of objects)
-	// - nodes.plugins (array of objects)
-	// - nodes.network_types (object with dynamic keys)
+	for _, fieldPath := range passthruFields {
+		if err = passthruField(fieldPath, dataMS, clusterStats); err != nil {
+			return err
+		}
+	}
 
 	clusterName, ok := data["cluster_name"].(string)
 	if !ok {
@@ -182,12 +197,25 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return err
 	}
 
+	// TODO: Inject `cluster_needs_tls` field under license object
+
 	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
 		return err
 	}
 
-	// stackStatsFields := "TODO: Fetch from http://localhost:9200/_xpack/usage + apm (from cluster state if apm-* indices exist) + and parse"
+	if err = passthruField("status", dataMS, clusterState); err != nil {
+		return err
+	}
+
+	// TODO: Compute and inject `node_hash` field under clusterState object
+
+	stackStats, err := elasticsearch.GetStackStats(m.HTTP, m.HTTP.GetURI())
+	if err != nil {
+		return err
+	}
+
+	// TODO: Inject `apm.found` field under stackStats object
 
 	event := mb.Event{}
 	event.RootFields = common.MapStr{
@@ -198,9 +226,9 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		"type":          "cluster_stats",
 		"license":       license,
 		"version":       info.Version.Number,
-		"cluster_stats": clusterStatsFields,
+		"cluster_stats": clusterStats,
 		"cluster_state": clusterState,
-		// "stack_stats":   stackStatsFields,
+		"stack_stats":   stackStats,
 	}
 
 	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
