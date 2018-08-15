@@ -9,7 +9,7 @@ var (
 		Service: "redis",
 		Options: map[string][]string{
 			"REDIS_VERSION": []string{
-				"3.2.4",
+				"3.2.12",
 				"4.0.11",
 				"5.0-rc",
 			},

@@ -6,6 +6,6 @@ services:
     healthcheck:
       test:
       - "CMD-SHELL"
-      - "nc -z localhost 6379"
+      - "redis-cli ping"
       interval: 1s
       retries: 90
