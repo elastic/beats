@@ -44,12 +44,19 @@ type Suite map[string]func(t *testing.T, host string)
 
 func (r *TestRunner) scenarios() []map[string]string {
 	n := 1
-	for _, values := range r.Options {
+	options := make(map[string][]string)
+	for env, values := range r.Options {
+		// Allow to ovverride options from environment variables
+		value := os.Getenv(env)
+		if value != "" {
+			values = []string{value}
+		}
+		options[env] = values
 		n *= len(values)
 	}
 
 	scenarios := make([]map[string]string, n)
-	for variable, values := range r.Options {
+	for variable, values := range options {
 		v := 0
 		for i, s := range scenarios {
 			if s == nil {
@@ -64,7 +71,26 @@ func (r *TestRunner) scenarios() []map[string]string {
 	return scenarios
 }
 
+func (r *TestRunner) runHostOverride(t *testing.T, tests Suite) bool {
+	env := strings.ToUpper(r.Service) + "_HOST"
+	host := os.Getenv(env)
+	if host == "" {
+		return false
+	}
+
+	t.Logf("Test host overriden by %s=%s", env, host)
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) { test(t, host) })
+	}
+	return true
+}
+
 func (r *TestRunner) Run(t *testing.T, tests Suite) {
+	if r.runHostOverride(t, tests) {
+		return
+	}
+
 	timeout := r.Timeout
 	if timeout == 0 {
 		timeout = 300
