@@ -20,6 +20,9 @@ package cluster_stats
 import (
 	"encoding/json"
 	"fmt"
+	"hash/fnv"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/metricbeat/helper/elastic"
@@ -200,6 +203,50 @@ func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
 	return !isTLSAlreadyEnabled, nil
 }
 
+// computeNodesHash computes a simple hash value that can be used to determine if the nodes listing has changed since the last report.
+func computeNodesHash(clusterState common.MapStr) (int32, error) {
+	value, err := clusterState.GetValue("nodes")
+	if err != nil {
+		return 0, err
+	}
+
+	nodes, ok := value.(map[string]interface{})
+	if !ok {
+		return 0, fmt.Errorf("Nodes is not a map")
+	}
+
+	var nodeEphemeralIDs []string
+	for _, value := range nodes {
+		nodeData, ok := value.(map[string]interface{})
+		if !ok {
+			return 0, fmt.Errorf("Node data is not a map")
+		}
+
+		value, ok := nodeData["ephemeral_id"]
+		if !ok {
+			return 0, fmt.Errorf("Node data does not contain ephemeral ID")
+		}
+
+		ephemeralID, ok := value.(string)
+		if !ok {
+			return 0, fmt.Errorf("Node ephemeral ID is not a string")
+		}
+
+		nodeEphemeralIDs = append(nodeEphemeralIDs, ephemeralID)
+	}
+
+	sort.Strings(nodeEphemeralIDs)
+
+	combinedNodeEphemeralIDs := strings.Join(nodeEphemeralIDs, "")
+	return hash(combinedNodeEphemeralIDs), nil
+}
+
+func hash(s string) int32 {
+	h := fnv.New32()
+	h.Write([]byte(s))
+	return int32(h.Sum32()) // This cast is needed because the ES mapping is for a 32-bit *signed* integer
+}
+
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
@@ -252,7 +299,11 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return err
 	}
 
-	// TODO: Compute and inject `node_hash` field under clusterState object
+	nodesHash, err := computeNodesHash(clusterState)
+	if err != nil {
+		return err
+	}
+	clusterState.Put("nodes_hash", nodesHash)
 
 	stackStats, err := elasticsearch.GetStackStats(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
