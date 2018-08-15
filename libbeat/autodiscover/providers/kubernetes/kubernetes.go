@@ -156,8 +156,15 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 
 	// Emit container and port information
 	for _, c := range containers {
+		cid := containerIDs[c.GetName()]
+
+		// If there is a container ID that is empty then ignore it. It either means that the container is still starting
+		// up or the container is shutting down.
+		if cid == "" {
+			continue
+		}
 		cmeta := common.MapStr{
-			"id":      containerIDs[c.GetName()],
+			"id":      cid,
 			"name":    c.GetName(),
 			"image":   c.GetImage(),
 			"runtime": runtimes[c.GetName()],
