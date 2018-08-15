@@ -121,7 +121,7 @@ module and load it automatically. The following command can be used:
 +
 ["source","shell",subs="attributes"]
 ----
-$ {beatname_lc} export dashboard --id="dashboard-id" > dashboard.json
+{beatname_lc} export dashboard --id="dashboard-id" > dashboard.json
 ----
 +
 The `dashboard-id` can be found in the Kibana URL. By default `export dashboard`
@@ -131,7 +131,7 @@ visualizations and searches. The index pattern is removed as it is
 expected to be loaded separately for {beatname_uc}.
 +
 The generated `dashboard.json` file can be copied into the `kibana/6/dashboard`
-directory of {beatname_lc} and next time `{beatname_lc} setup dashboards` is
+directory of {beatname_lc} and next time +{beatname_lc} setup dashboards+ is
 run the dashboard will be imported.
 +
 In case Kibana is not running on `localhost:5061` the {beatname_uc}
