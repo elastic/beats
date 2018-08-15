@@ -46,7 +46,7 @@ func (r *TestRunner) scenarios() []map[string]string {
 	n := 1
 	options := make(map[string][]string)
 	for env, values := range r.Options {
-		// Allow to ovverride options from environment variables
+		// Allow to override options from environment variables
 		value := os.Getenv(env)
 		if value != "" {
 			values = []string{value}
