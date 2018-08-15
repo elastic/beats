@@ -18,11 +18,14 @@
 package dialchain
 
 import (
+	cryptoTLS "crypto/tls"
+	"fmt"
 	"net"
 	"time"
 
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/x509util"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -49,10 +52,43 @@ func TLSLayer(cfg *transport.TLSConfig, to time.Duration) Layer {
 		}
 
 		return afterDial(dialer, func(conn net.Conn) (net.Conn, error) {
-			// TODO: extract TLS connection parameters from connection object.
+			tlsConn, ok := conn.(*cryptoTLS.Conn)
+			if !ok {
+				panic(fmt.Sprintf("TLS afterDial received a non-tls connection %t. This should never happen", conn))
+			}
 
+			// TODO: extract TLS connection parameters from connection object.
 			timer.stop()
 			event.Put("tls.rtt.handshake", look.RTT(timer.duration()))
+
+			var certs []string
+
+			// Pointers because we need a nil value
+			var chainNotValidBefore *time.Time
+			var chainNotValidAfter *time.Time
+
+			// Here we compute the minimal bounds during which this certificate chain is valid
+			// To do this correctly, we take the maximum NotBefore and the minimum NotAfter.
+			// This *should* always wind up being the terminal cert in the chain, but we should
+			// compute this correctly.
+			for _, chain := range tlsConn.ConnectionState().VerifiedChains {
+				for _, cert := range chain {
+					certs = append(certs, x509util.CertToPEMString(cert))
+
+					if chainNotValidBefore == nil || chainNotValidBefore.Before(cert.NotBefore) {
+						chainNotValidBefore = &cert.NotBefore
+					}
+
+					if chainNotValidAfter == nil || chainNotValidAfter.After(cert.NotAfter) {
+						chainNotValidAfter = &cert.NotAfter
+					}
+				}
+			}
+
+			event.Put("tls.certificate_not_valid_before", *chainNotValidBefore)
+			event.Put("tls.certificate_not_valid_after", *chainNotValidAfter)
+			event.Put("tls.certificates", certs)
+
 			return conn, nil
 		}), nil
 	}

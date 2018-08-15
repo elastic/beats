@@ -51,6 +51,8 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 *Heartbeat*
 
+- Added support for extra TLS/x509 metadata. {pull}7944[7944]
+
 *Metricbeat*
 
 - Fix golang.heap.gc.cpu_fraction type from long to float in Golang module. {pull}7789[7789]
