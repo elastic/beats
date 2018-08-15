@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 *Filebeat*
 
 - Fixed a memory leak when harvesters are closed. {pull}7820[7820]
+- Fix date format in Mongodb Ingest pipeline. {pull}7974[7974]
 
 *Heartbeat*
 
