@@ -6,38 +6,38 @@
     },
     "elasticsearch": {
         "cluster": {
-            "name": "elasticsearch"
+            "name": "es1"
         },
         "node": {
-            "name": "523zXyT6TRWiqXcQItnkyQ",
+            "name": "Z4hBonPxQVW9qPKEHpwWCg",
             "stats": {
                 "fs": {
                     "summary": {
                         "available": {
-                            "bytes": 47081816064
+                            "bytes": 403626668032
                         },
                         "free": {
-                            "bytes": 52054323200
+                            "bytes": 407551598592
                         },
                         "total": {
-                            "bytes": 250790436864
+                            "bytes": 499963170816
                         }
                     }
                 },
                 "indices": {
                     "docs": {
-                        "count": 231,
-                        "deleted": 56
+                        "count": 1819,
+                        "deleted": 0
                     },
                     "segments": {
-                        "count": 16,
+                        "count": 12,
                         "memory": {
-                            "bytes": 105245
+                            "bytes": 73785
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 444882
+                            "bytes": 3144383
                         }
                     }
                 },
@@ -47,13 +47,13 @@
                             "old": {
                                 "collection": {
                                     "count": 2,
-                                    "ms": 139
+                                    "ms": 83
                                 }
                             },
                             "young": {
                                 "collection": {
-                                    "count": 56,
-                                    "ms": 1288
+                                    "count": 13,
+                                    "ms": 167
                                 }
                             }
                         }
@@ -62,47 +62,217 @@
                         "pools": {
                             "old": {
                                 "max": {
-                                    "bytes": 724828160
+                                    "bytes": 715849728
                                 },
                                 "peak": {
-                                    "bytes": 225180248
+                                    "bytes": 69756112
                                 },
                                 "peak_max": {
-                                    "bytes": 724828160
+                                    "bytes": 715849728
                                 },
                                 "used": {
-                                    "bytes": 225180248
+                                    "bytes": 69756112
                                 }
                             },
                             "survivor": {
                                 "max": {
-                                    "bytes": 34865152
+                                    "bytes": 35782656
                                 },
                                 "peak": {
-                                    "bytes": 34865152
+                                    "bytes": 35782656
                                 },
                                 "peak_max": {
-                                    "bytes": 34865152
+                                    "bytes": 35782656
                                 },
                                 "used": {
-                                    "bytes": 5280456
+                                    "bytes": 14035600
                                 }
                             },
                             "young": {
                                 "max": {
-                                    "bytes": 279183360
+                                    "bytes": 286326784
                                 },
                                 "peak": {
-                                    "bytes": 279183360
+                                    "bytes": 286326784
                                 },
                                 "peak_max": {
-                                    "bytes": 279183360
+                                    "bytes": 286326784
                                 },
                                 "used": {
-                                    "bytes": 188134984
+                                    "bytes": 264787440
                                 }
                             }
                         }
+                    }
+                },
+                "thread_pool": {
+                    "analyze": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "ccr": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "fetch_shard_started": {
+                        "active": 0,
+                        "completed": 10,
+                        "largest": 8,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 8
+                    },
+                    "fetch_shard_store": {
+                        "active": 0,
+                        "completed": 24,
+                        "largest": 12,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 12
+                    },
+                    "flush": {
+                        "active": 0,
+                        "completed": 19,
+                        "largest": 1,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 1
+                    },
+                    "force_merge": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "generic": {
+                        "active": 0,
+                        "completed": 763,
+                        "largest": 6,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 6
+                    },
+                    "get": {
+                        "active": 0,
+                        "completed": 1,
+                        "largest": 1,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 1
+                    },
+                    "listener": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "management": {
+                        "active": 1,
+                        "completed": 402,
+                        "largest": 3,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 3
+                    },
+                    "ml_autodetect": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "ml_datafeed": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "ml_utility": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "refresh": {
+                        "active": 0,
+                        "completed": 1167,
+                        "largest": 4,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 4
+                    },
+                    "rollup_indexing": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "search": {
+                        "active": 0,
+                        "completed": 127,
+                        "largest": 13,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 13
+                    },
+                    "security-token-key": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "snapshot": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "warmer": {
+                        "active": 0,
+                        "completed": 4,
+                        "largest": 4,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 4
+                    },
+                    "watcher": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "write": {
+                        "active": 0,
+                        "completed": 36,
+                        "largest": 8,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 8
                     }
                 }
             }

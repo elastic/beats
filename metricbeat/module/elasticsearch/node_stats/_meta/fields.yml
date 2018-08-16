@@ -156,3 +156,28 @@
           type: long
           format: bytes
           description: >
+
+    - name: thread_pool.*.threads
+      type: object
+      object_type: long
+      description: >
+    - name: thread_pool.*.queue
+      type: object
+      object_type: long
+      description: >
+    - name: thread_pool.*.active
+      type: object
+      object_type: long
+      description: >
+    - name: thread_pool.*.rejected
+      type: object
+      object_type: long
+      description: >
+    - name: thread_pool.*.largest
+      type: object
+      object_type: long
+      description: >
+    - name: thread_pool.*.completed
+      type: object
+      object_type: long
+      description: >

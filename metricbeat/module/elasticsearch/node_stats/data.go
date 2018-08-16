@@ -75,6 +75,29 @@ var (
 				},
 			}),
 		}),
+		"thread_pool": c.Dict("thread_pool", s.Schema{
+			"analyze": c.Dict("analyze", threadPoolSchema),
+			"ccr":     c.Dict("ccr", threadPoolSchema),
+			"fetch_shard_started": c.Dict("fetch_shard_started", threadPoolSchema),
+			"fetch_shard_store":   c.Dict("fetch_shard_store", threadPoolSchema),
+			"flush":               c.Dict("flush", threadPoolSchema),
+			"force_merge":         c.Dict("force_merge", threadPoolSchema),
+			"generic":             c.Dict("generic", threadPoolSchema),
+			"get":                 c.Dict("get", threadPoolSchema),
+			"listener":            c.Dict("listener", threadPoolSchema),
+			"management":          c.Dict("management", threadPoolSchema),
+			"ml_autodetect":       c.Dict("ml_autodetect", threadPoolSchema),
+			"ml_datafeed":         c.Dict("ml_datafeed", threadPoolSchema),
+			"ml_utility":          c.Dict("ml_utility", threadPoolSchema),
+			"refresh":             c.Dict("refresh", threadPoolSchema),
+			"rollup_indexing":     c.Dict("rollup_indexing", threadPoolSchema),
+			"search":              c.Dict("search", threadPoolSchema),
+			"security-token-key":  c.Dict("security-token-key", threadPoolSchema),
+			"snapshot":            c.Dict("snapshot", threadPoolSchema),
+			"warmer":              c.Dict("warmer", threadPoolSchema),
+			"watcher":             c.Dict("watcher", threadPoolSchema),
+			"write":               c.Dict("write", threadPoolSchema),
+		}),
 	}
 
 	poolSchema = s.Schema{
@@ -97,6 +120,15 @@ var (
 			"count": c.Int("collection_count"),
 			"ms":    c.Int("collection_time_in_millis"),
 		},
+	}
+
+	threadPoolSchema = s.Schema{
+		"threads":   c.Int("threads"),
+		"queue":     c.Int("queue"),
+		"active":    c.Int("active"),
+		"rejected":  c.Int("rejected"),
+		"largest":   c.Int("largest"),
+		"completed": c.Int("completed"),
 	}
 )
 

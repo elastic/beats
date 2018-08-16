@@ -4337,6 +4337,60 @@ format: bytes
 
 --
 
+*`elasticsearch.node.stats.thread_pool.*.threads`*::
++
+--
+type: object
+
+
+
+--
+
+*`elasticsearch.node.stats.thread_pool.*.queue`*::
++
+--
+type: object
+
+
+
+--
+
+*`elasticsearch.node.stats.thread_pool.*.active`*::
++
+--
+type: object
+
+
+
+--
+
+*`elasticsearch.node.stats.thread_pool.*.rejected`*::
++
+--
+type: object
+
+
+
+--
+
+*`elasticsearch.node.stats.thread_pool.*.largest`*::
++
+--
+type: object
+
+
+
+--
+
+*`elasticsearch.node.stats.thread_pool.*.completed`*::
++
+--
+type: object
+
+
+
+--
+
 [float]
 == cluster.pending_task fields
 
