@@ -205,7 +205,9 @@ func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error
 	return nil, fmt.Errorf("no node matched id %s", nodeID)
 }
 
-// GetLicense returns license information
+// GetLicense returns license information. Since we don't expect license information
+// to change frequently, the information is cached for 1 minute to avoid
+// hitting Elasticsearch frequently
 func GetLicense(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	// First, check the cache
 	license := licenseCache.get()
