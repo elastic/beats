@@ -42,12 +42,10 @@ func init() {
 func setupMetrics(name string) error {
 	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
 	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
-	monitoring.NewFunc(beatMetrics, "fd", reportFDUsage, monitoring.Report)
 
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
-	if runtime.GOOS != "windows" {
-		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
-	}
+
+	setupPlatformSpecificMetrics()
 
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
@@ -59,6 +57,16 @@ func setupMetrics(name string) error {
 	err := beatProcessStats.Init()
 
 	return err
+}
+
+func setupPlatformSpecificMetrics() {
+	if runtime.GOOS != "windows" {
+		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
+	}
+
+	if runtime.GOOS == "linux" {
+		monitoring.NewFunc(beatMetrics, "fd", reportFDUsage, monitoring.Report)
+	}
 }
 
 func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
@@ -226,8 +234,6 @@ func reportFDUsage(_ monitoring.Mode, V monitoring.Visitor) {
 func getFDUsage() (open, hardLimit, softLimit uint64, err error) {
 	state, err := getBeatProcessState()
 	if err != nil {
-		// TODO copy
-		logp.Err("baj van")
 		return 0, 0, 0, err
 	}
 
