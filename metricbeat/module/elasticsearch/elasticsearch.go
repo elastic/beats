@@ -241,14 +241,14 @@ func GetClusterState(http *helper.HTTP, resetURI string) (common.MapStr, error) 
 	return clusterState, err
 }
 
-// GetStackStats returns stack stats (usage) information
-func GetStackStats(http *helper.HTTP, resetURI string) (common.MapStr, error) {
+// GetStackUsage returns stack usage information
+func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	content, err := fetchPath(http, resetURI, "_xpack/usage")
 	if err != nil {
 		return nil, err
 	}
 
-	var stackStats map[string]interface{}
-	err = json.Unmarshal(content, &stackStats)
-	return stackStats, err
+	var stackUsage map[string]interface{}
+	err = json.Unmarshal(content, &stackUsage)
+	return stackUsage, err
 }

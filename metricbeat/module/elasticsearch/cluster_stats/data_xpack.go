@@ -325,23 +325,29 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	}
 	clusterState.Put("nodes_hash", nodesHash)
 
-	stackStats, err := elasticsearch.GetStackStats(m.HTTP, m.HTTP.GetURI())
+	usage, err := elasticsearch.GetStackUsage(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
 		return err
 	}
+
+	clusterNeedsTLS, err := clusterNeedsTLSEnabled(license, usage)
+	if err != nil {
+		return err
+	}
+	license.Put("cluster_needs_tls", clusterNeedsTLS) // This powers a cluster alert for enabling TLS on the ES transport protocol
 
 	isAPMFound, err := apmIndicesExist(clusterState)
 	if err != nil {
 		return err
 	}
-	stackStats.Put("apm.found", isAPMFound)
 	delete(clusterState, "routing_table") // We don't want to index the routing table in monitoring indices
 
-	clusterNeedsTLS, err := clusterNeedsTLSEnabled(license, stackStats)
-	if err != nil {
-		return err
+	stackStats := map[string]interface{}{
+		"xpack": usage,
+		"apm": map[string]interface{}{
+			"found": isAPMFound,
+		},
 	}
-	license.Put("cluster_needs_tls", clusterNeedsTLS) // This powers a cluster alert for enabling TLS on the ES transport protocol
 
 	event := mb.Event{}
 	event.RootFields = common.MapStr{
