@@ -38,7 +38,7 @@ func TestScanner(t *testing.T) {
 	}
 
 	t.Run("non-recursive", func(t *testing.T) {
-		reader, err := NewFileSystemScanner(config)
+		reader, err := NewFileSystemScanner(config, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -62,7 +62,7 @@ func TestScanner(t *testing.T) {
 		c := config
 		c.Recursive = true
 
-		reader, err := NewFileSystemScanner(c)
+		reader, err := NewFileSystemScanner(c, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -94,7 +94,7 @@ func TestScanner(t *testing.T) {
 		c := config
 		c.ScanRateBytesPerSec = 1024 * 5
 
-		reader, err := NewFileSystemScanner(c)
+		reader, err := NewFileSystemScanner(c, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
