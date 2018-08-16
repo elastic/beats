@@ -258,7 +258,7 @@ func apmIndicesExist(clusterState common.MapStr) (bool, error) {
 		return false, fmt.Errorf("Routing table indices is not a map")
 	}
 
-	for name, _ := range indices {
+	for name := range indices {
 		if strings.HasPrefix(name, "apm-") {
 			return true, nil
 		}
