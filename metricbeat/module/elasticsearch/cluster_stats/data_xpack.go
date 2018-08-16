@@ -162,7 +162,7 @@ func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
 	// TLS does not need to be enabled if license type is something other than trial
 	value, err := license.GetValue("license.type")
 	if err != nil {
-		return false, err
+		return false, elastic.MakeErrorForMissingField("license.type", elastic.Elasticsearch)
 	}
 
 	licenseType, ok := value.(string)
@@ -177,7 +177,7 @@ func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
 	// TLS does not need to be enabled if security is not enabled
 	value, err = stackStats.GetValue("security.enabled")
 	if err != nil {
-		return false, err
+		return false, elastic.MakeErrorForMissingField("security.enabled", elastic.Elasticsearch)
 	}
 
 	isSecurityEnabled, ok := value.(bool)
@@ -192,7 +192,7 @@ func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
 	// TLS does not need to be enabled if TLS is already enabled on the transport protocol
 	value, err = stackStats.GetValue("security.ssl.transport.enabled")
 	if err != nil {
-		return false, err
+		return false, elastic.MakeErrorForMissingField("security.ssl.transport.enabled", elastic.Elasticsearch)
 	}
 
 	isTLSAlreadyEnabled, ok := value.(bool)
@@ -207,7 +207,7 @@ func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
 func computeNodesHash(clusterState common.MapStr) (int32, error) {
 	value, err := clusterState.GetValue("nodes")
 	if err != nil {
-		return 0, err
+		return 0, elastic.MakeErrorForMissingField("nodes", elastic.Elasticsearch)
 	}
 
 	nodes, ok := value.(map[string]interface{})
@@ -250,7 +250,7 @@ func hash(s string) int32 {
 func apmIndicesExist(clusterState common.MapStr) (bool, error) {
 	value, err := clusterState.GetValue("routing_table.indices")
 	if err != nil {
-		return false, err
+		return false, elastic.MakeErrorForMissingField("routing_table.indices", elastic.Elasticsearch)
 	}
 
 	indices, ok := value.(map[string]interface{})
