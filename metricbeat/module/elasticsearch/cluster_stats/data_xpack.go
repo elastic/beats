@@ -29,123 +29,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 
 	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/mb"
-)
-
-var (
-	clusterStatsSchema = s.Schema{
-		"cluster_uuid": c.Str("cluster_uuid"),
-		"timestamp":    c.Int("timestamp"),
-		"status":       c.Str("status"),
-		"indices": c.Dict("indices", s.Schema{
-			"count": c.Int("count"),
-			"shards": c.Dict("shards", s.Schema{
-				"total":       c.Int("total"),
-				"primaries":   c.Int("primaries"),
-				"replication": c.Int("replication"),
-				"index": c.Dict("index", s.Schema{
-					"shards": c.Dict("shards", s.Schema{
-						"min": c.Int("min"),
-						"max": c.Int("max"),
-						"avg": c.Int("avg"),
-					}),
-					"primaries": c.Dict("primaries", s.Schema{
-						"min": c.Int("min"),
-						"max": c.Int("max"),
-						"avg": c.Int("avg"),
-					}),
-					"replication": c.Dict("replication", s.Schema{
-						"min": c.Int("min"),
-						"max": c.Int("max"),
-						"avg": c.Int("avg"),
-					}),
-				}),
-			}),
-			"docs": c.Dict("docs", s.Schema{
-				"count":   c.Int("count"),
-				"deleted": c.Int("deleted"),
-			}),
-			"store": c.Dict("store", s.Schema{
-				"size_in_bytes": c.Int("size_in_bytes"),
-			}),
-			"fielddata": c.Dict("fielddata", s.Schema{
-				"memory_size_in_bytes": c.Int("memory_size_in_bytes"),
-				"evictions":            c.Int("evictions"),
-			}),
-			"query_cache": c.Dict("query_cache", s.Schema{
-				"memory_size_in_bytes": c.Int("memory_size_in_bytes"),
-				"total_count":          c.Int("total_count"),
-				"hit_count":            c.Int("hit_count"),
-				"miss_count":           c.Int("miss_count"),
-				"cache_size":           c.Int("cache_size"),
-				"cache_count":          c.Int("cache_count"),
-				"evictions":            c.Int("evictions"),
-			}),
-			"completion": c.Dict("completion", s.Schema{
-				"size_in_bytes": c.Int("size_in_bytes"),
-			}),
-			"segments": c.Dict("segments", s.Schema{
-				"count":                         c.Int("count"),
-				"memory_in_bytes":               c.Int("memory_in_bytes"),
-				"terms_memory_in_bytes":         c.Int("terms_memory_in_bytes"),
-				"stored_fields_memory_in_bytes": c.Int("stored_fields_memory_in_bytes"),
-				"term_vectors_memory_in_bytes":  c.Int("term_vectors_memory_in_bytes"),
-				"norms_memory_in_bytes":         c.Int("norms_memory_in_bytes"),
-				"points_memory_in_bytes":        c.Int("points_memory_in_bytes"),
-				"doc_values_memory_in_bytes":    c.Int("doc_values_memory_in_bytes"),
-
-				"index_writer_memory_in_bytes":  c.Int("index_writer_memory_in_bytes"),
-				"version_map_memory_in_bytes":   c.Int("version_map_memory_in_bytes"),
-				"fixed_bit_set_memory_in_bytes": c.Int("fixed_bit_set_memory_in_bytes"),
-				"max_unsafe_auto_id_timestamp":  c.Int("max_unsafe_auto_id_timestamp"),
-			}),
-		}),
-		"nodes": c.Dict("nodes", s.Schema{
-			"count": c.Dict("count", s.Schema{
-				"total":             c.Int("total"),
-				"data":              c.Int("data"),
-				"coordinating_only": c.Int("coordinating_only"),
-				"master":            c.Int("master"),
-				"ingest":            c.Int("ingest"),
-			}),
-			"os": c.Dict("os", s.Schema{
-				"available_processors": c.Int("available_processors"),
-				"allocated_processors": c.Int("allocated_processors"),
-				"mem": c.Dict("mem", s.Schema{
-					"total_in_bytes": c.Int("total_in_bytes"),
-					"free_in_bytes":  c.Int("free_in_bytes"),
-					"used_in_bytes":  c.Int("used_in_bytes"),
-					"free_percent":   c.Int("free_percent"),
-					"used_percent":   c.Int("used_percent"),
-				}),
-			}),
-			"process": c.Dict("process", s.Schema{
-				"cpu": c.Dict("cpu", s.Schema{
-					"percent": c.Int("percent"),
-				}),
-				"open_file_descriptors": c.Dict("open_file_descriptors", s.Schema{
-					"min": c.Int("min"),
-					"max": c.Int("max"),
-					"avg": c.Int("avg"),
-				}),
-			}),
-			"jvm": c.Dict("jvm", s.Schema{
-				"max_uptime_in_millis": c.Int("max_uptime_in_millis"),
-				"mem": c.Dict("mem", s.Schema{
-					"heap_used_in_bytes": c.Int("heap_used_in_bytes"),
-					"heap_max_in_bytes":  c.Int("heap_max_in_bytes"),
-				}),
-				"threads": c.Int("threads"),
-			}),
-			"fs": c.Dict("fs", s.Schema{
-				"total_in_bytes":     c.Int("total_in_bytes"),
-				"free_in_bytes":      c.Int("free_in_bytes"),
-				"available_in_bytes": c.Int("available_in_bytes"),
-			}),
-		}),
-	}
 )
 
 func passthruField(fieldPath string, sourceData, targetData common.MapStr) error {
@@ -274,30 +158,15 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return err
 	}
 
-	clusterStats, err := clusterStatsSchema.Apply(data)
+	clusterStats := common.MapStr(data)
+
+	value, err := clusterStats.GetValue("cluster_name")
 	if err != nil {
-		return err
-	}
-
-	dataMS := common.MapStr(data)
-
-	passthruFields := []string{
-		"indices.segments.file_sizes", // object with dynamic keys
-		"nodes.versions",              // array of strings
-		"nodes.os.names",              // array of objects
-		"nodes.jvm.versions",          // array of objects
-		"nodes.plugins",               // array of objects
-		"nodes.network_types",         // object with dynamic keys
-	}
-	for _, fieldPath := range passthruFields {
-		if err = passthruField(fieldPath, dataMS, clusterStats); err != nil {
-			return err
-		}
-	}
-
-	clusterName, ok := data["cluster_name"].(string)
-	if !ok {
 		return elastic.MakeErrorForMissingField("cluster_name", elastic.Elasticsearch)
+	}
+	clusterName, ok := value.(string)
+	if !ok {
+		return fmt.Errorf("cluster name is not a string")
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HTTP.GetURI())
@@ -315,7 +184,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return err
 	}
 
-	if err = passthruField("status", dataMS, clusterState); err != nil {
+	if err = passthruField("status", clusterStats, clusterState); err != nil {
 		return err
 	}
 
