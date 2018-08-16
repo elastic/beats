@@ -31,37 +31,6 @@ import (
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id
 var clusterIDCache = map[string]string{}
 
-// Global cache for license information. Assumption is that license information changes infrequently
-type _licenseCache struct {
-	sync.RWMutex
-	license  common.MapStr
-	cachedOn time.Time
-	ttl      time.Duration
-}
-
-var licenseCache = &_licenseCache{}
-
-func (c *_licenseCache) get() common.MapStr {
-	c.Lock()
-	defer c.Unlock()
-
-	if time.Since(c.cachedOn) > c.ttl {
-		// We are past the TTL, so invalidate cache
-		c.license = nil
-	}
-
-	return c.license
-}
-
-func (c *_licenseCache) set(license common.MapStr, ttl time.Duration) {
-	c.Lock()
-	defer c.Unlock()
-
-	c.license = license
-	c.ttl = ttl
-	c.cachedOn = time.Now()
-}
-
 // Info construct contains the data from the Elasticsearch / endpoint
 type Info struct {
 	ClusterName string `json:"cluster_name"`
@@ -253,4 +222,35 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	var stackUsage map[string]interface{}
 	err = json.Unmarshal(content, &stackUsage)
 	return stackUsage, err
+}
+
+// Global cache for license information. Assumption is that license information changes infrequently
+var licenseCache = &_licenseCache{}
+
+type _licenseCache struct {
+	sync.RWMutex
+	license  common.MapStr
+	cachedOn time.Time
+	ttl      time.Duration
+}
+
+func (c *_licenseCache) get() common.MapStr {
+	c.Lock()
+	defer c.Unlock()
+
+	if time.Since(c.cachedOn) > c.ttl {
+		// We are past the TTL, so invalidate cache
+		c.license = nil
+	}
+
+	return c.license
+}
+
+func (c *_licenseCache) set(license common.MapStr, ttl time.Duration) {
+	c.Lock()
+	defer c.Unlock()
+
+	c.license = license
+	c.ttl = ttl
+	c.cachedOn = time.Now()
 }
