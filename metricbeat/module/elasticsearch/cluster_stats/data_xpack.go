@@ -167,7 +167,7 @@ func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
 
 	licenseType, ok := value.(string)
 	if !ok {
-		return false, fmt.Errorf("License type is not a string")
+		return false, fmt.Errorf("license type is not a string")
 	}
 
 	if licenseType != "trial" {
@@ -182,7 +182,7 @@ func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
 
 	isSecurityEnabled, ok := value.(bool)
 	if !ok {
-		return false, fmt.Errorf("Security enabled flag is not a boolean")
+		return false, fmt.Errorf("security enabled flag is not a boolean")
 	}
 
 	if !isSecurityEnabled {
@@ -197,7 +197,7 @@ func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
 
 	isTLSAlreadyEnabled, ok := value.(bool)
 	if !ok {
-		return false, fmt.Errorf("Transport protocol SSL enabled flag is not a boolean")
+		return false, fmt.Errorf("transport protocol SSL enabled flag is not a boolean")
 	}
 
 	return !isTLSAlreadyEnabled, nil
@@ -212,24 +212,24 @@ func computeNodesHash(clusterState common.MapStr) (int32, error) {
 
 	nodes, ok := value.(map[string]interface{})
 	if !ok {
-		return 0, fmt.Errorf("Nodes is not a map")
+		return 0, fmt.Errorf("nodes is not a map")
 	}
 
 	var nodeEphemeralIDs []string
 	for _, value := range nodes {
 		nodeData, ok := value.(map[string]interface{})
 		if !ok {
-			return 0, fmt.Errorf("Node data is not a map")
+			return 0, fmt.Errorf("node data is not a map")
 		}
 
 		value, ok := nodeData["ephemeral_id"]
 		if !ok {
-			return 0, fmt.Errorf("Node data does not contain ephemeral ID")
+			return 0, fmt.Errorf("node data does not contain ephemeral ID")
 		}
 
 		ephemeralID, ok := value.(string)
 		if !ok {
-			return 0, fmt.Errorf("Node ephemeral ID is not a string")
+			return 0, fmt.Errorf("node ephemeral ID is not a string")
 		}
 
 		nodeEphemeralIDs = append(nodeEphemeralIDs, ephemeralID)
@@ -255,7 +255,7 @@ func apmIndicesExist(clusterState common.MapStr) (bool, error) {
 
 	indices, ok := value.(map[string]interface{})
 	if !ok {
-		return false, fmt.Errorf("Routing table indices is not a map")
+		return false, fmt.Errorf("routing table indices is not a map")
 	}
 
 	for name := range indices {
