@@ -247,6 +247,26 @@ func hash(s string) int32 {
 	return int32(h.Sum32()) // This cast is needed because the ES mapping is for a 32-bit *signed* integer
 }
 
+func apmIndicesExist(clusterState common.MapStr) (bool, error) {
+	value, err := clusterState.GetValue("routing_table.indices")
+	if err != nil {
+		return false, err
+	}
+
+	indices, ok := value.(map[string]interface{})
+	if !ok {
+		return false, fmt.Errorf("Routing table indices is not a map")
+	}
+
+	for name, _ := range indices {
+		if strings.HasPrefix(name, "apm-") {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
@@ -310,7 +330,12 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return err
 	}
 
-	// TODO: Inject `apm.found` field under stackStats object
+	isAPMFound, err := apmIndicesExist(clusterState)
+	if err != nil {
+		return err
+	}
+	stackStats.Put("apm.found", isAPMFound)
+	delete(clusterState, "routing_table") // We don't want to index the routing table in monitoring indices
 
 	clusterNeedsTLS, err := clusterNeedsTLSEnabled(license, stackStats)
 	if err != nil {

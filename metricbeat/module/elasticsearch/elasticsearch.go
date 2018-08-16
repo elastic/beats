@@ -231,7 +231,7 @@ func GetLicense(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 
 // GetClusterState returns cluster state information
 func GetClusterState(http *helper.HTTP, resetURI string) (common.MapStr, error) {
-	content, err := fetchPath(http, resetURI, "_cluster/state/version,master_node,nodes")
+	content, err := fetchPath(http, resetURI, "_cluster/state/version,master_node,nodes,routing_table")
 	if err != nil {
 		return nil, err
 	}
