@@ -42,17 +42,20 @@ type scanner struct {
 	done   <-chan struct{}
 	eventC chan Event
 
-	log    *logp.Logger
-	config Config
+	log      *logp.Logger
+	config   Config
+	newPaths map[string]struct{}
 }
 
 // NewFileSystemScanner creates a new EventProducer instance that scans the
-// configured file paths.
-func NewFileSystemScanner(c Config) (EventProducer, error) {
+// configured file paths. Files and directories in new paths are recorded with
+// the action `found`.
+func NewFileSystemScanner(c Config, newPathsInConfig map[string]struct{}) (EventProducer, error) {
 	return &scanner{
-		log:    logp.NewLogger(moduleName).With("scanner_id", atomic.AddUint32(&scannerID, 1)),
-		config: c,
-		eventC: make(chan Event, 1),
+		log:      logp.NewLogger(moduleName).With("scanner_id", atomic.AddUint32(&scannerID, 1)),
+		config:   c,
+		newPaths: newPathsInConfig,
+		eventC:   make(chan Event, 1),
 	}, nil
 }
 
@@ -83,7 +86,7 @@ func (s *scanner) Start(done <-chan struct{}) (<-chan Event, error) {
 
 // scan iterates over the configured paths and generates events for each file.
 func (s *scanner) scan() {
-	s.log.Debugw("File system scanner is starting", "file_path", s.config.Paths)
+	s.log.Debugw("File system scanner is starting", "file_path", s.config.Paths, "new_path", s.newPaths)
 	defer s.log.Debug("File system scanner is stopping")
 	defer close(s.eventC)
 	startTime := time.Now()
@@ -96,7 +99,13 @@ func (s *scanner) scan() {
 			continue
 		}
 
-		if err = s.walkDir(evalPath); err != nil {
+		// If action is None it will be filled later in the Metricset
+		action := None
+		if _, exists := s.newPaths[evalPath]; exists {
+			action = InitialScan
+		}
+
+		if err = s.walkDir(evalPath, action); err != nil {
 			s.log.Warnw("Failed to scan", "file_path", evalPath, "error", err)
 		}
 	}
@@ -113,7 +122,7 @@ func (s *scanner) scan() {
 	)
 }
 
-func (s *scanner) walkDir(dir string) error {
+func (s *scanner) walkDir(dir string, action Action) error {
 	errDone := errors.New("done")
 	startTime := time.Now()
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
@@ -133,7 +142,7 @@ func (s *scanner) walkDir(dir string) error {
 		}
 		defer func() { startTime = time.Now() }()
 
-		event := s.newScanEvent(path, info, err)
+		event := s.newScanEvent(path, info, err, action)
 		event.rtt = time.Since(startTime)
 		select {
 		case s.eventC <- event:
@@ -192,8 +201,8 @@ func (s *scanner) throttle(fileSize uint64) {
 	}
 }
 
-func (s *scanner) newScanEvent(path string, info os.FileInfo, err error) Event {
-	event := NewEventFromFileInfo(path, info, err, None, SourceScan,
+func (s *scanner) newScanEvent(path string, info os.FileInfo, err error, action Action) Event {
+	event := NewEventFromFileInfo(path, info, err, action, SourceScan,
 		s.config.MaxFileSizeBytes, s.config.HashTypes)
 
 	// Update metrics.
