@@ -23,18 +23,6 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func trySyncPath(path string) {
-	// best-effort fsync on path (directory). The fsync is required by some
-	// filesystems, so to update the parents directory metadata to actually
-	// contain the new file being rotated in.
-	f, err := os.Open(path)
-	if err != nil {
-		return // ignore error, sync on dir must not be necessarily supported by the FS
-	}
-	defer f.Close()
-	syncFile(f)
-}
-
 func syncFile(f *os.File) error {
 	for {
 		_, err := unix.FcntlInt(f.Fd(), unix.F_FULLFSYNC, 0)
