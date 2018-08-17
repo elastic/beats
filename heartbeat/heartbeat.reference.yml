@@ -1042,6 +1042,13 @@ output.elasticsearch:
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
 
+# A list of fields to be added to the template and Kibana index pattern. Also
+# specify setup.template.overwrite: true to overwrite the existing template.
+# This setting is experimental.
+#setup.template.append_fields:
+#- name: field_name
+#  type: field_type
+
 # Enable json template loading. If this is enabled, the fields.yml is ignored.
 #setup.template.json.enabled: false
 
