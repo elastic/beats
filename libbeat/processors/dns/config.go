@@ -120,6 +120,7 @@ func (c *Config) Validate() error {
 	return nil
 }
 
+// Validate validates the data contained in the CacheConfig.
 func (c *CacheConfig) Validate() error {
 	if c.FailureCache.TTL <= 0 {
 		return errors.Errorf("failure_cache.ttl must be > 0")
