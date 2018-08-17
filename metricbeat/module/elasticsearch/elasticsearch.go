@@ -21,7 +21,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"sync"
+	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 )
 
@@ -32,6 +35,9 @@ var clusterIDCache = map[string]string{}
 type Info struct {
 	ClusterName string `json:"cluster_name"`
 	ClusterID   string `json:"cluster_uuid"`
+	Version     struct {
+		Number string `json:"number"`
+	} `json:"version"`
 }
 
 // NodeInfo struct cotains data about the node
@@ -166,4 +172,85 @@ func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error
 		}
 	}
 	return nil, fmt.Errorf("no node matched id %s", nodeID)
+}
+
+// GetLicense returns license information. Since we don't expect license information
+// to change frequently, the information is cached for 1 minute to avoid
+// hitting Elasticsearch frequently
+func GetLicense(http *helper.HTTP, resetURI string) (common.MapStr, error) {
+	// First, check the cache
+	license := licenseCache.get()
+
+	// Not cached, fetch license from Elasticsearch
+	if license == nil {
+		content, err := fetchPath(http, resetURI, "_xpack/license")
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(content, &license)
+		if err != nil {
+			return nil, err
+		}
+
+		// Cache license for a minute
+		licenseCache.set(license, time.Minute)
+	}
+
+	return licenseCache.get(), nil
+}
+
+// GetClusterState returns cluster state information
+func GetClusterState(http *helper.HTTP, resetURI string) (common.MapStr, error) {
+	content, err := fetchPath(http, resetURI, "_cluster/state/version,master_node,nodes,routing_table")
+	if err != nil {
+		return nil, err
+	}
+
+	var clusterState map[string]interface{}
+	err = json.Unmarshal(content, &clusterState)
+	return clusterState, err
+}
+
+// GetStackUsage returns stack usage information
+func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
+	content, err := fetchPath(http, resetURI, "_xpack/usage")
+	if err != nil {
+		return nil, err
+	}
+
+	var stackUsage map[string]interface{}
+	err = json.Unmarshal(content, &stackUsage)
+	return stackUsage, err
+}
+
+// Global cache for license information. Assumption is that license information changes infrequently
+var licenseCache = &_licenseCache{}
+
+type _licenseCache struct {
+	sync.RWMutex
+	license  common.MapStr
+	cachedOn time.Time
+	ttl      time.Duration
+}
+
+func (c *_licenseCache) get() common.MapStr {
+	c.Lock()
+	defer c.Unlock()
+
+	if time.Since(c.cachedOn) > c.ttl {
+		// We are past the TTL, so invalidate cache
+		c.license = nil
+	}
+
+	return c.license
+}
+
+func (c *_licenseCache) set(license common.MapStr, ttl time.Duration) {
+	c.Lock()
+	defer c.Unlock()
+
+	c.license = license
+	c.ttl = ttl
+	c.cachedOn = time.Now()
 }
