@@ -21,6 +21,7 @@ package replstatus
 
 import (
 	"testing"
+        "time"
 
 	"github.com/stretchr/testify/assert"
 	mgo "gopkg.in/mgo.v2"
@@ -35,7 +36,7 @@ import (
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "mongodb")
 
-	err := initiateReplicaSet()
+	err := initiateReplicaSet(t)
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
@@ -89,7 +90,7 @@ func getConfig() map[string]interface{} {
 	}
 }
 
-func initiateReplicaSet() error {
+func initiateReplicaSet(t *testing.T) error {
 	url := getConfig()["hosts"].([]string)[0]
 
 	dialInfo, err := mgo.ParseURL(url)
@@ -111,6 +112,17 @@ func initiateReplicaSet() error {
 	if err := db.Run(bson.M{"replSetInitiate": config}, &initiateResult); err != nil {
 		if err.Error() != "already initialized" {
 			return err
+		}
+	}
+
+	var status map[string]interface{}
+	for {
+		db.Run(bson.M{"replSetGetStatus": 1}, &status)
+		myState, ok := status["myState"].(int)
+		t.Logf("Mongodb state is %d", myState)
+		if ok && myState == 1 {
+	                time.Sleep(5 * time.Second)   // hack, wait more for replica set to become stable
+			break
 		}
 	}
 
