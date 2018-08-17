@@ -184,11 +184,11 @@ type nodesStruct struct {
 }
 
 func pipelineMetricsMapping(node map[string]interface{}, metricSetFields common.MapStr, r mb.ReporterV2) {
-	value, ok := node["ingest"].(map[string]interface{})["pipelines"]
+	pipelines, ok := node["ingest"].(map[string]interface{})["pipelines"].(map[string]interface{})
 	if !ok {
 		elastic.ReportErrorForMissingField("ingest.pipelines", elastic.Elasticsearch, r)
 	}
-	pipelines := value.(map[string]interface{})
+
 	for pipelineID, value := range pipelines {
 		pipelineMetrics, ok := value.(map[string]interface{})
 		if !ok {
