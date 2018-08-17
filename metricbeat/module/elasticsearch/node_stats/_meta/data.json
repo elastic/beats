@@ -38,10 +38,10 @@
                 "fs": {
                     "summary": {
                         "available": {
-                            "bytes": 402744455168
+                            "bytes": 402721628160
                         },
                         "free": {
-                            "bytes": 406669385728
+                            "bytes": 406646558720
                         },
                         "total": {
                             "bytes": 499963170816
@@ -50,18 +50,18 @@
                 },
                 "indices": {
                     "docs": {
-                        "count": 6968,
-                        "deleted": 5440
+                        "count": 2151,
+                        "deleted": 260
                     },
                     "segments": {
-                        "count": 31,
+                        "count": 30,
                         "memory": {
-                            "bytes": 302100
+                            "bytes": 190369
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 6954319
+                            "bytes": 4219518
                         }
                     }
                 },
@@ -71,13 +71,13 @@
                             "count": 0,
                             "current": 0,
                             "failed": 0,
-                            "time_in_millis": 0
+                            "ms": 0
                         },
                         "xpack_monitoring_6": {
                             "count": 0,
                             "current": 0,
                             "failed": 0,
-                            "time_in_millis": 0
+                            "ms": 0
                         }
                     },
                     "total": {
@@ -98,8 +98,8 @@
                             },
                             "young": {
                                 "collection": {
-                                    "count": 152,
-                                    "ms": 718
+                                    "count": 220,
+                                    "ms": 1022
                                 }
                             }
                         }
@@ -111,13 +111,13 @@
                                     "bytes": 715849728
                                 },
                                 "peak": {
-                                    "bytes": 104400536
+                                    "bytes": 125262208
                                 },
                                 "peak_max": {
                                     "bytes": 715849728
                                 },
                                 "used": {
-                                    "bytes": 104400536
+                                    "bytes": 125262208
                                 }
                             },
                             "survivor": {
@@ -131,7 +131,7 @@
                                     "bytes": 35782656
                                 },
                                 "used": {
-                                    "bytes": 5284224
+                                    "bytes": 11079728
                                 }
                             },
                             "young": {
@@ -145,7 +145,7 @@
                                     "bytes": 286326784
                                 },
                                 "used": {
-                                    "bytes": 36951712
+                                    "bytes": 121002192
                                 }
                             }
                         }
@@ -186,7 +186,7 @@
                     },
                     "flush": {
                         "active": 0,
-                        "completed": 680,
+                        "completed": 999,
                         "largest": 4,
                         "queue": 0,
                         "rejected": 0,
@@ -202,7 +202,7 @@
                     },
                     "generic": {
                         "active": 0,
-                        "completed": 9106,
+                        "completed": 13449,
                         "largest": 5,
                         "queue": 0,
                         "rejected": 0,
@@ -210,7 +210,7 @@
                     },
                     "get": {
                         "active": 0,
-                        "completed": 12,
+                        "completed": 15,
                         "largest": 8,
                         "queue": 0,
                         "rejected": 0,
@@ -218,7 +218,7 @@
                     },
                     "listener": {
                         "active": 0,
-                        "completed": 4,
+                        "completed": 5,
                         "largest": 4,
                         "queue": 0,
                         "rejected": 0,
@@ -226,7 +226,7 @@
                     },
                     "management": {
                         "active": 1,
-                        "completed": 4913,
+                        "completed": 7173,
                         "largest": 3,
                         "queue": 0,
                         "rejected": 0,
@@ -258,7 +258,7 @@
                     },
                     "refresh": {
                         "active": 0,
-                        "completed": 30370,
+                        "completed": 44717,
                         "largest": 4,
                         "queue": 0,
                         "rejected": 0,
@@ -274,7 +274,7 @@
                     },
                     "search": {
                         "active": 0,
-                        "completed": 7568,
+                        "completed": 11046,
                         "largest": 13,
                         "queue": 0,
                         "rejected": 0,
@@ -314,7 +314,7 @@
                     },
                     "write": {
                         "active": 0,
-                        "completed": 1373,
+                        "completed": 2013,
                         "largest": 8,
                         "queue": 0,
                         "rejected": 0,
