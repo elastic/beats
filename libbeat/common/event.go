@@ -158,7 +158,7 @@ func normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
 
 	switch value.(type) {
 	case encoding.TextMarshaler:
-		if reflect.ValueOf(value).IsNil() {
+		if reflect.ValueOf(value).Kind() == reflect.Ptr && reflect.ValueOf(value).IsNil() {
 			return nil, nil
 		}
 		text, err := value.(encoding.TextMarshaler).MarshalText()
