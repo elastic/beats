@@ -31,8 +31,7 @@ var debugf = logp.MakeDebug("mongodb.replstatus")
 
 func init() {
 	mb.Registry.MustAddMetricSet("mongodb", "replstatus", New,
-		mb.WithHostParser(mongodb.ParseURL),
-		mb.DefaultMetricSet())
+		mb.WithHostParser(mongodb.ParseURL))
 }
 
 // MetricSet type defines all fields of the MetricSet
