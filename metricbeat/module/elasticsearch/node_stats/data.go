@@ -235,7 +235,7 @@ func adaptiveSelectionMapping(nodeName string, node map[string]interface{}, metr
 		r.Error(err)
 		return
 	}
-	metricSetFields.Put("adpative_selection", fields)
+	metricSetFields.Put("adaptive_selection", fields)
 }
 
 func eventsMapping(r mb.ReporterV2, content []byte) error {

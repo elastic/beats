@@ -11,20 +11,20 @@
         "node": {
             "name": "Z4hBonPxQVW9qPKEHpwWCg",
             "stats": {
-                "adpative_selection": {
+                "adaptive_selection": {
                     "outgoing_searches": 0,
                     "queue_size": {
                         "avg": 0
                     },
-                    "rank": "0.3",
+                    "rank": "0.1",
                     "response_time": {
                         "avg": {
-                            "ns": 337808
+                            "ns": 100227
                         }
                     },
                     "service_time": {
                         "avg": {
-                            "ns": 143508
+                            "ns": 79265
                         }
                     }
                 },
@@ -55,10 +55,10 @@
                 "fs": {
                     "summary": {
                         "available": {
-                            "bytes": 402729295872
+                            "bytes": 402727653376
                         },
                         "free": {
-                            "bytes": 406654226432
+                            "bytes": 406652583936
                         },
                         "total": {
                             "bytes": 499963170816
@@ -67,18 +67,18 @@
                 },
                 "indices": {
                     "docs": {
-                        "count": 2015,
-                        "deleted": 60
+                        "count": 2438,
+                        "deleted": 560
                     },
                     "segments": {
-                        "count": 32,
+                        "count": 27,
                         "memory": {
-                            "bytes": 180008
+                            "bytes": 181414
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 4069230
+                            "bytes": 4344617
                         }
                     }
                 },
@@ -115,8 +115,8 @@
                             },
                             "young": {
                                 "collection": {
-                                    "count": 273,
-                                    "ms": 1234
+                                    "count": 284,
+                                    "ms": 1270
                                 }
                             }
                         }
@@ -128,13 +128,13 @@
                                     "bytes": 715849728
                                 },
                                 "peak": {
-                                    "bytes": 140384456
+                                    "bytes": 143661128
                                 },
                                 "peak_max": {
                                     "bytes": 715849728
                                 },
                                 "used": {
-                                    "bytes": 140384456
+                                    "bytes": 143661128
                                 }
                             },
                             "survivor": {
@@ -148,7 +148,7 @@
                                     "bytes": 35782656
                                 },
                                 "used": {
-                                    "bytes": 6579472
+                                    "bytes": 7688192
                                 }
                             },
                             "young": {
@@ -162,7 +162,7 @@
                                     "bytes": 286326784
                                 },
                                 "used": {
-                                    "bytes": 182093296
+                                    "bytes": 23802824
                                 }
                             }
                         }
@@ -203,7 +203,7 @@
                     },
                     "flush": {
                         "active": 0,
-                        "completed": 1256,
+                        "completed": 1305,
                         "largest": 4,
                         "queue": 0,
                         "rejected": 0,
@@ -219,7 +219,7 @@
                     },
                     "generic": {
                         "active": 0,
-                        "completed": 16902,
+                        "completed": 17572,
                         "largest": 5,
                         "queue": 0,
                         "rejected": 0,
@@ -243,7 +243,7 @@
                     },
                     "management": {
                         "active": 1,
-                        "completed": 9006,
+                        "completed": 9438,
                         "largest": 3,
                         "queue": 0,
                         "rejected": 0,
@@ -275,7 +275,7 @@
                     },
                     "refresh": {
                         "active": 0,
-                        "completed": 56214,
+                        "completed": 58475,
                         "largest": 4,
                         "queue": 0,
                         "rejected": 0,
@@ -291,7 +291,7 @@
                     },
                     "search": {
                         "active": 0,
-                        "completed": 13882,
+                        "completed": 14480,
                         "largest": 13,
                         "queue": 0,
                         "rejected": 0,
@@ -331,7 +331,7 @@
                     },
                     "write": {
                         "active": 0,
-                        "completed": 2525,
+                        "completed": 2623,
                         "largest": 8,
                         "queue": 0,
                         "rejected": 0,
