@@ -6,7 +6,7 @@
     },
     "elasticsearch": {
         "cluster": {
-            "name": "es1"
+            "name": "elasticsearch"
         },
         "node": {
             "name": "Z4hBonPxQVW9qPKEHpwWCg",
@@ -14,10 +14,10 @@
                 "fs": {
                     "summary": {
                         "available": {
-                            "bytes": 403626668032
+                            "bytes": 402861912064
                         },
                         "free": {
-                            "bytes": 407551598592
+                            "bytes": 406786842624
                         },
                         "total": {
                             "bytes": 499963170816
@@ -26,18 +26,18 @@
                 },
                 "indices": {
                     "docs": {
-                        "count": 1819,
-                        "deleted": 0
+                        "count": 2081,
+                        "deleted": 180
                     },
                     "segments": {
-                        "count": 12,
+                        "count": 26,
                         "memory": {
-                            "bytes": 73785
+                            "bytes": 150611
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 3144383
+                            "bytes": 4112007
                         }
                     }
                 },
@@ -47,13 +47,13 @@
                             "old": {
                                 "collection": {
                                     "count": 2,
-                                    "ms": 83
+                                    "ms": 137
                                 }
                             },
                             "young": {
                                 "collection": {
-                                    "count": 13,
-                                    "ms": 167
+                                    "count": 31,
+                                    "ms": 250
                                 }
                             }
                         }
@@ -65,13 +65,13 @@
                                     "bytes": 715849728
                                 },
                                 "peak": {
-                                    "bytes": 69756112
+                                    "bytes": 69362992
                                 },
                                 "peak_max": {
                                     "bytes": 715849728
                                 },
                                 "used": {
-                                    "bytes": 69756112
+                                    "bytes": 69362992
                                 }
                             },
                             "survivor": {
@@ -85,7 +85,7 @@
                                     "bytes": 35782656
                                 },
                                 "used": {
-                                    "bytes": 14035600
+                                    "bytes": 24657064
                                 }
                             },
                             "young": {
@@ -99,7 +99,7 @@
                                     "bytes": 286326784
                                 },
                                 "used": {
-                                    "bytes": 264787440
+                                    "bytes": 193167200
                                 }
                             }
                         }
@@ -124,27 +124,27 @@
                     },
                     "fetch_shard_started": {
                         "active": 0,
-                        "completed": 10,
-                        "largest": 8,
-                        "queue": 0,
-                        "rejected": 0,
-                        "threads": 8
-                    },
-                    "fetch_shard_store": {
-                        "active": 0,
-                        "completed": 24,
-                        "largest": 12,
-                        "queue": 0,
-                        "rejected": 0,
-                        "threads": 12
-                    },
-                    "flush": {
-                        "active": 0,
-                        "completed": 19,
-                        "largest": 1,
+                        "completed": 17,
+                        "largest": 16,
                         "queue": 0,
                         "rejected": 0,
                         "threads": 1
+                    },
+                    "fetch_shard_store": {
+                        "active": 0,
+                        "completed": 0,
+                        "largest": 0,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 0
+                    },
+                    "flush": {
+                        "active": 0,
+                        "completed": 121,
+                        "largest": 4,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 4
                     },
                     "force_merge": {
                         "active": 0,
@@ -156,13 +156,21 @@
                     },
                     "generic": {
                         "active": 0,
-                        "completed": 763,
-                        "largest": 6,
+                        "completed": 1592,
+                        "largest": 4,
                         "queue": 0,
                         "rejected": 0,
-                        "threads": 6
+                        "threads": 4
                     },
                     "get": {
+                        "active": 0,
+                        "completed": 5,
+                        "largest": 5,
+                        "queue": 0,
+                        "rejected": 0,
+                        "threads": 5
+                    },
+                    "listener": {
                         "active": 0,
                         "completed": 1,
                         "largest": 1,
@@ -170,17 +178,9 @@
                         "rejected": 0,
                         "threads": 1
                     },
-                    "listener": {
-                        "active": 0,
-                        "completed": 0,
-                        "largest": 0,
-                        "queue": 0,
-                        "rejected": 0,
-                        "threads": 0
-                    },
                     "management": {
                         "active": 1,
-                        "completed": 402,
+                        "completed": 852,
                         "largest": 3,
                         "queue": 0,
                         "rejected": 0,
@@ -212,7 +212,7 @@
                     },
                     "refresh": {
                         "active": 0,
-                        "completed": 1167,
+                        "completed": 5267,
                         "largest": 4,
                         "queue": 0,
                         "rejected": 0,
@@ -228,7 +228,7 @@
                     },
                     "search": {
                         "active": 0,
-                        "completed": 127,
+                        "completed": 1312,
                         "largest": 13,
                         "queue": 0,
                         "rejected": 0,
@@ -256,7 +256,7 @@
                         "largest": 4,
                         "queue": 0,
                         "rejected": 0,
-                        "threads": 4
+                        "threads": 1
                     },
                     "watcher": {
                         "active": 0,
@@ -268,11 +268,21 @@
                     },
                     "write": {
                         "active": 0,
-                        "completed": 36,
+                        "completed": 241,
                         "largest": 8,
                         "queue": 0,
                         "rejected": 0,
                         "threads": 8
+                    }
+                },
+                "transport": {
+                    "rx": {
+                        "bytes": 1992,
+                        "count": 12
+                    },
+                    "tx": {
+                        "bytes": 1200,
+                        "count": 12
                     }
                 }
             }

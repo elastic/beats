@@ -181,3 +181,34 @@
       type: object
       object_type: long
       description: >
+
+    - name: transport
+      type: group
+      description: >
+        Transport stats
+      fields:
+        - name: rx
+          type: group
+          description: >
+            Received stats
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+        - name: tx
+          type: group
+          description: >
+            Transmitted stats
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+

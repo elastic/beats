@@ -4392,6 +4392,67 @@ type: object
 --
 
 [float]
+== transport fields
+
+Transport stats
+
+
+
+[float]
+== rx fields
+
+Received stats
+
+
+
+*`elasticsearch.node.stats.transport.rx.count`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.transport.rx.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+
+
+--
+
+[float]
+== tx fields
+
+Transmitted stats
+
+
+
+*`elasticsearch.node.stats.transport.tx.count`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.transport.tx.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+
+
+--
+
+[float]
 == cluster.pending_task fields
 
 `cluster.pending_task` contains a pending task description.

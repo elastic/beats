@@ -98,6 +98,16 @@ var (
 			"watcher":             c.Dict("watcher", threadPoolSchema),
 			"write":               c.Dict("write", threadPoolSchema),
 		}),
+		"transport": c.Dict("transport", s.Schema{
+			"rx": s.Object{
+				"count": c.Int("rx_count"),
+				"bytes": c.Int("rx_size_in_bytes"),
+			},
+			"tx": s.Object{
+				"count": c.Int("tx_count"),
+				"bytes": c.Int("tx_size_in_bytes"),
+			},
+		}),
 	}
 
 	poolSchema = s.Schema{
