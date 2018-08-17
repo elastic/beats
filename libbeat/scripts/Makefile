@@ -430,8 +430,8 @@ seccomp:
 # Generates seccomp profiles based on the binaries produced by the package target.
 .PHONY: seccomp-package
 seccomp-package:
-	SECCOMP_BINARY=build/package/${BEAT_NAME}-linux-386 $(MAKE) seccomp
-	SECCOMP_BINARY=build/package/${BEAT_NAME}-linux-amd64 $(MAKE) seccomp
+	SECCOMP_BINARY=build/golang-crossbuild/${BEAT_NAME}-linux-386 $(MAKE) seccomp
+	SECCOMP_BINARY=build/golang-crossbuild/${BEAT_NAME}-linux-amd64 $(MAKE) seccomp
 
 ### Packaging targets ####
 
