@@ -4453,6 +4453,54 @@ format: bytes
 --
 
 [float]
+== breakers fields
+
+Circuit breaker stats
+
+
+
+
+*`elasticsearch.node.stats.breakers.fielddata.limit.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+
+
+--
+
+*`elasticsearch.node.stats.breakers.fielddata.estimated.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+
+
+--
+
+*`elasticsearch.node.stats.breakers.fielddata.overhead`*::
++
+--
+type: float
+
+
+
+--
+
+*`elasticsearch.node.stats.breakers.fielddata.tripped`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
 == cluster.pending_task fields
 
 `cluster.pending_task` contains a pending task description.

@@ -212,3 +212,25 @@
               format: bytes
               description: >
 
+    - name: breakers
+      type: group
+      description: >
+        Circuit breaker stats
+      fields:
+        - name: fielddata
+          type: group
+          fields:
+            - name: limit.bytes
+              type: long
+              format: bytes
+              description: >
+            - name: estimated.bytes
+              type: long
+              format: bytes
+              description: >
+            - name: overhead
+              type: float
+              description: >
+            - name: tripped
+              type: long
+              description: >

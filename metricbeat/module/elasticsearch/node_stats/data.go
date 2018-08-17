@@ -108,6 +108,18 @@ var (
 				"bytes": c.Int("tx_size_in_bytes"),
 			},
 		}),
+		"breakers": c.Dict("breakers", s.Schema{
+			"fielddata": c.Dict("fielddata", s.Schema{
+				"limit": s.Object{
+					"bytes": c.Int("limit_size_in_bytes"),
+				},
+				"estimated": s.Object{
+					"bytes": c.Int("estimated_size_in_bytes"),
+				},
+				"overhead": c.Float("overhead"),
+				"tripped":  c.Int("tripped"),
+			}),
+		}),
 	}
 
 	poolSchema = s.Schema{
