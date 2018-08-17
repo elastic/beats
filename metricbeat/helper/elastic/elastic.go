@@ -82,7 +82,13 @@ func MakeXPackMonitoringIndexName(product Product) string {
 // ReportErrorForMissingField reports and returns an error message for the given
 // field being missing in API response received from a given product
 func ReportErrorForMissingField(field string, product Product, r mb.ReporterV2) error {
-	err := fmt.Errorf("Could not find field '%v' in %v stats API response", field, strings.Title(product.String()))
+	err := MakeErrorForMissingField(field, product)
 	r.Error(err)
 	return err
+}
+
+// MakeErrorForMissingField returns an error message for the given field being missing in an API
+// response received from a given product
+func MakeErrorForMissingField(field string, product Product) error {
+	return fmt.Errorf("Could not find field '%v' in %v stats API response", field, strings.Title(product.String()))
 }
