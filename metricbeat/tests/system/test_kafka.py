@@ -45,5 +45,9 @@ class KafkaTest(metricbeat.BaseTest):
                 os.getenv('KAFKA_PORT', '9092')]
 
 
+class Kafka_1_1_0_Test(KafkaTest):
+    COMPOSE_SERVICES = ['kafka_1_1_0']
+
+
 class Kafka_0_10_2_Test(KafkaTest):
     COMPOSE_SERVICES = ['kafka_0_10_2']
