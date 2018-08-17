@@ -21,7 +21,7 @@ package replstatus
 
 import (
 	"testing"
-        "time"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	mgo "gopkg.in/mgo.v2"
@@ -121,7 +121,7 @@ func initiateReplicaSet(t *testing.T) error {
 		myState, ok := status["myState"].(int)
 		t.Logf("Mongodb state is %d", myState)
 		if ok && myState == 1 {
-	                time.Sleep(5 * time.Second)   // hack, wait more for replica set to become stable
+			time.Sleep(5 * time.Second) // hack, wait more for replica set to become stable
 			break
 		}
 	}
