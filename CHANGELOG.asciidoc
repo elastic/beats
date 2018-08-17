@@ -200,7 +200,7 @@ https://github.com/elastic/beats/compare/v6.3.1...v6.4.0[View commits]
 - Add Audit log fileset to the Elasticsearch module. {pull}7365[7365]
 - Add Slow log fileset to the Elasticsearch module. {pull}7473[7473]
 - Add deprecation fileset to the Elasticsearch module. {pull}7474[7474]
-- Add `config_timezone` option to Kafka module to convert dates to UTC. {issue}7546[7546] {pull}7578[7578]
+- Add `convert_timezone` option to Kafka module to convert dates to UTC. {issue}7546[7546] {pull}7578[7578]
 - Add patterns for kafka 1.1 logs. {pull}7608[7608]
 - Move debug messages in tcp input source {pull}7712[7712]
 
