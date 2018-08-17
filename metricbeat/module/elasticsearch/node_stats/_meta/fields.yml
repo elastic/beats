@@ -234,3 +234,37 @@
             - name: tripped
               type: long
               description: >
+
+    - name: discovery
+      type: group
+      description: >
+        Discover stats
+      fields:
+        - name: cluster_state_queue
+          type: group
+          description: >
+            Cluster state queue stats
+          fields:
+            - name: total
+              type: long
+              description: >
+            - name: pending
+              type: long
+              description: >
+            - name: committed
+              type: long
+              description: >
+        - name: published_cluster_states
+          type: group
+          description: >
+            Published cluster states stats
+          fields:
+            - name: full_states
+              type: long
+              description: >
+            - name: incompatible_diffs
+              type: long
+              description: >
+            - name: compatible_diffs
+              type: long
+              description: >

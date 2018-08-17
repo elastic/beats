@@ -120,6 +120,18 @@ var (
 				"tripped":  c.Int("tripped"),
 			}),
 		}),
+		"discovery": c.Dict("discovery", s.Schema{
+			"cluster_state_queue": c.Dict("cluster_state_queue", s.Schema{
+				"total":     c.Int("total"),
+				"pending":   c.Int("pending"),
+				"committed": c.Int("committed"),
+			}),
+			"published_cluster_states": c.Dict("published_cluster_states", s.Schema{
+				"full_states":        c.Int("full_states"),
+				"incompatible_diffs": c.Int("incompatible_diffs"),
+				"compatible_diffs":   c.Int("compatible_diffs"),
+			}),
+		}),
 	}
 
 	poolSchema = s.Schema{

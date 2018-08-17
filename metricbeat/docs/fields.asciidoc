@@ -4501,6 +4501,81 @@ type: long
 --
 
 [float]
+== discovery fields
+
+Discover stats
+
+
+
+[float]
+== cluster_state_queue fields
+
+Cluster state queue stats
+
+
+
+*`elasticsearch.node.stats.discovery.cluster_state_queue.total`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.discovery.cluster_state_queue.pending`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.discovery.cluster_state_queue.committed`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
+== published_cluster_states fields
+
+Published cluster states stats
+
+
+
+*`elasticsearch.node.stats.discovery.published_cluster_states.full_states`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.discovery.published_cluster_states.incompatible_diffs`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.discovery.published_cluster_states.compatible_diffs`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
 == cluster.pending_task fields
 
 `cluster.pending_task` contains a pending task description.
