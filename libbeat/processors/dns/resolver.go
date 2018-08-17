@@ -150,7 +150,7 @@ func (res *MiekgResolver) LookupPTR(ip string) (*PTR, error) {
 			if !found {
 				name = "response code " + strconv.Itoa(r.Rcode)
 			}
-			return nil, &dnsError{"server returned " + name}
+			return nil, &dnsError{"nameserver " + server + " returned " + name}
 		}
 
 		for _, a := range r.Answer {
@@ -162,7 +162,7 @@ func (res *MiekgResolver) LookupPTR(ip string) (*PTR, error) {
 			}
 		}
 
-		return nil, &dnsError{"no PTR record was found the response"}
+		return nil, &dnsError{"no PTR record was found in the response"}
 	}
 
 	if rtnErr != nil {

@@ -18,6 +18,7 @@
 package dns
 
 import (
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -33,11 +34,15 @@ func (r ptrRecord) IsExpired(now time.Time) bool {
 }
 
 type ptrCache struct {
+	sync.RWMutex
 	data    map[string]ptrRecord
 	maxSize int
 }
 
 func (c *ptrCache) set(now time.Time, key string, ptr *PTR) {
+	c.Lock()
+	defer c.Unlock()
+
 	if len(c.data) >= c.maxSize {
 		c.evict()
 	}
@@ -48,6 +53,7 @@ func (c *ptrCache) set(now time.Time, key string, ptr *PTR) {
 	}
 }
 
+// evict removes a single random key from the cache.
 func (c *ptrCache) evict() {
 	var key string
 	for k := range c.data {
@@ -58,6 +64,9 @@ func (c *ptrCache) evict() {
 }
 
 func (c *ptrCache) get(now time.Time, key string) *PTR {
+	c.RLock()
+	defer c.RUnlock()
+
 	r, found := c.data[key]
 	if found && !r.IsExpired(now) {
 		return &PTR{r.host, uint32(r.expires.Sub(now) / time.Second)}
@@ -75,13 +84,15 @@ func (r failureRecord) IsExpired(now time.Time) bool {
 }
 
 type failureCache struct {
+	sync.RWMutex
 	data       map[string]failureRecord
 	maxSize    int
 	failureTTL time.Duration
-	stats      cacheStats
 }
 
 func (c *failureCache) set(now time.Time, key string, err error) {
+	c.Lock()
+	defer c.Unlock()
 	if len(c.data) >= c.maxSize {
 		c.evict()
 	}
@@ -92,6 +103,7 @@ func (c *failureCache) set(now time.Time, key string, err error) {
 	}
 }
 
+// evict removes a single random key from the cache.
 func (c *failureCache) evict() {
 	var key string
 	for k := range c.data {
@@ -102,12 +114,22 @@ func (c *failureCache) evict() {
 }
 
 func (c *failureCache) get(now time.Time, key string) error {
+	c.RLock()
+	defer c.RUnlock()
+
 	r, found := c.data[key]
 	if found && !r.IsExpired(now) {
 		return r.error
 	}
 	return nil
 }
+
+type cachedError struct {
+	err error
+}
+
+func (ce *cachedError) Error() string { return ce.err.Error() + " (from failure cache)" }
+func (ce *cachedError) Cause() error  { return ce.err }
 
 // PTRLookupCache is a cache for storing and retrieving the results of
 // reverse DNS queries. It caches the results of queries regardless of their
@@ -117,7 +139,6 @@ type PTRLookupCache struct {
 	failure    *failureCache
 	failureTTL time.Duration
 	resolver   PTRResolver
-	log        Logger
 	stats      cacheStats
 }
 
@@ -126,32 +147,30 @@ type cacheStats struct {
 	Miss *monitoring.Int
 }
 
-// Logger logs debug messages.
-type Logger interface {
-	Debugw(msg string, keysAndValues ...interface{})
-}
-
 // NewPTRLookupCache returns a new cache.
-func NewPTRLookupCache(reg *monitoring.Registry, l Logger, conf CacheConfig, resolver PTRResolver) *PTRLookupCache {
+func NewPTRLookupCache(reg *monitoring.Registry, conf CacheConfig, resolver PTRResolver) (*PTRLookupCache, error) {
+	if err := conf.Validate(); err != nil {
+		return nil, err
+	}
+
 	c := &PTRLookupCache{
 		success: &ptrCache{
 			data:    make(map[string]ptrRecord, conf.SuccessCache.InitialCapacity),
-			maxSize: max(100, max(conf.SuccessCache.InitialCapacity, conf.SuccessCache.MaxCapacity)),
+			maxSize: conf.SuccessCache.MaxCapacity,
 		},
 		failure: &failureCache{
 			data:       make(map[string]failureRecord, conf.FailureCache.InitialCapacity),
-			maxSize:    max(100, max(conf.FailureCache.InitialCapacity, conf.FailureCache.MaxCapacity)),
+			maxSize:    conf.FailureCache.MaxCapacity,
 			failureTTL: conf.FailureCache.TTL,
 		},
 		resolver: resolver,
-		log:      l,
 		stats: cacheStats{
 			Hit:  monitoring.NewInt(reg, "hits"),
 			Miss: monitoring.NewInt(reg, "misses"),
 		},
 	}
 
-	return c
+	return c, nil
 }
 
 // LookupPTR performs a reverse lookup on the given IP address. A cached result
@@ -175,10 +194,7 @@ func (c PTRLookupCache) LookupPTR(ip string) (*PTR, error) {
 
 	ptr, err = c.resolver.LookupPTR(ip)
 	if err != nil {
-		c.log.Debugw("Reverse DNS lookup failed.", "error", err, "ip", ip)
-		if _, cacheable := err.(*dnsError); cacheable {
-			c.failure.set(now, ip, err)
-		}
+		c.failure.set(now, ip, &cachedError{err})
 		return nil, err
 	}
 

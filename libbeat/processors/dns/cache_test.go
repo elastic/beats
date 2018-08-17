@@ -24,14 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-)
-
-const (
-	gatewayIP   = "192.168.0.1"
-	gatewayName = "default.gateway.example"
-	gatewayTTL  = 60 // Seconds
 )
 
 type stubResolver struct{}
@@ -39,7 +32,7 @@ type stubResolver struct{}
 func (r *stubResolver) LookupPTR(ip string) (*PTR, error) {
 	if ip == gatewayIP {
 		return &PTR{Host: gatewayName, TTL: gatewayTTL}, nil
-	} else if strings.HasSuffix(ip, "10") {
+	} else if strings.HasSuffix(ip, "11") {
 		return nil, io.ErrUnexpectedEOF
 	}
 
@@ -47,11 +40,13 @@ func (r *stubResolver) LookupPTR(ip string) (*PTR, error) {
 }
 
 func TestCache(t *testing.T) {
-	c := NewPTRLookupCache(
+	c, err := NewPTRLookupCache(
 		monitoring.NewRegistry(),
-		logp.NewLogger(logName),
 		defaultConfig.CacheConfig,
 		&stubResolver{})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Initial success query.
 	ptr, err := c.LookupPTR(gatewayIP)
@@ -72,8 +67,8 @@ func TestCache(t *testing.T) {
 		assert.EqualValues(t, 1, c.stats.Miss.Get())
 	}
 
-	// Initial failure query.
-	ptr, err = c.LookupPTR(gatewayIP + "1")
+	// Initial failure query (like a dns error response code).
+	ptr, err = c.LookupPTR(gatewayIP + "0")
 	if assert.Error(t, err) {
 		assert.Nil(t, ptr)
 		assert.EqualValues(t, 1, c.stats.Hit.Get())
@@ -81,26 +76,26 @@ func TestCache(t *testing.T) {
 	}
 
 	// Cached failure query.
-	ptr, err = c.LookupPTR(gatewayIP + "1")
+	ptr, err = c.LookupPTR(gatewayIP + "0")
 	if assert.Error(t, err) {
 		assert.Nil(t, ptr)
 		assert.EqualValues(t, 2, c.stats.Hit.Get())
 		assert.EqualValues(t, 2, c.stats.Miss.Get())
 	}
 
-	// Non-cacheable failure (like i/o timeout to server).
-	ptr, err = c.LookupPTR(gatewayIP + "0")
+	// Initial network failure (like I/O timeout).
+	ptr, err = c.LookupPTR(gatewayIP + "1")
 	if assert.Error(t, err) {
 		assert.Nil(t, ptr)
 		assert.EqualValues(t, 2, c.stats.Hit.Get())
 		assert.EqualValues(t, 3, c.stats.Miss.Get())
 	}
 
-	// Check for a cache miss.
-	ptr, err = c.LookupPTR(gatewayIP + "0")
+	// Check for a cache hit for the network failure.
+	ptr, err = c.LookupPTR(gatewayIP + "1")
 	if assert.Error(t, err) {
 		assert.Nil(t, ptr)
-		assert.EqualValues(t, 2, c.stats.Hit.Get())
-		assert.EqualValues(t, 4, c.stats.Miss.Get()) // Cache miss.
+		assert.EqualValues(t, 3, c.stats.Hit.Get())
+		assert.EqualValues(t, 3, c.stats.Miss.Get()) // Cache miss.
 	}
 }

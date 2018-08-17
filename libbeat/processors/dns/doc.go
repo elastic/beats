@@ -21,11 +21,16 @@
 // instance of the processor.
 //
 // It caches DNS results in memory and honors the record's TTL. It also caches
-// failures for the configured failure TTL.
+// failures for the configured failure TTL. The caches are simple, and they
+// evict a random item when the configured maximum size is reached.
 //
-// This filter, like all filters, only processes 1 event at a time, so the use
-// of this plugin can significantly slow down your pipeline’s throughput if you
-// have a high latency network. By way of example, if each DNS lookup takes 2
-// milliseconds, the maximum throughput you can achieve with a single filter
-// worker is 500 events per second (1000 milliseconds / 2 milliseconds).
+// This processor can significantly slow down your pipeline's throughput if you
+// have a high latency network or slow upstream nameserver. The cache will help
+// with performance, but if the addresses being resolved have a high cardinality
+// then the cache benefits will be diminished due to the high miss ratio.
+//
+// By way of example, if each DNS lookup takes 2 milliseconds, the maximum
+// throughput you can achieve is 500 events per second (1000 milliseconds / 2
+// milliseconds). If you have a high cache hit ratio then your throughput can be
+// higher.
 package dns

@@ -84,7 +84,6 @@ func ServeDNS(h dns.HandlerFunc) (cancel func() error, addr string, err error) {
 	s.Handler = h
 	go s.ActivateAndServe()
 	return s.Shutdown, s.PacketConn.LocalAddr().String(), err
-
 }
 
 func FakeDNSHandler(w dns.ResponseWriter, msg *dns.Msg) {

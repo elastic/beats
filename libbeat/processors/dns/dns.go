@@ -20,6 +20,8 @@ package dns
 import (
 	"fmt"
 	"strconv"
+	"strings"
+	"sync"
 
 	"github.com/pkg/errors"
 
@@ -52,27 +54,33 @@ func newDNSProcessor(cfg *common.Config) (processors.Processor, error) {
 		return nil, errors.Wrap(err, "fail to unpack the dns configuration")
 	}
 
-	log := logp.NewLogger(logName)
-	reg := monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(int(instanceID.Inc())), monitoring.DoNotReport)
+	// Logging and metrics (each processor instance has a unique ID).
+	var (
+		id      = int(instanceID.Inc())
+		log     = logp.NewLogger(logName).With("instance_id", id)
+		metrics = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
+	)
 
-	resolver, err := NewMiekgResolver(reg, c.Timeout, c.Nameservers...)
+	log.Debugf("DNS processor config: %+v", c)
+	resolver, err := NewMiekgResolver(metrics, c.Timeout, c.Nameservers...)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debugf("DNS processor config: %+v", c)
-	return &processor{
-		Config: c,
-		resolver: NewPTRLookupCache(reg.NewRegistry("cache"), log,
-			c.CacheConfig, resolver),
-		log: log,
-	}, nil
+	cache, err := NewPTRLookupCache(metrics.NewRegistry("cache"), c.CacheConfig, resolver)
+	if err != nil {
+		return nil, err
+	}
+
+	return &processor{Config: c, resolver: cache, log: log}, nil
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
-	for _, l := range p.Lookup {
-		for field, target := range l.reverseFlat {
-			p.processField(field, target, l.Action, event)
+	var tagOnce sync.Once
+	for field, target := range p.reverseFlat {
+		if err := p.processField(field, target, p.Action, event); err != nil {
+			p.log.Debugf("DNS processor failed: %v", err)
+			tagOnce.Do(func() { common.AddTags(event.Fields, p.TagOnFailure) })
 		}
 	}
 	return event, nil
@@ -89,27 +97,40 @@ func (p *processor) processField(source, target string, action FieldAction, even
 		return nil
 	}
 
-	name, err := p.resolver.LookupPTR(maybeIP)
+	ptrRecord, err := p.resolver.LookupPTR(maybeIP)
 	if err != nil {
-		return nil
+		return fmt.Errorf("reverse lookup of %v value '%v' failed: %v", source, maybeIP, err)
 	}
 
-	old, err := event.PutValue(target, name.Host)
-	if err != nil {
+	return setFieldValue(action, event, target, ptrRecord.Host)
+}
+
+func setFieldValue(action FieldAction, event *beat.Event, key string, value string) error {
+	switch action {
+	case ActionReplace:
+		_, err := event.PutValue(key, value)
 		return err
-	}
-
-	if action == ActionAppend && old != nil {
-		switch v := old.(type) {
-		case string:
-			_, err = event.PutValue(target, []string{v, name.Host})
-		case []string:
-			_, err = event.PutValue(target, append(v, name.Host))
+	case ActionAppend:
+		old, err := event.PutValue(key, value)
+		if err != nil {
+			return err
 		}
+
+		if old != nil {
+			switch v := old.(type) {
+			case string:
+				_, err = event.PutValue(key, []string{v, value})
+			case []string:
+				_, err = event.PutValue(key, append(v, value))
+			}
+		}
+		return err
+	default:
+		panic(errors.Errorf("Unexpected dns field action value encountered: %v", action))
 	}
-	return err
 }
 
 func (p processor) String() string {
-	return fmt.Sprintf("dns=[timeout=%v, nameservers=[%v], lookup=[%+v]]", p.Timeout, p.Nameservers, p.Lookup)
+	return fmt.Sprintf("dns=[timeout=%v, nameservers=[%v], action=%v, type=%v, fields=[%+v]",
+		p.Timeout, strings.Join(p.Nameservers, ","), p.Action, p.Type, p.reverseFlat)
 }

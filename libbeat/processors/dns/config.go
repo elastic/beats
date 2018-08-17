@@ -18,6 +18,7 @@
 package dns
 
 import (
+	"strconv"
 	"strings"
 	"time"
 
@@ -29,17 +30,13 @@ import (
 // Config defines the configuration options for the DNS processor.
 type Config struct {
 	CacheConfig
-	Nameservers []string        `config:"nameservers"`                // Required on Windows. /etc/resolv.conf is used if none are given.
-	Timeout     time.Duration   `conifg:"timeout"`                    // Per request timeout (with 2 nameservers the total timeout would be 2x).
-	Lookup      []*LookupConfig `config:"lookup" validate:"required"` // List lookups to perform.
-}
-
-// LookupConfig defines what type of lookup is performed on which fields.
-type LookupConfig struct {
-	Type        string        `config:"type" validate:"required"` // Reverse is the only supported type currently.
-	Action      FieldAction   `config:"action"`                   // Append or replace (defaults to append) when target exists.
-	Fields      common.MapStr `config:"fields"`                   // Mapping of source fields to target fields.
-	reverseFlat map[string]string
+	Nameservers  []string      `config:"nameservers"`              // Required on Windows. /etc/resolv.conf is used if none are given.
+	Timeout      time.Duration `conifg:"timeout"`                  // Per request timeout (with 2 nameservers the total timeout would be 2x).
+	Type         string        `config:"type" validate:"required"` // Reverse is the only supported type currently.
+	Action       FieldAction   `config:"action"`                   // Append or replace (defaults to append) when target exists.
+	TagOnFailure []string      `config:"tag_on_failure"`           // Tags to append when a failure occurs.
+	Fields       common.MapStr `config:"fields"`                   // Mapping of source fields to target fields.
+	reverseFlat  map[string]string
 }
 
 // FieldAction defines the behavior when the target field exists.
@@ -51,6 +48,20 @@ const (
 	ActionReplace
 )
 
+var fieldActionNames = map[FieldAction]string{
+	ActionAppend:  "append",
+	ActionReplace: "replace",
+}
+
+// String returns a field action name.
+func (fa FieldAction) String() string {
+	name, found := fieldActionNames[fa]
+	if found {
+		return name
+	}
+	return "unknown (" + strconv.Itoa(int(fa)) + ")"
+}
+
 // Unpack unpacks a string to a FieldAction.
 func (fa *FieldAction) Unpack(v string) error {
 	switch strings.ToLower(v) {
@@ -59,7 +70,7 @@ func (fa *FieldAction) Unpack(v string) error {
 	case "replace":
 		*fa = ActionReplace
 	default:
-		return errors.Errorf("invalid dns lookup action value '%v'", v)
+		return errors.Errorf("invalid dns field action value '%v'", v)
 	}
 	return nil
 }
@@ -75,41 +86,59 @@ type CacheSettings struct {
 	// TTL value for items in cache. Not used for success because we use TTL
 	// from the DNS record.
 	TTL time.Duration `config:"ttl"`
+
 	// Initial capacity. How much space is allocated at initialization.
 	InitialCapacity int `config:"capacity.initial" validate:"min=0"`
+
 	// Max capacity of the cache. When capacity is reached a random item is
 	// evicted from the cache.
-	MaxCapacity int `config:"capacity.max"     validate:"min=0"`
+	MaxCapacity int `config:"capacity.max" validate:"min=1"`
 }
 
 // Validate validates the data contained in the config.
 func (c *Config) Validate() error {
-	for _, l := range c.Lookup {
-		l.Type = strings.ToLower(l.Type)
-		switch l.Type {
-		case "reverse", "ptr":
-		default:
-			return errors.Errorf("invalid dns lookup type '%v' specified in "+
-				"config (valid values are reverse or ptr)", l.Type)
-		}
-
-		l.reverseFlat = map[string]string{}
-		for k, v := range l.Fields.Flatten() {
-			target, ok := v.(string)
-			if !ok {
-				return errors.Errorf("target field for dns lookup of %v "+
-					"must be a string but got %T", k, v)
-			}
-			l.reverseFlat[k] = target
-		}
+	// Validate lookup type.
+	c.Type = strings.ToLower(c.Type)
+	switch c.Type {
+	case "reverse":
+	default:
+		return errors.Errorf("invalid dns lookup type '%v' specified in "+
+			"config (valid values are: reverse)", c.Type)
 	}
 
-	if c.SuccessCache.MaxCapacity != 0 && c.SuccessCache.MaxCapacity < c.SuccessCache.InitialCapacity {
+	// Flatten the mapping of source fields to target fields.
+	c.reverseFlat = map[string]string{}
+	for k, v := range c.Fields.Flatten() {
+		target, ok := v.(string)
+		if !ok {
+			return errors.Errorf("target field for dns lookup of %v "+
+				"must be a string but got %T", k, v)
+		}
+		c.reverseFlat[k] = target
+	}
+
+	return nil
+}
+
+func (c *CacheConfig) Validate() error {
+	if c.FailureCache.TTL <= 0 {
+		return errors.Errorf("failure_cache.ttl must be > 0")
+	}
+
+	if c.SuccessCache.MaxCapacity <= 0 {
+		return errors.Errorf("success_cache.capacity.max must be > 0")
+	}
+	if c.FailureCache.MaxCapacity <= 0 {
+		return errors.Errorf("failure_cache.capacity.max must be > 0")
+	}
+
+	if c.SuccessCache.MaxCapacity < c.SuccessCache.InitialCapacity {
 		return errors.Errorf("success_cache.capacity.max must be >= success_cache.capacity.initial")
 	}
-	if c.FailureCache.MaxCapacity != 0 && c.FailureCache.MaxCapacity < c.FailureCache.InitialCapacity {
+	if c.FailureCache.MaxCapacity < c.FailureCache.InitialCapacity {
 		return errors.Errorf("failure_cache.capacity.max must be >= failure_cache.capacity.initial")
 	}
+
 	return nil
 }
 
