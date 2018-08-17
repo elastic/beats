@@ -45,7 +45,7 @@ type connURL struct {
 }
 
 func create(
-	info monitors.Info,
+	name string,
 	cfg *common.Config,
 ) ([]monitors.Job, error) {
 	config := DefaultConfig
