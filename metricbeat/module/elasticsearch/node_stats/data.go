@@ -176,6 +176,24 @@ var (
 		"failed":  c.Int("failed"),
 		"ms":      c.Int("time_in_millis"),
 	}
+
+	adaptiveSelectionSchema = s.Schema{
+		"outgoing_searches": c.Int("outgoing_searches"),
+		"queue_size": s.Object{
+			"avg": c.Int("avg_queue_size"),
+		},
+		"service_time": s.Object{
+			"avg": s.Object{
+				"ns": c.Int("avg_service_time_ns"),
+			},
+		},
+		"response_time": s.Object{
+			"avg": s.Object{
+				"ns": c.Int("avg_response_time_ns"),
+			},
+		},
+		"rank": c.Str("rank"),
+	}
 )
 
 type nodesStruct struct {
@@ -187,6 +205,7 @@ func pipelineMetricsMapping(node map[string]interface{}, metricSetFields common.
 	pipelines, ok := node["ingest"].(map[string]interface{})["pipelines"].(map[string]interface{})
 	if !ok {
 		elastic.ReportErrorForMissingField("ingest.pipelines", elastic.Elasticsearch, r)
+		return
 	}
 
 	for pipelineID, value := range pipelines {
@@ -198,9 +217,25 @@ func pipelineMetricsMapping(node map[string]interface{}, metricSetFields common.
 		fields, err := ingestPipelineSchema.Apply(pipelineMetrics)
 		if err != nil {
 			r.Error(err)
+			continue
 		}
 		metricSetFields.Put("ingest.pipelines."+pipelineID, fields)
 	}
+}
+
+func adaptiveSelectionMapping(nodeName string, node map[string]interface{}, metricSetFields common.MapStr, r mb.ReporterV2) {
+	adaptiveSelectionMetrics, ok := node["adaptive_selection"].(map[string]interface{})[nodeName].(map[string]interface{})
+	if !ok {
+		elastic.ReportErrorForMissingField("adaptive_selection."+nodeName, elastic.Elasticsearch, r)
+		return
+	}
+
+	fields, err := adaptiveSelectionSchema.Apply(adaptiveSelectionMetrics)
+	if err != nil {
+		r.Error(err)
+		return
+	}
+	metricSetFields.Put("adpative_selection", fields)
 }
 
 func eventsMapping(r mb.ReporterV2, content []byte) error {
@@ -223,6 +258,9 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		// Handle ingest.pipelines.*
 		pipelineMetricsMapping(node, event.MetricSetFields, r)
+
+		// Handle adaptive_selection[name]
+		adaptiveSelectionMapping(name, node, event.MetricSetFields, r)
 
 		event.ModuleFields = common.MapStr{
 			"node": common.MapStr{

@@ -11,6 +11,23 @@
         "node": {
             "name": "Z4hBonPxQVW9qPKEHpwWCg",
             "stats": {
+                "adpative_selection": {
+                    "outgoing_searches": 0,
+                    "queue_size": {
+                        "avg": 0
+                    },
+                    "rank": "0.3",
+                    "response_time": {
+                        "avg": {
+                            "ns": 337808
+                        }
+                    },
+                    "service_time": {
+                        "avg": {
+                            "ns": 143508
+                        }
+                    }
+                },
                 "breakers": {
                     "fielddata": {
                         "estimated": {
@@ -38,10 +55,10 @@
                 "fs": {
                     "summary": {
                         "available": {
-                            "bytes": 402721628160
+                            "bytes": 402729295872
                         },
                         "free": {
-                            "bytes": 406646558720
+                            "bytes": 406654226432
                         },
                         "total": {
                             "bytes": 499963170816
@@ -50,18 +67,18 @@
                 },
                 "indices": {
                     "docs": {
-                        "count": 2151,
-                        "deleted": 260
+                        "count": 2015,
+                        "deleted": 60
                     },
                     "segments": {
-                        "count": 30,
+                        "count": 32,
                         "memory": {
-                            "bytes": 190369
+                            "bytes": 180008
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 4219518
+                            "bytes": 4069230
                         }
                     }
                 },
@@ -98,8 +115,8 @@
                             },
                             "young": {
                                 "collection": {
-                                    "count": 220,
-                                    "ms": 1022
+                                    "count": 273,
+                                    "ms": 1234
                                 }
                             }
                         }
@@ -111,13 +128,13 @@
                                     "bytes": 715849728
                                 },
                                 "peak": {
-                                    "bytes": 125262208
+                                    "bytes": 140384456
                                 },
                                 "peak_max": {
                                     "bytes": 715849728
                                 },
                                 "used": {
-                                    "bytes": 125262208
+                                    "bytes": 140384456
                                 }
                             },
                             "survivor": {
@@ -131,7 +148,7 @@
                                     "bytes": 35782656
                                 },
                                 "used": {
-                                    "bytes": 11079728
+                                    "bytes": 6579472
                                 }
                             },
                             "young": {
@@ -145,7 +162,7 @@
                                     "bytes": 286326784
                                 },
                                 "used": {
-                                    "bytes": 121002192
+                                    "bytes": 182093296
                                 }
                             }
                         }
@@ -186,7 +203,7 @@
                     },
                     "flush": {
                         "active": 0,
-                        "completed": 999,
+                        "completed": 1256,
                         "largest": 4,
                         "queue": 0,
                         "rejected": 0,
@@ -202,7 +219,7 @@
                     },
                     "generic": {
                         "active": 0,
-                        "completed": 13449,
+                        "completed": 16902,
                         "largest": 5,
                         "queue": 0,
                         "rejected": 0,
@@ -210,7 +227,7 @@
                     },
                     "get": {
                         "active": 0,
-                        "completed": 15,
+                        "completed": 19,
                         "largest": 8,
                         "queue": 0,
                         "rejected": 0,
@@ -218,7 +235,7 @@
                     },
                     "listener": {
                         "active": 0,
-                        "completed": 5,
+                        "completed": 6,
                         "largest": 4,
                         "queue": 0,
                         "rejected": 0,
@@ -226,7 +243,7 @@
                     },
                     "management": {
                         "active": 1,
-                        "completed": 7173,
+                        "completed": 9006,
                         "largest": 3,
                         "queue": 0,
                         "rejected": 0,
@@ -258,7 +275,7 @@
                     },
                     "refresh": {
                         "active": 0,
-                        "completed": 44717,
+                        "completed": 56214,
                         "largest": 4,
                         "queue": 0,
                         "rejected": 0,
@@ -274,7 +291,7 @@
                     },
                     "search": {
                         "active": 0,
-                        "completed": 11046,
+                        "completed": 13882,
                         "largest": 13,
                         "queue": 0,
                         "rejected": 0,
@@ -314,7 +331,7 @@
                     },
                     "write": {
                         "active": 0,
-                        "completed": 2013,
+                        "completed": 2525,
                         "largest": 8,
                         "queue": 0,
                         "rejected": 0,

@@ -307,3 +307,22 @@
             - name: ms
               type: long
               description: >
+        - name: adaptive_selection
+          type: group
+          description: >
+          fields:
+            - name: outgoing_searches
+              type: long
+              description: >
+            - name: queue_size.avg
+              type: long
+              description: >
+            - name: service_time.avg.ns
+              type: long
+              description: >
+            - name: response_time.avg.ns
+              type: long
+              description: >
+            - name: rank
+              type: keyword
+              description: >

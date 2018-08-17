@@ -4634,6 +4634,57 @@ type: object
 --
 
 [float]
+== adaptive_selection fields
+
+
+
+
+*`elasticsearch.node.stats.ingest.adaptive_selection.outgoing_searches`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.adaptive_selection.queue_size.avg`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.adaptive_selection.service_time.avg.ns`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.adaptive_selection.response_time.avg.ns`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.adaptive_selection.rank`*::
++
+--
+type: keyword
+
+
+
+--
+
+[float]
 == cluster.pending_task fields
 
 `cluster.pending_task` contains a pending task description.
