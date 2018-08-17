@@ -181,6 +181,32 @@ type nodesStruct struct {
 	Nodes       map[string]map[string]interface{} `json:"nodes"`
 }
 
+func pipelineMetricsMapping(node map[string]interface{}, metricSetFields common.MapStr, r mb.ReporterV2) {
+	value, ok := node["ingest"].(map[string]interface{})["pipelines"]
+	if !ok {
+		elastic.ReportErrorForMissingField("ingest.pipelines", elastic.Elasticsearch, r)
+	}
+	pipelines := value.(map[string]interface{})
+	for pipelineID, value := range pipelines {
+		pipelineMetrics, ok := value.(map[string]interface{})
+		if !ok {
+			elastic.ReportErrorForMissingField("ingest.pipelines."+pipelineID, elastic.Elasticsearch, r)
+		}
+
+		fieldMapping := map[string]string{
+			"count":          "count",
+			"current":        "current",
+			"failed":         "failed",
+			"time_in_millis": "ms",
+		}
+
+		for src, target := range fieldMapping {
+			value := int(pipelineMetrics[src].(float64))
+			metricSetFields.Put("ingest.pipelines."+pipelineID+"."+target, value)
+		}
+	}
+}
+
 func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 	nodeData := &nodesStruct{}
@@ -199,13 +225,8 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 			r.Error(err)
 		}
 
-		// ingest.pipelines.*
-		value, ok := node["ingest"].(map[string]interface{})["pipelines"]
-		if !ok {
-			elastic.ReportErrorForMissingField("ingest.pipelines", elastic.Elasticsearch, r)
-		}
-		pipelines := value.(map[string]interface{})
-		event.MetricSetFields.Put("ingest.pipelines", pipelines)
+		// Handle ingest.pipelines.*
+		pipelineMetricsMapping(node, event.MetricSetFields, r)
 
 		event.ModuleFields = common.MapStr{
 			"node": common.MapStr{
