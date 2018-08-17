@@ -198,6 +198,7 @@ func TestNormalizeValue(t *testing.T) {
 	logp.TestingSetup()
 
 	var nilStringPtr *string
+	var nilTimePtr *time.Time
 	someString := "foo"
 
 	type mybool bool
@@ -211,6 +212,7 @@ func TestNormalizeValue(t *testing.T) {
 		{nil, nil},
 		{&someString, someString},   // Pointers are dereferenced.
 		{nilStringPtr, nil},         // Nil pointers are dropped.
+		{nilTimePtr, nil},           // Nil pointers are dropped.
 		{NetString("test"), "test"}, // It honors the TextMarshaler contract.
 		{true, true},
 		{int8(8), int8(8)},
