@@ -135,12 +135,7 @@ var (
 			}),
 		}),
 		"ingest": c.Dict("ingest", s.Schema{
-			"total": c.Dict("total", s.Schema{
-				"count":   c.Int("count"),
-				"current": c.Int("current"),
-				"failed":  c.Int("failed"),
-				"ms":      c.Int("time_in_millis"),
-			}),
+			"total": c.Dict("total", ingestPipelineSchema),
 		}),
 	}
 
@@ -174,6 +169,13 @@ var (
 		"largest":   c.Int("largest"),
 		"completed": c.Int("completed"),
 	}
+
+	ingestPipelineSchema = s.Schema{
+		"count":   c.Int("count"),
+		"current": c.Int("current"),
+		"failed":  c.Int("failed"),
+		"ms":      c.Int("time_in_millis"),
+	}
 )
 
 type nodesStruct struct {
@@ -193,17 +195,11 @@ func pipelineMetricsMapping(node map[string]interface{}, metricSetFields common.
 			elastic.ReportErrorForMissingField("ingest.pipelines."+pipelineID, elastic.Elasticsearch, r)
 		}
 
-		fieldMapping := map[string]string{
-			"count":          "count",
-			"current":        "current",
-			"failed":         "failed",
-			"time_in_millis": "ms",
+		fields, err := ingestPipelineSchema.Apply(pipelineMetrics)
+		if err != nil {
+			r.Error(err)
 		}
-
-		for src, target := range fieldMapping {
-			value := int(pipelineMetrics[src].(float64))
-			metricSetFields.Put("ingest.pipelines."+pipelineID+"."+target, value)
-		}
+		metricSetFields.Put("ingest.pipelines."+pipelineID, fields)
 	}
 }
 
