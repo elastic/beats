@@ -4576,6 +4576,64 @@ type: long
 --
 
 [float]
+== ingest fields
+
+Ingest pipeline stats
+
+
+
+[float]
+== total fields
+
+
+
+
+*`elasticsearch.node.stats.ingest.total.count`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.total.current`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.total.failed`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.total.ms`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.pipelines.*`*::
++
+--
+type: object
+
+
+
+--
+
+[float]
 == cluster.pending_task fields
 
 `cluster.pending_task` contains a pending task description.

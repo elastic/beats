@@ -20,6 +20,8 @@ package node_stats
 import (
 	"encoding/json"
 
+	"github.com/elastic/beats/metricbeat/helper/elastic"
+
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -132,6 +134,14 @@ var (
 				"compatible_diffs":   c.Int("compatible_diffs"),
 			}),
 		}),
+		"ingest": c.Dict("ingest", s.Schema{
+			"total": c.Dict("total", s.Schema{
+				"count":   c.Int("count"),
+				"current": c.Int("current"),
+				"failed":  c.Int("failed"),
+				"ms":      c.Int("time_in_millis"),
+			}),
+		}),
 	}
 
 	poolSchema = s.Schema{
@@ -188,6 +198,14 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 		if err != nil {
 			r.Error(err)
 		}
+
+		// ingest.pipelines.*
+		value, ok := node["ingest"].(map[string]interface{})["pipelines"]
+		if !ok {
+			elastic.ReportErrorForMissingField("ingest.pipelines", elastic.Elasticsearch, r)
+		}
+		pipelines := value.(map[string]interface{})
+		event.MetricSetFields.Put("ingest.pipelines", pipelines)
 
 		event.ModuleFields = common.MapStr{
 			"node": common.MapStr{

@@ -268,3 +268,42 @@
             - name: compatible_diffs
               type: long
               description: >
+
+    - name: ingest
+      type: group
+      description: >
+        Ingest pipeline stats
+      fields:
+        - name: total
+          type: group
+          description: >
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: current
+              type: long
+              description: >
+            - name: failed
+              type: long
+              description: >
+            - name: ms
+              type: long
+              description: >
+        - name: pipelines.*
+          type: object
+          object_type: group
+          description: >
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: current
+              type: long
+              description: >
+            - name: failed
+              type: long
+              description: >
+            - name: ms
+              type: long
+              description: >
