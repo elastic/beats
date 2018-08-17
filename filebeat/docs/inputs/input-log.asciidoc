@@ -57,6 +57,10 @@ multiple input sections:
 IMPORTANT: Make sure a file is not defined more than once across all inputs
 because this can lead to unexpected behaviour.
 
+NOTE: When dealing with file rotation, avoid harvesting symlinks. Instead
+use the <<input-paths>> setting to point to the original file, and specify
+a pattern that matches the file you want to harvest and all of its rotated
+files.  
 
 [id="{beatname_lc}-input-{type}-options"]
 ==== Configuration options
