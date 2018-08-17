@@ -1,4 +1,4 @@
-version: "2"
+version: "2.4"
 
 services:
   beat:
@@ -156,6 +156,11 @@ services:
 
   rabbitmq:
     build: ./module/rabbitmq/_meta
+
+  redis:
+    extends:
+      file: ./module/redis/docker-compose.yml
+      service: redis
 
   traefik:
     build: ./module/traefik/_meta
