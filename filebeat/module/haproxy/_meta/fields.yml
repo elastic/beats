@@ -1,0 +1,9 @@
+- key: haproxy
+  title: "haproxy"
+  description: >
+    haproxy Module
+  fields:
+    - name: haproxy
+      type: group
+      description: >
+      fields:

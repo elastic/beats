@@ -18,6 +18,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-elasticsearch>>
+* <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
@@ -1434,6 +1435,339 @@ type: keyword
 example: doc
 
 Type
+
+--
+
+[[exported-fields-haproxy]]
+== haproxy fields
+
+haproxy Module
+
+
+
+[float]
+== haproxy fields
+
+
+
+
+[float]
+== http fields
+
+Please add description
+
+
+*`haproxy.http.process_name`*::
++
+--
+Name of the process
+
+--
+
+*`haproxy.http.pid`*::
++
+--
+type: long
+
+Process ID
+
+--
+
+*`haproxy.http.client_ip`*::
++
+--
+client_ip is the IP address of the client which initiated the TCP connection to haproxy.
+
+--
+
+*`haproxy.http.client_port`*::
++
+--
+type: long
+
+client_port is the TCP port of the client which initiated the connection.
+
+--
+
+*`haproxy.http.frontend_name`*::
++
+--
+frontend_name is the name of the frontend (or listener) which received and processed the connection.
+
+--
+
+*`haproxy.http.backend_name`*::
++
+--
+backend_name is the name of the backend (or listener) which was selected to manage the connection to the server.
+
+--
+
+*`haproxy.http.server_name`*::
++
+--
+server_name is the name of the last server to which the connection was sent.
+
+--
+
+*`haproxy.http.time_client_req`*::
++
+--
+type: long
+
+time_client_req is the total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+
+--
+
+*`haproxy.http.time_queue`*::
++
+--
+type: long
+
+time_queue is the total time in milliseconds spent waiting in the various queues.
+
+--
+
+*`haproxy.http.time_backend_connect`*::
++
+--
+type: long
+
+time_backend_connect is the total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
+
+--
+
+*`haproxy.http.time_server_response`*::
++
+--
+type: long
+
+time_server_response is the total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
+
+--
+
+*`haproxy.http.time_duration`*::
++
+--
+type: long
+
+time_duration is the time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+
+--
+
+*`haproxy.http.status_code`*::
++
+--
+type: long
+
+status_code is the HTTP status code returned to the client.
+
+--
+
+*`haproxy.http.bytes_read`*::
++
+--
+type: long
+
+bytes_read is the total number of bytes transmitted to the client when the log is emitted.
+
+--
+
+*`haproxy.http.captured_request_cookie`*::
++
+--
+captured_request_cookie is an optional "name=value" entry indicating that the client had this cookie in the request.
+
+
+--
+
+*`haproxy.http.captured_response_cookie`*::
++
+--
+captured_response_cookie is an optional "name=value" entry indicating that the server has returned a cookie with its response.
+
+
+--
+
+*`haproxy.http.termination_state`*::
++
+--
+termination_state is the condition the session was in when the session ended.
+
+--
+
+*`haproxy.http.actconn`*::
++
+--
+type: long
+
+actconn is the total number of concurrent connections on the process when the session was logged.
+
+--
+
+*`haproxy.http.feconn`*::
++
+--
+type: long
+
+feconn is the total number of concurrent connections on the frontend when the session was logged.
+
+--
+
+*`haproxy.http.beconn`*::
++
+--
+type: long
+
+beconn is the total number of concurrent connections handled by the backend when the session was logged.
+
+--
+
+*`haproxy.http.srvconn`*::
++
+--
+type: long
+
+srv_conn is the total number of concurrent connections still active on the server when the session was logged.
+
+--
+
+*`haproxy.http.retries`*::
++
+--
+type: long
+
+retries is the number of connection retries experienced by this session when trying to connect to the server.
+
+--
+
+*`haproxy.http.srv_queue`*::
++
+--
+type: long
+
+srv_queue is the total number of requests which were processed before this one in the server queue.
+
+--
+
+*`haproxy.http.backend_queue`*::
++
+--
+type: long
+
+backend_queue is the total number of requests which were processed before this one in the backend's global queue.
+
+--
+
+*`haproxy.http.captured_request_headers`*::
++
+--
+type: text
+
+captured_request_headers is a list of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
+
+
+--
+
+*`haproxy.http.captured_response_headers`*::
++
+--
+type: text
+
+captured_response_headers is a list of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
+
+
+--
+
+*`haproxy.http.http_request`*::
++
+--
+type: text
+
+http_request is the complete HTTP request line, including the method, request and HTTP version string.
+
+--
+
+*`haproxy.http.bind_name`*::
++
+--
+Please add description
+
+--
+
+*`haproxy.http.error_message`*::
++
+--
+type: text
+
+Please add description
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`haproxy.http.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`haproxy.http.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`haproxy.http.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`haproxy.http.geoip.region_name`*::
++
+--
+type: keyword
+
+The region name.
+
+
+--
+
+*`haproxy.http.geoip.city_name`*::
++
+--
+type: keyword
+
+The city name.
+
+
+--
+
+*`haproxy.http.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
 
 --
 

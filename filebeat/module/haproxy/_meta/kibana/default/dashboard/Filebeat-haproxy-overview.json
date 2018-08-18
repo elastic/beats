@@ -1,0 +1,87 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"filter\":[{\"meta\":{\"index\":\"filebeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"haproxy.http.status_code\",\"value\":\"exists\"},\"exists\":{\"field\":\"haproxy.http.status_code\"},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
+        },
+        "title": "Unique IPs map [Filebeat HAProxy]",
+        "uiStateJSON": "{\"mapCenter\":[50.127621728300475,12.23876953125],\"mapZoom\":6}",
+        "version": 1,
+        "visState": "{\"title\":\"Unique IPs map [Filebeat HAProxy]\",\"type\":\"tile_map\",\"params\":{\"addTooltip\":true,\"heatClusterSize\":1.5,\"isDesaturated\":true,\"legendPosition\":\"bottomright\",\"mapCenter\":[0,0],\"mapType\":\"Shaded Geohash Grid\",\"mapZoom\":2,\"wms\":{\"baseLayersAreLoaded\":{\"_c\":[],\"_s\":1,\"_d\":true,\"_v\":true,\"_h\":0,\"_n\":false},\"enabled\":false,\"options\":{\"format\":\"image/png\",\"transparent\":true},\"selectedTmsLayer\":{\"attribution\":\"\u003cp\u003e\u0026#169; \u003ca href=\\\"http://www.openstreetmap.org/copyright\\\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\\\"https://www.elastic.co/elastic-maps-service\\\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;\",\"id\":\"road_map\",\"maxZoom\":18,\"minZoom\":0,\"subdomains\":[],\"url\":\"https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.3.2\u0026license=03cd7256-731b-4013-983b-201ecf4d8f77\"},\"tmsLayers\":[{\"attribution\":\"\u003cp\u003e\u0026#169; \u003ca href=\\\"http://www.openstreetmap.org/copyright\\\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\\\"https://www.elastic.co/elastic-maps-service\\\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;\",\"id\":\"road_map\",\"maxZoom\":18,\"minZoom\":0,\"subdomains\":[],\"url\":\"https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.3.2\u0026license=03cd7256-731b-4013-983b-201ecf4d8f77\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"geohash_grid\",\"schema\":\"segment\",\"params\":{\"field\":\"haproxy.http.geoip.location\",\"autoPrecision\":true,\"isFilteredByCollar\":true,\"useGeocentroid\":true,\"precision\":4}}]}"
+      },
+      "id": "90cb0a80-9445-11e8-a2f2-0753218bc679",
+      "type": "visualization",
+      "updated_at": "2018-08-05T10:58:54.815Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "title": "Backend breakdown [Filebeat HAProxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Backend breakdown [Filebeat HAProxy]\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"haproxy.http.backend_name\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
+      },
+      "id": "bf25d5f0-989f-11e8-b4ef-432170a5484f",
+      "type": "visualization",
+      "updated_at": "2018-08-05T11:19:46.091Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"filter\":[{\"meta\":{\"index\":\"filebeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"haproxy.http.status_code\",\"value\":\"exists\"},\"exists\":{\"field\":\"haproxy.http.status_code\"},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "title": "Frontend breakdown [Filebeat HAProxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Frontend breakdown [Filebeat HAProxy]\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"haproxy.http.frontend_name\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":8,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
+      },
+      "id": "22db9560-98a2-11e8-b4ef-432170a5484f",
+      "type": "visualization",
+      "updated_at": "2018-08-05T11:24:37.174Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "title": "Response codes over time [Filebeat HAProxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Response codes over time [Filebeat HAProxy]\",\"type\":\"histogram\",\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"haproxy.http.status_code\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
+      },
+      "id": "d0120a80-98a1-11e8-b4ef-432170a5484f",
+      "type": "visualization",
+      "updated_at": "2018-08-05T11:22:18.280Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "HAProxy module Dashboard",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}",
+        "panelsJSON": "[{\"panelIndex\":\"1\",\"gridData\":{\"x\":0,\"y\":0,\"w\":48,\"h\":14,\"i\":\"1\"},\"version\":\"6.3.2\",\"type\":\"visualization\",\"id\":\"90cb0a80-9445-11e8-a2f2-0753218bc679\",\"embeddableConfig\":{\"mapCenter\":[52.05249047600099,25.312500000000004],\"mapZoom\":2}},{\"panelIndex\":\"2\",\"gridData\":{\"x\":24,\"y\":14,\"w\":24,\"h\":15,\"i\":\"2\"},\"version\":\"6.3.2\",\"type\":\"visualization\",\"id\":\"bf25d5f0-989f-11e8-b4ef-432170a5484f\",\"embeddableConfig\":{}},{\"panelIndex\":\"3\",\"gridData\":{\"x\":0,\"y\":14,\"w\":24,\"h\":15,\"i\":\"3\"},\"version\":\"6.3.2\",\"type\":\"visualization\",\"id\":\"22db9560-98a2-11e8-b4ef-432170a5484f\",\"embeddableConfig\":{}},{\"panelIndex\":\"4\",\"gridData\":{\"x\":0,\"y\":29,\"w\":48,\"h\":14,\"i\":\"4\"},\"version\":\"6.3.2\",\"type\":\"visualization\",\"id\":\"d0120a80-98a1-11e8-b4ef-432170a5484f\",\"embeddableConfig\":{}}]",
+        "timeRestore": false,
+        "title": "[Filebeat HAProxy] Overview",
+        "version": 1
+      },
+      "id": "b1556050-989d-11e8-b4ef-432170a5484f",
+      "type": "dashboard",
+      "updated_at": "2018-08-05T20:57:43.788Z",
+      "version": 3
+    }
+  ],
+  "version": "6.3.2"
+}
