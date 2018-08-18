@@ -3,7 +3,7 @@ https://jolokia.org/reference/html/agents.html[Jolokia agents].
 
 [float]
 === Features and configuration
-Tested with Jolokia 1.3.4.
+Tested with Jolokia 1.5.0.
 
 To collect metrics from a Jolokia instance, define a mapping section that
 specifies an MBean `ObjectName` followed by an array of attributes to fetch. For
@@ -11,15 +11,15 @@ each attribute in the array, specify the Elastic field name where the
 returned value will be saved. 
 
 For example, to get the `Uptime` attribute from the `java.lang:type=Runtime`
-MBean and map it to an event field called `jolokia.jmx.uptime`, configure the
-following mapping:
+MBean and map it to an event field called `jolokia.testnamespace.uptime`,
+configure the following mapping:
 
 [source,yaml]
 ----
 - module: jolokia
   metricsets: ["jmx"]
   hosts: ["localhost:8778"]
-  namespace: "metrics" <1>
+  namespace: "testnamespace" <1>
   jmx.mappings:
     - mbean: 'java.lang:type=Runtime'
       attributes:
@@ -31,9 +31,10 @@ following mapping:
           user: "jolokia"
           password: "s!cr!t"
 ----
-<1> The `namespace` setting is required.
-<2> This field will be called `jolokia.jmx.uptime` in the output event because
-the Beats framework adds a prefix to the name.  
+<1> The `namespace` setting is required. This setting is used along with the
+module name to qualify field names in the output event.
+<2> The field where the returned value will be saved. This field will be called
+`jolokia.testnamespace.uptime` in the output event.  
 <3> The `event` setting is optional. Use this setting to group all attributes
 with the same `event` value into the same event when sending data to Elastic. 
 
