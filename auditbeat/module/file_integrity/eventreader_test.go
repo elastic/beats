@@ -18,10 +18,12 @@
 package file_integrity
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
@@ -231,6 +233,74 @@ func TestEventReader(t *testing.T) {
 
 		assertNoEvent(t, events)
 	})
+}
+
+func TestRaces(t *testing.T) {
+	const (
+		fileMode os.FileMode = 0640
+		N                    = 100
+	)
+
+	var dirs []string
+
+	for i := 0; i < N; i++ {
+		dir, err := ioutil.TempDir("", "audit")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if dir, err = filepath.EvalSymlinks(dir); err != nil {
+			t.Fatal(err)
+		}
+		dirs = append(dirs, dir)
+	}
+
+	defer func() {
+		for _, dir := range dirs {
+			os.RemoveAll(dir)
+		}
+	}()
+
+	// Create a new EventProducer.
+	config := defaultConfig
+	config.Paths = dirs
+	config.Recursive = true
+	r, err := NewEventReader(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	done := make(chan struct{})
+	defer close(done)
+
+	// Generate a lot of events in parallel to Start() so there is a chance of
+	// events arriving before all watched dirs are Add()-ed
+	go func() {
+		for i := 0; i < 10; i++ {
+			for _, dir := range dirs {
+				fname := filepath.Join(dir, fmt.Sprintf("%d.dat", i))
+				ioutil.WriteFile(fname, []byte("hello"), fileMode)
+			}
+		}
+	}()
+	eventC, err := r.Start(done)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const marker = "test_file"
+	for _, dir := range dirs {
+		fname := filepath.Join(dir, marker)
+		ioutil.WriteFile(fname, []byte("hello"), fileMode)
+	}
+
+	got := 0
+	for i := 0; got < N; i++ {
+		ev := readTimeout(t, eventC)
+		if strings.Contains(ev.Path, marker) {
+			got++
+		}
+	}
+	assert.Equal(t, N, got)
 }
 
 // readTimeout reads one event from the channel and returns it. If it does
