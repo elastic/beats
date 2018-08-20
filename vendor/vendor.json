@@ -1428,18 +1428,34 @@
 			"revisionTime": "2017-05-08T18:43:26Z"
 		},
 		{
-			"checksumSHA1": "Le1psgZO0t6mRg6oY5dmnjH13hk=",
+			"checksumSHA1": "XHH8+1ESYdBoyKSD4FXwdy1liUk=",
+			"path": "github.com/stretchr/objx",
+			"revision": "b8b73a35e9830ae509858c10dec5866b4d5c8bff",
+			"revisionTime": "2018-07-02T10:34:55Z"
+		},
+		{
+			"checksumSHA1": "c6pbpF7eowwO59phRTpF8cQ80Z0=",
 			"path": "github.com/stretchr/testify/assert",
-			"revision": "b91bfb9ebec76498946beb6af7c0230c7cc7ba6c",
-			"revisionTime": "2017-12-30T17:54:59Z",
-			"version": "v1.2.0",
-			"versionExact": "v1.2.0"
+			"revision": "f35b8ab0b5a2cef36673838d662e249dd9c94686",
+			"revisionTime": "2018-05-06T18:05:49Z",
+			"version": "v1.2.2",
+			"versionExact": "v1.2.2"
+		},
+		{
+			"checksumSHA1": "WmBSFdqpdYRIkp0I408JIZ3LDMY=",
+			"path": "github.com/stretchr/testify/mock",
+			"revision": "f35b8ab0b5a2cef36673838d662e249dd9c94686",
+			"revisionTime": "2018-05-06T18:05:49Z",
+			"version": "v1.2.2",
+			"versionExact": "v1.2.2"
 		},
 		{
 			"checksumSHA1": "wnEANt4k5X/KGwoFyfSSnpxULm4=",
 			"path": "github.com/stretchr/testify/require",
 			"revision": "f35b8ab0b5a2cef36673838d662e249dd9c94686",
-			"revisionTime": "2018-05-06T18:05:49Z"
+			"revisionTime": "2018-05-06T18:05:49Z",
+			"version": "v1.2.2",
+			"versionExact": "v1.2.2"
 		},
 		{
 			"checksumSHA1": "CpcG17Q/0k1g2uy8AL26Uu7TouU=",
