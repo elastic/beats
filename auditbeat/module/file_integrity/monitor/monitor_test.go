@@ -211,8 +211,9 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 	watcher, err := New(true)
 	assertNoError(t, err)
 
-	assertNoError(t, watcher.Add(dir))
 	assertNoError(t, watcher.Start())
+	assertNoError(t, watcher.Add(dir))
+
 	defer func() {
 		assertNoError(t, watcher.Close())
 	}()
