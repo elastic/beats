@@ -1549,13 +1549,6 @@ time_duration is the time the request remained active in haproxy, which is the t
 
 --
 
-*`haproxy.termination_state`*::
-+
---
-termination_state is the condition the session was in when the session ended.
-
---
-
 *`haproxy.server_queue`*::
 +
 --
@@ -1591,9 +1584,83 @@ error_message is the error message logged by HAProxy in case of error.
 --
 
 [float]
+== geoip fields
+
+Contains GeoIP information gathered based on the client_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`haproxy.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`haproxy.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`haproxy.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`haproxy.geoip.region_name`*::
++
+--
+type: keyword
+
+The region name.
+
+
+--
+
+*`haproxy.geoip.city_name`*::
++
+--
+type: keyword
+
+The city name.
+
+
+--
+
+*`haproxy.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+*`haproxy.termination_state`*::
++
+--
+termination_state is the condition the session was in when the session ended.
+
+--
+
+[float]
 == connections fields
 
-connections groups various counts of connections active in the process.
+Contains various counts of connections active in the process.
 
 
 *`haproxy.connections.active`*::
@@ -1653,7 +1720,7 @@ Please add description
 Fields related to the HTTP response
 
 
-*`haproxy.connections.http.response.status_code`*::
+*`haproxy.http.response.status_code`*::
 +
 --
 type: long
@@ -1662,7 +1729,7 @@ status_code is the HTTP status code returned to the client.
 
 --
 
-*`haproxy.connections.http.response.bytes_read`*::
+*`haproxy.http.response.bytes_read`*::
 +
 --
 type: long
@@ -1671,7 +1738,7 @@ bytes_read is the total number of bytes transmitted to the client when the log i
 
 --
 
-*`haproxy.connections.http.response.captured_cookie`*::
+*`haproxy.http.response.captured_cookie`*::
 +
 --
 captured_cookie is an optional "name=value" entry indicating that the client had this cookie in the response.
@@ -1679,7 +1746,7 @@ captured_cookie is an optional "name=value" entry indicating that the client had
 
 --
 
-*`haproxy.connections.http.response.captured_headers`*::
+*`haproxy.http.response.captured_headers`*::
 +
 --
 type: text
@@ -1695,7 +1762,7 @@ captured_response_headers is a list of headers captured in the response due to t
 Fields related to the HTTP request
 
 
-*`haproxy.connections.http.request.captured_cookie`*::
+*`haproxy.http.request.captured_cookie`*::
 +
 --
 captured_cookie is an optional "name=value" entry indicating that the server has returned a cookie with its request.
@@ -1703,7 +1770,7 @@ captured_cookie is an optional "name=value" entry indicating that the server has
 
 --
 
-*`haproxy.connections.http.request.captured_headers`*::
+*`haproxy.http.request.captured_headers`*::
 +
 --
 type: text
@@ -1713,7 +1780,7 @@ captured_request_headers is a list of headers captured in the request due to the
 
 --
 
-*`haproxy.connections.http.request.raw_request_line`*::
+*`haproxy.http.request.raw_request_line`*::
 +
 --
 type: text

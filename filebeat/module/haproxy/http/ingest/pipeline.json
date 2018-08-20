@@ -24,8 +24,8 @@
   },
   {
     "geoip": {
-      "field": "haproxy.http.client_ip",
-      "target_field": "haproxy.http.geoip"
+      "field": "haproxy.client_ip",
+      "target_field": "haproxy.geoip"
     }
   },
   {

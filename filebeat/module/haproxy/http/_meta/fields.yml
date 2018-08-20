@@ -1,7 +1,7 @@
 - name: http
   description: Please add description
   type: group
-  fields:
+  fields: 
   - name: response
     description: Fields related to the HTTP response
     type: group
@@ -39,4 +39,6 @@
     - name: raw_request_line
       description: raw_request_line is the complete HTTP request line, including the method, request and HTTP version string.
       type: text
+  
+
 
