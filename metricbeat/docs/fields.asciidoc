@@ -11279,6 +11279,381 @@ The number of times the background process removes documents from collections wi
 --
 
 [float]
+== replstatus fields
+
+replstatus provides an overview of replica set status.
+
+
+
+[float]
+== oplog fields
+
+oplog provides an overview of replication oplog status, which is retrieved from db.getReplicationInfo().
+
+
+
+*`mongodb.replstatus.oplog.size.allocated`*::
++
+--
+type: long
+
+format: bytes
+
+The total amount of space used by the replstatus in bytes.
+
+
+--
+
+*`mongodb.replstatus.oplog.size.used`*::
++
+--
+type: long
+
+format: bytes
+
+total amount of space allocated to the replstatus in bytes.
+
+
+--
+
+*`mongodb.replstatus.oplog.first.timestamp`*::
++
+--
+type: long
+
+Timestamp of the first (i.e. earliest) operation in the replstatus
+
+
+--
+
+*`mongodb.replstatus.oplog.last.timestamp`*::
++
+--
+type: long
+
+Timestamp of the last (i.e. latest) operation in the replstatus
+
+
+--
+
+*`mongodb.replstatus.oplog.window`*::
++
+--
+type: long
+
+The difference between the first and last operation in the replstatus.
+
+
+--
+
+*`mongodb.replstatus.set_name`*::
++
+--
+type: keyword
+
+The name of the replica set.
+
+
+--
+
+*`mongodb.replstatus.server_date`*::
++
+--
+type: date
+
+Reflects the current time according to the server that processed the replSetGetStatus command.
+
+
+--
+
+
+*`mongodb.replstatus.optimes.last_committed`*::
++
+--
+type: long
+
+Information, from the viewpoint of this member, regarding the most recent operation that has been written to a majority of replica set members.
+
+
+--
+
+*`mongodb.replstatus.optimes.applied`*::
++
+--
+type: long
+
+Information, from the viewpoint of this member, regarding the most recent operation that has been applied to this member of the replica set.
+
+
+--
+
+*`mongodb.replstatus.optimes.durable`*::
++
+--
+type: long
+
+Information, from the viewpoint of this member, regarding the most recent operation that has been written to the journal of this member of the replica set.
+
+
+--
+
+[float]
+== lag fields
+
+Delay between a write operation on the primary and its copy to a secondary
+
+
+
+*`mongodb.replstatus.lag.max`*::
++
+--
+type: long
+
+format: duration
+
+Difference between optime of primary and slowest secondary
+
+
+--
+
+*`mongodb.replstatus.lag.min`*::
++
+--
+type: long
+
+format: duration
+
+Difference between optime of primary and fastest secondary
+
+
+--
+
+[float]
+== headroom fields
+
+Difference between the primary's oplog window and the replication lag of the secondary
+
+
+
+*`mongodb.replstatus.headroom.max`*::
++
+--
+type: long
+
+format: duration
+
+Difference between primary's oplog window and the replication lag of the fastest secondary
+
+
+--
+
+*`mongodb.replstatus.headroom.min`*::
++
+--
+type: long
+
+format: duration
+
+Difference between primary's oplog window and the replication lag of the slowest secondary
+
+
+--
+
+[float]
+== members fields
+
+Provides information about members of replica set grouped by their state
+
+
+
+*`mongodb.replstatus.members.primary.host`*::
++
+--
+type: keyword
+
+Host address of the primary
+
+
+--
+
+*`mongodb.replstatus.members.primary.optime`*::
++
+--
+type: keyword
+
+Optime of primary
+
+
+--
+
+*`mongodb.replstatus.members.secondary.hosts`*::
++
+--
+type: array
+
+List of secondary hosts
+
+
+--
+
+*`mongodb.replstatus.members.secondary.optimes`*::
++
+--
+type: keyword
+
+Optimes of secondaries
+
+
+--
+
+*`mongodb.replstatus.members.secondary.count`*::
++
+--
+type: long
+
+--
+
+*`mongodb.replstatus.members.recovering.hosts`*::
++
+--
+type: array
+
+List of recovering members hosts
+
+
+--
+
+*`mongodb.replstatus.members.recovering.count`*::
++
+--
+type: long
+
+Count of members in the `recovering` state
+
+
+--
+
+*`mongodb.replstatus.members.unknown.hosts`*::
++
+--
+type: array
+
+List of members' hosts in the `unknown` state
+
+
+--
+
+*`mongodb.replstatus.members.unknown.count`*::
++
+--
+type: long
+
+Count of members with `unknown` state
+
+
+--
+
+*`mongodb.replstatus.members.startup2.hosts`*::
++
+--
+type: array
+
+List of initializing members hosts
+
+
+--
+
+*`mongodb.replstatus.members.startup2.count`*::
++
+--
+type: long
+
+Count of members in the `startup2` state
+
+
+--
+
+*`mongodb.replstatus.members.arbiter.hosts`*::
++
+--
+type: array
+
+List of arbiters hosts
+
+
+--
+
+*`mongodb.replstatus.members.arbiter.count`*::
++
+--
+type: long
+
+Count of arbiters
+
+
+--
+
+*`mongodb.replstatus.members.down.hosts`*::
++
+--
+type: array
+
+List of `down` members hosts
+
+
+--
+
+*`mongodb.replstatus.members.down.count`*::
++
+--
+type: long
+
+Count of `down` members
+
+
+--
+
+*`mongodb.replstatus.members.rollback.hosts`*::
++
+--
+type: array
+
+List of members in the `rollback` state
+
+
+--
+
+*`mongodb.replstatus.members.rollback.count`*::
++
+--
+type: long
+
+Count of members in the `rollback` state
+
+
+--
+
+*`mongodb.replstatus.members.unhealthy.hosts`*::
++
+--
+type: array
+
+List of members' hosts with healthy = false
+
+
+--
+
+*`mongodb.replstatus.members.unhealthy.count`*::
++
+--
+type: long
+
+Count of unhealthy members
+
+
+--
+
+[float]
 == status fields
 
 MongoDB server status metrics.

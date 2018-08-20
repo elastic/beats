@@ -444,7 +444,7 @@ metricbeat.modules:
 
 #------------------------------- MongoDB Module ------------------------------
 - module: mongodb
-  metricsets: ["dbstats", "status", "collstats", "metrics"]
+  metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
   period: 10s
   enabled: true
 
