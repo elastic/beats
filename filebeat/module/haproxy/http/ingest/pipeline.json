@@ -4,7 +4,7 @@
     "grok": {
         "field": "message",
         "patterns": [
-            "(%{NOTSPACE:haproxy.http.process_name}\\[%{NUMBER:haproxy.http.pid:int}\\]: )?%{IP:haproxy.http.client_ip}:%{NUMBER:haproxy.http.client_port:int} \\[%{NOTSPACE:haproxy.http.request_date}\\] %{NOTSPACE:haproxy.http.frontend_name} %{NOTSPACE:haproxy.http.backend_name}/%{NOTSPACE:haproxy.http.server_name} %{NUMBER:haproxy.http.time_client_req:int}/%{NUMBER:haproxy.http.time_queue:int}/%{NUMBER:haproxy.http.time_backend_connect:int}/%{NUMBER:haproxy.http.time_server_response:int}/%{NUMBER:haproxy.http.time_duration:int} %{NUMBER:haproxy.http.status_code:int} %{NUMBER:haproxy.http.bytes_read:int} %{NOTSPACE:haproxy.http.captured_request_cookie} %{NOTSPACE:haproxy.http.captured_response_cookie} %{NOTSPACE:haproxy.http.termination_state} %{NUMBER:haproxy.http.actconn:int}/%{NUMBER:haproxy.http.feconn:int}/%{NUMBER:haproxy.http.beconn:int}/%{NUMBER:haproxy.http.srvconn:int}/%{NUMBER:haproxy.http.retries:int} %{NUMBER:haproxy.http.srv_queue:int}/%{NUMBER:haproxy.http.backend_queue:int} \\{%{DATA:haproxy.http.captured_request_headers}\\} \\{%{DATA:haproxy.http.captured_response_headers}\\} \"%{GREEDYDATA:haproxy.http.http_request}\"",
+            "(%{NOTSPACE:haproxy.http.process_name}\\[%{NUMBER:haproxy.http.pid:int}\\]: )?%{IP:haproxy.http.client_ip}:%{NUMBER:haproxy.http.client_port:int} \\[%{NOTSPACE:haproxy.http.request_date}\\] %{NOTSPACE:haproxy.http.frontend_name} %{NOTSPACE:haproxy.http.backend_name}/%{NOTSPACE:haproxy.http.server_name} %{NUMBER:haproxy.http.time_client_req:int}/%{NUMBER:haproxy.http.time_queue:int}/%{NUMBER:haproxy.http.time_backend_connect:int}/%{NUMBER:haproxy.http.time_server_response:int}/%{NUMBER:haproxy.http.time_duration:int} %{NUMBER:haproxy.http.response.status_code:int} %{NUMBER:haproxy.http.response.bytes_read:int} %{NOTSPACE:haproxy.http.request.captured_cookie} %{NOTSPACE:haproxy.http.response.captured_cookie} %{NOTSPACE:haproxy.http.termination_state} %{NUMBER:haproxy.http.connections.active:int}/%{NUMBER:haproxy.http.connections.frontend:int}/%{NUMBER:haproxy.http.connections.backend:int}/%{NUMBER:haproxy.http.connections.server:int}/%{NUMBER:haproxy.http.retries:int} %{NUMBER:haproxy.http.srv_queue:int}/%{NUMBER:haproxy.http.backend_queue:int} \\{%{DATA:haproxy.http.request.captured_headers}\\} \\{%{DATA:haproxy.http.response.captured_headers}\\} \"%{GREEDYDATA:haproxy.http.request.request_line}\"",
             "(%{NOTSPACE:haproxy.http.process_name}\\[%{NUMBER:haproxy.http.pid:int}\\]: )?%{IP:haproxy.http.client_ip}:%{NUMBER:haproxy.http.client_port:int} \\[%{NOTSPACE:haproxy.http.request_date}\\] %{NOTSPACE:haproxy.http.frontend_name}/%{NOTSPACE:haproxy.http.bind_name} %{GREEDYDATA:haproxy.http.error_message}"
         ],
         "ignore_missing": false
@@ -30,14 +30,14 @@
   },
   {
     "split": {
-      "field": "haproxy.http.captured_request_headers",
+      "field": "haproxy.http.request.captured_headers",
       "separator": "\\|",
       "ignore_failure": true
     }
   },
   {
     "split": {
-      "field": "haproxy.http.captured_response_headers",
+      "field": "haproxy.http.response.captured_headers",
       "separator": "\\|",
       "ignore_failure": true
     }
