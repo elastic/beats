@@ -10,3 +10,5 @@
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Set the port for the syslog input to listen on. Default: 9001
+    #var.syslog_port:
