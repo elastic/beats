@@ -18,6 +18,7 @@
 package autodiscover
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -76,6 +77,9 @@ func (m *mockAdapter) CreateConfig(bus.Event) ([]*common.Config, error) {
 
 // CheckConfig tests given config to check if it will work or not, returns errors in case it won't work
 func (m *mockAdapter) CheckConfig(*common.Config) error {
+	if len(m.configs) == 0 {
+		return fmt.Errorf("unable to validate config")
+	}
 	return nil
 }
 
@@ -171,6 +175,7 @@ func TestAutodiscover(t *testing.T) {
 
 	runners := adapter.Runners()
 	assert.Equal(t, len(runners), 1)
+	assert.Equal(t, len(autodiscover.configs), 1)
 	assert.Equal(t, runners[0].meta.Get()["foo"], "bar")
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
@@ -186,6 +191,7 @@ func TestAutodiscover(t *testing.T) {
 
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 1)
+	assert.Equal(t, len(autodiscover.configs), 1)
 	assert.Equal(t, runners[0].meta.Get()["foo"], "baz") // meta is updated
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
@@ -207,6 +213,7 @@ func TestAutodiscover(t *testing.T) {
 
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 2)
+	assert.Equal(t, len(autodiscover.configs), 1)
 	assert.True(t, runners[0].stopped)
 	assert.Equal(t, runners[1].meta.Get()["foo"], "baz")
 	assert.True(t, runners[1].started)
@@ -223,6 +230,7 @@ func TestAutodiscover(t *testing.T) {
 
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 2)
+	assert.Equal(t, len(autodiscover.configs), 0)
 	assert.Equal(t, runners[1].meta.Get()["foo"], "baz")
 	assert.True(t, runners[1].started)
 	assert.True(t, runners[1].stopped)
@@ -281,12 +289,74 @@ func TestAutodiscoverHash(t *testing.T) {
 
 	runners := adapter.Runners()
 	assert.Equal(t, len(runners), 2)
+	assert.Equal(t, len(autodiscover.configs), 2)
 	assert.Equal(t, runners[0].meta.Get()["foo"], "bar")
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
 	assert.Equal(t, runners[1].meta.Get()["foo"], "bar")
 	assert.True(t, runners[1].started)
 	assert.False(t, runners[1].stopped)
+}
+
+func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
+	// Register mock autodiscover provider
+	busChan := make(chan bus.Bus, 1)
+	Registry = NewRegistry()
+	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
+		// intercept bus to mock events
+		busChan <- b
+
+		return &mockProvider{}, nil
+	})
+
+	adapter := mockAdapter{
+		configs: []*common.Config{},
+	}
+
+	// and settings:
+	providerConfig, _ := common.NewConfigFrom(map[string]string{
+		"type": "mock",
+	})
+	config := Config{
+		Providers: []*common.Config{providerConfig},
+	}
+
+	// Create autodiscover manager
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Start it
+	autodiscover.Start()
+	defer autodiscover.Stop()
+	eventBus := <-busChan
+
+	// Test start event
+	eventBus.Publish(bus.Event{
+		"start": true,
+		"meta": common.MapStr{
+			"foo": "bar",
+		},
+	})
+
+	// Timed sleep to make sure that bus event is processed
+	wait(t, func() bool { return true })
+	assert.Equal(t, 0, len(adapter.Runners()))
+	assert.Equal(t, 0, len(autodiscover.configs))
+
+	// Test another event
+	eventBus.Publish(bus.Event{
+		"start": true,
+		"meta": common.MapStr{
+			"foo": "baz",
+		},
+	})
+
+	// Timed sleep to make sure that bus event is processed
+	wait(t, func() bool { return true })
+	assert.Equal(t, 0, len(adapter.Runners()))
+	assert.Equal(t, 0, len(autodiscover.configs))
 }
 
 func wait(t *testing.T, test func() bool) {
