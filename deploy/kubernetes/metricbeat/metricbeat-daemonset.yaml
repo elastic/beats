@@ -74,7 +74,7 @@ spec:
       - name: config
         configMap:
           defaultMode: 0600
-          name: metricbeat-config
+          name: metricbeat-daemonset-config
       - name: modules
         configMap:
           defaultMode: 0600

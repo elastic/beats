@@ -55,7 +55,7 @@ spec:
       - name: config
         configMap:
           defaultMode: 0600
-          name: metricbeat-config
+          name: metricbeat-deployment-config
       - name: modules
         configMap:
           defaultMode: 0600
