@@ -47,7 +47,6 @@ func NewEventReader(c Config) (EventProducer, error) {
 	return &reader{
 		watcher: watcher,
 		config:  c,
-		eventC:  make(chan Event, 1),
 		log:     logp.NewLogger(moduleName),
 	}, nil
 }
@@ -56,7 +55,16 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	if err := r.watcher.Start(); err != nil {
 		return nil, errors.Wrap(err, "unable to start watcher")
 	}
-	go r.consumeEvents(done)
+
+	queueDone := make(chan struct{})
+	queueC := make(chan []*Event)
+
+	// Launch a separate goroutine to fetch all events that happen while
+	// watches are being installed.
+	go func() {
+		defer close(queueC)
+		queueC <- r.enqueueEvents(queueDone)
+	}()
 
 	// Windows implementation of fsnotify needs to have the watched paths
 	// installed after the event consumer is started, to avoid a potential
@@ -73,10 +81,31 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 		}
 	}
 
+	close(queueDone)
+	events := <-queueC
+
+	// Populate callee's event channel with the previously received events
+	r.eventC = make(chan Event, 1+len(events))
+	for _, ev := range events {
+		r.eventC <- *ev
+	}
+
+	go r.consumeEvents(done)
+
 	r.log.Infow("Started fsnotify watcher",
 		"file_path", r.config.Paths,
 		"recursive", r.config.Recursive)
 	return r.eventC, nil
+}
+
+func (r *reader) enqueueEvents(done <-chan struct{}) (events []*Event) {
+	for {
+		ev := r.nextEvent(done)
+		if ev == nil {
+			return
+		}
+		events = append(events, ev)
+	}
 }
 
 func (r *reader) consumeEvents(done <-chan struct{}) {
@@ -84,10 +113,21 @@ func (r *reader) consumeEvents(done <-chan struct{}) {
 	defer r.watcher.Close()
 
 	for {
-		select {
-		case <-done:
+		ev := r.nextEvent(done)
+		if ev == nil {
 			r.log.Debug("fsnotify reader terminated")
 			return
+		}
+		r.eventC <- *ev
+	}
+}
+
+func (r *reader) nextEvent(done <-chan struct{}) *Event {
+	for {
+		select {
+		case <-done:
+			return nil
+
 		case event := <-r.watcher.EventChannel():
 			if event.Name == "" || r.config.IsExcludedPath(event.Name) {
 				continue
@@ -101,7 +141,8 @@ func (r *reader) consumeEvents(done <-chan struct{}) {
 				r.config.MaxFileSizeBytes, r.config.HashTypes)
 			e.rtt = time.Since(start)
 
-			r.eventC <- e
+			return &e
+
 		case err := <-r.watcher.ErrorChannel():
 			// a bug in fsnotify can cause spurious nil errors to be sent
 			// on the error channel.
