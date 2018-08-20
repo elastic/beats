@@ -26,10 +26,12 @@ import (
 var (
 	schema = s.Schema{
 		"clients": s.Object{
-			"connected":         c.Int("connected_clients"),
-			"max_output_buffer": c.Int("client_recent_max_output_buffer"),
-			"max_input_buffer":  c.Int("client_recent_max_input_buffer"),
-			"blocked":           c.Int("blocked_clients"),
+			"connected":           c.Int("connected_clients"),
+			"longest_output_list": c.Int("client_longest_output_list", s.Optional), // Redis 4.x and below
+			"biggest_input_buf":   c.Int("client_biggest_input_buf", s.Optional), // Redis 4.x and below
+			"max_output_buffer":   c.Int("client_recent_max_output_buffer", s.Optional), // Redis 5.0 and above
+			"max_input_buffer":    c.Int("client_recent_max_input_buffer", s.Optional), // Redis 5.0 and above
+			"blocked":             c.Int("blocked_clients"),
 		},
 		"cluster": s.Object{
 			"enabled": c.Bool("cluster_enabled"),
