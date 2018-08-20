@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 *Auditbeat*
 
 - Fixed a crash in the file_integrity module under Linux. {issue}7753[7753]
+- Fixed a data race in the file_integrity module. {issue}8009[8009]
 
 *Filebeat*
 
