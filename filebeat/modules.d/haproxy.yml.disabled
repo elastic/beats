@@ -1,14 +1,8 @@
 - module: haproxy
   # All logs
-  http:
+  {fileset}:
     enabled: true
-
-    # Set which input to use between syslog (default) or file.
-    #var.input:
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
-
-    # Set the port for the syslog input to listen on. Default: 9001
-    #var.syslog_port:

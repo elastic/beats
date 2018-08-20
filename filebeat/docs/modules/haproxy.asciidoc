@@ -49,7 +49,7 @@ include::../include/config-option-intro.asciidoc[]
 
 
 [float]
-==== `{fileset}` log fileset settings
+==== `http` log fileset settings
 
 include::../include/var-paths.asciidoc[]
 
