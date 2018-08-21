@@ -20,9 +20,8 @@
 package consumergroup
 
 import (
-	"fmt"
 	"io"
-	"os"
+	"net"
 	"testing"
 	"time"
 
@@ -31,61 +30,39 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-)
-
-const (
-	kafkaDefaultHost = "localhost"
-	kafkaDefaultPort = "9092"
+	"github.com/elastic/beats/metricbeat/module/kafka/mtest"
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "kafka")
-
-	c, err := startConsumer(t, "metricbeat-test")
-	if err != nil {
-		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
-	}
-	defer c.Close()
-
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	for retries := 0; retries < 3; retries++ {
-		err = mbtest.WriteEventsReporterV2(ms, t, "")
-		if err == nil {
-			return
+	mtest.DataRunner.Run(t, compose.Suite{"Data": func(t *testing.T, host string) {
+		c, err := startConsumer(t, "metricbeat-test", host)
+		if err != nil {
+			t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 		}
-		time.Sleep(500 * time.Millisecond)
-	}
-	t.Fatal("write", err)
+		defer c.Close()
+
+		ms := mbtest.NewReportingMetricSetV2(t, getConfig(host))
+		for retries := 0; retries < 3; retries++ {
+			err = mbtest.WriteEventsReporterV2(ms, t, "")
+			if err == nil {
+				return
+			}
+			time.Sleep(500 * time.Millisecond)
+		}
+		t.Fatal("write", err)
+	}})
 }
 
-func startConsumer(t *testing.T, topic string) (io.Closer, error) {
-	brokers := []string{getTestKafkaHost()}
+func startConsumer(t *testing.T, topic, host string) (io.Closer, error) {
+	brokers := []string{net.JoinHostPort(host, "9092")}
 	topics := []string{topic}
 	return saramacluster.NewConsumer(brokers, "test-group", topics, nil)
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kafka",
 		"metricsets": []string{"consumergroup"},
-		"hosts":      []string{getTestKafkaHost()},
+		"hosts":      []string{net.JoinHostPort(host, "9092")},
 	}
-}
-
-func getTestKafkaHost() string {
-	return fmt.Sprintf("%v:%v",
-		getenv("KAFKA_HOST", kafkaDefaultHost),
-		getenv("KAFKA_PORT", kafkaDefaultPort),
-	)
-}
-
-func getenv(name, defaultValue string) string {
-	return strDefault(os.Getenv(name), defaultValue)
-}
-
-func strDefault(a, defaults string) string {
-	if len(a) == 0 {
-		return defaults
-	}
-	return a
 }

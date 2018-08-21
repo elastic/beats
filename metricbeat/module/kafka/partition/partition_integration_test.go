@@ -56,7 +56,7 @@ func TestTopic(t *testing.T) {
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))
 
-	mtest.DataRunner.Run(t, compose.Suite{"Topic": func(t *testing.T, host string) {
+	mtest.Runner.Run(t, compose.Suite{"Topic": func(t *testing.T, host string) {
 		id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
 		testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
