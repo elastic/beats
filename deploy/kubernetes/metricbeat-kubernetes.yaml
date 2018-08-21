@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: metricbeat-config
+  name: metricbeat-daemonset-config
   namespace: kube-system
   labels:
     k8s-app: metricbeat
@@ -13,6 +13,13 @@ data:
       path: ${path.config}/modules.d/*.yml
       # Reload module configs as they change:
       reload.enabled: false
+
+    # To enable hints based autodiscover uncomment this:
+    #metricbeat.autodiscover:
+    #  providers:
+    #    - type: kubernetes
+    #      host: ${NODE_NAME}
+    #      hints.enabled: true
 
     processors:
       - add_cloud_metadata:
@@ -68,6 +75,7 @@ data:
         - container
         - volume
       period: 10s
+      host: ${NODE_NAME}
       hosts: ["localhost:10255"]
 ---
 # Deploy a Metricbeat instance per node for node metrics retrieval
@@ -109,6 +117,10 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
         resources:
@@ -146,7 +158,7 @@ spec:
       - name: config
         configMap:
           defaultMode: 0600
-          name: metricbeat-config
+          name: metricbeat-daemonset-config
       - name: modules
         configMap:
           defaultMode: 0600
@@ -155,6 +167,32 @@ spec:
         hostPath:
           path: /var/lib/metricbeat-data
           type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metricbeat-deployment-config
+  namespace: kube-system
+  labels:
+    k8s-app: metricbeat
+data:
+  metricbeat.yml: |-
+    metricbeat.config.modules:
+      # Mounted `metricbeat-daemonset-modules` configmap:
+      path: ${path.config}/modules.d/*.yml
+      # Reload module configs as they change:
+      reload.enabled: false
+
+    processors:
+      - add_cloud_metadata:
+
+    cloud.id: ${ELASTIC_CLOUD_ID}
+    cloud.auth: ${ELASTIC_CLOUD_AUTH}
+
+    output.elasticsearch:
+      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      username: ${ELASTICSEARCH_USERNAME}
+      password: ${ELASTICSEARCH_PASSWORD}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -176,6 +214,7 @@ data:
         # Uncomment this to get k8s events:
         #- event
       period: 10s
+      host: ${NODE_NAME}
       hosts: ["kube-state-metrics:8080"]
 ---
 # Deploy singleton instance in the whole cluster for some unique data sources, like kube-state-metrics
@@ -215,6 +254,10 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
         resources:
@@ -235,7 +278,7 @@ spec:
       - name: config
         configMap:
           defaultMode: 0600
-          name: metricbeat-config
+          name: metricbeat-deployment-config
       - name: modules
         configMap:
           defaultMode: 0600
@@ -270,12 +313,12 @@ rules:
   verbs: ["get", "list", "watch"]
 - apiGroups: ["extensions"]
   resources:
-  - deployments
   - replicasets
   verbs: ["get", "list", "watch"]
 - apiGroups: ["apps"]
   resources:
   - statefulsets
+  - deployments
   verbs: ["get", "list", "watch"]
 ---
 apiVersion: v1
