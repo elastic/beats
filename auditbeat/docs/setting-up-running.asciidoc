@@ -20,6 +20,8 @@ This section includes additional information on how to set up and run
 
 * <<running-on-docker>>
 
+* <<running-on-kubernetes>>
+
 
 //MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
 
@@ -30,5 +32,7 @@ include::../../libbeat/docs/keystore.asciidoc[]
 include::../../libbeat/docs/command-reference.asciidoc[]
 
 include::./running-on-docker.asciidoc[]
+
+include::./running-on-kubernetes.asciidoc[]
 
 include::../../libbeat/docs/shared-shutdown.asciidoc[]
