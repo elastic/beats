@@ -28,6 +28,7 @@ type ClientConfig struct {
 	Protocol string            `config:"protocol"`
 	Host     string            `config:"host"`
 	Path     string            `config:"path"`
+	SpaceID  string            `config:"space.id"`
 	Username string            `config:"username"`
 	Password string            `config:"password"`
 	TLS      *tlscommon.Config `config:"ssl"`
@@ -39,6 +40,7 @@ var (
 		Protocol: "http",
 		Host:     "localhost:5601",
 		Path:     "",
+		SpaceID:  "",
 		Username: "",
 		Password: "",
 		Timeout:  90 * time.Second,
