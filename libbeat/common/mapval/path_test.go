@@ -27,17 +27,17 @@ import (
 func TestPathComponentType_String(t *testing.T) {
 	tests := []struct {
 		name string
-		pct  PathComponentType
+		pct  pathComponentType
 		want string
 	}{
 		{
 			"Should return the correct type",
-			PCMapKey,
+			pcMapKey,
 			"map",
 		},
 		{
 			"Should return the correct type",
-			PCSliceIdx,
+			pcSliceIdx,
 			"slice",
 		},
 	}
@@ -45,7 +45,7 @@ func TestPathComponentType_String(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.pct.String(); got != tt.want {
-				t.Errorf("PathComponentType.String() = %v, want %v", got, tt.want)
+				t.Errorf("pathComponentType.String() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -53,7 +53,7 @@ func TestPathComponentType_String(t *testing.T) {
 
 func TestPathComponent_String(t *testing.T) {
 	type fields struct {
-		Type  PathComponentType
+		Type  pathComponentType
 		Key   string
 		Index int
 	}
@@ -64,24 +64,24 @@ func TestPathComponent_String(t *testing.T) {
 	}{
 		{
 			"Map key should return a literal",
-			fields{PCMapKey, "foo", 0},
+			fields{pcMapKey, "foo", 0},
 			"foo",
 		},
 		{
 			"Array index should return a bracketed number",
-			fields{PCSliceIdx, "", 123},
+			fields{pcSliceIdx, "", 123},
 			"[123]",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pc := PathComponent{
+			pc := pathComponent{
 				Type:  tt.fields.Type,
 				Key:   tt.fields.Key,
 				Index: tt.fields.Index,
 			}
 			if got := pc.String(); got != tt.want {
-				t.Errorf("PathComponent.String() = %v, want %v", got, tt.want)
+				t.Errorf("pathComponent.String() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -93,27 +93,27 @@ func TestPath_ExtendSlice(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		p    Path
+		p    path
 		args args
-		want Path
+		want path
 	}{
 		{
 			"Extending an empty slice",
-			Path{},
+			path{},
 			args{123},
-			Path{PathComponent{PCSliceIdx, "", 123}},
+			path{pathComponent{pcSliceIdx, "", 123}},
 		},
 		{
 			"Extending a non-empty slice",
-			Path{PathComponent{PCMapKey, "foo", -1}},
+			path{pathComponent{pcMapKey, "foo", -1}},
 			args{123},
-			Path{PathComponent{PCMapKey, "foo", -1}, PathComponent{PCSliceIdx, "", 123}},
+			path{pathComponent{pcMapKey, "foo", -1}, pathComponent{pcSliceIdx, "", 123}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.p.ExtendSlice(tt.args.index); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Path.ExtendSlice() = %v, want %v", got, tt.want)
+			if got := tt.p.extendSlice(tt.args.index); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("path.extendSlice() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -125,27 +125,27 @@ func TestPath_ExtendMap(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		p    Path
+		p    path
 		args args
-		want Path
+		want path
 	}{
 		{
 			"Extending an empty slice",
-			Path{},
+			path{},
 			args{"foo"},
-			Path{PathComponent{PCMapKey, "foo", -1}},
+			path{pathComponent{pcMapKey, "foo", -1}},
 		},
 		{
 			"Extending a non-empty slice",
-			Path{}.ExtendMap("foo"),
+			path{}.extendMap("foo"),
 			args{"bar"},
-			Path{PathComponent{PCMapKey, "foo", -1}, PathComponent{PCMapKey, "bar", -1}},
+			path{pathComponent{pcMapKey, "foo", -1}, pathComponent{pcMapKey, "bar", -1}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.p.ExtendMap(tt.args.key); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Path.ExtendMap() = %v, want %v", got, tt.want)
+			if got := tt.p.extendMap(tt.args.key); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("path.extendMap() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -154,21 +154,21 @@ func TestPath_ExtendMap(t *testing.T) {
 func TestPath_Concat(t *testing.T) {
 	tests := []struct {
 		name string
-		p    Path
-		arg  Path
-		want Path
+		p    path
+		arg  path
+		want path
 	}{
 		{
 			"simple",
-			Path{}.ExtendMap("foo"),
-			Path{}.ExtendSlice(123),
-			Path{}.ExtendMap("foo").ExtendSlice(123),
+			path{}.extendMap("foo"),
+			path{}.extendSlice(123),
+			path{}.extendMap("foo").extendSlice(123),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.p.Concat(tt.arg); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Path.Concat() = %v, want %v", got, tt.want)
+			if got := tt.p.concat(tt.arg); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("path.concat() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -177,29 +177,29 @@ func TestPath_Concat(t *testing.T) {
 func TestPath_String(t *testing.T) {
 	tests := []struct {
 		name string
-		p    Path
+		p    path
 		want string
 	}{
 		{
 			"empty",
-			Path{},
+			path{},
 			"",
 		},
 		{
 			"one element",
-			Path{}.ExtendMap("foo"),
+			path{}.extendMap("foo"),
 			"foo",
 		},
 		{
 			"complex",
-			Path{}.ExtendMap("foo").ExtendSlice(123).ExtendMap("bar"),
+			path{}.extendMap("foo").extendSlice(123).extendMap("bar"),
 			"foo.[123].bar",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.p.String(); got != tt.want {
-				t.Errorf("Path.String() = %v, want %v", got, tt.want)
+				t.Errorf("path.String() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -208,40 +208,40 @@ func TestPath_String(t *testing.T) {
 func TestPath_Last(t *testing.T) {
 	tests := []struct {
 		name string
-		p    Path
-		want *PathComponent
+		p    path
+		want *pathComponent
 	}{
 		{
 			"empty path",
-			Path{},
+			path{},
 			nil,
 		},
 		{
 			"one element",
-			Path{}.ExtendMap("foo"),
-			&PathComponent{PCMapKey, "foo", -1},
+			path{}.extendMap("foo"),
+			&pathComponent{pcMapKey, "foo", -1},
 		},
 		{
 			"many elements",
-			Path{}.ExtendMap("foo").ExtendMap("bar").ExtendSlice(123),
-			&PathComponent{PCSliceIdx, "", 123},
+			path{}.extendMap("foo").extendMap("bar").extendSlice(123),
+			&pathComponent{pcSliceIdx, "", 123},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.p.Last(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Path.Last() = %v, want %v", got, tt.want)
+			if got := tt.p.last(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("path.last() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestPath_GetFrom(t *testing.T) {
-	fooPath := Path{}.ExtendMap("foo")
-	complexPath := Path{}.ExtendMap("foo").ExtendSlice(0).ExtendMap("bar").ExtendSlice(1)
+	fooPath := path{}.extendMap("foo")
+	complexPath := path{}.extendMap("foo").extendSlice(0).extendMap("bar").extendSlice(1)
 	tests := []struct {
 		name       string
-		p          Path
+		p          path
 		arg        common.MapStr
 		wantValue  interface{}
 		wantExists bool
@@ -277,12 +277,12 @@ func TestPath_GetFrom(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotValue, gotExists := tt.p.GetFrom(tt.arg)
+			gotValue, gotExists := tt.p.getFrom(tt.arg)
 			if !reflect.DeepEqual(gotValue, tt.wantValue) {
-				t.Errorf("Path.GetFrom() gotValue = %v, want %v", gotValue, tt.wantValue)
+				t.Errorf("path.getFrom() gotValue = %v, want %v", gotValue, tt.wantValue)
 			}
 			if gotExists != tt.wantExists {
-				t.Errorf("Path.GetFrom() gotExists = %v, want %v", gotExists, tt.wantExists)
+				t.Errorf("path.getFrom() gotExists = %v, want %v", gotExists, tt.wantExists)
 			}
 		})
 	}
@@ -292,32 +292,32 @@ func TestParsePath(t *testing.T) {
 	tests := []struct {
 		name    string
 		arg     string
-		wantP   Path
+		wantP   path
 		wantErr bool
 	}{
 		{
 			"simple",
 			"foo",
-			Path{}.ExtendMap("foo"),
+			path{}.extendMap("foo"),
 			false,
 		},
 		{
 			"complex",
 			"foo.[0].bar.[1].baz",
-			Path{}.ExtendMap("foo").ExtendSlice(0).ExtendMap("bar").ExtendSlice(1).ExtendMap("baz"),
+			path{}.extendMap("foo").extendSlice(0).extendMap("bar").extendSlice(1).extendMap("baz"),
 			false,
 		},
 		// TODO: The validation and testing for this needs to be better
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotP, err := ParsePath(tt.arg)
+			gotP, err := parsePath(tt.arg)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ParsePath() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("parsePath() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotP, tt.wantP) {
-				t.Errorf("ParsePath() = %v, want %v", gotP, tt.wantP)
+				t.Errorf("parsePath() = %v, want %v", gotP, tt.wantP)
 			}
 		})
 	}

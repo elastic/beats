@@ -24,7 +24,7 @@ type ValueResult struct {
 }
 
 // A ValueValidator is used to validate a value in a Map.
-type ValueValidator func(path Path, v interface{}) *Results
+type ValueValidator func(path path, v interface{}) *Results
 
 // An IsDef defines the type of check to do.
 // Generally only name and checker are set. optional and checkKeyMissing are
@@ -36,7 +36,7 @@ type IsDef struct {
 	checkKeyMissing bool
 }
 
-func (id IsDef) check(path Path, v interface{}, keyExists bool) *Results {
+func (id IsDef) check(path path, v interface{}, keyExists bool) *Results {
 	if id.checkKeyMissing {
 		if !keyExists {
 			return ValidResult(path)
@@ -57,7 +57,7 @@ func (id IsDef) check(path Path, v interface{}, keyExists bool) *Results {
 }
 
 // ValidResult is a convenience value for Valid results.
-func ValidResult(path Path) *Results {
+func ValidResult(path path) *Results {
 	return SimpleResult(path, true, "is valid")
 }
 
@@ -65,7 +65,7 @@ func ValidResult(path Path) *Results {
 var ValidVR = ValueResult{true, "is valid"}
 
 // KeyMissingResult is emitted when a key was expected, but was not present.
-func KeyMissingResult(path Path) *Results {
+func KeyMissingResult(path path) *Results {
 	return SingleResult(path, KeyMissingVR)
 }
 
@@ -76,7 +76,7 @@ var KeyMissingVR = ValueResult{
 }
 
 // StrictFailureResult is emitted when Strict() is used, and an unexpected field is found.
-func StrictFailureResult(path Path) *Results {
+func StrictFailureResult(path path) *Results {
 	return SingleResult(path, StrictFailureVR)
 }
 

@@ -15,30 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+/*
+Package mapval is used to validate JSON-like nested map data-structure against a set of expectations. Its key features are allowing custom, function defined validators  for values, and allowing the composition of multiple validation specs.
+
+See the example below for more details. Most key functions include detailed examples of their use within this documentation.
+*/
 package mapval
-
-import "github.com/elastic/beats/libbeat/common"
-
-type flatValidator struct {
-	path  path
-	isDef IsDef
-}
-
-// CompiledSchema represents a compiled definition for driving a Validator.
-type CompiledSchema []flatValidator
-
-// Check executes the the checks within the CompiledSchema
-func (cs CompiledSchema) Check(actual common.MapStr) *Results {
-	results := NewResults()
-	for _, pv := range cs {
-		actualV, actualKeyExists := pv.path.getFrom(actual)
-
-		if !pv.isDef.optional || pv.isDef.optional && actualKeyExists {
-			var checkRes *Results
-			checkRes = pv.isDef.check(pv.path, actualV, actualKeyExists)
-			results.merge(checkRes)
-		}
-	}
-
-	return results
-}
