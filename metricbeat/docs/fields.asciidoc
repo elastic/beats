@@ -4337,6 +4337,353 @@ format: bytes
 
 --
 
+*`elasticsearch.node.stats.thread_pool.*.threads`*::
++
+--
+type: object
+
+
+
+--
+
+*`elasticsearch.node.stats.thread_pool.*.queue`*::
++
+--
+type: object
+
+
+
+--
+
+*`elasticsearch.node.stats.thread_pool.*.active`*::
++
+--
+type: object
+
+
+
+--
+
+*`elasticsearch.node.stats.thread_pool.*.rejected`*::
++
+--
+type: object
+
+
+
+--
+
+*`elasticsearch.node.stats.thread_pool.*.largest`*::
++
+--
+type: object
+
+
+
+--
+
+*`elasticsearch.node.stats.thread_pool.*.completed`*::
++
+--
+type: object
+
+
+
+--
+
+[float]
+== transport fields
+
+Transport stats
+
+
+
+[float]
+== rx fields
+
+Received stats
+
+
+
+*`elasticsearch.node.stats.transport.rx.count`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.transport.rx.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+
+
+--
+
+[float]
+== tx fields
+
+Transmitted stats
+
+
+
+*`elasticsearch.node.stats.transport.tx.count`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.transport.tx.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+
+
+--
+
+[float]
+== breakers fields
+
+Circuit breaker stats
+
+
+
+
+*`elasticsearch.node.stats.breakers.fielddata.limit.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+
+
+--
+
+*`elasticsearch.node.stats.breakers.fielddata.estimated.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+
+
+--
+
+*`elasticsearch.node.stats.breakers.fielddata.overhead`*::
++
+--
+type: float
+
+
+
+--
+
+*`elasticsearch.node.stats.breakers.fielddata.tripped`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
+== discovery fields
+
+Discover stats
+
+
+
+[float]
+== cluster_state_queue fields
+
+Cluster state queue stats
+
+
+
+*`elasticsearch.node.stats.discovery.cluster_state_queue.total`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.discovery.cluster_state_queue.pending`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.discovery.cluster_state_queue.committed`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
+== published_cluster_states fields
+
+Published cluster states stats
+
+
+
+*`elasticsearch.node.stats.discovery.published_cluster_states.full_states`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.discovery.published_cluster_states.incompatible_diffs`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.discovery.published_cluster_states.compatible_diffs`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
+== ingest fields
+
+Ingest pipeline stats
+
+
+
+[float]
+== total fields
+
+
+
+
+*`elasticsearch.node.stats.ingest.total.count`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.total.current`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.total.failed`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.total.ms`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.pipelines.*`*::
++
+--
+type: object
+
+
+
+--
+
+[float]
+== adaptive_selection fields
+
+
+
+
+*`elasticsearch.node.stats.ingest.adaptive_selection.outgoing_searches`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.adaptive_selection.queue_size.avg`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.adaptive_selection.service_time.avg.ns`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.adaptive_selection.response_time.avg.ns`*::
++
+--
+type: long
+
+
+
+--
+
+*`elasticsearch.node.stats.ingest.adaptive_selection.rank`*::
++
+--
+type: keyword
+
+
+
+--
+
 [float]
 == cluster.pending_task fields
 

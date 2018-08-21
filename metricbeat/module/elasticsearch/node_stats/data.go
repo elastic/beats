@@ -20,6 +20,8 @@ package node_stats
 import (
 	"encoding/json"
 
+	"github.com/elastic/beats/metricbeat/helper/elastic"
+
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -75,6 +77,66 @@ var (
 				},
 			}),
 		}),
+		"thread_pool": c.Dict("thread_pool", s.Schema{
+			"analyze": c.Dict("analyze", threadPoolSchema),
+			"ccr":     c.Dict("ccr", threadPoolSchema),
+			"fetch_shard_started": c.Dict("fetch_shard_started", threadPoolSchema),
+			"fetch_shard_store":   c.Dict("fetch_shard_store", threadPoolSchema),
+			"flush":               c.Dict("flush", threadPoolSchema),
+			"force_merge":         c.Dict("force_merge", threadPoolSchema),
+			"generic":             c.Dict("generic", threadPoolSchema),
+			"get":                 c.Dict("get", threadPoolSchema),
+			"listener":            c.Dict("listener", threadPoolSchema),
+			"management":          c.Dict("management", threadPoolSchema),
+			"ml_autodetect":       c.Dict("ml_autodetect", threadPoolSchema),
+			"ml_datafeed":         c.Dict("ml_datafeed", threadPoolSchema),
+			"ml_utility":          c.Dict("ml_utility", threadPoolSchema),
+			"refresh":             c.Dict("refresh", threadPoolSchema),
+			"rollup_indexing":     c.Dict("rollup_indexing", threadPoolSchema),
+			"search":              c.Dict("search", threadPoolSchema),
+			"security-token-key":  c.Dict("security-token-key", threadPoolSchema),
+			"snapshot":            c.Dict("snapshot", threadPoolSchema),
+			"warmer":              c.Dict("warmer", threadPoolSchema),
+			"watcher":             c.Dict("watcher", threadPoolSchema),
+			"write":               c.Dict("write", threadPoolSchema),
+		}),
+		"transport": c.Dict("transport", s.Schema{
+			"rx": s.Object{
+				"count": c.Int("rx_count"),
+				"bytes": c.Int("rx_size_in_bytes"),
+			},
+			"tx": s.Object{
+				"count": c.Int("tx_count"),
+				"bytes": c.Int("tx_size_in_bytes"),
+			},
+		}),
+		"breakers": c.Dict("breakers", s.Schema{
+			"fielddata": c.Dict("fielddata", s.Schema{
+				"limit": s.Object{
+					"bytes": c.Int("limit_size_in_bytes"),
+				},
+				"estimated": s.Object{
+					"bytes": c.Int("estimated_size_in_bytes"),
+				},
+				"overhead": c.Float("overhead"),
+				"tripped":  c.Int("tripped"),
+			}),
+		}),
+		"discovery": c.Dict("discovery", s.Schema{
+			"cluster_state_queue": c.Dict("cluster_state_queue", s.Schema{
+				"total":     c.Int("total"),
+				"pending":   c.Int("pending"),
+				"committed": c.Int("committed"),
+			}),
+			"published_cluster_states": c.Dict("published_cluster_states", s.Schema{
+				"full_states":        c.Int("full_states"),
+				"incompatible_diffs": c.Int("incompatible_diffs"),
+				"compatible_diffs":   c.Int("compatible_diffs"),
+			}),
+		}),
+		"ingest": c.Dict("ingest", s.Schema{
+			"total": c.Dict("total", ingestPipelineSchema),
+		}),
 	}
 
 	poolSchema = s.Schema{
@@ -98,11 +160,82 @@ var (
 			"ms":    c.Int("collection_time_in_millis"),
 		},
 	}
+
+	threadPoolSchema = s.Schema{
+		"threads":   c.Int("threads"),
+		"queue":     c.Int("queue"),
+		"active":    c.Int("active"),
+		"rejected":  c.Int("rejected"),
+		"largest":   c.Int("largest"),
+		"completed": c.Int("completed"),
+	}
+
+	ingestPipelineSchema = s.Schema{
+		"count":   c.Int("count"),
+		"current": c.Int("current"),
+		"failed":  c.Int("failed"),
+		"ms":      c.Int("time_in_millis"),
+	}
+
+	adaptiveSelectionSchema = s.Schema{
+		"outgoing_searches": c.Int("outgoing_searches"),
+		"queue_size": s.Object{
+			"avg": c.Int("avg_queue_size"),
+		},
+		"service_time": s.Object{
+			"avg": s.Object{
+				"ns": c.Int("avg_service_time_ns"),
+			},
+		},
+		"response_time": s.Object{
+			"avg": s.Object{
+				"ns": c.Int("avg_response_time_ns"),
+			},
+		},
+		"rank": c.Str("rank"),
+	}
 )
 
 type nodesStruct struct {
 	ClusterName string                            `json:"cluster_name"`
 	Nodes       map[string]map[string]interface{} `json:"nodes"`
+}
+
+func pipelineMetricsMapping(node map[string]interface{}, metricSetFields common.MapStr, r mb.ReporterV2) {
+	pipelines, ok := node["ingest"].(map[string]interface{})["pipelines"].(map[string]interface{})
+	if !ok {
+		elastic.ReportErrorForMissingField("ingest.pipelines", elastic.Elasticsearch, r)
+		return
+	}
+
+	for pipelineID, value := range pipelines {
+		pipelineMetrics, ok := value.(map[string]interface{})
+		if !ok {
+			elastic.ReportErrorForMissingField("ingest.pipelines."+pipelineID, elastic.Elasticsearch, r)
+		}
+
+		fields, err := ingestPipelineSchema.Apply(pipelineMetrics)
+		if err != nil {
+			r.Error(err)
+			continue
+		}
+		metricSetFields.Put("ingest.pipelines."+pipelineID, fields)
+	}
+}
+
+func adaptiveSelectionMapping(nodeName string, node map[string]interface{}, metricSetFields common.MapStr, r mb.ReporterV2) {
+	adaptiveSelectionMetrics, ok := node["adaptive_selection"].(map[string]interface{})[nodeName].(map[string]interface{})
+	if !ok {
+		elastic.ReportErrorForMissingField("adaptive_selection."+nodeName, elastic.Elasticsearch, r)
+		return
+	}
+
+	fields, err := adaptiveSelectionSchema.Apply(adaptiveSelectionMetrics)
+	if err != nil {
+		r.Error(err)
+		return
+	}
+	metricSetFields.Put("adaptive_selection", fields)
 }
 
 func eventsMapping(r mb.ReporterV2, content []byte) error {
@@ -122,6 +255,12 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 		if err != nil {
 			r.Error(err)
 		}
+
+		// Handle ingest.pipelines.*
+		pipelineMetricsMapping(node, event.MetricSetFields, r)
+
+		// Handle adaptive_selection[name]
+		adaptiveSelectionMapping(name, node, event.MetricSetFields, r)
 
 		event.ModuleFields = common.MapStr{
 			"node": common.MapStr{

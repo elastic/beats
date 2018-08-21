@@ -101,6 +101,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Add `metircs` metricset to MongoDB module. {pull}7611[7611]
 - Add fields for mermory fragmentation, memory allocator stats, copy on write, master-slave status, and active defragmentation to `info` metricset of Redis module. {pull}7695[7695]
 - Add experimental socket summary metricset to system module {pull}6782[6782]
+- Add fields for thread pool, transport, circuit breakers, discovery, ingest pipelines, and adaptive selection to `node_stats` metricset of Elasticsearch module. {pull}7993[7993]
 
 *Packetbeat*
 

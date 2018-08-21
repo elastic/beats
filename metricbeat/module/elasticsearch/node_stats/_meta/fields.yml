@@ -156,3 +156,173 @@
           type: long
           format: bytes
           description: >
+
+    - name: thread_pool.*.threads
+      type: object
+      object_type: long
+      description: >
+    - name: thread_pool.*.queue
+      type: object
+      object_type: long
+      description: >
+    - name: thread_pool.*.active
+      type: object
+      object_type: long
+      description: >
+    - name: thread_pool.*.rejected
+      type: object
+      object_type: long
+      description: >
+    - name: thread_pool.*.largest
+      type: object
+      object_type: long
+      description: >
+    - name: thread_pool.*.completed
+      type: object
+      object_type: long
+      description: >
+
+    - name: transport
+      type: group
+      description: >
+        Transport stats
+      fields:
+        - name: rx
+          type: group
+          description: >
+            Received stats
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+        - name: tx
+          type: group
+          description: >
+            Transmitted stats
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+
+    - name: breakers
+      type: group
+      description: >
+        Circuit breaker stats
+      fields:
+        - name: fielddata
+          type: group
+          fields:
+            - name: limit.bytes
+              type: long
+              format: bytes
+              description: >
+            - name: estimated.bytes
+              type: long
+              format: bytes
+              description: >
+            - name: overhead
+              type: float
+              description: >
+            - name: tripped
+              type: long
+              description: >
+
+    - name: discovery
+      type: group
+      description: >
+        Discover stats
+      fields:
+        - name: cluster_state_queue
+          type: group
+          description: >
+            Cluster state queue stats
+          fields:
+            - name: total
+              type: long
+              description: >
+            - name: pending
+              type: long
+              description: >
+            - name: committed
+              type: long
+              description: >
+        - name: published_cluster_states
+          type: group
+          description: >
+            Published cluster states stats
+          fields:
+            - name: full_states
+              type: long
+              description: >
+            - name: incompatible_diffs
+              type: long
+              description: >
+            - name: compatible_diffs
+              type: long
+              description: >
+
+    - name: ingest
+      type: group
+      description: >
+        Ingest pipeline stats
+      fields:
+        - name: total
+          type: group
+          description: >
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: current
+              type: long
+              description: >
+            - name: failed
+              type: long
+              description: >
+            - name: ms
+              type: long
+              description: >
+        - name: pipelines.*
+          type: object
+          object_type: group
+          description: >
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: current
+              type: long
+              description: >
+            - name: failed
+              type: long
+              description: >
+            - name: ms
+              type: long
+              description: >
+        - name: adaptive_selection
+          type: group
+          description: >
+          fields:
+            - name: outgoing_searches
+              type: long
+              description: >
+            - name: queue_size.avg
+              type: long
+              description: >
+            - name: service_time.avg.ns
+              type: long
+              description: >
+            - name: response_time.avg.ns
+              type: long
+              description: >
+            - name: rank
+              type: keyword
+              description: >
