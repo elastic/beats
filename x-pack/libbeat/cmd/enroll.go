@@ -30,7 +30,7 @@ func getBeat(name, version string) (*instance.Beat, error) {
 }
 
 func genEnrollCmd(name, version string) *cobra.Command {
-	keystoreCmd := cobra.Command{
+	enrollCmd := cobra.Command{
 		Use:   "enroll <kibana_url> <enrollment_token>",
 		Short: "Enroll in Kibana for Central Management",
 		Args:  cobra.ExactArgs(2),
@@ -51,5 +51,5 @@ func genEnrollCmd(name, version string) *cobra.Command {
 		}),
 	}
 
-	return &keystoreCmd
+	return &enrollCmd
 }
