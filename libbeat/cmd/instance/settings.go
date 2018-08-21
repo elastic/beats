@@ -17,12 +17,15 @@
 
 package instance
 
+import "github.com/spf13/pflag"
+
 // Settings contains basic settings for any beat to pass into GenRootCmd
 type Settings struct {
 	Name        string
 	IndexPrefix string
 	Version     string
 	Monitoring  MonitoringConfig
+	RunFlags    *pflag.FlagSet
 }
 
 // MonitoringConfig contains monitoring-specific settings

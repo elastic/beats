@@ -72,24 +72,19 @@ func GenRootCmdWithIndexPrefixWithRunFlags(name, indexPrefix, version string, be
 		Name:        name,
 		IndexPrefix: indexPrefix,
 		Version:     version,
+		RunFlags:    runFlags,
 	}
-	return GenRootCmdWithSettingsWithRunFlags(beatCreator, settings, runFlags)
+	return GenRootCmdWithSettings(beatCreator, settings)
 }
 
 // GenRootCmdWithSettings returns the root command to use for your beat. It take the
 // run command, which will be called if no args are given (for backwards compatibility),
 // and beat settings
 func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings) *BeatsRootCmd {
-	return GenRootCmdWithSettingsWithRunFlags(beatCreator, settings, nil)
-}
-
-// GenRootCmdWithSettingsWithRunFlags returns the root command to use for your beat. It takes the
-// run command, which will be called if no args are given (for backwards compatibility),
-// beat settings, and runFlags. runFlags parameter must the flagset used by run command
-func GenRootCmdWithSettingsWithRunFlags(beatCreator beat.Creator, settings instance.Settings, runFlags *pflag.FlagSet) *BeatsRootCmd {
 	name := settings.Name
 	version := settings.Version
 	indexPrefix := settings.IndexPrefix
+	runFlags := settings.RunFlags
 
 	rootCmd := &BeatsRootCmd{}
 	rootCmd.Use = name
