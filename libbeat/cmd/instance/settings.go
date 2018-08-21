@@ -19,8 +19,13 @@ package instance
 
 // Settings contains basic settings for any beat to pass into GenRootCmd
 type Settings struct {
-	Name                      string
-	IndexPrefix               string
-	Version                   string
-	MonitoringDefaultUsername string
+	Name        string
+	IndexPrefix string
+	Version     string
+	Monitoring  MonitoringConfig
+}
+
+// MonitoringConfig contains monitoring-specific settings
+type MonitoringConfig struct {
+	DefaultUsername string
 }
