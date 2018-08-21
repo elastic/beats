@@ -35,6 +35,10 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
         resources:
@@ -55,7 +59,7 @@ spec:
       - name: config
         configMap:
           defaultMode: 0600
-          name: metricbeat-config
+          name: metricbeat-deployment-config
       - name: modules
         configMap:
           defaultMode: 0600
