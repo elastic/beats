@@ -87,6 +87,10 @@ func GenRootCmdWithIndexPrefixWithRunFlags(name, indexPrefix, version string, be
 // run command, which will be called if no args are given (for backwards compatibility),
 // and beat settings
 func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings) *BeatsRootCmd {
+	if settings.IndexPrefix == "" {
+		settings.IndexPrefix = settings.Name
+	}
+
 	name := settings.Name
 	version := settings.Version
 	indexPrefix := settings.IndexPrefix
