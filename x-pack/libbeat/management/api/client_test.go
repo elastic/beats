@@ -5,7 +5,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,7 +13,7 @@ import (
 func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *Client) {
 	mux := http.NewServeMux()
 	mux.Handle("/api/status", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `{"name": "test", "version": {"number": "6.3.0", "build_snapshot": false}}`)
+		http.Error(w, "Unauthorized", 401)
 	}))
 	mux.Handle("/", handler)
 
