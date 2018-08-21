@@ -58,6 +58,10 @@ func (r *runnerFactory) Create(x beat.Pipeline, c *common.Config, meta *common.M
 	return runner, err
 }
 
+func (r *runnerFactory) CheckConfig(config *common.Config) error {
+	return nil
+}
+
 func TestNewConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
