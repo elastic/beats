@@ -76,10 +76,17 @@ func (m *mockAdapter) CreateConfig(bus.Event) ([]*common.Config, error) {
 }
 
 // CheckConfig tests given config to check if it will work or not, returns errors in case it won't work
-func (m *mockAdapter) CheckConfig(*common.Config) error {
-	if len(m.configs) == 0 {
-		return fmt.Errorf("unable to validate config")
+func (m *mockAdapter) CheckConfig(c *common.Config) error {
+	config := struct {
+		Broken bool `config:"broken"`
+	}{}
+	c.Unpack(&config)
+
+	if config.Broken {
+		fmt.Println("broken")
+		return fmt.Errorf("Broken config")
 	}
+
 	return nil
 }
 
@@ -309,8 +316,15 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 		return &mockProvider{}, nil
 	})
 
+	// Create a mock adapter
+	runnerConfig1, _ := common.NewConfigFrom(map[string]string{
+		"broken": "true",
+	})
+	runnerConfig2, _ := common.NewConfigFrom(map[string]string{
+		"runner": "2",
+	})
 	adapter := mockAdapter{
-		configs: []*common.Config{},
+		configs: []*common.Config{runnerConfig1, runnerConfig2},
 	}
 
 	// and settings:
@@ -340,23 +354,9 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 		},
 	})
 
-	// Timed sleep to make sure that bus event is processed
-	wait(t, func() bool { return true })
-	assert.Equal(t, 0, len(adapter.Runners()))
-	assert.Equal(t, 0, len(autodiscover.configs))
-
-	// Test another event
-	eventBus.Publish(bus.Event{
-		"start": true,
-		"meta": common.MapStr{
-			"foo": "baz",
-		},
-	})
-
-	// Timed sleep to make sure that bus event is processed
-	wait(t, func() bool { return true })
-	assert.Equal(t, 0, len(adapter.Runners()))
-	assert.Equal(t, 0, len(autodiscover.configs))
+	// As only the second config is valid, total runners will be 1
+	wait(t, func() bool { return len(adapter.Runners()) == 1 })
+	assert.Equal(t, 1, len(autodiscover.configs))
 }
 
 func wait(t *testing.T, test func() bool) {
