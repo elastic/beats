@@ -27,7 +27,7 @@ import (
 )
 
 func assertIsDefValid(t *testing.T, id IsDef, value interface{}) *Results {
-	res := id.check(MustParsePath("p"), value, true)
+	res := id.check(mustParsePath("p"), value, true)
 
 	if !res.Valid {
 		assert.Fail(
@@ -40,7 +40,7 @@ func assertIsDefValid(t *testing.T, id IsDef, value interface{}) *Results {
 }
 
 func assertIsDefInvalid(t *testing.T, id IsDef, value interface{}) *Results {
-	res := id.check(MustParsePath("p"), value, true)
+	res := id.check(mustParsePath("p"), value, true)
 
 	if res.Valid {
 		assert.Fail(
@@ -100,6 +100,12 @@ func TestRegisteredIsEqual(t *testing.T) {
 
 	assertIsDefValid(t, id, now)
 	assertIsDefInvalid(t, id, now.Add(100))
+}
+
+func TestIsNonEmptyString(t *testing.T) {
+	assertIsDefValid(t, IsNonEmptyString, "abc")
+	assertIsDefValid(t, IsNonEmptyString, "a")
+	assertIsDefInvalid(t, IsNonEmptyString, "")
 }
 
 func TestIsStringContaining(t *testing.T) {
