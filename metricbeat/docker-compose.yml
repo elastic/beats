@@ -69,20 +69,23 @@ services:
     build: ./module/jolokia/_meta
 
   kafka:
-    build:
-      context: ./module/kafka/_meta
-      args:
-        KAFKA_VERSION: 2.0.0
+    extends:
+      file: ./module/kafka/docker-compose.yml
+      service: kafka
 
   kafka_1_1_0:
+    extends:
+      file: ./module/kafka/docker-compose.yml
+      service: kafka
     build:
-      context: ./module/kafka/_meta
       args:
         KAFKA_VERSION: 1.1.0
 
   kafka_0_10_2:
+    extends:
+      file: ./module/kafka/docker-compose.yml
+      service: kafka
     build:
-      context: ./module/kafka/_meta
       args:
         KAFKA_VERSION: 0.10.2.1
 

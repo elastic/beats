@@ -1,0 +1,8 @@
+version: "2.4"
+
+services:
+  kafka:
+    build:
+      context: ./_meta
+      args:
+        KAFKA_VERSION: 2.0.0

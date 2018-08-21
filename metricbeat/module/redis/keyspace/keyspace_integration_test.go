@@ -20,6 +20,7 @@
 package keyspace
 
 import (
+	"net"
 	"strings"
 	"testing"
 
@@ -79,7 +80,7 @@ func TestData(t *testing.T) {
 // addEntry adds an entry to redis
 func addEntry(t *testing.T, host string) {
 	// Insert at least one event to make sure db exists
-	c, err := rd.Dial("tcp", host)
+	c, err := rd.Dial("tcp", net.JoinHostPort(host, "6379"))
 	if err != nil {
 		t.Fatal("connect", err)
 	}
@@ -94,6 +95,6 @@ func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "redis",
 		"metricsets": []string{"keyspace"},
-		"hosts":      []string{host},
+		"hosts":      []string{net.JoinHostPort(host, "6379")},
 	}
 }

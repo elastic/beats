@@ -25,29 +25,22 @@ import (
 
 var (
 	Runner = compose.TestRunner{
-		Service: "redis",
+		Service: "kafka",
 		Options: map[string][]string{
-			"REDIS_VERSION": []string{
-				"3.2.12",
-				"4.0.11",
-				"5.0-rc",
-			},
-			"IMAGE_OS": []string{
-				"alpine",
-				"stretch",
+			"KAFKA_VERSION": []string{
+				"0.10.2.1",
+				"1.1.0",
+				"2.0.0",
 			},
 		},
 		Parallel: true,
 	}
 
 	DataRunner = compose.TestRunner{
-		Service: "redis",
+		Service: "kafka",
 		Options: map[string][]string{
-			"REDIS_VERSION": []string{
-				"4.0.11",
-			},
-			"IMAGE_OS": []string{
-				"alpine",
+			"KAFKA_VERSION": []string{
+				"1.1.0",
 			},
 		},
 		Parallel: true,

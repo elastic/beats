@@ -22,7 +22,7 @@ package partition
 import (
 	"fmt"
 	"math/rand"
-	"os"
+	"net"
 	"strconv"
 	"testing"
 	"time"
@@ -34,91 +34,89 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-)
-
-const (
-	kafkaDefaultHost = "localhost"
-	kafkaDefaultPort = "9092"
+	"github.com/elastic/beats/metricbeat/module/kafka/mtest"
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "kafka")
+	t.Parallel()
 
-	generateKafkaData(t, "metricbeat-generate-data")
+	mtest.DataRunner.Run(t, compose.Suite{"Data": func(t *testing.T, host string) {
+		generateKafkaData(t, "metricbeat-generate-data", host)
 
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig(""))
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
+		ms := mbtest.NewReportingMetricSetV2(t, getConfig("", host))
+		err := mbtest.WriteEventsReporterV2(ms, t, "")
+		if err != nil {
+			t.Fatal("write", err)
+		}
+	}})
 }
 
 func TestTopic(t *testing.T) {
-
-	compose.EnsureUp(t, "kafka")
+	t.Parallel()
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))
 
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
-	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
+	mtest.DataRunner.Run(t, compose.Suite{"Topic": func(t *testing.T, host string) {
+		id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+		testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
-	// Create initial topic
-	generateKafkaData(t, testTopic)
+		// Create initial topic
+		generateKafkaData(t, testTopic, host)
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig(testTopic))
-	dataBefore, err := mbtest.ReportingFetchV2(f)
-	if err != nil {
-		t.Fatal("write", err)
-	}
-	if len(dataBefore) == 0 {
-		t.Errorf("No offsets fetched from topic (before): %v", testTopic)
-	}
-	t.Logf("before: %v", dataBefore)
-
-	var n int64 = 10
-	var i int64 = 0
-	// Create n messages
-	for ; i < n; i++ {
-		generateKafkaData(t, testTopic)
-	}
-
-	dataAfter, err := mbtest.ReportingFetchV2(f)
-	if err != nil {
-		t.Fatal("write", err)
-	}
-	if len(dataAfter) == 0 {
-		t.Errorf("No offsets fetched from topic (after): %v", testTopic)
-	}
-	t.Logf("after: %v", dataAfter)
-
-	// Checks that no new topics / partitions were added
-	assert.True(t, len(dataBefore) == len(dataAfter))
-
-	var offsetBefore int64 = 0
-	var offsetAfter int64 = 0
-
-	// Its possible that other topics exists -> select the right data
-	for _, data := range dataBefore {
-		if data.ModuleFields["topic"].(common.MapStr)["name"] == testTopic {
-			offsetBefore = data.MetricSetFields["offset"].(common.MapStr)["newest"].(int64)
+		f := mbtest.NewReportingMetricSetV2(t, getConfig(testTopic, host))
+		dataBefore, err := mbtest.ReportingFetchV2(f)
+		if err != nil {
+			t.Fatal("write", err)
 		}
-	}
-
-	for _, data := range dataAfter {
-		if data.ModuleFields["topic"].(common.MapStr)["name"] == testTopic {
-			offsetAfter = data.MetricSetFields["offset"].(common.MapStr)["newest"].(int64)
+		if len(dataBefore) == 0 {
+			t.Errorf("No offsets fetched from topic (before): %v", testTopic)
 		}
-	}
+		t.Logf("before: %v", dataBefore)
 
-	// Compares offset before and after
-	if offsetBefore+n != offsetAfter {
-		t.Errorf("Offset before: %v", offsetBefore)
-		t.Errorf("Offset after: %v", offsetAfter)
-	}
-	assert.True(t, offsetBefore+n == offsetAfter)
+		var n int64 = 10
+		// Create n messages
+		for i := int64(0); i < n; i++ {
+			generateKafkaData(t, testTopic, host)
+		}
+
+		dataAfter, err := mbtest.ReportingFetchV2(f)
+		if err != nil {
+			t.Fatal("write", err)
+		}
+		if len(dataAfter) == 0 {
+			t.Errorf("No offsets fetched from topic (after): %v", testTopic)
+		}
+		t.Logf("after: %v", dataAfter)
+
+		// Checks that no new topics / partitions were added
+		assert.True(t, len(dataBefore) == len(dataAfter))
+
+		var offsetBefore int64 = 0
+		var offsetAfter int64 = 0
+
+		// Its possible that other topics exists -> select the right data
+		for _, data := range dataBefore {
+			if data.ModuleFields["topic"].(common.MapStr)["name"] == testTopic {
+				offsetBefore = data.MetricSetFields["offset"].(common.MapStr)["newest"].(int64)
+			}
+		}
+
+		for _, data := range dataAfter {
+			if data.ModuleFields["topic"].(common.MapStr)["name"] == testTopic {
+				offsetAfter = data.MetricSetFields["offset"].(common.MapStr)["newest"].(int64)
+			}
+		}
+
+		// Compares offset before and after
+		if offsetBefore+n != offsetAfter {
+			t.Errorf("Offset before: %v", offsetBefore)
+			t.Errorf("Offset after: %v", offsetAfter)
+		}
+		assert.True(t, offsetBefore+n == offsetAfter)
+	}})
 }
 
-func generateKafkaData(t *testing.T, topic string) {
+func generateKafkaData(t *testing.T, topic string, host string) {
 	t.Logf("Send Kafka Event to topic: %v", topic)
 
 	config := sarama.NewConfig()
@@ -128,7 +126,7 @@ func generateKafkaData(t *testing.T, topic string) {
 	config.Producer.Retry.Backoff = 500 * time.Millisecond
 	config.Metadata.Retry.Max = 20
 	config.Metadata.Retry.Backoff = 500 * time.Millisecond
-	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
+	client, err := sarama.NewClient([]string{net.JoinHostPort(host, "9092")}, config)
 	if err != nil {
 		t.Errorf("%s", err)
 		t.FailNow()
@@ -156,7 +154,7 @@ func generateKafkaData(t *testing.T, topic string) {
 	}
 }
 
-func getConfig(topic string) map[string]interface{} {
+func getConfig(topic string, host string) map[string]interface{} {
 	var topics []string
 	if topic != "" {
 		topics = []string{topic}
@@ -165,25 +163,7 @@ func getConfig(topic string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kafka",
 		"metricsets": []string{"partition"},
-		"hosts":      []string{getTestKafkaHost()},
+		"hosts":      []string{net.JoinHostPort(host, "9092")},
 		"topics":     topics,
 	}
-}
-
-func getTestKafkaHost() string {
-	return fmt.Sprintf("%v:%v",
-		getenv("KAFKA_HOST", kafkaDefaultHost),
-		getenv("KAFKA_PORT", kafkaDefaultPort),
-	)
-}
-
-func getenv(name, defaultValue string) string {
-	return strDefault(os.Getenv(name), defaultValue)
-}
-
-func strDefault(a, defaults string) string {
-	if len(a) == 0 {
-		return defaults
-	}
-	return a
 }

@@ -20,10 +20,8 @@ package compose
 import (
 	"context"
 	"fmt"
-	"net"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -77,11 +75,14 @@ func (c *wrapperContainer) Host() string {
 	if len(ip) == 0 {
 		return ""
 	}
+	return ip
 
+	/* TODO:
 	for _, port := range c.info.Ports {
 		return net.JoinHostPort(ip, strconv.Itoa(int(port.PrivatePort)))
 	}
 	return ""
+	*/
 }
 
 func (d *wrapperDriver) LockFile() string {
