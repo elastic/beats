@@ -44,5 +44,5 @@ data:
         # Uncomment this to get k8s events:
         #- event
       period: 10s
-      host: ${HOSTNAME}
+      host: ${NODE_NAME}
       hosts: ["kube-state-metrics:8080"]

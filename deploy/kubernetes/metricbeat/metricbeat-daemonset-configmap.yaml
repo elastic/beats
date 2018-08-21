@@ -18,7 +18,7 @@ data:
     #metricbeat.autodiscover:
     #  providers:
     #    - type: kubernetes
-    #      host: ${HOSTNAME}
+    #      host: ${NODE_NAME}
     #      hints.enabled: true
 
     processors:
@@ -75,5 +75,5 @@ data:
         - container
         - volume
       period: 10s
-      host: ${HOSTNAME}
+      host: ${NODE_NAME}
       hosts: ["localhost:10255"]

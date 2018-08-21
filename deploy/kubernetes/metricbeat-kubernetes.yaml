@@ -18,7 +18,7 @@ data:
     #metricbeat.autodiscover:
     #  providers:
     #    - type: kubernetes
-    #      host: ${HOSTNAME}
+    #      host: ${NODE_NAME}
     #      hints.enabled: true
 
     processors:
@@ -75,7 +75,7 @@ data:
         - container
         - volume
       period: 10s
-      host: ${HOSTNAME}
+      host: ${NODE_NAME}
       hosts: ["localhost:10255"]
 ---
 # Deploy a Metricbeat instance per node for node metrics retrieval
@@ -117,6 +117,10 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
         resources:
@@ -210,7 +214,7 @@ data:
         # Uncomment this to get k8s events:
         #- event
       period: 10s
-      host: ${HOSTNAME}
+      host: ${NODE_NAME}
       hosts: ["kube-state-metrics:8080"]
 ---
 # Deploy singleton instance in the whole cluster for some unique data sources, like kube-state-metrics
@@ -250,6 +254,10 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
         resources:
@@ -305,12 +313,12 @@ rules:
   verbs: ["get", "list", "watch"]
 - apiGroups: ["extensions"]
   resources:
-  - deployments
   - replicasets
   verbs: ["get", "list", "watch"]
 - apiGroups: ["apps"]
   resources:
   - statefulsets
+  - deployments
   verbs: ["get", "list", "watch"]
 ---
 apiVersion: v1
