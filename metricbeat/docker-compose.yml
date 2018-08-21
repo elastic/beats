@@ -134,6 +134,12 @@ services:
       file: ./module/redis/docker-compose.yml
       service: redis
 
+  redis_3_2_12:
+    extends:
+      file: ./module/redis/docker-compose.yml
+      service: redis
+    image: redis:3.2.12-alpine
+
   traefik:
     build: ./module/traefik/_meta
 

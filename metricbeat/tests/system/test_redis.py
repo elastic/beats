@@ -121,3 +121,7 @@ class Test(metricbeat.BaseTest):
     def get_hosts(self):
         return [os.getenv('REDIS_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('REDIS_PORT', '6379')]
+
+
+class Test_3_2_12(Test):
+    COMPOSE_SERVICES = ['redis_3_2_12']
