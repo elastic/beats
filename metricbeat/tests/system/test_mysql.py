@@ -40,4 +40,6 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [os.getenv('MYSQL_DSN', 'root:test@tcp(localhost:3306)/')]
+        host = os.getenv('MYSQL_HOST', self.compose_hosts()[0])
+        port = os.getenv('MYSQL_PORT', '3306')
+        return [os.getenv('MYSQL_DSN', 'root:test@tcp({}:{})/'.format(host, port))]

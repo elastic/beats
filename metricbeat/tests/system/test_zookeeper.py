@@ -51,5 +51,5 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [os.getenv('ZOOKEEPER_HOST', 'localhost') + ':' +
+        return [os.getenv('ZOOKEEPER_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('ZOOKEEPER_PORT', '2181')]

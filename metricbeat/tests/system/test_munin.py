@@ -34,5 +34,5 @@ class Test(metricbeat.BaseTest):
         assert evt["munin"][namespace]["cpu"]["user"] > 0
 
     def get_hosts(self):
-        return [os.getenv('MUNIN_HOST', 'localhost') + ':' +
+        return [os.getenv('MUNIN_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('MUNIN_PORT', '4949')]

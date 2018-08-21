@@ -50,5 +50,5 @@ class Test(metricbeat.BaseTest):
         assert evt["jolokia"]["test"]["gc"]["collection_count"] >= 0
 
     def get_hosts(self):
-        return [os.getenv('JOLOKIA_HOST', 'localhost') + ':' +
+        return [os.getenv('JOLOKIA_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('JOLOKIA_PORT', '8778')]

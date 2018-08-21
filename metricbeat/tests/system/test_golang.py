@@ -43,5 +43,5 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return ["http://" + os.getenv('GOLANG_HOST', 'localhost') + ':' +
+        return ["http://" + os.getenv('GOLANG_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('GOLANG_PORT', '6060')]

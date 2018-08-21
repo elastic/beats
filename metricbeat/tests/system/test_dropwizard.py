@@ -30,5 +30,5 @@ class Test(metricbeat.BaseTest):
         self.assertTrue(len(output) >= 1)
 
     def get_hosts(self):
-        return [os.getenv('DROPWIZARD_HOST', 'localhost') + ':' +
+        return [os.getenv('DROPWIZARD_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('DROPWIZARD_PORT', '8080')]

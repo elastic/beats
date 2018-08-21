@@ -31,5 +31,5 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [os.getenv('MEMCACHED_HOST', 'localhost') + ':' +
+        return [os.getenv('MEMCACHED_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('MEMCACHED_PORT', '11211')]

@@ -25,5 +25,5 @@ class Test(metricbeat.BaseTest):
         self.check_metricset("traefik", metricset, self.get_hosts(), self.FIELDS + ["service.name"])
 
     def get_hosts(self):
-        return [os.getenv('TRAEFIK_HOST', 'localhost') + ':' +
+        return [os.getenv('TRAEFIK_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('TRAEFIK_API_PORT', '8080')]

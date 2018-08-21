@@ -39,7 +39,7 @@ class Test(metricbeat.BaseTest):
                              ["service.name"], extras={"index_recovery.active_only": "false"})
 
     def get_hosts(self):
-        return [os.getenv('ES_HOST', 'localhost') + ':' +
+        return [os.getenv('ES_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('ES_PORT', '9200')]
 
     def create_ml_job(self):
