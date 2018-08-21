@@ -7,7 +7,7 @@
 ++++
 
 If you want {beatname_uc} to connect to a cluster that has
-{securitydoc}/xpack-security.html[{security}] enabled, there are extra
+{securitydoc}/elasticsearch-security.html[{security}] enabled, there are extra
 configuration steps:
 
 . <<beats-basic-auth>>.
@@ -44,7 +44,7 @@ password, set it up now.
 endif::[]
 
 For more information about {security}, see
-{xpack-ref}/xpack-security.html[Securing the {stack}].
+{xpack-ref}/elasticsearch-security.html[Securing the {stack}].
 
 [float]
 === {beatname_uc} features that require authorization

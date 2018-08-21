@@ -63,7 +63,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch index recovery stats from a non master node.")
+		logp.Debug("elasticsearch", "Trying to fetch cluster stats from a non master node.")
 		return
 	}
 
@@ -73,5 +73,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	eventMapping(r, content)
+	if m.MetricSet.XPack {
+		eventMappingXPack(r, m, content)
+	} else {
+		eventMapping(r, content)
+	}
 }

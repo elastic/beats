@@ -38,8 +38,8 @@ func NewResults() *Results {
 // SimpleResult provides a convenient and simple method for creating a *Results object for a single validation.
 // It's a very common way for validators to return a *Results object, and is generally simpler than
 // using SingleResult.
-func SimpleResult(path Path, valid bool, msg string) *Results {
-	vr := ValueResult{valid, msg}
+func SimpleResult(path Path, valid bool, msg string, args ...interface{}) *Results {
+	vr := ValueResult{valid, fmt.Sprintf(msg, args...)}
 	return SingleResult(path, vr)
 }
 

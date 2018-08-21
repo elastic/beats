@@ -2769,7 +2769,7 @@ type: keyword
 example: logged-in
 
 Action describes the change that triggered the event.
-For the file integrity module the possible values are: attributes_modified, created, deleted, updated, moved, and config_change.
+For the file integrity module the possible values are: attributes_modified, created, deleted, updated, moved, config_change, and initial_scan.
 
 
 --
