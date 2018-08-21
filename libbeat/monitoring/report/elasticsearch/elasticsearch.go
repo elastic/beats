@@ -75,23 +75,16 @@ func init() {
 	report.RegisterReporterFactory("elasticsearch", makeReporter)
 }
 
-func overrideConfigFromBeat(config *config, beat beat.Info) {
-	if beat.Monitoring.DefaultUsername != "" {
-		config.Username = beat.Monitoring.DefaultUsername
+func overrideConfigFromBeat(config *config, settings report.Settings) {
+	if settings.DefaultUsername != "" {
+		config.Username = settings.DefaultUsername
 	}
 }
 
-func overrideParamsFromBeat(params map[string]string, beat beat.Info) {
-	if beat.Monitoring.SystemID != "" {
-		params["system_id"] = beat.Monitoring.SystemID
-	}
-}
-
-func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
+func makeReporter(settings report.Settings, cfg *common.Config) (report.Reporter, error) {
 	log := logp.L().Named(selector)
-
 	config := defaultConfig
-	overrideConfigFromBeat(&config, beat)
+	overrideConfigFromBeat(&config, settings)
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
@@ -115,7 +108,6 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 		return nil, err
 	}
 
-	overrideParamsFromBeat(defaultParams, beat)
 	params := map[string]string{}
 	for k, v := range defaultParams {
 		params[k] = v
@@ -154,6 +146,7 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
 
+	beat := settings.Beat
 	pipeline, err := pipeline.New(
 		beat,
 		monitoring,
