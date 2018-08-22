@@ -1,3 +1,4 @@
+import hashlib
 import os
 import platform
 import sys
@@ -14,6 +15,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/
 
 from beat.beat import TestCase
 
+PROVIDER = "WinlogbeatTestPython"
+APP_NAME = "SystemTest"
+OTHER_APP_NAME = "OtherSystemTestApp"
+
 
 class BaseTest(TestCase):
 
@@ -25,15 +30,24 @@ class BaseTest(TestCase):
 
 
 class WriteReadTest(BaseTest):
-    providerName = "WinlogbeatTestPython"
-    applicationName = "SystemTest"
-    otherAppName = "OtherSystemTestApp"
+    providerName = PROVIDER
+    applicationName = APP_NAME
+    otherAppName = OTHER_APP_NAME
+    testSuffix = None
     sid = None
     sidString = None
     api = None
 
     def setUp(self):
         super(WriteReadTest, self).setUp()
+
+        # Every test will use its own event log and application names to ensure
+        # isolation.
+        self.testSuffix = "_" + hashlib.sha256(self.api + self._testMethodName).hexdigest()[:5]
+        self.providerName = PROVIDER + self.testSuffix
+        self.applicationName = APP_NAME + self.testSuffix
+        self.otherAppName = OTHER_APP_NAME + self.testSuffix
+
         win32evtlogutil.AddSourceToRegistry(self.applicationName,
                                             "%systemroot%\\system32\\EventCreate.exe",
                                             self.providerName)
