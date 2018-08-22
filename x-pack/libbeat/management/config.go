@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/x-pack/libbeat/management/api"
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
@@ -25,10 +26,7 @@ type Config struct {
 
 	Kibana *kibana.ClientConfig
 
-	Configs []struct {
-		Name   string
-		Config *common.Config
-	}
+	Configs []*api.ConfigBlock
 }
 
 // Load settings from its source file
