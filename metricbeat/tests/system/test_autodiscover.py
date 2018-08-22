@@ -102,7 +102,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         assert output[0]['docker']['container']['image'] == 'memcached:1.5.3'
         assert 'name' in output[0]['docker']['container']
 
-    @unittest.skipIf(not INTEGRATION_TESTS)
+    @unittest.skipIf(not INTEGRATION_TESTS, 'integration test')
     def test_config_appender(self):
         """
         Test config appender
