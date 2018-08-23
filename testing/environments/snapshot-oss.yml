@@ -22,10 +22,8 @@ services:
       retries: 600
       interval: 1s
     volumes:
-      - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
-      - ./docker/logstash/pki:/etc/pki:ro
-    environment:
-      - ES_HOST=elasticsearch
+    - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
+    - ./docker/logstash/pki:/etc/pki:ro
 
   kibana:
     image: docker.elastic.co/kibana/kibana-oss:7.0.0-alpha1-SNAPSHOT
@@ -33,3 +31,5 @@ services:
       test: ["CMD-SHELL", 'python -c ''import urllib, json; response = urllib.urlopen("http://localhost:5601/api/status"); data = json.loads(response.read()); exit(1) if data["status"]["overall"]["state"] != "green" else exit(0);''']
       retries: 600
       interval: 1s
+
+
