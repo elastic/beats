@@ -33,6 +33,14 @@ type config struct {
 	// RestrictedFields make restricted fields available (i.e. env).
 	RestrictedFields bool `config:"restricted_fields"`
 
+	// IgnoreErrors causes the event not to be discarded when errors
+	// are encountered during enrichment.
+	// For example when a PID field cannot be converted to an integer or
+	// a field cannot be overwritten. It is still an error if no PID field
+	// is found. Use `ignore_missing` for that.
+	// Instead of the event being dropped, it will return the original event.
+	IgnoreErrors bool `config:"ignore_errors"`
+
 	// MatchPIDs fields containing the PID to lookup.
 	MatchPIDs []string `config:"match_pids"`
 

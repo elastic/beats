@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
@@ -39,7 +40,13 @@ var (
 	// specified in match_pids.
 	ErrNoMatch = errors.New("none of the fields in match_pids found in the event")
 
+	// ErrNoProcess is returned when metadata for a process can't be collected.
+	ErrNoProcess = errors.New("process not found")
+
 	procCache = newProcessCache(cacheExpiration, gosysinfoProvider{})
+
+	isDebug = false
+	debugf  = logp.MakeDebug(processorName)
 )
 
 type addProcessMetadata struct {
@@ -71,6 +78,8 @@ func newProcessMetadataProcessor(cfg *common.Config) (processors.Processor, erro
 }
 
 func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider) (proc processors.Processor, err error) {
+	isDebug = logp.HasSelector(processorName)
+
 	config := defaultConfig()
 	if err = cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
@@ -92,10 +101,17 @@ func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	for _, pidField := range p.config.MatchPIDs {
 		result, err := p.enrich(event.Fields, pidField)
 		if err != nil {
-			if err == common.ErrKeyNotFound {
+			switch err {
+			case common.ErrKeyNotFound:
 				continue
+			case ErrNoProcess:
+				return event, err
+			default:
+				if !p.config.IgnoreErrors {
+					event = nil
+				}
+				return event, errors.Wrapf(err, "error applying %s processor", processorName)
 			}
-			return event, errors.Wrapf(err, "error applying %s processor", processorName)
 		}
 		if result != nil {
 			event.Fields = result
@@ -129,7 +145,10 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 
 	metaPtr, err := p.provider.GetProcessMetadata(pid)
 	if err != nil || metaPtr == nil {
-		return nil, err
+		if isDebug {
+			debugf("failed to get process metadata for PID=%d: %v", pid, err)
+		}
+		return nil, ErrNoProcess
 	}
 	meta := metaPtr.fields
 
