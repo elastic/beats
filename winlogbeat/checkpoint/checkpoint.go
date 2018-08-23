@@ -40,6 +40,7 @@ type Checkpoint struct {
 	done          chan struct{}  // Channel for shutting down the checkpoint worker.
 	once          sync.Once      // Used to guarantee shutdown happens once.
 	file          string         // File where the state is persisted.
+	fileLock      sync.RWMutex   // Lock that protects concurrent reads/writes to file.
 	numUpdates    int            // Number of updates received since last persisting to disk.
 	maxUpdates    int            // Maximum number of updates to buffer before persisting to disk.
 	flushInterval time.Duration  // Maximum time interval that can pass before persisting to disk.
@@ -208,6 +209,9 @@ func (c *Checkpoint) persist() bool {
 
 // flush writes the current state to disk.
 func (c *Checkpoint) flush() error {
+	c.fileLock.Lock()
+	defer c.fileLock.Unlock()
+
 	tempFile := c.file + ".new"
 	file, err := create(tempFile)
 	if os.IsNotExist(err) {
@@ -258,6 +262,9 @@ func (c *Checkpoint) flush() error {
 // read loads the persisted state from disk. If the file does not exists then
 // the method returns nil and no error.
 func (c *Checkpoint) read() (*PersistedState, error) {
+	c.fileLock.RLock()
+	defer c.fileLock.RUnlock()
+
 	contents, err := ioutil.ReadFile(c.file)
 	if err != nil {
 		if os.IsNotExist(err) {

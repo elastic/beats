@@ -44,6 +44,8 @@ class Test(metricbeat.BaseTest):
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_start_stop(self):
+        def reload_line(
+            num_runners): return "Starting reload procedure, current runners: %d" % num_runners
         """
         Test if module is properly started and stopped
         """
@@ -57,6 +59,11 @@ class Test(metricbeat.BaseTest):
         config_path = self.working_dir + "/configs/system.yml"
         proc = self.start_beat()
 
+        # Ensure no modules are loaded
+        self.wait_until(
+            lambda: self.log_contains(reload_line(0)),
+            max_timeout=10)
+
         systemConfig = """
 - module: system
   metricsets: ["cpu"]
@@ -66,27 +73,20 @@ class Test(metricbeat.BaseTest):
         with open(config_path, 'w') as f:
             f.write(systemConfig)
 
-        # Wait until offset for new line is updated
+        # Ensure the module was successfully loaded
         self.wait_until(
-            lambda: self.log_contains("Starting runner: system [metricsets=1]"),
+            lambda: self.log_contains(reload_line(1)),
             max_timeout=10)
-
-        self.wait_until(lambda: self.output_lines() > 0)
 
         # Remove config again
         os.remove(config_path)
 
-        # Wait until offset for new line is updated
+        # Ensure the module was successfully unloaded
         self.wait_until(
-            lambda: self.log_contains("Stopping runner: system [metricsets=1]"),
+            lambda: self.log_contains(reload_line(0)),
             max_timeout=10)
 
-        lines = self.output_lines()
-
         time.sleep(1)
-
-        # Make sure no new lines were added since stopping
-        assert lines == self.output_lines()
 
         proc.check_kill_and_wait()
 

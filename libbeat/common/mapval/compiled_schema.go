@@ -20,7 +20,7 @@ package mapval
 import "github.com/elastic/beats/libbeat/common"
 
 type flatValidator struct {
-	path  Path
+	path  path
 	isDef IsDef
 }
 
@@ -31,7 +31,7 @@ type CompiledSchema []flatValidator
 func (cs CompiledSchema) Check(actual common.MapStr) *Results {
 	results := NewResults()
 	for _, pv := range cs {
-		actualV, actualKeyExists := pv.path.GetFrom(actual)
+		actualV, actualKeyExists := pv.path.getFrom(actual)
 
 		if !pv.isDef.optional || pv.isDef.optional && actualKeyExists {
 			var checkRes *Results

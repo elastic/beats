@@ -45,9 +45,6 @@ type Adapter interface {
 	// CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
 	CreateConfig(bus.Event) ([]*common.Config, error)
 
-	// CheckConfig tests given config to check if it will work or not, returns errors in case it won't work
-	CheckConfig(*common.Config) error
-
 	// RunnerFactory provides runner creation by feeding valid configs
 	cfgfile.RunnerFactory
 
