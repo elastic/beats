@@ -4,7 +4,6 @@ SYSTEM_TESTS=true
 TEST_ENVIRONMENT?=true
 GOX_OS?=linux windows ## @Building List of all OS to be supported by "make crosscompile".
 DEV_OS?=linux
-TESTING_ENVIRONMENT?=latest
 ES_BEATS?=..
 
 # Path to the libbeat Makefile
