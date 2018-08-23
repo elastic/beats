@@ -82,6 +82,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Add fields for memory fragmentation, memory allocator stats, copy on write, master-slave status, and active defragmentation to `info` metricset of Redis module. {pull}7695[7695]
 
 
+- Add `metrics` metricset to MongoDB module. {pull}7611[7611]
+
 *Packetbeat*
 
 *Winlogbeat*
