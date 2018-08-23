@@ -148,7 +148,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 }
 
 func (d *wrapperDriver) Down(ctx context.Context) error {
-	return d.cmd(ctx, "down", "-v").Run()
+	return d.cmd(ctx, "down", "-v", "--rmi=local").Run()
 }
 
 func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string) error {
