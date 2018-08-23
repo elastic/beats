@@ -1,0 +1,107 @@
+{ "description": "Pipeline for parsing Suricata EVE logs"
+, "processors":
+  [ { "script":
+      { "lang": "painless"
+      , "source": "ctx['suricata'] = new HashMap(); ctx['suricata']['eve'] = ctx['json']; ctx.remove('json');"
+      }
+    }
+
+  , { "date":
+      { "field": "suricata.eve.timestamp"
+      , "target_field": "@timestamp"
+      , "formats": ["ISO8601"]
+      }
+    }
+
+  , { "lowercase":
+      { "field": "suricata.eve.event_type"
+      , "ignore_missing": true
+      }
+    }
+  , { "set":
+      { "field": "ecs.event.type"
+      , "value": "{{suricata.eve.event_type}}"
+      }
+    }
+
+  , { "set":
+      { "field": "ecs.user_agent.raw"
+      , "value": "{{suricata.eve.http.http_user_agent}}"
+      }
+    }
+  , { "user_agent":
+      { "field": "ecs.user_agent.raw"
+      , "target_field": "ecs.user_agent"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "ecs.user_agent.os"
+      , "target_field": "ecs.user_agent.temp_os"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "ecs.user_agent.temp_os"
+      , "target_field": "ecs.user_agent.os.full_name"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "ecs.user_agent.os_name"
+      , "target_field": "ecs.user_agent.os.name"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "ecs.user_agent.os_version"
+      , "target_field": "ecs.user_agent.os.version"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "ecs.user_agent.os_major"
+      , "target_field": "ecs.user_agent.os.major"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "ecs.user_agent.os_minor"
+      , "target_field": "ecs.user_agent.os.minor"
+      , "ignore_missing": true
+      }
+    }
+
+  , { "geoip":
+      { "field": "suricata.eve.src_ip"
+      , "target_field": "ecs.source.geo"
+      , "ignore_missing": true
+      }
+    }
+  , { "geoip":
+      { "field": "suricata.eve.dest_ip"
+      , "target_field": "ecs.destination.geo"
+      , "ignore_missing": true
+      }
+    }
+  , { "geoip":
+      { "field": "suricata.eve.src_ip"
+      , "target_field": "suricata.eve.src_geo"
+      , "ignore_missing": true
+      }
+    }
+  , { "geoip":
+      { "field": "suricata.eve.dest_ip"
+      , "target_field": "suricata.eve.dest_geo"
+      , "ignore_missing": true
+      }
+    }
+  ]
+, "on_failure":
+  [ { "set" :
+      { "field" : "error.message"
+      , "value" : "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ]
+}
