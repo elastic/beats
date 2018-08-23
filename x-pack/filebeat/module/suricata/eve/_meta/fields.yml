@@ -1,0 +1,16 @@
+- name: eve
+  type: group
+  description: >
+    Fields exported by the EVE JSON logs
+  fields:
+    - name: src_ip
+      type: ip
+    - name: dest_ip
+      type: ip
+    - name: flow_id
+      type: keyword
+    # Geo Points should be the ECS fields, but no way to config from here.
+    - name: src_geo.location
+      type: geo_point
+    - name: dest_geo.location
+      type: geo_point
