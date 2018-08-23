@@ -25,7 +25,6 @@ services:
     - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
     - ./docker/logstash/pki:/etc/pki:ro
 
-
   kibana:
     image: docker.elastic.co/kibana/kibana:6.0.1
     healthcheck:

@@ -40,12 +40,20 @@ class Test(BaseTest):
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
     @unittest.skipIf(os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
+    @unittest.skipIf(os.name == "nt", "skipped on Windows")
     def test_ml_setup(self, setup_flag, modules_flag):
         """ Test ML are installed in all possible ways """
         self._run_ml_test(setup_flag, modules_flag)
 
     def _run_ml_test(self, setup_flag, modules_flag):
         self.init()
+
+        from elasticsearch import AuthorizationException
+
+        try:
+            output = self.es.transport.perform_request("POST", "/_xpack/license/start_trial?acknowledge=true")
+        except AuthorizationException:
+            print("License already enabled")
 
         print("Test setup_flag: {}, modules_flag: {}".format(setup_flag, modules_flag))
 
