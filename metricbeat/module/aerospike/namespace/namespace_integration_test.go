@@ -20,27 +20,30 @@
 package namespace
 
 import (
+	"net"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/aerospike"
+	"github.com/elastic/beats/metricbeat/module/aerospike/mtest"
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "aerospike")
+	t.Parallel()
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
+	mtest.DataRunner.Run(t, compose.Suite{"Data": func(t *testing.T, host string) {
+		f := mbtest.NewEventsFetcher(t, getConfig(host))
+		err := mbtest.WriteEvents(f, t)
+		if err != nil {
+			t.Fatal("write", err)
+		}
+	}})
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "aerospike",
 		"metricsets": []string{"namespace"},
-		"hosts":      []string{aerospike.GetAerospikeEnvHost() + ":" + aerospike.GetAerospikeEnvPort()},
+		"hosts":      []string{net.JoinHostPort(host, "3000")},
 	}
 }

@@ -15,34 +15,35 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package aerospike
+// +build integration
+
+package mtest
 
 import (
-	"os"
+	"github.com/elastic/beats/libbeat/tests/compose"
 )
 
-// Helper functions for testing used in the aerospike MetricSets.
-
-// GetAerospikeEnvHost returns the hostname of the Aerospike server to use for
-// testing. It reads the value from the AEROSPIKE_HOST environment variable and
-// returns localhost if it is not set.
-func GetAerospikeEnvHost() string {
-	host := os.Getenv("AEROSPIKE_HOST")
-
-	if len(host) == 0 {
-		host = "localhost"
+var (
+	Runner = compose.TestRunner{
+		Service: "aerospike",
+		Options: map[string][]string{
+			"AEROSPIKE_VERSION": []string{
+				"3.9.0",
+				"3.13.0.11",
+				"3.16.0.6",
+				"4.3.0.2",
+			},
+		},
+		Parallel: true,
 	}
-	return host
-}
 
-// GetAerospikeEnvPort returns the port of the Aerospike server to use for
-// testing. It reads the value from the AEROSPIKE_PORT environment variable and
-// returns 3000 if it is not set.
-func GetAerospikeEnvPort() string {
-	port := os.Getenv("AEROSPIKE_PORT")
-
-	if len(port) == 0 {
-		port = "3000"
+	DataRunner = compose.TestRunner{
+		Service: "aerospike",
+		Options: map[string][]string{
+			"AEROSPIKE_VERSION": []string{
+				"3.9.0",
+			},
+		},
+		Parallel: true,
 	}
-	return port
-}
+)

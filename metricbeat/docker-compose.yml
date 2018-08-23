@@ -15,7 +15,9 @@ services:
 
   # Modules
   aerospike:
-    build: ./module/aerospike/_meta
+    extends:
+      file: ./module/aerospike/docker-compose.yml
+      service: aerospike
 
   apache:
     build: ./module/apache/_meta
