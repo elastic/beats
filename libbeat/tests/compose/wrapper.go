@@ -23,6 +23,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -131,7 +132,19 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		args = append(args, service)
 	}
 
-	return d.cmd(ctx, "up", args...).Run()
+	for {
+		// It can fail if we have reached some system limit, specially
+		// number of networks, retry while the context is not done
+		err := d.cmd(ctx, "up", args...).Run()
+		if err == nil {
+			return nil
+		}
+		select {
+		case <-time.After(time.Second):
+		case <-ctx.Done():
+			return err
+		}
+	}
 }
 
 func (d *wrapperDriver) Down(ctx context.Context) error {
