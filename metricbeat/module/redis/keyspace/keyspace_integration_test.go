@@ -36,11 +36,21 @@ func TestKeyspace(t *testing.T) {
 	t.Parallel()
 
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, host string) {
-			addEntry(t, host)
+		"Data": func(t *testing.T, r compose.R) {
+			addEntry(t, r.Host())
+
+			f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
+
+			err := mbtest.WriteEvents(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+		"Fetch": func(t *testing.T, r compose.R) {
+			addEntry(t, r.Host())
 
 			// Fetch data
-			f := mbtest.NewEventsFetcher(t, getConfig(host))
+			f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
 			events, err := f.Fetch()
 			if err != nil {
 				t.Fatal("fetch", err)
@@ -59,22 +69,6 @@ func TestKeyspace(t *testing.T) {
 			assert.True(t, strings.Contains(keyspace["id"].(string), "db"))
 		},
 	})
-}
-
-func TestData(t *testing.T) {
-	t.Parallel()
-
-	// TODO: Fix EnsureUp for this kind of scenarios
-	mtest.DataRunner.Run(t, compose.Suite{"Data": func(t *testing.T, host string) {
-		addEntry(t, host)
-
-		f := mbtest.NewEventsFetcher(t, getConfig(host))
-
-		err := mbtest.WriteEvents(f, t)
-		if err != nil {
-			t.Fatal("write", err)
-		}
-	}})
 }
 
 // addEntry adds an entry to redis

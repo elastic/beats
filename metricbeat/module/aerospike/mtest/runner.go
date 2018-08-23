@@ -29,19 +29,9 @@ var (
 		Options: map[string][]string{
 			"AEROSPIKE_VERSION": []string{
 				"3.9.0",
-				"3.13.0.11",
-				"3.16.0.6",
-				"4.3.0.2",
-			},
-		},
-		Parallel: true,
-	}
-
-	DataRunner = compose.TestRunner{
-		Service: "aerospike",
-		Options: map[string][]string{
-			"AEROSPIKE_VERSION": []string{
-				"3.9.0",
+				//"3.13.0.11",
+				//"3.16.0.6",
+				//"4.3.0.2",
 			},
 		},
 		Parallel: true,

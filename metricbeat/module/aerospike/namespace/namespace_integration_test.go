@@ -28,11 +28,11 @@ import (
 	"github.com/elastic/beats/metricbeat/module/aerospike/mtest"
 )
 
-func TestData(t *testing.T) {
+func TestNamespace(t *testing.T) {
 	t.Parallel()
 
-	mtest.DataRunner.Run(t, compose.Suite{"Data": func(t *testing.T, host string) {
-		f := mbtest.NewEventsFetcher(t, getConfig(host))
+	mtest.Runner.Run(t, compose.Suite{"Data": func(t *testing.T, r compose.R) {
+		f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
 		err := mbtest.WriteEvents(f, t)
 		if err != nil {
 			t.Fatal("write", err)

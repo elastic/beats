@@ -35,14 +35,4 @@ var (
 		},
 		Parallel: true,
 	}
-
-	DataRunner = compose.TestRunner{
-		Service: "kafka",
-		Options: map[string][]string{
-			"KAFKA_VERSION": []string{
-				"1.1.0",
-			},
-		},
-		Parallel: true,
-	}
 )

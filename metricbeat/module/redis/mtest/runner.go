@@ -39,17 +39,4 @@ var (
 		},
 		Parallel: true,
 	}
-
-	DataRunner = compose.TestRunner{
-		Service: "redis",
-		Options: map[string][]string{
-			"REDIS_VERSION": []string{
-				"4.0.11",
-			},
-			"IMAGE_OS": []string{
-				"alpine",
-			},
-		},
-		Parallel: true,
-	}
 )

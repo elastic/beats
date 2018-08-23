@@ -40,7 +40,7 @@ type TestRunner struct {
 	Timeout  int
 }
 
-type Suite map[string]func(t *testing.T, host string)
+type Suite map[string]func(t *testing.T, r R)
 
 func (r *TestRunner) scenarios() []map[string]string {
 	n := 1
@@ -71,6 +71,12 @@ func (r *TestRunner) scenarios() []map[string]string {
 	return scenarios
 }
 
+func (r *TestRunner) runSuite(t *testing.T, tests Suite, ctl R) {
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) { test(t, ctl) })
+	}
+}
+
 func (r *TestRunner) runHostOverride(t *testing.T, tests Suite) bool {
 	env := strings.ToUpper(r.Service) + "_HOST"
 	host := os.Getenv(env)
@@ -80,9 +86,11 @@ func (r *TestRunner) runHostOverride(t *testing.T, tests Suite) bool {
 
 	t.Logf("Test host overriden by %s=%s", env, host)
 
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) { test(t, host) })
+	ctl := &runnerControl{
+		host: host,
+		t:    t,
 	}
+	r.runSuite(t, tests, ctl)
 	return true
 }
 
@@ -136,10 +144,27 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 				t.Fatal(errors.Wrapf(err, "getting host for %s/%s", r.Service, desc))
 			}
 
-			for name, test := range tests {
-				t.Run(name, func(t *testing.T) { test(t, host) })
+			ctl := &runnerControl{
+				host:     host,
+				t:        t,
+				scenario: s,
 			}
+			r.runSuite(t, tests, ctl)
 		})
 
 	}
+}
+
+type R interface {
+	Host() string
+}
+
+type runnerControl struct {
+	t        *testing.T
+	host     string
+	scenario map[string]string
+}
+
+func (r *runnerControl) Host() string {
+	return r.host
 }

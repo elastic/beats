@@ -37,83 +37,79 @@ import (
 	"github.com/elastic/beats/metricbeat/module/kafka/mtest"
 )
 
-func TestData(t *testing.T) {
-	t.Parallel()
-
-	mtest.DataRunner.Run(t, compose.Suite{"Data": func(t *testing.T, host string) {
-		generateKafkaData(t, "metricbeat-generate-data", host)
-
-		ms := mbtest.NewReportingMetricSetV2(t, getConfig("", host))
-		err := mbtest.WriteEventsReporterV2(ms, t, "")
-		if err != nil {
-			t.Fatal("write", err)
-		}
-	}})
-}
-
-func TestTopic(t *testing.T) {
+func TestPartition(t *testing.T) {
 	t.Parallel()
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))
 
-	mtest.Runner.Run(t, compose.Suite{"Topic": func(t *testing.T, host string) {
-		id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
-		testTopic := fmt.Sprintf("test-metricbeat-%s", id)
+	mtest.Runner.Run(t, compose.Suite{
+		"Data": func(t *testing.T, r compose.R) {
+			generateKafkaData(t, "metricbeat-generate-data", r.Host())
 
-		// Create initial topic
-		generateKafkaData(t, testTopic, host)
-
-		f := mbtest.NewReportingMetricSetV2(t, getConfig(testTopic, host))
-		dataBefore, err := mbtest.ReportingFetchV2(f)
-		if err != nil {
-			t.Fatal("write", err)
-		}
-		if len(dataBefore) == 0 {
-			t.Errorf("No offsets fetched from topic (before): %v", testTopic)
-		}
-		t.Logf("before: %v", dataBefore)
-
-		var n int64 = 10
-		// Create n messages
-		for i := int64(0); i < n; i++ {
-			generateKafkaData(t, testTopic, host)
-		}
-
-		dataAfter, err := mbtest.ReportingFetchV2(f)
-		if err != nil {
-			t.Fatal("write", err)
-		}
-		if len(dataAfter) == 0 {
-			t.Errorf("No offsets fetched from topic (after): %v", testTopic)
-		}
-		t.Logf("after: %v", dataAfter)
-
-		// Checks that no new topics / partitions were added
-		assert.True(t, len(dataBefore) == len(dataAfter))
-
-		var offsetBefore int64 = 0
-		var offsetAfter int64 = 0
-
-		// Its possible that other topics exists -> select the right data
-		for _, data := range dataBefore {
-			if data.ModuleFields["topic"].(common.MapStr)["name"] == testTopic {
-				offsetBefore = data.MetricSetFields["offset"].(common.MapStr)["newest"].(int64)
+			ms := mbtest.NewReportingMetricSetV2(t, getConfig("", r.Host()))
+			err := mbtest.WriteEventsReporterV2(ms, t, "")
+			if err != nil {
+				t.Fatal("write", err)
 			}
-		}
+		},
+		"Topic": func(t *testing.T, r compose.R) {
+			id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+			testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
-		for _, data := range dataAfter {
-			if data.ModuleFields["topic"].(common.MapStr)["name"] == testTopic {
-				offsetAfter = data.MetricSetFields["offset"].(common.MapStr)["newest"].(int64)
+			// Create initial topic
+			generateKafkaData(t, testTopic, r.Host())
+
+			f := mbtest.NewReportingMetricSetV2(t, getConfig(testTopic, r.Host()))
+			dataBefore, err := mbtest.ReportingFetchV2(f)
+			if err != nil {
+				t.Fatal("write", err)
 			}
-		}
+			if len(dataBefore) == 0 {
+				t.Errorf("No offsets fetched from topic (before): %v", testTopic)
+			}
+			t.Logf("before: %v", dataBefore)
 
-		// Compares offset before and after
-		if offsetBefore+n != offsetAfter {
-			t.Errorf("Offset before: %v", offsetBefore)
-			t.Errorf("Offset after: %v", offsetAfter)
-		}
-		assert.True(t, offsetBefore+n == offsetAfter)
-	}})
+			var n int64 = 10
+			// Create n messages
+			for i := int64(0); i < n; i++ {
+				generateKafkaData(t, testTopic, r.Host())
+			}
+
+			dataAfter, err := mbtest.ReportingFetchV2(f)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+			if len(dataAfter) == 0 {
+				t.Errorf("No offsets fetched from topic (after): %v", testTopic)
+			}
+			t.Logf("after: %v", dataAfter)
+
+			// Checks that no new topics / partitions were added
+			assert.True(t, len(dataBefore) == len(dataAfter))
+
+			var offsetBefore int64 = 0
+			var offsetAfter int64 = 0
+
+			// Its possible that other topics exists -> select the right data
+			for _, data := range dataBefore {
+				if data.ModuleFields["topic"].(common.MapStr)["name"] == testTopic {
+					offsetBefore = data.MetricSetFields["offset"].(common.MapStr)["newest"].(int64)
+				}
+			}
+
+			for _, data := range dataAfter {
+				if data.ModuleFields["topic"].(common.MapStr)["name"] == testTopic {
+					offsetAfter = data.MetricSetFields["offset"].(common.MapStr)["newest"].(int64)
+				}
+			}
+
+			// Compares offset before and after
+			if offsetBefore+n != offsetAfter {
+				t.Errorf("Offset before: %v", offsetBefore)
+				t.Errorf("Offset after: %v", offsetAfter)
+			}
+			assert.True(t, offsetBefore+n == offsetAfter)
+		}})
 }
 
 func generateKafkaData(t *testing.T, topic string, host string) {
