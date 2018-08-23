@@ -18,6 +18,7 @@
 package info
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -78,6 +79,12 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	slowLogLength, err := redis.FetchSlowLogLength(m.pool.Get())
+	if err != nil {
+		return nil, err
+	}
+	info["slowlog_len"] = strconv.FormatInt(slowLogLength, 10)
 
 	debugf("Redis INFO from %s: %+v", m.Host(), info)
 	return eventMapping(info), nil
