@@ -20,12 +20,18 @@ services:
       service: aerospike
 
   apache:
-    build: ./module/apache/_meta
+    extends:
+      file: ./module/apache/docker-compose.yml
+      service: apache
 
   apache_2_4_12:
+    extends:
+      file: ./module/apache/docker-compose.yml
+      service: apache
     build:
-      context: ./module/apache/_meta
-      dockerfile: Dockerfile.2.4.12
+      args:
+        APACHE_VERSION: 2.4.12
+
 
   ceph:
     build: ./module/ceph/_meta

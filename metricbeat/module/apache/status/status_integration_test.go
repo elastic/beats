@@ -20,47 +20,48 @@
 package status
 
 import (
+	"net"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/apache"
+	"github.com/elastic/beats/metricbeat/module/apache/mtest"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "apache")
+func TestStatus(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+			err := mbtest.WriteEvent(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		"Fetch": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
+			event, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	// Check number of fields.
-	if len(event) < 11 {
-		t.Fatal("Too few top-level elements in the event")
-	}
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+			// Check number of fields.
+			if len(event) < 11 {
+				t.Fatal("Too few top-level elements in the event")
+			}
+		},
+	})
 }
 
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "apache")
-
-	f := mbtest.NewEventFetcher(t, getConfig())
-
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "apache",
 		"metricsets": []string{"status"},
-		"hosts":      []string{apache.GetApacheEnvHost()},
+		"hosts":      []string{net.JoinHostPort(host, "80")},
 	}
 }

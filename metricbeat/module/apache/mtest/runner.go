@@ -15,22 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package apache
+// +build integration
+
+package mtest
 
 import (
-	"os"
+	"github.com/elastic/beats/libbeat/tests/compose"
 )
 
-// Helper functions for testing the Apache module's MetricSets.
-
-// GetApacheEnvHost returns the apache server hostname to use for testing. It
-// reads the value from the APACHE_HOST environment variable and returns
-// 127.0.0.1 if it is not set.
-func GetApacheEnvHost() string {
-	host := os.Getenv("APACHE_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
+var (
+	Runner = compose.TestRunner{
+		Service: "apache",
+		Options: map[string][]string{
+			"APACHE_VERSION": []string{
+				"2.4.12",
+				"2.4.20",
+			},
+		},
+		Parallel: true,
 	}
-	return host
-}
+)
