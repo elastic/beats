@@ -486,7 +486,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-windows
-Revision: f11b8c9a625322edbca44926f9c0e4dc4916c9ac
+Revision: a4ab469ab3d6f167cba8cb515c3273c6b56f9fc3
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-windows/LICENSE.txt:
 --------------------------------------------------------------------

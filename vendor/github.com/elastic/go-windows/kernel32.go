@@ -33,6 +33,7 @@ import (
 //sys   _GetTickCount64() (millis uint64, err error) = kernel32.GetTickCount64
 //sys   _GetSystemTimes(idleTime *syscall.Filetime, kernelTime *syscall.Filetime, userTime *syscall.Filetime) (err error) = kernel32.GetSystemTimes
 //sys   _GlobalMemoryStatusEx(buffer *MemoryStatusEx) (err error) = kernel32.GlobalMemoryStatusEx
+//sys   _ReadProcessMemory(handle syscall.Handle, baseAddress uintptr, buffer uintptr, size uintptr, numRead *uintptr) (err error) = kernel32.ReadProcessMemory
 
 var (
 	sizeofMemoryStatusEx = uint32(unsafe.Sizeof(MemoryStatusEx{}))
@@ -66,6 +67,9 @@ const (
 	ProcessorArchitectureIntel   ProcessorArchitecture = 0
 	ProcessorArchitectureUnknown ProcessorArchitecture = 0xFFFF
 )
+
+// ErrReadFailed is returned by ReadProcessMemory on failure
+var ErrReadFailed = errors.New("ReadProcessMemory failed")
 
 func (a ProcessorArchitecture) String() string {
 	names := map[ProcessorArchitecture]string{
@@ -217,4 +221,18 @@ func GlobalMemoryStatusEx() (MemoryStatusEx, error) {
 	}
 
 	return memoryStatusEx, nil
+}
+
+// ReadProcessMemory reads from another process memory. The Handle needs to have
+// the PROCESS_VM_READ right.
+// A zero-byte read is a no-op, no error is returned.
+func ReadProcessMemory(handle syscall.Handle, baseAddress uintptr, dest []byte) (numRead uintptr, err error) {
+	n := len(dest)
+	if n == 0 {
+		return 0, nil
+	}
+	if err = _ReadProcessMemory(handle, baseAddress, uintptr(unsafe.Pointer(&dest[0])), uintptr(n), &numRead); err != nil {
+		return 0, err
+	}
+	return numRead, nil
 }
