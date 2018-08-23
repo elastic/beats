@@ -19,7 +19,7 @@ func getBeat(name, version string) (*instance.Beat, error) {
 	b, err := instance.NewBeat(name, "", version)
 
 	if err != nil {
-		return nil, fmt.Errorf("error initializing beat: %s", err)
+		return nil, fmt.Errorf("error creating beat: %s", err)
 	}
 
 	if err = b.Init(); err != nil {

@@ -77,7 +77,7 @@ func (c *Client) request(method, extraPath string,
 		err = extractError(result)
 	} else {
 		if err = json.Unmarshal(result, message); err != nil {
-			return statusCode, errors.Wrap(err, "error unmarshaling response")
+			return statusCode, errors.Wrap(err, "error unmarshaling Kibana response")
 		}
 	}
 
@@ -89,7 +89,7 @@ func extractError(result []byte) error {
 		Message string
 	}
 	if err := json.Unmarshal(result, &kibanaResult); err != nil {
-		return errors.Wrap(err, "parsing kibana response")
+		return errors.Wrap(err, "parsing Kibana response")
 	}
 	return errors.New(kibanaResult.Message)
 }
