@@ -111,7 +111,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 - Added DHCP protocol support. {pull}7647[7647]
 - Add support to decode HTTP bodies compressed with `gzip` and `deflate`. {pull}7915[7915]
-
+- Add support to decode mysql prepare statement command. {pull}5663[5663]
 *Winlogbeat*
 
 
