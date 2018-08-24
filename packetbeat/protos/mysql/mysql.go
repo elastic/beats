@@ -81,9 +81,9 @@ type mysqlMessage struct {
 	raw          []byte
 	notes        []string
 
-	statementID  	int
-	numberOfParams  int
-	params       	[]string
+	statementID    int
+	numberOfParams int
+	params         []string
 }
 
 type mysqlTransaction struct {
