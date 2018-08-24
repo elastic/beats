@@ -34,10 +34,19 @@ def get_rootfolder():
     # Libbeat detected
     return os.path.dirname(script_directory)
 
-def create_from_template(filename, template, version):
-    with open(filename, "w") as f:
-        f.write(template.format(version=version))
-        print ("Set version {} in file {}".format(version, filename))
+def replace_in_file(filename, varname, version):
+    new_lines = []
+    with open(filename, 'r') as f:
+        for line in f:
+            if line.startswith("const " + varname):
+                new_lines.append('const {} = "{}"\n'.format(varname, version))
+            else:
+                new_lines.append(line)
+
+    with open(filename, 'w') as f:
+        for line in new_lines:
+            f.write(line)
+    print ("Set version {} in file {}".format(version, filename))
 
 def main():
     parser = argparse.ArgumentParser(
