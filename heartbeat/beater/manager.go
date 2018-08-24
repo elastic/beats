@@ -24,15 +24,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/scheduler"
 	"github.com/elastic/beats/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/heartbeat/watcher"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 type monitorManager struct {
@@ -72,7 +71,7 @@ type monitorTaskConfig struct {
 }
 
 type jobControl interface {
-	Add(sched scheduler.Schedule, name string, f scheduler.TaskFunc) func() error
+	Add(sched scheduler.Schedule, name string, f scheduler.TaskFunc) (stopFn func() error, err error)
 }
 
 type jobCanceller func() error
@@ -231,7 +230,14 @@ func (m *monitor) Update(configs []*common.Config) error {
 		}
 
 		job := t.createJob(client)
-		jobCancel := m.manager.jobControl.Add(t.config.Schedule, id, job)
+		jobCancel, err := m.manager.jobControl.Add(t.config.Schedule, id, job)
+		if err == scheduler.ErrAlreadyStopped {
+			logp.Info("Will not add new task to scheduler. Heartbeat is stopping.")
+		} else if err != nil {
+			logp.Err("an unexpected error occurred adding a task to the scheduler: %v", err)
+			continue
+		}
+
 		t.cancel = func() error {
 			client.Close()
 			return jobCancel()
