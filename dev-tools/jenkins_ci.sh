@@ -1,6 +1,23 @@
 #!/usr/bin/env bash
 set -euox pipefail
 
+# Parse CLI options.
+for i in "$@"
+do
+case $i in
+    --testenv=*)
+    # Specify a different testing environment like "5.x" or "6.0" for
+    # running unit tests against older Elastic Stack versions.
+    export TEST_ENVIRONMENT="${i#*=}"
+    shift
+    ;;
+    *)
+    echo "unknown option: $i"
+    exit 1 
+    ;;
+esac
+done
+
 : "${HOME:?Need to set HOME to a non-empty value.}"
 : "${WORKSPACE:?Need to set WORKSPACE to a non-empty value.}"
 : "${beat:?Need to set beat to a non-empty value.}"
