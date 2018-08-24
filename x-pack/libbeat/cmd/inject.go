@@ -4,14 +4,9 @@
 
 package cmd
 
-import (
-	"github.com/elastic/beats/heartbeat/cmd"
-	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
-)
+import "github.com/elastic/beats/libbeat/cmd"
 
-// RootCmd to handle beats cli
-var RootCmd = cmd.RootCmd
-
-func init() {
-	xpackcmd.AddXPack(RootCmd, cmd.Name)
+// AddXPack extends the given root folder with XPack features
+func AddXPack(root *cmd.BeatsRootCmd, name string) {
+	root.AddCommand(genEnrollCmd(name, ""))
 }
