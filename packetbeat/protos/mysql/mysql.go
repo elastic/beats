@@ -81,9 +81,9 @@ type mysqlMessage struct {
 	raw          []byte
 	notes        []string
 
-	statementID       int
-	numberOfParameter int
-	params            []string
+	statementID  	int
+	numberOfParams  int
+	params       	[]string
 }
 
 type mysqlTransaction struct {
@@ -152,9 +152,9 @@ type mysqlPlugin struct {
 	transactions       *common.Cache
 	transactionTimeout time.Duration
 
-	// prepare statement cache
-	preparestatements       *common.Cache
-	preparestatementTimeout time.Duration
+	// prepare statements cache
+	prepareStatements       *common.Cache
+	prepareStatementTimeout time.Duration
 
 	results protos.Reporter
 
@@ -194,11 +194,11 @@ func (mysql *mysqlPlugin) init(results protos.Reporter, config *mysqlConfig) err
 		protos.DefaultTransactionHashSize)
 	mysql.transactions.StartJanitor(mysql.transactionTimeout)
 
-	// preparement cache
-	mysql.preparestatements = common.NewCache(
-		mysql.preparestatementTimeout,
+	// prepare statements cache
+	mysql.prepareStatements = common.NewCache(
+		mysql.prepareStatementTimeout,
 		protos.DefaultTransactionHashSize)
-	mysql.preparestatements.StartJanitor(mysql.preparestatementTimeout)
+	mysql.prepareStatements.StartJanitor(mysql.prepareStatementTimeout)
 
 	mysql.handleMysql = handleMysql
 	mysql.results = results
@@ -213,7 +213,7 @@ func (mysql *mysqlPlugin) setFromConfig(config *mysqlConfig) {
 	mysql.sendRequest = config.SendRequest
 	mysql.sendResponse = config.SendResponse
 	mysql.transactionTimeout = config.TransactionTimeout
-	mysql.preparestatementTimeout = config.StatementTimeout
+	mysql.prepareStatementTimeout = config.StatementTimeout
 }
 
 func (mysql *mysqlPlugin) getTransaction(k common.HashableTCPTuple) *mysqlTransaction {
@@ -233,7 +233,7 @@ type mysqlStmtData struct {
 type mysqlStmtMap map[int]*mysqlStmtData
 
 func (mysql *mysqlPlugin) getStmtsMap(k common.HashableTCPTuple) mysqlStmtMap {
-	v := mysql.preparestatements.Get(k)
+	v := mysql.prepareStatements.Get(k)
 	if v != nil {
 		return v.(mysqlStmtMap)
 	}
@@ -388,15 +388,14 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			if m.isOK && m.packetLength == 12 {
 				m.statementID = int(binary.LittleEndian.Uint32(s.data[m.start+5:]))
 				m.numberOfFields = int(binary.LittleEndian.Uint16(s.data[m.start+9:]))
-				m.numberOfParameter = int(binary.LittleEndian.Uint16(s.data[m.start+11:]))
+				m.numberOfParams = int(binary.LittleEndian.Uint16(s.data[m.start+11:]))
 				if m.numberOfFields > 0 {
 					s.parseState = mysqlStateEatFields
 				} else {
-					if m.numberOfParameter > 0 {
+					if m.numberOfParams > 0 {
 						s.parseState = mysqlStateEatRows
 					}
 				}
-				logp.Debug("mysqldetailed", "Prepare Statement Response statementID = %d, numberOfFields = %d,numberOfParameter = %d", m.statementID, m.numberOfFields, m.numberOfParameter)
 			} else {
 				return true, true
 			}
@@ -409,7 +408,6 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			hdr := s.data[s.parseOffset : s.parseOffset+4]
 			m.packetLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
 			m.seq = hdr[3]
-			logp.Debug("mysqldetailed", "Fields: packet length %d, packet number %d", m.packetLength, m.seq)
 
 			if len(s.data[s.parseOffset:]) >= int(m.packetLength)+4 {
 				s.parseOffset += 4 // header
@@ -772,19 +770,19 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 			stmts = mysqlStmtMap{}
 			stmtData := &mysqlStmtData{
 				query:           trans.query,
-				numOfParameters: msg.numberOfParameter,
+				numOfParameters: msg.numberOfParams,
 			}
 			stmts[msg.statementID] = stmtData
-			mysql.preparestatements.Put(msg.tcpTuple.Hashable(), stmts)
+			mysql.prepareStatements.Put(msg.tcpTuple.Hashable(), stmts)
 		} else {
 			if stmts[msg.statementID] == nil {
 				stmtData := &mysqlStmtData{
 					query:           trans.query,
-					numOfParameters: msg.numberOfParameter,
+					numOfParameters: msg.numberOfParams,
 				}
 				stmts[msg.statementID] = stmtData
 			}
-			mysql.preparestatements.Put(msg.tcpTuple.Hashable(), stmts)
+			mysql.prepareStatements.Put(msg.tcpTuple.Hashable(), stmts)
 		}
 		trans.notes = append(trans.notes, trans.query)
 		trans.query = "Request Prepare Statement"
@@ -815,7 +813,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 	dataLen := len(data)
 	if dataLen < 14 {
 		logp.Debug("mysql", "Data too small")
-		return []string{}
+		return nil
 	}
 	var paramType, paramUnsigned uint8
 	nparamType := []uint8{}
@@ -836,12 +834,12 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 	if nparam > 0 {
 		offset += (nparam + 7) / 8
 	} else {
-		return []string{}
+		return nil
 	}
 	// stmt bound
 	if dataLen <= offset {
 		logp.Debug("mysql", "Data too small")
-		return []string{}
+		return nil
 	}
 	stmtBound := data[offset]
 	offset++
@@ -850,7 +848,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		paramOffset += nparam * 2
 		if dataLen <= paramOffset {
 			logp.Debug("mysql", "Data too small to contain parameters")
-			return []string{}
+			return nil
 		}
 		// First call or rebound (1)
 		for stmtPos := 0; stmtPos < nparam; stmtPos++ {
@@ -862,7 +860,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			offset++
 			if paramUnsigned != 0 {
 				logp.Debug("mysql", "Illegal param unsigned")
-				return []string{}
+				return nil
 			}
 		}
 		// Save param type info
@@ -873,7 +871,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			// get saved param type info
 			nparamType = stmtdata.nparamType
 		} else {
-			return []string{}
+			return nil
 		}
 	}
 
@@ -890,7 +888,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		case 0x02:
 			if dataLen < paramOffset+2 {
 				logp.Debug("mysql", "Data too small")
-				return []string{}
+				return nil
 			}
 			valueString := strconv.Itoa(int(binary.LittleEndian.Uint16(data[paramOffset:])))
 			paramString = append(paramString, valueString)
@@ -899,7 +897,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		case 0x03:
 			if dataLen < paramOffset+4 {
 				logp.Debug("mysql", "Data too small")
-				return []string{}
+				return nil
 			}
 			valueString := strconv.Itoa(int(binary.LittleEndian.Uint32(data[paramOffset:])))
 			paramString = append(paramString, valueString)
@@ -919,7 +917,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		case 0x08:
 			if dataLen < paramOffset+8 {
 				logp.Debug("mysql", "Data too small")
-				return []string{}
+				return nil
 			}
 			valueString := strconv.FormatInt(int64(data[paramOffset])|int64(data[paramOffset+1])<<8|
 				int64(data[paramOffset+2])<<16|int64(data[paramOffset+3])<<24|
@@ -935,7 +933,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			paramLen := int(data[paramOffset])
 			if dataLen < paramOffset+paramLen+1 {
 				logp.Debug("mysql", "Data too small")
-				return []string{}
+				return nil
 			}
 			paramOffset++
 			if paramLen >= 2 {
@@ -962,7 +960,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			paramLen := int(data[paramOffset])
 			if dataLen < paramOffset+paramLen+1 {
 				logp.Debug("mysql", "Data too small")
-				return []string{}
+				return nil
 			}
 			paramOffset++
 			paramString = append(paramString, "TYPE_TIME")
@@ -978,7 +976,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				paramLen16 := int(data[paramOffset]) | int(data[paramOffset+1])<<8
 				if dataLen < paramOffset+paramLen16+2 {
 					logp.Debug("mysql", "Data too small")
-					return []string{}
+					return nil
 				}
 				paramOffset += 2
 				paramString = append(paramString, string(data[paramOffset:paramOffset+paramLen16]))
@@ -987,7 +985,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				paramLen24 := int(data[paramOffset]) | int(data[paramOffset+1])<<8 | int(data[paramOffset+2])<<16
 				if dataLen < paramOffset+paramLen24+3 {
 					logp.Debug("mysql", "Data too small")
-					return []string{}
+					return nil
 				}
 				paramOffset += 3
 				paramString = append(paramString, string(data[paramOffset:paramOffset+paramLen24]))
@@ -995,15 +993,14 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			default: /* < 252 chars     */
 				if dataLen < paramOffset+paramLen {
 					logp.Debug("mysql", "Data too small")
-					return []string{}
+					return nil
 				}
 				paramString = append(paramString, string(data[paramOffset:paramOffset+paramLen]))
-				//logp.Debug("mysql", "Field_type_var_string : %s", string(data[paramOffset:paramOffset+paramLen]))
 				paramOffset += paramLen
 			}
 		default:
 			logp.Debug("mysql", "Unknown param type")
-			return []string{}
+			return nil
 		}
 
 	}
@@ -1223,10 +1220,7 @@ func readLinteger(data []byte, offset int) (uint64, int, bool, error) {
 		if len(data[offset+1:]) < 8 {
 			return 0, 0, false, nil
 		}
-		return uint64(data[offset+1]) | uint64(data[offset+2])<<8 |
-				uint64(data[offset+3])<<16 | uint64(data[offset+4])<<24 |
-				uint64(data[offset+5])<<32 | uint64(data[offset+6])<<40 |
-				uint64(data[offset+7])<<48 | uint64(data[offset+8])<<56,
+		return binary.LittleEndian.Uint64(data[offset+1:]),
 			offset + 9, true, nil
 	case 0xfd:
 		if len(data[offset+1:]) < 3 {
