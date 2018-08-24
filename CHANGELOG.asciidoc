@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.4[Check the HEAD diff]
 *Auditbeat*
 
 - Fixed a crash in the file_integrity module under Linux. {issue}7753[7753]
+- Fixed the RPM by designating the config file as configuration data in the RPM spec. {issue}8075[8075]
 
 *Filebeat*
 
@@ -52,6 +53,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.4[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
+
+- Fixed the RPM by designating the modules.d config files as configuration data in the RPM spec. {issue}8075[8075]
 
 *Packetbeat*
 
