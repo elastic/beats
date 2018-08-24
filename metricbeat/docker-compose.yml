@@ -134,6 +134,7 @@ services:
 
   mongodb:
     build: ./module/mongodb/_meta
+    command: mongod --replSet beats
 
   munin:
     build: ./module/munin/_meta
