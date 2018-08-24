@@ -87,7 +87,7 @@ func (c *wrapperContainer) Host() string {
 }
 
 func (d *wrapperDriver) LockFile() string {
-	return d.Files[0] + "." + d.Name + ".lock"
+	return d.Files[0] + ".lock"
 }
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
@@ -148,7 +148,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 }
 
 func (d *wrapperDriver) Down(ctx context.Context) error {
-	return d.cmd(ctx, "down", "-v").Run()
+	return d.cmd(ctx, "down", "-v", "--rmi=local").Run()
 }
 
 func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string) error {
