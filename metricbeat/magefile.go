@@ -113,10 +113,12 @@ func customizePackaging() {
 		modulesDir = mage.PackageFile{
 			Mode:   0644,
 			Source: "modules.d",
+			Config: true,
 		}
 		windowsModulesDir = mage.PackageFile{
 			Mode:   0644,
 			Source: "{{.PackageDir}}/modules.d",
+			Config: true,
 			Dep: func(spec mage.PackageSpec) error {
 				if err := mage.Copy("modules.d", spec.MustExpand("{{.PackageDir}}/modules.d")); err != nil {
 					return errors.Wrap(err, "failed to copy modules.d dir")
