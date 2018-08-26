@@ -578,12 +578,16 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 }
 
 func (http *httpPlugin) makeRawMessage(m *message) string {
+	var result []byte
+	result = append(result, m.rawHeaders...)
 	if m.sendBody {
-		var b strings.Builder
-		b.Grow(len(m.rawHeaders) + len(m.body))
-		b.Write(m.rawHeaders)
-		b.Write(m.body)
-		return b.String()
+		result = append(result,m.body...)
+		//var b strings.Builder
+		//b.Grow(len(m.rawHeaders) + len(m.body))
+		//b.Write(m.rawHeaders)
+		//b.Write(m.body)
+		//return b.String()
+		return string(result)
 	}
 	return string(m.rawHeaders)
 }
