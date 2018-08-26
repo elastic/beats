@@ -42,10 +42,10 @@ type config struct {
 	BulkMaxSize      int               `config:"bulk_max_size" validate:"min=0"`
 	BufferSize       int               `config:"buffer_size"`
 	Tags             []string          `config:"tags"`
-	Backoff          Backoff           `config:"backoff"`
+	Backoff          backoff           `config:"backoff"`
 }
 
-type Backoff struct {
+type backoff struct {
 	Init time.Duration
 	Max  time.Duration
 }
@@ -67,7 +67,7 @@ var defaultConfig = config{
 	BulkMaxSize:      50,
 	BufferSize:       50,
 	Tags:             nil,
-	Backoff: Backoff{
+	Backoff: backoff{
 		Init: 1 * time.Second,
 		Max:  60 * time.Second,
 	},
