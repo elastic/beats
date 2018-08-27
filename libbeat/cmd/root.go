@@ -55,24 +55,27 @@ type BeatsRootCmd struct {
 }
 
 // GenRootCmd returns the root command to use for your beat. It takes the beat name, version,
-// and run command, which will be called if no args are given (for backwards compatibility)
-// DEPRECATED! Use GenRootCmdWithSettings instead.
+// and run command, which will be called if no args are given (for backwards compatibility).
+//
+// Deprecated: Use GenRootCmdWithSettings instead.
 func GenRootCmd(name, version string, beatCreator beat.Creator) *BeatsRootCmd {
 	return GenRootCmdWithRunFlags(name, version, beatCreator, nil)
 }
 
 // GenRootCmdWithRunFlags returns the root command to use for your beat. It takes
 // beat name, version, run command, and runFlags. runFlags parameter must the flagset used by
-// run command
-// DEPRECATED! Use GenRootCmdWithSettings instead.
+// run command.
+//
+// Deprecated: Use GenRootCmdWithSettings instead.
 func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *BeatsRootCmd {
 	return GenRootCmdWithIndexPrefixWithRunFlags(name, name, version, beatCreator, runFlags)
 }
 
 // GenRootCmdWithIndexPrefixWithRunFlags returns the root command to use for your beat. It takes
 // beat name, index prefix, version, run command, and runFlags. runFlags parameter must the flagset used by
-// run command
-// DEPRECATED! Use GenRootCmdWithSettings instead.
+// run command.
+//
+// Deprecated: Use GenRootCmdWithSettings instead.
 func GenRootCmdWithIndexPrefixWithRunFlags(name, indexPrefix, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *BeatsRootCmd {
 	settings := instance.Settings{
 		Name:        name,
