@@ -17,6 +17,8 @@ test: prepare-test
 	${PREPARE_COMMAND} \
 	$(MAKE) git-init || exit 1 ; \
 	$(MAKE) update || exit 1 ; \
+	git config user.email "beats-jenkins@test.com" || exit 1 ; \
+	git config user.name "beats-jenkins" || exit 1 ; \
 	$(MAKE) git-add || exit 1 ; \
 	$(MAKE) check CHECK_HEADERS_DISABLED=y || exit 1 ; \
 	$(MAKE) || exit 1 ; \
