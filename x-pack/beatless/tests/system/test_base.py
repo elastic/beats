@@ -1,10 +1,12 @@
 from beatless import BaseTest
 
 import os
+import unittest
 
 
 class Test(BaseTest):
 
+    @unittest.skip("temporarily disabled")
     def test_base(self):
         """
         Basic test with exiting Beatless normally
