@@ -5301,7 +5301,7 @@ Next collection will happen when HeapAlloc > this amount.
 *`golang.heap.gc.cpu_fraction`*::
 +
 --
-type: long
+type: float
 
 Fraction of CPU time used by GC.
 
