@@ -59,3 +59,15 @@ func (msg *Message) AddFields(fields common.MapStr) {
 	}
 	msg.Fields.Update(fields)
 }
+
+func (msg *Message) AddTagsWithKey(key string, tags []string) error {
+	if len(tags) == 0 {
+		return nil
+	}
+
+	if msg.Fields == nil {
+		msg.Fields = common.MapStr{}
+	}
+
+	return common.AddTagsWithKey(msg.Fields, key, tags)
+}
