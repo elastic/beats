@@ -150,10 +150,6 @@ connection <0.23893.109>, channel 3 - soft error:
         assert False == self.log_contains(
             "InternalClusterService.java:388", "output/filebeat")
 
-        # Check if multiline counters show up
-        assert True == self.log_contains(
-            "\"log\":{\"multiline\":3}", "output/filebeat")
-
         # Check that output file has the same number of lines as the log file
         assert 20 == len(output)
 
