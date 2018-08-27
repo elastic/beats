@@ -38,6 +38,8 @@ var publishDisabled = false
 
 const defaultQueueType = "mem"
 
+// Monitors configures visibility for observing state and progress of the
+// pipeline.
 type Monitors struct {
 	Metrics   *monitoring.Registry
 	Telemetry *monitoring.Registry
