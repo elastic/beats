@@ -18,7 +18,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-osquery>>
   * <<filebeat-module-postgresql>>
   * <<filebeat-module-redis>>
-  * <<filebeat-module-suricata>>
   * <<filebeat-module-system>>
   * <<filebeat-module-traefik>>
 
@@ -41,6 +40,5 @@ include::modules/nginx.asciidoc[]
 include::modules/osquery.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/redis.asciidoc[]
-include::modules/suricata.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/traefik.asciidoc[]
