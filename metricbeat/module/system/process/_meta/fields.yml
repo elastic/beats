@@ -29,6 +29,7 @@
       description: >
         The full command-line used to start the process, including the
         arguments separated by space.
+      ignore_above: 2048
     - name: username
       type: keyword
       description: >
