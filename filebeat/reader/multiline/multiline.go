@@ -271,7 +271,6 @@ func (mlr *Reader) clear() {
 func (mlr *Reader) finalize() reader.Message {
 	if mlr.truncated > 0 {
 		mlr.message.AddTagsWithKey("log.status", []string{"truncated"})
-		fmt.Println(mlr.message.Fields)
 	}
 
 	// Copy message from existing content
