@@ -5,6 +5,8 @@
 package cmd
 
 import (
+	"github.com/spf13/cobra"
+
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/x-pack/beatless/beater"
 )
@@ -12,5 +14,21 @@ import (
 // Name of this beat
 var Name = "beatless"
 
-// RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmd(Name, "", beater.New)
+// RootCmd to handle beatless
+var RootCmd *cmd.BeatsRootCmd
+
+func init() {
+	b := beater.New
+	RootCmd = cmd.GenRootCmd(Name, "", b)
+
+	functionCmd := &cobra.Command{
+		Use:   "function",
+		Short: "Manage functions",
+	}
+
+	functionCmd.AddCommand(genDeployCmd())
+	functionCmd.AddCommand(genUpdateCmd())
+	functionCmd.AddCommand(genRemoveCmd())
+
+	RootCmd.AddCommand(functionCmd)
+}
