@@ -6,6 +6,7 @@ package aws
 
 import (
 	"context"
+	"errors"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
