@@ -373,6 +373,7 @@ func customizePackaging() {
 		configYml = mage.PackageFile{
 			Mode:   0600,
 			Source: "{{.PackageDir}}/{{.BeatName}}.yml",
+			Config: true,
 			Dep: func(spec mage.PackageSpec) error {
 				if err := mage.Copy("packetbeat.yml",
 					spec.MustExpand("{{.PackageDir}}/packetbeat.yml")); err != nil {
