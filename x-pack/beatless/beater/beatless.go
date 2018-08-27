@@ -5,23 +5,46 @@
 package beater
 
 import (
+	"context"
 	"fmt"
+	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
 
-	"github.com/elastic/beats/x-pack/beatless/bus"
 	"github.com/elastic/beats/x-pack/beatless/config"
+	"github.com/elastic/beats/x-pack/beatless/core"
+	"github.com/elastic/beats/x-pack/beatless/licenser"
+	"github.com/elastic/beats/x-pack/beatless/provider"
+
+	// Imports providers and functions.
+	_ "github.com/elastic/beats/x-pack/beatless/include"
 )
 
-// Beatless configuration.
-type Beatless struct {
-	done   chan struct{}
-	config config.Config
-	log    *logp.Logger
+var (
+	graceDelay   = 45 * time.Minute
+	refreshDelay = 15 * time.Minute
+)
 
-	// TODO: Add registry reference here.
+// Beatless is a beat designed to un under a serverless environment and listen to external triggers,
+// each invocation will generate one or more events to Elasticsearch.
+//
+// Each serverless implementation is different but beatless follows a few executions rules.
+// - Publishing events from the source to the output is done synchronously.
+// - Execution can be suspended.
+// - Run on a read only filesystem
+// - More execution constraints based on speed and memory usage.
+type Beatless struct {
+	ctx      context.Context
+	config   config.Config
+	log      *logp.Logger
+	cancel   context.CancelFunc
+	provider provider.Provider
 }
 
 // New creates an instance of beatless.
@@ -31,35 +54,99 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading config file: %v", err)
 	}
 
+	// Configure the provider, the provider will take care of the configuration for the
+	// functions.
+	registry := provider.NewRegistry(feature.Registry)
+	providerFunc, err := registry.Lookup(c.Provider.Name())
+	if err != nil {
+		return nil, fmt.Errorf("error finding the provider '%s', error: %v", c.Provider.Name(), err)
+	}
+
+	provider, err := providerFunc(logp.NewLogger("provider"), registry, c.Provider.Config())
+	if err != nil {
+		return nil, fmt.Errorf("error creating the provider '%s', error: %v", c.Provider.Name(), err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+
 	bt := &Beatless{
-		done:   make(chan struct{}),
-		config: c,
-		log:    logp.NewLogger("beatless"),
+		ctx:      ctx,
+		cancel:   cancel,
+		config:   c,
+		log:      logp.NewLogger("beatless"),
+		provider: provider,
 	}
 	return bt, nil
 }
 
 // Run starts beatless.
 func (bt *Beatless) Run(b *beat.Beat) error {
+	defer bt.cancel()
 	bt.log.Info("beatless is running")
 	defer bt.log.Info("beatless stopped running")
 
-	client, err := b.Publisher.Connect()
+	manager, err := licenser.Create(&b.Config.Output, refreshDelay, graceDelay)
 	if err != nil {
+		return errors.Wrap(err, "could not create the license manager")
+	}
+	manager.Start()
+	defer manager.Stop()
+
+	// Wait until we receive the initial license.
+	if err := licenser.WaitForLicense(bt.ctx, bt.log, manager, checkLicense); err != nil {
 		return err
 	}
-	defer client.Close()
 
-	// NOTE: Do not review below, this is the minimal to have a working PR.
-	bus := bus.New(client)
-	// TODO: noop
-	bus.Listen()
+	// Each function has his own client to the publisher pipeline,
+	// publish operation will block the calling thread, when the method unwrap we have received the
+	// ACK for the batch.
+	clientFactory := func(cfg *common.Config) (core.Client, error) {
+		c := struct {
+			Processors           processors.PluginConfig `config:"processors"`
+			common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
+		}{}
 
-	// Stop until we are tell to shutdown.
-	// TODO this is where the events catcher starts.
-	select {
-	case <-bt.done:
-		// Stop catching events.
+		if err := cfg.Unpack(&c); err != nil {
+			return nil, err
+		}
+
+		processors, err := processors.New(c.Processors)
+		if err != nil {
+			return nil, err
+		}
+
+		client, err := core.NewSyncClient(b.Publisher, beat.ClientConfig{
+			PublishMode:   beat.GuaranteedSend,
+			Processor:     processors,
+			EventMetadata: c.EventMetadata,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		// Make the client aware of the current license, the client will accept sending events to the
+		// pipeline until the client is closed or if the license change and is not valid.
+		licenseAware := core.NewLicenseAwareClient(client, checkLicense)
+		manager.AddWatcher(licenseAware)
+
+		return licenseAware, nil
+	}
+
+	// Create a client per function and wrap them into a runnable function by the coordinator.
+	functions, err := bt.provider.CreateFunctions(clientFactory)
+	if err != nil {
+		return fmt.Errorf("error when creating the functions, error: %v", err)
+	}
+
+	// manages the goroutine related to the function handlers, if an errors occurs and its not handled
+	// by the function itself, it will reach the coordinator, we log the error and shutdown beats.
+	// When an error reach the coordinator we assume that we cannot recover from it and we initiate
+	// a shutdown and return an aggregated errors.
+	coordinator := core.NewCoordinator(logp.NewLogger("coordinator"), functions...)
+	err = coordinator.Start(bt.ctx)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -68,5 +155,5 @@ func (bt *Beatless) Run(b *beat.Beat) error {
 func (bt *Beatless) Stop() {
 	bt.log.Info("beatless is stopping")
 	defer bt.log.Info("beatless is stopped")
-	close(bt.done)
+	bt.cancel()
 }

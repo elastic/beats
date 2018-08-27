@@ -22,7 +22,7 @@ type Client interface {
 
 	// Close closes the current client, no events will be accepted, this method can block if we still
 	// need to ACK on events.
-	Close()
+	Close() error
 
 	// Wait blocks until the publisher pipeline send the ACKS for all the events.
 	Wait()

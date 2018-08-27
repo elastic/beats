@@ -14,7 +14,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
 // OSSLicense default license to use.
@@ -55,12 +54,14 @@ var (
 
 	ErrManagerStopped = errors.New("license manager is stopped")
 	ErrNoLicenseFound = errors.New("no license found")
+
+	ErrNoElasticsearchConfig = errors.New("no elasticsearch output configuration found, verify your configuration")
 )
 
 // Backoff values when the remote cluster is not responding.
 var (
-	maxBackoff  = time.Duration(60)
-	initBackoff = time.Duration(5)
+	maxBackoff  = 60 * time.Second
+	initBackoff = 1 * time.Second
 	jitterCap   = 1000 // 1000 milliseconds
 )
 
@@ -98,7 +99,7 @@ type Manager struct {
 
 // New takes an elasticsearch client and wraps it into a fetcher, the fetch will handle the JSON
 // and response code from the cluster.
-func New(client *elasticsearch.Client, duration time.Duration, gracePeriod time.Duration) *Manager {
+func New(client esclient, duration time.Duration, gracePeriod time.Duration) *Manager {
 	fetcher := NewElasticFetcher(client)
 	return NewWithFetcher(fetcher, duration, gracePeriod)
 }
@@ -170,7 +171,7 @@ func (m *Manager) Get() (*License, error) {
 func (m *Manager) Start() {
 	// First update should be in sync at startup to ensure a
 	// consistent state.
-	m.log.Info("license manager started, no license found.")
+	m.log.Info("license manager started, retrieving initial license")
 	m.wg.Add(1)
 	go m.worker()
 }
@@ -216,7 +217,7 @@ func (m *Manager) notify(op func(Watcher)) {
 
 func (m *Manager) worker() {
 	defer m.wg.Done()
-	m.log.Debug("starting periodic license check")
+	m.log.Debugf("starting periodic license check, refresh: %s grace: %s ", m.duration, m.gracePeriod)
 	defer m.log.Debug("periodic license check is stopped")
 
 	jitter := rand.Intn(jitterCap)
@@ -251,7 +252,7 @@ func (m *Manager) update() {
 		default:
 			license, err := m.fetcher.Fetch()
 			if err != nil {
-				m.log.Info("cannot retrieve license, retrying later, error: %s", err)
+				m.log.Infof("cannot retrieve license, retrying later, error: %s", err)
 
 				// check if the license is still in the grace period.
 				// permit some operations if the license could not be checked
@@ -268,8 +269,8 @@ func (m *Manager) update() {
 			}
 
 			// we have a valid license, notify watchers and sleep until next check.
-			m.log.Info(
-				"valid license retrieved, license mode: %s, type: %s, status: %s",
+			m.log.Infof(
+				"valid license retrieved, license mode: %v, type: %v, status: %v",
 				license.Get(),
 				license.Type,
 				license.Status,
