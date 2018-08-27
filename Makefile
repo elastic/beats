@@ -83,7 +83,7 @@ check: python-env
 
 .PHONY: check-headers
 check-headers:
-	@go get github.com/elastic/go-licenser
+	@go get -u github.com/elastic/go-licenser
 	@go-licenser -d -exclude x-pack
 	@go-licenser -d -license Elastic x-pack
 
