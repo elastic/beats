@@ -80,9 +80,9 @@ func (msg *Message) AddTagsWithKey(key string, tags []string) error {
 		return nil
 	}
 
-	if msg.Fields == nil {
-		msg.Fields = common.MapStr{}
+	if m.Fields == nil {
+		m.Fields = common.MapStr{}
 	}
 
-	return common.AddTagsWithKey(msg.Fields, key, tags)
+	return common.AddTagsWithKey(m.Fields, key, tags)
 }
