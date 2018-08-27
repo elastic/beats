@@ -38,6 +38,32 @@ class Test(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
+    def test_load_dashboard_into_space(self):
+        """
+        Test loading dashboards into Kibana space
+        """
+        self.render_config_template()
+        beat = self.start_beat(
+            logging_args=["-e", "-d", "*"],
+            extra_args=["setup",
+                        "--dashboards",
+                        "-E", "setup.dashboards.file=" +
+                        os.path.join(self.beat_path, "tests", "files", "testbeat-dashboards.zip"),
+                        "-E", "setup.dashboards.beat=testbeat",
+                        "-E", "setup.kibana.protocol=http",
+                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
+                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.space.id=foo-bar",
+                        "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.file.enabled=false"]
+        )
+
+        beat.check_wait(exit_code=0)
+
+        assert self.log_contains("Kibana dashboards successfully loaded") is True
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
     def test_load_only_index_patterns(self):
         """
         Test loading dashboards
@@ -74,6 +100,32 @@ class Test(BaseTest):
         path = os.path.normpath(self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards.go")
         command = path + " -kibana http://" + self.get_kibana_host() + ":" + self.get_kibana_port()
         command = "go run " + command + " -dashboard Metricbeat-system-overview"
+
+        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        content, err = p.communicate()
+
+        assert p.returncode == 0
+
+        assert os.path.isfile("output.json") is True
+
+        with open('output.json') as f:
+            content = f.read()
+            assert "Metricbeat-system-overview" in content
+
+        os.remove("output.json")
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_export_dashboard_from_space(self):
+        """
+        Test export dashboards from Kibana space and remove unsupported characters
+        """
+
+        self.test_load_dashboard_into_space()
+
+        path = os.path.normpath(self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards.go")
+        command = path + " -kibana http://" + self.get_kibana_host() + ":" + self.get_kibana_port()
+        command = "go run " + command + " -dashboard Metricbeat-system-overview -space-id foo-bar"
 
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         content, err = p.communicate()
