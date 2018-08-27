@@ -22,6 +22,7 @@ package multiline
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -150,6 +151,25 @@ func TestMultilineBeforeNegateOKWithEmptyLine(t *testing.T) {
 	)
 }
 
+func TestMultilineAfterTruncated(t *testing.T) {
+	pattern := match.MustCompile(`^[ ]`) // next line is indented a space
+	maxLines := 2
+	testMultilineTruncated(t,
+		Config{
+			Pattern:  &pattern,
+			Match:    "after",
+			MaxLines: &maxLines,
+		},
+		2,
+		[]string{
+			"line1\n line1.1\n line1.2\n",
+			"line2\n line2.1\n line2.2\n"},
+		[]string{
+			"line1\n line1.1",
+			"line2\n line2.1"},
+	)
+}
+
 func testMultilineOK(t *testing.T, cfg Config, events int, expected ...string) {
 	_, buf := createLineBuffer(expected...)
 	r := createMultilineTestReader(t, buf, cfg)
@@ -174,6 +194,53 @@ func testMultilineOK(t *testing.T, cfg Config, events int, expected ...string) {
 		assert.NotEqual(t, tsZero, message.Ts)
 		assert.Equal(t, strings.TrimRight(expected[i], "\r\n "), string(message.Content))
 		assert.Equal(t, len(expected[i]), int(message.Bytes))
+	}
+}
+
+func testMultilineTruncated(t *testing.T, cfg Config, events int, input, expected []string) {
+	_, buf := createLineBuffer(input...)
+	r := createMultilineTestReader(t, buf, cfg)
+
+	var messages []reader.Message
+	for {
+		message, err := r.Next()
+		if err != nil {
+			break
+		}
+
+		messages = append(messages, message)
+	}
+
+	if len(messages) != events {
+		t.Fatalf("expected %v lines, read only %v line(s)", len(expected), len(messages))
+	}
+
+	for _, message := range messages {
+		fmt.Println(message)
+		statusFlags, err := message.Fields.GetValue("log.status")
+		if err != nil {
+			t.Fatalf("error while getting log.status field: %v", err)
+		}
+
+		found := false
+		switch flags := statusFlags.(type) {
+		case []string:
+			for _, f := range flags {
+				if f == "truncated" {
+					found = true
+				}
+			}
+		case []interface{}:
+			for _, f := range flags {
+				if f == "truncated" {
+					found = true
+				}
+			}
+		default:
+			t.Fatalf("incorrect type for log.status")
+		}
+
+		assert.True(t, found)
 	}
 }
 
