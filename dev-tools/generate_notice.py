@@ -67,6 +67,7 @@ def gather_dependencies(vendor_dirs, overrides=None):
                 lib["license_contents"] = read_file(lib["license_file"])
                 lib["license_summary"] = detect_license_summary(lib["license_contents"])
                 if lib["license_summary"] == "UNKNOWN":
+                    print("no valid: {}".format(lib["license_file"]))
                     print("WARNING: Unknown license for: {}".format(lib_path))
 
                 revision = overrides.get(lib_path, {}).get("revision")
@@ -84,6 +85,11 @@ def gather_dependencies(vendor_dirs, overrides=None):
 
     return dependencies
 
+# Allow to skip files that could match the `LICENSE` pattern but does not have any license information.
+SKIP_FILES = [
+    # AWS lambda go defines that some part of the code is APLv2 and other on a MIT Modified license.
+    "./vendor/github.com/aws/aws-lambda-go/LICENSE-SUMMARY"
+]
 
 # Allow to skip files that could match the `LICENSE` pattern but does not have any license information.
 SKIP_FILES = [
@@ -337,7 +343,7 @@ ACCEPTED_LICENSES = [
     "BSD-2-Clause",
     "MPL-2.0",
 ]
-SKIP_NOTICE = []
+SKIP_NOTICE = [ ]
 
 if __name__ == "__main__":
 
