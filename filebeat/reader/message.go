@@ -50,7 +50,7 @@ func (m *Message) IsEmpty() bool {
 }
 
 // AddFields adds fields to the message.
-func (msg *Message) AddFields(fields common.MapStr) {
+func (m *Message) AddFields(fields common.MapStr) {
 	if fields == nil {
 		return
 	}
@@ -63,7 +63,7 @@ func (msg *Message) AddFields(fields common.MapStr) {
 
 // AddTagsWithKey adds tags to the message with an arbitrary key.
 // If the field does not exist, it is created.
-func (msg *Message) AddTagsWithKey(key string, tags []string) error {
+func (m *Message) AddTagsWithKey(key string, tags []string) error {
 	if len(tags) == 0 {
 		return nil
 	}
