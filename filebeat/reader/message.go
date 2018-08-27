@@ -49,6 +49,7 @@ func (m *Message) IsEmpty() bool {
 	return false
 }
 
+// AddFields adds fields to the message.
 func (msg *Message) AddFields(fields common.MapStr) {
 	if fields == nil {
 		return
@@ -60,6 +61,8 @@ func (msg *Message) AddFields(fields common.MapStr) {
 	msg.Fields.Update(fields)
 }
 
+// AddTagsWithKey adds tags to the message with an arbitrary key.
+// If the field does not exist, it is created.
 func (msg *Message) AddTagsWithKey(key string, tags []string) error {
 	if len(tags) == 0 {
 		return nil
