@@ -94,6 +94,8 @@ func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []
 	return formattedStats
 }
 
+// getStorageStats collects diskio metrics from StorageStats structure, that
+// is populated in Windows systems only
 func (io *BlkioService) getStorageStats(myRawStats *docker.Stat, dedot bool) BlkioStats {
 	return BlkioStats{
 		Time:      myRawStats.Stats.Read,
@@ -113,6 +115,8 @@ func (io *BlkioService) getStorageStats(myRawStats *docker.Stat, dedot bool) Blk
 	}
 }
 
+// getBlkioStats collects diskio metrics from BlkioStats structures, that
+// are not populated in Windows
 func (io *BlkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool) BlkioStats {
 	return BlkioStats{
 		Time:      myRawStat.Stats.Read,
