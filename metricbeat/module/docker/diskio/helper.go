@@ -36,6 +36,7 @@ type BlkioStats struct {
 	servicedBytes BlkioRaw
 }
 
+// Add adds blkio stats
 func (s *BlkioStats) Add(o *BlkioStats) {
 	s.reads += o.reads
 	s.writes += o.writes
@@ -52,6 +53,7 @@ type BlkioRaw struct {
 	totals uint64
 }
 
+// Add adds blkio raw stats
 func (s *BlkioRaw) Add(o *BlkioRaw) {
 	s.reads += o.reads
 	s.writes += o.writes
