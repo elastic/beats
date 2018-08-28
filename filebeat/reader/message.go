@@ -63,7 +63,7 @@ func (m *Message) AddFields(fields common.MapStr) {
 
 // AddTagsWithKey adds tags to the message with an arbitrary key.
 // If the field does not exist, it is created.
-func (m *Message) AddTagsWithKey(key string, tags []string) error {
+func (m *Message) AddTagsWithKey(key string, tags ...string) error {
 	if len(tags) == 0 {
 		return nil
 	}

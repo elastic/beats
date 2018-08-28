@@ -38,7 +38,7 @@ func (r *LimitReader) Next() (reader.Message, error) {
 	message, err := r.reader.Next()
 	if len(message.Content) > r.maxBytes {
 		message.Content = message.Content[:r.maxBytes]
-		message.AddTagsWithKey("log.status", []string{"truncated"})
+		message.AddTagsWithKey("log.status", "truncated")
 	}
 	return message, err
 }

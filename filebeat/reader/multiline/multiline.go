@@ -270,7 +270,7 @@ func (mlr *Reader) clear() {
 // finalize writes the existing content into the returned message and resets all reader variables.
 func (mlr *Reader) finalize() reader.Message {
 	if mlr.truncated > 0 {
-		mlr.message.AddTagsWithKey("log.status", []string{"truncated"})
+		mlr.message.AddTagsWithKey("log.status", "truncated")
 	}
 
 	// Copy message from existing content
