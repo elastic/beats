@@ -20,6 +20,8 @@ package add_process_metadata
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -44,8 +46,11 @@ type config struct {
 	// MatchPIDs fields containing the PID to lookup.
 	MatchPIDs []string `config:"match_pids"`
 
-	// TargetFields maps from destination field to value.
-	TargetFields common.MapStr `config:"target_fields"`
+	// Target is the destination root where fields will be added.
+	Target string `config:"target"`
+
+	// Fields is the list of fields to add to target.
+	Fields []string `config:"fields"`
 }
 
 // available fields by default
@@ -90,29 +95,40 @@ func (pf *config) getMappings() (mappings common.MapStr, err error) {
 	if pf.RestrictedFields {
 		validFields = restrictedFields
 	}
-	for key, srcIf := range pf.TargetFields.Flatten() {
-		targetField, ok := srcIf.(string)
-		if !ok {
-			if srcIf != nil {
-				return nil, fmt.Errorf("field '%v' not found (not a string)", srcIf)
+	fieldPrefix := pf.Target
+	if len(fieldPrefix) > 0 {
+		fieldPrefix += "."
+	}
+	wantedFields := pf.Fields
+	if len(wantedFields) == 0 {
+		wantedFields = []string{"process"}
+	}
+	for _, docSrc := range wantedFields {
+		dstField := fieldPrefix + docSrc
+		reqField, err := validFields.GetValue(docSrc)
+		if err != nil {
+			return nil, fmt.Errorf("field '%v' not found", docSrc)
+		}
+		if reqField != nil {
+			if len(wantedFields) != 1 {
+				return nil, fmt.Errorf("'%s' field cannot be used in conjunction with other fields", docSrc)
 			}
-			// allow nil to be a synonym for process
-			targetField = "process"
-		}
-
-		var val interface{}
-		var err error
-		if val, err = validFields.GetValue(targetField); err != nil {
-			return nil, fmt.Errorf("field '%v' not found", targetField)
-		}
-		if val == nil {
-			mappings.Put(key, targetField)
+			for subField := range reqField.(common.MapStr) {
+				key := dstField + "." + subField
+				val := docSrc + "." + subField
+				if _, err = mappings.Put(key, val); err != nil {
+					return nil, errors.Wrapf(err, "failed to set mapping '%v' -> '%v'", dstField, docSrc)
+				}
+			}
 		} else {
-			for subkey := range val.(common.MapStr) {
-				mappings.Put(key+"."+subkey, targetField+"."+subkey)
+			prev, err := mappings.Put(dstField, docSrc)
+			if err != nil {
+				return nil, errors.Wrapf(err, "failed to set mapping '%v' -> '%v'", dstField, docSrc)
+			}
+			if prev != nil {
+				return nil, fmt.Errorf("field '%v' repeated", docSrc)
 			}
 		}
 	}
-
 	return mappings.Flatten(), nil
 }

@@ -57,12 +57,9 @@ func TestAddProcessMetadata(t *testing.T) {
 		err                     error
 	}{
 		{
-			description: "single field",
+			description: "default fields",
 			config: common.MapStr{
 				"match_pids": []string{"system.process.ppid"},
-				"target_fields": common.MapStr{
-					"system.process.parent_name": "process.name",
-				},
 			},
 			event: common.MapStr{
 				"system": common.MapStr{
@@ -74,8 +71,43 @@ func TestAddProcessMetadata(t *testing.T) {
 			expected: common.MapStr{
 				"system": common.MapStr{
 					"process": common.MapStr{
-						"ppid":        "1",
-						"parent_name": "systemd",
+						"ppid": "1",
+					},
+				},
+				"process": common.MapStr{
+					"name":       "systemd",
+					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+					"exe":        "/usr/lib/systemd/systemd",
+					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+					"pid":        1,
+					"ppid":       0,
+					"start_time": startTime,
+				},
+			},
+		},
+		{
+			description: "single field",
+			config: common.MapStr{
+				"match_pids": []string{"system.process.ppid"},
+				"target":     "system.process.parent",
+				"fields":     []string{"process.name"},
+			},
+			event: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+			},
+			expected: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+						"parent": common.MapStr{
+							"process": common.MapStr{
+								"name": "systemd",
+							},
+						},
 					},
 				},
 			},
@@ -84,10 +116,8 @@ func TestAddProcessMetadata(t *testing.T) {
 			description: "multiple fields",
 			config: common.MapStr{
 				"match_pids": []string{"system.other.pid", "system.process.ppid"},
-				"target_fields": common.MapStr{
-					"extra.process.title":      "process.title",
-					"extra.process.start_time": "process.start_time",
-				},
+				"target":     "extra",
+				"fields":     []string{"process.title", "process.start_time"},
 			},
 			event: common.MapStr{
 				"system": common.MapStr{
@@ -114,9 +144,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			description: "complete process info",
 			config: common.MapStr{
 				"match_pids": []string{"ppid"},
-				"target_fields": common.MapStr{
-					"parent": "process",
-				},
+				"target":     "parent",
 			},
 			event: common.MapStr{
 				"ppid": "1",
@@ -124,13 +152,15 @@ func TestAddProcessMetadata(t *testing.T) {
 			expected: common.MapStr{
 				"ppid": "1",
 				"parent": common.MapStr{
-					"name":       "systemd",
-					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-					"exe":        "/usr/lib/systemd/systemd",
-					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
-					"pid":        1,
-					"ppid":       0,
-					"start_time": startTime,
+					"process": common.MapStr{
+						"name":       "systemd",
+						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+						"exe":        "/usr/lib/systemd/systemd",
+						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+						"pid":        1,
+						"ppid":       0,
+						"start_time": startTime,
+					},
 				},
 			},
 		},
@@ -139,9 +169,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			config: common.MapStr{
 				"match_pids":        []string{"ppid"},
 				"restricted_fields": true,
-				"target_fields": common.MapStr{
-					"parent": "process",
-				},
+				"target":            "parent",
 			},
 			event: common.MapStr{
 				"ppid": "1",
@@ -149,18 +177,52 @@ func TestAddProcessMetadata(t *testing.T) {
 			expected: common.MapStr{
 				"ppid": "1",
 				"parent": common.MapStr{
-					"name":       "systemd",
-					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-					"exe":        "/usr/lib/systemd/systemd",
-					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
-					"pid":        1,
-					"ppid":       0,
-					"start_time": startTime,
-					"env": map[string]string{
-						"HOME":       "/",
-						"TERM":       "linux",
-						"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
-						"LANG":       "en_US.UTF-8",
+					"process": common.MapStr{
+						"name":       "systemd",
+						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+						"exe":        "/usr/lib/systemd/systemd",
+						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+						"pid":        1,
+						"ppid":       0,
+						"start_time": startTime,
+						"env": map[string]string{
+							"HOME":       "/",
+							"TERM":       "linux",
+							"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
+							"LANG":       "en_US.UTF-8",
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "complete process info (restricted fields - alt)",
+			config: common.MapStr{
+				"match_pids":        []string{"ppid"},
+				"restricted_fields": true,
+				"target":            "parent",
+				"fields":            []string{"process"},
+			},
+			event: common.MapStr{
+				"ppid": "1",
+			},
+			expected: common.MapStr{
+				"ppid": "1",
+				"parent": common.MapStr{
+					"process": common.MapStr{
+						"name":       "systemd",
+						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+						"exe":        "/usr/lib/systemd/systemd",
+						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+						"pid":        1,
+						"ppid":       0,
+						"start_time": startTime,
+						"env": map[string]string{
+							"HOME":       "/",
+							"TERM":       "linux",
+							"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
+							"LANG":       "en_US.UTF-8",
+						},
 					},
 				},
 			},
@@ -169,9 +231,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			description: "fields not found (ignored)",
 			config: common.MapStr{
 				"match_pids": []string{"ppid"},
-				"target_fields": common.MapStr{
-					"parent": "process",
-				},
 			},
 			event: common.MapStr{
 				"other": "field",
@@ -183,10 +242,7 @@ func TestAddProcessMetadata(t *testing.T) {
 		{
 			description: "fields not found (reported)",
 			config: common.MapStr{
-				"match_pids": []string{"ppid"},
-				"target_fields": common.MapStr{
-					"parent": "process",
-				},
+				"match_pids":     []string{"ppid"},
 				"ignore_missing": false,
 			},
 			event: common.MapStr{
@@ -198,11 +254,8 @@ func TestAddProcessMetadata(t *testing.T) {
 		{
 			description: "fields not found (reported with ignore errors)",
 			config: common.MapStr{
-				"ignore_errors": true,
-				"match_pids":    []string{"ppid"},
-				"target_fields": common.MapStr{
-					"parent": "process",
-				},
+				"ignore_errors":  true,
+				"match_pids":     []string{"ppid"},
 				"ignore_missing": false,
 			},
 			event: common.MapStr{
@@ -216,60 +269,61 @@ func TestAddProcessMetadata(t *testing.T) {
 			config: common.MapStr{
 				"overwrite_fields": true,
 				"match_pids":       []string{"ppid"},
-				"target_fields": common.MapStr{
-					"name": "process.name",
-				},
+				"fields":           []string{"process.name"},
 			},
 			event: common.MapStr{
 				"ppid": 1,
-				"name": "value",
+				"process": common.MapStr{
+					"name": "other",
+				},
 			},
 			expected: common.MapStr{
 				"ppid": 1,
-				"name": "systemd",
+				"process": common.MapStr{
+					"name": "systemd",
+				},
 			},
 		},
 		{
 			description: "overwrite fields error",
 			config: common.MapStr{
 				"match_pids": []string{"ppid"},
-				"target_fields": common.MapStr{
-					"name": "process.name",
-				},
+				"fields":     []string{"process.name"},
 			},
 			event: common.MapStr{
 				"ppid": 1,
-				"name": "value",
+				"process": common.MapStr{
+					"name": "other",
+				},
 			},
 			expected: nil,
-			err:      errors.New("error applying add_process_metadata processor: target field 'name' already exists and overwrite_keys is false"),
+			err:      errors.New("error applying add_process_metadata processor: target field 'process.name' already exists and overwrite_keys is false"),
 		},
 		{
 			description: "overwrite fields error (ignore errors)",
 			config: common.MapStr{
 				"ignore_errors": true,
 				"match_pids":    []string{"ppid"},
-				"target_fields": common.MapStr{
-					"name": "process.name",
-				},
+				"fields":        []string{"process.name"},
 			},
 			event: common.MapStr{
 				"ppid": 1,
-				"name": "value",
+				"process": common.MapStr{
+					"name": "other",
+				},
 			},
 			expected: common.MapStr{
 				"ppid": 1,
-				"name": "value",
+				"process": common.MapStr{
+					"name": "other",
+				},
 			},
-			err: errors.New("error applying add_process_metadata processor: target field 'name' already exists and overwrite_keys is false"),
+			err: errors.New("error applying add_process_metadata processor: target field 'process.name' already exists and overwrite_keys is false"),
 		},
 		{
 			description: "bad PID field cast",
 			config: common.MapStr{
 				"match_pids": []string{"ppid"},
-				"target_fields": common.MapStr{
-					"name": "process.name",
-				},
 			},
 			event: common.MapStr{
 				"ppid": "a",
@@ -282,9 +336,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			config: common.MapStr{
 				"ignore_errors": true,
 				"match_pids":    []string{"ppid"},
-				"target_fields": common.MapStr{
-					"name": "process.name",
-				},
 			},
 			event: common.MapStr{
 				"ppid": "a",
@@ -298,9 +349,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			description: "bad PID field type",
 			config: common.MapStr{
 				"match_pids": []string{"ppid"},
-				"target_fields": common.MapStr{
-					"name": "process.name",
-				},
 			},
 			event: common.MapStr{
 				"ppid": false,
@@ -313,9 +361,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			config: common.MapStr{
 				"ignore_errors": true,
 				"match_pids":    []string{"ppid"},
-				"target_fields": common.MapStr{
-					"name": "process.name",
-				},
 			},
 			event: common.MapStr{
 				"ppid": false,
@@ -329,9 +374,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			description: "process not found",
 			config: common.MapStr{
 				"match_pids": []string{"ppid"},
-				"target_fields": common.MapStr{
-					"name": "process.name",
-				},
 			},
 			event: common.MapStr{
 				"ppid": 42,
@@ -345,9 +387,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			description: "lookup first PID",
 			config: common.MapStr{
 				"match_pids": []string{"nil", "ppid"},
-				"target_fields": common.MapStr{
-					"name": "process.name",
-				},
 			},
 			event: common.MapStr{
 				"nil":  0,
@@ -394,9 +433,7 @@ func TestSelf(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors(processorName))
 	config, err := common.NewConfigFrom(common.MapStr{
 		"match_pids": []string{"self_pid"},
-		"target_fields": common.MapStr{
-			"self": "process",
-		},
+		"target":     "self",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -416,7 +453,7 @@ func TestSelf(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log(result.Fields)
-	pidField, err := result.Fields.GetValue("self.pid")
+	pidField, err := result.Fields.GetValue("self.process.pid")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -429,9 +466,7 @@ func TestBadProcess(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors(processorName))
 	config, err := common.NewConfigFrom(common.MapStr{
 		"match_pids": []string{"self_pid"},
-		"target_fields": common.MapStr{
-			"self": "process",
-		},
+		"target":     "self",
 	})
 	if err != nil {
 		t.Fatal(err)
