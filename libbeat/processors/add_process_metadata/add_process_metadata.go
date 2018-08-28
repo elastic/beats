@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -45,13 +46,13 @@ var (
 
 	procCache = newProcessCache(cacheExpiration, gosysinfoProvider{})
 
-	isDebug = false
-	debugf  = logp.MakeDebug(processorName)
+	instanceID atomic.Uint32
 )
 
 type addProcessMetadata struct {
 	config   config
 	provider processMetadataProvider
+	log      *logp.Logger
 	mappings common.MapStr
 }
 
@@ -78,7 +79,11 @@ func newProcessMetadataProcessor(cfg *common.Config) (processors.Processor, erro
 }
 
 func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider) (proc processors.Processor, err error) {
-	isDebug = logp.HasSelector(processorName)
+	// Logging (each processor instance has a unique ID).
+	var (
+		id  = int(instanceID.Inc())
+		log = logp.NewLogger(processorName).With("instance_id", id)
+	)
 
 	config := defaultConfig()
 	if err = cfg.Unpack(&config); err != nil {
@@ -88,6 +93,7 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 	p := addProcessMetadata{
 		config:   config,
 		provider: provider,
+		log:      log,
 	}
 	if p.mappings, err = config.getMappings(); err != nil {
 		return nil, errors.Wrapf(err, "error unpacking %v.target_fields", processorName)
@@ -145,9 +151,7 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 
 	metaPtr, err := p.provider.GetProcessMetadata(pid)
 	if err != nil || metaPtr == nil {
-		if isDebug {
-			debugf("failed to get process metadata for PID=%d: %v", pid, err)
-		}
+		p.log.Debugf("failed to get process metadata for PID=%d: %v", pid, err)
 		return nil, ErrNoProcess
 	}
 	meta := metaPtr.fields
