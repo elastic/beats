@@ -55,7 +55,7 @@ func Export(client *http.Client, conn string, spaceID string, dashboard string, 
 	params.Add("dashboard", dashboard)
 
 	if spaceID != "" {
-		exportAPI = path.Join("s", spaceID, exportAPI)
+		exportAPI = path.Join("/s", spaceID, exportAPI)
 	}
 	fullURL := makeURL(conn, exportAPI, params)
 	if !quiet {
