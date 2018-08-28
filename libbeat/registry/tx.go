@@ -123,7 +123,19 @@ func (tx *Tx) Insert(val interface{}) (Key, error) {
 		tx.gen = newIDGen()
 	}
 
-	key := tx.gen.Make()
+	var key Key
+	for {
+		key = tx.gen.Make()
+		exists, err := tx.backend.Has(key)
+		if err != nil {
+			return nil, err
+		}
+
+		if !exists {
+			break
+		}
+	}
+
 	err := tx.backend.Set(backend.Key(key), val)
 	if err != nil {
 		return nil, err
