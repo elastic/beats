@@ -156,7 +156,7 @@ func (t *Template) LoadFile(file string) (common.MapStr, error) {
 
 // LoadBytes loads the the template from the given byte array
 func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
-	fields, err := loadYamlByte(data)
+	fields, err := LoadYamlByte(data)
 	if err != nil {
 		return nil, err
 	}
@@ -277,7 +277,7 @@ func appendFields(fields, appendFields common.Fields) (common.Fields, error) {
 	return fields, nil
 }
 
-func loadYamlByte(data []byte) (common.Fields, error) {
+func LoadYamlByte(data []byte) (common.Fields, error) {
 
 	var keys []common.Field
 

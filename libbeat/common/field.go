@@ -149,6 +149,44 @@ func (f Fields) HasNode(key string) bool {
 	return f.hasNode(keys)
 }
 
+// HasNode checks if inside fields the given node exists
+// In contrast to HasKey it not only compares the leaf nodes but
+// every single key it traverses.
+func (f Fields) GetNode(key string) Fields {
+	keys := strings.Split(key, ".")
+	return f.getNode(keys)
+}
+
+func (f Fields) getNode(keys []string) Fields {
+
+	// Nothing to compare, so does not contain it
+	if len(keys) == 0 {
+		return nil
+	}
+
+	key := keys[0]
+	keys = keys[1:]
+
+	for _, field := range f {
+
+		if field.Name == key {
+
+			//// It's the last key to compare
+			if len(keys) == 0 {
+				return field.Fields
+			}
+
+			// It's the last field to compare
+			if len(field.Fields) == 0 {
+				return nil
+			}
+
+			return field.Fields.getNode(keys)
+		}
+	}
+	return nil
+}
+
 func (f Fields) hasNode(keys []string) bool {
 
 	// Nothing to compare, so does not contain it

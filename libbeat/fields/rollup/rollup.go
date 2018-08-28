@@ -20,7 +20,6 @@ func NewProcessor() *Processor {
 // Process recursively processes the given fields and checks for rollup configs
 func (p *Processor) Process(fields common.Fields, path string) error {
 	for _, field := range fields {
-
 		field.Path = path
 
 		switch field.Type {
@@ -31,7 +30,6 @@ func (p *Processor) Process(fields common.Fields, path string) error {
 			} else {
 				newPath = path + "." + field.Name
 			}
-
 			if err := p.Process(field.Fields, newPath); err != nil {
 				return err
 			}
@@ -60,17 +58,17 @@ func (p *Processor) addTerm(f common.Field) {
 }
 
 // Generate creates a common.MapStr object for the rollup job with the terms and fields.
-func (p *Processor) Generate() common.MapStr {
+func (p *Processor) Generate(indexPattern, rollupIndex, cron, pageSize, interval, delay string) common.MapStr {
 	return common.MapStr{
-		"index_pattern": "metricbeat-*",
-		"rollup_index":  "metricbeat_rollup",
-		"cron":          "*/30 * * * * ?",
-		"page_size":     "10",
+		"index_pattern": indexPattern,
+		"rollup_index":  rollupIndex,
+		"cron":          cron,
+		"page_size":     pageSize,
 		"groups": common.MapStr{
 			"date_histogram": common.MapStr{
 				"field":    "@timestamp",
-				"interval": "1h",
-				"delay":    "7d",
+				"interval": interval,
+				"delay":    delay,
 			},
 			"terms": common.MapStr{
 				"fields": p.terms,
