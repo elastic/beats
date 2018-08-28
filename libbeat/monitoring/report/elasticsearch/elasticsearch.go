@@ -131,10 +131,7 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 
 	monitoring := monitoring.Default.GetRegistry("xpack.monitoring")
 
-	outClient := clients[0]
-	if len(clients) > 1 {
-		outClient = outputs.NewFailoverClient(clients)
-	}
+	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
 
 	pipeline, err := pipeline.New(
