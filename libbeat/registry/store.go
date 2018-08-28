@@ -53,6 +53,7 @@ func newSharedStore(reg *Registry, name string, backend backend.Store) *sharedSt
 }
 
 func newStore(shared *sharedStore) *Store {
+	shared.Retain()
 	return &Store{
 		shared: shared,
 		active: true,
@@ -70,7 +71,7 @@ func (s *Store) Close() error {
 	s.active = false
 	s.activeTx.Wait()
 
-	s.shared.close()
+	s.shared.Release()
 	return nil
 }
 
@@ -127,19 +128,26 @@ func (s *Store) finishTx(tx *Tx) {
 	s.activeTx.Done()
 }
 
-func (s *sharedStore) close() {
-	if s.refCount.Dec() > 0 {
-		return
+func (s *sharedStore) Retain() {
+	s.refCount.Inc()
+}
+
+func (s *sharedStore) Release() {
+	if s.refCount.Dec() == 0 && s.tryUnregister() {
+		s.backend.Close()
 	}
+}
 
-	reg := s.reg
-	reg.mu.Lock()
-	defer reg.mu.Unlock()
-
+// tryUnregister removed the store from the registry. tryUnregister returns false
+// if the store has been retained in the meantime. True is returned if the store
+// can be closed for sure.
+func (s *sharedStore) tryUnregister() bool {
+	s.reg.mu.Lock()
+	defer s.reg.mu.Unlock()
 	if s.refCount.Load() > 0 {
-		return
+		return false
 	}
 
-	reg.unregisterStore(s)
-	s.backend.Close()
+	s.reg.unregisterStore(s)
+	return true
 }

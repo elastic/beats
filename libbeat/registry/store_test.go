@@ -82,18 +82,7 @@ func testStoreBeginTxClosed(t *testing.T) {
 		ms := newMockStore()
 		store := makeTestStore(t, ms)
 
-		err := store.Update(func(tx *Tx) error { return nil })
-		assert.Error(t, err)
-
-		ms.AssertExpectations(t)
-		ms.AssertNotCalled(t, "Begin")
-	})
-
-	t.Run("GC fails", func(t *testing.T) {
-		ms := newMockStore()
-		store := makeTestStore(t, ms)
-
-		err := store.Update(func(tx *Tx) error { return nil })
+		err := store.View(func(tx *Tx) error { return nil })
 		assert.Error(t, err)
 
 		ms.AssertExpectations(t)
@@ -167,7 +156,7 @@ func testStoreWithTx(t *testing.T) {
 	})
 
 	t.Run("fail close if internal close fails", func(t *testing.T) {
-		errCloseFail := errors.New("rollback test error")
+		errCloseFail := errors.New("close test error")
 
 		ms := newMockStore()
 		mtx := newMockTx()
@@ -178,7 +167,7 @@ func testStoreWithTx(t *testing.T) {
 		s := makeTestStore(t, ms)
 		tx, err := s.Begin(false)
 		require.NoError(t, err)
-		require.Error(t, tx.Close())
+		require.Equal(t, errCloseFail, tx.Close())
 		require.NoError(t, s.Close())
 
 		ms.AssertExpectations(t)

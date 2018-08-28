@@ -72,10 +72,10 @@ func (r *Registry) Get(name string) (*Store, error) {
 		}
 
 		shared = newSharedStore(r, name, backend)
+		defer shared.Release()
+
 		r.active[name] = shared
 		r.wg.Add(1)
-	} else {
-		shared.refCount.Inc()
 	}
 
 	return newStore(shared), nil

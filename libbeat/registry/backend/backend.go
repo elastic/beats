@@ -27,7 +27,7 @@ type Registry interface {
 	Close() error
 }
 
-// Key representats the internal key.
+// Key represents the internal key.
 type Key []byte
 
 // ValueDecoder is used to decode values into go structs or maps within a transaction.
