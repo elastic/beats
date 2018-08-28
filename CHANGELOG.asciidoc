@@ -107,6 +107,21 @@ https://github.com/elastic/beats/compare/v6.4.0...6.4[Check the HEAD diff]
 === Beats version 6.4.0
 https://github.com/elastic/beats/compare/v6.3.1...v6.4.0[View commits]
 
+==== Known issue
+
+Due to a packaging mistake, the `modules.d` configuration directory is installed in the
+wrong path in the Metricbeat DEB and RPM packages. This manifests itself by showing an empty list
+on the `metricbeat modules list` command and failures to enable/disable any module. To workaround this issue, run the following command:
+
+[source,sh]
+-----------
+sudo cp -r /usr/share/metricbeat/modules.d /etc/metricbeat/
+-----------
+
+This should affect only new installations, upgrades should be fine because the old `modules.d` is left in place.
+
+The issue will be fixed in the 6.4.1 release.
+
 ==== Breaking changes
 
 *Affecting all Beats*
