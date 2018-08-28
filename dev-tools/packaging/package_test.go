@@ -26,6 +26,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"flag"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -55,7 +56,9 @@ var (
 )
 
 var (
-	files = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
+	files    = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
+	modules  = flag.Bool("modules", false, "check modules folder contents")
+	modulesd = flag.Bool("modules.d", false, "check modules.d folder contents")
 )
 
 func TestRPM(t *testing.T) {
@@ -101,6 +104,7 @@ func checkRPM(t *testing.T, file string) {
 	checkManifestPermissions(t, p)
 	checkManifestOwner(t, p)
 	checkModulesPermissions(t, p)
+	checkModulesPresent(t, "/etc/", p)
 	checkModulesOwner(t, p)
 	checkSystemdUnitPermissions(t, p)
 }
@@ -116,6 +120,7 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	checkConfigOwner(t, p)
 	checkManifestPermissions(t, p)
 	checkManifestOwner(t, p)
+	checkModulesPresent(t, "/etc/", p)
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p)
 	checkSystemdUnitPermissions(t, p)
@@ -131,6 +136,7 @@ func checkTar(t *testing.T, file string) {
 	checkConfigPermissions(t, p)
 	checkConfigOwner(t, p)
 	checkManifestPermissions(t, p)
+	checkModulesPresent(t, "", p)
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p)
 }
@@ -144,6 +150,7 @@ func checkZip(t *testing.T, file string) {
 
 	checkConfigPermissions(t, p)
 	checkManifestPermissions(t, p)
+	checkModulesPresent(t, "", p)
 	checkModulesPermissions(t, p)
 }
 
@@ -266,6 +273,35 @@ func checkSystemdUnitPermissions(t *testing.T, p *packageFile) {
 		}
 		t.Errorf("no systemd unit file found matching %v", configFilePattern)
 	})
+}
+
+// Verify that modules.d folder is present and has module files in
+func checkModulesPresent(t *testing.T, prefix string, p *packageFile) {
+	minExpectedModules := 4
+
+	test := func(name string, r *regexp.Regexp) {
+		t.Run(fmt.Sprintf("%s %s contents", p.Name, name), func(t *testing.T) {
+			total := 0
+			for _, entry := range p.Contents {
+				if strings.HasPrefix(entry.File, prefix) && r.MatchString(entry.File) {
+					total++
+				}
+			}
+
+			if total < minExpectedModules {
+				t.Errorf("not enough modules found under %s: actual=%d, expected>=%d",
+					name, total, minExpectedModules)
+			}
+		})
+	}
+
+	if *modules {
+		test("modules", modulesFilePattern)
+	}
+
+	if *modulesd {
+		test("modules.d", modulesDirPattern)
+	}
 }
 
 // Helpers
