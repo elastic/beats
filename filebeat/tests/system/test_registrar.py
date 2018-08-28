@@ -895,6 +895,9 @@ class Test(BaseTest):
             lambda: self.output_has(lines=3),
             max_timeout=10)
 
+        # Make sure all states are cleaned up
+        self.wait_until(lambda: self.log_contains("Before: 1, After: 1, Pending: 0"))
+
         filebeat.check_kill_and_wait()
 
         # Check that the first to files were removed from the registry
