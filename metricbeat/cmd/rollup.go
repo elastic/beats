@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package export
+package cmd
 
 import (
 	"fmt"
@@ -29,13 +29,14 @@ import (
 	"github.com/elastic/beats/libbeat/template"
 )
 
-func GenRollupConfigCmd(name, idxPrefix, beatVersion string) *cobra.Command {
+func GenRollupConfigCmd(name string) *cobra.Command {
 	genRollupConfigCmd := &cobra.Command{
 		Use:   "rollup",
 		Short: "Export rollup config for module/metricset to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
 
-			b, err := instance.NewBeat(name, idxPrefix, beatVersion)
+			// Skipping index prefix and beat version as not needed
+			b, err := instance.NewBeat(name, "", "")
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error creating beat: %s\n", err)
 				os.Exit(1)
@@ -43,21 +44,26 @@ func GenRollupConfigCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 
 			module, _ := cmd.Flags().GetString("module")
 			metricSet, _ := cmd.Flags().GetString("metricset")
-
 			if module == "" || metricSet == "" {
 				fmt.Fprintf(os.Stderr, "Module and metricset params have to be set.")
 				os.Exit(1)
 			}
 
-			nodePath := fmt.Sprintf("%s.%s", module, metricSet)
-
+			// Load fields from Beat
 			f, err := template.LoadYamlByte(b.Fields)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error loading fields: %s\n", err)
 				os.Exit(1)
 			}
+			nodePath := fmt.Sprintf("%s.%s", module, metricSet)
 			fields := f.GetNode(nodePath)
 
+			if fields == nil {
+				fmt.Fprint(os.Stderr, "No fields found for module %s and metricset %s\n", module, metricSet)
+				os.Exit(1)
+			}
+
+			// Load all the additional params
 			indexPattern, _ := cmd.Flags().GetString("index_pattern")
 			rollupIndex, _ := cmd.Flags().GetString("rollup_index")
 			cron, _ := cmd.Flags().GetString("cron")
@@ -65,7 +71,7 @@ func GenRollupConfigCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 			interval, _ := cmd.Flags().GetString("interval")
 			delay, _ := cmd.Flags().GetString("delay")
 
-			processor := rollup.Processor{}
+			processor := rollup.NewProcessor()
 			err = processor.Process(fields, nodePath)
 			if err != nil {
 				fmt.Fprint(os.Stderr, "Error processing fields: %s", err)
@@ -73,6 +79,7 @@ func GenRollupConfigCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 			}
 
 			// Note: No validation happens if the strings used are actually valid
+			// TODO: What if no terms are specified? Should we return error?
 			_, err = os.Stdout.WriteString(processor.Generate(indexPattern, rollupIndex, cron, pageSize, interval, delay).StringToPrint() + "\n")
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error writing rollup job: %+v", err)

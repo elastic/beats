@@ -44,4 +44,5 @@ func init() {
 	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.DefaultCreator(), runFlags)
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
 	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, ""))
+	RootCmd.ExportCmd.AddCommand(GenRollupConfigCmd(Name))
 }

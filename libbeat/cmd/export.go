@@ -32,8 +32,6 @@ func genExportCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 	exportCmd.AddCommand(export.GenExportConfigCmd(name, idxPrefix, beatVersion))
 	exportCmd.AddCommand(export.GenTemplateConfigCmd(name, idxPrefix, beatVersion))
 	exportCmd.AddCommand(export.GenDashboardCmd(name, idxPrefix, beatVersion))
-	// TODO: should this work for now only in Metricbeat?
-	exportCmd.AddCommand(export.GenRollupConfigCmd(name, idxPrefix, beatVersion))
 
 	return exportCmd
 }
