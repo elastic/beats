@@ -52,7 +52,7 @@ type BlkioRaw struct {
 	totals uint64
 }
 
-func (s *BlkioRaw) Add(o *BlkioStats) {
+func (s *BlkioRaw) Add(o *BlkioRaw) {
 	s.reads += o.reads
 	s.writes += o.writes
 	s.totals += o.totals
@@ -76,16 +76,17 @@ func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []
 	statsPerContainer := make(map[string]BlkioRaw)
 	for _, myRawStats := range rawStats {
 		stats := io.getBlkioStats(&myRawStats, dedot)
-		stats.Add(io.getStorageStats(&myRawStats, dedot))
+		storageStats := io.getStorageStats(&myRawStats, dedot)
+		stats.Add(&storageStats)
 
-		oldStats, exist := io.lastStatsPerContainer[myRawStat.Container.ID]
+		oldStats, exist := io.lastStatsPerContainer[stats.Container.ID]
 		if exist {
-			myBlkioStats.reads = io.getReadPs(&oldStats, &stats.serviced)
-			myBlkioStats.writes = io.getWritePs(&oldStats, &stats.serviced)
-			myBlkioStats.totals = io.getTotalPs(&oldStats, &stats.serviced)
+			stats.reads = io.getReadPs(&oldStats, &stats.serviced)
+			stats.writes = io.getWritePs(&oldStats, &stats.serviced)
+			stats.totals = io.getTotalPs(&oldStats, &stats.serviced)
 		}
 
-		statsPerContainer[myRawStats.Container.ID] = stats.serviced
+		statsPerContainer[stats.Container.ID] = stats.serviced
 		formattedStats = append(formattedStats, stats)
 	}
 
@@ -93,7 +94,7 @@ func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []
 	return formattedStats
 }
 
-func (io *BlkioService) getStorageStats(myRawStat *docker.Stat, dedot bool) BlkioStats {
+func (io *BlkioService) getStorageStats(myRawStats *docker.Stat, dedot bool) BlkioStats {
 	return BlkioStats{
 		Time:      myRawStats.Stats.Read,
 		Container: docker.NewContainer(myRawStats.Container, dedot),
