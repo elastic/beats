@@ -154,13 +154,17 @@ class Test(BaseTest):
             self.wait_log_contains(escape_path(dirs[0]), max_timeout=30, ignore_case=True)
             self.wait_log_contains("\"recursive\": true")
 
+            # auditbeat_test/subdir/
             subdir = os.path.join(dirs[0], "subdir")
             os.mkdir(subdir)
+            # auditbeat_test/subdir/file.txt
             file1 = os.path.join(subdir, "file.txt")
             self.create_file(file1, "hello world!")
 
+            # auditbeat_test/subdir/other/
             subdir2 = os.path.join(subdir, "other")
             os.mkdir(subdir2)
+            # auditbeat_test/subdir/other/more.txt
             file2 = os.path.join(subdir2, "more.txt")
             self.create_file(file2, "")
 
