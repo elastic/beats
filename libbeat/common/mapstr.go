@@ -316,24 +316,24 @@ func AddTagsWithKey(ms MapStr, key string, tags []string) error {
 		return nil
 	}
 
-	k, d, oldTags, present, err := mapFind(key, ms, true)
+	k, subMap, oldTags, present, err := mapFind(key, ms, true)
 	if err != nil {
 		return err
 	}
 
 	if !present {
-		d[k] = tags
+		subMap[k] = tags
 		return nil
 	}
 
 	switch arr := oldTags.(type) {
 	case []string:
-		d[k] = append(arr, tags...)
+		subMap[k] = append(arr, tags...)
 	case []interface{}:
 		for _, tag := range tags {
 			arr = append(arr, tag)
 		}
-		d[k] = arr
+		subMap[k] = arr
 	default:
 		return errors.Errorf("expected string array by type is %T", oldTags)
 
