@@ -35,24 +35,24 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	}
 
 	var results []map[string]interface{}
-	for indexName, value := range data {
-		indexData, ok := value.(map[string]interface{})
+	for indexName, indexData := range data {
+		indexData, ok := indexData.(map[string]interface{})
 		if !ok {
 			continue
 		}
 
-		value, ok = indexData["shards"]
+		shards, ok := indexData["shards"]
 		if !ok {
 			continue
 		}
 
-		shards, ok := value.([]interface{})
+		shardsArr, ok := shards.([]interface{})
 		if !ok {
 			continue
 		}
 
-		for _, value = range shards {
-			shard, ok := value.(map[string]interface{})
+		for _, shard := range shardsArr {
+			shard, ok := shard.(map[string]interface{})
 			if !ok {
 				continue
 			}
