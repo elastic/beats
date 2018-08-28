@@ -126,7 +126,7 @@ func (tx *Tx) Insert(val interface{}) (Key, error) {
 	var key Key
 	for {
 		key = tx.gen.Make()
-		exists, err := tx.backend.Has(key)
+		exists, err := tx.backend.Has(backend.Key(key))
 		if err != nil {
 			return nil, err
 		}
