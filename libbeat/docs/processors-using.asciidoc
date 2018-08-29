@@ -1051,24 +1051,26 @@ processors:
     target: system.process.parent
 -------------------------------------------------------------------------------
 
-The fields added to the event look as follow:
+The fields added to the event look as follows:
+[source,json]
 -------------------------------------------------------------------------------
 "process": {
   "name":  "systemd",
   "title": "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
   "exe":   "/usr/lib/systemd/systemd",
   "args":  ["/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"],
-  "pid:    1,
-  "ppid:   0,
+  "pid":   1,
+  "ppid":  0,
   "start_time": "2018-08-22T08:44:50.684Z",
 }
 -------------------------------------------------------------------------------
 
 Optionally, the process environment can be included, too:
+[source,json]
 -------------------------------------------------------------------------------
   ...
   "env": {
-	"HOME":       "/",
+    "HOME":       "/",
     "TERM":       "linux",
     "BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
     "LANG":       "en_US.UTF-8",
@@ -1086,11 +1088,6 @@ created. The default is the event's root.
 
 `fields`:: (Optional) List of fields to add. By default, the processor will add
 all the available fields except `process.env`.
-```
-target: parent
-fields: [ process.title ]
-will create parent.process.title.
-```
 
 `ignore_missing`:: (Optional) When set to `false`, events that don't contain any
 of the fields in match_pids will be discarded and an error will be generated. By
@@ -1100,12 +1097,11 @@ default, this condition is ignored.
 errors are encountered during enrichment.
 Possible errors include when a PID field cannot be converted to an integer or a
 field cannot be overwritten. It is still an error if no PID field is found. Use
-`ignore_missing` for that.
+`ignore_missing` for that. The default is `false`.
 
-`overwrite_fields`:: (Optional)
-By default, if a target field already exists, it will not be overwritten and an
-error will be logged. If `overwrite_fields` is set to `true`, this condition
-will be ignored.
+`overwrite_fields`:: (Optional) By default, if a target field already exists, it
+will not be overwritten and an error will be logged. If `overwrite_fields` is
+set to `true`, this condition will be ignored.
 
 `restricted_fields`:: (Optional) By default, the `process.env` field is not
 output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
