@@ -121,10 +121,10 @@ func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		}
 		return event, nil
 	}
-	if !p.config.IgnoreMissing {
-		return nil, ErrNoMatch
+	if p.config.IgnoreMissing {
+		return event, nil
 	}
-	return event, nil
+	return event, ErrNoMatch
 }
 
 func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (result common.MapStr, err error) {

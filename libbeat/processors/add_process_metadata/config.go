@@ -36,7 +36,7 @@ type config struct {
 	RestrictedFields bool `config:"restricted_fields"`
 
 	// MatchPIDs fields containing the PID to lookup.
-	MatchPIDs []string `config:"match_pids"`
+	MatchPIDs []string `config:"match_pids" validate:"required"`
 
 	// Target is the destination root where fields will be added.
 	Target string `config:"target"`

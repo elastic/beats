@@ -248,8 +248,10 @@ func TestAddProcessMetadata(t *testing.T) {
 			event: common.MapStr{
 				"other": "field",
 			},
-			expected: nil,
-			err:      ErrNoMatch,
+			expected: common.MapStr{
+				"other": "field",
+			},
+			err: ErrNoMatch,
 		},
 		{
 			description: "overwrite keys",
