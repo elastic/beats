@@ -34,6 +34,10 @@ func (c *Config) Load() error {
 	path := paths.Resolve(paths.Data, "management.yml")
 	config, err := common.LoadFile(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			// File is not present, beat is not enrolled
+			return nil
+		}
 		return err
 	}
 

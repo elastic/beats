@@ -35,6 +35,9 @@ import (
 	"github.com/satori/go.uuid"
 	"go.uber.org/zap"
 
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
+
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
@@ -48,6 +51,7 @@ import (
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/logp/configure"
+	"github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
@@ -59,8 +63,6 @@ import (
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
-	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
 
 	// Register publisher pipeline modules
 	_ "github.com/elastic/beats/libbeat/publisher/includes"
@@ -385,6 +387,10 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		api.Start(b.Config.HTTP)
 	}
 
+	// Launch config manager
+	b.ConfigManager.Start()
+	defer b.ConfigManager.Stop()
+
 	return beater.Run(&b.Beat)
 }
 
@@ -557,6 +563,16 @@ func (b *Beat) configure() error {
 
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())
+
+	// initialize config manager
+	b.ConfigManager, err = management.GetFactory()()
+	if err != nil {
+		return err
+	}
+
+	if err := b.ConfigManager.CheckRawConfig(b.RawConfig); err != nil {
+		return err
+	}
 
 	err = b.loadMeta()
 	if err != nil {

@@ -4,7 +4,12 @@
 
 package cmd
 
-import "github.com/elastic/beats/libbeat/cmd"
+import (
+	"github.com/elastic/beats/libbeat/cmd"
+
+	// register central management
+	_ "github.com/elastic/beats/x-pack/libbeat/management"
+)
 
 // AddXPack extends the given root folder with XPack features
 func AddXPack(root *cmd.BeatsRootCmd, name string) {
