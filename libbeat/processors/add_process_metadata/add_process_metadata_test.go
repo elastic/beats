@@ -252,19 +252,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			err:      ErrNoMatch,
 		},
 		{
-			description: "fields not found (reported with ignore errors)",
-			config: common.MapStr{
-				"ignore_errors":  true,
-				"match_pids":     []string{"ppid"},
-				"ignore_missing": false,
-			},
-			event: common.MapStr{
-				"other": "field",
-			},
-			expected: nil,
-			err:      ErrNoMatch,
-		},
-		{
 			description: "overwrite keys",
 			config: common.MapStr{
 				"overwrite_keys": true,
@@ -296,22 +283,6 @@ func TestAddProcessMetadata(t *testing.T) {
 					"name": "other",
 				},
 			},
-			expected: nil,
-			err:      errors.New("error applying add_process_metadata processor: target field 'process.name' already exists and overwrite_keys is false"),
-		},
-		{
-			description: "overwrite keys error (ignore errors)",
-			config: common.MapStr{
-				"ignore_errors":  true,
-				"match_pids":     []string{"ppid"},
-				"include_fields": []string{"process.name"},
-			},
-			event: common.MapStr{
-				"ppid": 1,
-				"process": common.MapStr{
-					"name": "other",
-				},
-			},
 			expected: common.MapStr{
 				"ppid": 1,
 				"process": common.MapStr{
@@ -328,18 +299,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			event: common.MapStr{
 				"ppid": "a",
 			},
-			expected: nil,
-			err:      errors.New("error applying add_process_metadata processor: cannot convert string field 'ppid' to an integer: strconv.Atoi: parsing \"a\": invalid syntax"),
-		},
-		{
-			description: "bad PID field cast (ignore errors)",
-			config: common.MapStr{
-				"ignore_errors": true,
-				"match_pids":    []string{"ppid"},
-			},
-			event: common.MapStr{
-				"ppid": "a",
-			},
 			expected: common.MapStr{
 				"ppid": "a",
 			},
@@ -349,18 +308,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			description: "bad PID field type",
 			config: common.MapStr{
 				"match_pids": []string{"ppid"},
-			},
-			event: common.MapStr{
-				"ppid": false,
-			},
-			expected: nil,
-			err:      errors.New("error applying add_process_metadata processor: cannot parse field 'ppid' (not an integer or string)"),
-		},
-		{
-			description: "bad PID field type (ignore errors)",
-			config: common.MapStr{
-				"ignore_errors": true,
-				"match_pids":    []string{"ppid"},
 			},
 			event: common.MapStr{
 				"ppid": false,

@@ -113,9 +113,6 @@ func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 			case ErrNoProcess:
 				return event, err
 			default:
-				if !p.config.IgnoreErrors {
-					event = nil
-				}
 				return event, errors.Wrapf(err, "error applying %s processor", processorName)
 			}
 		}
