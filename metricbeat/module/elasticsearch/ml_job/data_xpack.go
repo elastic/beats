@@ -45,12 +45,17 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return elastic.MakeErrorForMissingField("jobs", elastic.Elasticsearch)
 	}
 
-	jobsArr, ok := jobs.([]map[string]interface{})
+	jobsArr, ok := jobs.([]interface{})
 	if !ok {
 		return fmt.Errorf("jobs is not an array of objects")
 	}
 
 	for _, job := range jobsArr {
+		job, ok = job.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
 		event := mb.Event{}
 		event.RootFields = common.MapStr{
 			"cluster_uuid": info.ClusterID,
