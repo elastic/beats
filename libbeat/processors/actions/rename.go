@@ -97,14 +97,9 @@ func newRenameFields(c *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("failed to unpack the rename configuration: %s", err)
 	}
 
-	renamers := make([]fieldRenamer, len(config.Fields))
-	for i, fields := range config.Fields {
-		renamers[i] = makeFieldRenamer(fields)
-	}
-
 	f := &renameFields{
 		config:   config,
-		renamers: renamers,
+		renamers: makeFieldRenamers(config.Fields),
 	}
 	return f, nil
 }
@@ -142,6 +137,14 @@ func (f *renameFields) String() string {
 	return "rename=" + fmt.Sprintf("%+v", f.config.Fields)
 }
 
+func makeFieldRenamers(fields []fromTo) []fieldRenamer {
+	renamers := make([]fieldRenamer, len(fields))
+	for i, cfg := range fields {
+		renamers[i] = makeFieldRenamer(cfg)
+	}
+	return renamers
+}
+
 func makeFieldRenamer(fields fromTo) fieldRenamer {
 	from := makeAccessor(fields.From)
 	to := makeAccessor(fields.To)
@@ -150,8 +153,8 @@ func makeFieldRenamer(fields fromTo) fieldRenamer {
 	backupFields := from.IsFields() || to.IsFields()
 
 	return func(ctx *renameCtx, evt *beat.Event) error {
-		if !from.Has(evt) {
-			return fmt.Errorf("target field %s already exists, drop or rename this field first", to)
+		if to.Has(evt) {
+			return fmt.Errorf("target field %s already exists, drop or rename this field first", fields.To)
 		}
 
 		value, err := from.Get(evt)
@@ -307,7 +310,7 @@ func (a *timestampFieldAccessor) Delete(evt *beat.Event) error {
 
 func hasField(m common.MapStr, field string) bool {
 	b, err := m.HasKey(field)
-	return b && err != nil
+	return b && err == nil
 }
 
 func isMetadata(to string) bool {
