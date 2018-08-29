@@ -307,7 +307,7 @@ func (h *Harvester) Run() error {
 			fields.DeepUpdate(message.Fields)
 
 			if h.config.OriginalMessage {
-				fields.Put("log.message", string(message.Original))
+				fields.Put("log.original", string(message.Original))
 			}
 
 			// Check if json fields exist
