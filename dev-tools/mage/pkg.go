@@ -134,6 +134,8 @@ func TestPackages(options ...TestPackagesOption) error {
 		args = append(args, "-v")
 	}
 
+	args = append(args, MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/package_test.go"))
+
 	if params.HasModules {
 		args = append(args, "--modules")
 	}
@@ -142,11 +144,7 @@ func TestPackages(options ...TestPackagesOption) error {
 		args = append(args, "--modules.d")
 	}
 
-	args = append(args,
-		MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/package_test.go"),
-		"-files",
-		MustExpand("{{.PWD}}/build/distributions/*"),
-	)
+	args = append(args, "-files", MustExpand("{{.PWD}}/build/distributions/*"))
 
 	if out, err := goTest(args...); err != nil {
 		if !mg.Verbose() {
