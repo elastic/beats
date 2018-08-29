@@ -4777,6 +4777,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/oklog/ulid
+Version: v1.0.0
+Revision: 8356aea91ceecc7d00ef87508040d1031adb2953
+License type (autodetected): Apache-2.0
+./vendor/github.com/oklog/ulid/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/opencontainers/go-digest
 Revision: ac19fd6e7483ff933754af248d80be865e543d22
 License type (autodetected): Apache-2.0

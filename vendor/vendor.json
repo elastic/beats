@@ -4108,6 +4108,14 @@
 			"revisionTime": "2017-01-13T03:34:06Z"
 		},
 		{
+			"checksumSHA1": "g5dclR1fq92mbbC0vBm02nvMrB8=",
+			"path": "github.com/oklog/ulid",
+			"revision": "8356aea91ceecc7d00ef87508040d1031adb2953",
+			"revisionTime": "2018-07-20T10:24:17Z",
+			"version": "v1.0.0",
+			"versionExact": "v1.0.0"
+		},
+		{
 			"checksumSHA1": "NUD1Gf00sYOP6RUk6iSYmFzogmQ=",
 			"path": "github.com/opencontainers/go-digest",
 			"revision": "ac19fd6e7483ff933754af248d80be865e543d22",
