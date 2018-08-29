@@ -1086,8 +1086,8 @@ the PID lookup will be applied to the value of this field.
 `target`:: (Optional) Destination prefix where the `process` object will be
 created. The default is the event's root.
 
-`fields`:: (Optional) List of fields to add. By default, the processor will add
-all the available fields except `process.env`.
+`include_fields`:: (Optional) List of fields to add. By default, the processor
+will add all the available fields except `process.env`.
 
 `ignore_missing`:: (Optional) When set to `false`, events that don't contain any
 of the fields in match_pids will be discarded and an error will be generated. By

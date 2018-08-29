@@ -88,9 +88,9 @@ func TestAddProcessMetadata(t *testing.T) {
 		{
 			description: "single field",
 			config: common.MapStr{
-				"match_pids": []string{"system.process.ppid"},
-				"target":     "system.process.parent",
-				"fields":     []string{"process.name"},
+				"match_pids":     []string{"system.process.ppid"},
+				"target":         "system.process.parent",
+				"include_fields": []string{"process.name"},
 			},
 			event: common.MapStr{
 				"system": common.MapStr{
@@ -115,9 +115,9 @@ func TestAddProcessMetadata(t *testing.T) {
 		{
 			description: "multiple fields",
 			config: common.MapStr{
-				"match_pids": []string{"system.other.pid", "system.process.ppid"},
-				"target":     "extra",
-				"fields":     []string{"process.title", "process.start_time"},
+				"match_pids":     []string{"system.other.pid", "system.process.ppid"},
+				"target":         "extra",
+				"include_fields": []string{"process.title", "process.start_time"},
 			},
 			event: common.MapStr{
 				"system": common.MapStr{
@@ -201,7 +201,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				"match_pids":        []string{"ppid"},
 				"restricted_fields": true,
 				"target":            "parent",
-				"fields":            []string{"process"},
+				"include_fields":    []string{"process"},
 			},
 			event: common.MapStr{
 				"ppid": "1",
@@ -269,7 +269,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			config: common.MapStr{
 				"overwrite_fields": true,
 				"match_pids":       []string{"ppid"},
-				"fields":           []string{"process.name"},
+				"include_fields":   []string{"process.name"},
 			},
 			event: common.MapStr{
 				"ppid": 1,
@@ -287,8 +287,8 @@ func TestAddProcessMetadata(t *testing.T) {
 		{
 			description: "overwrite fields error",
 			config: common.MapStr{
-				"match_pids": []string{"ppid"},
-				"fields":     []string{"process.name"},
+				"match_pids":     []string{"ppid"},
+				"include_fields": []string{"process.name"},
 			},
 			event: common.MapStr{
 				"ppid": 1,
@@ -302,9 +302,9 @@ func TestAddProcessMetadata(t *testing.T) {
 		{
 			description: "overwrite fields error (ignore errors)",
 			config: common.MapStr{
-				"ignore_errors": true,
-				"match_pids":    []string{"ppid"},
-				"fields":        []string{"process.name"},
+				"ignore_errors":  true,
+				"match_pids":     []string{"ppid"},
+				"include_fields": []string{"process.name"},
 			},
 			event: common.MapStr{
 				"ppid": 1,

@@ -50,7 +50,7 @@ type config struct {
 	Target string `config:"target"`
 
 	// Fields is the list of fields to add to target.
-	Fields []string `config:"fields"`
+	Fields []string `config:"include_fields"`
 }
 
 // available fields by default
