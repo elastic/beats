@@ -206,7 +206,7 @@ func TestKafkaPublish(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			output := grp.Clients[0].(*client)
+			output := grp.Clients[0].(outputs.NetworkClient)
 			if err := output.Connect(); err != nil {
 				t.Fatal(err)
 			}
