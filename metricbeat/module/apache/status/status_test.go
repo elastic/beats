@@ -151,7 +151,7 @@ func TestFetchTimeout(t *testing.T) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "text/plain; charset=ISO-8859-1")
 		w.Write([]byte(response))
-		time.Sleep(100 * time.Millisecond)
+		<-r.Context().Done()
 	}))
 	defer server.Close()
 
