@@ -980,6 +980,7 @@ filebeat.inputs:
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
+#
 #processors:
 #- add_process_metadata:
 #    match_pids: ["system.process.ppid"]
