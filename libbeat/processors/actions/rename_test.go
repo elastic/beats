@@ -19,6 +19,7 @@ package actions
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -223,12 +224,14 @@ func TestRenameRun(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
+			// TODO: define and use proper constructor
 			f := &renameFields{
 				config: renameFieldsConfig{
 					Fields:        test.Fields,
 					IgnoreMissing: test.IgnoreMissing,
 					FailOnError:   test.FailOnError,
 				},
+				renamers: makeFieldRenamers(test.Fields),
 			}
 			event := &beat.Event{
 				Fields: test.Input,
@@ -341,20 +344,33 @@ func TestRenameField(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
-
+			// TODO: have proper constructor
 			f := &renameFields{
 				config: renameFieldsConfig{
 					IgnoreMissing: test.ignoreMissing,
 					FailOnError:   test.failOnError,
 				},
 			}
-
-			err := f.renameField(test.From, test.To, test.Input)
-			if err != nil {
-				assert.Equal(t, test.error, true)
+			f.renamers = []fieldRenamer{
+				makeFieldRenamer(fromTo{
+					From: test.From,
+					To:   test.To,
+				}),
 			}
 
-			assert.True(t, reflect.DeepEqual(test.Input, test.Output))
+			event := beat.Event{
+				Timestamp: time.Now(),
+				Fields:    test.Input,
+			}
+
+			out, err := f.Run(&event)
+			if err != nil {
+				assert.Equal(t, test.error, true)
+			} else {
+				assert.NotNil(t, out)
+			}
+			// assert.True(t, reflect.DeepEqual(test.Input, test.Output))
+			assert.Equal(t, test.Output, test.Input)
 		})
 	}
 }
