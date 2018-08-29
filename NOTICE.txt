@@ -4251,6 +4251,16 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/oklog/ulid
+Version: v1.0.0
+Revision: 8356aea91ceecc7d00ef87508040d1031adb2953
+License type (autodetected): Apache-2.0
+./vendor/github.com/oklog/ulid/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/opencontainers/go-digest
 Revision: eaa60544f31ccf3b0653b1a118b76d33418ff41b
 License type (autodetected): Apache-2.0
