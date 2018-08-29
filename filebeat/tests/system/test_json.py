@@ -43,7 +43,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*",
             json=dict(message_key="log", keys_under_root=True),
             exclude_lines=["windows"],
-            raw_message=False,
+            original_message=False,
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -76,7 +76,7 @@ class Test(BaseTest):
             pattern="^\[log\]",
             match="after",
             negate="true",
-            raw_message=False,
+            original_message=False,
         )
 
         os.mkdir(self.working_dir + "/log/")

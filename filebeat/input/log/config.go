@@ -43,17 +43,17 @@ var (
 		CleanInactive: 0,
 
 		// Input
-		Enabled:        true,
-		IgnoreOlder:    0,
-		ScanFrequency:  10 * time.Second,
-		CleanRemoved:   true,
-		HarvesterLimit: 0,
-		Symlinks:       false,
-		TailFiles:      false,
-		ScanSort:       "",
-		ScanOrder:      "asc",
-		RecursiveGlob:  true,
-		RawMessage:     true,
+		Enabled:         true,
+		IgnoreOlder:     0,
+		ScanFrequency:   10 * time.Second,
+		CleanRemoved:    true,
+		HarvesterLimit:  0,
+		Symlinks:        false,
+		TailFiles:       false,
+		ScanSort:        "",
+		ScanOrder:       "asc",
+		RecursiveGlob:   true,
+		OriginalMessage: true,
 
 		// Harvester
 		BufferSize: 16 * humanize.KiByte,
@@ -97,12 +97,12 @@ type config struct {
 	ScanOrder  string `config:"scan.order"`
 	ScanSort   string `config:"scan.sort"`
 
-	ExcludeLines []match.Matcher   `config:"exclude_lines"`
-	IncludeLines []match.Matcher   `config:"include_lines"`
-	MaxBytes     int               `config:"max_bytes" validate:"min=0,nonzero"`
-	Multiline    *multiline.Config `config:"multiline"`
-	JSON         *readjson.Config  `config:"json"`
-	RawMessage   bool              `config:"raw_message"`
+	ExcludeLines    []match.Matcher   `config:"exclude_lines"`
+	IncludeLines    []match.Matcher   `config:"include_lines"`
+	MaxBytes        int               `config:"max_bytes" validate:"min=0,nonzero"`
+	Multiline       *multiline.Config `config:"multiline"`
+	JSON            *readjson.Config  `config:"json"`
+	OriginalMessage bool              `config:"original_message"`
 
 	// Hidden on purpose, used by the docker input:
 	DockerJSON *struct {

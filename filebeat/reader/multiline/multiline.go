@@ -269,7 +269,7 @@ func (mlr *Reader) clear() {
 func (mlr *Reader) finalize() reader.Message {
 	// Copy message from existing content
 	msg := mlr.message
-	msg.Raw = mlr.message.Content
+	msg.Original = mlr.message.Content
 	mlr.clear()
 	return msg
 }

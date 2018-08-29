@@ -2684,13 +2684,15 @@ Logging level.
 
 --
 
-*`log.message`*::
+*`log.original`*::
 +
 --
 type: keyword
 
-The unprocesses raw log message. This can be used for reprocessing logs.
+The unprocessed original log message. This can be used for reprocessing logs.
 
+
+Field is not indexed.
 
 --
 

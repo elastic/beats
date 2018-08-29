@@ -81,9 +81,9 @@ filebeat.inputs:
   #max_bytes: 10485760
 
 
-  # By default Filebeat adds log.message to each event as this contains the raw event.
+  # By default Filebeat adds log.original to each event as this contains the original log.
   # This can be useful to reprocess the log files.
-  #raw_message: true
+  #original_message: true
 
   ### Recursive glob configuration
 

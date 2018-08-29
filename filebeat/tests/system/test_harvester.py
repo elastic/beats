@@ -819,9 +819,9 @@ class Test(BaseTest):
         output = self.read_output_json()
         assert output[2]["message"] == "hello world2"
 
-    def test_raw_message_enabled(self):
+    def test_original_message_enabled(self):
         """
-        Test raw message enabled for json use case
+        Test original message enabled for json use case
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
@@ -846,16 +846,16 @@ class Test(BaseTest):
 
         assert output[0]["log.message"] == message
 
-    def test_raw_message_disabled(self):
+    def test_original_message_disabled(self):
         """
-        Test raw message enabled for json use case
+        Test original message enabled for json use case
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             json=dict(
                 keys_under_root=True,
             ),
-            raw_message=False,
+            original_message=False,
         )
         os.mkdir(self.working_dir + "/log/")
         logfile = self.working_dir + "/log/test.log"
@@ -872,4 +872,4 @@ class Test(BaseTest):
         output = self.read_output()
         assert len(output) == 1
 
-        assert "log.message" not in output[0]
+        assert "log.original" not in output[0]
