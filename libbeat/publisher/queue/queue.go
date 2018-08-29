@@ -22,11 +22,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
 // Factory for creating a queue used by a pipeline instance.
-type Factory func(Eventer, *common.Config) (Queue, error)
+type Factory func(Eventer, *logp.Logger, *common.Config) (Queue, error)
 
 // Eventer listens to special events to be send by queue implementations.
 type Eventer interface {
