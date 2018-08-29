@@ -21,6 +21,10 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+const (
+	moduleName = "file_integrity"
+)
+
 // Watcher is an interface for a file watcher akin to fsnotify.Watcher
 // with an additional Start method.
 type Watcher interface {
