@@ -265,11 +265,11 @@ func TestAddProcessMetadata(t *testing.T) {
 			err:      ErrNoMatch,
 		},
 		{
-			description: "overwrite fields",
+			description: "overwrite keys",
 			config: common.MapStr{
-				"overwrite_fields": true,
-				"match_pids":       []string{"ppid"},
-				"include_fields":   []string{"process.name"},
+				"overwrite_keys": true,
+				"match_pids":     []string{"ppid"},
+				"include_fields": []string{"process.name"},
 			},
 			event: common.MapStr{
 				"ppid": 1,
@@ -285,7 +285,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			},
 		},
 		{
-			description: "overwrite fields error",
+			description: "overwrite keys error",
 			config: common.MapStr{
 				"match_pids":     []string{"ppid"},
 				"include_fields": []string{"process.name"},
@@ -300,7 +300,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			err:      errors.New("error applying add_process_metadata processor: target field 'process.name' already exists and overwrite_keys is false"),
 		},
 		{
-			description: "overwrite fields error (ignore errors)",
+			description: "overwrite keys error (ignore errors)",
 			config: common.MapStr{
 				"ignore_errors":  true,
 				"match_pids":     []string{"ppid"},

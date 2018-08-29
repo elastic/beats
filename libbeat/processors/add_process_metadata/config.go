@@ -29,8 +29,8 @@ type config struct {
 	// IgnoreMissing: Ignore errors if event has no PID field.
 	IgnoreMissing bool `config:"ignore_missing"`
 
-	// OverwriteFields allow target_fields to overwrite existing fields.
-	OverwriteFields bool `config:"overwrite_fields"`
+	// OverwriteKeys allow target_fields to overwrite existing fields.
+	OverwriteKeys bool `config:"overwrite_keys"`
 
 	// RestrictedFields make restricted fields available (i.e. env).
 	RestrictedFields bool `config:"restricted_fields"`
@@ -84,7 +84,7 @@ var restrictedFields = common.MapStr{
 func defaultConfig() config {
 	return config{
 		IgnoreMissing:    true,
-		OverwriteFields:  false,
+		OverwriteKeys:    false,
 		RestrictedFields: false,
 	}
 }

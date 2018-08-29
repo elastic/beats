@@ -1099,8 +1099,8 @@ Possible errors include when a PID field cannot be converted to an integer or a
 field cannot be overwritten. It is still an error if no PID field is found. Use
 `ignore_missing` for that. The default is `false`.
 
-`overwrite_fields`:: (Optional) By default, if a target field already exists, it
-will not be overwritten and an error will be logged. If `overwrite_fields` is
+`overwrite_keys`:: (Optional) By default, if a target field already exists, it
+will not be overwritten and an error will be logged. If `overwrite_keys` is
 set to `true`, this condition will be ignored.
 
 `restricted_fields`:: (Optional) By default, the `process.env` field is not
