@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Update CRI format to support partial/full tags. {pull}8265[8265]
 - Fix some errors happening when stopping syslog input. {pull}8347[8347]
 - Fix RFC3339 timezone and nanoseconds parsing with the syslog input. {pull}8346[8346]
+- Mark the TCP and UDP input as GA. {pull}8125[8125]
 
 *Heartbeat*
 
