@@ -9,7 +9,10 @@ include::../include/what-happens.asciidoc[]
 [float]
 === Compatibility
 
-TODO: document with what versions of the software is this tested
+This module requires the
+{elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugin.
+
+This module has been developed against Suricata v4.0.1, but is expected to work with other versions of Suricata.
 
 
 include::../include/running-modules.asciidoc[]
