@@ -462,11 +462,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Add support human friendly size for the UDP input. {pull}6886[6886]
 - Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
 - Remove the undefined `username` option from the Redis input and clarify the documentation. {pull}6662[6662]
-- Support MySQL 5.7.19 by mysql/slowlog {pull}6969[6969]
-- Correctly join partial log lines when using `docker` input. {pull}6967[6967]
-- Add support for TLS with client authentication to the TCP input {pull}7056[7056]
-- Converted part of pipeline from treafik/access metricSet to dissect to improve efficeny. {pull}7209[7209]
-- Add support for TLS with client authentication to the TCP input. {pull}7056[7056]
 - Add log.message to each log event. {pull}[]
 
 *Heartbeat*
