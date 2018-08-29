@@ -40,6 +40,21 @@ The maximum number of metrics to bulk in a single {es} bulk API index request.
 The default is `50`. For more information, see <<elasticsearch-output>>.
 
 [float]
+==== `backoff.init`
+
+The number of seconds to wait before trying to reconnect to Elasticsearch after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
+
+[float]
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Elasticsearch after a network error. The default is 60s.
+
+[float]
 ==== `compression_level`
 
 The gzip compression level. Setting this value to `0` disables compression. The
@@ -79,10 +94,17 @@ The password that {beatname_uc} uses to authenticate with the {es} instances for
 shipping monitoring data.
 
 [float]
-==== `period`
+==== `metrics.period`
 
 The time interval (in seconds) when metrics are sent to the {es} cluster. A new
 snapshot of {beatname_uc} metrics is generated and scheduled for publishing each
+period. The default value is 10 * time.Second.
+
+[float]
+==== `state.period`
+
+The time interval (in seconds) when state information are sent to the {es} cluster. A new
+snapshot of {beatname_uc} state is generated and scheduled for publishing each
 period. The default value is 60 * time.Second.
 
 [float]
