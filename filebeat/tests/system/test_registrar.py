@@ -950,20 +950,15 @@ class Test(BaseTest):
         os.remove(testfile_path1)
 
         # Wait until states are removed from inputs
-        self.wait_until(
-            lambda: self.log_contains(
-                "Remove state for file as file removed"),
-            max_timeout=15)
+        self.wait_until(lambda: self.log_contains("Remove state for file as file removed"))
 
         # Add one more line to make sure registry is written
         with open(testfile_path2, 'a') as testfile2:
             testfile2.write("make sure registry is written\n")
 
-        self.wait_until(
-            lambda: self.output_has(lines=3),
-            max_timeout=10)
-
-        time.sleep(3)
+        self.wait_until(lambda: self.output_has(lines=3))
+        # Check is > as the same log line might happen before but afterwards it is repeated
+        self.wait_until(lambda: self.log_contains_count("Before: 1, After: 1, Pending: 1") > 5)
 
         filebeat.check_kill_and_wait()
 
