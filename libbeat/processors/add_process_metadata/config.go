@@ -54,7 +54,7 @@ type config struct {
 }
 
 // available fields by default
-var validFields = common.MapStr{
+var defaultFields = common.MapStr{
 	"process": common.MapStr{
 		"name":       nil,
 		"title":      nil,
@@ -91,7 +91,7 @@ func defaultConfig() config {
 
 func (pf *config) getMappings() (mappings common.MapStr, err error) {
 	mappings = common.MapStr{}
-	validFields := validFields
+	validFields := defaultFields
 	if pf.RestrictedFields {
 		validFields = restrictedFields
 	}
