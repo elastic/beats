@@ -12,7 +12,7 @@ include::../include/what-happens.asciidoc[]
 This module requires the
 {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugin.
 
-This module has been developed against Suricata v4.0.1, but is expected to work with other versions of Suricata.
+This module has been developed against Suricata v4.0.4, but is expected to work with other versions of Suricata.
 
 
 include::../include/running-modules.asciidoc[]
