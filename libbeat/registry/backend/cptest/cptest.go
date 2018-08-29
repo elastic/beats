@@ -162,7 +162,7 @@ func testSetGet(t *testing.T, factory BackendFactory) {
 
 				// try to get update via decoder
 				actual = entry{}
-				must(t, dec.Decode(&actual), "faile to decode value")
+				must(t, dec.Decode(&actual), "failed to decode value")
 				assert.Equal(t, entry{A: 0, B: 1}, actual, "decoder state must reflect changes")
 
 				// try to get update via tx

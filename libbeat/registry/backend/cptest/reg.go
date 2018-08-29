@@ -79,7 +79,7 @@ func (s *Store) Reopen() {
 
 	store, err := s.Registry.Registry.Access(s.name)
 	if err != nil {
-		t.Fatalf("Repoen failed: %v", err)
+		t.Fatalf("Reopen failed: %v", err)
 	}
 
 	s.Store = store
@@ -116,7 +116,7 @@ func (s *Store) MustUpdate(fn func(tx *Tx)) {
 	})
 }
 
-// Update create a new write transaction. The transaction is only comitted if
+// Update create a new write transaction. The transaction is only committed if
 // fn return true.
 // The test fails if the transaction is supposed to succeed, but the final commit fails.
 func (s *Store) Update(fn func(tx *Tx) bool) {

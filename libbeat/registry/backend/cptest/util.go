@@ -25,7 +25,7 @@ import (
 )
 
 // RunWithPath uses the factory to create and configure a registry with a
-// temporary test path. The test function fn is called with the new reigstry.
+// temporary test path. The test function fn is called with the new registry.
 // The registry is closed once the test finishes and the temporary is deleted
 // afterwards (unless the `-keep` CLI flag is used).
 func RunWithPath(t *testing.T, factory BackendFactory, fn func(*Registry)) {
@@ -36,7 +36,7 @@ func RunWithPath(t *testing.T, factory BackendFactory, fn func(*Registry)) {
 
 // WithPath wraps a registry aware test function into a normalized test
 // function that can be used with `t.Run`.
-// The factory is used to create and configure the reigstry with a temporary
+// The factory is used to create and configure the registry with a temporary
 // test path.  The registry is closed and the temporary test directoy is delete
 // if the test function returns or panics.
 func WithPath(factory BackendFactory, fn func(*testing.T, *Registry)) func(t *testing.T) {
