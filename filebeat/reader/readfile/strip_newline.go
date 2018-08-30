@@ -42,6 +42,10 @@ func (p *StripNewline) Next() (reader.Message, error) {
 	L := message.Content
 	message.Content = L[:len(L)-lineEndingChars(L)]
 
+	// Also strip new lines from raw message
+	M := message.Original
+	message.Original = M[:len(M)-lineEndingChars(M)]
+
 	return message, err
 }
 

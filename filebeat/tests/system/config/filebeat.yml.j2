@@ -31,6 +31,7 @@ filebeat.{{input_config | default("inputs")}}:
   harvester_limit: {{harvester_limit | default(0) }}
   symlinks: {{symlinks}}
   pipeline: {{pipeline}}
+  original_message: {{original_message| default("true")}}
   {%- if input_processors %}
   processors:
     {%- for processor in input_processors %}

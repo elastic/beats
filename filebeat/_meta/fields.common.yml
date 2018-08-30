@@ -108,6 +108,12 @@
       description: >
         Logging level.
 
+    - name: log.original
+      type: keyword
+      description: >
+        The unprocessed original log message. This can be used for reprocessing logs.
+      index: false
+
     - name: event.created
       type: date
       description: >
