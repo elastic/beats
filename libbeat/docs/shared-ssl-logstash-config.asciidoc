@@ -23,7 +23,7 @@ TIP: If you are using X-Pack, you can use the
 {elasticsearch}/certgen.html[certgen tool] to generate certificates.
 
 . Configure {beatname_uc} to use SSL. In the +{beatname_lc}.yml+ config file, specify the following settings under
-`ssl`:
+`ssl` (it used to be `tls` in version 1.* <<breaking,Configuration File Changes>>):
 +
 * `certificate_authorities`: Configures {beatname_uc} to trust any certificates signed by the specified CA. If
 `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
