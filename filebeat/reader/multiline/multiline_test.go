@@ -232,6 +232,7 @@ func testMultilineTruncated(t *testing.T, cfg Config, events int, truncated bool
 
 	for _, message := range messages {
 		found := false
+		multiline := false
 		statusFlags, err := message.Fields.GetValue("log.flags")
 		if err != nil {
 			if !truncated {
@@ -247,6 +248,9 @@ func testMultilineTruncated(t *testing.T, cfg Config, events int, truncated bool
 				if f == "truncated" {
 					found = true
 				}
+				if f == "multiline" {
+					multiline = true
+				}
 			}
 		default:
 			t.Fatalf("incorrect type for log.flags")
@@ -257,6 +261,7 @@ func testMultilineTruncated(t *testing.T, cfg Config, events int, truncated bool
 		} else {
 			assert.False(t, found)
 		}
+		assert.True(t, multiline)
 	}
 }
 
