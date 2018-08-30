@@ -51,7 +51,6 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/reader"
 	"github.com/elastic/beats/filebeat/reader/docker_json"
-	"github.com/elastic/beats/filebeat/reader/encode/encoding"
 	"github.com/elastic/beats/filebeat/reader/json"
 	"github.com/elastic/beats/filebeat/reader/multiline"
 	"github.com/elastic/beats/filebeat/reader/readfile"

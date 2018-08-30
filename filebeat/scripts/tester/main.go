@@ -30,7 +30,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/filebeat/reader/encode/encoding"
 	"github.com/elastic/beats/filebeat/reader/multiline"
 	"github.com/elastic/beats/filebeat/reader/readfile"
 	"github.com/elastic/beats/filebeat/reader/readfile/encoding"
