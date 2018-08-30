@@ -16,11 +16,19 @@
         - name: longest_output_list
           type: long
           description: >
-            Longest output list among current client connections.
+            Longest output list among current client connections. For Redis 4.x and below.
         - name: biggest_input_buf
           type: long
           description: >
-            Biggest input buffer among current client connections.
+            Biggest input buffer among current client connections. For Redis 4.x and below.
+        - name: max_output_buffer
+          type: long
+          description: >
+            Biggest output list among current client connections. For Redis 5.0 and above.
+        - name: max_input_buffer
+          type: long
+          description: >
+            Biggest input buffer among current client connections. For Redis 5.0 and above.
         - name: blocked
           type: long
           description: >
