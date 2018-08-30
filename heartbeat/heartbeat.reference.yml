@@ -163,7 +163,7 @@ heartbeat.monitors:
     # Interval between file file changed checks.
     #interval: 5s
 
-  # Optional HTTP proxy url. If not set HTTP_PROXY environment variable will be used.
+  # Optional HTTP proxy url.
   #proxy_url: ''
 
   # Total test connection and data exchange timeout
