@@ -61,7 +61,7 @@ func (m *Message) AddFields(fields common.MapStr) {
 	m.Fields.Update(fields)
 }
 
-// AddTagsWithKey adds tags to the message with an arbitrary key.
+// AddFlagsWithKey adds flags to the message with an arbitrary key.
 // If the field does not exist, it is created.
 func (m *Message) AddFlagsWithKey(key string, flags ...string) error {
 	if len(flags) == 0 {
