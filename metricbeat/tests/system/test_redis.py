@@ -59,7 +59,10 @@ class Test(metricbeat.BaseTest):
         """
 
         # At least one event must be inserted so db stats exist
-        r = redis.StrictRedis(host=os.getenv('REDIS_HOST', self.compose_hosts()[0]), port=os.getenv('REDIS_PORT', '6379'), db=0)
+        r = redis.StrictRedis(
+            host=os.getenv('REDIS_HOST', self.compose_hosts()[0]),
+            port=os.getenv('REDIS_PORT', '6379'),
+            db=0)
         r.set('foo', 'bar')
 
         self.render_config_template(modules=[{
