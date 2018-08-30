@@ -26,6 +26,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"flag"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -49,12 +50,15 @@ const (
 var (
 	configFilePattern   = regexp.MustCompile(`.*beat\.yml|apm-server\.yml`)
 	manifestFilePattern = regexp.MustCompile(`manifest.yml`)
-	modulesDirPattern   = regexp.MustCompile(`modules.d/$`)
-	modulesFilePattern  = regexp.MustCompile(`modules.d/.+`)
+	modulesDirPattern   = regexp.MustCompile(`module/.+`)
+	modulesDDirPattern  = regexp.MustCompile(`modules.d/$`)
+	modulesDFilePattern = regexp.MustCompile(`modules.d/.+`)
 )
 
 var (
-	files = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
+	files    = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
+	modules  = flag.Bool("modules", false, "check modules folder contents")
+	modulesd = flag.Bool("modules.d", false, "check modules.d folder contents")
 )
 
 func TestRPM(t *testing.T) {
@@ -100,6 +104,8 @@ func checkRPM(t *testing.T, file string) {
 	checkManifestPermissions(t, p)
 	checkManifestOwner(t, p)
 	checkModulesPermissions(t, p)
+	checkModulesPresent(t, "/usr/share", p)
+	checkModulesDPresent(t, "/etc/", p)
 	checkModulesOwner(t, p)
 }
 
@@ -114,6 +120,8 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	checkConfigOwner(t, p)
 	checkManifestPermissions(t, p)
 	checkManifestOwner(t, p)
+	checkModulesPresent(t, "./usr/share", p)
+	checkModulesDPresent(t, "./etc/", p)
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p)
 }
@@ -128,6 +136,8 @@ func checkTar(t *testing.T, file string) {
 	checkConfigPermissions(t, p)
 	checkConfigOwner(t, p)
 	checkManifestPermissions(t, p)
+	checkModulesPresent(t, "", p)
+	checkModulesDPresent(t, "", p)
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p)
 }
@@ -141,6 +151,8 @@ func checkZip(t *testing.T, file string) {
 
 	checkConfigPermissions(t, p)
 	checkManifestPermissions(t, p)
+	checkModulesPresent(t, "", p)
+	checkModulesDPresent(t, "", p)
 	checkModulesPermissions(t, p)
 }
 
@@ -213,13 +225,13 @@ func checkManifestOwner(t *testing.T, p *packageFile) {
 func checkModulesPermissions(t *testing.T, p *packageFile) {
 	t.Run(p.Name+" modules.d file permissions", func(t *testing.T) {
 		for _, entry := range p.Contents {
-			if modulesFilePattern.MatchString(entry.File) {
+			if modulesDFilePattern.MatchString(entry.File) {
 				mode := entry.Mode.Perm()
 				if expectedModuleFileMode != mode {
 					t.Errorf("file %v has wrong permissions: expected=%v actual=%v",
 						entry.File, expectedModuleFileMode, mode)
 				}
-			} else if modulesDirPattern.MatchString(entry.File) {
+			} else if modulesDDirPattern.MatchString(entry.File) {
 				mode := entry.Mode.Perm()
 				if expectedModuleDirMode != mode {
 					t.Errorf("file %v has wrong permissions: expected=%v actual=%v",
@@ -234,7 +246,7 @@ func checkModulesPermissions(t *testing.T, p *packageFile) {
 func checkModulesOwner(t *testing.T, p *packageFile) {
 	t.Run(p.Name+" modules.d file owner", func(t *testing.T) {
 		for _, entry := range p.Contents {
-			if modulesFilePattern.MatchString(entry.File) || modulesDirPattern.MatchString(entry.File) {
+			if modulesDFilePattern.MatchString(entry.File) || modulesDDirPattern.MatchString(entry.File) {
 				if expectedConfigUID != entry.UID {
 					t.Errorf("file %v should be owned by user %v, owner=%v", entry.File, expectedConfigGID, entry.UID)
 				}
@@ -242,6 +254,37 @@ func checkModulesOwner(t *testing.T, p *packageFile) {
 					t.Errorf("file %v should be owned by group %v, group=%v", entry.File, expectedConfigGID, entry.GID)
 				}
 			}
+		}
+	})
+}
+
+// Verify that modules folder is present and has module files in
+func checkModulesPresent(t *testing.T, prefix string, p *packageFile) {
+	if *modules {
+		checkModules(t, "modules", prefix, modulesDirPattern, p)
+	}
+}
+
+// Verify that modules.d folder is present and has module files in
+func checkModulesDPresent(t *testing.T, prefix string, p *packageFile) {
+	if *modulesd {
+		checkModules(t, "modules.d", prefix, modulesDFilePattern, p)
+	}
+}
+
+func checkModules(t *testing.T, name, prefix string, r *regexp.Regexp, p *packageFile) {
+	t.Run(fmt.Sprintf("%s %s contents", p.Name, name), func(t *testing.T) {
+		minExpectedModules := 4
+		total := 0
+		for _, entry := range p.Contents {
+			if strings.HasPrefix(entry.File, prefix) && r.MatchString(entry.File) {
+				total++
+			}
+		}
+
+		if total < minExpectedModules {
+			t.Errorf("not enough modules found under %s: actual=%d, expected>=%d",
+				name, total, minExpectedModules)
 		}
 	})
 }

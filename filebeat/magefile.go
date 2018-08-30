@@ -83,7 +83,7 @@ func Package() {
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return mage.TestPackages()
+	return mage.TestPackages(mage.WithModules(), mage.WithModulesD())
 }
 
 // Update updates the generated files (aka make update).
