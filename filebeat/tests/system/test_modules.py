@@ -106,6 +106,8 @@ class Test(BaseTest):
             "-M", "{module}.*.enabled=false".format(module=module),
             "-M", "{module}.{fileset}.enabled=true".format(
                 module=module, fileset=fileset),
+            "-M", "{module}.{fileset}.var.input=file".format(
+                module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file),
             "-M", "*.*.input.close_eof=true",
