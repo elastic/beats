@@ -74,15 +74,3 @@ func (m *Message) AddFlagsWithKey(key string, flags ...string) error {
 
 	return common.AddTagsWithKey(m.Fields, key, flags)
 }
-
-func (msg *Message) AddTagsWithKey(key string, tags []string) error {
-	if len(tags) == 0 {
-		return nil
-	}
-
-	if m.Fields == nil {
-		m.Fields = common.MapStr{}
-	}
-
-	return common.AddTagsWithKey(m.Fields, key, tags)
-}
