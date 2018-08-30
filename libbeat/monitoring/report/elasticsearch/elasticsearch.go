@@ -106,7 +106,7 @@ func defaultConfig(settings report.Settings) config {
 	return c
 }
 
-func makeReporter(settings report.Settings, cfg *common.Config) (report.Reporter, error) {
+func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) (report.Reporter, error) {
 	log := logp.L().Named(selector)
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
@@ -170,7 +170,6 @@ func makeReporter(settings report.Settings, cfg *common.Config) (report.Reporter
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
 
-	beat := settings.Beat
 	pipeline, err := pipeline.New(
 		beat,
 		monitoring,

@@ -341,10 +341,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	if b.Config.Monitoring.Enabled() {
 		settings := report.Settings{
-			Beat:            b.Info,
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 		}
-		reporter, err := report.New(settings, b.Config.Monitoring, b.Config.Output)
+		reporter, err := report.New(b.Info, settings, b.Config.Monitoring, b.Config.Output)
 		if err != nil {
 			return err
 		}
