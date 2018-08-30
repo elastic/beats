@@ -54,7 +54,7 @@ func TestAddProcessMetadata(t *testing.T) {
 	for _, test := range []struct {
 		description             string
 		config, event, expected common.MapStr
-		err                     error
+		err, initErr            error
 	}{
 		{
 			description: "default fields",
@@ -228,6 +228,44 @@ func TestAddProcessMetadata(t *testing.T) {
 			},
 		},
 		{
+			description: "env field (restricted_fields: true)",
+			config: common.MapStr{
+				"match_pids":        []string{"ppid"},
+				"restricted_fields": true,
+				"target":            "parent",
+				"include_fields":    []string{"process.env"},
+			},
+			event: common.MapStr{
+				"ppid": "1",
+			},
+			expected: common.MapStr{
+				"ppid": "1",
+				"parent": common.MapStr{
+					"process": common.MapStr{
+						"env": map[string]string{
+							"HOME":       "/",
+							"TERM":       "linux",
+							"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
+							"LANG":       "en_US.UTF-8",
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "env field (restricted_fields: false)",
+			config: common.MapStr{
+				"match_pids":     []string{"ppid"},
+				"target":         "parent",
+				"include_fields": []string{"process.env"},
+			},
+			event: common.MapStr{
+				"ppid": "1",
+			},
+			expected: nil,
+			initErr:  errors.New("error unpacking add_process_metadata.target_fields: field 'process.env' not found"),
+		},
+		{
 			description: "fields not found (ignored)",
 			config: common.MapStr{
 				"match_pids": []string{"ppid"},
@@ -354,8 +392,13 @@ func TestAddProcessMetadata(t *testing.T) {
 				t.Fatal(err)
 			}
 			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs)
-			if err != nil {
-				t.Fatal(err)
+			if test.initErr == nil {
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				assert.EqualError(t, err, test.initErr.Error())
+				return
 			}
 			t.Log(proc.String())
 			ev := beat.Event{

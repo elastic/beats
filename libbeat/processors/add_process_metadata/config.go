@@ -58,19 +58,16 @@ var defaultFields = common.MapStr{
 	},
 }
 
-// fields declared in here (and not in validFields) will only appear in an
-// event if requested explicitly (restricted_fields: true).
+// fields declared in here will only appear when requested explicitly
+// with `restricted_fields: true`.
 var restrictedFields = common.MapStr{
 	"process": common.MapStr{
-		"name":       nil,
-		"title":      nil,
-		"exe":        nil,
-		"args":       nil,
-		"env":        nil,
-		"pid":        nil,
-		"ppid":       nil,
-		"start_time": nil,
+		"env": nil,
 	},
+}
+
+func init() {
+	restrictedFields.DeepUpdate(defaultFields)
 }
 
 func defaultConfig() config {
