@@ -357,7 +357,7 @@ func (s *diskStore) checkpointClearLog() {
 // commitOps finishes a transaction by appending operations to the transaction
 // log file.
 // A transaction has a `Begin` and `Commit` operation, including a transaction
-// IDs. On error An `Rollback` operation will be inserted.
+// IDs. On error a `Rollback` operation will be inserted.
 //
 // If an error was encountered, that will leave the transaction log in a
 // potential broken state, we force a checkpoint based commit within the next

@@ -60,16 +60,21 @@ type Settings struct {
 	Checkpoint func(pairs, logs uint) bool
 }
 
+const defaultFileMode os.FileMode = 0600
+const defaultBufferSize = 4096
+
+var defaultCheckpoint = CheckpointRatio(2.0, 10.0)
+
 // New creates a new Registry.
 func New(settings Settings) (*Registry, error) {
 	if settings.FileMode == 0 {
-		settings.FileMode = 0600
+		settings.FileMode = defaultFileMode
 	}
 	if settings.Checkpoint == nil {
-		settings.Checkpoint = CheckpointRatio(2.0, 10.0)
+		settings.Checkpoint = defaultCheckpoint
 	}
 	if settings.BufferSize == 0 {
-		settings.BufferSize = 4096
+		settings.BufferSize = defaultBufferSize
 	}
 
 	return &Registry{

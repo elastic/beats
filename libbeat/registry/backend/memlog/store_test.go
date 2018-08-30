@@ -55,7 +55,6 @@ func TestLoadVersion1(t *testing.T) {
 }
 
 func testLoadVersion1Case(t *testing.T, dataPath string) {
-
 	path, err := ioutil.TempDir("", "")
 	if err != nil {
 		t.Fatalf("Failed to create temporary test directory: %v", err)

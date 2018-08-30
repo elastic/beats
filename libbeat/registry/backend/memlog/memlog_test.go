@@ -32,7 +32,7 @@ func TestComplianceDefaults(t *testing.T) {
 	})
 }
 
-func TestComplianceCheckpiontAlways(t *testing.T) {
+func TestComplianceCheckpointAlways(t *testing.T) {
 	cptest.TestBackendCompliance(t, func(path string) (backend.Registry, error) {
 		return New(Settings{
 			Root: path,

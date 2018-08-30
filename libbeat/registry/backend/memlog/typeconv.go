@@ -34,7 +34,6 @@ type valueDecoder struct {
 	value common.MapStr
 }
 
-var dummyTarget interface{}
 var typeConvPool = sync.Pool{
 	New: func() interface{} {
 		t := &typeConv{}

@@ -75,13 +75,17 @@ func newStore(home string, mode os.FileMode, bufSz int) (*store, error) {
 		return nil, err
 	}
 
+	logp.Info("Loading data file of '%v' succeeded. Active transaction id=%v", home, txid)
+
 	mem := &memStore{tbl: tbl}
 	txid, entries, complete, err := loadLogFile(mem, txid, home)
+	logp.Info("Finished loading transaction log file for '%v'. Active transaction id=%v", home, txid)
+
 	if err != nil || !complete {
 		// Error indicates the log file was incomplete or corrupted.
 		// Anyways, we already have the table in a valid state and will
 		// continue opening the store from here.
-		logp.Warn("Incomplete or corrupted log file in %v: %v", home, err)
+		logp.Warn("Incomplete or corrupted log file in %v. Continue with last known complete and consistend state. Reason: %v", home, err)
 	}
 
 	store := &store{
