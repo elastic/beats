@@ -274,7 +274,7 @@ func (mlr *Reader) finalize() reader.Message {
 	}
 
 	if mlr.numLines > 1 {
-		mlr.message.AddTagsWithKey("log.status", []string{"multiline"})
+		mlr.message.AddFlagsWithKey("log.flags", "multiline")
 	}
 
 	// Copy message from existing content
