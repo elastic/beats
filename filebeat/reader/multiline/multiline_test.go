@@ -22,7 +22,6 @@ package multiline
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -161,9 +160,25 @@ func TestMultilineAfterTruncated(t *testing.T) {
 			MaxLines: &maxLines,
 		},
 		2,
+		true,
 		[]string{
 			"line1\n line1.1\n line1.2\n",
 			"line2\n line2.1\n line2.2\n"},
+		[]string{
+			"line1\n line1.1",
+			"line2\n line2.1"},
+	)
+	testMultilineTruncated(t,
+		Config{
+			Pattern:  &pattern,
+			Match:    "after",
+			MaxLines: &maxLines,
+		},
+		2,
+		false,
+		[]string{
+			"line1\n line1.1\n",
+			"line2\n line2.1\n"},
 		[]string{
 			"line1\n line1.1",
 			"line2\n line2.1"},
@@ -197,7 +212,7 @@ func testMultilineOK(t *testing.T, cfg Config, events int, expected ...string) {
 	}
 }
 
-func testMultilineTruncated(t *testing.T, cfg Config, events int, input, expected []string) {
+func testMultilineTruncated(t *testing.T, cfg Config, events int, truncated bool, input, expected []string) {
 	_, buf := createLineBuffer(input...)
 	r := createMultilineTestReader(t, buf, cfg)
 
@@ -216,13 +231,16 @@ func testMultilineTruncated(t *testing.T, cfg Config, events int, input, expecte
 	}
 
 	for _, message := range messages {
-		fmt.Println(message)
-		statusFlags, err := message.Fields.GetValue("log.status")
+		found := false
+		statusFlags, err := message.Fields.GetValue("log.flags")
 		if err != nil {
+			if !truncated {
+				assert.False(t, found)
+				return
+			}
 			t.Fatalf("error while getting log.status field: %v", err)
 		}
 
-		found := false
 		switch flags := statusFlags.(type) {
 		case []string:
 			for _, f := range flags {
@@ -230,17 +248,15 @@ func testMultilineTruncated(t *testing.T, cfg Config, events int, input, expecte
 					found = true
 				}
 			}
-		case []interface{}:
-			for _, f := range flags {
-				if f == "truncated" {
-					found = true
-				}
-			}
 		default:
-			t.Fatalf("incorrect type for log.status")
+			t.Fatalf("incorrect type for log.flags")
 		}
 
-		assert.True(t, found)
+		if truncated {
+			assert.True(t, found)
+		} else {
+			assert.False(t, found)
+		}
 	}
 }
 

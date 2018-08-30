@@ -38,11 +38,13 @@ func (m *mockReader) Next() (reader.Message, error) {
 }
 
 var limitTests = []struct {
-	line     string
-	maxBytes int
+	line      string
+	maxBytes  int
+	truncated bool
 }{
-	{"long-long-line", 5},
-	{"long-long-line", 3},
+	{"long-long-line", 5, true},
+	{"long-long-line", 3, true},
+	{"long-long-line", len("long-long-line"), false},
 }
 
 func TestLimitReader(t *testing.T) {
@@ -56,12 +58,16 @@ func TestLimitReader(t *testing.T) {
 
 		assert.Equal(t, test.maxBytes, len(msg.Content))
 
-		statusFlags, err := msg.Fields.GetValue("log.status")
+		found := false
+		statusFlags, err := msg.Fields.GetValue("log.flags")
 		if err != nil {
+			if !test.truncated {
+				assert.False(t, found)
+				return
+			}
 			t.Fatalf("Error getting truncated value: %v", err)
 		}
 
-		found := false
 		switch flags := statusFlags.(type) {
 		case []string:
 			for _, f := range flags {
@@ -69,16 +75,14 @@ func TestLimitReader(t *testing.T) {
 					found = true
 				}
 			}
-		case []interface{}:
-			for _, f := range flags {
-				if f == "truncated" {
-					found = true
-				}
-			}
 		default:
-			t.Fatalf("incorrect type for log.status")
+			t.Fatalf("incorrect type for log.flags")
 		}
 
-		assert.True(t, found)
+		if test.truncated {
+			assert.True(t, found)
+		} else {
+			assert.False(t, found)
+		}
 	}
 }

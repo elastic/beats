@@ -2684,7 +2684,7 @@ Logging level.
 
 --
 
-*`log.status`*::
+*`log.flags`*::
 +
 --
 This field contains the flags of the event.

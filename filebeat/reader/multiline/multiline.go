@@ -270,7 +270,7 @@ func (mlr *Reader) clear() {
 // finalize writes the existing content into the returned message and resets all reader variables.
 func (mlr *Reader) finalize() reader.Message {
 	if mlr.truncated > 0 {
-		mlr.message.AddTagsWithKey("log.status", "truncated")
+		mlr.message.AddFlagsWithKey("log.flags", "truncated")
 	}
 
 	// Copy message from existing content
@@ -299,10 +299,8 @@ func (mlr *Reader) addLine(m reader.Message) {
 	maxBytesReached := (mlr.maxBytes <= 0 || space > 0)
 	maxLinesReached := (mlr.maxLines <= 0 || mlr.numLines < mlr.maxLines)
 
-	truncated := mlr.truncated
 	if maxBytesReached && maxLinesReached {
 		if space < 0 || space > len(m.Content) {
-			truncated = space - len(m.Content)
 			space = len(m.Content)
 		}
 
@@ -316,11 +314,11 @@ func (mlr *Reader) addLine(m reader.Message) {
 		// add number of truncated bytes to fields
 		diff := len(m.Content) - space
 		if diff > 0 {
-			mlr.truncated = truncated + diff
+			mlr.truncated += diff
 		}
 	} else {
 		// increase the number of skipped bytes, if cannot add
-		mlr.truncated = truncated + len(m.Content)
+		mlr.truncated += len(m.Content)
 
 	}
 

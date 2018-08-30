@@ -546,6 +546,79 @@ func TestAddTag(t *testing.T) {
 	}
 }
 
+func TestAddTagsWithKey(t *testing.T) {
+	type io struct {
+		Event  MapStr
+		Key    string
+		Tags   []string
+		Output MapStr
+		Err    string
+	}
+	tests := []io{
+		// No existing tags, creates new tag array
+		{
+			Event: MapStr{},
+			Key:   "tags",
+			Tags:  []string{"json"},
+			Output: MapStr{
+				"tags": []string{"json"},
+			},
+		},
+		// Existing tags is a []string, appends
+		{
+			Event: MapStr{
+				"tags": []string{"json"},
+			},
+			Key:  "tags",
+			Tags: []string{"docker"},
+			Output: MapStr{
+				"tags": []string{"json", "docker"},
+			},
+		},
+		// Existing tags are in submap and is a []interface{}, appends
+		{
+			Event: MapStr{
+				"log": MapStr{
+					"flags": []interface{}{"json"},
+				},
+			},
+			Key:  "log.flags",
+			Tags: []string{"docker"},
+			Output: MapStr{
+				"log": MapStr{
+					"flags": []interface{}{"json", "docker"},
+				},
+			},
+		},
+		// Existing tags are in a submap and is not a []string or []interface{}
+		{
+			Event: MapStr{
+				"log": MapStr{
+					"flags": "not a slice",
+				},
+			},
+			Key:  "log.flags",
+			Tags: []string{"docker"},
+			Output: MapStr{
+				"log": MapStr{
+					"flags": "not a slice",
+				},
+			},
+			Err: "expected string array",
+		},
+	}
+
+	for _, test := range tests {
+		err := AddTagsWithKey(test.Event, test.Key, test.Tags)
+		assert.Equal(t, test.Output, test.Event)
+		if test.Err != "" {
+			assert.Contains(t, err.Error(), test.Err)
+		} else {
+			assert.NoError(t, err)
+		}
+	}
+}
+
 func TestFlatten(t *testing.T) {
 	type data struct {
 		Event    MapStr

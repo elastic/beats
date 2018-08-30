@@ -108,7 +108,7 @@
       description: >
         Logging level.
 
-    - name: log.status
+    - name: log.flags
       description: >
         This field contains the flags of the event.
 
