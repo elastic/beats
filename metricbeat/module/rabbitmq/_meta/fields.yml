@@ -3,7 +3,7 @@
   description: >
     RabbitMQ module
   release: beta
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   fields:
     - name: rabbitmq
       type: group

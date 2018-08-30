@@ -87,11 +87,19 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 
             module_file += "----\n\n"
 
-        # HTTP helper
-        if 'ssl' in get_settings(module_fields):
-            module_file += "This module supports TLS connection when using `ssl`" + \
-                           " config field, as described in <<configuration-ssl>>." + \
-                           " It also supports the options described in <<module-http-config-options>>.\n\n"
+        # HTTP/SSL helpers
+        settings = get_settings(module_fields)
+        helper_added = False
+        if 'ssl' in settings:
+            module_file += (
+                "This module supports TLS connections when using `ssl`"
+                " config field, as described in <<configuration-ssl>>.\n")
+            helper_added = True
+        if 'http' in settings:
+            module_file += "It also supports the options described in <<module-http-config-options>>.\n"
+            helper_added = True
+        if helper_added:
+            module_file += "\n"
 
         # Add metricsets title as below each metricset adds its link
         module_file += "[float]\n"

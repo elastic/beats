@@ -3,7 +3,7 @@
   description: >
     Logstash module
   release: beta
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   fields:
     - name: logstash
       type: group

@@ -4,7 +4,7 @@
     Metrics collected from Couchbase servers.
   short_config: false
   release: beta
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   fields:
     - name: couchbase
       type: group

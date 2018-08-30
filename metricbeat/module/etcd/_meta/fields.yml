@@ -3,7 +3,7 @@
   description: >
     etcd Module
   release: beta
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   fields:
     - name: etcd
       type: group
