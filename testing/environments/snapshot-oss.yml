@@ -3,7 +3,7 @@
 version: '2.1'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.0-SNAPSHOT
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.0.0-alpha1-SNAPSHOT
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9200"]
       retries: 300
@@ -13,20 +13,19 @@ services:
     - "network.host="
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"
-    - "xpack.security.enabled=false"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:6.5.0-SNAPSHOT
+    image: docker.elastic.co/logstash/logstash-oss:7.0.0-alpha1-SNAPSHOT
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600
       interval: 1s
     volumes:
-      - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
-      - ./docker/logstash/pki:/etc/pki:ro
+    - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
+    - ./docker/logstash/pki:/etc/pki:ro
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.5.0-SNAPSHOT
+    image: docker.elastic.co/kibana/kibana-oss:7.0.0-alpha1-SNAPSHOT
     healthcheck:
       test: ["CMD-SHELL", 'python -c ''import urllib, json; response = urllib.urlopen("http://localhost:5601/api/status"); data = json.loads(response.read()); exit(1) if data["status"]["overall"]["state"] != "green" else exit(0);''']
       retries: 600
