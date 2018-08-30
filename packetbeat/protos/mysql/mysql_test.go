@@ -35,6 +35,8 @@ import (
 	"time"
 )
 
+const serverPort = 3306
+
 type eventStore struct {
 	events []beat.Event
 }
@@ -55,6 +57,7 @@ func mysqlModForTests(store *eventStore) *mysqlPlugin {
 
 	var mysql mysqlPlugin
 	config := defaultConfig
+	config.Ports = []int{serverPort}
 	mysql.init(callback, &config)
 	return &mysql
 }
@@ -82,7 +85,7 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := &mysqlStream{data: message, message: new(mysqlMessage), isClient: true}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -482,7 +485,7 @@ func testTCPTuple() *common.TCPTuple {
 		IPLength: 4,
 		BaseTuple: common.BaseTuple{
 			SrcIP: net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
-			SrcPort: 6512, DstPort: 3306,
+			SrcPort: 6512, DstPort: serverPort,
 		},
 	}
 	t.ComputeHashables()
@@ -540,17 +543,17 @@ func Test_gap_in_response(t *testing.T) {
 
 	private := protos.ProtocolData(new(mysqlPrivateData))
 
-	private = mysql.Parse(&req, tcptuple, 0, private)
-	private = mysql.Parse(&resp, tcptuple, 1, private)
+	private = mysql.Parse(&req, tcptuple, 1, private)
+	private = mysql.Parse(&resp, tcptuple, 0, private)
 
 	logp.Debug("mysql", "Now sending gap..")
 
-	_, drop := mysql.GapInStream(tcptuple, 1, 10, private)
+	_, drop := mysql.GapInStream(tcptuple, 0, 10, private)
 	assert.Equal(t, true, drop)
 
 	trans := expectTransaction(t, store)
 	assert.NotNil(t, trans)
-	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
+	assert.Equal(t, []string{"Packet loss while capturing the response"}, trans["notes"])
 }
 
 // Test that loss of data during the request doesn't result in a
@@ -567,7 +570,7 @@ func Test_gap_in_eat_message(t *testing.T) {
 			"66726f6d20746573")
 	assert.Nil(t, err)
 
-	stream := &mysqlStream{data: reqData, message: new(mysqlMessage)}
+	stream := &mysqlStream{data: reqData, message: new(mysqlMessage), isClient: true}
 	ok, complete := mysqlMessageParser(stream)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)

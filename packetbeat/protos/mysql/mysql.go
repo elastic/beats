@@ -208,8 +208,16 @@ func (stream *mysqlStream) prepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
 	stream.parseState = mysqlStateStart
 	stream.parseOffset = 0
-	stream.isClient = false
 	stream.message = nil
+}
+
+func (mysql *mysqlPlugin) isServerPort(port uint16) bool {
+	for _, sPort := range mysql.ports {
+		if uint16(sPort) == port {
+			return true
+		}
+	}
+	return false
 }
 
 func mysqlMessageParser(s *mysqlStream) (bool, bool) {
@@ -229,12 +237,11 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			m.seq = hdr[3]
 			m.typ = hdr[4]
 
-			logp.Debug("mysqldetailed", "MySQL Header: Packet length %d, Seq %d, Type=%d", m.packetLength, m.seq, m.typ)
+			logp.Debug("mysqldetailed", "MySQL Header: Packet length %d, Seq %d, Type=%d isClient=%v", m.packetLength, m.seq, m.typ, s.isClient)
 
-			if m.seq == 0 {
+			if s.isClient {
 				// starts Command Phase
-
-				if m.typ == mysqlCmdQuery {
+				if m.seq == 0 && m.typ == mysqlCmdQuery {
 					// parse request
 					m.isRequest = true
 					m.start = s.parseOffset
@@ -245,11 +252,6 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					m.ignoreMessage = true
 					s.parseState = mysqlStateEatMessage
 				}
-
-				if !s.isClient {
-					s.isClient = true
-				}
-
 			} else if !s.isClient {
 				// parse response
 				m.isRequest = false
@@ -275,7 +277,6 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					m.ignoreMessage = true
 					s.parseState = mysqlStateEatMessage
 				}
-
 			} else {
 				// something else, not expected
 				logp.Debug("mysql", "Unexpected MySQL message of type %d received.", m.typ)
@@ -500,9 +501,14 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	}
 
 	if priv.data[dir] == nil {
+		dstPort := tcptuple.DstPort
+		if dir == 0 {
+			dstPort = tcptuple.SrcPort
+		}
 		priv.data[dir] = &mysqlStream{
-			data:    pkt.Payload,
-			message: &mysqlMessage{ts: pkt.Ts},
+			data:     pkt.Payload,
+			message:  &mysqlMessage{ts: pkt.Ts},
+			isClient: mysql.isServerPort(dstPort),
 		}
 	} else {
 		// concatenate bytes
@@ -521,7 +527,7 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 		}
 
 		ok, complete := mysqlMessageParser(priv.data[dir])
-		//logp.Debug("mysqldetailed", "mysqlMessageParser returned ok=%b complete=%b", ok, complete)
+		logp.Debug("mysqldetailed", "mysqlMessageParser returned ok=%v complete=%v", ok, complete)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
