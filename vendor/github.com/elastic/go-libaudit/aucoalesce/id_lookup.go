@@ -48,9 +48,9 @@ type UserCache struct {
 	mutex      sync.Mutex
 }
 
-// NewUserCache returns a new UserCache. UserCache is not thread-safe.
-func NewUserCache(expiration time.Duration) UserCache {
-	return UserCache{
+// NewUserCache returns a new UserCache. UserCache is thread-safe.
+func NewUserCache(expiration time.Duration) *UserCache {
+	return &UserCache{
 		expiration: expiration,
 		data: map[string]stringItem{
 			"0": {timeout: time.Unix(math.MaxInt64, 0), value: "root"},
@@ -91,9 +91,9 @@ type GroupCache struct {
 	mutex      sync.Mutex
 }
 
-// NewGroupCache returns a new GroupCache. GroupCache is not thread-safe.
-func NewGroupCache(expiration time.Duration) GroupCache {
-	return GroupCache{
+// NewGroupCache returns a new GroupCache. GroupCache is thread-safe.
+func NewGroupCache(expiration time.Duration) *GroupCache {
+	return &GroupCache{
 		expiration: expiration,
 		data: map[string]stringItem{
 			"0": {timeout: time.Unix(math.MaxInt64, 0), value: "root"},
@@ -136,7 +136,7 @@ func ResolveIDs(event *Event) {
 
 // ResolveIDsFromCaches translates all uid and gid values to their associated
 // names using the provided caches. Prior to Go 1.9 this requires cgo on Linux.
-func ResolveIDsFromCaches(event *Event, users UserCache, groups GroupCache) {
+func ResolveIDsFromCaches(event *Event, users *UserCache, groups *GroupCache) {
 	// Actor
 	if v := users.LookupUID(event.Summary.Actor.Primary); v != "" {
 		event.Summary.Actor.Primary = v
