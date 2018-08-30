@@ -122,5 +122,10 @@ func makeKafka(
 	if config.MaxRetries < 0 {
 		retry = -1
 	}
-	return outputs.Success(config.BulkMaxSize, retry, client)
+
+	backoffClient := outputs.WithBackoff(client, config.Backoff.Init, config.Backoff.Max)
+
+	clients := make([]outputs.NetworkClient, 1)
+	clients[0] = backoffClient
+	return outputs.SuccessNet(false, config.BulkMaxSize, retry, clients)
 }
