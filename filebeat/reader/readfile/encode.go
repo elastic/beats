@@ -15,37 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package encode
+package readfile
 
 import (
 	"io"
 	"time"
 
 	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/filebeat/reader/encode/encoding"
-	"github.com/elastic/beats/filebeat/reader/line"
+	"github.com/elastic/beats/filebeat/reader/readfile/encoding"
 )
 
 // Reader produces lines by reading lines from an io.Reader
 // through a decoder converting the reader it's encoding to utf-8.
-type Reader struct {
-	reader *line.Reader
+type EncoderReader struct {
+	reader *LineReader
 }
 
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func New(
+func NewEncodeReader(
 	r io.Reader,
 	codec encoding.Encoding,
 	bufferSize int,
-) (Reader, error) {
-	eReader, err := line.New(r, codec, bufferSize)
-	return Reader{eReader}, err
+) (EncoderReader, error) {
+	eReader, err := NewLineReader(r, codec, bufferSize)
+	return EncoderReader{eReader}, err
 }
 
 // Next reads the next line from it's initial io.Reader
 // This converts a io.Reader to a reader.reader
-func (r Reader) Next() (reader.Message, error) {
+func (r EncoderReader) Next() (reader.Message, error) {
 	c, sz, err := r.reader.Next()
 	// Creating message object
 	return reader.Message{
