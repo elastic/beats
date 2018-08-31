@@ -33,7 +33,7 @@ type testcase struct {
 }
 
 var (
-	beatsPath          = filepath.Join("testbeat")
+	beatsPath          = filepath.Join("testdata")
 	expectedFieldFiles = []*fields.YmlFile{
 		&fields.YmlFile{
 			Path:   filepath.Join(beatsPath, "module", "module1", "_meta", "fields.yml"),
