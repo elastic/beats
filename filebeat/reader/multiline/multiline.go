@@ -273,6 +273,10 @@ func (mlr *Reader) finalize() reader.Message {
 		mlr.message.AddFlagsWithKey("log.flags", "truncated")
 	}
 
+	if mlr.numLines > 1 {
+		mlr.message.AddFlagsWithKey("log.flags", "multiline")
+	}
+
 	// Copy message from existing content
 	msg := mlr.message
 
