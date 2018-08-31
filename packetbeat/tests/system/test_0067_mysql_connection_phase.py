@@ -19,4 +19,5 @@ class Test(BaseTest):
         self.run_packetbeat(pcap="mysql_connection.pcap")
 
         objs = self.read_output()
-        assert len(objs) > 0
+        assert len(objs) == 1
+        assert objs[0]['query'] == 'SELECT DATABASE()'
