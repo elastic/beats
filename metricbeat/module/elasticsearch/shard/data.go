@@ -24,16 +24,16 @@ import (
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 var (
 	schema = s.Schema{
-		"state":           c.Str("state"),
-		"primary":         c.Bool("primary"),
-		"node":            c.Str("node"),
-		"index":           c.Str("index"),
-		"shard":           c.Int("number"),
-		"relocating_node": c.Str("relocating_node"),
+		"state":   c.Str("state"),
+		"primary": c.Bool("primary"),
+		"node":    c.Str("node"),
+		"index":   c.Str("index"),
+		"shard":   c.Int("shard"),
 	}
 )
 
@@ -62,6 +62,21 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 				event := mb.Event{}
 
 				fields, _ := schema.Apply(shard)
+
+				// Handle node field: could be string or null
+				err = elasticsearch.PassThruField("node", shard, fields)
+				if err != nil {
+					r.Error(err)
+					continue
+				}
+
+				// Handle relocating_node field: could be string or null
+				err = elasticsearch.PassThruField("relocating_node", shard, fields)
+				if err != nil {
+					r.Error(err)
+					continue
+				}
+
 				event.ModuleFields = common.MapStr{}
 				event.ModuleFields.Put("node.name", fields["node"])
 				delete(fields, "node")

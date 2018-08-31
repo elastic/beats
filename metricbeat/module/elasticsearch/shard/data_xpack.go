@@ -68,8 +68,17 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 					continue
 				}
 
-				fields["shard"] = fields["number"]
-				delete(fields, "number")
+				// Handle node field: could be string or null
+				err = elasticsearch.PassThruField("node", shard, fields)
+				if err != nil {
+					continue
+				}
+
+				// Handle relocating_node field: could be string or null
+				err = elasticsearch.PassThruField("relocating_node", shard, fields)
+				if err != nil {
+					continue
+				}
 
 				event.RootFields = common.MapStr{}
 
