@@ -7,6 +7,12 @@ This file is generated! See scripts/docs_collector.py
 
 This is the Jolokia module.
 
+[float]
+=== Compatibility
+
+The Jolokia module is tested with Jolokia 1.5.0, it should work with any version
+since 1.2.2.
+
 
 
 [float]
