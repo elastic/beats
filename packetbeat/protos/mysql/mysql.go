@@ -246,7 +246,6 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					m.isRequest = true
 					m.start = s.parseOffset
 					s.parseState = mysqlStateEatMessage
-
 				} else {
 					// ignore command
 					m.ignoreMessage = true
@@ -277,10 +276,6 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					m.ignoreMessage = true
 					s.parseState = mysqlStateEatMessage
 				}
-			} else {
-				// something else, not expected
-				logp.Debug("mysql", "Unexpected MySQL message of type %d received.", m.typ)
-				return false, false
 			}
 
 		case mysqlStateEatMessage:
