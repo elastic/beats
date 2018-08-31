@@ -2684,6 +2684,14 @@ Logging level.
 
 --
 
+*`log.flags`*::
++
+--
+This field contains the flags of the event.
+
+
+--
+
 *`event.created`*::
 +
 --

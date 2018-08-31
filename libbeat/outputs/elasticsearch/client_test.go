@@ -119,11 +119,12 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	events := []publisher.Event{event, eventFail, event}
 
 	reader := newJSONReader(response)
-	res, _ := bulkCollectPublishFails(reader, events)
+	res, stats := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
 		assert.Equal(t, eventFail, res[0])
 	}
+	assert.Equal(t, stats, bulkResultStats{acked: 2, fails: 1, tooMany: 1})
 }
 
 func TestCollectPublishFailAll(t *testing.T) {
@@ -139,9 +140,10 @@ func TestCollectPublishFailAll(t *testing.T) {
 	events := []publisher.Event{event, event, event}
 
 	reader := newJSONReader(response)
-	res, _ := bulkCollectPublishFails(reader, events)
+	res, stats := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
+	assert.Equal(t, stats, bulkResultStats{fails: 3, tooMany: 3})
 }
 
 func TestCollectPipelinePublishFail(t *testing.T) {

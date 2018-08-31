@@ -169,6 +169,7 @@ func customizePackaging() {
 			Mode:   0600,
 			Source: "{{.PackageDir}}/auditbeat.yml",
 			Dep:    generateShortConfig,
+			Config: true,
 		}
 		referenceConfig = mage.PackageFile{
 			Mode:   0644,

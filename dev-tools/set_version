@@ -28,7 +28,7 @@ def replace_in_file(filename, varname, version):
     with open(filename, 'r') as f:
         for line in f:
             if line.startswith("const " + varname):
-                new_lines.append('const {} = "{}"'.format(varname, version))
+                new_lines.append('const {} = "{}"\n'.format(varname, version))
             else:
                 new_lines.append(line)
 

@@ -147,20 +147,13 @@ func TestFetchEventContents(t *testing.T) {
 // TestFetchTimeout verifies that the HTTP request times out and an error is
 // returned.
 func TestFetchTimeout(t *testing.T) {
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "text/plain; charset=ISO-8859-1")
 		w.Write([]byte(response))
-
-		wg.Wait()
+		<-r.Context().Done()
 	}))
-	defer func() {
-		wg.Done()
-		server.Close()
-	}()
+	defer server.Close()
 
 	config := map[string]interface{}{
 		"module":     "apache",
