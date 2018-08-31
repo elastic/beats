@@ -136,6 +136,7 @@ func (p *Reader) Next() (reader.Message, error) {
 					return message, err
 				}
 				message.Content = append(message.Content, next.Content...)
+				message.Bytes += next.Bytes
 			}
 		} else {
 			message, err = parseCRILog(message, &crioLine)
