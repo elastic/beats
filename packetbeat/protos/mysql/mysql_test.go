@@ -23,6 +23,7 @@ import (
 	"encoding/hex"
 	"net"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -31,8 +32,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/packetbeat/protos"
-
-	"time"
+	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
 const serverPort = 3306
@@ -367,7 +367,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 		countHandleMysql++
 	}
 
-	mysql.Parse(&pkt, &tuple, 1, private)
+	mysql.Parse(&pkt, &tuple, tcp.TCPDirectionOriginal, private)
 
 	if countHandleMysql != 1 {
 		t.Errorf("handleMysql not called")
@@ -408,7 +408,7 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 		countHandleMysql++
 	}
 
-	mysql.Parse(&pkt, &tuple, 1, private)
+	mysql.Parse(&pkt, &tuple, tcp.TCPDirectionOriginal, private)
 
 	if countHandleMysql != 3 {
 		t.Errorf("handleMysql not called three times")
@@ -450,7 +450,7 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 		countHandleMysql++
 	}
 
-	private = mysql.Parse(&pkt, &tuple, 1, private).(mysqlPrivateData)
+	private = mysql.Parse(&pkt, &tuple, tcp.TCPDirectionOriginal, private).(mysqlPrivateData)
 	if countHandleMysql != 0 {
 		t.Errorf("handleMysql called on first run")
 	}
@@ -543,12 +543,12 @@ func Test_gap_in_response(t *testing.T) {
 
 	private := protos.ProtocolData(new(mysqlPrivateData))
 
-	private = mysql.Parse(&req, tcptuple, 1, private)
-	private = mysql.Parse(&resp, tcptuple, 0, private)
+	private = mysql.Parse(&req, tcptuple, tcp.TCPDirectionOriginal, private)
+	private = mysql.Parse(&resp, tcptuple, tcp.TCPDirectionReverse, private)
 
 	logp.Debug("mysql", "Now sending gap..")
 
-	_, drop := mysql.GapInStream(tcptuple, 0, 10, private)
+	_, drop := mysql.GapInStream(tcptuple, tcp.TCPDirectionReverse, 10, private)
 	assert.Equal(t, true, drop)
 
 	trans := expectTransaction(t, store)

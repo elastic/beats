@@ -497,7 +497,7 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 
 	if priv.data[dir] == nil {
 		dstPort := tcptuple.DstPort
-		if dir == 0 {
+		if dir == tcp.TCPDirectionReverse {
 			dstPort = tcptuple.SrcPort
 		}
 		priv.data[dir] = &mysqlStream{
