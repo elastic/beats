@@ -43,6 +43,7 @@ func TestDockerJSON(t *testing.T) {
 				Content: []byte("1:M 09 Nov 13:27:36.276 # User requested shutdown...\n"),
 				Fields:  common.MapStr{"stream": "stdout"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+				Bytes:   122,
 			},
 		},
 		// Wrong JSON
@@ -77,6 +78,7 @@ func TestDockerJSON(t *testing.T) {
 				Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
 				Fields:  common.MapStr{"stream": "stdout"},
 				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
+				Bytes:   115,
 			},
 		},
 		// Filtering stream
@@ -91,6 +93,7 @@ func TestDockerJSON(t *testing.T) {
 				Content: []byte("unfiltered\n"),
 				Fields:  common.MapStr{"stream": "stderr"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+				Bytes:   80,
 			},
 		},
 		// Filtering stream
@@ -105,6 +108,7 @@ func TestDockerJSON(t *testing.T) {
 				Content: []byte("2017-11-12 23:32:21.212 [ERROR][77] table.go 111: error"),
 				Fields:  common.MapStr{"stream": "stderr"},
 				Ts:      time.Date(2017, 11, 12, 23, 32, 21, 212771448, time.UTC),
+				Bytes:   93,
 			},
 		},
 		// Split lines
@@ -119,6 +123,7 @@ func TestDockerJSON(t *testing.T) {
 				Content: []byte("1:M 09 Nov 13:27:36.276 # User requested shutdown...\n"),
 				Fields:  common.MapStr{"stream": "stdout"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+				Bytes:   190,
 			},
 		},
 		// Split lines with partial disabled
@@ -133,6 +138,7 @@ func TestDockerJSON(t *testing.T) {
 				Content: []byte("1:M 09 Nov 13:27:36.276 # User requested "),
 				Fields:  common.MapStr{"stream": "stdout"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+				Bytes:   109,
 			},
 		},
 	}
@@ -159,5 +165,6 @@ func (m *mockReader) Next() (reader.Message, error) {
 	m.messages = m.messages[1:]
 	return reader.Message{
 		Content: message,
+		Bytes:   len(message),
 	}, nil
 }
