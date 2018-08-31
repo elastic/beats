@@ -30,13 +30,11 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 	stateData := &stateStruct{}
 	err := json.Unmarshal(content, stateData)
 	if err != nil {
-		r.Error(err)
 		return
 	}
 
 	nodeInfo, err := elasticsearch.GetNodeInfo(m.HTTP, m.HostData().SanitizedURI+statePath, stateData.MasterNode)
 	if err != nil {
-		r.Error(err)
 		return
 	}
 
@@ -44,7 +42,6 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 	// Will be fixed in: https://github.com/elastic/elasticsearch/pull/30656
 	clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HostData().SanitizedURI+statePath, stateData.MasterNode)
 	if err != nil {
-		r.Error(err)
 		return
 	}
 
@@ -64,7 +61,6 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 				event := mb.Event{}
 				fields, err := schema.Apply(shard)
 				if err != nil {
-					r.Error(err)
 					continue
 				}
 
