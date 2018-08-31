@@ -57,6 +57,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Fixed a memory leak when harvesters are closed. {pull}7820[7820]
 - Fix date format in Mongodb Ingest pipeline. {pull}7974[7974]
 - Mark the TCP and UDP input as GA. {pull}8125[8125]
+- Fixed a docker input error due to the offset update bug in partial log join.{pull}8177[8177]
 
 *Heartbeat*
 
