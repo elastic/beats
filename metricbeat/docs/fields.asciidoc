@@ -12676,16 +12676,6 @@ The percentage of CPU time spent in non-idle state.
 
 --
 
-*`system.cpu.total.value`*::
-+
---
-type: long
-
-The value of CPU usage since starting the process.
-
-
---
-
 *`system.cpu.user.ticks`*::
 +
 --
