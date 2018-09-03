@@ -80,6 +80,21 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
+	// In 5.0 some fields are renamed, maintain both names, old ones will be deprecated
+	renamings := []struct {
+		old, new string
+	}{
+		{"client_longest_output_list", "client_recent_max_output_buffer"},
+		{"client_biggest_input_buf", "client_recent_max_input_buffer"},
+	}
+	for _, r := range renamings {
+		if v, ok := info[r.new]; ok {
+			info[r.old] = v
+		} else {
+			info[r.new] = info[r.old]
+		}
+	}
+
 	slowLogLength, err := redis.FetchSlowLogLength(m.pool.Get())
 	if err != nil {
 		return nil, err
