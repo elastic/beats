@@ -15,12 +15,22 @@
             Number of client connections (excluding connections from slaves).
         - name: longest_output_list
           type: long
+          deprecated: "6.5.0"
+          description: >
+            Longest output list among current client connections (replaced by max_output_buffer).
+        - name: max_output_buffer
+          type: long
           description: >
             Longest output list among current client connections.
         - name: biggest_input_buf
           type: long
+          deprecated: "6.5.0"
           description: >
-            Biggest input buffer among current client connections.
+            Biggest input buffer among current client connections (replaced by max_input_buffer).
+        - name: max_input_buffer
+          type: long
+          description: >
+            Biggest input buffer among current client connections (on redis 5.0).
         - name: blocked
           type: long
           description: >
