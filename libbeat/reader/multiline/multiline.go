@@ -22,10 +22,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/filebeat/reader/readfile"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/readfile"
 )
 
 // MultiLine reader combining multiple line events into one multi-line event.

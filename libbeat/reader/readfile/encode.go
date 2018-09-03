@@ -21,8 +21,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/filebeat/reader/readfile/encoding"
+	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
 )
 
 // Reader produces lines by reading lines from an io.Reader
