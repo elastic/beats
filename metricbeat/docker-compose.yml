@@ -160,6 +160,18 @@ services:
   redis:
     build: ./module/redis/_meta
 
+  redis_4:
+    build:
+      context: ./module/redis/_meta
+      args:
+        REDIS_VERSION: 4.0.11
+
+  redis_5:
+    build:
+      context: ./module/redis/_meta
+      args:
+        REDIS_VERSION: 5.0-rc4
+
   traefik:
     build: ./module/traefik/_meta
 

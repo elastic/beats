@@ -15,7 +15,8 @@ CPU_FIELDS = ["used.sys", "used.sys_children", "used.user",
               "used.user_children"]
 
 CLIENTS_FIELDS = ["blocked", "biggest_input_buf",
-                  "longest_output_list", "connected"]
+                  "longest_output_list", "connected",
+                  "max_input_buffer", "max_output_buffer"]
 
 
 class Test(metricbeat.BaseTest):
@@ -58,7 +59,10 @@ class Test(metricbeat.BaseTest):
         """
 
         # At least one event must be inserted so db stats exist
-        r = redis.StrictRedis(host=os.getenv('REDIS_HOST', 'localhost'), port=os.getenv('REDIS_PORT', '6379'), db=0)
+        r = redis.StrictRedis(
+            host=self.compose_hosts()[0],
+            port=os.getenv('REDIS_PORT', '6379'),
+            db=0)
         r.set('foo', 'bar')
 
         self.render_config_template(modules=[{
@@ -116,5 +120,13 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
 
     def get_hosts(self):
-        return [os.getenv('REDIS_HOST', 'localhost') + ':' +
+        return [self.compose_hosts()[0] + ':' +
                 os.getenv('REDIS_PORT', '6379')]
+
+
+class TestRedis4(Test):
+    COMPOSE_SERVICES = ['redis_4']
+
+
+class TestRedis5(Test):
+    COMPOSE_SERVICES = ['redis_5']
