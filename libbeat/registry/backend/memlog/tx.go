@@ -132,7 +132,7 @@ func (tx *transaction) Commit() error {
 	// Write transaction state to the transaction log file.
 	// On success we commit all state updates to the in-memory state.
 
-	// block any new readonly transactions bein generated
+	// block any new readonly transactions being generated
 	pending.Lock()
 	defer pending.Unlock()
 
