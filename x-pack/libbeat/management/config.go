@@ -6,6 +6,7 @@ package management
 
 import (
 	"os"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
@@ -22,11 +23,20 @@ type Config struct {
 	// true when enrolled
 	Enabled bool
 
+	// Poll configs period
+	Period time.Duration
+
 	AccessToken string
 
 	Kibana *kibana.ClientConfig
 
 	Configs []*api.ConfigBlock
+}
+
+func defaultConfig() *Config {
+	return &Config{
+		Period: 60 * time.Second,
+	}
 }
 
 // Load settings from its source file

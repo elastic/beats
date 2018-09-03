@@ -38,3 +38,22 @@ func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID) ([]*Confi
 
 	return resp.ConfigBlocks, err
 }
+
+// ConfigBlocksEqual returns true if the given config blocks are equal, false if not
+func ConfigBlocksEqual(a, b []*ConfigBlock) bool {
+	if (a == nil) != (b == nil) {
+		return false
+	}
+
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i].Type != b[i].Type || a[i].Raw != b[i].Raw {
+			return false
+		}
+	}
+
+	return true
+}

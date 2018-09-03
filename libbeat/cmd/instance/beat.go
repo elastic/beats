@@ -564,8 +564,15 @@ func (b *Beat) configure() error {
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())
 
+	err = b.loadMeta()
+	if err != nil {
+		return err
+	}
+
+	logp.Info("Beat UUID: %v", b.Info.UUID)
+
 	// initialize config manager
-	b.ConfigManager, err = management.GetFactory()()
+	b.ConfigManager, err = management.GetFactory()(b.Beat.Info.UUID)
 	if err != nil {
 		return err
 	}
@@ -573,13 +580,6 @@ func (b *Beat) configure() error {
 	if err := b.ConfigManager.CheckRawConfig(b.RawConfig); err != nil {
 		return err
 	}
-
-	err = b.loadMeta()
-	if err != nil {
-		return err
-	}
-
-	logp.Info("Beat UUID: %v", b.Info.UUID)
 
 	if maxProcs := b.Config.MaxProcs; maxProcs > 0 {
 		runtime.GOMAXPROCS(maxProcs)
