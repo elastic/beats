@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common/reload"
+	"github.com/elastic/beats/libbeat/management"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -208,7 +209,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	// Centrally managed modules
 	factory := module.NewFactory(bt.moduleOptions...)
-	modules := cfgfile.NewRunnerList("modules", factory, b.Publisher)
+	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
 	reload.MustRegisterList("metricbeat.modules", modules)
 	wg.Add(1)
 	go func() {

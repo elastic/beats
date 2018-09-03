@@ -27,6 +27,9 @@ import (
 // Namespace is the feature namespace for queue definition.
 var Namespace = "libbeat.management"
 
+// DebugK used as key for all things central management
+var DebugK = "centralmgmt"
+
 // ConfigManager interacts with the beat to update configurations
 // from an external source
 type ConfigManager interface {

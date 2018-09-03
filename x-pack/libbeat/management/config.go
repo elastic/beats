@@ -30,7 +30,7 @@ type Config struct {
 
 	Kibana *kibana.ClientConfig
 
-	Configs []*api.ConfigBlock
+	Configs api.ConfigBlocks
 }
 
 func defaultConfig() *Config {

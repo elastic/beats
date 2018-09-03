@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/reload"
+
 	"github.com/satori/go.uuid"
 
 	"github.com/pkg/errors"
@@ -50,7 +52,7 @@ func NewConfigManager(beatUUID uuid.UUID) (management.ConfigManager, error) {
 
 	return &ConfigManager{
 		config:   c,
-		logger:   logp.NewLogger("centralmgmt"),
+		logger:   logp.NewLogger(management.DebugK),
 		client:   client,
 		done:     make(chan struct{}),
 		beatUUID: beatUUID,
@@ -91,38 +93,94 @@ func (cm *ConfigManager) CheckRawConfig(cfg *common.Config) error {
 
 func (cm *ConfigManager) worker() {
 	defer cm.wg.Done()
-	sleep := 0 * time.Second
+
+	// Initial fetch && apply (even if errors happen while fetching)
+	cm.fetch()
+	cm.apply()
+
+	// Start worker loop: fetch + apply + cache new settings
 	for {
 		select {
 		case <-cm.done:
 			return
-		case <-time.After(sleep):
-			sleep = cm.config.Period
+		case <-time.After(cm.config.Period):
 		}
-		cm.logger.Debug("Retrieving new configurations from Kibana")
-		configs, err := cm.client.Configuration(cm.config.AccessToken, cm.beatUUID)
+
+		if cm.fetch() {
+			cm.logger.Info("New configuration retrieved from central management, applying changes...")
+
+			// configs changed, apply changes
+			// TODO only reload the blocks that changed
+			cm.apply()
+
+			// store new configs (already applied)
+			if err := cm.config.Save(); err != nil {
+				cm.logger.Errorf("error storing central management state: %s", err)
+			}
+		}
+	}
+}
+
+// fetch configurations from kibana, return true if they changed
+func (cm *ConfigManager) fetch() bool {
+	cm.logger.Debug("Retrieving new configurations from Kibana")
+	configs, err := cm.client.Configuration(cm.config.AccessToken, cm.beatUUID)
+	if err != nil {
+		cm.logger.Errorf("error retriving new configurations, will use cached ones: %s", err)
+		return false
+	}
+
+	if api.ConfigBlocksEqual(configs, cm.config.Configs) {
+		cm.logger.Debug("configuration didn't change, sleeping")
+		return false
+	}
+
+	cm.config.Configs = configs
+
+	return true
+}
+
+func (cm *ConfigManager) apply() {
+	for _, blockList := range cm.config.Configs {
+		cm.reload(blockList.Type, blockList.Blocks)
+	}
+}
+
+func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) {
+	cm.logger.Infof("Applying settings for %s", t)
+
+	if obj := reload.Get(t); obj != nil {
+		// Single object
+		if len(blocks) != 1 {
+			cm.logger.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
+			return
+		}
+		config, err := blocks[0].ConfigWithMeta()
 		if err != nil {
-			cm.logger.Errorf("error retriving new configurations: %s", err)
-			continue
+			cm.logger.Error(err)
+			return
 		}
 
-		if api.ConfigBlocksEqual(configs, cm.config.Configs) {
-			cm.logger.Debug("configuration didn't change, sleeping")
-			continue
+		if err := obj.Reload(config); err != nil {
+			cm.logger.Error(err)
+			return
+		}
+	}
+
+	if obj := reload.GetList(t); obj != nil {
+		// List
+		var configs []*reload.ConfigWithMeta
+		for _, block := range blocks {
+			config, err := block.ConfigWithMeta()
+			if err != nil {
+				cm.logger.Error(err)
+				continue
+			}
+			configs = append(configs, config)
 		}
 
-		cm.logger.Info("New configuration retrieved from central management, applying changes...")
-
-		// configs changed, apply changes
-		// TODO only reload the blocks that changed
-		for _, config := range configs {
-			cm.logger.Infof("%+v", config)
-		}
-
-		// store new configs (already applied)
-		cm.config.Configs = configs
-		if err := cm.config.Save(); err != nil {
-			cm.logger.Errorf("error storing central management state: %s", err)
+		if err := obj.Reload(configs); err != nil {
+			cm.logger.Error(err)
 		}
 	}
 }
