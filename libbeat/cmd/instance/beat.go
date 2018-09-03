@@ -392,7 +392,7 @@ func (b *Beat) TestConfig(bt beat.Creator) error {
 	}())
 }
 
-// Setup registers ES index template and kibana dashboards
+// Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
 func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pipelines bool) error {
 	return handleError(func() error {
 		err := b.Init()
@@ -666,7 +666,6 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // the elasticsearch output. It is important the the registration happens before
 // the publisher is created.
 func (b *Beat) registerTemplateLoading() error {
-
 	var cfg template.TemplateConfig
 
 	// Check if outputting to file is enabled, and output to file if it is
