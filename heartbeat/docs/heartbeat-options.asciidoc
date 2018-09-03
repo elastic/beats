@@ -390,8 +390,7 @@ Example configuration:
 [[monitor-http-proxy-url]]
 ==== `proxy_url`
 
-The HTTP proxy URL. This setting is optional. If not set, the HTTP_PROXY
-environment variable is used.
+The HTTP proxy URL. This setting is optional.
 
 [float]
 [[monitor-http-username]]
