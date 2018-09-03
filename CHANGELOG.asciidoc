@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.4[Check the HEAD diff]
 
 - Fix golang.heap.gc.cpu_fraction type from long to float in Golang module. {pull}7789[7789]
 - Fixed the RPM by designating the modules.d config files as configuration data in the RPM spec. {issue}8075[8075]
+- Fixed the location of the modules.d dir in Deb and RPM packages. {issue}8104[8104]
 
 *Packetbeat*
 
