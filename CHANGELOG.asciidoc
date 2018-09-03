@@ -83,6 +83,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 *Filebeat*
 
+- Add tag "truncated" to "log.flags" if incoming line is longer than configured limit. {pull}7991[7991]
+
 *Heartbeat*
 
 *Metricbeat*

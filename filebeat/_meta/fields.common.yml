@@ -108,6 +108,10 @@
       description: >
         Logging level.
 
+    - name: log.flags
+      description: >
+        This field contains the flags of the event.
+
     - name: event.created
       type: date
       description: >

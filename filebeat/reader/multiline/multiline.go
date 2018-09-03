@@ -48,6 +48,7 @@ type Reader struct {
 	separator    []byte
 	last         []byte
 	numLines     int
+	truncated    int
 	err          error // last seen error
 	state        func(*Reader) (reader.Message, error)
 	message      reader.Message
@@ -262,13 +263,19 @@ func (mlr *Reader) clear() {
 	mlr.message = reader.Message{}
 	mlr.last = nil
 	mlr.numLines = 0
+	mlr.truncated = 0
 	mlr.err = nil
 }
 
 // finalize writes the existing content into the returned message and resets all reader variables.
 func (mlr *Reader) finalize() reader.Message {
+	if mlr.truncated > 0 {
+		mlr.message.AddFlagsWithKey("log.flags", "truncated")
+	}
+
 	// Copy message from existing content
 	msg := mlr.message
+
 	mlr.clear()
 	return msg
 }
@@ -303,6 +310,16 @@ func (mlr *Reader) addLine(m reader.Message) {
 		}
 		mlr.message.Content = append(tmp, m.Content[:space]...)
 		mlr.numLines++
+
+		// add number of truncated bytes to fields
+		diff := len(m.Content) - space
+		if diff > 0 {
+			mlr.truncated += diff
+		}
+	} else {
+		// increase the number of skipped bytes, if cannot add
+		mlr.truncated += len(m.Content)
+
 	}
 
 	mlr.last = m.Content

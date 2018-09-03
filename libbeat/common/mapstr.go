@@ -305,25 +305,38 @@ func MergeFields(ms, fields MapStr, underRoot bool) error {
 // exist then it will be created. If the tags field exists and is not a []string
 // then an error will be returned. It does not deduplicate the list of tags.
 func AddTags(ms MapStr, tags []string) error {
+	return AddTagsWithKey(ms, TagsKey, tags)
+}
+
+// AddTagsWithKey appends a tag to the key field of ms. If the field does not
+// exist then it will be created. If the field exists and is not a []string
+// then an error will be returned. It does not deduplicate the list.
+func AddTagsWithKey(ms MapStr, key string, tags []string) error {
 	if ms == nil || len(tags) == 0 {
 		return nil
 	}
-	eventTags, exists := ms[TagsKey]
-	if !exists {
-		ms[TagsKey] = tags
+
+	k, subMap, oldTags, present, err := mapFind(key, ms, true)
+	if err != nil {
+		return err
+	}
+
+	if !present {
+		subMap[k] = tags
 		return nil
 	}
 
-	switch arr := eventTags.(type) {
+	switch arr := oldTags.(type) {
 	case []string:
-		ms[TagsKey] = append(arr, tags...)
+		subMap[k] = append(arr, tags...)
 	case []interface{}:
 		for _, tag := range tags {
 			arr = append(arr, tag)
 		}
-		ms[TagsKey] = arr
+		subMap[k] = arr
 	default:
-		return errors.Errorf("expected string array by type is %T", eventTags)
+		return errors.Errorf("expected string array by type is %T", oldTags)
+
 	}
 	return nil
 }
