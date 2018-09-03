@@ -77,6 +77,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Allow for cloud-id to specify a custom port. This makes cloud-id work in ECE contexts. {pull}7887[7887]
 - Add support to grow or shrink an existing spool file between restarts. {pull}7859[7859]
 - Make kubernetes autodiscover ignore events with empty container IDs {pull}7971[7971]
+- Implement CheckConfig in RunnerFactory to make autodiscover check configs {pull}7961[7961]
 
 *Auditbeat*
 
