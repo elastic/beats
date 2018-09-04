@@ -7,9 +7,8 @@ KUBERNETES_FIELDS = metricbeat.COMMON_FIELDS + ["kubernetes"]
 
 class Test(metricbeat.BaseTest):
 
-    COMPOSE_SERVICES = ['kubernetes']  # 'kubestate']
-
     # Tests are disabled as current docker-compose settings fail to start in many cases:
+    # COMPOSE_SERVICES = ['kubernetes']  # 'kubestate']
 
     @unittest.skipUnless(False and metricbeat.INTEGRATION_TESTS, "integration test")
     def test_kubelet_node(self):
