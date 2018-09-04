@@ -24,9 +24,14 @@ import (
 )
 
 type Pipeline interface {
-	Connect() (Client, error)
-	ConnectWith(ClientConfig) (Client, error)
+	PipelineConnector
 	SetACKHandler(PipelineACKHandler) error
+}
+
+// PipelineConnector creates a publishing Client. This is typically backed by a Pipeline.
+type PipelineConnector interface {
+	ConnectWith(ClientConfig) (Client, error)
+	Connect() (Client, error)
 }
 
 // Client holds a connection to the beats publisher pipeline
