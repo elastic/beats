@@ -46,3 +46,4 @@ The list below covers the major changes between 6.3.0 and master only.
   `mage -h goTestUnit`. {pull}7766[7766]
 - Beats packaging now build non-oss binaries from code located in the x-pack folder. {issue}7783[7783]
 - New function `AddTagsWithKey` is added, so `common.MapStr` can be enriched with tags with an arbitrary key. {pull}7991[7991]
+- Move filebeat/reader to libbeat/reader {pull}8206[8206]
