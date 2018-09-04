@@ -24,7 +24,7 @@ services:
       - ./module/jolokia/_meta/env
       - ./module/kafka/_meta/env
       - ./module/kibana/_meta/env
-      - ./module/kubernetes/_meta/env
+      #- ./module/kubernetes/_meta/env
       - ./module/logstash/_meta/env
       - ./module/memcached/_meta/env
       - ./module/mongodb/_meta/env
@@ -108,23 +108,23 @@ services:
   kibana:
     build: ./module/kibana/_meta
 
-  kubernetes:
-    build: ./module/kubernetes/_meta
-    network_mode: host
-    pid: host
-    privileged: true
-    volumes:
-      - /:/rootfs:ro
-      - /sys:/sys
-      - /var/lib/docker:/var/lib/docker
-      - /var/run:/var/run
+  #kubernetes:
+  #  build: ./module/kubernetes/_meta
+  #  network_mode: host
+  #  pid: host
+  #  privileged: true
+  #  volumes:
+  #    - /:/rootfs:ro
+  #    - /sys:/sys
+  #    - /var/lib/docker:/var/lib/docker
+  #    - /var/run:/var/run
 
-  kubestate:
-    build:
-      context: ./module/kubernetes/_meta/
-      dockerfile: Dockerfile.kube-state
-    depends_on:
-      - kubernetes
+  #kubestate:
+  #  build:
+  #    context: ./module/kubernetes/_meta/
+  #    dockerfile: Dockerfile.kube-state
+  #  depends_on:
+  #    - kubernetes
 
   logstash:
     build: ./module/logstash/_meta
