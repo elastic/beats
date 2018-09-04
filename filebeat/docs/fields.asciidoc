@@ -1570,7 +1570,7 @@ backend_queue is the total number of requests which were processed before this o
 *`haproxy.bind_name`*::
 +
 --
-
+bind_name is the name of the listening address which received the connection.
 
 --
 
