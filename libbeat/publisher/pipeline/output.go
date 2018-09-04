@@ -77,21 +77,33 @@ func (w *netClientWorker) Close() error {
 
 func (w *netClientWorker) run() {
 	for !w.closed.Load() {
+		reconnectAttempts := 0
+
 		// start initial connect loop from first batch, but return
 		// batch to pipeline for other outputs to catch up while we're trying to connect
 		for batch := range w.qu {
 			batch.Cancelled()
 
 			if w.closed.Load() {
+				logp.Info("Closed connection to %v", w.client)
 				return
+			}
+
+			if reconnectAttempts > 0 {
+				logp.Info("Attempting to reconnect to %v with %d reconnect attempt(s)", w.client, reconnectAttempts)
+			} else {
+				logp.Info("Connecting to %v", w.client)
 			}
 
 			err := w.client.Connect()
 			if err != nil {
-				logp.Err("Failed to connect: %v", err)
+				logp.Err("Failed to connect to %v: %v", w.client, err)
+				reconnectAttempts++
 				continue
 			}
 
+			logp.Info("Connection to %v established", w.client)
+			reconnectAttempts = 0
 			break
 		}
 

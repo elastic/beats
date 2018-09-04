@@ -247,3 +247,7 @@ func (c *Client) Test(d testing.Driver) {
 		d.Fatal("talk to server", err)
 	})
 }
+
+func (c *Client) String() string {
+	return c.network + "://" + c.host
+}
