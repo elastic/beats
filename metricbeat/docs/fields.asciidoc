@@ -4421,6 +4421,16 @@ The state of this shard.
 
 --
 
+*`elasticsearch.shard.relocating_node.name`*::
++
+--
+type: keyword
+
+The node the shard was relocated from.
+
+
+--
+
 [[exported-fields-envoyproxy]]
 == envoyproxy fields
 

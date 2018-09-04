@@ -31,7 +31,6 @@ var (
 	schema = s.Schema{
 		"state":   c.Str("state"),
 		"primary": c.Bool("primary"),
-		"node":    c.Str("node"),
 		"index":   c.Str("index"),
 		"shard":   c.Int("shard"),
 	}
@@ -61,28 +60,38 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 			for _, shard := range shards {
 				event := mb.Event{}
 
-				fields, _ := schema.Apply(shard)
+				fields, err := schema.Apply(shard)
+				if err != nil {
+					r.Error(err)
+					continue
+				}
 
 				// Handle node field: could be string or null
 				err = elasticsearch.PassThruField("node", shard, fields)
 				if err != nil {
-					r.Error(err)
 					continue
 				}
 
 				// Handle relocating_node field: could be string or null
 				err = elasticsearch.PassThruField("relocating_node", shard, fields)
 				if err != nil {
-					r.Error(err)
 					continue
 				}
 
 				event.ModuleFields = common.MapStr{}
 				event.ModuleFields.Put("node.name", fields["node"])
 				delete(fields, "node")
+
 				event.ModuleFields.Put("index.name", fields["index"])
 				delete(fields, "index")
+
 				event.MetricSetFields = fields
+				event.MetricSetFields.Put("number", fields["shard"])
+				delete(event.MetricSetFields, "shard")
+
+				event.MetricSetFields.Put("relocating_node.name", fields["relocating_node"])
+				delete(event.MetricSetFields, "relocating_node")
+
 				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
 				event.ModuleFields.Put("cluster.name", stateData.ClusterName)
 
