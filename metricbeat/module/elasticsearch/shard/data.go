@@ -89,8 +89,8 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 				event.MetricSetFields.Put("number", fields["shard"])
 				delete(event.MetricSetFields, "shard")
 
-				event.MetricSetFields.Put("relocating_node.name", fields["relocating_node"])
 				delete(event.MetricSetFields, "relocating_node")
+				event.MetricSetFields.Put("relocating_node.name", fields["relocating_node"])
 
 				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
 				event.ModuleFields.Put("cluster.name", stateData.ClusterName)
