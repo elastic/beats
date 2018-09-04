@@ -51,6 +51,7 @@ matrix:
       env: TARGETS="-C metricbeat testsuite"
       go: $GO_VERSION
     - os: osx
+      osx_image: xcode9.3
       env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
       go: $GO_VERSION
     - os: linux
