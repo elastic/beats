@@ -6,6 +6,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-apache2>>
   * <<filebeat-module-auditd>>
   * <<filebeat-module-elasticsearch>>
+  * <<filebeat-module-haproxy>>
   * <<filebeat-module-icinga>>
   * <<filebeat-module-iis>>
   * <<filebeat-module-kafka>>
@@ -27,6 +28,7 @@ include::modules-overview.asciidoc[]
 include::modules/apache2.asciidoc[]
 include::modules/auditd.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
+include::modules/haproxy.asciidoc[]
 include::modules/icinga.asciidoc[]
 include::modules/iis.asciidoc[]
 include::modules/kafka.asciidoc[]
