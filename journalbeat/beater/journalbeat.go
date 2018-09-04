@@ -2,20 +2,23 @@ package beater
 
 import (
 	"fmt"
+	"sync"
 
+	"github.com/elastic/beats/journalbeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
-	"github.com/elastic/xbeats/journalbeat/config"
-	"github.com/elastic/xbeats/journalbeat/reader"
+	"github.com/elastic/beats/journalbeat/config"
 )
 
 type Journalbeat struct {
-	done    chan struct{}
-	journal *reader.Reader
-	config  config.Config
-	client  beat.Client
+	input  *input.Input
+	done   chan struct{}
+	config config.Config
+
+	client   beat.Client
+	pipeline beat.Pipeline
 }
 
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
@@ -24,43 +27,44 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	r, err := reader.New(config)
+	client, err := b.Publisher.Connect()
+	if err != nil {
+		return err
+	}
+
+	done := make(chan struct{})
+	i, err := input.New(config, client, done)
 	if err != nil {
 		return nil, err
 	}
 
 	bt := &Journalbeat{
-		journal: r,
-		done:    make(chan struct{}),
-		config:  config,
+		input:  i,
+		done:   done,
+		config: config,
+		client: client,
 	}
 	return bt, nil
 }
 
 func (bt *Journalbeat) Run(b *beat.Beat) error {
 	logp.Info("journalbeat is running! Hit CTRL-C to stop it.")
+	defer logp.Info("journalbeat is stopping")
 
-	var err error
-	bt.client, err = b.Publisher.Connect()
-	if err != nil {
-		return err
-	}
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go runInput(&wg)
+	wg.Wait()
 
-	for {
-		select {
-		case <-bt.done:
-			return nil
-		default:
-			for e := range bt.journal.Follow(bt.done) {
-				bt.client.Publish(*e)
-			}
+	return nil
+}
 
-		}
-	}
+func (bt *Journalbeat) runInput(wg *sync.WaitGroup) {
+	defer wg.Done()
+	bt.input.Run()
 }
 
 func (bt *Journalbeat) Stop() {
 	bt.client.Close()
-	bt.journal.Close()
 	close(bt.done)
 }

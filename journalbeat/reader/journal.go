@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package reader
 
 import (
@@ -9,75 +26,71 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/sdjournal"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/xbeats/journalbeat/config"
 )
 
 const (
 	CURSOR_FILE = ".journalbeat_position"
 )
 
-type Reader struct {
-	j       *sdjournal.Journal
-	changes chan int
-
-	backoff       time.Duration
-	backoffMax    time.Duration
-	backoffFactor int
+type Config struct {
+	Path          string
+	MaxBackoff    time.Duration
+	Backoff       time.Duration
+	BackoffFactor int
 }
 
-func New(config config.Config) (*Reader, error) {
+type Reader struct {
+	j       *sdjournal.Journal
+	config  Config
+	changes chan int
+	done    chan struct{}
+}
+
+func New(c Config) (*Reader, error) {
+	f, err := os.Stat(c.Path)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open file")
+	}
+
 	var j *sdjournal.Journal
-	var err error
-
-	if len(config.Paths) == 0 {
-		j, err = sdjournal.NewJournal()
+	if f.IsDir() {
+		j, err = sdjournal.NewJournalFromDir(c.Path)
 		if err != nil {
-			logp.Err("Failed to open local journal: %v", err)
-			return nil, err
+			return nil, errors.Wrap(err, "failed to open journal directory")
 		}
-	} else if len(config.Paths) == 1 {
-		var f os.FileInfo
-		f, err = os.Stat(config.Paths[0])
-		if err != nil {
-			logp.Err("Failed to open file: %v", err)
-			return nil, err
-		}
-		if f.IsDir() {
-			j, err = sdjournal.NewJournalFromDir(config.Paths[0])
-			if err != nil {
-				logp.Err("Failed to open journal directory: %v", err)
-				return nil, err
-			}
-		} else {
-			j, err = sdjournal.NewJournalFromFiles(config.Paths...)
-			if err != nil {
-				logp.Err("Failed to open journal file: %v", err)
-				return nil, err
-			}
-		}
-
 	} else {
-		j, err = sdjournal.NewJournalFromFiles(config.Paths...)
+		j, err = sdjournal.NewJournalFromFiles(c.Path)
 		if err != nil {
-			logp.Err("Failed to open journal files: %v", err)
-			return nil, err
+			return nil, errors.Wrap(err, "failed to open journal file")
 		}
 	}
 
 	seekToSavedPosition(j)
 
-	r := &Reader{
-		j:             j,
-		changes:       make(chan int),
-		backoff:       config.Backoff,
-		backoffMax:    config.MaxBackoff,
-		backoffFactor: config.BackoffFactor,
+	return &Reader{
+		j:       j,
+		changes: make(chan int),
+		config:  c,
+	}, nil
+}
+
+func NewLocal(c Config) (*Reader, error) {
+	j, err := sdjournal.NewJournal()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open local journal")
 	}
-	return r, nil
+	seekToSavedPosition(j)
+
+	return &Reader{
+		j:       j,
+		changes: make(chan int),
+		config:  c,
+	}, nil
 }
 
 func seekToSavedPosition(j *sdjournal.Journal) {
@@ -96,20 +109,20 @@ func seekToSavedPosition(j *sdjournal.Journal) {
 	j.SeekCursor(cursor)
 }
 
-func (r *Reader) Follow(stop <-chan struct{}) <-chan *beat.Event {
+func (r *Reader) Follow() <-chan *beat.Event {
 	out := make(chan *beat.Event)
-	go r.readEntriesFromJournal(stop, out)
+	go r.readEntriesFromJournal(out)
 
 	return out
 }
 
-func (r *Reader) readEntriesFromJournal(stop <-chan struct{}, entries chan<- *beat.Event) {
+func (r *Reader) readEntriesFromJournal(entries chan<- *beat.Event) {
 	defer close(entries)
 
 process:
 	for {
 		select {
-		case <-stop:
+		case <-r.done:
 			return
 		default:
 			err := r.readUntilNotNull(entries)
@@ -120,15 +133,15 @@ process:
 		}
 
 		for {
-			go r.stopOrWait(stop)
+			go r.stopOrWait()
 
 			select {
-			case <-stop:
+			case <-r.done:
 				return
 			case e := <-r.changes:
 				switch e {
 				case sdjournal.SD_JOURNAL_NOP:
-					r.wait(stop)
+					r.wait()
 				case sdjournal.SD_JOURNAL_APPEND, sdjournal.SD_JOURNAL_INVALIDATE:
 					continue process
 				default:
@@ -175,26 +188,27 @@ func getEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	return &event
 }
 
-func (r *Reader) stopOrWait(stop <-chan struct{}) {
+func (r *Reader) stopOrWait() {
 	select {
-	case <-stop:
+	case <-r.done:
 	case r.changes <- r.j.Wait(100 * time.Millisecond):
 	}
 }
 
-func (r *Reader) wait(stop <-chan struct{}) {
+func (r *Reader) wait() {
 	select {
-	case <-stop:
+	case <-r.done:
 		return
-	case <-time.After(r.backoff):
+	case <-time.After(r.config.Backoff):
 	}
 
-	if r.backoff < r.backoffMax {
-		r.backoff = r.backoff * time.Duration(r.backoffFactor)
-		if r.backoff > r.backoffMax {
-			r.backoff = r.backoffMax
+	// TODO move current backoff
+	if r.config.Backoff < r.config.MaxBackoff {
+		r.config.Backoff = r.config.Backoff * time.Duration(r.config.BackoffFactor)
+		if r.config.Backoff > r.config.MaxBackoff {
+			r.config.Backoff = r.config.MaxBackoff
 		}
-		logp.Debug("reader", "Increasing backoff time to: %v factor: %v", r.backoff, r.backoffFactor)
+		logp.Debug("reader", "Increasing backoff time to: %v factor: %v", r.config.Backoff, r.config.BackoffFactor)
 	}
 }
 

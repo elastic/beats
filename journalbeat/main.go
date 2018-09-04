@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/elastic/xbeats/journalbeat/cmd"
+	"github.com/elastic/beats/journalbeat/cmd"
 )
 
 func main() {
