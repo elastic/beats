@@ -60,14 +60,14 @@ Example module with SSL enabled:
 
 [source,yaml]
 ----
-- module: prometheus
-  namespace: "kube-apiserver"
-  metricsets: ["collector"]
+- module: http
+  namespace: "myservice"
   enabled: true
   period: 10s
+  hosts: ["https://localhost"]
+  path: "/stats"
   headers:
     Authorization: "Bearer test123"
-  hosts: ["https://apiserver"]
   ssl.verification_mode: "none"
 ----
 endif::[]
