@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Replace index patterns in TSVB visualizations. {pull}7929[7929]
 - Deregister pipeline loader callback when inputsRunner is stopped. {pull}[7893][7893]
 - Add backoff support to x-pack monitoring outputs. {issue}7966[7966]
+- Removed execute permissions systemd unit file. {pull}7873[7873]
 
 *Auditbeat*
 
@@ -77,10 +78,13 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Allow for cloud-id to specify a custom port. This makes cloud-id work in ECE contexts. {pull}7887[7887]
 - Add support to grow or shrink an existing spool file between restarts. {pull}7859[7859]
 - Make kubernetes autodiscover ignore events with empty container IDs {pull}7971[7971]
+- Implement CheckConfig in RunnerFactory to make autodiscover check configs {pull}7961[7961]
 
 *Auditbeat*
 
 *Filebeat*
+
+- Add tag "truncated" to "log.flags" if incoming line is longer than configured limit. {pull}7991[7991]
 
 *Heartbeat*
 
@@ -91,6 +95,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Move common kafka fields (broker, topic and partition.id) to the module level to facilitate events correlation {pull}7767[7767]
 - Add fields for memory fragmentation, memory allocator stats, copy on write, master-slave status, and active defragmentation to `info` metricset of Redis module. {pull}7695[7695]
 - Increase ignore_above for system.process.cmdline to 2048. {pull}8101[8100]
+- Add support to renamed fields planned for redis 5.0. {pull}8167[8167]
 
 
 - Add `metrics` metricset to MongoDB module. {pull}7611[7611]
@@ -110,6 +115,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 *Metricbeat*
 - Redis `info` `replication.master_offset` has been deprecated in favor of `replication.master.offset`.{pull}7695[7695]
+- Redis `info` clients fields `longest_output_list` and `biggest_input_buf` have been renamed to `max_output_buffer` and `max_input_buffer` based on the names they will have in Redis 5.0, both fields will coexist during a time with the same value {pull}8167[8167].
 
 - Move common kafka fields (broker, topic and partition.id) to the module level {pull}7767[7767].
 

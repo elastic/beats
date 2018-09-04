@@ -39,3 +39,4 @@ The list below covers the major changes between 6.3.0 and master only.
 - Libbeat provides a global registry for beats developer that allow to register and retrieve plugin. {pull}7392[7392]
 - Added more options to control required and optional fields in schema.Apply(), error returned is a plain nil if no error happened {pull}7335[7335]
 - Packaging on MacOS now produces a .dmg file containing an installer (.pkg) and uninstaller for the Beat. {pull}7481[7481]
+- New function `AddTagsWithKey` is added, so `common.MapStr` can be enriched with tags with an arbitrary key. {pull}7991[7991]

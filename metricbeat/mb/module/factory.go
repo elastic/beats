@@ -69,3 +69,13 @@ func (r *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 	mr := NewRunner(client, w)
 	return mr, nil
 }
+
+// CheckConfig checks if a config is valid or not
+func (r *Factory) CheckConfig(config *common.Config) error {
+	_, err := NewWrapper(config, mb.Registry, r.options...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

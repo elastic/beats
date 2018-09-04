@@ -63,6 +63,7 @@ type Reload struct {
 
 type RunnerFactory interface {
 	Create(p beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (Runner, error)
+	CheckConfig(config *common.Config) error
 }
 
 type Runner interface {
