@@ -76,7 +76,7 @@ func readConfig(
 }
 
 // Producer produces a new event log instance for reading event log records.
-type producer func(*common.Config) (EventLog, error)
+type producer func(*common.Config) ([]EventLog, error)
 
 // Channels lists the available channels (event logs).
 type channels func() ([]string, error)
@@ -110,9 +110,9 @@ func Register(apiName string, priority int, producer producer, channels channels
 	}
 }
 
-// New creates and returns a new EventLog instance based on the given config
+// New creates and returns multiple EventLog instance based on the given config
 // and the registered EventLog producers.
-func New(options *common.Config) (EventLog, error) {
+func New(options *common.Config) ([]EventLog, error) {
 	if len(eventLogs) == 0 {
 		return nil, fmt.Errorf("No event log API is available on this system")
 	}

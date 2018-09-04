@@ -30,6 +30,7 @@ const (
 	ERROR_INSUFFICIENT_BUFFER             syscall.Errno = 122
 	ERROR_NO_MORE_ITEMS                   syscall.Errno = 259
 	ERROR_NONE_MAPPED                     syscall.Errno = 1332
+	ERROR_TIMEOUT                         syscall.Errno = 1460
 	RPC_S_INVALID_BOUND                   syscall.Errno = 1734
 	ERROR_INVALID_OPERATION               syscall.Errno = 4317
 	ERROR_EVT_MESSAGE_NOT_FOUND           syscall.Errno = 15027
@@ -50,6 +51,33 @@ const (
 	EvtSubscribeOriginMask          EvtSubscribeFlag = 0x3
 	EvtSubscribeTolerateQueryErrors EvtSubscribeFlag = 0x1000
 	EvtSubscribeStrict              EvtSubscribeFlag = 0x10000
+)
+
+//Defines the values that specify how to return the query results and whether you are query against a channel or log file.
+type EvtQueryFlag uint32
+
+// EVT_QUERY_FLAGS enumeration
+// https://docs.microsoft.com/zh-cn/windows/desktop/api/winevt/ne-winevt-_evt_query_flags
+const (
+	EvtQueryChannelPath         EvtQueryFlag = 0x1
+	EvtQueryFilePath            EvtQueryFlag = 0x2
+	EvtQueryForwardDirection    EvtQueryFlag = 0x100
+	EvtQueryReverseDirection    EvtQueryFlag = 0x200
+	EvtQueryTolerateQueryErrors EvtQueryFlag = 0x1000
+)
+
+// Defines the relative position in the result set from which to seek.
+type EvtSeekFlag uint32
+
+// EVT_SEEK_FLAGS EVT_SEEK_FLAGS
+// https://docs.microsoft.com/zh-cn/windows/desktop/api/winevt/ne-winevt-_evt_seek_flags
+const (
+	EvtSeekRelativeToFirst    EvtSeekFlag = 1
+	EvtSeekRelativeToLast     EvtSeekFlag = 2
+	EvtSeekRelativeToCurrent  EvtSeekFlag = 3
+	EvtSeekRelativeToBookmark EvtSeekFlag = 4
+	EvtSeekOriginMask         EvtSeekFlag = 7
+	EvtSeekStrict             EvtSeekFlag = 0x10000
 )
 
 // EvtRenderFlag defines the values that specify what to render.
@@ -246,12 +274,14 @@ func (et EventLevel) String() string {
 // Windows API calls
 //sys   _EvtOpenLog(session EvtHandle, path *uint16, flags uint32) (handle EvtHandle, err error) = wevtapi.EvtOpenLog
 //sys   _EvtSubscribe(session EvtHandle, signalEvent uintptr, channelPath *uint16, query *uint16, bookmark EvtHandle, context uintptr, callback syscall.Handle, flags EvtSubscribeFlag) (handle EvtHandle, err error) = wevtapi.EvtSubscribe
+//sys   _EvtQuery(session EvtHandle, chanelOrFilePath *uint16, query *uint16, flags EvtQueryFlag) (handle EvtHandle, err error) = wevtapi.EvtQuery
 //sys   _EvtCreateBookmark(bookmarkXML *uint16) (handle EvtHandle, err error) = wevtapi.EvtCreateBookmark
 //sys   _EvtUpdateBookmark(bookmark EvtHandle, event EvtHandle) (err error) = wevtapi.EvtUpdateBookmark
 //sys   _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths uintptr, flags EvtRenderContextFlag) (handle EvtHandle, err error) = wevtapi.EvtCreateRenderContext
 //sys   _EvtRender(context EvtHandle, fragment EvtHandle, flags EvtRenderFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32, propertyCount *uint32) (err error) = wevtapi.EvtRender
 //sys   _EvtClose(object EvtHandle) (err error) = wevtapi.EvtClose
 //sys   _EvtNext(resultSet EvtHandle, eventArraySize uint32, eventArray *EvtHandle, timeout uint32, flags uint32, numReturned *uint32) (err error) = wevtapi.EvtNext
+//sys   _EvtSeek(resultSet EvtHandle, position uint64, bookmark EvtHandle, timeout uint32, flags EvtSeekFlag) (err error) = wevtapi.EvtSeek
 //sys   _EvtOpenChannelEnum(session EvtHandle, flags uint32) (handle EvtHandle, err error) = wevtapi.EvtOpenChannelEnum
 //sys   _EvtNextChannelPath(channelEnum EvtHandle, channelPathBufferSize uint32, channelPathBuffer *uint16, channelPathBufferUsed *uint32) (err error) = wevtapi.EvtNextChannelPath
 //sys   _EvtFormatMessage(publisherMetadata EvtHandle, event EvtHandle, messageID uint32, valueCount uint32, values uintptr, flags EvtFormatMessageFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32) (err error) = wevtapi.EvtFormatMessage

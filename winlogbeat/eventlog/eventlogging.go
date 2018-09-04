@@ -276,7 +276,7 @@ func (l *eventLogging) ignoreOlder(r *Record) bool {
 
 // newEventLogging creates and returns a new EventLog for reading event logs
 // using the Event Logging API.
-func newEventLogging(options *common.Config) (EventLog, error) {
+func newEventLogging(options *common.Config) ([]EventLog, error) {
 	c := eventLoggingConfig{
 		ReadBufferSize:   win.MaxEventBufferSize,
 		FormatBufferSize: win.MaxFormatMessageBufferSize,
@@ -285,7 +285,7 @@ func newEventLogging(options *common.Config) (EventLog, error) {
 		return nil, err
 	}
 
-	return &eventLogging{
+	return []EventLog{&eventLogging{
 		config: c,
 		name:   c.Name,
 		handles: newMessageFilesCache(c.Name, win.QueryEventMessageFiles,
@@ -293,7 +293,7 @@ func newEventLogging(options *common.Config) (EventLog, error) {
 		logPrefix: fmt.Sprintf("EventLogging[%s]", c.Name),
 		readBuf:   make([]byte, 0, c.ReadBufferSize),
 		formatBuf: make([]byte, c.FormatBufferSize),
-	}, nil
+	}}, nil
 }
 
 func init() {

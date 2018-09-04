@@ -103,6 +103,36 @@ loop:
 	return channels, nil
 }
 
+func EvtQuery(session EvtHandle, channelOrFilePath string, query string, flags EvtQueryFlag) (EvtHandle, error) {
+	var err error
+	var cp *uint16
+	if channelOrFilePath != "" {
+		cp, err = syscall.UTF16PtrFromString(channelOrFilePath)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	var q *uint16
+	if query != "" {
+		q, err = syscall.UTF16PtrFromString(query)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	eventHandle, err := _EvtQuery(session, cp, q, flags)
+	if err != nil {
+		return 0, err
+	}
+
+	return eventHandle, nil
+}
+
+func EvtSeek(handle EvtHandle, pos uint64, bookmark EvtHandle) error {
+	return _EvtSeek(handle, 0, bookmark, 0, EvtSeekRelativeToBookmark)
+}
+
 // Subscribe creates a new subscription to an event log channel.
 func Subscribe(
 	session EvtHandle,
@@ -142,7 +172,7 @@ func Subscribe(
 // at most maxHandles. ErrorNoMoreHandles is returned when there are no more
 // handles available to return. Close must be called on each returned EvtHandle
 // when finished with the handle.
-func EventHandles(subscription EvtHandle, maxHandles int) ([]EvtHandle, error) {
+func EventHandles(subscription EvtHandle, maxHandles int, timeout uint32) ([]EvtHandle, error) {
 	if maxHandles < 1 {
 		return nil, fmt.Errorf("maxHandles must be greater than 0")
 	}
@@ -151,7 +181,7 @@ func EventHandles(subscription EvtHandle, maxHandles int) ([]EvtHandle, error) {
 	var numRead uint32
 
 	err := _EvtNext(subscription, uint32(len(eventHandles)),
-		&eventHandles[0], 0, 0, &numRead)
+		&eventHandles[0], timeout, 0, &numRead)
 	if err != nil {
 		// Munge ERROR_INVALID_OPERATION to ERROR_NO_MORE_ITEMS when no handles
 		// were read. This happens you call the method and there are no events
