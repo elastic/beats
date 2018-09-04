@@ -53,16 +53,20 @@ type Monitor struct {
 	pipeline beat.Pipeline
 }
 
-func checkMonitorConfig(config *common.Config, registrar *pluginsReg) error {
-	_, err := newMonitor(config, registrar, nil, nil)
+func checkMonitorConfig(config *common.Config, registrar *pluginsReg, allowWatches bool) error {
+	_, err := newMonitor(config, registrar, nil, nil, allowWatches)
 	return err
 }
+
+// ErrWatchesDisabled is returned when the user attempts to declare a watch poll file in a
+var ErrWatchesDisabled = errors.New("watch poll files are only allowed in heartbeat.yml, not dynamic configs")
 
 func newMonitor(
 	config *common.Config,
 	registrar *pluginsReg,
 	pipeline beat.Pipeline,
 	scheduler *scheduler.Scheduler,
+	allowWatches bool,
 ) (*Monitor, error) {
 	// Extract just the Type and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -100,6 +104,15 @@ func newMonitor(
 	err = m.makeWatchTasks(monitorPlugin)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(m.watchPollTasks) > 0 {
+		if !allowWatches {
+			return nil, ErrWatchesDisabled
+		}
+
+		logp.Info(`Obsolete option 'watch.poll_file' declared. This will be removed in a future release. 
+See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html for more info`)
 	}
 
 	return m, nil

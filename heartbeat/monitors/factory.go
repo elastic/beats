@@ -26,20 +26,23 @@ import (
 
 // RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
 // suitable for config reloading.
-type RunnerFactory struct{ sched *scheduler.Scheduler }
+type RunnerFactory struct {
+	sched        *scheduler.Scheduler
+	allowWatches bool
+}
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewFactory(sched *scheduler.Scheduler) *RunnerFactory {
-	return &RunnerFactory{sched}
+func NewFactory(sched *scheduler.Scheduler, allowWatches bool) *RunnerFactory {
+	return &RunnerFactory{sched, allowWatches}
 }
 
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
-	monitor, err := newMonitor(c, globalPluginsReg, p, f.sched)
+	monitor, err := newMonitor(c, globalPluginsReg, p, f.sched, f.allowWatches)
 	return monitor, err
 }
 
 // CheckConfig checks to see if the given monitor config is valid.
 func (f *RunnerFactory) CheckConfig(config *common.Config) error {
-	return checkMonitorConfig(config, globalPluginsReg)
+	return checkMonitorConfig(config, globalPluginsReg, f.allowWatches)
 }

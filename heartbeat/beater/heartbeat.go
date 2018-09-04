@@ -21,10 +21,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/monitors"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/heartbeat/config"
-	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/scheduler"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -39,9 +40,7 @@ type Heartbeat struct {
 	// config is used for iterating over elements of the config.
 	config config.Config
 	// rawConfig is used in places where we want to unpack the config differently.
-	scheduler *scheduler.Scheduler
-	// monitorFactory is used to create new monitors.
-	monitorFactory  *monitors.RunnerFactory
+	scheduler       *scheduler.Scheduler
 	monitorReloader *cfgfile.Reloader
 }
 
@@ -67,10 +66,9 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	scheduler := scheduler.NewWithLocation(limit, location)
 
 	bt := &Heartbeat{
-		done:           make(chan struct{}),
-		config:         parsedConfig,
-		scheduler:      scheduler,
-		monitorFactory: monitors.NewFactory(scheduler),
+		done:      make(chan struct{}),
+		config:    parsedConfig,
+		scheduler: scheduler,
 	}
 	return bt, nil
 }
@@ -107,8 +105,10 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
+	factory := monitors.NewFactory(bt.scheduler, true)
+
 	for _, cfg := range bt.config.Monitors {
-		created, err := bt.monitorFactory.Create(b.Publisher, cfg, nil)
+		created, err := factory.Create(b.Publisher, cfg, nil)
 		if err != nil {
 			return errors.Wrap(err, "could not create monitor")
 		}
@@ -119,13 +119,15 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 
 // RunDynamicMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunDynamicMonitors(b *beat.Beat) (err error) {
+	factory := monitors.NewFactory(bt.scheduler, false)
+
 	// Check monitor configs
-	if err := bt.monitorReloader.Check(bt.monitorFactory); err != nil {
+	if err := bt.monitorReloader.Check(factory); err != nil {
 		return err
 	}
 
 	// Execute the monitor
-	go bt.monitorReloader.Run(bt.monitorFactory)
+	go bt.monitorReloader.Run(factory)
 
 	return nil
 }
