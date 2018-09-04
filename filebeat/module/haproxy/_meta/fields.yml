@@ -59,7 +59,7 @@
           type: long
 
         - name: bind_name
-          description: >
+          description: bind_name is the name of the listening address which received the connection.
 
         - name: error_message
           description: error_message is the error message logged by HAProxy in case of error.
