@@ -21,7 +21,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/beats/filebeat/reader"
+	"github.com/elastic/beats/libbeat/reader"
 )
 
 var (

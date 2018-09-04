@@ -18,7 +18,7 @@
 package readfile
 
 import (
-	"github.com/elastic/beats/filebeat/reader"
+	"github.com/elastic/beats/libbeat/reader"
 )
 
 // Reader sets an upper limited on line length. Lines longer
