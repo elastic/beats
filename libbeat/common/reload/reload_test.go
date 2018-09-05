@@ -31,39 +31,44 @@ func (reloadable) Reload(config *ConfigWithMeta) error       { return nil }
 func (reloadableList) Reload(config []*ConfigWithMeta) error { return nil }
 
 func RegisterReloadable(t *testing.T) {
-	r := reloadable{}
+	obj := reloadable{}
+	r := registry{}
 
-	MustRegister("my.reloadable", reloadable{})
+	r.Register("my.reloadable", obj)
 
-	assert.Equal(t, r, Get("my.reloadable"))
+	assert.Equal(t, obj, r.Get("my.reloadable"))
 }
 
 func RegisterReloadableList(t *testing.T) {
-	r := reloadableList{}
+	objl := reloadableList{}
+	r := registry{}
 
-	MustRegisterList("my.reloadable", reloadableList{})
+	r.RegisterList("my.reloadable", objl)
 
-	assert.Equal(t, r, Get("my.reloadable"))
+	assert.Equal(t, objl, r.Get("my.reloadable"))
 }
 
 func TestRegisterNilFails(t *testing.T) {
-	assert.Panics(t, func() {
-		MustRegister("name", nil)
-	})
+	r := registry{}
 
-	assert.Panics(t, func() {
-		MustRegisterList("name", nil)
-	})
+	err := r.Register("name", nil)
+	assert.Error(t, err)
+
+	err = r.RegisterList("name", nil)
+	assert.Error(t, err)
 }
 
 func TestReRegisterFails(t *testing.T) {
-	assert.Panics(t, func() {
-		MustRegister("name", reloadable{})
-		MustRegister("name", reloadable{})
-	})
+	r := registry{}
+	err := r.Register("name", reloadable{})
+	assert.NoError(t, err)
 
-	assert.Panics(t, func() {
-		MustRegisterList("mylist", reloadableList{})
-		MustRegisterList("mylist", reloadableList{})
-	})
+	err = r.Register("name", reloadable{})
+	assert.Error(t, err)
+
+	err = r.RegisterList("name", reloadableList{})
+	assert.NoError(t, err)
+
+	err = r.RegisterList("name", reloadableList{})
+	assert.Error(t, err)
 }

@@ -18,8 +18,9 @@
 package reload
 
 import (
-	"fmt"
 	"sync"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -51,55 +52,81 @@ type registry struct {
 	confs      map[string]Reloadable
 }
 
-func newRegistry() registry {
-	return registry{
+func newRegistry() *registry {
+	return &registry{
 		confsLists: make(map[string]ReloadableList),
 		confs:      make(map[string]Reloadable),
 	}
 }
 
-// MustRegister declares a reloadable object
-func MustRegister(name string, r Reloadable) {
-	register.Lock()
-	defer register.Unlock()
+// Register declares a reloadable object
+func (r *registry) Register(name string, obj Reloadable) error {
+	r.Lock()
+	defer r.Unlock()
 
 	if r == nil {
-		panic("Got a nil object")
+		return errors.New("Got a nil object")
 	}
 
-	if _, ok := register.confs[name]; ok {
-		panic(fmt.Sprintf("%s configuration is already registered", name))
+	if _, ok := r.confs[name]; ok {
+		return errors.Errorf("%s configuration is already registered", name)
 	}
 
-	register.confs[name] = r
+	r.confs[name] = obj
+	return nil
 }
 
-// MustRegisterList declares a reloadable list of configurations
-func MustRegisterList(name string, list ReloadableList) {
-	register.Lock()
-	defer register.Unlock()
+// RegisterList declares a reloadable list of configurations
+func (r *registry) RegisterList(name string, list ReloadableList) error {
+	r.Lock()
+	defer r.Unlock()
 
-	if list == nil {
-		panic("Got a nil object")
+	if r == nil {
+		return errors.New("Got a nil object")
 	}
 
-	if _, ok := register.confsLists[name]; ok {
-		panic(fmt.Sprintf("%s configuration list is already registered", name))
+	if _, ok := r.confsLists[name]; ok {
+		return errors.Errorf("%s configuration list is already registered", name)
 	}
 
 	register.confsLists[name] = list
+	return nil
+}
+
+// Get returns the reloadable object with the given name, nil if not found
+func (r *registry) Get(name string) Reloadable {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confs[name]
+}
+
+// GetList returns the reloadable list with the given name, nil if not found
+func (r *registry) GetList(name string) ReloadableList {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confsLists[name]
+}
+
+// MustRegister declares a reloadable object
+func MustRegister(name string, r Reloadable) {
+	if err := register.Register(name, r); err != nil {
+		panic(err)
+	}
+}
+
+// MustRegisterList declares a reloadable object list
+func MustRegisterList(name string, r ReloadableList) {
+	if err := register.RegisterList(name, r); err != nil {
+		panic(err)
+	}
 }
 
 // Get returns the reloadable object with the given name, nil if not found
 func Get(name string) Reloadable {
-	register.RLock()
-	defer register.RUnlock()
-	return register.confs[name]
+	return register.Get(name)
 }
 
 // GetList returns the reloadable list with the given name, nil if not found
 func GetList(name string) ReloadableList {
-	register.RLock()
-	defer register.RUnlock()
-	return register.confsLists[name]
+	return register.GetList(name)
 }
