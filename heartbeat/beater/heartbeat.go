@@ -21,11 +21,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/monitors"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/heartbeat/config"
+	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/scheduler"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -38,8 +37,7 @@ import (
 type Heartbeat struct {
 	done chan struct{}
 	// config is used for iterating over elements of the config.
-	config config.Config
-	// rawConfig is used in places where we want to unpack the config differently.
+	config          config.Config
 	scheduler       *scheduler.Scheduler
 	monitorReloader *cfgfile.Reloader
 }

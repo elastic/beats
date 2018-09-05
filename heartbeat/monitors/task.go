@@ -120,6 +120,7 @@ func (t *task) makeSchedulerTaskFunc() scheduler.TaskFunc {
 	return t.prepareSchedulerJob(meta, t.job.Run)
 }
 
+// Start schedules this task for execution.
 func (t *task) Start() {
 	var err error
 	t.client, err = t.monitor.pipeline.ConnectWith(beat.ClientConfig{
@@ -138,6 +139,7 @@ func (t *task) Start() {
 	}
 }
 
+// Stop unschedules this task from execution.
 func (t *task) Stop() {
 	if t.cancelFn != nil {
 		t.cancelFn()
