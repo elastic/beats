@@ -1,0 +1,9 @@
+- module: mssql
+  metricsets: ["db"]
+  enabled: false
+  period: 10s
+  host: "127.0.0.1"
+  port: 1443
+  username: "sa"
+  password: "1234_asdf"
+

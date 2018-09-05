@@ -94,6 +94,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-mongodb-metrics,metrics>> experimental[]  
 |<<metricbeat-metricset-mongodb-replstatus,replstatus>> experimental[]  
 |<<metricbeat-metricset-mongodb-status,status>>   
+|<<metricbeat-module-mssql,mssql>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-mssql-io,io>> experimental[]  
 |<<metricbeat-module-munin,Munin>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>> beta[]  
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -172,6 +174,7 @@ include::modules/kvm.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/memcached.asciidoc[]
 include::modules/mongodb.asciidoc[]
+include::modules/mssql.asciidoc[]
 include::modules/munin.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nginx.asciidoc[]

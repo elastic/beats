@@ -1,0 +1,9 @@
+# Module: mssql
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-mssql.html
+
+- module: mssql
+  metricsets: ["io"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
