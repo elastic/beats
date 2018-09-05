@@ -15,21 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beat
+package instance
 
-import "github.com/satori/go.uuid"
+import (
+	"github.com/spf13/pflag"
 
-// Info stores a beats instance meta data.
-type Info struct {
-	Beat        string    // The actual beat's name
-	IndexPrefix string    // The beat's index prefix in Elasticsearch.
-	Version     string    // The beat version. Defaults to the libbeat version when an implementation does not set a version
-	Name        string    // configured beat name
-	Hostname    string    // hostname
-	UUID        uuid.UUID // ID assigned to beat instance
+	"github.com/elastic/beats/libbeat/monitoring/report"
+)
 
-	// Monitoring-related fields
-	Monitoring struct {
-		DefaultUsername string // The default username to be used to connect to Elasticsearch Monitoring
-	}
+// Settings contains basic settings for any beat to pass into GenRootCmd
+type Settings struct {
+	Name        string
+	IndexPrefix string
+	Version     string
+	Monitoring  report.Settings
+	RunFlags    *pflag.FlagSet
 }
