@@ -155,7 +155,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	event.Fields.DeepUpdate(common.MapStr{
-		"kubernetes": metadata,
+		"kubernetes": metadata.Clone(),
 	})
 
 	return event, nil
