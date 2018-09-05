@@ -65,7 +65,7 @@ func (r *registry) Register(name string, obj Reloadable) error {
 	defer r.Unlock()
 
 	if r == nil {
-		return errors.New("Got a nil object")
+		return errors.New("got a nil object")
 	}
 
 	if _, ok := r.confs[name]; ok {
@@ -82,7 +82,7 @@ func (r *registry) RegisterList(name string, list ReloadableList) error {
 	defer r.Unlock()
 
 	if r == nil {
-		return errors.New("Got a nil object")
+		return errors.New("got a nil object")
 	}
 
 	if _, ok := r.confsLists[name]; ok {
