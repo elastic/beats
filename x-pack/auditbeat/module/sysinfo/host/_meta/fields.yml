@@ -1,0 +1,6 @@
+- name: host
+  type: group
+  description: >
+    `host` contains TODO.
+  release: experimental
+  fields:

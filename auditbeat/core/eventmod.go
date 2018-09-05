@@ -30,4 +30,10 @@ func AddDatasetToEvent(module, metricSet string, event *mb.Event) {
 	}
 
 	event.RootFields.Put("event.module", module)
+
+	// Modules without "datasets" should set their module and metricset names
+	// to the same value then this will omit the event.dataset field.
+	if module != metricSet {
+		event.RootFields.Put("event.dataset", metricSet)
+	}
 }
