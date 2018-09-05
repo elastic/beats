@@ -8,7 +8,7 @@
     #- shard
     #- ml_job
   period: 10s
-  hosts: ["localhost:9200"]
+  hosts: ["http://localhost:9200"]
 
   # Set to false to fetch all entries
   #index_recovery.active_only: true

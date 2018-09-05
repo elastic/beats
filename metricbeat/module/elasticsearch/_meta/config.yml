@@ -3,6 +3,6 @@
   #  - node
   #  - node_stats
   period: 10s
-  hosts: ["localhost:9200"]
+  hosts: ["http://localhost:9200"]
   #username: "user"
   #password: "secret"
