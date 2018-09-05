@@ -1,0 +1,25 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "module": "mssql",
+        "name": "db",
+        "rtt": 115
+    },
+    "mssql": {
+        "db": {
+            "database": {
+                "id": "1"
+            },
+            "log_space_usage": {
+                "since_last_backup_bytes": 925696,
+                "total_bytes": 2088960,
+                "used_bytes": 1257472,
+                "used_percent": 60.19607925415039
+            }
+        }
+    }
+}

@@ -1,0 +1,5 @@
+- module: mssql
+  metricsets: ["db", "server", "os", "performance"]
+  hosts: ["sqlserver://sa:1234_asdf@localhost"]
+  period: 10s
+

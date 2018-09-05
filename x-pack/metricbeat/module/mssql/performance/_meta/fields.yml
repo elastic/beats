@@ -1,0 +1,9 @@
+- name: performance
+  type: group
+  description: >
+    performance
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
