@@ -45,9 +45,13 @@ func NewConfigManager(beatUUID uuid.UUID) (management.ConfigManager, error) {
 		return nil, errors.Wrap(err, "reading central management internal settings")
 	}
 
-	client, err := api.NewClient(c.Kibana)
-	if err != nil {
-		return nil, errors.Wrap(err, "initializing kibana client")
+	var client *api.Client
+	if c.Enabled {
+		var err error
+		client, err = api.NewClient(c.Kibana)
+		if err != nil {
+			return nil, errors.Wrap(err, "initializing kibana client")
+		}
 	}
 
 	return &ConfigManager{

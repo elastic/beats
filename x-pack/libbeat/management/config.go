@@ -51,7 +51,7 @@ func (c *Config) Load() error {
 		return err
 	}
 
-	if err = config.Unpack(c); err != nil {
+	if err = config.Unpack(&c); err != nil {
 		return err
 	}
 

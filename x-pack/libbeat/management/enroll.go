@@ -29,11 +29,10 @@ func Enroll(beat *instance.Beat, kibanaURL, enrollmentToken string) error {
 
 	// Enrolled, persist state
 	// TODO use beat.Keystore() for access_token
-	settings := Config{
-		Enabled:     true,
-		AccessToken: accessToken,
-		Kibana:      config,
-	}
+	settings := defaultConfig()
+	settings.Enabled = true
+	settings.AccessToken = accessToken
+	settings.Kibana = config
 
 	return settings.Save()
 }
