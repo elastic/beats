@@ -45,8 +45,8 @@ Beats].
 === Setting Up Your Dev Environment
 
 The Beats are Go programs, so install the latest version of
-http://golang.org/[golang] if you don't have it already. The current Go version
-used for development is Golang {go-version}.
+http://golang.org/[Go] if you don't have it already. The current Go version
+used for development is Go {go-version}.
 
 The location where you clone is important. Please clone under the source
 directory of your `GOPATH`. If you don't have `GOPATH` already set, you can

@@ -11,6 +11,11 @@ The Kibana module only tracks the high-level metrics. To monitor more Kibana met
 
 The default metricset is `status`.
 
+[float]
+=== Compatibility
+
+The Kibana module is tested with Kibana 6.3.
+
 
 [float]
 === Example configuration
