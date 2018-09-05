@@ -4,26 +4,27 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[community-dashboards]]
-== Community Beats
+== Community Dashboards
 
 The open source community has been hard at work developing new Dashboards. You can check
 out some of them here. For information on exporting and importing dashboards see the documentation for
-https://www.elastic.co/guide/en/kibana/current/managing-saved-objects.html[Kibana Saved Objects].
+{kibana-ref}/managing-saved-objects.html[Kibana Saved Objects].
 
-Have a question about a community Dashboard? You can post questions and discuss issues in the
+Have a question about a community dashboard? You can post questions and discuss issues in the
 https://discuss.elastic.co/c/beats/community-dashboards[Community Dashboards] category of the Beats discussion forum.
 
-Have you created a Dashboard that's not listed? Add the name, description, and link to the homepage  of your Dashboard
+Have you created a dashboard that's not listed? Add the name, description, and link to the homepage of your dashboard
 to the source document for https://github.com/elastic/beats/blob/master/libbeat/docs/communitydashboards.asciidoc[Community Dashboards]
 and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository]
 to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/announcements[announce]
-your new Beat in the Elastic discussion forum.
+your new dashboard in the Elastic discussion forum.
 
 ifndef::dev-guide[]
 Want to contribute? See <<contributing-to-beats>>.
 endif::[]
 
-NOTE: Elastic provides no warranty or support for community-sourced Dashboards.
+NOTE: Elastic provides no warranty or support for community-sourced dashboards.
 
 [horizontal]
 
+https://github.com/elastic/somedashboard[somedashboard]:: Reads some data, and shows it on some dashboard.
