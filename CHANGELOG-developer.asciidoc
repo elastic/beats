@@ -40,3 +40,5 @@ The list below covers the major changes between 6.3.0 and master only.
 - Added more options to control required and optional fields in schema.Apply(), error returned is a plain nil if no error happened {pull}7335[7335]
 - Packaging on MacOS now produces a .dmg file containing an installer (.pkg) and uninstaller for the Beat. {pull}7481[7481]
 - New function `AddTagsWithKey` is added, so `common.MapStr` can be enriched with tags with an arbitrary key. {pull}7991[7991]
+- Libbeat provides a new function `cmd.GenRootCmdWithSettings` that should be preferred over deprecated functions
+  `cmd.GenRootCmd`, `cmd.GenRootCmdWithRunFlags`, and `cmd.GenRootCmdWithIndexPrefixWithRunFlags`. {pull}7850[7850]
