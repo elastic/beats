@@ -13,11 +13,12 @@ import (
 	_ "{beat_path}/include"
 )
 
-var Name = "{beat}"
-var IndexPrefix = "{beat}"
+var settings = instance.Settings{
+	Name: "{beat}",
+}
 
 func main() {
-	if err := instance.Run(Name, IndexPrefix, "", beater.DefaultCreator()); err != nil {
+	if err := instance.Run(settings, beater.DefaultCreator()); err != nil {
 		os.Exit(1)
 	}
 }
