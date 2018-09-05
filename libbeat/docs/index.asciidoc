@@ -19,6 +19,8 @@ include::./overview.asciidoc[]
 
 include::./communitybeats.asciidoc[]
 
+include::./communitydashboards.asciidoc[]
+
 include::./gettingstarted.asciidoc[]
 
 include::./breaking.asciidoc[]
