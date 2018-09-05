@@ -25,7 +25,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-var register = newRegistry()
+// Register holds a registry of reloadable objects
+var Register = newRegistry()
 
 // ConfigWithMeta holds a pair of common.Config and optional metadata for it
 type ConfigWithMeta struct {
@@ -64,7 +65,7 @@ func (r *registry) Register(name string, obj Reloadable) error {
 	r.Lock()
 	defer r.Unlock()
 
-	if r == nil {
+	if obj == nil {
 		return errors.New("got a nil object")
 	}
 
@@ -81,7 +82,7 @@ func (r *registry) RegisterList(name string, list ReloadableList) error {
 	r.Lock()
 	defer r.Unlock()
 
-	if r == nil {
+	if list == nil {
 		return errors.New("got a nil object")
 	}
 
@@ -89,8 +90,22 @@ func (r *registry) RegisterList(name string, list ReloadableList) error {
 		return errors.Errorf("%s configuration list is already registered", name)
 	}
 
-	register.confsLists[name] = list
+	r.confsLists[name] = list
 	return nil
+}
+
+// MustRegister declares a reloadable object
+func (r *registry) MustRegister(name string, obj Reloadable) {
+	if err := r.Register(name, obj); err != nil {
+		panic(err)
+	}
+}
+
+// MustRegisterList declares a reloadable object list
+func (r *registry) MustRegisterList(name string, list ReloadableList) {
+	if err := r.RegisterList(name, list); err != nil {
+		panic(err)
+	}
 }
 
 // Get returns the reloadable object with the given name, nil if not found
@@ -105,28 +120,4 @@ func (r *registry) GetList(name string) ReloadableList {
 	r.RLock()
 	defer r.RUnlock()
 	return r.confsLists[name]
-}
-
-// MustRegister declares a reloadable object
-func MustRegister(name string, r Reloadable) {
-	if err := register.Register(name, r); err != nil {
-		panic(err)
-	}
-}
-
-// MustRegisterList declares a reloadable object list
-func MustRegisterList(name string, r ReloadableList) {
-	if err := register.RegisterList(name, r); err != nil {
-		panic(err)
-	}
-}
-
-// Get returns the reloadable object with the given name, nil if not found
-func Get(name string) Reloadable {
-	return register.Get(name)
-}
-
-// GetList returns the reloadable list with the given name, nil if not found
-func GetList(name string) ReloadableList {
-	return register.GetList(name)
 }

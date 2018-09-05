@@ -32,7 +32,7 @@ func (reloadableList) Reload(config []*ConfigWithMeta) error { return nil }
 
 func RegisterReloadable(t *testing.T) {
 	obj := reloadable{}
-	r := registry{}
+	r := newRegistry()
 
 	r.Register("my.reloadable", obj)
 
@@ -41,7 +41,7 @@ func RegisterReloadable(t *testing.T) {
 
 func RegisterReloadableList(t *testing.T) {
 	objl := reloadableList{}
-	r := registry{}
+	r := newRegistry()
 
 	r.RegisterList("my.reloadable", objl)
 
@@ -49,7 +49,7 @@ func RegisterReloadableList(t *testing.T) {
 }
 
 func TestRegisterNilFails(t *testing.T) {
-	r := registry{}
+	r := newRegistry()
 
 	err := r.Register("name", nil)
 	assert.Error(t, err)
@@ -59,7 +59,8 @@ func TestRegisterNilFails(t *testing.T) {
 }
 
 func TestReRegisterFails(t *testing.T) {
-	r := registry{}
+	r := newRegistry()
+
 	err := r.Register("name", reloadable{})
 	assert.NoError(t, err)
 
