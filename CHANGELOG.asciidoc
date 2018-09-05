@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Replace index patterns in TSVB visualizations. {pull}7929[7929]
 - Fixed Support `add_docker_metadata` in Windows by identifying systems' path separator. {issue}7797[7797]
 - Add backoff support to x-pack monitoring outputs. {issue}7966[7966]
+- Fix a race condition with the `add_host_metadata` and the event serialization. {pull}8223[8223]
 
 *Auditbeat*
 
