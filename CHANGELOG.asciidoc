@@ -196,6 +196,7 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
 - Fix delays on autodiscovery events handling caused by blocking runner stops. {pull}7170[7170]
 - Do not emit Kubernetes autodiscover events for Pods without IP address. {pull}7235[7235]
+- Fix self metrics when containerized {pull}6641[6641]
 
 *Auditbeat*
 
