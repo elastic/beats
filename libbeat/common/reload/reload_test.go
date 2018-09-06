@@ -60,15 +60,24 @@ func TestRegisterNilFails(t *testing.T) {
 func TestReRegisterFails(t *testing.T) {
 	r := newRegistry()
 
+	// two obj with the same name
 	err := r.Register("name", reloadable{})
 	assert.NoError(t, err)
 
 	err = r.Register("name", reloadable{})
 	assert.Error(t, err)
 
-	err = r.RegisterList("name", reloadableList{})
+	// two lists with the same name
+	err = r.RegisterList("foo", reloadableList{})
 	assert.NoError(t, err)
 
-	err = r.RegisterList("name", reloadableList{})
+	err = r.RegisterList("foo", reloadableList{})
+	assert.Error(t, err)
+
+	// one of each with the same name
+	err = r.Register("bar", reloadable{})
+	assert.NoError(t, err)
+
+	err = r.RegisterList("bar", reloadableList{})
 	assert.Error(t, err)
 }

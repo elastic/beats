@@ -69,8 +69,8 @@ func (r *registry) Register(name string, obj Reloadable) error {
 		return errors.New("got a nil object")
 	}
 
-	if _, ok := r.confs[name]; ok {
-		return errors.Errorf("%s configuration is already registered", name)
+	if r.nameTaken(name) {
+		return errors.Errorf("%s configuration list is already registered", name)
 	}
 
 	r.confs[name] = obj
@@ -86,8 +86,8 @@ func (r *registry) RegisterList(name string, list ReloadableList) error {
 		return errors.New("got a nil object")
 	}
 
-	if _, ok := r.confsLists[name]; ok {
-		return errors.Errorf("%s configuration list is already registered", name)
+	if r.nameTaken(name) {
+		return errors.Errorf("%s configuration is already registered", name)
 	}
 
 	r.confsLists[name] = list
@@ -120,4 +120,16 @@ func (r *registry) GetList(name string) ReloadableList {
 	r.RLock()
 	defer r.RUnlock()
 	return r.confsLists[name]
+}
+
+func (r *registry) nameTaken(name string) bool {
+	if _, ok := r.confs[name]; ok {
+		return true
+	}
+
+	if _, ok := r.confsLists[name]; ok {
+		return true
+	}
+
+	return false
 }
