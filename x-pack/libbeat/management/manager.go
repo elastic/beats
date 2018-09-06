@@ -145,15 +145,15 @@ func (cm *ConfigManager) fetch() bool {
 }
 
 func (cm *ConfigManager) apply() {
-	for _, blockList := range cm.config.Configs {
-		cm.reload(blockList.Type, blockList.Blocks)
+	for blockType, blockList := range cm.config.Configs {
+		cm.reload(blockType, blockList)
 	}
 }
 
 func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) {
 	cm.logger.Infof("Applying settings for %s", t)
 
-	if obj := reload.Get(t); obj != nil {
+	if obj := reload.Register.Get(t); obj != nil {
 		// Single object
 		if len(blocks) != 1 {
 			cm.logger.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
@@ -167,11 +167,8 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) {
 
 		if err := obj.Reload(config); err != nil {
 			cm.logger.Error(err)
-			return
 		}
-	}
-
-	if obj := reload.GetList(t); obj != nil {
+	} else if obj := reload.Register.GetList(t); obj != nil {
 		// List
 		var configs []*reload.ConfigWithMeta
 		for _, block := range blocks {

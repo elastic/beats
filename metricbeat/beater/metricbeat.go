@@ -210,7 +210,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	// Centrally managed modules
 	factory := module.NewFactory(bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
-	reload.MustRegisterList("metricbeat.modules", modules)
+	reload.Register.MustRegisterList("metricbeat.modules", modules)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()

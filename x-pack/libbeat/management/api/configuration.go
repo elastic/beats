@@ -16,16 +16,11 @@ import (
 
 // ConfigBlock stores a piece of config from central management
 type ConfigBlock struct {
-	Raw map[string]interface{} `json:"block_yml"`
+	Raw map[string]interface{}
 }
 
-type ConfigList struct {
-	Type   string
-	Blocks []*ConfigBlock
-}
-
-// ConfigBlocks holds a list of (type, list of configs) pairs
-type ConfigBlocks []ConfigList
+// ConfigBlocks holds a map of type -> list of configs
+type ConfigBlocks map[string][]*ConfigBlock
 
 // Config returns a common.Config object holding the config from this block
 func (c *ConfigBlock) Config() (*common.Config, error) {
@@ -59,17 +54,9 @@ func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID) (ConfigBl
 		return nil, err
 	}
 
-	configmap := map[string][]*ConfigBlock{}
-	for _, block := range resp.ConfigBlocks {
-		configmap[block.Type] = append(configmap[block.Type], &ConfigBlock{Raw: block.Raw})
-	}
-
 	res := ConfigBlocks{}
-	for t, blocks := range configmap {
-		res = append(res, ConfigList{
-			Type:   t,
-			Blocks: blocks,
-		})
+	for _, block := range resp.ConfigBlocks {
+		res[block.Type] = append(res[block.Type], &ConfigBlock{Raw: block.Raw})
 	}
 
 	return res, nil
