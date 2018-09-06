@@ -63,6 +63,7 @@ func Package() error {
 				spec.OS = target.GOOS()
 				spec.Arch = packageArch
 				spec.Snapshot = Snapshot
+				spec.VersionQualifier = VersionQualifier
 				spec.evalContext = map[string]interface{}{
 					"GOOS":        target.GOOS(),
 					"GOARCH":      target.GOARCH(),

@@ -82,8 +82,8 @@ func Package() {
 	mage.UseElasticBeatPackaging()
 	customizePackaging()
 
-	mg.Deps(Update, prepareModulePackaging)
-	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
+	//mg.Deps(Update, prepareModulePackaging)
+	//mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
 

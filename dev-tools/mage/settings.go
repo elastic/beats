@@ -63,7 +63,8 @@ var (
 	BeatLicense     = EnvOr("BEAT_LICENSE", "ASL 2.0")
 	BeatURL         = EnvOr("BEAT_URL", "https://www.elastic.co/products/beats/"+BeatName)
 
-	Snapshot bool
+	Snapshot         bool
+	VersionQualifier = EnvOr("VERSION_QUALIFIER", "")
 
 	FuncMap = map[string]interface{}{
 		"beat_doc_branch":   BeatDocBranch,
@@ -117,19 +118,20 @@ func EnvMap(args ...map[string]interface{}) map[string]interface{} {
 
 func varMap(args ...map[string]interface{}) map[string]interface{} {
 	data := map[string]interface{}{
-		"GOOS":            GOOS,
-		"GOARCH":          GOARCH,
-		"GOARM":           GOARM,
-		"Platform":        Platform,
-		"BinaryExt":       BinaryExt,
-		"BeatName":        BeatName,
-		"BeatServiceName": BeatServiceName,
-		"BeatIndexPrefix": BeatIndexPrefix,
-		"BeatDescription": BeatDescription,
-		"BeatVendor":      BeatVendor,
-		"BeatLicense":     BeatLicense,
-		"BeatURL":         BeatURL,
-		"Snapshot":        Snapshot,
+		"GOOS":             GOOS,
+		"GOARCH":           GOARCH,
+		"GOARM":            GOARM,
+		"Platform":         Platform,
+		"BinaryExt":        BinaryExt,
+		"BeatName":         BeatName,
+		"BeatServiceName":  BeatServiceName,
+		"BeatIndexPrefix":  BeatIndexPrefix,
+		"BeatDescription":  BeatDescription,
+		"BeatVendor":       BeatVendor,
+		"BeatLicense":      BeatLicense,
+		"BeatURL":          BeatURL,
+		"Snapshot":         Snapshot,
+		"VersionQualifier": VersionQualifier,
 	}
 
 	// Add the extra args to the map.
@@ -145,18 +147,20 @@ func varMap(args ...map[string]interface{}) map[string]interface{} {
 func dumpVariables() (string, error) {
 	var dumpTemplate = `## Variables
 
-GOOS            = {{.GOOS}}
-GOARCH          = {{.GOARCH}}
-GOARM           = {{.GOARM}}
-Platform        = {{.Platform}}
-BinaryExt       = {{.BinaryExt}}
-BeatName        = {{.BeatName}}
-BeatServiceName = {{.BeatServiceName}}
-BeatIndexPrefix = {{.BeatIndexPrefix}}
-BeatDescription = {{.BeatDescription}}
-BeatVendor      = {{.BeatVendor}}
-BeatLicense     = {{.BeatLicense}}
-BeatURL         = {{.BeatURL}}
+GOOS             = {{.GOOS}}
+GOARCH           = {{.GOARCH}}
+GOARM            = {{.GOARM}}
+Platform         = {{.Platform}}
+BinaryExt        = {{.BinaryExt}}
+BeatName         = {{.BeatName}}
+BeatServiceName  = {{.BeatServiceName}}
+BeatIndexPrefix  = {{.BeatIndexPrefix}}
+BeatDescription  = {{.BeatDescription}}
+BeatVendor       = {{.BeatVendor}}
+BeatLicense      = {{.BeatLicense}}
+BeatURL          = {{.BeatURL}}
+VersionQualifier = {{.VersionQualifier}}
+Snapshot         = {{.Snapshot}}
 
 ## Functions
 
