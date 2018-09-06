@@ -146,8 +146,6 @@ func testFunctionLookup(t *testing.T) {
 		global *feature.FeatureRegistry,
 		wrapper *Registry,
 	) {
-		// TODO
-		t.Skip("I need to update the code to return a more appropriate errors.")
 		err := global.Register(f)
 		if !assert.NoError(t, err) {
 			return
@@ -167,8 +165,6 @@ func testFunctionLookup(t *testing.T) {
 		global *feature.FeatureRegistry,
 		wrapper *Registry,
 	) {
-		// TODO
-		t.Skip("I need to update the code to return a more appropriate errors.")
 		err := global.Register(f)
 		if !assert.NoError(t, err) {
 			return
