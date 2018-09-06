@@ -16,7 +16,7 @@ import (
 
 // ConfigBlock stores a piece of config from central management
 type ConfigBlock struct {
-	Raw string `json:"block_yml"`
+	Raw map[string]interface{} `json:"block_yml"`
 }
 
 type ConfigList struct {
@@ -29,7 +29,7 @@ type ConfigBlocks []ConfigList
 
 // Config returns a common.Config object holding the config from this block
 func (c *ConfigBlock) Config() (*common.Config, error) {
-	return common.NewConfigWithYAML([]byte(c.Raw), "")
+	return common.NewConfigFrom(c.Raw)
 }
 
 // ConfigWithMeta returns a reload.ConfigWithMeta object holding the config from this block, meta will be nil
@@ -50,8 +50,8 @@ func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID) (ConfigBl
 
 	resp := struct {
 		ConfigBlocks []*struct {
-			Type string `json:"type"`
-			Raw  string `json:"block_yml"`
+			Type string                 `json:"type"`
+			Raw  map[string]interface{} `json:"config"`
 		} `json:"configuration_blocks"`
 	}{}
 	_, err := c.request("GET", "/api/beats/agent/"+beatUUID.String()+"/configuration", nil, headers, &resp)
