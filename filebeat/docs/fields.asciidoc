@@ -18,6 +18,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-elasticsearch>>
+* <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
@@ -1424,6 +1425,357 @@ type: keyword
 example: doc
 
 Type
+
+--
+
+[[exported-fields-haproxy]]
+== haproxy fields
+
+haproxy Module
+
+
+
+[float]
+== haproxy fields
+
+
+
+
+*`haproxy.process_name`*::
++
+--
+Name of the process
+
+--
+
+*`haproxy.pid`*::
++
+--
+type: long
+
+Process ID
+
+--
+
+*`haproxy.client_ip`*::
++
+--
+client_ip is the IP address of the client which initiated the TCP connection to haproxy.
+
+--
+
+*`haproxy.client_port`*::
++
+--
+type: long
+
+client_port is the TCP port of the client which initiated the connection.
+
+--
+
+*`haproxy.frontend_name`*::
++
+--
+frontend_name is the name of the frontend (or listener) which received and processed the connection.
+
+--
+
+*`haproxy.backend_name`*::
++
+--
+backend_name is the name of the backend (or listener) which was selected to manage the connection to the server.
+
+--
+
+*`haproxy.server_name`*::
++
+--
+server_name is the name of the last server to which the connection was sent.
+
+--
+
+*`haproxy.time_client_req`*::
++
+--
+type: long
+
+time_client_req is the total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+
+--
+
+*`haproxy.time_queue`*::
++
+--
+type: long
+
+time_queue is the total time in milliseconds spent waiting in the various queues.
+
+--
+
+*`haproxy.time_backend_connect`*::
++
+--
+type: long
+
+time_backend_connect is the total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
+
+--
+
+*`haproxy.time_server_response`*::
++
+--
+type: long
+
+time_server_response is the total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
+
+--
+
+*`haproxy.time_duration`*::
++
+--
+type: long
+
+time_duration is the time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+
+--
+
+*`haproxy.server_queue`*::
++
+--
+type: long
+
+server_queue is the total number of requests which were processed before this one in the server queue.
+
+--
+
+*`haproxy.backend_queue`*::
++
+--
+type: long
+
+backend_queue is the total number of requests which were processed before this one in the backend's global queue.
+
+--
+
+*`haproxy.bind_name`*::
++
+--
+bind_name is the name of the listening address which received the connection.
+
+--
+
+*`haproxy.error_message`*::
++
+--
+type: text
+
+error_message is the error message logged by HAProxy in case of error.
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the client_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`haproxy.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`haproxy.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`haproxy.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`haproxy.geoip.region_name`*::
++
+--
+type: keyword
+
+The region name.
+
+
+--
+
+*`haproxy.geoip.city_name`*::
++
+--
+type: keyword
+
+The city name.
+
+
+--
+
+*`haproxy.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+*`haproxy.termination_state`*::
++
+--
+termination_state is the condition the session was in when the session ended.
+
+--
+
+[float]
+== connections fields
+
+Contains various counts of connections active in the process.
+
+
+*`haproxy.connections.active`*::
++
+--
+type: long
+
+active is the total number of concurrent connections on the process when the session was logged.
+
+--
+
+*`haproxy.connections.frontend`*::
++
+--
+type: long
+
+frontend is the total number of concurrent connections on the frontend when the session was logged.
+
+--
+
+*`haproxy.connections.backend`*::
++
+--
+type: long
+
+backend is the total number of concurrent connections handled by the backend when the session was logged.
+
+--
+
+*`haproxy.connections.server`*::
++
+--
+type: long
+
+server is the total number of concurrent connections still active on the server when the session was logged.
+
+--
+
+*`haproxy.connections.retries`*::
++
+--
+type: long
+
+retries is the number of connection retries experienced by this session when trying to connect to the server.
+
+--
+
+[float]
+== http fields
+
+Please add description
+
+
+[float]
+== response fields
+
+Fields related to the HTTP response
+
+
+*`haproxy.http.response.status_code`*::
++
+--
+type: long
+
+status_code is the HTTP status code returned to the client.
+
+--
+
+*`haproxy.http.response.bytes_read`*::
++
+--
+type: long
+
+bytes_read is the total number of bytes transmitted to the client when the log is emitted.
+
+--
+
+*`haproxy.http.response.captured_cookie`*::
++
+--
+captured_cookie is an optional "name=value" entry indicating that the client had this cookie in the response.
+
+
+--
+
+*`haproxy.http.response.captured_headers`*::
++
+--
+type: text
+
+captured_response_headers is a list of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
+
+
+--
+
+[float]
+== request fields
+
+Fields related to the HTTP request
+
+
+*`haproxy.http.request.captured_cookie`*::
++
+--
+captured_cookie is an optional "name=value" entry indicating that the server has returned a cookie with its request.
+
+
+--
+
+*`haproxy.http.request.captured_headers`*::
++
+--
+type: text
+
+captured_request_headers is a list of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
+
+
+--
+
+*`haproxy.http.request.raw_request_line`*::
++
+--
+type: text
+
+raw_request_line is the complete HTTP request line, including the method, request and HTTP version string.
 
 --
 
