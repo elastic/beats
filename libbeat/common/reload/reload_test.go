@@ -23,7 +23,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type nonreloadable struct{}
 type reloadable struct{}
 type reloadableList struct{}
 
