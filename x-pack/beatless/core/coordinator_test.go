@@ -29,7 +29,7 @@ func (uhr *unhappyRunner) Run(ctx context.Context) error {
 
 func TestStart(t *testing.T) {
 	t.Run("start the runner", func(t *testing.T) {
-		coordinator := NewCoordinator(nil, []Runner{&happyRunner{}, &happyRunner{}})
+		coordinator := NewCoordinator(nil, &happyRunner{}, &happyRunner{})
 		ctx, cancel := context.WithCancel(context.Background())
 		var err error
 		go func() {
@@ -40,13 +40,13 @@ func TestStart(t *testing.T) {
 	})
 
 	t.Run("on error shutdown all the runner", func(t *testing.T) {
-		coordinator := NewCoordinator(nil, []Runner{&happyRunner{}, &unhappyRunner{}})
+		coordinator := NewCoordinator(nil, &happyRunner{}, &unhappyRunner{})
 		err := coordinator.Start(context.Background())
 		assert.Error(t, err)
 	})
 
 	t.Run("aggregate all errors", func(t *testing.T) {
-		coordinator := NewCoordinator(nil, []Runner{&unhappyRunner{}, &unhappyRunner{}})
+		coordinator := NewCoordinator(nil, &unhappyRunner{}, &unhappyRunner{})
 		err := coordinator.Start(context.Background())
 		assert.Error(t, err)
 	})
