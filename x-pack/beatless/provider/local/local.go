@@ -72,7 +72,7 @@ func (s *StdinFunction) Run(ctx context.Context, client core.Client) error {
 	for {
 		select {
 		case <-ctx.Done():
-			return nil
+			return os.Stdin.Close()
 		case err := <-errChan:
 			return err
 		case line := <-lineChan:

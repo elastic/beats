@@ -43,29 +43,29 @@ func (r *Coordinator) Start(ctx context.Context) error {
 	defer r.log.Debug("coordinator stopped")
 
 	// When an errors happen in a function and its not handled by the running function, we log an error
-	// and will trigger a shutdown of all the others goroutine and start will return and beatless
+	// and we trigger a shutdown of all the others goroutine and start will return and beatless
 	// will stop.
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	output := make(chan error, len(r.runners))
-	defer close(output)
+	results := make(chan error)
+	defer close(results)
 
+	r.log.Debugf("starting %d functions", len(r.runners))
 	for _, rfn := range r.runners {
-		go r.startFunc(ctx, cancel, rfn, output)
+		go r.startFunc(ctx, cancel, rfn, results)
 	}
 
 	// Wait for goroutine to complete and aggregate any errors from the goroutine and
 	// raise them back to the main program.
 	var aggErr multierror.Errors
-	for i := 0; i <= len(r.runners); i++ {
+	for i := 0; i < len(r.runners); i++ {
 		select {
-		case err := <-output:
+		case err := <-results:
 			if err != nil {
 				aggErr = append(aggErr, err)
 			}
 		}
-
 	}
 	return aggErr.Err()
 }
@@ -76,17 +76,18 @@ func (r *Coordinator) startFunc(
 	rfn Runner,
 	output chan<- error,
 ) {
-	defer r.log.Infof("function stopped: %s", rfn)
 	r.log.Info("starting function: %s", rfn)
+	defer r.log.Infof("function stopped: %s", rfn)
+
 	err := rfn.Run(ctx)
+	defer func() { output <- err }()
+
 	if err != nil {
 		r.log.Error(
-			"nonrecoverable error when executing the goroutine: '%s', error: '%s', terminating all the goroutine",
+			"nonrecoverable error when executing the function: '%s', error: '%s', terminating all the functions",
 			rfn,
 			err,
 		)
 		cancel()
-		output <- err
 	}
-	output <- nil
 }
