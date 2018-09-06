@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v6.3.2...6.3[Check the HEAD diff]
 *Affecting all Beats*
 
 - Fix a race condition with the `add_host_metadata` and the event serialization. {pull}8223[8223]
+- Enforce that data used by k8s or docker doesn't use any reference. {pull}8240[8240]
 
 *Auditbeat*
 
