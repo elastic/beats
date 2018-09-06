@@ -6,13 +6,14 @@ package include
 
 import (
 	"github.com/elastic/beats/libbeat/feature"
+	"github.com/elastic/beats/x-pack/beatless/provider/aws"
 	"github.com/elastic/beats/x-pack/beatless/provider/local"
 )
 
 // Bundle feature enabled.
 var Bundle = feature.MustBundle(
-	// Local provider
 	local.Bundle,
+	aws.Bundle,
 )
 
 func init() {
