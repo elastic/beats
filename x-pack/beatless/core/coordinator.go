@@ -76,8 +76,8 @@ func (r *Coordinator) startFunc(
 	rfn Runner,
 	output chan<- error,
 ) {
-	defer r.log.Infof("stopped, goroutine function: %s", rfn)
-	r.log.Info("starting, goroutine function: %s", rfn)
+	defer r.log.Infof("function stopped: %s", rfn)
+	r.log.Info("starting function: %s", rfn)
 	err := rfn.Run(ctx)
 	if err != nil {
 		r.log.Error(
