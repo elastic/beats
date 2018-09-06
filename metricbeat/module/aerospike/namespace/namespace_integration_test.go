@@ -20,7 +20,6 @@
 package namespace
 
 import (
-	"net"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -44,6 +43,6 @@ func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "aerospike",
 		"metricsets": []string{"namespace"},
-		"hosts":      []string{net.JoinHostPort(host, "3000")},
+		"hosts":      []string{host},
 	}
 }

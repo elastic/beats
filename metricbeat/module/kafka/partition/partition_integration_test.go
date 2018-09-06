@@ -22,7 +22,6 @@ package partition
 import (
 	"fmt"
 	"math/rand"
-	"net"
 	"strconv"
 	"testing"
 	"time"
@@ -122,7 +121,7 @@ func generateKafkaData(t *testing.T, topic string, host string) {
 	config.Producer.Retry.Backoff = 500 * time.Millisecond
 	config.Metadata.Retry.Max = 20
 	config.Metadata.Retry.Backoff = 500 * time.Millisecond
-	client, err := sarama.NewClient([]string{net.JoinHostPort(host, "9092")}, config)
+	client, err := sarama.NewClient([]string{host}, config)
 	if err != nil {
 		t.Errorf("%s", err)
 		t.FailNow()
@@ -159,7 +158,7 @@ func getConfig(topic string, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kafka",
 		"metricsets": []string{"partition"},
-		"hosts":      []string{net.JoinHostPort(host, "9092")},
+		"hosts":      []string{host},
 		"topics":     topics,
 	}
 }

@@ -21,7 +21,6 @@ package consumergroup
 
 import (
 	"io"
-	"net"
 	"testing"
 	"time"
 
@@ -54,7 +53,7 @@ func TestConsumerGroup(t *testing.T) {
 }
 
 func startConsumer(t *testing.T, topic, host string) (io.Closer, error) {
-	brokers := []string{net.JoinHostPort(host, "9092")}
+	brokers := []string{host}
 	topics := []string{topic}
 	return saramacluster.NewConsumer(brokers, "test-group", topics, nil)
 }
@@ -63,6 +62,6 @@ func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kafka",
 		"metricsets": []string{"consumergroup"},
-		"hosts":      []string{net.JoinHostPort(host, "9092")},
+		"hosts":      []string{host},
 	}
 }

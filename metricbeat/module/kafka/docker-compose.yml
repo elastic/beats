@@ -6,3 +6,5 @@ services:
       context: ./_meta
       args:
         KAFKA_VERSION: 2.0.0
+    ports:
+    - 9092

@@ -20,7 +20,6 @@
 package status
 
 import (
-	"net"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -62,6 +61,6 @@ func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "apache",
 		"metricsets": []string{"status"},
-		"hosts":      []string{net.JoinHostPort(host, "80")},
+		"hosts":      []string{host},
 	}
 }

@@ -20,6 +20,7 @@ package compose
 import (
 	"fmt"
 	"math/rand"
+	"net"
 	"os"
 	"sort"
 	"strings"
@@ -167,4 +168,14 @@ type runnerControl struct {
 
 func (r *runnerControl) Host() string {
 	return r.host
+}
+
+func (r *runnerControl) Hostname() string {
+	hostname, _, _ := net.SplitHostPort(r.host)
+	return hostname
+}
+
+func (r *runnerControl) Port() string {
+	_, port, _ := net.SplitHostPort(r.host)
+	return port
 }

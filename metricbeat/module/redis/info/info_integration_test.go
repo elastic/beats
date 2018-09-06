@@ -20,7 +20,6 @@
 package info
 
 import (
-	"net"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -100,7 +99,7 @@ func TestInfo(t *testing.T) {
 
 // addPassword will add a password to redis.
 func addPassword(host, pass string) error {
-	c, err := rd.Dial("tcp", net.JoinHostPort(host, "6379"))
+	c, err := rd.Dial("tcp", host)
 	if err != nil {
 		return err
 	}
@@ -112,7 +111,7 @@ func addPassword(host, pass string) error {
 
 // resetPassword changes the password to the redis DB.
 func resetPassword(host, currentPass string) error {
-	c, err := rd.Dial("tcp", net.JoinHostPort(host, "6379"))
+	c, err := rd.Dial("tcp", host)
 	if err != nil {
 		return err
 	}
@@ -129,7 +128,7 @@ func resetPassword(host, currentPass string) error {
 
 // writeToRedis will write to the default DB 0.
 func writeToRedis(host string) error {
-	c, err := rd.Dial("tcp", net.JoinHostPort(host, "6379"))
+	c, err := rd.Dial("tcp", host)
 	if err != nil {
 		return err
 	}
@@ -143,7 +142,7 @@ func getConfig(password, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "redis",
 		"metricsets": []string{"info"},
-		"hosts":      []string{net.JoinHostPort(host, "6379")},
+		"hosts":      []string{host},
 		"password":   password,
 	}
 }

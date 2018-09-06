@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -102,7 +103,11 @@ func (b *Broker) Close() error {
 // Connect connects the broker to the configured host
 func (b *Broker) Connect() error {
 	if err := b.broker.Open(b.cfg); err != nil {
-		return err
+		return errors.Wrap(err, "opening broker connection")
+	}
+
+	if ok, err := b.broker.Connected(); !ok {
+		return errors.Wrap(err, "broker not connected")
 	}
 
 	if b.id != noID || !b.matchID {
@@ -113,13 +118,13 @@ func (b *Broker) Connect() error {
 	meta, err := queryMetadataWithRetry(b.broker, b.cfg, nil)
 	if err != nil {
 		closeBroker(b.broker)
-		return err
+		return errors.Wrap(err, "querying metadata")
 	}
 
 	other := findMatchingBroker(brokerAddress(b.broker), meta.Brokers)
 	if other == nil { // no broker found
 		closeBroker(b.broker)
-		return fmt.Errorf("No advertised broker with address %v found", b.Addr())
+		return fmt.Errorf("no advertised broker with address %v found", b.Addr())
 	}
 
 	debugf("found matching broker %v with id %v", other.Addr(), other.ID())

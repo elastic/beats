@@ -20,8 +20,10 @@ package compose
 import (
 	"context"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -64,8 +66,7 @@ func (c *wrapperContainer) Old() bool {
 	return strings.Contains(c.info.Status, "minute")
 }
 
-func (c *wrapperContainer) Host() string {
-	// TODO: Support multiple networks/ports
+func (c *wrapperContainer) privateHost() string {
 	var ip string
 	for _, net := range c.info.NetworkSettings.Networks {
 		if len(net.IPAddress) > 0 {
@@ -76,14 +77,23 @@ func (c *wrapperContainer) Host() string {
 	if len(ip) == 0 {
 		return ""
 	}
-	return ip
 
-	/* TODO:
 	for _, port := range c.info.Ports {
 		return net.JoinHostPort(ip, strconv.Itoa(int(port.PrivatePort)))
 	}
 	return ""
-	*/
+}
+
+func (c *wrapperContainer) publicHost() string {
+	for _, port := range c.info.Ports {
+		return net.JoinHostPort("localhost", strconv.Itoa(int(port.PublicPort)))
+	}
+	return ""
+}
+
+func (c *wrapperContainer) Host() string {
+	// TODO: Support multiple networks/ports
+	return c.publicHost()
 }
 
 func (d *wrapperDriver) LockFile() string {
