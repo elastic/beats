@@ -5,7 +5,9 @@
 package licenser
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"math/rand"
 	"sync"
 	"time"
@@ -309,4 +311,33 @@ func (m *Manager) save(license *License) bool {
 func (m *Manager) invalidate() {
 	defer m.log.Debug("invalidate cached license, fallback to OSS")
 	m.saveAndNotify(OSSLicense)
+}
+
+// WaitForLicense transforms the async manager into a sync check, this is useful if you want
+// to block you application until you have received an initial license from the cluster, the manager
+// is not affected and will stay asynchronous.
+func WaitForLicense(ctx context.Context, log *logp.Logger, manager *Manager, checks ...CheckFunc) (err error) {
+	log.Info("waiting on synchronous license check")
+	received := make(chan struct{})
+	callback := CallbackWatcher{New: func(license License) {
+		log.Debug("validating license")
+		if !Validate(log, license, checks...) {
+			err = errors.New("invalid license")
+		}
+		close(received)
+		log.Infof("license is valid, mode: %s", license.Get())
+	}}
+
+	if err := manager.AddWatcher(&callback); err != nil {
+		return err
+	}
+	defer manager.RemoveWatcher(&callback)
+
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf("license check was interrupted")
+	case <-received:
+	}
+
+	return err
 }

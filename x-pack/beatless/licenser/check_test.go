@@ -16,6 +16,7 @@ import (
 func TestCheckLicense(t *testing.T) {
 	t.Run("Trial", testCheckTrial)
 	t.Run("Cover", testCheckLicenseCover)
+	t.Run("Validate", testValidate)
 }
 
 func testCheckTrial(t *testing.T) {
@@ -59,4 +60,17 @@ func testCheckLicenseCover(t *testing.T) {
 			assert.False(t, fn(log, l))
 		})
 	}
+}
+
+func testValidate(t *testing.T) {
+	l := License{Mode: Basic, Status: Active}
+	t.Run("when one of the check is valid", func(t *testing.T) {
+		valid := Validate(logp.NewLogger(""), l, CheckLicenseCover(Platinum), CheckLicenseCover(Basic))
+		assert.True(t, valid)
+	})
+
+	t.Run("when no check is valid", func(t *testing.T) {
+		valid := Validate(logp.NewLogger(""), l, CheckLicenseCover(Platinum), CheckLicenseCover(Gold))
+		assert.False(t, valid)
+	})
 }
