@@ -30,7 +30,8 @@ func FunctionFeature(
 }
 
 // Builder is used to have a fluent interface to build a set of function for a specific provider, it
-// provides a fluent interface to the developper of provider and functions.
+// provides a fluent interface to the developper of provider and functions, it wraps the Feature
+// functions to make sure the namespace are correctly configured.
 type Builder struct {
 	name   string
 	bundle *feature.Bundle
