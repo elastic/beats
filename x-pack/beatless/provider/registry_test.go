@@ -157,7 +157,7 @@ func testFunctionLookup(t *testing.T) {
 		}
 
 		_, err = wrapper.LookupFunction("I do not exist", fnName)
-		assert.Equal(t, errInvalidProvider, err)
+		assert.Error(t, err)
 	}))
 
 	t.Run("return an error if the function doesn't exist", withRegistry(func(
