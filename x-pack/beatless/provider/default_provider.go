@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/x-pack/beatless/core"
 )
 
+// Config is a generic configured used by providers.
 type Config struct {
 	Functions []*common.Config `config:"functions"`
 }
@@ -22,6 +23,7 @@ type DefaultProvider struct {
 	log      *logp.Logger
 }
 
+// NewDefaultProvider returns factory methods to handle generic provider.
 func NewDefaultProvider(name string) func(*logp.Logger, *Registry, *common.Config) (Provider, error) {
 	return func(log *logp.Logger, registry *Registry, config *common.Config) (Provider, error) {
 		c := &Config{}
@@ -33,10 +35,12 @@ func NewDefaultProvider(name string) func(*logp.Logger, *Registry, *common.Confi
 	}
 }
 
+// Name returns the name of the provider.
 func (d *DefaultProvider) Name() string {
 	return d.name
 }
 
+// CreateFunctions takes factory method and returns runnable function.
 func (d *DefaultProvider) CreateFunctions(clientFactory clientFactory) ([]core.Runner, error) {
 	return CreateFunctions(d.registry, d, d.config.Functions, clientFactory)
 }
