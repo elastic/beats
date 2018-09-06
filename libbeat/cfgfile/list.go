@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -36,15 +37,6 @@ type RunnerList struct {
 	factory  RunnerFactory
 	pipeline beat.Pipeline
 	logger   *logp.Logger
-}
-
-// ConfigWithMeta holds a pair of common.Config and optional metadata for it
-type ConfigWithMeta struct {
-	// Config to store
-	Config *common.Config
-
-	// Meta data related to this config
-	Meta *common.MapStrPointer
 }
 
 // NewRunnerList builds and returns a RunnerList
@@ -58,13 +50,13 @@ func NewRunnerList(name string, factory RunnerFactory, pipeline beat.Pipeline) *
 }
 
 // Reload the list of runners to match the given state
-func (r *RunnerList) Reload(configs []*ConfigWithMeta) error {
+func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
 	var errs multierror.Errors
 
-	startList := map[uint64]*ConfigWithMeta{}
+	startList := map[uint64]*reload.ConfigWithMeta{}
 	stopList := r.copyRunnerList()
 
 	r.logger.Debugf("Starting reload procedure, current runners: %d", len(stopList))

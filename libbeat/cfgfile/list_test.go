@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/reload"
 )
 
 type runner struct {
@@ -66,7 +67,7 @@ func TestNewConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
 
-	list.Reload([]*ConfigWithMeta{
+	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
@@ -79,7 +80,7 @@ func TestReloadSameConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
 
-	list.Reload([]*ConfigWithMeta{
+	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
@@ -88,7 +89,7 @@ func TestReloadSameConfigs(t *testing.T) {
 	state := list.copyRunnerList()
 	assert.Equal(t, len(state), 3)
 
-	list.Reload([]*ConfigWithMeta{
+	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
@@ -102,7 +103,7 @@ func TestReloadStopConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
 
-	list.Reload([]*ConfigWithMeta{
+	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
@@ -110,7 +111,7 @@ func TestReloadStopConfigs(t *testing.T) {
 
 	assert.Equal(t, len(list.copyRunnerList()), 3)
 
-	list.Reload([]*ConfigWithMeta{
+	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(3),
 	})
@@ -122,7 +123,7 @@ func TestReloadStartStopConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
 
-	list.Reload([]*ConfigWithMeta{
+	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
@@ -131,7 +132,7 @@ func TestReloadStartStopConfigs(t *testing.T) {
 	state := list.copyRunnerList()
 	assert.Equal(t, len(state), 3)
 
-	list.Reload([]*ConfigWithMeta{
+	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(3),
 		createConfig(4),
@@ -145,7 +146,7 @@ func TestStopAll(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
 
-	list.Reload([]*ConfigWithMeta{
+	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
@@ -170,7 +171,7 @@ func TestHas(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	list.Reload([]*ConfigWithMeta{
+	list.Reload([]*reload.ConfigWithMeta{
 		config,
 	})
 
@@ -178,10 +179,10 @@ func TestHas(t *testing.T) {
 	assert.False(t, list.Has(0))
 }
 
-func createConfig(id int64) *ConfigWithMeta {
+func createConfig(id int64) *reload.ConfigWithMeta {
 	c := common.NewConfig()
 	c.SetInt("id", -1, id)
-	return &ConfigWithMeta{
+	return &reload.ConfigWithMeta{
 		Config: c,
 	}
 }
