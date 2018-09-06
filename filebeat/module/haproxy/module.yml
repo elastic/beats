@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-haproxy-overview-dashboard
+  file: Filebeat-haproxy-overview.json

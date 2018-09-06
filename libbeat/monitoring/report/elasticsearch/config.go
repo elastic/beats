@@ -49,26 +49,3 @@ type backoff struct {
 	Init time.Duration
 	Max  time.Duration
 }
-
-var defaultConfig = config{
-	Hosts:            nil,
-	Protocol:         "http",
-	Params:           nil,
-	Headers:          nil,
-	Username:         "beats_system",
-	Password:         "",
-	ProxyURL:         "",
-	CompressionLevel: 0,
-	TLS:              nil,
-	MaxRetries:       3,
-	Timeout:          60 * time.Second,
-	MetricsPeriod:    10 * time.Second,
-	StatePeriod:      1 * time.Minute,
-	BulkMaxSize:      50,
-	BufferSize:       50,
-	Tags:             nil,
-	Backoff: backoff{
-		Init: 1 * time.Second,
-		Max:  60 * time.Second,
-	},
-}

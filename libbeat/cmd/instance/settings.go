@@ -15,30 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package readfile
+package instance
 
 import (
-	"github.com/elastic/beats/filebeat/reader"
+	"github.com/spf13/pflag"
+
+	"github.com/elastic/beats/libbeat/monitoring/report"
 )
 
-// Reader sets an upper limited on line length. Lines longer
-// then the max configured line length will be snapped short.
-type LimitReader struct {
-	reader   reader.Reader
-	maxBytes int
-}
-
-// New creates a new reader limiting the line length.
-func NewLimitReader(r reader.Reader, maxBytes int) *LimitReader {
-	return &LimitReader{reader: r, maxBytes: maxBytes}
-}
-
-// Next returns the next line.
-func (r *LimitReader) Next() (reader.Message, error) {
-	message, err := r.reader.Next()
-	if len(message.Content) > r.maxBytes {
-		message.Content = message.Content[:r.maxBytes]
-		message.AddFlagsWithKey("log.flags", "truncated")
-	}
-	return message, err
+// Settings contains basic settings for any beat to pass into GenRootCmd
+type Settings struct {
+	Name        string
+	IndexPrefix string
+	Version     string
+	Monitoring  report.Settings
+	RunFlags    *pflag.FlagSet
 }

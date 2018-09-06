@@ -100,23 +100,23 @@ services:
   kibana:
     build: ./module/kibana/_meta
 
-  kubernetes:
-    build: ./module/kubernetes/_meta
-    network_mode: host
-    pid: host
-    privileged: true
-    volumes:
-      - /:/rootfs:ro
-      - /sys:/sys
-      - /var/lib/docker:/var/lib/docker
-      - /var/run:/var/run
+  #kubernetes:
+  #  build: ./module/kubernetes/_meta
+  #  network_mode: host
+  #  pid: host
+  #  privileged: true
+  #  volumes:
+  #    - /:/rootfs:ro
+  #    - /sys:/sys
+  #    - /var/lib/docker:/var/lib/docker
+  #    - /var/run:/var/run
 
-  kubestate:
-    build:
-      context: ./module/kubernetes/_meta/
-      dockerfile: Dockerfile.kube-state
-    depends_on:
-      - kubernetes
+  #kubestate:
+  #  build:
+  #    context: ./module/kubernetes/_meta/
+  #    dockerfile: Dockerfile.kube-state
+  #  depends_on:
+  #    - kubernetes
 
   logstash:
     build: ./module/logstash/_meta
@@ -154,11 +154,17 @@ services:
       file: ./module/redis/docker-compose.yml
       service: redis
 
-  redis_3_2_12:
+  redis_4:
     extends:
       file: ./module/redis/docker-compose.yml
       service: redis
-    image: redis:3.2.12-alpine
+    image: redis:4.0.11-alpine
+
+  redis_5:
+    extends:
+      file: ./module/redis/docker-compose.yml
+      service: redis
+    image: redis:5.0-rc4-alpine
 
   traefik:
     build: ./module/traefik/_meta

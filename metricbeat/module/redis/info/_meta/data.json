@@ -16,7 +16,9 @@
                 "biggest_input_buf": 0,
                 "blocked": 0,
                 "connected": 1,
-                "longest_output_list": 0
+                "longest_output_list": 0,
+                "max_input_buffer": 0,
+                "max_output_buffer": 0
             },
             "cluster": {
                 "enabled": false

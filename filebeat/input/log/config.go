@@ -27,11 +27,11 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/reader/multiline"
-	"github.com/elastic/beats/filebeat/reader/readjson"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/reader/multiline"
+	"github.com/elastic/beats/libbeat/reader/readjson"
 )
 
 var (

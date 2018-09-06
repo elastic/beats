@@ -49,12 +49,12 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/filebeat/reader/multiline"
-	"github.com/elastic/beats/filebeat/reader/readfile"
-	"github.com/elastic/beats/filebeat/reader/readfile/encoding"
-	"github.com/elastic/beats/filebeat/reader/readjson"
 	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/multiline"
+	"github.com/elastic/beats/libbeat/reader/readfile"
+	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/libbeat/reader/readjson"
 )
 
 var (

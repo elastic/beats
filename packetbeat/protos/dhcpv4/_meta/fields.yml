@@ -64,7 +64,7 @@
             The message op code (bootrequest or bootreply).
 
         - name: hops
-          type: int
+          type: long
           description: The number of hops the DHCP message went through.
 
         - name: hardware_type

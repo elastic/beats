@@ -31,10 +31,10 @@ comma:=,
 ARCH?=$(shell uname -m)
 # Hidden directory to install dependencies for jenkins
 export PATH := ./bin:$(PATH)
-GOFILES = $(shell find . -type f -name '*.go')
-GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*")
-GOFILES_ALL = $(GOFILES) $(shell find $(ES_BEATS) -type f -name '*.go')
-GOPACKAGES_STRESSTESTS=$(shell find . -name '*.go' | xargs awk 'FNR>1 {nextfile} /\+build.*stresstest/ {print FILENAME; nextfile}' | xargs dirname | uniq)
+GOFILES = $(shell find . -type f -name '*.go' 2>/dev/null)
+GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*" 2>/dev/null)
+GOFILES_ALL = $(GOFILES) $(shell find $(ES_BEATS) -type f -name '*.go' 2>/dev/null)
+GOPACKAGES_STRESSTESTS=$(shell find . -name '*.go' 2>/dev/null | xargs awk 'FNR>1 {nextfile} /\+build.*stresstest/ {print FILENAME; nextfile}' | xargs dirname | uniq)
 SHELL=bash
 ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
@@ -57,7 +57,7 @@ REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO?=github.com/haya14busa/reviewdog/cmd/reviewdog
 PROCESSES?= 4
 TIMEOUT?= 90
-PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*")
+PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*" 2>/dev/null)
 NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v --with-xunit --xunit-file=${BUILD_DIR}/TEST-system.xml ## @testing the options to pass when calling nosetests
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
@@ -377,6 +377,7 @@ build-image: write-environment
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
 .PHONY: start-environment
 start-environment: stop-environment
+	${DOCKER_COMPOSE} pull --include-deps
 	${DOCKER_COMPOSE} up -d
 
 .PHONY: stop-environment

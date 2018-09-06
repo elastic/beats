@@ -15,7 +15,8 @@ CPU_FIELDS = ["used.sys", "used.sys_children", "used.user",
               "used.user_children"]
 
 CLIENTS_FIELDS = ["blocked", "biggest_input_buf",
-                  "longest_output_list", "connected"]
+                  "longest_output_list", "connected",
+                  "max_input_buffer", "max_output_buffer"]
 
 
 class Test(metricbeat.BaseTest):
@@ -122,6 +123,8 @@ class Test(metricbeat.BaseTest):
         return [os.getenv('REDIS_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('REDIS_PORT', '6379')]
 
+class TestRedis4(Test):
+    COMPOSE_SERVICES = ['redis_4']
 
-class Test_3_2_12(Test):
-    COMPOSE_SERVICES = ['redis_3_2_12']
+class TestRedis5(Test):
+    COMPOSE_SERVICES = ['redis_5']

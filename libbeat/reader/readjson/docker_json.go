@@ -23,8 +23,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/filebeat/reader"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/reader"
 
 	"github.com/pkg/errors"
 )
