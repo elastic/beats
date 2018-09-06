@@ -18,12 +18,14 @@ import (
 )
 
 type mockProvider struct {
-	runners []Runnable
+	runners []core.Runner
 	name    string
 }
 
-func (m *mockProvider) Functions() ([]Runnable, error) { return m.runners, nil }
-func (m *mockProvider) Name() string                   { return m.name }
+func (m *mockProvider) CreateFunctions(clientFactory clientFactory) ([]core.Runner, error) {
+	return m.runners, nil
+}
+func (m *mockProvider) Name() string { return m.name }
 
 func TestRegistry(t *testing.T) {
 	t.Run("provider", testProviderLookup)
