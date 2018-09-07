@@ -49,12 +49,13 @@ var (
 			}),
 		}),
 	}
+
+	indicesStruct struct {
+		Indices map[string]map[string]interface{} `json:"indices"`
+	}
 )
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
-	var indicesStruct struct {
-		Indices map[string]map[string]interface{} `json:"indices"`
-	}
 
 	err := json.Unmarshal(content, &indicesStruct)
 	if err != nil {
