@@ -33,7 +33,7 @@ func init() {
 }
 
 const (
-	statsPath = "/_stats"
+	statsPath = "/_stats/docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
 )
 
 // MetricSet type defines all fields of the MetricSet
