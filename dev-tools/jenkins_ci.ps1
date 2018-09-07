@@ -18,8 +18,6 @@ function Exec {
     }
 }
 
-exec { please fail the build } "Should have failed"
-
 # Setup Go.
 $env:GOPATH = $env:WORKSPACE
 $env:PATH = "$env:GOPATH\bin;C:\tools\mingw64\bin;$env:PATH"
@@ -54,7 +52,7 @@ echo "Building fields.yml"
 exec { mage fields } "mage fields FAILURE"
 
 echo "Building $env:beat"
-exec { mage build } "Build FAILURE" "mage build FAILURE"
+exec { mage build } "Build FAILURE"
 
 echo "Unit testing $env:beat"
 exec { mage goTestUnit } "mage goTestUnit FAILURE"
