@@ -18,11 +18,14 @@
 package compose
 
 import (
+	"archive/tar"
+	"bytes"
 	"context"
 	"fmt"
 	"net"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -86,7 +89,9 @@ func (c *wrapperContainer) privateHost() string {
 
 func (c *wrapperContainer) publicHost() string {
 	for _, port := range c.info.Ports {
-		return net.JoinHostPort("localhost", strconv.Itoa(int(port.PublicPort)))
+		if port.PublicPort != 0 {
+			return net.JoinHostPort("localhost", strconv.Itoa(int(port.PublicPort)))
+		}
 	}
 	return ""
 }
@@ -147,7 +152,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		// number of networks, retry while the context is not done
 		err := d.cmd(ctx, "up", args...).Run()
 		if err == nil {
-			return nil
+			return d.setupAdvertisedHost(ctx, service)
 		}
 		select {
 		case <-time.After(time.Second):
@@ -155,6 +160,64 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 			return err
 		}
 	}
+}
+
+func writeToContainer(ctx context.Context, id, filename, content string) error {
+	var buf bytes.Buffer
+	tw := tar.NewWriter(&buf)
+	now := time.Now()
+	err := tw.WriteHeader(&tar.Header{
+		Typeflag:   tar.TypeReg,
+		Name:       filepath.Base(filename),
+		Mode:       0100644,
+		Size:       int64(len(content)),
+		ModTime:    now,
+		AccessTime: now,
+		ChangeTime: now,
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to write tar header")
+	}
+	if _, err := tw.Write([]byte(content)); err != nil {
+		return errors.Wrap(err, "failed to write tar file")
+	}
+	if err := tw.Close(); err != nil {
+		return errors.Wrap(err, "failed to close tar")
+	}
+
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		return errors.Wrap(err, "failed to start docker client")
+	}
+	defer cli.Close()
+
+	opts := types.CopyToContainerOptions{}
+	err = cli.CopyToContainer(ctx, id, filepath.Dir(filename), bytes.NewReader(buf.Bytes()), opts)
+	if err != nil {
+		return errors.Wrapf(err, "failed to copy environment to container %s", id)
+	}
+	return nil
+}
+
+func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string) error {
+	containers, err := d.containers(ctx, Filter{State: AnyState}, service)
+	if err != nil {
+		return errors.Wrap(err, "setupAdvertisedHost")
+	}
+	if len(containers) == 0 {
+		return errors.Errorf("no containers for service %s", service)
+	}
+
+	for _, c := range containers {
+		w := &wrapperContainer{info: c}
+		content := fmt.Sprintf("SERVICE_HOST=%s", w.Host())
+
+		err := writeToContainer(ctx, c.ID, "/run/compose_env", content)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (d *wrapperDriver) Down(ctx context.Context) error {
@@ -206,6 +269,7 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to start docker client")
 	}
+	defer cli.Close()
 
 	var serviceFilters []filters.Args
 	if len(filter) == 0 {

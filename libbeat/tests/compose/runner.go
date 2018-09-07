@@ -130,10 +130,12 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 			}
 
 			err := project.Start(r.Service)
+			// Down() is "idempotent", Start() has several points where it can fail,
+			// so run Down() even if Start() fails.
+			defer project.Down()
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer project.Down()
 
 			err = project.Wait(timeout, r.Service)
 			if err != nil {
