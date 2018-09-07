@@ -19,6 +19,8 @@ package index
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -28,23 +30,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
-
-// TODO:
-// "index_stats.created",
-// "index_stats.status",
-// "index_stats.version.created",
-// "index_stats.version.upgraded",
-// "index_stats.shards.total",
-// "index_stats.shards.primaries",
-// "index_stats.shards.replicas",
-// "index_stats.shards.active_total",
-// "index_stats.shards.active_primaries",
-// "index_stats.shards.active_replicas",
-// "index_stats.shards.unassigned_total",
-// "index_stats.shards.unassigned_primaries",
-// "index_stats.shards.unassigned_replicas",
-// "index_stats.shards.initializing",
-// "index_stats.shards.relocating",
 
 var (
 	// Based on https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L127-L203
@@ -111,6 +96,12 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		return err
 	}
 
+	clusterStateMetrics := []string{"metadata", "routing_table"}
+	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
+	if err != nil {
+		return err
+	}
+
 	for name, index := range indicesStruct.Indices {
 		event := mb.Event{}
 		indexStats, err := xpackSchema.Apply(index)
@@ -118,6 +109,11 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 			continue
 		}
 		indexStats["index"] = name
+
+		err = addClusterStateFields(name, indexStats, clusterState)
+		if err != nil {
+			continue
+		}
 
 		event.RootFields = common.MapStr{
 			"cluster_uuid": info.ClusterID,
@@ -132,4 +128,205 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 	}
 
 	return nil
+}
+
+func addClusterStateFields(indexName string, indexStats, clusterState common.MapStr) error {
+	indexMetadata, err := getClusterStateMetricForIndex(clusterState, indexName, "metadata")
+	if err != nil {
+		return err
+	}
+
+	indexRoutingTable, err := getClusterStateMetricForIndex(clusterState, indexName, "routing_table")
+	if err != nil {
+		return err
+	}
+
+	// TODO:
+
+	// "index_stats.created",
+	v, err := indexMetadata.GetValue("settings.index.creation_date")
+	if err != nil {
+		return err
+	}
+	c, ok := v.(string)
+	if !ok {
+		return elastic.MakeErrorForMissingField("settings.index.creation_date", elastic.Elasticsearch)
+	}
+
+	created, err := strconv.ParseInt(c, 10, 64)
+	if err != nil {
+		return err
+	}
+	indexStats.Put("created", created)
+
+	// "index_stats.version.created", <--- don't think this is being used in the UI, so can we skip it?
+	// "index_stats.version.upgraded", <--- don't think this is being used in the UI, so can we skip it?
+
+	// "index_stats.status",
+	s, err := indexRoutingTable.GetValue("shards")
+	if err != nil {
+		return err
+	}
+	shards, ok := s.(map[string]interface{})
+	if !ok {
+		return elastic.MakeErrorForMissingField("shards", elastic.Elasticsearch)
+	}
+
+	status, err := getIndexStatus(shards)
+	if err != nil {
+		return err
+	}
+	indexStats.Put("status", status)
+
+	// "index_stats.shards.total",
+	// "index_stats.shards.primaries",
+	// "index_stats.shards.replicas",
+	// "index_stats.shards.active_total",
+	// "index_stats.shards.active_primaries",
+	// "index_stats.shards.active_replicas",
+	// "index_stats.shards.unassigned_total",
+	// "index_stats.shards.unassigned_primaries",
+	// "index_stats.shards.unassigned_replicas",
+	// "index_stats.shards.initializing",
+	// "index_stats.shards.relocating",
+	shardStats, err := getIndexShardStats(shards)
+	if err != nil {
+		return err
+	}
+	indexStats.Put("shards", shardStats)
+	return nil
+}
+
+func getClusterStateMetricForIndex(clusterState common.MapStr, index, metricKey string) (common.MapStr, error) {
+	fieldKey := metricKey + ".indices." + index
+	value, err := clusterState.GetValue(fieldKey)
+	if err != nil {
+		return nil, err
+	}
+
+	metric, ok := value.(map[string]interface{})
+	if !ok {
+		return nil, elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
+	}
+	return common.MapStr(metric), nil
+}
+
+func getIndexStatus(shards map[string]interface{}) (string, error) {
+	if len(shards) == 0 {
+		// No shards, index is red
+		return "red", nil
+	}
+
+	areAllPrimariesStarted := true
+	areAllReplicasStarted := true
+
+	for _, indexShard := range shards {
+		is, ok := indexShard.([]interface{})
+		if !ok {
+			return "", fmt.Errorf("shards is not an array")
+		}
+
+		for _, shard := range is {
+			s, ok := shard.(map[string]interface{})
+			if !ok {
+				return "", fmt.Errorf("shards is not an array of shard objects")
+			}
+
+			shard := common.MapStr(s)
+
+			isPrimary := shard["primary"].(bool)
+			state := shard["state"].(string)
+
+			if isPrimary {
+				areAllPrimariesStarted = areAllPrimariesStarted && (state == "STARTED")
+			} else {
+				areAllReplicasStarted = areAllReplicasStarted && (state == "STARTED")
+			}
+		}
+	}
+
+	if areAllPrimariesStarted && areAllReplicasStarted {
+		return "green", nil
+	}
+
+	if areAllPrimariesStarted && !areAllReplicasStarted {
+		return "yellow", nil
+	}
+
+	return "red", nil
+}
+
+func getIndexShardStats(shards common.MapStr) (common.MapStr, error) {
+	primaries := 0
+	replicas := 0
+
+	activePrimaries := 0
+	activeReplicas := 0
+
+	unassignedPrimaries := 0
+	unassignedReplicas := 0
+
+	initializing := 0
+	relocating := 0
+
+	for _, indexShard := range shards {
+		is, ok := indexShard.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("shards is not an array")
+		}
+
+		for _, shard := range is {
+			s, ok := shard.(map[string]interface{})
+			if !ok {
+				return nil, fmt.Errorf("shards is not an array of shard objects")
+			}
+
+			shard := common.MapStr(s)
+
+			isPrimary := shard["primary"].(bool)
+			state := shard["state"].(string)
+
+			if isPrimary {
+				primaries++
+				switch state {
+				case "STARTED":
+					activePrimaries++
+				case "UNASSIGNED":
+					unassignedPrimaries++
+				}
+			} else {
+				replicas++
+				switch state {
+				case "STARTED":
+					activeReplicas++
+				case "UNASSIGNED":
+					unassignedReplicas++
+				}
+			}
+
+			switch state {
+			case "INITIALIZING":
+				initializing++
+			case "RELOCATING":
+				relocating++
+			}
+		}
+	}
+
+	return common.MapStr{
+		"total":     primaries + replicas,
+		"primaries": primaries,
+		"replicas":  replicas,
+
+		"active_total":     activePrimaries + activeReplicas,
+		"active_primaries": activePrimaries,
+		"active_replicas":  activeReplicas,
+
+		"unassigned_total":     unassignedPrimaries + unassignedReplicas,
+		"unassigned_primaries": unassignedPrimaries,
+		"unassigned_replicas":  unassignedReplicas,
+
+		"initializing": initializing,
+		"relocating":   relocating,
+	}, nil
 }

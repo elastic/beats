@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 
@@ -201,8 +202,13 @@ func GetLicense(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 }
 
 // GetClusterState returns cluster state information
-func GetClusterState(http *helper.HTTP, resetURI string) (common.MapStr, error) {
-	content, err := fetchPath(http, resetURI, "_cluster/state/version,master_node,nodes,routing_table")
+func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (common.MapStr, error) {
+	clusterStateURI := "_cluster/state"
+	if metrics != nil && len(metrics) > 0 {
+		clusterStateURI += "/" + strings.Join(metrics, ",")
+	}
+
+	content, err := fetchPath(http, resetURI, clusterStateURI)
 	if err != nil {
 		return nil, err
 	}
