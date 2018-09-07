@@ -47,6 +47,7 @@ import (
 // "index_stats.shards.relocating",
 
 var (
+	// Based on https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L127-L203
 	xpackSchema = s.Schema{
 		"uuid":      c.Str("uuid"),
 		"primaries": c.Dict("primaries", indexStatsSchema),
