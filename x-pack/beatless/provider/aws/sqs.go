@@ -18,30 +18,30 @@ import (
 	"github.com/elastic/beats/x-pack/beatless/provider/aws/transformer"
 )
 
-// Kinesis receives events from a kinesis stream and forward them to elasticsearch.
-type Kinesis struct {
+// SQS receives events from the web service and forward them to elasticsearch.
+type SQS struct {
 	log *logp.Logger
 }
 
-// NewKinesis creates a new function to receives events from a kinesis stream.
-func NewKinesis(provider provider.Provider, config *common.Config) (provider.Function, error) {
-	return &Kinesis{log: logp.NewLogger("kinesis")}, nil
+// NewSQS creates a new function to receives events from a SQS queue.
+func NewSQS(provider provider.Provider, config *common.Config) (provider.Function, error) {
+	return &SQS{log: logp.NewLogger("sqs")}, nil
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (k *Kinesis) Run(_ context.Context, client core.Client) error {
-	lambda.Start(func(request events.KinesisEvent) error {
-		k.log.Debug("received %d events", len(request.Records))
+func (s *SQS) Run(_ context.Context, client core.Client) error {
+	lambda.Start(func(request events.SQSEvent) error {
+		s.log.Debug("received %d events", len(request.Records))
 
 		// defensive checks
 		if len(request.Records) == 0 {
-			k.log.Error("no log events received from Kinesis")
+			s.log.Error("no log events received from sqs")
 			return errors.New("no event received")
 		}
 
-		events := transformer.KinesisEvent(request)
+		events := transformer.SQS(request)
 		if err := client.PublishAll(events); err != nil {
-			k.log.Errorf("could not publish events to the pipeline, error: %s")
+			s.log.Errorf("could not publish events to the pipeline, error: %s")
 			return err
 		}
 		return nil
@@ -51,6 +51,6 @@ func (k *Kinesis) Run(_ context.Context, client core.Client) error {
 }
 
 // Name return the name of the lambda function.
-func (k *Kinesis) Name() string {
-	return "kinesis"
+func (s *SQS) Name() string {
+	return "sqs"
 }

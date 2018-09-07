@@ -57,21 +57,42 @@ func APIGatewayProxyRequest(request events.APIGatewayProxyRequest) beat.Event {
 	}
 }
 
-// KinesisEvent takes a kinesis event and create multiples beat event.
+// KinesisEvent takes a kinesis event and create multiples beat events.
 func KinesisEvent(request events.KinesisEvent) []beat.Event {
 	events := make([]beat.Event, len(request.Records))
 	for idx, record := range request.Records {
 		events[idx] = beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
-				"aws_region":       record.AwsRegion,
 				"event_id":         record.EventID,
 				"event_name":       record.EventName,
 				"event_source":     record.EventSource,
 				"event_source_arn": record.EventSourceArn,
 				"event_version":    record.EventVersion,
-				// TODO: more meta data at KinesisRecord
+				"aws_region":       record.AwsRegion,
+				// TODO: more meta data at KinesisRecord, need to check doc
 			},
+		}
+	}
+	return events
+}
+
+// SQS takes a SQS event and create multiples beat events.
+func SQS(request events.SQSEvent) []beat.Event {
+	events := make([]beat.Event, len(request.Records))
+	for idx, record := range request.Records {
+		events[idx] = beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"message_id":       record.MessageId,
+				"receipt_handle":   record.ReceiptHandle,
+				"message":          record.Body,
+				"attributes":       record.Attributes,
+				"event_source":     record.EventSource,
+				"event_source_arn": record.EventSourceARN,
+				"aws_region":       record.AWSRegion,
+			},
+			// TODO: SQS message attributes missing, need to check doc
 		}
 	}
 	return events

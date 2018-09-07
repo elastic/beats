@@ -32,4 +32,10 @@ var Bundle = provider.MustCreate(
 		"Kinesis trigger",
 		"receive events from a Kinesis stream",
 		feature.Experimental,
+	)).MustAddFunction("sqs",
+	NewSQS,
+	feature.NewDetails(
+		"SQS trigger",
+		"receive events from a SQS queue",
+		feature.Experimental,
 	)).Bundle()
