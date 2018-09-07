@@ -12,6 +12,8 @@ function Exec
     }
 }
 
+exec { please fail the build }
+
 # Setup Go.
 $env:GOPATH = $env:WORKSPACE
 $env:PATH = "$env:GOPATH\bin;C:\tools\mingw64\bin;$env:PATH"
