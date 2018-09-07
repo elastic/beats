@@ -14,10 +14,16 @@ var Bundle = provider.MustCreate(
 	"aws",
 	provider.NewDefaultProvider("aws"),
 	feature.NewDetails("AWS Lambda", "listen to events on AWS lambda", feature.Experimental),
-).MustAddFunction("cloudwatchlogs",
+).MustAddFunction("cloudwatch_logs",
 	NewCloudwatchLogs,
 	feature.NewDetails(
 		"Cloudwatch Logs",
 		"receive events from cloudwatch logs.",
+		feature.Experimental,
+	)).MustAddFunction("api_gateway_proxy",
+	NewAPIGatewayProxy,
+	feature.NewDetails(
+		"API Gateway proxy",
+		"receive events from the api gateway proxy",
 		feature.Experimental,
 	)).Bundle()

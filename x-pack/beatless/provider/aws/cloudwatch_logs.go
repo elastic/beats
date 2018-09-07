@@ -26,11 +26,11 @@ type CloudwatchLogs struct {
 
 // NewCloudwatchLogs create a new function to listen to cloudwatch logs events.
 func NewCloudwatchLogs(provider provider.Provider, config *common.Config) (provider.Function, error) {
-	return &CloudwatchLogs{log: logp.NewLogger("cloudwatchlogs")}, nil
+	return &CloudwatchLogs{log: logp.NewLogger("cloudwatch_logs")}, nil
 }
 
 // Run start the AWS lambda handles and will transform any events received to the pipeline.
-func (c *CloudwatchLogs) Run(ctx context.Context, client core.Client) error {
+func (c *CloudwatchLogs) Run(_ context.Context, client core.Client) error {
 	lambda.Start(func(request events.CloudwatchLogsData) error {
 		c.log.Debug(
 			"received %d events (logStream: %s, owner: %s, logGroup: %s, messageType: %s)",
@@ -49,6 +49,7 @@ func (c *CloudwatchLogs) Run(ctx context.Context, client core.Client) error {
 
 		events := transformer.CloudwatchLogs(request)
 		if err := client.PublishAll(events); err != nil {
+			c.log.Errorf("could not publish events to the pipeline, error: %s")
 			return err
 		}
 		return nil
@@ -58,5 +59,5 @@ func (c *CloudwatchLogs) Run(ctx context.Context, client core.Client) error {
 
 // Name returns the name of the function.
 func (c CloudwatchLogs) Name() string {
-	return "cloudwatchlogs"
+	return "cloudwatch_logs"
 }
