@@ -56,3 +56,23 @@ func APIGatewayProxyRequest(request events.APIGatewayProxyRequest) beat.Event {
 		},
 	}
 }
+
+// KinesisEvent takes a kinesis event and create multiples beat event.
+func KinesisEvent(request events.KinesisEvent) []beat.Event {
+	events := make([]beat.Event, len(request.Records))
+	for idx, record := range request.Records {
+		events[idx] = beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"aws_region":       record.AwsRegion,
+				"event_id":         record.EventID,
+				"event_name":       record.EventName,
+				"event_source":     record.EventSource,
+				"event_source_arn": record.EventSourceArn,
+				"event_version":    record.EventVersion,
+				// TODO: more meta data at KinesisRecord
+			},
+		}
+	}
+	return events
+}
