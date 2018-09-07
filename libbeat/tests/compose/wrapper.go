@@ -117,7 +117,7 @@ func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if len(d.Environment) > 0 {
-		cmd.Env = d.Environment
+		cmd.Env = append(d.Environment, os.Environ()...)
 	}
 	return cmd
 }
@@ -154,6 +154,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		if err == nil {
 			return d.setupAdvertisedHost(ctx, service)
 		}
+
 		select {
 		case <-time.After(time.Second):
 		case <-ctx.Done():
