@@ -48,7 +48,7 @@ func (a *APIGatewayProxy) Run(_ context.Context, client core.Client) error {
 				request.RequestContext.RequestID,
 			), err
 		}
-
+		client.Wait()
 		return a.buildResponse(
 			http.StatusOK,
 			"event received successfully.",

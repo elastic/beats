@@ -44,6 +44,7 @@ func (k *Kinesis) Run(_ context.Context, client core.Client) error {
 			k.log.Errorf("could not publish events to the pipeline, error: %s")
 			return err
 		}
+		client.Wait()
 		return nil
 	})
 

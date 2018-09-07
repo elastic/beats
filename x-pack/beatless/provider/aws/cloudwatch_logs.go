@@ -58,6 +58,7 @@ func (c *CloudwatchLogs) Run(_ context.Context, client core.Client) error {
 			c.log.Errorf("could not publish events to the pipeline, error: %s")
 			return err
 		}
+		client.Wait()
 		return nil
 	})
 	return nil
