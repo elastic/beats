@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 - Fixed a seccomp related error where the `fcntl64` syscall was not permitted
   on 32-bit Linux and the sniffer failed to start. {issue}7839[7839]
+- Added missing `cmdline` and `client_cmdline` fields to index template. {pull}8258[8258]
 
 *Winlogbeat*
 
