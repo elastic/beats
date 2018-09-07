@@ -31,13 +31,13 @@ func NewSQS(provider provider.Provider, config *common.Config) (provider.Functio
 // Run starts the lambda function and wait for web triggers.
 func (s *SQS) Run(_ context.Context, client core.Client) error {
 	lambda.Start(func(request events.SQSEvent) error {
-		s.log.Debug("received %d events", len(request.Records))
-
 		// defensive checks
 		if len(request.Records) == 0 {
 			s.log.Error("no log events received from sqs")
 			return errors.New("no event received")
 		}
+
+		s.log.Debugf("received %d events", len(request.Records))
 
 		events := transformer.SQS(request)
 		if err := client.PublishAll(events); err != nil {

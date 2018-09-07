@@ -38,7 +38,7 @@ func NewAPIGatewayProxy(provider provider.Provider, config *common.Config) (prov
 // Run starts the lambda function and wait for web triggers.
 func (a *APIGatewayProxy) Run(_ context.Context, client core.Client) error {
 	lambda.Start(func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-		a.log.Debug("received event (requestID: %s)", request.RequestContext.RequestID)
+		a.log.Debugf("received event (requestID: %s)", request.RequestContext.RequestID)
 		event := transformer.APIGatewayProxyRequest(request)
 		if err := client.Publish(event); err != nil {
 			a.log.Errorf("could not publish event to the pipeline, error: %s")

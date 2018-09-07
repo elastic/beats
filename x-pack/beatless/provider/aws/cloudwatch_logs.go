@@ -31,23 +31,29 @@ func NewCloudwatchLogs(provider provider.Provider, config *common.Config) (provi
 
 // Run start the AWS lambda handles and will transform any events received to the pipeline.
 func (c *CloudwatchLogs) Run(_ context.Context, client core.Client) error {
-	lambda.Start(func(request events.CloudwatchLogsData) error {
-		c.log.Debug(
-			"received %d events (logStream: %s, owner: %s, logGroup: %s, messageType: %s)",
-			len(request.LogEvents),
-			request.LogStream,
-			request.Owner,
-			request.LogGroup,
-			request.MessageType,
-		)
+	lambda.Start(func(request events.CloudwatchLogsEvent) error {
+		parsedEvent, err := request.AWSLogs.Parse()
+		if err != nil {
+			c.log.Errorf("could not parse events from cloudwatch logs, error: %s", err)
+			return err
+		}
 
 		// defensive checks
-		if len(request.LogEvents) == 0 {
+		if len(parsedEvent.LogEvents) == 0 {
 			c.log.Error("no log events received from cloudwatch log")
 			return errors.New("no event received")
 		}
 
-		events := transformer.CloudwatchLogs(request)
+		c.log.Debugf(
+			"received %d events (logStream: %s, owner: %s, logGroup: %s, messageType: %s)",
+			len(parsedEvent.LogEvents),
+			parsedEvent.LogStream,
+			parsedEvent.Owner,
+			parsedEvent.LogGroup,
+			parsedEvent.MessageType,
+		)
+
+		events := transformer.CloudwatchLogs(parsedEvent)
 		if err := client.PublishAll(events); err != nil {
 			c.log.Errorf("could not publish events to the pipeline, error: %s")
 			return err
