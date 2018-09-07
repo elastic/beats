@@ -77,7 +77,6 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 
 	err := json.Unmarshal(content, &all)
 	if err != nil {
-		r.Error(err)
 		return []error{err}
 	}
 
