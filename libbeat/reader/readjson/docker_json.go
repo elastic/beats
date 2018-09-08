@@ -37,6 +37,9 @@ type DockerJSONReader struct {
 
 	// join partial lines
 	partial bool
+
+	// parse CRI flags
+	criflags bool
 }
 
 type logLine struct {
@@ -48,44 +51,68 @@ type logLine struct {
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool) *DockerJSONReader {
+func New(r reader.Reader, stream string, partial bool, CRIFlags bool) *DockerJSONReader {
 	return &DockerJSONReader{
-		stream:  stream,
-		partial: partial,
-		reader:  r,
+		stream:   stream,
+		partial:  partial,
+		reader:   r,
+		criflags: CRIFlags,
 	}
 }
 
 // parseCRILog parses logs in CRI log format.
 // CRI log format example :
 // 2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache
-func parseCRILog(message *reader.Message, msg *logLine) error {
-	log := strings.SplitN(string(message.Content), " ", 4)
-	if len(log) < 3 {
-		return errors.New("invalid CRI log")
+func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) error {
+	split := 3
+	// read line tags if split is enabled:
+	if p.criflags {
+		split = 4
 	}
-	ts, err := time.Parse(time.RFC3339, log[0])
+
+	// current field
+	i := 0
+
+	// timestamp
+	log := strings.SplitN(string(message.Content), " ", split)
+	if len(log) < split {
+		return errors.New("invalid CRI log format")
+	}
+	ts, err := time.Parse(time.RFC3339, log[i])
 	if err != nil {
 		return errors.Wrap(err, "parsing CRI timestamp")
 	}
+	message.Ts = ts
+	i++
 
-	// Extract tags, currently only P(artial) or F(ull) are available
-	tags := strings.Split(log[2], ":")
+	// stream
+	msg.Stream = log[i]
+	i++
+
+	// tags
 	partial := false
-	for _, tag := range tags {
-		if tag == "P" {
-			partial = true
+	if p.criflags {
+		// currently only P(artial) or F(ull) are available
+		tags := strings.Split(log[i], ":")
+		for _, tag := range tags {
+			if tag == "P" {
+				partial = true
+			}
 		}
+		i++
 	}
 
 	msg.Partial = partial
-	msg.Stream = log[1]
-	msg.Log = log[3]
 	message.AddFields(common.MapStr{
 		"stream": msg.Stream,
 	})
-	message.Content = []byte(msg.Log)
-	message.Ts = ts
+	// Remove ending \n for partial messages
+	message.Content = []byte(log[i])
+	if partial {
+		message.Content = bytes.TrimRightFunc(message.Content, func(r rune) bool {
+			return r == '\n' || r == '\r'
+		})
+	}
 
 	return nil
 }
@@ -93,7 +120,7 @@ func parseCRILog(message *reader.Message, msg *logLine) error {
 // parseReaderLog parses logs in Docker JSON log format.
 // Docker JSON log format example:
 // {"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}
-func parseDockerJSONLog(message *reader.Message, msg *logLine) error {
+func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *logLine) error {
 	dec := json.NewDecoder(bytes.NewReader(message.Content))
 
 	if err := dec.Decode(&msg); err != nil {
@@ -116,12 +143,12 @@ func parseDockerJSONLog(message *reader.Message, msg *logLine) error {
 	return nil
 }
 
-func parseLine(message *reader.Message, msg *logLine) error {
+func (p *DockerJSONReader) parseLine(message *reader.Message, msg *logLine) error {
 	if strings.HasPrefix(string(message.Content), "{") {
-		return parseDockerJSONLog(message, msg)
+		return p.parseDockerJSONLog(message, msg)
 	}
 
-	return parseCRILog(message, msg)
+	return p.parseCRILog(message, msg)
 }
 
 // Next returns the next line.
@@ -133,7 +160,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		}
 
 		var logLine logLine
-		err = parseLine(&message, &logLine)
+		err = p.parseLine(&message, &logLine)
 		if err != nil {
 			return message, err
 		}
@@ -144,7 +171,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			if err != nil {
 				return message, err
 			}
-			err = parseLine(&next, &logLine)
+			err = p.parseLine(&next, &logLine)
 			if err != nil {
 				return message, err
 			}

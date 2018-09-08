@@ -33,6 +33,7 @@ func TestDockerJSON(t *testing.T) {
 		input           [][]byte
 		stream          string
 		partial         bool
+		criflags        bool
 		expectedError   bool
 		expectedMessage reader.Message
 	}{
@@ -72,6 +73,18 @@ func TestDockerJSON(t *testing.T) {
 			expectedError: true,
 		},
 		{
+			name:   "CRI log no tags",
+			input:  [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
+			stream: "all",
+			expectedMessage: reader.Message{
+				Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
+				Bytes:   115,
+			},
+			criflags: false,
+		},
+		{
 			name:   "CRI log",
 			input:  [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout F 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
 			stream: "all",
@@ -81,6 +94,7 @@ func TestDockerJSON(t *testing.T) {
 				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
 				Bytes:   117,
 			},
+			criflags: true,
 		},
 		{
 			name: "Filtering stream",
@@ -111,6 +125,7 @@ func TestDockerJSON(t *testing.T) {
 				Ts:      time.Date(2017, 11, 12, 23, 32, 21, 212771448, time.UTC),
 				Bytes:   95,
 			},
+			criflags: true,
 		},
 		{
 			name: "Split lines",
@@ -133,14 +148,31 @@ func TestDockerJSON(t *testing.T) {
 				[]byte(`2017-10-12T13:32:21.232861448Z stdout P 2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`),
 				[]byte(`2017-11-12T23:32:21.212771448Z stdout F  error`),
 			},
-			stream:  "stdout",
-			partial: true,
+			stream: "stdout",
 			expectedMessage: reader.Message{
 				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
 				Fields:  common.MapStr{"stream": "stdout"},
 				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
 				Bytes:   163,
 			},
+			partial:  true,
+			criflags: true,
+		},
+		{
+			name: "Split lines and remove \\n",
+			input: [][]byte{
+				[]byte("2017-10-12T13:32:21.232861448Z stdout P 2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache\n"),
+				[]byte("2017-11-12T23:32:21.212771448Z stdout F  error"),
+			},
+			stream: "stdout",
+			expectedMessage: reader.Message{
+				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
+				Bytes:   164,
+			},
+			partial:  true,
+			criflags: true,
 		},
 		{
 			name: "Split lines with partial disabled",
@@ -162,7 +194,7 @@ func TestDockerJSON(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			r := &mockReader{messages: test.input}
-			json := New(r, test.stream, test.partial)
+			json := New(r, test.stream, test.partial, test.criflags)
 			message, err := json.Next()
 
 			if test.expectedError {
