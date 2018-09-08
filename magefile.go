@@ -55,7 +55,7 @@ func PackageBeatDashboards() error {
 				Content: "{{ commit }}\n",
 			},
 		},
-		OutputFile: "build/distributions/dashboards/{{.Name}}-{{.Version}}{{.VersionQualifier}}{{if .Snapshot}}-SNAPSHOT{{end}}",
+		OutputFile: "build/distributions/dashboards/{{.Name}}-{{.Version}}{{if .VersionQualifier}}-{{.VersionQualifier}}{{end}}{{if .Snapshot}}-SNAPSHOT{{end}}",
 	}
 
 	for _, beat := range Beats {

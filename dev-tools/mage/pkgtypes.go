@@ -48,7 +48,7 @@ const (
 	packageStagingDir = "build/package"
 
 	// defaultBinaryName specifies the output file for zip, tar.gz, and dmg.
-	defaultBinaryName = "{{.Name}}-{{.Version}}{{.VersionQualifier}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
+	defaultBinaryName = "{{.Name}}-{{.Version}}{{if .VersionQualifier}}-{{.VersionQualifier}}{{end}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
 )
 
 // PackageType defines the file format of the package (e.g. zip, rpm, etc).
@@ -607,7 +607,7 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 	}
 	defer os.Remove(inputTar)
 
-	outputFile, err := spec.Expand("{{.Name}}-{{.Version}}{{.VersionQualifier}}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.Arch}}")
+	outputFile, err := spec.Expand("{{.Name}}-{{.Version}}{{if .VersionQualifier}}-{{.VersionQualifier}}{{end}}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.Arch}}")
 	if err != nil {
 		return err
 	}
