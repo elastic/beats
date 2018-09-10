@@ -80,10 +80,10 @@ func TestWriteMaxUpdates(t *testing.T) {
 	defer cp.Shutdown()
 
 	// Send update - it's not written to disk but it's in memory.
-	cp.Persist("App", 1, time.Now(), "")
+	cp.Persist("", "", 123456, 123456)
 	found := false
 	eventually(t, func() (bool, error) {
-		_, found = cp.States()["App"]
+		_, found = cp.States()[""]
 		return found, nil
 	}, time.Second*15)
 	assert.True(t, found)
@@ -95,15 +95,15 @@ func TestWriteMaxUpdates(t *testing.T) {
 	assert.Len(t, ps.States, 0)
 
 	// Send update - it is written to disk.
-	cp.Persist("App", 2, time.Now(), "")
+	cp.Persist("", "", 123456, 123456)
 	eventually(t, func() (bool, error) {
 		ps, err = cp.read()
 		return ps != nil && len(ps.States) > 0, err
 	}, time.Second*15)
 
 	if assert.Len(t, ps.States, 1, "state not written, could be a flush timing issue, retry") {
-		assert.Equal(t, "App", ps.States[0].Name)
-		assert.Equal(t, uint64(2), ps.States[0].RecordNumber)
+		assert.Equal(t, "", ps.States[0].Path)
+		assert.Equal(t, "", ps.States[0].Cursor)
 	}
 }
 
@@ -134,7 +134,7 @@ func TestWriteTimedFlush(t *testing.T) {
 
 	// Send update then wait longer than the flush interval and it should be
 	// on disk.
-	cp.Persist("App", 1, time.Now(), "")
+	cp.Persist("", "cursor", 123456, 123456)
 	eventually(t, func() (bool, error) {
 		ps, err := cp.read()
 		return ps != nil && len(ps.States) > 0, err
@@ -145,8 +145,8 @@ func TestWriteTimedFlush(t *testing.T) {
 		t.Fatal("read failed", err)
 	}
 	if assert.Len(t, ps.States, 1) {
-		assert.Equal(t, "App", ps.States[0].Name)
-		assert.Equal(t, uint64(1), ps.States[0].RecordNumber)
+		assert.Equal(t, "", ps.States[0].Path)
+		assert.Equal(t, "cursor", ps.States[0].Cursor)
 	}
 }
 
