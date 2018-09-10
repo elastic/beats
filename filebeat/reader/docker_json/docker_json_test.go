@@ -29,14 +29,16 @@ import (
 
 func TestDockerJSON(t *testing.T) {
 	tests := []struct {
+		name            string
 		input           [][]byte
 		stream          string
 		partial         bool
+		criflags        bool
 		expectedError   bool
 		expectedMessage reader.Message
 	}{
-		// Common log message
 		{
+			name:   "Common log message",
 			input:  [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`)},
 			stream: "all",
 			expectedMessage: reader.Message{
@@ -46,32 +48,32 @@ func TestDockerJSON(t *testing.T) {
 				Bytes:   122,
 			},
 		},
-		// Wrong JSON
 		{
+			name:          "Wrong JSON",
 			input:         [][]byte{[]byte(`this is not JSON`)},
 			stream:        "all",
 			expectedError: true,
 		},
-		// Wrong CRI
 		{
+			name:          "Wrong CRI",
 			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout`)},
 			stream:        "all",
 			expectedError: true,
 		},
-		// Wrong CRI
 		{
+			name:          "Wrong CRI",
 			input:         [][]byte{[]byte(`{this is not JSON nor CRI`)},
 			stream:        "all",
 			expectedError: true,
 		},
-		// Missing time
 		{
+			name:          "Missing time",
 			input:         [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}`)},
 			stream:        "all",
 			expectedError: true,
 		},
-		// CRI log
 		{
+			name:   "CRI log no tags",
 			input:  [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
 			stream: "all",
 			expectedMessage: reader.Message{
@@ -80,9 +82,22 @@ func TestDockerJSON(t *testing.T) {
 				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
 				Bytes:   115,
 			},
+			criflags: false,
 		},
-		// Filtering stream
 		{
+			name:   "CRI log",
+			input:  [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout F 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
+			stream: "all",
+			expectedMessage: reader.Message{
+				Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
+				Bytes:   117,
+			},
+			criflags: true,
+		},
+		{
+			name: "Filtering stream",
 			input: [][]byte{
 				[]byte(`{"log":"filtered\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
 				[]byte(`{"log":"unfiltered\n","stream":"stderr","time":"2017-11-09T13:27:36.277747246Z"}`),
@@ -96,23 +111,24 @@ func TestDockerJSON(t *testing.T) {
 				Bytes:   80,
 			},
 		},
-		// Filtering stream
 		{
+			name: "Filtering stream",
 			input: [][]byte{
-				[]byte(`2017-10-12T13:32:21.232861448Z stdout 2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`),
-				[]byte(`2017-11-12T23:32:21.212771448Z stderr 2017-11-12 23:32:21.212 [ERROR][77] table.go 111: error`),
-				[]byte(`2017-12-12T10:32:21.212864448Z stdout 2017-12-12 10:32:21.212 [WARN][88] table.go 222: Warn`),
+				[]byte(`2017-10-12T13:32:21.232861448Z stdout F 2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`),
+				[]byte(`2017-11-12T23:32:21.212771448Z stderr F 2017-11-12 23:32:21.212 [ERROR][77] table.go 111: error`),
+				[]byte(`2017-12-12T10:32:21.212864448Z stdout F 2017-12-12 10:32:21.212 [WARN][88] table.go 222: Warn`),
 			},
 			stream: "stderr",
 			expectedMessage: reader.Message{
 				Content: []byte("2017-11-12 23:32:21.212 [ERROR][77] table.go 111: error"),
 				Fields:  common.MapStr{"stream": "stderr"},
 				Ts:      time.Date(2017, 11, 12, 23, 32, 21, 212771448, time.UTC),
-				Bytes:   93,
+				Bytes:   95,
 			},
+			criflags: true,
 		},
-		// Split lines
 		{
+			name: "Split lines",
 			input: [][]byte{
 				[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested ","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
 				[]byte(`{"log":"shutdown...\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
@@ -126,8 +142,40 @@ func TestDockerJSON(t *testing.T) {
 				Bytes:   190,
 			},
 		},
-		// Split lines with partial disabled
 		{
+			name: "Split lines",
+			input: [][]byte{
+				[]byte(`2017-10-12T13:32:21.232861448Z stdout P 2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`),
+				[]byte(`2017-11-12T23:32:21.212771448Z stdout F  error`),
+			},
+			stream: "stdout",
+			expectedMessage: reader.Message{
+				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
+				Bytes:   163,
+			},
+			partial:  true,
+			criflags: true,
+		},
+		{
+			name: "Split lines and remove \\n",
+			input: [][]byte{
+				[]byte("2017-10-12T13:32:21.232861448Z stdout P 2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache\n"),
+				[]byte("2017-11-12T23:32:21.212771448Z stdout F  error"),
+			},
+			stream: "stdout",
+			expectedMessage: reader.Message{
+				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
+				Bytes:   164,
+			},
+			partial:  true,
+			criflags: true,
+		},
+		{
+			name: "Split lines with partial disabled",
 			input: [][]byte{
 				[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested ","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
 				[]byte(`{"log":"shutdown...\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
@@ -144,15 +192,21 @@ func TestDockerJSON(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		r := &mockReader{messages: test.input}
-		json := New(r, test.stream, test.partial)
-		message, err := json.Next()
+		t.Run(test.name, func(t *testing.T) {
+			r := &mockReader{messages: test.input}
+			json := New(r, test.stream, test.partial, test.criflags)
+			message, err := json.Next()
 
-		assert.Equal(t, test.expectedError, err != nil)
+			if test.expectedError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
 
-		if err == nil {
-			assert.EqualValues(t, test.expectedMessage, message)
-		}
+			if err == nil {
+				assert.EqualValues(t, test.expectedMessage, message)
+			}
+		})
 	}
 }
 
