@@ -31,12 +31,15 @@ type config struct {
 
 	// Partial configures the prospector to join partial lines
 	Partial bool `config:"combine_partials"`
+
+	// Enable CRI flags parsing (to be switched to default in 7.0)
+	CRIFlags bool `config:"cri.parse_flags"`
 }
 
 type containers struct {
 	IDs  []string `config:"ids"`
 	Path string   `config:"path"`
 
-	// Stream can be all,stdout or stderr
+	// Stream can be all, stdout or stderr
 	Stream string `config:"stream"`
 }
