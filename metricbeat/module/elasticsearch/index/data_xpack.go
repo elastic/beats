@@ -23,6 +23,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -135,38 +137,37 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 func addClusterStateFields(indexName string, indexStats, clusterState common.MapStr) error {
 	indexMetadata, err := getClusterStateMetricForIndex(clusterState, indexName, "metadata")
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get index metadata from cluster state")
 	}
 
 	indexRoutingTable, err := getClusterStateMetricForIndex(clusterState, indexName, "routing_table")
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get index routing table from cluster state")
 	}
 
 	shards, err := getShardsFromRoutingTable(indexRoutingTable)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get shards from routing table")
 	}
 
 	created, err := getIndexCreated(indexMetadata)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get index creation time")
 	}
 	indexStats.Put("created", created)
 
 	// "index_stats.version.created", <--- don't think this is being used in the UI, so can we skip it?
 	// "index_stats.version.upgraded", <--- don't think this is being used in the UI, so can we skip it?
 
-	// "index_stats.status",
 	status, err := getIndexStatus(shards)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get index status")
 	}
 	indexStats.Put("status", status)
 
 	shardStats, err := getIndexShardStats(shards)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get index shard stats")
 	}
 	indexStats.Put("shards", shardStats)
 	return nil
@@ -308,10 +309,11 @@ func getIndexShardStats(shards common.MapStr) (common.MapStr, error) {
 
 func getIndexCreated(indexMetadata common.MapStr) (int64, error) {
 	v, err := indexMetadata.GetValue("settings.index.creation_date")
-	c, ok := v.(string)
 	if err != nil {
 		return 0, err
 	}
+
+	c, ok := v.(string)
 	if !ok {
 		return 0, elastic.MakeErrorForMissingField("settings.index.creation_date", elastic.Elasticsearch)
 	}
@@ -324,6 +326,7 @@ func getShardsFromRoutingTable(indexRoutingTable common.MapStr) (map[string]inte
 	if err != nil {
 		return nil, err
 	}
+
 	shards, ok := s.(map[string]interface{})
 	if !ok {
 		return nil, elastic.MakeErrorForMissingField("shards", elastic.Elasticsearch)
