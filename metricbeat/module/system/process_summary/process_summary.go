@@ -96,7 +96,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		case 'Z':
 			summary.zombie++
 		default:
-			logp.Err("Unknown state <%v> for process with pid %d", state.State, pid)
+			logp.Err("Unknown or unexpected state <%c> (%s) for process with pid %d", state.State, prettyNameOf(state.State), pid)
 			summary.unknown++
 		}
 	}
@@ -114,4 +114,23 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	event[mb.NamespaceKey] = "process.summary"
 
 	return event, nil
+}
+
+func prettyNameOf(state sigar.RunState) string {
+	switch state {
+	case 'S':
+		return "sleeping"
+	case 'R':
+		return "running"
+	case 'D' | 'I':
+		return "idle"
+	case 'T':
+		return "stopped"
+	case 'Z':
+		return "zombie"
+	case 'X':
+		return "dead"
+	default:
+		return "unknown"
+	}
 }
