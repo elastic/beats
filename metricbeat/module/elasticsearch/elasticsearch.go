@@ -32,6 +32,9 @@ import (
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id
 var clusterIDCache = map[string]string{}
 
+// ModuleName is the ame of this module
+const ModuleName = "elasticsearch"
+
 // Info construct contains the data from the Elasticsearch / endpoint
 type Info struct {
 	ClusterName string `json:"cluster_name"`

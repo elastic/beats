@@ -27,7 +27,7 @@ import (
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "cluster_stats", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "cluster_stats", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 		mb.WithNamespace("elasticsearch.cluster.stats"),
 	)
