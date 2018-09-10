@@ -55,6 +55,12 @@ Enable partial messages joining. Docker `json-file` driver splits log lines larg
 end of line (`\n`) is present for common lines in the resulting file, while it's not the for the lines
 that have been split. `combine_partial` joins them back together when enabled. It is enabled by default.
 
+===== `cri.parse_flags`
+
+Enable CRI flags parsing from the log file. CRI uses flags to signal a partial line, enabling this will
+ensure partial lines are rejoined. It is disabled by default.
+
+
 The following input configures {beatname_uc} to read the `stdout` stream from
 all containers under the default Docker containers path:
 
