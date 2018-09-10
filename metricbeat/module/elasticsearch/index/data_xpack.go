@@ -130,6 +130,8 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 	return nil
 }
 
+// Fields added here are based on same fields being added by internal collection in
+// https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L62-L124
 func addClusterStateFields(indexName string, indexStats, clusterState common.MapStr) error {
 	indexMetadata, err := getClusterStateMetricForIndex(clusterState, indexName, "metadata")
 	if err != nil {
@@ -141,17 +143,12 @@ func addClusterStateFields(indexName string, indexStats, clusterState common.Map
 		return err
 	}
 
-	// "index_stats.created",
-	v, err := indexMetadata.GetValue("settings.index.creation_date")
+	shards, err := getShardsFromRoutingTable(indexRoutingTable)
 	if err != nil {
 		return err
 	}
-	c, ok := v.(string)
-	if !ok {
-		return elastic.MakeErrorForMissingField("settings.index.creation_date", elastic.Elasticsearch)
-	}
 
-	created, err := strconv.ParseInt(c, 10, 64)
+	created, err := getIndexCreated(indexMetadata)
 	if err != nil {
 		return err
 	}
@@ -161,32 +158,12 @@ func addClusterStateFields(indexName string, indexStats, clusterState common.Map
 	// "index_stats.version.upgraded", <--- don't think this is being used in the UI, so can we skip it?
 
 	// "index_stats.status",
-	s, err := indexRoutingTable.GetValue("shards")
-	if err != nil {
-		return err
-	}
-	shards, ok := s.(map[string]interface{})
-	if !ok {
-		return elastic.MakeErrorForMissingField("shards", elastic.Elasticsearch)
-	}
-
 	status, err := getIndexStatus(shards)
 	if err != nil {
 		return err
 	}
 	indexStats.Put("status", status)
 
-	// "index_stats.shards.total",
-	// "index_stats.shards.primaries",
-	// "index_stats.shards.replicas",
-	// "index_stats.shards.active_total",
-	// "index_stats.shards.active_primaries",
-	// "index_stats.shards.active_replicas",
-	// "index_stats.shards.unassigned_total",
-	// "index_stats.shards.unassigned_primaries",
-	// "index_stats.shards.unassigned_replicas",
-	// "index_stats.shards.initializing",
-	// "index_stats.shards.relocating",
 	shardStats, err := getIndexShardStats(shards)
 	if err != nil {
 		return err
@@ -327,4 +304,30 @@ func getIndexShardStats(shards common.MapStr) (common.MapStr, error) {
 		"initializing": initializing,
 		"relocating":   relocating,
 	}, nil
+}
+
+func getIndexCreated(indexMetadata common.MapStr) (int64, error) {
+	v, err := indexMetadata.GetValue("settings.index.creation_date")
+	c, ok := v.(string)
+	if err != nil {
+		return 0, err
+	}
+	if !ok {
+		return 0, elastic.MakeErrorForMissingField("settings.index.creation_date", elastic.Elasticsearch)
+	}
+
+	return strconv.ParseInt(c, 10, 64)
+}
+
+func getShardsFromRoutingTable(indexRoutingTable common.MapStr) (map[string]interface{}, error) {
+	s, err := indexRoutingTable.GetValue("shards")
+	if err != nil {
+		return nil, err
+	}
+	shards, ok := s.(map[string]interface{})
+	if !ok {
+		return nil, elastic.MakeErrorForMissingField("shards", elastic.Elasticsearch)
+	}
+
+	return shards, nil
 }
