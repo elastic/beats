@@ -141,8 +141,6 @@ func addClusterStateFields(indexName string, indexStats, clusterState common.Map
 		return err
 	}
 
-	// TODO:
-
 	// "index_stats.created",
 	v, err := indexMetadata.GetValue("settings.index.creation_date")
 	if err != nil {
