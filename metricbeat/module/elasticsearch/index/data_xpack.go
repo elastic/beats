@@ -95,12 +95,14 @@ var (
 func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	err := json.Unmarshal(content, &indicesStruct)
 	if err != nil {
+		m.Log.Errorw("Failure parsing Indices Stats Elasticsearch API response", "error", err)
 		return err
 	}
 
 	clusterStateMetrics := []string{"metadata", "routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
 	if err != nil {
+		m.Log.Errorw("Failure retrieving cluster state from Elasticsearch", "error", err)
 		return err
 	}
 
@@ -108,12 +110,14 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		event := mb.Event{}
 		indexStats, err := xpackSchema.Apply(index)
 		if err != nil {
+			m.Log.Errorw("Failure applying index stats schema", "error", err)
 			continue
 		}
 		indexStats["index"] = name
 
 		err = addClusterStateFields(name, indexStats, clusterState)
 		if err != nil {
+			m.Log.Errorw("Failure adding cluster state fields", "error", err)
 			continue
 		}
 

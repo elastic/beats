@@ -44,7 +44,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	*helper.HTTP
 	XPack bool
-	log   *logp.Logger
+	Log   *logp.Logger
 }
 
 // NewMetricSet creates an metric set that can be used to build other metric
