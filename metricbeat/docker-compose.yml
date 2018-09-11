@@ -135,6 +135,8 @@ services:
 
   logstash:
     build: ./module/logstash/_meta
+    ports:
+      - 9600
 
   memcached:
     build: ./module/memcached/_meta

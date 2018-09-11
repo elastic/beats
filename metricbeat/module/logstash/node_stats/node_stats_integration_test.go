@@ -29,25 +29,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "logstash")
+func TestNodeStats(t *testing.T) {
+	logstash.Runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, logstash.GetConfig("node_stats", r.Host()))
+			event, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	f := mbtest.NewEventFetcher(t, logstash.GetConfig("node_stats"))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+			assert.NotNil(t, event)
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, logstash.GetConfig("node_stats", r.Host()))
+			err := mbtest.WriteEvent(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
 
-	assert.NotNil(t, event)
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-}
-
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "logstash")
-
-	f := mbtest.NewEventFetcher(t, logstash.GetConfig("node_stats"))
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
+		},
+	})
 }
