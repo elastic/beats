@@ -20,7 +20,6 @@
 package server
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,51 +28,34 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "envoyproxy")
+func TestEnvoyproxy(t *testing.T) {
+	runner := compose.TestRunner{Service: "envoyproxy"}
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
+	runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
+			event, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
+
+			assert.NotNil(t, event)
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
+			err := mbtest.WriteEvent(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }
 
-func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "envoyproxy")
-
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-
-	assert.NotNil(t, event)
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-}
-
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "envoyproxy",
 		"metricsets": []string{"server"},
-		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
+		"hosts":      []string{host},
 	}
-}
-
-func GetEnvHost() string {
-	host := os.Getenv("ENVOYPROXY_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func GetEnvPort() string {
-	port := os.Getenv("ENVOYPROXY_PORT")
-
-	if len(port) == 0 {
-		port = "9901"
-	}
-	return port
 }

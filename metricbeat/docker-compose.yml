@@ -57,6 +57,8 @@ services:
 
   envoyproxy:
     build: ./module/envoyproxy/_meta
+    ports:
+      - 9901
 
   etcd:
     build: ./module/etcd/_meta
