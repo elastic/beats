@@ -41,6 +41,8 @@ services:
 
   dropwizard:
     build: ./module/dropwizard/_meta
+    ports:
+      - 8080
 
   elasticsearch:
     build: ./module/elasticsearch/_meta
