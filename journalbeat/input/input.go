@@ -18,9 +18,6 @@
 package input
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/elastic/beats/journalbeat/checkpoint"
 	"github.com/elastic/beats/journalbeat/reader"
 	"github.com/elastic/beats/libbeat/beat"
@@ -28,41 +25,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type Config struct {
-	Paths []string `config:"paths"`
-
-	Backoff       time.Duration `config:"backoff" validate:"min=0,nonzero"`
-	BackoffFactor int           `config:"backoff_factor" validate:"min=1"`
-	MaxBackoff    time.Duration `config:"max_backoff" validate:"min=0,nonzero"`
-
-	Matches map[string]string `config:"matches"`
-	Seek    string            `config:"seek"`
-}
-
-var (
-	DefaultConfig = Config{
-		Backoff:       1 * time.Second,
-		BackoffFactor: 2,
-		MaxBackoff:    6 * time.Second,
-		Seek:          "tail",
-	}
-)
-
-func (c *Config) Validate() error {
-	correctSeek := false
-	for _, s := range []string{"cursor", "head", "tail"} {
-		if c.Seek == s {
-			correctSeek = true
-		}
-	}
-
-	if !correctSeek {
-		return fmt.Errorf("incorrect value for seek: %s. possible values: cursor, head, tail", c.Seek)
-	}
-
-	return nil
-}
-
+// Input manages readers and forwards entries from journals.
 type Input struct {
 	readers  []*reader.Reader
 	done     chan struct{}
@@ -71,7 +34,13 @@ type Input struct {
 	states   map[string]checkpoint.JournalState
 }
 
-func New(c *common.Config, pipeline beat.Pipeline, done chan struct{}, states map[string]checkpoint.JournalState) *Input {
+// New returns a new Inout
+func New(
+	c *common.Config,
+	pipeline beat.Pipeline,
+	done chan struct{},
+	states map[string]checkpoint.JournalState,
+) *Input {
 	config := DefaultConfig
 	if err := c.Unpack(&config); err != nil {
 		logp.Err("Error unpacking config: %v", err)
@@ -80,16 +49,17 @@ func New(c *common.Config, pipeline beat.Pipeline, done chan struct{}, states ma
 	var readers []*reader.Reader
 	if len(config.Paths) == 0 {
 		cfg := reader.Config{
+			Path:          reader.LocalSystemJournalID, // used to identify the state in the registry
 			Backoff:       config.Backoff,
 			MaxBackoff:    config.MaxBackoff,
 			BackoffFactor: config.BackoffFactor,
 			Seek:          config.Seek,
 		}
 
-		state := states[""]
+		state := states[reader.LocalSystemJournalID]
 		r, err := reader.NewLocal(cfg, done, state)
 		if err != nil {
-			logp.Err("Error creating reader for journal: %v", err)
+			logp.Err("Error creating reader for local journal: %v", err)
 			return nil
 		}
 		readers = append(readers, r)
@@ -121,7 +91,13 @@ func New(c *common.Config, pipeline beat.Pipeline, done chan struct{}, states ma
 	}
 }
 
+// Run connects to the output, collects entries from the readers
+// and then publishes the events.
 func (i *Input) Run() {
+	if len(i.readers) == 0 {
+		return
+	}
+
 	client, err := i.pipeline.ConnectWith(beat.ClientConfig{
 		PublishMode:   beat.GuaranteedSend,
 		EventMetadata: common.EventMetadata{},
@@ -136,10 +112,6 @@ func (i *Input) Run() {
 		return
 	}
 	defer client.Close()
-
-	if len(i.readers) == 0 {
-		return
-	}
 
 	for {
 		select {
@@ -156,9 +128,14 @@ func (i *Input) Run() {
 
 }
 
+// Stop stops all readers of the input.
 func (i *Input) Stop() {
+	for _, r := range i.readers {
+		r.Close()
+	}
 }
 
+// Wait waits until all readers are done.
 func (i *Input) Wait() {
-
+	i.Stop()
 }

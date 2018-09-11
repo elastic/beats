@@ -31,11 +31,23 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+const (
+	LocalSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
+)
+
+// Config stores the options of a reder.
 type Config struct {
-	Path          string
-	Seek          string
-	MaxBackoff    time.Duration
-	Backoff       time.Duration
+	// Path is the path to the journal file.
+	Path string
+	// Seek specifies the seeking stategy.
+	// Possible values: head, tail, cursor.
+	Seek string
+	// MaxBackoff is the limit of the backoff time.
+	MaxBackoff time.Duration
+	// Backoff is the current interval to wait before
+	// attemting to read again from the journal.
+	Backoff time.Duration
+	// BackoffFactor is the multiplier of Backoff.
 	BackoffFactor int
 }
 
@@ -73,7 +85,7 @@ func New(c Config, done chan struct{}, state checkpoint.JournalState) (*Reader, 
 		config:  c,
 		done:    done,
 	}
-	r.seekToSavedPosition(state.Cursor)
+	r.seek(state.Cursor)
 
 	logp.Debug("reader", "New journal is opened for reading")
 
@@ -96,13 +108,23 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState) (*Rea
 		config:  c,
 		done:    done,
 	}
-	r.seekToSavedPosition(state.Cursor)
+	r.seek(state.Cursor)
 	return r, nil
 }
 
-func (r *Reader) seekToSavedPosition(cursor string) {
+// seek seeks to the position determined by the coniguration and cursor state.
+func (r *Reader) seek(cursor string) {
 	if r.config.Seek == "cursor" {
+		if cursor == "" {
+			r.j.SeekHead()
+			logp.Debug("journal", "Seeking method set to cursor, but no state is saved for reader. Starting to read from the beginning")
+			return
+		}
 		r.j.SeekCursor(cursor)
+		_, err := r.j.Next()
+		if err != nil {
+			logp.Err("Error while seeking to cursor")
+		}
 		logp.Debug("journal", "Seeked to position defined in cursor")
 	} else if r.config.Seek == "tail" {
 		r.j.SeekTail()
@@ -181,6 +203,7 @@ func (r *Reader) readUntilNotNull(entries chan<- *beat.Event) error {
 	return nil
 }
 
+// toEvent creates a beat.Event from journal entries.
 func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	fields := common.MapStr{}
 	for journalKey, eventKey := range journaldEventFields {
@@ -196,6 +219,8 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 		MonotonicTimestamp: entry.MonotonicTimestamp,
 	}
 
+	logp.Info("last state >>>> %v", state)
+
 	event := beat.Event{
 		Timestamp: time.Now(),
 		Fields:    fields,
@@ -204,10 +229,11 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	return &event
 }
 
+// stopOrWait waits for a journal event.
 func (r *Reader) stopOrWait() {
 	select {
 	case <-r.done:
-	case r.changes <- r.j.Wait(sdjournal.IndefiniteWait):
+	case r.changes <- r.j.Wait(100 * time.Millisecond):
 	}
 }
 
@@ -227,6 +253,7 @@ func (r *Reader) wait() {
 	}
 }
 
+// Close closes the underlying journal reader.
 func (r *Reader) Close() {
 	r.j.Close()
 }

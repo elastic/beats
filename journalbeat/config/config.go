@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// Config stores the configuration of Journalbeat
 type Config struct {
 	Inputs        []*common.Config  `config:"inputs"`
 	RegistryFile  string            `config:"registry"`
@@ -36,6 +37,7 @@ type Config struct {
 	Seek          string            `config:"seek"`
 }
 
+// DefaultConfig are the defaults of a Journalbeat instance
 var DefaultConfig = Config{
 	RegistryFile:  "registry",
 	Backoff:       1 * time.Second,

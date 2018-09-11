@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/journalbeat/config"
 )
 
+// Journalbeat instance
 type Journalbeat struct {
 	inputs []*input.Input
 	done   chan struct{}
@@ -40,6 +41,7 @@ type Journalbeat struct {
 	checkpoint *checkpoint.Checkpoint // Persists event log state to disk.
 }
 
+// New returns a new Journalbeat instance
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	config := config.DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
@@ -72,6 +74,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	return bt, nil
 }
 
+// Run sets up the ACK handler and starts inputs to read and forward events to outputs.
 func (bt *Journalbeat) Run(b *beat.Beat) error {
 	logp.Info("journalbeat is running! Hit CTRL-C to stop it.")
 	defer logp.Info("journalbeat is stopping")
@@ -106,6 +109,7 @@ func (bt *Journalbeat) runInput(i *input.Input, wg *sync.WaitGroup) {
 	i.Run()
 }
 
+// Stop stops the beat and its inputs.
 func (bt *Journalbeat) Stop() {
 	close(bt.done)
 	for _, i := range bt.inputs {
