@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -30,13 +31,11 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 	stateData := &stateStruct{}
 	err := json.Unmarshal(content, stateData)
 	if err != nil {
-		r.Error(err)
 		return
 	}
 
 	nodeInfo, err := elasticsearch.GetNodeInfo(m.HTTP, m.HostData().SanitizedURI+statePath, stateData.MasterNode)
 	if err != nil {
-		r.Error(err)
 		return
 	}
 
@@ -44,7 +43,6 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 	// Will be fixed in: https://github.com/elastic/elasticsearch/pull/30656
 	clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HostData().SanitizedURI+statePath, stateData.MasterNode)
 	if err != nil {
-		r.Error(err)
 		return
 	}
 
@@ -64,12 +62,20 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 				event := mb.Event{}
 				fields, err := schema.Apply(shard)
 				if err != nil {
-					r.Error(err)
 					continue
 				}
 
-				fields["shard"] = fields["number"]
-				delete(fields, "number")
+				// Handle node field: could be string or null
+				err = elasticsearch.PassThruField("node", shard, fields)
+				if err != nil {
+					continue
+				}
+
+				// Handle relocating_node field: could be string or null
+				err = elasticsearch.PassThruField("relocating_node", shard, fields)
+				if err != nil {
+					continue
+				}
 
 				event.RootFields = common.MapStr{}
 
@@ -82,7 +88,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 					"shard":        fields,
 					"state_uuid":   stateData.StateID,
 				}
-				event.Index = ".monitoring-es-6-mb"
+				event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 
 				r.Event(event)
 
