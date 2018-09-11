@@ -32,6 +32,7 @@ import (
 )
 
 const (
+	// LocalSystemJournalID is the ID of the local system journal.
 	LocalSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
 )
 
