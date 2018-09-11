@@ -8,16 +8,17 @@
         "cluster": {
             "name": "elasticsearch",
             "state": {
-                "id": "dJaHX6fxSqSVMOsL4QZwwQ"
+                "id": "MBE4XrQOSf6ScXRTuCO1Pw"
             }
         },
         "index": {
-            "name": "filebeat-7.0.0-alpha1-2018.05.09"
+            "name": "heartbeat-7.0.0-alpha1-2018.08.27"
         },
         "node": {
-            "name": "523zXyT6TRWiqXcQItnkyQ"
+            "name": "Z4hBonPxQVW9qPKEHpwWCg"
         },
         "shard": {
+            "number": 0,
             "primary": true,
             "state": "STARTED"
         }
