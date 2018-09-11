@@ -4,6 +4,9 @@
         "fileset.module": "system", 
         "fileset.name": "syslog", 
         "input.type": "log", 
+        "log.flags": [
+            "multiline"
+        ], 
         "offset": 0, 
         "prospector.type": "log", 
         "system.syslog.hostname": "a-mac-with-esc-key", 
