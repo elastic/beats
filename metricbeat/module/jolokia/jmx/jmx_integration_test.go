@@ -20,7 +20,6 @@
 package jmx
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,40 +28,41 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "jolokia")
+func TestJMX(t *testing.T) {
+	runner := compose.TestRunner{Service: "jolokia"}
 
-	for _, config := range getConfigs() {
-		f := mbtest.NewEventsFetcher(t, config)
-		events, err := f.Fetch()
-		if !assert.NoError(t, err) {
-			t.FailNow()
-		}
-		t.Logf("%s/%s events: %+v", f.Module().Name(), f.Name(), events)
-		if len(events) == 0 || len(events[0]) <= 1 {
-			t.Fatal("Empty events")
-		}
-	}
+	runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			for _, config := range getConfigs(r.Host()) {
+				f := mbtest.NewEventsFetcher(t, config)
+				events, err := f.Fetch()
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+				t.Logf("%s/%s events: %+v", f.Module().Name(), f.Name(), events)
+				if len(events) == 0 || len(events[0]) <= 1 {
+					t.Fatal("Empty events")
+				}
+			}
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			for _, config := range getConfigs(r.Host()) {
+				f := mbtest.NewEventsFetcher(t, config)
+				err := mbtest.WriteEvents(f, t)
+				if err != nil {
+					t.Fatal("write", err)
+				}
+			}
+		},
+	})
 }
 
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "jolokia")
-
-	for _, config := range getConfigs() {
-		f := mbtest.NewEventsFetcher(t, config)
-		err := mbtest.WriteEvents(f, t)
-		if err != nil {
-			t.Fatal("write", err)
-		}
-	}
-}
-
-func getConfigs() []map[string]interface{} {
+func getConfigs(host string) []map[string]interface{} {
 	return []map[string]interface{}{
 		{
 			"module":     "jolokia",
 			"metricsets": []string{"jmx"},
-			"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
+			"hosts":      []string{host},
 			"namespace":  "testnamespace",
 			"jmx.mappings": []map[string]interface{}{
 				{
@@ -105,7 +105,7 @@ func getConfigs() []map[string]interface{} {
 		{
 			"module":     "jolokia",
 			"metricsets": []string{"jmx"},
-			"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
+			"hosts":      []string{host},
 			"namespace":  "testnamespace",
 			"jmx.mappings": []map[string]interface{}{
 				{
@@ -152,22 +152,4 @@ func getConfigs() []map[string]interface{} {
 			},
 		},
 	}
-}
-
-func getEnvHost() string {
-	host := os.Getenv("JOLOKIA_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func getEnvPort() string {
-	port := os.Getenv("JOLOKIA_PORT")
-
-	if len(port) == 0 {
-		port = "8778"
-	}
-	return port
 }

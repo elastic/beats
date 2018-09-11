@@ -32,7 +32,6 @@ services:
       args:
         APACHE_VERSION: 2.4.12
 
-
   ceph:
     build: ./module/ceph/_meta
 
@@ -83,6 +82,8 @@ services:
 
   jolokia:
     build: ./module/jolokia/_meta
+    ports:
+      - 8778
 
   kafka:
     extends:
