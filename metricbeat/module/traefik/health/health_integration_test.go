@@ -42,6 +42,7 @@ func makeBadRequest(config map[string]interface{}) error {
 }
 
 func TestFetch(t *testing.T) {
+	t.Skip("ignoring tests with EnsureUp by now")
 	compose.EnsureUp(t, "traefik")
 
 	config := mtest.GetConfig("health")
@@ -66,6 +67,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	t.Skip("ignoring tests with EnsureUp by now")
 	compose.EnsureUp(t, "traefik")
 
 	ms := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("health"))

@@ -30,6 +30,7 @@ import (
 )
 
 func TestFetchTCP(t *testing.T) {
+	t.Skip("ignoring tests with EnsureUp by now")
 	compose.EnsureUp(t, "uwsgi_tcp")
 
 	f := mbtest.NewEventsFetcher(t, getConfig("tcp"))
@@ -42,6 +43,7 @@ func TestFetchTCP(t *testing.T) {
 }
 
 func TestFetchHTTP(t *testing.T) {
+	t.Skip("ignoring tests with EnsureUp by now")
 	compose.EnsureUp(t, "uwsgi_http")
 
 	f := mbtest.NewEventsFetcher(t, getConfig("http"))
