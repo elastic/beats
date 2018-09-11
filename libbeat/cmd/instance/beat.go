@@ -46,6 +46,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/keystore"
@@ -572,7 +573,7 @@ func (b *Beat) configure() error {
 	logp.Info("Beat UUID: %v", b.Info.UUID)
 
 	// initialize config manager
-	b.ConfigManager, err = management.GetFactory()(b.Beat.Info.UUID)
+	b.ConfigManager, err = management.GetFactory()(reload.Register, b.Beat.Info.UUID)
 	if err != nil {
 		return err
 	}

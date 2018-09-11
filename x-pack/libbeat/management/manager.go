@@ -35,11 +35,12 @@ type ConfigManager struct {
 	client   *api.Client
 	beatUUID uuid.UUID
 	done     chan struct{}
+	registry *reload.Registry
 	wg       sync.WaitGroup
 }
 
 // NewConfigManager returns a X-Pack Beats Central Management manager
-func NewConfigManager(beatUUID uuid.UUID) (management.ConfigManager, error) {
+func NewConfigManager(registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	c := defaultConfig()
 	if err := c.Load(); err != nil {
 		return nil, errors.Wrap(err, "reading central management internal settings")
@@ -64,6 +65,7 @@ func NewConfigManager(beatUUID uuid.UUID) (management.ConfigManager, error) {
 		client:   client,
 		done:     make(chan struct{}),
 		beatUUID: beatUUID,
+		registry: registry,
 	}, nil
 }
 

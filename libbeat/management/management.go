@@ -21,6 +21,7 @@ import (
 	"github.com/satori/go.uuid"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/feature"
 )
 
@@ -47,7 +48,7 @@ type ConfigManager interface {
 }
 
 // Factory for creating a config manager
-type Factory func(uuid.UUID) (ConfigManager, error)
+type Factory func(*reload.Registry, uuid.UUID) (ConfigManager, error)
 
 // Register a config manager
 func Register(name string, fn Factory, stability feature.Stability) {
@@ -75,7 +76,7 @@ func GetFactory() Factory {
 // nilManager, fallback when no manager is present
 type nilManager struct{}
 
-func nilFactory(uuid.UUID) (ConfigManager, error) { return nilManager{}, nil }
+func nilFactory(*reload.Registry, uuid.UUID) (ConfigManager, error) { return nilManager{}, nil }
 
 func (nilManager) Enabled() bool                           { return false }
 func (nilManager) Start()                                  {}
