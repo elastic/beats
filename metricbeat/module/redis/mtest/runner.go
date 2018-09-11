@@ -26,13 +26,13 @@ import (
 var (
 	Runner = compose.TestRunner{
 		Service: "redis",
-		Options: map[string][]string{
-			"REDIS_VERSION": []string{
+		Options: compose.RunnerOptions{
+			"REDIS_VERSION": {
 				"3.2.12",
 				"4.0.11",
 				"5.0-rc",
 			},
-			"IMAGE_OS": []string{
+			"IMAGE_OS": {
 				"alpine",
 				"stretch",
 			},

@@ -26,8 +26,8 @@ import (
 var (
 	Runner = compose.TestRunner{
 		Service: "aerospike",
-		Options: map[string][]string{
-			"AEROSPIKE_VERSION": []string{
+		Options: compose.RunnerOptions{
+			"AEROSPIKE_VERSION": {
 				"3.9.0",
 				"3.13.0.11",
 				"3.16.0.6",

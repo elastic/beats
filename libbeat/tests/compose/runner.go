@@ -36,12 +36,14 @@ func init() {
 
 type TestRunner struct {
 	Service  string
-	Options  map[string][]string
+	Options  RunnerOptions
 	Parallel bool
 	Timeout  int
 }
 
 type Suite map[string]func(t *testing.T, r R)
+
+type RunnerOptions map[string][]string
 
 func (r *TestRunner) scenarios() []map[string]string {
 	n := 1
@@ -96,6 +98,8 @@ func (r *TestRunner) runHostOverride(t *testing.T, tests Suite) bool {
 }
 
 func (r *TestRunner) Run(t *testing.T, tests Suite) {
+	t.Helper()
+
 	if r.runHostOverride(t, tests) {
 		return
 	}
@@ -105,7 +109,11 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 		timeout = 300
 	}
 
-	for _, s := range r.scenarios() {
+	scenarios := r.scenarios()
+	if len(scenarios) == 0 {
+		t.Fatal("Test runner configuration doesn't produce scenarios")
+	}
+	for _, s := range scenarios {
 		var vars []string
 		for k, v := range s {
 			os.Setenv(k, v)

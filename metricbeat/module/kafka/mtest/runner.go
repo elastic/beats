@@ -26,8 +26,8 @@ import (
 var (
 	Runner = compose.TestRunner{
 		Service: "kafka",
-		Options: map[string][]string{
-			"KAFKA_VERSION": []string{
+		Options: compose.RunnerOptions{
+			"KAFKA_VERSION": {
 				"0.10.2.1",
 				"1.1.0",
 				"2.0.0",
