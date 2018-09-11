@@ -117,7 +117,7 @@ func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if len(d.Environment) > 0 {
-		cmd.Env = append(d.Environment, os.Environ()...)
+		cmd.Env = append(os.Environ(), d.Environment...)
 	}
 	return cmd
 }

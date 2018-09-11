@@ -116,7 +116,6 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 	for _, s := range scenarios {
 		var vars []string
 		for k, v := range s {
-			os.Setenv(k, v)
 			vars = append(vars, fmt.Sprintf("%s=%s", k, v))
 		}
 		sort.Strings(vars)
