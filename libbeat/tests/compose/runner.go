@@ -114,6 +114,7 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 		t.Fatal("Test runner configuration doesn't produce scenarios")
 	}
 	for _, s := range scenarios {
+		s := s
 		var vars []string
 		for k, v := range s {
 			vars = append(vars, fmt.Sprintf("%s=%s", k, v))
@@ -167,6 +168,10 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 
 type R interface {
 	Host() string
+	Hostname() string
+	Port() string
+
+	Option(string) string
 }
 
 type runnerControl struct {
@@ -187,4 +192,8 @@ func (r *runnerControl) Hostname() string {
 func (r *runnerControl) Port() string {
 	_, port, _ := net.SplitHostPort(r.host)
 	return port
+}
+
+func (r *runnerControl) Option(key string) string {
+	return r.scenario[key]
 }

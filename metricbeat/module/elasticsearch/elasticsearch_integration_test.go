@@ -60,7 +60,7 @@ func TestElasticsearch(t *testing.T) {
 			"ELASTICSEARCH_VERSION": {
 				"6.4.0",
 				"6.3.2",
-				// "6.2.4",
+				"6.2.4",
 				"5.6.11",
 			},
 		},
@@ -69,6 +69,10 @@ func TestElasticsearch(t *testing.T) {
 
 	runner.Run(t, compose.Suite{
 		"Fetch": func(t *testing.T, r compose.R) {
+			if r.Option("ELASTICSEARCH_VERSION") == "6.2.4" {
+				t.Skip("This test fails on this version")
+			}
+
 			host := r.Host()
 			err := createIndex(host)
 			assert.NoError(t, err)
