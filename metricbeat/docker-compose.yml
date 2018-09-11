@@ -62,6 +62,8 @@ services:
 
   etcd:
     build: ./module/etcd/_meta
+    ports:
+      - 2379
 
   haproxy:
     build: ./module/haproxy/_meta
