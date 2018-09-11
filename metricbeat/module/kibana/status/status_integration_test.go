@@ -29,24 +29,23 @@ import (
 	"github.com/elastic/beats/metricbeat/module/kibana/mtest"
 )
 
-func TestFetch(t *testing.T) {
-	compose.EnsureUpWithTimeout(t, 600, "elasticsearch", "kibana")
+func TestStatus(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, mtest.GetConfig("status", r.Host()))
+			event, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	f := mbtest.NewEventFetcher(t, mtest.GetConfig("status"))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-}
-
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "elasticsearch", "kibana")
-
-	f := mbtest.NewEventFetcher(t, mtest.GetConfig("status"))
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, mtest.GetConfig("status", r.Host()))
+			err := mbtest.WriteEvent(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }

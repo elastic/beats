@@ -110,6 +110,10 @@ services:
 
   kibana:
     build: ./module/kibana/_meta
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601
 
   #kubernetes:
   #  build: ./module/kubernetes/_meta

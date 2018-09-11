@@ -33,30 +33,31 @@ import (
 	"github.com/elastic/beats/metricbeat/module/kibana/mtest"
 )
 
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "kibana")
+func TestStat(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Data": func(t *testing.T, r compose.R) {
+			config := mtest.GetConfig("stats", r.Host())
+			version, err := getKibanaVersion(r.Host())
+			if err != nil {
+				t.Fatal("getting kibana version", err)
+			}
 
-	config := mtest.GetConfig("stats")
-	host := config["hosts"].([]string)[0]
-	version, err := getKibanaVersion(host)
-	if err != nil {
-		t.Fatal("getting kibana version", err)
-	}
+			isStatsAPIAvailable, err := kibana.IsStatsAPIAvailable(version)
+			if err != nil {
+				t.Fatal("checking if kibana stats API is available", err)
+			}
 
-	isStatsAPIAvailable, err := kibana.IsStatsAPIAvailable(version)
-	if err != nil {
-		t.Fatal("checking if kibana stats API is available", err)
-	}
+			if !isStatsAPIAvailable {
+				t.Skip("Kibana stats API is not available until 6.4.0")
+			}
 
-	if !isStatsAPIAvailable {
-		t.Skip("Kibana stats API is not available until 6.4.0")
-	}
-
-	f := mbtest.NewReportingMetricSetV2(t, config)
-	err = mbtest.WriteEventsReporterV2(f, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
+			f := mbtest.NewReportingMetricSetV2(t, config)
+			err = mbtest.WriteEventsReporterV2(f, t, "")
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }
 
 func getKibanaVersion(kibanaHostPort string) (string, error) {
