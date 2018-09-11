@@ -36,8 +36,14 @@ class Test(BaseTest):
         )
         journalbeat_proc = self.start_beat()
 
-        self.wait_until(lambda: self.log_contains("journalbeat is running"), max_timeout=10)
-        self.wait_until(lambda: self.log_contains("Tailing the journal file") == 1, max_timeout=10)
+        required_log_snippets = [
+            # journalbeat can be started
+            "journalbeat is running",
+            # journalbeat can seek to the position defined in the cursor
+            "Tailing the journal file",
+        ]
+        for snippet in required_log_snippets:
+            self.wait_until(lambda: self.log_contains(snippet), name="Line in '{}' Journalbeat log".format(snippet))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
@@ -55,13 +61,21 @@ class Test(BaseTest):
         )
         journalbeat_proc = self.start_beat()
 
-        self.wait_until(lambda: self.log_contains("journalbeat is running"))
-        self.wait_until(
-            lambda: self.log_contains("Reading from the beginning of the journal file") == 1,
-            max_timeout=10)
-        self.wait_until(
-            lambda: self.log_contains("\"message\": \"thinkpad_acpi: unhandled HKEY event 0x60b0\"") == 1,
-            max_timeout=10)
+
+        required_log_snippets = [
+            # journalbeat can be started
+            "journalbeat is running",
+            # journalbeat can seek to the position defined in the cursor
+            "Reading from the beginning of the journal file",
+            # message can be read from test journal
+            "\"message\": \"thinkpad_acpi: unhandled HKEY event 0x60b0\"",
+        ]
+        for snippet in required_log_snippets:
+            self.wait_until(lambda: self.log_contains(snippet), name="Line in '{}' Journalbeat log".format(snippet))
+
+        exit_code = journalbeat_proc.kill_and_wait()
+        assert exit_code == 0
+
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
