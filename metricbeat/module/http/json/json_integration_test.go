@@ -20,7 +20,6 @@
 package json
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,41 +28,39 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestFetchObject(t *testing.T) {
-	compose.EnsureUp(t, "http")
+func TestJSON(t *testing.T) {
+	runner := compose.TestRunner{Service: "http"}
 
-	f := mbtest.NewEventsFetcher(t, getConfig("object"))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+	runner.Run(t, compose.Suite{
+		"FetchObject": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, getConfig("object", r.Host()))
+			event, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		},
+		"FetchArray": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, getConfig("array", r.Host()))
+			event, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
+
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, getConfig("object", r.Host()))
+			err := mbtest.WriteEvents(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }
 
-func TestFetchArray(t *testing.T) {
-	compose.EnsureUp(t, "http")
-
-	f := mbtest.NewEventsFetcher(t, getConfig("array"))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-}
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "http")
-
-	f := mbtest.NewEventsFetcher(t, getConfig("object"))
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
-
-}
-
-func getConfig(jsonType string) map[string]interface{} {
+func getConfig(jsonType string, host string) map[string]interface{} {
 	var path string
 	var responseIsArray bool
 	switch jsonType {
@@ -78,27 +75,9 @@ func getConfig(jsonType string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":        "http",
 		"metricsets":    []string{"json"},
-		"hosts":         []string{getEnvHost() + ":" + getEnvPort()},
+		"hosts":         []string{host},
 		"path":          path,
 		"namespace":     "testnamespace",
 		"json.is_array": responseIsArray,
 	}
-}
-
-func getEnvHost() string {
-	host := os.Getenv("HTTP_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func getEnvPort() string {
-	port := os.Getenv("HTTP_PORT")
-
-	if len(port) == 0 {
-		port = "8080"
-	}
-	return port
 }

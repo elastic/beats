@@ -79,6 +79,8 @@ services:
 
   http:
     build: ./module/http/_meta
+    ports:
+      - 8080
 
   jolokia:
     build: ./module/jolokia/_meta
