@@ -104,10 +104,9 @@ type config struct {
 
 	// Hidden on purpose, used by the docker input:
 	DockerJSON *struct {
-		Stream string `config:"stream"`
-
-		// TODO move this to true by default
-		Partial bool `config:"partial"`
+		Stream   string `config:"stream"`
+		Partial  bool   `config:"partial"`
+		CRIFlags bool   `config:"cri_flags"`
 	} `config:"docker-json"`
 }
 
