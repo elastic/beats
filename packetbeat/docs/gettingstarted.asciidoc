@@ -186,6 +186,9 @@ default values should do just fine.
 ----------------------------------------------------------------------
 packetbeat.protocols:
 
+- type: dhcpv4
+  ports: [67, 68]
+
 - type: dns
   ports: [53]
 

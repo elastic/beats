@@ -410,6 +410,9 @@ packetbeat.protocols:
 - type: icmp
   enabled: true
 
+- type: dhcpv4
+  ports: [67, 68]
+
 - type: dns
   ports: [53]
 
