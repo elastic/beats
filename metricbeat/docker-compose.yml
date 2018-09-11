@@ -44,15 +44,9 @@ services:
       - 8080
 
   elasticsearch:
-    build: ./module/elasticsearch/_meta
-    environment:
-      - "ES_JAVA_OPTS=-Xms90m -Xmx90m"
-      - "network.host="
-      - "transport.host=127.0.0.1"
-      - "http.host=0.0.0.0"
-      - "xpack.security.enabled=false"
-    ports:
-      - 9200
+    extends:
+      file: ./module/elasticsearch/docker-compose.yml
+      service: elasticsearch
 
   envoyproxy:
     build: ./module/envoyproxy/_meta

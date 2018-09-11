@@ -54,7 +54,18 @@ var metricSets = []string{
 }
 
 func TestElasticsearch(t *testing.T) {
-	runner := compose.TestRunner{Service: "elasticsearch"}
+	runner := compose.TestRunner{
+		Service: "elasticsearch",
+		Options: compose.RunnerOptions{
+			"ELASTICSEARCH_VERSION": {
+				"6.4.0",
+				"6.3.2",
+				// "6.2.4",
+				"5.6.11",
+			},
+		},
+		Parallel: true,
+	}
 
 	runner.Run(t, compose.Suite{
 		"Fetch": func(t *testing.T, r compose.R) {
