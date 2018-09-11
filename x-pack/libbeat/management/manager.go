@@ -48,6 +48,10 @@ func NewConfigManager(beatUUID uuid.UUID) (management.ConfigManager, error) {
 	var client *api.Client
 	if c.Enabled {
 		var err error
+
+		// Ignore kibana version to avoid permission errors
+		c.Kibana.IgnoreVersion = true
+
 		client, err = api.NewClient(c.Kibana)
 		if err != nil {
 			return nil, errors.Wrap(err, "initializing kibana client")

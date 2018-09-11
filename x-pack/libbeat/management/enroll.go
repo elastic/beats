@@ -17,6 +17,9 @@ func Enroll(beat *instance.Beat, kibanaURL, enrollmentToken string) error {
 		return err
 	}
 
+	// Ignore kibana version to avoid permission errors
+	config.IgnoreVersion = true
+
 	client, err := api.NewClient(config)
 	if err != nil {
 		return err

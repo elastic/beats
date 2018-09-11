@@ -38,13 +38,12 @@ func ConfigFromURL(kibanaURL string) (*kibana.ClientConfig, error) {
 	}
 
 	return &kibana.ClientConfig{
-		Protocol:      data.Scheme,
-		Host:          data.Host,
-		Path:          data.Path,
-		Username:      username,
-		Password:      password,
-		Timeout:       defaultTimeout,
-		IgnoreVersion: true,
+		Protocol: data.Scheme,
+		Host:     data.Host,
+		Path:     data.Path,
+		Username: username,
+		Password: password,
+		Timeout:  defaultTimeout,
 	}, nil
 }
 
