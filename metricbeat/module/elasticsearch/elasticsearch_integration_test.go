@@ -22,9 +22,7 @@ package elasticsearch_test
 import (
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -55,74 +53,55 @@ var metricSets = []string{
 	"shard",
 }
 
-func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "elasticsearch")
+func TestElasticsearch(t *testing.T) {
+	runner := compose.TestRunner{Service: "elasticsearch"}
 
-	host := net.JoinHostPort(getEnvHost(), getEnvPort())
-	err := createIndex(host)
-	assert.NoError(t, err)
+	runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			host := r.Host()
+			err := createIndex(host)
+			assert.NoError(t, err)
 
-	err = enableTrialLicense(host)
-	assert.NoError(t, err)
+			err = enableTrialLicense(host)
+			assert.NoError(t, err)
 
-	err = createMLJob(host)
-	assert.NoError(t, err)
+			err = createMLJob(host)
+			assert.NoError(t, err)
 
-	for _, metricSet := range metricSets {
-		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
-			events, errs := mbtest.ReportingFetchV2(f)
+			for _, metricSet := range metricSets {
+				t.Run(metricSet, func(t *testing.T) {
+					f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet, host))
+					events, errs := mbtest.ReportingFetchV2(f)
 
-			assert.Empty(t, errs)
-			if !assert.NotEmpty(t, events) {
-				t.FailNow()
+					assert.Empty(t, errs)
+					if !assert.NotEmpty(t, events) {
+						t.FailNow()
+					}
+					t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+						events[0].BeatEvent("elasticsearch", metricSet).Fields.StringToPrint())
+				})
 			}
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-				events[0].BeatEvent("elasticsearch", metricSet).Fields.StringToPrint())
-		})
-	}
-}
-
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "elasticsearch")
-
-	for _, metricSet := range metricSets {
-		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
-			err := mbtest.WriteEventsReporterV2(f, t, metricSet)
-			if err != nil {
-				t.Fatal("write", err)
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			for _, metricSet := range metricSets {
+				t.Run(metricSet, func(t *testing.T) {
+					f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet, r.Host()))
+					err := mbtest.WriteEventsReporterV2(f, t, metricSet)
+					if err != nil {
+						t.Fatal("write", err)
+					}
+				})
 			}
-		})
-	}
-}
-
-// GetEnvHost returns host for Elasticsearch
-func getEnvHost() string {
-	host := os.Getenv("ES_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-// GetEnvPort returns port for Elasticsearch
-func getEnvPort() string {
-	port := os.Getenv("ES_PORT")
-
-	if len(port) == 0 {
-		port = "9200"
-	}
-	return port
+		},
+	})
 }
 
 // GetConfig returns config for elasticsearch module
-func getConfig(metricset string) map[string]interface{} {
+func getConfig(metricset string, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "elasticsearch",
 		"metricsets": []string{metricset},
-		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
+		"hosts":      []string{host},
 		"index_recovery.active_only": false,
 	}
 }
