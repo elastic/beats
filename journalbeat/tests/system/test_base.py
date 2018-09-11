@@ -19,7 +19,8 @@ class Test(BaseTest):
         )
         journalbeat_proc = self.start_beat()
 
-        self.wait_until(lambda: self.log_contains("journalbeat is running"), max_timeout=10)
+        self.wait_until(lambda: self.log_contains(
+            "journalbeat is running"), max_timeout=10)
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
@@ -43,7 +44,8 @@ class Test(BaseTest):
             "Tailing the journal file",
         ]
         for snippet in required_log_snippets:
-            self.wait_until(lambda: self.log_contains(snippet), name="Line in '{}' Journalbeat log".format(snippet))
+            self.wait_until(lambda: self.log_contains(snippet),
+                            name="Line in '{}' Journalbeat log".format(snippet))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
@@ -61,7 +63,6 @@ class Test(BaseTest):
         )
         journalbeat_proc = self.start_beat()
 
-
         required_log_snippets = [
             # journalbeat can be started
             "journalbeat is running",
@@ -71,7 +72,8 @@ class Test(BaseTest):
             "\"message\": \"thinkpad_acpi: unhandled HKEY event 0x60b0\"",
         ]
         for snippet in required_log_snippets:
-            self.wait_until(lambda: self.log_contains(snippet), name="Line in '{}' Journalbeat log".format(snippet))
+            self.wait_until(lambda: self.log_contains(snippet),
+                            name="Line in '{}' Journalbeat log".format(snippet))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
@@ -101,7 +103,8 @@ class Test(BaseTest):
             "journalbeat successfully published 1 events",
         ]
         for snippet in required_log_snippets:
-            self.wait_until(lambda: self.log_contains(snippet), name="Line in '{}' Journalbeat log".format(snippet))
+            self.wait_until(lambda: self.log_contains(snippet),
+                            name="Line in '{}' Journalbeat log".format(snippet))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
