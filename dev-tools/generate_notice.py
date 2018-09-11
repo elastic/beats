@@ -65,6 +65,7 @@ def gather_dependencies(vendor_dirs, overrides=None):
                 lib["license_contents"] = read_file(lib["license_file"])
                 lib["license_summary"] = detect_license_summary(lib["license_contents"])
                 if lib["license_summary"] == "UNKNOWN":
+                    print("no valid: {}".format(lib["license_file"]))
                     print("WARNING: Unknown license for: {}".format(lib_path))
 
                 revision = overrides.get(lib_path, {}).get("revision")
@@ -81,6 +82,10 @@ def gather_dependencies(vendor_dirs, overrides=None):
                 dirs.remove("vendor")
     return dependencies
 
+SKIP_FILES = [
+    # AWS lambda go defines that some part of the code is APLv2 and other on a MIT Modified license.
+    "./vendor/github.com/aws/aws-lambda-go/LICENSE-SUMMARY"
+]
 
 def get_licenses(folder):
     """
@@ -88,7 +93,7 @@ def get_licenses(folder):
     """
     licenses = []
     for filename in sorted(os.listdir(folder)):
-        if filename.startswith("LICENSE") and "docs" not in filename:
+        if filename.startswith("LICENSE") and "docs" not in filename and os.path.join(folder, filename) not in SKIP_FILES:
             licenses.append(filename)
         elif filename.startswith("APLv2"):  # gorhill/cronexpr
             licenses.append(filename)
@@ -241,6 +246,19 @@ distribute, sublicense, and/or sell copies of the Software, and to
 permit persons to whom the Software is furnished to do so, subject to
 the following conditions:
     """),
+    re.sub(r"\s+", " ", """Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    """),
 ]
 
 BSD_LICENSE_CONTENTS = [
@@ -314,7 +332,7 @@ ACCEPTED_LICENSES = [
     "BSD-2-Clause",
     "MPL-2.0",
 ]
-SKIP_NOTICE = []
+SKIP_NOTICE = [ ]
 
 if __name__ == "__main__":
 

@@ -115,6 +115,22 @@
 			"revisionTime": "2016-09-02T18:42:37Z"
 		},
 		{
+			"checksumSHA1": "OF/FlsdnL1JiA+l4N3NEkrDuLZ0=",
+			"path": "github.com/aws/aws-lambda-go",
+			"revision": "2d482ef09017ae953b1e8d5a6ddac5b696663a3c",
+			"revisionTime": "2018-07-03T16:40:53Z",
+			"version": "=v1.6.0",
+			"versionExact": "v1.6.0"
+		},
+		{
+			"checksumSHA1": "WyQV07euFOe0+sgc35Ajq0gUApU=",
+			"path": "github.com/aws/aws-lambda-go/events",
+			"revision": "2d482ef09017ae953b1e8d5a6ddac5b696663a3c",
+			"revisionTime": "2018-07-03T16:40:53Z",
+			"version": "=v1.6.0",
+			"versionExact": "v1.6.0"
+		},
+		{
 			"checksumSHA1": "al43W4TWRdznwfxOWp4egKcL39c=",
 			"path": "github.com/bsm/sarama-cluster",
 			"revision": "7e67d87a6b3f83fe08c096fd084691bd9dca112f",
