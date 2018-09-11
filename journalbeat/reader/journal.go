@@ -175,7 +175,7 @@ process:
 					if e < 0 {
 						//logp.Err("Unexpected error: %v", syscall.Errno(-e))
 					}
-					return
+					r.wait()
 				}
 			}
 		}
