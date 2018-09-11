@@ -123,8 +123,10 @@ class Test(metricbeat.BaseTest):
         return [os.getenv('REDIS_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('REDIS_PORT', '6379')]
 
+
 class TestRedis4(Test):
     COMPOSE_SERVICES = ['redis_4']
+
 
 class TestRedis5(Test):
     COMPOSE_SERVICES = ['redis_5']
