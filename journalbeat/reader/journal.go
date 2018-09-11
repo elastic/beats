@@ -219,8 +219,6 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 		MonotonicTimestamp: entry.MonotonicTimestamp,
 	}
 
-	logp.Info("last state >>>> %v", state)
-
 	event := beat.Event{
 		Timestamp: time.Now(),
 		Fields:    fields,
