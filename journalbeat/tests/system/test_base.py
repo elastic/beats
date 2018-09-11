@@ -76,6 +76,32 @@ class Test(BaseTest):
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
+    def test_read_events_with_existing_registry(self):
+        """
+        Journalbeat is able to follow reading a from a journal with an existing registry file.
+        """
+
+        self.render_config_template(
+            journal_path=self.beat_path + "/tests/system/input/test.journal",
+            seek_method="cursor",
+            registry_file=self.beat_path + "/tests/system/input/test.registry",
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+        journalbeat_proc = self.start_beat()
+
+        required_log_snippets = [
+            # journalbeat can be started
+            "journalbeat is running",
+            # journalbeat can seek to the position defined in the cursor
+            "Seeked to position defined in cursor",
+            # message can be read from test journal
+            "please report the conditions when this event happened to",
+            # only one event is read and published
+            "journalbeat successfully published 1 events",
+        ]
+        for snippet in required_log_snippets:
+            self.wait_until(lambda: self.log_contains(snippet), name="Line in '{}' Journalbeat log".format(snippet))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
