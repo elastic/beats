@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
@@ -203,9 +204,9 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 	}
 }
 
-func (rl *Reloader) loadConfigs(files []string) ([]*ConfigWithMeta, error) {
+func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error) {
 	// Load all config objects
-	result := []*ConfigWithMeta{}
+	result := []*reload.ConfigWithMeta{}
 	var errs multierror.Errors
 	for _, file := range files {
 		configs, err := LoadList(file)
@@ -216,7 +217,7 @@ func (rl *Reloader) loadConfigs(files []string) ([]*ConfigWithMeta, error) {
 		}
 
 		for _, c := range configs {
-			result = append(result, &ConfigWithMeta{Config: c})
+			result = append(result, &reload.ConfigWithMeta{Config: c})
 		}
 	}
 

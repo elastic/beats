@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -59,7 +60,7 @@ type Autodiscover struct {
 	defaultPipeline beat.Pipeline
 	adapter         Adapter
 	providers       []Provider
-	configs         map[uint64]*cfgfile.ConfigWithMeta
+	configs         map[uint64]*reload.ConfigWithMeta
 	runners         *cfgfile.RunnerList
 	meta            *meta.Map
 
@@ -86,7 +87,7 @@ func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, confi
 		bus:             bus,
 		defaultPipeline: pipeline,
 		adapter:         adapter,
-		configs:         map[uint64]*cfgfile.ConfigWithMeta{},
+		configs:         map[uint64]*reload.ConfigWithMeta{},
 		runners:         cfgfile.NewRunnerList("autodiscover", adapter, pipeline),
 		providers:       providers,
 		meta:            meta.NewMap(),
@@ -135,7 +136,7 @@ func (a *Autodiscover) worker() {
 				logp.Debug(debugK, "Reloading existing autodiscover configs after error")
 			}
 
-			configs := make([]*cfgfile.ConfigWithMeta, 0, len(a.configs))
+			configs := make([]*reload.ConfigWithMeta, 0, len(a.configs))
 			for _, c := range a.configs {
 				configs = append(configs, c)
 			}
@@ -182,7 +183,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 			continue
 		}
 
-		a.configs[hash] = &cfgfile.ConfigWithMeta{
+		a.configs[hash] = &reload.ConfigWithMeta{
 			Config: config,
 			Meta:   &dynFields,
 		}
