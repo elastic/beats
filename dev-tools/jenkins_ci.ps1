@@ -50,7 +50,7 @@ exec { mage build } "Build FAILURE"
 
 echo "Unit testing $env:beat"
 go test -v $(go list ./... | select-string -Pattern "vendor" -NotMatch) 2>&1 | Out-File -encoding UTF8 build/TEST-go-unit.out
-exec { Get-Content build/TEST-go-unit.out | go-junit-report.exe -set-exit-code | Out-File -encoding UTF8 build/TEST-go-unit.xml } "Unit test FAILURE"
+exec { Get-Content build/TEST-go-unit.out | go-junit-report.exe -set-exit-code | Out-File -encoding UTF8 build/TEST-go-unit.xml } "Unit test FAILURE, view testReport or TEST-go-unit.out jenkins artifact for detailed error info."
 
 echo "System testing $env:beat"
 # Get a CSV list of package names.
