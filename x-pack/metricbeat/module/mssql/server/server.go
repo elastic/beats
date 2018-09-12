@@ -23,7 +23,7 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/mssql"
+	"github.com/elastic/beats/x-pack/metricbeat/module/mssqle/mssql"
 	"github.com/pkg/errors"
 )
 
