@@ -8,6 +8,8 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beatname_lc: beatname
 :beatname_uc: a Beat
 :beatname_pkg: {beatname_lc}
+:beat_monitoring_user: beats_system
+:beat_monitoring_version: 6.2
 :github_repo_name: beats
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
