@@ -11,7 +11,7 @@ class Test(metricbeat.BaseTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
         """
-        prometheus stats test
+        golang heap test
         """
         self.render_config_template(modules=[{
             "name": "golang",
@@ -43,5 +43,5 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return ["http://" + os.getenv('GOLANG_HOST', self.compose_hosts()[0]) + ':' +
+        return ["http://" + os.getenv('GOLANG_HOST', 'localhost') + ':' +
                 os.getenv('GOLANG_PORT', '6060')]
