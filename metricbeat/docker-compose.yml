@@ -93,6 +93,10 @@ services:
     extends:
       file: ./module/kafka/docker-compose.yml
       service: kafka
+    environment:
+      # Needed for python tests
+      KAFKA_ADVERTISED_HOST_AUTO: "yes"
+    image: metricbeat-kafka:1.1.0
     build:
       args:
         KAFKA_VERSION: 1.1.0
@@ -101,6 +105,10 @@ services:
     extends:
       file: ./module/kafka/docker-compose.yml
       service: kafka
+    environment:
+      # Needed for python tests
+      KAFKA_ADVERTISED_HOST_AUTO: "yes"
+    image: metricbeat-kafka:0.10.2.1
     build:
       args:
         KAFKA_VERSION: 0.10.2.1
