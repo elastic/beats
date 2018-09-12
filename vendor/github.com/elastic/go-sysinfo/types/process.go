@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -20,7 +20,9 @@ package types
 import "time"
 
 type Process interface {
+	CPUTimer
 	Info() (ProcessInfo, error)
+	Memory() (MemoryInfo, error)
 }
 
 type ProcessInfo struct {
@@ -43,23 +45,24 @@ type FileDescriptor interface {
 }
 
 type CPUTimer interface {
-	CPUTime() CPUTimes
-}
-
-type Memory interface {
-	Memory() MemoryInfo
+	// CPUTime returns a CPUTimes structure for
+	// the host or some process.
+	//
+	// The User and System fields are guaranteed
+	// to be populated for all platforms, and
+	// for both hosts and processes.
+	CPUTime() (CPUTimes, error)
 }
 
 type CPUTimes struct {
-	Timestamp time.Time     `json:"timestamp"` // Time at which samples were collected.
-	User      time.Duration `json:"user"`
-	System    time.Duration `json:"system"`
-	Idle      time.Duration `json:"idle,omitempty"`
-	IOWait    time.Duration `json:"iowait,omitempty"`
-	IRQ       time.Duration `json:"irq,omitempty"`
-	Nice      time.Duration `json:"nice,omitempty"`
-	SoftIRQ   time.Duration `json:"soft_irq,omitempty"`
-	Steal     time.Duration `json:"steal,omitempty"`
+	User    time.Duration `json:"user"`
+	System  time.Duration `json:"system"`
+	Idle    time.Duration `json:"idle,omitempty"`
+	IOWait  time.Duration `json:"iowait,omitempty"`
+	IRQ     time.Duration `json:"irq,omitempty"`
+	Nice    time.Duration `json:"nice,omitempty"`
+	SoftIRQ time.Duration `json:"soft_irq,omitempty"`
+	Steal   time.Duration `json:"steal,omitempty"`
 }
 
 func (cpu CPUTimes) Total() time.Duration {
@@ -68,10 +71,9 @@ func (cpu CPUTimes) Total() time.Duration {
 }
 
 type MemoryInfo struct {
-	Timestamp time.Time         `json:"timestamp"` // Time at which samples were collected.
-	Resident  uint64            `json:"resident_bytes"`
-	Virtual   uint64            `json:"virtual_bytes"`
-	Metrics   map[string]uint64 `json:"raw,omitempty"` // Other memory related metrics.
+	Resident uint64            `json:"resident_bytes"`
+	Virtual  uint64            `json:"virtual_bytes"`
+	Metrics  map[string]uint64 `json:"raw,omitempty"` // Other memory related metrics.
 }
 
 type SeccompInfo struct {

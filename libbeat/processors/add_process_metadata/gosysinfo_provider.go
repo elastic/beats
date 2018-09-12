@@ -15,29 +15,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
+package add_process_metadata
 
 import (
-	"github.com/elastic/go-windows"
+	"strings"
+
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 )
 
-const windowsKernelExe = `C:\Windows\System32\ntoskrnl.exe`
+type gosysinfoProvider struct{}
 
-func KernelVersion() (string, error) {
-	versionData, err := windows.GetFileVersionInfo(windowsKernelExe)
+func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata, err error) {
+	var proc types.Process
+	proc, err = sysinfo.Process(pid)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	fileVersion, err := versionData.QueryValue("FileVersion")
-	if err == nil {
-		return fileVersion, nil
-	}
-
-	// Make a second attempt through the fixed version info.
-	info, err := versionData.FixedFileInfo()
+	var info types.ProcessInfo
+	info, err = proc.Info()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return info.ProductVersion(), nil
+
+	r := processMetadata{
+		name:      info.Name,
+		args:      info.Args,
+		title:     strings.Join(info.Args, " "),
+		exe:       info.Exe,
+		pid:       info.PID,
+		ppid:      info.PPID,
+		startTime: info.StartTime,
+	}
+	r.fields = r.toMap()
+	return &r, nil
 }
