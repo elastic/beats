@@ -1,6 +1,6 @@
 [role="xpack"]
 [[beats-system-user]]
-=== Set the password for the +{beat_monitoring_user}+ built-in user
+=== Set the password for the built-in monitoring user
 
 {security} provides built-in user credentials in {es} that have a fixed set of
 privileges. In 6.3.0 and later releases, there is a +{beat_monitoring_user}+ built-in user,
