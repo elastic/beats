@@ -171,14 +171,22 @@ services:
       - 8778
 
   kafka:
-    build:
-      context: ./module/kafka/_meta
-      args:
-        KAFKA_VERSION: 2.1.1
+    extends:
+      file: ./module/kafka/docker-compose.yml
+      service: kafka
+    environment:
+      # Needed for python tests
+      KAFKA_ADVERTISED_HOST_AUTO: "yes"
     ports:
       - 9092
 
   kafka_1_1_0:
+    extends:
+      file: ./module/kafka/docker-compose.yml
+      service: kafka
+    environment:
+      # Needed for python tests
+      KAFKA_ADVERTISED_HOST_AUTO: "yes"
     build:
       context: ./module/kafka/_meta
       args:
@@ -187,10 +195,16 @@ services:
       - 9092
 
   kafka_0_10_2:
+    extends:
+      file: ./module/kafka/docker-compose.yml
+      service: kafka
+    environment:
+      # Needed for python tests
+      KAFKA_ADVERTISED_HOST_AUTO: "yes"
     build:
       context: ./module/kafka/_meta
       args:
-        KAFKA_VERSION: 0.10.2.3
+        KAFKA_VERSION: 0.10.2.2
     ports:
       - 9092
 

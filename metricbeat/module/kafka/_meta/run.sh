@@ -1,6 +1,27 @@
 #!/bin/bash
 
-KAFKA_ADVERTISED_HOST=$(dig +short $HOSTNAME)
+if [ -n "$KAFKA_ADVERTISED_HOST_AUTO" ]; then
+	ip=$(nslookup $HOSTNAME 2> /dev/null | grep ^Address | cut -d' ' -f3)
+	KAFKA_ADVERTISED_HOST=${ip}:9092
+fi
+
+# Check if KAFKA_ADVERTISED_HOST is set
+# if not wait to read it from file
+if [ -z "$KAFKA_ADVERTISED_HOST" ]; then
+	echo "KAFKA_ADVERTISED_HOST needed, will wait for it on /run/compose_env"
+	while true; do
+		if [ -f /run/compose_env ]; then
+			source /run/compose_env
+			KAFKA_ADVERTISED_HOST=$SERVICE_HOST
+		fi
+		if [ -n "$KAFKA_ADVERTISED_HOST" ]; then
+			# Remove it so it is not reused
+			> /run/compose_env
+			break
+		fi
+		sleep 1
+	done
+fi
 
 wait_for_port() {
     count=20
@@ -21,8 +42,13 @@ wait_for_port 2181
 echo "Starting Kafka broker"
 mkdir -p ${KAFKA_LOGS_DIR}
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
-    --override delete.topic.enable=true --override advertised.host.name=${KAFKA_ADVERTISED_HOST} \
-    --override listeners=PLAINTEXT://0.0.0.0:9092 \
+    --override delete.topic.enable=true \
+    --override listeners=INSIDE://localhost:9091,OUTSIDE://0.0.0.0:9092 \
+    --override advertised.listeners=INSIDE://localhost:9091,OUTSIDE://$KAFKA_ADVERTISED_HOST \
+    --override listener.security.protocol.map=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT \
+    --override inter.broker.listener.name=INSIDE \
+    --override offsets.topic.replication.factor=1 \
+    --override offsets.topic.num.partitions=2 \
     --override logs.dir=${KAFKA_LOGS_DIR} &
 
 wait_for_port 9092
