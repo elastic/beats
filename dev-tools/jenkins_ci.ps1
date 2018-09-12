@@ -1,14 +1,20 @@
-function Exec
-{
+function Exec {
+    [CmdletBinding()]
     param(
-        [Parameter(Position=0,Mandatory=1)][scriptblock]$cmd,
-        [Parameter(Position=1,Mandatory=0)][string]$errorMessage = ($msgs.error_bad_command -f $cmd)
+        [Parameter(Mandatory = $true)]
+        [scriptblock]$cmd,
+        [string]$errorMessage = ($msgs.error_bad_command -f $cmd)
     )
 
-    & $cmd
-    if ($LastExitCode -ne 0) {
-        Write-Error $errorMessage
-        exit $LastExitCode
+    try {
+        $global:lastexitcode = 0
+        & $cmd
+        if ($lastexitcode -ne 0) {
+            throw $errorMessage
+        }
+    }
+    catch [Exception] {
+        throw $_
     }
 }
 
@@ -26,7 +32,7 @@ $env:TEST_COVERAGE = "true"
 $env:RACE_DETECTOR = "true"
 
 # Install mage from vendor.
-exec { go install github.com/elastic/beats/vendor/github.com/magefile/mage }
+exec { go install github.com/elastic/beats/vendor/github.com/magefile/mage } "mage install FAILURE"
 
 echo "Fetching testing dependencies"
 # TODO (elastic/beats#5050): Use a vendored copy of this.
@@ -47,18 +53,18 @@ New-Item -ItemType directory -Path build\system-tests | Out-Null
 New-Item -ItemType directory -Path build\system-tests\run | Out-Null
 
 echo "Building fields.yml"
-exec { mage fields }
+exec { mage fields } "mage fields FAILURE"
 
 echo "Building $env:beat"
 exec { mage build } "Build FAILURE"
 
 echo "Unit testing $env:beat"
-exec { mage goTestUnit }
+exec { mage goTestUnit } "mage goTestUnit FAILURE"
 
 echo "System testing $env:beat"
 # Get a CSV list of package names.
 $packages = $(go list ./... | select-string -Pattern "/vendor/" -NotMatch | select-string -Pattern "/scripts/cmd/" -NotMatch)
 $packages = ($packages|group|Select -ExpandProperty Name) -join ","
-exec { go test -race -c -cover -covermode=atomic -coverpkg $packages }
-exec { cd tests/system }
+exec { go test -race -c -cover -covermode=atomic -coverpkg $packages } "go test -race -cover FAILURE"
+Set-Location -Path tests/system
 exec { nosetests --with-timer --with-xunit --xunit-file=../../build/TEST-system.xml } "System test FAILURE"
