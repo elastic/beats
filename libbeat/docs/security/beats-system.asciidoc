@@ -3,8 +3,9 @@
 === Set the password for the built-in monitoring user
 
 {security} provides built-in user credentials in {es} that have a fixed set of
-privileges. In 6.3.0 and later releases, there is a +{beat_monitoring_user}+ built-in user,
-which {beatname_uc} uses to store monitoring information in {es}.
+privileges. In {beat_monitoring_user_version} and later releases, there is a
++{beat_monitoring_user}+ built-in user, which {beatname_uc} uses to store
+monitoring information in {es}.
 
 The initial passwords for all of the built-in users are set by using the
 `setup-passwords` tool in {es}. Thereafter, you can change the passwords by
