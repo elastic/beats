@@ -48,7 +48,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [os.getenv('KIBANA_HOST', self.compose_hosts()[1]) + ':' +
+        return [os.getenv('KIBANA_HOST', self.compose_hosts()[0]) + ':' +
                 os.getenv('KIBANA_PORT', '5601')]
 
     def get_version(self):
