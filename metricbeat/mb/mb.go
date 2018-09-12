@@ -306,13 +306,14 @@ type ModuleConfig struct {
 	MetricSets []string      `config:"metricsets"`
 	Enabled    bool          `config:"enabled"`
 	Raw        bool          `config:"raw"`
+	Query      string        `config:"query"`
 }
 
 func (c ModuleConfig) String() string {
 	return fmt.Sprintf(`{Module:"%v", MetricSets:%v, Enabled:%v, `+
-		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v}`,
+		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v, Query:%v}`,
 		c.Module, c.MetricSets, c.Enabled, len(c.Hosts), c.Period, c.Timeout,
-		c.Raw)
+		c.Raw, c.Query)
 }
 
 func (c ModuleConfig) GoString() string { return c.String() }

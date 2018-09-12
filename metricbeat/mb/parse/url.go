@@ -50,6 +50,15 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 			return mb.HostData{}, err
 		}
 
+		query, ok := conf["query"]
+		if ok {
+			queryString, ok := query.(string)
+			if !ok {
+				return mb.HostData{}, errors.Errorf("'query' config for module %v is not a string", module.Name())
+			}
+			b.QueryParams = queryString
+		}
+
 		var user, pass, path, basePath string
 		t, ok := conf["username"]
 		if ok {
