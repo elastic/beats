@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -15,9 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package windows contains various Windows system calls.
-package windows
+package add_process_metadata
 
-// Use "GOOS=windows go generate -v -x" to generate the sources.
-// Add -trace to enable debug prints around syscalls.
-//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -systemdll=false -output zsyscall_windows.go kernel32.go version.go psapi.go ntdll.go
+type testProvider map[int]processMetadata
+
+func (p testProvider) GetProcessMetadata(pid int) (result *processMetadata, err error) {
+	meta, found := p[pid]
+	if !found {
+		return nil, nil
+	}
+	meta.fields = meta.toMap()
+	return &meta, nil
+}

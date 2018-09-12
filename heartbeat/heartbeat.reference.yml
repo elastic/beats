@@ -412,6 +412,13 @@ heartbeat.scheduler:
 #- add_host_metadata:
 #   netinfo.enabled: false
 #
+# The following example enriches each event with process metadata using
+# process IDs included in the event.
+#
+#processors:
+#- add_process_metadata:
+#    match_pids: ["system.process.ppid"]
+#    target: system.process.parent
 
 #============================= Elastic Cloud ==================================
 
