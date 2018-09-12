@@ -85,6 +85,9 @@ services:
     extends:
       file: ./module/kafka/docker-compose.yml
       service: kafka
+    environment:
+      # Needed for python tests
+      KAFKA_ADVERTISED_HOST_AUTO: "yes"
 
   kafka_1_1_0:
     extends:

@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -n "$KAFKA_ADVERTISED_HOST_AUTO" ]; then
+	ip=$(nslookup $HOSTNAME 2> /dev/null | grep ^Address | cut -d' ' -f3)
+	KAFKA_ADVERTISED_HOST=${ip}:9092
+fi
+
 # Check if KAFKA_ADVERTISED_HOST is set
 # if not wait to read it from file
 if [ -z "$KAFKA_ADVERTISED_HOST" ]; then
