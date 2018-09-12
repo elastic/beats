@@ -99,7 +99,9 @@ func (g *TcpServer) watchMetrics() {
 			continue
 		}
 
-		go g.handle(conn)
+		if conn != nil {
+			go g.handle(conn)
+		}
 	}
 }
 
@@ -108,9 +110,7 @@ func (g *TcpServer) handle(conn net.Conn) {
 
 	// Close connection when this function ends
 	defer func() {
-		if conn != nil {
-			conn.Close()
-		}
+		conn.Close()
 	}()
 
 	// Get a new reader with buffer size as the same as receiveBufferSize
