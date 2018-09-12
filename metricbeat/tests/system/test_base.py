@@ -76,3 +76,18 @@ class Test(BaseTest):
 
         assert exit_code == 0
         assert self.log_contains("Kibana dashboards successfully loaded.")
+
+    def get_elasticsearch_url(self):
+        return "http://{host}:{port}".format(
+            host=os.getenv("ES_HOST", self.compose_hosts()[1]),
+            port=os.getenv("ES_PORT", "9200"),
+        )
+
+    def get_kibana_url(self):
+        """
+        Returns kibana host URL
+        """
+        return "http://{host}:{port}".format(
+            host=os.getenv("KIBANA_HOST", self.compose_hosts()[0]),
+            port=os.getenv("KIBANA_PORT", "5601"),
+        )
