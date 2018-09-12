@@ -93,6 +93,7 @@ var (
 )
 
 func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+	var indicesStruct IndicesStruct
 	err := json.Unmarshal(content, &indicesStruct)
 	if err != nil {
 		m.Log.Errorw("Failure parsing Indices Stats Elasticsearch API response", "error", err)

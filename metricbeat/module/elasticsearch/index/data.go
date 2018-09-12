@@ -29,6 +29,10 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
+type IndicesStruct struct {
+	Indices map[string]map[string]interface{} `json:"indices"`
+}
+
 var (
 	schema = s.Schema{
 		"total": c.Dict("total", s.Schema{
@@ -49,14 +53,10 @@ var (
 			}),
 		}),
 	}
-
-	indicesStruct struct {
-		Indices map[string]map[string]interface{} `json:"indices"`
-	}
 )
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
-
+	var indicesStruct IndicesStruct
 	err := json.Unmarshal(content, &indicesStruct)
 	if err != nil {
 		r.Error(err)
