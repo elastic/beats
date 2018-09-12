@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM openjdk:8-jre-alpine3.8
 
 ARG KAFKA_VERSION=2.0.0
 
@@ -7,11 +7,12 @@ ENV KAFKA_LOGS_DIR="/kafka-logs"
 ENV _JAVA_OPTIONS "-Djava.net.preferIPv4Stack=true"
 ENV TERM=linux
 
-RUN apt-get update && apt-get install -y curl openjdk-8-jre-headless netcat dnsutils
+RUN apk add -u bash
 
-RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && curl -s -o $INSTALL_DIR/kafka.tgz \
-    "http://ftp.wayne.edu/apache/kafka/${KAFKA_VERSION}/kafka_2.11-${KAFKA_VERSION}.tgz" && \
-    tar xzf ${INSTALL_DIR}/kafka.tgz -C ${KAFKA_HOME} --strip-components 1
+RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && \
+    wget -q -O $INSTALL_DIR/kafka.tgz "http://ftp.wayne.edu/apache/kafka/${KAFKA_VERSION}/kafka_2.11-${KAFKA_VERSION}.tgz" && \
+    tar xzf ${INSTALL_DIR}/kafka.tgz -C ${KAFKA_HOME} --strip-components 1 && \
+    rm -f ${INSTALL_DIR}/kafka.tgz
 
 ADD run.sh /run.sh
 ADD healthcheck.sh /healthcheck.sh
