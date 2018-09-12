@@ -6,6 +6,7 @@ package api
 
 import (
 	"net/http"
+	"reflect"
 
 	"github.com/elastic/beats/libbeat/common/reload"
 
@@ -64,15 +65,13 @@ func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID) (ConfigBl
 
 // ConfigBlocksEqual returns true if the given config blocks are equal, false if not
 func ConfigBlocksEqual(a, b ConfigBlocks) bool {
-	if (a == nil) != (b == nil) {
-		return false
-	}
-
 	if len(a) != len(b) {
 		return false
 	}
 
-	// TODO implement equals check
+	if len(a) == 0 {
+		return true
+	}
 
-	return false
+	return reflect.DeepEqual(a, b)
 }
