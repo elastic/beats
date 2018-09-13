@@ -99,19 +99,18 @@ func (g *TcpServer) watchMetrics() {
 			continue
 		}
 
-		if conn != nil {
-			go g.handle(conn)
-		}
+		go g.handle(conn)
 	}
 }
 
 func (g *TcpServer) handle(conn net.Conn) {
+	if conn == nil {
+		return
+	}
 	logp.Debug("tcp", "Handling new connection...")
 
 	// Close connection when this function ends
-	defer func() {
-		conn.Close()
-	}()
+	defer conn.Close()
 
 	// Get a new reader with buffer size as the same as receiveBufferSize
 	bufReader := bufio.NewReaderSize(conn, g.receiveBufferSize)
