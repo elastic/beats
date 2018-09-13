@@ -47,6 +47,8 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override advertised.listeners=INSIDE://localhost:9091,OUTSIDE://$KAFKA_ADVERTISED_HOST \
     --override listener.security.protocol.map=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT \
     --override inter.broker.listener.name=INSIDE \
+    --override offsets.topic.replication.factor=1 \
+    --override offsets.topic.num.partitions=2 \
     --override logs.dir=${KAFKA_LOGS_DIR} &
 
 wait_for_port 9092
