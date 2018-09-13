@@ -53,6 +53,12 @@ type Monitor struct {
 	pipeline beat.Pipeline
 }
 
+// String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
+// values because it may be invoked from another thread in cfgfile/runner.
+func (m *Monitor) String() string {
+	return fmt.Sprintf("Monitor<name: %s, enabled: %t>", m.name, m.enabled)
+}
+
 func checkMonitorConfig(config *common.Config, registrar *pluginsReg, allowWatches bool) error {
 	_, err := newMonitor(config, registrar, nil, nil, allowWatches)
 	return err
