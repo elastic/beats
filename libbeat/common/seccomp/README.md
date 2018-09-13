@@ -20,7 +20,7 @@ profiles are built based on the binaries you plan to release. The policies are
 stored at `$beatname/include/seccomp_linux_$goarch.go`.
 
 ```sh
-make package && make seccomp-package
+make release && make seccomp-package
 ```
 
 If you are developing on Linux you can profile the binary produced by `make`.
