@@ -66,8 +66,6 @@ output.elasticsearch:
   ssl.key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
 
-//
-
 To enable SSL, just add `https` to all URLs defined under __hosts__.
 
 ["source","yaml",subs="attributes,callouts"]
@@ -229,8 +227,11 @@ to set the index:
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "%\{[fields.log_type]\}-%\{[beat.version]\}-%\{+yyyy.MM.dd}\"
+  index: "%\{[fields.log_type]\}-%\{[beat.version]\}-%\{+yyyy.MM.dd}\" <1>
 ------------------------------------------------------------------------------
+
+<1> We recommend including `beat.version` in the name to avoid mapping issues
+when you upgrade.
 
 With this configuration, all events with `log_type: normal` are sent to an 
 index named +normal-{version}-{localdate}+, and all events with
