@@ -20,6 +20,9 @@ package index_recovery
 import (
 	"encoding/json"
 
+	"github.com/elastic/beats/metricbeat/helper/elastic"
+
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -64,9 +67,13 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 		return err
 	}
 
+	var errs multierror.Errors
 	for indexName, d := range data {
 		shards, ok := d["shards"]
 		if !ok {
+			err = elastic.MakeErrorForMissingField(indexName+".shards", elastic.Elasticsearch)
+			errs = append(errs, err)
+			r.Error(err)
 			continue
 		}
 		for _, data := range shards {
@@ -79,5 +86,5 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 			r.Event(event)
 		}
 	}
-	return nil
+	return errs.Err()
 }
