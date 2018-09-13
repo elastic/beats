@@ -38,3 +38,7 @@
       example: elasticsearch
       description: >
         Name of the service metricbeat fetches the data from.
+
+    - name: query
+      description: >
+        A map of query parameters to add on each host request in the form "key=value"

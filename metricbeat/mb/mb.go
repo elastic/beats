@@ -23,6 +23,7 @@ package mb
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -306,7 +307,7 @@ type ModuleConfig struct {
 	MetricSets []string      `config:"metricsets"`
 	Enabled    bool          `config:"enabled"`
 	Raw        bool          `config:"raw"`
-	Query      string        `config:"query"`
+	Query      QueryParams   `config:"query"`
 }
 
 func (c ModuleConfig) String() string {
@@ -317,6 +318,26 @@ func (c ModuleConfig) String() string {
 }
 
 func (c ModuleConfig) GoString() string { return c.String() }
+
+// QueryParams is a convenient map[string]interface{} wrapper to implement the String interface which returns the
+// values in common query params format (key=value&key2=value2) which is the way that the url package expects this
+// params (without the initial '?')
+type QueryParams map[string]interface{}
+
+// String returns the values in common query params format (key=value&key2=value2) which is the way that the url
+// package expects this params (without the initial '?')
+func (q QueryParams) String() (s string) {
+	for k, v := range q {
+		if v == nil {
+			v = "null"
+		}
+
+		s = fmt.Sprintf("%s&%s=%v", s, k, v)
+	}
+
+	s = strings.TrimLeft(s, "&")
+	return
+}
 
 // defaultModuleConfig contains the default values for ModuleConfig instances.
 var defaultModuleConfig = ModuleConfig{

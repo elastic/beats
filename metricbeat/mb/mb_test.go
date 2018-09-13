@@ -206,7 +206,7 @@ func TestNewModulesHostParser(t *testing.T) {
 	r := newTestRegistry(t)
 
 	factory := func(base BaseMetricSet) (MetricSet, error) {
-		return &testMetricSet{base}, nil
+		return &testMetricSet{BaseMetricSet: base}, nil
 	}
 
 	hostParser := func(m Module, rawHost string) (HostData, error) {
@@ -374,4 +374,25 @@ func newConfig(t testing.TB, moduleConfig interface{}) *common.Config {
 		t.Fatal(err)
 	}
 	return config
+}
+
+func Test_QueryParams_String(t *testing.T) {
+	qp := QueryParams{
+		"stringKey": "value",
+		"intKey":    10,
+		"floatKey":  11.5,
+		"boolKey":   true,
+		"nullKey":   nil,
+	}
+
+	res := qp.String()
+
+	expectedValues := []string{"stringKey=value", "intKey=10", "floatKey=11.5", "boolKey=true", "nullKey=null"}
+	for _, expected := range expectedValues {
+		assert.Contains(t, res, expected)
+	}
+
+	assert.NotContains(t, res, "?")
+	assert.NotEqual(t, "&", res[0])
+	assert.NotEqual(t, "&", res[len(res)-1])
 }
