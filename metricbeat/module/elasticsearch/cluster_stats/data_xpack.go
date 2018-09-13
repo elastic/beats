@@ -32,16 +32,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func passthruField(fieldPath string, sourceData, targetData common.MapStr) error {
-	fieldValue, err := sourceData.GetValue(fieldPath)
-	if err != nil {
-		return elastic.MakeErrorForMissingField(fieldPath, elastic.Elasticsearch)
-	}
-
-	targetData.Put(fieldPath, fieldValue)
-	return nil
-}
-
 func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
 	// TLS does not need to be enabled if license type is something other than trial
 	value, err := license.GetValue("license.type")
@@ -184,7 +174,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return err
 	}
 
-	if err = passthruField("status", clusterStats, clusterState); err != nil {
+	if err = elasticsearch.PassThruField("status", clusterStats, clusterState); err != nil {
 		return err
 	}
 
