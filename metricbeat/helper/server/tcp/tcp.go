@@ -18,6 +18,7 @@
 package tcp
 
 import (
+	"bufio"
 	"fmt"
 	"net"
 
@@ -35,6 +36,7 @@ type TcpServer struct {
 	receiveBufferSize int
 	done              chan struct{}
 	eventQueue        chan server.Event
+	delimiter         byte
 }
 
 type TcpEvent struct {
@@ -67,6 +69,7 @@ func NewTcpServer(base mb.BaseMetricSet) (server.Server, error) {
 		receiveBufferSize: config.ReceiveBufferSize,
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
+		delimiter:         byte(config.Delimiter[0]),
 	}, nil
 }
 
@@ -83,7 +86,6 @@ func (g *TcpServer) Start() error {
 }
 
 func (g *TcpServer) watchMetrics() {
-	buffer := make([]byte, g.receiveBufferSize)
 	for {
 		select {
 		case <-g.done:
@@ -96,22 +98,45 @@ func (g *TcpServer) watchMetrics() {
 			logp.Err("Unable to accept connection due to error: %v", err)
 			continue
 		}
-		defer func() {
-			if conn != nil {
-				conn.Close()
-			}
-		}()
 
-		length, err := conn.Read(buffer)
+		go g.handle(conn)
+	}
+}
+
+func (g *TcpServer) handle(conn net.Conn) {
+	if conn == nil {
+		return
+	}
+	logp.Debug("tcp", "Handling new connection...")
+
+	// Close connection when this function ends
+	defer conn.Close()
+
+	// Get a new reader with buffer size as the same as receiveBufferSize
+	bufReader := bufio.NewReaderSize(conn, g.receiveBufferSize)
+
+	for {
+		// Read tokens delimited by delimiter
+		bytes, err := bufReader.ReadBytes(g.delimiter)
 		if err != nil {
-			logp.Err("Error reading from buffer: %v", err.Error())
-			continue
+			logp.Debug("tcp", "unable to read bytes due to error: %v", err)
+			return
 		}
-		g.eventQueue <- &TcpEvent{
-			event: common.MapStr{
-				server.EventDataKey: buffer[:length],
-			},
+
+		// Truncate to max buffer size if too big of a payload
+		if len(bytes) > g.receiveBufferSize {
+			bytes = bytes[:g.receiveBufferSize]
 		}
+
+		// Drop the delimiter and send the data
+		if len(bytes) > 0 {
+			g.eventQueue <- &TcpEvent{
+				event: common.MapStr{
+					server.EventDataKey: bytes[:len(bytes)-1],
+				},
+			}
+		}
+
 	}
 }
 
