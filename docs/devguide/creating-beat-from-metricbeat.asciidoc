@@ -91,7 +91,7 @@ The first step is to get the most recent packaging tools into your beat:
 
 [source,bash]
 ----
-make package
+make release
 ----
 
 This will fetch the most recent packaging tools and start the packaging of your beat. This can take a little bit longer.
