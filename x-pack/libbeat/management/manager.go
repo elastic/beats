@@ -45,7 +45,11 @@ func NewConfigManager(registry *reload.Registry, beatUUID uuid.UUID) (management
 	if err := c.Load(); err != nil {
 		return nil, errors.Wrap(err, "reading central management internal settings")
 	}
+	return NewConfigManagerWithConfig(c, registry, beatUUID)
+}
 
+// NewConfigManagerWithConfig returns a X-Pack Beats Central Management manager
+func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	var client *api.Client
 	if c.Enabled {
 		var err error
@@ -159,7 +163,7 @@ func (cm *ConfigManager) apply() {
 func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) {
 	cm.logger.Infof("Applying settings for %s", t)
 
-	if obj := reload.Register.Get(t); obj != nil {
+	if obj := cm.registry.Get(t); obj != nil {
 		// Single object
 		if len(blocks) != 1 {
 			cm.logger.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
@@ -174,7 +178,7 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) {
 		if err := obj.Reload(config); err != nil {
 			cm.logger.Error(err)
 		}
-	} else if obj := reload.Register.GetList(t); obj != nil {
+	} else if obj := cm.registry.GetList(t); obj != nil {
 		// List
 		var configs []*reload.ConfigWithMeta
 		for _, block := range blocks {

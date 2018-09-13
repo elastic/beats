@@ -26,7 +26,7 @@ import (
 )
 
 // Register holds a registry of reloadable objects
-var Register = newRegistry()
+var Register = NewRegistry()
 
 // ConfigWithMeta holds a pair of common.Config and optional metadata for it
 type ConfigWithMeta struct {
@@ -54,7 +54,8 @@ type Registry struct {
 	confs      map[string]Reloadable
 }
 
-func newRegistry() *Registry {
+// NewRegistry initializes and returns a reload registry
+func NewRegistry() *Registry {
 	return &Registry{
 		confsLists: make(map[string]ReloadableList),
 		confs:      make(map[string]Reloadable),
