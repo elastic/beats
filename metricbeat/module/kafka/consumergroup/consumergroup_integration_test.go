@@ -20,11 +20,9 @@
 package consumergroup
 
 import (
-	"io"
 	"testing"
 	"time"
 
-	saramacluster "github.com/bsm/sarama-cluster"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -34,7 +32,9 @@ import (
 
 func TestConsumerGroup(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{"Data": func(t *testing.T, r compose.R) {
-		c, err := startConsumer(t, "metricbeat-test", r.Host())
+		topic := "metricbeat-test"
+		mtest.GenerateKafkaData(t, topic, r.Host())
+		c, err := mtest.StartConsumer(t, topic, r.Host())
 		if err != nil {
 			t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 		}
@@ -50,12 +50,6 @@ func TestConsumerGroup(t *testing.T) {
 		}
 		t.Fatal("write", err)
 	}})
-}
-
-func startConsumer(t *testing.T, topic, host string) (io.Closer, error) {
-	brokers := []string{host}
-	topics := []string{topic}
-	return saramacluster.NewConsumer(brokers, "test-group", topics, nil)
 }
 
 func getConfig(host string) map[string]interface{} {

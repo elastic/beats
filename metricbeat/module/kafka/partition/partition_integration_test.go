@@ -26,7 +26,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -43,7 +42,7 @@ func TestPartition(t *testing.T) {
 
 	mtest.Runner.Run(t, compose.Suite{
 		"Data": func(t *testing.T, r compose.R) {
-			generateKafkaData(t, "metricbeat-generate-data", r.Host())
+			mtest.GenerateKafkaData(t, "metricbeat-generate-data", r.Host())
 
 			ms := mbtest.NewReportingMetricSetV2(t, getConfig("", r.Host()))
 			err := mbtest.WriteEventsReporterV2(ms, t, "")
@@ -56,7 +55,7 @@ func TestPartition(t *testing.T) {
 			testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
 			// Create initial topic
-			generateKafkaData(t, testTopic, r.Host())
+			mtest.GenerateKafkaData(t, testTopic, r.Host())
 
 			f := mbtest.NewReportingMetricSetV2(t, getConfig(testTopic, r.Host()))
 			dataBefore, err := mbtest.ReportingFetchV2(f)
@@ -71,7 +70,7 @@ func TestPartition(t *testing.T) {
 			var n int64 = 10
 			// Create n messages
 			for i := int64(0); i < n; i++ {
-				generateKafkaData(t, testTopic, r.Host())
+				mtest.GenerateKafkaData(t, testTopic, r.Host())
 			}
 
 			dataAfter, err := mbtest.ReportingFetchV2(f)
@@ -109,44 +108,6 @@ func TestPartition(t *testing.T) {
 			}
 			assert.True(t, offsetBefore+n == offsetAfter)
 		}})
-}
-
-func generateKafkaData(t *testing.T, topic string, host string) {
-	t.Logf("Send Kafka Event to topic: %v", topic)
-
-	config := sarama.NewConfig()
-	config.Producer.Return.Successes = true
-	// Retry for 10 seconds
-	config.Producer.Retry.Max = 20
-	config.Producer.Retry.Backoff = 500 * time.Millisecond
-	config.Metadata.Retry.Max = 20
-	config.Metadata.Retry.Backoff = 500 * time.Millisecond
-	client, err := sarama.NewClient([]string{host}, config)
-	if err != nil {
-		t.Errorf("%s", err)
-		t.FailNow()
-	}
-
-	producer, err := sarama.NewSyncProducerFromClient(client)
-	if err != nil {
-		t.Error(err)
-	}
-	defer producer.Close()
-
-	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.StringEncoder("Hello World"),
-	}
-
-	_, _, err = producer.SendMessage(msg)
-	if err != nil {
-		t.Errorf("failed to send message: %s\n", err)
-	}
-
-	err = client.RefreshMetadata(topic)
-	if err != nil {
-		t.Errorf("failed to refresh metadata for topic '%s': %s\n", topic, err)
-	}
 }
 
 func getConfig(topic string, host string) map[string]interface{} {
