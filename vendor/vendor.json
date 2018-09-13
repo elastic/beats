@@ -1143,6 +1143,24 @@
 			"revisionTime": "2014-01-24T17:37:10Z"
 		},
 		{
+			"checksumSHA1": "tUaGicGy0FLinVWKYFM5ejGzMcY=",
+			"path": "github.com/jstemmer/go-junit-report",
+			"revision": "385fac0ced9acaae6dc5b39144194008ded00697",
+			"revisionTime": "2018-06-14T14:38:34Z"
+		},
+		{
+			"checksumSHA1": "IH4jnWcj4d4h+hgsHsHOWg/F+rk=",
+			"path": "github.com/jstemmer/go-junit-report/formatter",
+			"revision": "385fac0ced9acaae6dc5b39144194008ded00697",
+			"revisionTime": "2018-06-14T14:38:34Z"
+		},
+		{
+			"checksumSHA1": "Tx9cQqKFUHzu1l6H2XEl8G7ivlI=",
+			"path": "github.com/jstemmer/go-junit-report/parser",
+			"revision": "385fac0ced9acaae6dc5b39144194008ded00697",
+			"revisionTime": "2018-06-14T14:38:34Z"
+		},
+		{
 			"checksumSHA1": "+CqJGh7NIDMnHgScq9sl9tPrnVM=",
 			"path": "github.com/klauspost/compress/flate",
 			"revision": "14c9a76e3c95e47f8ccce949bba2c1101a8b85e6",
