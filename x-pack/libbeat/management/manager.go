@@ -166,7 +166,7 @@ func (cm *ConfigManager) apply() {
 func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) {
 	cm.logger.Infof("Applying settings for %s", t)
 
-	if obj := cm.registry.Get(t); obj != nil {
+	if obj := cm.registry.GetReloadable(t); obj != nil {
 		// Single object
 		if len(blocks) != 1 {
 			cm.logger.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
@@ -181,7 +181,7 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) {
 		if err := obj.Reload(config); err != nil {
 			cm.logger.Error(err)
 		}
-	} else if obj := cm.registry.GetList(t); obj != nil {
+	} else if obj := cm.registry.GetReloadableList(t); obj != nil {
 		// List
 		var configs []*reload.ConfigWithMeta
 		for _, block := range blocks {

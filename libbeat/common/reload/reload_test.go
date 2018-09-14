@@ -29,22 +29,22 @@ type reloadableList struct{}
 func (reloadable) Reload(config *ConfigWithMeta) error       { return nil }
 func (reloadableList) Reload(config []*ConfigWithMeta) error { return nil }
 
-func RegisterReloadable(t *testing.T) {
+func TestRegisterReloadable(t *testing.T) {
 	obj := reloadable{}
 	r := NewRegistry()
 
 	r.Register("my.reloadable", obj)
 
-	assert.Equal(t, obj, r.Get("my.reloadable"))
+	assert.Equal(t, obj, r.GetReloadable("my.reloadable"))
 }
 
-func RegisterReloadableList(t *testing.T) {
+func TestRegisterReloadableList(t *testing.T) {
 	objl := reloadableList{}
 	r := NewRegistry()
 
 	r.RegisterList("my.reloadable", objl)
 
-	assert.Equal(t, objl, r.Get("my.reloadable"))
+	assert.Equal(t, objl, r.GetReloadableList("my.reloadable"))
 }
 
 func TestRegisterNilFails(t *testing.T) {

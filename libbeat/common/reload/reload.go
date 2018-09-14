@@ -110,15 +110,15 @@ func (r *Registry) MustRegisterList(name string, list ReloadableList) {
 	}
 }
 
-// Get returns the reloadable object with the given name, nil if not found
-func (r *Registry) Get(name string) Reloadable {
+// GetReloadable returns the reloadable object with the given name, nil if not found
+func (r *Registry) GetReloadable(name string) Reloadable {
 	r.RLock()
 	defer r.RUnlock()
 	return r.confs[name]
 }
 
-// GetList returns the reloadable list with the given name, nil if not found
-func (r *Registry) GetList(name string) ReloadableList {
+// GetReloadableList returns the reloadable list with the given name, nil if not found
+func (r *Registry) GetReloadableList(name string) ReloadableList {
 	r.RLock()
 	defer r.RUnlock()
 	return r.confsLists[name]
