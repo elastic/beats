@@ -1,6 +1,4 @@
 from heartbeat import BaseTest
-import BaseHTTPServer
-import threading
 from parameterized import parameterized
 import os
 from nose.plugins.skip import SkipTest
@@ -74,18 +72,3 @@ class Test(BaseTest):
             # Currently skipped on Windows as fields.yml not generated
             raise SkipTest
         self.assert_fields_are_documented(output[0])
-
-    def start_server(self, content, status_code):
-        class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
-            def do_GET(self):
-                self.send_response(status_code)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(content)
-
-        server = BaseHTTPServer.HTTPServer(('localhost', 8185), HTTPHandler)
-
-        thread = threading.Thread(target=server.serve_forever)
-        thread.start()
-
-        return server
