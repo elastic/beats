@@ -21,8 +21,16 @@ $env:PATH = "$env:GOPATH\bin;C:\tools\mingw64\bin;$env:PATH"
 # each run starts from a clean slate.
 $env:MAGEFILE_CACHE = "$env:WORKSPACE\.magefile"
 
+# Configure testing parameters.
+$env:TEST_COVERAGE = "true"
+$env:RACE_DETECTOR = "true"
+
+# Install mage from vendor.
 exec { go install github.com/elastic/beats/vendor/github.com/magefile/mage }
-exec { go get -u github.com/jstemmer/go-junit-report }
+
+echo "Fetching testing dependencies"
+# TODO (elastic/beats#5050): Use a vendored copy of this.
+exec { go get github.com/docker/libcompose }
 
 if (Test-Path "$env:beat") {
     cd "$env:beat"
@@ -45,12 +53,9 @@ echo "Building $env:beat"
 exec { mage build } "Build FAILURE"
 
 echo "Unit testing $env:beat"
-go test -v $(go list ./... | select-string -Pattern "vendor" -NotMatch) 2>&1 | Out-File -encoding UTF8 build/TEST-go-unit.out
-exec { Get-Content build/TEST-go-unit.out | go-junit-report.exe -set-exit-code | Out-File -encoding UTF8 build/TEST-go-unit.xml } "Unit test FAILURE"
+exec { mage goTestUnit }
 
 echo "System testing $env:beat"
-# TODO (elastic/beats#5050): Use a vendored copy of this.
-exec { go get github.com/docker/libcompose }
 # Get a CSV list of package names.
 $packages = $(go list ./... | select-string -Pattern "/vendor/" -NotMatch | select-string -Pattern "/scripts/cmd/" -NotMatch)
 $packages = ($packages|group|Select -ExpandProperty Name) -join ","

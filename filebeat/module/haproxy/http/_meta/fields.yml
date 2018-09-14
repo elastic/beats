@@ -1,0 +1,44 @@
+- name: http
+  description: Please add description
+  type: group
+  fields: 
+  - name: response
+    description: Fields related to the HTTP response
+    type: group
+    fields:
+    - name: status_code
+      description: status_code is the HTTP status code returned to the client.
+      type: long
+
+    - name: bytes_read
+      description: bytes_read is the total number of bytes transmitted to the client when the log is emitted.
+      type: long
+
+    - name: captured_cookie
+      description: >
+        captured_cookie is an optional "name=value" entry indicating that the client had this cookie in the response.
+
+    - name: captured_headers
+      description: >
+        captured_response_headers is a list of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
+      type: text
+
+  - name: request
+    description: Fields related to the HTTP request
+    type: group
+    fields:
+    - name: captured_cookie
+      description: >
+        captured_cookie is an optional "name=value" entry indicating that the server has returned a cookie with its request.
+
+    - name: captured_headers
+      description: >
+        captured_request_headers is a list of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
+      type: text
+
+    - name: raw_request_line
+      description: raw_request_line is the complete HTTP request line, including the method, request and HTTP version string.
+      type: text
+  
+
+

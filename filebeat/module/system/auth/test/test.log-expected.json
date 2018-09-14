@@ -61,6 +61,7 @@
         "system.auth.ssh.geoip.country_iso_code": "CN", 
         "system.auth.ssh.geoip.location.lat": 22.5333, 
         "system.auth.ssh.geoip.location.lon": 114.1333, 
+        "system.auth.ssh.geoip.region_iso_code": "CN-44", 
         "system.auth.ssh.geoip.region_name": "Guangdong", 
         "system.auth.ssh.ip": "116.31.116.24", 
         "system.auth.ssh.method": "password", 

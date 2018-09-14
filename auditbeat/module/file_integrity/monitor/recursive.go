@@ -27,17 +27,21 @@ import (
 )
 
 type recursiveWatcher struct {
-	inner  *fsnotify.Watcher
-	tree   FileTree
-	eventC chan fsnotify.Event
-	done   chan bool
+	inner   *fsnotify.Watcher
+	tree    FileTree
+	eventC  chan fsnotify.Event
+	done    chan bool
+	addC    chan string
+	addErrC chan error
 }
 
 func newRecursiveWatcher(inner *fsnotify.Watcher) *recursiveWatcher {
 	return &recursiveWatcher{
-		inner:  inner,
-		tree:   FileTree{},
-		eventC: make(chan fsnotify.Event, 1),
+		inner:   inner,
+		tree:    FileTree{},
+		eventC:  make(chan fsnotify.Event, 1),
+		addC:    make(chan string),
+		addErrC: make(chan error),
 	}
 }
 
@@ -48,6 +52,10 @@ func (watcher *recursiveWatcher) Start() error {
 }
 
 func (watcher *recursiveWatcher) Add(path string) error {
+	if watcher.done != nil {
+		watcher.addC <- path
+		return <-watcher.addErrC
+	}
 	return watcher.addRecursive(path)
 }
 
@@ -104,6 +112,21 @@ func (watcher *recursiveWatcher) close() error {
 	return watcher.inner.Close()
 }
 
+func (watcher *recursiveWatcher) deliver(ev fsnotify.Event) {
+	for {
+		select {
+		case <-watcher.done:
+			return
+
+		case path := <-watcher.addC:
+			watcher.addErrC <- watcher.addRecursive(path)
+
+		case watcher.eventC <- ev:
+			return
+		}
+	}
+}
+
 func (watcher *recursiveWatcher) forwardEvents() error {
 	defer watcher.close()
 
@@ -111,6 +134,9 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 		select {
 		case <-watcher.done:
 			return nil
+
+		case path := <-watcher.addC:
+			watcher.addErrC <- watcher.addRecursive(path)
 
 		case event, ok := <-watcher.inner.Events:
 			if !ok {
@@ -125,19 +151,19 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 					watcher.inner.Errors <- errors.Wrapf(err, "unable to recurse path '%s'", event.Name)
 				}
 				watcher.tree.Visit(event.Name, PreOrder, func(path string, _ bool) error {
-					watcher.eventC <- fsnotify.Event{
+					watcher.deliver(fsnotify.Event{
 						Name: path,
 						Op:   event.Op,
-					}
+					})
 					return nil
 				})
 
 			case fsnotify.Remove:
 				watcher.tree.Visit(event.Name, PostOrder, func(path string, _ bool) error {
-					watcher.eventC <- fsnotify.Event{
+					watcher.deliver(fsnotify.Event{
 						Name: path,
 						Op:   event.Op,
-					}
+					})
 					return nil
 				})
 				watcher.tree.Remove(event.Name)
@@ -151,7 +177,7 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 				fallthrough
 
 			default:
-				watcher.eventC <- event
+				watcher.deliver(event)
 			}
 		}
 	}

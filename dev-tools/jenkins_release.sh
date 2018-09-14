@@ -7,6 +7,7 @@ set -euox pipefail
 source $(dirname "$0")/common.bash
 
 jenkins_setup
+docker_setup
 
 cleanup() {
   echo "Running cleanup..."

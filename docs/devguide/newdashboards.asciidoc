@@ -208,7 +208,7 @@ make update
 === Exporting New and Modified Beat Dashboards
 
 To export all the dashboards for any Elastic Beat or any community Beat, including any new or modified dashboards and all dependencies such as
-visualizations, searches, you can use the Golang script `export_dashboards.go` from
+visualizations, searches, you can use the Go script `export_dashboards.go` from
 https://github.com/elastic/beats/tree/master/dev-tools/cmd/dashboards[dev-tools] for exporting Kibana 6.0 dashboards or later, and the Python script `export_5x_dashboards.py`
 for exporting Kibana 5.x dashboards. See the dev-tools
 https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.

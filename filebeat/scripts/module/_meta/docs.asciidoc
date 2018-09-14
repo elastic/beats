@@ -37,3 +37,7 @@ the relevant file. For example:
 ==== `{fileset}` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:fileset_ex!:
+
+:modulename!:

@@ -11,6 +11,11 @@ This is the Memcached module. These metricsets were tested with Memcached versio
 
 The default metricset is `stats`.
 
+[float]
+=== Compatibility
+
+The memcached module is tested with memcached 1.4.35.
+
 
 [float]
 === Example configuration

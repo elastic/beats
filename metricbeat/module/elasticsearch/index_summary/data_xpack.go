@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -76,7 +77,6 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 
 	err := json.Unmarshal(content, &all)
 	if err != nil {
-		r.Error(err)
 		return []error{err}
 	}
 
@@ -99,13 +99,13 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	event := mb.Event{}
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("indices_stats._all", fields)
-	event.RootFields.Put("cluser_uuid", info.ClusterID)
+	event.RootFields.Put("cluster_uuid", info.ClusterID)
 	event.RootFields.Put("timestamp", common.Time(time.Now()))
 	event.RootFields.Put("interval_ms", m.Module().Config().Period/time.Millisecond)
 	event.RootFields.Put("type", "indices_stats")
 	event.RootFields.Put("source_node", sourceNode)
 
-	event.Index = ".monitoring-es-6-mb"
+	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 
 	r.Event(event)
 

@@ -49,13 +49,28 @@ func (m *Message) IsEmpty() bool {
 	return false
 }
 
-func (msg *Message) AddFields(fields common.MapStr) {
+// AddFields adds fields to the message.
+func (m *Message) AddFields(fields common.MapStr) {
 	if fields == nil {
 		return
 	}
 
-	if msg.Fields == nil {
-		msg.Fields = common.MapStr{}
+	if m.Fields == nil {
+		m.Fields = common.MapStr{}
 	}
-	msg.Fields.Update(fields)
+	m.Fields.Update(fields)
+}
+
+// AddFlagsWithKey adds flags to the message with an arbitrary key.
+// If the field does not exist, it is created.
+func (m *Message) AddFlagsWithKey(key string, flags ...string) error {
+	if len(flags) == 0 {
+		return nil
+	}
+
+	if m.Fields == nil {
+		m.Fields = common.MapStr{}
+	}
+
+	return common.AddTagsWithKey(m.Fields, key, flags)
 }

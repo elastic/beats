@@ -6,11 +6,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Removed
+
+## [0.4.0]
+
+### Added
+
 - Added method to convert kernel rules to text format in order to display them.
 
 ### Changed
 
-- aucoalesce - Made the user/group ID cache thread-safe. #42
+- aucoalesce - Made the user/group ID cache thread-safe. #42 #45
 
 ### Deprecated
 

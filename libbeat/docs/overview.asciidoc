@@ -13,9 +13,9 @@ for capturing:
 Audit data:: https://www.elastic.co/products/beats/auditbeat[Auditbeat]
 Log files:: https://www.elastic.co/products/beats/filebeat[Filebeat]
 Availability:: https://www.elastic.co/products/beats/heartbeat[Heartbeat]
-Metrics:: https://www.elastic.co/products/beats/metricbeat[Metricbeat] 
-Network traffic:: https://www.elastic.co/products/beats/packetbeat[Packetbeat] 
-Windows event logs:: https://www.elastic.co/products/beats/winlogbeat[Winlogbeat] 
+Metrics:: https://www.elastic.co/products/beats/metricbeat[Metricbeat]
+Network traffic:: https://www.elastic.co/products/beats/packetbeat[Packetbeat]
+Windows event logs:: https://www.elastic.co/products/beats/winlogbeat[Winlogbeat]
 
 {beats} can send data directly to {es} or via
 https://www.elastic.co/products/logstash[{ls}], where you can further process
@@ -31,7 +31,7 @@ To get started, see <<getting-started>>.
 
 If you have a specific use case to solve, we encourage you to create a
 <<community-beats,community Beat>>. We've created an infrastructure to simplify
-the process. The _libbeat_ library, written entirely in Golang, offers the API
+the process. The _libbeat_ library, written entirely in Go, offers the API
 that all Beats use to ship data to Elasticsearch, configure the input options,
 implement logging, and more. To learn how to create a new Beat, see the
 {beatsdevguide}/index.html[Beats Developer Guide].

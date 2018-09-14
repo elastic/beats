@@ -58,7 +58,7 @@ shared:
         mode: 0755
       /lib/systemd/system/{{.BeatServiceName}}.service:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/systemd.unit.tmpl'
-        mode: 0755
+        mode: 0644
       /etc/init.d/{{.BeatServiceName}}:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/init.sh.tmpl'
         mode: 0755

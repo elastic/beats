@@ -7,7 +7,7 @@ own metricsets.
 [float]
 ==== Requirements
 
-To create your own Beat, you must have Golang {go-version} or later installed, and the `$GOPATH`
+To create your own Beat, you must have Go {go-version} or later installed, and the `$GOPATH`
 must be set up correctly. In addition, the following tools are required:
 
 * https://www.python.org/downloads/[python]
@@ -91,7 +91,7 @@ The first step is to get the most recent packaging tools into your beat:
 
 [source,bash]
 ----
-make package
+make release
 ----
 
 This will fetch the most recent packaging tools and start the packaging of your beat. This can take a little bit longer.

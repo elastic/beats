@@ -1,0 +1,52 @@
+{
+  "description": "Pipeline for parsing HAProxy http logs in their default format. Requires the geoip plugin.",
+  "processors": [{
+    "grok": {
+        "field": "message",
+        "patterns": [
+            "(%{NOTSPACE:haproxy.process_name}\\[%{NUMBER:haproxy.pid:int}\\]: )?%{IP:haproxy.client_ip}:%{NUMBER:haproxy.client_port:int} \\[%{NOTSPACE:haproxy.http.request_date}\\] %{NOTSPACE:haproxy.frontend_name} %{NOTSPACE:haproxy.backend_name}/%{NOTSPACE:haproxy.server_name} %{NUMBER:haproxy.time_client_req:int}/%{NUMBER:haproxy.time_queue:int}/%{NUMBER:haproxy.time_backend_connect:int}/%{NUMBER:haproxy.time_server_response:int}/%{NUMBER:haproxy.time_duration:int} %{NUMBER:haproxy.http.response.status_code:int} %{NUMBER:haproxy.http.response.bytes_read:int} %{NOTSPACE:haproxy.http.request.captured_cookie} %{NOTSPACE:haproxy.http.response.captured_cookie} %{NOTSPACE:haproxy.termination_state} %{NUMBER:haproxy.connections.active:int}/%{NUMBER:haproxy.connections.frontend:int}/%{NUMBER:haproxy.connections.backend:int}/%{NUMBER:haproxy.connections.server:int}/%{NUMBER:haproxy.connections.retries:int} %{NUMBER:haproxy.server_queue:int}/%{NUMBER:haproxy.backend_queue:int} \\{%{DATA:haproxy.http.request.captured_headers}\\} \\{%{DATA:haproxy.http.response.captured_headers}\\} \"%{GREEDYDATA:haproxy.http.request.raw_request_line}\"",
+            "(%{NOTSPACE:haproxy.process_name}\\[%{NUMBER:haproxy.pid:int}\\]: )?%{IP:haproxy.client_ip}:%{NUMBER:haproxy.client_port:int} \\[%{NOTSPACE:haproxy.http.request_date}\\] %{NOTSPACE:haproxy.frontend_name}/%{NOTSPACE:haproxy.bind_name} %{GREEDYDATA:haproxy.error_message}"
+        ],
+        "ignore_missing": false
+    }
+  },
+  {
+    "date": {
+      "field": "haproxy.http.request_date",
+      "target_field": "@timestamp",
+      "formats": ["dd/MMM/yyyy:HH:mm:ss.SSS"]
+    }
+  },
+  {
+    "remove": {
+      "field": "haproxy.http.request_date"
+    }
+  },
+  {
+    "geoip": {
+      "field": "haproxy.client_ip",
+      "target_field": "haproxy.geoip"
+    }
+  },
+  {
+    "split": {
+      "field": "haproxy.http.request.captured_headers",
+      "separator": "\\|",
+      "ignore_failure": true
+    }
+  },
+  {
+    "split": {
+      "field": "haproxy.http.response.captured_headers",
+      "separator": "\\|",
+      "ignore_failure": true
+    }
+  }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

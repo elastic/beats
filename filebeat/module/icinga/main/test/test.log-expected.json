@@ -18,6 +18,9 @@
         "icinga.main.message": "Notification command for object 'demo!load' (PID: 19401, arguments: '/etc/icinga2/scripts/mail-service-notification.sh') terminated with exit code 127, output: /etc/icinga2/scripts/mail-service-notification.sh: 20: /etc/icinga2/scripts/mail-service-notification.sh: mail: not found\n/usr/bin/printf: write error: Broken pipe\n", 
         "icinga.main.severity": "warning", 
         "input.type": "log", 
+        "log.flags": [
+            "multiline"
+        ], 
         "offset": 133, 
         "prospector.type": "log"
     }, 

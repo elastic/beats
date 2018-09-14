@@ -7,4 +7,4 @@
     - name: cmdline
       type: keyword
       description: >
-        The cmdline of this golang program start with.
+        The cmdline of this Go program start with.

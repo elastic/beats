@@ -11,6 +11,12 @@ The Elasticsearch module contains a minimal set of metrics to enable monitoring 
 
 The default metricsets are `node` and `node_stats`.
 
+[float]
+=== Compability
+
+The Elasticsearch module is tested with Elasticsearch 6.3 and is expected to
+work with all 6.x versions.
+
 
 [float]
 === Example configuration

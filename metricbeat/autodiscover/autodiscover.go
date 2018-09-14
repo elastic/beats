@@ -49,8 +49,7 @@ func (m *AutodiscoverAdapter) CreateConfig(e bus.Event) ([]*common.Config, error
 
 // CheckConfig tests given config to check if it will work or not, returns errors in case it won't work
 func (m *AutodiscoverAdapter) CheckConfig(c *common.Config) error {
-	// TODO implement config check for all modules
-	return nil
+	return m.factory.CheckConfig(c)
 }
 
 // Create a module or prospector from the given config

@@ -82,14 +82,44 @@ setup.template.overwrite: false
 setup.template.settings:
   _source.enabled: false
 ----------------------------------------------------------------------
+
 ifeval::["{beatname_lc}"!="apm-server"]
-*`setup.template.append_fields`*:: A list of of fields to be added to the template and Kibana index pattern. experimental[]
+*`setup.template.append_fields`* experimental[]:: A list of fields to be added
+to the template and {kib} index pattern. This setting adds new fields. It does
+not overwrite or change existing fields. 
++
+This setting is useful when your data contains fields that {beatname_uc} doesn't
+know about in advance. 
+ifeval::["{beatname_lc}"=="metricbeat"]
+For example, you might want to append fields to the template when you're using
+a metricset, such as the <<metricbeat-metricset-http-json>>, and the full data
+structure is not known in advance. 
+endif::[]
++
+If `append_fields` is specified along with `overwrite: true`, {beatname_uc}
+overwrites the existing template and applies the new template when creating new
+indices. Existing indices are not affected. If you're running multiple
+instances of {beatname_uc} with different `append_fields` settings, the last one
+writing the template takes precedence.
++
+Any changes to this setting also affect the {kib} index pattern.
++
+Example config:
++
+[source,yaml]
+----
+setup.template.overwrite: true
+setup.template.append_fields:
+- name: test.name
+  type: keyword
+- name: test.hostname
+  type: long
+----
 
-NOTE: With append_fields only new fields can be added an no existing one overwritten or changed. This is especially useful if data is collected through the http/json metricset where the data structure is not known in advance. Changing the config of append_fields means the template has to be overwritten and only applies to new indices. If there are 2 Beats with different append_fields configs the last one writing the template will win. Any changes will also have an affect on the Kibana Index pattern.
-
-*`setup.template.json.enabled`*:: Set to true to load a json based template file. Specify the path to your Elasticsearch
-index template file and set the name of the template. experimental[]
-
+*`setup.template.json.enabled`*:: Set to `true` to load a
+JSON-based template file. Specify the path to your {es} index template file and
+set the name of the template. 
++
 ["source","yaml",subs="attributes"]
 ----------------------------------------------------------------------
 setup.template.json.enabled: true
@@ -97,6 +127,7 @@ setup.template.json.path: "template.json"
 setup.template.json.name: "template-name
 ----------------------------------------------------------------------
 
-NOTE: If the JSON template is used, the fields.yml is skipped for the template generation.
+NOTE: If the JSON template is used, the `fields.yml` is skipped for the template
+generation.
 
 endif::[]

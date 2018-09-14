@@ -73,7 +73,7 @@ of supported processors.
 In order to provide ordering of the processor definition, numbers can be provided. If not, the hints builder will do
 arbitrary ordering:
 
-["source","yaml",subs="attributes"]
+["source","yaml"]
 -------------------------------------------------------------------------------------
 co.elastic.logs/processors.1.dissect.tokenizer: "%{key1} %{key2}"
 co.elastic.logs/processors.dissect.tokenizer: "%{key2} %{key1}"

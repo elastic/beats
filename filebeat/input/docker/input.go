@@ -71,6 +71,10 @@ func NewInput(
 		return nil, errors.Wrap(err, "update input config")
 	}
 
+	if err := cfg.SetBool("docker-json.cri_flags", -1, config.Partial); err != nil {
+		return nil, errors.Wrap(err, "update input config")
+	}
+
 	// Add stream to meta to ensure different state per stream
 	if config.Containers.Stream != "all" {
 		if context.Meta == nil {

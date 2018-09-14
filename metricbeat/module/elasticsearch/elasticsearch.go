@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 )
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id
@@ -222,6 +223,18 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	var stackUsage map[string]interface{}
 	err = json.Unmarshal(content, &stackUsage)
 	return stackUsage, err
+}
+
+// PassThruField copies the field at the given path from the given source data object into
+// the same path in the given target data object
+func PassThruField(fieldPath string, sourceData, targetData common.MapStr) error {
+	fieldValue, err := sourceData.GetValue(fieldPath)
+	if err != nil {
+		return elastic.MakeErrorForMissingField(fieldPath, elastic.Elasticsearch)
+	}
+
+	targetData.Put(fieldPath, fieldValue)
+	return nil
 }
 
 // Global cache for license information. Assumption is that license information changes infrequently

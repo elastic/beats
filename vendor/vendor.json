@@ -379,34 +379,44 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "D/7cJ8oboLL/gQxr57kfvDBtMZE=",
+			"checksumSHA1": "vNnw1bUS8Ct+8H64QuA2DWRJ9SQ=",
 			"path": "github.com/elastic/go-libaudit",
-			"revision": "ec7a7253716958d85ea854cbef4aaffcd6cbd50b",
-			"revisionTime": "2018-08-07T15:01:12Z"
+			"revision": "39073a2988f718067d85d27a4d18b1b57de5d947",
+			"revisionTime": "2018-08-29T20:25:13Z",
+			"version": "v0.4.0",
+			"versionExact": "v0.4.0"
 		},
 		{
-			"checksumSHA1": "QTR02jPgqq2P6mZKMWUdAUQPVbQ=",
+			"checksumSHA1": "NRGAFJY7u1wYeXtNzLlI5/MnBMQ=",
 			"path": "github.com/elastic/go-libaudit/aucoalesce",
-			"revision": "ec7a7253716958d85ea854cbef4aaffcd6cbd50b",
-			"revisionTime": "2018-08-07T15:01:12Z"
+			"revision": "39073a2988f718067d85d27a4d18b1b57de5d947",
+			"revisionTime": "2018-08-29T20:25:13Z",
+			"version": "v0.4.0",
+			"versionExact": "v0.4.0"
 		},
 		{
 			"checksumSHA1": "6OK3lLgocjmIUyLo8xNhYGpwE1E=",
 			"path": "github.com/elastic/go-libaudit/auparse",
-			"revision": "ec7a7253716958d85ea854cbef4aaffcd6cbd50b",
-			"revisionTime": "2018-08-07T15:01:12Z"
+			"revision": "39073a2988f718067d85d27a4d18b1b57de5d947",
+			"revisionTime": "2018-08-29T20:25:13Z",
+			"version": "v0.4.0",
+			"versionExact": "v0.4.0"
 		},
 		{
 			"checksumSHA1": "zGv2vPwSLoFCRt1kcD81pBzTo+0=",
 			"path": "github.com/elastic/go-libaudit/rule",
-			"revision": "ec7a7253716958d85ea854cbef4aaffcd6cbd50b",
-			"revisionTime": "2018-08-07T15:01:12Z"
+			"revision": "39073a2988f718067d85d27a4d18b1b57de5d947",
+			"revisionTime": "2018-08-29T20:25:13Z",
+			"version": "v0.4.0",
+			"versionExact": "v0.4.0"
 		},
 		{
 			"checksumSHA1": "5C083BvwcAVSKquRXbxXa950/wE=",
 			"path": "github.com/elastic/go-libaudit/rule/flags",
-			"revision": "ec7a7253716958d85ea854cbef4aaffcd6cbd50b",
-			"revisionTime": "2018-08-07T15:01:12Z"
+			"revision": "39073a2988f718067d85d27a4d18b1b57de5d947",
+			"revisionTime": "2018-08-29T20:25:13Z",
+			"version": "v0.4.0",
+			"versionExact": "v0.4.0"
 		},
 		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",
@@ -1115,10 +1125,40 @@
 			"revisionTime": "2014-10-17T20:07:13Z"
 		},
 		{
+			"checksumSHA1": "5qaMTb8eLAwaTeCqSHYMVyb4BSM=",
+			"path": "github.com/insomniacslk/dhcp/dhcpv4",
+			"revision": "633285ba52b2a67b98a3026eb87ee1a76ab60f3c",
+			"revisionTime": "2018-07-16T14:52:14Z"
+		},
+		{
+			"checksumSHA1": "AyBWbH2Ra2aFOO6tSk4aQaVqfBQ=",
+			"path": "github.com/insomniacslk/dhcp/iana",
+			"revision": "633285ba52b2a67b98a3026eb87ee1a76ab60f3c",
+			"revisionTime": "2018-07-16T14:52:14Z"
+		},
+		{
 			"checksumSHA1": "l9wW52CYGbmO/NGwYZ/Op2QTmaA=",
 			"path": "github.com/joeshaw/multierror",
 			"revision": "69b34d4ec901851247ae7e77d33909caf9df99ed",
 			"revisionTime": "2014-01-24T17:37:10Z"
+		},
+		{
+			"checksumSHA1": "tUaGicGy0FLinVWKYFM5ejGzMcY=",
+			"path": "github.com/jstemmer/go-junit-report",
+			"revision": "385fac0ced9acaae6dc5b39144194008ded00697",
+			"revisionTime": "2018-06-14T14:38:34Z"
+		},
+		{
+			"checksumSHA1": "IH4jnWcj4d4h+hgsHsHOWg/F+rk=",
+			"path": "github.com/jstemmer/go-junit-report/formatter",
+			"revision": "385fac0ced9acaae6dc5b39144194008ded00697",
+			"revisionTime": "2018-06-14T14:38:34Z"
+		},
+		{
+			"checksumSHA1": "Tx9cQqKFUHzu1l6H2XEl8G7ivlI=",
+			"path": "github.com/jstemmer/go-junit-report/parser",
+			"revision": "385fac0ced9acaae6dc5b39144194008ded00697",
+			"revisionTime": "2018-06-14T14:38:34Z"
 		},
 		{
 			"checksumSHA1": "+CqJGh7NIDMnHgScq9sl9tPrnVM=",

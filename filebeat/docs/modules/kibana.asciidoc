@@ -23,15 +23,17 @@ include::../include/running-modules.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
 
-//set the fileset name used in the included example
+//set the fileset name used in the included file
 :fileset_ex: log
 
 include::../include/config-option-intro.asciidoc[]
 
 [float]
-==== `{fileset}` log fileset settings
+==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:fileset_ex!:
 
 
 [float]
