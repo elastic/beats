@@ -152,10 +152,11 @@ addons:
   apt:
     update: true
     packages:
-      - python-virtualenv
       - libpcap-dev
-      - xsltproc
+      - libsystemd-journal-dev
       - libxml2-utils
+      - python-virtualenv
+      - xsltproc
 
 before_install:
   - python --version
