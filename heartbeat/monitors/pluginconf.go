@@ -15,28 +15,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Config is put into a different package to prevent cyclic imports in case
-// it is needed in several locations
-
-package config
+package monitors
 
 import (
+	"fmt"
+
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// Config defines the structure of heartbeat.yml.
-type Config struct {
-	// Modules is a list of module specific configuration data.
-	Monitors       []*common.Config `config:"monitors"`
-	ConfigMonitors *common.Config   `config:"config.monitors"`
-	Scheduler      Scheduler        `config:"scheduler"`
+type PluginDisabledError struct{}
+
+func (e PluginDisabledError) Error() string {
+	return fmt.Sprintf("Monitor not loaded, plugin is disabled")
 }
 
-// Scheduler defines the syntax of a heartbeat.yml scheduler block.
-type Scheduler struct {
-	Limit    uint   `config:"limit"  validate:"min=0"`
-	Location string `config:"location"`
+type MonitorPluginInfo struct {
+	Type    string `config:"type" validate:"required"`
+	Enabled bool   `config:"enabled"`
 }
 
-// DefaultConfig is the canonical instantiation of Config.
-var DefaultConfig = Config{}
+func pluginInfo(config *common.Config) (MonitorPluginInfo, error) {
+	mpi := MonitorPluginInfo{Enabled: true}
+
+	if err := config.Unpack(&mpi); err != nil {
+		return mpi, errors.Wrap(err, "error unpacking monitor plugin config")
+	}
+
+	if !mpi.Enabled {
+		return mpi, PluginDisabledError{}
+	}
+
+	return mpi, nil
+}
