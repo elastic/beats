@@ -72,6 +72,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		stopped  int
 		zombie   int
 		unknown  int
+		dead     int
 	}
 
 	for _, pid := range pids {
@@ -95,8 +96,10 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 			summary.stopped++
 		case 'Z':
 			summary.zombie++
+		case 'X':
+			summary.dead++
 		default:
-			logp.Err("Unknown state <%v> for process with pid %d", state.State, pid)
+			logp.Err("Unknown or unexpected state <%c> for process with pid %d", state.State, pid)
 			summary.unknown++
 		}
 	}
@@ -109,6 +112,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		"stopped":  summary.stopped,
 		"zombie":   summary.zombie,
 		"unknown":  summary.unknown,
+		"dead":     summary.dead,
 	}
 	// change the name space to use . instead of _
 	event[mb.NamespaceKey] = "process.summary"
