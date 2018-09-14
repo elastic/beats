@@ -47,25 +47,25 @@ type ConfigManager interface {
 	CheckRawConfig(cfg *common.Config) error
 }
 
-// Factory for creating a config manager
-type Factory func(*reload.Registry, uuid.UUID) (ConfigManager, error)
+// FactoryFunc for creating a config manager
+type FactoryFunc func(*reload.Registry, uuid.UUID) (ConfigManager, error)
 
 // Register a config manager
-func Register(name string, fn Factory, stability feature.Stability) {
+func Register(name string, fn FactoryFunc, stability feature.Stability) {
 	f := feature.New(Namespace, name, fn, feature.NewDetails(name, "", stability))
 	feature.MustRegister(f)
 }
 
-// GetFactory retrieves config manager constructor. If no one is registered
+// Factory retrieves config manager constructor. If no one is registered
 // it will create a nil manager
-func GetFactory() Factory {
+func Factory() FactoryFunc {
 	factories, err := feature.Registry.LookupAll(Namespace)
 	if err != nil {
 		return nilFactory
 	}
 
 	for _, f := range factories {
-		if factory, ok := f.Factory().(Factory); ok {
+		if factory, ok := f.Factory().(FactoryFunc); ok {
 			return factory
 		}
 	}
