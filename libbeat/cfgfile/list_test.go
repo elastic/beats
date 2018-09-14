@@ -34,6 +34,10 @@ type runner struct {
 	stopped bool
 }
 
+func (r *runner) String() string {
+	return "test runner"
+}
+
 func (r *runner) Start() { r.started = true }
 func (r *runner) Stop()  { r.stopped = true }
 
