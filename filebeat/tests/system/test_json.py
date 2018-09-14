@@ -41,7 +41,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            json=dict(message_key="log", keys_under_root=True),
+            json=dict(message_key="log", keys_under_root=False),
             exclude_lines=["windows"]
         )
 
@@ -59,10 +59,10 @@ class Test(BaseTest):
         output = self.read_output()
         assert len(output) == 19
 
-        assert all("log" in o for o in output)
-        assert all("time" in o for o in output)
-        assert all(o["stream"] == "stdout" for o in output)
-        assert all("windows" not in o["log"] for o in output)
+        assert all("json.log" in o for o in output)
+        assert all("json.time" in o for o in output)
+        assert all(o["json.stream"] == "stdout" for o in output)
+        assert all("windows" not in o["json.log"] for o in output)
 
     def test_simple_json_overwrite(self):
         """
@@ -89,7 +89,7 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
 
         output = self.read_output()[0]
-        assert output["source"] == "hello"
+        assert output["log.source"] == "hello"
         assert output["message"] == "test source"
 
     def test_json_add_tags(self):
