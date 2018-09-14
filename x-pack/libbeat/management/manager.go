@@ -100,8 +100,11 @@ func (cm *ConfigManager) Stop() {
 	cm.wg.Wait()
 }
 
-// CheckRawConfig check settings are correct to start the beat
+// CheckRawConfig check settings are correct to start the beat. This method
+// checks there are no collision between the existing configuration and what
+// central management can configure.
 func (cm *ConfigManager) CheckRawConfig(cfg *common.Config) error {
+	// TODO implement this method
 	return nil
 }
 
