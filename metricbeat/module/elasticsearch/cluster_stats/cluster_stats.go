@@ -56,7 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+clusterStatsPath)
 	if err != nil {
-		msg := errors.Wrap(err, "error determining if connected Elasticsearch node is master.")
+		msg := errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 		r.Error(msg)
 		m.Log.Error(msg)
 		return
@@ -64,7 +64,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	// Not master, no event sent
 	if !isMaster {
-		m.Log.Debug("trying to fetch cluster stats from a non master node.")
+		m.Log.Debug("trying to fetch cluster stats from a non master node")
 		return
 	}
 
