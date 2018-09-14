@@ -8,40 +8,16 @@
     - name: kubernetes
       type: group
       fields:
-        - name: pod.name
-          type: keyword
-          description: >
-            Kubernetes pod name
 
         - name: pod.uid
           type: keyword
           description: >
             Kubernetes Pod UID
 
-        - name: namespace
-          type: keyword
-          description: >
-            Kubernetes namespace
-
         - name: node.name
           type: keyword
           description: >
             Kubernetes node name
-
-        - name: labels
-          type: object
-          description: >
-            Kubernetes labels map
-
-        - name: annotations
-          type: object
-          description: >
-            Kubernetes annotations map
-
-        - name: container.name
-          type: keyword
-          description: >
-            Kubernetes container name
 
         - name: container.image
           type: keyword
