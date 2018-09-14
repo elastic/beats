@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.4.0...6.4[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.4.1...6.4[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -29,58 +29,21 @@ https://github.com/elastic/beats/compare/v6.4.0...6.4[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fixed `add_host_metadata` not initializing correctly on Windows. {issue}7715[7715]
-- Add backoff on error support to redis output. {pull}7781[7781]
-- Fixed `-d` CLI flag by trimming spaces from selectors. {pull}7864[7864]
-- Fixed missing file unlock in spool file on Windows, so file can be reopened and locked. {pull}7859[7859]
-- Fix spool file opening/creation failing due to file locking on Windows. {pull}7859[7859]
-- Fix size of maximum mmaped read area in spool file on Windows. {pull}7859[7859]
-- Fix potential data loss on OS X in spool file by using fcntl with F_FULLFSYNC. {pull}7859[7859]
-- Improve fsync on linux, by assuming the kernel resets error flags of failed writes. {pull}7859[7859]
-- Remove unix-like permission checks on Windows, so files can be opened. {issue}7849[7849]
-- Deregister pipeline loader callback when inputsRunner is stopped. {pull}7893[7893]
-- Replace index patterns in TSVB visualizations. {pull}7929[7929]
-- Add backoff support to x-pack monitoring outputs. {issue}7966[7966]
-- Removed execute permissions systemd unit file. {pull}7873[7873]
-- Fix a race condition with the `add_host_metadata` and the event serialization. {pull}8223[8223]
-- Enforce that data used by k8s or docker doesn't use any reference. {pull}8240[8240]
-
 *Auditbeat*
 
-- Fixed a crash in the file_integrity module under Linux. {issue}7753[7753]
-- Fixed the RPM by designating the config file as configuration data in the RPM spec. {issue}8075[8075]
-- Fixed a concurrent map write panic in the auditd module. {pull}8158[8158]
-
 *Filebeat*
-
-- Fixed a memory leak when harvesters are closed. {pull}7820[7820]
-- Fixed a docker input error due to the offset update bug in partial log join.{pull}8177[8177]
-- Update CRI format to support partial/full tags. {pull}8265[8265]
 
 *Heartbeat*
 
 *Metricbeat*
 
-- Fix golang.heap.gc.cpu_fraction type from long to float in Golang module. {pull}7789[7789]
-- Fixed the RPM by designating the modules.d config files as configuration data in the RPM spec. {issue}8075[8075]
-- Fixed the location of the modules.d dir in Deb and RPM packages. {issue}8104[8104]
-
 *Packetbeat*
-
-- Fixed a seccomp related error where the `fcntl64` syscall was not permitted
-  on 32-bit Linux and the sniffer failed to start. {issue}7839[7839]
-- Added missing `cmdline` and `client_cmdline` fields to index template. {pull}8258[8258]
 
 *Winlogbeat*
 
 ==== Added
 
 *Affecting all Beats*
-
-- Allow for cloud-id to specify a custom port. This makes cloud-id work in ECE contexts. {pull}7887[7887]
-- Add support to grow or shrink an existing spool file between restarts. {pull}7859[7859]
-- Make kubernetes autodiscover ignore events with empty container IDs {pull}7971[7971]
-- Implement CheckConfig in RunnerFactory to make autodiscover check configs {pull}7961[7961]
 
 *Auditbeat*
 
@@ -112,6 +75,41 @@ https://github.com/elastic/beats/compare/v6.4.0...6.4[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.4.1]]
+=== Beats version 6.4.1
+https://github.com/elastic/beats/compare/v6.4.0...v6.4.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Add backoff support to x-pack monitoring outputs. {issue}7966[7966]
+- Removed execute permissions systemd unit file. {pull}7873[7873]
+- Fix a race condition with the `add_host_metadata` and the event serialization. {pull}8223[8223]
+- Enforce that data used by k8s or docker doesn't use any reference. {pull}8240[8240]
+- Implement CheckConfig in RunnerFactory to make autodiscover check configs {pull}7961[7961]
+- Make kubernetes autodiscover ignore events with empty container IDs {pull}7971[7971]
+
+*Auditbeat*
+
+- Fixed a concurrent map write panic in the auditd module. {pull}8158[8158]
+- Fixed the RPM by designating the config file as configuration data in the RPM spec. {issue}8075[8075]
+
+*Filebeat*
+
+- Fixed a docker input error due to the offset update bug in partial log join.{pull}8177[8177]
+- Update CRI format to support partial/full tags. {pull}8265[8265]
+
+*Metricbeat*
+
+- Fixed the location of the modules.d dir in Deb and RPM packages. {issue}8104[8104]
+- Fixed the RPM by designating the modules.d config files as configuration data in the RPM spec. {issue}8075[8075]
+- Fix golang.heap.gc.cpu_fraction type from long to float in Golang module. {pull}7789[7789]
+
+*Packetbeat*
+
+- Added missing `cmdline` and `client_cmdline` fields to index template. {pull}8258[8258]
 
 [[release-notes-6.4.0]]
 === Beats version 6.4.0
