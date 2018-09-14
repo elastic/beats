@@ -69,11 +69,10 @@ func NewMetricSet(base mb.BaseMetricSet, subPath string) (*MetricSet, error) {
 		cfgwarn.Experimental("The experimental xpack.enabled flag in elasticsearch/node_stats metricset is enabled.")
 	}
 
-	log := logp.NewLogger(ModuleName)
 	return &MetricSet{
 		base,
 		http,
 		config.XPack,
-		log,
+		logp.NewLogger(ModuleName),
 	}, nil
 }
