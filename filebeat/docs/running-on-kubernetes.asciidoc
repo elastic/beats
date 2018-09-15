@@ -70,8 +70,7 @@ the manifest file and enable the container to run as privileged.
 -----
   securityContext:
     runAsUser: 0
-    privileged:
-        true
+    privileged: true
 -----
 
 . Grant the `filebeat` service account access to the privileged SCC:
@@ -83,6 +82,19 @@ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:fileb
 +
 This command enables the container to be privileged as an administrator for
 OpenShift.
+
+. Override the default node selector for the `kube-system` namespace (or your
+custom namespace) to allow for scheduling on any node:
++
+[source,shell]
+----
+oc patch namespace kube-system -p \
+'{"metadata": {"annotations": {"openshift.io/node-selector": ""}}}'
+----
++
+This command sets the node selector for the project to an empty string. If you
+don't run this command, the default node selector will skip master nodes.  
+
 
 [float]
 ==== Deploy

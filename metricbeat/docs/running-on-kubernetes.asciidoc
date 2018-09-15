@@ -70,18 +70,25 @@ in the manifest file:
 If you are using Red Hat OpenShift, you need to specify additional settings in
 the manifest file and enable the container to run as privileged.
 
-// REVIEWERS: I wanted to make it clearer as to where this info needs to go. Is
-// this correct? 
-
-. In the manifest file, modify the `metricbeat-daemonset-modules` ConfigMap, and
+. In the manifest file, edit the `metricbeat-daemonset-modules` ConfigMap, and
 specify the following settings under `kubernetes.yml` in the `data` section:
 +
 [source,yaml]
 -----
-hosts: ["https://${HOSTNAME}:10250"]
-bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-ssl.certificate_authorities:
-  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+  kubernetes.yml: |-
+    - module: kubernetes
+      metricsets:
+        - node
+        - system
+        - pod
+        - container
+        - volume
+      period: 10s
+      host: ${NODE_NAME}
+      hosts: ["https://${HOSTNAME}:10250"]
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      ssl.certificate_authorities:
+        - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 -----
 
 . Under the `metricbeat` ClusterRole, add the following resources:
@@ -102,15 +109,25 @@ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:metri
 This command enables the container to be privileged as an administrator for
 OpenShift.
 
+. Override the default node selector for the `kube-system` namespace (or your
+custom namespace) to allow for scheduling on any node:
++
+[source,shell]
+----
+oc patch namespace kube-system -p \
+'{"metadata": {"annotations": {"openshift.io/node-selector": ""}}}'
+----
++
+This command sets the node selector for the project to an empty string. If you
+don't run this command, the default node selector will skip master nodes.  
 
 [float]
 ==== Deploy
 
 Metricbeat gets some metrics from https://github.com/kubernetes/kube-state-metrics#usage[kube-state-metrics].
-If `kube-state-metrics` is not already running, deploy it now.
-
-// REVIEWERS: Should we show the command for deploying kube-state-metrics? Looks
-// like it's kubectl apply -f kubernetes. Is that correct?
+If `kube-state-metrics` is not already running, deploy it now (see the
+https://github.com/kubernetes/kube-state-metrics#kubernetes-deployment[Kubernetes
+deployment] docs).
 
 To deploy {beatname_uc} to Kubernetes, run:
 
