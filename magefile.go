@@ -46,15 +46,16 @@ func PackageBeatDashboards() error {
 	}
 
 	spec := mage.PackageSpec{
-		Name:     "beats-dashboards",
-		Version:  version,
-		Snapshot: mage.Snapshot,
+		Name:             "beats-dashboards",
+		Version:          version,
+		Snapshot:         mage.Snapshot,
+		VersionQualifier: mage.VersionQualifier,
 		Files: map[string]mage.PackageFile{
 			".build_hash.txt": mage.PackageFile{
 				Content: "{{ commit }}\n",
 			},
 		},
-		OutputFile: "build/distributions/dashboards/{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}",
+		OutputFile: "build/distributions/dashboards/{{.Name}}-{{.Version}}{{if .VersionQualifier}}-{{.VersionQualifier}}{{end}}{{if .Snapshot}}-SNAPSHOT{{end}}",
 	}
 
 	for _, beat := range Beats {
@@ -68,5 +69,5 @@ func PackageBeatDashboards() error {
 
 // DumpVariables writes the template variables and values to stdout.
 func DumpVariables() error {
-    return mage.DumpVariables()
+	return mage.DumpVariables()
 }
