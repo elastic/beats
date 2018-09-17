@@ -16,11 +16,16 @@ journalbeat.inputs:
   # Paths that should be crawled and fetched. Glob based paths.
   # When empty starts to read from local journal.
 - paths: []
+
+  # The number of seconds to wait before trying to read again from journals.
+  #backoff: 1s
+  # Multiplier of backoff value.
+  #backoff_factor: 2
+  # The maximum number of seconds to wait before attempting to read again from journals.
+  #max_backoff: 60s
+
   # Position to start reading from journal. Possible values: head, tail, cursor
   seek: head
-  #backoff:
-  #backoff_factor:
-  #max_backoff:
 
 #========================= Journalbeat global options ============================
 #journalbeat:

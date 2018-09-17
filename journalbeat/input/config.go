@@ -42,7 +42,7 @@ var (
 	DefaultConfig = Config{
 		Backoff:       1 * time.Second,
 		BackoffFactor: 2,
-		MaxBackoff:    6 * time.Second,
+		MaxBackoff:    60 * time.Second,
 		Seek:          "tail",
 	}
 )
