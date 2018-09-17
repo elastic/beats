@@ -34,6 +34,7 @@ import (
 
 	"bytes"
 
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/ccr"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/cluster_stats"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_recovery"
@@ -45,6 +46,7 @@ import (
 )
 
 var metricSets = []string{
+	"ccr",
 	"cluster_stats",
 	"index",
 	"index_recovery",
