@@ -28,13 +28,12 @@ import (
 
 // Config stores the configuration of Journalbeat
 type Config struct {
-	Inputs        []*common.Config  `config:"inputs"`
-	RegistryFile  string            `config:"registry"`
-	Backoff       time.Duration     `config:"backoff" validate:"min=0,nonzero"`
-	BackoffFactor int               `config:"backoff_factor" validate:"min=1"`
-	MaxBackoff    time.Duration     `config:"max_backoff" validate:"min=0,nonzero"`
-	Matches       map[string]string `config:"matches"`
-	Seek          string            `config:"seek"`
+	Inputs        []*common.Config `config:"inputs"`
+	RegistryFile  string           `config:"registry"`
+	Backoff       time.Duration    `config:"backoff" validate:"min=0,nonzero"`
+	BackoffFactor int              `config:"backoff_factor" validate:"min=1"`
+	MaxBackoff    time.Duration    `config:"max_backoff" validate:"min=0,nonzero"`
+	Seek          string           `config:"seek"`
 }
 
 // DefaultConfig are the defaults of a Journalbeat instance

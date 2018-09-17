@@ -33,8 +33,6 @@ type Config struct {
 	BackoffFactor int `config:"backoff_factor" validate:"min=1"`
 	// BackoffFactor is the multiplier of Backoff.
 	MaxBackoff time.Duration `config:"max_backoff" validate:"min=0,nonzero"`
-	// Matches store the key value pairs to match entries.
-	Matches map[string]string `config:"matches"`
 	// Seek is the method to read from journals.
 	Seek string `config:"seek"`
 }
