@@ -82,6 +82,12 @@ https://github.com/elastic/beats/compare/v5.6.10...5.6[Check the HEAD diff]
 
 ////////////////////////////////////////////////////////////
 
+[[release-notes-5.6.12]]
+=== Beats version 5.6.12
+https://github.com/elastic/beats/compare/v5.6.11...v5.6.12[View commits]
+
+No changes in this version.
+
 [[release-notes-5.6.11]]
 === Beats version 5.6.11
 https://github.com/elastic/beats/compare/v5.6.10...v5.6.11[View commits]
