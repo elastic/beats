@@ -78,8 +78,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 			event := mb.Event{}
 			event.MetricSetFields, err = schema.Apply(shard)
 			if err != nil {
-				r.Error(err)
 				errors = append(errors, err)
+				continue
 			}
 
 			event.RootFields = common.MapStr{}
