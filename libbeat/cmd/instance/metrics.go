@@ -28,11 +28,15 @@ import (
 	"github.com/elastic/beats/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/libbeat/metric/system/process"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 )
 
 var (
-	beatProcessStats *process.Stats
-	systemMetrics    *monitoring.Registry
+	beatProcessStats   *process.Stats
+	beatProcessSysInfo types.Process
+	handleCounter      types.OpenHandleCounter
+	systemMetrics      *monitoring.Registry
 )
 
 func init() {
@@ -55,13 +59,29 @@ func setupMetrics(name string) error {
 		IncludeTop:   process.IncludeTopConfig{},
 	}
 	err := beatProcessStats.Init()
+	if err != nil {
+		return err
+	}
 
-	return err
+	beatProcessSysInfo, err = sysinfo.Self()
+	if err != nil {
+		return err
+	}
+
+	var ok bool
+	handleCounter, ok = beatProcessSysInfo.(types.OpenHandleCounter)
+	if !ok {
+		return fmt.Errorf("cannot convert process to OpenHandleCounter: %v", beatProcessSysInfo)
+	}
+
+	return nil
 }
 
 func setupPlatformSpecificMetrics() {
 	if runtime.GOOS != "windows" {
 		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
+	} else {
+		monitoring.NewFunc(beatMetrics, "file_handles", reportOpenHandles, monitoring.Report)
 	}
 
 	if runtime.GOOS == "linux" {
@@ -268,6 +288,19 @@ func getFDUsage() (open, hardLimit, softLimit uint64, err error) {
 	}
 
 	return open, hardLimit, softLimit, nil
+}
+
+func reportOpenHandles(_ monitoring.Mode, V monitoring.Visitor) {
+	V.OnRegistryStart()
+	defer V.OnRegistryFinished()
+
+	n, err := handleCounter.OpenHandleCount()
+	if err != nil {
+		logp.Err("Error while retrieving the number of open file handles: %v", err)
+		return
+	}
+
+	monitoring.ReportInt(V, "open", int64(n))
 }
 
 func reportSystemLoadAverage(_ monitoring.Mode, V monitoring.Visitor) {
