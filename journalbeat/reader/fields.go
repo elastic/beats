@@ -21,6 +21,7 @@ import "github.com/coreos/go-systemd/sdjournal"
 
 var (
 	journaldEventFields = map[string]string{
+		// provided by systemd journal
 		"COREDUMP_UNIT":                              "coredump.unit",
 		"COREDUMP_USER_UNIT":                         "coredump.user_unit",
 		"OBJECT_AUDIT_LOGINUID":                      "object.audit.login_uid",
@@ -66,5 +67,12 @@ var (
 		sdjournal.SD_JOURNAL_FIELD_TRANSPORT:         "systemd.transport",
 		sdjournal.SD_JOURNAL_FIELD_UID:               "process.uid",
 		sdjournal.SD_JOURNAL_FIELD_MESSAGE:           "message",
+
+		// docker journald fields from: https://docs.docker.com/config/containers/logging/journald/
+		"CONTAINER_ID":              "conatiner.id_truncated",
+		"CONTAINER_ID_FULL":         "container.id",
+		"CONTAINER_NAME":            "container.name",
+		"CONTAINER_TAG":             "container.image.tag",
+		"CONTAINER_PARTIAL_MESSAGE": "container.partial",
 	}
 )
