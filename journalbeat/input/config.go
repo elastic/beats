@@ -35,6 +35,8 @@ type Config struct {
 	MaxBackoff time.Duration `config:"max_backoff" validate:"min=0,nonzero"`
 	// Seek is the method to read from journals.
 	Seek string `config:"seek"`
+	// Matches store the key value pairs to match entries.
+	Matches []string `config:"matches"`
 }
 
 var (

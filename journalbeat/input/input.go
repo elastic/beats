@@ -64,6 +64,7 @@ func New(
 			MaxBackoff:    config.MaxBackoff,
 			BackoffFactor: config.BackoffFactor,
 			Seek:          config.Seek,
+			Matches:       config.Matches,
 		}
 
 		state := states[reader.LocalSystemJournalID]
@@ -81,6 +82,7 @@ func New(
 			MaxBackoff:    config.MaxBackoff,
 			BackoffFactor: config.BackoffFactor,
 			Seek:          config.Seek,
+			Matches:       config.Matches,
 		}
 		state := states[p]
 		r, err := reader.New(cfg, done, state, logger)

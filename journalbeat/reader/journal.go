@@ -18,8 +18,10 @@
 package reader
 
 import (
+	"fmt"
 	"io"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/coreos/go-systemd/sdjournal"
@@ -50,6 +52,8 @@ type Config struct {
 	Backoff time.Duration
 	// BackoffFactor is the multiplier of Backoff.
 	BackoffFactor int
+	// Matches store the key value pairs to match entries.
+	Matches []string
 }
 
 // Reader reads entries from journal(s).
@@ -83,6 +87,11 @@ func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *lo
 		}
 	}
 
+	err = setupMatches(j, c.Matches)
+	if err != nil {
+		return nil, err
+	}
+
 	r := &Reader{
 		journal: j,
 		changes: make(chan int),
@@ -108,6 +117,11 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 	logger = logger.With("path", "local")
 	logger.Debug("New local journal is opened for reading")
 
+	err = setupMatches(j, c.Matches)
+	if err != nil {
+		return nil, err
+	}
+
 	r := &Reader{
 		journal: j,
 		changes: make(chan int),
@@ -117,6 +131,39 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 	}
 	r.seek(state.Cursor)
 	return r, nil
+}
+
+func setupMatches(j *sdjournal.Journal, matches []string) error {
+	for _, m := range matches {
+		elems := strings.Split(m, "=")
+		if len(elems) != 2 {
+			return fmt.Errorf("invalid match format: %s", m)
+		}
+
+		var p string
+		for journalKey, eventKey := range journaldEventFields {
+			if elems[0] == eventKey {
+				p = journalKey + "=" + elems[1]
+			}
+		}
+
+		if p == "" {
+			return fmt.Errorf("cannot create matcher: invalid event key: %s", elems[0])
+		}
+
+		logp.Debug("journal", "Added matcher expression: %s", p)
+
+		err := j.AddMatch(p)
+		if err != nil {
+			return fmt.Errorf("error adding match to journal %v", err)
+		}
+
+		err = j.AddDisjunction()
+		if err != nil {
+			return fmt.Errorf("error adding disjunction to journal: %v", err)
+		}
+	}
+	return nil
 }
 
 // seek seeks to the position determined by the coniguration and cursor state.
