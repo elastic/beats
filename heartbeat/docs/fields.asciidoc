@@ -440,7 +440,7 @@ List of keywords used to tag each event.
 --
 type: object
 
-example: {key1: value1, key2: value2}
+example: {'key2': 'value2', 'key1': 'value1'}
 
 Key/value pairs.
 Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
