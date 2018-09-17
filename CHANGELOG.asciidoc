@@ -117,6 +117,9 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 *Winlogbeat*
 
+*Heartbeat*
+
+- Add automatic config file reloading. {pull}8023[8023]
 
 ==== Deprecated
 
@@ -125,6 +128,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 *Filebeat*
 
 *Heartbeat*
+- watch.poll_file is now deprecated and superceded by automatic config file reloading.
 
 *Metricbeat*
 - Redis `info` `replication.master_offset` has been deprecated in favor of `replication.master.offset`.{pull}7695[7695]

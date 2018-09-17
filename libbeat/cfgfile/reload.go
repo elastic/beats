@@ -18,6 +18,7 @@
 package cfgfile
 
 import (
+	"fmt"
 	"path/filepath"
 	"sync"
 	"time"
@@ -68,6 +69,13 @@ type RunnerFactory interface {
 }
 
 type Runner interface {
+	// We include fmt.Stringer here because we do log debug messages that must print
+	// something for the given Runner. We need Runner implementers to consciously implement a
+	// String() method because the default behavior of `%s` is to print everything recursively
+	// in a struct, which could cause a race that would cause the race detector to fail.
+	// This is something that could be anticipated for the Runner interface specifically, because
+	// most runners will use a goroutine that modifies internal state.
+	fmt.Stringer
 	Start()
 	Stop()
 }

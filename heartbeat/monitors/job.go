@@ -15,28 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Config is put into a different package to prevent cyclic imports in case
-// it is needed in several locations
-
-package config
+package monitors
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/beat"
 )
 
-// Config defines the structure of heartbeat.yml.
-type Config struct {
-	// Modules is a list of module specific configuration data.
-	Monitors       []*common.Config `config:"monitors"`
-	ConfigMonitors *common.Config   `config:"config.monitors"`
-	Scheduler      Scheduler        `config:"scheduler"`
+// Job represents the work done by a single check by a given Monitor.
+type Job interface {
+	Name() string
+	Run() (beat.Event, []jobRunner, error)
 }
 
-// Scheduler defines the syntax of a heartbeat.yml scheduler block.
-type Scheduler struct {
-	Limit    uint   `config:"limit"  validate:"min=0"`
-	Location string `config:"location"`
-}
-
-// DefaultConfig is the canonical instantiation of Config.
-var DefaultConfig = Config{}
+type jobRunner func() (beat.Event, []jobRunner, error)

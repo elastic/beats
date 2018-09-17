@@ -35,7 +35,7 @@ func init() {
 var debugf = logp.MakeDebug("icmp")
 
 func create(
-	info monitors.Info,
+	name string,
 	cfg *common.Config,
 ) ([]monitors.Job, error) {
 	config := DefaultConfig

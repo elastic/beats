@@ -15,28 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Config is put into a different package to prevent cyclic imports in case
-// it is needed in several locations
+package watcher
 
-package config
+import "time"
 
-import (
-	"github.com/elastic/beats/libbeat/common"
-)
+var defaultFilePollInterval = 5 * time.Second
 
-// Config defines the structure of heartbeat.yml.
-type Config struct {
-	// Modules is a list of module specific configuration data.
-	Monitors       []*common.Config `config:"monitors"`
-	ConfigMonitors *common.Config   `config:"config.monitors"`
-	Scheduler      Scheduler        `config:"scheduler"`
+type watchConfig struct {
+	Path string        `config:"watch.poll_file.path"`
+	Poll time.Duration `config:"watch.poll_file.interval" validate:"min=1"`
 }
 
-// Scheduler defines the syntax of a heartbeat.yml scheduler block.
-type Scheduler struct {
-	Limit    uint   `config:"limit"  validate:"min=0"`
-	Location string `config:"location"`
+// DefaultWatchConfig is used to initialize watch config data.
+var DefaultWatchConfig = watchConfig{
+	Poll: defaultFilePollInterval,
 }
-
-// DefaultConfig is the canonical instantiation of Config.
-var DefaultConfig = Config{}
