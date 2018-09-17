@@ -30,7 +30,7 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
-        "offset": 257, 
+        "log.offset": 257, 
         "prospector.type": "log"
     }, 
     {
@@ -61,7 +61,7 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
-        "offset": 709, 
+        "log.offset": 709, 
         "prospector.type": "log"
     }, 
     {
@@ -102,7 +102,7 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
-        "offset": 1204, 
+        "log.offset": 1204, 
         "prospector.type": "log"
     }
 ]

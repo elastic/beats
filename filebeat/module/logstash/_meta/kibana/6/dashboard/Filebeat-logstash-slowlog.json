@@ -377,7 +377,7 @@
                     "logstash.log.level", 
                     "logstash.log.module", 
                     "logstash.log.message", 
-                    "source"
+                    "log.source"
                 ], 
                 "description": "", 
                 "hits": 0, 

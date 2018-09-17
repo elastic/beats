@@ -9,7 +9,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "starting", 
         "message": "[2017-08-04 10:48:20,377] INFO starting (kafka.server.KafkaServer)", 
-        "offset": 0, 
+        "log.offset": 0, 
         "prospector.type": "log"
     }, 
     {
@@ -22,7 +22,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Connecting to zookeeper on localhost:2181", 
         "message": "[2017-08-04 10:48:20,379] INFO Connecting to zookeeper on localhost:2181 (kafka.server.KafkaServer)", 
-        "offset": 67, 
+        "log.offset": 67, 
         "prospector.type": "log"
     }, 
     {
@@ -35,7 +35,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Client environment:java.io.tmpdir=/tmp", 
         "message": "[2017-08-04 10:48:20,400] INFO Client environment:java.io.tmpdir=/tmp (org.apache.zookeeper.ZooKeeper)", 
-        "offset": 167, 
+        "log.offset": 167, 
         "prospector.type": "log"
     }, 
     {
@@ -48,7 +48,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Client environment:java.compiler=<NA>", 
         "message": "[2017-08-04 10:48:20,400] INFO Client environment:java.compiler=<NA> (org.apache.zookeeper.ZooKeeper)", 
-        "offset": 270, 
+        "log.offset": 270, 
         "prospector.type": "log"
     }, 
     {
@@ -61,7 +61,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Initiating client connection, connectString=localhost:2181 sessionTimeout=6000 watcher=org.I0Itec.zkclient.ZkClient@5ffead27", 
         "message": "[2017-08-04 10:48:20,401] INFO Initiating client connection, connectString=localhost:2181 sessionTimeout=6000 watcher=org.I0Itec.zkclient.ZkClient@5ffead27 (org.apache.zookeeper.ZooKeeper)", 
-        "offset": 372, 
+        "log.offset": 372, 
         "prospector.type": "log"
     }, 
     {
@@ -74,7 +74,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Waiting for keeper state SyncConnected", 
         "message": "[2017-08-04 10:48:20,413] INFO Waiting for keeper state SyncConnected (org.I0Itec.zkclient.ZkClient)", 
-        "offset": 561, 
+        "log.offset": 561, 
         "prospector.type": "log"
     }, 
     {
@@ -87,7 +87,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Opening socket connection to server localhost/0:0:0:0:0:0:0:1:2181. Will not attempt to authenticate using SASL (unknown error)", 
         "message": "[2017-08-04 10:48:20,415] INFO Opening socket connection to server localhost/0:0:0:0:0:0:0:1:2181. Will not attempt to authenticate using SASL (unknown error) (org.apache.zookeeper.ClientCnxn)", 
-        "offset": 662, 
+        "log.offset": 662, 
         "prospector.type": "log"
     }, 
     {
@@ -100,7 +100,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Socket connection established to localhost/0:0:0:0:0:0:0:1:2181, initiating session", 
         "message": "[2017-08-04 10:48:20,420] INFO Socket connection established to localhost/0:0:0:0:0:0:0:1:2181, initiating session (org.apache.zookeeper.ClientCnxn)", 
-        "offset": 855, 
+        "log.offset": 855, 
         "prospector.type": "log"
     }, 
     {
@@ -113,7 +113,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Session establishment complete on server localhost/0:0:0:0:0:0:0:1:2181, sessionid = 0x15dabf8d4140000, negotiated timeout = 6000", 
         "message": "[2017-08-04 10:48:20,457] INFO Session establishment complete on server localhost/0:0:0:0:0:0:0:1:2181, sessionid = 0x15dabf8d4140000, negotiated timeout = 6000 (org.apache.zookeeper.ClientCnxn)", 
-        "offset": 1004, 
+        "log.offset": 1004, 
         "prospector.type": "log"
     }, 
     {
@@ -126,7 +126,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "zookeeper state changed (SyncConnected)", 
         "message": "[2017-08-04 10:48:20,458] INFO zookeeper state changed (SyncConnected) (org.I0Itec.zkclient.ZkClient)", 
-        "offset": 1199, 
+        "log.offset": 1199, 
         "prospector.type": "log"
     }, 
     {
@@ -139,7 +139,7 @@
         "kafka.log.level": "WARN", 
         "kafka.log.message": "No meta.properties file under dir /tmp/kafka-logs/meta.properties", 
         "message": "[2017-08-04 10:48:20,748] WARN No meta.properties file under dir /tmp/kafka-logs/meta.properties (kafka.server.BrokerMetadataCheckpoint)", 
-        "offset": 1301, 
+        "log.offset": 1301, 
         "prospector.type": "log"
     }, 
     {
@@ -152,7 +152,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Starting", 
         "message": "[2017-08-04 10:48:20,800] INFO [ThrottledRequestReaper-Fetch]: Starting (kafka.server.ClientQuotaManager$ThrottledRequestReaper)", 
-        "offset": 1438, 
+        "log.offset": 1438, 
         "prospector.type": "log"
     }, 
     {
@@ -165,7 +165,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Log directory '/tmp/kafka-logs' not found, creating it.", 
         "message": "[2017-08-04 10:48:20,866] INFO Log directory '/tmp/kafka-logs' not found, creating it. (kafka.log.LogManager)", 
-        "offset": 1567, 
+        "log.offset": 1567, 
         "prospector.type": "log"
     }, 
     {
@@ -178,7 +178,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Loading logs.", 
         "message": "[2017-08-04 10:48:20,873] INFO Loading logs. (kafka.log.LogManager)", 
-        "offset": 1677, 
+        "log.offset": 1677, 
         "prospector.type": "log"
     }, 
     {
@@ -191,7 +191,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Starting", 
         "message": "[2017-08-04 10:48:21,062] INFO [ExpirationReaper-0-Heartbeat]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)", 
-        "offset": 1745, 
+        "log.offset": 1745, 
         "prospector.type": "log"
     }, 
     {
@@ -204,7 +204,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Result of znode creation is: OK", 
         "message": "[2017-08-04 10:48:21,063] INFO Result of znode creation is: OK (kafka.utils.ZKCheckedEphemeral)", 
-        "offset": 1881, 
+        "log.offset": 1881, 
         "prospector.type": "log"
     }, 
     {
@@ -217,7 +217,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Removed 0 expired offsets in 1 milliseconds.", 
         "message": "[2017-08-04 10:48:21,095] INFO [Group Metadata Manager on Broker 0]: Removed 0 expired offsets in 1 milliseconds. (kafka.coordinator.group.GroupMetadataManager)", 
-        "offset": 1977, 
+        "log.offset": 1977, 
         "prospector.type": "log"
     }, 
     {
@@ -230,7 +230,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Acquired new producerId block (brokerId:0,blockStartProducerId:0,blockEndProducerId:999) by writing to Zk with path version 1", 
         "message": "[2017-08-04 10:48:21,127] INFO [ProducerId Manager 0]: Acquired new producerId block (brokerId:0,blockStartProducerId:0,blockEndProducerId:999) by writing to Zk with path version 1 (kafka.coordinator.transaction.ProducerIdManager)", 
-        "offset": 2138, 
+        "log.offset": 2138, 
         "prospector.type": "log"
     }, 
     {
@@ -243,7 +243,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Starting up.", 
         "message": "[2017-08-04 10:48:21,162] INFO [Transaction Coordinator 0]: Starting up. (kafka.coordinator.transaction.TransactionCoordinator)", 
-        "offset": 2369, 
+        "log.offset": 2369, 
         "prospector.type": "log"
     }, 
     {
@@ -256,7 +256,7 @@
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Starting", 
         "message": "[2017-08-04 10:48:21,167] INFO [Transaction Marker Channel Manager 0]: Starting (kafka.coordinator.transaction.TransactionMarkerChannelManager)", 
-        "offset": 2497, 
+        "log.offset": 2497, 
         "prospector.type": "log"
     }
 ]

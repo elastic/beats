@@ -7,7 +7,7 @@
         "fileset.module": "apache2", 
         "fileset.name": "error", 
         "input.type": "log", 
-        "offset": 0, 
+        "log.offset": 0, 
         "prospector.type": "log"
     }, 
     {
@@ -19,7 +19,7 @@
         "fileset.module": "apache2", 
         "fileset.name": "error", 
         "input.type": "log", 
-        "offset": 99, 
+        "log.offset": 99, 
         "prospector.type": "log"
     }, 
     {
@@ -33,7 +33,7 @@
         "fileset.module": "apache2", 
         "fileset.name": "error", 
         "input.type": "log", 
-        "offset": 229, 
+        "log.offset": 229, 
         "prospector.type": "log"
     }
 ]
