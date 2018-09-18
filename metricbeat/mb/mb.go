@@ -23,7 +23,7 @@ package mb
 
 import (
 	"fmt"
-	"strings"
+	"net/url"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -327,16 +327,39 @@ type QueryParams map[string]interface{}
 // String returns the values in common query params format (key=value&key2=value2) which is the way that the url
 // package expects this params (without the initial '?')
 func (q QueryParams) String() (s string) {
-	for k, v := range q {
-		if v == nil {
-			v = "null"
-		}
+	u := url.Values{}
 
-		s = fmt.Sprintf("%s&%s=%v", s, k, v)
+	for k, v := range q {
+		if values, ok := v.([]interface{}); ok {
+			for _, innerValue := range values {
+				u.Add(k, q.stringFromValue(innerValue))
+			}
+			fmt.Println(u.Get(k))
+		} else {
+			u.Add(k, q.stringFromValue(v))
+		}
 	}
 
-	s = strings.TrimLeft(s, "&")
-	return
+	return u.Encode()
+}
+
+func (q QueryParams) stringFromValue(v interface{}) string {
+	switch a := v.(type) {
+	case string:
+		return a
+	case int64:
+		return fmt.Sprintf("%d", a)
+	case uint64:
+		return fmt.Sprintf("%d", a)
+	case float64:
+		return fmt.Sprintf("%f", a)
+	case bool:
+		return fmt.Sprintf("%t", a)
+	default:
+		fmt.Println("Unknown type")
+	}
+
+	return ""
 }
 
 // defaultModuleConfig contains the default values for ModuleConfig instances.
