@@ -65,15 +65,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	if m.XPack {
 		err = eventsMappingXPack(r, m, content)
-		if err != nil {
-			m.Log.Error(err)
-			return
-		}
 	} else {
 		err = eventsMapping(r, content)
-		if err != nil {
-			elastic.ReportAndLogError(err, r, m.Log)
-			return
-		}
+	}
+
+	if err != nil {
+		m.Log.Error(err)
+		return
 	}
 }
