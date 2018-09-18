@@ -43,8 +43,6 @@ func NewInput(
 	outletFactory channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
-	logger := logp.NewLogger("docker")
-
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "reading docker input config")
