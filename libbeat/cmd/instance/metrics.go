@@ -44,12 +44,7 @@ func init() {
 }
 
 func setupMetrics(name string) error {
-	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
-	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
-
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
-
-	setupPlatformSpecificMetrics()
 
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
@@ -58,21 +53,16 @@ func setupMetrics(name string) error {
 		CacheCmdLine: true,
 		IncludeTop:   process.IncludeTopConfig{},
 	}
+
 	err := beatProcessStats.Init()
 	if err != nil {
 		return err
 	}
 
-	beatProcessSysInfo, err = sysinfo.Self()
-	if err != nil {
-		return err
-	}
+	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
+	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
 
-	var ok bool
-	handleCounter, ok = beatProcessSysInfo.(types.OpenHandleCounter)
-	if !ok {
-		return fmt.Errorf("cannot convert process to OpenHandleCounter: %v", beatProcessSysInfo)
-	}
+	setupPlatformSpecificMetrics()
 
 	return nil
 }
