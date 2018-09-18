@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -43,6 +44,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	*helper.HTTP
 	XPack bool
+	Log   *logp.Logger
 }
 
 // NewMetricSet creates an metric set that can be used to build other metric
@@ -67,9 +69,11 @@ func NewMetricSet(base mb.BaseMetricSet, subPath string) (*MetricSet, error) {
 		cfgwarn.Experimental("The experimental xpack.enabled flag in elasticsearch/node_stats metricset is enabled.")
 	}
 
+	log := logp.NewLogger(ModuleName)
 	return &MetricSet{
 		base,
 		http,
 		config.XPack,
+		log,
 	}, nil
 }
