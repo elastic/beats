@@ -88,5 +88,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	if err != nil {
 		m.Log.Error(err)
+		return
 	}
 }
