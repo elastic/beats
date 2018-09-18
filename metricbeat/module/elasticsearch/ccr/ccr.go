@@ -18,6 +18,8 @@
 package ccr
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -64,13 +66,27 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	content, err := m.HTTP.FetchContent()
+	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
 	if err != nil {
 		r.Error(err)
 		return
 	}
 
-	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
+	elasticsearchVersion := info.Version.Number
+	isCCRStatsAPIAvailable, err := elasticsearch.IsCCRStatsAPIAvailable(elasticsearchVersion)
+	if err != nil {
+		r.Error(err)
+		return
+	}
+
+	if !isCCRStatsAPIAvailable {
+		const errorMsg = "the elasticsearch ccr metricset is only supported with Elasticsearch >= %v. " +
+			"You are currently running Elasticsearch %v"
+		r.Error(fmt.Errorf(errorMsg, elasticsearch.CCRStatsAPIAvailableVersion, elasticsearchVersion))
+		return
+	}
+
+	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		r.Error(err)
 		return
