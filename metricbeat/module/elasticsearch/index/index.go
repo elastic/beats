@@ -81,8 +81,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
 	if err != nil {
-		r.Error(err)
-		m.Log.Error(err)
+		msg := errors.Wrap(err, "failed to get info from Elasticsearch")
+		r.Error(msg)
+		m.Log.Error(msg)
 		return
 	}
 
