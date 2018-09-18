@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/log"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/pkg/errors"
 )
