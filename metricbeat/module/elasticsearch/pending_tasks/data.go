@@ -59,13 +59,17 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	var errs multierror.Errors
 	for _, task := range tasksStruct.Tasks {
 		event := mb.Event{}
-		event.MetricSetFields, err = schema.Apply(task)
-		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure applying task schema"))
-		}
 
 		event.RootFields = common.MapStr{}
 		event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
+		event.MetricSetFields, err = schema.Apply(task)
+		if err != nil {
+			err = errors.Wrap(err, "failure applying task schema")
+			errs = append(errs, err)
+			event.Error = err
+		}
+
 		r.Event(event)
 	}
 

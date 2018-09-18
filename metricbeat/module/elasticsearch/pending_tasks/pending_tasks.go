@@ -56,6 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &MetricSet{MetricSet: ms}, nil
 }
 
@@ -63,7 +64,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+pendingTasksPath)
 	if err != nil {
-		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
+		msg := errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		r.Error(msg)
+		m.Log.Error(msg)
 		return
 	}
 
@@ -76,8 +79,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 
-	eventsMapping(r, content)
+	err = eventsMapping(r, content)
+	if err != nil {
+		m.Log.Error(err)
+		return
+	}
 }
