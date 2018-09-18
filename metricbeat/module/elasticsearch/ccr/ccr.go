@@ -23,7 +23,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -64,7 +63,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug(elasticsearch.ModuleName, "trying to fetch ccr stats from a non master node.")
+		m.Log.Debug("trying to fetch ccr stats from a non-master node")
 		return
 	}
 

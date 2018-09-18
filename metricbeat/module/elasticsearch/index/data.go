@@ -70,8 +70,10 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		event := mb.Event{}
 		event.MetricSetFields, err = schema.Apply(index)
 		if err != nil {
+			err = errors.Wrap(err, "failure applying index schema")
 			r.Error(err)
-			errs = append(errs, errors.Wrap(err, "failure applying index schema"))
+			errs = append(errs, err)
+			continue
 		}
 		// Write name here as full name only available as key
 		event.MetricSetFields["name"] = name

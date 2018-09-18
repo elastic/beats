@@ -18,8 +18,6 @@
 package index_summary
 
 import (
-	"fmt"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -77,9 +75,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	// Not master, no event sent
 	if !isMaster {
-		err = fmt.Errorf("trying to fetch index summary stats from a non-master node")
-		r.Error(err)
-		m.Log.Error(err)
+		m.Log.Debug("trying to fetch index summary stats from a non-master node")
 		return
 	}
 
@@ -106,5 +102,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	if err != nil {
 		m.Log.Error(err)
+		return
 	}
 }
