@@ -33,7 +33,8 @@ func init() {
 }
 
 const (
-	statsPath = "/_stats"
+	statsMetrics = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
+	statsPath    = "/_stats/" + statsMetrics
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -80,5 +81,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	eventsMapping(r, *info, content)
+	if m.XPack {
+		eventsMappingXPack(r, m, *info, content)
+	} else {
+		err = eventsMapping(r, *info, content)
+		if err != nil {
+			r.Error(err)
+			return
+		}
+	}
 }
