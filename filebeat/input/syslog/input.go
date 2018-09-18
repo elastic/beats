@@ -174,6 +174,7 @@ func (p *Input) Run() {
 		err := p.server.Start()
 		if err != nil {
 			p.log.Error("Error starting the server", "error", err)
+			return
 		}
 		p.started = true
 	}
@@ -184,6 +185,10 @@ func (p *Input) Stop() {
 	defer p.outlet.Close()
 	p.Lock()
 	defer p.Unlock()
+
+	if !p.started {
+		return
+	}
 
 	p.log.Info("Stopping Syslog input")
 	p.server.Stop()
