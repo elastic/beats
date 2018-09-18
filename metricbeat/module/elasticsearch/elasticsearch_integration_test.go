@@ -20,6 +20,8 @@
 package elasticsearch_test
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -32,9 +34,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	"bytes"
-
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/ccr"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/cluster_stats"
@@ -91,6 +90,7 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "elasticsearch")
 
+	host := net.JoinHostPort(getEnvHost(), getEnvPort())
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, host)
 		t.Run(metricSet, func(t *testing.T) {
@@ -265,7 +265,7 @@ func getElasticsearchVersion(elasticsearchHostPort string) (string, error) {
 	}
 
 	var data common.MapStr
-	err = json.Unmarshall(body, &data)
+	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return "", err
 	}
