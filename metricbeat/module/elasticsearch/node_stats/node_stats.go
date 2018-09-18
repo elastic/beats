@@ -59,12 +59,22 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 
-	if m.MetricSet.XPack {
-		eventsMappingXPack(r, m, content)
+	if m.XPack {
+		err = eventsMappingXPack(r, m, content)
+		if err != nil {
+			m.Log.Error(err)
+			return
+		}
 	} else {
-		eventsMapping(r, content)
+		err = eventsMapping(r, content)
+		if err != nil {
+			r.Error(err)
+			m.Log.Error(err)
+			return
+		}
 	}
 }

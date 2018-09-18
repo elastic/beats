@@ -22,12 +22,12 @@ import (
 
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -179,26 +179,27 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	// it will provid the data for multiple nodes. This will mean the detection of the
 	// master node will not be accurate anymore as often in these cases a proxy is in front
 	// of ES and it's not know if the request will be routed to the same node as before.
+	var errs multierror.Errors
 	for nodeID, node := range nodesStruct.Nodes {
 		clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HTTP.GetURI(), nodeID)
 		if err != nil {
-			logp.Err("could not fetch cluster id: %s", err)
+			errs = append(errs, errors.Wrap(err, "could not fetch cluster id"))
 			continue
 		}
 
 		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HTTP.GetURI())
 		if err != nil {
-			logp.Err("error determining if connected Elasticsearch node is master: %s", err)
+			errs = append(errs, errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
 			continue
 		}
+
 		event := mb.Event{}
 
 		nodeData, err := schemaXpack.Apply(node)
 		if err != nil {
-			logp.Err("failure to apply node schema: %s", err)
+			errs = append(errs, errors.Wrap(err, "failure to apply node schema"))
 			continue
 		}
-
 		nodeData["node_master"] = isMaster
 		nodeData["node_id"] = nodeID
 
@@ -213,5 +214,5 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 		r.Event(event)
 	}
-	return nil
+	return errs.Err()
 }

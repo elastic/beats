@@ -41,7 +41,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	for indexName, indexData := range data {
 		indexData, ok := indexData.(map[string]interface{})
 		if !ok {
-			return fmt.Errorf("%v is not an object", indexName)
+			return fmt.Errorf("%v is not a map", indexName)
 		}
 
 		shards, ok := indexData["shards"]
@@ -57,7 +57,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		for shardIdx, shard := range shardsArr {
 			shard, ok := shard.(map[string]interface{})
 			if !ok {
-				return fmt.Errorf("%v.shards[%v] is not an object", indexName, shardIdx)
+				return fmt.Errorf("%v.shards[%v] is not a map", indexName, shardIdx)
 			}
 
 			shard["index_name"] = indexName
