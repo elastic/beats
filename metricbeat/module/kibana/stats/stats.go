@@ -22,7 +22,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -57,20 +56,6 @@ type MetricSet struct {
 	statsHTTP    *helper.HTTP
 	settingsHTTP *helper.HTTP
 	xPackEnabled bool
-}
-
-func isKibanaStatsAPIAvailable(kibanaVersion string) (bool, error) {
-	currentVersion, err := common.NewVersion(kibanaVersion)
-	if err != nil {
-		return false, err
-	}
-
-	wantVersion, err := common.NewVersion(kibana.StatsAPIAvailableVersion)
-	if err != nil {
-		return false, err
-	}
-
-	return !currentVersion.LessThan(wantVersion), nil
 }
 
 // New create a new instance of the MetricSet
