@@ -28,15 +28,11 @@ import (
 	"github.com/elastic/beats/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/libbeat/metric/system/process"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
 )
 
 var (
-	beatProcessStats   *process.Stats
-	beatProcessSysInfo types.Process
-	handleCounter      types.OpenHandleCounter
-	systemMetrics      *monitoring.Registry
+	beatProcessStats *process.Stats
+	systemMetrics    *monitoring.Registry
 )
 
 func init() {
@@ -71,12 +67,10 @@ func setupPlatformSpecificMetrics() {
 	if runtime.GOOS != "windows" {
 		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
 	} else {
-		monitoring.NewFunc(beatMetrics, "file_handles", reportOpenHandles, monitoring.Report)
+		setupWindowsHandlesMetrics()
 	}
 
-	if runtime.GOOS == "linux" {
-		monitoring.NewFunc(beatMetrics, "fd", reportFDUsage, monitoring.Report)
-	}
+	setupLinuxBSDFDMetrics()
 }
 
 func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
@@ -222,75 +216,6 @@ func getCPUUsage() (float64, *process.Ticks, error) {
 	}
 
 	return totalCPUUsage, &p, nil
-}
-
-func reportFDUsage(_ monitoring.Mode, V monitoring.Visitor) {
-	V.OnRegistryStart()
-	defer V.OnRegistryFinished()
-
-	open, hardLimit, softLimit, err := getFDUsage()
-	if err != nil {
-		logp.Err("Error while retrieving FD information: %v", err)
-		return
-	}
-
-	monitoring.ReportInt(V, "open", int64(open))
-	monitoring.ReportNamespace(V, "limit", func() {
-		monitoring.ReportInt(V, "hard", int64(hardLimit))
-		monitoring.ReportInt(V, "soft", int64(softLimit))
-	})
-}
-
-func getFDUsage() (open, hardLimit, softLimit uint64, err error) {
-	state, err := getBeatProcessState()
-	if err != nil {
-		return 0, 0, 0, err
-	}
-
-	iOpen, err := state.GetValue("fd.open")
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("error getting number of open FD: %v", err)
-	}
-
-	open, ok := iOpen.(uint64)
-	if !ok {
-		return 0, 0, 0, fmt.Errorf("error converting value of open FDs to uint64: %v", iOpen)
-	}
-
-	iHardLimit, err := state.GetValue("fd.limit.hard")
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("error getting FD hard limit: %v", err)
-	}
-
-	hardLimit, ok = iHardLimit.(uint64)
-	if !ok {
-		return 0, 0, 0, fmt.Errorf("error converting values of FD hard limit: %v", iHardLimit)
-	}
-
-	iSoftLimit, err := state.GetValue("fd.limit.soft")
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("error getting FD hard limit: %v", err)
-	}
-
-	softLimit, ok = iSoftLimit.(uint64)
-	if !ok {
-		return 0, 0, 0, fmt.Errorf("error converting values of FD hard limit: %v", iSoftLimit)
-	}
-
-	return open, hardLimit, softLimit, nil
-}
-
-func reportOpenHandles(_ monitoring.Mode, V monitoring.Visitor) {
-	V.OnRegistryStart()
-	defer V.OnRegistryFinished()
-
-	n, err := handleCounter.OpenHandleCount()
-	if err != nil {
-		logp.Err("Error while retrieving the number of open file handles: %v", err)
-		return
-	}
-
-	monitoring.ReportInt(V, "open", int64(n))
 }
 
 func reportSystemLoadAverage(_ monitoring.Mode, V monitoring.Visitor) {
