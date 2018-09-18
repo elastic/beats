@@ -18,10 +18,11 @@
 package index_summary
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -68,32 +69,42 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statsPath)
 	if err != nil {
-		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
+		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug(elasticsearch.ModuleName, "Trying to fetch index summary stats from a non-master node.")
+		err = fmt.Errorf("trying to fetch index summary stats from a non-master node")
+		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+statsPath)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failed to get info from Elasticsearch"))
+		err = errors.Wrap(err, "failed to get info from Elasticsearch")
+		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 
 	if m.XPack {
-		eventMappingXPack(r, m, *info, content)
+		err = eventMappingXPack(r, m, *info, content)
 	} else {
-		eventMapping(r, *info, content)
+		err = eventMapping(r, *info, content)
 	}
 
+	if err != nil {
+		m.Log.Error(err)
+	}
 }

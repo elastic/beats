@@ -34,13 +34,6 @@ import (
 )
 
 var (
-	sourceNodeXpack = s.Schema{
-		"host":              c.Str("host"),
-		"transport_address": c.Str("transport_address"),
-		"ip":                c.Str("ip"),
-		"name":              c.Str("name"),
-	}
-
 	schemaXpack = s.Schema{
 		"indices": c.Dict("indices", s.Schema{
 			"docs": c.Dict("docs", s.Schema{
@@ -199,9 +192,6 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 			continue
 		}
 		event := mb.Event{}
-		// Build source_node object
-		sourceNode, _ := sourceNodeXpack.Apply(node)
-		sourceNode["uuid"] = nodeID
 
 		nodeData, err := schemaXpack.Apply(node)
 		if err != nil {
@@ -217,7 +207,6 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 			"cluster_uuid": clusterID,
 			"interval_ms":  m.Module().Config().Period.Nanoseconds() / 1000 / 1000,
 			"type":         "node_stats",
-			"source_node":  sourceNode,
 			"node_stats":   nodeData,
 		}
 
