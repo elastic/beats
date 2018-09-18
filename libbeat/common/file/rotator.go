@@ -18,10 +18,13 @@
 package file
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -37,6 +40,7 @@ const (
 	rotateReasonInitializing rotateReason = iota + 1
 	rotateReasonFileSize
 	rotateReasonManualTrigger
+	rotateReasonDay
 )
 
 func (rr rotateReason) String() string {
@@ -47,20 +51,27 @@ func (rr rotateReason) String() string {
 		return "file size"
 	case rotateReasonManualTrigger:
 		return "manual trigger"
+	case rotateReasonDay:
+		return "day"
 	default:
 		return "unknown"
 	}
 }
 
 // Rotator is a io.WriteCloser that automatically rotates the file it is
-// writing to when it reaches a maximum size. It also purges the oldest rotated
-// files when the maximum number of backups is reached.
+// writing to when it reaches a maximum size and optionally on a daily basis.
+// It also purges the oldest rotated files when the maximum number of backups
+// is reached.
 type Rotator struct {
 	filename     string
 	maxSizeBytes uint
 	maxBackups   uint
 	permissions  os.FileMode
 	log          Logger // Optional Logger (may be nil).
+	daily        bool
+	lastYear     int
+	lastMonth    time.Month
+	lastDay      int
 
 	file  *os.File
 	size  uint
@@ -108,6 +119,14 @@ func WithLogger(l Logger) RotatorOption {
 	}
 }
 
+// Daily enables or disables log rotation by day in addition to log rotation
+// by size. The default is disabled.
+func Daily(v bool) RotatorOption {
+	return func(r *Rotator) {
+		r.daily = v
+	}
+}
+
 // NewFileRotator returns a new Rotator.
 func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error) {
 	r := &Rotator{
@@ -137,6 +156,7 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 			"max_size_bytes", r.maxSizeBytes,
 			"max_backups", r.maxBackups,
 			"permissions", r.permissions,
+			"daily", r.daily,
 		)
 	}
 
@@ -156,8 +176,16 @@ func (r *Rotator) Write(data []byte) (int, error) {
 			"the max file size (%d bytes)", dataLen, r.maxSizeBytes)
 	}
 
+	y, m, d := time.Now().Date()
 	if r.file == nil {
 		if err := r.openNew(); err != nil {
+			return 0, err
+		}
+	} else if r.daily && (d != r.lastDay || m != r.lastMonth || y != r.lastYear) {
+		if err := r.rotate(rotateReasonDay); err != nil {
+			return 0, err
+		}
+		if err := r.openFile(); err != nil {
 			return 0, err
 		}
 	} else if r.size+dataLen > r.maxSizeBytes {
@@ -171,6 +199,9 @@ func (r *Rotator) Write(data []byte) (int, error) {
 
 	n, err := r.file.Write(data)
 	r.size += uint(n)
+	r.lastYear = y
+	r.lastMonth = m
+	r.lastDay = d
 	return n, errors.Wrap(err, "failed to write to file")
 }
 
@@ -235,6 +266,7 @@ func (r *Rotator) openNew() error {
 		}
 	}
 
+	r.lastYear, r.lastMonth, r.lastDay = time.Now().Date()
 	return r.openFile()
 }
 
@@ -263,6 +295,78 @@ func (r *Rotator) closeFile() error {
 }
 
 func (r *Rotator) purgeOldBackups() error {
+	if r.daily {
+		return r.purgeOldDailyBackups()
+	}
+	return r.purgeOldSizedBackups()
+}
+
+func (r *Rotator) purgeOldDailyBackups() error {
+	files, err := filepath.Glob(r.filename + "*")
+	if err != nil {
+		return errors.Wrap(err, "failed to list existing logs during rotation")
+	}
+
+	if len(files) > int(r.maxBackups) {
+
+		// sort log filenames numerically
+		sortDailyLogs(files)
+
+		for i := len(files) - int(r.maxBackups) - 1; i >= 0; i-- {
+			f := files[i]
+			_, err := os.Stat(f)
+			switch {
+			case err == nil:
+				if err = os.Remove(f); err != nil {
+					return errors.Wrapf(err, "failed to delete %v during rotation", f)
+				}
+			case os.IsNotExist(err):
+				return errors.Wrapf(err, "failed to delete non-existent %v during rotation", f)
+			default:
+				return errors.Wrapf(err, "failed on %v during rotation", f)
+			}
+		}
+	}
+
+	return nil
+}
+
+func sortDailyLogs(strings []string) {
+	sort.Slice(
+		strings,
+		func(i, j int) bool {
+			return orderDailyLog(strings[i]) < orderDailyLog(strings[j])
+		},
+	)
+}
+
+// Given a log filename in the form [prefix]-yyyy-MM-dd-n, returns the filename after
+// zero-padding the trailing n so that foo-2018-09-01-2 sorts before foo-2018-09-01-10.
+func orderDailyLog(filename string) string {
+	index, i, err := dailyLogIndex(filename)
+	if err == nil {
+		return filename[:i] + fmt.Sprintf("%020d", index)
+	}
+
+	return ""
+}
+
+// Given a log filename in the form [prefix]-yyyy-MM-dd-n, returns n as int
+func dailyLogIndex(filename string) (uint64, int, error) {
+	i := len(filename) - 1
+	for ; i >= 0; i-- {
+		if '0' > filename[i] || filename[i] > '9' {
+			break
+		}
+	}
+	i++
+
+	s64 := filename[i:]
+	u64, err := strconv.ParseUint(s64, 10, 64)
+	return u64, i, err
+}
+
+func (r *Rotator) purgeOldSizedBackups() error {
 	for i := r.maxBackups; i < MaxBackupsLimit; i++ {
 		name := r.backupName(i + 1)
 
@@ -287,6 +391,61 @@ func (r *Rotator) rotate(reason rotateReason) error {
 		return errors.Wrap(err, "error file closing current file")
 	}
 
+	var err error
+	if r.daily {
+		err = r.rotateByDay(reason)
+	} else {
+		err = r.rotateBySize(reason)
+	}
+	if err != nil {
+		return errors.Wrap(err, "failed to rotate backups")
+	}
+
+	return r.purgeOldBackups()
+}
+
+func (r *Rotator) rotateByDay(reason rotateReason) error {
+	if fi, err := os.Stat(r.filename); os.IsNotExist(err) {
+		return nil
+	} else if err == nil && r.lastYear == 0 && r.lastMonth == 0 && r.lastDay == 0 {
+		r.lastYear, r.lastMonth, r.lastDay = fi.ModTime().Date()
+	}
+
+	logPrefix := dailyLogPrefix(r.filename, r.lastYear, r.lastMonth, r.lastDay)
+	files, err := filepath.Glob(logPrefix + "*")
+	if err != nil {
+		return errors.Wrap(err, "failed to list current day logs during rotation")
+	}
+
+	var targetFilename string
+	if len(files) == 0 {
+		targetFilename = logPrefix + "1"
+	} else {
+		sortDailyLogs(files)
+		lastLogIndex, _, err := dailyLogIndex(files[len(files)-1])
+		if err != nil {
+			return errors.Wrap(err, "failed to locate last log index during rotation")
+		}
+		targetFilename = logPrefix + strconv.Itoa(int(lastLogIndex)+1)
+	}
+
+	if err := os.Rename(r.filename, targetFilename); err != nil {
+		return errors.Wrap(err, "failed to rotate backups")
+	}
+
+	if r.log != nil {
+		r.log.Debugw("Rotating file", "filename", r.filename, "reason", reason)
+	}
+
+	return nil
+
+}
+
+func dailyLogPrefix(filename string, year int, month time.Month, day int) string {
+	return filename + "-" + time.Date(year, month, day, 0, 0, 0, 0, time.Local).Format("2006-01-02") + "-"
+}
+
+func (r *Rotator) rotateBySize(reason rotateReason) error {
 	for i := r.maxBackups + 1; i > 0; i-- {
 		old := r.backupName(i - 1)
 		older := r.backupName(i)
@@ -309,6 +468,5 @@ func (r *Rotator) rotate(reason rotateReason) error {
 			}
 		}
 	}
-
-	return r.purgeOldBackups()
+	return nil
 }

@@ -45,6 +45,7 @@ type FileConfig struct {
 	MaxSize     uint   `config:"rotateeverybytes" validate:"min=1"`
 	MaxBackups  uint   `config:"keepfiles" validate:"max=1024"`
 	Permissions uint32 `config:"permissions"`
+	Daily       bool   `config:"daily"`
 }
 
 var defaultConfig = Config{
@@ -54,6 +55,7 @@ var defaultConfig = Config{
 		MaxSize:     10 * 1024 * 1024,
 		MaxBackups:  7,
 		Permissions: 0600,
+		Daily:       false,
 	},
 	addCaller: true,
 }

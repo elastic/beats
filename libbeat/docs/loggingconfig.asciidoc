@@ -156,6 +156,12 @@ Examples:
 associated with the file, as well as read access to all other users.
 
 [float]
+==== `logging.files.daily`
+
+Enables daily log file rotation in addition to size-based rotation. Defaults to disabled.
+
+
+[float]
 ==== `logging.json`
 
 When true, logs messages in JSON format. The default is false.
