@@ -35,7 +35,7 @@ func init() {
 
 const (
 	// This only fetches data for the local node.
-	nodeStatsPath = "_nodes/_local"
+	nodeStatsPath = "/_nodes/_local"
 )
 
 var (
