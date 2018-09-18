@@ -2877,6 +2877,14 @@ The name of the module that generated the event.
 
 --
 
+*`event.dataset`*::
++
+--
+The name of the module's dataset that generated the event.
+
+
+--
+
 *`event.action`*::
 +
 --

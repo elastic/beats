@@ -7,6 +7,10 @@
     description: >
       The name of the module that generated the event.
 
+  - name: event.dataset
+    description: >
+      The name of the module's dataset that generated the event.
+
   - name: event.action
     type: keyword
     example: logged-in
