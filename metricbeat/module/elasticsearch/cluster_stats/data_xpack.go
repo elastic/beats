@@ -169,7 +169,8 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return err
 	}
 
-	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI())
+	clusterStateMetrics := []string{"version", "master_node", "nodes", "routing_table"}
+	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
 	if err != nil {
 		return err
 	}
