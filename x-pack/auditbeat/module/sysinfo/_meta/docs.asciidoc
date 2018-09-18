@@ -1,0 +1,22 @@
+== Sysinfo Module
+
+The `sysinfo` module ... TODO.
+
+The module is implemented for Linux, macOS (Darwin), and Windows.
+
+[float]
+=== How it works
+
+TODO
+
+[float]
+=== Configuration options
+
+TODO
+
+[source,yaml]
+----
+- module: sysinfo
+----
+
+*`some_option`*:: TODO

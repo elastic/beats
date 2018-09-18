@@ -1,0 +1,15 @@
+{{ if .Reference -}}
+{{ end -}}
+- module: sysinfo
+  {{ if eq .GOOS "darwin" -}}
+  metricsets:
+    - host
+  {{ else if eq .GOOS "windows" -}}
+  metricsets:
+    - host
+  {{ else -}}
+  metricsets:
+    - host
+  {{- end }}
+{{ if .Reference }}
+{{- end }}
