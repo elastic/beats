@@ -304,7 +304,10 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 	if evRename.Op == fsnotify.Write {
 		evRename, err = readTimeout(t, watcher)
 	}
-	evCreate, err := readTimeout(t, watcher)
+	evCreate, err := readTimeoutMatching(t, watcher, func(event fsnotify.Event) bool {
+		t.Logf("Event received, but cond not matched for %v == %v\n", event.Name, fpath)
+		return event.Name == fpath
+	})
 	assertNoError(t, err)
 
 	if evRename.Op != fsnotify.Rename {
@@ -315,6 +318,7 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 	assert.Equal(t, fsnotify.Rename, evRename.Op)
 
 	assert.Equal(t, fpath2, evCreate.Name)
+
 	assert.Equal(t, fsnotify.Create, evCreate.Op)
 
 	// Delete
@@ -335,10 +339,33 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 
 var errReadTimeout = errors.New("read timeout")
 
+func readTimeoutMatching(tb testing.TB, watcher Watcher, cond func(event fsnotify.Event) bool) (fsnotify.Event, error) {
+	timer := time.NewTimer(10 * time.Second)
+	defer timer.Stop()
+
+	for {
+		select {
+		case <-timer.C:
+			return fsnotify.Event{}, errReadTimeout
+
+		case msg, ok := <-watcher.EventChannel():
+			if !ok {
+				return fsnotify.Event{}, errors.New("channel closed")
+			}
+			if cond(msg) {
+				return msg, nil
+			}
+		case err := <-watcher.ErrorChannel():
+			tb.Log("readTimeout got error:", err)
+		}
+	}
+}
+
 // helper to read from channel
 func readTimeout(tb testing.TB, watcher Watcher) (fsnotify.Event, error) {
 	timer := time.NewTimer(3 * time.Second)
 	defer timer.Stop()
+
 	for {
 		select {
 		case <-timer.C:
