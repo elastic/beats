@@ -107,6 +107,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Increase ignore_above for system.process.cmdline to 2048. {pull}8101[8100]
 - Add support to renamed fields planned for redis 5.0. {pull}8167[8167]
 - Allow TCP helper to support delimiters and graphite module to accept multiple metrics in a single payload. {pull}8278[8278]
+- Added 'died' PID state to process_system metricset on system module {pull}8275[8275]
 
 
 - Add `metrics` metricset to MongoDB module. {pull}7611[7611]

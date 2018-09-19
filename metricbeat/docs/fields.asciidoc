@@ -19630,6 +19630,16 @@ Number of zombie processes on this host.
 
 --
 
+*`system.process.summary.dead`*::
++
+--
+type: long
+
+Number of dead processes on this host. It's very unlikely that it will appear but in some special situations it may happen.
+
+
+--
+
 *`system.process.summary.unknown`*::
 +
 --
