@@ -33,6 +33,13 @@ heartbeat.monitors:
   {% endif %}
 {% endfor -%}
 
+{% if reload or reload_path -%}
+heartbeat.config.monitors:
+  path: {{ reload_path|default("${path.config}/monitors.d/*.yml") }}
+  reload.period: 1s
+  reload.enabled: {{ reload|default("false")}}
+{% endif -%}
+
 {%- if shipper_name %}
 name: {{ shipper_name }}
 {% endif %}

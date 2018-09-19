@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -20,19 +20,19 @@ package types
 import "time"
 
 type Host interface {
+	CPUTimer
 	Info() HostInfo
 	Memory() (*HostMemoryInfo, error)
-	CPUTime() (*CPUTimes, error)
 }
 
 type HostInfo struct {
 	Architecture      string    `json:"architecture"`            // Hardware architecture (e.g. x86_64, arm, ppc, mips).
 	BootTime          time.Time `json:"boot_time"`               // Host boot time.
 	Containerized     *bool     `json:"containerized,omitempty"` // Is the process containerized.
-	Hostname          string    `json:"hostname"`                // Hostname
-	IPs               []string  `json:"ips,omitempty"`           // List of all IPs.
+	Hostname          string    `json:"name"`                    // Hostname
+	IPs               []string  `json:"ip,omitempty"`            // List of all IPs.
 	KernelVersion     string    `json:"kernel_version"`          // Kernel version.
-	MACs              []string  `json:"mac_addresses"`           // List of MAC addresses.
+	MACs              []string  `json:"mac"`                     // List of MAC addresses.
 	OS                *OSInfo   `json:"os"`                      // OS information.
 	Timezone          string    `json:"timezone"`                // System timezone.
 	TimezoneOffsetSec int       `json:"timezone_offset_sec"`     // Timezone offset (seconds from UTC).
@@ -67,7 +67,6 @@ type LoadAverageInfo struct {
 
 // HostMemoryInfo (all values are specified in bytes).
 type HostMemoryInfo struct {
-	Timestamp    time.Time         `json:"timestamp"`           // Time at which samples were collected.
 	Total        uint64            `json:"total_bytes"`         // Total physical memory.
 	Used         uint64            `json:"used_bytes"`          // Total - Free
 	Available    uint64            `json:"available_bytes"`     // Amount of memory available without swapping.

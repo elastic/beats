@@ -17,16 +17,29 @@
 
 package tcp
 
+import "fmt"
+
 type TcpConfig struct {
 	Host              string `config:"host"`
 	Port              int    `config:"port"`
 	ReceiveBufferSize int    `config:"receive_buffer_size"`
+	Delimiter         string `config:"delimiter"`
 }
 
 func defaultTcpConfig() TcpConfig {
 	return TcpConfig{
 		Host:              "localhost",
 		Port:              2003,
-		ReceiveBufferSize: 1024,
+		ReceiveBufferSize: 4096,
+		Delimiter:         "\n",
 	}
+}
+
+// Validate ensures that the configured delimiter has only one character
+func (t *TcpConfig) Validate() error {
+	if len(t.Delimiter) != 1 {
+		return fmt.Errorf("length of delimiter is expected to be 1 but is %v", len(t.Delimiter))
+	}
+
+	return nil
 }

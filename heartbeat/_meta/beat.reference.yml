@@ -32,14 +32,6 @@ heartbeat.monitors:
   ipv6: true
   mode: any
 
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
   # Total running time per ping test.
   timeout: 16s
 
@@ -61,6 +53,15 @@ heartbeat.monitors:
   # fields in the output document instead of being grouped under a fields
   # sub-dictionary. Default is false.
   #fields_under_root: false
+
+  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
+  # Configure file json file to be watched for changes to the monitor:
+  #watch.poll_file:
+    # Path to check for updates.
+    #path:
+
+    # Interval between file file changed checks.
+    #interval: 5s
 
 - type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
             # by sending/receiving a custom payload
@@ -98,14 +99,6 @@ heartbeat.monitors:
   ipv6: true
   mode: any
 
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
   # List of ports to ping if host does not contain a port number
   # ports: [80, 9200, 5044]
 
@@ -134,6 +127,16 @@ heartbeat.monitors:
 
     # Required TLS protocols
     #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+
+  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
+  # Configure file json file to be watched for changes to the monitor:
+  #watch.poll_file:
+    # Path to check for updates.
+    #path:
+
+    # Interval between file file changed checks.
+    #interval: 5s
+
 
 - type: http # monitor type `http`. Connect via HTTP an optionally verify response
 
@@ -204,6 +207,16 @@ heartbeat.monitors:
 
     # Required response contents.
     #body:
+
+  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
+  # Configure file json file to be watched for changes to the monitor:
+  #watch.poll_file:
+    # Path to check for updates.
+    #path:
+
+    # Interval between file file changed checks.
+    #interval: 5s
+
 
 heartbeat.scheduler:
   # Limit number of concurrent tasks executed by heartbeat. The task limit if

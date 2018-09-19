@@ -109,6 +109,12 @@ jobs:
       go: $GO_VERSION
       stage: test
 
+    # Docs
+    - os: linux
+      env: TARGETS="docs"
+      go: $GO_VERSION
+      stage: test
+
     # Kubernetes
     - os: linux
       install: deploy/kubernetes/.travis/setup.sh
@@ -142,6 +148,8 @@ addons:
     packages:
       - python-virtualenv
       - libpcap-dev
+      - xsltproc
+      - libxml2-utils
 
 before_install:
   - python --version

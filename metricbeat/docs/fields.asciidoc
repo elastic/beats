@@ -4421,6 +4421,16 @@ The state of this shard.
 
 --
 
+*`elasticsearch.shard.relocating_node.name`*::
++
+--
+type: keyword
+
+The node the shard was relocated from.
+
+
+--
+
 [[exported-fields-envoyproxy]]
 == envoyproxy fields
 
@@ -16093,6 +16103,19 @@ Number of client connections (excluding connections from slaves).
 *`redis.info.clients.longest_output_list`*::
 +
 --
+
+deprecated[6.5.0]
+
+type: long
+
+Longest output list among current client connections (replaced by max_output_buffer).
+
+
+--
+
+*`redis.info.clients.max_output_buffer`*::
++
+--
 type: long
 
 Longest output list among current client connections.
@@ -16103,9 +16126,22 @@ Longest output list among current client connections.
 *`redis.info.clients.biggest_input_buf`*::
 +
 --
+
+deprecated[6.5.0]
+
 type: long
 
-Biggest input buffer among current client connections.
+Biggest input buffer among current client connections (replaced by max_input_buffer).
+
+
+--
+
+*`redis.info.clients.max_input_buffer`*::
++
+--
+type: long
+
+Biggest input buffer among current client connections (on redis 5.0).
 
 
 --
@@ -19600,6 +19636,16 @@ Number of stopped processes on this host.
 type: long
 
 Number of zombie processes on this host.
+
+
+--
+
+*`system.process.summary.dead`*::
++
+--
+type: long
+
+Number of dead processes on this host. It's very unlikely that it will appear but in some special situations it may happen.
 
 
 --

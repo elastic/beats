@@ -21,15 +21,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 )
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id
 var clusterIDCache = map[string]string{}
+
+// ModuleName is the ame of this module
+const ModuleName = "elasticsearch"
 
 // Info construct contains the data from the Elasticsearch / endpoint
 type Info struct {
@@ -201,8 +206,13 @@ func GetLicense(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 }
 
 // GetClusterState returns cluster state information
-func GetClusterState(http *helper.HTTP, resetURI string) (common.MapStr, error) {
-	content, err := fetchPath(http, resetURI, "_cluster/state/version,master_node,nodes,routing_table")
+func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (common.MapStr, error) {
+	clusterStateURI := "_cluster/state"
+	if metrics != nil && len(metrics) > 0 {
+		clusterStateURI += "/" + strings.Join(metrics, ",")
+	}
+
+	content, err := fetchPath(http, resetURI, clusterStateURI)
 	if err != nil {
 		return nil, err
 	}
@@ -222,6 +232,18 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	var stackUsage map[string]interface{}
 	err = json.Unmarshal(content, &stackUsage)
 	return stackUsage, err
+}
+
+// PassThruField copies the field at the given path from the given source data object into
+// the same path in the given target data object
+func PassThruField(fieldPath string, sourceData, targetData common.MapStr) error {
+	fieldValue, err := sourceData.GetValue(fieldPath)
+	if err != nil {
+		return elastic.MakeErrorForMissingField(fieldPath, elastic.Elasticsearch)
+	}
+
+	targetData.Put(fieldPath, fieldValue)
+	return nil
 }
 
 // Global cache for license information. Assumption is that license information changes infrequently

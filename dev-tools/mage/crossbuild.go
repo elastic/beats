@@ -223,6 +223,9 @@ func (b GolangCrossBuilder) Build() error {
 			"--env", "EXEC_GID="+strconv.Itoa(os.Getgid()),
 		)
 	}
+	if versionQualified {
+		args = append(args, "--env", "BEAT_VERSION_QUALIFIER="+versionQualifier)
+	}
 	args = append(args,
 		"--rm",
 		"--env", "MAGEFILE_VERBOSE="+verbose,

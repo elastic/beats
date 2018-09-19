@@ -1494,10 +1494,26 @@ The name of the process that served the transaction.
 
 --
 
+*`cmdline`*::
++
+--
+The command-line of the process that served the transaction.
+
+
+--
+
 *`client_proc`*::
 +
 --
 The name of the process that initiated the transaction.
+
+
+--
+
+*`client_cmdline`*::
++
+--
+The command-line of the process that initiated the transaction.
 
 
 --
@@ -1629,7 +1645,7 @@ The message op code (bootrequest or bootreply).
 *`dhcpv4.hops`*::
 +
 --
-type: int
+type: long
 
 The number of hops the DHCP message went through.
 

@@ -21,33 +21,38 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/heartbeat/config"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/scheduler"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
+// Heartbeat represents the root datastructure of this beat.
 type Heartbeat struct {
 	done chan struct{}
-
-	scheduler *scheduler.Scheduler
-	manager   *monitorManager
+	// config is used for iterating over elements of the config.
+	config          config.Config
+	scheduler       *scheduler.Scheduler
+	monitorReloader *cfgfile.Reloader
 }
 
-func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+// New creates a new heartbeat.
+func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	cfgwarn.Beta("Heartbeat is beta software")
 
-	config := config.DefaultConfig
-	if err := cfg.Unpack(&config); err != nil {
+	parsedConfig := config.DefaultConfig
+	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	limit := config.Scheduler.Limit
-	locationName := config.Scheduler.Location
+	limit := parsedConfig.Scheduler.Limit
+	locationName := parsedConfig.Scheduler.Location
 	if locationName == "" {
 		locationName = "Local"
 	}
@@ -56,22 +61,34 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	sched := scheduler.NewWithLocation(limit, location)
-	manager, err := newMonitorManager(b.Publisher, sched, monitors.Registry, config.Monitors)
-	if err != nil {
-		return nil, err
-	}
+	scheduler := scheduler.NewWithLocation(limit, location)
 
 	bt := &Heartbeat{
 		done:      make(chan struct{}),
-		scheduler: sched,
-		manager:   manager,
+		config:    parsedConfig,
+		scheduler: scheduler,
 	}
 	return bt, nil
 }
 
+// Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
+
+	err := bt.RunStaticMonitors(b)
+	if err != nil {
+		return err
+	}
+
+	if bt.config.ConfigMonitors.Enabled() {
+		bt.monitorReloader = cfgfile.NewReloader(b.Publisher, bt.config.ConfigMonitors)
+		defer bt.monitorReloader.Stop()
+
+		err := bt.RunDynamicMonitors(b)
+		if err != nil {
+			return err
+		}
+	}
 
 	if err := bt.scheduler.Start(); err != nil {
 		return err
@@ -80,12 +97,40 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	<-bt.done
 
-	bt.manager.Stop()
-
 	logp.Info("Shutting down.")
 	return nil
 }
 
+// RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
+func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
+	factory := monitors.NewFactory(bt.scheduler, true)
+
+	for _, cfg := range bt.config.Monitors {
+		created, err := factory.Create(b.Publisher, cfg, nil)
+		if err != nil {
+			return errors.Wrap(err, "could not create monitor")
+		}
+		created.Start()
+	}
+	return nil
+}
+
+// RunDynamicMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
+func (bt *Heartbeat) RunDynamicMonitors(b *beat.Beat) (err error) {
+	factory := monitors.NewFactory(bt.scheduler, false)
+
+	// Check monitor configs
+	if err := bt.monitorReloader.Check(factory); err != nil {
+		return err
+	}
+
+	// Execute the monitor
+	go bt.monitorReloader.Run(factory)
+
+	return nil
+}
+
+// Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	close(bt.done)
 }
