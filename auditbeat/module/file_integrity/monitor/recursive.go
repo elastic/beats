@@ -24,6 +24,8 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type recursiveWatcher struct {
@@ -33,6 +35,7 @@ type recursiveWatcher struct {
 	done    chan bool
 	addC    chan string
 	addErrC chan error
+	log     *logp.Logger
 }
 
 func newRecursiveWatcher(inner *fsnotify.Watcher) *recursiveWatcher {
@@ -42,6 +45,7 @@ func newRecursiveWatcher(inner *fsnotify.Watcher) *recursiveWatcher {
 		eventC:  make(chan fsnotify.Event, 1),
 		addC:    make(chan string),
 		addErrC: make(chan error),
+		log:     logp.NewLogger(moduleName),
 	}
 }
 
@@ -101,6 +105,8 @@ func (watcher *recursiveWatcher) addRecursive(path string) error {
 		}
 		return err
 	})
+	watcher.log.Debugw("Added recursive watch", "path", path)
+
 	if err != nil {
 		errs = append(errs, errors.Wrapf(err, "failed to walk path '%s'", path))
 	}
@@ -147,33 +153,47 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 			}
 			switch event.Op {
 			case fsnotify.Create:
-				if err := watcher.addRecursive(event.Name); err != nil {
-					watcher.inner.Errors <- errors.Wrapf(err, "unable to recurse path '%s'", event.Name)
+				err := watcher.addRecursive(event.Name)
+				if err != nil {
+					watcher.inner.Errors <- errors.Wrapf(err, "failed to add created path '%s'", event.Name)
 				}
-				watcher.tree.Visit(event.Name, PreOrder, func(path string, _ bool) error {
+				err = watcher.tree.Visit(event.Name, PreOrder, func(path string, _ bool) error {
 					watcher.deliver(fsnotify.Event{
 						Name: path,
 						Op:   event.Op,
 					})
 					return nil
 				})
+				if err != nil {
+					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit created path '%s'", event.Name)
+				}
 
 			case fsnotify.Remove:
-				watcher.tree.Visit(event.Name, PostOrder, func(path string, _ bool) error {
+				err := watcher.tree.Visit(event.Name, PostOrder, func(path string, _ bool) error {
 					watcher.deliver(fsnotify.Event{
 						Name: path,
 						Op:   event.Op,
 					})
 					return nil
 				})
-				watcher.tree.Remove(event.Name)
+				if err != nil {
+					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", event.Name)
+				}
+
+				err = watcher.tree.Remove(event.Name)
+				if err != nil {
+					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", event.Name)
+				}
 
 			// Handling rename (move) as a special case to give this recursion
 			// the same semantics as macOS FSEvents:
 			// - Removal of a dir notifies removal for all files inside it
 			// - Moving a dir away sends only one notification for this dir
 			case fsnotify.Rename:
-				watcher.tree.Remove(event.Name)
+				err := watcher.tree.Remove(event.Name)
+				if err != nil {
+					watcher.inner.Errors <- errors.Wrapf(err, "failed to remove path '%s'", event.Name)
+				}
 				fallthrough
 
 			default:
