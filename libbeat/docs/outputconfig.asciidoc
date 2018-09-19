@@ -265,7 +265,7 @@ Rule settings:
 *`index`*:: The index format string to use. If this string contains field
 references, such as `%{[fields.name]}`, the fields must exist, or the rule fails. 
 
-*`mapping`*:: A dictionary that takes the value returned by `index` and maps it
+*`mappings`*:: A dictionary that takes the value returned by `index` and maps it
 to a new name.
 
 *`default`*:: The default string value to use if `mappings` does not find a
@@ -306,8 +306,8 @@ output.elasticsearch:
   indices:
     - index: "%{[fields.log_type]}"
       mappings:
-        "critical": "sev1"
-        "normal": "sev2"
+        critical: "sev1"
+        normal: "sev2"
       default: "sev3"
 ------------------------------------------------------------------------------
 
@@ -370,7 +370,7 @@ Rule settings:
 references, such as `%{[fields.name]}`, the fields must exist, or the rule
 fails.  
 
-*`mapping`*:: A dictionary that takes the value returned by `pipeline` and maps
+*`mappings`*:: A dictionary that takes the value returned by `pipeline` and maps
 it to a new name.
 
 *`default`*:: The default string value to use if `mappings` does not find a
@@ -408,8 +408,8 @@ output.elasticsearch:
   pipelines:
     - pipeline: "%{[fields.log_type]}"
       mappings:
-        "critical": "sev1_pipeline"
-        "normal": "sev2_pipeline"
+        critical: "sev1_pipeline"
+        normal: "sev2_pipeline"
       default: "sev3_pipeline"
 ------------------------------------------------------------------------------
 
@@ -859,7 +859,7 @@ Rule settings:
 references, such as `%{[fields.name]}`, the fields must exist, or the rule
 fails. 
 
-*`mapping`*:: A dictionary that takes the value returned by `topic` and maps it
+*`mappings`*:: A dictionary that takes the value returned by `topic` and maps it
 to a new name.
 
 *`default`*:: The default string value to use if `mappings` does not find a
@@ -1088,16 +1088,16 @@ and name mappings. If the `keys` setting is missing or no rule matches, the
 
 Rule settings:
 
-*`index`*: The key format string to use. If this string contains field
+*`index`*:: The key format string to use. If this string contains field
 references, such as `%{[fields.name]}`, the fields must exist, or the rule
 fails.
 
-*`mapping`*: A dictionary that takes the value returned by `key` and maps it to
+*`mappings`*:: A dictionary that takes the value returned by `key` and maps it to
 a new name.
 
-*`default`*: The default string value to use if `mappings` does not find a match.
+*`default`*:: The default string value to use if `mappings` does not find a match.
 
-*`when`*: A condition that must succeed in order to execute the current rule.
+*`when`*:: A condition that must succeed in order to execute the current rule.
 All the <<conditions,conditions>> supported by processors are also supported
 here. 
 
@@ -1117,9 +1117,9 @@ output.redis:
         message: "DEBUG"
     - key: "%{[fields.list]}"
       mappings:
-        "http": "frontend_list"
-        "nginx": "frontend_list"
-        "mysql": "backend_list"
+        http: "frontend_list"
+        nginx: "frontend_list"
+        mysql: "backend_list"
 ------------------------------------------------------------------------------
 
 ===== `password`
