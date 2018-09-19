@@ -2,13 +2,14 @@
 == Set up monitors
 
 ++++
-<titleabbrev>Set up Heartbeat monitors</titleabbrev>
+<titleabbrev>Set up {beatname_uc} monitors</titleabbrev>
 ++++
 
-Heartbeat is configured by defining a set of `monitors` to check your remote hosts.
-These can be specified either inside the +heartbeat.yml+ config file, or in external
-files. One advantage of using external files is that these can be automatically
-reloaded without stopping the Heartbeat process.
+To configure {beatname_uc} define a set of `monitors` to check your remote hosts.
+Specify monitors either directly inside the +heartbeat.yml+ config file, or in external
+dynamically loaded files located in the directory referenced by `heartbeat.config.monitors.path`.
+One advantage of using external files is that these can be automatically reloaded
+without stopping the Heartbeat process.
 
 Each `monitor` item is an entry in a yaml list, and so begins with a dash (-).
 You can define the type of monitor to use, the hosts to check, and other
@@ -540,15 +541,12 @@ The timezone for the scheduler. By default the scheduler uses localtime.
 [[monitor-watch-poll-file]]
 ==== `watch.poll_file`
 
-experimental[]
-
-THIS EXPERIMENTAL FEATURE IS NOW DEPRECATED. IT WILL BE REMOVED IN A FUTURE
-RELEASE. It is replaced by using dynamic reloading via the
-`heartbeat.config.monitors` option.
+deprecated[6.5.0,Replaced by using dynamic reloading via the
+`heartbeat.config.monitors` option.]
 
 The JSON file to watch for additional monitor configurations. The JSON file can
 contain multiple objects, each of which specifies a different monitor config.
-Heartbeat checks this file periodically and starts a new monitor instance for
+{beatname_uc} checks this file periodically and starts a new monitor instance for
 each new JSON object added to the file. For example, imagine that you add
 10 new entries to the JSON file, each for a different hostname. When Heartbeat
 picks up the changes in the file, it merges the original config
