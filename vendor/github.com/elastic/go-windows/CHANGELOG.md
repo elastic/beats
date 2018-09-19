@@ -7,3 +7,4 @@
   - GetProcessImageFileName
   - EnumProcesses
   [#6](https://github.com/elastic/go-windows/pull/6)
+* Add GetProcessHandleCount to kernel32: [#7](https://github.com/elastic/go-windows/pull/7)

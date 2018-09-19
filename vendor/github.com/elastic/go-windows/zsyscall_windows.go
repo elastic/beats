@@ -45,6 +45,7 @@ var (
 	procGetSystemTimes            = modkernel32.NewProc("GetSystemTimes")
 	procGlobalMemoryStatusEx      = modkernel32.NewProc("GlobalMemoryStatusEx")
 	procReadProcessMemory         = modkernel32.NewProc("ReadProcessMemory")
+	procGetProcessHandleCount     = modkernel32.NewProc("GetProcessHandleCount")
 	procGetFileVersionInfoW       = modversion.NewProc("GetFileVersionInfoW")
 	procGetFileVersionInfoSizeW   = modversion.NewProc("GetFileVersionInfoSizeW")
 	procVerQueryValueW            = modversion.NewProc("VerQueryValueW")
@@ -98,6 +99,18 @@ func _GlobalMemoryStatusEx(buffer *MemoryStatusEx) (err error) {
 
 func _ReadProcessMemory(handle syscall.Handle, baseAddress uintptr, buffer uintptr, size uintptr, numRead *uintptr) (err error) {
 	r1, _, e1 := syscall.Syscall6(procReadProcessMemory.Addr(), 5, uintptr(handle), uintptr(baseAddress), uintptr(buffer), uintptr(size), uintptr(unsafe.Pointer(numRead)), 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = errnoErr(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _GetProcessHandleCount(handle syscall.Handle, pdwHandleCount *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procGetProcessHandleCount.Addr(), 2, uintptr(handle), uintptr(unsafe.Pointer(pdwHandleCount)), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
