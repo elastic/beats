@@ -215,6 +215,7 @@ func (m *Monitor) makeWatchTasks(monitorPlugin pluginBuilder) error {
 	return nil
 }
 
+// Start starts the monitor's execution using its configured scheduler.
 func (m *Monitor) Start() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
@@ -228,6 +229,8 @@ func (m *Monitor) Start() {
 	}
 }
 
+// Stop stops the Monitor's execution in its configured scheduler.
+// This is safe to call even if the Monitor was never started.
 func (m *Monitor) Stop() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
