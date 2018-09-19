@@ -40,12 +40,7 @@ func init() {
 }
 
 func setupMetrics(name string) error {
-	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
-	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
-
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
-
-	setupPlatformSpecificMetrics()
 
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
@@ -54,19 +49,28 @@ func setupMetrics(name string) error {
 		CacheCmdLine: true,
 		IncludeTop:   process.IncludeTopConfig{},
 	}
-	err := beatProcessStats.Init()
 
-	return err
+	err := beatProcessStats.Init()
+	if err != nil {
+		return err
+	}
+
+	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
+	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
+
+	setupPlatformSpecificMetrics()
+
+	return nil
 }
 
 func setupPlatformSpecificMetrics() {
 	if runtime.GOOS != "windows" {
 		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
+	} else {
+		setupWindowsHandlesMetrics()
 	}
 
-	if runtime.GOOS == "linux" {
-		monitoring.NewFunc(beatMetrics, "fd", reportFDUsage, monitoring.Report)
-	}
+	setupLinuxBSDFDMetrics()
 }
 
 func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {

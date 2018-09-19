@@ -154,11 +154,13 @@ func (p *process) CPUTime() types.CPUTimes {
 	}
 }
 
-func (p *process) FileDescriptors() ([]string, error) {
+// OpenHandles returns the list of open file descriptors of the process.
+func (p *process) OpenHandles() ([]string, error) {
 	return p.Proc.FileDescriptorTargets()
 }
 
-func (p *process) FileDescriptorCount() (int, error) {
+// OpenHandles returns the number of open file descriptors of the process.
+func (p *process) OpenHandleCount() (int, error) {
 	return p.Proc.FileDescriptorsLen()
 }
 

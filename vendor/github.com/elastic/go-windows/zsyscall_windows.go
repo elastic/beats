@@ -91,6 +91,18 @@ func _GlobalMemoryStatusEx(buffer *MemoryStatusEx) (err error) {
 	return
 }
 
+func _GetProcessHandleCount(handle syscall.Handle, pdwHandleCount *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procGetProcessHandleCount.Addr(), 2, uintptr(handle), uintptr(unsafe.Pointer(pdwHandleCount)), 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = errnoErr(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
 func _GetFileVersionInfo(filename string, reserved uint32, dataLen uint32, data *byte) (success bool, err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(filename)
