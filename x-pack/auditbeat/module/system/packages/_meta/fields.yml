@@ -1,0 +1,6 @@
+- name: packages
+  type: group
+  description: >
+    `packages` contains TODO.
+  release: experimental
+  fields:
