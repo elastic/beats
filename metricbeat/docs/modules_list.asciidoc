@@ -33,7 +33,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-dropwizard,Dropwizard>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>> beta[]  
 |<<metricbeat-module-elasticsearch,Elasticsearch>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.9+| .9+|  |<<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>> beta[]  
+.10+| .10+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>> beta[]  
+|<<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>> beta[]  
 |<<metricbeat-metricset-elasticsearch-index,index>> beta[]  
 |<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>> beta[]  
 |<<metricbeat-metricset-elasticsearch-index_summary,index_summary>> beta[]  

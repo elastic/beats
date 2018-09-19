@@ -3462,6 +3462,85 @@ Elasticsearch state id.
 --
 
 [float]
+== ccr fields
+
+Cross-cluster replication stats
+
+
+
+
+*`elasticsearch.ccr.leader.index`*::
++
+--
+type: keyword
+
+Name of leader index
+
+
+--
+
+*`elasticsearch.ccr.leader.max_seq_no`*::
++
+--
+type: long
+
+Maximum sequence number of operation on the leader shard
+
+
+--
+
+
+*`elasticsearch.ccr.follower.index`*::
++
+--
+type: keyword
+
+Name of follower index
+
+
+--
+
+*`elasticsearch.ccr.follower.shard.number`*::
++
+--
+type: long
+
+Number of the shard within the index
+
+
+--
+
+*`elasticsearch.ccr.follower.operations_indexed`*::
++
+--
+type: long
+
+Number of operations indexed (replicated) into the follower shard from the leader shard
+
+
+--
+
+*`elasticsearch.ccr.follower.time_since_last_fetch.ms`*::
++
+--
+type: long
+
+Time, in ms, since the follower last fetched from the leader
+
+
+--
+
+*`elasticsearch.ccr.follower.global_checkpoint`*::
++
+--
+type: long
+
+Global checkpoint value on follower shard
+
+
+--
+
+[float]
 == cluster.stats fields
 
 Cluster stats

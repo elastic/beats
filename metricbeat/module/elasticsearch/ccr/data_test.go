@@ -15,33 +15,35 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package monitors
+// +build !integration
+
+package ccr
 
 import (
-	"github.com/pkg/errors"
+	"io/ioutil"
+	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/stretchr/testify/assert"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-// ErrPluginDisabled is returned when the monitor plugin is marked as disabled.
-var ErrPluginDisabled = errors.New("Monitor not loaded, plugin is disabled")
-
-// MonitorPluginInfo represents the generic configuration options around a monitor plugin.
-type MonitorPluginInfo struct {
-	Type    string `config:"type" validate:"required"`
-	Enabled bool   `config:"enabled"`
+var info = elasticsearch.Info{
+	ClusterID:   "1234",
+	ClusterName: "helloworld",
 }
 
-func pluginInfo(config *common.Config) (MonitorPluginInfo, error) {
-	mpi := MonitorPluginInfo{Enabled: true}
+func TestMapper(t *testing.T) {
+	elasticsearch.TestMapperWithInfo(t, "./_meta/test/ccr_stats.*.json", eventsMapping)
+}
 
-	if err := config.Unpack(&mpi); err != nil {
-		return mpi, errors.Wrap(err, "error unpacking monitor plugin config")
-	}
+func TestEmpty(t *testing.T) {
+	input, err := ioutil.ReadFile("./_meta/test/empty.700.json")
+	assert.NoError(t, err)
 
-	if !mpi.Enabled {
-		return mpi, ErrPluginDisabled
-	}
-
-	return mpi, nil
+	reporter := &mbtest.CapturingReporterV2{}
+	eventsMapping(reporter, info, input)
+	assert.Equal(t, 0, len(reporter.GetErrors()))
+	assert.Equal(t, 0, len(reporter.GetEvents()))
 }

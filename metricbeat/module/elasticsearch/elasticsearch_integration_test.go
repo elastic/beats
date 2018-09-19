@@ -20,6 +20,8 @@
 package elasticsearch_test
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -29,11 +31,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	"bytes"
-
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/ccr"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/cluster_stats"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_recovery"
@@ -45,6 +47,7 @@ import (
 )
 
 var metricSets = []string{
+	"ccr",
 	"cluster_stats",
 	"index",
 	"index_recovery",
@@ -69,6 +72,7 @@ func TestFetch(t *testing.T) {
 	assert.NoError(t, err)
 
 	for _, metricSet := range metricSets {
+		checkSkip(t, metricSet, host)
 		t.Run(metricSet, func(t *testing.T) {
 			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
 			events, errs := mbtest.ReportingFetchV2(f)
@@ -86,7 +90,9 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "elasticsearch")
 
+	host := net.JoinHostPort(getEnvHost(), getEnvPort())
 	for _, metricSet := range metricSets {
+		checkSkip(t, metricSet, host)
 		t.Run(metricSet, func(t *testing.T) {
 			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
 			err := mbtest.WriteEventsReporterV2(f, t, metricSet)
@@ -224,4 +230,49 @@ func checkExists(url string) bool {
 		return true
 	}
 	return false
+}
+
+func checkSkip(t *testing.T, metricset string, host string) {
+	if metricset != "ccr" {
+		return
+	}
+
+	version, err := getElasticsearchVersion(host)
+	if err != nil {
+		t.Fatal("getting elasticsearch version", err)
+	}
+
+	isCCRStatsAPIAvailable, err := elasticsearch.IsCCRStatsAPIAvailable(version)
+	if err != nil {
+		t.Fatal("checking if elasticsearch CCR stats API is available", err)
+	}
+
+	if !isCCRStatsAPIAvailable {
+		t.Skip("elasticsearch CCR stats API is not available until " + elasticsearch.CCRStatsAPIAvailableVersion)
+	}
+}
+
+func getElasticsearchVersion(elasticsearchHostPort string) (string, error) {
+	resp, err := http.Get("http://" + elasticsearchHostPort + "/")
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var data common.MapStr
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return "", err
+	}
+
+	version, err := data.GetValue("version.number")
+	if err != nil {
+		return "", err
+	}
+	return version.(string), nil
 }
