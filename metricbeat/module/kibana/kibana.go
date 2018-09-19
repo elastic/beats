@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -72,28 +73,14 @@ func GetVersion(http *helper.HTTP, currentPath string) (string, error) {
 	return versionStr, nil
 }
 
-func isKibanaAPIAvailable(currentKibanaVersion, apiAvailableInKibanaVersion string) (bool, error) {
-	currentVersion, err := common.NewVersion(currentKibanaVersion)
-	if err != nil {
-		return false, err
-	}
-
-	wantVersion, err := common.NewVersion(apiAvailableInKibanaVersion)
-	if err != nil {
-		return false, err
-	}
-
-	return !currentVersion.LessThan(wantVersion), nil
-}
-
 // IsStatsAPIAvailable returns whether the stats API is available in the given version of Kibana
 func IsStatsAPIAvailable(currentKibanaVersion string) (bool, error) {
-	return isKibanaAPIAvailable(currentKibanaVersion, StatsAPIAvailableVersion)
+	return elastic.IsFeatureAvailable(currentKibanaVersion, StatsAPIAvailableVersion)
 }
 
 // IsSettingsAPIAvailable returns whether the settings API is available in the given version of Kibana
 func IsSettingsAPIAvailable(currentKibanaVersion string) (bool, error) {
-	return isKibanaAPIAvailable(currentKibanaVersion, SettingsAPIAvailableVersion)
+	return elastic.IsFeatureAvailable(currentKibanaVersion, SettingsAPIAvailableVersion)
 }
 
 func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {

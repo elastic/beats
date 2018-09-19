@@ -50,6 +50,8 @@ This module supports TLS connection when using `ssl` config field, as described 
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-elasticsearch-ccr,ccr>>
+
 * <<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>>
 
 * <<metricbeat-metricset-elasticsearch-index,index>>
@@ -67,6 +69,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>
 
 * <<metricbeat-metricset-elasticsearch-shard,shard>>
+
+include::elasticsearch/ccr.asciidoc[]
 
 include::elasticsearch/cluster_stats.asciidoc[]
 

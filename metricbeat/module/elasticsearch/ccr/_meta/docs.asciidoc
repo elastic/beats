@@ -1,0 +1,3 @@
+This is the `ccr` metricset of the Elasticsearch module. It interrogates the
+Cross Cluster Replication Stats API endpoint to fetch information about shards
+in the Elasticsearch cluster that are participating in cross-cluster replication.
