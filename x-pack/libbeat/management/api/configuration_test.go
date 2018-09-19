@@ -23,7 +23,7 @@ func TestConfiguration(t *testing.T) {
 		// Check enrollment token is correct
 		assert.Equal(t, "thisismyenrollmenttoken", r.Header.Get("kbn-beats-access-token"))
 
-		fmt.Fprintf(w, `{"configuration_blocks":[{"type":"filebeat.modules","block_yml":"module: apache2\n"},{"type":"metricbeat.modules","block_yml":"module: nginx\n"}]}`)
+		fmt.Fprintf(w, `{"configuration_blocks":[{"type":"filebeat.modules","config":{"module":"apache2"}},{"type":"metricbeat.modules","config":{"module":"system","period":"10s"}}]}`)
 	}))
 	defer server.Close()
 
@@ -33,4 +33,104 @@ func TestConfiguration(t *testing.T) {
 	}
 
 	assert.Equal(t, 2, len(configs))
+	assert.Equal(t, &ConfigBlock{Raw: map[string]interface{}{
+		"module": "apache2",
+	}}, configs["filebeat.modules"][0])
+
+	assert.Equal(t, &ConfigBlock{Raw: map[string]interface{}{
+		"module": "system",
+		"period": "10s",
+	}}, configs["metricbeat.modules"][0])
+}
+
+func TestConfigBlocksEqual(t *testing.T) {
+	tests := []struct {
+		name  string
+		a, b  ConfigBlocks
+		equal bool
+	}{
+		{
+			name:  "empty lists or nil",
+			a:     nil,
+			b:     ConfigBlocks{},
+			equal: true,
+		},
+		{
+			name: "single element",
+			a: ConfigBlocks{
+				"metricbeat.modules": []*ConfigBlock{
+					&ConfigBlock{
+						Raw: map[string]interface{}{
+							"foo": "bar",
+						},
+					},
+				},
+			},
+			b: ConfigBlocks{
+				"metricbeat.modules": []*ConfigBlock{
+					&ConfigBlock{
+						Raw: map[string]interface{}{
+							"foo": "bar",
+						},
+					},
+				},
+			},
+			equal: true,
+		},
+		{
+			name: "different number of blocks",
+			a: ConfigBlocks{
+				"metricbeat.modules": []*ConfigBlock{
+					&ConfigBlock{
+						Raw: map[string]interface{}{
+							"foo": "bar",
+						},
+					},
+					&ConfigBlock{
+						Raw: map[string]interface{}{
+							"baz": "buzz",
+						},
+					},
+				},
+			},
+			b: ConfigBlocks{
+				"metricbeat.modules": []*ConfigBlock{
+					&ConfigBlock{
+						Raw: map[string]interface{}{
+							"foo": "bar",
+						},
+					},
+				},
+			},
+			equal: false,
+		},
+		{
+			name: "different block",
+			a: ConfigBlocks{
+				"metricbeat.modules": []*ConfigBlock{
+					&ConfigBlock{
+						Raw: map[string]interface{}{
+							"baz": "buzz",
+						},
+					},
+				},
+			},
+			b: ConfigBlocks{
+				"metricbeat.modules": []*ConfigBlock{
+					&ConfigBlock{
+						Raw: map[string]interface{}{
+							"foo": "bar",
+						},
+					},
+				},
+			},
+			equal: false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.equal, ConfigBlocksEqual(test.a, test.b))
+		})
+	}
 }

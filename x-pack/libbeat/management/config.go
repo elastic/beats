@@ -6,6 +6,7 @@ package management
 
 import (
 	"os"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
@@ -22,11 +23,20 @@ type Config struct {
 	// true when enrolled
 	Enabled bool
 
+	// Poll configs period
+	Period time.Duration
+
 	AccessToken string
 
 	Kibana *kibana.ClientConfig
 
-	Configs []*api.ConfigBlock
+	Configs api.ConfigBlocks
+}
+
+func defaultConfig() *Config {
+	return &Config{
+		Period: 60 * time.Second,
+	}
 }
 
 // Load settings from its source file
@@ -34,10 +44,14 @@ func (c *Config) Load() error {
 	path := paths.Resolve(paths.Data, "management.yml")
 	config, err := common.LoadFile(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			// File is not present, beat is not enrolled
+			return nil
+		}
 		return err
 	}
 
-	if err = config.Unpack(c); err != nil {
+	if err = config.Unpack(&c); err != nil {
 		return err
 	}
 

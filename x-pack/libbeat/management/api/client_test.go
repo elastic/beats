@@ -24,6 +24,8 @@ func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Serv
 		t.Fatal(err)
 	}
 
+	config.IgnoreVersion = true
+
 	client, err := NewClient(config)
 	if err != nil {
 		t.Fatal(err)

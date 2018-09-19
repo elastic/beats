@@ -17,6 +17,9 @@ func Enroll(beat *instance.Beat, kibanaURL, enrollmentToken string) error {
 		return err
 	}
 
+	// Ignore kibana version to avoid permission errors
+	config.IgnoreVersion = true
+
 	client, err := api.NewClient(config)
 	if err != nil {
 		return err
@@ -29,11 +32,10 @@ func Enroll(beat *instance.Beat, kibanaURL, enrollmentToken string) error {
 
 	// Enrolled, persist state
 	// TODO use beat.Keystore() for access_token
-	settings := Config{
-		Enabled:     true,
-		AccessToken: accessToken,
-		Kibana:      config,
-	}
+	settings := defaultConfig()
+	settings.Enabled = true
+	settings.AccessToken = accessToken
+	settings.Kibana = config
 
 	return settings.Save()
 }
