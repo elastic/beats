@@ -34,6 +34,7 @@ import (
 //sys   _GetSystemTimes(idleTime *syscall.Filetime, kernelTime *syscall.Filetime, userTime *syscall.Filetime) (err error) = kernel32.GetSystemTimes
 //sys   _GlobalMemoryStatusEx(buffer *MemoryStatusEx) (err error) = kernel32.GlobalMemoryStatusEx
 //sys   _ReadProcessMemory(handle syscall.Handle, baseAddress uintptr, buffer uintptr, size uintptr, numRead *uintptr) (err error) = kernel32.ReadProcessMemory
+//sys   _GetProcessHandleCount(handle syscall.Handle, pdwHandleCount *uint32) (err error) = kernel32.GetProcessHandleCount
 
 var (
 	sizeofMemoryStatusEx = uint32(unsafe.Sizeof(MemoryStatusEx{}))
@@ -235,4 +236,14 @@ func ReadProcessMemory(handle syscall.Handle, baseAddress uintptr, dest []byte) 
 		return 0, err
 	}
 	return numRead, nil
+}
+
+// GetProcessHandleCount retrieves the number of open handles of a process.
+// https://docs.microsoft.com/en-us/windows/desktop/api/processthreadsapi/nf-processthreadsapi-getprocesshandlecount
+func GetProcessHandleCount(process syscall.Handle) (uint32, error) {
+	var count uint32
+	if err := _GetProcessHandleCount(process, &count); err != nil {
+		return 0, errors.Wrap(err, "GetProcessHandleCount failed")
+	}
+	return count, nil
 }
