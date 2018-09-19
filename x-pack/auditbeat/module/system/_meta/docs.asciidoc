@@ -1,6 +1,6 @@
-== Sysinfo Module
+== System Module
 
-The `sysinfo` module ... TODO.
+The `system` module ... TODO.
 
 The module is implemented for Linux, macOS (Darwin), and Windows.
 
@@ -16,7 +16,7 @@ TODO
 
 [source,yaml]
 ----
-- module: sysinfo
+- module: system
 ----
 
 *`some_option`*:: TODO

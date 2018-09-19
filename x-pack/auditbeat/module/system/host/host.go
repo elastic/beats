@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	moduleName    = "sysinfo"
+	moduleName    = "system"
 	metricsetName = "host"
 )
 

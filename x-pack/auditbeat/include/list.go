@@ -7,5 +7,5 @@ package include
 import (
 	// Include all Auditbeat modules so that they register their
 	// factories with the global registry.
-	_ "github.com/elastic/beats/x-pack/auditbeat/module/sysinfo/host"
+	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/host"
 )
