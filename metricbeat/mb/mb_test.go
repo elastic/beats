@@ -383,16 +383,18 @@ func Test_QueryParams_String(t *testing.T) {
 		"floatKey":  11.5,
 		"boolKey":   true,
 		"nullKey":   nil,
+		"arKey":     []interface{}{1, 2},
 	}
 
 	res := qp.String()
 
-	expectedValues := []string{"stringKey=value", "intKey=10", "floatKey=11.5", "boolKey=true", "nullKey=null"}
+	expectedValues := []string{"stringKey=value", "intKey=10", "floatKey=11.5", "boolKey=true", "nullKey=", "arKey=1", "arKey=2"}
 	for _, expected := range expectedValues {
 		assert.Contains(t, res, expected)
 	}
 
 	assert.NotContains(t, res, "?")
+	assert.NotContains(t, res, "%")
 	assert.NotEqual(t, "&", res[0])
 	assert.NotEqual(t, "&", res[len(res)-1])
 }

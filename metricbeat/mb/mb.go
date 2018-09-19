@@ -22,6 +22,7 @@ to implement Modules and their associated MetricSets.
 package mb
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"time"
@@ -332,34 +333,22 @@ func (q QueryParams) String() (s string) {
 	for k, v := range q {
 		if values, ok := v.([]interface{}); ok {
 			for _, innerValue := range values {
-				u.Add(k, q.stringFromValue(innerValue))
+				u.Add(k, fmt.Sprintf("%v", innerValue))
 			}
-			fmt.Println(u.Get(k))
 		} else {
-			u.Add(k, q.stringFromValue(v))
+			//nil values in YAML shouldn't be stringified anyhow
+			if v == nil {
+				u.Add(k, "")
+			} else {
+				u.Add(k, fmt.Sprintf("%v", v))
+			}
 		}
 	}
 
+	byt, _ := json.MarshalIndent(u, "", "  ")
+	fmt.Println(string(byt), u.Encode())
+
 	return u.Encode()
-}
-
-func (q QueryParams) stringFromValue(v interface{}) string {
-	switch a := v.(type) {
-	case string:
-		return a
-	case int64:
-		return fmt.Sprintf("%d", a)
-	case uint64:
-		return fmt.Sprintf("%d", a)
-	case float64:
-		return fmt.Sprintf("%f", a)
-	case bool:
-		return fmt.Sprintf("%t", a)
-	default:
-		fmt.Println("Unknown type")
-	}
-
-	return ""
 }
 
 // defaultModuleConfig contains the default values for ModuleConfig instances.
