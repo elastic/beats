@@ -1,4 +1,4 @@
-The Sysinfo `host` metricset provides ... TODO.
+The System `host` metricset provides ... TODO.
 
 The module is implemented for Linux, macOS (Darwin), and Windows.
 
