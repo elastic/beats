@@ -24,8 +24,9 @@ import (
 
 type tlsConfig struct {
 	config.ProtocolCommon  `config:",inline"`
-	SendCertificates       bool `config:"send_certificates"`
-	IncludeRawCertificates bool `config:"include_raw_certificates"`
+	SendCertificates       bool     `config:"send_certificates"`
+	IncludeRawCertificates bool     `config:"include_raw_certificates"`
+	Fingerprints           []string `config:fingerprints`
 }
 
 var (

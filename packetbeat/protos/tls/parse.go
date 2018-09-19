@@ -477,24 +477,22 @@ func parseServerHello(buffer bufferView) *helloMessage {
 	return &result
 }
 
-func parseCertificates(buffer bufferView) []*x509.Certificate {
+func parseCertificates(buffer bufferView) (certs []*x509.Certificate) {
 	var totalLen uint32
 	if !buffer.read24Net(0, &totalLen) || int(totalLen+3) != buffer.length() {
 		return nil
 	}
-
-	var certs []*x509.Certificate
 
 	for pos, limit := 3, int(totalLen)+3; pos+3 <= limit; {
 		var certLen uint32
 		if !buffer.read24Net(pos, &certLen) || pos+3+int(certLen) > limit {
 			return nil
 		}
-		cert := buffer.readBytes(pos+3, int(certLen))
-		if len(cert) != int(certLen) {
+		raw := buffer.readBytes(pos+3, int(certLen))
+		if len(raw) != int(certLen) {
 			return nil
 		}
-		parsed, err := x509.ParseCertificate(cert)
+		parsed, err := x509.ParseCertificate(raw)
 		if err != nil {
 			return nil
 		}
@@ -545,7 +543,7 @@ func getKeySize(key interface{}) int {
 
 // certToMap takes an x509 cert and converts it into a map. If includeRaw is set
 // to true a PEM encoded copy of the cert is encoded into the map as well.
-func certToMap(cert *x509.Certificate, includeRaw bool) common.MapStr {
+func certToMap(cert *x509.Certificate, includeRaw bool, hashes []*FingerprintAlgorithm) common.MapStr {
 	certMap := common.MapStr{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
@@ -569,6 +567,13 @@ func certToMap(cert *x509.Certificate, includeRaw bool) common.MapStr {
 	}
 	if includeRaw {
 		certMap["raw"] = x509util.CertToPEMString(cert)
+	}
+	if len(hashes) > 0 {
+		fingerprints := common.MapStr{}
+		for _, hash := range hashes {
+			fingerprints[hash.name] = hash.algo.Hash(cert.Raw)
+		}
+		certMap["fingerprint"] = fingerprints
 	}
 	return certMap
 }

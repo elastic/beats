@@ -77,6 +77,7 @@ func TestPlugin(t *testing.T) {
 	assert.NotNil(t, plugin)
 	assert.Empty(t, plugin.GetPorts())
 	assert.Equal(t, protos.DefaultTransactionExpiration, plugin.ConnectionTimeout())
+	assert.Empty(t, plugin.fingerprints)
 }
 
 func TestNotTLS(t *testing.T) {
@@ -329,5 +330,4 @@ func TestCompletedHandshake(t *testing.T) {
 	private = tls.Parse(&req, tcpTuple, 1, private)
 	assert.NotNil(t, private)
 	assert.NotEmpty(t, results.events)
-
 }
