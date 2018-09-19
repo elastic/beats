@@ -1,6 +1,5 @@
 /.idea
 /build
-
 .DS_Store
 .journalbeat_position
 /journalbeat

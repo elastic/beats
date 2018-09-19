@@ -91,6 +91,7 @@ func (bt *Journalbeat) Run(b *beat.Beat) error {
 	if err != nil {
 		return err
 	}
+	defer bt.checkpoint.Shutdown()
 
 	var wg sync.WaitGroup
 	for _, i := range bt.inputs {
@@ -99,7 +100,6 @@ func (bt *Journalbeat) Run(b *beat.Beat) error {
 	}
 
 	wg.Wait()
-	bt.checkpoint.Shutdown()
 
 	return nil
 }

@@ -31,7 +31,7 @@ import (
 )
 
 func init() {
-	mage.BeatDescription = "Winlogbeat ships Windows event logs to Elasticsearch or Logstash."
+	mage.BeatDescription = "Journalbeat ships systemd journal entries to Elasticsearch or Logstash."
 
 	// TODO filter platforms
 }
