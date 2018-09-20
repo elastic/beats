@@ -92,8 +92,12 @@ func splitTagsFromMetricName(metricName string) (string, common.MapStr) {
 	if metricName == "" {
 		return "", nil
 	}
+	// Tags are located at the end
+	if metricName[len(metricName)-1] != '}' {
+		return metricName, nil
+	}
 
-	index := strings.Index(metricName, "{")
+	index := strings.LastIndex(metricName, "{")
 	if index == -1 {
 		return metricName, nil
 	}
@@ -107,12 +111,19 @@ func splitTagsFromMetricName(metricName string) (string, common.MapStr) {
 		dobreak := false
 		ind := strings.Index(tagStr, ",")
 		eqPos := strings.Index(tagStr, "=")
+		if eqPos == -1 {
+			return metricName, nil
+		}
 		if ind == -1 {
 			tags[tagStr[:eqPos]] = tagStr[eqPos+1:]
 			dobreak = true
 		} else {
 			tags[tagStr[:eqPos]] = tagStr[eqPos+1 : ind]
-			tagStr = tagStr[ind+2:]
+			if ind+2 < len(tagStr) {
+				tagStr = tagStr[ind+2:]
+			} else {
+				dobreak = true
+			}
 		}
 
 		if dobreak == true {
