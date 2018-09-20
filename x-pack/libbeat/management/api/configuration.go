@@ -20,8 +20,14 @@ type ConfigBlock struct {
 	Raw map[string]interface{}
 }
 
-// ConfigBlocks holds a map of type -> list of configs
-type ConfigBlocks map[string][]*ConfigBlock
+// ConfigBlocksWithType is a list of config blocks with the same type
+type ConfigBlocksWithType struct {
+	Type   string
+	Blocks []*ConfigBlock
+}
+
+// ConfigBlocks holds a list of type + configs objects
+type ConfigBlocks []ConfigBlocksWithType
 
 // Config returns a common.Config object holding the config from this block
 func (c *ConfigBlock) Config() (*common.Config, error) {
@@ -55,9 +61,14 @@ func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID) (ConfigBl
 		return nil, err
 	}
 
-	res := ConfigBlocks{}
+	blocks := map[string][]*ConfigBlock{}
 	for _, block := range resp.ConfigBlocks {
-		res[block.Type] = append(res[block.Type], &ConfigBlock{Raw: block.Raw})
+		blocks[block.Type] = append(blocks[block.Type], &ConfigBlock{Raw: block.Raw})
+	}
+
+	res := ConfigBlocks{}
+	for t, b := range blocks {
+		res = append(res, ConfigBlocksWithType{Type: t, Blocks: b})
 	}
 
 	return res, nil

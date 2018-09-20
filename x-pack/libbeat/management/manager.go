@@ -152,14 +152,15 @@ func (cm *ConfigManager) fetch() bool {
 		return false
 	}
 
+	cm.logger.Info("New configurations retrieved")
 	cm.config.Configs = configs
 
 	return true
 }
 
 func (cm *ConfigManager) apply() {
-	for blockType, blockList := range cm.config.Configs {
-		cm.reload(blockType, blockList)
+	for _, b := range cm.config.Configs {
+		cm.reload(b.Type, b.Blocks)
 	}
 }
 
