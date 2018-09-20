@@ -96,7 +96,15 @@ func (u *Server) run() {
 				continue
 			}
 
-			u.log.Errorw("Error reading from the socket", "error", err)
+			// Closed network error string will never change in Go 1.X
+			// https://github.com/golang/go/issues/4373
+			opErr, ok := err.(*net.OpError)
+			if ok && strings.Contains(opErr.Err.Error(), "use of closed network connection") {
+				u.log.Info("Connection has been closed")
+				return
+			}
+
+			u.log.Errorf("Error reading from the socket %s", err)
 
 			// On Windows send the current buffer and mark it as truncated.
 			// The buffer will have content but length will return 0, addr will be nil.
@@ -115,8 +123,8 @@ func (u *Server) run() {
 // Stop stops the current udp server.
 func (u *Server) Stop() {
 	u.log.Info("Stopping UDP server")
-	u.Listener.Close()
 	close(u.done)
+	u.Listener.Close()
 	u.wg.Wait()
 	u.log.Info("UDP server stopped")
 }
