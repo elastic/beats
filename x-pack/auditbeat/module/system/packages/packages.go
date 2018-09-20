@@ -20,6 +20,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/auditbeat/cache"
+	"github.com/elastic/beats/x-pack/auditbeat/module/system/config"
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/go-sysinfo"
@@ -39,26 +41,124 @@ func init() {
 // MetricSet collects data about the host.
 type MetricSet struct {
 	mb.BaseMetricSet
-	log *logp.Logger
+	config config.Config
+	cache  *cache.Cache
+	log    *logp.Logger
+}
+
+// Package represents information for a package.
+type Package struct {
+	Name        string
+	Version     string
+	Release     string
+	Arch        string
+	License     string
+	InstallTime time.Time
+	Size        uint64
+	Summary     string
+	URL         string
+}
+
+// Hash creates a hash for Package.
+func (pkg Package) Hash() string {
+	// Could use real hash e.g. FNV if there is an advantage
+	return pkg.Name + pkg.InstallTime.String()
+}
+
+func (pkg Package) toMapStr() common.MapStr {
+	return common.MapStr{
+		"package.name":        pkg.Name,
+		"package.version":     pkg.Version,
+		"package.release":     pkg.Release,
+		"package.arch":        pkg.Arch,
+		"package.license":     pkg.License,
+		"package.installtime": pkg.InstallTime,
+		"package.size":        pkg.Size,
+		"package.summary":     pkg.Summary,
+		"package.url":         pkg.URL,
+	}
 }
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
 
-	config := defaultConfig
+	config := config.NewDefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
 	}
 
-	return &MetricSet{
+	ms := &MetricSet{
 		BaseMetricSet: base,
+		config:        config,
 		log:           logp.NewLogger(moduleName),
-	}, nil
+	}
+
+	if config.ReportChanges {
+		ms.cache = cache.New()
+	}
+
+	return ms, nil
 }
 
 // Fetch collects data about the host. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
+	packages := ms.getPackages()
+
+	/*var pkgInfos []common.MapStr
+
+	for _, pkg := range packages {
+		pkgInfos = append(pkgInfos, pkg.toMapStr())
+	}
+
+	report.Event(mb.Event{
+		MetricSetFields: common.MapStr{
+			"packages": pkgInfos,
+		},
+	})*/
+
+	if ms.cache != nil && !ms.cache.IsEmpty() {
+		installed, removed := ms.cache.DiffAndUpdateCache(packages)
+
+		for _, pkgInfo := range installed {
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"status":   "installed",
+					"packages": pkgInfo.(Package).toMapStr(),
+				},
+			})
+		}
+
+		for _, pkgInfo := range removed {
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"status":   "removed",
+					"packages": pkgInfo.(Package).toMapStr(),
+				},
+			})
+		}
+	} else {
+		// Report all installed packages
+		var pkgInfos []common.MapStr
+
+		for _, pkgInfo := range packages {
+			pkgInfos = append(pkgInfos, pkgInfo.(Package).toMapStr())
+		}
+
+		report.Event(mb.Event{
+			MetricSetFields: common.MapStr{
+				"packages": pkgInfos,
+			},
+		})
+
+		if ms.cache != nil {
+			// This will initialize the cache with the current packages
+			ms.cache.DiffAndUpdateCache(packages)
+		}
+	}
+}
+
+func (ms *MetricSet) getPackages() (packages []cache.Cacheable) {
 	host, err := sysinfo.Host()
 	if err != nil {
 		ms.log.Errorw("Error getting the OS", "error", err)
@@ -69,7 +169,6 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		ms.log.Errorw("No OS info from sysinfo.Host", "error", err)
 	}
 
-	var packages []Package
 	switch hostInfo.OS.Family {
 	case "redhat":
 		packages, err = listRPMPackages()
@@ -90,45 +189,13 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		ms.log.Errorw("No logic for getting packages for OS family", "os", hostInfo.OS.Family)
 	}
 
-	var pkgInfos []common.MapStr
-
-	for _, pkg := range packages {
-		pkgInfos = append(pkgInfos, common.MapStr{
-			"package.name":        pkg.Name,
-			"package.version":     pkg.Version,
-			"package.release":     pkg.Release,
-			"package.arch":        pkg.Arch,
-			"package.license":     pkg.License,
-			"package.installtime": pkg.InstallTime,
-			"package.size":        pkg.Size,
-			"package.summary":     pkg.Summary,
-			"package.url":         pkg.URL,
-		})
-	}
-
-	report.Event(mb.Event{
-		MetricSetFields: common.MapStr{
-			"packages": pkgInfos,
-		},
-	})
-}
-
-type Package struct {
-	Name        string
-	Version     string
-	Release     string
-	Arch        string
-	License     string
-	InstallTime time.Time
-	Size        uint64
-	Summary     string
-	URL         string
+	return
 }
 
 /*
 The following functions copied from https://github.com/tsg/listpackages/blob/master/main.go
 */
-func listRPMPackages() ([]Package, error) {
+func listRPMPackages() ([]cache.Cacheable, error) {
 	format := "%{NAME}|%{VERSION}|%{RELEASE}|%{ARCH}|%{LICENSE}|%{INSTALLTIME}|%{SIZE}|%{URL}|%{SUMMARY}\\n"
 	out, err := exec.Command("/usr/bin/rpm", "--qf", format, "-qa").Output()
 	if err != nil {
@@ -136,7 +203,7 @@ func listRPMPackages() ([]Package, error) {
 	}
 
 	lines := strings.Split(string(out), "\n")
-	packages := []Package{}
+	packages := []cache.Cacheable{}
 	for _, line := range lines {
 		if len(strings.TrimSpace(line)) == 0 {
 			continue
@@ -174,7 +241,7 @@ func listRPMPackages() ([]Package, error) {
 	return packages, nil
 }
 
-func listDebPackages() ([]Package, error) {
+func listDebPackages() ([]cache.Cacheable, error) {
 	statusFile := "/var/lib/dpkg/status"
 	file, err := os.Open(statusFile)
 	if err != nil {
@@ -182,7 +249,7 @@ func listDebPackages() ([]Package, error) {
 	}
 	defer file.Close()
 
-	packages := []Package{}
+	packages := []cache.Cacheable{}
 	pkg := &Package{}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -226,7 +293,7 @@ func listDebPackages() ([]Package, error) {
 	return packages, nil
 }
 
-func listBrewPackages() ([]Package, error) {
+func listBrewPackages() ([]cache.Cacheable, error) {
 	cellarPath := "/usr/local/Cellar"
 
 	cellarInfo, err := os.Stat(cellarPath)
@@ -242,7 +309,7 @@ func listBrewPackages() ([]Package, error) {
 		return nil, fmt.Errorf("Error reading directory %s: %v", cellarPath, err)
 	}
 
-	packages := []Package{}
+	packages := []cache.Cacheable{}
 	for _, packageDir := range packageDirs {
 		if !packageDir.IsDir() {
 			continue
