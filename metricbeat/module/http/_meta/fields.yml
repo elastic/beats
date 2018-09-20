@@ -3,7 +3,7 @@
   description: >
     HTTP module
   release: ga
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   fields:
     - name: http
       type: group
