@@ -3,7 +3,7 @@
   description: >
     Stats collected from Dropwizard.
   release: beta
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   short_config: false
   fields:
     - name: dropwizard

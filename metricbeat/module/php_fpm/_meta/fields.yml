@@ -6,7 +6,7 @@
     PHP-FPM server status metrics collected from PHP-FPM.
   short_config: false
   release: beta
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   fields:
     - name: php_fpm
       type: group
