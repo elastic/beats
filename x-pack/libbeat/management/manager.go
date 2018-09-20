@@ -112,28 +112,35 @@ func (cm *ConfigManager) worker() {
 	defer cm.wg.Done()
 
 	// Initial fetch && apply (even if errors happen while fetching)
-	cm.fetch()
-	cm.apply()
+	firstRun := true
+	period := 0 * time.Second
 
 	// Start worker loop: fetch + apply + cache new settings
 	for {
 		select {
 		case <-cm.done:
 			return
-		case <-time.After(cm.config.Period):
+		case <-time.After(period):
 		}
 
-		if cm.fetch() {
-			cm.logger.Info("New configuration retrieved from central management, applying changes...")
-
+		changed := cm.fetch()
+		if changed || firstRun {
 			// configs changed, apply changes
 			// TODO only reload the blocks that changed
 			cm.apply()
+		}
 
+		if changed {
 			// store new configs (already applied)
+			cm.logger.Info("Storing new state")
 			if err := cm.config.Save(); err != nil {
 				cm.logger.Errorf("error storing central management state: %s", err)
 			}
+		}
+
+		if firstRun {
+			period = cm.config.Period
+			firstRun = false
 		}
 	}
 }
