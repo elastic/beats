@@ -18,6 +18,8 @@
 package input
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/journalbeat/checkpoint"
 	"github.com/elastic/beats/journalbeat/reader"
 	"github.com/elastic/beats/libbeat/beat"
@@ -118,14 +120,39 @@ func (i *Input) Run() {
 		case <-i.done:
 			return
 		default:
-			for _, r := range i.readers {
-				for e := range r.Follow() {
-					client.Publish(*e)
-				}
-			}
+			i.publishAll(client)
 		}
 	}
 
+}
+
+func (i *Input) publishAll(client beat.Client) {
+	out := make(chan *beat.Event)
+	var wg sync.WaitGroup
+
+	merge := func(in chan *beat.Event) {
+		wg.Add(1)
+
+		go func(c chan *beat.Event) {
+			for v := range c {
+				out <- v
+			}
+			wg.Done()
+		}(in)
+	}
+	go func() {
+		wg.Wait()
+		close(out)
+	}()
+
+	for _, r := range i.readers {
+		c := r.Follow()
+		merge(c)
+	}
+
+	for e := range out {
+		client.Publish(*e)
+	}
 }
 
 // Stop stops all readers of the input.

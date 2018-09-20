@@ -137,14 +137,14 @@ func (r *Reader) seek(cursor string) {
 }
 
 // Follow reads entries from journals.
-func (r *Reader) Follow() <-chan *beat.Event {
+func (r *Reader) Follow() chan *beat.Event {
 	out := make(chan *beat.Event)
 	go r.readEntriesFromJournal(out)
 
 	return out
 }
 
-func (r *Reader) readEntriesFromJournal(entries chan<- *beat.Event) {
+func (r *Reader) readEntriesFromJournal(entries chan *beat.Event) {
 	defer close(entries)
 
 process:
