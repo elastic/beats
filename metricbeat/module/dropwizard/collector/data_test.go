@@ -20,8 +20,9 @@ package collector
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 func TestSplitTagsFromMetricName(t *testing.T) {
