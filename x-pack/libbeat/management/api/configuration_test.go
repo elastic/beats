@@ -33,14 +33,24 @@ func TestConfiguration(t *testing.T) {
 	}
 
 	assert.Equal(t, 2, len(configs))
-	assert.Equal(t, &ConfigBlock{Raw: map[string]interface{}{
-		"module": "apache2",
-	}}, configs["filebeat.modules"][0])
+	checked := 0
+	for _, config := range configs {
+		if config.Type == "metricbeat.modules" {
+			assert.Equal(t, &ConfigBlock{Raw: map[string]interface{}{
+				"module": "system",
+				"period": "10s",
+			}}, config.Blocks[0])
+			checked++
 
-	assert.Equal(t, &ConfigBlock{Raw: map[string]interface{}{
-		"module": "system",
-		"period": "10s",
-	}}, configs["metricbeat.modules"][0])
+		} else if config.Type == "filebeat.modules" {
+			assert.Equal(t, &ConfigBlock{Raw: map[string]interface{}{
+				"module": "apache2",
+			}}, config.Blocks[0])
+			checked++
+		}
+	}
+
+	assert.Equal(t, 2, checked)
 }
 
 func TestConfigBlocksEqual(t *testing.T) {
@@ -58,19 +68,25 @@ func TestConfigBlocksEqual(t *testing.T) {
 		{
 			name: "single element",
 			a: ConfigBlocks{
-				"metricbeat.modules": []*ConfigBlock{
-					&ConfigBlock{
-						Raw: map[string]interface{}{
-							"foo": "bar",
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"foo": "bar",
+							},
 						},
 					},
 				},
 			},
 			b: ConfigBlocks{
-				"metricbeat.modules": []*ConfigBlock{
-					&ConfigBlock{
-						Raw: map[string]interface{}{
-							"foo": "bar",
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"foo": "bar",
+							},
 						},
 					},
 				},
@@ -80,24 +96,30 @@ func TestConfigBlocksEqual(t *testing.T) {
 		{
 			name: "different number of blocks",
 			a: ConfigBlocks{
-				"metricbeat.modules": []*ConfigBlock{
-					&ConfigBlock{
-						Raw: map[string]interface{}{
-							"foo": "bar",
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"foo": "bar",
+							},
 						},
-					},
-					&ConfigBlock{
-						Raw: map[string]interface{}{
-							"baz": "buzz",
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"baz": "buzz",
+							},
 						},
 					},
 				},
 			},
 			b: ConfigBlocks{
-				"metricbeat.modules": []*ConfigBlock{
-					&ConfigBlock{
-						Raw: map[string]interface{}{
-							"foo": "bar",
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"foo": "bar",
+							},
 						},
 					},
 				},
@@ -107,19 +129,27 @@ func TestConfigBlocksEqual(t *testing.T) {
 		{
 			name: "different block",
 			a: ConfigBlocks{
-				"metricbeat.modules": []*ConfigBlock{
-					&ConfigBlock{
-						Raw: map[string]interface{}{
-							"baz": "buzz",
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"baz": "buzz",
+							},
 						},
 					},
 				},
 			},
 			b: ConfigBlocks{
-				"metricbeat.modules": []*ConfigBlock{
-					&ConfigBlock{
-						Raw: map[string]interface{}{
-							"foo": "bar",
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"foo": "bar",
+							},
 						},
 					},
 				},
