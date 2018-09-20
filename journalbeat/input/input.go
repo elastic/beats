@@ -18,6 +18,7 @@
 package input
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/journalbeat/checkpoint"
@@ -42,11 +43,10 @@ func New(
 	pipeline beat.Pipeline,
 	done chan struct{},
 	states map[string]checkpoint.JournalState,
-) *Input {
+) (*Input, error) {
 	config := DefaultConfig
 	if err := c.Unpack(&config); err != nil {
-		logp.Err("Error unpacking config: %v", err)
-		return nil
+		return nil, err
 	}
 	var readers []*reader.Reader
 	if len(config.Paths) == 0 {
@@ -61,8 +61,7 @@ func New(
 		state := states[reader.LocalSystemJournalID]
 		r, err := reader.NewLocal(cfg, done, state)
 		if err != nil {
-			logp.Err("Error creating reader for local journal: %v", err)
-			return nil
+			return nil, fmt.Errorf("error creating reader for local journal: %v", err)
 		}
 		readers = append(readers, r)
 	}
@@ -78,8 +77,7 @@ func New(
 		state := states[p]
 		r, err := reader.New(cfg, done, state)
 		if err != nil {
-			logp.Err("Error creating reader for journal: %v", err)
-			continue
+			return nil, fmt.Errorf("error creating reader for journal: %v", err)
 		}
 		readers = append(readers, r)
 	}
@@ -90,16 +88,12 @@ func New(
 		config:   config,
 		pipeline: pipeline,
 		states:   states,
-	}
+	}, nil
 }
 
 // Run connects to the output, collects entries from the readers
 // and then publishes the events.
 func (i *Input) Run() {
-	if len(i.readers) == 0 {
-		return
-	}
-
 	client, err := i.pipeline.ConnectWith(beat.ClientConfig{
 		PublishMode:   beat.GuaranteedSend,
 		EventMetadata: common.EventMetadata{},
