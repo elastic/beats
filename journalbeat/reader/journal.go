@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -284,7 +283,7 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	}
 
 	fields["read_timestamp"] = time.Now()
-	receivedByJournal := getReceivedTs(entry.Fields["_SOURCE_MONOTONIC_TIMESTAMP"])
+	receivedByJournal := time.Unix(0, int64(entry.RealtimeTimestamp)*1000)
 
 	event := beat.Event{
 		Timestamp: receivedByJournal,
@@ -292,15 +291,6 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 		Private:   state,
 	}
 	return &event
-}
-
-func getReceivedTs(ts string) time.Time {
-	receivedByJournalTs, err := strconv.ParseInt(ts, 10, 64)
-	if err != nil {
-		logp.Debug("journal", "cannot parse string timestamp: %v", err)
-		return time.Now()
-	}
-	return time.Unix(receivedByJournalTs, 0)
 }
 
 // stopOrWait waits for a journal event.
