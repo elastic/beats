@@ -448,7 +448,7 @@ packetbeat.protocols:
 
   # List of hash algorithms to use to calculate certificates' fingerprints.
   # Valid values are `sha1`, `sha256` and `md5`.
-  fingerprints: [sha1]
+  #fingerprints: [sha1]
 
   # If this option is enabled, the client and server certificates and
   # certificate chains are sent to Elasticsearch. The default is true.

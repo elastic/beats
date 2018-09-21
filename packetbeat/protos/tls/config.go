@@ -36,5 +36,6 @@ var (
 		},
 		SendCertificates:       true,
 		IncludeRawCertificates: false,
+		Fingerprints:           []string{"sha1"},
 	}
 )

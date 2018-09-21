@@ -101,7 +101,6 @@ packetbeat.protocols:
   # Configure the ports where to listen for TLS traffic. You can disable
   # the TLS protocol by commenting out the list of ports.
   ports: [443]
-  fingerprints: [sha1]
 
 #==================== Elasticsearch template setting ==========================
 
