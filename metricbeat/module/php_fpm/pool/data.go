@@ -18,29 +18,95 @@
 package pool
 
 import (
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"encoding/json"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
-var (
-	schema = s.Schema{
-		"name":            c.Str("pool"),
-		"process_manager": c.Str("process manager"),
-		"slow_requests":   c.Int("slow requests"),
-		"start_time":      c.Int("start time"),
-		"start_since":     c.Int("start since"),
-		"connections": s.Object{
-			"accepted":         c.Int("accepted conn"),
-			"listen_queue_len": c.Int("listen queue len"),
-			"max_listen_queue": c.Int("max listen queue"),
-			"queued":           c.Int("listen queue"),
-		},
-		"processes": s.Object{
-			"active":               c.Int("active processes"),
-			"idle":                 c.Int("idle processes"),
-			"max_active":           c.Int("max active processes"),
-			"max_children_reached": c.Int("max children reached"),
-			"total":                c.Int("total processes"),
-		},
+type phpFpmStatus struct {
+	Name                  string        	`json:"pool"`
+	ProcessManager        string          	`json:"process manager"`
+	SlowRequests          int        		`json:"slow requests"`
+	StartTime   	  	  int          		`json:"start time"`
+	StartSince            int        		`json:"start since"`
+	AcceptedConnection    int        		`json:"accepted conn"`
+	ListenQueueLen        int          		`json:"listen queue len"`
+	MaxListenQueue        int        		`json:"max listen queue"`
+	Queued        		  int          		`json:"listen queue"`  
+	ActiveProcesses       int         	    `json:"active processes"`
+	IdleProcesses         int   			`json:"idle processes"`
+	MaxActiveProcesses    int         	    `json:"max active processes"`
+	MaxChildrenReached    int        		`json:"max children reached"`
+	TotalProcesses        int         	    `json:"total processes"`
+	Processes             []phpFpmProcess   `json:"processes"`
+	
+}
+
+type phpFpmProcess struct {
+	PID           		int         `json:"pid"`
+	State         		string   	`json:"state"`
+	StartTime       	int         `json:"start time"`
+	StartSince        	int        	`json:"start since"`
+	Requests           	int         `json:"requests"`
+	RequestDuration   	int         `json:"request duration"`
+	RequestMethod       string      `json:"request method"`
+	RequestURI          string      `json:"request uri"`
+	ContentLength       int         `json:"content length"`
+	User           		string      `json:"user"`
+	Script           	string      `json:"script"`
+	LastRequestCPU      float64     `json:"last request cpu"`
+	LastRequestMemory	int         `json:"last request memory"`
+}
+
+func eventsMapping(content []byte) (common.MapStr, error) {
+	var status phpFpmStatus
+	err := json.Unmarshal(content, &status)
+	if err != nil {
+		logp.Err("php-fpm status parsing failed with error: ", err)
+		return nil, err
 	}
-)
+	//remapping process details to match the naming format
+	var mapProcesses []common.MapStr
+	for _, process := range status.Processes {
+		proc := common.MapStr {
+			"pid":                 process.PID,
+			"state":               process.State,
+			"start_time":          process.StartTime,
+			"start_since":         process.StartSince,
+			"requests":            process.Requests,
+			"request_duration":    process.RequestDuration,
+			"request_method":      process.RequestMethod,
+			"request_uri":         process.RequestURI,
+			"content_length":      process.ContentLength,
+			"user":                process.User,
+			"script":              process.Script,
+			"last_request_cpu":    process.LastRequestCPU,
+			"last_request_memory": process.LastRequestMemory,
+		}
+		mapProcesses = append(mapProcesses, proc)
+	}
+	baseEvent := common.MapStr{
+			"name":              status.Name,
+			"process_manager":   status.ProcessManager,
+			"slow_requests":     status.SlowRequests,
+			"start_time":        status.StartTime,
+			"start_since":       status.StartSince,
+			"connections":       common.MapStr{
+				"accepted":          status.AcceptedConnection,
+				"listen_queue_len":  status.ListenQueueLen,
+				"max_listen_queue":  status.MaxListenQueue,
+				"queued":            status.Queued,
+			},
+			"processes":         common.MapStr { 
+				"active":            	status.ActiveProcesses,
+				"idle":					status.IdleProcesses,
+				"max_active":			status.MaxActiveProcesses,
+				"max_children_reached":	status.MaxChildrenReached,
+				"total":				status.TotalProcesses,
+				"details":				mapProcesses,
+			},
+	}
+
+	return baseEvent, nil
+}
+

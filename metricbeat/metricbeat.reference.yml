@@ -527,6 +527,7 @@ metricbeat.modules:
   period: 10s
   status_path: "/status"
   hosts: ["localhost:8080"]
+  #status_full: true
 
 #----------------------------- PostgreSQL Module -----------------------------
 - module: postgresql
