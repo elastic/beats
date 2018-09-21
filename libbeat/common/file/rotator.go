@@ -115,8 +115,8 @@ func WithLogger(l Logger) RotatorOption {
 	}
 }
 
-// Daily enables or disables log rotation by time interval in addition to log
-// rotation by size. The default is disabled.
+// Interval sets the time interval for log rotation in addition to log
+// rotation by size. The default is 0 for disabled.
 func Interval(d time.Duration) RotatorOption {
 	return func(r *Rotator) {
 		r.interval = d
@@ -147,7 +147,7 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 		return nil, errors.Errorf("file rotator permissions mask of %o is invalid", r.permissions)
 	}
 	var err error
-	r.intervalRotator, err = NewIntervalRotator(r.interval)
+	r.intervalRotator, err = newIntervalRotator(r.interval)
 	if err != nil {
 		return nil, err
 	}

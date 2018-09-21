@@ -24,7 +24,7 @@ import (
 )
 
 func TestSecondRotator(t *testing.T) {
-	a, err := NewIntervalRotator(time.Second)
+	a, err := newIntervalRotator(time.Second)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +50,7 @@ func TestSecondRotator(t *testing.T) {
 }
 
 func TestMinuteRotator(t *testing.T) {
-	a, err := NewIntervalRotator(time.Minute)
+	a, err := newIntervalRotator(time.Minute)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,7 +76,7 @@ func TestMinuteRotator(t *testing.T) {
 }
 
 func TestHourlyRotator(t *testing.T) {
-	a, err := NewIntervalRotator(time.Hour)
+	a, err := newIntervalRotator(time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +102,7 @@ func TestHourlyRotator(t *testing.T) {
 }
 
 func TestDailyRotator(t *testing.T) {
-	a, err := NewIntervalRotator(24 * time.Hour)
+	a, err := newIntervalRotator(24 * time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +128,7 @@ func TestDailyRotator(t *testing.T) {
 }
 
 func TestWeeklyRotator(t *testing.T) {
-	a, err := NewIntervalRotator(7 * 24 * time.Hour)
+	a, err := newIntervalRotator(7 * 24 * time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -157,7 +157,7 @@ func TestWeeklyRotator(t *testing.T) {
 }
 
 func TestMonthlyRotator(t *testing.T) {
-	a, err := NewIntervalRotator(30 * 24 * time.Hour)
+	a, err := newIntervalRotator(30 * 24 * time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -183,7 +183,7 @@ func TestMonthlyRotator(t *testing.T) {
 }
 
 func TestYearlyRotator(t *testing.T) {
-	a, err := NewIntervalRotator(365 * 24 * time.Hour)
+	a, err := newIntervalRotator(365 * 24 * time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -210,7 +210,7 @@ func TestYearlyRotator(t *testing.T) {
 
 
 func TestArbitraryIntervalRotator(t *testing.T) {
-	a, err := NewIntervalRotator(3 * time.Second)
+	a, err := newIntervalRotator(3 * time.Second)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -253,7 +253,7 @@ func TestArbitraryIntervalRotator(t *testing.T) {
 }
 
 func TestIntervalIsTruncatedToSeconds(t *testing.T) {
-	a, err := NewIntervalRotator(2345 * time.Millisecond)
+	a, err := newIntervalRotator(2345 * time.Millisecond)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -261,7 +261,7 @@ func TestIntervalIsTruncatedToSeconds(t *testing.T) {
 }
 
 func TestZeroIntervalIsNil(t *testing.T) {
-	a, err := NewIntervalRotator(0)
+	a, err := newIntervalRotator(0)
 	if err != nil {
 		t.Fatal(err)
 	}

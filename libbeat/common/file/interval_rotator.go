@@ -45,7 +45,7 @@ func (realClock) Now() time.Time {
 	return time.Now()
 }
 
-func NewIntervalRotator(interval time.Duration) (*intervalRotator, error) {
+func newIntervalRotator(interval time.Duration) (*intervalRotator, error) {
 	if interval == 0 {
 		return nil, nil
 	}
@@ -135,8 +135,9 @@ func (r *intervalRotator) SortIntervalLogs(strings []string) {
 	)
 }
 
-// Given a log filename in the form [prefix]-[formattedDate]-n, returns the filename after
-// zero-padding the trailing n so that foo-[date]-2 sorts before foo-[date]-10.
+// OrderIntervalLogs, when given a log filename in the form [prefix]-[formattedDate]-n
+// returns the filename after zero-padding the trailing n so that foo-[date]-2 sorts
+// before foo-[date]-10.
 func OrderIntervalLogs(filename string) string {
 	index, i, err := IntervalLogIndex(filename)
 	if err == nil {
@@ -146,7 +147,7 @@ func OrderIntervalLogs(filename string) string {
 	return ""
 }
 
-// Given a log filename in the form [prefix]-[formattedDate]-n, returns n as int
+// IntervalLogIndex returns n as int given a log filename in the form [prefix]-[formattedDate]-n
 func IntervalLogIndex(filename string) (uint64, int, error) {
 	i := len(filename) - 1
 	for ; i >= 0; i-- {
