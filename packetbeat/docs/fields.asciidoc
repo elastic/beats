@@ -4265,6 +4265,34 @@ Name or host name identified by the certificate.
 
 --
 
+
+*`tls.client_certificate.fingerprint.md5`*::
++
+--
+type: keyword
+
+Certificate's MD5 fingerprint.
+
+--
+
+*`tls.client_certificate.fingerprint.sha1`*::
++
+--
+type: keyword
+
+Certificate's SHA-1 fingerprint.
+
+--
+
+*`tls.client_certificate.fingerprint.sha256`*::
++
+--
+type: keyword
+
+Certificate's SHA-256 fingerprint.
+
+--
+
 [float]
 == server_certificate fields
 
@@ -4453,6 +4481,34 @@ Province or region within country.
 type: keyword
 
 Name or host name identified by the certificate.
+
+--
+
+
+*`tls.server_certificate.fingerprint.md5`*::
++
+--
+type: keyword
+
+Certificate's MD5 fingerprint.
+
+--
+
+*`tls.server_certificate.fingerprint.sha1`*::
++
+--
+type: keyword
+
+Certificate's SHA-1 fingerprint.
+
+--
+
+*`tls.server_certificate.fingerprint.sha256`*::
++
+--
+type: keyword
+
+Certificate's SHA-256 fingerprint.
 
 --
 

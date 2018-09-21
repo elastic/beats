@@ -137,6 +137,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 - Added DHCP protocol support. {pull}7647[7647]
 - Add support to decode HTTP bodies compressed with `gzip` and `deflate`. {pull}7915[7915]
+- Added support to calculate certificates' fingerprints (MD5, SHA-1, SHA-256). {issue}8180[8180]
 
 *Winlogbeat*
 
