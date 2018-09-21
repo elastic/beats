@@ -446,6 +446,10 @@ packetbeat.protocols:
   # the TLS protocol by commenting out the list of ports.
   ports: [443]
 
+  # List of hash algorithms to use to calculate certificates' fingerprints.
+  # Valid values are `sha1`, `sha256` and `md5`.
+  #fingerprints: [sha1]
+
   # If this option is enabled, the client and server certificates and
   # certificate chains are sent to Elasticsearch. The default is true.
   #send_certificates: true
