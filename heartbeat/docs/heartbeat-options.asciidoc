@@ -2,20 +2,26 @@
 == Set up monitors
 
 ++++
-<titleabbrev>Set up Heartbeat monitors</titleabbrev>
+<titleabbrev>Set up {beatname_uc} monitors</titleabbrev>
 ++++
 
-The `heartbeat.monitors` section of the +heartbeat.yml+ config file specifies
-the list of `monitors` that Heartbeat uses to check your remote hosts to
-determine if they are available. Each `monitor` item begins with a dash (-) and
-specifies the type of monitor to use, the hosts to check, and other settings
-that control Heartbeat behavior.
+To configure {beatname_uc} define a set of `monitors` to check your remote hosts.
+Specify monitors either directly inside the +heartbeat.yml+ config file, or in external
+dynamically loaded files located in the directory referenced by `heartbeat.config.monitors.path`.
+One advantage of using external files is that these can be automatically reloaded
+without stopping the {beatname_uc} process.
 
-The following example configures three monitors, `icmp`, `tcp`, and `http`, and
-demonstrates how to use TCP Echo and HTTP response verification:
+Each `monitor` item is an entry in a yaml list, and so begins with a dash (-).
+You can define the type of monitor to use, the hosts to check, and other
+optional settings that control {beatname_uc} behavior.
+
+The following example configures three monitors checking via the `icmp`, `tcp`, and `http`
+protocols directly inside the +heartbeat.yml+ file, and demonstrates how to use TCP Echo
+and HTTP response verification:
 
 [source,yaml]
 ----------------------------------------------------------------------
+# heartbeat.yml
 heartbeat.monitors:
 - type: icmp
   schedule: '*/5 * * * * * *'
@@ -33,14 +39,44 @@ heartbeat.scheduler:
   limit: 10
 ----------------------------------------------------------------------
 
+Using the +heartbeat.yml+ configuration file is convenient, but has two drawbacks:
+it can become hard to manage with large numbers of monitors, and it will not reload
+heartbeat automatically when its contents changes.
+
+Define monitors via the +heartbeat.config.monitors+ to prevent those issues from
+happening to you. To do so you would instead have your +heartbeat.yml+ file contain the following:
+
+[source,yaml]
+----------------------------------------------------------------------
+# heartbeat.yml
+heartbeat.config.monitors:
+  # Directory + glob pattern to search for configuration files
+  path: /path/to/my/monitors.d/*.yml
+  # How often to check for changes
+  reload.period: 1s
+----------------------------------------------------------------------
+
+Then, define one or more files in the directory pointed to by `heartbeat.config.monitors.path`.
+You may specify multiple monitors in a given file if you like. The contents of these files is
+monitor definitions only, e.g. what is normally under the `heartbeat.monitors` section of
++heartbeat.yml+. See below for an example
+
+[source,yaml]
+----------------------------------------------------------------------
+# /path/to/my/monitors.d/localhost_service_check.yml
+- type: http
+  schedule: '@every 5s'
+  urls: ["http://localhost:80/service/status"]
+  check.response.status: 200
+----------------------------------------------------------------------
+
 [float]
 [[monitor-options]]
 === Monitor options
 
-You can specify the following options in the `heartbeat.monitors` section of the
-+heartbeat.yml+ config file. These options are the same for all monitors.
-Each monitor type has additional configuration options that are specific to that
-monitor type.
+You can specify the following options when defining a {beatname_uc} monitor in any location.
+These options are the same for all monitors. Each monitor type has additional configuration
+options that are specific to that monitor type.
 
 [float]
 [[monitor-type]]
@@ -82,7 +118,7 @@ A cron-like expression that specifies the task schedule. For example:
 
 * `*/5 * * * * * *` runs the task every 5 seconds (for example, at 10:00:00,
 10:00:05, and so on).
-* `@every 5s` runs the task every 5 seconds from the time when Heartbeat was
+* `@every 5s` runs the task every 5 seconds from the time when {beatname_uc} was
 started.
 
 The `schedule` option uses a cron-like syntax based on https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementation],
@@ -118,7 +154,7 @@ ping every IP address for the specified hostname. The default is `any`.
 The total running time for each ping test. This is the total time allowed for
 testing the connection and exchanging data. The default is 16 seconds (16s).
 
-If the timeout is exceeded, Heartbeat publishes a `service-down` event. If the
+If the timeout is exceeded, {beatname_uc} publishes a `service-down` event. If the
 value specified for `timeout` is greater than `schedule`, intermediate checks
 will not be executed by the scheduler.
 
@@ -142,7 +178,7 @@ will be overwritten by the value declared here.
 If this option is set to true, the custom <<monitor-fields,fields>>
 are stored as top-level fields in the output document instead of being grouped
 under a `fields` sub-dictionary. If the custom field names conflict with other
-field names added by Heartbeat, then the custom fields overwrite the other
+field names added by {beatname_uc}, then the custom fields overwrite the other
 fields.
 
 [float]
@@ -161,65 +197,10 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
-[[monitor-watch-poll-file]]
-==== `watch.poll_file`
-
-experimental[]
-
-The JSON file to watch for additional monitor configurations. The JSON file can
-contain multiple objects, each of which specifies a different monitor config.
-Heartbeat checks this file periodically and starts a new monitor instance for
-each new JSON object added to the file. For example, imagine that you add
-10 new entries to the JSON file, each for a different hostname. When Heartbeat
-picks up the changes in the file, it merges the original config
-(`heartbeat.yml`) plus the JSON objects, and starts a monitor for each new host
-that you've configured. If you delete an object from the JSON file and it
-doesn't exist in the main config, Heartbeat stops the monitor instance running
-for that object.
-
-Each monitor has a unique ID that's based on parameters like protocol, host,
-and port. If two monitors have the same ID, Heartbeat uses the settings that
-are defined in the last JSON object of the merged config. This means that
-you can specify settings in the JSON file that overwrite the settings in
-the main config. In this way, the configuration that you specify for the
-monitor in the main Heartbeat config file acts like a default config that you
-can live-reconfigure by specifying additional configurations in the external
-JSON file.
-
-Example configuration:
-
-[source, yaml]
--------------------------------------------------------------------------------
-heartbeat.monitors:
-- type: tcp
-  schedule: '*/5 * * * * * *'
-  hosts: ["myhost"]
-  watch.poll_file:
-    path: {path.config}/monitors/dynamic.json
-    interval: 5s
--------------------------------------------------------------------------------
-
-*`path`*:: Specifies the path to the JSON file to check for updates.
-*`interval`*:: Specifies how often Heartbeat checks the file for changes.
-
-To reconfigure the settings specified in the example config, you could define
-the following JSON objects in `dynamic.json`:
-
-[source, json]
--------------------------------------------------------------------------------
-{"hosts": ["myhost:1234"], "schedule": "*/15 * * * * * *"} <1>
-{"hosts": ["tls://otherhost:479"], "ssl.certificate_authorities": ["path/to/ca/file.pem"]} <2>
--------------------------------------------------------------------------------
-<1> Upon detecting the changes, Heartbeat stops the old monitor and then
-restarts it with a schedule of 15 seconds between checks.
-<2> Heartbeat starts a new monitor that uses a TLS-based connection with a
-custom CA certificate.
-
-[float]
 [[monitor-icmp-options]]
 === ICMP options
 
-These options configure Heartbeat to use ICMP (v4 and v6) Echo Requests to check
+These options configure {beatname_uc} to use ICMP (v4 and v6) Echo Requests to check
 the configured hosts. These options are valid when the <<monitor-type,`type`>> is
 `icmp`.
 
@@ -240,7 +221,7 @@ second (1s).
 [[monitor-tcp-options]]
 === TCP options
 
-These options configure Heartbeat to connect via TCP and optionally verify the
+These options configure {beatname_uc} to connect via TCP and optionally verify the
 endpoint by sending and/or receiving a custom payload. These options are valid when
 the <<monitor-type,`type`>> is `tcp`.
 
@@ -252,16 +233,16 @@ A list of hosts to ping. The entries in the list can be:
 
 * A plain host name, such as `localhost`, or an IP address. If you specify this
 option, you must also specify a value for <<monitor-tcp-ports,`ports`>>.  If the
-monitor is <<configuration-ssl,configured to use SSL>>, Heartbeat establishes an
+monitor is <<configuration-ssl,configured to use SSL>>, {beatname_uc} establishes an
 SSL/TLS-based connection. Otherwise, it establishes a plain TCP connection.
-* A hostname and port, such as `localhost:12345`. Heartbeat connects
+* A hostname and port, such as `localhost:12345`. {beatname_uc} connects
 to the port on the specified host. If the monitor is
-<<configuration-ssl,configured to use SSL>>, Heartbeat establishes an
+<<configuration-ssl,configured to use SSL>>, {beatname_uc} establishes an
 SSL/TLS-based connection. Otherwise, it establishes a TCP connection.
 * A full URL using the syntax `scheme://<host>:[port]`, where:
 ** `scheme` is one of `tcp`, `plain`, `ssl` or `tls`. If `tcp` or `plain` is
-specified, Heartbeat establishes a TCP connection even if the monitor is
-configured to use SSL. If `tls` or `ssl` is specified, Heartbeat establishes
+specified, {beatname_uc} establishes a TCP connection even if the monitor is
+configured to use SSL. If `tls` or `ssl` is specified, {beatname_uc} establishes
 an SSL connection. However, if the monitor is not configured to use SSL, the
 system defaults are used (currently not supported on Windows).
 ** `host` is the hostname.
@@ -366,7 +347,7 @@ Also see <<configuration-ssl>> for a full description of the `ssl` options.
 [[monitor-http-options]]
 === HTTP options
 
-These options configure Heartbeat to connect via HTTP and optionally verify that
+These options configure {beatname_uc} to connect via HTTP and optionally verify that
 the host returns the expected response. These options are valid when the
 <<monitor-type,`type`>> is `http`.
 
@@ -542,10 +523,10 @@ address via DNS.
 [[heartbeat-scheduler-limit]]
 ==== `limit`
 
-The number of concurrent I/O tasks that Heartbeat is allowed to execute. If set
+The number of concurrent I/O tasks that {beatname_uc} is allowed to execute. If set
 to 0, there is no limit. The default is 0.
 
-Most operating systems set a file descriptor limit of 1024. For Heartbeat to
+Most operating systems set a file descriptor limit of 1024. For {beatname_uc} to
 operate correctly and not accidentally block libbeat output, the value that you
 specify for `limit` should be below the configured ulimit.
 
@@ -556,5 +537,60 @@ specify for `limit` should be below the configured ulimit.
 
 The timezone for the scheduler. By default the scheduler uses localtime.
 
+[float]
+[[monitor-watch-poll-file]]
+==== `watch.poll_file`
+
+deprecated[6.5.0,Replaced by using dynamic reloading via the
+`heartbeat.config.monitors` option.]
+
+The JSON file to watch for additional monitor configurations. The JSON file can
+contain multiple objects, each of which specifies a different monitor config.
+{beatname_uc} checks this file periodically and starts a new monitor instance for
+each new JSON object added to the file. For example, imagine that you add
+10 new entries to the JSON file, each for a different hostname. When {beatname_uc}
+picks up the changes in the file, it merges the original config
+(`heartbeat.yml`) plus the JSON objects, and starts a monitor for each new host
+that you've configured. If you delete an object from the JSON file and it
+doesn't exist in the main config, {beatname_uc} stops the monitor instance running
+for that object.
+
+Each monitor has a unique ID that's based on parameters like protocol, host,
+and port. If two monitors have the same ID, {beatname_uc} uses the settings that
+are defined in the last JSON object of the merged config. This means that
+you can specify settings in the JSON file that overwrite the settings in
+the main config. In this way, the configuration that you specify for the
+monitor in the main {beatname_uc} config file acts like a default config that you
+can live-reconfigure by specifying additional configurations in the external
+JSON file.
+
+Example configuration:
+
+[source, yaml]
+-------------------------------------------------------------------------------
+heartbeat.monitors:
+- type: tcp
+  schedule: '*/5 * * * * * *'
+  hosts: ["myhost"]
+  watch.poll_file:
+    path: {path.config}/monitors/dynamic.json
+    interval: 5s
+-------------------------------------------------------------------------------
+
+*`path`*:: Specifies the path to the JSON file to check for updates.
+*`interval`*:: Specifies how often {beatname_uc} checks the file for changes.
+
+To reconfigure the settings specified in the example config, you could define
+the following JSON objects in `dynamic.json`:
+
+[source, json]
+-------------------------------------------------------------------------------
+{"hosts": ["myhost:1234"], "schedule": "*/15 * * * * * *"} <1>
+{"hosts": ["tls://otherhost:479"], "ssl.certificate_authorities": ["path/to/ca/file.pem"]} <2>
+-------------------------------------------------------------------------------
+<1> Upon detecting the changes, {beatname_uc} stops the old monitor and then
+restarts it with a schedule of 15 seconds between checks.
+<2> {beatname_uc} starts a new monitor that uses a TLS-based connection with a
+custom CA certificate.
 
 
