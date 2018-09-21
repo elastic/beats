@@ -20,7 +20,8 @@ the following:
   correct types for each field. They also contain short descriptions for each
   of the fields.
 
-* Sample Kibana dashboards, which can be used to visualize the log files.
+* Sample Kibana dashboards, when available, that can be used to visualize the
+log files.
 
 {beatname_uc} automatically adjusts these configurations based on your environment
 and loads them to the respective Elastic stack components.
