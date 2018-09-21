@@ -208,6 +208,14 @@ Contains common fields available in all event types.
 
 
 
+*`read_timestamp`*::
++
+--
+The time when Journalbeat read the journal entry.
+
+
+--
+
 [float]
 == coredump fields
 

@@ -3,6 +3,9 @@
   description: >
     Contains common fields available in all event types.
   fields:
+    - name: read_timestamp
+      description: >
+          The time when Journalbeat read the journal entry.
     - name: coredump
       type: group
       description: >

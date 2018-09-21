@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -263,8 +264,9 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	custom := common.MapStr{}
 
 	for k, v := range entry.Fields {
-		if kk, ok := journaldEventFields[k]; !ok {
-			custom.Put(k, v)
+		if kk, _ := journaldEventFields[k]; kk == "" {
+			normalized := strings.ToLower(strings.TrimLeft(k, "_"))
+			custom.Put(normalized, v)
 		} else {
 			fields.Put(kk, v)
 		}
@@ -281,12 +283,24 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 		MonotonicTimestamp: entry.MonotonicTimestamp,
 	}
 
+	fields["read_timestamp"] = time.Now()
+	receivedByJournal := getReceivedTs(entry.Fields["_SOURCE_MONOTONIC_TIMESTAMP"])
+
 	event := beat.Event{
-		Timestamp: time.Now(),
+		Timestamp: receivedByJournal,
 		Fields:    fields,
 		Private:   state,
 	}
 	return &event
+}
+
+func getReceivedTs(ts string) time.Time {
+	receivedByJournalTs, err := strconv.ParseInt(ts, 10, 64)
+	if err != nil {
+		logp.Debug("journal", "cannot parse string timestamp: %v", err)
+		return time.Now()
+	}
+	return time.Unix(receivedByJournalTs, 0)
 }
 
 // stopOrWait waits for a journal event.

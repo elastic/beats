@@ -79,5 +79,6 @@ var (
 		sdjournal.SD_JOURNAL_FIELD_MONOTONIC_TIMESTAMP:       "", // saved in the registry
 		sdjournal.SD_JOURNAL_FIELD_SOURCE_REALTIME_TIMESTAMP: "", // saved in the registry
 		sdjournal.SD_JOURNAL_FIELD_CURSOR:                    "", // saved in the registry
+		"_SOURCE_MONOTONIC_TIMESTAMP":                        "", // received timestamp stored in @timestamp
 	}
 )
