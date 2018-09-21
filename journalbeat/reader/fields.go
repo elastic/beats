@@ -74,5 +74,10 @@ var (
 		"CONTAINER_NAME":            "container.name",
 		"CONTAINER_TAG":             "container.image.tag",
 		"CONTAINER_PARTIAL_MESSAGE": "container.partial",
+
+		// dropped fields
+		sdjournal.SD_JOURNAL_FIELD_MONOTONIC_TIMESTAMP:       "", // saved in the registry
+		sdjournal.SD_JOURNAL_FIELD_SOURCE_REALTIME_TIMESTAMP: "", // saved in the registry
+		sdjournal.SD_JOURNAL_FIELD_CURSOR:                    "", // saved in the registry
 	}
 )

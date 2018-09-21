@@ -260,10 +260,18 @@ func (r *Reader) readUntilNotNull(entries chan<- *beat.Event) error {
 // toEvent creates a beat.Event from journal entries.
 func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	fields := common.MapStr{}
-	for journalKey, eventKey := range journaldEventFields {
-		if entry.Fields[journalKey] != "" {
-			fields.Put(eventKey, entry.Fields[journalKey])
+	custom := common.MapStr{}
+
+	for k, v := range entry.Fields {
+		if kk, ok := journaldEventFields[k]; !ok {
+			custom.Put(k, v)
+		} else {
+			fields.Put(kk, v)
 		}
+	}
+
+	if len(custom) != 0 {
+		fields["custom"] = custom
 	}
 
 	state := checkpoint.JournalState{
