@@ -1216,9 +1216,12 @@ logging.files:
   # Must be a valid Unix-style file permissions mask expressed in octal notation.
   #permissions: 0600
 
-  # Enable daily log file rotation in addition to size-based rotation. Defaults to
-  # disabled.
-  #daily: true
+  # Enable log file rotation on time intervals in addition to size-based rotation.
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # are boundary-aligned with minutes, hours, days, weeks, months, and years as
+  # reported by the local system clock. All other intervals are calculated from the
+  # unix epoch. Defaults to disabled.
+  #interval: 0
 
 # Set to true to log messages in json format.
 #logging.json: false
