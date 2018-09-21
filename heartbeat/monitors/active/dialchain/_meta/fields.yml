@@ -32,9 +32,6 @@
       description: >
         TLS layer related fields.
       fields:
-        - name: certificates
-          type: keyword
-          description: List of PEM encoded x509 certificates.
         - name: certificate_not_valid_before
           type: date
           description: Earliest time at which the connection's certificates are valid.
