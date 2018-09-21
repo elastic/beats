@@ -139,7 +139,7 @@ func TestDailyRotation(t *testing.T) {
 
 	maxSizeBytes := uint(500)
 	filename := filepath.Join(dir, logname)
-	r, err := file.NewFileRotator(filename, file.MaxBackups(2), file.Daily(true), file.MaxSizeBytes(maxSizeBytes))
+	r, err := file.NewFileRotator(filename, file.MaxBackups(2), file.Interval(24*time.Hour), file.MaxSizeBytes(maxSizeBytes))
 	if err != nil {
 		t.Fatal(err)
 	}

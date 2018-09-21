@@ -17,6 +17,8 @@
 
 package logp
 
+import "time"
+
 // Config contains the configuration options for the logger. To create a Config
 // from a common.Config use logp/config.Build.
 type Config struct {
@@ -40,12 +42,12 @@ type Config struct {
 
 // FileConfig contains the configuration options for the file output.
 type FileConfig struct {
-	Path        string `config:"path"`
-	Name        string `config:"name"`
-	MaxSize     uint   `config:"rotateeverybytes" validate:"min=1"`
-	MaxBackups  uint   `config:"keepfiles" validate:"max=1024"`
-	Permissions uint32 `config:"permissions"`
-	Daily       bool   `config:"daily"`
+	Path        string        `config:"path"`
+	Name        string        `config:"name"`
+	MaxSize     uint          `config:"rotateeverybytes" validate:"min=1"`
+	MaxBackups  uint          `config:"keepfiles" validate:"max=1024"`
+	Permissions uint32        `config:"permissions"`
+	Interval    time.Duration `config:"interval"`
 }
 
 var defaultConfig = Config{
@@ -55,7 +57,7 @@ var defaultConfig = Config{
 		MaxSize:     10 * 1024 * 1024,
 		MaxBackups:  7,
 		Permissions: 0600,
-		Daily:       false,
+		Interval:    0,
 	},
 	addCaller: true,
 }
