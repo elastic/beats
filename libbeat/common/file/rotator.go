@@ -328,7 +328,6 @@ func (r *Rotator) purgeOldIntervalBackups() error {
 	return nil
 }
 
-
 func (r *Rotator) purgeOldSizedBackups() error {
 	for i := r.maxBackups; i < MaxBackupsLimit; i++ {
 		name := r.backupName(i + 1)
@@ -368,7 +367,7 @@ func (r *Rotator) rotate(reason rotateReason) error {
 }
 
 func (r *Rotator) rotateByInterval(reason rotateReason) error {
-	fi, err :=  os.Stat(r.filename)
+	fi, err := os.Stat(r.filename)
 	if os.IsNotExist(err) {
 		return nil
 	} else if err != nil {

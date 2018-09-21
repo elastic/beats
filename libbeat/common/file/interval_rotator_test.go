@@ -20,6 +20,7 @@ package file
 import (
 	"testing"
 	"time"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -94,7 +95,7 @@ func TestHourlyRotator(t *testing.T) {
 	assert.False(t, n)
 	assert.Equal(t, "foo-2018-12-31-01-", a.LogPrefix("foo", time.Now()))
 
-	clock.time = clock.time.Add(time.Minute + 59 * time.Second)
+	clock.time = clock.time.Add(time.Minute + 59*time.Second)
 	n = a.NewInterval()
 	assert.True(t, n)
 	a.Rotate()
@@ -207,7 +208,6 @@ func TestYearlyRotator(t *testing.T) {
 	a.Rotate()
 	assert.Equal(t, "foo-2019-", a.LogPrefix("foo", time.Now()))
 }
-
 
 func TestArbitraryIntervalRotator(t *testing.T) {
 	a, err := newIntervalRotator(3 * time.Second)

@@ -39,7 +39,7 @@ type clock interface {
 	Now() time.Time
 }
 
-type realClock struct {}
+type realClock struct{}
 
 func (realClock) Now() time.Time {
 	return time.Now()
@@ -87,7 +87,7 @@ func (r *intervalRotator) initialize() error {
 	default:
 		r.arbitrary = true
 		r.fileFormat = "2006-01-02-15-04-05"
-		r.newInterval = func (lastTime time.Time, currentTime time.Time ) bool {
+		r.newInterval = func(lastTime time.Time, currentTime time.Time) bool {
 			lastInterval := lastTime.Unix() / (int64(r.interval) / int64(time.Second))
 			currentInterval := currentTime.Unix() / (int64(r.interval) / int64(time.Second))
 			return lastInterval != currentInterval
