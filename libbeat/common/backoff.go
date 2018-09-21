@@ -81,3 +81,7 @@ func (b *Backoff) TryWaitOnError(failTS time.Time, err error) bool {
 
 	return b.Wait()
 }
+
+func (b *Backoff) Duration() time.Duration {
+	return b.duration
+}

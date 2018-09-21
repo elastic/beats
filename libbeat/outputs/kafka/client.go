@@ -32,6 +32,8 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/common"
+	"time"
 )
 
 type client struct {
@@ -49,17 +51,22 @@ type client struct {
 }
 
 type msgRef struct {
-	client *client
-	count  int32
-	total  int
-	failed []publisher.Event
-	batch  publisher.Batch
+	client  *client
+	count   int32
+	total   int
+	failed  []publisher.Event
+	batch   publisher.Batch
+	backoff *common.Backoff
+	retry   bool
 
 	err error
 }
 
 var (
 	errNoTopicsSelected = errors.New("no topic could be selected")
+	stop = make(chan interface{})
+	publish = make(chan *msgRef, 250)
+	stopRequested = false
 )
 
 func newKafkaClient(
@@ -98,6 +105,7 @@ func (c *client) Connect() error {
 	c.wg.Add(2)
 	go c.successWorker(producer.Successes())
 	go c.errorWorker(producer.Errors())
+	go c.publishLoop()
 
 	return nil
 }
@@ -105,9 +113,29 @@ func (c *client) Connect() error {
 func (c *client) Close() error {
 	debugf("closed kafka client")
 
+	stop <- true
 	c.producer.AsyncClose()
 	c.wg.Wait()
 	c.producer = nil
+	return nil
+}
+
+func (c *client) reconnect() error {
+	c.producer.AsyncClose()
+	c.wg.Wait()
+	c.producer = nil
+
+	producer, err := sarama.NewAsyncProducer(c.hosts, &c.config)
+	if err != nil {
+		logp.Err("Kafka connect fails with: %v", err)
+		return err
+	}
+
+	c.producer = producer
+
+	c.wg.Add(2)
+	go c.successWorker(producer.Successes())
+	go c.errorWorker(producer.Errors())
 	return nil
 }
 
@@ -116,30 +144,58 @@ func (c *client) Publish(batch publisher.Batch) error {
 	c.observer.NewBatch(len(events))
 
 	ref := &msgRef{
-		client: c,
-		count:  int32(len(events)),
-		total:  len(events),
-		failed: nil,
-		batch:  batch,
+		client:  c,
+		count:   int32(len(events)),
+		total:   len(events),
+		failed:  nil,
+		batch:   batch,
+		retry:   false,
+		backoff: common.NewBackoff(nil, 1*time.Second, 60*time.Second),
 	}
 
+	publish <- ref
+	return nil
+}
+
+func (c *client) publish(msgRef *msgRef) error {
+	if msgRef.retry {
+		c.reconnect()
+	}
 	ch := c.producer.Input()
+	events := msgRef.batch.Events()
+
 	for i := range events {
 		d := &events[i]
 		msg, err := c.getEventMessage(d)
 		if err != nil {
 			logp.Err("Dropping event: %v", err)
-			ref.done()
+			msgRef.done()
 			c.observer.Dropped(1)
 			continue
 		}
 
-		msg.ref = ref
+		msg.ref = msgRef
 		msg.initProducerMessage()
 		ch <- &msg.msg
 	}
 
 	return nil
+}
+
+func (c *client) publishLoop() {
+	for !stopRequested {
+		select {
+		case msgRef := <-publish:
+			c.publish(msgRef)
+		case <-stop:
+			stopRequested = true
+		}
+	}
+
+	// flush remaining messages
+	for m := range publish {
+		c.publish(m)
+	}
 }
 
 func (c *client) String() string {
@@ -220,6 +276,13 @@ func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 	}
 }
 
+func (c *client) retry(r *msgRef) {
+	go func() {
+		r.backoff.Wait()
+		publish <- r
+	}()
+}
+
 func (r *msgRef) done() {
 	r.dec()
 }
@@ -254,7 +317,19 @@ func (r *msgRef) dec() {
 	if err != nil {
 		failed := len(r.failed)
 		success := r.total - failed
-		r.batch.RetryEvents(r.failed)
+
+		mr := &msgRef{
+			client:  r.client,
+			count:   int32(len(r.failed)),
+			total:   len(r.failed),
+			failed:  nil,
+			batch:   newRetryBatch(r.failed),
+			retry:   true,
+			backoff: common.NewBackoff(nil, r.backoff.Duration(), 60*time.Second),
+			err:     nil,
+		}
+
+		mr.client.retry(mr)
 
 		stats.Failed(failed)
 		if success > 0 {
@@ -266,4 +341,44 @@ func (r *msgRef) dec() {
 		r.batch.ACK()
 		stats.Acked(r.total)
 	}
+}
+
+type retryBatch struct {
+	events   []publisher.Event
+}
+
+func newRetryBatch(in []publisher.Event) *retryBatch {
+	events := make([]publisher.Event, len(in))
+	for i, c := range in {
+		events[i] = c
+	}
+	return &retryBatch{events: events}
+}
+
+func (b *retryBatch) Events() []publisher.Event {
+	return b.events
+}
+
+func (b *retryBatch) ACK() {
+	//b.doSignal(BatchSignal{Tag: BatchACK})
+}
+
+func (b *retryBatch) Drop() {
+	//b.doSignal(BatchSignal{Tag: BatchDrop})
+}
+
+func (b *retryBatch) Retry() {
+	//b.doSignal(BatchSignal{Tag: BatchRetry})
+}
+
+func (b *retryBatch) RetryEvents(events []publisher.Event) {
+	//b.doSignal(BatchSignal{Tag: BatchRetryEvents, Events: events})
+}
+
+func (b *retryBatch) Cancelled() {
+	//b.doSignal(BatchSignal{Tag: BatchCancelled})
+}
+
+func (b *retryBatch) CancelledEvents(events []publisher.Event) {
+	//b.doSignal(BatchSignal{Tag: BatchCancelledEvents, Events: events})
 }

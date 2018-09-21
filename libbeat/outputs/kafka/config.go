@@ -56,6 +56,12 @@ type kafkaConfig struct {
 	Username         string                    `config:"username"`
 	Password         string                    `config:"password"`
 	Codec            codec.Config              `config:"codec"`
+	Backoff          backoff                   `config:"backoff"`
+}
+
+type backoff struct {
+	Init time.Duration
+	Max  time.Duration
 }
 
 type metaConfig struct {
@@ -102,6 +108,10 @@ func defaultConfig() kafkaConfig {
 		ChanBufferSize:   256,
 		Username:         "",
 		Password:         "",
+		Backoff: backoff{
+			Init: 1 * time.Second,
+			Max:  60 * time.Second,
+		},
 	}
 }
 
@@ -165,7 +175,7 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	}
 
 	// configure metadata update properties
-	k.Metadata.Retry.Max = config.Metadata.Retry.Max
+	k.Metadata.Retry.Max =  config.Metadata.Retry.Max
 	k.Metadata.Retry.Backoff = config.Metadata.Retry.Backoff
 	k.Metadata.RefreshFrequency = config.Metadata.RefreshFreq
 
@@ -191,8 +201,7 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	if retryMax < 0 {
 		retryMax = 1000
 	}
-	k.Producer.Retry.Max = retryMax
-	// TODO: k.Producer.Retry.Backoff = ?
+	k.Producer.Retry.Max = 0 // disable retries in sarama library -- retries handled in kafka output
 
 	// configure per broker go channel buffering
 	k.ChannelBufferSize = config.ChanBufferSize
