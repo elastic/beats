@@ -77,7 +77,8 @@ func TestPlugin(t *testing.T) {
 	assert.NotNil(t, plugin)
 	assert.Empty(t, plugin.GetPorts())
 	assert.Equal(t, protos.DefaultTransactionExpiration, plugin.ConnectionTimeout())
-	assert.Empty(t, plugin.fingerprints)
+	assert.Len(t, plugin.fingerprints, 1)
+	assert.Equal(t, "sha1", plugin.fingerprints[0].name)
 }
 
 func TestNotTLS(t *testing.T) {
