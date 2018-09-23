@@ -23,6 +23,7 @@ import (
 	"github.com/Shopify/sarama"
 )
 
+// Version is a kafka version
 type Version struct {
 	String string
 }
@@ -89,6 +90,7 @@ func parseKafkaVersion(s string) sarama.KafkaVersion {
 	return v
 }
 
+// Validate that a kafka version is among the possible options
 func (v *Version) Validate() error {
 	if _, ok := kafkaVersions[v.String]; !ok {
 		return fmt.Errorf("unknown/unsupported kafka vesion '%v'", v.String)
@@ -97,6 +99,7 @@ func (v *Version) Validate() error {
 	return nil
 }
 
+// Unpack a kafka version
 func (v *Version) Unpack(s string) error {
 	tmp := Version{s}
 	if err := tmp.Validate(); err != nil {
@@ -107,6 +110,7 @@ func (v *Version) Unpack(s string) error {
 	return nil
 }
 
+// Get a sarama kafka version
 func (v *Version) Get() (sarama.KafkaVersion, bool) {
 	kv, ok := kafkaVersions[v.String]
 	return kv, ok
