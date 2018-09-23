@@ -28,7 +28,15 @@ type Version struct {
 }
 
 var (
+	// TODO: Unify with kafka output versioning
 	minVersion = sarama.V0_8_2_0
+
+	v0_10_2_1 = parseKafkaVersion("0.10.2.1")
+	v0_11_0_1 = parseKafkaVersion("0.11.0.1")
+	v0_11_0_2 = parseKafkaVersion("0.11.0.2")
+	v1_0_1    = parseKafkaVersion("1.0.1")
+	v1_0_2    = parseKafkaVersion("1.0.2")
+	v1_1_1    = parseKafkaVersion("1.1.1")
 
 	kafkaVersions = map[string]sarama.KafkaVersion{
 		"": sarama.V0_8_2_0,
@@ -49,9 +57,39 @@ var (
 		"0.10.0":   sarama.V0_10_0_1,
 		"0.10.1.0": sarama.V0_10_1_0,
 		"0.10.1":   sarama.V0_10_1_0,
-		"0.10":     sarama.V0_10_1_0,
+		"0.10.2.0": sarama.V0_10_2_0,
+		"0.10.2.1": v0_10_2_1,
+		"0.10.2":   v0_10_2_1,
+		"0.10":     v0_10_2_1,
+
+		"0.11.0.0": sarama.V0_11_0_0,
+		"0.11.0.1": v0_11_0_1,
+		"0.11.0.2": v0_11_0_2,
+		"0.11.0":   v0_11_0_2,
+		"0.11":     v0_11_0_2,
+
+		"1.0.0": sarama.V1_0_0_0,
+		"1.0.1": v1_0_1,
+		"1.0.2": v1_0_2,
+		"1.0":   v1_0_2,
+		"1.1.0": sarama.V1_1_0_0,
+		"1.1.1": v1_1_1,
+		"1.1":   v1_1_1,
+		"1":     v1_1_1,
+
+		"2.0.0": sarama.V2_0_0_0,
+		"2.0":   sarama.V2_0_0_0,
+		"2":     sarama.V2_0_0_0,
 	}
 )
+
+func parseKafkaVersion(s string) sarama.KafkaVersion {
+	v, err := sarama.ParseKafkaVersion(s)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
 
 func (v *Version) Validate() error {
 	if _, ok := kafkaVersions[v.String]; !ok {
