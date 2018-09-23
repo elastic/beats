@@ -27,10 +27,10 @@ type Version struct {
 	String string
 }
 
+// TODO: remove me.
+// Compat version overwrite for missing versions in sarama
+// Public API is compatible between these versions.
 var (
-	// TODO: Unify with kafka output versioning
-	minVersion = sarama.V0_8_2_0
-
 	v0_10_2_1 = parseKafkaVersion("0.10.2.1")
 	v0_11_0_1 = parseKafkaVersion("0.11.0.1")
 	v0_11_0_2 = parseKafkaVersion("0.11.0.2")
@@ -39,8 +39,6 @@ var (
 	v1_1_1    = parseKafkaVersion("1.1.1")
 
 	kafkaVersions = map[string]sarama.KafkaVersion{
-		"": sarama.V0_8_2_0,
-
 		"0.8.2.0": sarama.V0_8_2_0,
 		"0.8.2.1": sarama.V0_8_2_1,
 		"0.8.2.2": sarama.V0_8_2_2,
@@ -95,6 +93,7 @@ func (v *Version) Validate() error {
 	if _, ok := kafkaVersions[v.String]; !ok {
 		return fmt.Errorf("unknown/unsupported kafka vesion '%v'", v.String)
 	}
+
 	return nil
 }
 
@@ -108,10 +107,7 @@ func (v *Version) Unpack(s string) error {
 	return nil
 }
 
-func (v *Version) get() sarama.KafkaVersion {
-	if v, ok := kafkaVersions[v.String]; ok {
-		return v
-	}
-
-	return minVersion
+func (v *Version) Get() (sarama.KafkaVersion, bool) {
+	kv, ok := kafkaVersions[v.String]
+	return kv, ok
 }
