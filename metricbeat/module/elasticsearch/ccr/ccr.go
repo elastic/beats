@@ -66,7 +66,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
+	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+ccrStatsPath)
 	if err != nil {
 		r.Error(err)
 		return
@@ -92,9 +92,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	err = eventsMapping(r, *info, content)
-	if err != nil {
-		r.Error(err)
-		return
+	if m.XPack {
+		eventsMappingXPack(r, m, *info, content)
+	} else {
+		err = eventsMapping(r, *info, content)
+		if err != nil {
+			r.Error(err)
+			return
+		}
 	}
 }
