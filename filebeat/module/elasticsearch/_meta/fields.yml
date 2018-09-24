@@ -22,4 +22,4 @@
         - name: shard.id
           description: "Id of the shard"
           example: "0"
-          type: integer
+          type: keyword
