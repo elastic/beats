@@ -869,8 +869,6 @@ match.
 All the <<conditions,conditions>> supported by processors are also supported
 here. 
 
-// REVIEWERS: WE should add an example here. Can someone offer a realistic
-// example based on data you would expect to see for Kafka?
 
 ===== `key`
 
