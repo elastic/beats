@@ -219,14 +219,8 @@ The index name to write events to. The default is
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>).
 
-If you are using the pre-built Kibana dashboards,
+When loading the pre-built Kibana dashboards via {beatname_uc},
 you also need to set the `setup.dashboards.index` option (see <<configuration-dashboards>>).
-
-ifdef::deprecate_dashboard_loading[]
-
-deprecated[{deprecate_dashboard_loading}]
-
-endif::[]
 
 ===== `indices`
 
@@ -244,6 +238,13 @@ Rule settings:
 *`default`*: Default string value if `mapping` does not find a match.
 
 *`when`*: Condition which must succeed in order to execute the current rule.
+
+ifeval::["{beatname_lc}" == "apm-server"]
+
+NOTE: When changing APM indices, you have to update the {kibana-ref}/apm-settings-kb.html[Kibana APM settings]
+accordingly to ensure the Kibana UI can still query the data.
+
+endif::[]
 
 Examples elasticsearch output with `indices`:
 
