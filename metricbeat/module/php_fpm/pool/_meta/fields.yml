@@ -86,7 +86,7 @@
           - name: state
             type: string
             description: >
-              The state of the process (Idle, Running, …)
+             The state of the process (Idle, Running, etc)
           - name: start_time
             type: date
             format: epoch_second
@@ -107,7 +107,7 @@
           - name: request_method
             type: string
             description: >
-              The request method (GET, POST, …) (of the current request)
+              The request method (GET, POST, etc) (of the current request)
           - name: request_uri
             type: string
             description: >
@@ -119,15 +119,15 @@
           - name: user
             type: string
             description: >
-              The user (PHP_AUTH_USER) (or ‘-‘ if not set) (for the current request)
+              The user (PHP_AUTH_USER) (or - if not set) (for the current request)
           - name: script
             type: string
             description: >
-              The main script called (or ‘-‘ if not set) (for the current request)
+              The main script called (or - if not set) (for the current request)
           - name: last_request_cpu
             type: long
             description: >
-              The max amount of memory the last request consumed (it’s always 0 if the process is not in Idle state because memory calculation is done when the request processing has terminated)
+              The max amount of memory the last request consumed (it is always 0 if the process is not in Idle state because memory calculation is done when the request processing has terminated)
           - name: last_request_memory
             type: integer
             description: >
