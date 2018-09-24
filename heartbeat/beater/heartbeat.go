@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/autodiscover"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/heartbeat/config"
@@ -39,6 +41,8 @@ type Heartbeat struct {
 	config          config.Config
 	scheduler       *scheduler.Scheduler
 	monitorReloader *cfgfile.Reloader
+	dynamicFactory  *monitors.RunnerFactory
+	autodiscover    *autodiscover.Autodiscover
 }
 
 // New creates a new heartbeat.
@@ -64,6 +68,8 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		done:      make(chan struct{}),
 		config:    parsedConfig,
 		scheduler: scheduler,
+		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
+		dynamicFactory: monitors.NewFactory(scheduler, false),
 	}
 	return bt, nil
 }
@@ -81,16 +87,29 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		bt.monitorReloader = cfgfile.NewReloader(b.Publisher, bt.config.ConfigMonitors)
 		defer bt.monitorReloader.Stop()
 
-		err := bt.RunDynamicMonitors(b)
+		err := bt.RunReloadableMonitors(b)
 		if err != nil {
 			return err
 		}
+	}
+
+	if bt.config.Autodiscover != nil {
+		bt.autodiscover, err = bt.makeAutodiscover(b)
+		if err != nil {
+			return err
+		}
+
+		bt.autodiscover.Start()
+		defer bt.autodiscover.Stop()
 	}
 
 	if err := bt.scheduler.Start(); err != nil {
 		return err
 	}
 	defer bt.scheduler.Stop()
+	defer func() {
+
+	}()
 
 	<-bt.done
 
@@ -112,19 +131,29 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 	return nil
 }
 
-// RunDynamicMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
-func (bt *Heartbeat) RunDynamicMonitors(b *beat.Beat) (err error) {
-	factory := monitors.NewFactory(bt.scheduler, false)
-
+// RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
+func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	// Check monitor configs
-	if err := bt.monitorReloader.Check(factory); err != nil {
+	if err := bt.monitorReloader.Check(bt.dynamicFactory); err != nil {
 		return err
 	}
 
 	// Execute the monitor
-	go bt.monitorReloader.Run(factory)
+	go bt.monitorReloader.Run(bt.dynamicFactory)
 
 	return nil
+}
+
+// makeAutodiscover creates an autodiscover object ready to be started.
+func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
+	adapter := autodiscover.NewFactoryAdapter(bt.dynamicFactory)
+
+	ad, err := autodiscover.NewAutodiscover("heartbeat", b.Publisher, adapter, bt.config.Autodiscover)
+	if err != nil {
+		return nil, err
+	}
+
+	return ad, nil
 }
 
 // Stop stops the beat.

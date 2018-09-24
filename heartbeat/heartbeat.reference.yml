@@ -218,6 +218,21 @@ heartbeat.monitors:
     #interval: 5s
 
 
+# Use the autodiscover feature to automatically configure heartbeat via a beats
+# autodiscover provider
+#heartbeat.autodiscover:
+#  providers:
+#  - type: docker
+#    templates:
+#    - condition:
+#        contains:
+#          docker.container.image: redis
+#      config:
+#      - type: tcp
+#        hosts: ["localhost:${data.port}"]
+#        timeout: 1s
+#        schedule: "@every 10s"
+
 heartbeat.scheduler:
   # Limit number of concurrent tasks executed by heartbeat. The task limit if
   # disabled if set to 0. The default is 0.
