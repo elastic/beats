@@ -26,12 +26,12 @@ import (
 	"github.com/elastic/beats/libbeat/common/bus"
 )
 
-// FactoryAdapter for Metricbeat modules
+// FactoryAdapter is an adapter that works with any cfgfile.RunnerFactory.
 type FactoryAdapter struct {
 	factory cfgfile.RunnerFactory
 }
 
-// NewFactoryAdapter builds and returns an autodiscover adapter for Metricbeat modules
+// NewFactoryAdapter builds and returns an autodiscover adapter that works with any cfgfile.RunnerFactory.
 func NewFactoryAdapter(factory cfgfile.RunnerFactory) *FactoryAdapter {
 	return &FactoryAdapter{
 		factory: factory,

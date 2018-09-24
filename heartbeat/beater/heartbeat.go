@@ -107,9 +107,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		return err
 	}
 	defer bt.scheduler.Stop()
-	defer func() {
-
-	}()
 
 	<-bt.done
 

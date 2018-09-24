@@ -229,7 +229,7 @@ heartbeat.monitors:
 #          docker.container.image: redis
 #      config:
 #      - type: tcp
-#        hosts: ["localhost:${data.port}"]
+#        hosts: ["${data.host}:${data.port}"]
 #        timeout: 1s
 #        schedule: "@every 10s"
 
