@@ -867,7 +867,7 @@ Index id
 *`elasticsearch.shard.id`*::
 +
 --
-type: keyword
+type: integer
 
 example: 0
 
@@ -1375,7 +1375,7 @@ Extra source information
 *`elasticsearch.slowlog.took_millis`*::
 +
 --
-type: keyword
+type: integer
 
 example: 42
 
@@ -1386,7 +1386,7 @@ Time took in milliseconds
 *`elasticsearch.slowlog.total_hits`*::
 +
 --
-type: keyword
+type: integer
 
 example: 42
 
@@ -1397,7 +1397,7 @@ Total hits
 *`elasticsearch.slowlog.total_shards`*::
 +
 --
-type: keyword
+type: integer
 
 example: 22
 

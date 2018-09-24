@@ -34,15 +34,15 @@
   - name: took_millis
     description: "Time took in milliseconds"
     example: 42
-    type: keyword
+    type: integer
   - name: total_hits
     description: "Total hits"
     example: 42
-    type: keyword
+    type: integer
   - name: total_shards
     description: "Total queried shards"
     example: 22
-    type: keyword
+    type: integer
   - name: routing
     description: "Routing"
     example: "s01HZ2QBk9jw4gtgaFtn"
