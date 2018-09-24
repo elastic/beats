@@ -13,11 +13,12 @@ import (
 )
 
 // Enroll a beat in central management, this call returns a valid access token to retrieve configurations
-func (c *Client) Enroll(beatType, beatVersion, hostname string, beatUUID uuid.UUID, enrollmentToken string) (string, error) {
+func (c *Client) Enroll(beatType, beatName, beatVersion, hostname string, beatUUID uuid.UUID, enrollmentToken string) (string, error) {
 	params := common.MapStr{
 		"type":      beatType,
-		"host_name": hostname,
+		"name":      beatName,
 		"version":   beatVersion,
+		"host_name": hostname,
 	}
 
 	resp := struct {

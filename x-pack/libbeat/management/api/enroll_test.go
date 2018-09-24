@@ -35,6 +35,7 @@ func TestEnrollValid(t *testing.T) {
 			Hostname string `json:"host_name"`
 			Type     string `json:"type"`
 			Version  string `json:"version"`
+			Name     string `json:"name"`
 		}{}
 		if err := json.Unmarshal(body, &request); err != nil {
 			t.Fatal(err)
@@ -43,12 +44,13 @@ func TestEnrollValid(t *testing.T) {
 		assert.Equal(t, "myhostname.lan", request.Hostname)
 		assert.Equal(t, "metricbeat", request.Type)
 		assert.Equal(t, "6.3.0", request.Version)
+		assert.Equal(t, "beatname", request.Name)
 
 		fmt.Fprintf(w, `{"access_token": "fooo"}`)
 	}))
 	defer server.Close()
 
-	accessToken, err := client.Enroll("metricbeat", "6.3.0", "myhostname.lan", beatUUID, "thisismyenrollmenttoken")
+	accessToken, err := client.Enroll("metricbeat", "beatname", "6.3.0", "myhostname.lan", beatUUID, "thisismyenrollmenttoken")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,7 +66,7 @@ func TestEnrollError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	accessToken, err := client.Enroll("metricbeat", "6.3.0", "myhostname.lan", beatUUID, "thisismyenrollmenttoken")
+	accessToken, err := client.Enroll("metricbeat", "beatname", "6.3.0", "myhostname.lan", beatUUID, "thisismyenrollmenttoken")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "", accessToken)
