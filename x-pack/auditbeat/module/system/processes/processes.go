@@ -53,8 +53,8 @@ func (pInfo ProcessInfo) Hash() string {
 func (pInfo ProcessInfo) toMapStr() common.MapStr {
 	return common.MapStr{
 		// https://github.com/elastic/ecs#-process-fields
-		"process.args": pInfo.Args,
 		"process.name": pInfo.Name,
+		"process.args": pInfo.Args,
 		"process.pid":  pInfo.PID,
 		"process.ppid": pInfo.PPID,
 
@@ -97,8 +97,8 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		for _, pInfo := range started {
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					"status":  "started",
-					"process": pInfo.(ProcessInfo).toMapStr(),
+					"status":    "started",
+					"processes": pInfo.(ProcessInfo).toMapStr(),
 				},
 			})
 		}
@@ -106,8 +106,8 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		for _, pInfo := range stopped {
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					"status":  "stopped",
-					"process": pInfo.(ProcessInfo).toMapStr(),
+					"status":    "stopped",
+					"processes": pInfo.(ProcessInfo).toMapStr(),
 				},
 			})
 		}

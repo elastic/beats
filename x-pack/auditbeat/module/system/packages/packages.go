@@ -103,19 +103,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch collects data about the host. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	packages := ms.getPackages()
-
-	/*var pkgInfos []common.MapStr
-
-	for _, pkg := range packages {
-		pkgInfos = append(pkgInfos, pkg.toMapStr())
+	packages, err := getPackages()
+	if err != nil {
+		report.Error(err)
 	}
-
-	report.Event(mb.Event{
-		MetricSetFields: common.MapStr{
-			"packages": pkgInfos,
-		},
-	})*/
+	if packages == nil {
+		return
+	}
 
 	if ms.cache != nil && !ms.cache.IsEmpty() {
 		installed, removed := ms.cache.DiffAndUpdateCache(packages)
@@ -158,38 +152,40 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 }
 
-func (ms *MetricSet) getPackages() (packages []cache.Cacheable) {
+func getPackages() ([]cache.Cacheable, error) {
 	host, err := sysinfo.Host()
 	if err != nil {
-		ms.log.Errorw("Error getting the OS", "error", err)
+		return nil, errors.Wrap(err, "Error getting the OS")
 	}
 
 	hostInfo := host.Info()
 	if hostInfo.OS == nil {
-		ms.log.Errorw("No OS info from sysinfo.Host", "error", err)
+		return nil, errors.New("No host info")
 	}
+
+	var packages []cache.Cacheable
 
 	switch hostInfo.OS.Family {
 	case "redhat":
 		packages, err = listRPMPackages()
 		if err != nil {
-			ms.log.Errorw("Error getting RPM packages", "error", err)
+			err = errors.Wrap(err, "Error getting RPM packages")
 		}
 	case "debian":
 		packages, err = listDebPackages()
 		if err != nil {
-			ms.log.Errorw("Error getting DEB packages", "error", err)
+			err = errors.Wrap(err, "Error getting DEB packages")
 		}
 	case "darwin":
 		packages, err = listBrewPackages()
 		if err != nil {
-			ms.log.Errorw("Error getting Homebrew packages", "error", err)
+			err = errors.Wrap(err, "Error getting Homebrew packages")
 		}
 	default:
-		ms.log.Errorw("No logic for getting packages for OS family", "os", hostInfo.OS.Family)
+		return nil, fmt.Errorf("No logic for getting packages for OS family %v", hostInfo.OS.Family)
 	}
 
-	return
+	return packages, err
 }
 
 /*
