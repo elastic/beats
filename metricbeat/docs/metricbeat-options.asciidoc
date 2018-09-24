@@ -204,8 +204,8 @@ processors in your config.
 [[module-http-config-options]]
 === Standard HTTP config options
 
-The modules and metricsets for which the host is defined as a HTTP URL, also
-support the following options:
+The following options are available for modules and metricsets that define the
+host as an HTTP URL:
 
 [float]
 ==== `username`
@@ -216,6 +216,14 @@ The username to use for basic authentication.
 ==== `password`
 
 The password to use for basic authentication.
+
+[float]
+==== `ssl`
+
+Configuration options for SSL parameters like the certificate authority to use
+for HTTPS-based connections.
+
+See <<configuration-ssl>> for more information.
 
 [float]
 ==== `headers`
