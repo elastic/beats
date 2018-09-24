@@ -729,7 +729,7 @@
                                 "chart_type": "line", 
                                 "color": "#68BC00", 
                                 "fill": 0.5, 
-                                "formatter": "s,ms,0", 
+                                "formatter": "ms,ms,0", 
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
                                 "label": "Average response time", 
                                 "line_width": 1, 
