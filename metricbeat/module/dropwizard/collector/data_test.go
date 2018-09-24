@@ -47,6 +47,11 @@ func TestSplitTagsFromMetricName(t *testing.T) {
 			key:   "metric",
 			tags:  common.MapStr{"key1": "var1", "key2": "var2"},
 		}, {
+			title: "standard tags (no space)",
+			name:  "metric{key1=var1,key2=var2}",
+			key:   "metric",
+			tags:  common.MapStr{"key1": "var1", "key2": "var2"},
+		}, {
 			title: "empty parameter",
 			name:  "metric/{}",
 		}, {
@@ -69,6 +74,9 @@ func TestSplitTagsFromMetricName(t *testing.T) {
 			name:  "metric{a=b, }",
 			key:   "metric",
 			tags:  common.MapStr{"a": "b"},
+		}, {
+			title: "extra comma and space",
+			name:  "metric{,a=b}",
 		},
 	} {
 		t.Run(testCase.title, func(t *testing.T) {

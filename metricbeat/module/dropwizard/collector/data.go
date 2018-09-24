@@ -108,26 +108,22 @@ func splitTagsFromMetricName(metricName string) (string, common.MapStr) {
 	tagStr := metricName[index+1 : len(metricName)-1]
 
 	for {
-		dobreak := false
 		ind := strings.Index(tagStr, ",")
 		eqPos := strings.Index(tagStr, "=")
-		if eqPos == -1 {
+		if eqPos == -1 || ind != -1 && eqPos > ind {
 			return metricName, nil
 		}
 		if ind == -1 {
 			tags[tagStr[:eqPos]] = tagStr[eqPos+1:]
-			dobreak = true
-		} else {
-			tags[tagStr[:eqPos]] = tagStr[eqPos+1 : ind]
-			if ind+2 < len(tagStr) {
-				tagStr = tagStr[ind+2:]
-			} else {
-				dobreak = true
-			}
-		}
-
-		if dobreak == true {
 			break
+		}
+		tags[tagStr[:eqPos]] = tagStr[eqPos+1 : ind]
+		if ind+2 >= len(tagStr) {
+			break
+		}
+		tagStr = tagStr[ind+1:]
+		if tagStr[0] == ' ' {
+			tagStr = tagStr[1:]
 		}
 	}
 
