@@ -34,7 +34,7 @@ import (
 
 // Version returns a kafka version from its string representation
 func Version(version string) kafka.Version {
-	return kafka.Version{String: version}
+	return kafka.Version(version)
 }
 
 // Broker provides functionality for communicating with a single kafka broker

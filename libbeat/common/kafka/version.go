@@ -24,9 +24,7 @@ import (
 )
 
 // Version is a kafka version
-type Version struct {
-	String string
-}
+type Version string
 
 // TODO: remove me.
 // Compat version overwrite for missing versions in sarama
@@ -92,8 +90,8 @@ func parseKafkaVersion(s string) sarama.KafkaVersion {
 
 // Validate that a kafka version is among the possible options
 func (v *Version) Validate() error {
-	if _, ok := kafkaVersions[v.String]; !ok {
-		return fmt.Errorf("unknown/unsupported kafka vesion '%v'", v.String)
+	if _, ok := kafkaVersions[string(*v)]; !ok {
+		return fmt.Errorf("unknown/unsupported kafka vesion '%v'", *v)
 	}
 
 	return nil
@@ -101,7 +99,7 @@ func (v *Version) Validate() error {
 
 // Unpack a kafka version
 func (v *Version) Unpack(s string) error {
-	tmp := Version{s}
+	tmp := Version(s)
 	if err := tmp.Validate(); err != nil {
 		return err
 	}
@@ -111,7 +109,7 @@ func (v *Version) Unpack(s string) error {
 }
 
 // Get a sarama kafka version
-func (v *Version) Get() (sarama.KafkaVersion, bool) {
-	kv, ok := kafkaVersions[v.String]
+func (v Version) Get() (sarama.KafkaVersion, bool) {
+	kv, ok := kafkaVersions[string(v)]
 	return kv, ok
 }
