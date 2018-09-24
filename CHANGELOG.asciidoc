@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v6.4.1...6.4[Check the HEAD diff]
 *Filebeat*
 
 - Fix some errors happening when stopping syslog input. {pull}8347[8347]
+- Fix RFC3339 timezone and nanoseconds parsing with the syslog input. {pull}8346[8346]
 
 *Heartbeat*
 
