@@ -38,7 +38,8 @@ type Journalbeat struct {
 	config config.Config
 
 	pipeline   beat.Pipeline
-	checkpoint *checkpoint.Checkpoint // Persists event log state to disk.
+	checkpoint *checkpoint.Checkpoint
+	logger     *logp.Logger
 }
 
 // New returns a new Journalbeat instance
@@ -69,6 +70,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		config:     config,
 		pipeline:   b.Publisher,
 		checkpoint: cp,
+		logger:     logp.NewLogger("journalbeat"),
 	}
 
 	return bt, nil
@@ -76,8 +78,8 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 // Run sets up the ACK handler and starts inputs to read and forward events to outputs.
 func (bt *Journalbeat) Run(b *beat.Beat) error {
-	logp.Info("journalbeat is running! Hit CTRL-C to stop it.")
-	defer logp.Info("journalbeat is stopping")
+	bt.logger.Info("journalbeat is running! Hit CTRL-C to stop it.")
+	defer bt.logger.Info("journalbeat is stopping")
 
 	err := bt.pipeline.SetACKHandler(beat.PipelineACKHandler{
 		ACKLastEvents: func(data []interface{}) {

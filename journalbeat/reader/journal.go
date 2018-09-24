@@ -58,14 +58,17 @@ type Reader struct {
 	config  Config
 	changes chan int
 	done    chan struct{}
+	logger  *logp.Logger
 }
 
 // New creates a new journal reader and moves the FP to the configured position.
-func New(c Config, done chan struct{}, state checkpoint.JournalState) (*Reader, error) {
+func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *logp.Logger) (*Reader, error) {
 	f, err := os.Stat(c.Path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open file")
 	}
+
+	logger = logger.With("path", c.Path)
 
 	var j *sdjournal.Journal
 	if f.IsDir() {
@@ -85,29 +88,32 @@ func New(c Config, done chan struct{}, state checkpoint.JournalState) (*Reader, 
 		changes: make(chan int),
 		config:  c,
 		done:    done,
+		logger:  logger,
 	}
 	r.seek(state.Cursor)
 
-	logp.Debug("reader", "New journal is opened for reading")
+	r.logger.Debug("New journal is opened for reading")
 
 	return r, nil
 }
 
 // NewLocal creates a reader to read form the local journal and moves the FP
 // to the configured position.
-func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState) (*Reader, error) {
+func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logger *logp.Logger) (*Reader, error) {
 	j, err := sdjournal.NewJournal()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open local journal")
 	}
 
-	logp.Debug("reader", "New local journal is opened for reading")
+	logger = logger.With("path", "local")
+	logger.Debug("New local journal is opened for reading")
 
 	r := &Reader{
 		j:       j,
 		changes: make(chan int),
 		config:  c,
 		done:    done,
+		logger:  logger,
 	}
 	r.seek(state.Cursor)
 	return r, nil
@@ -118,21 +124,21 @@ func (r *Reader) seek(cursor string) {
 	if r.config.Seek == "cursor" {
 		if cursor == "" {
 			r.j.SeekHead()
-			logp.Debug("journal", "Seeking method set to cursor, but no state is saved for reader. Starting to read from the beginning")
+			r.logger.Debug("Seeking method set to cursor, but no state is saved for reader. Starting to read from the beginning")
 			return
 		}
 		r.j.SeekCursor(cursor)
 		_, err := r.j.Next()
 		if err != nil {
-			logp.Err("Error while seeking to cursor")
+			r.logger.Error("Error while seeking to cursor")
 		}
-		logp.Debug("journal", "Seeked to position defined in cursor")
+		r.logger.Debug("Seeked to position defined in cursor")
 	} else if r.config.Seek == "tail" {
 		r.j.SeekTail()
-		logp.Debug("journal", "Tailing the journal file")
+		r.logger.Debug("Tailing the journal file")
 	} else if r.config.Seek == "head" {
 		r.j.SeekHead()
-		logp.Debug("journal", "Reading from the beginning of the journal file")
+		r.logger.Debug("Reading from the beginning of the journal file")
 	}
 }
 
@@ -155,7 +161,7 @@ process:
 		default:
 			err := r.readUntilNotNull(entries)
 			if err != nil {
-				logp.Err("Unexpected error while reading from journal: %v", err)
+				r.logger.Error("Unexpected error while reading from journal: %v", err)
 			}
 		}
 
@@ -173,7 +179,7 @@ process:
 					continue process
 				default:
 					if e < 0 {
-						//logp.Err("Unexpected error: %v", syscall.Errno(-e))
+						//r.logger.Error("Unexpected error: %v", syscall.Errno(-e))
 					}
 					r.wait()
 				}
@@ -248,7 +254,7 @@ func (r *Reader) wait() {
 		if r.config.Backoff > r.config.MaxBackoff {
 			r.config.Backoff = r.config.MaxBackoff
 		}
-		logp.Debug("reader", "Increasing backoff time to: %v factor: %v", r.config.Backoff, r.config.BackoffFactor)
+		r.logger.Debugf("Increasing backoff time to: %v factor: %v", r.config.Backoff, r.config.BackoffFactor)
 	}
 }
 

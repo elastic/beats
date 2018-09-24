@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"sync"
 
+	uuid "github.com/satori/go.uuid"
+
 	"github.com/elastic/beats/journalbeat/checkpoint"
 	"github.com/elastic/beats/journalbeat/reader"
 	"github.com/elastic/beats/libbeat/beat"
@@ -35,6 +37,8 @@ type Input struct {
 	config   Config
 	pipeline beat.Pipeline
 	states   map[string]checkpoint.JournalState
+	id       uuid.UUID
+	logger   *logp.Logger
 }
 
 // New returns a new Inout
@@ -48,6 +52,10 @@ func New(
 	if err := c.Unpack(&config); err != nil {
 		return nil, err
 	}
+
+	id := uuid.NewV4()
+	logger := logp.NewLogger("input").With("id", id)
+
 	var readers []*reader.Reader
 	if len(config.Paths) == 0 {
 		cfg := reader.Config{
@@ -59,7 +67,7 @@ func New(
 		}
 
 		state := states[reader.LocalSystemJournalID]
-		r, err := reader.NewLocal(cfg, done, state)
+		r, err := reader.NewLocal(cfg, done, state, logger)
 		if err != nil {
 			return nil, fmt.Errorf("error creating reader for local journal: %v", err)
 		}
@@ -75,12 +83,14 @@ func New(
 			Seek:          config.Seek,
 		}
 		state := states[p]
-		r, err := reader.New(cfg, done, state)
+		r, err := reader.New(cfg, done, state, logger)
 		if err != nil {
 			return nil, fmt.Errorf("error creating reader for journal: %v", err)
 		}
 		readers = append(readers, r)
 	}
+
+	logger.Debugf("New input is created for paths %v", config.Paths)
 
 	return &Input{
 		readers:  readers,
@@ -88,6 +98,8 @@ func New(
 		config:   config,
 		pipeline: pipeline,
 		states:   states,
+		id:       id,
+		logger:   logger,
 	}, nil
 }
 
@@ -100,11 +112,11 @@ func (i *Input) Run() {
 		Meta:          nil,
 		Processor:     nil,
 		ACKCount: func(n int) {
-			logp.Info("journalbeat successfully published %d events", n)
+			i.logger.Infof("journalbeat successfully published %d events", n)
 		},
 	})
 	if err != nil {
-		logp.Err("Error connecting: %v", err)
+		i.logger.Error("Error connecting to output: %v", err)
 		return
 	}
 	defer client.Close()
