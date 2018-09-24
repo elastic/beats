@@ -19,43 +19,43 @@ package pool
 
 import (
 	"encoding/json"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 type phpFpmStatus struct {
-	Name                  string        	`json:"pool"`
-	ProcessManager        string          	`json:"process manager"`
-	SlowRequests          int        		`json:"slow requests"`
-	StartTime   	  	  int          		`json:"start time"`
-	StartSince            int        		`json:"start since"`
-	AcceptedConnection    int        		`json:"accepted conn"`
-	ListenQueueLen        int          		`json:"listen queue len"`
-	MaxListenQueue        int        		`json:"max listen queue"`
-	Queued        		  int          		`json:"listen queue"`  
-	ActiveProcesses       int         	    `json:"active processes"`
-	IdleProcesses         int   			`json:"idle processes"`
-	MaxActiveProcesses    int         	    `json:"max active processes"`
-	MaxChildrenReached    int        		`json:"max children reached"`
-	TotalProcesses        int         	    `json:"total processes"`
-	Processes             []phpFpmProcess   `json:"processes"`
-	
+	Name               string          `json:"pool"`
+	ProcessManager     string          `json:"process manager"`
+	SlowRequests       int             `json:"slow requests"`
+	StartTime          int             `json:"start time"`
+	StartSince         int             `json:"start since"`
+	AcceptedConnection int             `json:"accepted conn"`
+	ListenQueueLen     int             `json:"listen queue len"`
+	MaxListenQueue     int             `json:"max listen queue"`
+	Queued             int             `json:"listen queue"`
+	ActiveProcesses    int             `json:"active processes"`
+	IdleProcesses      int             `json:"idle processes"`
+	MaxActiveProcesses int             `json:"max active processes"`
+	MaxChildrenReached int             `json:"max children reached"`
+	TotalProcesses     int             `json:"total processes"`
+	Processes          []phpFpmProcess `json:"processes"`
 }
 
 type phpFpmProcess struct {
-	PID           		int         `json:"pid"`
-	State         		string   	`json:"state"`
-	StartTime       	int         `json:"start time"`
-	StartSince        	int        	`json:"start since"`
-	Requests           	int         `json:"requests"`
-	RequestDuration   	int         `json:"request duration"`
-	RequestMethod       string      `json:"request method"`
-	RequestURI          string      `json:"request uri"`
-	ContentLength       int         `json:"content length"`
-	User           		string      `json:"user"`
-	Script           	string      `json:"script"`
-	LastRequestCPU      float64     `json:"last request cpu"`
-	LastRequestMemory	int         `json:"last request memory"`
+	PID               int     `json:"pid"`
+	State             string  `json:"state"`
+	StartTime         int     `json:"start time"`
+	StartSince        int     `json:"start since"`
+	Requests          int     `json:"requests"`
+	RequestDuration   int     `json:"request duration"`
+	RequestMethod     string  `json:"request method"`
+	RequestURI        string  `json:"request uri"`
+	ContentLength     int     `json:"content length"`
+	User              string  `json:"user"`
+	Script            string  `json:"script"`
+	LastRequestCPU    float64 `json:"last request cpu"`
+	LastRequestMemory int     `json:"last request memory"`
 }
 
 func eventsMapping(content []byte) (common.MapStr, error) {
@@ -68,7 +68,7 @@ func eventsMapping(content []byte) (common.MapStr, error) {
 	//remapping process details to match the naming format
 	var mapProcesses []common.MapStr
 	for _, process := range status.Processes {
-		proc := common.MapStr {
+		proc := common.MapStr{
 			"pid":                 process.PID,
 			"state":               process.State,
 			"start_time":          process.StartTime,
@@ -86,27 +86,26 @@ func eventsMapping(content []byte) (common.MapStr, error) {
 		mapProcesses = append(mapProcesses, proc)
 	}
 	baseEvent := common.MapStr{
-			"name":              status.Name,
-			"process_manager":   status.ProcessManager,
-			"slow_requests":     status.SlowRequests,
-			"start_time":        status.StartTime,
-			"start_since":       status.StartSince,
-			"connections":       common.MapStr{
-				"accepted":          status.AcceptedConnection,
-				"listen_queue_len":  status.ListenQueueLen,
-				"max_listen_queue":  status.MaxListenQueue,
-				"queued":            status.Queued,
-			},
-			"processes":         common.MapStr { 
-				"active":            	status.ActiveProcesses,
-				"idle":					status.IdleProcesses,
-				"max_active":			status.MaxActiveProcesses,
-				"max_children_reached":	status.MaxChildrenReached,
-				"total":				status.TotalProcesses,
-				"details":				mapProcesses,
-			},
+		"name":            status.Name,
+		"process_manager": status.ProcessManager,
+		"slow_requests":   status.SlowRequests,
+		"start_time":      status.StartTime,
+		"start_since":     status.StartSince,
+		"connections": common.MapStr{
+			"accepted":         status.AcceptedConnection,
+			"listen_queue_len": status.ListenQueueLen,
+			"max_listen_queue": status.MaxListenQueue,
+			"queued":           status.Queued,
+		},
+		"processes": common.MapStr{
+			"active":               status.ActiveProcesses,
+			"idle":                 status.IdleProcesses,
+			"max_active":           status.MaxActiveProcesses,
+			"max_children_reached": status.MaxChildrenReached,
+			"total":                status.TotalProcesses,
+			"details":              mapProcesses,
+		},
 	}
 
 	return baseEvent, nil
 }
-

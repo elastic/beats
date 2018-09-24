@@ -233,13 +233,14 @@ func SetQueryParams(u *url.URL, query string) (*url.URL, error) {
 	}
 	for key, values := range params {
 		for _, v := range values {
-				q.Set(key, v)
-			}
+			q.Set(key, v)
 		}
+	}
 	u.RawQuery = q.Encode()
 	return u, nil
 
 }
+
 // redactURLCredentials returns the URL as a string with the username and
 // password redacted.
 func redactURLCredentials(u *url.URL) *url.URL {

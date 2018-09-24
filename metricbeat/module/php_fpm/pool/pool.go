@@ -19,25 +19,26 @@ package pool
 
 import (
 	"fmt"
+	"net/url"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-	"net/url"
 )
 
 // init registers the MetricSet with the central registry.
 func init() {
 	mb.Registry.MustAddMetricSet("php_fpm", "pool", New,
- mb.WithHostParser(hostParser),
+		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
 }
 
 const (
-	defaultScheme = "http"
-	defaultPath   = "/status"
+	defaultScheme      = "http"
+	defaultPath        = "/status"
 	defaultQueryParams = "json"
 )
 
@@ -48,7 +49,6 @@ var hostParser = parse.URLHostParserBuilder{
 	QueryParams:   defaultQueryParams,
 	PathConfigKey: "status_path",
 }.Build()
-
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
@@ -67,7 +67,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		base,
 		http,
-	},nil
+	}, nil
 }
 
 // Fetch gathers data for the pool metricset
@@ -77,21 +77,21 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	if err := m.Module().UnpackConfig(&conf); err != nil {
 		return nil, err
 	}
-	t,ok := conf["status_full"]
+	t, ok := conf["status_full"]
 	if ok {
 		l, ok = t.(bool)
-		if ok && l{
+		if ok && l {
 			u, err := url.Parse(m.GetURI())
 			if err != nil {
 				return nil, fmt.Errorf("error parsing URL: %v", err)
 			}
-			u, err = parse.SetQueryParams(u,"full")
-			if err== nil {
+			u, err = parse.SetQueryParams(u, "full")
+			if err == nil {
 				m.SetURI(u.String())
 			}
 		}
 	}
-content, err := m.HTTP.FetchContent()
+	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		return nil, err
 	}
