@@ -30,6 +30,9 @@ import (
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 )
 
+// CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available
+const CCRStatsAPIAvailableVersion = "6.5.0"
+
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id
 var clusterIDCache = map[string]string{}
 
@@ -244,6 +247,12 @@ func PassThruField(fieldPath string, sourceData, targetData common.MapStr) error
 
 	targetData.Put(fieldPath, fieldValue)
 	return nil
+}
+
+// IsCCRStatsAPIAvailable returns whether the CCR stats API is available in the given version
+// of Elasticsearch
+func IsCCRStatsAPIAvailable(currentElasticsearchVersion string) (bool, error) {
+	return elastic.IsFeatureAvailable(currentElasticsearchVersion, CCRStatsAPIAvailableVersion)
 }
 
 // Global cache for license information. Assumption is that license information changes infrequently

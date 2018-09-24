@@ -51,6 +51,8 @@ It also supports the options described in <<module-http-config-options>>.
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-elasticsearch-ccr,ccr>>
+
 * <<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>>
 
 * <<metricbeat-metricset-elasticsearch-index,index>>
@@ -68,6 +70,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>
 
 * <<metricbeat-metricset-elasticsearch-shard,shard>>
+
+include::elasticsearch/ccr.asciidoc[]
 
 include::elasticsearch/cluster_stats.asciidoc[]
 
