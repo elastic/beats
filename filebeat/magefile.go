@@ -83,7 +83,7 @@ func Package() {
 	mage.UseElasticBeatPackaging()
 	customizePackaging()
 
-	mg.Deps(Update, prepareModulePackaging)
+	mg.Deps(Update, prepareModulePackagingOSS, prepareModulePackagingXPack)
 	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
@@ -122,7 +122,9 @@ func GoTestIntegration(ctx context.Context) error {
 // - Include modules directory in packages (minus _meta and test files).
 // - Include modules.d directory in packages.
 
-var modulesDirGenerated = filepath.Clean("build/packaging/modules")
+var modulesDirGeneratedOSS = filepath.Clean("build/packaging/modules-oss")
+var modulesDirGeneratedXPack = filepath.Clean("build/packaging/modules-x-pack")
+var modules_D_DirGeneratedXpack = filepath.Clean("build/packaging/modules.d-x-pack")
 
 // customizePackaging modifies the package specs to add the modules and
 // modules.d directory.
@@ -131,45 +133,59 @@ func customizePackaging() {
 		moduleTarget = "module"
 		module       = mage.PackageFile{
 			Mode:   0644,
-			Source: modulesDirGenerated,
+			Source: modulesDirGeneratedOSS,
 		}
-
+		moduleXPack = mage.PackageFile{
+			Mode:   0644,
+			Source: modulesDirGeneratedXPack,
+		}
 		modulesDTarget = "modules.d"
 		modulesD       = mage.PackageFile{
 			Mode:   0644,
 			Source: "modules.d",
 			Config: true,
 		}
+		modulesDXPack = mage.PackageFile{
+			Mode:   0644,
+			Source: modules_D_DirGeneratedXpack,
+			Config: true,
+		}
 	)
 
 	for _, args := range mage.Packages {
+		mods := module
+		modsD := modulesD
+		if args.Spec.License == "Elastic License" {
+			mods = moduleXPack
+			modsD = modulesDXPack
+		}
 		pkgType := args.Types[0]
 		switch pkgType {
 		case mage.TarGz, mage.Zip:
-			args.Spec.Files[moduleTarget] = module
-			args.Spec.Files[modulesDTarget] = modulesD
+			args.Spec.Files[moduleTarget] = mods
+			args.Spec.Files[modulesDTarget] = modsD
 		case mage.Deb, mage.RPM:
-			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
-			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
+			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = mods
+			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modsD
 		case mage.DMG:
-			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}"+moduleTarget] = module
-			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
+			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}"+moduleTarget] = mods
+			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modsD
 		default:
 			panic(errors.Errorf("unhandled package type: %v", pkgType))
 		}
 	}
 }
 
-// prepareModulePackaging copies the module dir to the build dir and excludes
+// prepareModulePackagingOSS copies the module dir to the build dir and excludes
 // _meta and test files so that they are not included in packages.
-func prepareModulePackaging() error {
-	if err := sh.Rm(modulesDirGenerated); err != nil {
+func prepareModulePackagingOSS() error {
+	if err := sh.Rm(modulesDirGeneratedOSS); err != nil {
 		return err
 	}
 
 	copy := &mage.CopyTask{
 		Source:  "module",
-		Dest:    modulesDirGenerated,
+		Dest:    modulesDirGeneratedOSS,
 		Mode:    0644,
 		DirMode: 0755,
 		Exclude: []string{
@@ -178,4 +194,38 @@ func prepareModulePackaging() error {
 		},
 	}
 	return copy.Execute()
+}
+
+// prepareModulePackagingXPack generates modules and modules.d directories
+// for an x-pack distribution, excluding _meta and test files so that they are
+// not included in packages.
+func prepareModulePackagingXPack() error {
+	for _, dir := range []string{modulesDirGeneratedXPack, modules_D_DirGeneratedXpack} {
+		if err := sh.Rm(dir); err != nil {
+			return err
+		}
+	}
+	for _, copyAction := range []struct {
+		src, dst string
+	}{
+		{"module", modulesDirGeneratedXPack},
+		{"../x-pack/filebeat/module", modulesDirGeneratedXPack},
+		{"modules.d", modules_D_DirGeneratedXpack},
+		{"../x-pack/filebeat/modules.d", modules_D_DirGeneratedXpack},
+	} {
+		err := (&mage.CopyTask{
+			Source:  copyAction.src,
+			Dest:    copyAction.dst,
+			Mode:    0644,
+			DirMode: 0755,
+			Exclude: []string{
+				"/_meta",
+				"/test",
+			},
+		}).Execute()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
