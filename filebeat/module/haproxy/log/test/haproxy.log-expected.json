@@ -2,7 +2,7 @@
     {
         "@timestamp": "2018-07-30T09:03:52.726Z", 
         "fileset.module": "haproxy", 
-        "fileset.name": "http", 
+        "fileset.name": "log", 
         "haproxy.backend_name": "docs_microservice", 
         "haproxy.backend_queue": 0, 
         "haproxy.client_ip": "1.2.3.4", 
