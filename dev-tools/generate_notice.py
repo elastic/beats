@@ -79,11 +79,9 @@ def gather_dependencies(vendor_dirs, overrides=None):
                 else:
                     dependencies[lib_path].append(lib)
 
-
             # don't walk down into another vendor dir
             if "vendor" in dirs:
                 dirs.remove("vendor")
-
 
     return dependencies
 
