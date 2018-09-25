@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/generator/fields"
 )
@@ -78,15 +79,29 @@ func main() {
 
 	var fieldsFiles []*fields.YmlFile
 	for _, fieldsFilePath := range beatFieldsPaths {
-		pathToModules := filepath.Join(beatPath, fieldsFilePath)
+		fullPath := filepath.Join(beatPath, fieldsFilePath)
 
-		fieldsFile, err := fields.CollectModuleFiles(pathToModules)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
-			os.Exit(2)
+		isFile := strings.HasSuffix(fullPath, ".yml")
+		if isFile {
+			file, err := fields.NewYmlFile(fullPath, 0)
+
+			if err != nil || file == nil {
+				fmt.Fprintf(os.Stderr, "Cannot collect fields.yml file: %+v\n", err)
+				os.Exit(2)
+			}
+
+			fieldsFiles = append(fieldsFiles, file)
+		} else {
+			// fullPath is a directory
+			files, err := fields.CollectModuleFiles(fullPath)
+
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
+				os.Exit(2)
+			}
+
+			fieldsFiles = append(fieldsFiles, files...)
 		}
-
-		fieldsFiles = append(fieldsFiles, fieldsFile...)
 	}
 
 	err = fields.Generate(esBeatsPath, beatPath, fieldsFiles, output)

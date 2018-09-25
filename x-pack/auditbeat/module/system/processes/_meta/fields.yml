@@ -9,7 +9,7 @@
     description: >
         Process change - `started` or `stopped`.
   - name: processes
-    type: group
+    type: array
     description: >
         List of processes.
     fields:

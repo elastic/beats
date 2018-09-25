@@ -9,7 +9,7 @@
     description: >
         Package change - `installed` or `removed`.
   - name: packages
-    type: group
+    type: array
     description: >
         List of packages.
     fields:
