@@ -7,6 +7,10 @@ import argparse
 import json
 import csv
 import re
+<<<<<<< HEAD
+=======
+import pdb
+>>>>>>> f56598ebf... Correctly report double licensed project and allow to skip file
 import copy
 
 
@@ -77,6 +81,7 @@ def gather_dependencies(vendor_dirs, overrides=None):
                     dependencies[lib_path] = [lib]
                 else:
                     dependencies[lib_path].append(lib)
+
 
             # don't walk down into another vendor dir
             if "vendor" in dirs:
