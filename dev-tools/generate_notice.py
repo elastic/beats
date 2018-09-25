@@ -7,6 +7,7 @@ import argparse
 import json
 import csv
 import re
+import pdb
 import copy
 
 
@@ -83,6 +84,7 @@ def gather_dependencies(vendor_dirs, overrides=None):
             if "vendor" in dirs:
                 dirs.remove("vendor")
 
+
     return dependencies
 
 
@@ -92,15 +94,6 @@ SKIP_FILES = [
     "./vendor/github.com/aws/aws-lambda-go/LICENSE-SUMMARY"
 ]
 
-<<<<<<< HEAD
-# Allow to skip files that could match the `LICENSE` pattern but does not have any license information.
-SKIP_FILES = [
-    # AWS lambda go defines that some part of the code is APLv2 and other on a MIT Modified license.
-    "./vendor/github.com/aws/aws-lambda-go/LICENSE-SUMMARY"
-]
-
-=======
->>>>>>> 5822591c7... bad type
 
 def get_licenses(folder):
     """
