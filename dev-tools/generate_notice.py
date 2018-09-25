@@ -7,6 +7,8 @@ import argparse
 import json
 import csv
 import re
+import pdb
+import copy
 
 
 def read_file(filename):
@@ -59,7 +61,8 @@ def gather_dependencies(vendor_dirs, overrides=None):
                     print("WARNING: No version information found for: {}".format(lib_path))
                     lib = {"path": lib_path}
                 else:
-                    lib = lib_search[0]
+                    lib = copy.deepcopy(lib_search[0])
+
                 lib["license_file"] = os.path.join(root, filename)
 
                 lib["license_contents"] = read_file(lib["license_file"])
@@ -76,9 +79,12 @@ def gather_dependencies(vendor_dirs, overrides=None):
                 else:
                     dependencies[lib_path].append(lib)
 
+
             # don't walk down into another vendor dir
             if "vendor" in dirs:
                 dirs.remove("vendor")
+
+
     return dependencies
 
 
