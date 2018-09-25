@@ -39,6 +39,8 @@ https://github.com/elastic/beats/compare/v6.4.1...6.4[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix incorrect type conversion of average response time in Haproxy dashboards {pull}8404[8404]
+
 *Packetbeat*
 
 *Winlogbeat*
