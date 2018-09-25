@@ -162,6 +162,9 @@ release-manager-snapshot:
 # installed and used for the build.
 .PHONY: release-manager-release
 release-manager-release:
+	# XXX (andrewkroh on 2018-09-25): Clean the project prior to building to
+	# remove any state caused by prior builds of apm-server.
+	git clean -dfx
 	./dev-tools/run_with_go_ver $(MAKE) release
 
 # Installs the mage build tool from the vendor directory.
