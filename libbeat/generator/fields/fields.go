@@ -33,6 +33,8 @@ type YmlFile struct {
 
 func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]*YmlFile, error) {
 	commonFields := []string{
+		// Fields for custom beats
+		filepath.Join(beatPath, "_meta/fields.yml"),
 		filepath.Join(beatPath, "_meta/fields.common.yml"),
 	}
 
