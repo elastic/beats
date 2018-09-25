@@ -7,13 +7,14 @@ package processes
 import (
 	"strconv"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
 	"github.com/elastic/beats/x-pack/auditbeat/module/system/config"
 	"github.com/elastic/go-sysinfo/types"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/process"

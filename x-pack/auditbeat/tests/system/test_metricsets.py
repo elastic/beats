@@ -9,6 +9,7 @@ from auditbeat_xpack import *
 
 COMMON_FIELDS = ["@timestamp", "beat.version", "host.name", "event.module", "event.dataset"]
 
+
 class Test(AuditbeatXPackTest):
 
     def test_metricset_host(self):
@@ -17,7 +18,7 @@ class Test(AuditbeatXPackTest):
         """
 
         fields = ["system.host.uptime", "system.host.ip", "system.host.os.name"]
-        
+
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "host", COMMON_FIELDS + fields, warnings_allowed=True)
 
@@ -27,7 +28,7 @@ class Test(AuditbeatXPackTest):
         """
 
         fields = ["system.packages.packages.package.name"]
-        
+
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "packages", COMMON_FIELDS + fields, warnings_allowed=True)
 
@@ -37,6 +38,6 @@ class Test(AuditbeatXPackTest):
         """
 
         fields = ["system.processes.processes.process.name"]
-        
+
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "processes", COMMON_FIELDS + fields, warnings_allowed=True)

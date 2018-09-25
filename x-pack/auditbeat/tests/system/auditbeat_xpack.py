@@ -3,6 +3,7 @@ import os
 
 from auditbeat import BaseTest as AuditbeatTest
 
+
 class AuditbeatXPackTest(AuditbeatTest):
 
     @classmethod
@@ -12,7 +13,6 @@ class AuditbeatXPackTest(AuditbeatTest):
             os.path.join(os.path.dirname(__file__), "../../"))
 
         super(AuditbeatTest, self).setUpClass()
-
 
     def setUp(self):
         super(AuditbeatTest, self).setUp()
