@@ -142,6 +142,23 @@ func apmIndicesExist(clusterState common.MapStr) (bool, error) {
 	return false, nil
 }
 
+func getClusterMetadataSettings(m *MetricSet) (common.MapStr, error) {
+	filterPaths := []string{"*.cluster.metadata"}
+	clusterSettings, err := elasticsearch.GetClusterSettingsWithDefaults(m.HTTP, m.HTTP.GetURI(), filterPaths)
+	if err != nil {
+		return nil, errors.Wrap(err, "failure to get cluster settings")
+	}
+
+	clusterSettings, err = elasticsearch.MergeClusterSettings(clusterSettings)
+	if err != nil {
+		return nil, errors.Wrap(err, "failure to merge cluster settings")
+	}
+
+	clusterMetadataSettings := common.MapStr{}
+	clusterMetadataSettings.Put("cluster.metadata", clusterSettings)
+	return clusterMetadataSettings, nil
+}
+
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
@@ -205,18 +222,24 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		},
 	}
 
+	clusterSettings, err := getClusterMetadataSettings(m)
+	if err != nil {
+		return err
+	}
+
 	event := mb.Event{}
 	event.RootFields = common.MapStr{
-		"cluster_uuid":  info.ClusterID,
-		"cluster_name":  clusterName,
-		"timestamp":     common.Time(time.Now()),
-		"interval_ms":   m.Module().Config().Period / time.Millisecond,
-		"type":          "cluster_stats",
-		"license":       license,
-		"version":       info.Version.Number,
-		"cluster_stats": clusterStats,
-		"cluster_state": clusterState,
-		"stack_stats":   stackStats,
+		"cluster_uuid":     info.ClusterID,
+		"cluster_name":     clusterName,
+		"timestamp":        common.Time(time.Now()),
+		"interval_ms":      m.Module().Config().Period / time.Millisecond,
+		"type":             "cluster_stats",
+		"license":          license,
+		"version":          info.Version.Number,
+		"cluster_stats":    clusterStats,
+		"cluster_state":    clusterState,
+		"stack_stats":      stackStats,
+		"cluster_settings": clusterSettings,
 	}
 
 	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
