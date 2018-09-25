@@ -84,7 +84,6 @@ def gather_dependencies(vendor_dirs, overrides=None):
             if "vendor" in dirs:
                 dirs.remove("vendor")
 
-
     return dependencies
 
 
