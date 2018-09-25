@@ -58,6 +58,8 @@ https://github.com/elastic/beats/compare/v6.4.1...6.4[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix dropwizard module parsing of metric names. {issue}8365[8365] {pull}6385[8385]
+
 *Packetbeat*
 
 *Winlogbeat*
