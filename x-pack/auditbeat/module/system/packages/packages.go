@@ -336,7 +336,7 @@ func listBrewPackages() ([]cache.Cacheable, error) {
 			scanner := bufio.NewScanner(file)
 			count := 15 // only look into the first few lines of the formula
 			for scanner.Scan() {
-				count -= 1
+				count--
 				if count == 0 {
 					break
 				}
