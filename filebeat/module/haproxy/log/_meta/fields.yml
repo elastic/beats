@@ -40,5 +40,23 @@
       description: raw_request_line is the complete HTTP request line, including the method, request and HTTP version string.
       type: text
   
-
+- name: default
+  description: Default HAProxy log format
+  type: group
+  fields:
+  - name: facility
+    type: text
+    description: One of the 24 standard syslog facilities. Refer to https://cbonte.github.io/haproxy-dconv/1.7/configuration.html#3.1 for more information
+  - name: priority
+    type: long
+    description: Self descriptive
+  - name: frontend_name
+    type: text
+    description: Name of the frontend (or listener) which received and processed the connection
+  - name: mode
+    type: text
+    description: The mode the frontend is operating (TCP or HTTP)
+  - name: logsource
+    type: text
+    description: The HAProxy source of the log
 
