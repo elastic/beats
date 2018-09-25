@@ -54,7 +54,7 @@ type Config struct {
 
 // Reader reads entries from journal(s).
 type Reader struct {
-	j       *sdjournal.Journal
+	journal *sdjournal.Journal
 	config  Config
 	changes chan int
 	done    chan struct{}
@@ -84,7 +84,7 @@ func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *lo
 	}
 
 	r := &Reader{
-		j:       j,
+		journal: j,
 		changes: make(chan int),
 		config:  c,
 		done:    done,
@@ -109,7 +109,7 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 	logger.Debug("New local journal is opened for reading")
 
 	r := &Reader{
-		j:       j,
+		journal: j,
 		changes: make(chan int),
 		config:  c,
 		done:    done,
@@ -123,21 +123,21 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 func (r *Reader) seek(cursor string) {
 	if r.config.Seek == "cursor" {
 		if cursor == "" {
-			r.j.SeekHead()
+			r.journal.SeekHead()
 			r.logger.Debug("Seeking method set to cursor, but no state is saved for reader. Starting to read from the beginning")
 			return
 		}
-		r.j.SeekCursor(cursor)
-		_, err := r.j.Next()
+		r.journal.SeekCursor(cursor)
+		_, err := r.journal.Next()
 		if err != nil {
 			r.logger.Error("Error while seeking to cursor")
 		}
 		r.logger.Debug("Seeked to position defined in cursor")
 	} else if r.config.Seek == "tail" {
-		r.j.SeekTail()
+		r.journal.SeekTail()
 		r.logger.Debug("Tailing the journal file")
 	} else if r.config.Seek == "head" {
-		r.j.SeekHead()
+		r.journal.SeekHead()
 		r.logger.Debug("Reading from the beginning of the journal file")
 	}
 }
@@ -189,20 +189,20 @@ process:
 }
 
 func (r *Reader) readUntilNotNull(entries chan<- *beat.Event) error {
-	n, err := r.j.Next()
+	n, err := r.journal.Next()
 	if err != nil && err != io.EOF {
 		return err
 	}
 
 	for n != 0 {
-		entry, err := r.j.GetEntry()
+		entry, err := r.journal.GetEntry()
 		if err != nil {
 			return err
 		}
 		event := r.toEvent(entry)
 		entries <- event
 
-		n, err = r.j.Next()
+		n, err = r.journal.Next()
 		if err != nil && err != io.EOF {
 			return err
 		}
@@ -238,7 +238,7 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 func (r *Reader) stopOrWait() {
 	select {
 	case <-r.done:
-	case r.changes <- r.j.Wait(100 * time.Millisecond):
+	case r.changes <- r.journal.Wait(100 * time.Millisecond):
 	}
 }
 
@@ -260,5 +260,5 @@ func (r *Reader) wait() {
 
 // Close closes the underlying journal reader.
 func (r *Reader) Close() {
-	r.j.Close()
+	r.journal.Close()
 }
