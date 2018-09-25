@@ -18,37 +18,21 @@
 package pool
 
 import (
-	"fmt"
-	"net/url"
+	"encoding/json"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/php_fpm"
 )
 
 // init registers the MetricSet with the central registry.
 func init() {
 	mb.Registry.MustAddMetricSet("php_fpm", "pool", New,
-		mb.WithHostParser(hostParser),
+		mb.WithHostParser(php_fpm.HostParser),
 		mb.DefaultMetricSet(),
 	)
 }
-
-const (
-	defaultScheme      = "http"
-	defaultPath        = "/status"
-	defaultQueryParams = "json"
-)
-
-// hostParser is used for parsing the configured php-fpm hosts.
-var hostParser = parse.URLHostParserBuilder{
-	DefaultScheme: defaultScheme,
-	DefaultPath:   defaultPath,
-	QueryParams:   defaultQueryParams,
-	PathConfigKey: "status_path",
-}.Build()
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
@@ -71,29 +55,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch gathers data for the pool metricset
-func (m *MetricSet) Fetch() (common.MapStr, error) {
-	conf := map[string]interface{}{}
-	var l bool
-	if err := m.Module().UnpackConfig(&conf); err != nil {
-		return nil, err
-	}
-	t, ok := conf["status_full"]
-	if ok {
-		l, ok = t.(bool)
-		if ok && l {
-			u, err := url.Parse(m.GetURI())
-			if err != nil {
-				return nil, fmt.Errorf("error parsing URL: %v", err)
-			}
-			u, err = parse.SetQueryParams(u, "full")
-			if err == nil {
-				m.SetURI(u.String())
-			}
-		}
-	}
+func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		return nil, err
+		report.Error(err)
+		return
 	}
-	return eventsMapping(content)
+	var stats map[string]interface{}
+	err = json.Unmarshal(content, &stats)
+	if err != nil {
+		report.Error(err)
+		return
+	}
+	event, err := schema.Apply(stats)
+	if err != nil {
+		report.Error(err)
+		return
+	}
+	report.Event(mb.Event{
+		MetricSetFields: event,
+	})
 }

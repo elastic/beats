@@ -50,12 +50,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: php_fpm
-  metricsets: ["pool"]
+  metricsets: ["pool", "process"]
   enabled: true
   period: 10s
   status_path: "/status"
   hosts: ["localhost:8080"]
-  status_full: true
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
@@ -68,5 +67,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-php_fpm-pool,pool>>
 
+* <<metricbeat-metricset-php_fpm-process,process>>
+
 include::php_fpm/pool.asciidoc[]
+
+include::php_fpm/process.asciidoc[]
 
