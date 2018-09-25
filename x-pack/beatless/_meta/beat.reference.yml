@@ -15,6 +15,9 @@ beatless.provider.aws.functions:
 # Accepts events from a cloudwatch log group.
   - name: fn_cloudwatch_logs
     type: cloudwatch_logs
+    # The IAM role that the lambda will take when executing your function.
+    role: iam
+    # List of cloudwatch streams registered to this function.
     triggers:
       - log_group: /aws/lambda/beatless-cloudwatch_logs
         filter_name: myfiltername
