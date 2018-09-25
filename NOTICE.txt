@@ -162,6 +162,20 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 --------------------------------------------------------------------
+Dependency: github.com/aws/aws-sdk-go-v2
+Version: v2.0.0-preview.4
+Revision: ff1a530c31507c97cf5edbee226e604ca08661cc
+License type (autodetected): Apache-2.0
+./vendor/github.com/aws/aws-sdk-go-v2/LICENSE.txt:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE.txt-----
+AWS SDK for Go
+Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved. 
+Copyright 2014-2015 Stripe, Inc.
+
+--------------------------------------------------------------------
 Dependency: github.com/bsm/sarama-cluster
 Revision: 7e67d87a6b3f83fe08c096fd084691bd9dca112f
 License type (autodetected): MIT
@@ -736,6 +750,15 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/go-ini/ini
+Revision: fa25069db393aecc09b71267d0489b357781c860
+License type (autodetected): Apache-2.0
+./vendor/github.com/go-ini/ini/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: github.com/go-ole/go-ole
@@ -1407,6 +1430,15 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/jmespath/go-jmespath
+Revision: c2b33e8439af944379acbdd9c3a5fe0bc44bd8a5
+License type (autodetected): Apache-2.0
+./vendor/github.com/jmespath/go-jmespath/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: github.com/joeshaw/multierror
