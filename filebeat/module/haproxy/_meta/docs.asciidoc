@@ -32,18 +32,18 @@ it can also be configured to read from a file path. See the following example.
 ["source","yaml",subs="attributes"]
 -----
 - module: haproxy
-  http:
+  log:
     enabled: true
     var.paths: ["/var/log/haproxy.log"]
     var.input: "file"
 -----
 
-:fileset_ex: http
+:fileset_ex: log
 
 include::../include/config-option-intro.asciidoc[]
 
 
 [float]
-==== `http` log fileset settings
+==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
