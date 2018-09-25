@@ -7,6 +7,14 @@
       type: group
       description: >
       fields:
+
+        - name: destination_port
+          description: Port of the destination host
+          type: long
+
+        - name: destination_ip
+          description: IP of the destination host
+
         - name: process_name
           description: Name of the process
 
@@ -123,5 +131,4 @@
             - name: retries
               description: retries is the number of connection retries experienced by this session when trying to connect to the server.
               type: long
-      
       

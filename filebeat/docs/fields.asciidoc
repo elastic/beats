@@ -3233,6 +3233,22 @@ haproxy Module
 
 
 
+*`haproxy.destination_port`*::
++
+--
+type: long
+
+Port of the destination host
+
+--
+
+*`haproxy.destination_ip`*::
++
+--
+IP of the destination host
+
+--
+
 *`haproxy.process_name`*::
 +
 --
@@ -3568,6 +3584,57 @@ captured_request_headers is a list of headers captured in the request due to the
 type: text
 
 raw_request_line is the complete HTTP request line, including the method, request and HTTP version string.
+
+--
+
+[float]
+== default fields
+
+Default HAProxy log format
+
+
+*`haproxy.default.facility`*::
++
+--
+type: text
+
+One of the 24 standard syslog facilities. Refer to https://cbonte.github.io/haproxy-dconv/1.7/configuration.html#3.1 for more information
+
+--
+
+*`haproxy.default.priority`*::
++
+--
+type: long
+
+Self descriptive
+
+--
+
+*`haproxy.default.frontend_name`*::
++
+--
+type: text
+
+Name of the frontend (or listener) which received and processed the connection
+
+--
+
+*`haproxy.default.mode`*::
++
+--
+type: text
+
+The mode the frontend is operating (TCP or HTTP)
+
+--
+
+*`haproxy.default.logsource`*::
++
+--
+type: text
+
+The HAProxy source of the log
 
 --
 
