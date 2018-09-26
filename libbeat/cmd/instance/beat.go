@@ -330,7 +330,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer logp.Sync()
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
-	err := b.Init()
+	err := b.InitWithSettings(settings)
 	if err != nil {
 		return err
 	}
@@ -514,21 +514,9 @@ func (b *Beat) handleFlags() error {
 func (b *Beat) configure(settings Settings) error {
 	var err error
 
-	cfg, err := cfgfile.Load("")
+	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
 	if err != nil {
 		return fmt.Errorf("error loading config file: %v", err)
-	}
-
-	// Overrides config defaults for a specific beat.
-	if settings.ConfigOverrides != nil {
-		c, _ := common.NewConfigFrom(map[string]interface{}{})
-		if err := c.Merge(settings.ConfigOverrides); err != nil {
-			return err
-		}
-		if err := c.Merge(cfg); err != nil {
-			return err
-		}
-		cfg = c
 	}
 
 	// We have to initialize the keystore before any unpack or merging the cloud
