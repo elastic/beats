@@ -345,9 +345,6 @@ func (q QueryParams) String() (s string) {
 		}
 	}
 
-	byt, _ := json.MarshalIndent(u, "", "  ")
-	fmt.Println(string(byt), u.Encode())
-
 	return u.Encode()
 }
 
