@@ -2,16 +2,13 @@
   description: Please add description
   type: group
   fields: 
+
   - name: response
     description: Fields related to the HTTP response
     type: group
     fields:
     - name: status_code
       description: status_code is the HTTP status code returned to the client.
-      type: long
-
-    - name: bytes_read
-      description: bytes_read is the total number of bytes transmitted to the client when the log is emitted.
       type: long
 
     - name: captured_cookie
@@ -39,6 +36,18 @@
     - name: raw_request_line
       description: raw_request_line is the complete HTTP request line, including the method, request and HTTP version string.
       type: text
+      
+    - name: time_active_ms
+      description: time_active_ms is the time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+      type: long
+
+    - name: time_wait_without_data_ms
+      description: time_wait_without_data_ms is the total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
+      type: long
+
+    - name: time_wait_ms
+      description: time_wait_ms is the total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+      type: long
   
 - name: default
   description: Default HAProxy log format
@@ -60,3 +69,13 @@
     type: text
     description: The HAProxy source of the log
 
+- name: tcp
+  description: TCP log format
+  type: group
+  fields:
+  - name: processing_time_ms
+    type: long
+    description: Total time in milliseconds elapsed between the accept and the last close
+  - name: connection_waiting_time_ms
+    type: long
+    description: Total time in milliseconds elapsed between the accept and the last close
