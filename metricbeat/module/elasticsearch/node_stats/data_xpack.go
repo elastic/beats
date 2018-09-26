@@ -115,7 +115,7 @@ var (
 					"limit_in_bytes": c.Str("limit_in_bytes"),
 					"usage_in_bytes": c.Str("usage_in_bytes"),
 				}),
-			}),
+			}, c.DictOptional),
 		}),
 		"process": c.Dict("process", s.Schema{
 			"open_file_descriptors": c.Int("open_file_descriptors"),
