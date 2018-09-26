@@ -376,7 +376,7 @@ func newConfig(t testing.TB, moduleConfig interface{}) *common.Config {
 	return config
 }
 
-func Test_QueryParams_String(t *testing.T) {
+func TestModuleConfigQueryParams(t *testing.T) {
 	qp := QueryParams{
 		"stringKey": "value",
 		"intKey":    10,
