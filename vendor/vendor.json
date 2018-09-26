@@ -1376,12 +1376,6 @@
 			"revisionTime": "2014-05-22T04:34:39Z"
 		},
 		{
-			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
-			"path": "github.com/satori/go.uuid",
-			"revision": "5bf94b69c6b68ee1b541973bb8e1144db23a194b",
-			"revisionTime": "2017-03-21T23:07:31Z"
-		},
-		{
 			"checksumSHA1": "wZ7Q/3JyIlVKeYVqRUGh1zuLa9E=",
 			"path": "github.com/shirou/gopsutil",
 			"revision": "4a180b209f5f494e5923cfce81ea30ba23915877",
