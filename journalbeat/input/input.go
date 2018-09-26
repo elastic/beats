@@ -126,6 +126,7 @@ func (i *Input) Run() {
 
 func (i *Input) publishAll(client beat.Client) {
 	out := make(chan *beat.Event)
+	defer close(out)
 
 	var wg sync.WaitGroup
 	merge := func(in chan *beat.Event) {
@@ -144,26 +145,22 @@ func (i *Input) publishAll(client beat.Client) {
 		}(in)
 	}
 
-	// close output channel after all input channels are merged or beats is stopped
-	go func() {
-		wg.Wait()
-		close(out)
-	}()
-
 	// merge channels of readers into a single output channel
 	for _, r := range i.readers {
 		c := r.Follow()
 		merge(c)
 	}
 
+loop:
 	for {
 		select {
 		case <-i.done:
-			return
+			break loop
 		case e := <-out:
 			client.Publish(*e)
 		}
 	}
+	wg.Wait()
 }
 
 // Stop stops all readers of the input.
