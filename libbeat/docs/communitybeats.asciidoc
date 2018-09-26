@@ -64,6 +64,7 @@ https://github.com/PPACI/krakenbeat[krakenbeat]:: Collect information on each tr
 https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus).
 https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Logstash monitoring API (v5 onwards) and indexes them in Elasticsearch.
 https://github.com/yedamao/mcqbeat[mcqbeat]:: Reads the status of queues from memcacheq.
+https://developer.cisco.com/codeexchange/github/repo/CiscoDevNet/merakibeat[merakibeat]:: Collects https://dashboard.meraki.com/api_docs#wireless-health[wireless health] and users https://documentation.meraki.com/MR/Monitoring_and_Reporting/Scanning_API[location analytics] data using Cisco  Meraki APIs.
 https://github.com/scottcrespo/mongobeat[mongobeat]:: Monitors MongoDB instances and can be configured to send multiple document types to Elasticsearch.
 https://github.com/nathan-K-/mqttbeat[mqttbeat]:: Add messages from mqtt topics to Elasticsearch.
 https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and send results to Elasticsearch.
