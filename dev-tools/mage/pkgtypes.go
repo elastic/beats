@@ -646,6 +646,9 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 	if spec.URL != "" {
 		args = append(args, "--url", spec.URL)
 	}
+	if spec.localPreInstallScript != "" {
+		args = append(args, "--before-install", spec.localPreInstallScript)
+	}
 	if spec.localPostInstallScript != "" {
 		args = append(args, "--after-install", spec.localPostInstallScript)
 	}
