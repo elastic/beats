@@ -338,12 +338,12 @@
                                     {
                                         "field": "kafka.partition.offset.newest", 
                                         "id": "0dcb8021-8e6d-11e8-bfab-6f29bad3a6f2", 
-                                        "type": "sum"
+                                        "type": "max"
                                     }, 
                                     {
                                         "field": "kafka.consumergroup.offset", 
                                         "id": "4bd11db0-8e6f-11e8-bfab-6f29bad3a6f2", 
-                                        "type": "sum"
+                                        "type": "max"
                                     }, 
                                     {
                                         "id": "e0742d50-8e78-11e8-abb3-cf57ca7a810c", 
