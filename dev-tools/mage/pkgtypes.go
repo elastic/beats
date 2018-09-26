@@ -85,6 +85,8 @@ type PackageSpec struct {
 	Description       string                 `yaml:"description,omitempty"`
 	PreInstallScript  string                 `yaml:"pre_install_script,omitempty"`
 	PostInstallScript string                 `yaml:"post_install_script,omitempty"`
+	User              string                 `yaml:"user,omitempty"`  // Ownership for all files in the package (deb and rpm only).
+	Group             string                 `yaml:"group,omitempty"` // Ownership for all files in the package (deb and rpm only).
 	Files             map[string]PackageFile `yaml:"files"`
 	OutputFile        string                 `yaml:"output_file,omitempty"` // Optional
 	ExtraVars         map[string]string      `yaml:"extra_vars,omitempty"`  // Optional
@@ -645,6 +647,14 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 	}
 	if spec.URL != "" {
 		args = append(args, "--url", spec.URL)
+	}
+	if spec.User != "" {
+		args = append(args, "--rpm-user", spec.User)
+		args = append(args, "--deb-user", spec.User)
+	}
+	if spec.Group != "" {
+		args = append(args, "--rpm-group", spec.Group)
+		args = append(args, "--deb-group", spec.Group)
 	}
 	if spec.localPreInstallScript != "" {
 		args = append(args, "--before-install", spec.localPreInstallScript)
