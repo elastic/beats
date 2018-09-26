@@ -320,7 +320,7 @@ var (
 // BeatQualifiedVersion returns the Beat's qualified version.  The value can be overwritten by
 // setting BEAT_VERSION_QUALIFIER in the environment.
 func BeatQualifiedVersion() (string, error) {
-	version, err := BeatVersion()
+	version, err := beatVersion()
 	if err != nil {
 		return "", err
 	}
@@ -333,7 +333,7 @@ func BeatQualifiedVersion() (string, error) {
 
 // BeatVersion returns the Beat's version. The value can be overridden by
 // setting BEAT_VERSION in the environment.
-func BeatVersion() (string, error) {
+func beatVersion() (string, error) {
 	beatVersionOnce.Do(func() {
 		beatVersionValue = os.Getenv("BEAT_VERSION")
 		if beatVersionValue != "" {

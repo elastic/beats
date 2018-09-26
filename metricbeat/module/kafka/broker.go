@@ -29,7 +29,13 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/kafka"
 )
+
+// Version returns a kafka version from its string representation
+func Version(version string) kafka.Version {
+	return kafka.Version(version)
+}
 
 // Broker provides functionality for communicating with a single kafka broker
 type Broker struct {
@@ -50,7 +56,7 @@ type BrokerSettings struct {
 	Backoff                  time.Duration
 	TLS                      *tls.Config
 	Username, Password       string
-	Version                  Version
+	Version                  kafka.Version
 }
 
 type GroupDescription struct {
@@ -83,7 +89,7 @@ func NewBroker(host string, settings BrokerSettings) *Broker {
 		cfg.Net.SASL.User = user
 		cfg.Net.SASL.Password = settings.Password
 	}
-	cfg.Version = settings.Version.get()
+	cfg.Version, _ = settings.Version.Get()
 
 	return &Broker{
 		broker:  sarama.NewBroker(host),

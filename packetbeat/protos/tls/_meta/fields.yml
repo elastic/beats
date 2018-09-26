@@ -197,6 +197,21 @@
                   type: keyword
                   description: Name or host name identified by the certificate.
 
+            - name: fingerprint
+              type: group
+              fields:
+              - name: md5
+                type: keyword
+                description: Certificate's MD5 fingerprint.
+
+              - name: sha1
+                type: keyword
+                description: Certificate's SHA-1 fingerprint.
+
+              - name: sha256
+                type: keyword
+                description: Certificate's SHA-256 fingerprint.
+
 
         - name: server_certificate
           type: group
@@ -289,6 +304,21 @@
                 - name: common_name
                   type: keyword
                   description: Name or host name identified by the certificate.
+
+            - name: fingerprint
+              type: group
+              fields:
+              - name: md5
+                type: keyword
+                description: Certificate's MD5 fingerprint.
+
+              - name: sha1
+                type: keyword
+                description: Certificate's SHA-1 fingerprint.
+
+              - name: sha256
+                type: keyword
+                description: Certificate's SHA-256 fingerprint.
 
         - name: server_certificate_chain
           type: array

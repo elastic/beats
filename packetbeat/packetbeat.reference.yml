@@ -446,6 +446,10 @@ packetbeat.protocols:
   # the TLS protocol by commenting out the list of ports.
   ports: [443]
 
+  # List of hash algorithms to use to calculate certificates' fingerprints.
+  # Valid values are `sha1`, `sha256` and `md5`.
+  #fingerprints: [sha1]
+
   # If this option is enabled, the client and server certificates and
   # certificate chains are sent to Elasticsearch. The default is true.
   #send_certificates: true
@@ -601,8 +605,8 @@ packetbeat.protocols:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, and
-# add_cloud_metadata.
+# The supported processors are drop_fields, drop_event, include_fields, 
+# decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
 # contain CPU load percentages, but remove the fields that contain CPU ticks
@@ -690,6 +694,17 @@ packetbeat.protocols:
 #- add_process_metadata:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
+#
+# The following example decodes fields containing JSON strings 
+# and replaces the strings with valid JSON objects.
+#
+#processors:
+#- decode_json_fields:
+#    fields: ["field1", "field2", ...]
+#    process_array: false
+#    max_depth: 1
+#    target: ""
+#    overwrite_keys: false
 
 #============================= Elastic Cloud ==================================
 

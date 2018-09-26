@@ -108,7 +108,7 @@ func Load(
 		return nil, err
 	}
 
-	log.Info("Beat name: %s", name)
+	log.Infof("Beat name: %s", name)
 	return p, err
 }
 

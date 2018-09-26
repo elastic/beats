@@ -18,19 +18,15 @@
 package monitors
 
 import (
-	"fmt"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type PluginDisabledError struct{}
+// ErrPluginDisabled is returned when the monitor plugin is marked as disabled.
+var ErrPluginDisabled = errors.New("Monitor not loaded, plugin is disabled")
 
-func (e PluginDisabledError) Error() string {
-	return fmt.Sprintf("Monitor not loaded, plugin is disabled")
-}
-
+// MonitorPluginInfo represents the generic configuration options around a monitor plugin.
 type MonitorPluginInfo struct {
 	Type    string `config:"type" validate:"required"`
 	Enabled bool   `config:"enabled"`
@@ -44,7 +40,7 @@ func pluginInfo(config *common.Config) (MonitorPluginInfo, error) {
 	}
 
 	if !mpi.Enabled {
-		return mpi, PluginDisabledError{}
+		return mpi, ErrPluginDisabled
 	}
 
 	return mpi, nil
