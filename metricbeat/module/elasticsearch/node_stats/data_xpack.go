@@ -144,41 +144,13 @@ var (
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"bulk": c.Dict("bulk", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"generic": c.Dict("generic", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"get": c.Dict("get", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"index": c.Dict("index", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"management": c.Dict("management", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"search": c.Dict("search", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"watcher": c.Dict("watcher", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
+			"analyze":    c.Dict("analyze", threadPoolStatsSchema),
+			"write":      c.Dict("write", threadPoolStatsSchema),
+			"generic":    c.Dict("generic", threadPoolStatsSchema),
+			"get":        c.Dict("get", threadPoolStatsSchema),
+			"management": c.Dict("management", threadPoolStatsSchema),
+			"search":     c.Dict("search", threadPoolStatsSchema),
+			"watcher":    c.Dict("watcher", threadPoolStatsSchema),
 		}),
 		"fs": c.Dict("fs", s.Schema{
 			"summary": c.Dict("total", s.Schema{
@@ -187,6 +159,12 @@ var (
 				"available_in_bytes": c.Int("available_in_bytes"),
 			}),
 		}),
+	}
+
+	threadPoolStatsSchema = s.Schema{
+		"threads":  c.Int("threads"),
+		"queue":    c.Int("queue"),
+		"rejected": c.Int("rejected"),
 	}
 )
 
