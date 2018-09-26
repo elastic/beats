@@ -209,7 +209,7 @@
                             "id": "5", 
                             "params": {
                                 "customLabel": "Number of Leader Partitions", 
-                                "field": "kafka.partition_id"
+                                "field": "kafka.partition.partition.id"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -574,7 +574,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "metricbeat-*", 
-                                    "key": "kafka.topic", 
+                                    "key": "kafka.topic.name", 
                                     "negate": true, 
                                     "params": {
                                         "query": "__consumer_offsets", 
@@ -585,7 +585,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "kafka.topic": {
+                                        "kafka.topic.name": {
                                             "query": "__consumer_offsets", 
                                             "type": "phrase"
                                         }
@@ -619,7 +619,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Topic Name", 
-                                "field": "kafka.topic", 
+                                "field": "kafka.topic.name", 
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
@@ -636,7 +636,7 @@
                             "id": "4", 
                             "params": {
                                 "customLabel": "Number of Brokers", 
-                                "field": "kafka.broker_id"
+                                "field": "kafka.broker.id"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -718,7 +718,7 @@
                         "axis_max": "1", 
                         "axis_min": "-1", 
                         "axis_position": "right", 
-                        "filter": "NOT kafka.topic:__consumer_offsets", 
+                        "filter": "NOT kafka.topic.name:__consumer_offsets", 
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "index_pattern": "metricbeat-*", 
                         "interval": "auto", 
@@ -795,7 +795,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "metricbeat-*", 
-                                    "key": "kafka.topic", 
+                                    "key": "kafka.topic.name", 
                                     "negate": true, 
                                     "params": {
                                         "query": "__consumer_offsets", 
@@ -806,7 +806,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "kafka.topic": {
+                                        "kafka.topic.name": {
                                             "query": "__consumer_offsets", 
                                             "type": "phrase"
                                         }
@@ -889,7 +889,7 @@
                         "axis_formatter": "number", 
                         "axis_position": "left", 
                         "drop_last_bucket": 0, 
-                        "filter": "((metricset.name: partition AND kafka.leader_partition: true) OR metricset.name: consumergroup) AND NOT kafka.topic:__consumer_offsets", 
+                        "filter": "((metricset.name: partition AND kafka.partition.partition.is_leader: true) OR metricset.name: consumergroup) AND NOT kafka.topic.name:__consumer_offsets", 
                         "gauge_color_rules": [
                             {
                                 "gauge": "rgba(244,78,59,0.5)", 
@@ -956,7 +956,7 @@
                                 "split_color_mode": "rainbow", 
                                 "split_mode": "terms", 
                                 "stacked": "none", 
-                                "terms_field": "kafka.topic"
+                                "terms_field": "kafka.topic.name"
                             }
                         ], 
                         "show_grid": 1, 
