@@ -19,7 +19,7 @@
                                 "id": "8b27e6a0-8e61-11e8-b741-c3e458b74a68"
                             }
                         ], 
-                        "filter": "NOT kafka.topic:__consumer_offsets", 
+                        "filter": "NOT kafka.topic.name:__consumer_offsets", 
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "index_pattern": "metricbeat-*", 
                         "interval": "auto", 
@@ -29,7 +29,7 @@
                                 "chart_type": "bar", 
                                 "color": "rgba(244,78,59,1)", 
                                 "fill": "0.1", 
-                                "filter": "metricset.name: partition AND kafka.leader_partition: true", 
+                                "filter": "metricset.name: partition AND kafka.partition.partition.is_leader: true", 
                                 "formatter": "number", 
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
                                 "label": "Topic Offsets", 
@@ -46,7 +46,7 @@
                                 "split_color_mode": "rainbow", 
                                 "split_mode": "terms", 
                                 "stacked": "none", 
-                                "terms_field": "kafka.topic", 
+                                "terms_field": "kafka.topic.name", 
                                 "terms_order_by": "_term", 
                                 "value_template": "topic - {{value}}"
                             }, 
@@ -137,7 +137,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "metricbeat-*", 
-                                    "key": "kafka.topic", 
+                                    "key": "kafka.topic.name", 
                                     "negate": true, 
                                     "params": {
                                         "query": "__consumer_offsets", 
@@ -148,7 +148,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "kafka.topic": {
+                                        "kafka.topic.name": {
                                             "query": "__consumer_offsets", 
                                             "type": "phrase"
                                         }
@@ -182,7 +182,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Broker Id", 
-                                "field": "kafka.broker_id", 
+                                "field": "kafka.broker.id", 
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
@@ -199,7 +199,7 @@
                             "id": "4", 
                             "params": {
                                 "customLabel": "Number of Topics", 
-                                "field": "kafka.topic"
+                                "field": "kafka.topic.name"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -279,7 +279,7 @@
                     "params": {
                         "controls": [
                             {
-                                "fieldName": "kafka.topic", 
+                                "fieldName": "kafka.topic.name", 
                                 "id": "1532342651170", 
                                 "indexPattern": "metricbeat-*", 
                                 "label": "Topic Name", 
@@ -320,7 +320,7 @@
                     "params": {
                         "axis_formatter": "number", 
                         "axis_position": "left", 
-                        "filter": "((metricset.name: partition AND kafka.leader_partition: true) OR metricset.name: consumergroup) AND NOT kafka.topic:__consumer_offsets", 
+                        "filter": "((metricset.name: partition AND kafka.partition.partition.is_leader: true) OR metricset.name: consumergroup) AND NOT kafka.topic.name:__consumer_offsets", 
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "index_pattern": "metricbeat-*", 
                         "interval": "auto", 
@@ -368,7 +368,7 @@
                                 "split_color_mode": "rainbow", 
                                 "split_mode": "terms", 
                                 "stacked": "none", 
-                                "terms_field": "kafka.topic"
+                                "terms_field": "kafka.topic.name"
                             }
                         ], 
                         "show_grid": 1, 
@@ -425,7 +425,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "metricbeat-*", 
-                                    "key": "kafka.topic", 
+                                    "key": "kafka.topic.name", 
                                     "negate": true, 
                                     "params": {
                                         "query": "__consumer_offsets", 
@@ -436,7 +436,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "kafka.topic": {
+                                        "kafka.topic.name": {
                                             "query": "__consumer_offsets", 
                                             "type": "phrase"
                                         }
@@ -461,7 +461,7 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "Topics", 
-                                "field": "kafka.topic"
+                                "field": "kafka.topic.name"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
