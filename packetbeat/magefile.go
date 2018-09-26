@@ -160,6 +160,7 @@ var libpcapLDFLAGS = map[string]string{
 var libpcapCFLAGS = map[string]string{
 	"linux/386":      linuxPcapCFLAGS,
 	"linux/amd64":    linuxPcapCFLAGS,
+	"linux/arm64":    linuxPcapCFLAGS,
 	"linux/armv5":    linuxPcapCFLAGS,
 	"linux/armv6":    linuxPcapCFLAGS,
 	"linux/armv7":    linuxPcapCFLAGS,
@@ -174,8 +175,8 @@ var libpcapCFLAGS = map[string]string{
 }
 
 var crossBuildDeps = map[string]func() error{
-	"linux/amd64":    buildLibpcapLinuxAMD64,
 	"linux/386":      buildLibpcapLinux386,
+	"linux/amd64":    buildLibpcapLinuxAMD64,
 	"linux/arm64":    buildLibpcapLinuxARM64,
 	"linux/armv5":    buildLibpcapLinuxARMv5,
 	"linux/armv6":    buildLibpcapLinuxARMv6,
