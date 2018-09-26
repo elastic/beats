@@ -7,21 +7,23 @@
         "name": "process"
     },
     "php_fpm": {
+        "pool": {
+            "name": "www"
+        },
         "process": {
-            "pid": 6,
-            "start_since": 4985,
-            "content_length": 0,
-            "script": "-",
-            "last_request_memory": 0,
-            "request_duration": 900,
-            "start_time": 1537890302,
-            "request_uri": "/status?full=&json=",
-            "pool_name": "www",
-            "state": "Running",
             "last_request_cpu": 0,
-            "requests": 23,
+            "last_request_memory": 2097152,
+            "request_duration": 1404,
+            "script": "-",
+            "pid": 6,
+            "start_time": 1537974596,
+            "user": "-",
+            "state": "Idle",
+            "start_since": 3946,
+            "requests": 28,
             "request_method": "GET",
-            "user": "-"
+            "request_uri": "/status?json=",
+            "content_length": 0
         }
     },
     "beat": {

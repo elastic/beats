@@ -56,7 +56,6 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 	//remapping process details to match the naming format
 	for _, process := range status.Processes {
 		proc := common.MapStr{
-			"pool_name":           status.Name,
 			"pid":                 process.PID,
 			"state":               process.State,
 			"start_time":          process.StartTime,
@@ -71,8 +70,9 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 			"last_request_cpu":    process.LastRequestCPU,
 			"last_request_memory": process.LastRequestMemory,
 		}
-		r.Event(mb.Event{
-			MetricSetFields: proc,
-		})
+		event := mb.Event{MetricSetFields: proc}
+		event.ModuleFields = common.MapStr{}
+		event.ModuleFields.Put("pool.name", status.Name)
+		r.Event(event)
 	}
 }

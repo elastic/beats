@@ -18,7 +18,7 @@
 package php_fpm
 
 import (
-"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 )
 
 const (
@@ -27,13 +27,12 @@ const (
 	defaultQueryParams = "json"
 )
 
-
 var (
-// HostParser is used for parsing the configured php-fpm hosts.
-    HostParser = parse.URLHostParserBuilder{
-	DefaultScheme: defaultScheme,
-	DefaultPath:   defaultPath,
-	QueryParams:   defaultQueryParams,
-	PathConfigKey: "status_path",
-}.Build()
+	// HostParser is used for parsing the configured php-fpm hosts.
+	HostParser = parse.URLHostParserBuilder{
+		DefaultScheme: defaultScheme,
+		DefaultPath:   defaultPath,
+		QueryParams:   defaultQueryParams,
+		PathConfigKey: "status_path",
+	}.Build()
 )

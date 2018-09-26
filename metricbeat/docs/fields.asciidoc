@@ -14321,6 +14321,13 @@ The name of the pool.
 
 --
 
+[float]
+== pool fields
+
+`pool` contains the metrics that were obtained from the PHP-FPM process pool.
+
+
+
 *`php_fpm.pool.process_manager`*::
 +
 --
@@ -14473,16 +14480,6 @@ The date and time FPM has started.
 process contains the metrics that were obtained from the PHP-FPM process.
 
 
-
-*`php_fpm.process.pool_name`*::
-+
---
-type: keyword
-
-The name of the pool.
-
-
---
 
 *`php_fpm.process.pid`*::
 +
