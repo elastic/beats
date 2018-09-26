@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	bc "github.com/elastic/beats/x-pack/beatless/config"
 	"github.com/elastic/beats/x-pack/beatless/core/bundle"
 	"github.com/elastic/beats/x-pack/beatless/provider"
 )
@@ -49,7 +50,7 @@ type CLIManager struct {
 func (c *CLIManager) rawYaml() ([]byte, error) {
 	// Load the configuration file from disk with all the settings,
 	// the function takes care of using -c.
-	rawConfig, err := cfgfile.Load("")
+	rawConfig, err := cfgfile.Load("", bc.ConfigOverrides)
 	if err != nil {
 		return nil, err
 	}

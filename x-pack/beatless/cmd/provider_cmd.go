@@ -22,7 +22,9 @@ func handler() (*cliHandler, error) {
 		return nil, err
 	}
 
-	if err = b.Init(); err != nil {
+	if err = b.InitWithSettings(instance.Settings{
+		ConfigOverrides: config.ConfigOverrides,
+	}); err != nil {
 		return nil, err
 	}
 
