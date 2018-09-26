@@ -19,6 +19,8 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 *Filebeat*
 
+- Keep original messages in case of Filebeat modules. {pull}8448[8448]
+
 *Heartbeat*
 
 *Metricbeat*
