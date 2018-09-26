@@ -163,47 +163,32 @@ func IntervalLogIndex(filename string) (uint64, int, error) {
 }
 
 func newSecond(lastTime time.Time, currentTime time.Time) bool {
-	return currentTime.Second() != lastTime.Second() ||
-		currentTime.Minute() != lastTime.Minute() ||
-		currentTime.Hour() != lastTime.Hour() ||
-		currentTime.Day() != lastTime.Day() ||
-		currentTime.Month() != lastTime.Month() ||
-		currentTime.Year() != lastTime.Year()
+	return lastTime.Second() != currentTime.Second() || newMinute(lastTime, currentTime)
 }
 
 func newMinute(lastTime time.Time, currentTime time.Time) bool {
-	return currentTime.Minute() != lastTime.Minute() ||
-		currentTime.Hour() != lastTime.Hour() ||
-		currentTime.Day() != lastTime.Day() ||
-		currentTime.Month() != lastTime.Month() ||
-		currentTime.Year() != lastTime.Year()
+	return lastTime.Minute() != currentTime.Minute() || newHour(lastTime, currentTime)
 }
 
 func newHour(lastTime time.Time, currentTime time.Time) bool {
-	return currentTime.Hour() != lastTime.Hour() ||
-		currentTime.Day() != lastTime.Day() ||
-		currentTime.Month() != lastTime.Month() ||
-		currentTime.Year() != lastTime.Year()
+	return lastTime.Hour() != currentTime.Hour() || newDay(lastTime, currentTime)
 }
 
 func newDay(lastTime time.Time, currentTime time.Time) bool {
-	return currentTime.Day() != lastTime.Day() ||
-		currentTime.Month() != lastTime.Month() ||
-		currentTime.Year() != lastTime.Year()
+	return lastTime.Day() != currentTime.Day() || newMonth(lastTime, currentTime)
 }
 
 func newWeek(lastTime time.Time, currentTime time.Time) bool {
 	lastYear, lastWeek := lastTime.ISOWeek()
 	currentYear, currentWeek := currentTime.ISOWeek()
-	return currentWeek != lastWeek ||
-		currentYear != lastYear
+	return lastWeek != currentWeek ||
+		lastYear != currentYear
 }
 
 func newMonth(lastTime time.Time, currentTime time.Time) bool {
-	return currentTime.Month() != lastTime.Month() ||
-		currentTime.Year() != lastTime.Year()
+	return lastTime.Month() != currentTime.Month() || newYear(lastTime, currentTime)
 }
 
 func newYear(lastTime time.Time, currentTime time.Time) bool {
-	return currentTime.Year() != lastTime.Year()
+	return lastTime.Year() != currentTime.Year()
 }
