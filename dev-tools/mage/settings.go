@@ -62,6 +62,7 @@ var (
 	BeatVendor      = EnvOr("BEAT_VENDOR", "Elastic")
 	BeatLicense     = EnvOr("BEAT_LICENSE", "ASL 2.0")
 	BeatURL         = EnvOr("BEAT_URL", "https://www.elastic.co/products/beats/"+BeatName)
+	BeatUser        = EnvOr("BEAT_USER", "root")
 
 	Snapshot bool
 
@@ -134,6 +135,7 @@ func varMap(args ...map[string]interface{}) map[string]interface{} {
 		"BeatVendor":      BeatVendor,
 		"BeatLicense":     BeatLicense,
 		"BeatURL":         BeatURL,
+		"BeatUser":        BeatUser,
 		"Snapshot":        Snapshot,
 		"Qualifier":       versionQualifier,
 	}
@@ -163,6 +165,7 @@ BeatDescription  = {{.BeatDescription}}
 BeatVendor       = {{.BeatVendor}}
 BeatLicense      = {{.BeatLicense}}
 BeatURL          = {{.BeatURL}}
+BeatUser         = {{.BeatUser}}
 VersionQualifier = {{.Qualifier}}
 
 ## Functions
