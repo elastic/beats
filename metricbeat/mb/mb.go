@@ -22,7 +22,6 @@ to implement Modules and their associated MetricSets.
 package mb
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"time"
