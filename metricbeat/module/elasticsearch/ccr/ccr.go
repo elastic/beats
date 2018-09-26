@@ -87,7 +87,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	if !isCCRStatsAPIAvailable {
 		const errorMsg = "the %v metricset is only supported with Elasticsearch >= %v. " +
 			"You are currently running Elasticsearch %v"
-		err := fmt.Errorf(errorMsg, elasticsearch.CCRStatsAPIAvailableVersion, elasticsearchVersion)
+		err := fmt.Errorf(errorMsg, m.FullyQualifiedName(), elasticsearch.CCRStatsAPIAvailableVersion, elasticsearchVersion)
 		r.Error(err)
 		m.Log.Error(err)
 		return
