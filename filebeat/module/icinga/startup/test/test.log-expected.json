@@ -7,6 +7,7 @@
         "icinga.startup.message": "Icinga application loader (version: r2.6.3-1)", 
         "icinga.startup.severity": "information", 
         "input.type": "log", 
+        "log.message": "information/cli: Icinga application loader (version: r2.6.3-1)", 
         "offset": 0, 
         "prospector.type": "log"
     }, 
@@ -18,6 +19,7 @@
         "icinga.startup.message": "Loading configuration file(s).", 
         "icinga.startup.severity": "information", 
         "input.type": "log", 
+        "log.message": "information/cli: Loading configuration file(s).", 
         "offset": 63, 
         "prospector.type": "log"
     }

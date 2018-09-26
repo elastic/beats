@@ -20,6 +20,7 @@ package channel
 import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
@@ -43,6 +44,9 @@ type clientEventer struct {
 // inputOutletConfig defines common input settings
 // for the publisher pipeline.
 type inputOutletConfig struct {
+	// KeepOriginalMsg determines if the original message needs to be kept for a module.
+	KeepOriginalMsg bool `config:"keep_original_message"`
+
 	// event processing
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 	Processors           processors.PluginConfig `config:"processors"`
@@ -57,6 +61,10 @@ type inputOutletConfig struct {
 	// Output meta data settings
 	Pipeline string `config:"pipeline"` // ES Ingest pipeline name
 
+}
+
+var defaultConfig = inputOutletConfig{
+	KeepOriginalMsg: true,
 }
 
 // NewOutletFactory creates a new outlet factory for
@@ -82,7 +90,7 @@ func NewOutletFactory(
 // This guarantees ordering between events as required by the registrar for
 // file.State updates
 func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *common.MapStrPointer) (Outleter, error) {
-	config := inputOutletConfig{}
+	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
@@ -101,6 +109,7 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 	meta := common.MapStr{}
 	setMeta(meta, "pipeline", config.Pipeline)
 
+	keepOriginal := false
 	fields := common.MapStr{}
 	setMeta(fields, "module", config.Module)
 	setMeta(fields, "name", config.Fileset)
@@ -108,6 +117,8 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 		fields = common.MapStr{
 			"fileset": fields,
 		}
+		keepOriginal = config.KeepOriginalMsg
+
 	}
 	if config.Type != "" {
 		fields["prospector"] = common.MapStr{
@@ -119,13 +130,14 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 	}
 
 	client, err := p.ConnectWith(beat.ClientConfig{
-		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: config.EventMetadata,
-		DynamicFields: dynFields,
-		Meta:          meta,
-		Fields:        fields,
-		Processor:     processors,
-		Events:        f.eventer,
+		PublishMode:     beat.GuaranteedSend,
+		EventMetadata:   config.EventMetadata,
+		DynamicFields:   dynFields,
+		Meta:            meta,
+		Fields:          fields,
+		KeepOriginalMsg: keepOriginal,
+		Processor:       processors,
+		Events:          f.eventer,
 	})
 	if err != nil {
 		return nil, err

@@ -14,6 +14,7 @@
         "iis.error.server_port": "80", 
         "iis.error.url": "/qos/1kbfile.txt", 
         "input.type": "log", 
+        "log.message": "2018-01-01 08:09:10 172.31.77.6 2094 172.31.77.6 80 HTTP/1.1 GET /qos/1kbfile.txt 503 - ConnLimit -", 
         "offset": 186, 
         "prospector.type": "log"
     }, 
@@ -39,6 +40,7 @@
         "iis.error.server_port": "80", 
         "iis.error.url": "/ThisIsMyUrl.htm", 
         "input.type": "log", 
+        "log.message": "2018-01-01 09:10:11 85.181.35.98 2780 127.0.0.1 80 HTTP/1.1 GET /ThisIsMyUrl.htm 400 - Hostname -", 
         "offset": 286, 
         "prospector.type": "log"
     }, 
@@ -64,6 +66,7 @@
         "iis.error.server_port": "80", 
         "iis.error.url": "/", 
         "input.type": "log", 
+        "log.message": "2018-01-01 10:11:12 85.181.35.98 2894 127.0.0.1 80 HTTP/2.0 GET / 505 - Version_N/S -", 
         "offset": 384, 
         "prospector.type": "log"
     }, 
@@ -85,6 +88,7 @@
         "iis.error.server_ip": "127.0.0.1", 
         "iis.error.server_port": "80", 
         "input.type": "log", 
+        "log.message": "2018-01-01 11:12:13 85.181.35.98 64388 127.0.0.1 80 - - - - - Timer_MinBytesPerSecond -", 
         "offset": 470, 
         "prospector.type": "log"
     }

@@ -10,6 +10,9 @@
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+      #Keeps the original message, so the data can be processed again on Ingest Node
+      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #keep_original_message: true
 
   # Debug logs
   #debug:
@@ -22,6 +25,9 @@
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+      #Keeps the original message, so the data can be processed again on Ingest Node
+      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #keep_original_message: true
 
   # Startup logs
   #startup:
@@ -34,3 +40,6 @@
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+      #Keeps the original message, so the data can be processed again on Ingest Node
+      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #keep_original_message: true

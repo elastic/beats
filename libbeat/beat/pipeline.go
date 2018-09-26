@@ -54,6 +54,9 @@ type ClientConfig struct {
 	// DynamicFields provides additional fields to be added to every event, supporting live updates
 	DynamicFields *common.MapStrPointer
 
+	// KeepOriginalMsg determines whether an outgoing event needs to include the original log message.
+	KeepOriginalMsg bool
+
 	// Processors passes additional processor to the client, to be executed before
 	// the pipeline processors.
 	Processor ProcessorList

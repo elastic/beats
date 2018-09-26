@@ -8,6 +8,7 @@
         "kafka.log.component": "controller-event-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Starting", 
+        "log.message": "[2017-08-04 10:48:21,048] INFO [controller-event-thread]: Starting (kafka.controller.ControllerEventManager$ControllerEventThread)", 
         "message": "[2017-08-04 10:48:21,048] INFO [controller-event-thread]: Starting (kafka.controller.ControllerEventManager$ControllerEventThread)", 
         "offset": 0, 
         "prospector.type": "log"
@@ -21,6 +22,7 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "0 successfully elected as the controller", 
+        "log.message": "[2017-08-04 10:48:21,063] INFO [Controller 0]: 0 successfully elected as the controller (kafka.controller.KafkaController)", 
         "message": "[2017-08-04 10:48:21,063] INFO [Controller 0]: 0 successfully elected as the controller (kafka.controller.KafkaController)", 
         "offset": 131, 
         "prospector.type": "log"
@@ -34,6 +36,7 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Broker 0 starting become controller state transition", 
+        "log.message": "[2017-08-04 10:48:21,064] INFO [Controller 0]: Broker 0 starting become controller state transition (kafka.controller.KafkaController)", 
         "message": "[2017-08-04 10:48:21,064] INFO [Controller 0]: Broker 0 starting become controller state transition (kafka.controller.KafkaController)", 
         "offset": 254, 
         "prospector.type": "log"
@@ -47,6 +50,7 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Controller 0 incremented epoch to 1", 
+        "log.message": "[2017-08-04 10:48:21,082] INFO [Controller 0]: Controller 0 incremented epoch to 1 (kafka.controller.KafkaController)", 
         "message": "[2017-08-04 10:48:21,082] INFO [Controller 0]: Controller 0 incremented epoch to 1 (kafka.controller.KafkaController)", 
         "offset": 389, 
         "prospector.type": "log"
@@ -60,6 +64,7 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "DEBUG", 
         "kafka.log.message": "Registering IsrChangeNotificationListener", 
+        "log.message": "[2017-08-04 10:48:21,085] DEBUG [Controller 0]: Registering IsrChangeNotificationListener (kafka.controller.KafkaController)", 
         "message": "[2017-08-04 10:48:21,085] DEBUG [Controller 0]: Registering IsrChangeNotificationListener (kafka.controller.KafkaController)", 
         "offset": 507, 
         "prospector.type": "log"
@@ -73,6 +78,7 @@
         "kafka.log.component": "Replica state machine on controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Started replica state machine with initial state -> Map()", 
+        "log.message": "[2017-08-04 10:48:21,154] INFO [Replica state machine on controller 0]: Started replica state machine with initial state -> Map() (kafka.controller.ReplicaStateMachine)", 
         "message": "[2017-08-04 10:48:21,154] INFO [Replica state machine on controller 0]: Started replica state machine with initial state -> Map() (kafka.controller.ReplicaStateMachine)", 
         "offset": 632, 
         "prospector.type": "log"
@@ -86,6 +92,7 @@
         "kafka.log.component": "Partition state machine on Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Started partition state machine with initial state -> Map()", 
+        "log.message": "[2017-08-04 10:48:21,156] INFO [Partition state machine on Controller 0]: Started partition state machine with initial state -> Map() (kafka.controller.PartitionStateMachine)", 
         "message": "[2017-08-04 10:48:21,156] INFO [Partition state machine on Controller 0]: Started partition state machine with initial state -> Map() (kafka.controller.PartitionStateMachine)", 
         "offset": 801, 
         "prospector.type": "log"
@@ -99,6 +106,7 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Broker 0 is ready to serve as the new controller with epoch 1", 
+        "log.message": "[2017-08-04 10:48:21,157] INFO [Controller 0]: Broker 0 is ready to serve as the new controller with epoch 1 (kafka.controller.KafkaController)", 
         "message": "[2017-08-04 10:48:21,157] INFO [Controller 0]: Broker 0 is ready to serve as the new controller with epoch 1 (kafka.controller.KafkaController)", 
         "offset": 976, 
         "prospector.type": "log"
@@ -112,6 +120,7 @@
         "kafka.log.component": "Partition state machine on Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Invoking state change to OnlinePartition for partitions ", 
+        "log.message": "[2017-08-04 10:48:21,165] INFO [Partition state machine on Controller 0]: Invoking state change to OnlinePartition for partitions  (kafka.controller.PartitionStateMachine)", 
         "message": "[2017-08-04 10:48:21,165] INFO [Partition state machine on Controller 0]: Invoking state change to OnlinePartition for partitions  (kafka.controller.PartitionStateMachine)", 
         "offset": 1120, 
         "prospector.type": "log"
@@ -125,6 +134,7 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "DEBUG", 
         "kafka.log.message": "Live brokers: ", 
+        "log.message": "[2017-08-04 11:44:22,588] DEBUG [Controller 0]: Live brokers:  (kafka.controller.KafkaController)", 
         "message": "[2017-08-04 11:44:22,588] DEBUG [Controller 0]: Live brokers:  (kafka.controller.KafkaController)", 
         "offset": 1292, 
         "prospector.type": "log"
@@ -138,6 +148,7 @@
         "kafka.log.component": "controller-event-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Shutting down", 
+        "log.message": "[2017-08-04 11:44:25,094] INFO [controller-event-thread]: Shutting down (kafka.controller.ControllerEventManager$ControllerEventThread)", 
         "message": "[2017-08-04 11:44:25,094] INFO [controller-event-thread]: Shutting down (kafka.controller.ControllerEventManager$ControllerEventThread)", 
         "offset": 1390, 
         "prospector.type": "log"
@@ -151,6 +162,7 @@
         "kafka.log.component": "controller-event-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Stopped", 
+        "log.message": "[2017-08-04 11:44:25,095] INFO [controller-event-thread]: Stopped (kafka.controller.ControllerEventManager$ControllerEventThread)", 
         "message": "[2017-08-04 11:44:25,095] INFO [controller-event-thread]: Stopped (kafka.controller.ControllerEventManager$ControllerEventThread)", 
         "offset": 1526, 
         "prospector.type": "log"
@@ -164,6 +176,7 @@
         "kafka.log.component": "controller-event-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Shutdown completed", 
+        "log.message": "[2017-08-04 11:44:25,097] INFO [controller-event-thread]: Shutdown completed (kafka.controller.ControllerEventManager$ControllerEventThread)", 
         "message": "[2017-08-04 11:44:25,097] INFO [controller-event-thread]: Shutdown completed (kafka.controller.ControllerEventManager$ControllerEventThread)", 
         "offset": 1656, 
         "prospector.type": "log"
@@ -177,6 +190,7 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "DEBUG", 
         "kafka.log.message": "Controller resigning, broker id 0", 
+        "log.message": "[2017-08-04 11:44:25,099] DEBUG [Controller 0]: Controller resigning, broker id 0 (kafka.controller.KafkaController)", 
         "message": "[2017-08-04 11:44:25,099] DEBUG [Controller 0]: Controller resigning, broker id 0 (kafka.controller.KafkaController)", 
         "offset": 1797, 
         "prospector.type": "log"
@@ -190,6 +204,7 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "DEBUG", 
         "kafka.log.message": "De-registering IsrChangeNotificationListener", 
+        "log.message": "[2017-08-04 11:44:25,100] DEBUG [Controller 0]: De-registering IsrChangeNotificationListener (kafka.controller.KafkaController)", 
         "message": "[2017-08-04 11:44:25,100] DEBUG [Controller 0]: De-registering IsrChangeNotificationListener (kafka.controller.KafkaController)", 
         "offset": 1914, 
         "prospector.type": "log"
@@ -203,6 +218,7 @@
         "kafka.log.component": "Partition state machine on Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Stopped partition state machine", 
+        "log.message": "[2017-08-04 11:44:25,105] INFO [Partition state machine on Controller 0]: Stopped partition state machine (kafka.controller.PartitionStateMachine)", 
         "message": "[2017-08-04 11:44:25,105] INFO [Partition state machine on Controller 0]: Stopped partition state machine (kafka.controller.PartitionStateMachine)", 
         "offset": 2042, 
         "prospector.type": "log"
@@ -216,6 +232,7 @@
         "kafka.log.component": "Replica state machine on controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Stopped replica state machine", 
+        "log.message": "[2017-08-04 11:44:25,111] INFO [Replica state machine on controller 0]: Stopped replica state machine (kafka.controller.ReplicaStateMachine)", 
         "message": "[2017-08-04 11:44:25,111] INFO [Replica state machine on controller 0]: Stopped replica state machine (kafka.controller.ReplicaStateMachine)", 
         "offset": 2189, 
         "prospector.type": "log"
@@ -229,6 +246,7 @@
         "kafka.log.component": "Controller-0-to-broker-0-send-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Shutting down", 
+        "log.message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Shutting down (kafka.controller.RequestSendThread)", 
         "message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Shutting down (kafka.controller.RequestSendThread)", 
         "offset": 2330, 
         "prospector.type": "log"
@@ -242,6 +260,7 @@
         "kafka.log.component": "Controller-0-to-broker-0-send-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Stopped", 
+        "log.message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Stopped (kafka.controller.RequestSendThread)", 
         "message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Stopped (kafka.controller.RequestSendThread)", 
         "offset": 2452, 
         "prospector.type": "log"
@@ -255,6 +274,7 @@
         "kafka.log.component": "Controller-0-to-broker-0-send-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Shutdown completed", 
+        "log.message": "[2017-08-04 11:44:25,113] INFO [Controller-0-to-broker-0-send-thread]: Shutdown completed (kafka.controller.RequestSendThread)", 
         "message": "[2017-08-04 11:44:25,113] INFO [Controller-0-to-broker-0-send-thread]: Shutdown completed (kafka.controller.RequestSendThread)", 
         "offset": 2568, 
         "prospector.type": "log"

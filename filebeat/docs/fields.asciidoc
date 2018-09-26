@@ -3044,6 +3044,18 @@ This field contains the flags of the event.
 
 --
 
+*`log.message`*::
++
+--
+type: keyword
+
+The unprocessed original log message. This can be used for reprocessing logs.
+
+
+Field is not indexed.
+
+--
+
 *`event.created`*::
 +
 --

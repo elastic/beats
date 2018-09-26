@@ -82,6 +82,10 @@ func newProcessorPipeline(
 		processors.add(clientEventMeta(m, needsCopy))
 	}
 
+	if config.KeepOriginalMsg {
+		processors.add(keepOriginalMsgProcessor)
+	}
+
 	// setup 4, 5: pipeline tags + client tags
 	var tags []string
 	tags = append(tags, global.tags...)
@@ -215,6 +219,17 @@ var generalizeProcessor = newProcessor("generalizeEvent", func(event *beat.Event
 
 var dropDisabledProcessor = newProcessor("dropDisabled", func(event *beat.Event) (*beat.Event, error) {
 	return nil, nil
+})
+
+var keepOriginalMsgProcessor = newProcessor("keepOriginalMsgEvent", func(event *beat.Event) (*beat.Event, error) {
+	// skip event if there is no message
+	original, ok := event.Fields["message"]
+	if !ok {
+		return event, nil
+	}
+
+	event.PutValue("log.message", original)
+	return event, nil
 })
 
 func beatAnnotateProcessor(beatMeta common.MapStr) *processorFn {

@@ -30,6 +30,7 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
+        "log.message": "2018-01-01 08:09:10 127.0.0.1 GET / q=100 80 - 85.181.35.98 Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0 - 200 0 0 123", 
         "offset": 257, 
         "prospector.type": "log"
     }, 
@@ -61,6 +62,7 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
+        "log.message": "2018-01-01 09:10:11 W3SVC1 GET / - 80 - 127.0.0.1 Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0 - - example.com 200 0 0 123 456 789", 
         "offset": 709, 
         "prospector.type": "log"
     }, 
@@ -102,6 +104,7 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
+        "log.message": "2018-01-01 10:11:12 W3SVC1 MACHINE-NAME 127.0.0.1 GET / - 80 - 85.181.35.98 HTTP/1.1 Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0 - - example.com 200 0 0 123 456 789", 
         "offset": 1204, 
         "prospector.type": "log"
     }
