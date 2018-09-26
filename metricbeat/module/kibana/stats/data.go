@@ -93,7 +93,9 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 
 	dataFields, err := schema.Apply(data)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failure to apply stats schema"))
+		err = errors.Wrap(err, "failure to apply stats schema")
+		r.Error(err)
+		return err
 	}
 
 	var event mb.Event
@@ -103,18 +105,27 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	// Set elasticsearch cluster id
 	elasticsearchClusterID, ok := data["cluster_uuid"]
 	if !ok {
-		return elastic.ReportErrorForMissingField("cluster_uuid", elastic.Kibana, r)
+		err = elastic.MakeErrorForMissingField("cluster_uuid", elastic.Kibana)
+		event.Error = err
+		r.Event(event)
+		return err
 	}
 	event.RootFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	// Set process PID
 	process, ok := data["process"].(map[string]interface{})
 	if !ok {
-		return elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
+		err = elastic.MakeErrorForMissingField("process", elastic.Kibana)
+		event.Error = err
+		r.Event(event)
+		return err
 	}
 	pid, ok := process["pid"].(float64)
 	if !ok {
-		return elastic.ReportErrorForMissingField("process.pid", elastic.Kibana, r)
+		err = elastic.MakeErrorForMissingField("process.pid", elastic.Kibana)
+		event.Error = err
+		r.Event(event)
+		return err
 	}
 	event.RootFields.Put("process.pid", int(pid))
 
