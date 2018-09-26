@@ -22,6 +22,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -205,27 +206,40 @@ func prepareModulePackagingXPack() error {
 			return err
 		}
 	}
+	numMissing := 0
 	for _, copyAction := range []struct {
-		src, dst string
+		src, dst      string
+		ignoreMissing bool
 	}{
-		{"module", modulesDirGeneratedXPack},
-		{"../x-pack/filebeat/module", modulesDirGeneratedXPack},
-		{"modules.d", modules_D_DirGeneratedXpack},
-		{"../x-pack/filebeat/modules.d", modules_D_DirGeneratedXpack},
+		{src: "module", dst: modulesDirGeneratedXPack},
+		{src: "../x-pack/filebeat/module", dst: modulesDirGeneratedXPack, ignoreMissing: true},
+		{src: "modules.d", dst: modules_D_DirGeneratedXpack},
+		{src: "../x-pack/filebeat/modules.d", dst: modules_D_DirGeneratedXpack, ignoreMissing: true},
 	} {
-		err := (&mage.CopyTask{
-			Source:  copyAction.src,
-			Dest:    copyAction.dst,
-			Mode:    0644,
-			DirMode: 0755,
-			Exclude: []string{
-				"/_meta",
-				"/test",
-			},
-		}).Execute()
-		if err != nil {
-			return err
+		if _, err := os.Stat(copyAction.src); err == nil {
+			err = (&mage.CopyTask{
+				Source:  copyAction.src,
+				Dest:    copyAction.dst,
+				Mode:    0644,
+				DirMode: 0755,
+				Exclude: []string{
+					"/_meta",
+					"/test",
+				},
+			}).Execute()
+			if err != nil {
+				return err
+			}
+		} else {
+			if !copyAction.ignoreMissing {
+				return err
+			}
+			numMissing++
 		}
+	}
+	// Fail if there is a modules.d or a module folder under x-pack, but not the other.
+	if numMissing&1 != 0 {
+		return errors.New("both module and modules.d directories need to exist under x-pack/filebeat")
 	}
 	return nil
 }
