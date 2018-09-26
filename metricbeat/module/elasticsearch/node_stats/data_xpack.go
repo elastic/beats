@@ -89,9 +89,9 @@ var (
 		"os": c.Dict("os", s.Schema{
 			"cpu": c.Dict("cpu", s.Schema{
 				"load_average": c.Dict("load_average", s.Schema{
-					"1m":  c.Float("1m"),
-					"5m":  c.Float("5m"),
-					"15m": c.Float("15m"),
+					"1m":  c.Float("1m", s.Optional),
+					"5m":  c.Float("5m", s.Optional),
+					"15m": c.Float("15m", s.Optional),
 				}),
 			}),
 			"cgroup": c.Dict("cgroup", s.Schema{
