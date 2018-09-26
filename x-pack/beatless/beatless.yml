@@ -20,7 +20,7 @@ beatless.provider.aws.functions:
     role: iam
     # List of cloudwatch streams registered to this function.
     triggers:
-      - log_group: /aws/lambda/beatless-cloudwatch_logs
+      - log_group_name: /aws/lambda/beatless-cloudwatch_logs
         filter_name: myfiltername
         filter_pattern: mylog_
 
