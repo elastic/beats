@@ -121,43 +121,48 @@ func (i *Input) Run() {
 	}
 	defer client.Close()
 
-	for {
-		select {
-		case <-i.done:
-			return
-		default:
-			i.publishAll(client)
-		}
-	}
-
+	i.publishAll(client)
 }
 
 func (i *Input) publishAll(client beat.Client) {
 	out := make(chan *beat.Event)
-	var wg sync.WaitGroup
 
+	var wg sync.WaitGroup
 	merge := func(in chan *beat.Event) {
 		wg.Add(1)
 
 		go func(c chan *beat.Event) {
-			for v := range c {
-				out <- v
+			defer wg.Done()
+			for {
+				select {
+				case <-i.done:
+					return
+				case v := <-c:
+					out <- v
+				}
 			}
-			wg.Done()
 		}(in)
 	}
+
+	// close output channel after all input channels are merged or beats is stopped
 	go func() {
 		wg.Wait()
 		close(out)
 	}()
 
+	// merge channels of readers into a single output channel
 	for _, r := range i.readers {
 		c := r.Follow()
 		merge(c)
 	}
 
-	for e := range out {
-		client.Publish(*e)
+	for {
+		select {
+		case <-i.done:
+			return
+		case e := <-out:
+			client.Publish(*e)
+		}
 	}
 }
 
