@@ -43,8 +43,6 @@ const (
 	expectedManifestMode   = os.FileMode(0644)
 	expectedModuleFileMode = expectedManifestMode
 	expectedModuleDirMode  = os.FileMode(0755)
-	expectedConfigUID      = 0
-	expectedConfigGID      = 0
 )
 
 var (
@@ -57,9 +55,10 @@ var (
 )
 
 var (
-	files    = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
-	modules  = flag.Bool("modules", false, "check modules folder contents")
-	modulesd = flag.Bool("modules.d", false, "check modules.d folder contents")
+	files     = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
+	modules   = flag.Bool("modules", false, "check modules folder contents")
+	modulesd  = flag.Bool("modules.d", false, "check modules.d folder contents")
+	rootOwner = flag.Bool("root-owner", false, "expect root to own package files")
 )
 
 func TestRPM(t *testing.T) {
@@ -101,13 +100,13 @@ func checkRPM(t *testing.T, file string) {
 	}
 
 	checkConfigPermissions(t, p)
-	checkConfigOwner(t, p)
+	checkConfigOwner(t, p, *rootOwner)
 	checkManifestPermissions(t, p)
-	checkManifestOwner(t, p)
+	checkManifestOwner(t, p, *rootOwner)
 	checkModulesPermissions(t, p)
 	checkModulesPresent(t, "/usr/share", p)
 	checkModulesDPresent(t, "/etc/", p)
-	checkModulesOwner(t, p)
+	checkModulesOwner(t, p, *rootOwner)
 	checkSystemdUnitPermissions(t, p)
 }
 
@@ -119,13 +118,13 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	}
 
 	checkConfigPermissions(t, p)
-	checkConfigOwner(t, p)
+	checkConfigOwner(t, p, *rootOwner)
 	checkManifestPermissions(t, p)
-	checkManifestOwner(t, p)
+	checkManifestOwner(t, p, *rootOwner)
 	checkModulesPresent(t, "./usr/share", p)
 	checkModulesDPresent(t, "./etc/", p)
 	checkModulesPermissions(t, p)
-	checkModulesOwner(t, p)
+	checkModulesOwner(t, p, *rootOwner)
 	checkSystemdUnitPermissions(t, p)
 }
 
@@ -137,12 +136,12 @@ func checkTar(t *testing.T, file string) {
 	}
 
 	checkConfigPermissions(t, p)
-	checkConfigOwner(t, p)
+	checkConfigOwner(t, p, true)
 	checkManifestPermissions(t, p)
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 	checkModulesPermissions(t, p)
-	checkModulesOwner(t, p)
+	checkModulesOwner(t, p, true)
 }
 
 func checkZip(t *testing.T, file string) {
@@ -176,16 +175,24 @@ func checkConfigPermissions(t *testing.T, p *packageFile) {
 	})
 }
 
-func checkConfigOwner(t *testing.T, p *packageFile) {
+func checkOwner(t *testing.T, entry packageEntry, expectRoot bool) {
+	should := "not "
+	if expectRoot {
+		should = ""
+	}
+	if expectRoot != (entry.UID == 0) {
+		t.Errorf("file %v should %sbe owned by root user, owner=%v", entry.File, should, entry.UID)
+	}
+	if expectRoot != (entry.GID == 0) {
+		t.Errorf("file %v should %sbe owned by root group, group=%v", entry.File, should, entry.GID)
+	}
+}
+
+func checkConfigOwner(t *testing.T, p *packageFile, expectRoot bool) {
 	t.Run(p.Name+" config file owner", func(t *testing.T) {
 		for _, entry := range p.Contents {
 			if configFilePattern.MatchString(entry.File) {
-				if expectedConfigUID != entry.UID {
-					t.Errorf("file %v should be owned by user %v, owner=%v", entry.File, expectedConfigGID, entry.UID)
-				}
-				if expectedConfigGID != entry.GID {
-					t.Errorf("file %v should be owned by group %v, group=%v", entry.File, expectedConfigGID, entry.GID)
-				}
+				checkOwner(t, entry, expectRoot)
 				return
 			}
 		}
@@ -208,17 +215,12 @@ func checkManifestPermissions(t *testing.T, p *packageFile) {
 	})
 }
 
-// Verify that the manifest owner is root
-func checkManifestOwner(t *testing.T, p *packageFile) {
+// Verify that the manifest owner is correct.
+func checkManifestOwner(t *testing.T, p *packageFile, expectRoot bool) {
 	t.Run(p.Name+" manifest file owner", func(t *testing.T) {
 		for _, entry := range p.Contents {
 			if manifestFilePattern.MatchString(entry.File) {
-				if expectedConfigUID != entry.UID {
-					t.Errorf("file %v should be owned by user %v, owner=%v", entry.File, expectedConfigGID, entry.UID)
-				}
-				if expectedConfigGID != entry.GID {
-					t.Errorf("file %v should be owned by group %v, group=%v", entry.File, expectedConfigGID, entry.GID)
-				}
+				checkOwner(t, entry, expectRoot)
 			}
 		}
 	})
@@ -246,16 +248,11 @@ func checkModulesPermissions(t *testing.T, p *packageFile) {
 }
 
 // Verify the owner of the modules.d dir and its contents.
-func checkModulesOwner(t *testing.T, p *packageFile) {
+func checkModulesOwner(t *testing.T, p *packageFile, expectRoot bool) {
 	t.Run(p.Name+" modules.d file owner", func(t *testing.T) {
 		for _, entry := range p.Contents {
 			if modulesDFilePattern.MatchString(entry.File) || modulesDDirPattern.MatchString(entry.File) {
-				if expectedConfigUID != entry.UID {
-					t.Errorf("file %v should be owned by user %v, owner=%v", entry.File, expectedConfigGID, entry.UID)
-				}
-				if expectedConfigGID != entry.GID {
-					t.Errorf("file %v should be owned by group %v, group=%v", entry.File, expectedConfigGID, entry.GID)
-				}
+				checkOwner(t, entry, expectRoot)
 			}
 		}
 	})
@@ -351,10 +348,16 @@ func readRPM(rpmFile string) (*packageFile, error) {
 	pf := &packageFile{Name: filepath.Base(rpmFile), Contents: map[string]packageEntry{}}
 
 	for _, file := range contents {
-		pf.Contents[file.Name()] = packageEntry{
+		pe := packageEntry{
 			File: file.Name(),
 			Mode: file.Mode(),
 		}
+		if file.Owner() != "root" {
+			// not 0
+			pe.UID = 123
+			pe.GID = 123
+		}
+		pf.Contents[file.Name()] = pe
 	}
 
 	return pf, nil
