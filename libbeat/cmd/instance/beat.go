@@ -229,8 +229,8 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 	return &Beat{Beat: b}, nil
 }
 
-// init does initialization of things common to all actions (read confs, flags)
-func (b *Beat) Init() error {
+// InitWithSettings does initialization of things common to all actions (read confs, flags)
+func (b *Beat) InitWithSettings(settings Settings) error {
 	err := b.handleFlags()
 	if err != nil {
 		return err
@@ -240,11 +240,18 @@ func (b *Beat) Init() error {
 		return err
 	}
 
-	if err := b.configure(); err != nil {
+	if err := b.configure(settings); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// Init does initialization of things common to all actions (read confs, flags)
+//
+// Deprecated: use InitWithSettings
+func (b *Beat) Init() error {
+	return b.InitWithSettings(Settings{})
 }
 
 // BeatConfig returns config section for this beat
@@ -504,12 +511,24 @@ func (b *Beat) handleFlags() error {
 // config reads the configuration file from disk, parses the common options
 // defined in BeatConfig, initializes logging, and set GOMAXPROCS if defined
 // in the config. Lastly it invokes the Config method implemented by the beat.
-func (b *Beat) configure() error {
+func (b *Beat) configure(settings Settings) error {
 	var err error
 
 	cfg, err := cfgfile.Load("")
 	if err != nil {
 		return fmt.Errorf("error loading config file: %v", err)
+	}
+
+	// Overrides config defaults for a specific beat.
+	if settings.ConfigOverrides != nil {
+		c, _ := common.NewConfigFrom(map[string]interface{}{})
+		if err := c.Merge(settings.ConfigOverrides); err != nil {
+			return err
+		}
+		if err := c.Merge(cfg); err != nil {
+			return err
+		}
+		cfg = c
 	}
 
 	// We have to initialize the keystore before any unpack or merging the cloud
