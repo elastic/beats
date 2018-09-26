@@ -129,6 +129,24 @@ PLEASE UPDATE DOCUMENTATION
 
 --
 
+[[exported-fields-beatless]]
+== beatless fields
+
+None
+
+
+*`counter`*::
++
+--
+type: long
+
+required: True
+
+PLEASE UPDATE DOCUMENTATION
+
+
+--
+
 [[exported-fields-cloud]]
 == Cloud provider metadata fields
 
