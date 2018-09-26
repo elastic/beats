@@ -116,6 +116,53 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/aws/aws-lambda-go
+Version: =v1.6.0
+Revision: 2d482ef09017ae953b1e8d5a6ddac5b696663a3c
+License type (autodetected): Apache-2.0
+./vendor/github.com/aws/aws-lambda-go/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/aws/aws-lambda-go
+Version: =v1.6.0
+Revision: 2d482ef09017ae953b1e8d5a6ddac5b696663a3c
+License type (autodetected): MIT
+./vendor/github.com/aws/aws-lambda-go/LICENSE-LAMBDACODE:
+--------------------------------------------------------------------
+MIT No Attribution
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------
+Dependency: github.com/aws/aws-sdk-go-v2
+Version: v2.0.0-preview.4
+Revision: ff1a530c31507c97cf5edbee226e604ca08661cc
+License type (autodetected): Apache-2.0
+./vendor/github.com/aws/aws-sdk-go-v2/LICENSE.txt:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE.txt-----
+AWS SDK for Go
+Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved. 
+Copyright 2014-2015 Stripe, Inc.
+
+--------------------------------------------------------------------
 Dependency: github.com/bsm/sarama-cluster
 Revision: 7e67d87a6b3f83fe08c096fd084691bd9dca112f
 License type (autodetected): MIT
@@ -690,6 +737,15 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/go-ini/ini
+Revision: fa25069db393aecc09b71267d0489b357781c860
+License type (autodetected): Apache-2.0
+./vendor/github.com/go-ini/ini/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: github.com/go-ole/go-ole
@@ -1361,6 +1417,15 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/jmespath/go-jmespath
+Revision: c2b33e8439af944379acbdd9c3a5fe0bc44bd8a5
+License type (autodetected): Apache-2.0
+./vendor/github.com/jmespath/go-jmespath/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: github.com/joeshaw/multierror
@@ -2974,40 +3039,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: gopkg.in/yaml.v2
 Revision: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
-License type (autodetected): MIT
-./vendor/gopkg.in/yaml.v2/LICENSE.libyaml:
+License type (autodetected): Apache-2.0
+./vendor/gopkg.in/yaml.v2/LICENSE:
 --------------------------------------------------------------------
-The following files were ported to Go from C files of libyaml, and thus
-are still covered by their original copyright and license:
+Apache License 2.0
 
-    apic.go
-    emitterc.go
-    parserc.go
-    readerc.go
-    scannerc.go
-    writerc.go
-    yamlh.go
-    yamlprivateh.go
-
-Copyright (c) 2006 Kirill Simonov
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/yaml.v2

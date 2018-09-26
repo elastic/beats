@@ -5,12 +5,34 @@
 package cmd
 
 import (
+	"github.com/spf13/cobra"
+
 	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/x-pack/beatless/beater"
+	"github.com/elastic/beats/x-pack/beatless/config"
 )
 
 // Name of this beat
 var Name = "beatless"
 
-// RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmd(Name, "", beater.New)
+// RootCmd to handle beatless
+var RootCmd *cmd.BeatsRootCmd
+
+func init() {
+	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{
+		Name:            Name,
+		ConfigOverrides: config.ConfigOverrides,
+	})
+
+	functionCmd := &cobra.Command{
+		Use:   "function",
+		Short: "Manage functions",
+	}
+
+	functionCmd.AddCommand(genDeployCmd())
+	functionCmd.AddCommand(genUpdateCmd())
+	functionCmd.AddCommand(genRemoveCmd())
+
+	RootCmd.AddCommand(functionCmd)
+}

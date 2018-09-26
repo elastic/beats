@@ -1,8 +1,40 @@
-################### Beatless Configuration Example #########################
+###################### Beatless Configuration Example #######################
 
-############################# Beatless ######################################
+# This file is an example configuration file highlighting only the most common
+# options. The beatless.reference.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/beatless/index.html
+#
 
-beatless:
+#============================  Provider ===============================
+# Configure functions to run on AWS Lambda, currently we assume that the credentials
+# are present in the environment to correctly create the function when using the CLI.
+#
+beatless.provider.aws.functions:
+# Accepts events from a cloudwatch log group.
+  - name: fn_cloudwatch_logs
+    type: cloudwatch_logs
+    # The IAM role that the lambda will take when executing your function.
+    role: iam
+    # List of cloudwatch streams registered to this function.
+    triggers:
+      - log_group_name: /aws/lambda/beatless-cloudwatch_logs
+        filter_name: myfiltername
+        filter_pattern: mylog_
+
+# Accepts events from a SQS queue.
+# - name: fn_sqs
+#   type: sqs
+#
+# Accepts events form a Kinesis stream
+# - name: fn_kinesis
+#   type: kinesis
+#
+# Accepts events from an api gateway proxy call.
+# - name: fn_apigateway_proxy
+#   type: api_gateway_proxy
 
 #================================ General =====================================
 
