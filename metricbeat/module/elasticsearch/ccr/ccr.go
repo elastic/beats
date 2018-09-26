@@ -57,7 +57,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+ccrStatsPath)
 	if err != nil {
-		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
+		msg := errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		r.Error(msg)
+		m.Log.Error(msg)
 		return
 	}
 
@@ -70,6 +72,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+ccrStatsPath)
 	if err != nil {
 		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 
@@ -77,29 +80,34 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isCCRStatsAPIAvailable, err := elasticsearch.IsCCRStatsAPIAvailable(elasticsearchVersion)
 	if err != nil {
 		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 
 	if !isCCRStatsAPIAvailable {
 		const errorMsg = "the %v metricset is only supported with Elasticsearch >= %v. " +
 			"You are currently running Elasticsearch %v"
-		r.Error(fmt.Errorf(errorMsg, m.FullyQualifiedName(), elasticsearch.CCRStatsAPIAvailableVersion, elasticsearchVersion))
+		err := fmt.Errorf(errorMsg, elasticsearch.CCRStatsAPIAvailableVersion, elasticsearchVersion)
+		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 
 	if m.XPack {
-		eventsMappingXPack(r, m, *info, content)
+		err = eventsMappingXPack(r, m, *info, content)
 	} else {
 		err = eventsMapping(r, *info, content)
-		if err != nil {
-			r.Error(err)
-			return
-		}
+	}
+
+	if err != nil {
+		m.Log.Error(err)
+		return
 	}
 }
