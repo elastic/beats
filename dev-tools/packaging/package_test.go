@@ -117,14 +117,15 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 		return
 	}
 
+	// deb file permissions are managed post-install
 	checkConfigPermissions(t, p)
-	checkConfigOwner(t, p, *rootOwner)
+	checkConfigOwner(t, p, true)
 	checkManifestPermissions(t, p)
-	checkManifestOwner(t, p, *rootOwner)
+	checkManifestOwner(t, p, true)
 	checkModulesPresent(t, "./usr/share", p)
 	checkModulesDPresent(t, "./etc/", p)
 	checkModulesPermissions(t, p)
-	checkModulesOwner(t, p, *rootOwner)
+	checkModulesOwner(t, p, true)
 	checkSystemdUnitPermissions(t, p)
 }
 

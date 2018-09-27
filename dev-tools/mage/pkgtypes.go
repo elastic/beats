@@ -85,8 +85,6 @@ type PackageSpec struct {
 	Description       string                 `yaml:"description,omitempty"`
 	PreInstallScript  string                 `yaml:"pre_install_script,omitempty"`
 	PostInstallScript string                 `yaml:"post_install_script,omitempty"`
-	User              string                 `yaml:"user,omitempty"`  // Ownership for all files in the package (deb and rpm only).
-	Group             string                 `yaml:"group,omitempty"` // Ownership for all files in the package (deb and rpm only).
 	Files             map[string]PackageFile `yaml:"files"`
 	OutputFile        string                 `yaml:"output_file,omitempty"` // Optional
 	ExtraVars         map[string]string      `yaml:"extra_vars,omitempty"`  // Optional
@@ -106,6 +104,7 @@ type PackageFile struct {
 	Mode     os.FileMode             `yaml:"mode,omitempty"`      // Target mode for file. Does not apply when source is a directory.
 	Config   bool                    `yaml:"config"`              // Mark file as config in the package (deb and rpm only).
 	Dep      func(PackageSpec) error `yaml:"-" hash:"-" json:"-"` // Dependency to invoke during Evaluate.
+	Owner    string                  `yaml:"owner,omitempty"`     // File Owner, for user and group name (rpm only).
 }
 
 // OSArchNames defines the names of architectures for use in packages.
@@ -648,14 +647,6 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 	if spec.URL != "" {
 		args = append(args, "--url", spec.URL)
 	}
-	if spec.User != "" {
-		args = append(args, "--rpm-user", spec.User)
-		args = append(args, "--deb-user", spec.User)
-	}
-	if spec.Group != "" {
-		args = append(args, "--rpm-group", spec.Group)
-		args = append(args, "--deb-group", spec.Group)
-	}
 	if spec.localPreInstallScript != "" {
 		args = append(args, "--before-install", spec.localPreInstallScript)
 	}
@@ -665,6 +656,9 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 	for _, pf := range spec.Files {
 		if pf.Config {
 			args = append(args, "--config-files", pf.Target)
+		}
+		if pf.Owner != "" {
+			args = append(args, "--rpm-attr", fmt.Sprintf("%04o,%s,%s:%s", pf.Mode, pf.Owner, pf.Owner, pf.Target))
 		}
 	}
 	args = append(args,
