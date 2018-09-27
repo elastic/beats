@@ -7,14 +7,11 @@ package aws
 import (
 	"context"
 	"errors"
-	"strconv"
-	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
-	lambdaApi "github.com/aws/aws-sdk-go-v2/service/lambda"
+	merrors "github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -99,75 +96,36 @@ func (c CloudwatchLogs) Name() string {
 // Deploy returns the list of operation that we need to execute on AWS lambda after installing the
 // function.
 func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
-	lambdaSvc := lambdaApi.New(awsCfg)
-
-	envVariables := map[string]string{
-		"BEAT_STRICT_PERMS": "false",
-		"ENABLED_FUNCTIONS": c.config.Name,
+	context := &executerContext{
+		Content:     content,
+		Name:        c.config.Name,
+		Description: c.config.Description,
+		Role:        c.config.Role,
+		Runtime:     runtime,
+		HandleName:  handlerName,
 	}
 
-	cLambdaReq := &lambdaApi.CreateFunctionInput{
-		Code:         &lambdaApi.FunctionCode{ZipFile: content},
-		FunctionName: aws.String(c.config.Name),
-		Handler:      aws.String(handlerName),
-		Role:         aws.String(c.config.Role), // TODO: push it in the conf.
-		Runtime:      runtime,
-		Description:  aws.String(c.config.Description),
-		Publish:      aws.Bool(false), // function is not published.
-		Environment:  &lambdaApi.Environment{Variables: envVariables},
-	}
+	executer := newExecuter(c.log, context)
+	executer.Add(newOpCreateLambda(c.log, awsCfg))
+	executer.Add(newOpAddPermission(c.log, awsCfg, permission{
+		Action:    "lambda:InvokeFunction",
+		Principal: "logs." + awsCfg.Region + "amazonaws.com",
+	}))
 
-	cLambdaSend := lambdaSvc.CreateFunctionRequest(cLambdaReq)
-	cLambdaSendResp, err := cLambdaSend.Send()
-	if err != nil {
-		c.log.Debugf("could not create function, error: %s, response: %s", err, cLambdaSendResp)
-		return err
-	}
-
-	c.log.Debug("function successfully created")
-	c.log.Debug("adding permissions")
-
-	permissions := &lambdaApi.AddPermissionInput{
-		Action:       aws.String("lambda:InvokeFunction"),
-		Principal:    aws.String("logs." + awsCfg.Region + ".amazonaws.com"),
-		FunctionName: aws.String(c.config.Name),
-		StatementId:  aws.String(strconv.Itoa(int(time.Now().Unix()))),
-		// 		// SourceArn: // must be the cloudwatch arn
-	}
-
-	permissionsSend := lambdaSvc.AddPermissionRequest(permissions)
-	permissionResp, err := permissionsSend.Send()
-	if err != nil {
-		c.log.Debugf("could not add permission to function, error: %s, response: %s", err, permissionResp)
-		return err
-	}
-	c.log.Debug("added permissions to function successfully")
-	c.log.Debugf("adding %d triggers to the function", len(c.config.Triggers))
-
-	cloudwatchLogsSvc := cloudwatchlogs.New(awsCfg)
 	for _, trigger := range c.config.Triggers {
-		c.log.Debugf(
-			"adding trigger, log_group_name: %s, filter_name: %s, filter_pattern: %s",
-			trigger.LogGroupName,
-			trigger.FilterName,
-			trigger.FilterPattern,
-		)
-
-		cloudwatchlogsReq := &cloudwatchlogs.PutSubscriptionFilterInput{
-			DestinationArn: cLambdaSendResp.FunctionArn,
-			LogGroupName:   aws.String(trigger.LogGroupName),
-			FilterName:     aws.String(trigger.FilterName),
-			FilterPattern:  aws.String(trigger.FilterPattern),
-		}
-
-		cloudwatchLogsSend := cloudwatchLogsSvc.PutSubscriptionFilterRequest(cloudwatchlogsReq)
-		cloudwatchLogsResp, err := cloudwatchLogsSend.Send()
-		if err != nil {
-			c.log.Debugf("could not subscription to lambda, error: %s, response: %s", err, cloudwatchLogsResp)
-			return err
-		}
+		executer.Add(newOpAddSubscriptionFilter(c.log, awsCfg, subscriptionFilter{
+			LogGroupName:  trigger.LogGroupName,
+			FilterName:    trigger.FilterName,
+			FilterPattern: trigger.FilterPattern,
+		}))
 	}
 
+	if err := executer.Execute(); err != nil {
+		if rollbackErr := executer.Rollback(); rollbackErr != nil {
+			return merrors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
+		}
+		return err
+	}
 	return nil
 }
 

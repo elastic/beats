@@ -27,8 +27,6 @@ const (
 	// adding a check to make sure we never go over.
 	packageCompressedLimit   = 50 * 1000 * 1000  // 50MB
 	packageUncompressedLimit = 250 * 1000 * 1000 // 250MB
-
-	handlerName = "beatless"
 )
 
 type functionManager interface {
