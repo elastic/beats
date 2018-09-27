@@ -888,15 +888,6 @@ TLS layer related fields.
 
 
 
-*`tls.certificates`*::
-+
---
-type: keyword
-
-List of PEM encoded x509 certificates.
-
---
-
 *`tls.certificate_not_valid_before`*::
 +
 --
