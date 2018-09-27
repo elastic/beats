@@ -177,11 +177,7 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 		prefix = prefix.Append(name)
 	} else {
 		if !hasKey {
-			if _, hasRelease := dict["release"]; hasRelease {
-				// Ignore fields that have no name or key, but a release. Used in metricbeat to document some modules.
-				return nil
-			}
-			return errors.Errorf("field [%s](%s) has a sub-field without 'name' nor 'key'", key, prefix)
+			return errors.Errorf("field [%s](%s) has 'fields' but neither 'name' nor 'type", key, prefix)
 		}
 	}
 
@@ -189,9 +185,6 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 		typ, ok = typIf.(string)
 		if !ok {
 			return errors.Errorf("field [%s](%s) has a 'type' entry of unexpected type (type=%T value=%v)", key, prefix, nameIf, nameIf)
-		}
-		if typ == "object" {
-			typ = "group"
 		}
 	}
 
@@ -202,7 +195,7 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 		}
 	}
 
-	if !hasFields && typ != "group" {
+	if !hasFields {
 		// Parse a leaf field (not a group)
 
 		if !hasType {
