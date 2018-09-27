@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"errors"
 	"strconv"
 	"time"
 
@@ -27,10 +28,15 @@ func (o *opAddPermission) Execute(ctx *executerContext) error {
 		o.permission.Action,
 		o.permission.Principal,
 	)
+
+	if ctx.AliasArn == "" {
+		return errors.New("AliasArn not found, need to create or update the alias")
+	}
+
 	permissions := &lambdaApi.AddPermissionInput{
 		Action:       aws.String(o.permission.Action),
 		Principal:    aws.String(o.permission.Principal),
-		FunctionName: aws.String(ctx.Name),
+		FunctionName: aws.String(ctx.AliasArn),
 		StatementId:  aws.String(strconv.Itoa(int(time.Now().Unix()))),
 		// 		// SourceArn: // must be the cloudwatch arn
 	}

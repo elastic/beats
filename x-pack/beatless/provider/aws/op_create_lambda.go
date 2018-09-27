@@ -29,7 +29,7 @@ func (o *opCreateLambda) Execute(ctx *executerContext) error {
 		Role:         aws.String(ctx.Role),
 		Runtime:      ctx.Runtime,
 		Description:  aws.String(ctx.Description),
-		Publish:      aws.Bool(false), // TODO check that.
+		Publish:      aws.Bool(true), // Create and publish a new version atomically.
 		Environment:  &lambdaApi.Environment{Variables: envVariables},
 	}
 

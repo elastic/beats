@@ -18,7 +18,7 @@ func (o *opUpdateLambda) Execute(ctx *executerContext) error {
 	req := &lambdaApi.UpdateFunctionCodeInput{
 		ZipFile:      ctx.Content,
 		FunctionName: aws.String(ctx.Name),
-		Publish:      aws.Bool(false), // TODO check that.
+		Publish:      aws.Bool(true), // Create and publish a new version.
 	}
 
 	api := o.svc.UpdateFunctionCodeRequest(req)

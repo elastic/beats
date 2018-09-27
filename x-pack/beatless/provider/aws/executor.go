@@ -16,6 +16,7 @@ type executerContext struct {
 	Content     []byte
 	Name        string
 	FunctionArn string
+	AliasArn    string
 	Description string
 	HandleName  string
 	Role        string

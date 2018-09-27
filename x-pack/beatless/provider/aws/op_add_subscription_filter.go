@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"errors"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
@@ -25,8 +27,13 @@ func (o *opAddSubscriptionFilter) Execute(ctx *executerContext) error {
 		o.subscription.FilterName,
 		o.subscription.FilterPattern,
 	)
+
+	if ctx.AliasArn == "" {
+		return errors.New("AliasArn not found, need to create or update the alias")
+	}
+
 	req := &cloudwatchlogs.PutSubscriptionFilterInput{
-		DestinationArn: aws.String(ctx.FunctionArn),
+		DestinationArn: aws.String(ctx.AliasArn),
 		LogGroupName:   aws.String(o.subscription.LogGroupName),
 		FilterName:     aws.String(o.subscription.FilterName),
 		FilterPattern:  aws.String(o.subscription.FilterPattern),
