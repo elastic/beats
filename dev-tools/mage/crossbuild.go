@@ -63,6 +63,13 @@ func WithTarget(target string) func(params *crossBuildParams) {
 	}
 }
 
+// InDir specifies the base directory to use when cross-building.
+func InDir(path ...string) func(params *crossBuildParams) {
+	return func(params *crossBuildParams) {
+		params.InDir = filepath.Join(path...)
+	}
+}
+
 // Serially causes each cross-build target to be executed serially instead of
 // in parallel.
 func Serially() func(params *crossBuildParams) {
@@ -75,6 +82,7 @@ type crossBuildParams struct {
 	Platforms BuildPlatformList
 	Target    string
 	Serial    bool
+	InDir     string
 }
 
 // CrossBuild executes a given build target once for each target platform.
@@ -103,8 +111,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 		if !buildPlatform.Flags.CanCrossBuild() {
 			return fmt.Errorf("unsupported cross build platform %v", buildPlatform.Name)
 		}
-
-		builder := GolangCrossBuilder{buildPlatform.Name, params.Target}
+		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir}
 		if params.Serial {
 			if err := builder.Build(); err != nil {
 				return errors.Wrapf(err, "failed cross-building target=%v for platform=%v",
@@ -118,6 +125,15 @@ func CrossBuild(options ...CrossBuildOption) error {
 	// Each build runs in parallel.
 	Parallel(deps...)
 	return nil
+}
+
+// CrossBuildXPack executes the 'golangCrossBuild' target in the Beat's
+// associated x-pack directory to produce a version of the Beat that contains
+// Elastic licensed content.
+func CrossBuildXPack(options ...CrossBuildOption) error {
+	o := []CrossBuildOption{InDir("x-pack", BeatName)}
+	o = append(o, options...)
+	return CrossBuild(o...)
 }
 
 // buildMage pre-compiles the magefile to a binary using the native GOOS/GOARCH
@@ -166,6 +182,7 @@ func crossBuildImage(platform string) (string, error) {
 type GolangCrossBuilder struct {
 	Platform string
 	Target   string
+	InDir    string
 }
 
 // Build executes the build inside of Docker.
@@ -178,9 +195,16 @@ func (b GolangCrossBuilder) Build() error {
 	}
 
 	mountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.RootImportPath))
-	workDir := mountPoint
-	if repoInfo.SubDir != "" {
-		workDir = filepath.ToSlash(filepath.Join(workDir, repoInfo.SubDir))
+	// use custom dir for build if given, subdir if not:
+	cwd := repoInfo.SubDir
+	if b.InDir != "" {
+		cwd = b.InDir
+	}
+	workDir := filepath.ToSlash(filepath.Join(mountPoint, cwd))
+
+	buildCmd, err := filepath.Rel(workDir, filepath.Join(mountPoint, repoInfo.SubDir, "build/mage-linux-amd64"))
+	if err != nil {
+		return errors.Wrap(err, "failed to determine mage-linux-amd64 relative path")
 	}
 
 	dockerRun := sh.RunCmd("docker", "run")
@@ -206,7 +230,7 @@ func (b GolangCrossBuilder) Build() error {
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 		image,
-		"--build-cmd", "build/mage-linux-amd64 "+b.Target,
+		"--build-cmd", buildCmd+" "+b.Target,
 		"-p", b.Platform,
 	)
 
@@ -215,25 +239,27 @@ func (b GolangCrossBuilder) Build() error {
 
 // DockerChown chowns files generated during build. EXEC_UID and EXEC_GID must
 // be set in the containers environment otherwise this is a noop.
-func DockerChown(file string) {
+func DockerChown(path string) {
 	// Chown files generated during build that are root owned.
 	uid, _ := strconv.Atoi(EnvOr("EXEC_UID", "-1"))
 	gid, _ := strconv.Atoi(EnvOr("EXEC_GID", "-1"))
 	if uid > 0 && gid > 0 {
-		if err := chownPaths(uid, gid, file); err != nil {
+		if err := chownPaths(uid, gid, path); err != nil {
 			log.Println(err)
 		}
 	}
 }
 
 // chownPaths will chown the file and all of the dirs specified in the path.
-func chownPaths(uid, gid int, file string) error {
-	pathParts := strings.Split(file, string(filepath.Separator))
-	for i := range pathParts {
-		chownDir := filepath.Join(pathParts[:i+1]...)
-		if err := os.Chown(chownDir, uid, gid); err != nil {
-			return errors.Wrapf(err, "failed to chown path=%v", chownDir)
+func chownPaths(uid, gid int, path string) error {
+	return filepath.Walk(path, func(name string, _ os.FileInfo, err error) error {
+		if err != nil {
+			return err
 		}
-	}
-	return nil
+		log.Printf("chown line: %s\n", name)
+		if err := os.Chown(name, uid, gid); err != nil {
+			return errors.Wrapf(err, "failed to chown path=%v", name)
+		}
+		return err
+	})
 }
