@@ -142,3 +142,9 @@ This is not a SSL problem. Make sure that Logstash is running and that there is 
 
 A firewall is refusing the connection. Check if a firewall is blocking the traffic on the client, the network, or the
 destination host.
+
+[float]
+[[monitoring-shows-fewer-than-expected-beats]]
+=== Monitoring UI shows fewer beats than expected
+
+If you are running multiple beat instances on the same host, make sure they each have a distinct `path.data` value.
