@@ -2,6 +2,7 @@ import jinja2
 import os
 import sys
 import time
+import unittest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../auditbeat/tests/system'))
 
@@ -32,6 +33,7 @@ class Test(AuditbeatXPackTest):
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "packages", COMMON_FIELDS + fields, warnings_allowed=True)
 
+    @unittest.skipIf(sys.platform == "darwin" and os.geteuid != 0, "Requires root on macOS")
     def test_metricset_processes(self):
         """
         processes metricset collects information about processes running on a system.
