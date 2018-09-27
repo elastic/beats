@@ -63,7 +63,7 @@ func (c *MockBeatClient) Publishes() []beat.Event {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	dst := make([]beat.Event, 0, len(c.publishes))
+	dst := make([]beat.Event, len(c.publishes))
 	copy(dst, c.publishes)
 	return dst
 }

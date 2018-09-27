@@ -46,12 +46,23 @@ func TestMonitor(t *testing.T) {
 	require.Equal(t, 1, len(pipelineConnector.clients))
 	pcClient := pipelineConnector.clients[0]
 
-	time.Sleep(time.Duration(100 * time.Millisecond))
+	timeout := time.Second
+	start := time.Now()
+	success := false
+	for time.Since(start) < timeout && !success {
+		count := len(pcClient.Publishes())
+		if count >= 1 {
+			success = true
+		} else {
+			// Let's yield this goroutine so we don't spin
+			// This could (possibly?) lock on a single core system otherwise
+			time.Sleep(time.Microsecond)
+		}
+	}
 
-	count := len(pcClient.Publishes())
-	assert.Condition(t, func() (success bool) {
-		return count >= 1
-	}, "expected publishes to be >= 1, got %d", count)
+	if !success {
+		t.Fatalf("No publishes detected!")
+	}
 
 	mon.Stop()
 	assert.Equal(t, true, pcClient.closed)
