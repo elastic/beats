@@ -145,7 +145,7 @@ func TestPackages(options ...TestPackagesOption) error {
 	}
 
 	if BeatUser == "root" {
-		args = append(args, "-root-owned")
+		args = append(args, "-root-owner")
 	}
 	args = append(args, "-files", MustExpand("{{.PWD}}/build/distributions/*"))
 
