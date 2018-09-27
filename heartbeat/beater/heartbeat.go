@@ -21,13 +21,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/autodiscover"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/heartbeat/config"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/scheduler"
+	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
