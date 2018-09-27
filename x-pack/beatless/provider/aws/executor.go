@@ -47,7 +47,7 @@ func newExecuter(log *logp.Logger, context *executerContext) *executer {
 }
 
 func (e *executer) Execute() (err error) {
-	e.log.Debugf("executing %d calls", len(e.operations))
+	e.log.Debugf("executing %d operations", len(e.operations))
 	if e.IsCompleted() {
 		return errAlreadyExecuted
 	}
@@ -61,6 +61,9 @@ func (e *executer) Execute() (err error) {
 		if ok {
 			e.undos = append(e.undos, v)
 		}
+	}
+	if err == nil {
+		e.log.Debug("all operations successful")
 	}
 	e.markCompleted()
 	return err
@@ -78,6 +81,12 @@ func (e *executer) Rollback() (err error) {
 		if err != nil {
 			break
 		}
+	}
+
+	if err == nil {
+		e.log.Debug("rollback successful")
+	} else {
+		e.log.Debug("rollback incomplete")
 	}
 	return err
 }

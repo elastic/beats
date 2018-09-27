@@ -15,6 +15,7 @@ type opCreateLambda struct {
 }
 
 func (o *opCreateLambda) Execute(ctx *executerContext) error {
+	o.log.Debugf("create new lambda function with name: %s", ctx.Name)
 	// Setup the environment to known which function to execute.
 	envVariables := map[string]string{
 		"BEAT_STRICT_PERMS": "false",
@@ -42,10 +43,12 @@ func (o *opCreateLambda) Execute(ctx *executerContext) error {
 	// retrieve the function arn for future calls.
 	ctx.FunctionArn = *resp.FunctionArn
 
+	o.log.Debug("creation successful")
 	return nil
 }
 
 func (o *opCreateLambda) Rollback(ctx *executerContext) error {
+	o.log.Debugf("remove lambda function with name: %s", ctx.Name)
 	req := &lambdaApi.DeleteFunctionInput{FunctionName: aws.String(ctx.Name)}
 
 	api := o.svc.DeleteFunctionRequest(req)
@@ -54,6 +57,8 @@ func (o *opCreateLambda) Rollback(ctx *executerContext) error {
 		o.log.Debugf("could not remove function, error: %s, response: %s", err, resp)
 		return err
 	}
+
+	o.log.Debug("remove successful")
 	return nil
 }
 

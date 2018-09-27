@@ -22,6 +22,11 @@ type opAddPermission struct {
 }
 
 func (o *opAddPermission) Execute(ctx *executerContext) error {
+	o.log.Debugf(
+		"adding permissions, action: %s, principal: %s",
+		o.permission.Action,
+		o.permission.Principal,
+	)
 	permissions := &lambdaApi.AddPermissionInput{
 		Action:       aws.String(o.permission.Action),
 		Principal:    aws.String(o.permission.Principal),
@@ -36,6 +41,8 @@ func (o *opAddPermission) Execute(ctx *executerContext) error {
 		o.log.Debugf("could not add permission to function, error: %s, response: %s", err, permissionResp)
 		return err
 	}
+
+	o.log.Debugf("adding permissions successful")
 	return nil
 }
 
