@@ -96,6 +96,8 @@ var (
 	ErrRequired = errors.New("missing required field")
 
 	ErrEmpty = errors.New("empty field")
+
+	ErrUUIDGeneration = errors.New("failed to generate UUID for ID")
 )
 
 // Error Classes
@@ -331,4 +333,9 @@ func raiseInvalidRegexp(v value, err error) Error {
 func raiseParseSplice(ctx context, meta *Meta, err error) Error {
 	message := fmt.Sprintf("%v parsing splice", err)
 	return raisePathErr(err, meta, message, ctx.path("."))
+}
+
+func raiseIDGeneration(ctx context, meta *Meta, err error) Error {
+	message := fmt.Sprintf("failed to generate UUID for ID: %v", err)
+	return raiseErr(ErrUUIDGeneration, message)
 }
