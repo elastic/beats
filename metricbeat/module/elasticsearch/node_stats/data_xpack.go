@@ -182,13 +182,13 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 	// master node will not be accurate anymore as often in these cases a proxy is in front
 	// of ES and it's not know if the request will be routed to the same node as before.
 	for nodeID, node := range nodesStruct.Nodes {
-		clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HostData().SanitizedURI, nodeID)
+		clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HTTP.GetURI(), nodeID)
 		if err != nil {
 			logp.Err("could not fetch cluster id: %s", err)
 			continue
 		}
 
-		isMaster, _ := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI)
+		isMaster, _ := elasticsearch.IsMaster(m.HTTP, m.HTTP.GetURI())
 
 		event := mb.Event{}
 		// Build source_node object
