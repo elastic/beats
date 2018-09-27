@@ -143,6 +143,17 @@ func (c *CloudwatchLogs) Update(content []byte, awsCfg aws.Config) error {
 	executer := newExecuter(c.log, context)
 
 	executer.Add(newOpUpdateLambda(c.log, awsCfg))
+	executer.Add(newOpUpdateAlias(c.log, awsCfg))
+
+	for _, trigger := range c.config.Triggers {
+		subscription := subscriptionFilter{
+			LogGroupName:  trigger.LogGroupName,
+			FilterName:    trigger.FilterName,
+			FilterPattern: trigger.FilterPattern,
+		}
+		executer.Add(newOpAddSubscriptionFilter(c.log, awsCfg, subscription))
+	}
+
 	if err := executer.Execute(); err != nil {
 		if rollbackErr := executer.Rollback(); rollbackErr != nil {
 			return merrors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
