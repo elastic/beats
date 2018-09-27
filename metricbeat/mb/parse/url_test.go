@@ -20,6 +20,8 @@ package parse
 import (
 	"testing"
 
+	"github.com/elastic/beats/metricbeat/mb"
+
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
@@ -118,6 +120,7 @@ func TestURLHostParserBuilder(t *testing.T) {
 		{map[string]interface{}{"basepath": "foo/"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
 		{map[string]interface{}{"basepath": "/foo/"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
 		{map[string]interface{}{"basepath": "foo"}, URLHostParserBuilder{DefaultPath: "/default"}, "http://example.com/foo/default"},
+		{map[string]interface{}{"basepath": "foo"}, URLHostParserBuilder{DefaultPath: "/queryParams", QueryParams: mb.QueryParams{"key": "value"}.String()}, "http://example.com/foo/queryParams?key=value"},
 	}
 
 	for _, test := range cases {
