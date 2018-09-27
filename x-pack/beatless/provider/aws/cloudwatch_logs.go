@@ -93,8 +93,7 @@ func (c CloudwatchLogs) Name() string {
 	return "cloudwatch_logs"
 }
 
-// Deploy returns the list of operation that we need to execute on AWS lambda after installing the
-// function.
+// Deploy executes a number of operation to make the state consistent for this specific lambda function.
 func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 	context := &executerContext{
 		Content:     content,
@@ -131,5 +130,23 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 
 // Update an existing lambda function.
 func (c *CloudwatchLogs) Update(content []byte, awsCfg aws.Config) error {
+	context := &executerContext{
+		Content:     content,
+		Name:        c.config.Name,
+		Description: c.config.Description,
+		Role:        c.config.Role,
+		Runtime:     runtime,
+		HandleName:  handlerName,
+	}
+
+	executer := newExecuter(c.log, context)
+
+	executer.Add(newOpUpdateLambda(c.log, awsCfg))
+	if err := executer.Execute(); err != nil {
+		if rollbackErr := executer.Rollback(); rollbackErr != nil {
+			return merrors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
+		}
+		return err
+	}
 	return nil
 }
