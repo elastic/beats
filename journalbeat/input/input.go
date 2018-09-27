@@ -138,7 +138,9 @@ func (i *Input) publishAll(client beat.Client) {
 				select {
 				case <-i.done:
 					return
-				case v := <-c:
+				default:
+				}
+				for v := range c {
 					out <- v
 				}
 			}
