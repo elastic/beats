@@ -80,6 +80,8 @@ func main() {
 		}
 	}
 
+	// Depending on OS or tools configuration, files can contain carriages (\r),
+	// what leads to different results, remove them before encoding.
 	encData, err := asset.EncodeData(strings.Replace(string(data), "\r", "", -1))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error encoding the data: %s\n", err)
