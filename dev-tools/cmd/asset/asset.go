@@ -27,6 +27,7 @@ import (
 	"go/format"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/licenses"
@@ -79,7 +80,7 @@ func main() {
 		}
 	}
 
-	encData, err := asset.EncodeData(string(data))
+	encData, err := asset.EncodeData(strings.Replace(string(data), "\r", "", -1))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error encoding the data: %s\n", err)
 		os.Exit(1)
