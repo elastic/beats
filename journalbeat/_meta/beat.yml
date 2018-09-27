@@ -13,7 +13,8 @@
 #=========================== Journalbeat inputs =============================
 
 journalbeat.inputs:
-  # Paths that should be crawled and fetched. Glob based paths.
+  # Paths that should be crawled and fetched. Possible values files and directories.
+  # When setting a directory, all journals under it are merged.
   # When empty starts to read from local journal.
 - paths: []
 
