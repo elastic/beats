@@ -86,8 +86,8 @@ Example:
 path.data: /var/lib/beats
 ------------------------------------------------------------------------------
 
-TIP: When running {beatname_uc} along with other beats on the same host, make sure that
-each beat has its own distinct `path.data` value.
+TIP: When running multiple beat instances on the same host, make sure they
+each have a distinct `path.data` value.
 
 [float]
 ==== `logs`
