@@ -145,6 +145,6 @@ destination host.
 
 [float]
 [[monitoring-shows-fewer-than-expected-beats]]
-=== Monitoring UI shows fewer beats than expected
+=== Monitoring UI shows fewer Beats than expected
 
-If you are running multiple beat instances on the same host, make sure they each have a distinct `path.data` value.
+If you are running multiple Beat instances on the same host, make sure they each have a distinct `path.data` value.
