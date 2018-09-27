@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -44,8 +43,6 @@ type Heartbeat struct {
 
 // New creates a new heartbeat.
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
-	cfgwarn.Beta("Heartbeat is beta software")
-
 	parsedConfig := config.DefaultConfig
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
