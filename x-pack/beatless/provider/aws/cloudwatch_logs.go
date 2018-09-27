@@ -109,7 +109,7 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 	executer.Add(newOpCreateLambda(c.log, awsCfg))
 	executer.Add(newOpAddPermission(c.log, awsCfg, permission{
 		Action:    "lambda:InvokeFunction",
-		Principal: "logs." + awsCfg.Region + "amazonaws.com",
+		Principal: "logs." + awsCfg.Region + ".amazonaws.com",
 	}))
 
 	for _, trigger := range c.config.Triggers {

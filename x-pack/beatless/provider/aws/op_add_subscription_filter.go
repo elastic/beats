@@ -39,7 +39,7 @@ func (o *opAddSubscriptionFilter) Execute(ctx *executerContext) error {
 		return err
 	}
 
-	o.log.Debugf("subscription filter added successfully")
+	o.log.Debugf("adding subscription filter successfully")
 	return nil
 }
 
