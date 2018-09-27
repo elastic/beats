@@ -23,7 +23,6 @@ The following topics describe how to build a new Beat:
 * <<setting-up-beat>>
 * <<compiling-and-running>>
 * <<beater-interface>>
-* <<ls-beat>>
 * <<newbeat-sharing>>
 * <<event-conventions>>
 
@@ -490,16 +489,6 @@ func main() {
 	}
 }
 ----------------------------------------------------------------------
-
-
-[[ls-beat]]
-=== Example: Building Lsbeat from Scratch
-
-https://github.com/kimjmin/lsbeat[Lsbeat] is similar to the `ls` command-line tool, but instead of printing the files and subdirectories to the screen,
-Lsbeat periodically ships them to Elasticsearch for storage.
-
-To help you learn how to build a Beat, we've created this http://elastic.co//blog/build-your-own-beat[blog post]
-that describes how to build Lsbeat from scratch. You can refer to the Lsbeat implementation as a working example.
 
 [[newbeat-sharing]]
 === Sharing Your Beat with the Community
