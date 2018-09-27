@@ -59,7 +59,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	host, err := sysinfo.Host()
 	if err != nil {
-		report.Error(errors.Wrap(err, "Failed to load host information"))
+		errW := errors.Wrap(err, "Failed to load host information")
+		ms.log.Error(errW)
+		report.Error(errW)
 		return
 	}
 

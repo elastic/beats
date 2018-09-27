@@ -90,7 +90,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch checks which processes are running on the host and reports them.
 // It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	processInfos := ms.getProcessInfos()
+	processInfos, errorList := ms.getProcessInfos()
+	if len(errorList) != 0 {
+		for _, err := range errorList {
+			ms.log.Error(err)
+			report.Error(err)
+		}
+	}
+	if processInfos == nil {
+		return
+	}
 
 	if ms.cache != nil && !ms.cache.IsEmpty() {
 		started, stopped := ms.cache.DiffAndUpdateCache(processInfos)
@@ -133,25 +142,28 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 }
 
-func (ms *MetricSet) getProcessInfos() (processInfos []cache.Cacheable) {
+func (ms *MetricSet) getProcessInfos() ([]cache.Cacheable, []error) {
 	// TODO: Implement Processes() in go-sysinfo
 	// e.g. https://github.com/elastic/go-sysinfo/blob/master/providers/darwin/process_darwin_amd64.go#L41
 	pids, err := process.Pids()
 	if err != nil {
-		ms.log.Errorw("Failed to fetch the list of PIDs", "error", err)
+		return nil, []error{errors.Wrap(err, "Failed to fetch the list of PIDs")}
 	}
+
+	var processInfos []cache.Cacheable
+	var errorList []error
 
 	for _, pid := range pids {
 		if p, err := sysinfo.Process(pid); err == nil {
 			if pInfo, err := p.Info(); err == nil {
 				processInfos = append(processInfos, ProcessInfo{pInfo})
 			} else {
-				ms.log.Errorw("Failed to load process information", "error", err)
+				errorList = append(errorList, errors.Wrap(err, "Failed to load process information"))
 			}
 		} else {
-			ms.log.Errorw("Failed to load process", "error", err)
+			errorList = append(errorList, errors.Wrap(err, "Failed to load process"))
 		}
 	}
 
-	return
+	return processInfos, errorList
 }

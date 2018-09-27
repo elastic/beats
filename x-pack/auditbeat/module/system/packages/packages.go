@@ -105,6 +105,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	packages, err := getPackages()
 	if err != nil {
+		ms.log.Error(err)
 		report.Error(err)
 	}
 	if packages == nil {
