@@ -4621,7 +4621,7 @@ Contains log file lines.
 
 
 
-*`log.source`*::
+*`source`*::
 +
 --
 type: keyword
@@ -4629,6 +4629,18 @@ type: keyword
 required: True
 
 The file from which the line was read. This field contains the absolute path to the file. For example: `/var/log/system.log`.
+
+
+--
+
+*`offset`*::
++
+--
+type: long
+
+required: False
+
+The file offset the reported line starts at.
 
 
 --
