@@ -14494,7 +14494,7 @@ The PID of the process
 *`php_fpm.process.state`*::
 +
 --
-type: string
+type: keyword
 
 The state of the process (Idle, Running, etc)
 
@@ -14546,7 +14546,7 @@ The duration in microseconds (1 million in a second) of the current request (my 
 *`php_fpm.process.request_method`*::
 +
 --
-type: string
+type: keyword
 
 The request method (GET, POST, etc) (of the current request)
 
@@ -14556,7 +14556,7 @@ The request method (GET, POST, etc) (of the current request)
 *`php_fpm.process.request_uri`*::
 +
 --
-type: string
+type: text
 
 The request URI with the query string (of the current request)
 
@@ -14576,7 +14576,7 @@ The content length of the request (only with POST) (of the current request)
 *`php_fpm.process.user`*::
 +
 --
-type: string
+type: keyword
 
 The user (PHP_AUTH_USER) (or - if not set) (for the current request)
 
@@ -14586,7 +14586,7 @@ The user (PHP_AUTH_USER) (or - if not set) (for the current request)
 *`php_fpm.process.script`*::
 +
 --
-type: string
+type: text
 
 The main script called (or - if not set) (for the current request)
 
