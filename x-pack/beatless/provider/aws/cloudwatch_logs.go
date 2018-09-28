@@ -22,10 +22,10 @@ import (
 
 // CloudwatchLogsConfig is the configuration for the cloudwatchlogs event type.
 type CloudwatchLogsConfig struct {
-	Triggers    []*CloudwatchLogsTriggerConfig
-	Description string `config:"description"`
-	Name        string `config:"name" validate:"nonzero,required"`
-	Role        string `config:"role" validate:"nonzero,required"`
+	Triggers    []*CloudwatchLogsTriggerConfig `config:"triggers"`
+	Description string                         `config:"description"`
+	Name        string                         `config:"name" validate:"nonzero,required"`
+	Role        string                         `config:"role" validate:"nonzero,required"`
 }
 
 // CloudwatchLogsTriggerConfig is the configuration for the specific triggers for cloudwatch.
@@ -61,7 +61,12 @@ func NewCloudwatchLogs(provider provider.Provider, cfg *common.Config) (provider
 
 // Run start the AWS lambda handles and will transform any events received to the pipeline.
 func (c *CloudwatchLogs) Run(_ context.Context, client core.Client) error {
-	lambda.Start(func(request events.CloudwatchLogsEvent) error {
+	lambda.Start(c.createHandler(client))
+	return nil
+}
+
+func (c *CloudwatchLogs) createHandler(client core.Client) func(request events.CloudwatchLogsEvent) error {
+	return func(request events.CloudwatchLogsEvent) error {
 		parsedEvent, err := request.AWSLogs.Parse()
 		if err != nil {
 			c.log.Errorf("could not parse events from cloudwatch logs, error: %s", err)
@@ -84,8 +89,7 @@ func (c *CloudwatchLogs) Run(_ context.Context, client core.Client) error {
 		}
 		client.Wait()
 		return nil
-	})
-	return nil
+	}
 }
 
 // Name returns the name of the function.
