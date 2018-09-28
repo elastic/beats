@@ -1,4 +1,5 @@
 :modulename: iis
+:has-dashboards: true
 
 == IIS module
 
@@ -64,3 +65,9 @@ include::../include/var-paths.asciidoc[]
 ==== `error` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

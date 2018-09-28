@@ -6,9 +6,9 @@
 
 {beatname_uc} provides a set of pre-built modules that you can use to rapidly
 implement and deploy a log monitoring solution, complete with sample dashboards
-and data visualizations, in about 5 minutes. These modules support common log
-formats, such as Nginx, Apache2, and MySQL, and can be run by issuing a simple
-command.
+and data visualizations (when available), in about 5 minutes. These modules
+support common log formats, such as Nginx, Apache2, and MySQL, and can be run by
+issuing a simple command.
 
 This topic shows you how to run the basic modules with minimal extra
 configuration. For detailed documentation and the full list of available
