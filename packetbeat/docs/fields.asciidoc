@@ -4283,6 +4283,22 @@ Properties of the source host
 
 
 
+*`source.mac`*::
++
+--
+Source MAC address as indicated by first packet seen for the current flow.
+
+
+--
+
+*`source.ip`*::
++
+--
+Innermost IPv4 source address as indicated by first packet seen for the current flow.
+
+
+--
+
 *`source.ip_location`*::
 +
 --
@@ -4351,6 +4367,14 @@ type: geo_point
 example: 60.715, -76.011
 
 The GeoIP location of the `outer_ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+--
+
+*`source.port`*::
++
+--
+Source port number as indicated by first packet seen for the current flow.
 
 
 --
