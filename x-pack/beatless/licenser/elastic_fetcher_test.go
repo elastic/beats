@@ -92,7 +92,7 @@ func TestParseJSON(t *testing.T) {
 	})
 
 	t.Run("200 response", func(t *testing.T) {
-		filepath.Walk("data/", func(path string, i os.FileInfo, err error) error {
+		filepath.Walk("testdata/", func(path string, i os.FileInfo, err error) error {
 			if i.IsDir() {
 				return nil
 			}

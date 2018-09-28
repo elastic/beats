@@ -7,12 +7,14 @@ package licenser
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
@@ -82,15 +84,25 @@ func (et *expiryTime) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+type esclient interface {
+	Request(
+		method,
+		path string,
+		pipeline string,
+		params map[string]string,
+		body interface{},
+	) (int, []byte, error)
+}
+
 // ElasticFetcher wraps an elasticsearch clients to retrieve licensing information
 // on a specific cluster.
 type ElasticFetcher struct {
-	client *elasticsearch.Client
+	client esclient
 	log    *logp.Logger
 }
 
 // NewElasticFetcher creates a new Elastic Fetcher
-func NewElasticFetcher(client *elasticsearch.Client) *ElasticFetcher {
+func NewElasticFetcher(client esclient) *ElasticFetcher {
 	return &ElasticFetcher{client: client, log: logp.NewLogger("elasticfetcher")}
 }
 
@@ -111,7 +123,7 @@ func (f *ElasticFetcher) Fetch() (*License, error) {
 	}
 
 	if status != http.StatusOK {
-		return nil, fmt.Errorf("could not retrieve license information, response code: %d", status)
+		return nil, fmt.Errorf("error from server, response code: %d", status)
 	}
 
 	if err != nil {
@@ -144,4 +156,58 @@ func (f *ElasticFetcher) parseJSON(b []byte) (*License, error) {
 	license.Features = info.Features
 
 	return &license, nil
+}
+
+// esClientMux is taking care of round robin request over an array of elasticsearch client, note that
+// calling request is not threadsafe.
+type esClientMux struct {
+	clients []elasticsearch.Client
+	idx     int
+}
+
+// Request takes a slice of elasticsearch clients and connect to one randomly and close the connection
+// at the end of the function call, if an error occur we return the error and will pick up the next client on the
+// next call. Not that we just round robin between hosts, any backoff strategy should be handled by
+// the consumer of this type.
+func (mux *esClientMux) Request(
+	method, path string,
+	pipeline string,
+	params map[string]string,
+	body interface{},
+) (int, []byte, error) {
+	c := mux.clients[mux.idx]
+
+	if err := c.Connect(); err != nil {
+		return 0, nil, err
+	}
+	defer c.Close()
+
+	status, response, err := c.Request(method, path, pipeline, params, body)
+	if err != nil {
+		// use next host for next retry
+		mux.idx = (mux.idx + 1) % len(mux.clients)
+	}
+	return status, response, err
+}
+
+func newESClientMux(clients []elasticsearch.Client) *esClientMux {
+	idx := rand.Intn(len(clients))
+	return &esClientMux{idx: idx, clients: clients}
+}
+
+// Create takes a raw configuration and will create a a license manager based on the elasticsearch
+// output configuration, if no output is found we return an error.
+func Create(cfg *common.ConfigNamespace, refreshDelay, graceDelay time.Duration) (*Manager, error) {
+	if !cfg.IsSet() || cfg.Name() != "elasticsearch" {
+		return nil, ErrNoElasticsearchConfig
+	}
+
+	clients, err := elasticsearch.NewElasticsearchClients(cfg.Config())
+	if err != nil {
+		return nil, err
+	}
+	clientsMux := newESClientMux(clients)
+
+	manager := New(clientsMux, refreshDelay, graceDelay)
+	return manager, nil
 }

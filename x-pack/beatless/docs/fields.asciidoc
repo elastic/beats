@@ -13,6 +13,7 @@ This document describes the fields that are exported by Beatless. They are
 grouped in the following categories:
 
 * <<exported-fields-beat>>
+* <<exported-fields-beatless>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-host-processor>>
@@ -125,6 +126,24 @@ Error code.
 type: keyword
 
 Error type.
+
+
+--
+
+[[exported-fields-beatless]]
+== beatless fields
+
+None
+
+
+*`counter`*::
++
+--
+type: long
+
+required: True
+
+PLEASE UPDATE DOCUMENTATION
 
 
 --
