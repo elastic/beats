@@ -392,3 +392,8 @@ func (w *watcher) ListenStart() bus.Listener {
 func (w *watcher) ListenStop() bus.Listener {
 	return w.bus.Subscribe("stop")
 }
+
+// ListenDelete returns a bus listener to receive container deleted events, with a `container` key holding it
+func (w *watcher) ListenDelete() bus.Listener {
+	return w.bus.Subscribe("delete")
+}

@@ -76,7 +76,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	}
 
 	start := watcher.ListenStart()
-	stop := watcher.ListenStop()
+	stop := watcher.ListenDelete()
 
 	if err := watcher.Start(); err != nil {
 		return nil, err
