@@ -37,7 +37,14 @@ func NewAPIGatewayProxy(provider provider.Provider, config *common.Config) (prov
 
 // Run starts the lambda function and wait for web triggers.
 func (a *APIGatewayProxy) Run(_ context.Context, client core.Client) error {
-	lambda.Start(func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	lambda.Start(a.createHandler(client))
+	return nil
+}
+
+func (a *APIGatewayProxy) createHandler(
+	client core.Client,
+) func(events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	return func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 		a.log.Debugf("received event (requestID: %s)", request.RequestContext.RequestID)
 		event := transformer.APIGatewayProxyRequest(request)
 		if err := client.Publish(event); err != nil {
@@ -54,13 +61,15 @@ func (a *APIGatewayProxy) Run(_ context.Context, client core.Client) error {
 			"event received successfully.",
 			request.RequestContext.RequestID,
 		), nil
-	})
-
-	return nil
+	}
 }
 
-func (a *APIGatewayProxy) buildResponse(statusCode int, responseMsg string, requestID string) events.APIGatewayProxyResponse {
-	body, _ := json.Marshal(message{Status: http.StatusOK, Message: responseMsg, RequestID: requestID})
+func (a *APIGatewayProxy) buildResponse(
+	statusCode int,
+	responseMsg string,
+	requestID string,
+) events.APIGatewayProxyResponse {
+	body, _ := json.Marshal(message{Status: statusCode, Message: responseMsg, RequestID: requestID})
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: statusCode,
