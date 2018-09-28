@@ -1,4 +1,5 @@
 :modulename: apache2
+:has-dashboards: true
 
 == Apache2 module
 
@@ -69,3 +70,9 @@ include::../include/var-paths.asciidoc[]
 ==== `error` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
