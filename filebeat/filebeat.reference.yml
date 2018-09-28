@@ -27,8 +27,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
   # Authorization logs
@@ -45,8 +44,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
 #------------------------------- Apache2 Module ------------------------------
@@ -62,8 +60,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
   # Error logs
@@ -77,8 +74,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
 #------------------------------- Auditd Module -------------------------------
@@ -93,8 +89,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
 #---------------------------- elasticsearch Module ---------------------------
@@ -157,8 +152,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
   # Debug logs
@@ -172,8 +166,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
   # Startup logs
@@ -187,8 +180,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
 #--------------------------------- IIS Module --------------------------------
@@ -204,8 +196,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
   # Error logs
@@ -219,8 +210,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
 #-------------------------------- Kafka Module -------------------------------
@@ -280,8 +270,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
 #-------------------------------- MySQL Module -------------------------------
@@ -297,8 +286,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
   # Slow logs
@@ -312,8 +300,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
 #-------------------------------- Nginx Module -------------------------------
@@ -329,6 +316,8 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+      #Keeps the original message, so the data can be processed again on Ingest Node.
+      #keep_original_message: true
 
   # Error logs
   #error:
@@ -341,8 +330,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
 #------------------------------- Osquery Module ------------------------------
@@ -372,8 +360,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
 #-------------------------------- Redis Module -------------------------------
@@ -409,8 +396,7 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-      #Keeps the original message, so the data can be processed again on Ingest Node
-      #It requires increased storage size, because the sizes of events are approximately doubled.
+      #Keeps the original message, so the data can be processed again on Ingest Node.
       #keep_original_message: true
 
 
