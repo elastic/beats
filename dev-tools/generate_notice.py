@@ -7,10 +7,10 @@ import argparse
 import json
 import csv
 import re
-<<<<<<< HEAD
-=======
+<< << << < HEAD
+== == == =
 import pdb
->>>>>>> f56598ebf... Correctly report double licensed project and allow to skip file
+>>>>>> > f56598ebf... Correctly report double licensed project and allow to skip file
 import copy
 
 
@@ -94,6 +94,7 @@ SKIP_FILES = [
     # AWS lambda go defines that some part of the code is APLv2 and other on a MIT Modified license.
     "./vendor/github.com/aws/aws-lambda-go/LICENSE-SUMMARY"
 ]
+
 
 def get_licenses(folder):
     """
