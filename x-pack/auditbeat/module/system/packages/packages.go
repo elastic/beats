@@ -24,6 +24,8 @@ import (
 
 	"github.com/OneOfOne/xxhash"
 
+	"github.com/OneOfOne/xxhash"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/go-sysinfo"
 )
