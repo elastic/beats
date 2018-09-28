@@ -109,7 +109,7 @@ func CreateFunctions(
 			return nil, err
 		}
 
-		if functionInSlice(enabledFunctions, c.Name) == -1 {
+		if strInSlice(enabledFunctions, c.Name) == -1 {
 			continue
 		}
 
@@ -136,9 +136,9 @@ func CreateFunctions(
 	return runners, nil
 }
 
-func functionInSlice(functions []string, name string) int {
-	for idx, function := range functions {
-		if function == name {
+func strInSlice(haystack []string, name string) int {
+	for idx, s := range haystack {
+		if s == name {
 			return idx
 		}
 	}

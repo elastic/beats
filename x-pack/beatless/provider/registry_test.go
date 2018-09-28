@@ -195,3 +195,14 @@ func withRegistry(fn func(t *testing.T, global *feature.FeatureRegistry, registr
 		fn(t, global, wrapped)
 	}
 }
+
+func testStrInSlice(t *testing.T) {
+	haystack := []string{"bob", "aline"}
+	t.Run("when in slice return position", func(t *testing.T) {
+		assert.Equal(t, 1, strInSlice(haystack, "aline"))
+	})
+
+	t.Run("when not in slice return -1", func(t *testing.T) {
+		assert.Equal(t, -1, strInSlice(haystack, "robert"))
+	})
+}
