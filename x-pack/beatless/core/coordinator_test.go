@@ -20,12 +20,15 @@ func (hr *happyRunner) Run(ctx context.Context) error {
 	<-ctx.Done()
 	return nil
 }
+func (hr *happyRunner) String() string { return "happyRunner" }
 
 type unhappyRunner struct{}
 
 func (uhr *unhappyRunner) Run(ctx context.Context) error {
 	return errUnhappy
 }
+
+func (uhr *unhappyRunner) String() string { return "unhappyRunner" }
 
 func TestStart(t *testing.T) {
 	t.Run("start the runner", func(t *testing.T) {
