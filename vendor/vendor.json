@@ -431,6 +431,24 @@
 			"revisionTime": "2018-03-18T00:15:26Z"
 		},
 		{
+			"checksumSHA1": "cEszpxh1szqTb440ze4hm/Vfm40=",
+			"path": "github.com/coreos/go-systemd/sdjournal",
+			"revision": "eee3db372b31153ca0b90702e165948699803fd0",
+			"revisionTime": "2018-08-28T14:03:53Z"
+		},
+		{
+			"checksumSHA1": "nwll5KjH9SKrWxB45OmN09wdipI=",
+			"path": "github.com/coreos/pkg",
+			"revision": "97fdf19511ea361ae1c100dd393cc47f8dcfa1e1",
+			"revisionTime": "2018-01-08T23:06:52Z"
+		},
+		{
+			"checksumSHA1": "O8c/VKtW34XPJNNlyeb/im8vWSI=",
+			"path": "github.com/coreos/pkg/dlopen",
+			"revision": "97fdf19511ea361ae1c100dd393cc47f8dcfa1e1",
+			"revisionTime": "2018-01-08T23:06:52Z"
+		},
+		{
 			"checksumSHA1": "dvabztWVQX8f6oMLRyv4dLH+TGY=",
 			"path": "github.com/davecgh/go-spew/spew",
 			"revision": "346938d642f2ec3594ed81d874461961cd0faa76",

@@ -109,6 +109,12 @@ jobs:
       go: $GO_VERSION
       stage: test
 
+    # Journalbeat
+    - os: linux
+      env: TARGETS="-C journalbeat testsuite"
+      go: $GO_VERSION
+      stage: test
+
     # Generators
     - os: linux
       env: TARGETS="-C generator/metricbeat test"
@@ -156,10 +162,12 @@ addons:
   apt:
     update: true
     packages:
-      - python-virtualenv
+      - libc6-dev-i386
       - libpcap-dev
-      - xsltproc
+      - libsystemd-journal-dev
       - libxml2-utils
+      - python-virtualenv
+      - xsltproc
 
 before_install:
   - python --version

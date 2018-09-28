@@ -1,0 +1,5 @@
+= Journalbeat Docs
+
+Welcome to the Journalbeat documentation.
+
+
