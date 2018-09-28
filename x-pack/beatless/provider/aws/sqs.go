@@ -29,7 +29,12 @@ func NewSQS(provider provider.Provider, config *common.Config) (provider.Functio
 
 // Run starts the lambda function and wait for web triggers.
 func (s *SQS) Run(_ context.Context, client core.Client) error {
-	lambda.Start(func(request events.SQSEvent) error {
+	lambda.Start(s.createHandler(client))
+	return nil
+}
+
+func (s *SQS) createHandler(client core.Client) func(request events.SQSEvent) error {
+	return func(request events.SQSEvent) error {
 		s.log.Debugf("received %d events", len(request.Records))
 
 		events := transformer.SQS(request)
@@ -39,9 +44,7 @@ func (s *SQS) Run(_ context.Context, client core.Client) error {
 		}
 		client.Wait()
 		return nil
-	})
-
-	return nil
+	}
 }
 
 // Name return the name of the lambda function.
