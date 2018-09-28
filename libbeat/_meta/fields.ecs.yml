@@ -982,44 +982,6 @@
             This id normally changes across restarts, but `service.id` does not.
           example: 8a4f500f
     
-    - name: source
-      title: Source
-      group: 2
-      description: >
-        Source fields describe details about the source of the event.
-      type: group
-      fields:
-        - name: ip
-          type: ip
-          description: >
-            IP address of the source.
-    
-            Can be one or multiple IPv4 or IPv6 addresses.
-        - name: hostname
-          type: keyword
-          description: >
-            Hostname of the source.
-        - name: port
-          type: long
-          phase: 1
-          description: >
-            Port of the source.
-        - name: mac
-          type: keyword
-          phase: 1
-          description: >
-            MAC address of the source.
-        - name: domain
-          type: keyword
-          phase: 1
-          description: >
-            Source domain.
-        - name: subdomain
-          type: keyword
-          phase: 1
-          description: >
-            Source subdomain.
-    
     - name: tls
       title: TLS
       group: 2
