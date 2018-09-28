@@ -26,7 +26,7 @@ type opAddPermission struct {
 	permission permission
 }
 
-func (o *opAddPermission) Execute(ctx *executerContext) error {
+func (o *opAddPermission) Execute(ctx *executorContext) error {
 	o.log.Debugf(
 		"adding permissions, action: %s, principal: %s",
 		o.permission.Action,

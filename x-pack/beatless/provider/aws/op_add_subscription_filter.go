@@ -24,7 +24,7 @@ type opAddSubscriptionFilter struct {
 	svc          *cloudwatchlogs.CloudWatchLogs
 }
 
-func (o *opAddSubscriptionFilter) Execute(ctx *executerContext) error {
+func (o *opAddSubscriptionFilter) Execute(ctx *executorContext) error {
 	o.log.Debugf(
 		"adding subscription filter for LogGroupName: %, FilterName: %s, FilterPattern: %s",
 		o.subscription.LogGroupName,
@@ -54,7 +54,7 @@ func (o *opAddSubscriptionFilter) Execute(ctx *executerContext) error {
 	return nil
 }
 
-func (o *opAddSubscriptionFilter) Rollback(ctx *executerContext) error {
+func (o *opAddSubscriptionFilter) Rollback(ctx *executorContext) error {
 	o.log.Debugf(
 		"remove subscription filter for LogGroupName: %, FilterName: %s, FilterPattern: %s",
 		o.subscription.LogGroupName,

@@ -16,7 +16,7 @@ type opUpdateAlias struct {
 	log *logp.Logger
 }
 
-func (o *opUpdateAlias) Execute(ctx *executerContext) error {
+func (o *opUpdateAlias) Execute(ctx *executorContext) error {
 	o.log.Debugf("updating new alias for function with name: %s", ctx.Name)
 	req := &lambdaApi.UpdateAliasInput{
 		Description:     aws.String("alias for " + ctx.Name),

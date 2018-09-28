@@ -95,7 +95,7 @@ func (c CloudwatchLogs) Name() string {
 
 // Deploy executes a number of operation to make the state consistent for this specific lambda function.
 func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
-	context := &executerContext{
+	context := &executorContext{
 		Content:     content,
 		Name:        c.config.Name,
 		Description: c.config.Description,
@@ -104,7 +104,7 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 		HandleName:  handlerName,
 	}
 
-	executer := newExecuter(c.log, context)
+	executer := newExecutor(c.log, context)
 	executer.Add(newOpCreateLambda(c.log, awsCfg))
 	executer.Add(newOpCreateAlias(c.log, awsCfg))
 	executer.Add(newOpAddPermission(c.log, awsCfg, permission{
@@ -131,7 +131,7 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 
 // Update an existing lambda function.
 func (c *CloudwatchLogs) Update(content []byte, awsCfg aws.Config) error {
-	context := &executerContext{
+	context := &executorContext{
 		Content:     content,
 		Name:        c.config.Name,
 		Description: c.config.Description,
@@ -140,7 +140,7 @@ func (c *CloudwatchLogs) Update(content []byte, awsCfg aws.Config) error {
 		HandleName:  handlerName,
 	}
 
-	executer := newExecuter(c.log, context)
+	executer := newExecutor(c.log, context)
 
 	executer.Add(newOpUpdateLambda(c.log, awsCfg))
 	executer.Add(newOpUpdateAlias(c.log, awsCfg))

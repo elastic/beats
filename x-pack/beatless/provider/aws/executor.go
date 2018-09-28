@@ -16,7 +16,7 @@ var errNeverRun = errors.New("executer was never executed")
 var errCannotAdd = errors.New("cannot add to an already executed executer")
 var errAlreadyExecuted = errors.New("executer already executed")
 
-type executerContext struct {
+type executorContext struct {
 	Content     []byte
 	Name        string
 	FunctionArn string
@@ -27,8 +27,8 @@ type executerContext struct {
 	Runtime     lambdaApi.Runtime
 }
 
-type executer struct {
-	Context    *executerContext
+type executor struct {
+	Context    *executorContext
 	operations []doer
 	undos      []undoer
 	completed  bool
@@ -36,22 +36,22 @@ type executer struct {
 }
 
 type doer interface {
-	Execute(*executerContext) error
+	Execute(*executorContext) error
 }
 
 type undoer interface {
-	Rollback(*executerContext) error
+	Rollback(*executorContext) error
 }
 
-func newExecuter(log *logp.Logger, context *executerContext) *executer {
+func newExecutor(log *logp.Logger, context *executorContext) *executor {
 	if log == nil {
 		log = logp.NewLogger("executer")
 	}
 
-	return &executer{log: log, Context: context}
+	return &executor{log: log, Context: context}
 }
 
-func (e *executer) Execute() (err error) {
+func (e *executor) Execute() (err error) {
 	e.log.Debugf("executing %d operations", len(e.operations))
 	if e.IsCompleted() {
 		return errAlreadyExecuted
@@ -74,7 +74,7 @@ func (e *executer) Execute() (err error) {
 	return err
 }
 
-func (e *executer) Rollback() (err error) {
+func (e *executor) Rollback() (err error) {
 	e.log.Debugf("rolling back previous execution, %d operations", len(e.undos))
 	if !e.IsCompleted() {
 		return errNeverRun
@@ -96,18 +96,18 @@ func (e *executer) Rollback() (err error) {
 	return err
 }
 
-func (e *executer) Add(operation doer) error {
+func (e *executor) Add(operation ...doer) error {
 	if e.IsCompleted() {
 		return errCannotAdd
 	}
-	e.operations = append(e.operations, operation)
+	e.operations = append(e.operations, operation...)
 	return nil
 }
 
-func (e *executer) markCompleted() {
+func (e *executor) markCompleted() {
 	e.completed = true
 }
 
-func (e *executer) IsCompleted() bool {
+func (e *executor) IsCompleted() bool {
 	return e.completed
 }

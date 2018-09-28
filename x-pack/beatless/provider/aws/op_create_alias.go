@@ -18,7 +18,7 @@ type opCreateAlias struct {
 	log *logp.Logger
 }
 
-func (o *opCreateAlias) Execute(ctx *executerContext) error {
+func (o *opCreateAlias) Execute(ctx *executorContext) error {
 	o.log.Debugf("creating new alias for function with name: %s", ctx.Name)
 	req := &lambdaApi.CreateAliasInput{
 		Description:     aws.String("alias for " + ctx.Name),
@@ -39,7 +39,7 @@ func (o *opCreateAlias) Execute(ctx *executerContext) error {
 	return nil
 }
 
-func (o *opCreateAlias) Rollback(ctx executerContext) error {
+func (o *opCreateAlias) Rollback(ctx executorContext) error {
 	o.log.Debugf("remove alias for function with name: %s", ctx.Name)
 
 	req := &lambdaApi.DeleteAliasInput{

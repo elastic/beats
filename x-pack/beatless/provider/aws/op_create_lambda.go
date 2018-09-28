@@ -18,7 +18,7 @@ type opCreateLambda struct {
 	log *logp.Logger
 }
 
-func (o *opCreateLambda) Execute(ctx *executerContext) error {
+func (o *opCreateLambda) Execute(ctx *executorContext) error {
 	o.log.Debugf("create new lambda function with name: %s", ctx.Name)
 	// Setup the environment to known which function to execute.
 	envVariables := map[string]string{
@@ -51,7 +51,7 @@ func (o *opCreateLambda) Execute(ctx *executerContext) error {
 	return nil
 }
 
-func (o *opCreateLambda) Rollback(ctx *executerContext) error {
+func (o *opCreateLambda) Rollback(ctx *executorContext) error {
 	o.log.Debugf("remove lambda function with name: %s", ctx.Name)
 	req := &lambdaApi.DeleteFunctionInput{FunctionName: aws.String(ctx.Name)}
 

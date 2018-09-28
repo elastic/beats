@@ -16,7 +16,7 @@ type opUpdateLambda struct {
 	log *logp.Logger
 }
 
-func (o *opUpdateLambda) Execute(ctx *executerContext) error {
+func (o *opUpdateLambda) Execute(ctx *executorContext) error {
 	o.log.Debugf("updating lambda function with name: %s", ctx.Name)
 
 	req := &lambdaApi.UpdateFunctionCodeInput{
