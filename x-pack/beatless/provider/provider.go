@@ -54,6 +54,10 @@ func (r *Runnable) Run(ctx context.Context) error {
 	return r.function.Run(ctx, client)
 }
 
+func (r *Runnable) String() string {
+	return r.function.Name()
+}
+
 // NewProvider return the provider specified in the configuration or an error.
 func NewProvider(cfg *config.Config) (Provider, error) {
 	// Configure the provider, the provider will take care of the configuration for the

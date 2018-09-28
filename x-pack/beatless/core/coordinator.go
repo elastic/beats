@@ -6,6 +6,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/joeshaw/multierror"
 
@@ -14,6 +15,7 @@ import (
 
 // Runner is the interface that the coordinator will follow to manage a function goroutine.
 type Runner interface {
+	fmt.Stringer
 	Run(context.Context) error
 }
 
@@ -76,7 +78,7 @@ func (r *Coordinator) startFunc(
 	rfn Runner,
 	output chan<- error,
 ) {
-	r.log.Info("starting function: %s", rfn)
+	r.log.Infof("starting function: %s", rfn)
 	defer r.log.Infof("function stopped: %s", rfn)
 
 	err := rfn.Run(ctx)
