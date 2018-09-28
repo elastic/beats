@@ -43,3 +43,4 @@ The list below covers the major changes between 6.3.0 and master only.
 - Packaging on MacOS now produces a .dmg file containing an installer (.pkg) and uninstaller for the Beat. {pull}7481[7481]
 - Libbeat provides a new function `cmd.GenRootCmdWithSettings` that should be preferred over deprecated functions
   `cmd.GenRootCmd`, `cmd.GenRootCmdWithRunFlags`, and `cmd.GenRootCmdWithIndexPrefixWithRunFlags`. {pull}7850[7850]
+- You can now override default settings of libbeat by using instance.Settings. {pull}8449[8449]
