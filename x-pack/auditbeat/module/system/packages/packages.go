@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/config"
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/go-sysinfo"
@@ -41,7 +40,7 @@ func init() {
 // MetricSet collects data about the host.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config config.Config
+	config Config
 	cache  *cache.Cache
 	log    *logp.Logger
 }
@@ -83,7 +82,7 @@ func (pkg Package) toMapStr() common.MapStr {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
 
-	config := config.NewDefaultConfig()
+	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
 	}
