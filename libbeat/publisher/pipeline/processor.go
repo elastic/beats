@@ -48,14 +48,15 @@ type processorFn struct {
 //
 //  1. (P) generalize/normalize event
 //  2. (C) add Meta from client Config to event.Meta
-//  3. (C) add Fields from client config to event.Fields
-//  4. (P) add pipeline fields + tags
-//  5. (C) add client fields + tags
-//  6. (C) client processors list
-//  7. (P) add beats metadata
-//  8. (P) pipeline processors list
-//  9. (P) (if publish/debug enabled) log event
-// 10. (P) (if output disabled) dropEvent
+//  3. (P) copy contents of message to `log.original`
+//  4. (C) add Fields from client config to event.Fields
+//  5. (P) add pipeline fields + tags
+//  6. (C) add client fields + tags
+//  7. (C) client processors list
+//  8. (P) add beats metadata
+//  9. (P) pipeline processors list
+// 10. (P) (if publish/debug enabled) log event
+// 11. (P) (if output disabled) dropEvent
 func newProcessorPipeline(
 	info beat.Info,
 	global pipelineProcessors,
@@ -83,6 +84,7 @@ func newProcessorPipeline(
 	}
 
 	if config.KeepOriginalMsg {
+		// setup 3: keep original message
 		processors.add(keepOriginalMsgProcessor)
 	}
 
@@ -228,7 +230,7 @@ var keepOriginalMsgProcessor = newProcessor("keepOriginalMsgEvent", func(event *
 		return event, nil
 	}
 
-	event.PutValue("log.message", original)
+	event.PutValue("log.original", original)
 	return event, nil
 })
 
