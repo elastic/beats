@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
+	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/OneOfOne/xxhash"
 
@@ -31,6 +32,10 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "packages"
+
+	redhat = "redhat"
+	debian = "debian"
+	darwin = "darwin"
 )
 
 func init() {
@@ -42,9 +47,10 @@ func init() {
 // MetricSet collects data about the host.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config Config
-	cache  *cache.Cache
-	log    *logp.Logger
+	config   Config
+	osFamily string
+	cache    *cache.Cache
+	log      *logp.Logger
 }
 
 // Package represents information for a package.
@@ -70,16 +76,30 @@ func (pkg Package) Hash() uint64 {
 
 func (pkg Package) toMapStr() common.MapStr {
 	return common.MapStr{
-		"package.name":        pkg.Name,
-		"package.version":     pkg.Version,
-		"package.release":     pkg.Release,
-		"package.arch":        pkg.Arch,
-		"package.license":     pkg.License,
-		"package.installtime": pkg.InstallTime,
-		"package.size":        pkg.Size,
-		"package.summary":     pkg.Summary,
-		"package.url":         pkg.URL,
+		"name":        pkg.Name,
+		"version":     pkg.Version,
+		"release":     pkg.Release,
+		"arch":        pkg.Arch,
+		"license":     pkg.License,
+		"installtime": pkg.InstallTime,
+		"size":        pkg.Size,
+		"summary":     pkg.Summary,
+		"url":         pkg.URL,
 	}
+}
+
+func getOS() (*types.OSInfo, error) {
+	host, err := sysinfo.Host()
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting the OS")
+	}
+
+	hostInfo := host.Info()
+	if hostInfo.OS == nil {
+		return nil, errors.New("no host info")
+	}
+
+	return hostInfo.OS, nil
 }
 
 // New constructs a new MetricSet.
@@ -97,6 +117,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		log:           logp.NewLogger(moduleName),
 	}
 
+	if os, err := getOS(); err == nil {
+		switch os.Family {
+		case redhat, debian, darwin:
+			ms.osFamily = os.Family
+		default:
+			return nil, fmt.Errorf("this metricset does not support OS family %v", os.Family)
+		}
+	} else if err != nil {
+		return nil, err
+	}
+
 	if config.ReportChanges {
 		ms.cache = cache.New()
 	}
@@ -106,12 +137,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch collects data about the host. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	packages, err := getPackages()
+	packages, err := getPackages(ms.osFamily)
 	if err != nil {
 		ms.log.Error(err)
 		report.Error(err)
-	}
-	if packages == nil {
 		return
 	}
 
@@ -121,8 +150,10 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		for _, pkgInfo := range installed {
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					"status":   "installed",
-					"packages": pkgInfo.(Package).toMapStr(),
+					"status": "installed",
+					"packages": common.MapStr{
+						"package": pkgInfo.(Package).toMapStr(),
+					},
 				},
 			})
 		}
@@ -130,8 +161,10 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		for _, pkgInfo := range removed {
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					"status":   "removed",
-					"packages": pkgInfo.(Package).toMapStr(),
+					"status": "removed",
+					"packages": common.MapStr{
+						"package": pkgInfo.(Package).toMapStr(),
+					},
 				},
 			})
 		}
@@ -140,7 +173,9 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		var pkgInfos []common.MapStr
 
 		for _, pkgInfo := range packages {
-			pkgInfos = append(pkgInfos, pkgInfo.(Package).toMapStr())
+			pkgInfos = append(pkgInfos, common.MapStr{
+				"package": pkgInfo.(Package).toMapStr(),
+			})
 		}
 
 		report.Event(mb.Event{
@@ -156,61 +191,49 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 }
 
-func getPackages() ([]cache.Cacheable, error) {
-	host, err := sysinfo.Host()
-	if err != nil {
-		return nil, errors.Wrap(err, "Error getting the OS")
-	}
-
-	hostInfo := host.Info()
-	if hostInfo.OS == nil {
-		return nil, errors.New("No host info")
-	}
-
-	var packages []cache.Cacheable
-
-	switch hostInfo.OS.Family {
-	case "redhat":
+func getPackages(osFamily string) (packages []cache.Cacheable, err error) {
+	switch osFamily {
+	case redhat:
 		packages, err = listRPMPackages()
 		if err != nil {
-			err = errors.Wrap(err, "Error getting RPM packages")
+			err = errors.Wrap(err, "error getting RPM packages")
 		}
-	case "debian":
+	case debian:
 		packages, err = listDebPackages()
 		if err != nil {
-			err = errors.Wrap(err, "Error getting DEB packages")
+			err = errors.Wrap(err, "error getting DEB packages")
 		}
-	case "darwin":
+	case darwin:
 		packages, err = listBrewPackages()
 		if err != nil {
-			err = errors.Wrap(err, "Error getting Homebrew packages")
+			err = errors.Wrap(err, "error getting Homebrew packages")
 		}
 	default:
-		return nil, fmt.Errorf("No logic for getting packages for OS family %v", hostInfo.OS.Family)
+		panic("unknown OS - this should not have happened")
 	}
 
-	return packages, err
+	return
 }
 
 /*
 The following functions copied from https://github.com/tsg/listpackages/blob/master/main.go
 */
 func listRPMPackages() ([]cache.Cacheable, error) {
-	format := "%{NAME}|%{VERSION}|%{RELEASE}|%{ARCH}|%{LICENSE}|%{INSTALLTIME}|%{SIZE}|%{URL}|%{SUMMARY}\\n"
+	const format = "%{NAME}|%{VERSION}|%{RELEASE}|%{ARCH}|%{LICENSE}|%{INSTALLTIME}|%{SIZE}|%{URL}|%{SUMMARY}\\n"
 	out, err := exec.Command("/usr/bin/rpm", "--qf", format, "-qa").Output()
 	if err != nil {
-		return nil, fmt.Errorf("Error running rpm -qa command: %v", err)
+		return nil, errors.Wrapf(err, "error running rpm -qa command - output: %v", out)
 	}
 
 	lines := strings.Split(string(out), "\n")
-	packages := []cache.Cacheable{}
+	var packages []cache.Cacheable
 	for _, line := range lines {
 		if len(strings.TrimSpace(line)) == 0 {
 			continue
 		}
 		words := strings.SplitN(line, "|", 9)
 		if len(words) < 9 {
-			return nil, fmt.Errorf("Line '%s' doesn't have enough elements", line)
+			return nil, fmt.Errorf("line '%s' doesn't have enough elements", line)
 		}
 		pkg := Package{
 			Name:    words[0],
@@ -225,31 +248,30 @@ func listRPMPackages() ([]cache.Cacheable, error) {
 		}
 		ts, err := strconv.ParseInt(words[5], 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("Error converting %s to string: %v", words[5], err)
+			return nil, errors.Wrapf(err, "error converting %s to string", words[5])
 		}
 		pkg.InstallTime = time.Unix(ts, 0)
 
 		pkg.Size, err = strconv.ParseUint(words[6], 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("Error converting %s to string: %v", words[6], err)
+			return nil, errors.Wrapf(err, "error converting %s to string", words[6])
 		}
 
 		packages = append(packages, pkg)
-
 	}
 
 	return packages, nil
 }
 
 func listDebPackages() ([]cache.Cacheable, error) {
-	statusFile := "/var/lib/dpkg/status"
+	const statusFile = "/var/lib/dpkg/status"
 	file, err := os.Open(statusFile)
 	if err != nil {
-		return nil, fmt.Errorf("Error opening '%s': %v", statusFile, err)
+		return nil, errors.Wrapf(err, "error opening '%s'", statusFile)
 	}
 	defer file.Close()
 
-	packages := []cache.Cacheable{}
+	var packages []cache.Cacheable
 	pkg := &Package{}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -266,7 +288,7 @@ func listDebPackages() ([]cache.Cacheable, error) {
 		}
 		words := strings.SplitN(line, ":", 2)
 		if len(words) != 2 {
-			return nil, fmt.Errorf("The following line was unexpected (no ':' found): '%s'", line)
+			return nil, fmt.Errorf("the following line was unexpected (no ':' found): '%s'", line)
 		}
 		value := strings.TrimSpace(words[1])
 		switch strings.ToLower(words[0]) {
@@ -281,35 +303,29 @@ func listDebPackages() ([]cache.Cacheable, error) {
 		case "installed-size":
 			pkg.Size, err = strconv.ParseUint(value, 10, 64)
 			if err != nil {
-				return nil, fmt.Errorf("Error converting %s to int: %v", value, err)
+				return nil, errors.Wrapf(err, "error converting %s to int", value)
 			}
 		default:
 			continue
 		}
 	}
 	if err = scanner.Err(); err != nil {
-		return nil, fmt.Errorf("Error scanning file: %v", err)
+		return nil, errors.Wrap(err, "error scanning file")
 	}
 	return packages, nil
 }
 
 func listBrewPackages() ([]cache.Cacheable, error) {
-	cellarPath := "/usr/local/Cellar"
-
-	cellarInfo, err := os.Stat(cellarPath)
-	if err != nil {
-		return nil, fmt.Errorf("Homebrew cellar not found in %s: %v", cellarPath, err)
-	}
-	if !cellarInfo.IsDir() {
-		return nil, fmt.Errorf("%s is not a directory", cellarPath)
-	}
+	const cellarPath = "/usr/local/Cellar"
 
 	packageDirs, err := ioutil.ReadDir(cellarPath)
-	if err != nil {
-		return nil, fmt.Errorf("Error reading directory %s: %v", cellarPath, err)
+	if os.IsNotExist(err) {
+		return nil, errors.Wrapf(err, "%s does not exist - is Homebrew installed?", cellarPath)
+	} else if err != nil {
+		return nil, errors.Wrapf(err, "error reading directory %s", cellarPath)
 	}
 
-	packages := []cache.Cacheable{}
+	var packages []cache.Cacheable
 	for _, packageDir := range packageDirs {
 		if !packageDir.IsDir() {
 			continue
@@ -317,8 +333,9 @@ func listBrewPackages() ([]cache.Cacheable, error) {
 		pkgPath := path.Join(cellarPath, packageDir.Name())
 		versions, err := ioutil.ReadDir(pkgPath)
 		if err != nil {
-			return nil, fmt.Errorf("Error reading directory: %s: %v", pkgPath, err)
+			return nil, errors.Wrapf(err, "error reading directory: %s", pkgPath)
 		}
+
 		for _, version := range versions {
 			if !version.IsDir() {
 				continue
