@@ -201,7 +201,10 @@ func TestNormalizeValue(t *testing.T) {
 	var nilStringPtr *string
 	var nilTimePtr *time.Time
 	someString := "foo"
-	uuidValue := uuid.NewV1()
+	uuidValue, err := uuid.NewV1()
+	if err != nil {
+		t.Fatalf("error while generating uuid: %v", err)
+	}
 
 	type mybool bool
 	type myint int32
