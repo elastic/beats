@@ -57,6 +57,9 @@ type Watcher interface {
 
 	// ListenStop returns a bus listener to receive container stopped events, with a `container` key holding it
 	ListenStop() bus.Listener
+
+	// ListenDelete returns a bus listener to receive container deleted events, with a `container` key holding it
+	ListenDelete() bus.Listener
 }
 
 // TLSConfig for docker socket connection
