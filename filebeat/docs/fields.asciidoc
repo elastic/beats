@@ -3044,7 +3044,7 @@ This field contains the flags of the event.
 
 --
 
-*`log.message`*::
+*`log.original`*::
 +
 --
 type: keyword

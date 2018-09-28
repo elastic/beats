@@ -112,7 +112,7 @@
       description: >
         This field contains the flags of the event.
 
-    - name: log.message
+    - name: log.original
       type: keyword
       description: >
         The unprocessed original log message. This can be used for reprocessing logs.
