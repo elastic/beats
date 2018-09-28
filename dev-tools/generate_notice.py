@@ -7,10 +7,6 @@ import argparse
 import json
 import csv
 import re
-<< << << < HEAD
-== == == =
-import pdb
->>>>>> > f56598ebf... Correctly report double licensed project and allow to skip file
 import copy
 
 
