@@ -66,7 +66,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	// Not master, no event sent
 	if !isMaster {
-		m.Log.Debug("trying to fetch shard stats from a non master node")
+		m.Log.Debug("trying to fetch shard stats from a non-master node")
 		return
 	}
 
