@@ -1,0 +1,4 @@
+[id="running-{beatname_lc}-on-kubernetes"]
+=== Running {beatname_uc} on Kubernetes
+
+ADD CONTENT HERE.

@@ -62,9 +62,10 @@ Processors are valid:
 * At the top-level in the configuration. The processor is applied to all data
 collected by {beatname_uc}.
 * Under a specific {processor-scope}. The processor is applied to the data
-collected for that {processor-scope}. For example:
-+
+collected for that {processor-scope}.
 ifeval::["{beatname_lc}"=="filebeat"]
+For example:
++
 [source,yaml]
 ------
 - type: <input_type>
@@ -92,6 +93,8 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
+For example:
++
 [source,yaml]
 ----
 auditbeat.modules:
@@ -104,6 +107,8 @@ auditbeat.modules:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
+For example:
++
 [source,yaml]
 ----
 packetbeat.protocols:
@@ -129,6 +134,8 @@ packetbeat.flows:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
+For example:
++
 [source,yaml]
 ----
 heartbeat.monitors:
@@ -141,6 +148,8 @@ heartbeat.monitors:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="winlogbeat"]
+For example:
++
 [source,yaml]
 ----
 winlogbeat.event_logs:

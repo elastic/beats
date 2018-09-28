@@ -1,0 +1,9 @@
+[id="configuration-{beatname_lc}-options"]
+== Configure inputs
+
+++++
+<titleabbrev>Configure inputs</titleabbrev>
+++++
+
+ADD INTRO HERE
+

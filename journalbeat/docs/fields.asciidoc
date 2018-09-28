@@ -1,0 +1,4854 @@
+
+////
+This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+////
+
+////
+This file will get updated with the fields from your Beat when you run
+make update.
+////
+
+[[exported-fields]]
+= Exported fields
+
+[partintro]
+
+--
+This document describes the fields that are exported by Beatname. They are
+grouped in the following categories:
+
+* <<exported-fields-apache2>>
+* <<exported-fields-auditd>>
+* <<exported-fields-beat>>
+* <<exported-fields-cloud>>
+* <<exported-fields-docker-processor>>
+* <<exported-fields-elasticsearch>>
+* <<exported-fields-haproxy>>
+* <<exported-fields-host-processor>>
+* <<exported-fields-icinga>>
+* <<exported-fields-iis>>
+* <<exported-fields-kafka>>
+* <<exported-fields-kibana>>
+* <<exported-fields-kubernetes-processor>>
+* <<exported-fields-log>>
+* <<exported-fields-logstash>>
+* <<exported-fields-mongodb>>
+* <<exported-fields-mysql>>
+* <<exported-fields-nginx>>
+* <<exported-fields-osquery>>
+* <<exported-fields-postgresql>>
+* <<exported-fields-redis>>
+* <<exported-fields-system>>
+* <<exported-fields-traefik>>
+
+--
+[[exported-fields-apache2]]
+== Apache2 fields
+
+Apache2 Module
+
+
+
+[float]
+== apache2 fields
+
+Apache2 fields.
+
+
+
+[float]
+== access fields
+
+Contains fields for the Apache2 HTTPD access logs.
+
+
+
+*`apache2.access.remote_ip`*::
++
+--
+type: keyword
+
+Client IP address.
+
+
+--
+
+*`apache2.access.user_name`*::
++
+--
+type: keyword
+
+The user name used when basic authentication is used.
+
+
+--
+
+*`apache2.access.method`*::
++
+--
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+--
+
+*`apache2.access.url`*::
++
+--
+type: keyword
+
+The request HTTP URL.
+
+
+--
+
+*`apache2.access.http_version`*::
++
+--
+type: keyword
+
+The HTTP version.
+
+
+--
+
+*`apache2.access.response_code`*::
++
+--
+type: long
+
+The HTTP response code.
+
+
+--
+
+*`apache2.access.body_sent.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+--
+
+*`apache2.access.referrer`*::
++
+--
+type: keyword
+
+The HTTP referrer.
+
+
+--
+
+*`apache2.access.agent`*::
++
+--
+type: text
+
+Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
+
+
+--
+
+[float]
+== user_agent fields
+
+Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
+
+
+
+*`apache2.access.user_agent.device`*::
++
+--
+type: keyword
+
+The name of the physical device.
+
+
+--
+
+*`apache2.access.user_agent.major`*::
++
+--
+type: long
+
+The major version of the user agent.
+
+
+--
+
+*`apache2.access.user_agent.minor`*::
++
+--
+type: long
+
+The minor version of the user agent.
+
+
+--
+
+*`apache2.access.user_agent.patch`*::
++
+--
+type: keyword
+
+The patch version of the user agent.
+
+
+--
+
+*`apache2.access.user_agent.name`*::
++
+--
+type: keyword
+
+example: Chrome
+
+The name of the user agent.
+
+
+--
+
+*`apache2.access.user_agent.os`*::
++
+--
+type: keyword
+
+The name of the operating system.
+
+
+--
+
+*`apache2.access.user_agent.os_major`*::
++
+--
+type: long
+
+The major version of the operating system.
+
+
+--
+
+*`apache2.access.user_agent.os_minor`*::
++
+--
+type: long
+
+The minor version of the operating system.
+
+
+--
+
+*`apache2.access.user_agent.os_name`*::
++
+--
+type: keyword
+
+The name of the operating system.
+
+
+--
+
+*`apache2.access.user_agent.raw`*::
++
+--
+type: text
+
+Raw user agent value before parsing by ingest-user-agent plugin.
+
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`apache2.access.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`apache2.access.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`apache2.access.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`apache2.access.geoip.region_name`*::
++
+--
+type: keyword
+
+The region name.
+
+
+--
+
+*`apache2.access.geoip.city_name`*::
++
+--
+type: keyword
+
+The city name.
+
+
+--
+
+*`apache2.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+[float]
+== error fields
+
+Fields from the Apache error logs.
+
+
+
+*`apache2.error.level`*::
++
+--
+type: keyword
+
+The severity level of the message.
+
+
+--
+
+*`apache2.error.client`*::
++
+--
+type: keyword
+
+The IP address of the client that generated the error.
+
+
+--
+
+*`apache2.error.message`*::
++
+--
+type: text
+
+The logged message.
+
+
+--
+
+*`apache2.error.pid`*::
++
+--
+type: long
+
+The process ID.
+
+
+--
+
+*`apache2.error.tid`*::
++
+--
+type: long
+
+The thread ID.
+
+
+--
+
+*`apache2.error.module`*::
++
+--
+type: keyword
+
+The module producing the logged message.
+
+
+--
+
+[[exported-fields-auditd]]
+== Auditd fields
+
+Module for parsing auditd logs.
+
+
+
+[float]
+== auditd fields
+
+Fields from the auditd logs.
+
+
+
+[float]
+== log fields
+
+Fields from the Linux audit log. Not all fields are documented here because they are dynamic and vary by audit event type.
+
+
+
+*`auditd.log.record_type`*::
++
+--
+The audit event type.
+
+
+--
+
+*`auditd.log.old_auid`*::
++
+--
+For login events this is the old audit ID used for the user prior to this login.
+
+
+--
+
+*`auditd.log.new_auid`*::
++
+--
+For login events this is the new audit ID. The audit ID can be used to trace future events to the user even if their identity changes (like becoming root).
+
+
+--
+
+*`auditd.log.old_ses`*::
++
+--
+For login events this is the old session ID used for the user prior to this login.
+
+
+--
+
+*`auditd.log.new_ses`*::
++
+--
+For login events this is the new session ID. It can be used to tie a user to future events by session ID.
+
+
+--
+
+*`auditd.log.sequence`*::
++
+--
+type: long
+
+The audit event sequence number.
+
+
+--
+
+*`auditd.log.acct`*::
++
+--
+The user account name associated with the event.
+
+
+--
+
+*`auditd.log.pid`*::
++
+--
+The ID of the process.
+
+
+--
+
+*`auditd.log.ppid`*::
++
+--
+The ID of the process.
+
+
+--
+
+*`auditd.log.items`*::
++
+--
+The number of items in an event.
+
+
+--
+
+*`auditd.log.item`*::
++
+--
+The item field indicates which item out of the total number of items. This number is zero-based; a value of 0 means it is the first item.
+
+
+--
+
+*`auditd.log.a0`*::
++
+--
+The first argument to the system call.
+
+
+--
+
+*`auditd.log.res`*::
++
+--
+The result of the system call (success or failure).
+
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the `auditd.log.addr` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`auditd.log.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`auditd.log.geoip.city_name`*::
++
+--
+type: keyword
+
+The name of the city.
+
+
+--
+
+*`auditd.log.geoip.region_name`*::
++
+--
+type: keyword
+
+The name of the region.
+
+
+--
+
+*`auditd.log.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`auditd.log.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`auditd.log.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+[[exported-fields-beat]]
+== Beat fields
+
+Contains common beat fields available in all event types.
+
+
+
+*`beat.name`*::
++
+--
+The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
+
+
+--
+
+*`beat.hostname`*::
++
+--
+The hostname as returned by the operating system on which the Beat is running.
+
+
+--
+
+*`beat.timezone`*::
++
+--
+The timezone as returned by the operating system on which the Beat is running.
+
+
+--
+
+*`beat.version`*::
++
+--
+The version of the beat that generated this event.
+
+
+--
+
+*`@timestamp`*::
++
+--
+type: date
+
+example: August 26th 2016, 12:35:53.332
+
+format: date
+
+required: True
+
+The timestamp when the event log record was generated.
+
+
+--
+
+*`tags`*::
++
+--
+Arbitrary tags that can be set per Beat and per transaction type.
+
+
+--
+
+*`fields`*::
++
+--
+type: object
+
+Contains user configurable fields.
+
+
+--
+
+[float]
+== error fields
+
+Error fields containing additional info in case of errors.
+
+
+
+*`error.message`*::
++
+--
+type: text
+
+Error message.
+
+
+--
+
+*`error.code`*::
++
+--
+type: long
+
+Error code.
+
+
+--
+
+*`error.type`*::
++
+--
+type: keyword
+
+Error type.
+
+
+--
+
+[[exported-fields-cloud]]
+== Cloud provider metadata fields
+
+Metadata from cloud providers added by the add_cloud_metadata processor.
+
+
+
+*`meta.cloud.provider`*::
++
+--
+example: ec2
+
+Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
+
+
+--
+
+*`meta.cloud.instance_id`*::
++
+--
+Instance ID of the host machine.
+
+
+--
+
+*`meta.cloud.instance_name`*::
++
+--
+Instance name of the host machine.
+
+
+--
+
+*`meta.cloud.machine_type`*::
++
+--
+example: t2.medium
+
+Machine type of the host machine.
+
+
+--
+
+*`meta.cloud.availability_zone`*::
++
+--
+example: us-east-1c
+
+Availability zone in which this host is running.
+
+
+--
+
+*`meta.cloud.project_id`*::
++
+--
+example: project-x
+
+Name of the project in Google Cloud.
+
+
+--
+
+*`meta.cloud.region`*::
++
+--
+Region in which this host is running.
+
+
+--
+
+[[exported-fields-docker-processor]]
+== Docker fields
+
+Docker stats collected from Docker.
+
+
+
+
+*`docker.container.id`*::
++
+--
+type: keyword
+
+Unique container id.
+
+
+--
+
+*`docker.container.image`*::
++
+--
+type: keyword
+
+Name of the image the container was built on.
+
+
+--
+
+*`docker.container.name`*::
++
+--
+type: keyword
+
+Container name.
+
+
+--
+
+*`docker.container.labels`*::
++
+--
+type: object
+
+Image labels.
+
+
+--
+
+[[exported-fields-elasticsearch]]
+== elasticsearch fields
+
+elasticsearch Module
+
+
+
+[float]
+== elasticsearch fields
+
+
+
+
+*`elasticsearch.node.name`*::
++
+--
+type: keyword
+
+example: vWNJsZ3
+
+Name of the node
+
+--
+
+*`elasticsearch.index.name`*::
++
+--
+type: keyword
+
+example: filebeat-test-input
+
+Index name
+
+--
+
+*`elasticsearch.index.id`*::
++
+--
+type: keyword
+
+example: aOGgDwbURfCV57AScqbCgw
+
+Index id
+
+--
+
+*`elasticsearch.shard.id`*::
++
+--
+type: keyword
+
+example: 0
+
+Id of the shard
+
+--
+
+[float]
+== audit fields
+
+
+
+
+*`elasticsearch.audit.layer`*::
++
+--
+type: keyword
+
+example: rest
+
+The layer from which this event originated: rest, transport or ip_filter
+
+--
+
+*`elasticsearch.audit.event_type`*::
++
+--
+type: keyword
+
+example: access_granted
+
+The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied
+
+--
+
+*`elasticsearch.audit.origin_type`*::
++
+--
+type: keyword
+
+example: local_node
+
+Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)
+
+--
+
+*`elasticsearch.audit.origin_address`*::
++
+--
+type: ip
+
+example: 192.168.1.42
+
+The IP address from which the request originated
+
+--
+
+*`elasticsearch.audit.principal`*::
++
+--
+type: keyword
+
+example: _anonymous
+
+The principal (username) that failed authentication
+
+--
+
+*`elasticsearch.audit.action`*::
++
+--
+type: keyword
+
+example: cluster:monitor/main
+
+The name of the action that was executed
+
+--
+
+*`elasticsearch.audit.uri`*::
++
+--
+type: keyword
+
+example: /_xpack/security/_authenticate
+
+The REST endpoint URI
+
+--
+
+*`elasticsearch.audit.request`*::
++
+--
+type: keyword
+
+example: ClearScrollRequest
+
+The type of request that was executed
+
+--
+
+*`elasticsearch.audit.request_body`*::
++
+--
+type: text
+
+example: body
+
+The body of the request, if enabled
+
+--
+
+[float]
+== deprecation fields
+
+
+
+[float]
+== gc fields
+
+GC fileset fields.
+
+
+
+[float]
+== phase fields
+
+Fields specific to GC phase.
+
+
+
+*`elasticsearch.gc.phase.name`*::
++
+--
+type: keyword
+
+Name of the GC collection phase.
+
+
+--
+
+*`elasticsearch.gc.phase.duration_sec`*::
++
+--
+type: float
+
+Collection phase duration according to the Java virtual machine.
+
+
+--
+
+*`elasticsearch.gc.phase.scrub_symbol_table_time_sec`*::
++
+--
+type: float
+
+Pause time in seconds cleaning up symbol tables.
+
+
+--
+
+*`elasticsearch.gc.phase.scrub_string_table_time_sec`*::
++
+--
+type: float
+
+Pause time in seconds cleaning up string tables.
+
+
+--
+
+*`elasticsearch.gc.phase.weak_refs_processing_time_sec`*::
++
+--
+type: float
+
+Time spent processing weak references in seconds.
+
+
+--
+
+*`elasticsearch.gc.phase.parallel_rescan_time_sec`*::
++
+--
+type: float
+
+Time spent in seconds marking live objects while application is stopped.
+
+
+--
+
+*`elasticsearch.gc.phase.class_unload_time_sec`*::
++
+--
+type: float
+
+Time spent unloading unused classes in seconds.
+
+
+--
+
+[float]
+== cpu_time fields
+
+Process CPU time spent performing collections.
+
+
+
+*`elasticsearch.gc.phase.cpu_time.user_sec`*::
++
+--
+type: float
+
+CPU time spent outside the kernel.
+
+
+--
+
+*`elasticsearch.gc.phase.cpu_time.sys_sec`*::
++
+--
+type: float
+
+CPU time spent inside the kernel. 
+
+
+--
+
+*`elasticsearch.gc.phase.cpu_time.real_sec`*::
++
+--
+type: float
+
+Total elapsed CPU time spent to complete the collection from start to finish.
+
+
+--
+
+*`elasticsearch.gc.jvm_runtime_sec`*::
++
+--
+type: float
+
+The time from JVM start up in seconds, as a floating point number.
+
+
+--
+
+*`elasticsearch.gc.threads_total_stop_time_sec`*::
++
+--
+type: float
+
+Garbage collection threads total stop time seconds.
+
+
+--
+
+*`elasticsearch.gc.stopping_threads_time_sec`*::
++
+--
+type: float
+
+Time took to stop threads seconds.
+
+
+--
+
+*`elasticsearch.gc.tags`*::
++
+--
+type: keyword
+
+GC logging tags.
+
+
+--
+
+[float]
+== heap fields
+
+Heap allocation and total size.
+
+
+
+*`elasticsearch.gc.heap.size_kb`*::
++
+--
+type: integer
+
+Total heap size in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.heap.used_kb`*::
++
+--
+type: integer
+
+Used heap in kilobytes.
+
+
+--
+
+[float]
+== old_gen fields
+
+Old generation occupancy and total size.
+
+
+
+*`elasticsearch.gc.old_gen.size_kb`*::
++
+--
+type: integer
+
+Total size of old generation in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.old_gen.used_kb`*::
++
+--
+type: integer
+
+Old generation occupancy in kilobytes.
+
+
+--
+
+[float]
+== young_gen fields
+
+Young generation occupancy and total size.
+
+
+
+*`elasticsearch.gc.young_gen.size_kb`*::
++
+--
+type: integer
+
+Total size of young generation in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.young_gen.used_kb`*::
++
+--
+type: integer
+
+Young generation occupancy in kilobytes.
+
+
+--
+
+[float]
+== server fields
+
+Server log file
+
+
+*`elasticsearch.server.component`*::
++
+--
+type: keyword
+
+example: o.e.c.m.MetaDataCreateIndexService
+
+Log component
+
+--
+
+[float]
+== gc fields
+
+GC log
+
+
+[float]
+== young fields
+
+Young GC
+
+
+*`elasticsearch.server.gc.young.one`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+*`elasticsearch.server.gc.young.two`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+*`elasticsearch.server.gc_overhead`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+[float]
+== slowlog fields
+
+Slowlog events from Elasticsearch
+
+
+*`elasticsearch.slowlog.logger`*::
++
+--
+type: keyword
+
+example: index.search.slowlog.fetch
+
+Logger name
+
+--
+
+*`elasticsearch.slowlog.took`*::
++
+--
+type: text
+
+example: 300ms
+
+Time it took to execute the query
+
+--
+
+*`elasticsearch.slowlog.types`*::
++
+--
+type: keyword
+
+example: 
+
+Types
+
+--
+
+*`elasticsearch.slowlog.stats`*::
++
+--
+type: text
+
+example: 
+
+Statistics
+
+--
+
+*`elasticsearch.slowlog.search_type`*::
++
+--
+type: keyword
+
+example: QUERY_THEN_FETCH
+
+Search type
+
+--
+
+*`elasticsearch.slowlog.source_query`*::
++
+--
+type: text
+
+example: {"query":{"match_all":{"boost":1.0}}}
+
+Slow query
+
+--
+
+*`elasticsearch.slowlog.extra_source`*::
++
+--
+type: text
+
+example: 
+
+Extra source information
+
+--
+
+*`elasticsearch.slowlog.took_millis`*::
++
+--
+type: keyword
+
+example: 42
+
+Time took in milliseconds
+
+--
+
+*`elasticsearch.slowlog.total_hits`*::
++
+--
+type: keyword
+
+example: 42
+
+Total hits
+
+--
+
+*`elasticsearch.slowlog.total_shards`*::
++
+--
+type: keyword
+
+example: 22
+
+Total queried shards
+
+--
+
+*`elasticsearch.slowlog.routing`*::
++
+--
+type: keyword
+
+example: s01HZ2QBk9jw4gtgaFtn
+
+Routing
+
+--
+
+*`elasticsearch.slowlog.id`*::
++
+--
+type: keyword
+
+example: 
+
+Id
+
+--
+
+*`elasticsearch.slowlog.type`*::
++
+--
+type: keyword
+
+example: doc
+
+Type
+
+--
+
+[[exported-fields-haproxy]]
+== haproxy fields
+
+haproxy Module
+
+
+
+[float]
+== haproxy fields
+
+
+
+
+*`haproxy.process_name`*::
++
+--
+Name of the process
+
+--
+
+*`haproxy.pid`*::
++
+--
+type: long
+
+Process ID
+
+--
+
+*`haproxy.client_ip`*::
++
+--
+client_ip is the IP address of the client which initiated the TCP connection to haproxy.
+
+--
+
+*`haproxy.client_port`*::
++
+--
+type: long
+
+client_port is the TCP port of the client which initiated the connection.
+
+--
+
+*`haproxy.frontend_name`*::
++
+--
+frontend_name is the name of the frontend (or listener) which received and processed the connection.
+
+--
+
+*`haproxy.backend_name`*::
++
+--
+backend_name is the name of the backend (or listener) which was selected to manage the connection to the server.
+
+--
+
+*`haproxy.server_name`*::
++
+--
+server_name is the name of the last server to which the connection was sent.
+
+--
+
+*`haproxy.time_client_req`*::
++
+--
+type: long
+
+time_client_req is the total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+
+--
+
+*`haproxy.time_queue`*::
++
+--
+type: long
+
+time_queue is the total time in milliseconds spent waiting in the various queues.
+
+--
+
+*`haproxy.time_backend_connect`*::
++
+--
+type: long
+
+time_backend_connect is the total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
+
+--
+
+*`haproxy.time_server_response`*::
++
+--
+type: long
+
+time_server_response is the total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
+
+--
+
+*`haproxy.time_duration`*::
++
+--
+type: long
+
+time_duration is the time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+
+--
+
+*`haproxy.server_queue`*::
++
+--
+type: long
+
+server_queue is the total number of requests which were processed before this one in the server queue.
+
+--
+
+*`haproxy.backend_queue`*::
++
+--
+type: long
+
+backend_queue is the total number of requests which were processed before this one in the backend's global queue.
+
+--
+
+*`haproxy.bind_name`*::
++
+--
+bind_name is the name of the listening address which received the connection.
+
+--
+
+*`haproxy.error_message`*::
++
+--
+type: text
+
+error_message is the error message logged by HAProxy in case of error.
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the client_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`haproxy.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`haproxy.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`haproxy.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`haproxy.geoip.region_name`*::
++
+--
+type: keyword
+
+The region name.
+
+
+--
+
+*`haproxy.geoip.city_name`*::
++
+--
+type: keyword
+
+The city name.
+
+
+--
+
+*`haproxy.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+*`haproxy.termination_state`*::
++
+--
+termination_state is the condition the session was in when the session ended.
+
+--
+
+[float]
+== connections fields
+
+Contains various counts of connections active in the process.
+
+
+*`haproxy.connections.active`*::
++
+--
+type: long
+
+active is the total number of concurrent connections on the process when the session was logged.
+
+--
+
+*`haproxy.connections.frontend`*::
++
+--
+type: long
+
+frontend is the total number of concurrent connections on the frontend when the session was logged.
+
+--
+
+*`haproxy.connections.backend`*::
++
+--
+type: long
+
+backend is the total number of concurrent connections handled by the backend when the session was logged.
+
+--
+
+*`haproxy.connections.server`*::
++
+--
+type: long
+
+server is the total number of concurrent connections still active on the server when the session was logged.
+
+--
+
+*`haproxy.connections.retries`*::
++
+--
+type: long
+
+retries is the number of connection retries experienced by this session when trying to connect to the server.
+
+--
+
+[float]
+== http fields
+
+Please add description
+
+
+[float]
+== response fields
+
+Fields related to the HTTP response
+
+
+*`haproxy.http.response.status_code`*::
++
+--
+type: long
+
+status_code is the HTTP status code returned to the client.
+
+--
+
+*`haproxy.http.response.bytes_read`*::
++
+--
+type: long
+
+bytes_read is the total number of bytes transmitted to the client when the log is emitted.
+
+--
+
+*`haproxy.http.response.captured_cookie`*::
++
+--
+captured_cookie is an optional "name=value" entry indicating that the client had this cookie in the response.
+
+
+--
+
+*`haproxy.http.response.captured_headers`*::
++
+--
+type: text
+
+captured_response_headers is a list of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
+
+
+--
+
+[float]
+== request fields
+
+Fields related to the HTTP request
+
+
+*`haproxy.http.request.captured_cookie`*::
++
+--
+captured_cookie is an optional "name=value" entry indicating that the server has returned a cookie with its request.
+
+
+--
+
+*`haproxy.http.request.captured_headers`*::
++
+--
+type: text
+
+captured_request_headers is a list of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
+
+
+--
+
+*`haproxy.http.request.raw_request_line`*::
++
+--
+type: text
+
+raw_request_line is the complete HTTP request line, including the method, request and HTTP version string.
+
+--
+
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+*`host.name`*::
++
+--
+type: keyword
+
+Hostname.
+
+
+--
+
+*`host.id`*::
++
+--
+type: keyword
+
+Unique host id.
+
+
+--
+
+*`host.architecture`*::
++
+--
+type: keyword
+
+Host architecture (e.g. x86_64, arm, ppc, mips).
+
+
+--
+
+*`host.os.platform`*::
++
+--
+type: keyword
+
+OS platform (e.g. centos, ubuntu, windows).
+
+
+--
+
+*`host.os.version`*::
++
+--
+type: keyword
+
+OS version.
+
+
+--
+
+*`host.os.family`*::
++
+--
+type: keyword
+
+OS family (e.g. redhat, debian, freebsd, windows).
+
+
+--
+
+*`host.os.kernel`*::
++
+--
+type: keyword
+
+The operating system's kernel version.
+
+
+--
+
+*`host.ip`*::
++
+--
+type: ip
+
+List of IP-addresses.
+
+
+--
+
+*`host.mac`*::
++
+--
+type: keyword
+
+List of hardware-addresses, usually MAC-addresses.
+
+
+--
+
+[[exported-fields-icinga]]
+== Icinga fields
+
+Icinga Module
+
+
+
+[float]
+== icinga fields
+
+
+
+
+[float]
+== debug fields
+
+Contains fields for the Icinga debug logs.
+
+
+
+*`icinga.debug.facility`*::
++
+--
+type: keyword
+
+Specifies what component of Icinga logged the message.
+
+
+--
+
+*`icinga.debug.severity`*::
++
+--
+type: keyword
+
+Possible values are "debug", "notice", "information", "warning" or "critical".
+
+
+--
+
+*`icinga.debug.message`*::
++
+--
+type: text
+
+The logged message.
+
+
+--
+
+[float]
+== main fields
+
+Contains fields for the Icinga main logs.
+
+
+
+*`icinga.main.facility`*::
++
+--
+type: keyword
+
+Specifies what component of Icinga logged the message.
+
+
+--
+
+*`icinga.main.severity`*::
++
+--
+type: keyword
+
+Possible values are "debug", "notice", "information", "warning" or "critical".
+
+
+--
+
+*`icinga.main.message`*::
++
+--
+type: text
+
+The logged message.
+
+
+--
+
+[float]
+== startup fields
+
+Contains fields for the Icinga startup logs.
+
+
+
+*`icinga.startup.facility`*::
++
+--
+type: keyword
+
+Specifies what component of Icinga logged the message.
+
+
+--
+
+*`icinga.startup.severity`*::
++
+--
+type: keyword
+
+Possible values are "debug", "notice", "information", "warning" or "critical".
+
+
+--
+
+*`icinga.startup.message`*::
++
+--
+type: text
+
+The logged message.
+
+
+--
+
+[[exported-fields-iis]]
+== IIS fields
+
+Module for parsing IIS log files.
+
+
+
+[float]
+== iis fields
+
+Fields from IIS log files.
+
+
+
+[float]
+== access fields
+
+Contains fields for IIS access logs.
+
+
+
+*`iis.access.server_ip`*::
++
+--
+type: keyword
+
+The server IP address.
+
+
+--
+
+*`iis.access.method`*::
++
+--
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+--
+
+*`iis.access.url`*::
++
+--
+type: keyword
+
+The request HTTP URL.
+
+
+--
+
+*`iis.access.query_string`*::
++
+--
+type: keyword
+
+The request query string, if any.
+
+
+--
+
+*`iis.access.port`*::
++
+--
+type: long
+
+The request port number.
+
+
+--
+
+*`iis.access.user_name`*::
++
+--
+type: keyword
+
+The user name used when basic authentication is used.
+
+
+--
+
+*`iis.access.remote_ip`*::
++
+--
+type: keyword
+
+The client IP address.
+
+
+--
+
+*`iis.access.referrer`*::
++
+--
+type: keyword
+
+The HTTP referrer.
+
+
+--
+
+*`iis.access.response_code`*::
++
+--
+type: long
+
+The HTTP response code.
+
+
+--
+
+*`iis.access.sub_status`*::
++
+--
+type: long
+
+The HTTP substatus code.
+
+
+--
+
+*`iis.access.win32_status`*::
++
+--
+type: long
+
+The Windows status code.
+
+
+--
+
+*`iis.access.request_time_ms`*::
++
+--
+type: long
+
+The request time in milliseconds.
+
+
+--
+
+*`iis.access.site_name`*::
++
+--
+type: keyword
+
+The site name and instance number.
+
+
+--
+
+*`iis.access.server_name`*::
++
+--
+type: keyword
+
+The name of the server on which the log file entry was generated.
+
+
+--
+
+*`iis.access.http_version`*::
++
+--
+type: keyword
+
+The HTTP version.
+
+
+--
+
+*`iis.access.cookie`*::
++
+--
+type: keyword
+
+The content of the cookie sent or received, if any.
+
+
+--
+
+*`iis.access.hostname`*::
++
+--
+type: keyword
+
+The host header name, if any.
+
+
+--
+
+*`iis.access.body_sent.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+--
+
+*`iis.access.body_received.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes of the server request body.
+
+
+--
+
+*`iis.access.agent`*::
++
+--
+type: text
+
+Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
+
+
+--
+
+[float]
+== user_agent fields
+
+Contains the parsed user agent field. Only present if the user agent Elasticsearch plugin is available and used.
+
+
+
+*`iis.access.user_agent.device`*::
++
+--
+type: keyword
+
+The name of the physical device.
+
+
+--
+
+*`iis.access.user_agent.major`*::
++
+--
+type: long
+
+The major version of the user agent.
+
+
+--
+
+*`iis.access.user_agent.minor`*::
++
+--
+type: long
+
+The minor version of the user agent.
+
+
+--
+
+*`iis.access.user_agent.patch`*::
++
+--
+type: keyword
+
+The patch version of the user agent.
+
+
+--
+
+*`iis.access.user_agent.name`*::
++
+--
+type: keyword
+
+example: Chrome
+
+The name of the user agent.
+
+
+--
+
+*`iis.access.user_agent.os`*::
++
+--
+type: keyword
+
+The name of the operating system.
+
+
+--
+
+*`iis.access.user_agent.os_major`*::
++
+--
+type: long
+
+The major version of the operating system.
+
+
+--
+
+*`iis.access.user_agent.os_minor`*::
++
+--
+type: long
+
+The minor version of the operating system.
+
+
+--
+
+*`iis.access.user_agent.os_name`*::
++
+--
+type: keyword
+
+The name of the operating system.
+
+
+--
+
+*`iis.access.user_agent.raw`*::
++
+--
+type: text
+
+Raw user agent value before parsing by ingest-user-agent plugin.
+
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`iis.access.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`iis.access.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`iis.access.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`iis.access.geoip.region_name`*::
++
+--
+type: keyword
+
+The region name.
+
+
+--
+
+*`iis.access.geoip.city_name`*::
++
+--
+type: keyword
+
+The city name.
+
+
+--
+
+*`iis.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+[float]
+== error fields
+
+Contains fields for IIS error logs.
+
+
+
+*`iis.error.remote_ip`*::
++
+--
+type: keyword
+
+The client IP address.
+
+
+--
+
+*`iis.error.remote_port`*::
++
+--
+type: long
+
+The client port number.
+
+
+--
+
+*`iis.error.server_ip`*::
++
+--
+type: keyword
+
+The server IP address.
+
+
+--
+
+*`iis.error.server_port`*::
++
+--
+type: long
+
+The server port number.
+
+
+--
+
+*`iis.error.http_version`*::
++
+--
+type: keyword
+
+The HTTP version.
+
+
+--
+
+*`iis.error.method`*::
++
+--
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+--
+
+*`iis.error.url`*::
++
+--
+type: keyword
+
+The request HTTP URL.
+
+
+--
+
+*`iis.error.response_code`*::
++
+--
+type: long
+
+The HTTP response code.
+
+
+--
+
+*`iis.error.reason_phrase`*::
++
+--
+type: keyword
+
+The HTTP reason phrase.
+
+
+--
+
+*`iis.error.queue_name`*::
++
+--
+type: keyword
+
+The IIS application pool name.
+
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`iis.error.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`iis.error.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`iis.error.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`iis.error.geoip.region_name`*::
++
+--
+type: keyword
+
+The region name.
+
+
+--
+
+*`iis.error.geoip.city_name`*::
++
+--
+type: keyword
+
+The city name.
+
+
+--
+
+*`iis.error.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+[[exported-fields-kafka]]
+== Kafka fields
+
+Kafka module
+
+
+
+[float]
+== kafka fields
+
+
+
+
+[float]
+== log fields
+
+Kafka log lines.
+
+
+
+*`kafka.log.timestamp`*::
++
+--
+The timestamp from the log line.
+
+
+--
+
+*`kafka.log.level`*::
++
+--
+example: WARN
+
+The log level.
+
+
+--
+
+*`kafka.log.message`*::
++
+--
+type: text
+
+The logged message.
+
+
+--
+
+*`kafka.log.component`*::
++
+--
+type: keyword
+
+Component the log is coming from.
+
+
+--
+
+*`kafka.log.class`*::
++
+--
+type: text
+
+Java class the log is coming from.
+
+
+--
+
+[float]
+== trace fields
+
+Trace in the log line.
+
+
+
+*`kafka.log.trace.class`*::
++
+--
+type: keyword
+
+Java class the trace is coming from.
+
+
+--
+
+*`kafka.log.trace.message`*::
++
+--
+type: text
+
+Message part of the trace.
+
+
+--
+
+*`kafka.log.trace.full`*::
++
+--
+type: text
+
+The full trace in the log line.
+
+
+--
+
+[[exported-fields-kibana]]
+== kibana fields
+
+kibana Module
+
+
+
+[float]
+== kibana fields
+
+
+
+
+[float]
+== log fields
+
+Kafka log lines.
+
+
+
+*`kibana.log.tags`*::
++
+--
+type: keyword
+
+Kibana logging tags.
+
+
+--
+
+*`kibana.log.state`*::
++
+--
+type: keyword
+
+Current state of Kibana.
+
+
+--
+
+*`kibana.log.meta`*::
++
+--
+type: object
+
+--
+
+[[exported-fields-kubernetes-processor]]
+== Kubernetes fields
+
+Kubernetes metadata added by the kubernetes processor
+
+
+
+
+*`kubernetes.pod.name`*::
++
+--
+type: keyword
+
+Kubernetes pod name
+
+
+--
+
+*`kubernetes.pod.uid`*::
++
+--
+type: keyword
+
+Kubernetes Pod UID
+
+
+--
+
+*`kubernetes.namespace`*::
++
+--
+type: keyword
+
+Kubernetes namespace
+
+
+--
+
+*`kubernetes.node.name`*::
++
+--
+type: keyword
+
+Kubernetes node name
+
+
+--
+
+*`kubernetes.labels`*::
++
+--
+type: object
+
+Kubernetes labels map
+
+
+--
+
+*`kubernetes.annotations`*::
++
+--
+type: object
+
+Kubernetes annotations map
+
+
+--
+
+*`kubernetes.container.name`*::
++
+--
+type: keyword
+
+Kubernetes container name
+
+
+--
+
+*`kubernetes.container.image`*::
++
+--
+type: keyword
+
+Kubernetes container image
+
+
+--
+
+[[exported-fields-log]]
+== Log file content fields
+
+Contains log file lines.
+
+
+
+*`source`*::
++
+--
+type: keyword
+
+required: True
+
+The file from which the line was read. This field contains the absolute path to the file. For example: `/var/log/system.log`.
+
+
+--
+
+*`offset`*::
++
+--
+type: long
+
+required: False
+
+The file offset the reported line starts at.
+
+
+--
+
+*`message`*::
++
+--
+type: text
+
+required: True
+
+The content of the line read from the log file.
+
+
+--
+
+*`stream`*::
++
+--
+type: keyword
+
+required: False
+
+Log stream when reading container logs, can be 'stdout' or 'stderr'
+
+
+--
+
+*`prospector.type`*::
++
+--
+
+deprecated[6.3]
+
+required: True
+
+The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Beatname config file. (DEPRECATED: see `input.type`)
+
+
+--
+
+*`input.type`*::
++
+--
+required: True
+
+The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Beatname config file.
+
+
+--
+
+*`read_timestamp`*::
++
+--
+In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
+
+
+--
+
+*`fileset.module`*::
++
+--
+The Beatname module that generated this event.
+
+
+--
+
+*`fileset.name`*::
++
+--
+The Beatname fileset that generated this event.
+
+
+--
+
+*`syslog.facility`*::
++
+--
+type: long
+
+required: False
+
+The facility extracted from the priority.
+
+
+--
+
+*`syslog.priority`*::
++
+--
+type: long
+
+required: False
+
+The priority of the syslog event.
+
+
+--
+
+*`syslog.severity_label`*::
++
+--
+type: keyword
+
+required: False
+
+The human readable severity.
+
+
+--
+
+*`syslog.facility_label`*::
++
+--
+type: keyword
+
+required: False
+
+The human readable facility.
+
+
+--
+
+*`process.program`*::
++
+--
+type: keyword
+
+required: False
+
+The name of the program.
+
+
+--
+
+*`process.pid`*::
++
+--
+type: long
+
+required: False
+
+The pid of the process.
+
+
+--
+
+*`event.severity`*::
++
+--
+type: long
+
+required: False
+
+The severity of the event.
+
+
+--
+
+*`service.name`*::
++
+--
+type: keyword
+
+Service name.
+
+
+--
+
+*`log.level`*::
++
+--
+type: keyword
+
+Logging level.
+
+
+--
+
+*`log.flags`*::
++
+--
+This field contains the flags of the event.
+
+
+--
+
+*`event.created`*::
++
+--
+type: date
+
+event.created contains the date on which the event was created. In case of log events this is when the log line was read by Beatname. In comparison @timestamp is the processed timestamp from the log line. If both are identical only @timestamp should be used.
+
+
+--
+
+*`http.response.status_code`*::
++
+--
+type: long
+
+example: 404
+
+HTTP response status_code.
+
+
+--
+
+*`http.response.elapsed_time`*::
++
+--
+type: long
+
+Elapsed time between request and response in milli seconds.
+
+
+--
+
+*`http.response.content_length`*::
++
+--
+type: long
+
+Content length of the HTTP response body.
+
+
+--
+
+*`http.request.method`*::
++
+--
+type: keyword
+
+Request method.
+
+
+--
+
+[[exported-fields-logstash]]
+== logstash fields
+
+logstash Module
+
+
+
+[float]
+== logstash fields
+
+
+
+
+[float]
+== log fields
+
+Fields from the Logstash logs.
+
+
+
+*`logstash.log.message`*::
++
+--
+type: text
+
+Contains the un-parsed log message
+
+
+--
+
+*`logstash.log.level`*::
++
+--
+type: keyword
+
+The log level of the message, this correspond to Log4j levels.
+
+
+--
+
+*`logstash.log.module`*::
++
+--
+type: keyword
+
+The module or class where the event originate.
+
+
+--
+
+*`logstash.log.thread`*::
++
+--
+type: text
+
+Information about the running thread where the log originate.
+
+
+--
+
+*`logstash.log.log_event`*::
++
+--
+type: object
+
+key and value debugging information.
+
+
+--
+
+[float]
+== slowlog fields
+
+slowlog
+
+
+
+*`logstash.slowlog.message`*::
++
+--
+type: text
+
+Contains the un-parsed log message
+
+
+--
+
+*`logstash.slowlog.level`*::
++
+--
+type: keyword
+
+The log level of the message, this correspond to Log4j levels.
+
+
+--
+
+*`logstash.slowlog.module`*::
++
+--
+type: keyword
+
+The module or class where the event originate.
+
+
+--
+
+*`logstash.slowlog.thread`*::
++
+--
+type: text
+
+Information about the running thread where the log originate.
+
+
+--
+
+*`logstash.slowlog.event`*::
++
+--
+type: text
+
+Raw dump of the original event
+
+
+--
+
+*`logstash.slowlog.plugin_name`*::
++
+--
+type: keyword
+
+Name of the plugin
+
+
+--
+
+*`logstash.slowlog.plugin_type`*::
++
+--
+type: keyword
+
+Type of the plugin: Inputs, Filters, Outputs or Codecs.
+
+
+--
+
+*`logstash.slowlog.took_in_millis`*::
++
+--
+type: long
+
+Execution time for the plugin in milliseconds.
+
+
+--
+
+*`logstash.slowlog.took_in_nanos`*::
++
+--
+type: long
+
+Execution time for the plugin in nanoseconds.
+
+
+--
+
+*`logstash.slowlog.plugin_params`*::
++
+--
+type: text
+
+String value of the plugin configuration
+
+
+--
+
+*`logstash.slowlog.plugin_params_object`*::
++
+--
+type: object
+
+key -> value of the configuration used by the plugin.
+
+
+--
+
+[[exported-fields-mongodb]]
+== mongodb fields
+
+Module for parsing MongoDB log files.
+
+
+
+[float]
+== mongodb fields
+
+Fields from MongoDB logs.
+
+
+
+[float]
+== log fields
+
+Contains fields from MongoDB logs.
+
+
+
+*`mongodb.log.severity`*::
++
+--
+type: keyword
+
+example: I
+
+Severity level of message
+
+
+--
+
+*`mongodb.log.component`*::
++
+--
+type: keyword
+
+example: COMMAND
+
+Functional categorization of message
+
+
+--
+
+*`mongodb.log.context`*::
++
+--
+type: keyword
+
+example: initandlisten
+
+Context of message
+
+
+--
+
+*`mongodb.log.message`*::
++
+--
+type: text
+
+The message in the log line.
+
+
+--
+
+[[exported-fields-mysql]]
+== MySQL fields
+
+Module for parsing the MySQL log files.
+
+
+
+[float]
+== mysql fields
+
+Fields from the MySQL log files.
+
+
+
+[float]
+== error fields
+
+Contains fields from the MySQL error logs.
+
+
+
+*`mysql.error.timestamp`*::
++
+--
+The timestamp from the log line.
+
+
+--
+
+*`mysql.error.thread_id`*::
++
+--
+type: long
+
+As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this field contains the process id.
+
+
+--
+
+*`mysql.error.level`*::
++
+--
+example: Warning
+
+The log level.
+
+--
+
+*`mysql.error.message`*::
++
+--
+type: text
+
+The logged message.
+
+
+--
+
+[float]
+== slowlog fields
+
+Contains fields from the MySQL slow logs.
+
+
+
+*`mysql.slowlog.user`*::
++
+--
+The MySQL user that created the query.
+
+
+--
+
+*`mysql.slowlog.host`*::
++
+--
+The host from where the user that created the query logged in.
+
+
+--
+
+*`mysql.slowlog.ip`*::
++
+--
+The IP address from where the user that created the query logged in.
+
+
+--
+
+*`mysql.slowlog.query_time.sec`*::
++
+--
+type: float
+
+The total time the query took, in seconds, as a floating point number.
+
+
+--
+
+*`mysql.slowlog.lock_time.sec`*::
++
+--
+type: float
+
+The amount of time the query waited for the lock to be available. The value is in seconds, as a floating point number.
+
+
+--
+
+*`mysql.slowlog.rows_sent`*::
++
+--
+type: long
+
+The number of rows returned by the query.
+
+
+--
+
+*`mysql.slowlog.rows_examined`*::
++
+--
+type: long
+
+The number of rows scanned by the query.
+
+
+--
+
+*`mysql.slowlog.timestamp`*::
++
+--
+type: long
+
+The unix timestamp taken from the `SET timestamp` query.
+
+
+--
+
+*`mysql.slowlog.query`*::
++
+--
+The slow query.
+
+
+--
+
+*`mysql.slowlog.id`*::
++
+--
+type: long
+
+The connection ID for the query.
+
+
+--
+
+[[exported-fields-nginx]]
+== Nginx fields
+
+Module for parsing the Nginx log files.
+
+
+
+[float]
+== nginx fields
+
+Fields from the Nginx log files.
+
+
+
+[float]
+== access fields
+
+Contains fields for the Nginx access logs.
+
+
+
+*`nginx.access.remote_ip_list`*::
++
+--
+type: array
+
+An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.
+
+
+--
+
+*`nginx.access.remote_ip`*::
++
+--
+type: keyword
+
+Client IP address. The first public IP address from the `remote_ip_list` array. If no public IP addresses are present, this field contains the first private IP address from the `remote_ip_list` array.
+
+
+--
+
+*`nginx.access.user_name`*::
++
+--
+type: keyword
+
+The user name used when basic authentication is used.
+
+
+--
+
+*`nginx.access.method`*::
++
+--
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+--
+
+*`nginx.access.url`*::
++
+--
+type: keyword
+
+The request HTTP URL.
+
+
+--
+
+*`nginx.access.http_version`*::
++
+--
+type: keyword
+
+The HTTP version.
+
+
+--
+
+*`nginx.access.response_code`*::
++
+--
+type: long
+
+The HTTP response code.
+
+
+--
+
+*`nginx.access.body_sent.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+--
+
+*`nginx.access.referrer`*::
++
+--
+type: keyword
+
+The HTTP referrer.
+
+
+--
+
+*`nginx.access.agent`*::
++
+--
+type: text
+
+Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
+
+
+--
+
+[float]
+== user_agent fields
+
+Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
+
+
+
+*`nginx.access.user_agent.device`*::
++
+--
+type: keyword
+
+The name of the physical device.
+
+
+--
+
+*`nginx.access.user_agent.major`*::
++
+--
+type: long
+
+The major version of the user agent.
+
+
+--
+
+*`nginx.access.user_agent.minor`*::
++
+--
+type: long
+
+The minor version of the user agent.
+
+
+--
+
+*`nginx.access.user_agent.patch`*::
++
+--
+type: keyword
+
+The patch version of the user agent.
+
+
+--
+
+*`nginx.access.user_agent.name`*::
++
+--
+type: keyword
+
+example: Chrome
+
+The name of the user agent.
+
+
+--
+
+*`nginx.access.user_agent.os`*::
++
+--
+type: keyword
+
+The name of the operating system.
+
+
+--
+
+*`nginx.access.user_agent.os_major`*::
++
+--
+type: long
+
+The major version of the operating system.
+
+
+--
+
+*`nginx.access.user_agent.os_minor`*::
++
+--
+type: long
+
+The minor version of the operating system.
+
+
+--
+
+*`nginx.access.user_agent.os_name`*::
++
+--
+type: keyword
+
+The name of the operating system.
+
+
+--
+
+*`nginx.access.user_agent.raw`*::
++
+--
+type: text
+
+Raw user agent value before parsing by ingest-user-agent plugin.
+
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`nginx.access.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`nginx.access.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`nginx.access.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`nginx.access.geoip.region_name`*::
++
+--
+type: keyword
+
+The region name.
+
+
+--
+
+*`nginx.access.geoip.city_name`*::
++
+--
+type: keyword
+
+The city name.
+
+
+--
+
+*`nginx.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+[float]
+== error fields
+
+Contains fields for the Nginx error logs.
+
+
+
+*`nginx.error.level`*::
++
+--
+type: keyword
+
+Error level (e.g. error, critical).
+
+
+--
+
+*`nginx.error.pid`*::
++
+--
+type: long
+
+Process identifier (PID).
+
+
+--
+
+*`nginx.error.tid`*::
++
+--
+type: long
+
+Thread identifier.
+
+
+--
+
+*`nginx.error.connection_id`*::
++
+--
+type: long
+
+Connection identifier.
+
+
+--
+
+*`nginx.error.message`*::
++
+--
+type: text
+
+The error message
+
+
+--
+
+[[exported-fields-osquery]]
+== Osquery fields
+
+Fields exported by the `osquery` module
+
+
+
+[float]
+== osquery fields
+
+
+
+
+[float]
+== result fields
+
+Common fields exported by the result metricset.
+
+
+
+*`osquery.result.name`*::
++
+--
+type: keyword
+
+The name of the query that generated this event.
+
+
+--
+
+*`osquery.result.action`*::
++
+--
+type: keyword
+
+For incremental data, marks whether the entry was added or removed. It can be one of "added", "removed", or "snapshot".
+
+
+--
+
+*`osquery.result.host_identifier`*::
++
+--
+type: keyword
+
+The identifier for the host on which the osquery agent is running. Normally the hostname.
+
+
+--
+
+*`osquery.result.unix_time`*::
++
+--
+type: long
+
+Unix timestamp of the event, in seconds since the epoch. Used for computing the `@timestamp` column.
+
+
+--
+
+*`osquery.result.calendar_time`*::
++
+--
+String representation of the collection time, as formatted by osquery.
+
+
+--
+
+[[exported-fields-postgresql]]
+== PostgreSQL fields
+
+Module for parsing the PostgreSQL log files.
+
+
+
+[float]
+== postgresql fields
+
+Fields from PostgreSQL logs.
+
+
+
+[float]
+== log fields
+
+Fields from the PostgreSQL log files.
+
+
+
+*`postgresql.log.timestamp`*::
++
+--
+The timestamp from the log line.
+
+
+--
+
+*`postgresql.log.timezone`*::
++
+--
+The timezone of timestamp.
+
+
+--
+
+*`postgresql.log.thread_id`*::
++
+--
+type: long
+
+Process id
+
+
+--
+
+*`postgresql.log.user`*::
++
+--
+example: admin
+
+Name of user
+
+--
+
+*`postgresql.log.database`*::
++
+--
+example: mydb
+
+Name of database
+
+--
+
+*`postgresql.log.level`*::
++
+--
+example: FATAL
+
+The log level.
+
+--
+
+*`postgresql.log.duration`*::
++
+--
+type: float
+
+example: 30.0
+
+Duration of a query.
+
+--
+
+*`postgresql.log.query`*::
++
+--
+example: SELECT * FROM users;
+
+Query statement.
+
+--
+
+*`postgresql.log.message`*::
++
+--
+type: text
+
+The logged message.
+
+
+--
+
+[[exported-fields-redis]]
+== Redis fields
+
+Redis Module
+
+
+
+[float]
+== redis fields
+
+
+
+
+[float]
+== log fields
+
+Redis log files
+
+
+
+*`redis.log.pid`*::
++
+--
+type: long
+
+The process ID of the Redis server.
+
+
+--
+
+*`redis.log.role`*::
++
+--
+type: keyword
+
+The role of the Redis instance. Can be one of `master`, `slave`, `child` (for RDF/AOF writing child), or `sentinel`.
+
+
+--
+
+*`redis.log.level`*::
++
+--
+type: keyword
+
+The log level. Can be one of `debug`, `verbose`, `notice`, or `warning`.
+
+
+--
+
+*`redis.log.message`*::
++
+--
+type: text
+
+The log message
+
+
+--
+
+[float]
+== slowlog fields
+
+Slow logs are retrieved from Redis via a network connection.
+
+
+
+*`redis.slowlog.cmd`*::
++
+--
+type: keyword
+
+The command executed.
+
+
+--
+
+*`redis.slowlog.duration.us`*::
++
+--
+type: long
+
+How long it took to execute the command in microseconds.
+
+
+--
+
+*`redis.slowlog.id`*::
++
+--
+type: long
+
+The ID of the query.
+
+
+--
+
+*`redis.slowlog.key`*::
++
+--
+type: keyword
+
+The key on which the command was executed.
+
+
+--
+
+*`redis.slowlog.args`*::
++
+--
+type: keyword
+
+The arguments with which the command was called.
+
+
+--
+
+[[exported-fields-system]]
+== System fields
+
+Module for parsing system log files.
+
+
+
+[float]
+== system fields
+
+Fields from the system log files.
+
+
+
+[float]
+== auth fields
+
+Fields from the Linux authorization logs.
+
+
+
+*`system.auth.timestamp`*::
++
+--
+The timestamp as read from the auth message.
+
+
+--
+
+*`system.auth.hostname`*::
++
+--
+The hostname as read from the auth message.
+
+
+--
+
+*`system.auth.program`*::
++
+--
+The process name as read from the auth message.
+
+
+--
+
+*`system.auth.pid`*::
++
+--
+type: long
+
+The PID of the process that sent the auth message.
+
+
+--
+
+*`system.auth.message`*::
++
+--
+type: text
+
+The message in the log line.
+
+
+--
+
+*`system.auth.user`*::
++
+--
+The Unix user that this event refers to.
+
+
+--
+
+[float]
+== ssh fields
+
+Fields specific to SSH login events.
+
+
+
+*`system.auth.ssh.event`*::
++
+--
+The SSH login event. Can be one of "Accepted", "Failed", or "Invalid". "Accepted" means a successful login. "Invalid" means that the user is not configured on the system. "Failed" means that the SSH login attempt has failed.
+
+
+--
+
+*`system.auth.ssh.method`*::
++
+--
+The SSH authentication method. Can be one of "password" or "publickey".
+
+
+--
+
+*`system.auth.ssh.ip`*::
++
+--
+type: ip
+
+The client IP from where the login attempt was made.
+
+
+--
+
+*`system.auth.ssh.dropped_ip`*::
++
+--
+type: ip
+
+The client IP from SSH connections that are open and immediately dropped.
+
+
+--
+
+*`system.auth.ssh.port`*::
++
+--
+type: long
+
+The client port from where the login attempt was made.
+
+
+--
+
+*`system.auth.ssh.signature`*::
++
+--
+The signature of the client public key.
+
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the `system.auth.ip` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`system.auth.ssh.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`system.auth.ssh.geoip.city_name`*::
++
+--
+type: keyword
+
+The name of the city.
+
+
+--
+
+*`system.auth.ssh.geoip.region_name`*::
++
+--
+type: keyword
+
+The name of the region.
+
+
+--
+
+*`system.auth.ssh.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`system.auth.ssh.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`system.auth.ssh.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+[float]
+== sudo fields
+
+Fields specific to events created by the `sudo` command.
+
+
+
+*`system.auth.sudo.error`*::
++
+--
+example: user NOT in sudoers
+
+The error message in case the sudo command failed.
+
+
+--
+
+*`system.auth.sudo.tty`*::
++
+--
+The TTY where the sudo command is executed.
+
+
+--
+
+*`system.auth.sudo.pwd`*::
++
+--
+The current directory where the sudo command is executed.
+
+
+--
+
+*`system.auth.sudo.user`*::
++
+--
+example: root
+
+The target user to which the sudo command is switching.
+
+
+--
+
+*`system.auth.sudo.command`*::
++
+--
+The command executed via sudo.
+
+
+--
+
+[float]
+== useradd fields
+
+Fields specific to events created by the `useradd` command.
+
+
+
+*`system.auth.useradd.name`*::
++
+--
+The user name being added.
+
+
+--
+
+*`system.auth.useradd.uid`*::
++
+--
+type: long
+
+The user ID.
+
+--
+
+*`system.auth.useradd.gid`*::
++
+--
+type: long
+
+The group ID.
+
+--
+
+*`system.auth.useradd.home`*::
++
+--
+The home folder for the new user.
+
+--
+
+*`system.auth.useradd.shell`*::
++
+--
+The default shell for the new user.
+
+--
+
+[float]
+== groupadd fields
+
+Fields specific to events created by the `groupadd` command.
+
+
+
+*`system.auth.groupadd.name`*::
++
+--
+The name of the new group.
+
+
+--
+
+*`system.auth.groupadd.gid`*::
++
+--
+type: long
+
+The ID of the new group.
+
+
+--
+
+[float]
+== syslog fields
+
+Contains fields from the syslog system logs.
+
+
+
+*`system.syslog.timestamp`*::
++
+--
+The timestamp as read from the syslog message.
+
+
+--
+
+*`system.syslog.hostname`*::
++
+--
+The hostname as read from the syslog message.
+
+
+--
+
+*`system.syslog.program`*::
++
+--
+The process name as read from the syslog message.
+
+
+--
+
+*`system.syslog.pid`*::
++
+--
+The PID of the process that sent the syslog message.
+
+
+--
+
+*`system.syslog.message`*::
++
+--
+type: text
+
+The message in the log line.
+
+
+--
+
+[[exported-fields-traefik]]
+== Traefik fields
+
+Module for parsing the Traefik log files.
+
+
+
+[float]
+== traefik fields
+
+Fields from the Traefik log files.
+
+
+
+[float]
+== access fields
+
+Contains fields for the Traefik access logs.
+
+
+
+*`traefik.access.remote_ip`*::
++
+--
+type: keyword
+
+Client IP address.
+
+
+--
+
+*`traefik.access.user_name`*::
++
+--
+type: keyword
+
+The user name used when basic authentication is used.
+
+
+--
+
+*`traefik.access.method`*::
++
+--
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+--
+
+*`traefik.access.url`*::
++
+--
+type: keyword
+
+The request HTTP URL.
+
+
+--
+
+*`traefik.access.http_version`*::
++
+--
+type: keyword
+
+The HTTP version.
+
+
+--
+
+*`traefik.access.response_code`*::
++
+--
+type: long
+
+The HTTP response code.
+
+
+--
+
+*`traefik.access.body_sent.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+--
+
+*`traefik.access.referrer`*::
++
+--
+type: keyword
+
+The HTTP referrer.
+
+
+--
+
+*`traefik.access.agent`*::
++
+--
+type: text
+
+Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
+
+
+--
+
+[float]
+== user_agent fields
+
+Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
+
+
+
+*`traefik.access.user_agent.device`*::
++
+--
+type: keyword
+
+The name of the physical device.
+
+
+--
+
+*`traefik.access.user_agent.major`*::
++
+--
+type: long
+
+The major version of the user agent.
+
+
+--
+
+*`traefik.access.user_agent.minor`*::
++
+--
+type: long
+
+The minor version of the user agent.
+
+
+--
+
+*`traefik.access.user_agent.patch`*::
++
+--
+type: keyword
+
+The patch version of the user agent.
+
+
+--
+
+*`traefik.access.user_agent.name`*::
++
+--
+type: keyword
+
+example: Chrome
+
+The name of the user agent.
+
+
+--
+
+*`traefik.access.user_agent.os`*::
++
+--
+type: keyword
+
+The name of the operating system.
+
+
+--
+
+*`traefik.access.user_agent.os_major`*::
++
+--
+type: long
+
+The major version of the operating system.
+
+
+--
+
+*`traefik.access.user_agent.os_minor`*::
++
+--
+type: long
+
+The minor version of the operating system.
+
+
+--
+
+*`traefik.access.user_agent.os_name`*::
++
+--
+type: keyword
+
+The name of the operating system.
+
+
+--
+
+*`traefik.access.user_agent.raw`*::
++
+--
+type: text
+
+Raw user agent value before parsing by ingest-user-agent plugin.
+
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`traefik.access.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`traefik.access.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`traefik.access.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`traefik.access.geoip.region_name`*::
++
+--
+type: keyword
+
+The region name.
+
+
+--
+
+*`traefik.access.geoip.city_name`*::
++
+--
+type: keyword
+
+The city name.
+
+
+--
+
+*`traefik.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+*`traefik.access.request_count`*::
++
+--
+type: long
+
+The number of requests
+
+
+--
+
+*`traefik.access.frontend_name`*::
++
+--
+type: text
+
+The name of the frontend used
+
+
+--
+
+*`traefik.access.backend_url`*::
++
+--
+type: text
+
+The url of the backend where request is forwarded
+
+--
+
