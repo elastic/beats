@@ -1,0 +1,4 @@
+[id="how-{beatname_lc}-works"]
+== How {beatname_uc} works
+
+DESCRIBE HOW THE BEAT WORKS.
