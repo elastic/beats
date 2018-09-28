@@ -94,6 +94,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Added time-based log rotation. {pull}8349[8349]
 - Add backoff on error support to redis output. {pull}7781[7781]
 - Add field `host.os.kernel` to the add_host_metadata processor and to the
   internal monitoring data. {issue}7807[7807]
