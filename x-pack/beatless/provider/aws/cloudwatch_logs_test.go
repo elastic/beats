@@ -43,7 +43,7 @@ func (a *arrayBackedClient) Close() error { return nil }
 
 func TestCloudwatchLogs(t *testing.T) {
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
-		"name":        "ph",
+		"name":        "foobar",
 		"description": "my long description",
 		"role":        "arn:aws:iam::00000000:role/beatless",
 		"triggers": []map[string]interface{}{
@@ -84,7 +84,6 @@ func TestCloudwatchLogs(t *testing.T) {
 
 		assert.Equal(t, e, err)
 	})
-
 }
 
 func generateCloudwatchLogRawEvent() events.CloudwatchLogsEvent {
