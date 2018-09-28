@@ -301,10 +301,8 @@ func (h *Harvester) Run() error {
 		// Check if data should be added to event. Only export non empty events.
 		if !message.IsEmpty() && h.shouldExportLine(text) {
 			fields := common.MapStr{
-				"log": common.MapStr{
-					"source": state.Source,
-					"offset": startingOffset, // Offset here is the offset before the starting char.
-				},
+				"source": state.Source,
+				"offset": startingOffset, // Offset here is the offset before the starting char.
 			}
 			fields.DeepUpdate(message.Fields)
 

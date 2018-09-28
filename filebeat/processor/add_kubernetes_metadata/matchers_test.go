@@ -108,9 +108,7 @@ func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceTy
 	assert.Nil(t, err)
 
 	input := common.MapStr{
-		"log": common.MapStr{
-			"source": source,
-		},
+		"source": source,
 	}
 	output := logMatcher.MetadataIndex(input)
 	assert.Equal(t, expectedResult, output)

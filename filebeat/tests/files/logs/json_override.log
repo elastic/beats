@@ -1,1 +1,1 @@
-{"log": { "source": "hello" }, "message": "test source"}
+{"source": "hello", "message": "test source"}

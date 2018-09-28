@@ -41,7 +41,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/test.log",
             processors=[{
                 "include_fields": {
-                    "fields": ["log.source", "log.offset", "message"],
+                    "fields": ["source", "offset", "message"],
                 },
             }]
         )
@@ -66,7 +66,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/test*.log",
             processors=[{
                 "drop_event": {
-                    "when": "contains.log.source: test1",
+                    "when": "contains.source: test1",
                 },
             }]
         )

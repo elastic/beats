@@ -203,9 +203,7 @@ func (p *Input) Wait() {
 func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) *beat.Event {
 	f := common.MapStr{
 		"message": strings.TrimRight(ev.Message(), "\n"),
-		"log": common.MapStr{
-			"source": metadata.RemoteAddr.String(),
-		},
+		"source":  metadata.RemoteAddr.String(),
 	}
 
 	syslog := common.MapStr{}

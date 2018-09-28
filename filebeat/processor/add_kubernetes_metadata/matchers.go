@@ -77,7 +77,7 @@ const containerIdLen = 64
 const podUIDPos = 5
 
 func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
-	if value, err := event.GetValue("log.source"); err == nil {
+	if value, ok := event["source"]; ok {
 		source := value.(string)
 		logp.Debug("kubernetes", "Incoming source value: %s", source)
 
