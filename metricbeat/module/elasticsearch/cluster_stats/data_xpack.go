@@ -154,9 +154,7 @@ func getClusterMetadataSettings(m *MetricSet) (common.MapStr, error) {
 		return nil, errors.Wrap(err, "failure to merge cluster settings")
 	}
 
-	clusterMetadataSettings := common.MapStr{}
-	clusterMetadataSettings.Put("cluster.metadata", clusterSettings)
-	return clusterMetadataSettings, nil
+	return clusterSettings, nil
 }
 
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
