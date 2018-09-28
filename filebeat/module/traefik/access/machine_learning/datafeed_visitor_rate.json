@@ -16,7 +16,7 @@
         "date_histogram": {
           "field": "@timestamp",
           "interval": 900000,
-          "log.offset": 0,
+          "offset": 0,
           "order": {
             "_key": "asc"
           },

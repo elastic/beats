@@ -128,7 +128,7 @@ class Test(BaseTest):
         self.es.indices.refresh(index=self.index_name)
         # Loads the first 100 events to be checked
         res = self.es.search(index=self.index_name,
-                             body={"query": {"match_all": {}}, "size": 100, "sort": {"log.offset": {"order": "asc"}}})
+                             body={"query": {"match_all": {}}, "size": 100, "sort": {"offset": {"order": "asc"}}})
         objects = [o["_source"] for o in res["hits"]["hits"]]
         assert len(objects) > 0
         for obj in objects:
@@ -168,7 +168,6 @@ class Test(BaseTest):
 
         for ev in expected:
             found = False
-            tested = []
             for obj in objects:
 
                 # Flatten objects for easier comparing
@@ -183,9 +182,9 @@ class Test(BaseTest):
                 if ev == obj:
                     found = True
                     break
-                tested.append(obj)
+
             assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
-                pretty_json(ev), pretty_json(tested))
+                pretty_json(ev), pretty_json(objects))
 
 
 def clean_keys(obj):
@@ -194,7 +193,7 @@ def clean_keys(obj):
     # The create timestamps area always new
     time_keys = ["read_timestamp", "event.created"]
     # source path and beat.version can be different for each run
-    other_keys = ["log.source", "beat.version"]
+    other_keys = ["source", "beat.version"]
 
     for key in host_keys + time_keys + other_keys:
         delete_key(obj, key)
