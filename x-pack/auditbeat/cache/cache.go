@@ -6,18 +6,18 @@ package cache
 
 // Cache is just a map being used as a cache.
 type Cache struct {
-	hashMap map[string]Cacheable
+	hashMap map[uint64]Cacheable
 }
 
 // Cacheable is the interface items stored in Cache need to implement.
 type Cacheable interface {
-	Hash() string
+	Hash() uint64
 }
 
 // New creates a new cache.
 func New() *Cache {
 	return &Cache{
-		hashMap: make(map[string]Cacheable),
+		hashMap: make(map[uint64]Cacheable),
 	}
 }
 

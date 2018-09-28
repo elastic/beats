@@ -22,6 +22,8 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
 
+	"github.com/OneOfOne/xxhash"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/go-sysinfo"
 )
@@ -59,9 +61,11 @@ type Package struct {
 }
 
 // Hash creates a hash for Package.
-func (pkg Package) Hash() string {
-	// Could use real hash e.g. FNV if there is an advantage
-	return pkg.Name + pkg.InstallTime.String()
+func (pkg Package) Hash() uint64 {
+	h := xxhash.New64()
+	h.WriteString(pkg.Name)
+	h.WriteString(pkg.InstallTime.String())
+	return h.Sum64()
 }
 
 func (pkg Package) toMapStr() common.MapStr {

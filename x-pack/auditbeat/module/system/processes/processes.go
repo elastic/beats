@@ -7,6 +7,7 @@ package processes
 import (
 	"strconv"
 
+	"github.com/OneOfOne/xxhash"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -45,9 +46,11 @@ type ProcessInfo struct {
 }
 
 // Hash creates a hash for ProcessInfo.
-func (pInfo ProcessInfo) Hash() string {
-	// Could use real hash e.g. FNV if there is an advantage
-	return strconv.Itoa(pInfo.PID) + pInfo.StartTime.String()
+func (pInfo ProcessInfo) Hash() uint64 {
+	h := xxhash.New64()
+	h.WriteString(strconv.Itoa(pInfo.PID))
+	h.WriteString(pInfo.StartTime.String())
+	return h.Sum64()
 }
 
 func (pInfo ProcessInfo) toMapStr() common.MapStr {
