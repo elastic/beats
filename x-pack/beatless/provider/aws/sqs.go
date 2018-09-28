@@ -6,7 +6,6 @@ package aws
 
 import (
 	"context"
-	"errors"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -31,12 +30,6 @@ func NewSQS(provider provider.Provider, config *common.Config) (provider.Functio
 // Run starts the lambda function and wait for web triggers.
 func (s *SQS) Run(_ context.Context, client core.Client) error {
 	lambda.Start(func(request events.SQSEvent) error {
-		// defensive checks
-		if len(request.Records) == 0 {
-			s.log.Error("no log events received from sqs")
-			return errors.New("no event received")
-		}
-
 		s.log.Debugf("received %d events", len(request.Records))
 
 		events := transformer.SQS(request)

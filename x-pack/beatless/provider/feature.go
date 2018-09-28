@@ -6,10 +6,10 @@ package provider
 
 import "github.com/elastic/beats/libbeat/feature"
 
-// ns return the namespace for functions of a specific provider. The registry have a flat view
+// getNamespace return the namespace for functions of a specific provider. The registry have a flat view
 // representation of the plugin world this mean we don't really have a tree, instead what we do is
 // to create a unique keys per providers that will only keep the functions of the provider.
-func ns(provider string) string {
+func getNamespace(provider string) string {
 	return namespace + "." + provider + ".functions"
 }
 
@@ -26,7 +26,7 @@ func FunctionFeature(
 	factory FunctionFactory,
 	description feature.Describer,
 ) *feature.Feature {
-	return feature.New(ns(provider), name, factory, description)
+	return feature.New(getNamespace(provider), name, factory, description)
 }
 
 // Builder is used to have a fluent interface to build a set of function for a specific provider, it

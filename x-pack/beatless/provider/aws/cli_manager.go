@@ -49,7 +49,7 @@ type CLIManager struct {
 func (c *CLIManager) rawYaml() ([]byte, error) {
 	// Load the configuration file from disk with all the settings,
 	// the function takes care of using -c.
-	rawConfig, err := cfgfile.Load("")
+	rawConfig, err := cfgfile.Load("", &common.Config{})
 	if err != nil {
 		return nil, err
 	}
