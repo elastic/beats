@@ -33,7 +33,7 @@ func TestStart(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		var err error
 		go func() {
-			err = coordinator.Start(ctx)
+			err = coordinator.Run(ctx)
 			assert.NoError(t, err)
 		}()
 		cancel()
@@ -41,13 +41,13 @@ func TestStart(t *testing.T) {
 
 	t.Run("on error shutdown all the runner", func(t *testing.T) {
 		coordinator := NewCoordinator(nil, &happyRunner{}, &unhappyRunner{})
-		err := coordinator.Start(context.Background())
+		err := coordinator.Run(context.Background())
 		assert.Error(t, err)
 	})
 
 	t.Run("aggregate all errors", func(t *testing.T) {
 		coordinator := NewCoordinator(nil, &unhappyRunner{}, &unhappyRunner{})
-		err := coordinator.Start(context.Background())
+		err := coordinator.Run(context.Background())
 		assert.Error(t, err)
 	})
 }

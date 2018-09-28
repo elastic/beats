@@ -36,9 +36,9 @@ func NewCoordinator(log *logp.Logger,
 	return &Coordinator{log: log, runners: runners}
 }
 
-// Start starts each functions into an independant goroutine and wait until all the goroutine are
+// Run starts each functions into an independent goroutine and wait until all the goroutine are
 // stopped to exit.
-func (r *Coordinator) Start(ctx context.Context) error {
+func (r *Coordinator) Run(ctx context.Context) error {
 	r.log.Debug("coordinator started")
 	defer r.log.Debug("coordinator stopped")
 

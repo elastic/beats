@@ -71,12 +71,6 @@ func (c *CloudwatchLogs) Run(_ context.Context, client core.Client) error {
 			return err
 		}
 
-		// defensive checks
-		if len(parsedEvent.LogEvents) == 0 {
-			c.log.Error("no log events received from cloudwatch log")
-			return errors.New("no event received")
-		}
-
 		c.log.Debugf(
 			"received %d events (logStream: %s, owner: %s, logGroup: %s, messageType: %s)",
 			len(parsedEvent.LogEvents),

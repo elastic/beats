@@ -6,7 +6,6 @@ package aws
 
 import (
 	"context"
-	"errors"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -31,12 +30,6 @@ func NewKinesis(provider provider.Provider, config *common.Config) (provider.Fun
 // Run starts the lambda function and wait for web triggers.
 func (k *Kinesis) Run(_ context.Context, client core.Client) error {
 	lambda.Start(func(request events.KinesisEvent) error {
-		// defensive checks
-		if len(request.Records) == 0 {
-			k.log.Error("no log events received from Kinesis")
-			return errors.New("no event received")
-		}
-
 		k.log.Debugf("received %d events", len(request.Records))
 
 		events := transformer.KinesisEvent(request)

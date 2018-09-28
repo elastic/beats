@@ -23,7 +23,7 @@ var (
 )
 
 // namespace is the namespace were providers will be registered in the global registry.
-var namespace = "beatless.provider"
+const namespace = "beatless.provider"
 
 // Factory factory to create a concrete provider for a specific cloud service.
 type Factory func(*logp.Logger, *Registry, *common.Config) (Provider, error)
@@ -77,7 +77,7 @@ func (r *Registry) LookupFunction(provider, function string) (FunctionFactory, e
 		return nil, err
 	}
 
-	ns := ns(provider)
+	ns := getNamespace(provider)
 
 	f, err := r.registry.Lookup(ns, function)
 	if err != nil {

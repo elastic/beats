@@ -32,10 +32,10 @@ var (
 	refreshDelay = 15 * time.Minute
 )
 
-// Beatless is a beat designed to un under a serverless environment and listen to external triggers,
+// Beatless is a beat designed to run under a serverless environment and listen to external triggers,
 // each invocation will generate one or more events to Elasticsearch.
 //
-// Each serverless implementation is different but beatless follows a few executions rules.
+// Each serverless implementation is different but beatless follows a few execution rules.
 // - Publishing events from the source to the output is done synchronously.
 // - Execution can be suspended.
 // - Run on a read only filesystem
@@ -52,7 +52,7 @@ type Beatless struct {
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	c := &config.DefaultConfig
 	if err := cfg.Unpack(c); err != nil {
-		return nil, fmt.Errorf("xerror reading config file: %v", err)
+		return nil, fmt.Errorf("error reading config file: %v", err)
 	}
 
 	provider, err := provider.NewProvider(c)
@@ -137,7 +137,7 @@ func (bt *Beatless) Run(b *beat.Beat) error {
 	// When an error reach the coordinator we assume that we cannot recover from it and we initiate
 	// a shutdown and return an aggregated errors.
 	coordinator := core.NewCoordinator(logp.NewLogger("coordinator"), functions...)
-	err = coordinator.Start(bt.ctx)
+	err = coordinator.Run(bt.ctx)
 	if err != nil {
 		return err
 	}
