@@ -29,7 +29,12 @@ func NewKinesis(provider provider.Provider, config *common.Config) (provider.Fun
 
 // Run starts the lambda function and wait for web triggers.
 func (k *Kinesis) Run(_ context.Context, client core.Client) error {
-	lambda.Start(func(request events.KinesisEvent) error {
+	lambda.Start(k.createHandler(client))
+	return nil
+}
+
+func (k *Kinesis) createHandler(client core.Client) func(request events.KinesisEvent) error {
+	return func(request events.KinesisEvent) error {
 		k.log.Debugf("received %d events", len(request.Records))
 
 		events := transformer.KinesisEvent(request)
@@ -39,9 +44,7 @@ func (k *Kinesis) Run(_ context.Context, client core.Client) error {
 		}
 		client.Wait()
 		return nil
-	})
-
-	return nil
+	}
 }
 
 // Name return the name of the lambda function.
