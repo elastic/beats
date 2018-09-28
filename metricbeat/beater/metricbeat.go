@@ -32,6 +32,9 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
 
+	// Add autodiscover builders / appenders
+	_ "github.com/elastic/beats/metricbeat/autodiscover"
+
 	// Add metricbeat default processors
 	_ "github.com/elastic/beats/metricbeat/processor/add_kubernetes_metadata"
 )
