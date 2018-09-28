@@ -1,4 +1,5 @@
 :modulename: mysql
+:has-dashboards: true
 
 == MySQL module
 
@@ -65,3 +66,9 @@ include::../include/var-paths.asciidoc[]
 ==== `slowlog` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
