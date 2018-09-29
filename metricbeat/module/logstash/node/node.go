@@ -51,7 +51,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
+	cfgwarn.Beta("the " + base.FullyQualifiedName() + " metricset is beta")
 
 	ms, err := logstash.NewMetricSet(base)
 	if err != nil {
