@@ -109,7 +109,6 @@ class Test(BaseTest):
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
 
-
     @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
     def test_read_events_with_existing_registry(self):
         """
