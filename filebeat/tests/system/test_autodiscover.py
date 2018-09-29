@@ -43,7 +43,7 @@ class TestAutodiscover(filebeat.BaseTest):
         docker_client.containers.run('busybox', 'sleep 1')
 
         self.wait_until(lambda: self.log_contains('Starting runner: input'))
-        self.wait_until(lambda: self.log_contains('Stopping runner: input'), max_timeout: 70)
+        self.wait_until(lambda: self.log_contains('Stopping runner: input'), max_timeout=70)
 
         output = self.read_output_json()
         proc.check_kill_and_wait()
