@@ -25,17 +25,12 @@ import (
 	"github.com/elastic/beats/metricbeat/module/logstash"
 )
 
-const (
-	metricsetName = "node_stats"
-	namespace     = "logstash.node.stats"
-)
-
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet(logstash.ModuleName, metricsetName, New,
+	mb.Registry.MustAddMetricSet(logstash.ModuleName, "node_stats", New,
 		mb.WithHostParser(hostParser),
-		mb.WithNamespace(namespace),
+		mb.WithNamespace("logstash.node.stats"),
 		mb.DefaultMetricSet(),
 	)
 }
@@ -50,20 +45,25 @@ var (
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
-	mb.BaseMetricSet
+	*logstash.MetricSet
 	http *helper.HTTP
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The logstash node_stats metricset is beta")
+	cfgwarn.Beta("the " + base.FullyQualifiedName() + " metricset is beta")
+
+	ms, err := logstash.NewMetricSet(base)
+	if err != nil {
+		return nil, err
+	}
 
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
 	}
 	return &MetricSet{
-		base,
+		ms,
 		http,
 	}, nil
 }
@@ -75,8 +75,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.http.FetchContent()
 	if err != nil {
 		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 
-	eventMapping(r, content)
+	err = eventMapping(r, content)
+	if err != nil {
+		m.Log.Error(err)
+		return
+	}
 }
