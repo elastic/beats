@@ -100,7 +100,7 @@ func checkEvent(t *testing.T, listener bus.Listener, start bool) {
 			assert.Equal(t, getValue(e, "docker"), getValue(e, "meta.docker"))
 			return
 
-		case <-time.After(10 * time.Second):
+		case <-time.After(70 * time.Second):
 			t.Fatal("Timeout waiting for provider events")
 			return
 		}
