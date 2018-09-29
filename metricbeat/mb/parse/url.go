@@ -218,18 +218,27 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 		u.Path = path
 	}
 
-	// Add the query params to existing query parameters overwriting any
-	// keys that already exist.
+	//Adds the query params in the url
+	u, err = SetQueryParams(u, query)
+	return u, err
+}
+
+// SetQueryParams adds the query params to existing query parameters overwriting any
+// keys that already exist.
+func SetQueryParams(u *url.URL, query string) (*url.URL, error) {
 	q := u.Query()
 	params, err := url.ParseQuery(query)
+	if err != nil {
+		return u, err
+	}
 	for key, values := range params {
 		for _, v := range values {
 			q.Set(key, v)
 		}
 	}
 	u.RawQuery = q.Encode()
-
 	return u, nil
+
 }
 
 // redactURLCredentials returns the URL as a string with the username and

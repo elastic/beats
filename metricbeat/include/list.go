@@ -126,6 +126,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/nginx/stubstatus"
 	_ "github.com/elastic/beats/metricbeat/module/php_fpm"
 	_ "github.com/elastic/beats/metricbeat/module/php_fpm/pool"
+	_ "github.com/elastic/beats/metricbeat/module/php_fpm/process"
 	_ "github.com/elastic/beats/metricbeat/module/postgresql"
 	_ "github.com/elastic/beats/metricbeat/module/postgresql/activity"
 	_ "github.com/elastic/beats/metricbeat/module/postgresql/bgwriter"
