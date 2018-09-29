@@ -41,22 +41,26 @@ var (
 )
 
 func eventMapping(r mb.ReporterV2, content []byte) error {
+	event := mb.Event{}
+	event.RootFields = common.MapStr{}
+	event.RootFields.Put("service.name", logstash.ModuleName)
+
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
 		err = errors.Wrap(err, "failure parsing Logstash Node API response")
-		r.Error(err)
+		event.Error = err
+		r.Event(event)
 		return err
 	}
 
 	fields, err := schema.Apply(data)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failure applying node schema"))
+		err = errors.Wrap(err, "failure applying node schema")
+		event.Error = err
+		r.Event(event)
+		return err
 	}
-
-	event := mb.Event{}
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", logstash.ModuleName)
 
 	event.MetricSetFields = fields
 
