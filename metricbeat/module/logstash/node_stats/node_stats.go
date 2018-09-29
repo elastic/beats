@@ -20,6 +20,8 @@ package node_stats
 import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
+
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/logstash"
@@ -74,8 +76,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		r.Error(err)
-		m.Log.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 

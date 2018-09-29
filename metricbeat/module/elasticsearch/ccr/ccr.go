@@ -23,6 +23,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -57,9 +58,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+ccrStatsPath)
 	if err != nil {
-		msg := errors.Wrap(err, "error determining if connected Elasticsearch node is master")
-		r.Error(msg)
-		m.Log.Error(msg)
+		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
@@ -71,32 +71,28 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+ccrStatsPath)
 	if err != nil {
-		r.Error(err)
-		m.Log.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	elasticsearchVersion := info.Version.Number
 	isCCRStatsAPIAvailable, err := elasticsearch.IsCCRStatsAPIAvailable(elasticsearchVersion)
 	if err != nil {
-		r.Error(err)
-		m.Log.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	if !isCCRStatsAPIAvailable {
 		const errorMsg = "the %v metricset is only supported with Elasticsearch >= %v. " +
 			"You are currently running Elasticsearch %v"
-		err := fmt.Errorf(errorMsg, m.FullyQualifiedName(), elasticsearch.CCRStatsAPIAvailableVersion, elasticsearchVersion)
-		r.Error(err)
-		m.Log.Error(err)
+		err = fmt.Errorf(errorMsg, elasticsearch.CCRStatsAPIAvailableVersion, elasticsearchVersion)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
-		m.Log.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 

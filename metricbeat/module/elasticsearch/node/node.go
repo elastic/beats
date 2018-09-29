@@ -19,6 +19,7 @@ package node
 
 import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -67,15 +68,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
-		m.Log.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	err = eventsMapping(r, content)
 	if err != nil {
-		r.Error(err)
-		m.Log.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 }

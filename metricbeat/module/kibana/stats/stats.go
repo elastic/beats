@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/kibana"
@@ -140,8 +141,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
 	content, err := m.statsHTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
-		m.Log.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
@@ -155,8 +155,7 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
 	} else {
 		err = eventMapping(r, content)
 		if err != nil {
-			r.Error(err)
-			m.Log.Error(err)
+			elastic.ReportAndLogError(err, r, m.Log)
 			return
 		}
 	}
