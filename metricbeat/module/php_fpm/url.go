@@ -15,49 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
-
-package pool
+package php_fpm
 
 import (
-	"os"
-	"testing"
-
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 )
 
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "phpfpm")
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(f, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
+const (
+	defaultScheme      = "http"
+	defaultPath        = "/status"
+	defaultQueryParams = "json"
+)
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "php_fpm",
-		"metricsets": []string{"pool"},
-		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
-	}
-}
-
-func GetEnvHost() string {
-	host := os.Getenv("PHPFPM_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func GetEnvPort() string {
-	port := os.Getenv("PHPFPM_PORT")
-
-	if len(port) == 0 {
-		port = "81"
-	}
-	return port
-}
+var (
+	// HostParser is used for parsing the configured php-fpm hosts.
+	HostParser = parse.URLHostParserBuilder{
+		DefaultScheme: defaultScheme,
+		DefaultPath:   defaultPath,
+		QueryParams:   defaultQueryParams,
+		PathConfigKey: "status_path",
+	}.Build()
+)
