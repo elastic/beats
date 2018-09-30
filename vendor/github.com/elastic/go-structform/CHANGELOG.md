@@ -14,6 +14,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.0.5]
+
+### Added
+- Add Reset to gotype.Unfolder. (PR #7)
+
 ## [0.0.4]
 
 ### Added
@@ -42,6 +47,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Fix invalid pointer indirections in struct to array/map.
 
-[Unreleased]: https://github.com/elastic/go-structform/compare/v0.0.3...HEAD
+[Unreleased]: https://github.com/elastic/go-structform/compare/v0.0.5...HEAD
+[0.0.5]: https://github.com/elastic/go-structform/compare/v0.0.4...v0.0.5
+[0.0.4]: https://github.com/elastic/go-structform/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/elastic/go-structform/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/elastic/go-structform/compare/v0.0.1...v0.0.2
