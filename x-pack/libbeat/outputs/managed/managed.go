@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package pause
+package managed
 
 import (
 	"time"
@@ -16,7 +16,7 @@ import (
 // managed output is used as a placeholder for central management
 // this output will cause the beat to pause the output until a real
 // output is configured
-// It's used both during startup (before we retrieved the current output settings)
+// It's used both during startup (before we retrieve the current output settings)
 // and can be also used to effectively pause the beat
 type managed struct{}
 

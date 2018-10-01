@@ -7,7 +7,7 @@ package cmd
 import (
 	"github.com/elastic/beats/libbeat/cmd"
 
-	// register central management modules
+	// register central management packages
 	_ "github.com/elastic/beats/x-pack/libbeat/management"
 	_ "github.com/elastic/beats/x-pack/libbeat/outputs/managed"
 )
