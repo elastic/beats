@@ -32,36 +32,66 @@
     type: keyword
     description: >
         Host ID.
-  - name: ip
-    type: ip
-    description: >
-        List of IP addresses on this host.
-  - name: mac
-    type: keyword
-    description: >
-        List of MAC addresses on this host.
   - name: architecture
     type: keyword
     description: >
         Host architecture (e.g. x86_64).
-  - name: os.platform
-    type: keyword
+  - name: os
+    type: group
     description: >
-      OS platform (e.g. centos, ubuntu, windows).
-  - name: os.name
-    type: keyword
+      `os` contains information about the operating system.
+    fields:
+    - name: platform
+      type: keyword
+      description: >
+        OS platform (e.g. centos, ubuntu, windows).
+    - name: name
+      type: keyword
+      description: >
+        OS name (e.g. Mac OS X).
+    - name: family
+      type: keyword
+      description: >
+        OS family (e.g. redhat, debian, freebsd, windows).
+    - name: version
+      type: keyword
+      description: >
+        OS version.
+    - name: kernel
+      type: keyword
+      description: >
+        The operating system's kernel version.
+  - name: network
+    type: group
     description: >
-      OS name (e.g. Mac OS X).
-  - name: os.family
-    type: keyword
-    description: >
-      OS family (e.g. redhat, debian, freebsd, windows).
-  - name: os.version
-    type: keyword
-    description: >
-      OS version.
-  - name: os.kernel
-    type: keyword
-    description: >
-      The operating system's kernel version.
-     
+      `network` contains network information from the system.
+    fields:
+    - name: interfaces
+      type: array
+      description: >
+        `interfaces` contains information about network interfaces.
+      fields:
+      - name: index
+        type: integer
+        description: >
+          Index of the interface.
+      - name: mtu
+        type: integer
+        description: >
+          Maximum transmission unit.
+      - name: name
+        type: keyword
+        description: >
+          Interface name.
+      - name: mac
+        type: keyword
+        description: >
+          MAC address.
+      - name: flags
+        type: text
+        description: >
+          Interface flags.
+      - name: ips
+        type: ip
+        description: >
+          IP addresses.

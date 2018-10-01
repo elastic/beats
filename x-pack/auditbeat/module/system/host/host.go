@@ -5,6 +5,8 @@
 package host
 
 import (
+	"net"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -52,6 +54,19 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		return
 	}
 
+	networkInterfaces, err := getNetworkInterfaces()
+	if err != nil {
+		errW := errors.Wrap(err, "Failed to load network interface information")
+		ms.log.Error(errW)
+		report.Error(errW)
+		return
+	}
+
+	var networkInterfaceMapStr []common.MapStr
+	for _, ifc := range networkInterfaces {
+		networkInterfaceMapStr = append(networkInterfaceMapStr, ifc.toMapStr())
+	}
+
 	report.Event(mb.Event{
 		MetricSetFields: common.MapStr{
 			// https://github.com/elastic/ecs#-host-fields
@@ -62,8 +77,6 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 			"timezone.offset.sec": host.Info().TimezoneOffsetSec,
 			"name":                host.Info().Hostname,
 			"id":                  host.Info().UniqueID,
-			"ip":                  host.Info().IPs,
-			"mac":                 host.Info().MACs,
 			// TODO "host.type": ?
 			"architecture": host.Info().Architecture,
 
@@ -75,6 +88,65 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 				"version":  host.Info().OS.Version,
 				"kernel":   host.Info().KernelVersion,
 			},
+
+			"network": common.MapStr{
+				"interfaces": networkInterfaceMapStr,
+			},
 		},
 	})
+}
+
+type NetworkInterface struct {
+	net.Interface
+
+	ips []net.IP
+}
+
+func (ifc NetworkInterface) toMapStr() common.MapStr {
+	return common.MapStr{
+		"index": ifc.Index,
+		"mtu":   ifc.MTU,
+		"name":  ifc.Name,
+		"mac":   ifc.HardwareAddr.String(),
+		"flags": ifc.Flags.String(),
+		"ips":   ifc.ips,
+	}
+}
+
+// getInterfaces fetches information about the system's network interfaces.
+// TODO: Move to go-sysinfo?
+func getNetworkInterfaces() ([]NetworkInterface, error) {
+	ifcs, err := net.Interfaces()
+	if err != nil {
+		return nil, err
+	}
+
+	var networkInterfaces []NetworkInterface
+
+	for _, ifc := range ifcs {
+		addrs, err := ifc.Addrs()
+		if err != nil {
+			return nil, err
+		}
+
+		var ips []net.IP
+		for _, addr := range addrs {
+			ip, _, err := net.ParseCIDR(addr.String())
+			if err != nil {
+				return nil, err
+			}
+
+			ips = append(ips, ip)
+		}
+
+		isLoopback := ifc.Flags&net.FlagLoopback != 0
+		if !isLoopback {
+			networkInterfaces = append(networkInterfaces, NetworkInterface{
+				ifc,
+				ips,
+			})
+		}
+	}
+
+	return networkInterfaces, nil
 }
