@@ -19,6 +19,7 @@ package consumergroup
 
 import (
 	"crypto/tls"
+	"fmt"
 
 	"github.com/pkg/errors"
 
@@ -111,6 +112,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 
 	emitEvent := func(event common.MapStr) {
+		// Helpful IDs for dashboards
+		partitionTopicID := fmt.Sprintf("%d-%s", event["partition"], event["topic"])
+		partitionTopicBrokerID := fmt.Sprintf("%s-%d", partitionTopicID, m.broker.ID())
+
 		// TODO (deprecation): Remove fields from MetricSetFields moved to ModuleFields
 		event["broker"] = brokerInfo
 		r.Event(mb.Event{
@@ -120,7 +125,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 					"name": event["topic"],
 				},
 				"partition": common.MapStr{
-					"id": event["partition"],
+					"id":              event["partition"],
+					"topic_id":        partitionTopicID,
+					"topic_broker_id": partitionTopicBrokerID,
 				},
 			},
 			MetricSetFields: event,
