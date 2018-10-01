@@ -52,8 +52,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 					},
 				},
 
-				"name":       container.Name,
-				"start_time": container.StartTime,
+				"name": container.Name,
 
 				"cpu": common.MapStr{
 					"usage": common.MapStr{
@@ -112,6 +111,10 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 						"count": container.Logs.Inodes,
 					},
 				},
+			}
+
+			if container.StartTime != "" {
+				containerEvent.Put("start_time", container.StartTime)
 			}
 
 			if nodeCores > 0 {
