@@ -32,6 +32,13 @@ journalbeat.inputs:
   # Matching for nginx entries: "systemd.unit=nginx"
   #matches: []
 
+  # Optional fields that you can specify to add additional information to the
+  # output. Fields can be scalar values, arrays, dictionaries, or any nested
+  # combination of these.
+  #fields:
+  #  env: staging
+
+
 #========================= Journalbeat global options ============================
 #journalbeat:
   # Name of the registry file. If a relative path is used, it is considered relative to the

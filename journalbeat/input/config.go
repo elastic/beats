@@ -20,6 +20,9 @@ package input
 import (
 	"fmt"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 // Config stores the options of an input.
@@ -37,6 +40,11 @@ type Config struct {
 	Seek string `config:"seek"`
 	// Matches store the key value pairs to match entries.
 	Matches []string `config:"matches"`
+
+	// Fields and tags to add to events.
+	common.EventMetadata `config:",inline"`
+	// Processors to run on events.
+	Processors processors.PluginConfig `config:"processors"`
 }
 
 var (
