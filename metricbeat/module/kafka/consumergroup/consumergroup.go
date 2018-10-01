@@ -112,7 +112,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 
 	emitEvent := func(event common.MapStr) {
-		// Helpful IDs for dashboards
+		// Helpful IDs to avoid scripts on queries
 		partitionTopicID := fmt.Sprintf("%d-%s", event["partition"], event["topic"])
 		partitionTopicBrokerID := fmt.Sprintf("%s-%d", partitionTopicID, m.broker.ID())
 

@@ -168,7 +168,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 					}
 				}
 
-				// Helpful IDs for dashboards
+				// Helpful IDs to avoid scripts on queries
 				partitionTopicID := fmt.Sprintf("%d-%s", partition.ID, topic.Name)
 				partitionTopicBrokerID := fmt.Sprintf("%s-%d", partitionTopicID, b.ID())
 
