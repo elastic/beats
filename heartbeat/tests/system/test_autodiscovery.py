@@ -37,8 +37,6 @@ class TestAutodiscover(BaseTest):
         )
 
         proc = self.start_beat()
-        docker_client.images.pull('redis:3.2.4')
-        container = docker_client.containers.run('redis:3.2.4', detach=True)
 
         self.wait_until(lambda: self.log_contains(re.compile('autodiscover.+Got a start event:', re.I)))
 
