@@ -145,7 +145,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 
 	if ms.cache != nil && !ms.cache.IsEmpty() {
-		installed, removed := ms.cache.DiffAndUpdateCache(packages)
+		installed, removed := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
 
 		for _, pkgInfo := range installed {
 			report.Event(mb.Event{
@@ -174,7 +174,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 		for _, pkgInfo := range packages {
 			pkgInfos = append(pkgInfos, common.MapStr{
-				"package": pkgInfo.(Package).toMapStr(),
+				"package": pkgInfo.toMapStr(),
 			})
 		}
 
@@ -186,12 +186,22 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 		if ms.cache != nil {
 			// This will initialize the cache with the current packages
-			ms.cache.DiffAndUpdateCache(packages)
+			ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
 		}
 	}
 }
 
-func getPackages(osFamily string) (packages []cache.Cacheable, err error) {
+func convertToCacheable(packages []*Package) []cache.Cacheable {
+	c := make([]cache.Cacheable, 0, len(packages))
+
+	for _, p := range packages {
+		c = append(c, p)
+	}
+
+	return c
+}
+
+func getPackages(osFamily string) (packages []*Package, err error) {
 	switch osFamily {
 	case redhat:
 		packages, err = listRPMPackages()
@@ -218,7 +228,7 @@ func getPackages(osFamily string) (packages []cache.Cacheable, err error) {
 /*
 The following functions copied from https://github.com/tsg/listpackages/blob/master/main.go
 */
-func listRPMPackages() ([]cache.Cacheable, error) {
+func listRPMPackages() ([]*Package, error) {
 	const format = "%{NAME}|%{VERSION}|%{RELEASE}|%{ARCH}|%{LICENSE}|%{INSTALLTIME}|%{SIZE}|%{URL}|%{SUMMARY}\\n"
 	out, err := exec.Command("/usr/bin/rpm", "--qf", format, "-qa").Output()
 	if err != nil {
@@ -226,7 +236,7 @@ func listRPMPackages() ([]cache.Cacheable, error) {
 	}
 
 	lines := strings.Split(string(out), "\n")
-	var packages []cache.Cacheable
+	var packages []*Package
 	for _, line := range lines {
 		if len(strings.TrimSpace(line)) == 0 {
 			continue
@@ -235,7 +245,7 @@ func listRPMPackages() ([]cache.Cacheable, error) {
 		if len(words) < 9 {
 			return nil, fmt.Errorf("line '%s' doesn't have enough elements", line)
 		}
-		pkg := Package{
+		pkg := &Package{
 			Name:    words[0],
 			Version: words[1],
 			Release: words[2],
@@ -263,7 +273,7 @@ func listRPMPackages() ([]cache.Cacheable, error) {
 	return packages, nil
 }
 
-func listDebPackages() ([]cache.Cacheable, error) {
+func listDebPackages() ([]*Package, error) {
 	const statusFile = "/var/lib/dpkg/status"
 	file, err := os.Open(statusFile)
 	if err != nil {
@@ -271,14 +281,14 @@ func listDebPackages() ([]cache.Cacheable, error) {
 	}
 	defer file.Close()
 
-	var packages []cache.Cacheable
+	var packages []*Package
 	pkg := &Package{}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if len(strings.TrimSpace(line)) == 0 {
 			// empty line signals new package
-			packages = append(packages, *pkg)
+			packages = append(packages, pkg)
 			pkg = &Package{}
 			continue
 		}
@@ -315,7 +325,7 @@ func listDebPackages() ([]cache.Cacheable, error) {
 	return packages, nil
 }
 
-func listBrewPackages() ([]cache.Cacheable, error) {
+func listBrewPackages() ([]*Package, error) {
 	const cellarPath = "/usr/local/Cellar"
 
 	packageDirs, err := ioutil.ReadDir(cellarPath)
@@ -325,7 +335,7 @@ func listBrewPackages() ([]cache.Cacheable, error) {
 		return nil, errors.Wrapf(err, "error reading directory %s", cellarPath)
 	}
 
-	var packages []cache.Cacheable
+	var packages []*Package
 	for _, packageDir := range packageDirs {
 		if !packageDir.IsDir() {
 			continue
@@ -340,7 +350,7 @@ func listBrewPackages() ([]cache.Cacheable, error) {
 			if !version.IsDir() {
 				continue
 			}
-			pkg := Package{
+			pkg := &Package{
 				Name:        packageDir.Name(),
 				Version:     version.Name(),
 				InstallTime: version.ModTime(),

@@ -104,7 +104,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 
 	if ms.cache != nil && !ms.cache.IsEmpty() {
-		started, stopped := ms.cache.DiffAndUpdateCache(processInfos)
+		started, stopped := ms.cache.DiffAndUpdateCache(convertToCacheable(processInfos))
 
 		for _, pInfo := range started {
 			report.Event(mb.Event{
@@ -128,7 +128,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		var processEvents []common.MapStr
 
 		for _, pInfo := range processInfos {
-			processEvents = append(processEvents, pInfo.(ProcessInfo).toMapStr())
+			processEvents = append(processEvents, pInfo.toMapStr())
 		}
 
 		report.Event(mb.Event{
@@ -139,12 +139,22 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 		if ms.cache != nil {
 			// This will initialize the cache with the current processes
-			ms.cache.DiffAndUpdateCache(processInfos)
+			ms.cache.DiffAndUpdateCache(convertToCacheable(processInfos))
 		}
 	}
 }
 
-func (ms *MetricSet) getProcessInfos() ([]cache.Cacheable, []error) {
+func convertToCacheable(processInfos []*ProcessInfo) []cache.Cacheable {
+	c := make([]cache.Cacheable, 0, len(processInfos))
+
+	for _, p := range processInfos {
+		c = append(c, p)
+	}
+
+	return c
+}
+
+func (ms *MetricSet) getProcessInfos() ([]*ProcessInfo, []error) {
 	// TODO: Implement Processes() in go-sysinfo
 	// e.g. https://github.com/elastic/go-sysinfo/blob/master/providers/darwin/process_darwin_amd64.go#L41
 	pids, err := process.Pids()
@@ -152,13 +162,13 @@ func (ms *MetricSet) getProcessInfos() ([]cache.Cacheable, []error) {
 		return nil, []error{errors.Wrap(err, "Failed to fetch the list of PIDs")}
 	}
 
-	var processInfos []cache.Cacheable
+	var processInfos []*ProcessInfo
 	var errorList []error
 
 	for _, pid := range pids {
 		if p, err := sysinfo.Process(pid); err == nil {
 			if pInfo, err := p.Info(); err == nil {
-				processInfos = append(processInfos, ProcessInfo{pInfo})
+				processInfos = append(processInfos, &ProcessInfo{pInfo})
 			} else {
 				errorList = append(errorList, errors.Wrap(err, "Failed to load process information"))
 			}
