@@ -28,6 +28,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/journalbeat/checkpoint"
+	"github.com/elastic/beats/journalbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -101,6 +102,8 @@ func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *lo
 	}
 	r.seek(state.Cursor)
 
+	instance.AddJournalToMonitor(c.Path, *j)
+
 	r.logger.Debug("New journal is opened for reading")
 
 	return r, nil
@@ -114,6 +117,7 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 		return nil, errors.Wrap(err, "failed to open local journal")
 	}
 
+	c.Path = LocalSystemJournalID
 	logger = logger.With("path", "local")
 	logger.Debug("New local journal is opened for reading")
 
@@ -130,6 +134,9 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 		logger:  logger,
 	}
 	r.seek(state.Cursor)
+
+	instance.AddJournalToMonitor(c.Path, *j)
+
 	return r, nil
 }
 
@@ -325,5 +332,6 @@ func (r *Reader) wait() {
 
 // Close closes the underlying journal reader.
 func (r *Reader) Close() {
+	instance.StopMonitoringJournal(r.config.Path)
 	r.journal.Close()
 }

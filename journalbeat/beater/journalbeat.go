@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/journalbeat/checkpoint"
+	"github.com/elastic/beats/journalbeat/cmd/instance"
 	"github.com/elastic/beats/journalbeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -54,6 +55,8 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	instance.SetupJournalMetrics()
 
 	var inputs []*input.Input
 	for _, c := range config.Inputs {
