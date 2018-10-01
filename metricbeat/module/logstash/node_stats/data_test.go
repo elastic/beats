@@ -21,6 +21,7 @@ package node_stats
 
 import (
 	"io/ioutil"
+	"path/filepath"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -29,10 +30,16 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("./_meta/test/input.json")
+
+	files, err := filepath.Glob("./_meta/test/node_stats.*.json")
 	assert.NoError(t, err)
 
-	event, _ := eventMapping(content)
+	for _, f := range files {
+		content, err := ioutil.ReadFile(f)
+		assert.NoError(t, err)
 
-	assert.Equal(t, event["events"].(common.MapStr)["out"], int64(5))
+		event, _ := eventMapping(content)
+
+		assert.Equal(t, event["events"].(common.MapStr)["out"], int64(5))
+	}
 }
