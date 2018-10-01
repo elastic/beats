@@ -91,6 +91,7 @@ type transaction struct {
 
 	event     common.MapStr
 	method    string
+	opCode    opCode
 	resource  string
 	error     string
 	params    map[string]interface{}
