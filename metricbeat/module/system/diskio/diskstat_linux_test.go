@@ -20,8 +20,9 @@
 package diskio
 
 import (
-	sigar "github.com/elastic/gosigar"
 	"testing"
+
+	sigar "github.com/elastic/gosigar"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/system"
