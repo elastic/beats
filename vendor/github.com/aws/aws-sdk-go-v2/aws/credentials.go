@@ -3,6 +3,7 @@ package aws
 import (
 	"math"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/internal/sdk"
@@ -85,7 +86,7 @@ type CredentialsProvider interface {
 type SafeCredentialsProvider struct {
 	RetrieveFn func() (Credentials, error)
 
-	creds Credentials
+	creds atomic.Value
 	m     sync.Mutex
 }
 
@@ -95,28 +96,43 @@ type SafeCredentialsProvider struct {
 //
 // Retruns and error if RetrieveFn returns an error.
 func (p *SafeCredentialsProvider) Retrieve() (Credentials, error) {
+	if creds := p.getCreds(); creds != nil {
+		return *creds, nil
+	}
+
 	p.m.Lock()
 	defer p.m.Unlock()
 
-	if p.creds.HasKeys() && !p.creds.Expired() {
-		return p.creds, nil
+	// Make sure another goroutine didn't already update the credentials.
+	if creds := p.getCreds(); creds != nil {
+		return *creds, nil
 	}
 
 	creds, err := p.RetrieveFn()
 	if err != nil {
 		return Credentials{}, err
 	}
+	p.creds.Store(&creds)
 
-	p.creds = creds
+	return creds, nil
+}
 
-	return p.creds, nil
+func (p *SafeCredentialsProvider) getCreds() *Credentials {
+	v := p.creds.Load()
+	if v == nil {
+		return nil
+	}
+
+	c := v.(*Credentials)
+	if c != nil && c.HasKeys() && !c.Expired() {
+		return c
+	}
+
+	return nil
 }
 
 // Invalidate will invalidate the cached credentials. The next call to Retrieve
 // will cause RetrieveFn to be called.
 func (p *SafeCredentialsProvider) Invalidate() {
-	p.m.Lock()
-	defer p.m.Unlock()
-
-	p.creds = Credentials{}
+	p.creds.Store((*Credentials)(nil))
 }

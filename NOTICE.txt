@@ -150,8 +150,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/aws/aws-sdk-go-v2
-Version: v2.0.0-preview.4
-Revision: ff1a530c31507c97cf5edbee226e604ca08661cc
+Version: v2.0.0-preview.5
+Revision: d52522b5f4b95591ff6528d7c54923951aadf099
 License type (autodetected): Apache-2.0
 ./vendor/github.com/aws/aws-sdk-go-v2/LICENSE.txt:
 --------------------------------------------------------------------
@@ -740,7 +740,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/go-ini/ini
-Revision: fa25069db393aecc09b71267d0489b357781c860
 License type (autodetected): Apache-2.0
 ./vendor/github.com/go-ini/ini/LICENSE:
 --------------------------------------------------------------------
@@ -1420,7 +1419,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/jmespath/go-jmespath
-Revision: c2b33e8439af944379acbdd9c3a5fe0bc44bd8a5
 License type (autodetected): Apache-2.0
 ./vendor/github.com/jmespath/go-jmespath/LICENSE:
 --------------------------------------------------------------------

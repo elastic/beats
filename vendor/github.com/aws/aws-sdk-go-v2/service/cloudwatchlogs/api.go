@@ -1806,13 +1806,18 @@ func (r PutLogEventsRequest) Send() (*PutLogEventsOutput, error) {
 //    retention period of the log group.
 //
 //    * The log events in the batch must be in chronological ordered by their
-//    time stamp (the time the event occurred, expressed as the number of milliseconds
-//    after Jan 1, 1970 00:00:00 UTC).
+//    time stamp. The time stamp is the time the event occurred, expressed as
+//    the number of milliseconds after Jan 1, 1970 00:00:00 UTC. (In AWS Tools
+//    for PowerShell and the AWS SDK for .NET, the timestamp is specified in
+//    .NET format: yyyy-mm-ddThh:mm:ss. For example, 2017-09-15T13:45:30.)
 //
 //    * The maximum number of log events in a batch is 10,000.
 //
 //    * A batch of log events in a single request cannot span more than 24 hours.
 //    Otherwise, the operation fails.
+//
+// If a call to PutLogEvents returns "UnrecognizedClientException" the most
+// likely cause is an invalid AWS access key ID or secret key.
 //
 //    // Example sending a request using the PutLogEventsRequest method.
 //    req := client.PutLogEventsRequest(params)
@@ -1921,7 +1926,7 @@ func (r PutResourcePolicyRequest) Send() (*PutResourcePolicyOutput, error) {
 //
 // Creates or updates a resource policy allowing other AWS services to put log
 // events to this account, such as Amazon Route 53. An account can have up to
-// 50 resource policies per region.
+// 10 resource policies per region.
 //
 //    // Example sending a request using the PutResourcePolicyRequest method.
 //    req := client.PutResourcePolicyRequest(params)
@@ -3302,7 +3307,7 @@ type DescribeLogStreamsInput struct {
 
 	// The prefix to match.
 	//
-	// iIf orderBy is LastEventTime,you cannot specify this parameter.
+	// If orderBy is LastEventTime,you cannot specify this parameter.
 	LogStreamNamePrefix *string `locationName:"logStreamNamePrefix" min:"1" type:"string"`
 
 	// The token for the next set of items to return. (You received this token from
@@ -3403,11 +3408,14 @@ type DescribeMetricFiltersInput struct {
 	// The name of the log group.
 	LogGroupName *string `locationName:"logGroupName" min:"1" type:"string"`
 
-	// The name of the CloudWatch metric to which the monitored log information
-	// should be published. For example, you may publish to a metric called ErrorCount.
+	// Filters results to include only those with the specified metric name. If
+	// you include this parameter in your request, you must also include the metricNamespace
+	// parameter.
 	MetricName *string `locationName:"metricName" type:"string"`
 
-	// The namespace of the CloudWatch metric.
+	// Filters results to include only those in the specified namespace. If you
+	// include this parameter in your request, you must also include the metricName
+	// parameter.
 	MetricNamespace *string `locationName:"metricNamespace" type:"string"`
 
 	// The token for the next set of items to return. (You received this token from
@@ -3826,7 +3834,10 @@ type FilterLogEventsInput struct {
 	// not returned.
 	EndTime *int64 `locationName:"endTime" type:"long"`
 
-	// The filter pattern to use. If not provided, all the events are matched.
+	// The filter pattern to use. For more information, see Filter and Pattern Syntax
+	// (http://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html).
+	//
+	// If not provided, all the events are matched.
 	FilterPattern *string `locationName:"filterPattern" type:"string"`
 
 	// If the value is true, the operation makes a best effort to provide responses
@@ -3839,12 +3850,24 @@ type FilterLogEventsInput struct {
 	// The maximum number of events to return. The default is 10,000 events.
 	Limit *int64 `locationName:"limit" min:"1" type:"integer"`
 
-	// The name of the log group.
+	// The name of the log group to search.
 	//
 	// LogGroupName is a required field
 	LogGroupName *string `locationName:"logGroupName" min:"1" type:"string" required:"true"`
 
-	// Optional list of log stream names.
+	// Filters the results to include only events from log streams that have names
+	// starting with this prefix.
+	//
+	// If you specify a value for both logStreamNamePrefix and logStreamNames, but
+	// the value for logStreamNamePrefix does not match any log stream names specified
+	// in logStreamNames, the action returns an InvalidParameterException error.
+	LogStreamNamePrefix *string `locationName:"logStreamNamePrefix" min:"1" type:"string"`
+
+	// Filters the results to only logs from the log streams in this list.
+	//
+	// If you specify a value for both logStreamNamePrefix and logStreamNames, but
+	// the value for logStreamNamePrefix does not match any log stream names specified
+	// in logStreamNames, the action returns an InvalidParameterException error.
 	LogStreamNames []string `locationName:"logStreamNames" min:"1" type:"list"`
 
 	// The token for the next set of events to return. (You received this token
@@ -3879,6 +3902,9 @@ func (s *FilterLogEventsInput) Validate() error {
 	}
 	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(aws.NewErrParamMinLen("LogGroupName", 1))
+	}
+	if s.LogStreamNamePrefix != nil && len(*s.LogStreamNamePrefix) < 1 {
+		invalidParams.Add(aws.NewErrParamMinLen("LogStreamNamePrefix", 1))
 	}
 	if s.LogStreamNames != nil && len(s.LogStreamNames) < 1 {
 		invalidParams.Add(aws.NewErrParamMinLen("LogStreamNames", 1))
@@ -3964,8 +3990,8 @@ type GetLogEventsInput struct {
 	_ struct{} `type:"structure"`
 
 	// The end of the time range, expressed as the number of milliseconds after
-	// Jan 1, 1970 00:00:00 UTC. Events with a time stamp later than this time are
-	// not included.
+	// Jan 1, 1970 00:00:00 UTC. Events with a time stamp equal to or later than
+	// this time are not included.
 	EndTime *int64 `locationName:"endTime" type:"long"`
 
 	// The maximum number of log events returned. If you don't specify a value,
@@ -3993,8 +4019,9 @@ type GetLogEventsInput struct {
 	StartFromHead *bool `locationName:"startFromHead" type:"boolean"`
 
 	// The start of the time range, expressed as the number of milliseconds after
-	// Jan 1, 1970 00:00:00 UTC. Events with a time stamp earlier than this time
-	// are not included.
+	// Jan 1, 1970 00:00:00 UTC. Events with a time stamp equal to this time or
+	// later than this time are included. Events with a time stamp earlier than
+	// this time are not included.
 	StartTime *int64 `locationName:"startTime" type:"long"`
 }
 
@@ -4048,11 +4075,13 @@ type GetLogEventsOutput struct {
 	Events []OutputLogEvent `locationName:"events" type:"list"`
 
 	// The token for the next set of items in the backward direction. The token
-	// expires after 24 hours.
+	// expires after 24 hours. This token will never be null. If you have reached
+	// the end of the stream, it will return the same token you passed in.
 	NextBackwardToken *string `locationName:"nextBackwardToken" min:"1" type:"string"`
 
 	// The token for the next set of items in the forward direction. The token expires
-	// after 24 hours.
+	// after 24 hours. If you have reached the end of the stream, it will return
+	// the same token you passed in.
 	NextForwardToken *string `locationName:"nextForwardToken" min:"1" type:"string"`
 }
 
@@ -4082,7 +4111,7 @@ type InputLogEvent struct {
 	// Message is a required field
 	Message *string `locationName:"message" min:"1" type:"string" required:"true"`
 
-	// The time the event occurred, expressed as the number of milliseconds fter
+	// The time the event occurred, expressed as the number of milliseconds after
 	// Jan 1, 1970 00:00:00 UTC.
 	//
 	// Timestamp is a required field
@@ -4793,9 +4822,9 @@ type PutResourcePolicyInput struct {
 	// to put DNS query logs in to the specified log group. Replace "logArn" with
 	// the ARN of your CloudWatch Logs resource, such as a log group or log stream.
 	//
-	// { "Version": "2012-10-17" "Statement": [ { "Sid": "Route53LogsToCloudWatchLogs",
+	// { "Version": "2012-10-17", "Statement": [ { "Sid": "Route53LogsToCloudWatchLogs",
 	// "Effect": "Allow", "Principal": { "Service": [ "route53.amazonaws.com" ]
-	// }, "Action":"logs:PutLogEvents", "Resource": logArn } ] }
+	// }, "Action":"logs:PutLogEvents", "Resource": "logArn" } ] }
 	PolicyDocument *string `locationName:"policyDocument" min:"1" type:"string"`
 
 	// Name of the new policy. This parameter is required.

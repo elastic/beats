@@ -1,3 +1,28 @@
+Release v2.0.0-preview.5 (2018-09-19)
+===
+
+### Services
+* Synced the V2 SDK with latests AWS service API definitions.
+
+### SDK Bugs
+* Fix SDK Go 1.11 connection reset handling (#207)
+	* Fixes how the SDK checks for connection reset errors when making API calls to be compatiable with Go 1.11.
+* `aws/signer/v4`: Fix X-Amz-Content-Sha256 being in to query for presign (#188)
+	* Fixes the bug which would allow the X-Amz-Content-Sha256 header to be promoted to the query string when presigning a S3 request.  This bug also was preventing users from setting their own sha256 value for a presigned URL. Presigned requests generated with the custom sha256 would of always failed with invalid signature.
+	* Related to aws/aws-sdk-go#1974
+
+### SDK Enhancements
+* Cleanup SDK README and example documenation.
+* `service/s3/s3manager`: Add doc for sequential download (#201)
+	Adds documentation for downloading object sequentially with the S3 download manager.
+* `aws/credentials`: Update Credentials cache to have less overhead (#184)
+	* Updates the Credentials type's cache of the CredentialsValue to be synchronized with an atomic value in addition to the Mutex. This reduces the overhead applications will encounter when many concurrent API requests are being made.
+	* Related to: aws/aws-sdk-go#1973
+* `service/dynamodb/dynamodbattribute`: Add support for custom struct tag keys (#203)
+	* Adds support for (un)marshaling Go types using custom struct tag keys. The new `MarshalOptions.TagKey` allows the user to specify the tag key to use when (un)marshaling struct fields.  Adds support for struct tags such as `yaml`, `toml`, etc. Support for these keys are in name only, and require the tag value format and values to be supported by the package's Marshalers.
+* `internal/ini`: Add custom INI parser for shared config/credentials file (#209)
+	* Related to: aws/aws-sdk-go#2024
+
 Release v2.0.0-preview.4 (2018-05-25)
 ===
 
