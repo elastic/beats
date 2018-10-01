@@ -58,8 +58,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 					"name": node.NodeName,
 				},
 			},
-			"name":       pod.PodRef.Name,
-			"start_time": pod.StartTime,
+			"name": pod.PodRef.Name,
 
 			"cpu": common.MapStr{
 				"usage": common.MapStr{
@@ -83,6 +82,10 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 					"errors": pod.Network.TxErrors,
 				},
 			},
+		}
+
+		if pod.StartTime != "" {
+			podEvent.Put("start_time", pod.StartTime)
 		}
 
 		if coresLimit > nodeCores {

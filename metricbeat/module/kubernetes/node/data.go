@@ -34,8 +34,7 @@ func eventMapping(content []byte) (common.MapStr, error) {
 
 	node := summary.Node
 	nodeEvent := common.MapStr{
-		"name":       node.NodeName,
-		"start_time": node.StartTime,
+		"name": node.NodeName,
 
 		"cpu": common.MapStr{
 			"usage": common.MapStr{
@@ -105,5 +104,10 @@ func eventMapping(content []byte) (common.MapStr, error) {
 			},
 		},
 	}
+
+	if node.StartTime != "" {
+		nodeEvent.Put("start_time", node.StartTime)
+	}
+
 	return nodeEvent, nil
 }
