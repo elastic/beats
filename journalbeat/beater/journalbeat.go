@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/journalbeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/journalbeat/config"
@@ -45,6 +46,8 @@ type Journalbeat struct {
 
 // New returns a new Journalbeat instance
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	cfgwarn.Beta("Journalbeat is beta.")
+
 	config := config.DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("error reading config file: %v", err)
