@@ -30,7 +30,7 @@ journalbeat.inputs:
 
   # Exact matching for field values of events.
   # Matching for nginx entries: "systemd.unit=nginx"
-  #matches: []
+  #include_matches: []
 
   # Optional fields that you can specify to add additional information to the
   # output. Fields can be scalar values, arrays, dictionaries, or any nested

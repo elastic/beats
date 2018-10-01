@@ -39,7 +39,7 @@ type Config struct {
 	// Seek is the method to read from journals.
 	Seek string `config:"seek"`
 	// Matches store the key value pairs to match entries.
-	Matches []string `config:"matches"`
+	Matches []string `config:"include_matches"`
 
 	// Fields and tags to add to events.
 	common.EventMetadata `config:",inline"`
