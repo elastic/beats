@@ -45,7 +45,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         self.wait_until(lambda: self.output_count(lambda x: x >= 1))
         container.stop()
 
-        self.wait_until(lambda: self.log_contains('Stopping runner: memcached'), max_timeout=70)
+        self.wait_until(lambda: self.log_contains('Stopping runner: memcached'), max_timeout=130)
 
         output = self.read_output_json()
         proc.check_kill_and_wait()
@@ -87,7 +87,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         self.wait_until(lambda: self.output_count(lambda x: x >= 1))
         container.stop()
 
-        self.wait_until(lambda: self.log_contains('Stopping runner: memcached'), max_timeout=70)
+        self.wait_until(lambda: self.log_contains('Stopping runner: memcached'), max_timeout=130)
 
         output = self.read_output_json()
         proc.check_kill_and_wait()
