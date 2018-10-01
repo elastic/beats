@@ -24,8 +24,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,11 +36,9 @@ func TestEventMapping(t *testing.T) {
 		content, err := ioutil.ReadFile(f)
 		assert.NoError(t, err)
 
-		event, _ := eventMapping(content)
+		event, err := eventMapping(content)
 
-		assert.Equal(t, event["host"], "Shaunaks-MBP-2")
-		assert.Equal(t, event["version"], "7.0.0-alpha1")
-		assert.Equal(t, event["jvm"].(common.MapStr)["pid"], int64(83353))
-		assert.Equal(t, event["jvm"].(common.MapStr)["version"], "1.8.0_171")
+		assert.NoError(t, err, f)
+		assert.True(t, len(event) >= 1, f)
 	}
 }
