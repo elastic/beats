@@ -105,6 +105,7 @@ func (cm *ConfigManager) Stop() {
 // central management can configure.
 func (cm *ConfigManager) CheckRawConfig(cfg *common.Config) error {
 	// TODO implement this method
+	// TODO check output is set to "managed"
 	return nil
 }
 
