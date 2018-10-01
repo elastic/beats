@@ -1,9 +1,10 @@
 FROM debian:stretch
 
+ARG KAFKA_VERSION=2.0.0
+
 ENV KAFKA_HOME /kafka
 # The advertised host is kafka. This means it will not work if container is started locally and connected from localhost to it
 ENV KAFKA_LOGS_DIR="/kafka-logs"
-ENV KAFKA_VERSION 0.10.2.1
 ENV _JAVA_OPTIONS "-Djava.net.preferIPv4Stack=true"
 ENV TERM=linux
 
