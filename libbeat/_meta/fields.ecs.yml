@@ -1,4 +1,3 @@
-
 - key: ecs
   title: ECS
   description: >
@@ -454,7 +453,7 @@
         type: text
         description: Path to the file.
         multi_fields:
-        - name: raw
+        - name: keyword
           type: keyword
           description: >
             Path to the file. This is a non-analyzed field that is useful
@@ -464,7 +463,7 @@
         type: text
         description: Target path for symlinks.
         multi_fields:
-          - name: raw
+          - name: keyword
             type: keyword
             description: >
               Path to the file. This is a non-analyzed field that is useful
@@ -674,41 +673,6 @@
             Http version.
           example: 1.1
     
-    - name: kubernetes
-      title: Kubernetes
-      group: 2
-      description: >
-        Kubernetes fields are used for Kubernetes meta information. This
-        information helps correlate data from Kubernetes setups.
-    
-      type: group
-      fields:
-        - name: pod.name
-          type: keyword
-          description: >
-            Kubernetes pod name
-    
-        - name: namespace
-          type: keyword
-          description: >
-            Kubernetes namespace
-    
-        - name: labels
-          type: object
-          description: >
-            Kubernetes labels map
-    
-        - name: annotations
-          type: object
-          description: >
-            Kubernetes annotations map
-    
-        - name: container.name
-          type: keyword
-          description: >
-            Kubernetes container name. This name is unique within the pod only.
-            It is different from the underlying `container.name` field.
-    
     - name: log
       title: Log
       description: >
@@ -722,16 +686,6 @@
     
             Some examples are `WARN`, `ERR`, `INFO`.
           example: ERR
-        - name: line
-          type: long
-          description: >
-            Line number the log event was collected from.
-          example: 18
-        - name: offset
-          type: long
-          description: >
-            Offset of the beginning of the log event.
-          example: 12
         - name: original
           type: keyword
           phase: 1
@@ -764,7 +718,7 @@
             Name given by operators to sections of their network.
           example: Guest Wifi
           multi_fields:
-            - name: raw
+            - name: keyword
               type: keyword
               description: >
                 Name given by operators to sections of their network.
@@ -982,44 +936,6 @@
             This id normally changes across restarts, but `service.id` does not.
           example: 8a4f500f
     
-    - name: tls
-      title: TLS
-      group: 2
-      description: >
-        The tls fields contain the TLS related data about a specific connection.
-    
-      footnote: >
-        As an example in the case of Filebeat and the TCP input, the `version` field would be the
-        version of the TLS protocol in use, the `certificates` would be the chain of certificates
-        provided by the client and the `ciphersuite` is the encryption algorithm used for the
-        communication.
-      type: group
-      fields:
-        - name: version
-          type: keyword
-          description: >
-            TLS version.
-    
-          example: TLSv1.2
-        - name: certificates
-          type: keyword
-          description: >
-            An array of certificates.
-          ignore_above: -1
-          doc_values: false
-        - name: servername
-          type: keyword
-          description: >
-            Server name requested by the client.
-    
-          example: localhost
-        - name: ciphersuite
-          type: keyword
-          description: >
-            Name of the cipher used for the communication.
-    
-          example: ECDHE-ECDSA-AES-128-CBC-SHA
-    
     - name: url
       title: URL
       description: >
@@ -1045,7 +961,7 @@
             through `href.analyzed` in queries.
     
           multi_fields:
-            - name: raw
+            - name: keyword
               type: keyword
               description: >
                 The full URL. This is a non-analyzed field that is useful
@@ -1076,7 +992,7 @@
           description: >
             Path of the request, such as "/search".
           multi_fields:
-            - name: raw
+            - name: keyword
               type: keyword
               description: >
                 URL path. A non-analyzed field that is useful
@@ -1092,7 +1008,7 @@
             the query field exists with an empty string. The `exists`
             query can be used to differentiate between the two cases.
           multi_fields:
-            - name: raw
+            - name: keyword
               type: keyword
               description: >
                 URL query part. A non-analyzed field that is useful
