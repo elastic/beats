@@ -196,9 +196,19 @@ func GetLicense(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 			return nil, err
 		}
 
-		err = json.Unmarshal(content, &license)
+		var data common.MapStr
+		err = json.Unmarshal(content, &data)
 		if err != nil {
 			return nil, err
+		}
+
+		l, err := data.GetValue("license")
+		if err != nil {
+			return nil, err
+		}
+		license, ok := l.(map[string]interface{})
+		if !ok {
+			return nil, elastic.MakeErrorForMissingField("license", elastic.Elasticsearch)
 		}
 
 		// Cache license for a minute
