@@ -1016,7 +1016,7 @@ type: text
 
 Path to the file.
 
-*`file.path.raw`*::
+*`file.path.keyword`*::
 +
 --
 type: keyword
@@ -1035,7 +1035,7 @@ type: text
 
 Target path for symlinks.
 
-*`file.target_path.raw`*::
+*`file.target_path.keyword`*::
 +
 --
 type: keyword
@@ -1410,63 +1410,6 @@ Http version.
 --
 
 [float]
-== kubernetes fields
-
-Kubernetes fields are used for Kubernetes meta information. This information helps correlate data from Kubernetes setups.
-
-
-
-*`kubernetes.pod.name`*::
-+
---
-type: keyword
-
-Kubernetes pod name
-
-
---
-
-*`kubernetes.namespace`*::
-+
---
-type: keyword
-
-Kubernetes namespace
-
-
---
-
-*`kubernetes.labels`*::
-+
---
-type: object
-
-Kubernetes labels map
-
-
---
-
-*`kubernetes.annotations`*::
-+
---
-type: object
-
-Kubernetes annotations map
-
-
---
-
-*`kubernetes.container.name`*::
-+
---
-type: keyword
-
-Kubernetes container name. This name is unique within the pod only. It is different from the underlying `container.name` field.
-
-
---
-
-[float]
 == log fields
 
 Fields which are specific to log events.
@@ -1482,30 +1425,6 @@ example: ERR
 
 Log level of the log event.
 Some examples are `WARN`, `ERR`, `INFO`.
-
-
---
-
-*`log.line`*::
-+
---
-type: long
-
-example: 18
-
-Line number the log event was collected from.
-
-
---
-
-*`log.offset`*::
-+
---
-type: long
-
-example: 12
-
-Offset of the beginning of the log event.
 
 
 --
@@ -1544,7 +1463,7 @@ example: Guest Wifi
 Name given by operators to sections of their network.
 
 
-*`network.name.raw`*::
+*`network.name.keyword`*::
 +
 --
 type: keyword
@@ -1908,59 +1827,6 @@ This id normally changes across restarts, but `service.id` does not.
 --
 
 [float]
-== tls fields
-
-The tls fields contain the TLS related data about a specific connection.
-
-
-
-*`tls.version`*::
-+
---
-type: keyword
-
-example: TLSv1.2
-
-TLS version.
-
-
---
-
-*`tls.certificates`*::
-+
---
-type: keyword
-
-An array of certificates.
-
-
---
-
-*`tls.servername`*::
-+
---
-type: keyword
-
-example: localhost
-
-Server name requested by the client.
-
-
---
-
-*`tls.ciphersuite`*::
-+
---
-type: keyword
-
-example: ECDHE-ECDSA-AES-128-CBC-SHA
-
-Name of the cipher used for the communication.
-
-
---
-
-[float]
 == url fields
 
 URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
@@ -1979,7 +1845,7 @@ Full url. The field is stored as keyword.
 `href` is an analyzed field so the parsed information can be accessed through `href.analyzed` in queries.
 
 
-*`url.href.raw`*::
+*`url.href.keyword`*::
 +
 --
 type: keyword
@@ -2037,7 +1903,7 @@ type: text
 Path of the request, such as "/search".
 
 
-*`url.path.raw`*::
+*`url.path.keyword`*::
 +
 --
 type: keyword
@@ -2058,7 +1924,7 @@ The query field describes the query string of the request, such as "q=elasticsea
 The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
 
 
-*`url.query.raw`*::
+*`url.query.keyword`*::
 +
 --
 type: keyword
@@ -2476,6 +2342,16 @@ Kubernetes metadata added by the kubernetes processor
 
 
 
+*`kubernetes.pod.name`*::
++
+--
+type: keyword
+
+Kubernetes pod name
+
+
+--
+
 *`kubernetes.pod.uid`*::
 +
 --
@@ -2486,12 +2362,52 @@ Kubernetes Pod UID
 
 --
 
+*`kubernetes.namespace`*::
++
+--
+type: keyword
+
+Kubernetes namespace
+
+
+--
+
 *`kubernetes.node.name`*::
 +
 --
 type: keyword
 
 Kubernetes node name
+
+
+--
+
+*`kubernetes.labels`*::
++
+--
+type: object
+
+Kubernetes labels map
+
+
+--
+
+*`kubernetes.annotations`*::
++
+--
+type: object
+
+Kubernetes annotations map
+
+
+--
+
+*`kubernetes.container.name`*::
++
+--
+type: keyword
+
+Kubernetes container name
 
 
 --
