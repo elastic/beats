@@ -156,6 +156,15 @@ Examples:
 associated with the file, as well as read access to all other users.
 
 [float]
+==== `logging.files.interval`
+
+Enable log file rotation on time intervals in addition to size-based rotation.
+Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+are boundary-aligned with minutes, hours, days, weeks, months, and years as
+reported by the local system clock. All other intervals are calculated from the
+unix epoch. Defaults to disabled.
+
+[float]
 ==== `logging.json`
 
 When true, logs messages in JSON format. The default is false.

@@ -84,6 +84,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Added time-based log rotation. {pull}8349[8349]
 - Add backoff on error support to redis output. {pull}7781[7781]
 - Allow for cloud-id to specify a custom port. This makes cloud-id work in ECE contexts. {pull}7887[7887]
 - Add support to grow or shrink an existing spool file between restarts. {pull}7859[7859]

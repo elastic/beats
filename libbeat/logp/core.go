@@ -195,6 +195,7 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		file.MaxSizeBytes(cfg.Files.MaxSize),
 		file.MaxBackups(cfg.Files.MaxBackups),
 		file.Permissions(os.FileMode(cfg.Files.Permissions)),
+		file.Interval(cfg.Files.Interval),
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create file rotator")
