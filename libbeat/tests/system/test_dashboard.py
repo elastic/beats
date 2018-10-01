@@ -4,7 +4,7 @@ import os.path
 import subprocess
 from nose.plugins.attrib import attr
 import unittest
-
+import requests
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -43,6 +43,8 @@ class Test(BaseTest):
         Test loading dashboards into Kibana space
         """
         self.render_config_template()
+        self.create_kibana_space()
+
         beat = self.start_beat(
             logging_args=["-e", "-d", "*"],
             extra_args=["setup",
@@ -148,3 +150,13 @@ class Test(BaseTest):
 
     def get_kibana_port(self):
         return os.getenv('KIBANA_PORT', '5601')
+
+    def create_kibana_space(self):
+        url = "http://" + self.get_kibana_host() + ":" + self.get_kibana_port() + \
+            "/api/spaces/space"
+        data = {
+            "id": "foo-bar",
+            "name": "Foo bar space"
+        }
+        r = requests.post(url, data)
+        assert r.status_code == 200
