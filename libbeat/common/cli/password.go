@@ -35,7 +35,7 @@ var methods = map[string]method{
 }
 
 // ReadPassword allows to read a password passed as a command line parameter.
-// it offers several ways to read the password so it is not directly passed as a plain text argument:
+// It offers several ways to read the password so it is not directly passed as a plain text argument:
 //   stdin - Will prompt the user to input the password
 //   env:VAR_NAME - Will read the password from the given env variable
 //
@@ -46,7 +46,7 @@ func ReadPassword(def string) (string, error) {
 
 	var method, params string
 	parts := strings.SplitN(def, ":", 2)
-	method = parts[0]
+	method = strings.ToLower(parts[0])
 
 	if len(parts) == 2 {
 		params = parts[1]
@@ -54,7 +54,7 @@ func ReadPassword(def string) (string, error) {
 
 	m := methods[method]
 	if m == nil {
-		return "", fmt.Errorf("unknown password retrieval method %s", method)
+		return "", errors.New("unknown password source, use stdin or env:VAR_NAME")
 	}
 
 	return m(params)
