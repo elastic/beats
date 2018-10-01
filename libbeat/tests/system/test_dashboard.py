@@ -5,6 +5,7 @@ import subprocess
 from nose.plugins.attrib import attr
 import unittest
 import requests
+import semver
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -42,6 +43,11 @@ class Test(BaseTest):
         """
         Test loading dashboards into Kibana space
         """
+        version = self.get_version()
+        if semver.compare(version, "6.5.0") == -1:
+            # Skip for Kibana versions < 6.5.0 as Kibana Spaces not available
+            raise SkipTest
+
         self.render_config_template()
         self.create_kibana_space()
 
@@ -122,6 +128,10 @@ class Test(BaseTest):
         """
         Test export dashboards from Kibana space and remove unsupported characters
         """
+        version = self.get_version()
+        if semver.compare(version, "6.5.0") == -1:
+            # Skip for Kibana versions < 6.5.0 as Kibana Spaces not available
+            raise SkipTest
 
         self.test_load_dashboard_into_space()
 
@@ -160,3 +170,13 @@ class Test(BaseTest):
         }
         r = requests.post(url, data)
         assert r.status_code == 200
+
+    def get_version(self):
+        url = "http://" + self.get_kibana_host() + ":" + self.get_kibana_port() + \
+            "/api/status"
+
+        r = requests.get(url)
+        body = r.json()
+        version = body["version"]["number"]
+
+        return version
