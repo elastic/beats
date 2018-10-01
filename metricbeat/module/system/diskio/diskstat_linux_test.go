@@ -20,12 +20,13 @@
 package diskio
 
 import (
+	sigar "github.com/elastic/gosigar"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/system"
+	"github.com/shirou/gopsutil/disk"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Get_CLK_TCK(t *testing.T) {
@@ -80,4 +81,43 @@ func TestDataEmptyFilter(t *testing.T) {
 	data, err := f.Fetch()
 	assert.NoError(t, err)
 	assert.Equal(t, 10, len(data))
+}
+
+func TestDiskIOStat_CalIOStatistics(t *testing.T) {
+	counter := disk.IOCountersStat{
+		ReadCount:  13,
+		WriteCount: 17,
+		ReadTime:   19,
+		WriteTime:  23,
+		Name:       "iostat",
+	}
+
+	stat := &DiskIOStat{
+		lastDiskIOCounters: map[string]disk.IOCountersStat{
+			"iostat": disk.IOCountersStat{
+				ReadCount:  3,
+				WriteCount: 5,
+				ReadTime:   7,
+				WriteTime:  11,
+				Name:       "iostat",
+			},
+		},
+		lastCpu: sigar.Cpu{Idle: 100},
+		curCpu:  sigar.Cpu{Idle: 1},
+	}
+
+	expected := DiskIOMetric{
+		AvgAwaitTime:      24.0 / 22.0,
+		AvgReadAwaitTime:  1.2,
+		AvgWriteAwaitTime: 1,
+	}
+
+	got, err := stat.CalIOStatistics(counter)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, expected.AvgAwaitTime, got.AvgAwaitTime)
+	assert.Equal(t, expected.AvgReadAwaitTime, got.AvgReadAwaitTime)
+	assert.Equal(t, expected.AvgWriteAwaitTime, got.AvgWriteAwaitTime)
 }
