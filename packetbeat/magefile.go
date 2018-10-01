@@ -84,6 +84,22 @@ func CrossBuild() error {
 	return mage.CrossBuild(mage.ForPlatforms("!windows"))
 }
 
+// CrossBuildXPack cross-builds the beat with XPack for all target platforms.
+func CrossBuildXPack() error {
+	mg.Deps(patchCGODirectives)
+	defer undoPatchCGODirectives()
+
+	// These Windows builds write temporary .s and .o files into the packetbeat
+	// dir so they cannot be run in parallel. Changing to a different CWD does
+	// not change where the temp files get written so that cannot be used as a
+	// fix.
+	if err := mage.CrossBuildXPack(mage.ForPlatforms("windows"), mage.Serially()); err != nil {
+		return err
+	}
+
+	return mage.CrossBuildXPack(mage.ForPlatforms("!windows"))
+}
+
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return mage.CrossBuildGoDaemon()
@@ -105,7 +121,7 @@ func Package() {
 	customizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
 
@@ -175,6 +191,7 @@ var libpcapLDFLAGS = map[string]string{
 var libpcapCFLAGS = map[string]string{
 	"linux/386":      linuxPcapCFLAGS,
 	"linux/amd64":    linuxPcapCFLAGS,
+	"linux/arm64":    linuxPcapCFLAGS,
 	"linux/armv5":    linuxPcapCFLAGS,
 	"linux/armv6":    linuxPcapCFLAGS,
 	"linux/armv7":    linuxPcapCFLAGS,
@@ -189,8 +206,8 @@ var libpcapCFLAGS = map[string]string{
 }
 
 var crossBuildDeps = map[string]func() error{
-	"linux/amd64":    buildLibpcapLinuxAMD64,
 	"linux/386":      buildLibpcapLinux386,
+	"linux/amd64":    buildLibpcapLinuxAMD64,
 	"linux/arm64":    buildLibpcapLinuxARM64,
 	"linux/armv5":    buildLibpcapLinuxARMv5,
 	"linux/armv6":    buildLibpcapLinuxARMv6,
@@ -347,20 +364,22 @@ func installWinpcap() error {
 func generateWin64StaticWinpcap() error {
 	log.Println(">> Generating 64-bit winpcap static lib")
 
+	// Notes: We are using absolute path to make sure the files
+	// are available for x-pack build.
 	// Ref: https://github.com/elastic/beats/issues/1259
-	defer mage.DockerChown("lib/windows-64/wpcap.def")
+	defer mage.DockerChown(mage.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib"))
 	return mage.RunCmds(
 		// Requires mingw-w64-tools.
-		[]string{"gendef", "lib/windows-64/wpcap.dll"},
-		[]string{"mv", "wpcap.def", "lib/windows-64/wpcap.def"},
+		[]string{"gendef", mage.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib/windows-64/wpcap.dll")},
+		[]string{"mv", "wpcap.def", mage.MustExpand("{{ elastic_beats_dir}}/{{.BeatName}}/lib/windows-64/wpcap.def")},
 		[]string{"x86_64-w64-mingw32-dlltool", "--as-flags=--64",
 			"-m", "i386:x86-64", "-k",
 			"--output-lib", "/libpcap/win/WpdPack/Lib/x64/libwpcap.a",
-			"--input-def", "lib/windows-64/wpcap.def"},
+			"--input-def", mage.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib/windows-64/wpcap.def")},
 	)
 }
 
-const pcapGoFile = "../vendor/github.com/tsg/gopacket/pcap/pcap.go"
+var pcapGoFile = mage.MustExpand("{{elastic_beats_dir}}/vendor/github.com/tsg/gopacket/pcap/pcap.go")
 
 var cgoDirectiveRegex = regexp.MustCompile(`(?m)#cgo .*(?:LDFLAGS|CFLAGS).*$`)
 

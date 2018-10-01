@@ -35,13 +35,11 @@ access to the indices {beatname_uc} creates.
 If encryption is enabled on the cluster, you need to enable HTTPS in the
 {beatname_uc} configuration.
 
-ifeval::["{beatname_lc}"!="apm-server"]
 . <<beats-system-user>>.
 +
-{beatname_uc} uses the `beats_system` user to send monitoring data to {es}. If
+{beatname_uc} uses the +{beat_monitoring_user}+ user to send monitoring data to {es}. If
 you plan to monitor {beatname_uc} in {kib} and have not yet set up the
 password, set it up now.
-endif::[]
 
 For more information about {security}, see
 {xpack-ref}/xpack-security.html[Securing the {stack}].
@@ -83,6 +81,4 @@ include::user-access.asciidoc[]
 
 include::tls.asciidoc[]
 
-ifeval::["{beatname_lc}"!="apm-server"]
 include::beats-system.asciidoc[]
-endif::[]

@@ -7,8 +7,6 @@
 <titleabbrev>Docker</titleabbrev>
 ++++
 
-experimental[]
-
 Use the `docker` input to read logs from Docker containers.
 
 This input searches for container logs under its path, and parse them into

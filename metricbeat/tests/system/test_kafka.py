@@ -7,6 +7,7 @@ from nose.plugins.skip import SkipTest
 
 class KafkaTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['kafka']
+    VERSION = "2.0.0"
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_partition(self):
@@ -20,7 +21,8 @@ class KafkaTest(metricbeat.BaseTest):
             "name": "kafka",
             "metricsets": ["partition"],
             "hosts": self.get_hosts(),
-            "period": "1s"
+            "period": "1s",
+            "version": self.VERSION,
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
@@ -45,5 +47,11 @@ class KafkaTest(metricbeat.BaseTest):
                 os.getenv('KAFKA_PORT', '9092')]
 
 
+class Kafka_1_1_0_Test(KafkaTest):
+    COMPOSE_SERVICES = ['kafka_1_1_0']
+    VERSION = "1.1.0"
+
+
 class Kafka_0_10_2_Test(KafkaTest):
     COMPOSE_SERVICES = ['kafka_0_10_2']
+    VERSION = "0.10.2"

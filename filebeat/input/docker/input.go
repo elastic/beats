@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/log"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 
 	"github.com/pkg/errors"
 )
@@ -43,8 +42,6 @@ func NewInput(
 	outletFactory channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
-	cfgwarn.Experimental("Docker input is enabled.")
-
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "reading docker input config")

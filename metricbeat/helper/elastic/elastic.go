@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -91,4 +92,19 @@ func ReportErrorForMissingField(field string, product Product, r mb.ReporterV2) 
 // response received from a given product
 func MakeErrorForMissingField(field string, product Product) error {
 	return fmt.Errorf("Could not find field '%v' in %v stats API response", field, strings.Title(product.String()))
+}
+
+// IsFeatureAvailable returns whether a feature is available in the current product version
+func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion string) (bool, error) {
+	currentVersion, err := common.NewVersion(currentProductVersion)
+	if err != nil {
+		return false, err
+	}
+
+	wantVersion, err := common.NewVersion(featureAvailableInProductVersion)
+	if err != nil {
+		return false, err
+	}
+
+	return !currentVersion.LessThan(wantVersion), nil
 }
