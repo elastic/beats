@@ -3474,12 +3474,12 @@ The number of documents in the reply.
 
 --
 
-*`mongodb.opCode`*::
+*`mongodb.opcodeName`*::
 +
 --
 type: string
 
-The opCode of the request.
+The opcodeName of the request.
 
 
 --
