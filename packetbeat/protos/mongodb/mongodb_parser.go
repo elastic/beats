@@ -67,6 +67,7 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 
 	// then split depending on operation type
 	s.message.event = common.MapStr{}
+	s.message.event["opCode"] = opCode
 
 	switch s.message.opCode {
 	case opReply:

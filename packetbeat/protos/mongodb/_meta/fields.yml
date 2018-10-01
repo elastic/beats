@@ -31,6 +31,10 @@
           type: long
           description: >
             The number of documents in the reply.
+        - name: opCode
+          type: long
+          description: >
+            The opCode of the request.
         - name: startingFrom
           description: >
             Where in the cursor this reply is starting.

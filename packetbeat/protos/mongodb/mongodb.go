@@ -283,7 +283,6 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 		trans.mongodb = common.MapStr{}
 		trans.event = requ.event
 		trans.method = requ.method
-		trans.opCode = requ.opCode
 
 		trans.cmdline = requ.cmdlineTuple
 		trans.ts = requ.ts
@@ -387,7 +386,6 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 	}
 	fields["mongodb"] = t.event
 	fields["method"] = t.method
-	fields["opcode"] = t.opCode
 	fields["resource"] = t.resource
 	fields["query"] = reconstructQuery(t, false)
 	fields["responsetime"] = t.responseTime
