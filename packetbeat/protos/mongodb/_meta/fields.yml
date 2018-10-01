@@ -32,7 +32,7 @@
           description: >
             The number of documents in the reply.
         - name: opCode
-          type: long
+          type: string
           description: >
             The opCode of the request.
         - name: startingFrom

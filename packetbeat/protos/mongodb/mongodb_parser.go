@@ -20,6 +20,7 @@ package mongodb
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -67,7 +68,7 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 
 	// then split depending on operation type
 	s.message.event = common.MapStr{}
-	s.message.event["opCode"] = opCode
+	s.message.event["opcodeName"] = fmt.Sprintf("%v", opCode)
 
 	switch s.message.opCode {
 	case opReply:
