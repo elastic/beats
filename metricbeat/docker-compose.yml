@@ -98,12 +98,20 @@ services:
   kafka:
     build:
       context: ./module/kafka/_meta
-      dockerfile: Dockerfile.1.1.0
+      args:
+        KAFKA_VERSION: 2.0.0
+
+  kafka_1_1_0:
+    build:
+      context: ./module/kafka/_meta
+      args:
+        KAFKA_VERSION: 1.1.0
 
   kafka_0_10_2:
     build:
       context: ./module/kafka/_meta
-      dockerfile: Dockerfile.0.10.2
+      args:
+        KAFKA_VERSION: 0.10.2.1
 
   kibana:
     build: ./module/kibana/_meta

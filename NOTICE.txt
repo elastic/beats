@@ -441,8 +441,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-structform
-Version: v0.0.4
-Revision: 0ea09ff9b43c387dd183a4088f6d573bf823e4ed
+Version: v0.0.5
+Revision: 1425975cf4eb470099fcf02cbe9389cf3a7028a3
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-structform/LICENSE:
 --------------------------------------------------------------------
@@ -2175,8 +2175,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
-Version: v1.17.0/enh/offset-replica-id
-Revision: d1575e4abe04acbbe8ac766320585cdf271dd189
+Version: =v1.18.0/enh/offset-replica-id
+Revision: 0143592836b090a1b481def4d902cfb3c5c05ae5
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------

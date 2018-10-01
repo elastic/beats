@@ -240,3 +240,20 @@ and then use the value in an HTTP Authorization header.
 
 An optional base path to be used in HTTP URIs. If defined, Metricbeat will insert this value
 as the first segment in the HTTP URI path.
+
+[float]
+==== `query`
+
+An optional value to pass common query params in YAML. Instead of setting the query params 
+within hosts values using the syntax `?key=value&key2&value2`, you can set it here like this:
+
+[source,yaml]
+----
+query:
+  key: value
+  key2: value2
+  list:
+  - 1.1
+  - 2.95
+  - -15
+----

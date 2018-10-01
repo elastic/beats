@@ -62,6 +62,26 @@ func UseElasticBeatPackaging() {
 	}
 }
 
+// UseElasticBeatWithoutXPackPackaging configures the package target to build packages for
+// an Elastic Beat. This means it will generate two sets of packages -- one
+// that is purely OSS under Apache 2.0 and one that is licensed under the
+// Elastic License and may contain additional X-Pack features.
+//
+// NOTE: This method doesn't use binaries produced in the x-pack folder, this is
+// a temporary packaging target for projects that depends on beat but do have concrete x-pack
+// binaries.
+func UseElasticBeatWithoutXPackPackaging() {
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		panic(err)
+	}
+
+	err = LoadNamedSpec("elastic_beat_without_xpack", filepath.Join(beatsDir, packageSpecFile))
+	if err != nil {
+		panic(err)
+	}
+}
+
 // LoadNamedSpec loads a packaging specification with the given name from the
 // specified YAML file. name should be a sub-key of 'specs'.
 func LoadNamedSpec(name, file string) error {

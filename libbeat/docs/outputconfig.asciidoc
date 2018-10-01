@@ -674,7 +674,7 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 
 ==== Compatibility
 
-This output works with all Kafka in between 0.11 and 1.1.1. Older versions
+This output works with all Kafka versions in between 0.11 and 2.0.0. Older versions
 might work as well, but are not supported.
 
 ==== Configuration options

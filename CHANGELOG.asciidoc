@@ -56,6 +56,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Fix date format in Mongodb Ingest pipeline. {pull}7974[7974]
 - Fixed a docker input error due to the offset update bug in partial log join.{pull}8177[8177]
 - Update CRI format to support partial/full tags. {pull}8265[8265]
+- Fix some errors happening when stopping syslog input. {pull}8347[8347]
+- Fix RFC3339 timezone and nanoseconds parsing with the syslog input. {pull}8346[8346]
 
 *Heartbeat*
 
@@ -67,6 +69,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Fixed the RPM by designating the modules.d config files as configuration data in the RPM spec. {issue}8075[8075]
 - Fixed the location of the modules.d dir in Deb and RPM packages. {issue}8104[8104]
 - Add docker diskio stats on Windows. {issue}6815[6815] {pull}8126[8126]
+- Fix incorrect type conversion of average response time in Haproxy dashboards {pull}8404[8404]
 
 *Packetbeat*
 
@@ -87,6 +90,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Make kubernetes autodiscover ignore events with empty container IDs {pull}7971[7971]
 - Implement CheckConfig in RunnerFactory to make autodiscover check configs {pull}7961[7961]
 - Add DNS processor with support for performing reverse lookups on IP addresses. {issue}7770[7770]
+- Support for Kafka 2.0.0 in kafka output {pull}8399[8399]
 
 *Auditbeat*
 
@@ -111,6 +115,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Added 'died' PID state to process_system metricset on system module {pull}8275[8275]
 - Add `metrics` metricset to MongoDB module. {pull}7611[7611]
 - Added `ccr` metricset to Elasticsearch module. {pull}8335[8335]
+- Support for Kafka 2.0.0 {pull}8399[8399]
+- Added support for query params in configuration {issue}8286[8286] {pull}8292[8292]
 
 *Packetbeat*
 
