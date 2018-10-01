@@ -34,9 +34,9 @@ import (
 
 func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
 	// TLS does not need to be enabled if license type is something other than trial
-	value, err := license.GetValue("license.type")
+	value, err := license.GetValue("type")
 	if err != nil {
-		return false, elastic.MakeErrorForMissingField("license.type", elastic.Elasticsearch)
+		return false, elastic.MakeErrorForMissingField("type", elastic.Elasticsearch)
 	}
 
 	licenseType, ok := value.(string)
