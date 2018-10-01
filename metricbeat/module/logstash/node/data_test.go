@@ -15,33 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build !integration
+
 package node
 
 import (
-	"encoding/json"
+	"io/ioutil"
+	"path/filepath"
+	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/stretchr/testify/assert"
 )
 
-var (
-	schema = s.Schema{
-		"host":    c.Str("host"),
-		"version": c.Str("version"),
-		"jvm": c.Dict("jvm", s.Schema{
-			"version": c.Str("version"),
-			"pid":     c.Int("pid"),
-		}),
-	}
-)
+func TestEventMapping(t *testing.T) {
 
-func eventMapping(content []byte) (common.MapStr, error) {
-	var data map[string]interface{}
-	err := json.Unmarshal(content, &data)
-	if err != nil {
-		return nil, err
-	}
+	files, err := filepath.Glob("./_meta/test/node.*.json")
+	assert.NoError(t, err)
 
-	return schema.Apply(data)
+	for _, f := range files {
+		content, err := ioutil.ReadFile(f)
+		assert.NoError(t, err)
+
+		event, err := eventMapping(content)
+
+		assert.NoError(t, err, f)
+		assert.True(t, len(event) >= 1, f)
+	}
 }
