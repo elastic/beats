@@ -263,11 +263,13 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	custom := common.MapStr{}
 
 	for k, v := range entry.Fields {
-		if kk, _ := journaldEventFields[k]; kk == "" {
+		if kk, ok := journaldEventFields[k]; !ok {
 			normalized := strings.ToLower(strings.TrimLeft(k, "_"))
 			custom.Put(normalized, v)
 		} else {
-			fields.Put(kk, v)
+			if isKept(kk) {
+				fields.Put(kk, v)
+			}
 		}
 	}
 
@@ -291,6 +293,10 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 		Private:   state,
 	}
 	return &event
+}
+
+func isKept(key string) bool {
+	return key != ""
 }
 
 // stopOrWait waits for a journal event.

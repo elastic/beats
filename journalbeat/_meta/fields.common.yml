@@ -187,6 +187,10 @@
           example: 1
           description: >
             The ID of the user which runs the process.
+        - name: capabilites
+          required: false
+          description: >
+            The effective capabilites of the process.
     - name: systemd
       type: group
       description: >
@@ -220,6 +224,11 @@
           example: "user-1234.slice"
           description: >
             The systemd slice unit.
+        - name: user_slice
+          type: keyword
+          required: false
+          description: >
+            The systemd user slice unit.
         - name: unit
           type: keyword
           required: false

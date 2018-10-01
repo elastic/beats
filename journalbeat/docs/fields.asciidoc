@@ -611,6 +611,16 @@ The ID of the user which runs the process.
 
 --
 
+*`process.capabilites`*::
++
+--
+required: False
+
+The effective capabilites of the process.
+
+
+--
+
 [float]
 == systemd fields
 
@@ -680,6 +690,18 @@ example: user-1234.slice
 required: False
 
 The systemd slice unit.
+
+
+--
+
+*`systemd.user_slice`*::
++
+--
+type: keyword
+
+required: False
+
+The systemd user slice unit.
 
 
 --
