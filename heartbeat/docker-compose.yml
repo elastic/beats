@@ -21,13 +21,7 @@ services:
   proxy_dep:
     image: busybox
     depends_on:
-      elasticsearch: { condition: service_healthy }
       redis:         { condition: service_healthy }
-
-  elasticsearch:
-    extends:
-      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
-      service: elasticsearch
 
   redis:
     build: ${PWD}/tests/docker_support/redis
