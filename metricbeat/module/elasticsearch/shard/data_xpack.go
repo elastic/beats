@@ -62,30 +62,28 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 					continue
 				}
 
-				// Build source_node object
-				var sourceNode common.MapStr
-				nodeID, ok := shard["node"]
-				if !ok {
-					continue
-				}
-				if nodeID != nil { // shard has not been allocated yet
-					sourceNode, err = getSourceNode(nodeID.(string), stateData)
-					if err != nil {
-						continue
-					}
-				}
-
-				event.RootFields = common.MapStr{}
-
 				event.RootFields = common.MapStr{
 					"timestamp":    time.Now(),
 					"cluster_uuid": clusterID,
 					"interval_ms":  m.Module().Config().Period.Nanoseconds() / 1000 / 1000,
 					"type":         "shards",
-					"source_node":  sourceNode,
 					"shard":        fields,
 					"state_uuid":   stateData.StateID,
 				}
+
+				// Build source_node object
+				nodeID, ok := shard["node"]
+				if !ok {
+					continue
+				}
+				if nodeID != nil { // shard has not been allocated yet
+					sourceNode, err := getSourceNode(nodeID.(string), stateData)
+					if err != nil {
+						continue
+					}
+					event.RootFields.Put("source_node", sourceNode)
+				}
+
 				event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 
 				r.Event(event)
