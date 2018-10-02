@@ -168,7 +168,12 @@ class Test(BaseTest):
             "id": "foo-bar",
             "name": "Foo bar space"
         }
-        r = requests.post(url, data)
+
+        headers = {
+            "kbn-xsrf": "1"
+        }
+
+        r = requests.post(url, json=data, headers=headers)
         assert r.status_code == 200
 
     def get_version(self):
