@@ -96,6 +96,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	})
 }
 
+// NetworkInterface represent information on a network interface.
 type NetworkInterface struct {
 	net.Interface
 
