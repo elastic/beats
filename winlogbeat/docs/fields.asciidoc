@@ -929,7 +929,7 @@ type: text
 
 Path to the file.
 
-*`file.path.keyword`*::
+*`file.path.raw`*::
 +
 --
 type: keyword
@@ -948,7 +948,7 @@ type: text
 
 Target path for symlinks.
 
-*`file.target_path.keyword`*::
+*`file.target_path.raw`*::
 +
 --
 type: keyword
@@ -1376,7 +1376,7 @@ example: Guest Wifi
 Name given by operators to sections of their network.
 
 
-*`network.name.keyword`*::
+*`network.name.raw`*::
 +
 --
 type: keyword
@@ -1758,7 +1758,7 @@ Full url. The field is stored as keyword.
 `href` is an analyzed field so the parsed information can be accessed through `href.analyzed` in queries.
 
 
-*`url.href.keyword`*::
+*`url.href.raw`*::
 +
 --
 type: keyword
@@ -1816,7 +1816,7 @@ type: text
 Path of the request, such as "/search".
 
 
-*`url.path.keyword`*::
+*`url.path.raw`*::
 +
 --
 type: keyword
@@ -1837,7 +1837,7 @@ The query field describes the query string of the request, such as "q=elasticsea
 The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
 
 
-*`url.query.keyword`*::
+*`url.query.raw`*::
 +
 --
 type: keyword
