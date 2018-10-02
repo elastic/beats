@@ -109,7 +109,7 @@ func (ifc NetworkInterface) toMapStr() common.MapStr {
 		"name":  ifc.Name,
 		"mac":   ifc.HardwareAddr.String(),
 		"flags": ifc.Flags.String(),
-		"ips":   ifc.ips,
+		"ip":    ifc.ips,
 	}
 }
 

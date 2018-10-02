@@ -4,15 +4,15 @@
     `packages` contains information about installed packages.
   release: experimental
   fields:
-  - name: status
-    type: keyword
-    description: >
-        Package change - `installed` or `removed`.
-  - name: packages
+  - name: package
     type: array
     description: >
-        List of packages.
+        One or more packages.
     fields:
+    - name: status
+      type: keyword
+      description: >
+        Package change - `new`, `installed` or `removed`.
     - name: package.name
       type: keyword
       description: >

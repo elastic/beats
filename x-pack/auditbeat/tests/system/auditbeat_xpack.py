@@ -47,6 +47,9 @@ class AuditbeatXPackTest(AuditbeatTest):
         evt = output[0]
         print(evt)
 
-        self.assertItemsEqual(self.de_dot(fields), evt.keys())
+        flattened = self.flatten_object(evt, {})
+        for f in fields:
+            if not f in flattened:
+                raise Exception("Field '{}' not found in event.".format(f))
 
         self.assert_fields_are_documented(evt)

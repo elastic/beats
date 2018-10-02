@@ -56,14 +56,13 @@ func (pInfo ProcessInfo) Hash() uint64 {
 func (pInfo ProcessInfo) toMapStr() common.MapStr {
 	return common.MapStr{
 		// https://github.com/elastic/ecs#-process-fields
-		"process.name": pInfo.Name,
-		"process.args": pInfo.Args,
-		"process.pid":  pInfo.PID,
-		"process.ppid": pInfo.PPID,
-
-		"process.cwd":       pInfo.CWD,
-		"process.exe":       pInfo.Exe,
-		"process.starttime": pInfo.StartTime,
+		"name":      pInfo.Name,
+		"args":      pInfo.Args,
+		"pid":       pInfo.PID,
+		"ppid":      pInfo.PPID,
+		"cwd":       pInfo.CWD,
+		"exe":       pInfo.Exe,
+		"starttime": pInfo.StartTime,
 	}
 }
 
@@ -107,19 +106,23 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		started, stopped := ms.cache.DiffAndUpdateCache(convertToCacheable(processInfos))
 
 		for _, pInfo := range started {
+			pInfoMapStr := pInfo.(*ProcessInfo).toMapStr()
+			pInfoMapStr.Put("status", "started")
+
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					"status":    "started",
-					"processes": pInfo.(ProcessInfo).toMapStr(),
+					"process": pInfoMapStr,
 				},
 			})
 		}
 
 		for _, pInfo := range stopped {
+			pInfoMapStr := pInfo.(*ProcessInfo).toMapStr()
+			pInfoMapStr.Put("status", "stopped")
+
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					"status":    "stopped",
-					"processes": pInfo.(ProcessInfo).toMapStr(),
+					"process": pInfoMapStr,
 				},
 			})
 		}
@@ -128,12 +131,15 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		var processEvents []common.MapStr
 
 		for _, pInfo := range processInfos {
-			processEvents = append(processEvents, pInfo.toMapStr())
+			pInfoMapStr := pInfo.toMapStr()
+			pInfoMapStr.Put("status", "running")
+
+			processEvents = append(processEvents, pInfoMapStr)
 		}
 
 		report.Event(mb.Event{
 			MetricSetFields: common.MapStr{
-				"processes": processEvents,
+				"process": processEvents,
 			},
 		})
 

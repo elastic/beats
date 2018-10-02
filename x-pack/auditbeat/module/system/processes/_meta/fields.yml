@@ -4,15 +4,15 @@
     `processes` contains process information.
   release: experimental
   fields:
-  - name: status
-    type: keyword
-    description: >
-        Process change - `started` or `stopped`.
-  - name: processes
+  - name: process
     type: array
     description: >
-        List of processes.
+        One or more processes.
     fields:
+    - name: status
+      type: keyword
+      description: >
+        Process status - `started`, `running`, or `stopped`.
     - name: process.name
       type: keyword
       description: >

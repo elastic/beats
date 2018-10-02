@@ -148,23 +148,23 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		installed, removed := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
 
 		for _, pkgInfo := range installed {
+			pkgInfoMapStr := pkgInfo.(*Package).toMapStr()
+			pkgInfoMapStr.Put("status", "new")
+
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					"status": "installed",
-					"packages": common.MapStr{
-						"package": pkgInfo.(Package).toMapStr(),
-					},
+					"package": pkgInfoMapStr,
 				},
 			})
 		}
 
 		for _, pkgInfo := range removed {
+			pkgInfoMapStr := pkgInfo.(*Package).toMapStr()
+			pkgInfoMapStr.Put("status", "removed")
+
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					"status": "removed",
-					"packages": common.MapStr{
-						"package": pkgInfo.(Package).toMapStr(),
-					},
+					"package": pkgInfoMapStr,
 				},
 			})
 		}
@@ -173,14 +173,15 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		var pkgInfos []common.MapStr
 
 		for _, pkgInfo := range packages {
-			pkgInfos = append(pkgInfos, common.MapStr{
-				"package": pkgInfo.toMapStr(),
-			})
+			pkgInfoMapStr := pkgInfo.toMapStr()
+			pkgInfoMapStr.Put("status", "installed")
+
+			pkgInfos = append(pkgInfos, pkgInfoMapStr)
 		}
 
 		report.Event(mb.Event{
 			MetricSetFields: common.MapStr{
-				"packages": pkgInfos,
+				"package": pkgInfos,
 			},
 		})
 

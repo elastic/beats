@@ -91,7 +91,7 @@
         type: text
         description: >
           Interface flags.
-      - name: ips
+      - name: ip
         type: ip
         description: >
           IP addresses.
