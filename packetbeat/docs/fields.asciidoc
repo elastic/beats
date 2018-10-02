@@ -3474,6 +3474,16 @@ The number of documents in the reply.
 
 --
 
+*`mongodb.opcode`*::
++
+--
+type: long
+
+The opcode of the request.
+
+
+--
+
 *`mongodb.opcodeName`*::
 +
 --

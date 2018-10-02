@@ -31,6 +31,10 @@
           type: long
           description: >
             The number of documents in the reply.
+        - name: opcode
+          type: long
+          description: >
+            The opcode of the request.
         - name: opcodeName
           type: string
           description: >

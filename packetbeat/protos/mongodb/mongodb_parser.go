@@ -68,6 +68,7 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 
 	// then split depending on operation type
 	s.message.event = common.MapStr{}
+	s.message.event["opcode"] = opCode
 	s.message.event["opcodeName"] = fmt.Sprintf("%v", opCode)
 
 	switch s.message.opCode {
