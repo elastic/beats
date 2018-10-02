@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/awslabs/goformation/cloudformation"
 	merrors "github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -108,21 +109,41 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 		HandleName:  handlerName,
 	}
 
-	executer := newExecutor(c.log, context)
-	executer.Add(newOpCreateLambda(c.log, awsCfg))
-	executer.Add(newOpCreateAlias(c.log, awsCfg))
-	executer.Add(newOpAddPermission(c.log, awsCfg, permission{
-		Action:    "lambda:InvokeFunction",
-		Principal: "logs." + awsCfg.Region + ".amazonaws.com",
-	}))
+	bucket := "mybucket-for-beatless"
+	fnCodeKey := "beatless-deployment/beatless/ph/beatless.zip"
 
-	for _, trigger := range c.config.Triggers {
-		executer.Add(newOpAddSubscriptionFilter(c.log, awsCfg, subscriptionFilter{
-			LogGroupName:  trigger.LogGroupName,
-			FilterName:    trigger.FilterName,
-			FilterPattern: trigger.FilterPattern,
-		}))
+	template := cloudformation.NewTemplate()
+	template.Resource["beatless-lambda-"+c.config.Name] = &cloudformation.AWSLambdaFunction{
+		Code: cloudformation.AWSLambdaFunction_Code{
+			S3Bucket: bucket,
+			S3Key:    fnCodeKey,
+		},
+		Description: "beatless " + c.config.name + " lambda",
+		Environment: cloudformation.AWSLambdaFunction_Environment{
+			Variables: map[string]string{
+				"BEAT_STRICT_PERMS": "false",
+				"ENABLED_FUNCTIONS": c.config.Name,
+			},
+		},
+		FunctionName: c.config.Name,
+		Role:         cloudformation.GetAtt("IamRoleLambdaExecution", "Arn"),
+		Runtime:      runtime,
+		Handler:      handlerName,
 	}
+
+	j, err := template.JSON()
+	if err != nil {
+		return err
+	}
+
+	template.JSON()
+
+	executer := newExecutor(c.log, context)
+	executer.Add(newOpEnsureBucket(c.log, awsCfg, bucket))
+	executer.Add(newOpUploadToBucket(c.log, awsCfg, bucket, fnCodeKey, content))
+	executer.Add(newOpUploadToBucket(c.log, awsCfg, bucket, "beatless-deployment/beatless/ph/cloudformation-template-create.json", j))
+	// executer.Add(newOpCreateFormation)
+	// executer.ddd(newOpWaitCloudFormation)
 
 	if err := executer.Execute(); err != nil {
 		if rollbackErr := executer.Rollback(); rollbackErr != nil {

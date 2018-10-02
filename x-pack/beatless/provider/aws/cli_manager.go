@@ -76,7 +76,7 @@ func (c *CLIManager) makeZip() ([]byte, error) {
 		packageUncompressedLimit,
 		packageCompressedLimit,
 		&bundle.MemoryFile{Path: "beatless.yml", Raw: rawConfig, FileMode: 0766},
-		&bundle.LocalFile{Path: "build/beatless", FileMode: 0755},
+		&bundle.LocalFile{Path: "pkg/beatless", FileMode: 0755},
 	)
 
 	c.log.Debug("compressing assets")
