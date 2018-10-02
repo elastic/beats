@@ -18,8 +18,6 @@
 package node_stats
 
 import (
-	"encoding/json"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -39,18 +37,10 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, content []byte) error {
+func eventMapping(r mb.ReporterV2, data map[string]interface{}) error {
 	event := mb.Event{}
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", logstash.ModuleName)
-
-	var data map[string]interface{}
-	err := json.Unmarshal(content, &data)
-	if err != nil {
-		event.Error = errors.Wrap(err, "failure parsing Logstash Node Stats API response")
-		r.Event(event)
-		return event.Error
-	}
 
 	fields, err := schema.Apply(data)
 	if err != nil {
