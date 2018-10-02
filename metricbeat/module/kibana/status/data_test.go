@@ -20,6 +20,7 @@
 package status
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"testing"
 
@@ -30,11 +31,15 @@ import (
 
 func TestEventMapping(t *testing.T) {
 	f := "./_meta/test/input.json"
-	content, err := ioutil.ReadFile(f)
+	input, err := ioutil.ReadFile(f)
+	assert.NoError(t, err)
+
+	var data map[string]interface{}
+	err = json.Unmarshal(input, &data)
 	assert.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventMapping(reporter, content)
+	err = eventMapping(reporter, data)
 	assert.NoError(t, err, f)
 	assert.True(t, len(reporter.GetEvents()) >= 1, f)
 	assert.Equal(t, 0, len(reporter.GetErrors()), f)

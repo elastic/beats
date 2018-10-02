@@ -73,7 +73,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	content, err := m.http.FetchContent()
+	content, err := m.http.FetchJSON()
 	if err != nil {
 		elastic.ReportAndLogError(err, r, m.Log)
 		return
