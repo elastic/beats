@@ -19,6 +19,7 @@ package shard
 
 import (
 	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -85,6 +86,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 				}
 
 				event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+				event.ID = getEventID(stateData.StateID, fields)
 
 				r.Event(event)
 
@@ -103,4 +105,25 @@ func getSourceNode(nodeID string, stateData *stateStruct) (common.MapStr, error)
 		"uuid": nodeID,
 		"name": nodeInfo.Name,
 	}, nil
+}
+
+func getEventID(stateID string, shard common.MapStr) string {
+	var nodeID string
+	if shard["node"] == nil {
+		nodeID = "_na"
+	} else {
+		nodeID = shard["node"].(string)
+	}
+
+	indexName := shard["index"].(string)
+	shardNumber := strconv.FormatInt(shard["shard"].(int64), 10)
+
+	var shardType string
+	if shard["primary"].(bool) {
+		shardType = "p"
+	} else {
+		shardType = "r"
+	}
+
+	return stateID + ":" + nodeID + ":" + indexName + ":" + shardNumber + ":" + shardType
 }
