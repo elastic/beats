@@ -73,7 +73,6 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 		for _, s := range shards {
 			event := mb.Event{}
-
 			event.RootFields = common.MapStr{}
 			event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
@@ -83,18 +82,17 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 			shard, ok := s.(map[string]interface{})
 			if !ok {
-				err := fmt.Errorf("shard is not an object")
-				errs = append(errs, err)
-				event.Error = err
+				event.Error = fmt.Errorf("shard is not an object")
 				r.Event(event)
+				errs = append(errs, event.Error)
 				continue
 			}
 
-			event.MetricSetFields, err = schema.Apply(shard)
-			if err != nil {
-				err = errors.Wrap(err, "failure applying shard schema")
-				errs = append(errs, err)
-				event.Error = err
+			event.MetricSetFields, event.Error = schema.Apply(shard)
+			if event.Error != nil {
+				r.Event(event)
+				errs = append(errs, event.Error)
+				continue
 			}
 
 			r.Event(event)
