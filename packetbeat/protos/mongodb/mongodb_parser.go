@@ -43,7 +43,7 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 		return true, false
 	}
 
-	// Tell decoder to only consider current message
+	// tell decoder to only consider current message
 	d.truncate(length)
 
 	// fill up the header common to all messages
