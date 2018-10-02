@@ -102,7 +102,7 @@ func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *lo
 	}
 	r.seek(state.Cursor)
 
-	instance.AddJournalToMonitor(c.Path, *j)
+	instance.AddJournalToMonitor(c.Path, j)
 
 	r.logger.Debug("New journal is opened for reading")
 
@@ -135,7 +135,7 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 	}
 	r.seek(state.Cursor)
 
-	instance.AddJournalToMonitor(c.Path, *j)
+	instance.AddJournalToMonitor(c.Path, j)
 
 	return r, nil
 }
@@ -154,8 +154,9 @@ func setupMatches(j *sdjournal.Journal, matches []string) error {
 			}
 		}
 
+		// pass custom fields as is
 		if p == "" {
-			return fmt.Errorf("cannot create matcher: invalid event key: %s", elems[0])
+			p = m
 		}
 
 		logp.Debug("journal", "Added matcher expression: %s", p)
