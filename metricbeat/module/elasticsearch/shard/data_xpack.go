@@ -34,26 +34,11 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 		return
 	}
 
-	nodeInfo, err := elasticsearch.GetNodeInfo(m.HTTP, m.HostData().SanitizedURI+statePath, stateData.MasterNode)
-	if err != nil {
-		return
-	}
-
 	// TODO: This is currently needed because the cluser_uuid is `na` in stateData in case not the full state is requested.
 	// Will be fixed in: https://github.com/elastic/elasticsearch/pull/30656
 	clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HostData().SanitizedURI+statePath, stateData.MasterNode)
 	if err != nil {
 		return
-	}
-
-	sourceNode := common.MapStr{
-		"uuid":              stateData.MasterNode,
-		"host":              nodeInfo.Host,
-		"transport_address": nodeInfo.TransportAddress,
-		"ip":                nodeInfo.IP,
-		// This seems to be in the x-pack data a subset of the cluster_uuid not the name?
-		"name":      stateData.ClusterName,
-		"timestamp": common.Time(time.Now()),
 	}
 
 	for _, index := range stateData.RoutingTable.Indices {
@@ -77,6 +62,19 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 					continue
 				}
 
+				// Build source_node object
+				var sourceNode common.MapStr
+				nodeID, ok := shard["node"]
+				if !ok {
+					continue
+				}
+				if nodeID != nil { // shard has not been allocated yet
+					sourceNode, err = getSourceNode(nodeID.(string), stateData)
+					if err != nil {
+						continue
+					}
+				}
+
 				event.RootFields = common.MapStr{}
 
 				event.RootFields = common.MapStr{
@@ -95,4 +93,16 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 			}
 		}
 	}
+}
+
+func getSourceNode(nodeID string, stateData *stateStruct) (common.MapStr, error) {
+	nodeInfo, ok := stateData.Nodes[nodeID]
+	if !ok {
+		return nil, elastic.MakeErrorForMissingField("nodes."+nodeID, elastic.Elasticsearch)
+	}
+
+	return common.MapStr{
+		"uuid": nodeID,
+		"name": nodeInfo.Name,
+	}, nil
 }

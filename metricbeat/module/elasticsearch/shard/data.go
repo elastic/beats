@@ -37,9 +37,12 @@ var (
 )
 
 type stateStruct struct {
-	ClusterName  string `json:"cluster_name"`
-	StateID      string `json:"state_uuid"`
-	MasterNode   string `json:"master_node"`
+	ClusterName string `json:"cluster_name"`
+	StateID     string `json:"state_uuid"`
+	MasterNode  string `json:"master_node"`
+	Nodes       map[string]struct {
+		Name string `json:"name"`
+	} `json:"nodes"`
 	RoutingTable struct {
 		Indices map[string]struct {
 			Shards map[string][]map[string]interface{} `json:"shards"`
