@@ -39,7 +39,7 @@ class Test(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_load_dashboard_into_space(self):
+    def test_load_dashboard_into_space(self, create_space=True):
         """
         Test loading dashboards into Kibana space
         """
@@ -49,7 +49,8 @@ class Test(BaseTest):
             raise SkipTest
 
         self.render_config_template()
-        self.create_kibana_space()
+        if create_space:
+            self.create_kibana_space()
 
         beat = self.start_beat(
             logging_args=["-e", "-d", "*"],
@@ -133,7 +134,7 @@ class Test(BaseTest):
             # Skip for Kibana versions < 6.5.0 as Kibana Spaces not available
             raise SkipTest
 
-        self.test_load_dashboard_into_space()
+        self.test_load_dashboard_into_space(False)
 
         path = os.path.normpath(self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards.go")
         command = path + " -kibana http://" + self.get_kibana_host() + ":" + self.get_kibana_port()
