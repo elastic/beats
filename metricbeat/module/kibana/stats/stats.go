@@ -139,7 +139,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 }
 
 func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
-	content, err := m.statsHTTP.FetchContent()
+	content, err := m.statsHTTP.FetchJSON()
 	if err != nil {
 		elastic.ReportAndLogError(err, r, m.Log)
 		return
@@ -162,7 +162,7 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
 }
 
 func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
-	content, err := m.settingsHTTP.FetchContent()
+	content, err := m.settingsHTTP.FetchJSON()
 	if err != nil {
 		m.Log.Error(err)
 		return

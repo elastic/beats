@@ -18,7 +18,6 @@
 package stats
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/pkg/errors"
@@ -160,13 +159,7 @@ func settingsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (str
 	return "kibana_settings", clusterUUID, kibanaSettingsFields.(map[string]interface{}), nil
 }
 
-func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte, dataParserFunc dataParser) error {
-	var data map[string]interface{}
-	err := json.Unmarshal(content, &data)
-	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana API response")
-	}
-
+func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, data map[string]interface{}, dataParserFunc dataParser) error {
 	t, clusterUUID, fields, err := dataParserFunc(r, data, now)
 	if err != nil {
 		return errors.Wrap(err, "failure to parse data")
@@ -187,10 +180,10 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content
 	return nil
 }
 
-func eventMappingStatsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte) error {
-	return eventMappingXPack(r, intervalMs, now, content, statsDataParser)
+func eventMappingStatsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, data map[string]interface{}) error {
+	return eventMappingXPack(r, intervalMs, now, data, statsDataParser)
 }
 
-func eventMappingSettingsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte) error {
-	return eventMappingXPack(r, intervalMs, now, content, settingsDataParser)
+func eventMappingSettingsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, data map[string]interface{}) error {
+	return eventMappingXPack(r, intervalMs, now, data, settingsDataParser)
 }

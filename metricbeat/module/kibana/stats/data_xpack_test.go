@@ -20,6 +20,7 @@
 package stats
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
@@ -39,10 +40,14 @@ func TestEventMappingStatsXPack(t *testing.T) {
 		input, err := ioutil.ReadFile(f)
 		assert.NoError(t, err)
 
+		var data map[string]interface{}
+		err = json.Unmarshal(input, &data)
+		assert.NoError(t, err)
+
 		reporter := &mbtest.CapturingReporterV2{}
 		now := time.Now()
 
-		err = eventMappingStatsXPack(reporter, 10000, now, input)
+		err = eventMappingStatsXPack(reporter, 10000, now, data)
 		assert.NoError(t, err, f)
 		assert.True(t, len(reporter.GetEvents()) >= 1, f)
 		assert.Equal(t, 0, len(reporter.GetErrors()), f)
@@ -58,10 +63,14 @@ func TestEventMappingSettingsXPack(t *testing.T) {
 		input, err := ioutil.ReadFile(f)
 		assert.NoError(t, err)
 
+		var data map[string]interface{}
+		err = json.Unmarshal(input, &data)
+		assert.NoError(t, err)
+
 		reporter := &mbtest.CapturingReporterV2{}
 		now := time.Now()
 
-		err = eventMappingSettingsXPack(reporter, 10000, now, input)
+		err = eventMappingSettingsXPack(reporter, 10000, now, data)
 		assert.NoError(t, err, f)
 		assert.True(t, len(reporter.GetEvents()) >= 1, f)
 		assert.Equal(t, 0, len(reporter.GetErrors()), f)

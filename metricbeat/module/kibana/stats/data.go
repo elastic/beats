@@ -18,8 +18,6 @@
 package stats
 
 import (
-	"encoding/json"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -82,15 +80,7 @@ var (
 	})
 )
 
-func eventMapping(r mb.ReporterV2, content []byte) error {
-	var data map[string]interface{}
-	err := json.Unmarshal(content, &data)
-	if err != nil {
-		err = errors.Wrap(err, "failure parsing Kibana Stats API response")
-		r.Error(err)
-		return err
-	}
-
+func eventMapping(r mb.ReporterV2, data map[string]interface{}) error {
 	dataFields, err := schema.Apply(data)
 	if err != nil {
 		err = errors.Wrap(err, "failure to apply stats schema")
