@@ -19,4 +19,4 @@ collect:
 # we will do this in another PR.
 .PHONY: linux
 linux:
-	GOOS=linux go build -o build/beatless
+	GOOS=linux go build -o beatless-function
