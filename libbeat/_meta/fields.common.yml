@@ -47,14 +47,6 @@
       description: >
         Error fields containing additional info in case of errors.
       fields:
-        - name: message
-          type: text
-          description: >
-            Error message.
-        - name: code
-          type: long
-          description: >
-            Error code.
         - name: type
           type: keyword
           description: >
