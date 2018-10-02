@@ -326,6 +326,12 @@ rules:
   - statefulsets
   - deployments
   verbs: ["get", "list", "watch"]
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  verbs:
+  - get
 ---
 apiVersion: v1
 kind: ServiceAccount
