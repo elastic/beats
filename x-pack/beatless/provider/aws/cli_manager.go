@@ -13,23 +13,16 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/awslabs/goformation/cloudformation"
 	merrors "github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/beatless/core/bundle"
+	"github.com/elastic/beats/x-pack/beatless/core"
 	"github.com/elastic/beats/x-pack/beatless/provider"
 )
 
 const (
 	// AWS lambda currently support go 1.x as a runtime.
 	runtime = "go1.x"
-
-	// Package size limits for AWS lambda, we should be a lot under this limit but
-	// adding a check to make sure we never go over.
-	packageCompressedLimit   = 50 * 1000 * 1000  // 50MB
-	packageUncompressedLimit = 250 * 1000 * 1000 // 250MB
 
 	bucket = "beatless-deploy"
 )
@@ -47,50 +40,6 @@ type CLIManager struct {
 	svc      *lambda.Lambda
 	awsCfg   aws.Config
 	log      *logp.Logger
-}
-
-func (c *CLIManager) rawYaml() ([]byte, error) {
-	// Load the configuration file from disk with all the settings,
-	// the function takes care of using -c.
-
-	// TODO: changes is made in another PR
-	dummyCfg := common.MustNewConfigFrom(map[string]interface{}{})
-	rawConfig, err := cfgfile.Load("", dummyCfg)
-	if err != nil {
-		return nil, err
-	}
-	var config map[string]interface{}
-	if err := rawConfig.Unpack(&config); err != nil {
-		return nil, err
-	}
-
-	res, err := yaml.Marshal(config)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
-}
-
-func (c *CLIManager) makeZip() ([]byte, error) {
-	rawConfig, err := c.rawYaml()
-	if err != nil {
-		return nil, err
-	}
-	bundle := bundle.NewZipWithLimits(
-		packageUncompressedLimit,
-		packageCompressedLimit,
-		&bundle.MemoryFile{Path: "beatless.yml", Raw: rawConfig, FileMode: 0766},
-		&bundle.LocalFile{Path: "pkg/beatless", FileMode: 0755},
-	)
-
-	c.log.Debug("compressing assets")
-	content, err := bundle.Bytes()
-	if err != nil {
-		return nil, err
-	}
-	c.log.Debugf("compression successful, zip size: %d bytes", len(content))
-	return content, nil
 }
 
 func (c *CLIManager) findFunction(name string) (installer, error) {
@@ -175,10 +124,12 @@ func (c *CLIManager) codeKey(name string) string {
 }
 
 func (c *CLIManager) deployTemplate(update bool, name string) error {
-	content, err := c.makeZip()
+	c.log.Debug("compressing assets")
+	content, err := core.MakeZip()
 	if err != nil {
 		return err
 	}
+	c.log.Debugf("compression successful, zip size: %d bytes", len(content))
 
 	function, err := c.findFunction(name)
 	if err != nil {
