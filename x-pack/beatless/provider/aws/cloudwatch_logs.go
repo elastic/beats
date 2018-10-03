@@ -23,6 +23,8 @@ import (
 	"github.com/elastic/beats/x-pack/beatless/provider/aws/transformer"
 )
 
+const handlerName = "beatless"
+
 // CloudwatchLogsConfig is the configuration for the cloudwatchlogs event type.
 type CloudwatchLogsConfig struct {
 	Triggers    []*CloudwatchLogsTriggerConfig `config:"triggers"`
@@ -344,6 +346,8 @@ func (c *CloudwatchLogs) Update(content []byte, awsCfg aws.Config) error {
 		"https://s3.amazonaws.com/mybucket-for-beatless/beatless-deployment/beatless/ph/cloudformation-template-update.json",
 		stackName,
 	))
+
+	executer.Add(newOpWaitCloudFormation(c.log, awsCfg, stackName))
 
 	if err := executer.Execute(); err != nil {
 		if rollbackErr := executer.Rollback(); rollbackErr != nil {

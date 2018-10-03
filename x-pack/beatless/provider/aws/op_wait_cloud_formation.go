@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -49,15 +50,17 @@ func (o *opCloudWaitCloudFormation) query() (*cloudformation.StackStatus, string
 func (o *opCloudWaitCloudFormation) Execute(ctx *executorContext) error {
 	o.log.Debug("waiting for cloudformation confirmation")
 	status, reason, err := o.query()
-	for *status == cloudformation.StackStatusCreateInProgress && err == nil {
+
+	for strings.Index(string(*status), "FAILED") == -1 && *status != "UPDATE_COMPLETE" && *status != "CREATE_COMPLETE" && err == nil {
 		select {
 		case <-time.After(periodicCheck):
 			status, reason, err = o.query()
 		}
 	}
 
-	if *status != cloudformation.StackStatusCreateComplete {
+	if *status != "UPDATE_COMPLETE" || *status != "CREATE_COMPLETE" {
 		return fmt.Errorf("could not create the stack, status: %s, reason: %s", *status, reason)
 	}
+
 	return nil
 }
