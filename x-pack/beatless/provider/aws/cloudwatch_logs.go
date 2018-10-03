@@ -123,6 +123,7 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 
 	bucket := "mybucket-for-beatless"
 	fnCodeKey := "beatless-deployment/beatless/ph/beatless.zip"
+	stackName := prefix("stack")
 
 	template := cloudformation.NewTemplate()
 	template.Resources["IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
@@ -164,12 +165,12 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 
 	for idx, trigger := range c.config.Triggers {
 		template.Resources[prefix("Permission"+strconv.Itoa(idx))] = &cloudformation.AWSLambdaPermission{
-			Action:       "lambda:InvokeAction",
+			Action:       "lambda:InvokeFunction",
 			FunctionName: cloudformation.GetAtt(prefix(""), "Arn"),
 			Principal: cloudformation.Join("", []string{
 				"logs.",
 				cloudformation.Ref("AWS::Region"), // Use the configuration region.
-				":",
+				".",
 				cloudformation.Ref("AWS::URLSuffix"), // awsamazon.com or .com.ch
 			}),
 			SourceArn: cloudformation.Join(
@@ -178,6 +179,8 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 					"arn:",
 					cloudformation.Ref("AWS::Partition"),
 					":logs:",
+					cloudformation.Ref("AWS::Region"),
+					":",
 					cloudformation.Ref("AWS::AccountId"),
 					":log-group:",
 					trigger.LogGroupName,
@@ -198,8 +201,7 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 		return err
 	}
 
-	template.JSON()
-
+	c.log.Debugf("cloudformation template:\n%s", j)
 	executer := newExecutor(c.log, context)
 	executer.Add(newOpEnsureBucket(c.log, awsCfg, bucket))
 	executer.Add(newOpUploadToBucket(c.log, awsCfg, bucket, fnCodeKey, content))
@@ -214,8 +216,10 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 		c.log,
 		awsCfg,
 		"https://s3.amazonaws.com/mybucket-for-beatless/beatless-deployment/beatless/ph/cloudformation-template-create.json",
-		"stack-"+c.config.Name,
+		stackName,
 	))
+
+	executer.Add(newOpWaitCloudFormation(c.log, awsCfg, stackName))
 
 	if err := executer.Execute(); err != nil {
 		if rollbackErr := executer.Rollback(); rollbackErr != nil {
