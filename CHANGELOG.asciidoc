@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Fixed the location of the modules.d dir in Deb and RPM packages. {issue}8104[8104]
 - Add docker diskio stats on Windows. {issue}6815[6815] {pull}8126[8126]
 - Fix incorrect type conversion of average response time in Haproxy dashboards {pull}8404[8404]
+- Avoid mapping issues in kubernetes module. {pull}8487[8487]
 
 *Packetbeat*
 
