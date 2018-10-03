@@ -31,36 +31,24 @@ func newOpWaitCloudFormation(
 	}
 }
 
-func (o *opCloudWaitCloudFormation) query() (*cloudformation.StackStatus, string, error) {
-	input := &cloudformation.DescribeStacksInput{StackName: aws.String(o.stackName)}
-	req := o.svc.DescribeStacksRequest(input)
-	resp, err := req.Send()
-	if err != nil {
-		return nil, "", err
-	}
-
-	if len(resp.Stacks) == 0 {
-		return nil, "", fmt.Errorf("no stack found with the name %s", o.stackName)
-	}
-
-	stack := resp.Stacks[0]
-	return &stack.StackStatus, "", nil
-}
-
 func (o *opCloudWaitCloudFormation) Execute(ctx *executorContext) error {
 	o.log.Debug("waiting for cloudformation confirmation")
-	status, reason, err := o.query()
+	status, reason, err := queryStackStatus(o.svc, o.stackName)
 
 	for strings.Index(string(*status), "FAILED") == -1 && *status != cloudformation.StackStatusUpdateComplete && *status != cloudformation.StackStatusCreateComplete && err == nil {
 		select {
 		case <-time.After(periodicCheck):
-			status, reason, err = o.query()
+			status, reason, err = queryStackStatus(o.svc, o.stackName)
 		}
 	}
 
 	// Multiple status, setup a catch all for all errors.
 	if strings.Index(string(*status), "FAILED") != -1 {
 		return fmt.Errorf("could not create the stack, status: %s, reason: %s", *status, reason)
+	}
+
+	if err != nil {
+		return err
 	}
 
 	return nil

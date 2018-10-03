@@ -221,6 +221,7 @@ func (c *CLIManager) Remove(name string) error {
 	context := &executorContext{}
 	executer := newExecutor(c.log, context)
 	executer.Add(newOpDeleteCloudFormation(c.log, c.awsCfg, c.stackName(name)))
+	executer.Add(newWaitDeleteCloudFormation(c.log, c.awsCfg, c.stackName(name)))
 
 	if err := executer.Execute(); err != nil {
 		if rollbackErr := executer.Rollback(); rollbackErr != nil {
