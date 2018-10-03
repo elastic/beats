@@ -6,10 +6,13 @@ package aws
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
+	"github.com/awslabs/goformation/cloudformation"
+	merrors "github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -27,11 +30,12 @@ const (
 	// adding a check to make sure we never go over.
 	packageCompressedLimit   = 50 * 1000 * 1000  // 50MB
 	packageUncompressedLimit = 250 * 1000 * 1000 // 250MB
+
+	bucket = "beatless-deploy"
 )
 
-type functionManager interface {
-	Deploy([]byte, aws.Config) error
-	Update([]byte, aws.Config) error
+type templater interface {
+	Template() *cloudformation.Template
 }
 
 // CLIManager interacts with the AWS Lambda API to deploy, update or remove a function.
@@ -88,13 +92,13 @@ func (c *CLIManager) makeZip() ([]byte, error) {
 	return content, nil
 }
 
-func (c *CLIManager) findFunction(name string) (functionManager, error) {
+func (c *CLIManager) findFunction(name string) (templater, error) {
 	fn, err := c.provider.FindFunctionByName(name)
 	if err != nil {
 		return nil, err
 	}
 
-	function, ok := fn.(functionManager)
+	function, ok := fn.(templater)
 	if !ok {
 		return nil, errors.New("incompatible type received, expecting: 'functionManager'")
 	}
@@ -102,45 +106,140 @@ func (c *CLIManager) findFunction(name string) (functionManager, error) {
 	return function, nil
 }
 
+func (c *CLIManager) template(name string) *cloudformation.Template {
+	// Create the generate cloudformation template for the lambda itself.
+
+	template := cloudformation.NewTemplate()
+	template.Resources["IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
+		AssumeRolePolicyDocument: map[string]interface{}{
+			"Version": "2012-10-17",
+			"Statement": []interface{}{
+				map[string]interface{}{
+					"Action": "sts:AssumeRole",
+					"Effect": "Allow",
+					"Principal": map[string]interface{}{
+						"Service": cloudformation.Join("", []string{
+							"lambda.",
+							cloudformation.Ref("AWS::URLSuffix"),
+						}),
+					},
+				},
+			},
+		},
+		RoleName: "beatless-lambda",
+	}
+
+	template.Resources["btl"+name] = &AWSLambdaFunction{
+		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
+			Code: &cloudformation.AWSLambdaFunction_Code{
+				S3Bucket: bucket,
+				S3Key:    c.codeKey(name),
+			},
+			Description: "beatless " + name + " lambda",
+			Environment: &cloudformation.AWSLambdaFunction_Environment{
+				Variables: map[string]string{
+					"BEAT_STRICT_PERMS": "false",
+					"ENABLED_FUNCTIONS": name,
+				},
+			},
+			FunctionName: name,
+			Role:         cloudformation.GetAtt("IAMRoleLambdaExecution", "Arn"),
+			Runtime:      runtime,
+			Handler:      handlerName,
+		},
+		DependsOn: []string{"IAMRoleLambdaExecution"},
+	}
+	return template
+}
+
+// stackName cloudformation stack are unique per function.
+func (c *CLIManager) stackName(name string) string {
+	return "btl-" + name + "stack"
+}
+
+func (c *CLIManager) codeKey(name string) string {
+	return "beatless-deployment/" + name + "/beatless.zip"
+}
+
+func (c *CLIManager) deployTemplate(update bool, name string) error {
+	content, err := c.makeZip()
+	if err != nil {
+		return err
+	}
+
+	function, err := c.findFunction(name)
+	if err != nil {
+		return err
+	}
+
+	fnTemplate := function.Template()
+
+	template, err := mergeTemplate(c.template(name), fnTemplate)
+	if err != nil {
+		return err
+	}
+
+	j, err := template.JSON()
+	if err != nil {
+		return err
+	}
+
+	context := &executorContext{}
+	executer := newExecutor(c.log, context)
+	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, bucket))
+	executer.Add(newOpUploadToBucket(c.log, c.awsCfg, bucket, c.codeKey(name), content))
+	executer.Add(newOpUploadToBucket(
+		c.log,
+		c.awsCfg,
+		bucket,
+		"beatless-deployment/"+name+"/cloudformation-template-create.json",
+		j,
+	))
+	if update {
+		executer.Add(newOpUpdateCloudFormation(
+			c.log,
+			c.awsCfg,
+			"https://s3.amazonaws.com/"+bucket+"/beatless-deployment/"+name+"/cloudformation-template-create.json",
+			c.stackName(name),
+		))
+	} else {
+		executer.Add(newOpCreateCloudFormation(
+			c.log,
+			c.awsCfg,
+			"https://s3.amazonaws.com/"+bucket+"/beatless-deployment/"+name+"/cloudformation-template-create.json",
+			c.stackName(name),
+		))
+	}
+
+	executer.Add(newOpWaitCloudFormation(c.log, c.awsCfg, c.stackName(name)))
+
+	if err := executer.Execute(); err != nil {
+		if rollbackErr := executer.Rollback(); rollbackErr != nil {
+			return merrors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
+		}
+		return err
+	}
+	return nil
+}
+
 // Deploy delegate deploy to the actual function implementation.
 func (c *CLIManager) Deploy(name string) error {
 	c.log.Debugf("function: %s, starting deploy", name)
 	defer c.log.Debugf("function: %s, deploy execution ended", name)
 
-	content, err := c.makeZip()
-	if err != nil {
+	if err := c.deployTemplate(false, name); err != nil {
 		return err
 	}
-
-	function, err := c.findFunction(name)
-	if err != nil {
-		return err
-	}
-
-	if err := function.Deploy(content, c.awsCfg); err != nil {
-		return err
-	}
-
 	c.log.Debugf("Successfully created function: %s", name)
 	return nil
 }
 
-// TODO add support for version qualifier
+// Update updates lambda using cloudformation.
 func (c *CLIManager) Update(name string) error {
 	c.log.Debugf("function: %s, starting update", name)
 	defer c.log.Debugf("function: %s, update execution ended", name)
 
-	content, err := c.makeZip()
-	if err != nil {
-		return err
-	}
-
-	function, err := c.findFunction(name)
-	if err != nil {
-		return err
-	}
-
-	if err := function.Update(content, c.awsCfg); err != nil {
+	if err := c.deployTemplate(true, name); err != nil {
 		return err
 	}
 
@@ -148,24 +247,10 @@ func (c *CLIManager) Update(name string) error {
 	return nil
 }
 
-// TODO add support for version qualifier
-// TODO add support for force to remove function not in the YML?
+// Remove removes a stack and unregister any resources created.
 func (c *CLIManager) Remove(name string) error {
 	c.log.Debugf("function: %s, starting remove", name)
 	defer c.log.Debugf("function: %s, remove execution ended", name)
-
-	deleteReq := &lambda.DeleteFunctionInput{
-		FunctionName: aws.String(name),
-	}
-	req := c.svc.DeleteFunctionRequest(deleteReq)
-
-	resp, err := req.Send()
-	if err != nil {
-		c.log.Debugf("could not remove function: %s, error: %s, response:", name, err, resp)
-		return err
-	}
-
-	c.log.Debugf("Removal successful of function: %s, response: %s", name, resp)
 	return nil
 }
 
@@ -174,8 +259,6 @@ func NewCLI(
 	cfg *common.Config,
 	provider provider.Provider,
 ) (provider.CLIManager, error) {
-	// TODO use configuration from the yml file
-	// correctly merge with priority.
 	awsCfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
 		return nil, err
@@ -188,4 +271,50 @@ func NewCLI(
 		awsCfg:   awsCfg,
 		log:      logp.NewLogger("aws lambda cli"),
 	}, nil
+}
+
+// mergeTemplate takes two cloudformation and merge them, if a key already exist we return an error.
+func mergeTemplate(one, two *cloudformation.Template) (*cloudformation.Template, error) {
+	merge := func(m1 map[string]interface{}, m2 map[string]interface{}) (map[string]interface{}, error) {
+		for k, v := range m2 {
+			if _, ok := m1[k]; ok {
+				return nil, fmt.Errorf("key %s already exist in the template map", k)
+			}
+			m1[k] = v
+		}
+		return m1, nil
+	}
+
+	v, err := merge(one.Parameters, two.Parameters)
+	if err != nil {
+		return nil, err
+	}
+
+	one.Parameters = v
+
+	v, err = merge(one.Mappings, two.Mappings)
+	if err != nil {
+		return nil, err
+	}
+	one.Mappings = v
+
+	v, err = merge(one.Conditions, two.Conditions)
+	if err != nil {
+		return nil, err
+	}
+	one.Conditions = v
+
+	v, err = merge(one.Resources, two.Resources)
+	if err != nil {
+		return nil, err
+	}
+	one.Resources = v
+
+	v, err = merge(one.Outputs, two.Outputs)
+	if err != nil {
+		return nil, err
+	}
+
+	one.Outputs = v
+	return one, nil
 }
