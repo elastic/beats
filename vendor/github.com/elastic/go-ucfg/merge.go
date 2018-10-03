@@ -120,7 +120,11 @@ func mergeConfigDict(opts *options, to, from *Config) Error {
 			return err
 		}
 
-		to.fields.set(k, merged.cpy(ctx))
+		val, e := merged.cpy(ctx)
+		if e != nil {
+			return raiseIDGeneration(ctx, opts.meta, e)
+		}
+		to.fields.set(k, val)
 	}
 
 	ok = true
@@ -182,7 +186,11 @@ func mergeConfigMergeArr(opts *options, to, from *Config) Error {
 		if err != nil {
 			return err
 		}
-		to.fields.setAt(i, parent, merged.cpy(ctx))
+		val, e := merged.cpy(ctx)
+		if e != nil {
+			return raiseIDGeneration(ctx, opts.meta, e)
+		}
+		to.fields.setAt(i, parent, val)
 	}
 
 	if len(arr) > l {
@@ -508,10 +516,18 @@ func normalizeString(ctx context, opts *options, str string) (value, Error) {
 
 	switch p := varexp.(type) {
 	case constExp:
-		return newString(ctx, opts.meta, str), nil
+		return newString(ctx, opts.meta, string(p)), nil
 	case *reference:
-		return newRef(ctx, opts.meta, p), nil
+		val, err := newRef(ctx, opts.meta, p)
+		if err != nil {
+			return nil, raiseIDGeneration(ctx, opts.meta, err)
+		}
+		return val, nil
 	}
 
-	return newSplice(ctx, opts.meta, varexp), nil
+	val, err := newSplice(ctx, opts.meta, varexp)
+	if err != nil {
+		return nil, raiseIDGeneration(ctx, opts.meta, err)
+	}
+	return val, nil
 }

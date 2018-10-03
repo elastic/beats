@@ -25,7 +25,7 @@ import (
 	"strings"
 	"sync/atomic"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/go-ucfg/internal/parse"
 )
@@ -33,7 +33,7 @@ import (
 type value interface {
 	typ(opts *options) (typeInfo, error)
 
-	cpy(c context) value
+	cpy(c context) (value, error)
 
 	Context() context
 	SetContext(c context)
@@ -177,17 +177,21 @@ func newString(ctx context, m *Meta, s string) *cfgString {
 	return &cfgString{cfgPrimitive{ctx, m}, s}
 }
 
-func newRef(ctx context, m *Meta, ref *reference) *cfgDynamic {
+func newRef(ctx context, m *Meta, ref *reference) (*cfgDynamic, error) {
 	return newDyn(ctx, m, (*refDynValue)(ref))
 }
 
-func newSplice(ctx context, m *Meta, s varEvaler) *cfgDynamic {
+func newSplice(ctx context, m *Meta, s varEvaler) (*cfgDynamic, error) {
 	return newDyn(ctx, m, spliceDynValue{s})
 }
 
-func newDyn(ctx context, m *Meta, val dynValue) *cfgDynamic {
-	id := string(atomic.AddInt32(&spliceSeq, 1)) + uuid.NewV4().String()
-	return &cfgDynamic{cfgPrimitive{ctx, m}, cacheID(id), val}
+func newDyn(ctx context, m *Meta, val dynValue) (*cfgDynamic, error) {
+	idElem, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+	id := string(atomic.AddInt32(&spliceSeq, 1)) + idElem.String()
+	return &cfgDynamic{cfgPrimitive{ctx, m}, cacheID(id), val}, nil
 }
 
 func (p *cfgPrimitive) Context() context                { return p.ctx }
@@ -203,7 +207,7 @@ func (cfgPrimitive) toFloat(*options) (float64, error)  { return 0, ErrTypeMisma
 func (cfgPrimitive) toConfig(*options) (*Config, error) { return nil, ErrTypeMismatch }
 func (cfgPrimitive) canCache() bool                     { return true }
 
-func (c *cfgNil) cpy(ctx context) value             { return &cfgNil{cfgPrimitive{ctx, c.metadata}} }
+func (c *cfgNil) cpy(ctx context) (value, error)    { return &cfgNil{cfgPrimitive{ctx, c.metadata}}, nil }
 func (*cfgNil) Len(*options) (int, error)           { return 0, nil }
 func (*cfgNil) toString(*options) (string, error)   { return "null", nil }
 func (*cfgNil) toInt(*options) (int64, error)       { return 0, ErrTypeMismatch }
@@ -225,14 +229,14 @@ func (c *cfgNil) toConfig(*options) (*Config, error) {
 	return n, nil
 }
 
-func (c *cfgBool) cpy(ctx context) value                   { return newBool(ctx, c.meta(), c.b) }
+func (c *cfgBool) cpy(ctx context) (value, error)          { return newBool(ctx, c.meta(), c.b), nil }
 func (c *cfgBool) toBool(*options) (bool, error)           { return c.b, nil }
 func (c *cfgBool) reflect(*options) (reflect.Value, error) { return reflect.ValueOf(c.b), nil }
 func (c *cfgBool) reify(*options) (interface{}, error)     { return c.b, nil }
 func (c *cfgBool) toString(*options) (string, error)       { return fmt.Sprintf("%t", c.b), nil }
 func (c *cfgBool) typ(*options) (typeInfo, error)          { return typeInfo{"bool", tBool}, nil }
 
-func (c *cfgInt) cpy(ctx context) value                   { return newInt(ctx, c.meta(), c.i) }
+func (c *cfgInt) cpy(ctx context) (value, error)          { return newInt(ctx, c.meta(), c.i), nil }
 func (c *cfgInt) toInt(*options) (int64, error)           { return c.i, nil }
 func (c *cfgInt) toFloat(*options) (float64, error)       { return float64(c.i), nil }
 func (c *cfgInt) reflect(*options) (reflect.Value, error) { return reflect.ValueOf(c.i), nil }
@@ -246,7 +250,7 @@ func (c *cfgInt) toUint(*options) (uint64, error) {
 	return uint64(c.i), nil
 }
 
-func (c *cfgUint) cpy(ctx context) value                   { return newUint(ctx, c.meta(), c.u) }
+func (c *cfgUint) cpy(ctx context) (value, error)          { return newUint(ctx, c.meta(), c.u), nil }
 func (c *cfgUint) reflect(*options) (reflect.Value, error) { return reflect.ValueOf(c.u), nil }
 func (c *cfgUint) reify(*options) (interface{}, error)     { return c.u, nil }
 func (c *cfgUint) toString(*options) (string, error)       { return fmt.Sprintf("%d", c.u), nil }
@@ -260,7 +264,7 @@ func (c *cfgUint) toInt(*options) (int64, error) {
 	return int64(c.u), nil
 }
 
-func (c *cfgFloat) cpy(ctx context) value                   { return newFloat(ctx, c.meta(), c.f) }
+func (c *cfgFloat) cpy(ctx context) (value, error)          { return newFloat(ctx, c.meta(), c.f), nil }
 func (c *cfgFloat) toFloat(*options) (float64, error)       { return c.f, nil }
 func (c *cfgFloat) reflect(*options) (reflect.Value, error) { return reflect.ValueOf(c.f), nil }
 func (c *cfgFloat) reify(*options) (interface{}, error)     { return c.f, nil }
@@ -284,7 +288,7 @@ func (c *cfgFloat) toInt(*options) (int64, error) {
 	return int64(c.f), nil
 }
 
-func (c *cfgString) cpy(ctx context) value { return newString(ctx, c.meta(), c.s) }
+func (c *cfgString) cpy(ctx context) (value, error) { return newString(ctx, c.meta(), c.s), nil }
 func (c *cfgString) reflect(*options) (reflect.Value, error) {
 	return reflect.ValueOf(c.s), nil
 }
@@ -324,7 +328,7 @@ func (c cfgSub) reflect(*options) (reflect.Value, error) { return reflect.ValueO
 func (c cfgSub) meta() *Meta                             { return c.c.metadata }
 func (c cfgSub) setMeta(m *Meta)                         { c.c.metadata = m }
 
-func (c cfgSub) cpy(ctx context) value {
+func (c cfgSub) cpy(ctx context) (value, error) {
 	newC := cfgSub{
 		c: &Config{ctx: ctx, metadata: c.c.metadata},
 	}
@@ -335,7 +339,10 @@ func (c cfgSub) cpy(ctx context) value {
 
 	for name, f := range dict {
 		ctx := f.Context()
-		v := f.cpy(context{field: ctx.field, parent: newC})
+		v, err := f.cpy(context{field: ctx.field, parent: newC})
+		if err != nil {
+			return nil, err
+		}
 		fields.set(name, v)
 	}
 
@@ -343,13 +350,16 @@ func (c cfgSub) cpy(ctx context) value {
 		fields.a = make([]value, len(arr))
 		for i, f := range arr {
 			ctx := f.Context()
-			v := f.cpy(context{field: ctx.field, parent: newC})
+			v, err := f.cpy(context{field: ctx.field, parent: newC})
+			if err != nil {
+				return nil, err
+			}
 			fields.setAt(i, newC, v)
 		}
 	}
 
 	newC.c.fields = fields
-	return newC
+	return newC, nil
 }
 
 func (c cfgSub) SetContext(ctx context) {
@@ -421,7 +431,7 @@ func (d *cfgDynamic) typ(opts *options) (ti typeInfo, err error) {
 	return
 }
 
-func (d *cfgDynamic) cpy(c context) value {
+func (d *cfgDynamic) cpy(c context) (value, error) {
 	return newDyn(c, d.meta(), d.dyn)
 }
 
