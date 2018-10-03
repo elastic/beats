@@ -12,9 +12,7 @@
         "elasticsearch.slowlog.took_millis": 4, 
         "elasticsearch.slowlog.total_hits": 19435, 
         "elasticsearch.slowlog.total_shards": 1, 
-        "elasticsearch.slowlog.types": [
-            ""
-        ], 
+        "elasticsearch.slowlog.types": "", 
         "fileset.module": "elasticsearch", 
         "fileset.name": "slowlog", 
         "input.type": "log", 
@@ -37,9 +35,7 @@
         "elasticsearch.slowlog.took_millis": 10, 
         "elasticsearch.slowlog.total_hits": 19435, 
         "elasticsearch.slowlog.total_shards": 1, 
-        "elasticsearch.slowlog.types": [
-            ""
-        ], 
+        "elasticsearch.slowlog.types": "", 
         "fileset.module": "elasticsearch", 
         "fileset.name": "slowlog", 
         "input.type": "log", 
@@ -62,9 +58,7 @@
         "elasticsearch.slowlog.took_millis": 124, 
         "elasticsearch.slowlog.total_hits": 0, 
         "elasticsearch.slowlog.total_shards": 1, 
-        "elasticsearch.slowlog.types": [
-            ""
-        ], 
+        "elasticsearch.slowlog.types": "", 
         "fileset.module": "elasticsearch", 
         "fileset.name": "slowlog", 
         "input.type": "log", 
@@ -87,9 +81,7 @@
         "elasticsearch.slowlog.took_millis": 7, 
         "elasticsearch.slowlog.total_hits": 0, 
         "elasticsearch.slowlog.total_shards": 1, 
-        "elasticsearch.slowlog.types": [
-            ""
-        ], 
+        "elasticsearch.slowlog.types": "", 
         "fileset.module": "elasticsearch", 
         "fileset.name": "slowlog", 
         "input.type": "log", 
