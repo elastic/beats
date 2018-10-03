@@ -18094,6 +18094,16 @@ The number of Bytes read from the device per second.
 
 --
 
+*`system.diskio.iostat.read.await`*::
++
+--
+type: float
+
+The average time spent for read requests issued to the device to be served.
+
+
+--
+
 *`system.diskio.iostat.write.per_sec.bytes`*::
 +
 --
@@ -18102,6 +18112,16 @@ type: float
 format: bytes
 
 The number of Bytes write from the device per second.
+
+
+--
+
+*`system.diskio.iostat.write.await`*::
++
+--
+type: float
+
+The average time spent for write requests issued to the device to be served.
 
 
 --
