@@ -119,6 +119,8 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 	bucket := "mybucket-for-beatless"
 	fnCodeKey := "beatless-deployment/beatless/ph/beatless.zip"
 
+	stackName := "stack-" + c.config.Name
+
 	template := cloudformation.NewTemplate()
 	template.Resources["IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
 		AssumeRolePolicyDocument: map[string]interface{}{
@@ -178,11 +180,12 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 		c.log,
 		awsCfg,
 		"https://s3.amazonaws.com/mybucket-for-beatless/beatless-deployment/beatless/ph/cloudformation-template-create.json",
-		"stack-"+c.config.Name,
+		stackName,
 	))
 	executer.Add(newOpWaitCloudFormation(
 		c.log,
 		awsCfg,
+		stackName,
 	))
 
 	if err := executer.Execute(); err != nil {
