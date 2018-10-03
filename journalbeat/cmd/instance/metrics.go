@@ -30,6 +30,7 @@ var (
 	journals map[string]*sdjournal.Journal
 )
 
+// SetupJournalMetrics initializes and registers monitoring functions.
 func SetupJournalMetrics() {
 	metrics = monitoring.Default.NewRegistry("journalbeat")
 	journals = make(map[string]*sdjournal.Journal)
@@ -37,10 +38,12 @@ func SetupJournalMetrics() {
 	monitoring.NewFunc(metrics, "journals", reportJournalSizes, monitoring.Report)
 }
 
+// AddJournalToMonitor adds a new journal which has to be monitored.
 func AddJournalToMonitor(path string, journal *sdjournal.Journal) {
 	journals[path] = journal
 }
 
+// StopMonitoringJournal stops monitoring the journal under the path.
 func StopMonitoringJournal(path string) {
 	delete(journals, path)
 }
