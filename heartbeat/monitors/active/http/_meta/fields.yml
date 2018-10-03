@@ -17,16 +17,6 @@
             description: >
               The service url used by monitor. This is a non-analyzed field that is useful
               for aggregations.
-
-        - name: response
-          type: group
-          description: >
-            Service response parameters.
-          fields:
-            - name: status_code
-              type: integer
-              description: >
-                Response status code.
         - name: rtt
           type: group
           description: >

@@ -37,7 +37,7 @@ var (
 	testConfig  = flag.Bool("configtest", false, "Test configuration and exit.")
 
 	// Additional default settings, that must be available for variable expansion
-	defaults = mustNewConfigFrom(map[string]interface{}{
+	defaults = common.MustNewConfigFrom(map[string]interface{}{
 		"path": map[string]interface{}{
 			"home":   ".", // to be initialized by beat
 			"config": "${path.home}",
@@ -61,14 +61,6 @@ func init() {
 	configPath = makePathFlag("path.config", "Configuration path")
 	makePathFlag("path.data", "Data path")
 	makePathFlag("path.logs", "Logs path")
-}
-
-func mustNewConfigFrom(from interface{}) *common.Config {
-	cfg, err := common.NewConfigFrom(from)
-	if err != nil {
-		panic(err)
-	}
-	return cfg
 }
 
 // ChangeDefaultCfgfileFlag replaces the value and default value for the `-c`
@@ -105,7 +97,7 @@ func HandleFlags() error {
 // structure. If path is empty this method reads from the configuration
 // file specified by the '-c' command line flag.
 func Read(out interface{}, path string) error {
-	config, err := Load(path)
+	config, err := Load(path, nil)
 	if err != nil {
 		return err
 	}
@@ -116,7 +108,7 @@ func Read(out interface{}, path string) error {
 // Load reads the configuration from a YAML file structure. If path is empty
 // this method reads from the configuration file specified by the '-c' command
 // line flag.
-func Load(path string) (*common.Config, error) {
+func Load(path string, beatOverrides *common.Config) (*common.Config, error) {
 	var config *common.Config
 	var err error
 
@@ -142,13 +134,22 @@ func Load(path string) (*common.Config, error) {
 		return nil, err
 	}
 
-	config, err = common.MergeConfigs(
-		defaults,
-		config,
-		overwrites,
-	)
-	if err != nil {
-		return nil, err
+	if beatOverrides != nil {
+		config, err = common.MergeConfigs(
+			defaults,
+			beatOverrides,
+			config,
+			overwrites,
+		)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		config, err = common.MergeConfigs(
+			defaults,
+			config,
+			overwrites,
+		)
 	}
 
 	config.PrintDebugf("Complete configuration loaded:")

@@ -23,6 +23,7 @@ package mb
 
 import (
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -306,16 +307,45 @@ type ModuleConfig struct {
 	MetricSets []string      `config:"metricsets"`
 	Enabled    bool          `config:"enabled"`
 	Raw        bool          `config:"raw"`
+	Query      QueryParams   `config:"query"`
 }
 
 func (c ModuleConfig) String() string {
 	return fmt.Sprintf(`{Module:"%v", MetricSets:%v, Enabled:%v, `+
-		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v}`,
+		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v, Query:%v}`,
 		c.Module, c.MetricSets, c.Enabled, len(c.Hosts), c.Period, c.Timeout,
-		c.Raw)
+		c.Raw, c.Query)
 }
 
 func (c ModuleConfig) GoString() string { return c.String() }
+
+// QueryParams is a convenient map[string]interface{} wrapper to implement the String interface which returns the
+// values in common query params format (key=value&key2=value2) which is the way that the url package expects this
+// params (without the initial '?')
+type QueryParams map[string]interface{}
+
+// String returns the values in common query params format (key=value&key2=value2) which is the way that the url
+// package expects this params (without the initial '?')
+func (q QueryParams) String() (s string) {
+	u := url.Values{}
+
+	for k, v := range q {
+		if values, ok := v.([]interface{}); ok {
+			for _, innerValue := range values {
+				u.Add(k, fmt.Sprintf("%v", innerValue))
+			}
+		} else {
+			//nil values in YAML shouldn't be stringified anyhow
+			if v == nil {
+				u.Add(k, "")
+			} else {
+				u.Add(k, fmt.Sprintf("%v", v))
+			}
+		}
+	}
+
+	return u.Encode()
+}
 
 // defaultModuleConfig contains the default values for ModuleConfig instances.
 var defaultModuleConfig = ModuleConfig{

@@ -14,3 +14,13 @@
         `php_fpm` contains the metrics that were obtained from PHP-FPM status
         page call.
       fields:
+        - name: pool
+          type: group
+          description: >
+            `pool` contains the metrics that were obtained from the PHP-FPM process pool.
+          release: beta
+          fields:
+            - name: name
+              type: keyword
+              description: >
+                The name of the pool.

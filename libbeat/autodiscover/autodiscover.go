@@ -18,6 +18,7 @@
 package autodiscover
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -171,7 +172,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 
 		err = a.adapter.CheckConfig(config)
 		if err != nil {
-			logp.Debug(debugK, "Check failed for config %v: %v, won't start runner", config, err)
+			logp.Error(errors.Wrap(err, fmt.Sprintf("Auto discover config check failed for config %v, won't start runner", config)))
 			continue
 		}
 
