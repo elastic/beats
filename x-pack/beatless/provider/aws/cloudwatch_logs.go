@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -189,7 +190,11 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 			),
 		}
 
-		template.Resources[prefix("SubscriptionFilter"+strconv.Itoa(idx))] = &cloudformation.AWSLogsSubscriptionFilter{
+		normalize := func(c string) string {
+			return strings.Replace(c, "/", "", -1)
+		}
+
+		template.Resources[prefix("SubscriptionFilter"+normalize(trigger.LogGroupName))] = &cloudformation.AWSLogsSubscriptionFilter{
 			DestinationArn: cloudformation.GetAtt(prefix(""), "Arn"),
 			FilterPattern:  trigger.FilterPattern,
 			LogGroupName:   trigger.LogGroupName,
@@ -232,28 +237,113 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 
 // Update an existing lambda function.
 func (c *CloudwatchLogs) Update(content []byte, awsCfg aws.Config) error {
-	context := &executorContext{
-		Content:     content,
-		Name:        c.config.Name,
-		Description: c.config.Description,
-		Role:        c.config.Role,
-		Runtime:     runtime,
-		HandleName:  handlerName,
+	context := &executorContext{}
+
+	prefix := func(suffix string) string {
+		return "btl" + c.config.Name + suffix
 	}
 
-	executer := newExecutor(c.log, context)
+	bucket := "mybucket-for-beatless"
+	fnCodeKey := "beatless-deployment/beatless/ph/beatless.zip"
+	stackName := prefix("stack")
 
-	executer.Add(newOpUpdateLambda(c.log, awsCfg))
-	executer.Add(newOpUpdateAlias(c.log, awsCfg))
+	template := cloudformation.NewTemplate()
+	template.Resources["IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
+		AssumeRolePolicyDocument: map[string]interface{}{
+			"Version": "2012-10-17",
+			"Statement": []interface{}{
+				map[string]interface{}{
+					"Action": "sts:AssumeRole",
+					"Effect": "Allow",
+					"Principal": map[string]interface{}{
+						"Service": []string{"lambda.amazonaws.com"},
+					},
+				},
+			},
+		},
+		RoleName: "beatless-lambda",
+	}
 
-	for _, trigger := range c.config.Triggers {
-		subscription := subscriptionFilter{
-			LogGroupName:  trigger.LogGroupName,
-			FilterName:    trigger.FilterName,
-			FilterPattern: trigger.FilterPattern,
+	template.Resources[prefix("")] = &AWSLambdaFunction{
+		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
+			Code: &cloudformation.AWSLambdaFunction_Code{
+				S3Bucket: bucket,
+				S3Key:    fnCodeKey,
+			},
+			Description: "beatless " + c.config.Name + " lambda",
+			Environment: &cloudformation.AWSLambdaFunction_Environment{
+				Variables: map[string]string{
+					"BEAT_STRICT_PERMS": "false",
+					"ENABLED_FUNCTIONS": c.config.Name,
+				},
+			},
+			FunctionName: c.config.Name,
+			Role:         cloudformation.GetAtt("IAMRoleLambdaExecution", "Arn"),
+			Runtime:      runtime,
+			Handler:      handlerName,
+		},
+		DependsOn: []string{"IAMRoleLambdaExecution"},
+	}
+
+	for idx, trigger := range c.config.Triggers {
+		template.Resources[prefix("Permission"+strconv.Itoa(idx))] = &cloudformation.AWSLambdaPermission{
+			Action:       "lambda:InvokeFunction",
+			FunctionName: cloudformation.GetAtt(prefix(""), "Arn"),
+			Principal: cloudformation.Join("", []string{
+				"logs.",
+				cloudformation.Ref("AWS::Region"), // Use the configuration region.
+				".",
+				cloudformation.Ref("AWS::URLSuffix"), // awsamazon.com or .com.ch
+			}),
+			SourceArn: cloudformation.Join(
+				"",
+				[]string{
+					"arn:",
+					cloudformation.Ref("AWS::Partition"),
+					":logs:",
+					cloudformation.Ref("AWS::Region"),
+					":",
+					cloudformation.Ref("AWS::AccountId"),
+					":log-group:",
+					trigger.LogGroupName,
+					":*",
+				},
+			),
 		}
-		executer.Add(newOpAddSubscriptionFilter(c.log, awsCfg, subscription))
+
+		normalize := func(c string) string {
+			return strings.Replace(c, "/", "", -1)
+		}
+
+		template.Resources[prefix("SubscriptionFilter"+normalize(trigger.LogGroupName))] = &cloudformation.AWSLogsSubscriptionFilter{
+			DestinationArn: cloudformation.GetAtt(prefix(""), "Arn"),
+			FilterPattern:  trigger.FilterPattern,
+			LogGroupName:   trigger.LogGroupName,
+		}
 	}
+
+	j, err := template.JSON()
+	if err != nil {
+		return err
+	}
+
+	c.log.Debugf("cloudformation template:\n%s", j)
+	executer := newExecutor(c.log, context)
+	executer.Add(newOpEnsureBucket(c.log, awsCfg, bucket))
+	executer.Add(newOpUploadToBucket(c.log, awsCfg, bucket, fnCodeKey, content))
+	executer.Add(newOpUploadToBucket(
+		c.log,
+		awsCfg,
+		bucket,
+		"beatless-deployment/beatless/ph/cloudformation-template-update.json",
+		j,
+	))
+	executer.Add(newOpUpdateCloudFormation(
+		c.log,
+		awsCfg,
+		"https://s3.amazonaws.com/mybucket-for-beatless/beatless-deployment/beatless/ph/cloudformation-template-update.json",
+		stackName,
+	))
 
 	if err := executer.Execute(); err != nil {
 		if rollbackErr := executer.Rollback(); rollbackErr != nil {
