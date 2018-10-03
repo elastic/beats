@@ -28,7 +28,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
-	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
@@ -55,7 +54,7 @@ func testTLSRequest(t *testing.T, testURL string, certPath string) beat.Event {
 	config, err := common.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	jobs, err := create(monitors.Info{}, config)
+	jobs, err := create("tls", config)
 	require.NoError(t, err)
 
 	job := jobs[0]

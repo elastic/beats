@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -30,13 +31,6 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 	stateData := &stateStruct{}
 	err := json.Unmarshal(content, stateData)
 	if err != nil {
-		r.Error(err)
-		return
-	}
-
-	nodeInfo, err := elasticsearch.GetNodeInfo(m.HTTP, m.HostData().SanitizedURI+statePath, stateData.MasterNode)
-	if err != nil {
-		r.Error(err)
 		return
 	}
 
@@ -44,18 +38,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 	// Will be fixed in: https://github.com/elastic/elasticsearch/pull/30656
 	clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HostData().SanitizedURI+statePath, stateData.MasterNode)
 	if err != nil {
-		r.Error(err)
 		return
-	}
-
-	sourceNode := common.MapStr{
-		"uuid":              stateData.MasterNode,
-		"host":              nodeInfo.Host,
-		"transport_address": nodeInfo.TransportAddress,
-		"ip":                nodeInfo.IP,
-		// This seems to be in the x-pack data a subset of the cluster_uuid not the name?
-		"name":      stateData.ClusterName,
-		"timestamp": common.Time(time.Now()),
 	}
 
 	for _, index := range stateData.RoutingTable.Indices {
@@ -64,29 +47,60 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 				event := mb.Event{}
 				fields, err := schema.Apply(shard)
 				if err != nil {
-					r.Error(err)
 					continue
 				}
 
-				fields["shard"] = fields["number"]
-				delete(fields, "number")
+				// Handle node field: could be string or null
+				err = elasticsearch.PassThruField("node", shard, fields)
+				if err != nil {
+					continue
+				}
 
-				event.RootFields = common.MapStr{}
+				// Handle relocating_node field: could be string or null
+				err = elasticsearch.PassThruField("relocating_node", shard, fields)
+				if err != nil {
+					continue
+				}
 
 				event.RootFields = common.MapStr{
 					"timestamp":    time.Now(),
 					"cluster_uuid": clusterID,
 					"interval_ms":  m.Module().Config().Period.Nanoseconds() / 1000 / 1000,
 					"type":         "shards",
-					"source_node":  sourceNode,
 					"shard":        fields,
 					"state_uuid":   stateData.StateID,
 				}
-				event.Index = ".monitoring-es-6-mb"
+
+				// Build source_node object
+				nodeID, ok := shard["node"]
+				if !ok {
+					continue
+				}
+				if nodeID != nil { // shard has not been allocated yet
+					sourceNode, err := getSourceNode(nodeID.(string), stateData)
+					if err != nil {
+						continue
+					}
+					event.RootFields.Put("source_node", sourceNode)
+				}
+
+				event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 
 				r.Event(event)
 
 			}
 		}
 	}
+}
+
+func getSourceNode(nodeID string, stateData *stateStruct) (common.MapStr, error) {
+	nodeInfo, ok := stateData.Nodes[nodeID]
+	if !ok {
+		return nil, elastic.MakeErrorForMissingField("nodes."+nodeID, elastic.Elasticsearch)
+	}
+
+	return common.MapStr{
+		"uuid": nodeID,
+		"name": nodeInfo.Name,
+	}, nil
 }

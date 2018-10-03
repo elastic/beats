@@ -32,14 +32,6 @@ heartbeat.monitors:
   ipv6: true
   mode: any
 
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
   # Total running time per ping test.
   timeout: 16s
 
@@ -61,6 +53,15 @@ heartbeat.monitors:
   # fields in the output document instead of being grouped under a fields
   # sub-dictionary. Default is false.
   #fields_under_root: false
+
+  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
+  # Configure file json file to be watched for changes to the monitor:
+  #watch.poll_file:
+    # Path to check for updates.
+    #path:
+
+    # Interval between file file changed checks.
+    #interval: 5s
 
 - type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
             # by sending/receiving a custom payload
@@ -98,14 +99,6 @@ heartbeat.monitors:
   ipv6: true
   mode: any
 
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
   # List of ports to ping if host does not contain a port number
   # ports: [80, 9200, 5044]
 
@@ -134,6 +127,16 @@ heartbeat.monitors:
 
     # Required TLS protocols
     #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+
+  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
+  # Configure file json file to be watched for changes to the monitor:
+  #watch.poll_file:
+    # Path to check for updates.
+    #path:
+
+    # Interval between file file changed checks.
+    #interval: 5s
+
 
 - type: http # monitor type `http`. Connect via HTTP an optionally verify response
 
@@ -204,6 +207,16 @@ heartbeat.monitors:
 
     # Required response contents.
     #body:
+
+  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
+  # Configure file json file to be watched for changes to the monitor:
+  #watch.poll_file:
+    # Path to check for updates.
+    #path:
+
+    # Interval between file file changed checks.
+    #interval: 5s
+
 
 heartbeat.scheduler:
   # Limit number of concurrent tasks executed by heartbeat. The task limit if
@@ -330,8 +343,8 @@ heartbeat.scheduler:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, and
-# add_cloud_metadata.
+# The supported processors are drop_fields, drop_event, include_fields, 
+# decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
 # contain CPU load percentages, but remove the fields that contain CPU ticks
@@ -412,6 +425,24 @@ heartbeat.scheduler:
 #- add_host_metadata:
 #   netinfo.enabled: false
 #
+# The following example enriches each event with process metadata using
+# process IDs included in the event.
+#
+#processors:
+#- add_process_metadata:
+#    match_pids: ["system.process.ppid"]
+#    target: system.process.parent
+#
+# The following example decodes fields containing JSON strings 
+# and replaces the strings with valid JSON objects.
+#
+#processors:
+#- decode_json_fields:
+#    fields: ["field1", "field2", ...]
+#    process_array: false
+#    max_depth: 1
+#    target: ""
+#    overwrite_keys: false
 
 #============================= Elastic Cloud ==================================
 
@@ -637,11 +668,11 @@ output.elasticsearch:
   # and retry until all events are published.  Set max_retries to a value less
   # than 0 to retry until all events are published. The default is 3.
   #max_retries: 3
-  
+
   # The maximum number of events to bulk in a single Logstash request. The
   # default is 2048.
   #bulk_max_size: 2048
-  
+
   # The number of seconds to wait for responses from the Logstash server before
   # timing out. The default is 30s.
   #timeout: 30s
@@ -1195,6 +1226,13 @@ logging.files:
   # The permissions mask to apply when rotating log files. The default value is 0600.
   # Must be a valid Unix-style file permissions mask expressed in octal notation.
   #permissions: 0600
+
+  # Enable log file rotation on time intervals in addition to size-based rotation.
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # are boundary-aligned with minutes, hours, days, weeks, months, and years as
+  # reported by the local system clock. All other intervals are calculated from the
+  # unix epoch. Defaults to disabled.
+  #interval: 0
 
 # Set to true to log messages in json format.
 #logging.json: false

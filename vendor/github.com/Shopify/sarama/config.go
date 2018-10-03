@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"regexp"
 	"time"
 
@@ -17,6 +18,13 @@ var validID = regexp.MustCompile(`\A[A-Za-z0-9._-]+\z`)
 
 // Config is used to pass multiple configuration options to Sarama's constructors.
 type Config struct {
+	// Admin is the namespace for ClusterAdmin properties used by the administrative Kafka client.
+	Admin struct {
+		// The maximum duration the administrative Kafka client will wait for ClusterAdmin operations,
+		// including topics, brokers, configurations and ACLs (defaults to 3 seconds).
+		Timeout time.Duration
+	}
+
 	// Net is the namespace for network-level properties used by the Broker, and
 	// shared by the Client/Producer/Consumer.
 	Net struct {
@@ -58,6 +66,12 @@ type Config struct {
 		// KeepAlive specifies the keep-alive period for an active network connection.
 		// If zero, keep-alives are disabled. (default is 0: disabled).
 		KeepAlive time.Duration
+
+		// LocalAddr is the local address to use when dialing an
+		// address. The address must be of a compatible type for the
+		// network being dialed.
+		// If nil, a local address is automatically chosen.
+		LocalAddr net.Addr
 	}
 
 	// Metadata is the namespace for metadata management properties used by the
@@ -248,6 +262,12 @@ type Config struct {
 			// broker version 0.9.0 or later.
 			// (default is 0: disabled).
 			Retention time.Duration
+
+			Retry struct {
+				// The total number of times to retry failing commit
+				// requests during OffsetManager shutdown (default 3).
+				Max int
+			}
 		}
 	}
 
@@ -279,6 +299,8 @@ type Config struct {
 func NewConfig() *Config {
 	c := &Config{}
 
+	c.Admin.Timeout = 3 * time.Second
+
 	c.Net.MaxOpenRequests = 5
 	c.Net.DialTimeout = 30 * time.Second
 	c.Net.ReadTimeout = 30 * time.Second
@@ -307,6 +329,7 @@ func NewConfig() *Config {
 	c.Consumer.Return.Errors = false
 	c.Consumer.Offsets.CommitInterval = 1 * time.Second
 	c.Consumer.Offsets.Initial = OffsetNewest
+	c.Consumer.Offsets.Retry.Max = 3
 
 	c.ClientID = defaultClientID
 	c.ChannelBufferSize = 256
@@ -377,6 +400,12 @@ func (c *Config) Validate() error {
 		return ConfigurationError("Net.SASL.Password must not be empty when SASL is enabled")
 	}
 
+	// validate the Admin values
+	switch {
+	case c.Admin.Timeout <= 0:
+		return ConfigurationError("Admin.Timeout must be > 0")
+	}
+
 	// validate the Metadata values
 	switch {
 	case c.Metadata.Retry.Max < 0:
@@ -443,7 +472,8 @@ func (c *Config) Validate() error {
 		return ConfigurationError("Consumer.Offsets.CommitInterval must be > 0")
 	case c.Consumer.Offsets.Initial != OffsetOldest && c.Consumer.Offsets.Initial != OffsetNewest:
 		return ConfigurationError("Consumer.Offsets.Initial must be OffsetOldest or OffsetNewest")
-
+	case c.Consumer.Offsets.Retry.Max < 0:
+		return ConfigurationError("Consumer.Offsets.Retry.Max must be >= 0")
 	}
 
 	// validate misc shared values

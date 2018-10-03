@@ -83,6 +83,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		TLS:         tls,
 		Username:    config.Username,
 		Password:    config.Password,
+		Version:     kafka.Version("0.8.2.0"),
 	}
 
 	return &MetricSet{

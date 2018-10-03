@@ -4,6 +4,8 @@ This file is generated! See scripts/docs_collector.py
 
 [[filebeat-module-nginx]]
 :modulename: nginx
+:has-dashboards: true
+
 
 == Nginx module
 
@@ -75,6 +77,12 @@ include::../include/var-paths.asciidoc[]
 ==== `error` log fileset
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
 
 
 [float]

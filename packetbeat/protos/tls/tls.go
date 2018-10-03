@@ -52,6 +52,7 @@ type tlsPlugin struct {
 	ports                  []int
 	sendCertificates       bool
 	includeRawCertificates bool
+	fingerprints           []*FingerprintAlgorithm
 	transactionTimeout     time.Duration
 	results                protos.Reporter
 }
@@ -89,7 +90,9 @@ func New(
 }
 
 func (plugin *tlsPlugin) init(results protos.Reporter, config *tlsConfig) error {
-	plugin.setFromConfig(config)
+	if err := plugin.setFromConfig(config); err != nil {
+		return err
+	}
 
 	plugin.results = results
 	isDebug = logp.IsDebug("tls")
@@ -97,11 +100,19 @@ func (plugin *tlsPlugin) init(results protos.Reporter, config *tlsConfig) error 
 	return nil
 }
 
-func (plugin *tlsPlugin) setFromConfig(config *tlsConfig) {
+func (plugin *tlsPlugin) setFromConfig(config *tlsConfig) error {
 	plugin.ports = config.Ports
 	plugin.sendCertificates = config.SendCertificates
 	plugin.includeRawCertificates = config.IncludeRawCertificates
 	plugin.transactionTimeout = config.TransactionTimeout
+	for _, hashName := range config.Fingerprints {
+		algo, err := GetFingerprintAlgorithm(hashName)
+		if err != nil {
+			return err
+		}
+		plugin.fingerprints = append(plugin.fingerprints, algo)
+	}
+	return nil
 }
 
 func (plugin *tlsPlugin) GetPorts() []int {
@@ -280,14 +291,14 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	} else {
 		serverHello = emptyHello
 	}
-	if cert, chain := getCerts(client.parser.certificates, plugin.includeRawCertificates); cert != nil {
+	if cert, chain := plugin.getCerts(client.parser.certificates); cert != nil {
 		tls["client_certificate"] = cert
 		if chain != nil {
 			tls["client_certificate_chain"] = chain
 		}
 	}
 	if plugin.sendCertificates {
-		if cert, chain := getCerts(server.parser.certificates, plugin.includeRawCertificates); cert != nil {
+		if cert, chain := plugin.getCerts(server.parser.certificates); cert != nil {
 			tls["server_certificate"] = cert
 			if chain != nil {
 				tls["server_certificate_chain"] = chain
@@ -374,17 +385,17 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	}
 }
 
-func getCerts(certs []*x509.Certificate, includeRaw bool) (common.MapStr, []common.MapStr) {
+func (plugin *tlsPlugin) getCerts(certs []*x509.Certificate) (common.MapStr, []common.MapStr) {
 	if len(certs) == 0 {
 		return nil, nil
 	}
-	cert := certToMap(certs[0], includeRaw)
+	cert := certToMap(certs[0], plugin.includeRawCertificates, plugin.fingerprints)
 	if len(certs) == 1 {
 		return cert, nil
 	}
 	chain := make([]common.MapStr, len(certs)-1)
 	for idx := 1; idx < len(certs); idx++ {
-		chain[idx-1] = certToMap(certs[idx], includeRaw)
+		chain[idx-1] = certToMap(certs[idx], plugin.includeRawCertificates, plugin.fingerprints)
 	}
 	return cert, chain
 }

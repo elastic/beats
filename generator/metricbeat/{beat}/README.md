@@ -76,7 +76,7 @@ git commit -m "Add {beat}"
 The beat frameworks provides tools to crosscompile and package your beat for different platforms. This requires [docker](https://www.docker.com/) and vendoring as described above. To build packages of your beat, run the following command:
 
 ```
-make package
+make release
 ```
 
 This will fetch and create all images required for the build process. The hole process to finish can take several minutes.

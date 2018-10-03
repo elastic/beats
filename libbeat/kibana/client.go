@@ -25,6 +25,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -88,7 +89,11 @@ func NewKibanaClient(cfg *common.Config) (*Client, error) {
 
 // NewClientWithConfig creates and returns a kibana client using the given config
 func NewClientWithConfig(config *ClientConfig) (*Client, error) {
-	kibanaURL, err := common.MakeURL(config.Protocol, config.Path, config.Host, 5601)
+	p := config.Path
+	if config.SpaceID != "" {
+		p = path.Join(p, "s", config.SpaceID)
+	}
+	kibanaURL, err := common.MakeURL(config.Protocol, p, config.Host, 5601)
 	if err != nil {
 		return nil, fmt.Errorf("invalid Kibana host: %v", err)
 	}

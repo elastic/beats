@@ -73,11 +73,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-	data, err := m.http.FetchJSON()
+	content, err := m.http.FetchContent()
 	if err != nil {
 		return nil, err
 	}
 
-	event, _ := eventMapping(data)
+	event, _ := eventMapping(content)
 	return event, nil
 }
