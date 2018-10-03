@@ -20,6 +20,8 @@ package ccr
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -27,7 +29,7 @@ import (
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "ccr", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "ccr", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 	)
 }
@@ -43,7 +45,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch ccr metricset is beta")
+	cfgwarn.Beta("the " + base.FullyQualifiedName() + " metricset is beta")
 
 	ms, err := elasticsearch.NewMetricSet(base, ccrStatsPath)
 	if err != nil {
@@ -56,13 +58,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+ccrStatsPath)
 	if err != nil {
-		r.Error(err)
+		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch ccr stats from a non master node.")
+		logp.Debug(elasticsearch.ModuleName, "trying to fetch ccr stats from a non master node.")
 		return
 	}
 
@@ -80,9 +82,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 
 	if !isCCRStatsAPIAvailable {
-		const errorMsg = "the elasticsearch ccr metricset is only supported with Elasticsearch >= %v. " +
+		const errorMsg = "the %v metricset is only supported with Elasticsearch >= %v. " +
 			"You are currently running Elasticsearch %v"
-		r.Error(fmt.Errorf(errorMsg, elasticsearch.CCRStatsAPIAvailableVersion, elasticsearchVersion))
+		r.Error(fmt.Errorf(errorMsg, m.FullyQualifiedName(), elasticsearch.CCRStatsAPIAvailableVersion, elasticsearchVersion))
 		return
 	}
 
