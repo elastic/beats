@@ -46,7 +46,7 @@ type Journalbeat struct {
 
 // New returns a new Journalbeat instance
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
-	cfgwarn.Beta("Journalbeat is beta.")
+	cfgwarn.Experimental("Journalbeat is experimental.")
 
 	config := config.DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
