@@ -51,14 +51,15 @@ func (o *opCloudWaitCloudFormation) Execute(ctx *executorContext) error {
 	o.log.Debug("waiting for cloudformation confirmation")
 	status, reason, err := o.query()
 
-	for strings.Index(string(*status), "FAILED") == -1 && *status != "UPDATE_COMPLETE" && *status != "CREATE_COMPLETE" && err == nil {
+	for strings.Index(string(*status), "FAILED") == -1 && *status != cloudformation.StackStatusUpdateComplete && *status != cloudformation.StackStatusCreateComplete && err == nil {
 		select {
 		case <-time.After(periodicCheck):
 			status, reason, err = o.query()
 		}
 	}
 
-	if *status != "UPDATE_COMPLETE" || *status != "CREATE_COMPLETE" {
+	// Multiple status, setup a catch all for all errors.
+	if strings.Index(string(*status), "FAILED") != -1 {
 		return fmt.Errorf("could not create the stack, status: %s, reason: %s", *status, reason)
 	}
 
