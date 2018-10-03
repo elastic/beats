@@ -217,9 +217,21 @@ func (c *CLIManager) Update(name string) error {
 func (c *CLIManager) Remove(name string) error {
 	c.log.Debugf("function: %s, starting remove", name)
 	defer c.log.Debugf("function: %s, remove execution ended", name)
+
+	context := &executorContext{}
+	executer := newExecutor(c.log, context)
+	executer.Add(newOpDeleteCloudFormation(c.log, c.awsCfg, c.stackName(name)))
+
+	if err := executer.Execute(); err != nil {
+		if rollbackErr := executer.Rollback(); rollbackErr != nil {
+			return merrors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
+		}
+		return err
+	}
 	return nil
 }
 
+// NewCLI returns the interface to managa function on Amazon lambda.
 func NewCLI(
 	log *logp.Logger,
 	cfg *common.Config,
