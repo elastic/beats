@@ -27,6 +27,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -48,11 +49,14 @@ func makeURL(url, path string, params url.Values) string {
 	return strings.Join([]string{url, path, "?", params.Encode()}, "")
 }
 
-func Export(client *http.Client, conn string, dashboard string, out string) error {
+func Export(client *http.Client, conn string, spaceID string, dashboard string, out string) error {
 	params := url.Values{}
 
 	params.Add("dashboard", dashboard)
 
+	if spaceID != "" {
+		exportAPI = path.Join("/s", spaceID, exportAPI)
+	}
 	fullURL := makeURL(conn, exportAPI, params)
 	if !quiet {
 		log.Printf("Calling HTTP GET %v\n", fullURL)
@@ -138,6 +142,7 @@ var quiet = false
 
 func main() {
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
+	spaceID := flag.String("space-id", "", "Space ID")
 	dashboard := flag.String("dashboard", "", "Dashboard ID")
 	fileOutput := flag.String("output", "output.json", "Output file")
 	ymlFile := flag.String("yml", "", "Path to the module.yml file containing the dashboards")
@@ -171,7 +176,7 @@ func main() {
 			if err != nil {
 				log.Fatalf("fail to create directory %s: %v", directory, err)
 			}
-			err = Export(client, *kibanaURL, dashboard["id"], filepath.Join(directory, dashboard["file"]))
+			err = Export(client, *kibanaURL, *spaceID, dashboard["id"], filepath.Join(directory, dashboard["file"]))
 			if err != nil {
 				log.Fatalf("fail to export the dashboards: %s", err)
 			}
@@ -180,7 +185,7 @@ func main() {
 	}
 
 	if len(*dashboard) > 0 {
-		err := Export(client, *kibanaURL, *dashboard, *fileOutput)
+		err := Export(client, *kibanaURL, *spaceID, *dashboard, *fileOutput)
 		if err != nil {
 			log.Fatalf("fail to export the dashboards: %s", err)
 		}

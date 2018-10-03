@@ -283,6 +283,15 @@ go run dev-tools/cmd/dashboards/export_dashboards.go -yml filebeat/module/system
 -------------------
 
 
+===== Export dashboards from a Kibana Space
+
+If you are using the Kibana Spaces feature and want to export dashboards from a specific Space, pass the Space ID to the `export_dashboards.go` script:
+
+[source,shell]
+-------------------
+go run dev-tools/cmd/dashboards/export_dashboards.go -space-id my-space [other-options]
+-------------------
+
 
 ==== Exporting Kibana 5.x dashboards
 
