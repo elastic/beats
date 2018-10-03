@@ -6,6 +6,7 @@ package aws
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"strconv"
 	"strings"
@@ -101,11 +102,31 @@ func (c CloudwatchLogs) Name() string {
 	return "cloudwatch_logs"
 }
 
-// AWSLambdaFunction add 'dependsOn' as a serializable parameters, for no good reason it's
-// not supported.
-type AWSLambdaFunction struct {
-	*cloudformation.AWSLambdaFunction
-	DependsOn []string
+// AWSLogsSubscriptionFilter overrides the type from goformation to allow to pass an empty string.
+// The API support an empty string, but requires one, the original type does not permit that.
+type AWSLogsSubscriptionFilter struct {
+	DestinationArn string `json:"DestinationArn,omitempty"`
+	FilterPattern  string `json:"FilterPattern"`
+	LogGroupName   string `json:"LogGroupName,omitempty"`
+}
+
+// MarshalJSON is a custom JSON marshalling hook that embeds this object into
+// an AWS CloudFormation JSON resource's 'Properties' field and adds a 'Type'.
+func (r AWSLogsSubscriptionFilter) MarshalJSON() ([]byte, error) {
+	type Properties AWSLogsSubscriptionFilter
+	return json.Marshal(&struct {
+		Type           string
+		Properties     Properties
+		DeletionPolicy cloudformation.DeletionPolicy `json:"DeletionPolicy,omitempty"`
+	}{
+		Type:       r.AWSCloudFormationType(),
+		Properties: (Properties)(r),
+	})
+}
+
+// AWSCloudFormationType return the AWS type.
+func (r *AWSLogsSubscriptionFilter) AWSCloudFormationType() string {
+	return "AWS::Logs::SubscriptionFilter"
 }
 
 // Template returns the cloudformation template for configuring the service with the specified triggers.
@@ -145,7 +166,7 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 			return strings.Replace(c, "/", "", -1)
 		}
 
-		template.Resources[prefix("SubscriptionFilter"+normalize(trigger.LogGroupName))] = &cloudformation.AWSLogsSubscriptionFilter{
+		template.Resources[prefix("SubscriptionFilter"+normalize(trigger.LogGroupName))] = &AWSLogsSubscriptionFilter{
 			DestinationArn: cloudformation.GetAtt(prefix(""), "Arn"),
 			FilterPattern:  trigger.FilterPattern,
 			LogGroupName:   trigger.LogGroupName,

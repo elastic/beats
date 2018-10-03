@@ -27,6 +27,13 @@ const (
 	bucket = "beatless-deploy"
 )
 
+// AWSLambdaFunction add 'dependsOn' as a serializable parameters, for no good reason it's
+// not supported.
+type AWSLambdaFunction struct {
+	*cloudformation.AWSLambdaFunction
+	DependsOn []string
+}
+
 type installer interface {
 	Template() *cloudformation.Template
 	LambdaConfig() *lambdaConfig
