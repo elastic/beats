@@ -19,71 +19,59 @@
       }
     }
   , { "set":
-      { "field": "ecs.event.type"
+      { "field": "event.type"
       , "value": "{{suricata.eve.event_type}}"
       }
     }
 
   , { "set":
-      { "field": "ecs.user_agent.raw"
+      { "field": "user_agent.original"
       , "value": "{{suricata.eve.http.http_user_agent}}"
       }
     }
   , { "user_agent":
-      { "field": "ecs.user_agent.raw"
-      , "target_field": "ecs.user_agent"
+      { "field": "user_agent.original"
+      , "target_field": "user_agent"
       , "ignore_missing": true
       }
     }
   , { "rename":
-      { "field": "ecs.user_agent.os"
-      , "target_field": "ecs.user_agent.temp_os"
+      { "field": "user_agent.os"
+      , "target_field": "user_agent.temp_os"
       , "ignore_missing": true
       }
     }
   , { "rename":
-      { "field": "ecs.user_agent.temp_os"
-      , "target_field": "ecs.user_agent.os.full_name"
+      { "field": "user_agent.temp_os"
+      , "target_field": "user_agent.os.full_name"
       , "ignore_missing": true
       }
     }
   , { "rename":
-      { "field": "ecs.user_agent.os_name"
-      , "target_field": "ecs.user_agent.os.name"
+      { "field": "user_agent.os_name"
+      , "target_field": "user_agent.os.name"
       , "ignore_missing": true
       }
     }
   , { "rename":
-      { "field": "ecs.user_agent.os_version"
-      , "target_field": "ecs.user_agent.os.version"
+      { "field": "user_agent.os_version"
+      , "target_field": "user_agent.os.version"
       , "ignore_missing": true
       }
     }
   , { "rename":
-      { "field": "ecs.user_agent.os_major"
-      , "target_field": "ecs.user_agent.os.major"
+      { "field": "user_agent.os_major"
+      , "target_field": "user_agent.os.major"
       , "ignore_missing": true
       }
     }
   , { "rename":
-      { "field": "ecs.user_agent.os_minor"
-      , "target_field": "ecs.user_agent.os.minor"
+      { "field": "user_agent.os_minor"
+      , "target_field": "user_agent.os.minor"
       , "ignore_missing": true
       }
     }
 
-  , { "geoip":
-      { "field": "suricata.eve.src_ip"
-      , "target_field": "ecs.source.geo"
-      , "ignore_missing": true
-      }
-    }
-  , { "geoip":
-      { "field": "suricata.eve.dest_ip"
-      , "target_field": "ecs.destination.geo"
-      , "ignore_missing": true
-      }
-    }
   , { "geoip":
       { "field": "suricata.eve.src_ip"
       , "target_field": "suricata.eve.src_geo"
@@ -96,6 +84,28 @@
       , "ignore_missing": true
       }
     }
+
+  , { "set":
+      { "field": "http.request.method"
+      , "value": "{{suricata.eve.http.http_method}}"
+      }
+    }
+  , { "set":
+      { "field": "http.response.status_code"
+      , "value": "{{suricata.eve.http.status}}"
+      }
+    }
+  , { "set":
+      { "field": "http.response.status_code"
+      , "value": "{{suricata.eve.http.status}}"
+      }
+    }
+  , { "set":
+      { "field": "url.host.name"
+      , "value": "{{suricata.eve.http.hostname}}"
+      }
+    }
+
   ]
 , "on_failure":
   [ { "set" :

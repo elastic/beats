@@ -9,8 +9,51 @@
       type: ip
     - name: flow_id
       type: keyword
-    # Geo Points should be the ECS fields, but no way to config from here.
-    - name: src_geo.location
-      type: geo_point
-    - name: dest_geo.location
-      type: geo_point
+
+    - name: src_geo
+      type: group
+      fields:
+        - name: continent_name
+          type: keyword
+          description: >
+            Name of the continent.
+        - name: country_iso_code
+          type: keyword
+          description: >
+            Country ISO code.
+        - name: location
+          type: geo_point
+          description: >
+            Longitude and latitude.
+        - name: region_name
+          type: keyword
+          description: >
+            Region name.
+        - name: city_name
+          type: keyword
+          description: >
+            City name.
+
+    - name: dest_geo
+      type: group
+      fields:
+      - name: continent_name
+        type: keyword
+        description: >
+          Name of the continent.
+      - name: country_iso_code
+        type: keyword
+        description: >
+          Country ISO code.
+      - name: location
+        type: geo_point
+        description: >
+          Longitude and latitude.
+      - name: region_name
+        type: keyword
+        description: >
+          Region name.
+      - name: city_name
+        type: keyword
+        description: >
+          City name.
