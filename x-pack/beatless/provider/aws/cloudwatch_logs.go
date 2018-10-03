@@ -98,6 +98,13 @@ func (c CloudwatchLogs) Name() string {
 	return "cloudwatch_logs"
 }
 
+// AWSLambdaFunction add 'dependsOn' as a serializable parameters, for no good reason it's
+// not supported.
+type AWSLambdaFunction struct {
+	*cloudformation.AWSLambdaFunction
+	DependsOn []string
+}
+
 // Deploy executes a number of operation to make the state consistent for this specific lambda function.
 func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 	context := &executorContext{
@@ -113,22 +120,41 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 	fnCodeKey := "beatless-deployment/beatless/ph/beatless.zip"
 
 	template := cloudformation.NewTemplate()
-	template.Resource["beatless-lambda-"+c.config.Name] = &cloudformation.AWSLambdaFunction{
-		Code: cloudformation.AWSLambdaFunction_Code{
-			S3Bucket: bucket,
-			S3Key:    fnCodeKey,
-		},
-		Description: "beatless " + c.config.name + " lambda",
-		Environment: cloudformation.AWSLambdaFunction_Environment{
-			Variables: map[string]string{
-				"BEAT_STRICT_PERMS": "false",
-				"ENABLED_FUNCTIONS": c.config.Name,
+	template.Resources["IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
+		AssumeRolePolicyDocument: map[string]interface{}{
+			"Version": "2012-10-17",
+			"Statement": []interface{}{
+				map[string]interface{}{
+					"Action": "sts:AssumeRole",
+					"Effect": "Allow",
+					"Principal": map[string]interface{}{
+						"Service": []string{"lambda.amazonaws.com"},
+					},
+				},
 			},
 		},
-		FunctionName: c.config.Name,
-		Role:         cloudformation.GetAtt("IamRoleLambdaExecution", "Arn"),
-		Runtime:      runtime,
-		Handler:      handlerName,
+		RoleName: "beatless-lambda",
+	}
+
+	template.Resources["btl"+c.config.Name] = &AWSLambdaFunction{
+		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
+			Code: &cloudformation.AWSLambdaFunction_Code{
+				S3Bucket: bucket,
+				S3Key:    fnCodeKey,
+			},
+			Description: "beatless " + c.config.Name + " lambda",
+			Environment: &cloudformation.AWSLambdaFunction_Environment{
+				Variables: map[string]string{
+					"BEAT_STRICT_PERMS": "false",
+					"ENABLED_FUNCTIONS": c.config.Name,
+				},
+			},
+			FunctionName: c.config.Name,
+			Role:         cloudformation.GetAtt("IAMRoleLambdaExecution", "Arn"),
+			Runtime:      runtime,
+			Handler:      handlerName,
+		},
+		DependsOn: []string{"IAMRoleLambdaExecution"},
 	}
 
 	j, err := template.JSON()
@@ -141,9 +167,23 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 	executer := newExecutor(c.log, context)
 	executer.Add(newOpEnsureBucket(c.log, awsCfg, bucket))
 	executer.Add(newOpUploadToBucket(c.log, awsCfg, bucket, fnCodeKey, content))
-	executer.Add(newOpUploadToBucket(c.log, awsCfg, bucket, "beatless-deployment/beatless/ph/cloudformation-template-create.json", j))
-	// executer.Add(newOpCreateFormation)
-	// executer.ddd(newOpWaitCloudFormation)
+	executer.Add(newOpUploadToBucket(
+		c.log,
+		awsCfg,
+		bucket,
+		"beatless-deployment/beatless/ph/cloudformation-template-create.json",
+		j,
+	))
+	executer.Add(newOpCreateCloudFormation(
+		c.log,
+		awsCfg,
+		"https://s3.amazonaws.com/mybucket-for-beatless/beatless-deployment/beatless/ph/cloudformation-template-create.json",
+		"stack-"+c.config.Name,
+	))
+	executer.Add(newOpWaitCloudFormation(
+		c.log,
+		awsCfg,
+	))
 
 	if err := executer.Execute(); err != nil {
 		if rollbackErr := executer.Rollback(); rollbackErr != nil {
