@@ -27,6 +27,7 @@ import (
 	"go/format"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/asset"
 )
@@ -76,7 +77,9 @@ func main() {
 		}
 	}
 
-	encData, err := asset.EncodeData(string(data))
+	// Depending on OS or tools configuration, files can contain carriages (\r),
+	// what leads to different results, remove them before encoding.
+	encData, err := asset.EncodeData(strings.Replace(string(data), "\r", "", -1))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error encoding the data: %s\n", err)
 		os.Exit(1)
