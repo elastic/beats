@@ -34,8 +34,9 @@ const (
 	bucket = "beatless-deploy"
 )
 
-type templater interface {
+type installer interface {
 	Template() *cloudformation.Template
+	LambdaConfig() *lambdaConfig
 }
 
 // CLIManager interacts with the AWS Lambda API to deploy, update or remove a function.
@@ -92,13 +93,13 @@ func (c *CLIManager) makeZip() ([]byte, error) {
 	return content, nil
 }
 
-func (c *CLIManager) findFunction(name string) (templater, error) {
+func (c *CLIManager) findFunction(name string) (installer, error) {
 	fn, err := c.provider.FindFunctionByName(name)
 	if err != nil {
 		return nil, err
 	}
 
-	function, ok := fn.(templater)
+	function, ok := fn.(installer)
 	if !ok {
 		return nil, errors.New("incompatible type received, expecting: 'functionManager'")
 	}
@@ -106,7 +107,9 @@ func (c *CLIManager) findFunction(name string) (templater, error) {
 	return function, nil
 }
 
-func (c *CLIManager) template(name string) *cloudformation.Template {
+func (c *CLIManager) template(function installer, name string) *cloudformation.Template {
+	lambdaConfig := function.LambdaConfig()
+
 	// Create the generate cloudformation template for the lambda itself.
 	template := cloudformation.NewTemplate()
 	template.Resources["IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
@@ -128,23 +131,34 @@ func (c *CLIManager) template(name string) *cloudformation.Template {
 		RoleName: "beatless-lambda",
 	}
 
+	var dlc *cloudformation.AWSLambdaFunction_DeadLetterConfig
+	if lambdaConfig.DeadLetterConfig != nil && len(lambdaConfig.DeadLetterConfig.TargetArn) != 0 {
+		dlc = &cloudformation.AWSLambdaFunction_DeadLetterConfig{
+			TargetArn: lambdaConfig.DeadLetterConfig.TargetArn,
+		}
+	}
+
 	template.Resources["btl"+name] = &AWSLambdaFunction{
 		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
 			Code: &cloudformation.AWSLambdaFunction_Code{
 				S3Bucket: bucket,
 				S3Key:    c.codeKey(name),
 			},
-			Description: "beatless " + name + " lambda",
+			Description: lambdaConfig.Description,
 			Environment: &cloudformation.AWSLambdaFunction_Environment{
 				Variables: map[string]string{
 					"BEAT_STRICT_PERMS": "false",
 					"ENABLED_FUNCTIONS": name,
 				},
 			},
-			FunctionName: name,
-			Role:         cloudformation.GetAtt("IAMRoleLambdaExecution", "Arn"),
-			Runtime:      runtime,
-			Handler:      handlerName,
+			DeadLetterConfig:             dlc,
+			FunctionName:                 name,
+			Role:                         cloudformation.GetAtt("IAMRoleLambdaExecution", "Arn"),
+			Runtime:                      runtime,
+			Handler:                      handlerName,
+			MemorySize:                   lambdaConfig.MemorySize.Megabytes(),
+			ReservedConcurrentExecutions: lambdaConfig.Concurrency,
+			Timeout: int(lambdaConfig.Timeout.Seconds()),
 		},
 		DependsOn: []string{"IAMRoleLambdaExecution"},
 	}
@@ -173,7 +187,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	fnTemplate := function.Template()
 
-	template, err := mergeTemplate(c.template(name), fnTemplate)
+	template, err := mergeTemplate(c.template(function, name), fnTemplate)
 	if err != nil {
 		return err
 	}

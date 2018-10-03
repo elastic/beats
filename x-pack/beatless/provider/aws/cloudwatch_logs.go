@@ -25,9 +25,10 @@ const handlerName = "beatless"
 
 // CloudwatchLogsConfig is the configuration for the cloudwatchlogs event type.
 type CloudwatchLogsConfig struct {
-	Triggers    []*CloudwatchLogsTriggerConfig `config:"triggers"`
-	Description string                         `config:"description"`
-	Name        string                         `config:"name" validate:"nonzero,required"`
+	Triggers     []*CloudwatchLogsTriggerConfig `config:"triggers"`
+	Description  string                         `config:"description"`
+	Name         string                         `config:"name" validate:"nonzero,required"`
+	LambdaConfig *lambdaConfig                  `config:",inline"`
 }
 
 // CloudwatchLogsTriggerConfig is the configuration for the specific triggers for cloudwatch.
@@ -53,7 +54,9 @@ type CloudwatchLogs struct {
 
 // NewCloudwatchLogs create a new function to listen to cloudwatch logs events.
 func NewCloudwatchLogs(provider provider.Provider, cfg *common.Config) (provider.Function, error) {
-	config := &CloudwatchLogsConfig{}
+	config := &CloudwatchLogsConfig{
+		LambdaConfig: DefaultLambdaConfig,
+	}
 	if err := cfg.Unpack(config); err != nil {
 		return nil, err
 	}
@@ -149,4 +152,9 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 		}
 	}
 	return template
+}
+
+// LambdaConfig returns the configuration to use when creating the lambda.
+func (c *CloudwatchLogs) LambdaConfig() *lambdaConfig {
+	return c.config.LambdaConfig
 }
