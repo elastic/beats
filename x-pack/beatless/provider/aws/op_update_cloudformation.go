@@ -1,0 +1,49 @@
+package aws
+
+import (
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	uuid "github.com/satori/go.uuid"
+
+	"github.com/elastic/beats/libbeat/logp"
+)
+
+type opUpdateCloudFormation struct {
+	log         *logp.Logger
+	svc         *cloudformation.CloudFormation
+	templateURL string
+	stackName   string
+}
+
+func (o *opUpdateCloudFormation) Execute(ctx *executorContext) error {
+	uuid := uuid.NewV4()
+	input := &cloudformation.UpdateStackInput{
+		ClientRequestToken: aws.String(uuid.String()),
+		StackName:          aws.String(o.stackName),
+		TemplateURL:        aws.String(o.templateURL),
+		Capabilities: []cloudformation.Capability{
+			cloudformation.CapabilityCapabilityNamedIam,
+		},
+	}
+
+	req := o.svc.UpdateStackRequest(input)
+	resp, err := req.Send()
+	if err != nil {
+		o.log.Debug("could not update the cloudformation stack, resp: %s", resp)
+		return err
+	}
+	return nil
+}
+
+func newOpUpdateCloudFormation(
+	log *logp.Logger,
+	cfg aws.Config,
+	templateURL, stackName string,
+) *opUpdateCloudFormation {
+	return &opUpdateCloudFormation{
+		log:         log,
+		svc:         cloudformation.New(cfg),
+		templateURL: templateURL,
+		stackName:   stackName,
+	}
+}
