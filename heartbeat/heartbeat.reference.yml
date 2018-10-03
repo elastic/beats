@@ -217,23 +217,6 @@ heartbeat.monitors:
     # Interval between file file changed checks.
     #interval: 5s
 
-#========================== Heartbeat autodiscover ==============================
-
-# Autodiscover allows you to detect changes in the system and spawn new monitors as those changes happen
-
-#heartbeat.autodiscover:
-  # List of enabled autodiscover providers
-#  providers:
-#    - type: docker
-#      templates:
-#      - condition:
-#        contains:
-#          docker.container.image: redis
-#        config:
-#          - type: tcp
-#            hosts: ["${data.host}:${data.port}"]
-#            schedule: "@every 1s"
-#            timeout: 1s
 
 heartbeat.scheduler:
   # Limit number of concurrent tasks executed by heartbeat. The task limit if
