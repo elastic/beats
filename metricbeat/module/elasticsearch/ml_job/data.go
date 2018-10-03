@@ -20,7 +20,10 @@ package ml_job
 import (
 	"encoding/json"
 
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
@@ -48,6 +51,8 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	jobsData := &jobsStruct{}
 	err := json.Unmarshal(content, jobsData)
 	if err != nil {
+		err = errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
+		r.Error(err)
 		return err
 	}
 
@@ -58,11 +63,11 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		event.MetricSetFields, err = schema.Apply(job)
 		if err != nil {
-			errs = append(errs, err)
+			errs = append(errs, errors.Wrap(err, "failure applying ml job schema"))
 		}
 
 		event.RootFields = common.MapStr{}
-		event.RootFields.Put("service.name", "elasticsearch")
+		event.RootFields.Put("service.name", elasticsearch.ModuleName)
 		r.Event(event)
 	}
 	return errs.Err()
