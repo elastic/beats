@@ -1432,6 +1432,8 @@ https://github.com/elastic/beats/compare/v6.4.0...v6.5.0[View commits]
 - Added default and TCP parsing formats to HAproxy module {issue}8311[8311] {pull}8637[8637]
 - Add Suricata IDS/IDP/NSM module. {issue}8153[8153] {pull}8693[8693]
 - Support for Kafka 2.0.0 {pull}8853[8853]
+- Allow to force CRI format parsing for better performance {pull}8424[8424]
+- Add ClientFactory to TCP input source to add SplitFunc/NetworkFuncs per client. {pull}8543[8543]
 
 *Heartbeat*
 

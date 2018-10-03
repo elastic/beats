@@ -25,13 +25,14 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/satori/go.uuid"
 
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Client is a remote client.
+// ClientInfo is a remote client.
 type client struct {
 	conn           net.Conn
 	log            *logp.Logger
@@ -41,7 +42,22 @@ type client struct {
 	splitFunc      bufio.SplitFunc
 	maxMessageSize uint64
 	timeout        time.Duration
+	onConnect      ClientCallback
+	OnDisconnect   ClientCallback
+	id             string
 }
+
+// ClientFactory passes a connection ID as an input and gets back a NetworkFunc and a SplitFunc
+type ClientFactory func() (inputsource.NetworkFunc, bufio.SplitFunc, ClientCallback, ClientCallback)
+
+// ClientInfo allows creator of clients to get information about a client
+type ClientInfo interface {
+	// ID() returns a connection id for the given client connection
+	ID() string
+}
+
+// ClientCallback allows a callback to occur when a new client connects or disconnects to the server
+type ClientCallback func(info ClientInfo)
 
 func newClient(
 	conn net.Conn,
@@ -50,6 +66,8 @@ func newClient(
 	splitFunc bufio.SplitFunc,
 	maxReadMessage uint64,
 	timeout time.Duration,
+	onConnect ClientCallback,
+	onDisconnect ClientCallback,
 ) *client {
 	client := &client{
 		conn:           conn,
@@ -63,12 +81,19 @@ func newClient(
 			RemoteAddr: conn.RemoteAddr(),
 			TLS:        extractSSLInformation(conn),
 		},
+		onConnect:    onConnect,
+		OnDisconnect: onDisconnect,
+		id:           uuid.NewV4().String(),
 	}
 	extractSSLInformation(conn)
 	return client
 }
 
 func (c *client) handle() error {
+	if c.onConnect != nil {
+		c.onConnect(c)
+	}
+
 	r := NewResetableLimitedReader(NewDeadlineReader(c.conn, c.timeout), c.maxMessageSize)
 	buf := bufio.NewReader(r)
 	scanner := bufio.NewScanner(buf)
@@ -79,7 +104,7 @@ func (c *client) handle() error {
 	for scanner.Scan() {
 		err := scanner.Err()
 		if err != nil {
-			// we are forcing a close on the socket, lets ignore any error that could happen.
+			// we are forcing a Close on the socket, lets ignore any error that could happen.
 			select {
 			case <-c.done:
 				break
@@ -95,6 +120,10 @@ func (c *client) handle() error {
 		c.callback(scanner.Bytes(), c.metadata)
 	}
 
+	if c.OnDisconnect != nil {
+		c.OnDisconnect(c)
+	}
+
 	// We are out of the scanner, either we reached EOF or another fatal error occurred.
 	// like we failed to complete the TLS handshake or we are missing the client certificate when
 	// mutual auth is on, which is the default.
@@ -108,6 +137,10 @@ func (c *client) handle() error {
 func (c *client) close() {
 	close(c.done)
 	c.conn.Close()
+}
+
+func (c *client) ID() string {
+	return c.id
 }
 
 func extractSSLInformation(c net.Conn) *inputsource.TLSMetadata {

@@ -36,13 +36,12 @@ import (
 // Server represent a TCP server
 type Server struct {
 	sync.RWMutex
-	callback  inputsource.NetworkFunc
 	config    *Config
 	Listener  net.Listener
-	clients   map[*client]struct{}
+	clients   map[string]*client
 	wg        sync.WaitGroup
 	done      chan struct{}
-	splitFunc bufio.SplitFunc
+	factory   ClientFactory
 	log       *logp.Logger
 	tlsConfig *transport.TLSConfig
 }
@@ -50,24 +49,22 @@ type Server struct {
 // New creates a new tcp server
 func New(
 	config *Config,
-	splitFunc bufio.SplitFunc,
-	callback inputsource.NetworkFunc,
+	factory ClientFactory,
 ) (*Server, error) {
 	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
 
-	if splitFunc == nil {
-		return nil, fmt.Errorf("SplitFunc can't be empty")
+	if factory == nil {
+		return nil, fmt.Errorf("ClientFactory can't be empty")
 	}
 
 	return &Server{
 		config:    config,
-		callback:  callback,
-		clients:   make(map[*client]struct{}, 0),
+		clients:   make(map[string]*client, 0),
 		done:      make(chan struct{}),
-		splitFunc: splitFunc,
+		factory:   factory,
 		log:       logp.NewLogger("tcp").With("address", config.Host),
 		tlsConfig: tlsConfig,
 	}, nil
@@ -105,13 +102,16 @@ func (s *Server) run() {
 			}
 		}
 
+		networkFunc, splitFunc, onConnect, onDisconnect := s.factory()
 		client := newClient(
 			conn,
 			s.log,
-			s.callback,
-			s.splitFunc,
+			networkFunc,
+			splitFunc,
 			uint64(s.config.MaxMessageSize),
 			s.config.Timeout,
+			onConnect,
+			onDisconnect,
 		)
 
 		s.wg.Add(1)
@@ -126,11 +126,11 @@ func (s *Server) run() {
 
 			err := client.handle()
 			if err != nil {
-				s.log.Debugw("Client error", "error", err)
+				s.log.Debugw("ClientInfo error", "error", err)
 			}
 
 			defer s.log.Debugw(
-				"Client disconnected",
+				"ClientInfo disconnected",
 				"remote_address",
 				conn.RemoteAddr(),
 				"total",
@@ -140,7 +140,7 @@ func (s *Server) run() {
 	}
 }
 
-// Stop stops accepting new incoming TCP connection and close any active clients
+// Stop stops accepting new incoming TCP connection and Close any active clients
 func (s *Server) Stop() {
 	s.log.Info("Stopping TCP server")
 	close(s.done)
@@ -155,13 +155,13 @@ func (s *Server) Stop() {
 func (s *Server) registerClient(client *client) {
 	s.Lock()
 	defer s.Unlock()
-	s.clients[client] = struct{}{}
+	s.clients[client.ID()] = client
 }
 
 func (s *Server) unregisterClient(client *client) {
 	s.Lock()
 	defer s.Unlock()
-	delete(s.clients, client)
+	delete(s.clients, client.ID())
 }
 
 func (s *Server) allClients() []*client {
@@ -169,7 +169,7 @@ func (s *Server) allClients() []*client {
 	defer s.RUnlock()
 	currentClients := make([]*client, len(s.clients))
 	idx := 0
-	for client := range s.clients {
+	for _, client := range s.clients {
 		currentClients[idx] = client
 		idx++
 	}

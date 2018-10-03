@@ -18,6 +18,7 @@
 package syslog
 
 import (
+	"bufio"
 	"fmt"
 	"time"
 
@@ -77,7 +78,11 @@ func factory(
 			return nil, fmt.Errorf("error creating splitFunc from delimiter %s", config.LineDelimiter)
 		}
 
-		return tcp.New(&config.Config, splitFunc, cb)
+		factory := func() (inputsource.NetworkFunc, bufio.SplitFunc, tcp.ClientCallback, tcp.ClientCallback) {
+			return cb, splitFunc, nil, nil
+		}
+
+		return tcp.New(&config.Config, factory)
 	case udp.Name:
 		config := defaultUDP
 		if err := cfg.Unpack(&config); err != nil {
