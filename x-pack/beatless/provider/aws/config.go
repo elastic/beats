@@ -16,16 +16,16 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 )
 
+// maxMegabytes maximums memory that a lambda can use.
 const maxMegabytes = 3008
 
 // DefaultConfig confguration for AWS lambda function.
-var DefaultConfig = config{
+var DefaultConfig = lambdaConfig{
 	MemorySize: 128 * 1024 * 1024,
 	Timeout:    time.Second * 3,
 }
 
-type config struct {
-	Role             string            `config:"role" validate:"required"`
+type lambdaConfig struct {
 	DeadLetterConfig *deadLetterConfig `config:"dead_letter_config"`
 	Description      string            `config:"description"`
 	KMSKeyArn        string            `config:"kms_key_arn"`
@@ -36,7 +36,7 @@ type config struct {
 	VPC              vpcConfig         `config:"vpc"`
 }
 
-func (c *config) Validate() error {
+func (c *lambdaConfig) Validate() error {
 	if c.MemorySize.Megabytes() == 0 {
 		return fmt.Errorf("'memory_size' need to be higher than 0 and must be a factor 64")
 	}
@@ -113,6 +113,3 @@ func isRawBytes(v string) bool {
 	}
 	return true
 }
-
-// TODO
-// Function name <= 64 char

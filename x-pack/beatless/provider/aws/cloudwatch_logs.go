@@ -28,13 +28,11 @@ type CloudwatchLogsConfig struct {
 	Triggers    []*CloudwatchLogsTriggerConfig `config:"triggers"`
 	Description string                         `config:"description"`
 	Name        string                         `config:"name" validate:"nonzero,required"`
-	Role        string                         `config:"role" validate:"nonzero,required"`
 }
 
 // CloudwatchLogsTriggerConfig is the configuration for the specific triggers for cloudwatch.
 type CloudwatchLogsTriggerConfig struct {
 	LogGroupName  string `config:"log_group_name" validate:"nonzero,required"`
-	FilterName    string `config:"filter_name" validate:"nonzero,required"`
 	FilterPattern string `config:"filter_pattern"`
 }
 

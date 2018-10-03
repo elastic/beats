@@ -108,7 +108,6 @@ func (c *CLIManager) findFunction(name string) (templater, error) {
 
 func (c *CLIManager) template(name string) *cloudformation.Template {
 	// Create the generate cloudformation template for the lambda itself.
-
 	template := cloudformation.NewTemplate()
 	template.Resources["IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
 		AssumeRolePolicyDocument: map[string]interface{}{
