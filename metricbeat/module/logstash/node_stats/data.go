@@ -18,6 +18,8 @@
 package node_stats
 
 import (
+	"encoding/json"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -33,6 +35,11 @@ var (
 	}
 )
 
-func eventMapping(node map[string]interface{}) (common.MapStr, error) {
-	return schema.Apply(node)
+func eventMapping(content []byte) (common.MapStr, error) {
+	var data map[string]interface{}
+	err := json.Unmarshal(content, &data)
+	if err != nil {
+		return nil, err
+	}
+	return schema.Apply(data)
 }
