@@ -7,6 +7,7 @@ package aws
 import (
 	"context"
 	"errors"
+	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -116,10 +117,12 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 		HandleName:  handlerName,
 	}
 
+	prefix := func(suffix string) string {
+		return "btl" + c.config.Name + suffix
+	}
+
 	bucket := "mybucket-for-beatless"
 	fnCodeKey := "beatless-deployment/beatless/ph/beatless.zip"
-
-	stackName := "stack-" + c.config.Name
 
 	template := cloudformation.NewTemplate()
 	template.Resources["IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
@@ -138,7 +141,7 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 		RoleName: "beatless-lambda",
 	}
 
-	template.Resources["btl"+c.config.Name] = &AWSLambdaFunction{
+	template.Resources[prefix("")] = &AWSLambdaFunction{
 		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
 			Code: &cloudformation.AWSLambdaFunction_Code{
 				S3Bucket: bucket,
@@ -157,6 +160,37 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 			Handler:      handlerName,
 		},
 		DependsOn: []string{"IAMRoleLambdaExecution"},
+	}
+
+	for idx, trigger := range c.config.Triggers {
+		template.Resources[prefix("Permission"+strconv.Itoa(idx))] = &cloudformation.AWSLambdaPermission{
+			Action:       "lambda:InvokeAction",
+			FunctionName: cloudformation.GetAtt(prefix(""), "Arn"),
+			Principal: cloudformation.Join("", []string{
+				"logs.",
+				cloudformation.Ref("AWS::Region"), // Use the configuration region.
+				":",
+				cloudformation.Ref("AWS::URLSuffix"), // awsamazon.com or .com.ch
+			}),
+			SourceArn: cloudformation.Join(
+				"",
+				[]string{
+					"arn:",
+					cloudformation.Ref("AWS::Partition"),
+					":logs:",
+					cloudformation.Ref("AWS::AccountId"),
+					":log-group:",
+					trigger.LogGroupName,
+					":*",
+				},
+			),
+		}
+
+		template.Resources[prefix("SubscriptionFilter"+strconv.Itoa(idx))] = &cloudformation.AWSLogsSubscriptionFilter{
+			DestinationArn: cloudformation.GetAtt(prefix(""), "Arn"),
+			FilterPattern:  trigger.FilterPattern,
+			LogGroupName:   trigger.LogGroupName,
+		}
 	}
 
 	j, err := template.JSON()
@@ -180,12 +214,7 @@ func (c *CloudwatchLogs) Deploy(content []byte, awsCfg aws.Config) error {
 		c.log,
 		awsCfg,
 		"https://s3.amazonaws.com/mybucket-for-beatless/beatless-deployment/beatless/ph/cloudformation-template-create.json",
-		stackName,
-	))
-	executer.Add(newOpWaitCloudFormation(
-		c.log,
-		awsCfg,
-		stackName,
+		"stack-"+c.config.Name,
 	))
 
 	if err := executer.Execute(); err != nil {
