@@ -1,0 +1,1117 @@
+- key: ecs
+  title: ECS
+  description: >
+    ECS fields.
+  fields:
+    
+    - name: agent
+      title: Agent
+      group: 2
+      description: >
+        The agent fields contain the data about the agent/client/shipper that
+        created the event.
+      footnote: >
+        Examples: In the case of Beats for logs, the agent.name is filebeat. For APM, it is the
+        agent running in the app/service. The agent information does not change if
+        data is sent through queuing systems like Kafka, Redis, or processing systems
+        such as Logstash or APM Server.
+      type: group
+      fields:
+        - name: version
+          type: keyword
+          description: >
+            Version of the agent.
+    
+          example: 6.0.0-rc2
+        - name: name
+          type: keyword
+          description: >
+            Name of the agent.
+    
+          example: filebeat
+        - name: id
+          type: keyword
+          description: >
+            Unique identifier of this agent (if one exists).
+    
+            Example: For Beats this would be beat.id.
+          example: 8a4f500d
+        - name: ephemeral_id
+          type: keyword
+          description: >
+            Ephemeral identifier of this agent (if one exists).
+    
+            This id normally changes across restarts, but `agent.id` does not.
+          example: 8a4f500f
+    
+    - name: base
+      title: Base
+      group: 1
+      description: >
+        The base set contains all fields which are on the top level. These fields are common across all types of events.
+      type: group
+      fields:
+        - name: "@timestamp"
+          type: date
+          required: true
+          phase: 3
+          example: "2016-05-23T08:05:34.853Z"
+          description: >
+            Date/time when the event originated.
+    
+            For log events this is the date/time when the event was generated, and
+            not when it was read.
+    
+            Required field for all events.
+    
+        - name: tags
+          type: keyword
+          example: "[\"production\", \"env2\"]"
+          description: >
+            List of keywords used to tag each event.
+    
+        - name: labels
+          type: object
+          example: {key1: value1, key2: value2}
+          description: >
+            Key/value pairs.
+    
+            Can be used to add meta information to events. Should not contain nested
+            objects. All values are stored as keyword.
+    
+            Example: `docker` and `k8s` labels.
+    
+        - name: message
+          type: text
+          phase: 1
+          example: "Hello World"
+          description: >
+            For log events the message field contains the log message.
+    
+            In other use cases the message field can be used to concatenate
+            different values which are then freely searchable. If multiple
+            messages exist, they can be combined into one message.
+    
+    - name: cloud
+      title: Cloud
+      group: 2
+      description: >
+        Fields related to the cloud or infrastructure the events
+        are coming from.
+      footnote: >
+        Examples: If Metricbeat is running on an EC2 host and fetches data from its
+        host, the cloud info contains the data about this machine. If Metricbeat
+        runs on a remote machine outside the cloud and fetches data from a service
+        running in the cloud, the field contains cloud data from the machine the
+        service is running on.
+      type: group
+      fields:
+        - name: provider
+          example: ec2
+          type: keyword
+          description: >
+            Name of the cloud provider. Example values are ec2, gce, or
+            digitalocean.
+    
+        - name: availability_zone
+          example: us-east-1c
+          type: keyword
+          description: >
+            Availability zone in which this host is running.
+    
+        - name: region
+          type: keyword
+          example: us-east-1
+          description: >
+            Region in which this host is running.
+    
+        - name: instance.id
+          type: keyword
+          example: i-1234567890abcdef0
+          description: >
+            Instance ID of the host machine.
+    
+        - name: instance.name
+          type: keyword
+          description: >
+            Instance name of the host machine.
+    
+        - name: machine.type
+          type: keyword
+          example: t2.medium
+          description: >
+            Machine type of the host machine.
+    
+        - name: account.id
+          type: keyword
+          example: 666777888999
+          description: >
+            The cloud account or organization id used to identify different
+            entities in a multi-tenant environment.
+    
+            Examples: AWS account id, Google Cloud ORG Id, or other unique
+            identifier.
+    
+    - name: container
+      title: Container
+      group: 2
+      description: >
+        Container fields are used for meta information about the specific container
+        that is the source of information. These fields help correlate data based
+        containers from any runtime.
+      type: group
+      fields:
+        - name: runtime
+          type: keyword
+          description: >
+            Runtime managing this container.
+          example: docker
+        - name: id
+          type: keyword
+          description: >
+            Unique container id.
+        - name: image.name
+          type: keyword
+          description: >
+            Name of the image the container was built on.
+        - name: image.tag
+          type: keyword
+          description: >
+            Container image tag.
+        - name: name
+          type: keyword
+          description: >
+            Container name.
+        - name: labels
+          type: object
+          object_type: keyword
+          description: >
+            Image labels.
+    
+    - name: destination
+      title: Destination
+      group: 2
+      description: >
+        Destination fields describe details about the destination of a
+        packet/event.
+      type: group
+      fields:
+        - name: ip
+          type: ip
+          description: >
+            IP address of the destination.
+    
+            Can be one or multiple IPv4 or IPv6 addresses.
+        - name: hostname
+          type: keyword
+          description: >
+            Hostname of the destination.
+        - name: port
+          type: long
+          description: >
+            Port of the destination.
+        - name: mac
+          type: keyword
+          description: >
+            MAC address of the destination.
+        - name: domain
+          type: keyword
+          phase: 1
+          description: >
+            Destination domain.
+        - name: subdomain
+          type: keyword
+          phase: 1
+          description: >
+            Destination subdomain.
+    
+    - name: device
+      title: Device
+      group: 2
+      description: >
+        Device fields are used to provide additional information about the device
+        that is the source of the information. This could be a firewall, network device, etc.
+      type: group
+      fields:
+        - name: mac
+          type: keyword
+          description: >
+            MAC address of the device
+        - name: ip
+          type: ip
+          description: >
+            IP address of the device.
+        - name: hostname
+          type: keyword
+          description: >
+            Hostname of the device.
+        - name: vendor
+          type: text
+          description: >
+            Device vendor information.
+        - name: version
+          type: keyword
+          description: >
+            Device version.
+        - name: serial_number
+          type: keyword
+          description: >
+            Device serial number.
+        - name: timezone.offset.sec
+          type: long
+          description: >
+            Timezone offset of the host in seconds.
+    
+            Number of seconds relative to UTC. If the offset is -01:30 the
+            value will be -5400.
+          example: -5400
+        - name: type
+          type: keyword
+          description: >
+            The type of the device the data is coming from.
+    
+            There is no predefined list of device types. Some examples are
+            `endpoint`, `firewall`, `ids`, `ips`, `proxy`.
+          example: firewall
+    
+    - name: error
+      title: Error
+      group: 2
+      description: >
+        These fields can represent errors of any kind. Use them for errors that
+        happen while fetching events or in cases where the event itself contains an error.
+    
+      type: group
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            Unique identifier for the error.
+    
+        - name: message
+          type: text
+          description: >
+            Error message.
+    
+        - name: code
+          type: keyword
+          description: >
+            Error code describing the error.
+    
+    - name: event
+      title: Event
+      group: 2
+      description: >
+        The event fields are used for context information about the data itself.
+      type: group
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            Unique ID to describe the event.
+          example: 8a4f500d
+          phase: 1
+        - name: category
+          type: keyword
+          description: >
+            Event category.
+    
+            This can be a user defined category.
+          example: metrics
+    
+        - name: type
+          type: keyword
+          description: >
+            A type given to this kind of event which can be used for grouping.
+    
+            This is normally defined by the user.
+          example: nginx-stats-metrics
+    
+        - name: action
+          type: keyword
+          description: >
+            The action captured by the event. The type of action will vary from
+            system to system but is likely to include actions by security services,
+            such as blocking or quarantining; as well as more generic actions such
+            as login events, file i/o or proxy forwarding events.
+    
+            The value is normally defined by the user.
+          example: reject
+    
+        - name: module
+          type: keyword
+          description: >
+            Name of the module this data is coming from.
+    
+            This information is coming from the modules used in Beats or Logstash.
+          example: mysql
+    
+        - name: dataset
+          type: keyword
+          description: >
+            Name of the dataset.
+    
+            The concept of a `dataset` (fileset / metricset) is used in Beats as a
+            subset of modules. It contains the information which is currently
+            stored in metricset.name and metricset.module or fileset.name.
+          example: stats
+    
+        - name: severity
+          type: long
+          phase: 1
+          example: "7"
+          description: >
+            Severity describes the severity of the event. What the different
+            severity values mean can very different between use cases. It's up to
+            the implementer to make sure severities are consistent across events.
+    
+        - name: original
+          type: keyword
+          phase: 1
+          # Unfortunately this example is not shown correctly yet as | do not work
+          # in tables well
+          # Is &#124; is the representation of | it works except for cases where
+          # used ticks.
+          example: "Sep 19 08:26:10 host CEF:0&#124;Security&#124;
+              threatmanager&#124;1.0&#124;100&#124;
+              worm successfully stopped&#124;10&#124;src=10.0.0.1
+              dst=2.1.2.2spt=1232"
+          description: >
+              Raw text message of entire event. Used to demonstrate log integrity.
+    
+              This field is not indexed and doc_values are disabled. It cannot be
+              searched, but it can be retrieved from `_source`.
+          index: false
+          doc_values: false
+    
+        - name: hash
+          type: keyword
+          phase: 1
+          example: "123456789012345678901234567890ABCD"
+          description: >
+              Hash (perhaps logstash fingerprint) of raw field to be able to
+              demonstrate log integrity.
+    
+        - name: version
+          type: keyword
+          required: true
+          description: >
+            The version field contains the version an event for ECS adheres to.
+    
+            This field should be provided as part of each event to make it possible
+            to detect to which ECS version an event belongs.
+    
+            event.version is a required field and must exist in all events. It
+            describes which ECS version the event adheres to.
+    
+            The current version is 0.1.0.
+          example: 0.1.0
+    
+        - name: duration
+          type: long
+          description: >
+            Duration of the event in nanoseconds.
+    
+        - name: created
+          type: date
+          description: >
+            event.created contains the date when the event was created.
+    
+            This timestamp is distinct from @timestamp in that @timestamp contains
+            the processed timestamp. For logs these two timestamps can be different
+            as the timestamp in the log line and when the event is read for example
+            by Filebeat are not identical. `@timestamp` must contain the timestamp
+            extracted from the log line, event.created when the log line is read.
+            The same could apply to package capturing where @timestamp contains the
+            timestamp extracted from the network package and event.created when the
+            event was created.
+    
+            In case the two timestamps are identical, @timestamp should be used.
+    
+        - name: risk_score
+          type: float
+          description: >
+            Risk score or priority of the event (e.g. security solutions).
+            Use your system's original value here.
+    
+        - name: risk_score_norm
+          type: float
+          description: >
+            Normalized risk score or priority of the event, on a scale of 0 to 100.
+    
+            This is mainly useful if you use more than one system that assigns
+            risk scores, and you want to see a normalized value across all systems.
+    
+    - name: file
+      group: 2
+      title: File
+      description: >
+        File fields provide details about each file.
+      type: group
+      fields:
+      - name: path
+        type: text
+        description: Path to the file.
+        multi_fields:
+        - name: raw
+          type: keyword
+          description: >
+            Path to the file. This is a non-analyzed field that is useful
+            for aggregations.
+    
+      - name: target_path
+        type: text
+        description: Target path for symlinks.
+        multi_fields:
+          - name: raw
+            type: keyword
+            description: >
+              Path to the file. This is a non-analyzed field that is useful
+              for aggregations.
+    
+      - name: extension
+        type: keyword
+        description: >
+          File extension.
+    
+          This should allow easy filtering by file extensions.
+        example: png
+    
+      - name: type
+        type: keyword
+        description: File type (file, dir, or symlink).
+    
+      - name: device
+        type: keyword
+        description: Device that is the source of the file.
+    
+      - name: inode
+        type: keyword
+        description: Inode representing the file in the filesystem.
+    
+      - name: uid
+        type: keyword
+        description: >
+          The user ID (UID) or security identifier (SID) of the file owner.
+    
+      - name: owner
+        type: keyword
+        description: File owner's username.
+    
+      - name: gid
+        type: keyword
+        description: Primary group ID (GID) of the file.
+    
+      - name: group
+        type: keyword
+        description: Primary group name of the file.
+    
+      - name: mode
+        type: keyword
+        example: 0640
+        description: Mode of the file in octal representation.
+    
+      - name: size
+        type: long
+        description: File size in bytes (field is only added when `type` is
+            `file`).
+    
+      - name: mtime
+        type: date
+        description: Last time file content was modified.
+    
+      - name: ctime
+        type: date
+        description: Last time file metadata changed.
+    
+    - name: geo
+      title: Geo
+      group: 2
+      description: >
+        Geo fields can carry data about a specific location related to an event
+        or geo information for an IP field.
+      type: group
+      fields:
+        - name: continent_name
+          type: keyword
+          description: >
+            Name of the continent.
+        - name: country_iso_code
+          type: keyword
+          description: >
+            Country ISO code.
+        - name: location
+          type: geo_point
+          description: >
+            Longitude and latitude.
+        - name: region_name
+          type: keyword
+          description: >
+            Region name.
+        - name: city_name
+          type: keyword
+          description: >
+            City name.
+    
+    - name: host
+      title: Host
+      group: 2
+      description: >
+        Host fields provide information related to a host. A host can be a
+        physical machine, a virtual machine, or a Docker container.
+    
+        Normally the host information is related to the machine on which the event
+        was generated/collected, but they can be used differently if needed.
+      type: group
+      fields:
+        - name: timezone.offset.sec
+          type: long
+          description: >
+            Timezone offset of the host in seconds.
+    
+            Number of seconds relative to UTC. If the offset is -01:30 the
+            value will be -5400.
+          phase: 1
+          example: -5400
+    
+        - name: name
+          type: keyword
+          description: >
+            host.name is the hostname of the host.
+    
+            It can contain what `hostname` returns on Unix systems, the fully
+            qualified domain name, or a name specified by the user. The sender
+            decides which value to use.
+          phase: 1
+    
+        - name: id
+          type: keyword
+          phase: 1
+          description: >
+            Unique host id.
+    
+            As hostname is not always unique, use values that are meaningful
+            in your environment.
+    
+            Example: The current usage of `beat.name`.
+        - name: ip
+          type: ip
+          description: >
+            Host ip address.
+    
+        - name: mac
+          type: keyword
+          description: >
+            Host mac address.
+    
+        - name: type
+          type: keyword
+          description: >
+            Type of host.
+    
+            For Cloud providers this can be the machine type like `t2.medium`.
+            If vm, this could be the container, for example, or other information
+            meaningful in your environment.
+          phase: 1
+    
+        # Operating System information
+        - name: os.platform
+          type: keyword
+          description: >
+            Operating system platform (centos, ubuntu, windows, etc.)
+          example: darwin
+    
+        - name: os.name
+          type: keyword
+          example: "Mac OS X"
+          description: >
+            Operating system name.
+    
+        - name: os.family
+          type: keyword
+          example: "debian"
+          description: >
+            OS family (redhat, debian, freebsd, windows, etc.)
+    
+        - name: os.version
+          type: keyword
+          example: "10.12.6"
+          description: >
+            Operating system version.
+    
+        - name: architecture
+          type: keyword
+          example: "x86_64"
+          description: >
+            Operating system architecture.
+    
+    - name: http
+      title: HTTP
+      group: 2
+      description: >
+        Fields related to HTTP requests and responses.
+      type: group
+      fields:
+        - name: request.method
+          type: keyword
+          description: >
+            Http request method.
+          example: GET, POST, PUT
+        - name: response.status_code
+          type: long
+          description: >
+            Http response status code.
+          example: 404
+        - name: response.body
+          type: text
+          description: >
+            The full http response body.
+          example: Hello world
+        - name: version
+          type: keyword
+          description: >
+            Http version.
+          example: 1.1
+    
+    - name: log
+      title: Log
+      description: >
+        Fields which are specific to log events.
+      type: group
+      fields:
+        - name: level
+          type: keyword
+          description: >
+            Log level of the log event.
+    
+            Some examples are `WARN`, `ERR`, `INFO`.
+          example: ERR
+        - name: original
+          type: keyword
+          phase: 1
+          example: "Sep 19 08:26:10 localhost My log"
+          index: false
+          doc_values: false
+          description: >
+    
+            This is the original log message and contains the full log message
+            before splitting it up in multiple parts.
+    
+            In contrast to the `message` field which can contain an extracted part
+            of the log message, this field contains the original, full log message.
+            It can have already some modifications applied like encoding or new
+            lines removed to clean up the log message.
+    
+            This field is not indexed and doc_values are disabled so it can't be
+            queried but the value can be retrieved from `_source`.
+    
+    - name: network
+      title: Network
+      group: 2
+      description: >
+        Fields related to network data.
+      type: group
+      fields:
+        - name: name
+          type: text
+          description: >
+            Name given by operators to sections of their network.
+          example: Guest Wifi
+          multi_fields:
+            - name: raw
+              type: keyword
+              description: >
+                Name given by operators to sections of their network.
+    
+        - name: protocol
+          type: keyword
+          description: >
+            Network protocol name.
+          example: http
+        - name: direction
+          type: keyword
+          description: >
+            Direction of the network traffic.
+    
+            Recommended values are:
+              * inbound
+              * outbound
+              * unknown
+          example: inbound
+    
+        - name: forwarded_ip
+          type: ip
+          description: >
+            Host IP address when the source IP address is the proxy.
+          example: 192.1.1.2
+    
+        # Metrics
+        - name: inbound.bytes
+          type: long
+          description: >
+            Network inbound bytes.
+          example: 184
+        - name: inbound.packets
+          type: long
+          description: >
+            Network inbound packets.
+          example: 12
+        - name: outbound.bytes
+          type: long
+          description: >
+            Network outbound bytes.
+          example: 184
+        - name: outbound.packets
+          type: long
+          description: >
+            Network outbound packets.
+          example: 12
+        - name: total.bytes
+          type: long
+          description: >
+            Network total bytes. The sum of inbound.bytes + outbound.bytes.
+          example: 368
+        - name: total.packets
+          type: long
+          description: >
+            Network outbound packets. The sum of inbound.packets + outbound.packets
+          example: 24
+    
+    - name: organization
+      title: Organization
+      group: 2
+      description: >
+        The organization fields enrich data with information about the company or entity
+        the data is associated with. These fields help you arrange or filter data stored in an index by one or multiple
+        organizations.
+      type: group
+      fields:
+        - name: name
+          type: text
+          description: >
+            Organization name.
+    
+        - name: id
+          type: keyword
+          description: >
+            Unique identifier for the organization.
+    - name: os
+      title: Operating System
+      group: 2
+      description: >
+        The OS fields contain information about the operating system.
+        These fields are often used inside other prefixes, such as `host.os.*` or `user_agent.os.*`.
+      type: group
+      fields:
+        - name: platform
+          type: keyword
+          description: >
+            Operating system platform (such centos, ubuntu, windows).
+          example: darwin
+        - name: name
+          type: keyword
+          example: "Mac OS X"
+          description: >
+            Operating system name.
+        - name: family
+          type: keyword
+          example: "debian"
+          description: >
+            OS family (such as redhat, debian, freebsd, windows).
+        - name: version
+          type: keyword
+          example: "10.12.6-rc2"
+          description: >
+            Operating system version as a raw string.
+        - name: kernel
+          type: keyword
+          example: "4.4.0-112-generic"
+          description: >
+            Operating system kernel version as a raw string.
+    
+    - name: process
+      title: Process
+      group: 2
+      description: >
+        These fields contain information about a process.
+        These fields can help you correlate metrics information with a process id/name
+        from a log message.  The `process.pid` often stays in the metric itself and is
+        copied to the global field for correlation.
+    
+      type: group
+      fields:
+        - name: args
+          type: keyword
+          description: >
+            Process arguments.
+    
+            May be filtered to protect sensitive information.
+          example: ["-l", "user", "10.0.0.16"]
+        - name: name
+          type: keyword
+          description: >
+            Process name.
+    
+            Sometimes called program name or similar.
+          example: ssh
+        - name: pid
+          type: long
+          description: >
+            Process id.
+          exmple: ssh
+        - name: ppid
+          type: long
+          description: >
+            Process parent id.
+    
+        - name: title
+          type: keyword
+          description: >
+            Process title.
+    
+            The proctitle, often the same as process name.
+    
+    - name: service
+      title: Service
+      group: 2
+      description: >
+        The service fields describe the service for or from which the data was
+        collected. These fields help you find and correlate logs for a specific
+        service and version.
+    
+      type: group
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            Unique identifier of the running service.
+    
+            This id should uniquely identify this service. This makes it possible
+            to correlate logs and metrics for one specific service.
+    
+            Example: If you are experiencing issues with one redis instance, you
+            can filter on that id to see metrics and logs for that single instance.
+    
+          example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+          phase: 1
+    
+        - name: name
+          type: keyword
+          phase: 1
+          example: "elasticsearch"
+          description: >
+            Name of the service data is collected from.
+    
+            The name can be used to group and correlate logs and metrics from one
+            service.
+    
+            Example: If logs or metrics are collected from Redis, `service.name` would be
+            `redis`.
+    
+        - name: type
+          type: keyword
+          phase: 1
+          description: >
+            Service type.
+    
+        - name: state
+          type: keyword
+          phase: 1
+          description: >
+            Current state of the service.
+        - name: version
+          type: keyword
+          phase: 1
+          example: "3.2.4"
+          description: >
+            Version of the service the data was collected from.
+    
+            This allows to look at a data set only for a specific version of a
+            service.
+        - name: ephemeral_id
+          type: keyword
+          description: >
+            Ephemeral identifier of this service (if one exists).
+    
+            This id normally changes across restarts, but `service.id` does not.
+          example: 8a4f500f
+    
+    - name: url
+      title: URL
+      description: >
+        URL fields provide a complete URL, with scheme, host, and path. The URL
+        object can be reused in other prefixes, such as `host.url.*` for
+        example. Keep the structure consistent whenever you use URL fields.
+    
+      type: group
+      fields:
+        - name: href
+          type: text
+          description: >
+            Full url. The field is stored as keyword.
+    
+            `url.href` is a [multi field](https://www.elastic.co/guide/en/
+            elasticsearch/reference/6.2/
+            multi-fields.html#_multi_fields_with_multiple_analyzers). The data is
+            stored as keyword `url.href` and test
+            `url.href.analyzed`. These fields enable you to run a query against part
+            of the url still works splitting up the URL at ingest time.
+    
+            `href` is an analyzed field so the parsed information can be accessed
+            through `href.analyzed` in queries.
+    
+          multi_fields:
+            - name: raw
+              type: keyword
+              description: >
+                The full URL. This is a non-analyzed field that is useful
+                for aggregations.
+          example: https://elastic.co:443/search?q=elasticsearch#top
+        - name: scheme
+          type: keyword
+          description: >
+            Scheme of the request, such as "https".
+    
+            Note: The `:` is not part of the scheme.
+          example: https
+        - name: host.name
+          type: keyword
+          description: >
+            Hostname of the request, such as "example.com".
+    
+            For correlation the this field can be copied into the `host.name`
+            field.
+          example: elastic.co
+        - name: port
+          type: integer
+          description: >
+            Port of the request, such as 443.
+          example: 443
+        - name: path
+          type: text
+          description: >
+            Path of the request, such as "/search".
+          multi_fields:
+            - name: raw
+              type: keyword
+              description: >
+                URL path. A non-analyzed field that is useful
+                for aggregations.
+        - name: query
+          type: text
+          description: >
+            The query field describes the query string of the request,
+            such as "q=elasticsearch".
+    
+            The `?` is excluded from the query string. If a URL contains
+            no `?`, there is no query field. If there is a `?` but no query,
+            the query field exists with an empty string. The `exists`
+            query can be used to differentiate between the two cases.
+          multi_fields:
+            - name: raw
+              type: keyword
+              description: >
+                URL query part. A non-analyzed field that is useful
+                for aggregations.
+        - name: fragment
+          type: keyword
+          description: >
+            Portion of the url after the `#`, such as "top".
+    
+            The `#` is not part of the fragment.
+        - name: username
+          type: keyword
+          description: >
+            Username of the request.
+        - name: password
+          type: keyword
+          description: >
+            Password of the request.
+    
+    - name: user
+      title: User
+      group: 2
+      description: >
+        The user fields describe information about the user that is relevant
+        to  the event. Fields can have one entry or multiple entries. If a
+        user has more than one id, provide an array that includes all of
+        them.
+      type: group
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            One or multiple unique identifiers of the user.
+        - name: name
+          type: keyword
+          description: >
+            Name of the user.
+    
+            The field is a keyword, and will not be tokenized.
+        - name: email
+          type: keyword
+          phase: 1
+          description: >
+            User email address.
+        - name: hash
+          type: keyword
+          phase: 1
+          description: >
+            Unique user hash to correlate information for a user in anonymized form.
+    
+            Useful if `user.id` or `user.name` contain confidential information and
+            cannot be used.
+    
+    - name: user_agent
+      title: User agent
+      group: 2
+      description: >
+        The user_agent fields normally come from a browser request. They often
+        show up in web service logs coming from the parsed user agent string.
+      type: group
+      fields:
+        - name: original
+          type: text
+          description: >
+            Unparsed version of the user_agent.
+        - name: device
+          type: keyword
+          description: >
+            Name of the physical device.
+        - name: version
+          type: keyword
+          description: >
+            Version of the physical device.
+        - name: major
+          type: long
+          description: >
+            Major version of the user agent.
+        - name: minor
+          type: long
+          description: >
+            Minor version of the user agent.
+        - name: patch
+          type: keyword
+          description: >
+            Patch version of the user agent.
+        - name: name
+          type: keyword
+          example: Chrome
+          description: >
+            Name of the user agent.
+        - name: os.name
+          type: keyword
+          description: >
+            Name of the operating system.
+        - name: os.version
+          type: keyword
+          description: >
+            Version of the operating system.
+        - name: os.major
+          type: long
+          description: >
+            Major version of the operating system.
+        - name: os.minor
+          type: long
+          description: >
+            Minor version of the operating system.

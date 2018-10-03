@@ -451,7 +451,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-sysinfo
-Revision: b30cfd89b3c329a5b84f237573c8422730d2e170
+Revision: 7b021494a9562d0c3f0422d49b9980709c5650e9
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-sysinfo/LICENSE.txt:
 --------------------------------------------------------------------
@@ -486,7 +486,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-windows
-Revision: a4ab469ab3d6f167cba8cb515c3273c6b56f9fc3
+Revision: bb1581babc04d5cb29a2bfa7a9ac6781c730c8dd
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-windows/LICENSE.txt:
 --------------------------------------------------------------------
@@ -2175,8 +2175,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
-Version: v1.17.0/enh/offset-replica-id
-Revision: d1575e4abe04acbbe8ac766320585cdf271dd189
+Version: =v1.18.0/enh/offset-replica-id
+Revision: 0143592836b090a1b481def4d902cfb3c5c05ae5
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------
@@ -2974,40 +2974,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: gopkg.in/yaml.v2
 Revision: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
-License type (autodetected): MIT
-./vendor/gopkg.in/yaml.v2/LICENSE.libyaml:
+License type (autodetected): Apache-2.0
+./vendor/gopkg.in/yaml.v2/LICENSE:
 --------------------------------------------------------------------
-The following files were ported to Go from C files of libyaml, and thus
-are still covered by their original copyright and license:
+Apache License 2.0
 
-    apic.go
-    emitterc.go
-    parserc.go
-    readerc.go
-    scannerc.go
-    writerc.go
-    yamlh.go
-    yamlprivateh.go
-
-Copyright (c) 2006 Kirill Simonov
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/yaml.v2
