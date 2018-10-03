@@ -179,10 +179,12 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		return err
 	}
 
-	j, err := template.JSON()
+	json, err := template.JSON()
 	if err != nil {
 		return err
 	}
+
+	c.log.Debugf("cloudformation template: \n%s", json)
 
 	context := &executorContext{}
 	executer := newExecutor(c.log, context)
@@ -193,7 +195,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		c.awsCfg,
 		bucket,
 		"beatless-deployment/"+name+"/cloudformation-template-create.json",
-		j,
+		json,
 	))
 	if update {
 		executer.Add(newOpUpdateCloudFormation(
