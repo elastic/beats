@@ -29,6 +29,7 @@ func init() {
 	functionCmd.AddCommand(genDeployCmd())
 	functionCmd.AddCommand(genUpdateCmd())
 	functionCmd.AddCommand(genRemoveCmd())
+	functionCmd.AddCommand(genPackageCmd())
 
 	RootCmd.AddCommand(functionCmd)
 }

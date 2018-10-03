@@ -93,3 +93,18 @@ func genRemoveCmd() *cobra.Command {
 	}
 	return cmd
 }
+
+func genPackageCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "package",
+		Short: "Package the configuration and the executable in a zip",
+		Run: cli.RunWith(func(cmd *cobra.Command, args []string) error {
+			h, err := handler()
+			if err != nil {
+				return err
+			}
+			return h.BuildPackage("")
+		}),
+	}
+	return cmd
+}

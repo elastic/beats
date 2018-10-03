@@ -8,9 +8,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/x-pack/beatless/core"
 	"github.com/elastic/beats/x-pack/beatless/provider"
 )
 
@@ -27,7 +29,7 @@ var (
 // NOTES: Each execution call of the CLIManager are independant, this mean that a fail call will not
 // stop other calls to succeed.
 //
-// TODO(ph) functions could be merged into a single invokation, but I thought it was premature to do
+// TODO(ph) functions could be merged into a single call , but I thought it was premature to do
 // it.
 type cliHandler struct {
 	cli       provider.CLIManager
@@ -109,5 +111,23 @@ func (c *cliHandler) Remove(names []string) error {
 	if errCount > 0 {
 		return fmt.Errorf("fail to remove %d function(s)", errCount)
 	}
+	return nil
+}
+
+// TODO(ph) check current path and option flag for cobra
+func (c *cliHandler) BuildPackage(output string) error {
+	content, err := core.MakeZip()
+	if err != nil {
+		return err
+	}
+
+	output = "/tmp/package.zip"
+
+	err = ioutil.WriteFile(output, content, 0644)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(c.output, "Generated pacakge at: %s", output)
 	return nil
 }
