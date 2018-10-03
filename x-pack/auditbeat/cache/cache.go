@@ -30,27 +30,28 @@ func (cache *Cache) IsEmpty() bool {
 // cache contents, and returns both items new to the cache and items that are in the cache
 // but missing in the new data.
 func (cache *Cache) DiffAndUpdateCache(current []Cacheable) (new, missing []interface{}) {
+	// Create hashmap of incoming Cacheables to avoid calling Hash() on each one many times
+	currentMap := make(map[uint64]Cacheable, len(current))
+
+	for _, currentValue := range current {
+		currentMap[currentValue.Hash()] = currentValue
+	}
+
 	// Check for and delete missing - what is no longer in current that was in the cache
-	for cacheKey, cacheValue := range cache.hashMap {
-		found := false
-		for _, currentValue := range current {
-			if currentValue.Hash() == cacheKey {
-				found = true
-				break
-			}
-		}
+	for cacheHash, cacheValue := range cache.hashMap {
+		_, found := currentMap[cacheHash]
 
 		if !found {
 			missing = append(missing, cacheValue)
-			delete(cache.hashMap, cacheKey)
+			delete(cache.hashMap, cacheHash)
 		}
 	}
 
 	// Check for new - what is in current but not in cache
-	for _, currentValue := range current {
-		if _, contains := cache.hashMap[currentValue.Hash()]; !contains {
+	for currentHash, currentValue := range currentMap {
+		if _, contains := cache.hashMap[currentHash]; !contains {
 			new = append(new, currentValue)
-			cache.hashMap[currentValue.Hash()] = currentValue
+			cache.hashMap[currentHash] = currentValue
 		}
 	}
 
