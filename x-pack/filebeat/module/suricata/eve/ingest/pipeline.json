@@ -6,6 +6,23 @@
       }
     }
 
+  , { "script":
+      { "lang": "painless"
+      , "source": "void createAndSet(def ctx, List components, def value) { int n = components.getLength(); try { def map = ctx; for (int i = 0; i < n - 1; i++) { map = map.computeIfAbsent(components.get(i), x -> new HashMap()); } map[components.get(n-1)] = value; } catch (Exception e) { } } def getValue(def ctx, List components) { int n = components.getLength(); try { def map = ctx; for (int i = 0; i < n - 1; i++) { map = map.get(components.get(i)); if (map == null) return null; } return map[components.get(n-1)]; }catch(Exception e) { return null; } } List split(String path) { List res = new ArrayList(); int pos = 0; int next = -1; while ( (next=path.indexOf('.',pos))>=0) { if (pos < next - 1) { res.add(path.substring(pos, next)); } pos = next + 1; } if (pos < path.length()) { res.add(path.substring(pos)); } return res; } void copyIfPresent(def ctx, String source, String dest) { def val = getValue(ctx, split(source)); if (val != null) { createAndSet(ctx, split(dest), val); } } int n = params.list.getLength(); for (int i=0; i<n; i+=2) { copyIfPresent(ctx, params.list.get(i), params.list.get(i+1)); }"
+      , "params": {
+      "list": [
+          "suricata.eve.src_ip", "source_ecs.ip",
+          "suricata.eve.dest_ip", "destination.ip",
+          "suricata.eve.http.http_method", "http.request.method",
+          "suricata.eve.http.status", "http.response.status_code",
+          "suricata.eve.http.hostname", "url.host.name",
+          "suricata.eve.fileinfo.filename", "file.path",
+          "suricata.eve.fileinfo.size", "file.size",
+          "suricata.eve.http.http_user_agent", "user_agent.original"
+      ]}
+      }
+    }
+
   , { "date":
       { "field": "suricata.eve.timestamp"
       , "target_field": "@timestamp"
@@ -24,13 +41,6 @@
       }
     }
 
-  , { "convert":
-      { "field": "suricata.eve.http.http_user_agent"
-      , "target_field": "user_agent.original"
-      , "type": "keyword"
-      , "ignore_missing": true
-      }
-    }
   , { "user_agent":
       { "field": "user_agent.original"
       , "target_field": "user_agent"
@@ -73,20 +83,6 @@
       , "ignore_missing": true
       }
     }
-  , { "convert":
-      { "field": "suricata.eve.src_ip"
-      , "target_field": "source_ecs.ip"
-      , "type": "ip"
-      , "ignore_missing": true
-      }
-    }
-  , { "convert":
-      { "field": "suricata.eve.dest_ip"
-      , "target_field": "destination.ip"
-      , "type": "ip"
-      , "ignore_missing": true
-      }
-    }
 
   , { "geoip":
       { "field": "source_ecs.ip"
@@ -97,28 +93,6 @@
   , { "geoip":
       { "field": "destination.ip"
       , "target_field": "destination.geo"
-      , "ignore_missing": true
-      }
-    }
-
-  , { "convert":
-      { "field": "suricata.eve.http.http_method"
-      , "target_field": "http.request.method"
-      , "type": "keyword"
-      , "ignore_missing": true
-      }
-    }
-  , { "convert":
-      { "field": "suricata.eve.http.status"
-      , "target_field": "http.response.status_code"
-      , "type": "keyword"
-      , "ignore_missing": true
-      }
-    }
-  , { "convert":
-      { "field": "suricata.eve.http.hostname"
-      , "target_field": "url.host.name"
-      , "type": "keyword"
       , "ignore_missing": true
       }
     }
