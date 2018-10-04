@@ -20,8 +20,6 @@ package stats
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/metricbeat/module/kibana"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -29,6 +27,7 @@ import (
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/kibana"
 )
 
 var (

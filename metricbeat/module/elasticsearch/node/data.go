@@ -20,8 +20,6 @@ package node
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
-
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
@@ -29,6 +27,7 @@ import (
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 var (
