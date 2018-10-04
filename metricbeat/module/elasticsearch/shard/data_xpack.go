@@ -19,6 +19,7 @@ package shard
 
 import (
 	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -84,6 +85,11 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 					event.RootFields.Put("source_node", sourceNode)
 				}
 
+				event.ID, err = getEventID(stateData.StateID, fields)
+				if err != nil {
+					continue
+				}
+
 				event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 
 				r.Event(event)
@@ -103,4 +109,41 @@ func getSourceNode(nodeID string, stateData *stateStruct) (common.MapStr, error)
 		"uuid": nodeID,
 		"name": nodeInfo.Name,
 	}, nil
+}
+
+func getEventID(stateID string, shard common.MapStr) (string, error) {
+	var nodeID string
+	if shard["node"] == nil {
+		nodeID = "_na"
+	} else {
+		var ok bool
+		nodeID, ok = shard["node"].(string)
+		if !ok {
+			return "", elastic.MakeErrorForMissingField("node", elastic.Elasticsearch)
+		}
+	}
+
+	indexName, ok := shard["index"].(string)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField("index", elastic.Elasticsearch)
+	}
+
+	shardNumberInt, ok := shard["shard"].(int64)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField("shard", elastic.Elasticsearch)
+	}
+	shardNumberStr := strconv.FormatInt(shardNumberInt, 10)
+
+	isPrimary, ok := shard["primary"].(bool)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField("primary", elastic.Elasticsearch)
+	}
+	var shardType string
+	if isPrimary {
+		shardType = "p"
+	} else {
+		shardType = "r"
+	}
+
+	return stateID + ":" + nodeID + ":" + indexName + ":" + shardNumberStr + ":" + shardType, nil
 }
