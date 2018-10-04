@@ -157,7 +157,7 @@ func (c *outputController) Reload(cfg *reload.ConfigWithMeta) error {
 		return err
 	}
 
-	output, err := loadOutput(c.beat, c.monitors, outputCfg)
+	output, err := loadOutput(c.beat, c.monitors, outputCfg, false)
 	if err != nil {
 		return err
 	}

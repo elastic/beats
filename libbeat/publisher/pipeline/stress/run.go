@@ -63,7 +63,8 @@ func RunTests(
 		Logger:    logp.L(),
 	},
 		config.Pipeline,
-		config.Output)
+		config.Output,
+		true)
 	if err != nil {
 		return fmt.Errorf("loading pipeline failed: %+v", err)
 	}
