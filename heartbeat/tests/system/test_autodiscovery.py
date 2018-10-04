@@ -25,7 +25,7 @@ class TestAutodiscover(BaseTest):
                 'docker': {
                     'templates': '''
                       - condition:
-                          equals.docker.container.image: redis:3.2.4
+                          contains.docker.container.image: redis
                         config:
                           - type: tcp
                             hosts: ["${data.host}:${data.port}"]
@@ -41,8 +41,6 @@ class TestAutodiscover(BaseTest):
         self.wait_until(lambda: self.log_contains(re.compile('autodiscover.+Got a start event:', re.I)))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 1))
-
-        self.wait_until(lambda: self.log_contains(re.compile('autodiscover.+Got a stop event:', re.I)))
 
         output = self.read_output_json()
         proc.check_kill_and_wait()
