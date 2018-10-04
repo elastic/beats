@@ -12,28 +12,38 @@
 # are present in the environment to correctly create the function when using the CLI.
 #
 beatless.provider.aws.functions:
-# Accepts events from a cloudwatch log group.
+  # Define the list of function availables, each function required to have a unique name.
   - name: fn_cloudwatch_logs
     type: cloudwatch_logs
-    # The IAM role that the lambda will take when executing your function.
-    role: iam
-    # List of cloudwatch streams registered to this function.
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "listen to cloudwatch logs"
+    #
+    # Concurrency, is the reserved number of instance for that function.
+    # Default is unreserved.
+    #
+    # Note: There is a hard limit of 1000 of running function of any kind per account.
+    # concurrency: 5
+    #
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    # memory_size: 128MiB
+    #
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    # dead_letter_config.target_arn:
+    #
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # List of cloudwatch log group registered to that function.
     triggers:
       - log_group_name: /aws/lambda/beatless-cloudwatch_logs
-        filter_name: myfiltername
         filter_pattern: mylog_
+    #
+    # Define custom processors for this function.
     # processors:
     #   - dissect:
     #       tokenizer: "%{key1} %{key2}"
-
-# Accepts events from a SQS queue.
-# - name: fn_sqs
-#   type: sqs
-#
-# Accepts events form a Kinesis stream
-# - name: fn_kinesis
-#   type: kinesis
-#
-# Accepts events from an api gateway proxy call.
-# - name: fn_apigateway_proxy
-#   type: api_gateway_proxy

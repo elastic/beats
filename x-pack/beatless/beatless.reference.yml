@@ -12,31 +12,41 @@
 # are present in the environment to correctly create the function when using the CLI.
 #
 beatless.provider.aws.functions:
-# Accepts events from a cloudwatch log group.
+  # Define the list of function availables, each function required to have a unique name.
   - name: fn_cloudwatch_logs
     type: cloudwatch_logs
-    # The IAM role that the lambda will take when executing your function.
-    role: iam
-    # List of cloudwatch streams registered to this function.
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "listen to cloudwatch logs"
+    #
+    # Concurrency, is the reserved number of instance for that function.
+    # Default is unreserved.
+    #
+    # Note: There is a hard limit of 1000 of running function of any kind per account.
+    # concurrency: 5
+    #
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    # memory_size: 128MiB
+    #
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    # dead_letter_config.target_arn:
+    #
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # List of cloudwatch log group registered to that function.
     triggers:
       - log_group_name: /aws/lambda/beatless-cloudwatch_logs
-        filter_name: myfiltername
         filter_pattern: mylog_
+    #
+    # Define custom processors for this function.
     # processors:
     #   - dissect:
     #       tokenizer: "%{key1} %{key2}"
-
-# Accepts events from a SQS queue.
-# - name: fn_sqs
-#   type: sqs
-#
-# Accepts events form a Kinesis stream
-# - name: fn_kinesis
-#   type: kinesis
-#
-# Accepts events from an api gateway proxy call.
-# - name: fn_apigateway_proxy
-#   type: api_gateway_proxy
 
 #================================ General ======================================
 
@@ -480,11 +490,11 @@ output.elasticsearch:
   # and retry until all events are published.  Set max_retries to a value less
   # than 0 to retry until all events are published. The default is 3.
   #max_retries: 3
-  
+
   # The maximum number of events to bulk in a single Logstash request. The
   # default is 2048.
   #bulk_max_size: 2048
-  
+
   # The number of seconds to wait for responses from the Logstash server before
   # timing out. The default is 30s.
   #timeout: 30s
@@ -1038,6 +1048,13 @@ logging.files:
   # The permissions mask to apply when rotating log files. The default value is 0600.
   # Must be a valid Unix-style file permissions mask expressed in octal notation.
   #permissions: 0600
+
+  # Enable log file rotation on time intervals in addition to size-based rotation.
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # are boundary-aligned with minutes, hours, days, weeks, months, and years as
+  # reported by the local system clock. All other intervals are calculated from the
+  # unix epoch. Defaults to disabled.
+  #interval: 0
 
 # Set to true to log messages in json format.
 #logging.json: false
