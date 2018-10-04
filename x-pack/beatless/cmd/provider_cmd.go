@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -14,6 +15,8 @@ import (
 	"github.com/elastic/beats/x-pack/beatless/config"
 	"github.com/elastic/beats/x-pack/beatless/provider"
 )
+
+var output string
 
 // TODO: Add List() subcommand.
 func handler() (*cliHandler, error) {
@@ -103,8 +106,19 @@ func genPackageCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return h.BuildPackage("")
+
+			if len(output) == 0 {
+				dir, err := os.Getwd()
+				if err != nil {
+					return err
+				}
+
+				output = filepath.Join(dir, "package.zip")
+			}
+
+			return h.BuildPackage(output)
 		}),
 	}
+	cmd.Flags().StringVarP(&output, "output", "o", "", "full path to the package")
 	return cmd
 }

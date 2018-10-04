@@ -121,13 +121,11 @@ func (c *cliHandler) BuildPackage(output string) error {
 		return err
 	}
 
-	output = "/tmp/package.zip"
-
 	err = ioutil.WriteFile(output, content, 0644)
 	if err != nil {
 		return err
 	}
 
-	fmt.Fprintf(c.output, "Generated pacakge at: %s", output)
+	fmt.Fprintf(c.output, "Generated pacakge at: %s\n", output)
 	return nil
 }
