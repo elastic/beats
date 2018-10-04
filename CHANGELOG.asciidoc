@@ -95,6 +95,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Implement CheckConfig in RunnerFactory to make autodiscover check configs {pull}7961[7961]
 - Add DNS processor with support for performing reverse lookups on IP addresses. {issue}7770[7770]
 - Support for Kafka 2.0.0 in kafka output {pull}8399[8399]
+- Add setting `setup.kibana.space.id` to support Kibana Spaces {pull}7942[7942]
 
 *Auditbeat*
 

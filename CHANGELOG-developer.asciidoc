@@ -50,3 +50,4 @@ The list below covers the major changes between 6.3.0 and master only.
   `cmd.GenRootCmd`, `cmd.GenRootCmdWithRunFlags`, and `cmd.GenRootCmdWithIndexPrefixWithRunFlags`. {pull}7850[7850]
 - Set current year in generator templates. {pull}8396[8396]
 - You can now override default settings of libbeat by using instance.Settings. {pull}8449[8449]
+- Add `-space-id` option to `export_dashboards.go` script to support Kibana Spaces {pull}7942[7942]
