@@ -24,9 +24,11 @@
       }
     }
 
-  , { "set":
-      { "field": "user_agent.original"
-      , "value": "{{suricata.eve.http.http_user_agent}}"
+  , { "convert":
+      { "field": "suricata.eve.http.http_user_agent"
+      , "target_field": "user_agent.original"
+      , "type": "keyword"
+      , "ignore_missing": true
       }
     }
   , { "user_agent":
@@ -71,14 +73,18 @@
       , "ignore_missing": true
       }
     }
-  , { "script":
-      { "lang": "painless"
-      , "source": "if (ctx.suricata.eve.src_ip != null) { if (ctx.source_ecs == null) ctx.source_ecs = new HashMap(); ctx.source_ecs.ip = ctx.suricata.eve.src_ip; }"
+  , { "convert":
+      { "field": "suricata.eve.src_ip"
+      , "target_field": "source_ecs.ip"
+      , "type": "ip"
+      , "ignore_missing": true
       }
     }
-  , { "script":
-      { "lang": "painless"
-      , "source": "if (ctx.suricata.eve.dest_ip != null) { if (ctx.destination == null) ctx.destination = new HashMap(); ctx.destination.ip = ctx.suricata.eve.dest_ip; }"
+  , { "convert":
+      { "field": "suricata.eve.dest_ip"
+      , "target_field": "destination.ip"
+      , "type": "ip"
+      , "ignore_missing": true
       }
     }
 
@@ -95,24 +101,25 @@
       }
     }
 
-  , { "set":
-      { "field": "http.request.method"
-      , "value": "{{suricata.eve.http.http_method}}"
+  , { "convert":
+      { "field": "suricata.eve.http.http_method"
+      , "target_field": "http.request.method"
+      , "type": "keyword"
+      , "ignore_missing": true
       }
     }
-  , { "set":
-      { "field": "http.response.status_code"
-      , "value": "{{suricata.eve.http.status}}"
+  , { "convert":
+      { "field": "suricata.eve.http.status"
+      , "target_field": "http.response.status_code"
+      , "type": "keyword"
+      , "ignore_missing": true
       }
     }
-  , { "set":
-      { "field": "http.response.status_code"
-      , "value": "{{suricata.eve.http.status}}"
-      }
-    }
-  , { "set":
-      { "field": "url.host.name"
-      , "value": "{{suricata.eve.http.hostname}}"
+  , { "convert":
+      { "field": "suricata.eve.http.hostname"
+      , "target_field": "url.host.name"
+      , "type": "keyword"
+      , "ignore_missing": true
       }
     }
 
