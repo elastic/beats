@@ -18,14 +18,17 @@
 package reader
 
 import (
+	"fmt"
 	"io"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/coreos/go-systemd/sdjournal"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/journalbeat/checkpoint"
+	"github.com/elastic/beats/journalbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -50,6 +53,8 @@ type Config struct {
 	Backoff time.Duration
 	// BackoffFactor is the multiplier of Backoff.
 	BackoffFactor int
+	// Matches store the key value pairs to match entries.
+	Matches []string
 }
 
 // Reader reads entries from journal(s).
@@ -83,6 +88,11 @@ func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *lo
 		}
 	}
 
+	err = setupMatches(j, c.Matches)
+	if err != nil {
+		return nil, err
+	}
+
 	r := &Reader{
 		journal: j,
 		changes: make(chan int),
@@ -91,6 +101,8 @@ func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *lo
 		logger:  logger,
 	}
 	r.seek(state.Cursor)
+
+	instance.AddJournalToMonitor(c.Path, j)
 
 	r.logger.Debug("New journal is opened for reading")
 
@@ -105,8 +117,14 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 		return nil, errors.Wrap(err, "failed to open local journal")
 	}
 
+	c.Path = LocalSystemJournalID
 	logger = logger.With("path", "local")
 	logger.Debug("New local journal is opened for reading")
+
+	err = setupMatches(j, c.Matches)
+	if err != nil {
+		return nil, err
+	}
 
 	r := &Reader{
 		journal: j,
@@ -116,7 +134,44 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 		logger:  logger,
 	}
 	r.seek(state.Cursor)
+
+	instance.AddJournalToMonitor(c.Path, j)
+
 	return r, nil
+}
+
+func setupMatches(j *sdjournal.Journal, matches []string) error {
+	for _, m := range matches {
+		elems := strings.Split(m, "=")
+		if len(elems) != 2 {
+			return fmt.Errorf("invalid match format: %s", m)
+		}
+
+		var p string
+		for journalKey, eventKey := range journaldEventFields {
+			if elems[0] == eventKey {
+				p = journalKey + "=" + elems[1]
+			}
+		}
+
+		// pass custom fields as is
+		if p == "" {
+			p = m
+		}
+
+		logp.Debug("journal", "Added matcher expression: %s", p)
+
+		err := j.AddMatch(p)
+		if err != nil {
+			return fmt.Errorf("error adding match to journal %v", err)
+		}
+
+		err = j.AddDisjunction()
+		if err != nil {
+			return fmt.Errorf("error adding disjunction to journal: %v", err)
+		}
+	}
+	return nil
 }
 
 // seek seeks to the position determined by the coniguration and cursor state.
@@ -213,10 +268,21 @@ func (r *Reader) readUntilNotNull(entries chan<- *beat.Event) error {
 // toEvent creates a beat.Event from journal entries.
 func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	fields := common.MapStr{}
-	for journalKey, eventKey := range journaldEventFields {
-		if entry.Fields[journalKey] != "" {
-			fields.Put(eventKey, entry.Fields[journalKey])
+	custom := common.MapStr{}
+
+	for k, v := range entry.Fields {
+		if kk, ok := journaldEventFields[k]; !ok {
+			normalized := strings.ToLower(strings.TrimLeft(k, "_"))
+			custom.Put(normalized, v)
+		} else {
+			if isKept(kk) {
+				fields.Put(kk, v)
+			}
 		}
+	}
+
+	if len(custom) != 0 {
+		fields["custom"] = custom
 	}
 
 	state := checkpoint.JournalState{
@@ -226,12 +292,19 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 		MonotonicTimestamp: entry.MonotonicTimestamp,
 	}
 
+	fields["read_timestamp"] = time.Now()
+	receivedByJournal := time.Unix(0, int64(entry.RealtimeTimestamp)*1000)
+
 	event := beat.Event{
-		Timestamp: time.Now(),
+		Timestamp: receivedByJournal,
 		Fields:    fields,
 		Private:   state,
 	}
 	return &event
+}
+
+func isKept(key string) bool {
+	return key != ""
 }
 
 // stopOrWait waits for a journal event.
@@ -260,5 +333,6 @@ func (r *Reader) wait() {
 
 // Close closes the underlying journal reader.
 func (r *Reader) Close() {
+	instance.StopMonitoringJournal(r.config.Path)
 	r.journal.Close()
 }

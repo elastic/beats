@@ -2,6 +2,7 @@
 journalbeat.inputs:
 - paths: [{{ journal_path }}]
   seek: {{ seek_method }}
+  matches: [{{ matches }}]
 
 journalbeat.registry: {{ registry_file }}
 

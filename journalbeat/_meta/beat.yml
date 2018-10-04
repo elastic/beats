@@ -28,6 +28,17 @@ journalbeat.inputs:
   # Position to start reading from journal. Valid values: head, tail, cursor
   seek: tail
 
+  # Exact matching for field values of events.
+  # Matching for nginx entries: "systemd.unit=nginx"
+  #include_matches: []
+
+  # Optional fields that you can specify to add additional information to the
+  # output. Fields can be scalar values, arrays, dictionaries, or any nested
+  # combination of these.
+  #fields:
+  #  env: staging
+
+
 #========================= Journalbeat global options ============================
 #journalbeat:
   # Name of the registry file. If a relative path is used, it is considered relative to the
@@ -43,3 +54,7 @@ journalbeat.inputs:
 
   # Position to start reading from all journal. Possible values: head, tail, cursor
   #seek: head
+
+  # Exact matching for field values of events.
+  # Matching for nginx entries: "systemd.unit=nginx"
+  #matches: []

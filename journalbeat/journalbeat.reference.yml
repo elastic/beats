@@ -28,6 +28,17 @@ journalbeat.inputs:
   # Position to start reading from journal. Valid values: head, tail, cursor
   seek: tail
 
+  # Exact matching for field values of events.
+  # Matching for nginx entries: "systemd.unit=nginx"
+  #include_matches: []
+
+  # Optional fields that you can specify to add additional information to the
+  # output. Fields can be scalar values, arrays, dictionaries, or any nested
+  # combination of these.
+  #fields:
+  #  env: staging
+
+
 #========================= Journalbeat global options ============================
 #journalbeat:
   # Name of the registry file. If a relative path is used, it is considered relative to the
@@ -43,6 +54,10 @@ journalbeat.inputs:
 
   # Position to start reading from all journal. Possible values: head, tail, cursor
   #seek: head
+
+  # Exact matching for field values of events.
+  # Matching for nginx entries: "systemd.unit=nginx"
+  #matches: []
 
 #================================ General ======================================
 
@@ -161,8 +176,8 @@ journalbeat.inputs:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, and
-# add_cloud_metadata.
+# The supported processors are drop_fields, drop_event, include_fields, 
+# decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
 # contain CPU load percentages, but remove the fields that contain CPU ticks
@@ -243,6 +258,24 @@ journalbeat.inputs:
 #- add_host_metadata:
 #   netinfo.enabled: false
 #
+# The following example enriches each event with process metadata using
+# process IDs included in the event.
+#
+#processors:
+#- add_process_metadata:
+#    match_pids: ["system.process.ppid"]
+#    target: system.process.parent
+#
+# The following example decodes fields containing JSON strings 
+# and replaces the strings with valid JSON objects.
+#
+#processors:
+#- decode_json_fields:
+#    fields: ["field1", "field2", ...]
+#    process_array: false
+#    max_depth: 1
+#    target: ""
+#    overwrite_keys: false
 
 #============================= Elastic Cloud ==================================
 
