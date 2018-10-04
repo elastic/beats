@@ -96,14 +96,16 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 	var indicesStruct IndicesStruct
 	err := json.Unmarshal(content, &indicesStruct)
 	if err != nil {
-		m.Log.Errorw("Failure parsing Indices Stats Elasticsearch API response", "error", err)
+		err = errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
+		m.Log.Error(err)
 		return err
 	}
 
 	clusterStateMetrics := []string{"metadata", "routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
 	if err != nil {
-		m.Log.Errorw("Failure retrieving cluster state from Elasticsearch", "error", err)
+		err = errors.Wrap(err, "failure retrieving cluster state from Elasticsearch")
+		m.Log.Error(err)
 		return err
 	}
 
@@ -111,14 +113,14 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		event := mb.Event{}
 		indexStats, err := xpackSchema.Apply(index)
 		if err != nil {
-			m.Log.Errorw("Failure applying index stats schema", "error", err)
+			m.Log.Error(errors.Wrap(err, "failure applying index stats schema"))
 			continue
 		}
 		indexStats["index"] = name
 
 		err = addClusterStateFields(name, indexStats, clusterState)
 		if err != nil {
-			m.Log.Errorw("Failure adding cluster state fields", "error", err)
+			m.Log.Error(errors.Wrap(err, "failure adding cluster state fields"))
 			continue
 		}
 
@@ -201,16 +203,16 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 	areAllPrimariesStarted := true
 	areAllReplicasStarted := true
 
-	for _, indexShard := range shards {
+	for indexName, indexShard := range shards {
 		is, ok := indexShard.([]interface{})
 		if !ok {
 			return "", fmt.Errorf("shards is not an array")
 		}
 
-		for _, shard := range is {
+		for shardIdx, shard := range is {
 			s, ok := shard.(map[string]interface{})
 			if !ok {
-				return "", fmt.Errorf("shards is not an array of shard objects")
+				return "", fmt.Errorf("%v.shards[%v] is not a map", indexName, shardIdx)
 			}
 
 			shard := common.MapStr(s)
@@ -250,16 +252,16 @@ func getIndexShardStats(shards common.MapStr) (common.MapStr, error) {
 	initializing := 0
 	relocating := 0
 
-	for _, indexShard := range shards {
+	for indexName, indexShard := range shards {
 		is, ok := indexShard.([]interface{})
 		if !ok {
 			return nil, fmt.Errorf("shards is not an array")
 		}
 
-		for _, shard := range is {
+		for shardIdx, shard := range is {
 			s, ok := shard.(map[string]interface{})
 			if !ok {
-				return nil, fmt.Errorf("shards is not an array of shard objects")
+				return nil, fmt.Errorf("%v.shards[%v] is not a map", indexName, shardIdx)
 			}
 
 			shard := common.MapStr(s)

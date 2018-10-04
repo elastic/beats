@@ -20,9 +20,13 @@ package node
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/logstash"
 )
 
 var (
@@ -36,12 +40,26 @@ var (
 	}
 )
 
-func eventMapping(content []byte) (common.MapStr, error) {
+func eventMapping(r mb.ReporterV2, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return nil, err
+		err = errors.Wrap(err, "failure parsing Logstash Node API response")
+		r.Error(err)
+		return err
 	}
 
-	return schema.Apply(data)
+	fields, err := schema.Apply(data)
+	if err != nil {
+		r.Error(errors.Wrap(err, "failure applying node schema"))
+	}
+
+	event := mb.Event{}
+	event.RootFields = common.MapStr{}
+	event.RootFields.Put("service.name", logstash.ModuleName)
+
+	event.MetricSetFields = fields
+
+	r.Event(event)
+	return nil
 }

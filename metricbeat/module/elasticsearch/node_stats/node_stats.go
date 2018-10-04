@@ -26,7 +26,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "node_stats", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "node_stats", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 		mb.DefaultMetricSet(),
 		mb.WithNamespace("elasticsearch.node.stats"),
@@ -44,7 +44,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch node_stats metricset is beta")
+	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
 
 	// Get the stats from the local node
 	ms, err := elasticsearch.NewMetricSet(base, nodeStatsPath)

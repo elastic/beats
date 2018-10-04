@@ -270,6 +270,12 @@ func (b *BaseMetricSet) Name() string {
 	return b.name
 }
 
+// FullyQualifiedName returns the complete name of the MetricSet, including the
+// name of the module.
+func (b *BaseMetricSet) FullyQualifiedName() string {
+	return b.Module().Name() + "/" + b.Name()
+}
+
 // Module returns the parent Module for the MetricSet.
 func (b *BaseMetricSet) Module() Module {
 	return b.module
