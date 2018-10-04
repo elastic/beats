@@ -21,11 +21,11 @@ const maxMegabytes = 3008
 var DefaultLambdaConfig = &lambdaConfig{
 	MemorySize:  128 * 1024 * 1024,
 	Timeout:     time.Second * 3,
-	Concurrency: 1000, // unreserve
+	Concurrency: 0, // unreserve
 }
 
 type lambdaConfig struct {
-	Concurrency      int               `config:"concurrency" validate:"nonzero,positive"`
+	Concurrency      int               `config:"concurrency" validate:"positive"`
 	DeadLetterConfig *deadLetterConfig `config:"dead_letter_config"`
 	Description      string            `config:"description"`
 	MemorySize       MemSizeFactor64   `config:"memory_size"`
