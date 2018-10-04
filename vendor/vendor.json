@@ -1409,6 +1409,14 @@
 			"revisionTime": "2018-07-16T14:52:14Z"
 		},
 		{
+			"checksumSHA1": "9dPHJ2IqSJok9bKZ6btWALYE/pA=",
+			"path": "github.com/jmespath/go-jmespath",
+			"revision": "3433f3ea46d9f8019119e7dd41274e112a2359a9",
+			"revisionTime": "2015-11-17T17:58:22Z",
+			"version": "0.2.2",
+			"versionExact": "0.2.2"
+		},
+		{
 			"checksumSHA1": "l9wW52CYGbmO/NGwYZ/Op2QTmaA=",
 			"path": "github.com/joeshaw/multierror",
 			"revision": "69b34d4ec901851247ae7e77d33909caf9df99ed",
@@ -2256,11 +2264,6 @@
 			"path": "howett.net/plist",
 			"revision": "233df3c4f07b0c562da0e8a6fb850681ac49bb90",
 			"revisionTime": "2017-11-05T00:43:39Z"
-		},
-		{
-			"path": "jmespath/go-jmespath",
-			"revision": "v0.2.2",
-			"version": "v0.2.2"
 		},
 		{
 			"path": "plugin",

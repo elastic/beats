@@ -1469,6 +1469,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/jmespath/go-jmespath
+Version: 0.2.2
+Revision: 3433f3ea46d9f8019119e7dd41274e112a2359a9
+License type (autodetected): Apache-2.0
+./vendor/github.com/jmespath/go-jmespath/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/joeshaw/multierror
 Revision: 69b34d4ec901851247ae7e77d33909caf9df99ed
 License type (autodetected): MIT
