@@ -42,7 +42,6 @@ class TestAutodiscover(BaseTest):
         self.wait_until(lambda: self.log_contains(re.compile('autodiscover.+Got a start event:', re.I)))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 1))
-        container.stop()
 
         self.wait_until(lambda: self.log_contains(re.compile('autodiscover.+Got a stop event:', re.I)))
 
