@@ -69,6 +69,9 @@ const (
 	ProcessorArchitectureUnknown ProcessorArchitecture = 0xFFFF
 )
 
+// ErrReadFailed is returned by ReadProcessMemory on failure
+var ErrReadFailed = errors.New("ReadProcessMemory failed")
+
 func (a ProcessorArchitecture) String() string {
 	names := map[ProcessorArchitecture]string{
 		ProcessorArchitectureAMD64: "x86_64",
