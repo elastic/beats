@@ -35,13 +35,15 @@ type DiskIOMetric struct {
 	ReadRequestCountPerSec       float64 `json:"rrqCps"`
 	WriteRequestCountPerSec      float64 `json:"wrqCps"`
 	// using bytes instead of sector
-	ReadBytesPerSec  float64 `json:"rBps"`
-	WriteBytesPerSec float64 `json:"wBps"`
-	AvgRequestSize   float64 `json:"avgrqSz"`
-	AvgQueueSize     float64 `json:"avgquSz"`
-	AvgAwaitTime     float64 `json:"await"`
-	AvgServiceTime   float64 `json:"svctm"`
-	BusyPct          float64 `json:"busy"`
+	ReadBytesPerSec   float64 `json:"rBps"`
+	WriteBytesPerSec  float64 `json:"wBps"`
+	AvgRequestSize    float64 `json:"avgrqSz"`
+	AvgQueueSize      float64 `json:"avgquSz"`
+	AvgAwaitTime      float64 `json:"await"`
+	AvgReadAwaitTime  float64 `json:"r_await"`
+	AvgWriteAwaitTime float64 `json:"w_await"`
+	AvgServiceTime    float64 `json:"svctm"`
+	BusyPct           float64 `json:"busy"`
 }
 
 type DiskIOStat struct {
