@@ -15,36 +15,51 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kibana
+package cli
 
 import (
-	"time"
+	"os"
+	"testing"
 
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
+	"github.com/stretchr/testify/assert"
 )
 
-// ClientConfig to connect to Kibana
-type ClientConfig struct {
-	Protocol      string            `config:"protocol"`
-	Host          string            `config:"host"`
-	Path          string            `config:"path"`
-	SpaceID       string            `config:"space.id"`
-	Username      string            `config:"username"`
-	Password      string            `config:"password"`
-	TLS           *tlscommon.Config `config:"ssl"`
-	Timeout       time.Duration     `config:"timeout"`
-	IgnoreVersion bool
-}
+func TestReadPassword(t *testing.T) {
+	os.Setenv("FOO", "random")
 
-var (
-	defaultClientConfig = ClientConfig{
-		Protocol: "http",
-		Host:     "localhost:5601",
-		Path:     "",
-		SpaceID:  "",
-		Username: "",
-		Password: "",
-		Timeout:  90 * time.Second,
-		TLS:      nil,
+	tests := []struct {
+		name     string
+		input    string
+		password string
+		error    bool
+	}{
+		{
+			name:     "Test env variable",
+			input:    "env:FOO",
+			password: "random",
+		},
+		{
+			name:  "Test unknown method",
+			input: "foo:bar",
+			error: true,
+		},
+		{
+			name:  "Test empty input",
+			input: "",
+			error: true,
+		},
 	}
-)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			password, err := ReadPassword(test.input)
+			assert.Equal(t, test.password, password)
+
+			if test.error {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}

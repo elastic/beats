@@ -114,14 +114,18 @@ func loadOutput(
 		return outputs.Fail(errors.New(msg))
 	}
 
-	// TODO: add support to unload/reassign outStats on output reloading
-
 	var (
 		outReg   *monitoring.Registry
 		outStats outputs.Observer
 	)
+
 	if reg != nil {
-		outReg = reg.NewRegistry("output")
+		outReg = reg.GetRegistry("output")
+		if outReg != nil {
+			outReg.Clear()
+		} else {
+			outReg = reg.NewRegistry("output")
+		}
 		outStats = outputs.NewStats(outReg)
 	}
 
