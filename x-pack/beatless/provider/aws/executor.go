@@ -7,8 +7,6 @@ package aws
 import (
 	"errors"
 
-	lambdaApi "github.com/aws/aws-sdk-go-v2/service/lambda"
-
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -16,19 +14,7 @@ var errNeverRun = errors.New("executer was never executed")
 var errCannotAdd = errors.New("cannot add to an already executed executer")
 var errAlreadyExecuted = errors.New("executer already executed")
 
-type executorContext struct {
-	Content     []byte
-	Name        string
-	FunctionArn string
-	AliasArn    string
-	Description string
-	HandleName  string
-	Role        string
-	Runtime     lambdaApi.Runtime
-}
-
 type executor struct {
-	Context    *executorContext
 	operations []doer
 	undos      []undoer
 	completed  bool
@@ -36,19 +22,19 @@ type executor struct {
 }
 
 type doer interface {
-	Execute(*executorContext) error
+	Execute() error
 }
 
 type undoer interface {
-	Rollback(*executorContext) error
+	Rollback() error
 }
 
-func newExecutor(log *logp.Logger, context *executorContext) *executor {
+func newExecutor(log *logp.Logger) *executor {
 	if log == nil {
 		log = logp.NewLogger("executer")
 	}
 
-	return &executor{log: log, Context: context}
+	return &executor{log: log}
 }
 
 func (e *executor) Execute() (err error) {
@@ -56,9 +42,8 @@ func (e *executor) Execute() (err error) {
 	if e.IsCompleted() {
 		return errAlreadyExecuted
 	}
-	context := e.Context
 	for _, operation := range e.operations {
-		err = operation.Execute(context)
+		err = operation.Execute()
 		if err != nil {
 			break
 		}
@@ -79,10 +64,9 @@ func (e *executor) Rollback() (err error) {
 	if !e.IsCompleted() {
 		return errNeverRun
 	}
-	context := e.Context
 	for i := len(e.undos) - 1; i >= 0; i-- {
 		operation := e.undos[i]
-		err = operation.Rollback(context)
+		err = operation.Rollback()
 		if err != nil {
 			break
 		}

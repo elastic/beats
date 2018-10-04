@@ -35,7 +35,7 @@ func newOpWaitCloudFormation(
 	}
 }
 
-func (o *opCloudWaitCloudFormation) Execute(ctx *executorContext) error {
+func (o *opCloudWaitCloudFormation) Execute() error {
 	o.log.Debug("waiting for cloudformation confirmation")
 	status, reason, err := queryStackStatus(o.svc, o.stackName)
 

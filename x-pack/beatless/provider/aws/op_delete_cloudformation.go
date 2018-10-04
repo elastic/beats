@@ -18,7 +18,7 @@ type opDeleteCloudFormation struct {
 	stackName string
 }
 
-func (o *opDeleteCloudFormation) Execute(ctx *executorContext) error {
+func (o *opDeleteCloudFormation) Execute() error {
 	uuid := uuid.NewV4()
 	input := &cloudformation.DeleteStackInput{
 		ClientRequestToken: aws.String(uuid.String()),

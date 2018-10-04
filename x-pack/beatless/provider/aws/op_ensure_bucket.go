@@ -21,7 +21,7 @@ func newOpEnsureBucket(log *logp.Logger, cfg aws.Config, bucketName string) *opE
 	return &opEnsureBucket{log: log, svc: s3.New(cfg), bucketName: bucketName}
 }
 
-func (o *opEnsureBucket) Execute(ctx *executorContext) error {
+func (o *opEnsureBucket) Execute() error {
 	o.log.Debugf("creating bucket: %s", o.bucketName)
 
 	check := &s3.HeadBucketInput{Bucket: aws.String(o.bucketName)}

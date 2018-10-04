@@ -21,7 +21,7 @@ type opWaitDeleteCloudFormation struct {
 	stackName string
 }
 
-func (o *opWaitDeleteCloudFormation) Execute(ctx *executorContext) error {
+func (o *opWaitDeleteCloudFormation) Execute() error {
 	o.log.Debug("waiting for cloudformation confirmation")
 	status, _, err := queryStackStatus(o.svc, o.stackName)
 

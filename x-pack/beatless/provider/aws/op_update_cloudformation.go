@@ -19,7 +19,7 @@ type opUpdateCloudFormation struct {
 	stackName   string
 }
 
-func (o *opUpdateCloudFormation) Execute(ctx *executorContext) error {
+func (o *opUpdateCloudFormation) Execute() error {
 	uuid := uuid.NewV4()
 	input := &cloudformation.UpdateStackInput{
 		ClientRequestToken: aws.String(uuid.String()),

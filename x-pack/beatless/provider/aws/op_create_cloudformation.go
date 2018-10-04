@@ -32,7 +32,7 @@ func newOpCreateCloudFormation(
 	}
 }
 
-func (o *opCreateCloudFormation) Execute(ctx *executorContext) error {
+func (o *opCreateCloudFormation) Execute() error {
 	o.log.Debug("Creating CloudFormation create request")
 	uuid := uuid.NewV4()
 	input := &cloudformation.CreateStackInput{

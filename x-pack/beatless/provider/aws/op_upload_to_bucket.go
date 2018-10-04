@@ -36,7 +36,7 @@ func newOpUploadToBucket(
 	}
 }
 
-func (o *opUploadToBucket) Execute(ctx *executorContext) error {
+func (o *opUploadToBucket) Execute() error {
 	o.log.Debugf("uploading file '%s' to bucket '%s' with size %d bytes", o.path, o.bucketName, len(o.raw))
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(o.bucketName),

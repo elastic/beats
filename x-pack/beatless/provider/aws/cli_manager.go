@@ -157,8 +157,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	c.log.Debugf("cloudformation template: \n%s", json)
 
-	context := &executorContext{}
-	executer := newExecutor(c.log, context)
+	executer := newExecutor(c.log)
 	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, bucket))
 	executer.Add(newOpUploadToBucket(c.log, c.awsCfg, bucket, c.codeKey(name), content))
 	executer.Add(newOpUploadToBucket(
@@ -225,8 +224,7 @@ func (c *CLIManager) Remove(name string) error {
 	c.log.Debugf("function: %s, starting remove", name)
 	defer c.log.Debugf("function: %s, remove execution ended", name)
 
-	context := &executorContext{}
-	executer := newExecutor(c.log, context)
+	executer := newExecutor(c.log)
 	executer.Add(newOpDeleteCloudFormation(c.log, c.awsCfg, c.stackName(name)))
 	executer.Add(newWaitDeleteCloudFormation(c.log, c.awsCfg, c.stackName(name)))
 

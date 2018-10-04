@@ -16,13 +16,13 @@ type MockUndoer struct {
 	mock.Mock
 }
 
-func (m *MockUndoer) Execute(ctx *executorContext) error {
-	args := m.Called(ctx)
+func (m *MockUndoer) Execute() error {
+	args := m.Called()
 	return args.Error(0)
 }
 
-func (m *MockUndoer) Rollback(ctx *executorContext) error {
-	args := m.Called(ctx)
+func (m *MockUndoer) Rollback() error {
+	args := m.Called()
 	return args.Error(0)
 }
 
@@ -30,8 +30,8 @@ type MockDoer struct {
 	mock.Mock
 }
 
-func (m *MockDoer) Execute(ctx *executorContext) error {
-	args := m.Called(ctx)
+func (m *MockDoer) Execute() error {
+	args := m.Called()
 	return args.Error(0)
 }
 
@@ -45,13 +45,12 @@ func TestExecutor(t *testing.T) {
 }
 
 func testAll(t *testing.T) {
-	ctx := &executorContext{}
-	executor := newExecutor(nil, ctx)
+	executor := newExecutor(nil)
 	m1 := &MockDoer{}
-	m1.On("Execute", ctx).Return(nil)
+	m1.On("Execute").Return(nil)
 
 	m2 := &MockDoer{}
-	m2.On("Execute", ctx).Return(nil)
+	m2.On("Execute").Return(nil)
 
 	executor.Add(m1, m2)
 	err := executor.Execute()
@@ -64,14 +63,13 @@ func testAll(t *testing.T) {
 }
 
 func testError(t *testing.T) {
-	ctx := &executorContext{}
-	executor := newExecutor(nil, ctx)
+	executor := newExecutor(nil)
 	m1 := &MockDoer{}
-	m1.On("Execute", ctx).Return(nil)
+	m1.On("Execute").Return(nil)
 
 	m2 := &MockDoer{}
 	e := errors.New("something bad")
-	m2.On("Execute", ctx).Return(e)
+	m2.On("Execute").Return(e)
 
 	m3 := &MockDoer{}
 	executor.Add(m1, m2, m3)
@@ -86,15 +84,14 @@ func testError(t *testing.T) {
 }
 
 func testUndoer(t *testing.T) {
-	ctx := &executorContext{}
-	executor := newExecutor(nil, ctx)
+	executor := newExecutor(nil)
 	m1 := &MockUndoer{}
-	m1.On("Execute", ctx).Return(nil)
-	m1.On("Rollback", ctx).Return(nil)
+	m1.On("Execute").Return(nil)
+	m1.On("Rollback").Return(nil)
 
 	m2 := &MockDoer{}
 	e := errors.New("something bad")
-	m2.On("Execute", ctx).Return(e)
+	m2.On("Execute").Return(e)
 
 	m3 := &MockDoer{}
 	executor.Add(m1, m2, m3)
@@ -117,17 +114,16 @@ func testFailRollback(t *testing.T) {
 	e := errors.New("error on execution")
 	e2 := errors.New("error on rollback")
 
-	ctx := &executorContext{}
-	executor := newExecutor(nil, ctx)
+	executor := newExecutor(nil)
 	m1 := &MockUndoer{}
-	m1.On("Execute", ctx).Return(nil)
+	m1.On("Execute").Return(nil)
 
 	m2 := &MockUndoer{}
-	m2.On("Execute", ctx).Return(nil)
-	m2.On("Rollback", ctx).Return(e2)
+	m2.On("Execute").Return(nil)
+	m2.On("Rollback").Return(e2)
 
 	m3 := &MockUndoer{}
-	m3.On("Execute", ctx).Return(e)
+	m3.On("Execute").Return(e)
 
 	executor.Add(m1, m2, m3)
 
@@ -147,10 +143,9 @@ func testFailRollback(t *testing.T) {
 }
 
 func testCannotRunTwice(t *testing.T) {
-	ctx := &executorContext{}
-	executor := newExecutor(nil, ctx)
+	executor := newExecutor(nil)
 	m1 := &MockDoer{}
-	m1.On("Execute", ctx).Return(nil)
+	m1.On("Execute").Return(nil)
 
 	executor.Add(m1)
 	err := executor.Execute()
@@ -165,10 +160,9 @@ func testCannotRunTwice(t *testing.T) {
 }
 
 func testCannotAddCompleted(t *testing.T) {
-	ctx := &executorContext{}
-	executor := newExecutor(nil, ctx)
+	executor := newExecutor(nil)
 	m1 := &MockDoer{}
-	m1.On("Execute", ctx).Return(nil)
+	m1.On("Execute").Return(nil)
 
 	executor.Add(m1)
 	err := executor.Execute()
