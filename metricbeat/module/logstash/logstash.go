@@ -14,35 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+package logstash
 
-// +build !integration
-
-package node
-
-import (
-	"io/ioutil"
-	"path/filepath"
-	"testing"
-
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	"github.com/stretchr/testify/assert"
-)
-
-func TestEventMapping(t *testing.T) {
-
-	files, err := filepath.Glob("./_meta/test/node.*.json")
-	assert.NoError(t, err)
-
-	for _, f := range files {
-		content, err := ioutil.ReadFile(f)
-		assert.NoError(t, err)
-
-		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, content)
-
-		assert.NoError(t, err, f)
-		assert.True(t, len(reporter.GetEvents()) >= 1, f)
-		assert.Equal(t, 0, len(reporter.GetErrors()), f)
-	}
-}
+// ModuleName is the name of this module.
+const ModuleName = "logstash"
