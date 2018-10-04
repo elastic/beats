@@ -1,4 +1,4 @@
-.PHONY: build test bench vet coverage
+.PHONY: build test bench vet
 
 build: vet bench
 
@@ -10,6 +10,3 @@ bench:
 
 vet:
 	go vet
-
-coverage:
-	go test -coverprofile=c.out && go tool cover -html=c.out && rm c.out

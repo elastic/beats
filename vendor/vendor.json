@@ -363,6 +363,14 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
+			"checksumSHA1": "bYNIHZ2HowxKRrXRFVzNh2A12i4=",
+			"path": "github.com/awslabs/goformation",
+			"revision": "d42502ef32a8892bf380256e2f57c6f69190d802",
+			"revisionTime": "2018-09-16T20:29:49Z",
+			"version": "1.2.2",
+			"versionExact": "1.2.2"
+		},
+		{
 			"checksumSHA1": "al43W4TWRdznwfxOWp4egKcL39c=",
 			"path": "github.com/bsm/sarama-cluster",
 			"revision": "7e67d87a6b3f83fe08c096fd084691bd9dca112f",
@@ -1325,6 +1333,14 @@
 			"revisionTime": "2017-03-27T23:54:44Z"
 		},
 		{
+			"checksumSHA1": "VvZKmbuBN1QAG699KduTdmSPwA4=",
+			"path": "github.com/go-ini/ini",
+			"revision": "300e940a926eb277d3901b20bdfcc54928ad3642",
+			"revisionTime": "2017-03-13T04:11:30Z",
+			"version": "v1.25.4",
+			"versionExact": "v1.25.4"
+		},
+		{
 			"checksumSHA1": "wDZdTaY9JiqqqnF4c3pHP71nWmk=",
 			"path": "github.com/go-ole/go-ole",
 			"revision": "de8695c8edbf8236f30d6e1376e20b198a028d42",
@@ -1365,6 +1381,14 @@
 			"path": "github.com/gorhill/cronexpr",
 			"revision": "d520615e531a6bf3fb69406b9eba718261285ec8",
 			"revisionTime": "2016-12-05T14:13:22Z"
+		},
+		{
+			"checksumSHA1": "3LWNcQT7yTaLpEmjhI/3fi8puv0=",
+			"path": "github.com/imdario/mergo",
+			"revision": "9f23e2d6bd2a77f959b2bf6acdbefd708a83a4a4",
+			"revisionTime": "2018-07-30T21:26:40Z",
+			"version": "v0.3.6",
+			"versionExact": "v0.3.6"
 		},
 		{
 			"checksumSHA1": "40vJyUB4ezQSn/NSadsKEOrudMc=",
@@ -1622,6 +1646,22 @@
 			"path": "github.com/samuel/go-thrift/parser",
 			"revision": "2187045faa54fce7f5028706ffeb2f2fc342aa7e",
 			"revisionTime": "2014-05-22T04:34:39Z"
+		},
+		{
+			"checksumSHA1": "SjPjmaPGaIWKtmvyv6cJ7Fdzy50=",
+			"path": "github.com/sanathkr/go-yaml",
+			"revision": "ed9d249f429b3f5a69f80a7abef6bfce81fef894",
+			"revisionTime": "2017-08-19T19:51:28Z",
+			"version": "v2",
+			"versionExact": "v2"
+		},
+		{
+			"checksumSHA1": "qoSnctxGqjdm6K9unlf/Mgo+mbA=",
+			"path": "github.com/sanathkr/yaml",
+			"revision": "0ca9ea5df5451ffdf184b4428c902747c2c11cd7",
+			"revisionTime": "2017-03-27T23:54:44Z",
+			"version": "v1.0.0",
+			"versionExact": "v1.0.0"
 		},
 		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
@@ -2216,6 +2256,11 @@
 			"path": "howett.net/plist",
 			"revision": "233df3c4f07b0c562da0e8a6fb850681ac49bb90",
 			"revisionTime": "2017-11-05T00:43:39Z"
+		},
+		{
+			"path": "jmespath/go-jmespath",
+			"revision": "v0.2.2",
+			"version": "v0.2.2"
 		},
 		{
 			"path": "plugin",
