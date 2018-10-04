@@ -25,8 +25,7 @@ class TestAutodiscover(BaseTest):
                 'docker': {
                     'templates': '''
                       - condition:
-                          contains:
-                            docker.container.image: redis
+                          equals.docker.container.image: redis:3.2.4
                         config:
                           - type: tcp
                             hosts: ["${data.host}:${data.port}"]
