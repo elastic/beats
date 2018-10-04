@@ -8055,6 +8055,27 @@ Count field records the number of times the particular event has occurred
 
 --
 
+
+*`kubernetes.event.timestamp.first_occurrence`*::
++
+--
+type: date
+
+Timestamp of first occurrence of event
+
+
+--
+
+*`kubernetes.event.timestamp.last_occurrence`*::
++
+--
+type: date
+
+Timestamp of last occurrence of event
+
+
+--
+
 *`kubernetes.event.message`*::
 +
 --

@@ -37,6 +37,8 @@ https://github.com/elastic/beats/compare/v6.4.1...6.4[Check the HEAD diff]
 
 *Metricbeat*
 
+- Avoid mapping issues in kubernetes module. {pull}8487[8487]
+
 *Packetbeat*
 
 *Winlogbeat*
