@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path"
 	"strconv"
 	"strings"
@@ -205,10 +204,8 @@ func convertToCacheable(packages []*Package) []cache.Cacheable {
 func getPackages(osFamily string) (packages []*Package, err error) {
 	switch osFamily {
 	case redhat:
-		packages, err = listRPMPackages()
-		if err != nil {
-			err = errors.Wrap(err, "error getting RPM packages")
-		}
+		// TODO: Implement RPM
+		err = errors.New("RPM not yet supported")
 	case debian:
 		packages, err = listDebPackages()
 		if err != nil {
@@ -224,54 +221,6 @@ func getPackages(osFamily string) (packages []*Package, err error) {
 	}
 
 	return
-}
-
-/*
-The following functions copied from https://github.com/tsg/listpackages/blob/master/main.go
-*/
-func listRPMPackages() ([]*Package, error) {
-	const format = "%{NAME}|%{VERSION}|%{RELEASE}|%{ARCH}|%{LICENSE}|%{INSTALLTIME}|%{SIZE}|%{URL}|%{SUMMARY}\\n"
-	out, err := exec.Command("/usr/bin/rpm", "--qf", format, "-qa").Output()
-	if err != nil {
-		return nil, errors.Wrapf(err, "error running rpm -qa command - output: %v", out)
-	}
-
-	lines := strings.Split(string(out), "\n")
-	var packages []*Package
-	for _, line := range lines {
-		if len(strings.TrimSpace(line)) == 0 {
-			continue
-		}
-		words := strings.SplitN(line, "|", 9)
-		if len(words) < 9 {
-			return nil, fmt.Errorf("line '%s' doesn't have enough elements", line)
-		}
-		pkg := &Package{
-			Name:    words[0],
-			Version: words[1],
-			Release: words[2],
-			Arch:    words[3],
-			License: words[4],
-			// install time - 5
-			// size - 6
-			URL:     words[7],
-			Summary: words[8],
-		}
-		ts, err := strconv.ParseInt(words[5], 10, 64)
-		if err != nil {
-			return nil, errors.Wrapf(err, "error converting %s to string", words[5])
-		}
-		pkg.InstallTime = time.Unix(ts, 0)
-
-		pkg.Size, err = strconv.ParseUint(words[6], 10, 64)
-		if err != nil {
-			return nil, errors.Wrapf(err, "error converting %s to string", words[6])
-		}
-
-		packages = append(packages, pkg)
-	}
-
-	return packages, nil
 }
 
 func listDebPackages() ([]*Package, error) {
