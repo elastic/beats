@@ -42,6 +42,6 @@ func TestMemSizeFactor64(t *testing.T) {
 
 	t.Run("returns the value in megabyte", func(t *testing.T) {
 		v := MemSizeFactor64(128 * 1024 * 1024)
-		assert.Equal(t, int64(128), v.Megabytes())
+		assert.Equal(t, 128, v.Megabytes())
 	})
 }
