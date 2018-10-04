@@ -45,34 +45,3 @@ func TestMemSizeFactor64(t *testing.T) {
 		assert.Equal(t, int64(128), v.Megabytes())
 	})
 }
-
-func TestTracingConfig(t *testing.T) {
-	t.Run("known values", func(t *testing.T) {
-		tests := []struct {
-			value    string
-			expected tracingConfig
-		}{
-			{value: "Active", expected: tracingConfig("Active")},
-			{value: "active", expected: tracingConfig("Active")},
-			{value: "passthrough", expected: tracingConfig("PassThrough")},
-			{value: "PassThrough", expected: tracingConfig("PassThrough")},
-		}
-
-		for _, test := range tests {
-			t.Run(test.value, func(t *testing.T) {
-				v := tracingConfig("")
-				err := v.Unpack(test.value)
-				if !assert.NoError(t, err) {
-					return
-				}
-				assert.Equal(t, test.expected, v)
-			})
-		}
-	})
-
-	t.Run("unknown values", func(t *testing.T) {
-		v := tracingConfig("")
-		err := v.Unpack("unknown")
-		assert.Error(t, err)
-	})
-}
