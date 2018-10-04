@@ -94,6 +94,7 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 		}
 	}
 
+	// Create the lambda
 	template.Resources["btl"+name] = &AWSLambdaFunction{
 		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
 			Code: &cloudformation.AWSLambdaFunction_Code{
@@ -118,6 +119,12 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 		},
 		DependsOn: []string{"IAMRoleLambdaExecution"},
 	}
+
+	// Create the log group for the specific function lambda.
+	template.Resources[prefix("LogGroup")] = &cloudformation.AWSLogsLogGroup{
+		LogGroupName: "/aws/lambda/" + prefix(""),
+	}
+
 	return template
 }
 
