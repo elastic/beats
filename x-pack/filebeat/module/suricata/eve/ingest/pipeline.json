@@ -71,16 +71,28 @@
       , "ignore_missing": true
       }
     }
+  , { "rename":
+      { "field": "suricata.eve.src_ip"
+      , "target_field": "source_ecs.ip"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "suricata.eve.dest_ip"
+      , "target_field": "destination.ip"
+      , "ignore_missing": true
+      }
+    }
 
   , { "geoip":
-      { "field": "suricata.eve.src_ip"
-      , "target_field": "suricata.eve.src_geo"
+      { "field": "source_ecs.ip"
+      , "target_field": "source_ecs.geo"
       , "ignore_missing": true
       }
     }
   , { "geoip":
-      { "field": "suricata.eve.dest_ip"
-      , "target_field": "suricata.eve.dest_geo"
+      { "field": "destination.ip"
+      , "target_field": "destination.geo"
       , "ignore_missing": true
       }
     }
