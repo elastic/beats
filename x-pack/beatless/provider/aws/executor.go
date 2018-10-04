@@ -10,9 +10,11 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-var errNeverRun = errors.New("executer was never executed")
-var errCannotAdd = errors.New("cannot add to an already executed executer")
-var errAlreadyExecuted = errors.New("executer already executed")
+var (
+	errNeverRun        = errors.New("executor was never executed")
+	errCannotAdd       = errors.New("cannot add to an already executed executor")
+	errAlreadyExecuted = errors.New("executor already executed")
+)
 
 type executor struct {
 	operations []doer
@@ -31,7 +33,7 @@ type undoer interface {
 
 func newExecutor(log *logp.Logger) *executor {
 	if log == nil {
-		log = logp.NewLogger("executer")
+		log = logp.NewLogger("executor")
 	}
 
 	return &executor{log: log}
@@ -53,7 +55,7 @@ func (e *executor) Execute() (err error) {
 		}
 	}
 	if err == nil {
-		e.log.Debug("all operations successful")
+		e.log.Debug("all operations have been successful")
 	}
 	e.markCompleted()
 	return err

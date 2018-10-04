@@ -22,8 +22,6 @@ import (
 	"github.com/elastic/beats/x-pack/beatless/provider/aws/transformer"
 )
 
-const handlerName = "beatless"
-
 // CloudwatchLogsConfig is the configuration for the cloudwatchlogs event type.
 type CloudwatchLogsConfig struct {
 	Triggers     []*CloudwatchLogsTriggerConfig `config:"triggers"`

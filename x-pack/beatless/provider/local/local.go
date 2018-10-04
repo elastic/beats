@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/x-pack/beatless/provider"
 )
 
-var stdinName = "stdin"
+const stdinName = "stdin"
 
 // Bundle exposes the local provider and the STDIN function.
 var Bundle = provider.MustCreate(
@@ -56,8 +56,8 @@ func (s *StdinFunction) Run(ctx context.Context, client core.Client) error {
 		scanner.Split(bufio.ScanLines)
 
 		for scanner.Scan() {
-			if scanner.Err() != nil {
-				errChan <- scanner.Err()
+			if err := scanner.Err(); err != nil {
+				errChan <- err
 				return
 			}
 

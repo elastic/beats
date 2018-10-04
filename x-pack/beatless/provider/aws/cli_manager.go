@@ -21,9 +21,9 @@ import (
 
 const (
 	// AWS lambda currently support go 1.x as a runtime.
-	runtime = "go1.x"
-
-	bucket = "beatless-deploy"
+	runtime     = "go1.x"
+	bucket      = "beatless-deploy"
+	handlerName = "beatless"
 )
 
 // AWSLambdaFunction add 'dependsOn' as a serializable parameters, for no good reason it's
