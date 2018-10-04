@@ -94,14 +94,7 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 				PolicyDocument: map[string]interface{}{
 					"Statement": []map[string]interface{}{
 						map[string]interface{}{
-							"Action": []string{"logs:CreateLogStream"},
-							"Effect": "Allow",
-							"Resource": []string{
-								cloudformation.Sub("arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/" + name + ":*"),
-							},
-						},
-						map[string]interface{}{
-							"Action": []string{"logs:PutLogEvents"},
+							"Action": []string{"logs:CreateLogStream", "Logs:PutLogEvents"},
 							"Effect": "Allow",
 							"Resource": []string{
 								cloudformation.Sub("arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/" + name + ":*"),
