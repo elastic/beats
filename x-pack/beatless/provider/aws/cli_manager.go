@@ -10,7 +10,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
-	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/awslabs/goformation/cloudformation"
 	merrors "github.com/pkg/errors"
 
@@ -44,7 +43,6 @@ type installer interface {
 // operation that need to be executed to connect the lambda to the triggers.
 type CLIManager struct {
 	provider provider.Provider
-	svc      *lambda.Lambda
 	awsCfg   aws.Config
 	log      *logp.Logger
 }
@@ -66,6 +64,10 @@ func (c *CLIManager) findFunction(name string) (installer, error) {
 func (c *CLIManager) template(function installer, name string) *cloudformation.Template {
 	lambdaConfig := function.LambdaConfig()
 
+	prefix := func(s string) string {
+		return "btl" + name + s
+	}
+
 	// Create the generate cloudformation template for the lambda itself.
 	template := cloudformation.NewTemplate()
 	template.Resources["IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
@@ -84,7 +86,31 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 				},
 			},
 		},
+		Path:     "/",
 		RoleName: "beatless-lambda",
+		Policies: []cloudformation.AWSIAMRole_Policy{
+			cloudformation.AWSIAMRole_Policy{
+				PolicyName: cloudformation.Join("-", []string{"btl", "lambda", name}),
+				PolicyDocument: map[string]interface{}{
+					"Statement": []map[string]interface{}{
+						map[string]interface{}{
+							"Action": []string{"logs:CreateLogStream"},
+							"Effect": "Allow",
+							"Resource": []string{
+								cloudformation.Sub("arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/" + name + ":*"),
+							},
+						},
+						map[string]interface{}{
+							"Action": []string{"logs:PutLogEvents"},
+							"Effect": "Allow",
+							"Resource": []string{
+								cloudformation.Sub("arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/" + name + ":*"),
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	var dlc *cloudformation.AWSLambdaFunction_DeadLetterConfig
@@ -95,7 +121,7 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 	}
 
 	// Create the lambda
-	template.Resources["btl"+name] = &AWSLambdaFunction{
+	template.Resources[prefix("")] = &AWSLambdaFunction{
 		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
 			Code: &cloudformation.AWSLambdaFunction_Code{
 				S3Bucket: bucket,
@@ -122,7 +148,7 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 
 	// Create the log group for the specific function lambda.
 	template.Resources[prefix("LogGroup")] = &cloudformation.AWSLogsLogGroup{
-		LogGroupName: "/aws/lambda/" + prefix(""),
+		LogGroupName: "/aws/lambda/" + name,
 	}
 
 	return template
@@ -130,7 +156,7 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 
 // stackName cloudformation stack are unique per function.
 func (c *CLIManager) stackName(name string) string {
-	return "btl-" + name + "stack"
+	return "btl-" + name + "-stack"
 }
 
 func (c *CLIManager) codeKey(name string) string {
@@ -255,10 +281,8 @@ func NewCLI(
 		return nil, err
 	}
 
-	svc := lambda.New(awsCfg)
 	return &CLIManager{
 		provider: provider,
-		svc:      svc,
 		awsCfg:   awsCfg,
 		log:      logp.NewLogger("aws lambda cli"),
 	}, nil
