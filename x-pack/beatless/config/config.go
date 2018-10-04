@@ -13,6 +13,21 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// ConfigOverrides overrides the defaults provided by libbeat.
+var ConfigOverrides = common.MustNewConfigFrom(map[string]interface{}{
+	"path.data":              "/tmp",
+	"path.logs":              "/tmp/logs",
+	"logging.to_stderr":      true,
+	"logging.to_files":       false,
+	"logging.level":          "debug",
+	"setup.template.enabled": true,
+	"queue.mem": map[string]interface{}{
+		"events":           50,
+		"flush.min_events": 1,
+		"flush.timeout":    "0.1s",
+	},
+})
+
 // Config default configuration for Beatless.
 type Config struct {
 	Provider *common.ConfigNamespace `config:"provider" validate:"required"`
