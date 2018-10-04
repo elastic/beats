@@ -28,17 +28,20 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 // Input manages readers and forwards entries from journals.
 type Input struct {
-	readers  []*reader.Reader
-	done     chan struct{}
-	config   Config
-	pipeline beat.Pipeline
-	states   map[string]checkpoint.JournalState
-	id       uuid.UUID
-	logger   *logp.Logger
+	readers    []*reader.Reader
+	done       chan struct{}
+	config     Config
+	pipeline   beat.Pipeline
+	states     map[string]checkpoint.JournalState
+	id         uuid.UUID
+	logger     *logp.Logger
+	eventMeta  common.EventMetadata
+	processors beat.ProcessorList
 }
 
 // New returns a new Inout
@@ -64,6 +67,7 @@ func New(
 			MaxBackoff:    config.MaxBackoff,
 			BackoffFactor: config.BackoffFactor,
 			Seek:          config.Seek,
+			Matches:       config.Matches,
 		}
 
 		state := states[reader.LocalSystemJournalID]
@@ -81,6 +85,7 @@ func New(
 			MaxBackoff:    config.MaxBackoff,
 			BackoffFactor: config.BackoffFactor,
 			Seek:          config.Seek,
+			Matches:       config.Matches,
 		}
 		state := states[p]
 		r, err := reader.New(cfg, done, state, logger)
@@ -90,16 +95,24 @@ func New(
 		readers = append(readers, r)
 	}
 
+	processors, err := processors.New(config.Processors)
+	if err != nil {
+		return nil, err
+	}
+	logp.Info(">>> %v", config.EventMetadata)
+
 	logger.Debugf("New input is created for paths %v", config.Paths)
 
 	return &Input{
-		readers:  readers,
-		done:     done,
-		config:   config,
-		pipeline: pipeline,
-		states:   states,
-		id:       id,
-		logger:   logger,
+		readers:    readers,
+		done:       done,
+		config:     config,
+		pipeline:   pipeline,
+		states:     states,
+		id:         id,
+		logger:     logger,
+		eventMeta:  config.EventMetadata,
+		processors: processors,
 	}, nil
 }
 
@@ -108,9 +121,9 @@ func New(
 func (i *Input) Run() {
 	client, err := i.pipeline.ConnectWith(beat.ClientConfig{
 		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: common.EventMetadata{},
+		EventMetadata: i.eventMeta,
 		Meta:          nil,
-		Processor:     nil,
+		Processor:     i.processors,
 		ACKCount: func(n int) {
 			i.logger.Infof("journalbeat successfully published %d events", n)
 		},

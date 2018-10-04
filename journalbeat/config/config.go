@@ -34,6 +34,7 @@ type Config struct {
 	BackoffFactor int              `config:"backoff_factor" validate:"min=1"`
 	MaxBackoff    time.Duration    `config:"max_backoff" validate:"min=0,nonzero"`
 	Seek          string           `config:"seek"`
+	Matches       []string         `config:"include_matches"`
 }
 
 // DefaultConfig are the defaults of a Journalbeat instance

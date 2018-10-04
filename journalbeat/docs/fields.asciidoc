@@ -208,6 +208,14 @@ Contains common fields available in all event types.
 
 
 
+*`read_timestamp`*::
++
+--
+The time when Journalbeat read the journal entry.
+
+
+--
+
 [float]
 == coredump fields
 
@@ -236,7 +244,7 @@ Annotations of messages containing coredumps from user units.
 --
 
 [float]
-== object fields
+== journald fields
 
 Fields to log on behalf of a different program.
 
@@ -249,249 +257,7 @@ Audit fields of event.
 
 
 
-*`object.audit.loginuid`*::
-+
---
-type: long
-
-example: 1000
-
-required: False
-
-The login UID of the object process.
-
-
---
-
-*`object.audit.session`*::
-+
---
-type: long
-
-example: 3
-
-required: False
-
-The audit session of the object process.
-
-
---
-
-*`object.cmd`*::
-+
---
-type: keyword
-
-example: /lib/systemd/systemd --user
-
-required: False
-
-The command line of the process.
-
-
---
-
-*`object.name`*::
-+
---
-type: keyword
-
-example: /lib/systemd/systemd
-
-required: False
-
-Name of the executable.
-
-
---
-
-*`object.executable`*::
-+
---
-type: keyword
-
-example: /lib/systemd/systemd
-
-required: False
-
-Path to the the executable.
-
-
---
-
-*`object.uid`*::
-+
---
-type: long
-
-required: False
-
-UID of the object process.
-
-
---
-
-*`object.gid`*::
-+
---
-type: long
-
-required: False
-
-GID of the object process.
-
-
---
-
-*`object.pid`*::
-+
---
-type: long
-
-required: False
-
-PID of the object process.
-
-
---
-
-[float]
-== systemd fields
-
-Systemd fields of event.
-
-
-
-*`object.systemd.owner_uid`*::
-+
---
-type: long
-
-required: False
-
-The UID of the owner.
-
-
---
-
-*`object.systemd.session`*::
-+
---
-type: keyword
-
-required: False
-
-The ID of the systemd session.
-
-
---
-
-*`object.systemd.unit`*::
-+
---
-type: keyword
-
-required: False
-
-The name of the systemd unit.
-
-
---
-
-*`object.systemd.user_unit`*::
-+
---
-type: keyword
-
-required: False
-
-The name of the systemd user unit.
-
-
---
-
-[float]
-== kernel fields
-
-Fields to log on behalf of a different program.
-
-
-
-*`kernel.device`*::
-+
---
-type: keyword
-
-required: False
-
-The kernel device name.
-
-
---
-
-*`kernel.subsystem`*::
-+
---
-type: keyword
-
-required: False
-
-The kernel subsystem name.
-
-
---
-
-*`kernel.device_symlinks`*::
-+
---
-type: text
-
-required: False
-
-Additional symlink names pointing to the device node in /dev.
-
-
---
-
-*`kernel.device_node_path`*::
-+
---
-type: text
-
-required: False
-
-The device node path of this device in /dev.
-
-
---
-
-*`kernel.device_name`*::
-+
---
-type: text
-
-required: False
-
-The kernel device name as it shows up in the device tree below /sys.
-
-
---
-
-[float]
-== process fields
-
-Fields to log on behalf of a different program.
-
-
-
-[float]
-== audit fields
-
-Audit fields of event.
-
-
-
-*`process.audit.loginuid`*::
+*`journald.audit.loginuid`*::
 +
 --
 type: long
@@ -505,7 +271,7 @@ The login UID of the source process.
 
 --
 
-*`process.audit.session`*::
+*`journald.audit.session`*::
 +
 --
 type: long
@@ -519,7 +285,7 @@ The audit session of the source process.
 
 --
 
-*`process.cmd`*::
+*`journald.cmd`*::
 +
 --
 type: keyword
@@ -533,7 +299,7 @@ The command line of the process.
 
 --
 
-*`process.name`*::
+*`journald.name`*::
 +
 --
 type: keyword
@@ -547,7 +313,7 @@ Name of the executable.
 
 --
 
-*`process.executable`*::
+*`journald.executable`*::
 +
 --
 type: keyword
@@ -561,7 +327,7 @@ Path to the the executable.
 
 --
 
-*`process.pid`*::
+*`journald.pid`*::
 +
 --
 type: long
@@ -575,7 +341,7 @@ The ID of the process which logged the message.
 
 --
 
-*`process.gid`*::
+*`journald.gid`*::
 +
 --
 type: long
@@ -589,7 +355,7 @@ The ID of the group which runs the process.
 
 --
 
-*`process.uid`*::
+*`journald.uid`*::
 +
 --
 type: long
@@ -599,6 +365,16 @@ example: 1
 required: False
 
 The ID of the user which runs the process.
+
+
+--
+
+*`journald.capabilites`*::
++
+--
+required: False
+
+The effective capabilites of the process.
 
 
 --
@@ -676,6 +452,18 @@ The systemd slice unit.
 
 --
 
+*`systemd.user_slice`*::
++
+--
+type: keyword
+
+required: False
+
+The systemd user slice unit.
+
+
+--
+
 *`systemd.unit`*::
 +
 --
@@ -735,55 +523,6 @@ example: dd8c974asdf01dbe2ef26d7fasdf264c9
 required: False
 
 The boot ID for the boot the log was generated in.
-
-
---
-
-[float]
-== code fields
-
-Fields of the code generating the event.
-
-
-
-*`code.file`*::
-+
---
-type: text
-
-example: ../src/core/manager.c
-
-required: False
-
-The name of the source file where the log is generated.
-
-
---
-
-*`code.function`*::
-+
---
-type: text
-
-example: job_log_status_message
-
-required: False
-
-The name of the function which generated the log message.
-
-
---
-
-*`code.line`*::
-+
---
-type: long
-
-example: 123
-
-required: False
-
-The line number of the code which generated the log message.
 
 
 --

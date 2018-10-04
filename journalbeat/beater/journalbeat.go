@@ -23,9 +23,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/journalbeat/checkpoint"
+	"github.com/elastic/beats/journalbeat/cmd/instance"
 	"github.com/elastic/beats/journalbeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/journalbeat/config"
@@ -44,6 +46,8 @@ type Journalbeat struct {
 
 // New returns a new Journalbeat instance
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	cfgwarn.Experimental("Journalbeat is experimental.")
+
 	config := config.DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("error reading config file: %v", err)
@@ -54,6 +58,8 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	instance.SetupJournalMetrics()
 
 	var inputs []*input.Input
 	for _, c := range config.Inputs {

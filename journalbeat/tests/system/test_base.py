@@ -109,6 +109,39 @@ class Test(BaseTest):
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
+    def test_read_events_with_existing_registry(self):
+        """
+        Journalbeat is able to pass matchers to the journal reader and read filtered messages.
+        """
+
+        self.render_config_template(
+            journal_path=self.beat_path + "/tests/system/input/test.journal",
+            seek_method="head",
+            matches="syslog.priority=5",
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+        journalbeat_proc = self.start_beat()
+
+        required_log_snippets = [
+            # journalbeat can be started
+            "journalbeat is running",
+            # journalbeat can seek to the position defined in the cursor
+            "Added matcher expression",
+            # message can be read from test journal
+            "unhandled HKEY event 0x60b0",
+            "please report the conditions when this event happened to",
+            "unhandled HKEY event 0x60b1",
+            # Four events with priority 5 is publised
+            "journalbeat successfully published 4 events",
+        ]
+        for snippet in required_log_snippets:
+            self.wait_until(lambda: self.log_contains(snippet),
+                            name="Line in '{}' Journalbeat log".format(snippet))
+
+        exit_code = journalbeat_proc.kill_and_wait()
+        assert exit_code == 0
+
 
 if __name__ == '__main__':
     unittest.main()
