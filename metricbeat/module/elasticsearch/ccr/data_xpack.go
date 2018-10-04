@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
@@ -34,6 +35,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
+		err = errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
 		r.Error(err)
 		return err
 	}

@@ -18,7 +18,7 @@
 package shard
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -27,7 +27,7 @@ import (
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "shard", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "shard", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 		mb.DefaultMetricSet(),
 		mb.WithNamespace("elasticsearch.shard"),
@@ -45,7 +45,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch shard metricset is beta")
+	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
 
 	// Get the stats from the local node
 	ms, err := elasticsearch.NewMetricSet(base, statePath)
@@ -59,13 +59,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statePath)
 	if err != nil {
-		r.Error(fmt.Errorf("Error fetch master info: %s", err))
+		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch shard stats from a non master node.")
+		logp.Debug(elasticsearch.ModuleName, "Trying to fetch shard stats from a non master node.")
 		return
 	}
 

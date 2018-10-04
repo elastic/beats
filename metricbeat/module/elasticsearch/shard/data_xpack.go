@@ -22,24 +22,26 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	stateData := &stateStruct{}
 	err := json.Unmarshal(content, stateData)
 	if err != nil {
-		return
+		return errors.Wrap(err, "failure parsing Elasticsearch Cluster State API response")
 	}
 
 	// TODO: This is currently needed because the cluser_uuid is `na` in stateData in case not the full state is requested.
 	// Will be fixed in: https://github.com/elastic/elasticsearch/pull/30656
 	clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HostData().SanitizedURI+statePath, stateData.MasterNode)
 	if err != nil {
-		return
+		return errors.Wrap(err, "failed to get cluster ID from Elasticsearch")
 	}
 
 	for _, index := range stateData.RoutingTable.Indices {
@@ -97,6 +99,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 			}
 		}
 	}
+	return nil
 }
 
 func getSourceNode(nodeID string, stateData *stateStruct) (common.MapStr, error) {

@@ -22,6 +22,8 @@ import (
 
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -168,13 +170,16 @@ var (
 	}
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`
 	}{}
 
-	json.Unmarshal(content, &nodesStruct)
+	err := json.Unmarshal(content, &nodesStruct)
+	if err != nil {
+		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
+	}
 
 	// Normally the nodeStruct should only contain one node. But if _local is removed
 	// from the path and Metricbeat is not installed on the same machine as the node
@@ -188,14 +193,22 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 			continue
 		}
 
-		isMaster, _ := elasticsearch.IsMaster(m.HTTP, m.HTTP.GetURI())
-
+		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HTTP.GetURI())
+		if err != nil {
+			logp.Err("error determining if connected Elasticsearch node is master: %s", err)
+			continue
+		}
 		event := mb.Event{}
 		// Build source_node object
 		sourceNode, _ := sourceNodeXpack.Apply(node)
 		sourceNode["uuid"] = nodeID
 
-		nodeData, _ := schemaXpack.Apply(node)
+		nodeData, err := schemaXpack.Apply(node)
+		if err != nil {
+			logp.Err("failure to apply node schema: %s", err)
+			continue
+		}
+
 		nodeData["node_master"] = isMaster
 		nodeData["node_id"] = nodeID
 
@@ -211,4 +224,5 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 		r.Event(event)
 	}
+	return nil
 }

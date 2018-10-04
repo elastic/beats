@@ -20,11 +20,14 @@ package stats
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/kibana"
 )
 
 var (
@@ -83,18 +86,19 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
+		err = errors.Wrap(err, "failure parsing Kibana Stats API response")
 		r.Error(err)
 		return err
 	}
 
 	dataFields, err := schema.Apply(data)
 	if err != nil {
-		r.Error(err)
+		r.Error(errors.Wrap(err, "failure to apply stats schema"))
 	}
 
 	var event mb.Event
 	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", "kibana")
+	event.RootFields.Put("service.name", kibana.ModuleName)
 
 	// Set elasticsearch cluster id
 	elasticsearchClusterID, ok := data["cluster_uuid"]
@@ -117,6 +121,5 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	event.MetricSetFields = dataFields
 
 	r.Event(event)
-
-	return err
+	return nil
 }
