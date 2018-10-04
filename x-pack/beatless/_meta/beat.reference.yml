@@ -17,12 +17,12 @@ beatless.provider.aws.functions:
     type: cloudwatch_logs
 
     # Description of the method to help identify them when you run multiples functions.
-    description: "listen to cloudwatch logs"
+    description: "lambda function for cloudwatch logs"
     #
     # Concurrency, is the reserved number of instance for that function.
     # Default is unreserved.
     #
-    # Note: There is a hard limit of 1000 of running function of any kind per account.
+    # Note: There is a hard limit of 1000 functions of any kind per account.
     # concurrency: 5
     #
     # The maximum memory allocated for this function, the configured size must be a factor of 64.
