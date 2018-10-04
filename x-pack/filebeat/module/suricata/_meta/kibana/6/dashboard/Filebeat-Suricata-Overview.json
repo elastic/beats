@@ -42,7 +42,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "ecs.event.type", 
+                                "field": "event.type",
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
@@ -161,7 +161,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "ecs.event.type", 
+                                "field": "event.type",
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
@@ -515,7 +515,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Top Connection Source Countries", 
-                                "field": "suricata.eve.src_geo.country_iso_code", 
+                                "field": "source_ecs.geo.country_iso_code",
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
@@ -574,7 +574,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Top Connection Destination Countries", 
-                                "field": "suricata.eve.dest_geo.country_iso_code", 
+                                "field": "destination.geo.country_iso_code",
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
