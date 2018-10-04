@@ -13,10 +13,13 @@
         "haproxy.connections.retries": 0, 
         "haproxy.connections.server": 0, 
         "haproxy.frontend_name": "incoming~", 
-        "haproxy.geoip.continent_name": "North America", 
-        "haproxy.geoip.country_iso_code": "US", 
-        "haproxy.geoip.location.lat": 37.751, 
-        "haproxy.geoip.location.lon": -97.822, 
+        "haproxy.geoip.city_name": "Minas Tirith", 
+        "haproxy.geoip.continent_name": "Middle Earth", 
+        "haproxy.geoip.country_iso_code": "GO", 
+        "haproxy.geoip.location.lat": 40.7143, 
+        "haproxy.geoip.location.lon": -74.006, 
+        "haproxy.geoip.region_iso_code": "GO-PE", 
+        "haproxy.geoip.region_name": "Pelennor", 
         "haproxy.http.request.captured_cookie": "-", 
         "haproxy.http.request.captured_headers": [
             "docs.example.internal"

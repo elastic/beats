@@ -14,6 +14,8 @@ services:
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"
     - "xpack.security.enabled=false"
+    volumes:
+    - ./geoip/GeoLite2-City.mmdb:/usr/share/elasticsearch/config/ingest-geoip/GeoLite2-City.mmdb
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.0.0-alpha1-SNAPSHOT
