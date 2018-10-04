@@ -3,6 +3,10 @@
   description: >
     Fields exported by the EVE JSON logs
   fields:
+    - name: src_ip
+      type: ip
+    - name: dest_ip
+      type: ip
     - name: flow_id
       type: keyword
 
