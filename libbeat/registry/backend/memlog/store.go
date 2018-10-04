@@ -39,7 +39,7 @@ type memStore struct {
 	tbl hashtable
 }
 
-func newStore(home string, mode os.FileMode, bufSz int) (*store, error) {
+func newStore(home string, mode os.FileMode, bufSz uint) (*store, error) {
 	fi, err := os.Stat(home)
 	if os.IsNotExist(err) {
 		err = os.MkdirAll(home, os.ModeDir|0770)

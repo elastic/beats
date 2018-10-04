@@ -94,10 +94,10 @@ func (r *Registry) Access(name string) (backend.Store, error) {
 		return nil, errRegClosed
 	}
 
-	root := r.settings.Root
+	home := filepath.Join(r.settings.Root, name)
 	fileMode := r.settings.FileMode
-	bufSz := int(r.settings.BufferSize)
-	store, err := newStore(filepath.Join(root, name), fileMode, bufSz)
+	bufSz := r.settings.BufferSize
+	store, err := newStore(home, fileMode, bufSz)
 	if err != nil {
 		return nil, err
 	}

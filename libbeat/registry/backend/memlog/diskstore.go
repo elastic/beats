@@ -86,7 +86,7 @@ func newDiskStore(
 	mode os.FileMode,
 	entries uint,
 	logInvalid bool,
-	bufferSize int,
+	bufferSize uint,
 ) *diskStore {
 	s := &diskStore{
 		home:             home,
@@ -97,7 +97,7 @@ func newDiskStore(
 		logInvalid:       logInvalid,
 		logNeedsTruncate: false, // only truncate on next checkpoint
 		dataFiles:        dataFiles,
-		bufferSize:       bufferSize,
+		bufferSize:       int(bufferSize),
 	}
 
 	s.tryOpenLog()
@@ -275,9 +275,9 @@ func (s *diskStore) checkpointTmpFile(baseName string, tbl *hashtable) (string, 
 		return "", err
 	}
 
-	needsClose := true
+	ok := false
 	defer func() {
-		if !needsClose {
+		if !ok {
 			f.Close()
 		}
 	}()
@@ -324,7 +324,7 @@ func (s *diskStore) checkpointTmpFile(baseName string, tbl *hashtable) (string, 
 		return "", err
 	}
 
-	needsClose = false
+	ok = true
 	if err = f.Close(); err != nil {
 		return "", err
 	}
@@ -605,9 +605,9 @@ func writeMetaFile(home string, mode os.FileMode) error {
 		return err
 	}
 
-	needsClose := true
+	ok := false
 	defer func() {
-		if !needsClose {
+		if !ok {
 			f.Close()
 		}
 	}()
@@ -624,7 +624,7 @@ func writeMetaFile(home string, mode os.FileMode) error {
 		return err
 	}
 
-	needsClose = false
+	ok = true
 	if err := f.Close(); err != nil {
 		return err
 	}
