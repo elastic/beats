@@ -25,11 +25,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
@@ -145,7 +146,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch Cluster Stats API response")
 	}
 
 	clusterStats := common.MapStr(data)
@@ -161,44 +162,44 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
 
 	license, err := elasticsearch.GetLicense(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get license from Elasticsearch")
 	}
 
 	clusterStateMetrics := []string{"version", "master_node", "nodes", "routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get cluster state from Elasticsearch")
 	}
 
 	if err = elasticsearch.PassThruField("status", clusterStats, clusterState); err != nil {
-		return err
+		return errors.Wrap(err, "failed to pass through status field")
 	}
 
 	nodesHash, err := computeNodesHash(clusterState)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to compute nodes hash")
 	}
 	clusterState.Put("nodes_hash", nodesHash)
 
 	usage, err := elasticsearch.GetStackUsage(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get stack usage from Elasticsearch")
 	}
 
 	clusterNeedsTLS, err := clusterNeedsTLSEnabled(license, usage)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to determine if cluster needs TLS enabled")
 	}
 	license.Put("cluster_needs_tls", clusterNeedsTLS) // This powers a cluster alert for enabling TLS on the ES transport protocol
 
 	isAPMFound, err := apmIndicesExist(clusterState)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to determine if APM indices exist")
 	}
 	delete(clusterState, "routing_table") // We don't want to index the routing table in monitoring indices
 

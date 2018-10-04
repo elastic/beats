@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -31,7 +33,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch Recovery API response")
 	}
 
 	var results []map[string]interface{}
@@ -67,7 +69,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to retrieve info from Elasticsearch")
 	}
 
 	event := mb.Event{}

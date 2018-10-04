@@ -20,10 +20,13 @@ package index_recovery
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 var (
@@ -56,6 +59,8 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 	err := json.Unmarshal(content, &data)
 	if err != nil {
+		err = errors.Wrap(err, "failure parsing Elasticsearch Recovery API response")
+		r.Error(err)
 		return err
 	}
 
@@ -70,7 +75,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 			event.MetricSetFields, _ = schema.Apply(data)
 			event.ModuleFields.Put("index.name", indexName)
 			event.RootFields = common.MapStr{}
-			event.RootFields.Put("service.name", "elasticsearch")
+			event.RootFields.Put("service.name", elasticsearch.ModuleName)
 			r.Event(event)
 		}
 	}

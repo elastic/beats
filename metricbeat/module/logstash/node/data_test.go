@@ -24,6 +24,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,9 +38,11 @@ func TestEventMapping(t *testing.T) {
 		content, err := ioutil.ReadFile(f)
 		assert.NoError(t, err)
 
-		event, err := eventMapping(content)
+		reporter := &mbtest.CapturingReporterV2{}
+		err = eventMapping(reporter, content)
 
 		assert.NoError(t, err, f)
-		assert.True(t, len(event) >= 1, f)
+		assert.True(t, len(reporter.GetEvents()) >= 1, f)
+		assert.Equal(t, 0, len(reporter.GetErrors()), f)
 	}
 }
