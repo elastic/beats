@@ -65,9 +65,8 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		event.MetricSetFields, err = schema.Apply(job)
 		if err != nil {
-			err = errors.Wrap(err, "failure applying ml job schema")
-			event.Error = err
-			errs = append(errs)
+			event.Error = errors.Wrap(err, "failure applying ml job schema")
+			errs = append(errs, event.Error)
 		}
 
 		r.Event(event)

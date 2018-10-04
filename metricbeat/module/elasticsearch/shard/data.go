@@ -77,30 +77,27 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 				fields, err := schema.Apply(shard)
 				if err != nil {
-					err = errors.Wrap(err, "failure applying shard schema")
-					event.Error = err
+					event.Error = errors.Wrap(err, "failure applying shard schema")
 					r.Event(event)
-					errs = append(errs, err)
+					errs = append(errs, event.Error)
 					continue
 				}
 
 				// Handle node field: could be string or null
 				err = elasticsearch.PassThruField("node", shard, fields)
 				if err != nil {
-					err = errors.Wrap(err, "failure passing through node field")
-					event.Error = err
+					event.Error = errors.Wrap(err, "failure passing through node field")
 					r.Event(event)
-					errs = append(errs, err)
+					errs = append(errs, event.Error)
 					continue
 				}
 
 				// Handle relocating_node field: could be string or null
 				err = elasticsearch.PassThruField("relocating_node", shard, fields)
 				if err != nil {
-					err = errors.Wrap(err, "failure passing through relocating_node field")
-					event.Error = err
+					event.Error = errors.Wrap(err, "failure passing through relocating_node field")
 					r.Event(event)
-					errs = append(errs, err)
+					errs = append(errs, event.Error)
 					continue
 				}
 

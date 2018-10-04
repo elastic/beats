@@ -71,17 +71,25 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 		shards, ok := d["shards"]
 		if !ok {
 			err = elastic.MakeErrorForMissingField(indexName+".shards", elastic.Elasticsearch)
-			errs = append(errs, err)
 			r.Error(err)
+			errs = append(errs, err)
 			continue
 		}
 		for _, data := range shards {
 			event := mb.Event{}
-			event.ModuleFields = common.MapStr{}
-			event.MetricSetFields, _ = schema.Apply(data)
-			event.ModuleFields.Put("index.name", indexName)
+
 			event.RootFields = common.MapStr{}
 			event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
+			event.ModuleFields = common.MapStr{}
+			event.ModuleFields.Put("index.name", indexName)
+
+			event.MetricSetFields, err = schema.Apply(data)
+			if err != nil {
+				event.Error = errors.Wrap(err, "failure applying shard schema")
+				errs = append(errs, event.Error)
+			}
+
 			r.Event(event)
 		}
 	}

@@ -65,9 +65,8 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		event.MetricSetFields, err = schema.Apply(task)
 		if err != nil {
-			err = errors.Wrap(err, "failure applying task schema")
-			errs = append(errs, err)
-			event.Error = err
+			event.Error = errors.Wrap(err, "failure applying task schema")
+			errs = append(errs, event.Error)
 		}
 
 		r.Event(event)

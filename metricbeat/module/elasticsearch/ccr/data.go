@@ -88,8 +88,9 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 				continue
 			}
 
-			event.MetricSetFields, event.Error = schema.Apply(shard)
-			if event.Error != nil {
+			event.MetricSetFields, err = schema.Apply(shard)
+			if err != nil {
+				event.Error = errors.Wrap(err, "failure applying shard schema")
 				r.Event(event)
 				errs = append(errs, event.Error)
 				continue

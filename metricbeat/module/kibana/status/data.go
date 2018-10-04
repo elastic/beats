@@ -59,18 +59,16 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Kibana Status API response")
-		event.Error = err
+		event.Error = errors.Wrap(err, "failure parsing Kibana Status API response")
 		r.Event(event)
-		return err
+		return event.Error
 	}
 
 	dataFields, err := schema.Apply(data)
 	if err != nil {
-		err = errors.Wrap(err, "failure to apply status schema")
-		event.Error = err
+		event.Error = errors.Wrap(err, "failure to apply status schema")
 		r.Event(event)
-		return err
+		return event.Error
 	}
 
 	event.MetricSetFields = dataFields

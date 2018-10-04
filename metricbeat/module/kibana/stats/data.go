@@ -105,27 +105,24 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	// Set elasticsearch cluster id
 	elasticsearchClusterID, ok := data["cluster_uuid"]
 	if !ok {
-		err = elastic.MakeErrorForMissingField("cluster_uuid", elastic.Kibana)
-		event.Error = err
+		event.Error = elastic.MakeErrorForMissingField("cluster_uuid", elastic.Kibana)
 		r.Event(event)
-		return err
+		return event.Error
 	}
 	event.RootFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	// Set process PID
 	process, ok := data["process"].(map[string]interface{})
 	if !ok {
-		err = elastic.MakeErrorForMissingField("process", elastic.Kibana)
-		event.Error = err
+		event.Error = elastic.MakeErrorForMissingField("process", elastic.Kibana)
 		r.Event(event)
-		return err
+		return event.Error
 	}
 	pid, ok := process["pid"].(float64)
 	if !ok {
-		err = elastic.MakeErrorForMissingField("process.pid", elastic.Kibana)
-		event.Error = err
+		event.Error = elastic.MakeErrorForMissingField("process.pid", elastic.Kibana)
 		r.Event(event)
-		return err
+		return event.Error
 	}
 	event.RootFields.Put("process.pid", int(pid))
 

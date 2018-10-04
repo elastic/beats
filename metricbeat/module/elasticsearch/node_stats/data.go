@@ -135,9 +135,9 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
-			err = errors.Wrap(err, "failure to apply node schema")
-			event.Error = err
-			errs = append(errs, err)
+			event.Error = errors.Wrap(err, "failure to apply node schema")
+			r.Event(event)
+			errs = append(errs, event.Error)
 		}
 
 		r.Event(event)
