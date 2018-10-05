@@ -252,13 +252,15 @@ The name of the operating system.
 
 --
 
-*`apache2.access.user_agent.raw`*::
+*`apache2.access.user_agent.original`*::
 +
 --
 type: text
 
-Raw user agent value before parsing by ingest-user-agent plugin.
+Original user agent value before parsing by ingest-user-agent plugin.
 
+
+Field is not indexed.
 
 --
 
@@ -4037,13 +4039,15 @@ The name of the operating system.
 
 --
 
-*`iis.access.user_agent.raw`*::
+*`iis.access.user_agent.original`*::
 +
 --
 type: text
 
-Raw user agent value before parsing by ingest-user-agent plugin.
+Original user agent value before parsing by ingest-user-agent plugin.
 
+
+Field is not indexed.
 
 --
 
@@ -5355,13 +5359,15 @@ The name of the operating system.
 
 --
 
-*`nginx.access.user_agent.raw`*::
+*`nginx.access.user_agent.original`*::
 +
 --
 type: text
 
-Raw user agent value before parsing by ingest-user-agent plugin.
+Original user agent value before parsing by ingest-user-agent plugin.
 
+
+Field is not indexed.
 
 --
 
@@ -6365,13 +6371,15 @@ The name of the operating system.
 
 --
 
-*`traefik.access.user_agent.raw`*::
+*`traefik.access.user_agent.original`*::
 +
 --
 type: text
 
-Raw user agent value before parsing by ingest-user-agent plugin.
+Original user agent value before parsing by ingest-user-agent plugin.
 
+
+Field is not indexed.
 
 --
 

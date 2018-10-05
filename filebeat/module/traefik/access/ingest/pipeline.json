@@ -50,7 +50,7 @@
         {
             "rename": {
                 "field": "traefik.access.agent",
-                "target_field": "traefik.access.user_agent.raw"
+                "target_field": "traefik.access.user_agent.original"
             }
         },
         {
