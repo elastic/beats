@@ -23,7 +23,7 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/mssqle/mssql"
+	"github.com/elastic/beats/x-pack/metricbeat/module/mssql"
 	"github.com/pkg/errors"
 )
 
@@ -70,7 +70,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	fetcher, err := mssql.NewFetcher(m.config, []string{
 		"SELECT * FROM sys.dm_server_services;",
-		"SELECT * FROM sys.dm_server_memory_dumps;",
+		"SELECT * FROM sys.dm_server_memory_dumps;", //TODO Does not return anything?
 	}, &schema)
 	if err != nil {
 		reporter.Error(errors.Wrap(err, "error creating fetcher"))

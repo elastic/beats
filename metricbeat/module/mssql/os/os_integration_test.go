@@ -4,13 +4,14 @@
 
 // +build integration
 
-package server
+package os
 
 import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,22 +26,26 @@ func TestFetch(t *testing.T) {
 	}
 
 	t.Logf("Module: %s Metricset: %s", f.Module().Name(), f.Name())
-
 	for _, event := range events {
-		userPercent, err := event.MetricSetFields.GetValue("services.status")
-		assert.NoError(t, err)
-		if userPercentFloat, ok := userPercent.(int64); !ok {
-			t.Fail()
-		} else {
-			assert.True(t, userPercentFloat > 0)
-		}
+		pretty.Println(event, event.ModuleFields)
 	}
+
+	//TODO Each event is a different field but the order is unknown to check
+	// for _, event := range events {
+	// 	pageSplitsSeconds, err := event.MetricSetFields.GetValue("performance.page_splits_seconds")
+	// 	assert.NoError(t, err)
+	// 	if pageSplitsSecondsFloat, ok := pageSplitsSeconds.(int64); !ok {
+	// 		t.Fail()
+	// 	} else {
+	// 		assert.True(t, pageSplitsSecondsFloat > 0)
+	// 	}
+	// }
 }
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "mssql",
-		"metricsets": []string{"server"},
+		"metricsets": []string{"os"},
 		"host":       "127.0.0.1",
 		"user":       "sa",
 		"password":   "1234_asdf",

@@ -1,0 +1,195 @@
+version: '2'
+services:
+  beat:
+    build: ${PWD}/.
+    environment:
+      - TEST_ENVIRONMENT=false
+    working_dir: /go/src/github.com/elastic/beats/metricbeat
+    volumes:
+      - ${PWD}/..:/go/src/github.com/elastic/beats/
+      # This is required to on-demand launching the rest on containers for tests & also docker module tests:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: make
+    env_file:
+      - ./module/aerospike/_meta/env
+      - ./module/apache/_meta/env
+      - ./module/ceph/_meta/env
+      - ./module/couchbase/_meta/env
+      - ./module/dropwizard/_meta/env
+      - ./module/elasticsearch/_meta/env
+      - ./module/envoyproxy/_meta/env
+      - ./module/etcd/_meta/env
+      - ./module/haproxy/_meta/env
+      - ./module/http/_meta/env
+      - ./module/jolokia/_meta/env
+      - ./module/kafka/_meta/env
+      - ./module/kibana/_meta/env
+      - ./module/kubernetes/_meta/env
+      - ./module/logstash/_meta/env
+      - ./module/memcached/_meta/env
+      - ./module/mongodb/_meta/env
+      - ./module/munin/_meta/env
+      - ./module/mysql/_meta/env
+      - ./module/nginx/_meta/env
+      - ./module/php_fpm/_meta/env
+      - ./module/postgresql/_meta/env
+      - ./module/prometheus/_meta/env
+      - ./module/rabbitmq/_meta/env
+      - ./module/redis/_meta/env
+      - ./module/traefik/_meta/env
+      - ./module/uwsgi/_meta/env
+      - ./module/zookeeper/_meta/env
+
+  # Modules
+  aerospike:
+    build: ./module/aerospike/_meta
+
+  apache:
+    build: ./module/apache/_meta
+
+  apache_2_4_12:
+    build:
+      context: ./module/apache/_meta
+      dockerfile: Dockerfile.2.4.12
+
+  ceph:
+    build: ./module/ceph/_meta
+
+  couchbase:
+    build: ./module/couchbase/_meta
+
+  dropwizard:
+    build: ./module/dropwizard/_meta
+
+  elasticsearch:
+    build: ./module/elasticsearch/_meta
+    environment:
+      - "ES_JAVA_OPTS=-Xms90m -Xmx90m"
+      - "network.host="
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
+      - "xpack.security.enabled=false"
+
+  envoyproxy:
+    build: ./module/envoyproxy/_meta
+
+  etcd:
+    build: ./module/etcd/_meta
+
+  haproxy:
+    build: ./module/haproxy/_meta
+
+  haproxy_1_6:
+    build:
+      context: ./module/haproxy/_meta
+      dockerfile: Dockerfile.1.6
+
+  haproxy_1_7:
+    build:
+      context: ./module/haproxy/_meta
+      dockerfile: Dockerfile.1.7
+
+  http:
+    build: ./module/http/_meta
+
+  jolokia:
+    build: ./module/jolokia/_meta
+
+  kafka:
+    build:
+      context: ./module/kafka/_meta
+      args:
+        KAFKA_VERSION: 2.0.0
+
+  kafka_1_1_0:
+    build:
+      context: ./module/kafka/_meta
+      args:
+        KAFKA_VERSION: 1.1.0
+
+  kafka_0_10_2:
+    build:
+      context: ./module/kafka/_meta
+      args:
+        KAFKA_VERSION: 0.10.2.1
+
+  kibana:
+    build: ./module/kibana/_meta
+
+  kubernetes:
+    build: ./module/kubernetes/_meta
+    network_mode: host
+    pid: host
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /sys:/sys
+      - /var/lib/docker:/var/lib/docker
+      - /var/run:/var/run
+
+  kubestate:
+    build:
+      context: ./module/kubernetes/_meta/
+      dockerfile: Dockerfile.kube-state
+    depends_on:
+      - kubernetes
+
+  logstash:
+    build: ./module/logstash/_meta
+
+  memcached:
+    build: ./module/memcached/_meta
+
+  mongodb:
+    build: ./module/mongodb/_meta
+    command: mongod --replSet beats
+
+  munin:
+    build: ./module/munin/_meta
+
+  mysql:
+    build: ./module/mysql/_meta
+
+  nginx:
+    build: ./module/nginx/_meta
+
+  phpfpm:
+    build: ./module/php_fpm/_meta
+
+  postgresql:
+    build: ./module/postgresql/_meta
+
+  prometheus:
+    build: ./module/prometheus/_meta
+
+  rabbitmq:
+    build: ./module/rabbitmq/_meta
+
+  redis:
+    build: ./module/redis/_meta
+
+  redis_4:
+    build:
+      context: ./module/redis/_meta
+      args:
+        REDIS_VERSION: 4.0.11
+
+  redis_5:
+    build:
+      context: ./module/redis/_meta
+      args:
+        REDIS_VERSION: 5.0-rc4
+
+  traefik:
+    build: ./module/traefik/_meta
+
+  uwsgi_tcp:
+    build: ./module/uwsgi/_meta
+    command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9191 --memory-report --wsgi-file app.py
+
+  uwsgi_http:
+    build: ./module/uwsgi/_meta
+    command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9192 --memory-report --stats-http --wsgi-file app.py
+
+  zookeeper:
+    build: ./module/zookeeper/_meta
