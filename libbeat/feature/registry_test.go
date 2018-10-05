@@ -184,18 +184,18 @@ func TestOverwrite(t *testing.T) {
 		f := func() {}
 		r := newRegistry()
 		assert.Equal(t, 0, r.Size())
-		r.Overwrite(New("processor", "foo", f, Stable))
+		r.Overwrite(New("processor", "foo", f, defaultDetails))
 		assert.Equal(t, 1, r.Size())
 	})
 
 	t.Run("overwrite when the feature exists", func(t *testing.T) {
 		f := func() {}
 		r := newRegistry()
-		r.Register(New("processor", "foo", f, Stable))
+		r.Register(New("processor", "foo", f, defaultDetails))
 		assert.Equal(t, 1, r.Size())
 
 		check := 42
-		r.Overwrite(New("processor", "foo", check, Stable))
+		r.Overwrite(New("processor", "foo", check, defaultDetails))
 		assert.Equal(t, 1, r.Size())
 
 		feature, err := r.Lookup("processor", "foo")
