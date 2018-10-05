@@ -80,7 +80,7 @@ func RegisterConnectCallback(callback connectCallback) (uuid.UUID, error) {
 	for exists {
 		key, err := uuid.NewV4()
 		if err != nil {
-			return uuid.UUID{}, err
+			return uuid.Nil, err
 		}
 		_, exists = connectCallbackRegistry.callbacks[key]
 	}
