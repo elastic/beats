@@ -178,3 +178,33 @@ func TestUnregister(t *testing.T) {
 		assert.Equal(t, 0, r.Size())
 	})
 }
+
+func TestOverwrite(t *testing.T) {
+	t.Run("when the feature doesn't exist", func(t *testing.T) {
+		f := func() {}
+		r := newRegistry()
+		assert.Equal(t, 0, r.Size())
+		r.Overwrite(New("processor", "foo", f, Stable))
+		assert.Equal(t, 1, r.Size())
+	})
+
+	t.Run("overwrite when the feature exists", func(t *testing.T) {
+		f := func() {}
+		r := newRegistry()
+		r.Register(New("processor", "foo", f, Stable))
+		assert.Equal(t, 1, r.Size())
+
+		check := 42
+		r.Overwrite(New("processor", "foo", check, Stable))
+		assert.Equal(t, 1, r.Size())
+
+		feature, err := r.Lookup("processor", "foo")
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		v, ok := feature.Factory().(int)
+		assert.True(t, ok)
+		assert.Equal(t, 42, v)
+	})
+}

@@ -99,9 +99,41 @@ func New(namespace, name string, factory interface{}, description Describer) *Fe
 // RegisterBundle registers a bundle of features.
 func RegisterBundle(bundle *Bundle) error {
 	for _, f := range bundle.Features() {
-		Registry.Register(f)
+		err := Registry.Register(f)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+// MustRegisterBundle register a new bundle and panic on error.
+func MustRegisterBundle(bundle *Bundle) {
+	err := RegisterBundle(bundle)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// OverwriteBundle register a bundle of feature and replace any existing feature with a new
+// implementation.
+func OverwriteBundle(bundle *Bundle) error {
+	for _, f := range bundle.Features() {
+		err := Registry.Register(f)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// MustOverwriteBundle register a bundle of feature, replace any existing feature with a new
+// implementation and panic on error.
+func MustOverwriteBundle(bundle *Bundle) {
+	err := OverwriteBundle(bundle)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Register register a new feature on the global registry.
