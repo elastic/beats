@@ -46,10 +46,9 @@ class TestAutodiscover(BaseTest):
         proc.check_kill_and_wait()
 
         matched = False
-        matcher = re.compile("redis")
+        matcher = re.compile("redis", re.I)
         for i, container in enumerate(docker_client.containers.list()):
-            print "Search for redis in: {} ".format(container.image.tags)
-            if any(matcher.match(tag) for tag in container.image.tags):
+            if any(matcher.search(tag) for tag in container.image.tags):
                 network_settings = container.attrs['NetworkSettings']
                 host = network_settings['IPAddress']
                 port = network_settings['Ports'].keys()[0].split("/")[0]
