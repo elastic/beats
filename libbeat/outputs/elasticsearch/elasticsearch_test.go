@@ -40,10 +40,8 @@ func TestConnectCallbacksManagement(t *testing.T) {
 		t.Fatalf("error while registering callback: %v", err)
 	}
 
-	fmt.Printf("%v\n", connectCallbackRegistry.callbacks)
 	t.Logf("removing second callback")
 	DeregisterConnectCallback(id1)
-	fmt.Printf("%v\n", connectCallbackRegistry.callbacks)
 	if _, ok := connectCallbackRegistry.callbacks[id2]; !ok {
 		t.Fatalf("third callback cannot be retrieved")
 	}
