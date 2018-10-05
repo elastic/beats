@@ -48,7 +48,9 @@ class TestAutodiscover(BaseTest):
         matched = False
         matcher = re.compile("redis", re.I)
         for i, container in enumerate(docker_client.containers.list()):
+            print "Search for redis in: {} ".format(container.image.tags)
             if any(matcher.search(tag) for tag in container.image.tags):
+                print "matched tag in: {}".format(container.image.tags)
                 network_settings = container.attrs['NetworkSettings']
                 host = network_settings['IPAddress']
                 port = network_settings['Ports'].keys()[0].split("/")[0]
