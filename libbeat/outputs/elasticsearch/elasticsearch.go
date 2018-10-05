@@ -76,9 +76,10 @@ func RegisterConnectCallback(callback connectCallback) (uuid.UUID, error) {
 
 	// find the next unique key
 	var key uuid.UUID
+	var err error
 	exists := true
 	for exists {
-		key, err := uuid.NewV4()
+		key, err = uuid.NewV4()
 		if err != nil {
 			return uuid.Nil, err
 		}
