@@ -155,7 +155,7 @@ var (
 			"watcher":    c.Dict("watcher", threadPoolStatsSchema),
 		}),
 		"fs": c.Dict("fs", s.Schema{
-			"summary": c.Dict("total", s.Schema{
+			"total": c.Dict("total", s.Schema{
 				"total_in_bytes":     c.Int("total_in_bytes"),
 				"free_in_bytes":      c.Int("free_in_bytes"),
 				"available_in_bytes": c.Int("available_in_bytes"),
