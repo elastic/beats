@@ -126,6 +126,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Add tag "multiline" to "log.flags" if event consists of multiple lines. {pull}7997[7997]
 - Add haproxy module. {pull}8014[8014]
 - Release `docker` input as GA. {pull}8328[8328]
+- Better tracking of number of open file descriptors. {pull}7986[7986]
 
 *Heartbeat*
 
