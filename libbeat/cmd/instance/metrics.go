@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/libbeat/metric/system/process"
@@ -43,9 +44,8 @@ func setupMetrics(name string) error {
 	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
 
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
-	if runtime.GOOS != "windows" {
-		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
-	}
+
+	setupPlatformSpecificMetrics()
 
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
@@ -57,6 +57,16 @@ func setupMetrics(name string) error {
 	err := beatProcessStats.Init()
 
 	return err
+}
+
+func setupPlatformSpecificMetrics() {
+	if runtime.GOOS != "windows" {
+		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
+	}
+
+	if runtime.GOOS == "linux" {
+		monitoring.NewFunc(beatMetrics, "fd", reportFDUsage, monitoring.Report)
+	}
 }
 
 func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
@@ -81,14 +91,9 @@ func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
 }
 
 func getRSSSize() (uint64, error) {
-	pid, err := process.GetSelfPid()
+	state, err := getBeatProcessState()
 	if err != nil {
-		return 0, fmt.Errorf("error getting PID for self process: %v", err)
-	}
-
-	state, err := beatProcessStats.GetOne(pid)
-	if err != nil {
-		return 0, fmt.Errorf("error retrieving process stats: %v", err)
+		return 0, err
 	}
 
 	iRss, err := state.GetValue("memory.rss.bytes")
@@ -101,6 +106,20 @@ func getRSSSize() (uint64, error) {
 		return 0, fmt.Errorf("error converting Resident Set Size to uint64: %v", iRss)
 	}
 	return rss, nil
+}
+
+func getBeatProcessState() (common.MapStr, error) {
+	pid, err := process.GetSelfPid()
+	if err != nil {
+		return nil, fmt.Errorf("error getting PID for self process: %v", err)
+	}
+
+	state, err := beatProcessStats.GetOne(pid)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving process stats: %v", err)
+	}
+
+	return state, nil
 }
 
 func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
@@ -141,14 +160,9 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 }
 
 func getCPUUsage() (float64, *process.Ticks, error) {
-	pid, err := process.GetSelfPid()
+	state, err := getBeatProcessState()
 	if err != nil {
-		return 0.0, nil, fmt.Errorf("error getting PID for self process: %v", err)
-	}
-
-	state, err := beatProcessStats.GetOne(pid)
-	if err != nil {
-		return 0.0, nil, fmt.Errorf("error retrieving process stats: %v", err)
+		return 0.0, nil, err
 	}
 
 	iTotalCPUUsage, err := state.GetValue("cpu.total.value")
@@ -198,6 +212,62 @@ func getCPUUsage() (float64, *process.Ticks, error) {
 	}
 
 	return totalCPUUsage, &p, nil
+}
+
+func reportFDUsage(_ monitoring.Mode, V monitoring.Visitor) {
+	V.OnRegistryStart()
+	defer V.OnRegistryFinished()
+
+	open, hardLimit, softLimit, err := getFDUsage()
+	if err != nil {
+		logp.Err("Error while retrieving FD information: %v", err)
+		return
+	}
+
+	monitoring.ReportInt(V, "open", int64(open))
+	monitoring.ReportNamespace(V, "limit", func() {
+		monitoring.ReportInt(V, "hard", int64(hardLimit))
+		monitoring.ReportInt(V, "soft", int64(softLimit))
+	})
+}
+
+func getFDUsage() (open, hardLimit, softLimit uint64, err error) {
+	state, err := getBeatProcessState()
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	iOpen, err := state.GetValue("fd.open")
+	if err != nil {
+		return 0, 0, 0, fmt.Errorf("error getting number of open FD: %v", err)
+	}
+
+	open, ok := iOpen.(uint64)
+	if !ok {
+		return 0, 0, 0, fmt.Errorf("error converting value of open FDs to uint64: %v", iOpen)
+	}
+
+	iHardLimit, err := state.GetValue("fd.limit.hard")
+	if err != nil {
+		return 0, 0, 0, fmt.Errorf("error getting FD hard limit: %v", err)
+	}
+
+	hardLimit, ok = iHardLimit.(uint64)
+	if !ok {
+		return 0, 0, 0, fmt.Errorf("error converting values of FD hard limit: %v", iHardLimit)
+	}
+
+	iSoftLimit, err := state.GetValue("fd.limit.soft")
+	if err != nil {
+		return 0, 0, 0, fmt.Errorf("error getting FD hard limit: %v", err)
+	}
+
+	softLimit, ok = iSoftLimit.(uint64)
+	if !ok {
+		return 0, 0, 0, fmt.Errorf("error converting values of FD hard limit: %v", iSoftLimit)
+	}
+
+	return open, hardLimit, softLimit, nil
 }
 
 func reportSystemLoadAverage(_ monitoring.Mode, V monitoring.Visitor) {
