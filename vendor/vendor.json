@@ -678,12 +678,12 @@
 			"versionExact": "v0.0.3"
 		},
 		{
-			"checksumSHA1": "MK8/w0Idj7kRBUiBabARPdm9hOo=",
+			"checksumSHA1": "+FZjRtpNIIvf+ZteS0y6IGw/JA8=",
 			"path": "github.com/elastic/go-ucfg",
-			"revision": "581f7b1fe9d84f4c18ef0694d6e0eb944a925dae",
-			"revisionTime": "2018-07-13T14:04:29Z",
-			"version": "v0.6.1",
-			"versionExact": "v0.6.1"
+			"revision": "e81c02ad8f1ab46b9e8b07f0832245c0c2e1d13c",
+			"revisionTime": "2018-10-05T15:55:04Z",
+			"version": "v0.6.4",
+			"versionExact": "v0.6.4"
 		},
 		{
 			"checksumSHA1": "X+R/CD8SokJrmlxFTx2nSevRDhQ=",
