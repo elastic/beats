@@ -73,9 +73,15 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
+	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+clusterStatsPath)
+	if err != nil {
+		r.Error(errors.Wrap(err, "failed to get info from Elasticsearch"))
+		return
+	}
+
 	if m.MetricSet.XPack {
-		eventMappingXPack(r, m, content)
+		eventMappingXPack(r, m, *info, content)
 	} else {
-		eventMapping(r, content)
+		eventMapping(r, *info, content)
 	}
 }
