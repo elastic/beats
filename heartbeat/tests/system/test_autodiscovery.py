@@ -46,13 +46,16 @@ class TestAutodiscover(BaseTest):
         proc.check_kill_and_wait()
 
         matched = False
+        matcher = re.compile("redis")
         for i, container in enumerate(docker_client.containers.list()):
-            network_settings = container.attrs['NetworkSettings']
-            host = network_settings['IPAddress']
-            port = network_settings['Ports'].keys()[0].split("/")[0]
-            # Check metadata is added
-            expected = 'tcp-tcp@%s:%s' % (host, port)
-            if expected == output[0]['monitor']['id']:
-                matched = True
+            print "Search for redis in: {} ".format(container.image.tags)
+            if any(matcher.match(tag) for tag in container.image.tags):
+                network_settings = container.attrs['NetworkSettings']
+                host = network_settings['IPAddress']
+                port = network_settings['Ports'].keys()[0].split("/")[0]
+                # Check metadata is added
+                expected = 'tcp-tcp@%s:%s' % (host, port)
+                if expected == output[0]['monitor']['id']:
+                    matched = True
 
         assert matched
