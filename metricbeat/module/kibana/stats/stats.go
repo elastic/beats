@@ -32,7 +32,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet("kibana", "stats", New,
+	mb.Registry.MustAddMetricSet(kibana.ModuleName, "stats", New,
 		mb.WithHostParser(hostParser),
 	)
 }
@@ -60,7 +60,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The kibana stats metricset is experimental")
+	cfgwarn.Experimental("The " + base.FullyQualifiedName() + " metricset is experimental")
 
 	config := kibana.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -83,12 +83,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if !isStatsAPIAvailable {
-		const errorMsg = "The kibana stats metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
-		return nil, fmt.Errorf(errorMsg, kibana.StatsAPIAvailableVersion, kibanaVersion)
+		const errorMsg = "The %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
+		return nil, fmt.Errorf(errorMsg, base.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
 	}
 
 	if config.XPackEnabled {
-		cfgwarn.Experimental("The experimental xpack.enabled flag in kibana/stats metricset is enabled.")
+		cfgwarn.Experimental("The experimental xpack.enabled flag in the " + base.FullyQualifiedName() + " metricset is enabled.")
 
 		// Use legacy API response so we can passthru usage as-is
 		statsHTTP.SetURI(statsHTTP.GetURI() + "&legacy=true")
@@ -96,7 +96,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	var settingsHTTP *helper.HTTP
 	if config.XPackEnabled {
-		cfgwarn.Experimental("The experimental xpack.enabled flag in kibana/stats metricset is enabled.")
+		cfgwarn.Experimental("The experimental xpack.enabled flag in the " + base.FullyQualifiedName() + " metricset is enabled.")
 
 		isSettingsAPIAvailable, err := kibana.IsSettingsAPIAvailable(kibanaVersion)
 		if err != nil {
@@ -104,8 +104,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 
 		if !isSettingsAPIAvailable {
-			const errorMsg = "The kibana stats metricset with X-Pack enabled is only supported with Kibana >= %v. You are currently running Kibana %v"
-			return nil, fmt.Errorf(errorMsg, kibana.SettingsAPIAvailableVersion, kibanaVersion)
+			const errorMsg = "The %v metricset with X-Pack enabled is only supported with Kibana >= %v. You are currently running Kibana %v"
+			return nil, fmt.Errorf(errorMsg, base.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
 		}
 
 		settingsHTTP, err = helper.NewHTTP(base)

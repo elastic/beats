@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
@@ -54,6 +55,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
+		err = errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
 		r.Error(err)
 		return err
 	}
@@ -83,7 +85,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 			}
 
 			event.RootFields = common.MapStr{}
-			event.RootFields.Put("service.name", "elasticsearch")
+			event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
 			event.ModuleFields = common.MapStr{}
 			event.ModuleFields.Put("cluster.name", info.ClusterName)

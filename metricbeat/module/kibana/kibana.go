@@ -31,6 +31,9 @@ import (
 )
 
 const (
+	// ModuleName is the name of this module
+	ModuleName = "kibana"
+
 	// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
 	StatsAPIAvailableVersion = "6.4.0"
 
