@@ -1,3 +1,5 @@
+logging.level: debug
+
 heartbeat.monitors:
 {% for monitor in monitors -%}
 - type: {{ monitor.type }}
@@ -39,6 +41,19 @@ heartbeat.config.monitors:
   reload.period: 1s
   reload.enabled: {{ reload|default("false")}}
 {% endif -%}
+
+{% if autodiscover %}
+heartbeat.autodiscover:
+  providers:
+  {%- for provider, settings in autodiscover.items() %}
+  - type: {{provider}}
+    {%- if settings %}
+    {%- for k, v in settings.items() %}
+    {{k}}: {{v | default([])}}
+    {%- endfor %}
+    {%- endif %}
+  {%- endfor %}
+{% endif %}
 
 {%- if shipper_name %}
 name: {{ shipper_name }}
