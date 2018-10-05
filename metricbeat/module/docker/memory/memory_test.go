@@ -60,8 +60,9 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	expectedEvent := common.MapStr{
 		"_module": common.MapStr{
 			"container": common.MapStr{
-				"id":   containerID,
-				"name": "name1",
+				"id":    containerID,
+				"name":  "name1",
+				"image": "image",
 				"labels": common.MapStr{
 					"label1": "val1",
 					"label2": common.MapStr{
