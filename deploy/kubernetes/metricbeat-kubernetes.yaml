@@ -77,6 +77,12 @@ data:
       period: 10s
       host: ${NODE_NAME}
       hosts: ["localhost:10255"]
+      # If using Red Hat OpenShift remove the previous hosts entry and 
+      # uncomment these settings:
+      #hosts: ["https://${HOSTNAME}:10250"]
+      #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      #ssl.certificate_authorities:
+        #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 ---
 # Deploy a Metricbeat instance per node for node metrics retrieval
 apiVersion: extensions/v1beta1
@@ -320,6 +326,12 @@ rules:
   - statefulsets
   - deployments
   verbs: ["get", "list", "watch"]
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  verbs:
+  - get
 ---
 apiVersion: v1
 kind: ServiceAccount
