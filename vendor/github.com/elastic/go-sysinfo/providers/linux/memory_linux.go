@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -20,7 +20,6 @@ package linux
 import (
 	"bytes"
 	"strconv"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -29,8 +28,7 @@ import (
 
 func parseMemInfo(content []byte) (*types.HostMemoryInfo, error) {
 	memInfo := &types.HostMemoryInfo{
-		Timestamp: time.Now().UTC(),
-		Metrics:   map[string]uint64{},
+		Metrics: map[string]uint64{},
 	}
 
 	hasAvailable := false

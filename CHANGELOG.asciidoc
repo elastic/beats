@@ -98,6 +98,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Support for Kafka 2.0.0 in kafka output {pull}8399[8399]
 - Add setting `setup.kibana.space.id` to support Kibana Spaces {pull}7942[7942]
 - Better tracking of number of open file descriptors. {pull}7986[7986]
+- Report number of open file handles on Windows. {pull}8329[8329]
 
 *Auditbeat*
 

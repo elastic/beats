@@ -15,9 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package windows contains various Windows system calls.
+// +build windows
+
 package windows
 
-// Use "GOOS=windows go generate -v -x" to generate the sources.
-// Add -trace to enable debug prints around syscalls.
-//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -systemdll=false -output zsyscall_windows.go kernel32.go version.go psapi.go ntdll.go
+const (
+	// This process access rights are missing from Go's syscall package as of 1.10.3
+
+	// PROCESS_VM_READ right allows to read memory from the target process.
+	PROCESS_VM_READ = 0x10
+
+	// PROCESS_QUERY_LIMITED_INFORMATION right allows to access a subset of the
+	// information granted by PROCESS_QUERY_INFORMATION. Not available in XP
+	// and Server 2003.
+	PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+)

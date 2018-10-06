@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -69,22 +69,21 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	return parseMemInfo(content)
 }
 
-func (h *host) CPUTime() (*types.CPUTimes, error) {
+func (h *host) CPUTime() (types.CPUTimes, error) {
 	stat, err := h.procFS.NewStat()
 	if err != nil {
-		return nil, err
+		return types.CPUTimes{}, err
 	}
 
-	return &types.CPUTimes{
-		Timestamp: time.Now(),
-		User:      time.Duration(stat.CPUTotal.User * float64(time.Second)),
-		System:    time.Duration(stat.CPUTotal.System * float64(time.Second)),
-		Idle:      time.Duration(stat.CPUTotal.Idle * float64(time.Second)),
-		IOWait:    time.Duration(stat.CPUTotal.Iowait * float64(time.Second)),
-		IRQ:       time.Duration(stat.CPUTotal.IRQ * float64(time.Second)),
-		Nice:      time.Duration(stat.CPUTotal.Nice * float64(time.Second)),
-		SoftIRQ:   time.Duration(stat.CPUTotal.SoftIRQ * float64(time.Second)),
-		Steal:     time.Duration(stat.CPUTotal.Steal * float64(time.Second)),
+	return types.CPUTimes{
+		User:    time.Duration(stat.CPUTotal.User * float64(time.Second)),
+		System:  time.Duration(stat.CPUTotal.System * float64(time.Second)),
+		Idle:    time.Duration(stat.CPUTotal.Idle * float64(time.Second)),
+		IOWait:  time.Duration(stat.CPUTotal.Iowait * float64(time.Second)),
+		IRQ:     time.Duration(stat.CPUTotal.IRQ * float64(time.Second)),
+		Nice:    time.Duration(stat.CPUTotal.Nice * float64(time.Second)),
+		SoftIRQ: time.Duration(stat.CPUTotal.SoftIRQ * float64(time.Second)),
+		Steal:   time.Duration(stat.CPUTotal.Steal * float64(time.Second)),
 	}, nil
 }
 
