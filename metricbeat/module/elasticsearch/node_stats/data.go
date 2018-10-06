@@ -21,11 +21,13 @@ import (
 	"encoding/json"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 var (
@@ -110,6 +112,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	nodeData := &nodesStruct{}
 	err := json.Unmarshal(content, nodeData)
 	if err != nil {
+		err = errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
 		r.Error(err)
 		return err
 	}
@@ -120,7 +123,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
-			r.Error(err)
+			r.Error(errors.Wrap(err, "failure to apply node schema"))
 		}
 
 		event.ModuleFields = common.MapStr{
@@ -132,7 +135,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 			},
 		}
 		event.RootFields = common.MapStr{}
-		event.RootFields.Put("service.name", "elasticsearch")
+		event.RootFields.Put("service.name", elasticsearch.ModuleName)
 		r.Event(event)
 	}
 	return errs.Err()

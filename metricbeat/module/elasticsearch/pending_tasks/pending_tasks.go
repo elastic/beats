@@ -18,7 +18,8 @@
 package pending_tasks
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
@@ -30,7 +31,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.AddMetricSet("elasticsearch", "pending_tasks", New, hostParser)
+	mb.Registry.AddMetricSet(elasticsearch.ModuleName, "pending_tasks", New, hostParser)
 }
 
 var (
@@ -53,7 +54,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch pending_tasks metricset is beta.")
+	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta.")
 
 	http, err := helper.NewHTTP(base)
 	if err != nil {
@@ -67,28 +68,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.http, m.HostData().SanitizedURI)
 	if err != nil {
-		return nil, err
+		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
+		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch pending tasks from a none master node.")
-		return nil, nil
+		logp.Debug(elasticsearch.ModuleName, "Trying to fetch pending tasks from a non-master node.")
+		return
 	}
 
 	content, err := m.http.FetchContent()
 	if err != nil {
-		return nil, err
+		r.Error(err)
+		return
 	}
 
-	events, _ := eventsMapping(content)
-
-	for _, event := range events {
-		event.Put(mb.NamespaceKey, "cluster.pending_task")
-	}
-
-	return events, nil
+	eventsMapping(r, content)
 }

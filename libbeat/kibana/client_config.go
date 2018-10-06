@@ -25,13 +25,15 @@ import (
 
 // ClientConfig to connect to Kibana
 type ClientConfig struct {
-	Protocol string            `config:"protocol"`
-	Host     string            `config:"host"`
-	Path     string            `config:"path"`
-	Username string            `config:"username"`
-	Password string            `config:"password"`
-	TLS      *tlscommon.Config `config:"ssl"`
-	Timeout  time.Duration     `config:"timeout"`
+	Protocol      string            `config:"protocol"`
+	Host          string            `config:"host"`
+	Path          string            `config:"path"`
+	SpaceID       string            `config:"space.id"`
+	Username      string            `config:"username"`
+	Password      string            `config:"password"`
+	TLS           *tlscommon.Config `config:"ssl"`
+	Timeout       time.Duration     `config:"timeout"`
+	IgnoreVersion bool
 }
 
 var (
@@ -39,6 +41,7 @@ var (
 		Protocol: "http",
 		Host:     "localhost:5601",
 		Path:     "",
+		SpaceID:  "",
 		Username: "",
 		Password: "",
 		Timeout:  90 * time.Second,

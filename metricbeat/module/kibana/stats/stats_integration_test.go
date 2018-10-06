@@ -25,6 +25,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
 
@@ -32,6 +34,37 @@ import (
 	"github.com/elastic/beats/metricbeat/module/kibana"
 	"github.com/elastic/beats/metricbeat/module/kibana/mtest"
 )
+
+func TestFetch(t *testing.T) {
+	compose.EnsureUpWithTimeout(t, 600, "elasticsearch", "kibana")
+
+	config := mtest.GetConfig("stats")
+	host := config["hosts"].([]string)[0]
+	version, err := getKibanaVersion(host)
+	if err != nil {
+		t.Fatal("getting kibana version", err)
+	}
+
+	isStatsAPIAvailable, err := kibana.IsStatsAPIAvailable(version)
+	if err != nil {
+		t.Fatal("checking if kibana stats API is available", err)
+	}
+
+	if !isStatsAPIAvailable {
+		t.Skip("Kibana stats API is not available until 6.4.0")
+	}
+
+	f := mbtest.NewReportingMetricSetV2(t, config)
+	events, errs := mbtest.ReportingFetchV2(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("kibana", "stats").Fields.StringToPrint())
+}
 
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "kibana")
