@@ -153,7 +153,6 @@ type queueFactory func(queue.Eventer) (queue.Queue, error)
 // queue and outputs will be closed.
 func New(
 	beat beat.Info,
-	monitors Monitors,
 	metrics *monitoring.Registry,
 	queueFactory queueFactory,
 	out outputs.Group,
@@ -206,7 +205,7 @@ func New(
 	}
 	p.eventSema = newSema(maxEvents)
 
-	p.output = newOutputController(beat, monitors, log, p.observer, p.queue)
+	p.output = newOutputController(beat, metrics, log, p.observer, p.queue)
 	p.output.Set(out)
 
 	return p, nil

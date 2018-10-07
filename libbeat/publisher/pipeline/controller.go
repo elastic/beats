@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
@@ -32,9 +33,9 @@ import (
 // - reload
 type outputController struct {
 	beat     beat.Info
-	monitors Monitors
 	logger   *logp.Logger
 	observer outputObserver
+	reg      *monitoring.Registry
 
 	queue queue.Queue
 
@@ -62,14 +63,14 @@ type outputWorker interface {
 
 func newOutputController(
 	beat beat.Info,
-	monitors Monitors,
+	reg *monitoring.Registry,
 	log *logp.Logger,
 	observer outputObserver,
 	b queue.Queue,
 ) *outputController {
 	c := &outputController{
 		beat:     beat,
-		monitors: monitors,
+		reg:      reg,
 		logger:   log,
 		observer: observer,
 		queue:    b,
@@ -157,7 +158,7 @@ func (c *outputController) Reload(cfg *reload.ConfigWithMeta) error {
 		return err
 	}
 
-	output, err := loadOutput(c.beat, c.monitors, outputCfg)
+	output, err := loadOutput(c.beat, c.reg, outputCfg)
 	if err != nil {
 		return err
 	}
