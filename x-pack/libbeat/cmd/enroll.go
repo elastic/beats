@@ -41,6 +41,10 @@ func genEnrollCmd(name, version string) *cobra.Command {
 		Args: cobra.RangeArgs(1, 2),
 		Run: cli.RunWith(func(cmd *cobra.Command, args []string) error {
 			beat, err := getBeat(name, version)
+			if err != nil {
+				return err
+			}
+
 			kibanaURL := args[0]
 
 			if username == "" && len(args) == 1 {
@@ -75,7 +79,7 @@ func genEnrollCmd(name, version string) *cobra.Command {
 				}
 				enrollmentToken, err = client.CreateEnrollmentToken()
 				if err != nil {
-					return errors.Wrap(err, "Creating a new enrollment token")
+					return errors.Wrap(err, "Error creating a new enrollment token")
 				}
 			}
 

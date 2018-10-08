@@ -43,8 +43,10 @@ type ConfigManager struct {
 // NewConfigManager returns a X-Pack Beats Central Management manager
 func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	c := defaultConfig()
-	if err := config.Unpack(&c); err != nil {
-		return nil, errors.Wrap(err, "parsing central management settings")
+	if config != nil {
+		if err := config.Unpack(&c); err != nil {
+			return nil, errors.Wrap(err, "parsing central management settings")
+		}
 	}
 	return NewConfigManagerWithConfig(c, registry, beatUUID)
 }

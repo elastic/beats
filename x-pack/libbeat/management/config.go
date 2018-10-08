@@ -24,7 +24,6 @@ const ManagedConfigTemplate = `
 # are not supported by Kibana Beats management.
 
 {{.CentralManagementSettings}}
-
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -94,7 +93,13 @@ type templateParams struct {
 func (c *Config) OverwriteConfigFile(wr io.Writer) error {
 	t := template.Must(template.New("beat.management.yml").Parse(ManagedConfigTemplate))
 
-	data, err := yaml.Marshal(c)
+	tmp := struct {
+		Management *Config `yaml:"xpack.management"`
+	}{
+		Management: c,
+	}
+
+	data, err := yaml.Marshal(tmp)
 	if err != nil {
 		return err
 	}
