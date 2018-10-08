@@ -51,7 +51,7 @@ const ManagedConfigTemplate = `
 #logging.selectors: ["*"]
 
 #============================== Xpack Monitoring ===============================
-# beatname can export internal metrics to a central Elasticsearch monitoring
+# {{.BeatName}} can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
@@ -87,10 +87,11 @@ func defaultConfig() *Config {
 
 type templateParams struct {
 	CentralManagementSettings string
+	BeatName                  string
 }
 
 // OverwriteConfigFile will overwrite beat settings file with the enrolled template
-func (c *Config) OverwriteConfigFile(wr io.Writer) error {
+func (c *Config) OverwriteConfigFile(wr io.Writer, beatName string) error {
 	t := template.Must(template.New("beat.management.yml").Parse(ManagedConfigTemplate))
 
 	tmp := struct {
@@ -106,6 +107,7 @@ func (c *Config) OverwriteConfigFile(wr io.Writer) error {
 
 	params := templateParams{
 		CentralManagementSettings: string(data),
+		BeatName:                  beatName,
 	}
 
 	return t.Execute(wr, params)

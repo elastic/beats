@@ -50,7 +50,7 @@ func Enroll(beat *instance.Beat, kibanaURL, enrollmentToken string) error {
 	}
 	defer f.Close()
 
-	if err := config.OverwriteConfigFile(f); err != nil {
+	if err := config.OverwriteConfigFile(f, beat.Beat.Info.Beat); err != nil {
 		return errors.Wrap(err, "overriding settings file")
 	}
 
