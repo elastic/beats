@@ -70,14 +70,14 @@ const ManagedConfigTemplate = `
 // Config for central management
 type Config struct {
 	// true when enrolled
-	Enabled bool `config:"enabled"`
+	Enabled bool `config:"enabled" yaml:"enabled"`
 
 	// Poll configs period
-	Period time.Duration `config:"period"`
+	Period time.Duration `config:"period" yaml:"period"`
 
-	AccessToken string `config:"access_token"`
+	AccessToken string `config:"access_token" yaml:"access_token"`
 
-	Kibana *kibana.ClientConfig `config:"kibana"`
+	Kibana *kibana.ClientConfig `config:"kibana" yaml:"kibana"`
 }
 
 func defaultConfig() *Config {
