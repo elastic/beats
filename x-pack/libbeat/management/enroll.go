@@ -5,6 +5,11 @@
 package management
 
 import (
+	"os"
+
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
 )
@@ -12,15 +17,15 @@ import (
 // Enroll this beat to the given kibana
 // This will use Central Management API to enroll and retrieve an access key for config retrieval
 func Enroll(beat *instance.Beat, kibanaURL, enrollmentToken string) error {
-	config, err := api.ConfigFromURL(kibanaURL)
+	kibanaConfig, err := api.ConfigFromURL(kibanaURL)
 	if err != nil {
 		return err
 	}
 
 	// Ignore kibana version to avoid permission errors
-	config.IgnoreVersion = true
+	kibanaConfig.IgnoreVersion = true
 
-	client, err := api.NewClient(config)
+	client, err := api.NewClient(kibanaConfig)
 	if err != nil {
 		return err
 	}
@@ -32,10 +37,22 @@ func Enroll(beat *instance.Beat, kibanaURL, enrollmentToken string) error {
 
 	// Enrolled, persist state
 	// TODO use beat.Keystore() for access_token
-	settings := defaultConfig()
-	settings.Enabled = true
-	settings.AccessToken = accessToken
-	settings.Kibana = config
+	config := defaultConfig()
+	config.Enabled = true
+	config.AccessToken = accessToken
+	config.Kibana = kibanaConfig
 
-	return settings.Save()
+	// TODO ask for confirmation before doing this, save a backup copy:
+	configFile := cfgfile.GetDefaultCfgfile()
+	f, err := os.OpenFile(configFile, os.O_RDWR|os.O_TRUNC, 0600)
+	if err != nil {
+		return errors.Wrap(err, "opening settings file")
+	}
+	defer f.Close()
+
+	if err := config.OverwriteConfigFile(f); err != nil {
+		return errors.Wrap(err, "overriding settings file")
+	}
+
+	return nil
 }
