@@ -6,6 +6,54 @@
     - name: event_type
       type: keyword
 
+    - name: vars
+      type: group
+      fields:
+      - name: flowbits
+        type: group
+        fields:
+        - name: ET.MalformedTLSHB
+          type: boolean
+
+        - name: ET.http.binary
+          type: boolean
+
+        - name: exe.no.referer
+          type: boolean
+
+        - name: ET.realEDUrequest
+          type: boolean
+
+        - name: ET.HB.Request.CI
+          type: boolean
+
+        - name: ET.smb.binary
+          type: boolean
+
+        - name: ET.HB.Request.SI
+          type: boolean
+
+        - name: ET.HB.Response.CI
+          type: boolean
+
+        - name: is_proto_irc
+          type: boolean
+
+      - name: flowints
+        type: group
+        fields:
+        - name: tls.anomaly.count
+          type: long
+
+        - name: http.anomaly.count
+          type: long
+
+        - name: smtp.anomaly.count
+          type: long
+
+    - name: app_proto_orig
+      type: keyword
+
     - name: tcp
       type: group
       fields:
@@ -78,6 +126,9 @@
     - name: proto
       type: keyword
 
+    - name: pcap_cnt
+      type: long
+
     - name: src_ip
       type: ip
 
@@ -111,6 +162,12 @@
     - name: flow_id
       type: keyword
 
+    - name: email
+      type: group
+      fields:
+      - name: status
+        type: keyword
+
     - name: dest_ip
       type: ip
 
@@ -123,10 +180,16 @@
       - name: status
         type: long
 
+      - name: redirect
+        type: keyword
+
       - name: http_user_agent
         type: keyword
 
       - name: protocol
+        type: keyword
+
+      - name: http_refer
         type: keyword
 
       - name: url
@@ -170,7 +233,6 @@
 
       - name: action
         type: keyword
-        # value = allowed
 
       - name: signature_id
         type: long
@@ -631,6 +693,9 @@
       - name: subject
         type: keyword
 
+    - name: app_proto_ts
+      type: keyword
+
     - name: flow
       type: group
       fields:
@@ -669,3 +734,21 @@
 
     - name: tx_id
       type: long
+
+    - name: app_proto_tc
+      type: keyword
+
+    - name: smtp
+      type: group
+      fields:
+      - name: rcpt_to
+        type: keyword
+
+      - name: mail_from
+        type: keyword
+
+      - name: helo
+        type: keyword
+
+    - name: app_proto_expected
+      type: keyword
