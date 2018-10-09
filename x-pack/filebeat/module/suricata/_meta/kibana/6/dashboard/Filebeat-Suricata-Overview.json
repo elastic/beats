@@ -396,15 +396,15 @@
             "attributes": {
                 "columns": [
                     "host.name", 
-                    "ecs.event.type", 
+                    "event.type", 
                     "suricata.eve.flow_id", 
                     "suricata.eve.proto", 
-                    "suricata.eve.src_ip", 
+                    "source_ecs.ip", 
                     "suricata.eve.src_port", 
                     "suricata.eve.dest_ip", 
                     "suricata.eve.dest_port", 
-                    "ecs.destination.geo.region_name", 
-                    "ecs.destination.geo.country_iso_code"
+                    "destination.geo.region_name", 
+                    "destination.geo.country_iso_code"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -419,7 +419,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "ecs.event.type", 
+                                    "key": "event.type", 
                                     "negate": true, 
                                     "params": {
                                         "query": "stats", 
@@ -430,7 +430,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "ecs.event.type": {
+                                        "event.type": {
                                             "query": "stats", 
                                             "type": "phrase"
                                         }
@@ -717,7 +717,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "ecs.event.type", 
+                                    "key": "event.type", 
                                     "negate": false, 
                                     "params": {
                                         "query": "stats", 
@@ -728,7 +728,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "ecs.event.type": {
+                                        "event.type": {
                                             "query": "stats", 
                                             "type": "phrase"
                                         }
