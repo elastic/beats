@@ -86,6 +86,9 @@ Example:
 path.data: /var/lib/beats
 ------------------------------------------------------------------------------
 
+TIP: When running multiple Beat instances on the same host, make sure they
+each have a distinct `path.data` value.
+
 [float]
 ==== `logs`
 

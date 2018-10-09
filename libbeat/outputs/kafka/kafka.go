@@ -33,13 +33,6 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
-type kafka struct {
-	config kafkaConfig
-	topic  outil.Selector
-
-	partitioner sarama.PartitionerConstructor
-}
-
 const (
 	defaultWaitRetry = 1 * time.Second
 

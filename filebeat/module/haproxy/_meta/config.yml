@@ -1,6 +1,6 @@
 - module: haproxy
   # All logs
-  http:
+  log:
     enabled: true
 
     # Set which input to use between syslog (default) or file.

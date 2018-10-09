@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -77,14 +79,14 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 
 	err := json.Unmarshal(content, &all)
 	if err != nil {
-		return []error{err}
+		return []error{errors.Wrap(err, "failure parsing Elasticsearch Stats API response")}
 	}
 
 	var errs []error
 
 	fields, err := schemaXPack.Apply(all.Data)
 	if err != nil {
-		errs = append(errs, err)
+		errs = append(errs, errors.Wrap(err, "failure applying stats schema"))
 	}
 
 	nodeInfo, err := elasticsearch.GetNodeInfo(m.HTTP, m.HostData().SanitizedURI+statsPath, "")
@@ -108,6 +110,5 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 
 	r.Event(event)
-
 	return errs
 }

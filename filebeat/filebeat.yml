@@ -122,6 +122,11 @@ setup.kibana:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
   #host: "localhost:5601"
 
+  # Kibana Space ID
+  # ID of the Kibana Space into which the dashboards should be loaded. By default,
+  # the Default Space will be used.
+  #space.id:
+
 #============================= Elastic Cloud ==================================
 
 # These settings simplify using filebeat with the Elastic Cloud (https://cloud.elastic.co/).

@@ -19,7 +19,10 @@ package shard
 
 import (
 	"encoding/json"
+	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
@@ -27,33 +30,18 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	stateData := &stateStruct{}
 	err := json.Unmarshal(content, stateData)
 	if err != nil {
-		return
-	}
-
-	nodeInfo, err := elasticsearch.GetNodeInfo(m.HTTP, m.HostData().SanitizedURI+statePath, stateData.MasterNode)
-	if err != nil {
-		return
+		return errors.Wrap(err, "failure parsing Elasticsearch Cluster State API response")
 	}
 
 	// TODO: This is currently needed because the cluser_uuid is `na` in stateData in case not the full state is requested.
 	// Will be fixed in: https://github.com/elastic/elasticsearch/pull/30656
 	clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HostData().SanitizedURI+statePath, stateData.MasterNode)
 	if err != nil {
-		return
-	}
-
-	sourceNode := common.MapStr{
-		"uuid":              stateData.MasterNode,
-		"host":              nodeInfo.Host,
-		"transport_address": nodeInfo.TransportAddress,
-		"ip":                nodeInfo.IP,
-		// This seems to be in the x-pack data a subset of the cluster_uuid not the name?
-		"name":      stateData.ClusterName,
-		"timestamp": common.Time(time.Now()),
+		return errors.Wrap(err, "failed to get cluster ID from Elasticsearch")
 	}
 
 	for _, index := range stateData.RoutingTable.Indices {
@@ -77,17 +65,33 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 					continue
 				}
 
-				event.RootFields = common.MapStr{}
-
 				event.RootFields = common.MapStr{
 					"timestamp":    time.Now(),
 					"cluster_uuid": clusterID,
 					"interval_ms":  m.Module().Config().Period.Nanoseconds() / 1000 / 1000,
 					"type":         "shards",
-					"source_node":  sourceNode,
 					"shard":        fields,
 					"state_uuid":   stateData.StateID,
 				}
+
+				// Build source_node object
+				nodeID, ok := shard["node"]
+				if !ok {
+					continue
+				}
+				if nodeID != nil { // shard has not been allocated yet
+					sourceNode, err := getSourceNode(nodeID.(string), stateData)
+					if err != nil {
+						continue
+					}
+					event.RootFields.Put("source_node", sourceNode)
+				}
+
+				event.ID, err = getEventID(stateData.StateID, fields)
+				if err != nil {
+					continue
+				}
+
 				event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 
 				r.Event(event)
@@ -95,4 +99,54 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 			}
 		}
 	}
+	return nil
+}
+
+func getSourceNode(nodeID string, stateData *stateStruct) (common.MapStr, error) {
+	nodeInfo, ok := stateData.Nodes[nodeID]
+	if !ok {
+		return nil, elastic.MakeErrorForMissingField("nodes."+nodeID, elastic.Elasticsearch)
+	}
+
+	return common.MapStr{
+		"uuid": nodeID,
+		"name": nodeInfo.Name,
+	}, nil
+}
+
+func getEventID(stateID string, shard common.MapStr) (string, error) {
+	var nodeID string
+	if shard["node"] == nil {
+		nodeID = "_na"
+	} else {
+		var ok bool
+		nodeID, ok = shard["node"].(string)
+		if !ok {
+			return "", elastic.MakeErrorForMissingField("node", elastic.Elasticsearch)
+		}
+	}
+
+	indexName, ok := shard["index"].(string)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField("index", elastic.Elasticsearch)
+	}
+
+	shardNumberInt, ok := shard["shard"].(int64)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField("shard", elastic.Elasticsearch)
+	}
+	shardNumberStr := strconv.FormatInt(shardNumberInt, 10)
+
+	isPrimary, ok := shard["primary"].(bool)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField("primary", elastic.Elasticsearch)
+	}
+	var shardType string
+	if isPrimary {
+		shardType = "p"
+	} else {
+		shardType = "r"
+	}
+
+	return stateID + ":" + nodeID + ":" + indexName + ":" + shardNumberStr + ":" + shardType, nil
 }

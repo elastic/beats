@@ -18,6 +18,8 @@
 package index
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -27,7 +29,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "index", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "index", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 	)
 }
@@ -44,7 +46,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch index metricset is beta")
+	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
 
 	// TODO: This currently gets index data for all indices. Make it configurable.
 	ms, err := elasticsearch.NewMetricSet(base, statsPath)
@@ -59,13 +61,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statsPath)
 	if err != nil {
-		r.Error(err)
+		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch index stats from a non master node.")
+		logp.Debug(elasticsearch.ModuleName, "Trying to fetch index stats from a non-master node.")
 		return
 	}
 
@@ -77,7 +79,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
 	if err != nil {
-		r.Error(err)
+		r.Error(errors.Wrap(err, "failed to get info from Elasticsearch"))
 		return
 	}
 
