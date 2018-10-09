@@ -140,7 +140,9 @@ func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *logL
 
 	if len(msg.Attrs) > 0 {
 		message.AddFields(common.MapStr{
-			"attrs": msg.Attrs,
+			"docker": common.MapStr{
+				"attrs": msg.Attrs,
+			},
 		})
 	}
 
