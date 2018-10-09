@@ -230,8 +230,8 @@
                     "suricata.eve.src_port", 
                     "suricata.eve.dest_ip", 
                     "suricata.eve.dest_port", 
-                    "ecs.source.geo.country_iso_code", 
-                    "ecs.destination.geo.country_iso_code"
+                    "source_ecs.geo.country_iso_code",
+                    "destination.geo.country_iso_code"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -246,7 +246,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "ecs.event.type", 
+                                    "key": "event.type",
                                     "negate": false, 
                                     "params": {
                                         "query": "alert", 
@@ -257,7 +257,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "ecs.event.type": {
+                                        "event.type": {
                                             "query": "alert", 
                                             "type": "phrase"
                                         }
