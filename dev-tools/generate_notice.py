@@ -7,6 +7,7 @@ import argparse
 import json
 import csv
 import re
+import copy
 
 
 def read_file(filename):
@@ -59,7 +60,8 @@ def gather_dependencies(vendor_dirs, overrides=None):
                     print("WARNING: No version information found for: {}".format(lib_path))
                     lib = {"path": lib_path}
                 else:
-                    lib = lib_search[0]
+                    lib = copy.deepcopy(lib_search[0])
+
                 lib["license_file"] = os.path.join(root, filename)
 
                 lib["license_contents"] = read_file(lib["license_file"])
@@ -79,7 +81,13 @@ def gather_dependencies(vendor_dirs, overrides=None):
             # don't walk down into another vendor dir
             if "vendor" in dirs:
                 dirs.remove("vendor")
+
     return dependencies
+
+
+# Allow to skip files that could match the `LICENSE` pattern but does not have any license information.
+SKIP_FILES = [
+]
 
 
 def get_licenses(folder):
@@ -88,7 +96,7 @@ def get_licenses(folder):
     """
     licenses = []
     for filename in sorted(os.listdir(folder)):
-        if filename.startswith("LICENSE") and "docs" not in filename:
+        if filename.startswith("LICENSE") and "docs" not in filename and os.path.join(folder, filename) not in SKIP_FILES:
             licenses.append(filename)
         elif filename.startswith("APLv2"):  # gorhill/cronexpr
             licenses.append(filename)
@@ -240,6 +248,19 @@ without limitation the rights to use, copy, modify, merge, publish,
 distribute, sublicense, and/or sell copies of the Software, and to
 permit persons to whom the Software is furnished to do so, subject to
 the following conditions:
+    """),
+    re.sub(r"\s+", " ", """Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     """),
 ]
 

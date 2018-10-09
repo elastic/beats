@@ -61,7 +61,7 @@
   }, {
     "rename": {
       "field": "nginx.access.agent",
-      "target_field": "nginx.access.user_agent.raw"
+      "target_field": "nginx.access.user_agent.original"
     }
   }, {
     "geoip": {

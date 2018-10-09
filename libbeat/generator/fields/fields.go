@@ -33,6 +33,8 @@ type YmlFile struct {
 
 func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]*YmlFile, error) {
 	commonFields := []string{
+		// Fields for custom beats
+		filepath.Join(beatPath, "_meta/fields.yml"),
 		filepath.Join(beatPath, "_meta/fields.common.yml"),
 	}
 
@@ -41,6 +43,7 @@ func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]
 	if !isLibbeat(beatPath) {
 		commonFields = append(commonFields,
 			filepath.Join(esBeatsPath, "libbeat/_meta/fields.common.yml"),
+			filepath.Join(esBeatsPath, "libbeat/_meta/fields.ecs.yml"),
 		)
 
 		libbeatModulesPath := filepath.Join(esBeatsPath, "libbeat/processors")

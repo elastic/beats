@@ -1,0 +1,129 @@
+{
+    "host": "Shaunaks-MBP-2",
+    "version": "6.4.1",
+    "http_address": "127.0.0.1:9600",
+    "id": "01cf780e-b576-4e59-9ee0-6b49d73e1238",
+    "name": "Shaunaks-MBP-2",
+    "jvm": {
+        "threads": {
+            "count": 30,
+            "peak_count": 32
+        },
+        "mem": {
+            "heap_used_percent": 32,
+            "heap_committed_in_bytes": 1037959168,
+            "heap_max_in_bytes": 1037959168,
+            "heap_used_in_bytes": 341759888,
+            "non_heap_used_in_bytes": 121819632,
+            "non_heap_committed_in_bytes": 140050432,
+            "pools": {
+                "survivor": {
+                    "peak_used_in_bytes": 35782656,
+                    "used_in_bytes": 21321184,
+                    "peak_max_in_bytes": 35782656,
+                    "max_in_bytes": 35782656,
+                    "committed_in_bytes": 35782656
+                },
+                "old": {
+                    "peak_used_in_bytes": 103570264,
+                    "used_in_bytes": 91787528,
+                    "peak_max_in_bytes": 715849728,
+                    "max_in_bytes": 715849728,
+                    "committed_in_bytes": 715849728
+                },
+                "young": {
+                    "peak_used_in_bytes": 286326784,
+                    "used_in_bytes": 228651176,
+                    "peak_max_in_bytes": 286326784,
+                    "max_in_bytes": 286326784,
+                    "committed_in_bytes": 286326784
+                }
+            }
+        },
+        "gc": {
+            "collectors": {
+                "old": {
+                    "collection_time_in_millis": 184,
+                    "collection_count": 2
+                },
+                "young": {
+                    "collection_time_in_millis": 413,
+                    "collection_count": 8
+                }
+            }
+        },
+        "uptime_in_millis": 70624
+    },
+    "process": {
+        "open_file_descriptors": 95,
+        "peak_open_file_descriptors": 96,
+        "max_file_descriptors": 10240,
+        "mem": {
+            "total_virtual_in_bytes": 7176814592
+        },
+        "cpu": {
+            "total_in_millis": 100279,
+            "percent": 0,
+            "load_average": {
+                "1m": 5.107421875
+            }
+        }
+    },
+    "events": {
+        "in": 0,
+        "filtered": 0,
+        "out": 0,
+        "duration_in_millis": 0,
+        "queue_push_duration_in_millis": 0
+    },
+    "pipelines": {
+        "main": {
+            "events": {
+                "duration_in_millis": 0,
+                "in": 0,
+                "out": 0,
+                "filtered": 0,
+                "queue_push_duration_in_millis": 0
+            },
+            "plugins": {
+                "inputs": [
+                    {
+                        "id": "fc1bd2827edc6b55a3caf4af83c5ac8c5c32b84cb54453bdac8c0d1dcb37ee46",
+                        "events": {
+                            "out": 0,
+                            "queue_push_duration_in_millis": 0
+                        },
+                        "name": "stdin"
+                    }
+                ],
+                "filters": [],
+                "outputs": [
+                    {
+                        "id": "47e3be4432eda99c8d50ea91fdec98aa9c3d5689589ddd3cfdbd62b43746d841",
+                        "events": {
+                            "duration_in_millis": 0,
+                            "in": 0,
+                            "out": 0
+                        },
+                        "name": "stdout"
+                    }
+                ]
+            },
+            "reloads": {
+                "last_error": null,
+                "successes": 0,
+                "last_success_timestamp": null,
+                "last_failure_timestamp": null,
+                "failures": 0
+            },
+            "queue": {
+                "type": "memory"
+            }
+        }
+    },
+    "reloads": {
+        "successes": 0,
+        "failures": 0
+    },
+    "os": {}
+}

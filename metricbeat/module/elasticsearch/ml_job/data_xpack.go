@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -31,13 +33,13 @@ import (
 func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
 
 	var data map[string]interface{}
 	err = json.Unmarshal(content, &data)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
 	}
 
 	jobs, ok := data["jobs"]
@@ -47,7 +49,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 
 	jobsArr, ok := jobs.([]interface{})
 	if !ok {
-		return fmt.Errorf("jobs is not an array of objects")
+		return fmt.Errorf("jobs is not an array of maps")
 	}
 
 	for _, job := range jobsArr {

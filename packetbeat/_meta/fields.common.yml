@@ -12,10 +12,6 @@
       description: >
         The name of the server that initiated the transaction.
 
-    - name: service
-      description: >
-        The name of the logical service that served the transaction.
-
     - name: client_service
       description: >
         The name of the logical service that initiated the transaction.
@@ -142,12 +138,12 @@
       fields:
         - name: mac
           description: >
-            Source MAC address as indicated by first packet seen for the current flow.
+              Source MAC address as indicated by first packet seen for the current flow.
 
         - name: ip
           description: >
-            Innermost IPv4 source address as indicated by first packet seen for the
-            current flow.
+              Innermost IPv4 source address as indicated by first packet seen for the
+              current flow.
 
         - name: ip_location
           type: geo_point

@@ -1251,7 +1251,8 @@ configuration for the `tls` section of the +{beatname_lc}.yml+ config file:
 packetbeat.protocols:
 - type: tls
   send_certificates: true
-  include_raw_certificates: true
+  include_raw_certificates: false
+  fingerprints: [ sha1, sha256 ]
 ------------------------------------------------------------------------------
 
 ==== Configuration options
@@ -1279,6 +1280,14 @@ When `send_certificates` is true, you can set `include_raw_certificates` to
 include the raw certificate encoded in PEM format as a `raw` field.
 
 If `send_certificates` is false, this setting is ignored. The default is false.
+
+==== `fingerprints`
+
+Defines a list of hash algorithms to calculate the certificate's fingerprints.
+Valid values are `sha1`, `sha256` and `md5`.
+
+If `send_certificates` is false, this setting is ignored. The default is to
+output SHA-1 fingerprints.
 
 [[configuration-processes]]
 == Specify which processes to monitor

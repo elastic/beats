@@ -66,11 +66,9 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 
 // TLSChecks validates the given x509 cert at the given position.
 func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) mapval.Validator {
-	certPEMString := x509util.CertToPEMString(certificate)
 	return mapval.MustCompile(mapval.Map{
 		"tls": mapval.Map{
 			"rtt.handshake.us":             mapval.IsDuration,
-			"certificates":                 mapval.Slice{certPEMString},
 			"certificate_not_valid_before": certificate.NotBefore,
 			"certificate_not_valid_after":  certificate.NotAfter,
 		},

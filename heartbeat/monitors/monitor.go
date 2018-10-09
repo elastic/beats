@@ -50,7 +50,7 @@ type Monitor struct {
 	watchPollTasks []*task
 	watch          watcher.Watch
 
-	pipeline beat.Pipeline
+	pipelineConnector beat.PipelineConnector
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -70,7 +70,7 @@ var ErrWatchesDisabled = errors.New("watch poll files are only allowed in heartb
 func newMonitor(
 	config *common.Config,
 	registrar *pluginsReg,
-	pipeline beat.Pipeline,
+	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
 ) (*Monitor, error) {
@@ -84,17 +84,17 @@ func newMonitor(
 
 	monitorPlugin, found := registrar.get(mpi.Type)
 	if !found {
-		return nil, fmt.Errorf("monitor type %v does not exist", mpi.Type)
+		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", mpi.Type, registrar.monitorNames())
 	}
 
 	m := &Monitor{
-		name:           monitorPlugin.name,
-		scheduler:      scheduler,
-		jobTasks:       []*task{},
-		pipeline:       pipeline,
-		watchPollTasks: []*task{},
-		internalsMtx:   sync.Mutex{},
-		config:         config,
+		name:              monitorPlugin.name,
+		scheduler:         scheduler,
+		jobTasks:          []*task{},
+		pipelineConnector: pipelineConnector,
+		watchPollTasks:    []*task{},
+		internalsMtx:      sync.Mutex{},
+		config:            config,
 	}
 
 	jobs, err := monitorPlugin.create(config)

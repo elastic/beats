@@ -28,11 +28,11 @@ import (
 	"strings"
 
 	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/cfgutil"
 	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/go-ucfg/cfgutil"
 )
 
 var flagStrictPerms = flag.Bool("strict.perms", true, "Strict permission checking on config files")
