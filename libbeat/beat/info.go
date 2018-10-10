@@ -17,7 +17,7 @@
 
 package beat
 
-import "github.com/satori/go.uuid"
+import "github.com/gofrs/uuid"
 
 // Info stores a beats instance meta data.
 type Info struct {

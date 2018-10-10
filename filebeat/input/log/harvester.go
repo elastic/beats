@@ -37,7 +37,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -113,6 +113,11 @@ func NewHarvester(
 	outletFactory OutletFactory,
 ) (*Harvester, error) {
 
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
 	h := &Harvester{
 		config:        defaultConfig,
 		state:         state,
@@ -120,7 +125,7 @@ func NewHarvester(
 		publishState:  publishState,
 		done:          make(chan struct{}),
 		stopWg:        &sync.WaitGroup{},
-		id:            uuid.NewV4(),
+		id:            id,
 		outletFactory: outletFactory,
 	}
 
