@@ -4731,6 +4731,16 @@ IP address of the source.
 
 --
 
+*`source_ecs.port`*::
++
+--
+type: long
+
+Port of the source.
+
+
+--
+
 [float]
 == geo fields
 

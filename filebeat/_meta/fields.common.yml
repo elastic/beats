@@ -108,6 +108,11 @@
         description: >
           IP address of the source.
 
+      - name: port
+        type: long
+        description: >
+          Port of the source.
+
       - name: geo
         type: group
         description:

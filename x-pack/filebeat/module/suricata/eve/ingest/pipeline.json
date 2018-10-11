@@ -13,9 +13,23 @@
       }
     }
   , {"convert":
+      {"field": "suricata.eve.src_port"
+      ,"target_field": "source_ecs.port"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
       {"field": "suricata.eve.dest_ip"
       ,"target_field": "destination.ip"
       ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.dest_port"
+      ,"target_field": "destination.port"
+      ,"type": "integer"
       ,"ignore_missing": true
       }
     }
