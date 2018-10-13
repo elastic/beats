@@ -27,10 +27,24 @@ import (
 // the common fields specified by libbeat, the common fields for the Beat,
 // and any additional fields.yml files you specify.
 //
-// fieldsFiles specifies additional directories to search recursively for files
-// named fields.yml. The contents of each fields.yml will be included in the
-// generated file.
-func GenerateFieldsYAML(fieldsFiles ...string) error {
+// moduleDirs specifies additional directories to search for modules. The
+// contents of each fields.yml will be included in the generated file.
+func GenerateFieldsYAML(moduleDirs ...string) error {
+	return generateFieldsYAML(OSSBeatDir(), moduleDirs...)
+}
+
+func OSSBeatDir(path ...string) string {
+	ossDir := CWD()
+
+	// Check if we need to correct ossDir because it's in x-pack.
+	if parentDir := filepath.Base(filepath.Dir(ossDir)); parentDir == "x-pack" {
+		ossDir = filepath.Join(ossDir, "../..", BeatName)
+	}
+
+	return filepath.Join(append([]string{ossDir}, path...)...)
+}
+
+func generateFieldsYAML(baseDir string, moduleDirs ...string) error {
 	const globalFieldsCmdPath = "libbeat/scripts/cmd/global_fields/main.go"
 
 	beatsDir, err := ElasticBeatsDir()
@@ -41,9 +55,57 @@ func GenerateFieldsYAML(fieldsFiles ...string) error {
 	globalFieldsCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, globalFieldsCmdPath),
 		"-es_beats_path", beatsDir,
-		"-beat_path", CWD(),
+		"-beat_path", baseDir,
 		"-out", "fields.yml",
 	)
 
-	return globalFieldsCmd(fieldsFiles...)
+	return globalFieldsCmd(moduleDirs...)
+}
+
+// GenerateAllInOneFieldsGo generates an all-in-one fields.go file.
+func GenerateAllInOneFieldsGo() error {
+	return GenerateFieldsGo("fields.yml", "include/fields.go")
+}
+
+// GenerateFieldsGo generates a .go file containing the fields.yml data.
+func GenerateFieldsGo(fieldsYML, out string) error {
+	const assetCmdPath = "dev-tools/cmd/asset/asset.go"
+
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+
+	assetCmd := sh.RunCmd("go", "run",
+		filepath.Join(beatsDir, assetCmdPath),
+		"-pkg", "include",
+		"-in", fieldsYML,
+		"-out", createDir(out),
+		BeatName,
+	)
+
+	return assetCmd()
+}
+
+func GenerateModuleFieldsGo() error {
+	const moduleFieldsCmdPath = "dev-tools/cmd/module_fields/main.go"
+
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+
+	licenseType := BeatLicense
+	if licenseType == "ASL 2.0" {
+		licenseType = "ASL2"
+	}
+
+	moduleFieldsCmd := sh.RunCmd("go", "run",
+		filepath.Join(beatsDir, moduleFieldsCmdPath),
+		"-beat", BeatName,
+		"-license", licenseType,
+		filepath.Join(CWD(), "module"),
+	)
+
+	return moduleFieldsCmd()
 }

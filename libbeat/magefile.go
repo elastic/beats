@@ -23,7 +23,7 @@ import (
 	"context"
 
 	"github.com/elastic/beats/dev-tools/mage"
-)
+	)
 
 // Build builds the Beat binary.
 func Build() error {
