@@ -58,14 +58,15 @@ var (
 		BufferSize: 16 * humanize.KiByte,
 		MaxBytes:   10 * humanize.MiByte,
 		LogConfig: LogConfig{
-			Backoff:       1 * time.Second,
-			BackoffFactor: 2,
-			MaxBackoff:    10 * time.Second,
-			CloseInactive: 5 * time.Minute,
-			CloseRemoved:  true,
-			CloseRenamed:  false,
-			CloseEOF:      false,
-			CloseTimeout:  0,
+			Backoff:             1 * time.Second,
+			BackoffFactor:       2,
+			MaxBackoff:          10 * time.Second,
+			CloseInactive:       5 * time.Minute,
+			CloseRemoved:        true,
+			CloseRenamed:        false,
+			CloseEOF:            false,
+			CloseTimeout:        0,
+			CheckStatusInterval: 0,
 		},
 	}
 )
@@ -111,14 +112,15 @@ type config struct {
 }
 
 type LogConfig struct {
-	Backoff       time.Duration `config:"backoff" validate:"min=0,nonzero"`
-	BackoffFactor int           `config:"backoff_factor" validate:"min=1"`
-	MaxBackoff    time.Duration `config:"max_backoff" validate:"min=0,nonzero"`
-	CloseInactive time.Duration `config:"close_inactive"`
-	CloseRemoved  bool          `config:"close_removed"`
-	CloseRenamed  bool          `config:"close_renamed"`
-	CloseEOF      bool          `config:"close_eof"`
-	CloseTimeout  time.Duration `config:"close_timeout" validate:"min=0"`
+	Backoff             time.Duration `config:"backoff" validate:"min=0,nonzero"`
+	BackoffFactor       int           `config:"backoff_factor" validate:"min=1"`
+	MaxBackoff          time.Duration `config:"max_backoff" validate:"min=0,nonzero"`
+	CloseInactive       time.Duration `config:"close_inactive"`
+	CloseRemoved        bool          `config:"close_removed"`
+	CloseRenamed        bool          `config:"close_renamed"`
+	CloseEOF            bool          `config:"close_eof"`
+	CloseTimeout        time.Duration `config:"close_timeout" validate:"min=0"`
+	CheckStatusInterval time.Duration `config:"check_status_interval" validate:"min=0"`
 }
 
 // Contains available scan options

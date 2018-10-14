@@ -29,12 +29,13 @@ import (
 
 // Log contains all log related data
 type Log struct {
-	fs           harvester.Source
-	offset       int64
-	config       LogConfig
-	lastTimeRead time.Time
-	backoff      time.Duration
-	done         chan struct{}
+	fs                harvester.Source
+	offset            int64
+	config            LogConfig
+	lastTimeRead      time.Time
+	backoff           time.Duration
+	checkStatusTicker *time.Ticker
+	done              chan struct{}
 }
 
 // NewLog creates a new log instance to read log sources
@@ -51,14 +52,28 @@ func NewLog(
 		}
 	}
 
+	var checkTicker *time.Ticker = nil
+	// starts close_timeout timer
+	if config.CheckStatusInterval > 0 {
+		checkTicker = time.NewTicker(config.CheckStatusInterval)
+	}
+
 	return &Log{
-		fs:           fs,
-		offset:       offset,
-		config:       config,
-		lastTimeRead: time.Now(),
-		backoff:      config.Backoff,
-		done:         make(chan struct{}),
+		fs:                fs,
+		offset:            offset,
+		config:            config,
+		lastTimeRead:      time.Now(),
+		backoff:           config.Backoff,
+		checkStatusTicker: checkTicker,
+		done:              make(chan struct{}),
 	}, nil
+}
+
+func (f *Log) checkStatusC() <-chan time.Time {
+	if f.checkStatusTicker == nil {
+		return nil
+	}
+	return f.checkStatusTicker.C
 }
 
 // Read reads from the reader and updates the offset
@@ -70,6 +85,11 @@ func (f *Log) Read(buf []byte) (int, error) {
 		select {
 		case <-f.done:
 			return 0, ErrClosed
+		case <-f.checkStatusC():
+			err := f.checkStatus()
+			if err != nil {
+				return totalN, err
+			}
 		default:
 		}
 
@@ -104,23 +124,7 @@ func (f *Log) Read(buf []byte) (int, error) {
 	}
 }
 
-// errorChecks checks how the given error should be handled based on the config options
-func (f *Log) errorChecks(err error) error {
-	if err != io.EOF {
-		logp.Err("Unexpected state reading from %s; error: %s", f.fs.Name(), err)
-		return err
-	}
-
-	// Stdin is not continuable
-	if !f.fs.Continuable() {
-		logp.Debug("harvester", "Source is not continuable: %s", f.fs.Name())
-		return err
-	}
-
-	if err == io.EOF && f.config.CloseEOF {
-		return err
-	}
-
+func (f *Log) checkStatus() error {
 	// Refetch fileinfo to check if the file was truncated or disappeared.
 	// Errors if the file was removed/rotated after reading and before
 	// calling the stat function
@@ -143,13 +147,6 @@ func (f *Log) errorChecks(err error) error {
 		return ErrInactive
 	}
 
-	if f.config.CloseRenamed {
-		// Check if the file can still be found under the same path
-		if !file.IsSameFile(f.fs.Name(), info) {
-			return ErrRenamed
-		}
-	}
-
 	if f.config.CloseRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
 		_, statErr := os.Stat(f.fs.Name())
@@ -160,7 +157,33 @@ func (f *Log) errorChecks(err error) error {
 		}
 	}
 
+	if f.config.CloseRenamed {
+		// Check if the file can still be found under the same path
+		if !file.IsSameFile(f.fs.Name(), info) {
+			return ErrRenamed
+		}
+	}
+
 	return nil
+}
+
+// errorChecks checks how the given error should be handled based on the config options
+func (f *Log) errorChecks(err error) error {
+	if err != io.EOF {
+		logp.Err("Unexpected state reading from %s; error: %s", f.fs.Name(), err)
+		return err
+	}
+
+	// Stdin is not continuable
+	if !f.fs.Continuable() {
+		logp.Debug("harvester", "Source is not continuable: %s", f.fs.Name())
+		return err
+	}
+
+	if err == io.EOF && f.config.CloseEOF {
+		return err
+	}
+	return f.checkStatus()
 }
 
 func (f *Log) wait() {
@@ -182,6 +205,9 @@ func (f *Log) wait() {
 
 // Close closes the done channel but no th the file handler
 func (f *Log) Close() {
+	if f.checkStatusTicker != nil {
+		f.checkStatusTicker.Stop()
+	}
 	close(f.done)
 	// Note: File reader is not closed here because that leads to race conditions
 }

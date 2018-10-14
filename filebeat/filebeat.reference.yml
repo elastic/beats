@@ -571,6 +571,10 @@ filebeat.inputs:
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_timeout: 0
 
+  # Check status interval controls how fast harvester will notice the file's status (closed/renamed)
+  # By default this option is disabled, the file status will be checked only on EOF
+  #check_status_interval: 0
+
   # Defines if inputs is enabled
   #enabled: true
 

@@ -191,6 +191,19 @@ still exists, only the second part of the event will be sent.
 
 This option is set to 0 by default which means it is disabled.
 
+[float]
+[id="{beatname_lc}-input-{type}-check-status-interval"]
+===== `check_status_interval`
+
+WARNING: Only use this option if you understand that data loss is a potential
+side effect.
+
+By default, the `close_*` options will only be checked when the end of a file is reached.
+In case that the file is very large, the close of removed / renamed file will be delayed.
+You can use `check_status_interval` to control the file status checking interval
+and ensure that the file will be closed faster.
+
+This option is set to 0 by default which means it is disabled.
 
 [float]
 [id="{beatname_lc}-input-{type}-clean-options"]
