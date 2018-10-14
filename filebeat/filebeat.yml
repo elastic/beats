@@ -142,12 +142,18 @@ setup.kibana:
 
 #================================ Outputs =====================================
 
+# Console
+output.console:
+  codec.json:
+    pretty: true
+    escape_html: false
+
 # Configure what output to use when sending the data collected by the beat.
 
 #-------------------------- Elasticsearch output ------------------------------
-output.elasticsearch:
+# output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+  # hosts: ["localhost:9200"]
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
