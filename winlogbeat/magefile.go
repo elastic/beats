@@ -101,6 +101,12 @@ func Fields() error {
 	return mage.GenerateFieldsYAML()
 }
 
+// Dashboards collects all the dashboards and generates index patterns.
+func Dashboards() error {
+	mg.Deps(Fields)
+	return mage.KibanaDashboards()
+}
+
 // GoTestUnit executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.

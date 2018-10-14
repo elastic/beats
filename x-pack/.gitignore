@@ -1,2 +1,5 @@
 # Directories
 */build
+*beat/logs
+*beat/data
+*beat/fields.yml

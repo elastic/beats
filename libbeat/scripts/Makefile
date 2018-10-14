@@ -307,9 +307,13 @@ coverage-report:
 fields: mage
 	@mage fields
 
+.PHONY: dashboards
+dashboards: mage
+	@mage dashboards
+
 .PHONY: update
 update: ## @build Update expects the most recent version of libbeat in the GOPATH
-update: python-env fields collect
+update: python-env fields collect dashboards
 	@echo "Updating generated files for ${BEAT_NAME}"
 
 	@mkdir -p _meta
@@ -328,6 +332,7 @@ ifeq ($(BEAT_REF_YAML),true)
 	@chmod 0640 ${BEAT_NAME}.reference.yml
 endif
 
+# TODO: Remove as this becomes part of mage fields.
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
 	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
@@ -338,17 +343,6 @@ ifneq ($(shell [[ $(BEAT_NAME) == libbeat ]] && echo true ),true)
 	@mkdir -p docs
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_TITLE} ${ES_BEATS}
 endif
-
-	@mkdir -p $(PWD)/_meta/kibana.generated
-	@# Generate Kibana index pattern and copy dashboard files
-	if [ -d $(PWD)/_meta/kibana ]; then \
-		cp -pr $(PWD)/_meta/kibana/* $(PWD)/_meta/kibana.generated ; \
-	fi
-	@# Convert all dashboards to string
-	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/6/dashboard/*.json"
-	@mkdir -p $(PWD)/_meta/kibana.generated/5/index-pattern
-	@mkdir -p $(PWD)/_meta/kibana.generated/6/index-pattern
-	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go -index '${BEAT_INDEX_PREFIX}-*' -beat-name ${BEAT_NAME} -beat-dir $(PWD) -version ${BEAT_VERSION}
 
 .PHONY: docs
 docs:  ## @build Builds the documents for the beat

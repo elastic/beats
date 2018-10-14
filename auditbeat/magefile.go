@@ -98,9 +98,20 @@ func Update() error {
 	return sh.Run("make", "update")
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
+// Fields generates a fields.yml and include/fields.go for the Beat.
+func Fields() {
+	mg.SerialDeps(fieldsYML, mage.GenerateAllInOneFieldsGo)
+}
+
+// fieldsYML generates a fields.yml.
+func fieldsYML() error {
 	return mage.GenerateFieldsYAML("module")
+}
+
+// Dashboards collects all the dashboards and generates index patterns.
+func Dashboards() error {
+	mg.Deps(Fields)
+	return mage.KibanaDashboards("module")
 }
 
 // GoTestUnit executes the Go unit tests.

@@ -48,7 +48,7 @@ shared:
         mode: 0600
         config: true
       /usr/share/{{.BeatName}}/kibana:
-        source: _meta/kibana.generated
+        source: build/kibana
         mode: 0644
       /usr/share/{{.BeatName}}/bin/{{.BeatName}}-god:
         source: build/golang-crossbuild/god-{{.GOOS}}-{{.Platform.Arch}}
@@ -95,7 +95,7 @@ shared:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/launchd-daemon.plist.tmpl'
         mode: 0644
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/kibana:
-        source: _meta/kibana.generated
+        source: build/kibana
         mode: 0644
       /etc/{{.BeatName}}/fields.yml:
         source: fields.yml
@@ -136,7 +136,7 @@ shared:
       mode: 0600
       config: true
     kibana:
-      source: _meta/kibana.generated
+      source: build/kibana
       mode: 0644
 
   # Binary package spec (tar.gz for linux/darwin) for community beats.
@@ -349,8 +349,9 @@ specs:
       spec:
         <<: *windows_binary_spec
         <<: *elastic_license_for_binaries
-        '{{.BeatName}}{{.BinaryExt}}':
-          source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: darwin
       types: [tgz]

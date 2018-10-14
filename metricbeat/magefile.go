@@ -98,9 +98,33 @@ func Update() error {
 	return sh.Run("make", "update")
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
+// Fields generates a top-level fields.yml, fields.go for each module, fields.go
+// for metricbeat's common fields, and fields.go for libbeat's common fields.
+func Fields() {
+	mg.SerialDeps(fieldsYML, mage.GenerateModuleFieldsGo,
+		metricbeatFieldsGo, libbeatFieldsGo)
+}
+
+func metricbeatFieldsGo() error {
+	return mage.GenerateFieldsGo("_meta/fields.common.yml", "include/fields.go")
+}
+
+func libbeatFieldsGo() error {
+	// TODO: generate the fields.go from libbeat data only.
+	// 	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD}
+	// | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -out ./include/fields/fields.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
+	return nil
+}
+
+// fieldsYML generates a fields.yml.
+func fieldsYML() error {
 	return mage.GenerateFieldsYAML("module")
+}
+
+// Dashboards collects all the dashboards and generates index patterns.
+func Dashboards() error {
+	mg.Deps(Fields)
+	return mage.KibanaDashboards("module")
 }
 
 // GoTestUnit executes the Go unit tests.

@@ -1,19 +1,6 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
 
 // +build mage
 
@@ -22,21 +9,19 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
-
-	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage"
+	"github.com/magefile/mage/mg"
 )
 
 func init() {
 	mage.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
+	mage.BeatLicense = "Elastic"
 }
 
 // Build builds the Beat binary.
@@ -78,11 +63,10 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	mage.UseCommunityBeatPackaging()
-	customizePackaging()
+	mage.LoadLocalNamedSpec("xpack")
 
-	mg.Deps(Fields, Dashboards, Config, prepareModulePackaging)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.SerialDeps(Fields, Dashboards, Config, prepareModulePackaging)
+	//mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
 
@@ -91,25 +75,19 @@ func TestPackages() error {
 	return mage.TestPackages(mage.WithModules(), mage.WithModulesD())
 }
 
-// Update updates the generated files (aka make update).
-func Update() error {
-	return sh.Run("make", "update")
-}
-
-// Fields generates a fields.yml and include/fields.go for the Beat.
+// Fields generates a fields.yml and fields.go for each module.
 func Fields() {
-	mg.SerialDeps(fieldsYML, mage.GenerateAllInOneFieldsGo)
+	mg.Deps(mage.GenerateModuleFieldsGo, fieldsYML)
 }
 
-// fieldsYML generates a fields.yml.
+// fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.
 func fieldsYML() error {
-	return mage.GenerateFieldsYAML("module")
+	return mage.GenerateFieldsYAML(mage.OSSBeatDir("module"), "module")
 }
 
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
-	mg.Deps(Fields)
-	return mage.KibanaDashboards("module")
+	return mage.KibanaDashboards(mage.OSSBeatDir("module"), "module")
 }
 
 // Config generates both the short and reference configs.
@@ -141,43 +119,9 @@ const (
 	dirModulesDGenerated = "build/package/modules.d"
 )
 
-// customizePackaging modifies the package specs to add the modules and
-// modules.d directory.
-func customizePackaging() {
-	var (
-		moduleTarget = "module"
-		module       = mage.PackageFile{
-			Mode:   0644,
-			Source: dirModuleGenerated,
-		}
-		modulesDTarget = "modules.d"
-		modulesD       = mage.PackageFile{
-			Mode:   0644,
-			Source: dirModulesDGenerated,
-			Config: true,
-		}
-	)
-
-	for _, args := range mage.Packages {
-		pkgType := args.Types[0]
-		switch pkgType {
-		case mage.TarGz, mage.Zip:
-			args.Spec.Files[moduleTarget] = module
-			args.Spec.Files[modulesDTarget] = modulesD
-		case mage.Deb, mage.RPM:
-			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
-			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
-		case mage.DMG:
-			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}"+moduleTarget] = module
-			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
-		default:
-			panic(errors.Errorf("unhandled package type: %v", pkgType))
-		}
-	}
-}
-
-// prepareModulePackaging copies the module dir to the build dir and excludes
-// _meta and test files so that they are not included in packages.
+// prepareModulePackaging generates modules and modules.d directories
+// for an x-pack distribution, excluding _meta and test files so that they are
+// not included in packages.
 func prepareModulePackaging() error {
 	mg.Deps(createDirModulesD)
 
@@ -193,7 +137,9 @@ func prepareModulePackaging() error {
 		src, dst string
 	}{
 		{mage.OSSBeatDir("module"), dirModuleGenerated},
+		{"module", dirModuleGenerated},
 		{mage.OSSBeatDir("modules.d"), dirModulesDGenerated},
+		{"modules.d", dirModulesDGenerated},
 	} {
 		err := (&mage.CopyTask{
 			Source:  copyAction.src,

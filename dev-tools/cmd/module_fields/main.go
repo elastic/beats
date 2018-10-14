@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"go/format"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 
@@ -31,46 +32,69 @@ import (
 	"github.com/elastic/beats/licenses"
 )
 
-func main() {
-	flag.Parse()
-	args := flag.Args()
+var usageText = `
+Usage: module_fields [flags] [module-dir]
+  module_fields generates a fields.go file containing a copy of the module's
+  field.yml data in a format that can be embedded in Beat's binary. module-dir
+  should be the directory containing modules (e.g. filebeat/module).
+Options:
+`[1:]
 
-	if len(args) != 1 {
-		fmt.Fprintln(os.Stderr, "Module path must be set")
-		os.Exit(1)
+var (
+	beatName string
+	license  string
+)
+
+func init() {
+	flag.StringVar(&beatName, "beat", "", "Name of the beat. (Required)")
+	flag.StringVar(&license, "license", "ASL2", "License header for generated file.")
+	flag.Usage = usageFlag
+}
+
+func main() {
+	log.SetFlags(0)
+	flag.Parse()
+
+	if beatName == "" {
+		log.Fatal("You must use -beat to specify the beat name.")
 	}
 
+	license, err := licenses.Find(license)
+	if err != nil {
+		log.Fatalf("Invalid license specifier: %v", err)
+	}
+
+	args := flag.Args()
+	if len(args) != 1 {
+		log.Fatal("module-dir must be passed as an argument.")
+	}
 	dir := args[0]
 
 	modules, err := fields.GetModules(dir)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error fetching modules: %s\n", err)
-		os.Exit(1)
+		log.Fatalf("Error fetching modules: %v", err)
 	}
 
 	for _, module := range modules {
 		files, err := fields.CollectFiles(module, dir)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error fetching files for module %s: %s\n", module, err)
-			os.Exit(1)
+			log.Fatalf("Error fetching files for module %v: %v", module, err)
 		}
 
 		data, err := fields.GenerateFieldsYml(files)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error fetching files for module %s: %s\n", module, err)
-			os.Exit(1)
+			log.Fatalf("Error fetching files for module %v: %v", module, err)
 		}
 
 		encData, err := asset.EncodeData(string(data))
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error encoding the data: %s\n", err)
-			os.Exit(1)
+			log.Fatalf("Error encoding the data: %v", err)
 		}
 
 		var buf bytes.Buffer
 		asset.Template.Execute(&buf, asset.Data{
-			License: licenses.ASL2,
-			Beat:    "metricbeat",
+			License: license,
+			Beat:    beatName,
 			Name:    module,
 			Data:    encData,
 			Package: module,
@@ -78,14 +102,17 @@ func main() {
 
 		bs, err := format.Source(buf.Bytes())
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error creating golang file from template: %s\n", err)
-			os.Exit(1)
+			log.Fatalf("Error creating golang file from template: %v", err)
 		}
 
 		err = ioutil.WriteFile(path.Join(dir, module, "fields.go"), bs, 0644)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error writing fields.go: %s\n", err)
-			os.Exit(1)
+			log.Fatalf("Error writing fields.go: %v", err)
 		}
 	}
+}
+
+func usageFlag() {
+	fmt.Fprintf(os.Stderr, usageText)
+	flag.PrintDefaults()
 }

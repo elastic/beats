@@ -78,9 +78,7 @@ func main() {
 
 	var fieldsFiles []*fields.YmlFile
 	for _, fieldsFilePath := range beatFieldsPaths {
-		pathToModules := filepath.Join(beatPath, fieldsFilePath)
-
-		fieldsFile, err := fields.CollectModuleFiles(pathToModules)
+		fieldsFile, err := fields.CollectModuleFiles(fieldsFilePath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
 			os.Exit(2)
@@ -95,5 +93,9 @@ func main() {
 		os.Exit(3)
 	}
 
-	fmt.Fprintf(os.Stderr, "Generated fields.yml for %s to %s\n", name, filepath.Join(beatPath, output))
+	outputPath, _ := filepath.Abs(output)
+	if err != nil {
+		outputPath = output
+	}
+	fmt.Fprintf(os.Stderr, "Generated fields.yml for %s to %s\n", name, outputPath)
 }
