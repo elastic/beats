@@ -2,18 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package cmd
+package include
 
 import (
-	"github.com/elastic/beats/filebeat/cmd"
-
-	// Register the includes.
-	_ "github.com/elastic/beats/x-pack/filebeat/include"
+	// Include modules to register their fields.go.
+	_ "github.com/elastic/beats/x-pack/filebeat/module/suricata"
 )
-
-// RootCmd to handle beats cli
-var RootCmd = cmd.RootCmd
-
-func init() {
-	// TODO inject x-pack features
-}
