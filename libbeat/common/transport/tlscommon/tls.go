@@ -60,7 +60,7 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 
 	cert, err := tls.X509KeyPair(certPEM, keyPEM)
 	if err != nil {
-		logp.Critical("Failed loading client certificate", err)
+		logp.Critical("Failed loading client certificate: %v", err)
 		return nil, err
 	}
 
