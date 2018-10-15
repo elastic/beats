@@ -47,6 +47,7 @@ type EventMetadata struct {
 	FieldsUnderRoot bool `config:"fields_under_root"`
 	Tags            []string
 	Location        string
+	GeoLocation     string `config:"geo.location"`
 }
 
 // MapStr is a map[string]interface{} wrapper with utility methods for common

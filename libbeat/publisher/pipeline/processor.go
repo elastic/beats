@@ -96,6 +96,12 @@ func newProcessorPipeline(
 	}
 	processors.add(makeAddFieldsProcessor("location", common.MapStr{"location": location}, false))
 
+	geoLocation := global.geoLocation
+	if config.EventMetadata.GeoLocation != "" {
+		geoLocation = config.EventMetadata.GeoLocation
+	}
+	processors.add(makeAddFieldsProcessor("geo.location", common.MapStr{"geo": common.MapStr{"location": geoLocation}}, false))
+
 	// setup 3, 4, 5: client config fields + pipeline fields + client fields + dyn metadata
 	fields := config.Fields.Clone()
 	fields.DeepUpdate(global.fields.Clone())

@@ -85,6 +85,7 @@ type pipelineProcessors struct {
 	fields      common.MapStr
 	tags        []string
 	location    string
+	geoLocation string
 
 	processors beat.Processor
 
@@ -438,6 +439,10 @@ func makePipelineProcessors(
 
 	if annotations.Event.Location != "" {
 		p.location = annotations.Event.Location
+	}
+
+	if annotations.Event.GeoLocation != "" {
+		p.geoLocation = annotations.Event.GeoLocation
 	}
 
 	return p
