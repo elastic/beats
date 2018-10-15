@@ -84,6 +84,7 @@ type pipelineProcessors struct {
 	builtinMeta common.MapStr
 	fields      common.MapStr
 	tags        []string
+	location    string
 
 	processors beat.Processor
 
@@ -433,6 +434,10 @@ func makePipelineProcessors(
 
 	if t := annotations.Event.Tags; len(t) > 0 {
 		p.tags = t
+	}
+
+	if annotations.Event.Location != "" {
+		p.location = annotations.Event.Location
 	}
 
 	return p

@@ -90,6 +90,12 @@ func newProcessorPipeline(
 		processors.add(makeAddTagsProcessor("tags", tags))
 	}
 
+	location := global.location
+	if config.EventMetadata.Location != "" {
+		location = config.EventMetadata.Location
+	}
+	processors.add(makeAddFieldsProcessor("location", common.MapStr{"location": location}, false))
+
 	// setup 3, 4, 5: client config fields + pipeline fields + client fields + dyn metadata
 	fields := config.Fields.Clone()
 	fields.DeepUpdate(global.fields.Clone())

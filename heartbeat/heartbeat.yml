@@ -22,6 +22,8 @@ heartbeat.monitors:
   # Total test connection and data exchange timeout
   #timeout: 16s
 
+location: scout
+
 #==================== Elasticsearch template setting ==========================
 
 setup.template.settings:
