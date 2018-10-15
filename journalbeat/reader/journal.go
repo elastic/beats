@@ -61,9 +61,9 @@ type Config struct {
 type Reader struct {
 	journal *sdjournal.Journal
 	config  Config
-	changes chan int
 	done    chan struct{}
 	logger  *logp.Logger
+	backoff time.Duration
 }
 
 // New creates a new journal reader and moves the FP to the configured position.
@@ -95,10 +95,10 @@ func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *lo
 
 	r := &Reader{
 		journal: j,
-		changes: make(chan int),
 		config:  c,
 		done:    done,
 		logger:  logger,
+		backoff: c.Backoff,
 	}
 	r.seek(state.Cursor)
 
@@ -128,7 +128,6 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 
 	r := &Reader{
 		journal: j,
-		changes: make(chan int),
 		config:  c,
 		done:    done,
 		logger:  logger,
@@ -197,72 +196,46 @@ func (r *Reader) seek(cursor string) {
 	}
 }
 
-// Follow reads entries from journals.
-func (r *Reader) Follow() chan *beat.Event {
-	out := make(chan *beat.Event)
-	go r.readEntriesFromJournal(out)
-
-	return out
-}
-
-func (r *Reader) readEntriesFromJournal(entries chan *beat.Event) {
-	defer close(entries)
-
-process:
+// Next waits until a new event shows up and returns it.
+// It block until an event is returned or an error occurs.
+func (r *Reader) Next() (*beat.Event, error) {
 	for {
 		select {
 		case <-r.done:
-			return
+			return nil, nil
 		default:
-			err := r.readUntilNotNull(entries)
+			event, err := r.readEvent()
 			if err != nil {
-				r.logger.Error("Unexpected error while reading from journal: %v", err)
+				return nil, err
 			}
-		}
 
-		for {
-			go r.stopOrWait()
-
-			select {
-			case <-r.done:
-				return
-			case e := <-r.changes:
-				switch e {
-				case sdjournal.SD_JOURNAL_NOP:
-					r.wait()
-				case sdjournal.SD_JOURNAL_APPEND, sdjournal.SD_JOURNAL_INVALIDATE:
-					continue process
-				default:
-					if e < 0 {
-						//r.logger.Error("Unexpected error: %v", syscall.Errno(-e))
-					}
-					r.wait()
-				}
+			if event == nil {
+				r.wait()
+				continue
 			}
+
+			// reset backoff when new event is available
+			r.backoff = r.config.Backoff
+			return event, nil
 		}
 	}
 }
 
-func (r *Reader) readUntilNotNull(entries chan<- *beat.Event) error {
+func (r *Reader) readEvent() (*beat.Event, error) {
 	n, err := r.journal.Next()
 	if err != nil && err != io.EOF {
-		return err
+		return nil, err
 	}
 
-	for n != 0 {
+	for n == 1 {
 		entry, err := r.journal.GetEntry()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		event := r.toEvent(entry)
-		entries <- event
-
-		n, err = r.journal.Next()
-		if err != nil && err != io.EOF {
-			return err
-		}
+		return event, nil
 	}
-	return nil
+	return nil, nil
 }
 
 // toEvent creates a beat.Event from journal entries.
@@ -307,27 +280,19 @@ func isKept(key string) bool {
 	return key != ""
 }
 
-// stopOrWait waits for a journal event.
-func (r *Reader) stopOrWait() {
-	select {
-	case <-r.done:
-	case r.changes <- r.journal.Wait(100 * time.Millisecond):
-	}
-}
-
 func (r *Reader) wait() {
 	select {
 	case <-r.done:
 		return
-	case <-time.After(r.config.Backoff):
+	case <-time.After(r.backoff):
 	}
 
-	if r.config.Backoff < r.config.MaxBackoff {
-		r.config.Backoff = r.config.Backoff * time.Duration(r.config.BackoffFactor)
-		if r.config.Backoff > r.config.MaxBackoff {
-			r.config.Backoff = r.config.MaxBackoff
+	if r.backoff < r.config.MaxBackoff {
+		r.backoff = r.backoff * time.Duration(r.config.BackoffFactor)
+		if r.backoff > r.config.MaxBackoff {
+			r.backoff = r.config.MaxBackoff
 		}
-		r.logger.Debugf("Increasing backoff time to: %v factor: %v", r.config.Backoff, r.config.BackoffFactor)
+		r.logger.Debugf("Increasing backoff time to: %v factor: %v", r.backoff, r.config.BackoffFactor)
 	}
 }
 

@@ -99,7 +99,6 @@ func New(
 	if err != nil {
 		return nil, err
 	}
-	logp.Info(">>> %v", config.EventMetadata)
 
 	logger.Debugf("New input is created for paths %v", config.Paths)
 
@@ -137,34 +136,15 @@ func (i *Input) Run() {
 	i.publishAll(client)
 }
 
+// publishAll reads events from all readers and publishes them.
 func (i *Input) publishAll(client beat.Client) {
 	out := make(chan *beat.Event)
 	defer close(out)
 
 	var wg sync.WaitGroup
-	merge := func(in chan *beat.Event) {
-		wg.Add(1)
-
-		go func(c chan *beat.Event) {
-			defer wg.Done()
-			for {
-				select {
-				case <-i.done:
-					return
-				case v, ok := <-c:
-					if !ok {
-						return
-					}
-					out <- v
-				}
-			}
-		}(in)
-	}
-
-	// merge channels of readers into a single output channel
 	for _, r := range i.readers {
-		c := r.Follow()
-		merge(c)
+		wg.Add(1)
+		go i.readEvents(&wg, r, out)
 	}
 
 loop:
@@ -177,6 +157,29 @@ loop:
 		}
 	}
 	wg.Wait()
+}
+
+// readEvents reads events from a reader.
+func (i *Input) readEvents(wg *sync.WaitGroup, r *reader.Reader, out chan *beat.Event) {
+	defer wg.Done()
+
+	for {
+		select {
+		case <-i.done:
+			return
+		default:
+		}
+
+		event, err := r.Next()
+		if event == nil {
+			if err != nil {
+				i.logger.Errorf("Error while reading event: %v", err)
+			}
+			continue
+		}
+
+		out <- event
+	}
 }
 
 // Stop stops all readers of the input.
