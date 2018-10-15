@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -147,8 +148,8 @@ func setupMatches(j *sdjournal.Journal, matches []string) error {
 		}
 
 		var p string
-		for journalKey, eventKey := range journaldEventFields {
-			if elems[0] == eventKey {
+		for journalKey, eventField := range journaldEventFields {
+			if elems[0] == eventField.Name {
 				p = journalKey + "=" + elems[1]
 			}
 		}
@@ -248,8 +249,18 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 			normalized := strings.ToLower(strings.TrimLeft(k, "_"))
 			custom.Put(normalized, v)
 		} else {
-			if isKept(kk) {
-				fields.Put(kk, v)
+			if !kk.Dropped {
+				if kk.IsInteger {
+					vv, err := strconv.ParseInt(v, 10, 64)
+					if err != nil {
+						r.logger.Debug("Failed to convert field: %s %v to int: %v", kk.Name, v, err)
+						fields.Put(kk.Name, v)
+						continue
+					}
+					fields.Put(kk.Name, vv)
+				} else {
+					fields.Put(kk.Name, v)
+				}
 			}
 		}
 	}
@@ -274,10 +285,6 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 		Private:   state,
 	}
 	return &event
-}
-
-func isKept(key string) bool {
-	return key != ""
 }
 
 func (r *Reader) wait() {
