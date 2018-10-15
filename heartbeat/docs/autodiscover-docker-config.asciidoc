@@ -1,4 +1,4 @@
-Heartbeat supports templates for modules:
+{beatname_uc} supports templates for modules:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
