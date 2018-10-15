@@ -259,6 +259,8 @@ type: text
 Original user agent value before parsing by ingest-user-agent plugin.
 
 
+Field is not indexed.
+
 --
 
 [float]
@@ -2335,6 +2337,8 @@ type: text
 Original user agent value before parsing by ingest-user-agent plugin.
 
 
+Field is not indexed.
+
 --
 
 [float]
@@ -3729,6 +3733,8 @@ type: text
 Original user agent value before parsing by ingest-user-agent plugin.
 
 
+Field is not indexed.
+
 --
 
 [float]
@@ -4738,6 +4744,8 @@ type: text
 
 Original user agent value before parsing by ingest-user-agent plugin.
 
+
+Field is not indexed.
 
 --
 
