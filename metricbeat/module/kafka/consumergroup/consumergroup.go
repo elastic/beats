@@ -1,21 +1,40 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package consumergroup
 
 import (
 	"crypto/tls"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/kafka"
 )
 
 // init registers the MetricSet with the central registry.
 func init() {
-	if err := mb.Registry.AddMetricSet("kafka", "consumergroup", New); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("kafka", "consumergroup", New,
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -45,7 +64,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	var tls *tls.Config
-	tlsCfg, err := outputs.LoadTLSConfig(config.TLS)
+	tlsCfg, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +86,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Password:    config.Password,
 
 		// consumer groups API requires at least 0.9.0.0
-		Version: kafka.Version{String: "0.9.0.0"},
+		Version: kafka.Version("0.9.0.0"),
 	}
 
 	return &MetricSet{
@@ -78,25 +97,37 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch consumer group metrics from kafka
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	if err := m.broker.Connect(); err != nil {
-		logp.Err("broker connect failed: %v", err)
-		return nil, err
+		r.Error(errors.Wrap(err, "broker connection failed"))
+		return
 	}
-
-	b := m.broker
-	defer b.Close()
+	defer m.broker.Close()
 
 	brokerInfo := common.MapStr{
-		"id":      b.ID(),
-		"address": b.AdvertisedAddr(),
+		"id":      m.broker.ID(),
+		"address": m.broker.AdvertisedAddr(),
 	}
 
-	var events []common.MapStr
 	emitEvent := func(event common.MapStr) {
+		// TODO (deprecation): Remove fields from MetricSetFields moved to ModuleFields
 		event["broker"] = brokerInfo
-		events = append(events, event)
+		r.Event(mb.Event{
+			ModuleFields: common.MapStr{
+				"broker": brokerInfo,
+				"topic": common.MapStr{
+					"name": event["topic"],
+				},
+				"partition": common.MapStr{
+					"id": event["partition"],
+				},
+			},
+			MetricSetFields: event,
+		})
 	}
-	err := fetchGroupInfo(emitEvent, b, m.groups.pred(), m.topics.pred())
-	return events, err
+	err := fetchGroupInfo(emitEvent, m.broker, m.groups.pred(), m.topics.pred())
+	if err != nil {
+		r.Error(err)
+	}
 }

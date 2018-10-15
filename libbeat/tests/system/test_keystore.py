@@ -34,7 +34,7 @@ class TestKeystore(KeystoreBase):
 
         self.add_secret(key, secret)
         proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("no such host"))
+        self.wait_until(lambda: self.log_contains("Elasticsearch url: http://myeleasticsearchsecrethost:9200"))
         assert self.log_contains(secret)
         proc.check_kill_and_wait()
 
@@ -67,6 +67,6 @@ class TestKeystore(KeystoreBase):
 
         self.add_secret(key, secret)
         proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("no such host"))
+        self.wait_until(lambda: self.log_contains("Elasticsearch url: http://myeleasticsearchsecrethost:9200"))
         assert self.log_contains(secret)
         proc.check_kill_and_wait()

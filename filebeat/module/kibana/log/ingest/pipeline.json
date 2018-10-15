@@ -1,0 +1,91 @@
+{
+    "description": "Pipeline for parsing Kibana logs",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
+    "processors": [
+        {
+            "rename": {
+                "field": "json",
+                "target_field": "kibana.log.meta"
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.@timestamp",
+                "target_field": "read_timestamp"
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.message",
+                "target_field": "message"
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.state",
+                "target_field": "kibana.log.state",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.pid",
+                "target_field": "process.pid"
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.tags",
+                "target_field": "kibana.log.tags"
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.res.statusCode",
+                "target_field": "http.response.status_code",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.res.responseTime",
+                "target_field": "http.response.elapsed_time",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.res.contentLength",
+                "target_field": "http.response.content_length",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.req.method",
+                "target_field": "http.request.method",
+                "ignore_missing": true
+            }
+        },
+        {
+            "date": {
+                "field": "read_timestamp",
+                "formats" : ["ISO8601"],
+                "target_field": "@timestamp"
+            }
+        },
+        {
+            "append": {
+                "field": "service.name",
+                "value": "kibana"
+            }
+        }
+    ]
+}

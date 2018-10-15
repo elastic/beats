@@ -34,7 +34,7 @@ Lists and dictionaries are used in beats to build structured configurations.
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 filebeat:
-  prospectors:
+  inputs:
     - type: log
       paths:
         - /var/log/*.log
@@ -92,12 +92,12 @@ For example this filebeat setting:
 ------------------------------------------------------------------------------
 
 filebeat:
-  prospectors:
+  inputs:
     - type: log
 
 ------------------------------------------------------------------------------
 
-Gets collapsed into `filebeat.prospectors.0.type: log`.
+Gets collapsed into `filebeat.inputs.0.type: log`.
 
 Alternatively to using indentation, setting names can be used in collapsed form too.
 
@@ -109,7 +109,7 @@ Simple filebeat example with partially collapsed setting names and use of compac
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 
-filebeat.prospectors:
+filebeat.inputs:
 - type: log
   paths: ["/var/log/*.log"]
   multiline.pattern: '^['
@@ -231,7 +231,7 @@ For example the filebeat registry file defaults to:
 filebeat.registry: $\{path.data}/registry
 ------------------------------------------------------------------------------
 
-With `path.data` being an implicit config setting, that is overwritable from
+With `path.data` being an implicit config setting, that is overridable from
 command line, as well as in the configuration file.
 
 Example referencing `es.host` in `output.elasticsearch.hosts`:
@@ -324,7 +324,7 @@ to the same ownership and file permission checks.
 ==== Disabling strict permission checks
 
 You can disable strict permission checks from the command line by using
-`-strict.perms=false`, but we strongly encourage you to leave the checks enabled.
+`--strict.perms=false`, but we strongly encourage you to leave the checks enabled.
 
 [[config-file-format-cli]]
 === Command line arguments

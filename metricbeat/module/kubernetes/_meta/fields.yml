@@ -3,7 +3,7 @@
   description: >
     Kubernetes metrics
   release: ga
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   short_config: false
   fields:
     - name: kubernetes

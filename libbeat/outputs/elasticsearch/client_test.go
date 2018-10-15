@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package elasticsearch
@@ -102,11 +119,12 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	events := []publisher.Event{event, eventFail, event}
 
 	reader := newJSONReader(response)
-	res, _ := bulkCollectPublishFails(reader, events)
+	res, stats := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
 		assert.Equal(t, eventFail, res[0])
 	}
+	assert.Equal(t, stats, bulkResultStats{acked: 2, fails: 1, tooMany: 1})
 }
 
 func TestCollectPublishFailAll(t *testing.T) {
@@ -122,9 +140,10 @@ func TestCollectPublishFailAll(t *testing.T) {
 	events := []publisher.Event{event, event, event}
 
 	reader := newJSONReader(response)
-	res, _ := bulkCollectPublishFails(reader, events)
+	res, stats := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
+	assert.Equal(t, stats, bulkResultStats{fails: 3, tooMany: 3})
 }
 
 func TestCollectPipelinePublishFail(t *testing.T) {

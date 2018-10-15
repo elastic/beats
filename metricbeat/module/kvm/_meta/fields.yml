@@ -1,0 +1,11 @@
+- key: kvm
+  title: "kvm"
+  description: >
+    experimental[]
+
+    kvm module
+  fields:
+    - name: kvm
+      type: group
+      description: >
+      fields:

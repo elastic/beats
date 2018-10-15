@@ -1,0 +1,34 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "index": {
+            "name": "test-index",
+            "recovery": {
+                "id": 0,
+                "primary": true,
+                "source": {},
+                "stage": "DONE",
+                "target": {
+                    "host": "127.0.0.1",
+                    "id": "ODWb5m6zT9q0lf8YTPyWWg",
+                    "name": "ODWb5m6"
+                },
+                "type": "EMPTY_STORE"
+            }
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:9200",
+        "module": "elasticsearch",
+        "name": "index_recovery",
+        "namespace": "elasticsearch.index.recovery",
+        "rtt": 115
+    },
+    "service": {
+        "name": "elasticsearch"
+    }
+}

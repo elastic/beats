@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package pipeline
 
 import (
@@ -21,6 +38,14 @@ var publishDisabled = false
 
 const defaultQueueType = "mem"
 
+// Monitors configures visibility for observing state and progress of the
+// pipeline.
+type Monitors struct {
+	Metrics   *monitoring.Registry
+	Telemetry *monitoring.Registry
+	Logger    *logp.Logger
+}
+
 func init() {
 	flag.BoolVar(&publishDisabled, "N", false, "Disable actual publishing for testing")
 }
@@ -29,12 +54,17 @@ func init() {
 // configured queue and outputs.
 func Load(
 	beatInfo beat.Info,
-	reg *monitoring.Registry,
+	monitors Monitors,
 	config Config,
 	outcfg common.ConfigNamespace,
 ) (*Pipeline, error) {
+	log := monitors.Logger
+	if log == nil {
+		log = logp.L()
+	}
+
 	if publishDisabled {
-		logp.Info("Dry run mode. All output types except the file based one are disabled.")
+		log.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
 	processors, err := processors.New(config.Processors)
@@ -50,57 +80,70 @@ func Load(
 		Processors:    processors,
 		Annotations: Annotations{
 			Event: config.EventMetadata,
-			Beat: common.MapStr{
-				"name":     name,
-				"hostname": beatInfo.Hostname,
-				"version":  beatInfo.Version,
+			Builtin: common.MapStr{
+				"beat": common.MapStr{
+					"name":     name,
+					"hostname": beatInfo.Hostname,
+					"version":  beatInfo.Version,
+				},
+				"host": common.MapStr{
+					"name": name,
+				},
 			},
 		},
 	}
 
-	queueBuilder, err := createQueueBuilder(config.Queue)
+	queueBuilder, err := createQueueBuilder(config.Queue, monitors)
 	if err != nil {
 		return nil, err
 	}
 
-	out, err := loadOutput(beatInfo, reg, outcfg)
+	out, err := loadOutput(beatInfo, monitors, outcfg)
 	if err != nil {
 		return nil, err
 	}
 
-	p, err := New(beatInfo, reg, queueBuilder, out, settings)
+	p, err := New(beatInfo, monitors, monitors.Metrics, queueBuilder, out, settings)
 	if err != nil {
 		return nil, err
 	}
 
-	logp.Info("Beat name: %s", name)
+	log.Infof("Beat name: %s", name)
 	return p, err
 }
 
 func loadOutput(
 	beatInfo beat.Info,
-	reg *monitoring.Registry,
+	monitors Monitors,
 	outcfg common.ConfigNamespace,
 ) (outputs.Group, error) {
+	log := monitors.Logger
+	if log == nil {
+		log = logp.L()
+	}
+
 	if publishDisabled {
 		return outputs.Group{}, nil
 	}
 
 	if !outcfg.IsSet() {
 		msg := "No outputs are defined. Please define one under the output section."
-		logp.Info(msg)
+		log.Info(msg)
 		return outputs.Fail(errors.New(msg))
 	}
 
-	// TODO: add support to unload/reassign outStats on output reloading
-
 	var (
-		outReg   *monitoring.Registry
+		metrics  *monitoring.Registry
 		outStats outputs.Observer
 	)
-	if reg != nil {
-		outReg = reg.NewRegistry("output")
-		outStats = outputs.NewStats(outReg)
+	if monitors.Metrics != nil {
+		metrics = monitors.Metrics.GetRegistry("output")
+		if metrics != nil {
+			metrics.Clear()
+		} else {
+			metrics = monitors.Metrics.NewRegistry("output")
+		}
+		outStats = outputs.NewStats(metrics)
 	}
 
 	out, err := outputs.Load(beatInfo, outStats, outcfg.Name(), outcfg.Config())
@@ -108,14 +151,26 @@ func loadOutput(
 		return outputs.Fail(err)
 	}
 
-	if outReg != nil {
-		monitoring.NewString(outReg, "type").Set(outcfg.Name())
+	if metrics != nil {
+		monitoring.NewString(metrics, "type").Set(outcfg.Name())
+	}
+	if monitors.Telemetry != nil {
+		telemetry := monitors.Telemetry.GetRegistry("output")
+		if telemetry != nil {
+			telemetry.Clear()
+		} else {
+			telemetry = monitors.Telemetry.NewRegistry("output")
+		}
+		monitoring.NewString(telemetry, "name").Set(outcfg.Name())
 	}
 
 	return out, nil
 }
 
-func createQueueBuilder(config common.ConfigNamespace) (func(queue.Eventer) (queue.Queue, error), error) {
+func createQueueBuilder(
+	config common.ConfigNamespace,
+	monitors Monitors,
+) (func(queue.Eventer) (queue.Queue, error), error) {
 	queueType := defaultQueueType
 	if b := config.Name(); b != "" {
 		queueType = b
@@ -131,7 +186,12 @@ func createQueueBuilder(config common.ConfigNamespace) (func(queue.Eventer) (que
 		queueConfig = common.NewConfig()
 	}
 
+	if monitors.Telemetry != nil {
+		queueReg := monitors.Telemetry.NewRegistry("queue")
+		monitoring.NewString(queueReg, "name").Set(queueType)
+	}
+
 	return func(eventer queue.Eventer) (queue.Queue, error) {
-		return queueFactory(eventer, queueConfig)
+		return queueFactory(eventer, monitors.Logger, queueConfig)
 	}, nil
 }

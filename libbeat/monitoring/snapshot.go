@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package monitoring
 
 import "strings"
@@ -5,10 +22,11 @@ import "strings"
 // FlatSnapshot represents a flatten snapshot of all metrics.
 // Names in the tree will be joined with `.` .
 type FlatSnapshot struct {
-	Bools   map[string]bool
-	Ints    map[string]int64
-	Floats  map[string]float64
-	Strings map[string]string
+	Bools        map[string]bool
+	Ints         map[string]int64
+	Floats       map[string]float64
+	Strings      map[string]string
+	StringSlices map[string][]string
 }
 
 type flatSnapshotVisitor struct {
@@ -51,10 +69,11 @@ func CollectFlatSnapshot(r *Registry, mode Mode, expvar bool) FlatSnapshot {
 
 func MakeFlatSnapshot() FlatSnapshot {
 	return FlatSnapshot{
-		Bools:   map[string]bool{},
-		Ints:    map[string]int64{},
-		Floats:  map[string]float64{},
-		Strings: map[string]string{},
+		Bools:        map[string]bool{},
+		Ints:         map[string]int64{},
+		Floats:       map[string]float64{},
+		Strings:      map[string]string{},
+		StringSlices: map[string][]string{},
 	}
 }
 
@@ -125,6 +144,10 @@ func (vs *flatSnapshotVisitor) OnFloat(f float64) {
 	vs.snapshot.Floats[vs.getName()] = f
 }
 
+func (vs *flatSnapshotVisitor) OnStringSlice(f []string) {
+	vs.snapshot.StringSlices[vs.getName()] = f
+}
+
 func newStructSnapshotVisitor() *structSnapshotVisitor {
 	vs := &structSnapshotVisitor{}
 	vs.key.stack = vs.key.stack0[:0]
@@ -162,6 +185,11 @@ func (s *structSnapshotVisitor) OnString(str string) { s.setValue(str) }
 func (s *structSnapshotVisitor) OnBool(b bool)       { s.setValue(b) }
 func (s *structSnapshotVisitor) OnInt(i int64)       { s.setValue(i) }
 func (s *structSnapshotVisitor) OnFloat(f float64)   { s.setValue(f) }
+func (s *structSnapshotVisitor) OnStringSlice(f []string) {
+	c := make([]string, len(f))
+	copy(c, f)
+	s.setValue(c)
+}
 
 func (s *structSnapshotVisitor) setValue(v interface{}) {
 	if s.event.current == nil {

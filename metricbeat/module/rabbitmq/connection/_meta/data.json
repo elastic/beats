@@ -1,0 +1,40 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "localhost:15672",
+        "module": "rabbitmq",
+        "name": "connection",
+        "rtt": 115
+    },
+    "rabbitmq": {
+        "connection": {
+            "channel_max": 0,
+            "channels": 1,
+            "frame_max": 4096,
+            "host": "127.0.0.1",
+            "name": "127.0.0.1:42256 -\u003e 127.0.0.1:5672",
+            "node": "rabbit@lake",
+            "octet_count": {
+                "received": 1025,
+                "sent": 1056
+            },
+            "packet_count": {
+                "pending": 0,
+                "received": 50,
+                "sent": 49
+            },
+            "peer": {
+                "host": "127.0.0.1",
+                "port": 42256
+            },
+            "port": 5672,
+            "type": "network",
+            "user": "guest",
+            "vhost": "/"
+        }
+    }
+}

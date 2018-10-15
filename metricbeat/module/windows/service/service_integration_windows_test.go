@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build integration windows
 
 package service
@@ -40,32 +57,35 @@ func TestReadService(t *testing.T) {
 
 	var wmiSrc []Win32Service
 
-	// Get services per WMI
+	// Get services from WMI.
 	err = wmi.Query("SELECT * FROM Win32_Service ", &wmiSrc)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Get services per windows module
+	// Get services from Windows module.
 	services, err := reader.Read()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	//Compare them
+	// Compare our module's data against WMI.
 	for _, s := range services {
-		// Look if the service is in the wmi src
+		// Look if the service is in the WMI data.
 		var found bool
 		for _, w := range wmiSrc {
 			if w.Name == s["name"] {
 				if s["pid"] != nil {
-					assert.Equal(t, w.ProcessId, s["pid"])
+					assert.Equal(t, w.ProcessId, s["pid"],
+						"PID of service %v does not match", w.DisplayName)
 				}
-				assert.Equal(t, w.State, s["state"])
+				assert.Equal(t, w.State, s["state"],
+					"State of service %v does not match", w.DisplayName)
 
 				// For some services DisplayName and Name are the same. It seems to be a bug from the wmi query.
 				if w.DisplayName != w.Name {
-					assert.Equal(t, w.DisplayName, s["display_name"])
+					assert.Equal(t, w.DisplayName, s["display_name"],
+						"Display name of service %v does not match", w.Name)
 				}
 				found = true
 				break

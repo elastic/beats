@@ -5,7 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-zookeeper]]
 == ZooKeeper module
 
-The ZooKeeper module fetches statistics from the ZooKeeper service.
+The ZooKeeper module fetches statistics from the ZooKeeper service. The default
+metricset is `mntr`.
 
 [float]
 === Compatibility
@@ -24,6 +25,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: zookeeper
+  enabled: true
   metricsets: ["mntr"]
   period: 10s
   hosts: ["localhost:2181"]

@@ -31,7 +31,7 @@ class Test(BaseTest):
         """
         Checks if filebeat fails to load if removed settings have been used:
         """
-        self.render_config_template(console={"pretty": "false"})
+        self.render_config_template()
 
         exit_code = self.run_beat(extra_args=[
             "-E", "filebeat.spool_size=2048",

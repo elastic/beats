@@ -25,13 +25,22 @@
         "state": "running",
         "messages": {
           "total": {
-            "count": 0
+            "count": 0,
+            "details": {
+              "rate": 2.2
+            }
           },
           "ready": {
-            "count": 0
+            "count": 0,
+            "details": {
+              "rate": 0
+            }
           },
           "unacknowledged": {
-            "count": 0
+            "count": 0,
+            "details": {
+              "rate": 0.5
+            }
           },
           "persistent": {
             "count": 0

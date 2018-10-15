@@ -17,6 +17,7 @@
       description: >
         The PID of the process that sent the auth message.
     - name: message
+      type: text
       description: >
         The message in the log line.
     - name: user
@@ -78,7 +79,10 @@
             type: geo_point
             description: >
               The longitude and latitude.
-
+          - name: region_iso_code
+            type: keyword
+            description: >
+              Region ISO code.
     - name: sudo
       type: group
       description: >

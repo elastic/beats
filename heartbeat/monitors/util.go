@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package monitors
 
 import (
@@ -12,9 +29,16 @@ import (
 	"github.com/elastic/beats/heartbeat/look"
 )
 
+// TaskRunner describes a runnable task.
+// Note that these tasks can decompose and produce continuations,
+// along the line of a java fork join pool.
+type TaskRunner interface {
+	Run() (common.MapStr, []TaskRunner, error)
+}
+
 type funcJob struct {
 	settings JobSettings
-	run      JobRunner
+	run      jobRunner
 }
 
 type funcTask struct {
@@ -97,7 +121,7 @@ func MakeJob(settings JobSettings, f func() (common.MapStr, []TaskRunner, error)
 		},
 	})
 
-	return &funcJob{settings, func() (beat.Event, []JobRunner, error) {
+	return &funcJob{settings, func() (beat.Event, []jobRunner, error) {
 		// Create and run new annotated Job whenever the Jobs root is Task is executed.
 		// This will set the jobs active start timestamp to the time.Now().
 		return annotated(settings, time.Now(), f)()
@@ -109,8 +133,8 @@ func annotated(
 	settings JobSettings,
 	start time.Time,
 	fn func() (common.MapStr, []TaskRunner, error),
-) JobRunner {
-	return func() (beat.Event, []JobRunner, error) {
+) jobRunner {
+	return func() (beat.Event, []jobRunner, error) {
 		var event beat.Event
 
 		fields, cont, err := fn()
@@ -122,6 +146,8 @@ func annotated(
 		}
 
 		if fields != nil {
+			fields = fields.Clone()
+
 			status := look.Status(err)
 			fields.DeepUpdate(common.MapStr{
 				"monitor": common.MapStr{
@@ -130,14 +156,14 @@ func annotated(
 				},
 			})
 			if user := settings.Fields; user != nil {
-				fields.DeepUpdate(user)
+				fields.DeepUpdate(user.Clone())
 			}
 
 			event.Timestamp = start
 			event.Fields = fields
 		}
 
-		jobCont := make([]JobRunner, len(cont))
+		jobCont := make([]jobRunner, len(cont))
 		for i, c := range cont {
 			jobCont[i] = annotated(settings, start, c.Run)
 		}
@@ -160,7 +186,7 @@ func MakeSimpleCont(f func() (common.MapStr, error)) TaskRunner {
 	})
 }
 
-// MakePingIPFactory creates a factory for building a Task from a new IP address.
+// MakePingIPFactory creates a jobFactory for building a Task from a new IP address.
 func MakePingIPFactory(
 	f func(*net.IPAddr) (common.MapStr, error),
 ) func(*net.IPAddr) TaskRunner {
@@ -370,10 +396,13 @@ func resolveErr(host string, err error) (common.MapStr, []TaskRunner, error) {
 func WithFields(fields common.MapStr, r TaskRunner) TaskRunner {
 	return MakeCont(func() (common.MapStr, []TaskRunner, error) {
 		event, cont, err := r.Run()
-		if event == nil {
+		if event != nil {
+			event = event.Clone()
+			event.DeepUpdate(fields)
+		} else if err != nil {
 			event = common.MapStr{}
+			event.DeepUpdate(fields)
 		}
-		event.DeepUpdate(fields)
 
 		for i := range cont {
 			cont[i] = WithFields(fields, cont[i])
@@ -406,7 +435,7 @@ func withStart(field string, start time.Time, r TaskRunner) TaskRunner {
 
 func (f *funcJob) Name() string { return f.settings.Name }
 
-func (f *funcJob) Run() (beat.Event, []JobRunner, error) { return f.run() }
+func (f *funcJob) Run() (beat.Event, []jobRunner, error) { return f.run() }
 
 func (f funcTask) Run() (common.MapStr, []TaskRunner, error) { return f.run() }
 

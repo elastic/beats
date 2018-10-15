@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package input
 
 import (
@@ -11,7 +28,16 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
+
+var (
+	inputList = monitoring.NewUniqueList()
+)
+
+func init() {
+	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "input", inputList.Report, monitoring.Report)
+}
 
 // Input is the interface common to all input
 type Input interface {
@@ -34,7 +60,7 @@ type Runner struct {
 // New instantiates a new Runner
 func New(
 	conf *common.Config,
-	outlet channel.Factory,
+	outlet channel.Connector,
 	beatDone chan struct{},
 	states []file.State,
 	dynFields *common.MapStrPointer,
@@ -70,6 +96,7 @@ func New(
 		Done:          input.done,
 		BeatDone:      input.beatDone,
 		DynamicFields: dynFields,
+		Meta:          nil,
 	}
 	var ipt Input
 	ipt, err = f(conf, outlet, context)
@@ -93,6 +120,7 @@ func (p *Runner) Start() {
 	}
 
 	onceWg.Add(1)
+	inputList.Add(p.config.Type)
 	// Add waitgroup to make sure input is finished
 	go func() {
 		defer func() {
@@ -132,6 +160,7 @@ func (p *Runner) Stop() {
 	// Stop scanning and wait for completion
 	close(p.done)
 	p.wg.Wait()
+	inputList.Remove(p.config.Type)
 }
 
 func (p *Runner) stop() {

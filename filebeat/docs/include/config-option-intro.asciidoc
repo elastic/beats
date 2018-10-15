@@ -2,11 +2,9 @@
 [id="{modulename}-settings"]
 ==== Variable settings
 
-The +{modulename}+ module provides the following settings for configuring the
-behavior of the module. Each fileset has separate settings.
-
-If you don’t specify variable settings, the +{modulename}+ module uses the
-defaults.
+Each fileset has separate variable settings for configuring the behavior of the
+module. If you don’t specify variable settings, the +{modulename}+ module uses
+the defaults.
 
 For more information, see <<specify-variable-settings>>. Also see
 <<advanced-settings>>.

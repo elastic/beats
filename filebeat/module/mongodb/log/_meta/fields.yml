@@ -1,0 +1,24 @@
+- name: log
+  type: group
+  description: >
+      Contains fields from MongoDB logs.
+  fields:
+  - name: severity
+    description: >
+        Severity level of message
+    example: I
+    type: keyword
+  - name: component
+    description: >
+        Functional categorization of message
+    example: COMMAND
+    type: keyword
+  - name: context
+    description: >
+        Context of message
+    example: initandlisten
+    type: keyword
+  - name: message
+    description: >
+        The message in the log line.
+    type: text

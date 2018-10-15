@@ -5,13 +5,11 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: filebeat
-    kubernetes.io/cluster-service: "true"
 spec:
   template:
     metadata:
       labels:
         k8s-app: filebeat
-        kubernetes.io/cluster-service: "true"
     spec:
       serviceAccountName: filebeat
       terminationGracePeriodSeconds: 30
@@ -37,6 +35,8 @@ spec:
           value:
         securityContext:
           runAsUser: 0
+          # If using Red Hat OpenShift uncomment this:
+          #privileged: true
         resources:
           limits:
             memory: 200Mi
@@ -48,8 +48,8 @@ spec:
           mountPath: /etc/filebeat.yml
           readOnly: true
           subPath: filebeat.yml
-        - name: prospectors
-          mountPath: /usr/share/filebeat/prospectors.d
+        - name: inputs
+          mountPath: /usr/share/filebeat/inputs.d
           readOnly: true
         - name: data
           mountPath: /usr/share/filebeat/data
@@ -64,9 +64,12 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
-      - name: prospectors
+      - name: inputs
         configMap:
           defaultMode: 0600
-          name: filebeat-prospectors
+          name: filebeat-inputs
+      # data folder stores a registry of read status for all files, so we don't send everything again on a Filebeat pod restart
       - name: data
-        emptyDir: {}
+        hostPath:
+          path: /var/lib/filebeat-data
+          type: DirectoryOrCreate

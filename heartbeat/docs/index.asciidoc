@@ -10,12 +10,12 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beatname_pkg: heartbeat-elastic
 :github_repo_name: beats
 :discuss_forum: beats/{beatname_lc}
+:beat_default_index_prefix: {beatname_lc}
+:has_ml_jobs: yes
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
-
-include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
@@ -23,25 +23,17 @@ include::../../libbeat/docs/repositories.asciidoc[]
 
 include::./setting-up-running.asciidoc[]
 
-//
-//include::./upgrading.asciidoc[]
-
-//
-//include::./how-heartbeat-works.asciidoc[]
-
 include::./configuring-howto.asciidoc[]
 
 include::./fields.asciidoc[]
 
 include::../../libbeat/docs/monitoring/monitoring-beats.asciidoc[]
 
-include::./securing-heartbeat.asciidoc[]
-
-include::../../libbeat/docs/security/securing-beats.asciidoc[]
+include::../../libbeat/docs/shared-securing-beat.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
 
-//
-//include::./heartbeat-devguide.asciidoc[]
+include::../../libbeat/docs/contributing-to-beats.asciidoc[]
+

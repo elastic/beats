@@ -1,4 +1,5 @@
-The ZooKeeper module fetches statistics from the ZooKeeper service.
+The ZooKeeper module fetches statistics from the ZooKeeper service. The default
+metricset is `mntr`.
 
 [float]
 === Compatibility

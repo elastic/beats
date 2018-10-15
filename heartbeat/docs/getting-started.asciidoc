@@ -1,18 +1,7 @@
 [[heartbeat-getting-started]]
 == Getting Started With Heartbeat
 
-To get started with your own Heartbeat setup, install and configure these
-related products:
-
- * Elasticsearch for storage and indexing the data.
- * Kibana for the UI.
- * Logstash (optional) for inserting data into Elasticsearch.
-
-See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack]
-for more information.
-
-After installing the Elastic Stack, read the following topics to learn how to
-install, configure, and run Heartbeat:
+include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
 
 * <<heartbeat-installation>>
 * <<heartbeat-configuration>>
@@ -130,8 +119,7 @@ https://www.elastic.co/downloads/beats/heartbeat[downloads page].
 . Rename the +heartbeat-<version>-windows+ directory to +Heartbeat+.
 
 . Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
-and select *Run As Administrator*). If you are running Windows XP, you may need
-to download and install PowerShell.
+and select *Run As Administrator*).
 
 . From the PowerShell prompt, run the following commands to install Heartbeat as
 a Windows service:
@@ -204,18 +192,7 @@ was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 See <<configuring-howto-heartbeat>> for a full description of each
 configuration option.
 
-. If you are sending output directly to Elasticsearch (and not using Logstash),
-set the IP address and port where Heartbeat can find the Elasticsearch
-installation:
-+
-[source,yaml]
-----------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["192.168.1.42:9200"]
-----------------------------------------------------------------------
-+
-If you are sending output to Logstash, make sure you
-<<logstash-output,Configure the Logstash output>> instead.
+include::../../libbeat/docs/step-configure-output.asciidoc[]
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
@@ -270,7 +247,7 @@ sudo chown root heartbeat.yml <1>
 sudo ./heartbeat -e -c heartbeat.yml -d "publish"
 ----------------------------------------------------------------------
 <1> You'll be running Heartbeat as root, so you need to change ownership of the
-configuration file, or run Heartbeat with `-strict.perms=false` specified. See
+configuration file, or run Heartbeat with `--strict.perms=false` specified. See
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
@@ -298,4 +275,5 @@ include::../../libbeat/docs/opendashboards.asciidoc[]
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
+[role="screenshot"]
 image:./images/heartbeat-statistics.png[Heartbeat statistics]

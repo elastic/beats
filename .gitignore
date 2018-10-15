@@ -7,6 +7,8 @@
 /*/logs
 /*/fields.yml
 /*/*.template*.json
+**/html_docs
+/*/_meta/kibana.generated
 
 # Files
 .DS_Store

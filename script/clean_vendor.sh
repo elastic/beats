@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Removes unncessary files from the vendor directories
+# Removes unnecessary files from the vendor directories
 #
 # A list for files to be removed is used instead of excluding files.
 # The reason is that this makes the setup simpler and prevents

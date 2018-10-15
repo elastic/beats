@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build windows
 
 package perfmon
@@ -10,11 +27,12 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
-	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/winlogbeat/sys"
 )
 
@@ -199,7 +217,7 @@ type Query struct {
 type Format int
 
 const (
-	FloatFlormat Format = iota
+	FloatFormat Format = iota
 	LongFormat
 )
 
@@ -222,7 +240,7 @@ func (q *Query) AddCounter(counterPath string, format Format, instanceName strin
 
 	h, err := PdhAddCounter(q.handle, counterPath, 0)
 	if err != nil {
-		return errors.Wrapf(err, `failed to add counter (path="%v")`, counterPath)
+		return err
 	}
 
 	wildcard := wildcardRegexp.MatchString(counterPath)
@@ -242,7 +260,7 @@ func (q *Query) AddCounter(counterPath string, format Format, instanceName strin
 		wildcard:     wildcard,
 	}
 	switch format {
-	case FloatFlormat:
+	case FloatFormat:
 		q.counters[counterPath].format = PdhFmtDouble
 	case LongFormat:
 		q.counters[counterPath].format = PdhFmtLarge
@@ -309,12 +327,14 @@ func (q *Query) Close() error {
 
 type PerfmonReader struct {
 	query         *Query            // PDH Query
-	instanceLabel map[string]string // Mapping of counter path to key used in output.
-	measurement   map[string]string
-	executed      bool // Indicates if the query has been executed.
+	instanceLabel map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
+	measurement   map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
+	executed      bool              // Indicates if the query has been executed.
+	log           *logp.Logger
 }
 
-func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
+// NewPerfmonReader creates a new instance of PerfmonReader.
+func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 	query, err := NewQuery("")
 	if err != nil {
 		return nil, err
@@ -324,19 +344,29 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 		query:         query,
 		instanceLabel: map[string]string{},
 		measurement:   map[string]string{},
+		log:           logp.NewLogger("perfmon"),
 	}
 
-	for _, counter := range config {
+	for _, counter := range config.CounterConfig {
 		var format Format
 		switch counter.Format {
 		case "float":
-			format = FloatFlormat
+			format = FloatFormat
 		case "long":
 			format = LongFormat
 		}
 		if err := query.AddCounter(counter.Query, format, counter.InstanceName); err != nil {
+			if config.IgnoreNECounters {
+				switch err {
+				case PDH_CSTATUS_NO_COUNTER, PDH_CSTATUS_NO_COUNTERNAME,
+					PDH_CSTATUS_NO_INSTANCE, PDH_CSTATUS_NO_OBJECT:
+					r.log.Infow("Ignoring non existent counter", "error", err,
+						logp.Namespace("perfmon"), "query", counter.Query)
+					continue
+				}
+			}
 			query.Close()
-			return nil, err
+			return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
 		}
 
 		r.instanceLabel[counter.Query] = counter.InstanceLabel
@@ -347,9 +377,9 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 	return r, nil
 }
 
-func (r *PerfmonReader) Read() ([]common.MapStr, error) {
+func (r *PerfmonReader) Read() ([]mb.Event, error) {
 	if err := r.query.Execute(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed querying counter values")
 	}
 
 	// Get the values.
@@ -359,38 +389,37 @@ func (r *PerfmonReader) Read() ([]common.MapStr, error) {
 	}
 
 	// Write the values into the map.
-	result := make([]common.MapStr, 0, len(values))
-	var errs multierror.Errors
+	events := make([]mb.Event, 0, len(values))
 
-	for counterPath, counter := range values {
-		for _, val := range counter {
-			ev := common.MapStr{}
-			instanceKey := r.instanceLabel[counterPath]
-			ev.Put(instanceKey, val.Instance)
-			measurementKey := r.measurement[counterPath]
-			ev.Put(measurementKey, val.Measurement)
-
-			if val.Err != nil {
-				switch val.Err {
-				case PDH_CALC_NEGATIVE_DENOMINATOR:
-				case PDH_INVALID_DATA:
-					if r.executed {
-						errs = append(errs, errors.Wrapf(val.Err, "key=%v", measurementKey))
-					}
-				default:
-					errs = append(errs, errors.Wrapf(val.Err, "key=%v", measurementKey))
-				}
+	for counterPath, values := range values {
+		for _, val := range values {
+			if val.Err != nil && !r.executed {
+				r.log.Debugw("Ignoring the first measurement because the data isn't ready",
+					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
+				continue
 			}
 
-			result = append(result, ev)
+			event := mb.Event{
+				MetricSetFields: common.MapStr{},
+				Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
+			}
+
+			if val.Instance != "" {
+				event.MetricSetFields.Put(r.instanceLabel[counterPath], val.Instance)
+			}
+
+			if val.Measurement != nil {
+				event.MetricSetFields.Put(r.measurement[counterPath], val.Measurement)
+			} else {
+				event.MetricSetFields.Put(r.measurement[counterPath], 0)
+			}
+
+			events = append(events, event)
 		}
 	}
 
-	if !r.executed {
-		r.executed = true
-	}
-
-	return result, errs.Err()
+	r.executed = true
+	return events, nil
 }
 
 func (e PdhErrno) Error() string {

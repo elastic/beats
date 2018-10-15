@@ -6,12 +6,12 @@
     },
     "logstash": {
         "node": {
-            "host": "4318d3c307b3",
+            "host": "5256c6d0f05a",
             "jvm": {
                 "pid": 1,
-                "version": "1.8.0_151"
+                "version": "1.8.0_161"
             },
-            "version": "6.0.0-rc2"
+            "version": "6.2.3"
         }
     },
     "metricset": {

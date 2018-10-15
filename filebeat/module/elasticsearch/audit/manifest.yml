@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/elasticsearch/*_access.log
+    os.darwin:
+      - /usr/local/elasticsearch/*_access.log
+    os.windows:
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_access.log
+
+ingest_pipeline: ingest/pipeline.json
+input: config/audit.yml

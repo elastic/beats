@@ -1,0 +1,252 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"mongodb",
+        "name":"metrics",
+        "rtt":44269
+    },
+    "mongodb":{
+      "metrics": {
+        "get_last_error": {
+          "write_wait": {
+            "ms": 0,
+            "count": 0
+          },
+          "write_timeouts": 0
+        },
+        "cursor": {
+          "open": {
+            "no_timeout": 0,
+            "pinned": 0,
+            "total": 1
+          },
+          "timed_out": 137
+        },
+        "replication": {
+          "apply": {
+            "batches": {
+              "count": 66871,
+              "time": {
+                "ms": 9981
+              }
+            },
+            "ops": 28536,
+            "attempts_to_become_secondary": 1
+          },
+          "buffer": {
+            "count": 0,
+            "max_size": {
+              "bytes": 268435456
+            },
+            "size": {}
+          },
+          "initial_sync": {
+            "failures": 0,
+            "completed": 0,
+            "failed_attempts": 0
+          },
+          "network": {
+            "bytes": 17002617,
+            "getmores": {
+              "count": 183078,
+              "time": {
+                "ms": 515206213
+              }
+            },
+            "ops": 78266,
+            "reders_created": 1
+          },
+          "preload": {
+            "docs": {
+              "count": 0,
+              "time": {
+                "ms": 0
+              }
+            },
+            "indexes": {
+              "count": 0,
+              "time": {
+                "ms": 0
+              }
+            }
+          },
+          "executor": {
+            "counters": {
+              "event_created": 2,
+              "event_wait": 2,
+              "cancels": 440622,
+              "waits": 0,
+              "scheduled": {
+                "dbwork": 1,
+                "exclusive": 0,
+                "work_at": 1032681,
+                "work": 0,
+                "failures": 0,
+                "netcmd": 515015
+              }
+            },
+            "queues": {
+              "in_progress": {
+                "network": 0,
+                "dbwork": 0,
+                "exclusive": 0
+              },
+              "sleepers": 4,
+              "ready": 0,
+              "free": 5
+            },
+            "unsignaled_events": 4,
+            "event_waiters": 0,
+            "shutting_down": false,
+            "network_interface": "\nNetworkInterfaceASIO Operations' Diagnostic:\nOperation:    Count:   \nConnecting    0        \nIn Progress   0        \nSucceeded     515014   \nCanceled      0        \nFailed        1        \nTimed Out     1        \n\n"
+          }
+        },
+        "operation": {
+          "scan_and_order": 0,
+          "write_conflicts": 0
+        },
+        "ttl": {
+          "passes": {
+            "count": 8590
+          },
+          "deleted_documents": {
+            "count": 0
+          }
+        },
+        "commands": {
+          "db_stats": {
+            "total": 3440,
+            "failed": 0
+          },
+          "last_collections": {
+            "failed": 0,
+            "total": 146
+          },
+          "aggregate": {
+            "failed": 0,
+            "total": 0
+          },
+          "server_status": {
+            "total": 123122,
+            "failed": 0
+          },
+          "get_last_error": {
+            "failed": 0,
+            "total": 15
+          },
+          "list_indexes": {
+            "failed": 0,
+            "total": 216
+          },
+          "connection_pool_stats": {
+            "total": 9372,
+            "failed": 0
+          },
+          "update": {
+            "total": 0,
+            "failed": 0
+          },
+          "is_self": {
+            "total": 9372,
+            "failed": 0
+          },
+          "insert": {
+            "total": 0,
+            "failed": 0
+          },
+          "replset_get_rbid": {
+            "failed": 0,
+            "total": 0
+          },
+          "get_parameter": {
+            "failed": 0,
+            "total": 9372
+          },
+          "count": {
+            "failed": 0,
+            "total": 432
+          },
+          "replset_update_position": {
+            "failed": 0,
+            "total": 0
+          },
+          "host_info": {
+            "failed": 0,
+            "total": 9372
+          },
+          "replset_heartbeat": {
+            "total": 360615,
+            "failed": 0
+          },
+          "profile": {
+            "failed": 0,
+            "total": 0
+          },
+          "coll_stats": {
+            "failed": 0,
+            "total": 112526
+          },
+          "whatsmyuri": {
+            "total": 7,
+            "failed": 0
+          },
+          "replset_get_status": {
+            "failed": 0,
+            "total": 121833
+          },
+          "ping": {
+            "failed": 0,
+            "total": 160781
+          },
+          "build_info": {
+            "failed": 0,
+            "total": 112751
+          },
+          "find": {
+            "failed": 0,
+            "total": 9726
+          },
+          "get_cmd_line_opts": {
+            "failed": 0,
+            "total": 9372
+          },
+          "list_databased": {
+            "total": 2612,
+            "failed": 0
+          },
+          "get_log": {
+            "failed": 0,
+            "total": 9372
+          },
+          "get_more": {
+            "failed": 0,
+            "total": 28359
+          },
+          "distinct": {
+            "total": 0,
+            "failed": 0
+          },
+          "last_commands": {
+            "failed": 0,
+            "total": 0
+          },
+          "is_master": {
+            "total": 295988,
+            "failed": 0
+          }
+        },
+        "document": {
+          "deleted": 0,
+          "inserted": 0,
+          "returned": 1615596512,
+          "updated": 0
+        }
+      }
+    },
+    "type":"metricsets"
+}

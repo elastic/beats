@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package kibana
 
 import (
@@ -20,7 +37,7 @@ func TestNewGenerator(t *testing.T) {
 
 	v, _ := common.NewVersion("7.0.0")
 	// checks for fields.yml
-	generator, err := NewGenerator("beat-index", "mybeat.", filepath.Join(beatDir, "notexistent"), "7.0", *v)
+	generator, err := NewGenerator("beat-index", "mybeat.", filepath.Join(beatDir, "nonexistent"), "7.0", *v)
 	assert.Error(t, err)
 
 	generator, err = NewGenerator("beat-index", "mybeat.", beatDir, "7.0", *v)
@@ -30,7 +47,7 @@ func TestNewGenerator(t *testing.T) {
 	assert.Equal(t, filepath.Join(beatDir, "fields.yml"), generator.fieldsYaml)
 
 	// creates file dir and sets name
-	expectedDir := filepath.Join(beatDir, "_meta/kibana/6/index-pattern")
+	expectedDir := filepath.Join(beatDir, "_meta/kibana.generated/6/index-pattern")
 	assert.Equal(t, expectedDir, generator.targetDir)
 	_, err = os.Stat(generator.targetDir)
 	assert.NoError(t, err)
@@ -40,7 +57,7 @@ func TestNewGenerator(t *testing.T) {
 	generator, err = NewGenerator("beat-index", "mybeat.", beatDir, "7.0", *v)
 	assert.NoError(t, err)
 
-	expectedDir = filepath.Join(beatDir, "_meta/kibana/5/index-pattern")
+	expectedDir = filepath.Join(beatDir, "_meta/kibana.generated/5/index-pattern")
 	assert.Equal(t, expectedDir, generator.targetDir)
 	_, err = os.Stat(generator.targetDir)
 
@@ -127,8 +144,8 @@ func TestGenerate(t *testing.T) {
 	}
 
 	tests := []map[string]string{
-		{"existing": "beat-5.json", "created": "_meta/kibana/5/index-pattern/beat.json"},
-		{"existing": "beat-6.json", "created": "_meta/kibana/6/index-pattern/beat.json"},
+		{"existing": "beat-5.json", "created": "_meta/kibana.generated/5/index-pattern/beat.json"},
+		{"existing": "beat-6.json", "created": "_meta/kibana.generated/6/index-pattern/beat.json"},
 	}
 	testGenerate(t, beatDir, tests, true)
 }
@@ -152,8 +169,8 @@ func TestGenerateExtensive(t *testing.T) {
 	}
 
 	tests := []map[string]string{
-		{"existing": "metricbeat-5.json", "created": "_meta/kibana/5/index-pattern/metricbeat.json"},
-		{"existing": "metricbeat-6.json", "created": "_meta/kibana/6/index-pattern/metricbeat.json"},
+		{"existing": "metricbeat-5.json", "created": "_meta/kibana.generated/5/index-pattern/metricbeat.json"},
+		{"existing": "metricbeat-6.json", "created": "_meta/kibana.generated/6/index-pattern/metricbeat.json"},
 	}
 	testGenerate(t, beatDir, tests, false)
 }

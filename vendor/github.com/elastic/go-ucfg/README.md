@@ -17,26 +17,25 @@ The full API Documentation can be found [here](https://godoc.org/github.com/elas
 
 A few examples on how ucfg can be used. All examples below assume, that the following packages are imported:
 
-```
+```golang
 import (
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/yaml"
 )
 ```
 
-
-### Dot notations
+### Dot notations
 
 ufcg allows you to load yaml configuration files using dots instead of indentation. For example instead of having:
 
-```
+```yaml
 config:
   user: name
 ```
 
 with ucfg you can write:
 
-```
+```yaml
 config.user: name
 ```
 
@@ -44,7 +43,7 @@ This makes configurations easier and simpler.
 
 To load such a config file in Golang, use the following command:
 
-```
+```golang
 config, err := yaml.NewConfigWithFile(path, ucfg.PathSep("."))
 ```
 
@@ -55,7 +54,7 @@ config, err := yaml.NewConfigWithFile(path, ucfg.PathSep("."))
 ucfg allows to automatically validate fields and set defaults for fields in case they are not defined.
 
 
-```
+```golang
 // Defines struct to read config from
 type ExampleConfig struct {
     Counter  string 	`config:"counter" validate:"min=0, max=9"`
@@ -90,4 +89,4 @@ The above uses `Counter` as the config variable. ucfg assures that the value is 
 
 ucfg has the following requirements:
 
-* Golang 1.5+
+* Golang 1.7+

@@ -15,9 +15,9 @@ host machine from within the container.
 ["source","sh",subs="attributes"]
 ----
 docker run \
-  --volume=/proc:/hostfs/proc:ro \ <1>
-  --volume=/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro \ <2>
-  --volume=/:/hostfs:ro \ <3>
+  --mount type=bind,source=/proc,target=/hostfs/proc,readonly \ <1>
+  --mount type=bind,source=/sys/fs/cgroup,target=/hostfs/sys/fs/cgroup,readonly \ <2>
+  --mount type=bind,source=/,target=/hostfs,readonly \ <3>
   --net=host <4>
   {dockerimage} -system.hostfs=/hostfs
 ----
@@ -75,7 +75,7 @@ The mysql module configuration would look like this:
 metricbeat.modules:
 - module: mysql
   metricsets: ["status"]
-  hosts: ["mysql:3306"] <1>
+  hosts: ["tcp(mysql:3306)/"] <1>
   username: root
   password: ${MYSQL_PASSWORD} <2>
 ----

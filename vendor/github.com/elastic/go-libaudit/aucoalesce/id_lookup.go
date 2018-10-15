@@ -1,16 +1,19 @@
-// Copyright 2017-2018 Elasticsearch Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package aucoalesce
 
@@ -18,14 +21,15 @@ import (
 	"math"
 	"os/user"
 	"strings"
+	"sync"
 	"time"
 )
 
-const cacheTimeout = 0
+const cacheTimeout = time.Minute
 
 var (
-	userLookup  = NewUserCache()
-	groupLookup = NewGroupCache()
+	userLookup  = NewUserCache(cacheTimeout)
+	groupLookup = NewGroupCache(cacheTimeout)
 )
 
 type stringItem struct {
@@ -38,79 +42,106 @@ func (i *stringItem) isExpired() bool {
 }
 
 // UserCache is a cache of UID to username.
-type UserCache map[string]stringItem
+type UserCache struct {
+	expiration time.Duration
+	data       map[string]stringItem
+	mutex      sync.Mutex
+}
 
-// NewUserCache returns a new UserCache.
-func NewUserCache() UserCache {
-	return map[string]stringItem{
-		"0": {timeout: time.Unix(math.MaxInt64, 0), value: "root"},
+// NewUserCache returns a new UserCache. UserCache is thread-safe.
+func NewUserCache(expiration time.Duration) *UserCache {
+	return &UserCache{
+		expiration: expiration,
+		data: map[string]stringItem{
+			"0": {timeout: time.Unix(math.MaxInt64, 0), value: "root"},
+		},
 	}
 }
 
 // LookupUID looks up a UID and returns the username associated with it. If
 // no username could be found an empty string is returned. The value will be
 // cached for a minute. This requires cgo on Linux.
-func (c UserCache) LookupUID(uid string) string {
+func (c *UserCache) LookupUID(uid string) string {
 	if uid == "" || uid == "unset" {
 		return ""
 	}
 
-	if item, found := c[uid]; found && !item.isExpired() {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if item, found := c.data[uid]; found && !item.isExpired() {
 		return item.value
 	}
 
 	// Cache the value (even on error).
 	user, err := user.LookupId(uid)
 	if err != nil {
-		c[uid] = stringItem{timeout: time.Now().Add(cacheTimeout), value: ""}
+		c.data[uid] = stringItem{timeout: time.Now().Add(c.expiration), value: ""}
 		return ""
 	}
 
-	c[uid] = stringItem{timeout: time.Now().Add(cacheTimeout), value: user.Username}
+	c.data[uid] = stringItem{timeout: time.Now().Add(c.expiration), value: user.Username}
 	return user.Username
 }
 
 // GroupCache is a cache of GID to group name.
-type GroupCache map[string]stringItem
+type GroupCache struct {
+	expiration time.Duration
+	data       map[string]stringItem
+	mutex      sync.Mutex
+}
 
-// NewGroupCache returns a new GroupCache.
-func NewGroupCache() GroupCache {
-	return map[string]stringItem{
-		"0": {timeout: time.Unix(math.MaxInt64, 0), value: "root"},
+// NewGroupCache returns a new GroupCache. GroupCache is thread-safe.
+func NewGroupCache(expiration time.Duration) *GroupCache {
+	return &GroupCache{
+		expiration: expiration,
+		data: map[string]stringItem{
+			"0": {timeout: time.Unix(math.MaxInt64, 0), value: "root"},
+		},
 	}
 }
 
 // LookupGID looks up a GID and returns the group associated with it. If
 // no group could be found an empty string is returned. The value will be
 // cached for a minute. This requires cgo on Linux.
-func (c GroupCache) LookupGID(gid string) string {
+func (c *GroupCache) LookupGID(gid string) string {
 	if gid == "" || gid == "unset" {
 		return ""
 	}
 
-	if item, found := c[gid]; found && !item.isExpired() {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if item, found := c.data[gid]; found && !item.isExpired() {
 		return item.value
 	}
 
 	// Cache the value (even on error).
 	group, err := user.LookupGroupId(gid)
 	if err != nil {
-		c[gid] = stringItem{timeout: time.Now().Add(cacheTimeout), value: ""}
+		c.data[gid] = stringItem{timeout: time.Now().Add(c.expiration), value: ""}
 		return ""
 	}
 
-	c[gid] = stringItem{timeout: time.Now().Add(cacheTimeout), value: group.Name}
+	c.data[gid] = stringItem{timeout: time.Now().Add(c.expiration), value: group.Name}
 	return group.Name
 }
 
 // ResolveIDs translates all uid and gid values to their associated names.
-// This requires cgo on Linux.
+// Prior to Go 1.9 this requires cgo on Linux. UID and GID values are cached
+// for 60 seconds from the time they are read.
 func ResolveIDs(event *Event) {
+	ResolveIDsFromCaches(event, userLookup, groupLookup)
+}
+
+// ResolveIDsFromCaches translates all uid and gid values to their associated
+// names using the provided caches. Prior to Go 1.9 this requires cgo on Linux.
+func ResolveIDsFromCaches(event *Event, users *UserCache, groups *GroupCache) {
 	// Actor
-	if v := userLookup.LookupUID(event.Summary.Actor.Primary); v != "" {
+	if v := users.LookupUID(event.Summary.Actor.Primary); v != "" {
 		event.Summary.Actor.Primary = v
 	}
-	if v := userLookup.LookupUID(event.Summary.Actor.Secondary); v != "" {
+	if v := users.LookupUID(event.Summary.Actor.Secondary); v != "" {
 		event.Summary.Actor.Secondary = v
 	}
 
@@ -118,11 +149,11 @@ func ResolveIDs(event *Event) {
 	names := map[string]string{}
 	for key, id := range event.User.IDs {
 		if strings.HasSuffix(key, "uid") {
-			if v := userLookup.LookupUID(id); v != "" {
+			if v := users.LookupUID(id); v != "" {
 				names[key] = v
 			}
 		} else if strings.HasSuffix(key, "gid") {
-			if v := groupLookup.LookupGID(id); v != "" {
+			if v := groups.LookupGID(id); v != "" {
 				names[key] = v
 			}
 		}
@@ -134,10 +165,10 @@ func ResolveIDs(event *Event) {
 	// File owner/group
 	if event.File != nil {
 		if event.File.UID != "" {
-			event.File.Owner = userLookup.LookupUID(event.File.UID)
+			event.File.Owner = users.LookupUID(event.File.UID)
 		}
 		if event.File.GID != "" {
-			event.File.Group = groupLookup.LookupGID(event.File.GID)
+			event.File.Group = groups.LookupGID(event.File.GID)
 		}
 	}
 }

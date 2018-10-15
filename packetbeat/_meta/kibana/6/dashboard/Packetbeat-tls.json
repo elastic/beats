@@ -1,0 +1,1629 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "lucene", 
+                            "query": {
+                                "query_string": {
+                                    "analyze_wildcard": true, 
+                                    "query": "*"
+                                }
+                            }
+                        }
+                    }
+                }, 
+                "title": "Navigation", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "fontSize": "10", 
+                        "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Flows](#/dashboard/Packetbeat-Flows)\n\n[Web transactions](#/dashboard/Packetbeat-HTTP)\n\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\n\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\n\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\n\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\n\n[NFS transactions](#/dashboard/Packetbeat-NFS)\n\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)"
+                    }, 
+                    "title": "Navigation", 
+                    "type": "markdown"
+                }
+            }, 
+            "id": "Navigation", 
+            "type": "visualization", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 10
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063", 
+                "title": "TLS Sessions", 
+                "uiStateJSON": {
+                    "vis": {
+                        "colors": {
+                            "false": "#E24D42", 
+                            "true": "#7EB26D"
+                        }, 
+                        "legendOpen": false
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "2h", 
+                                "customLabel": "Sessions per minute", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "auto", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "Handshake completed", 
+                                "field": "tls.handshake_completed", 
+                                "json": "", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "group", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {}, 
+                                "type": "category"
+                            }
+                        ], 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }, 
+                            "valueAxis": "ValueAxis-1"
+                        }, 
+                        "legendPosition": "right", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Count"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "mode": "stacked", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "histogram", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "times": [], 
+                        "type": "histogram", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Count"
+                                }, 
+                                "type": "value"
+                            }
+                        ]
+                    }, 
+                    "title": "TLS Sessions", 
+                    "type": "histogram"
+                }
+            }, 
+            "id": "059fe5e0-d2dd-11e7-9914-4982455b3063", 
+            "type": "visualization", 
+            "updated_at": "2017-11-30T00:11:22.296Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "packetbeat-*", 
+                                    "key": "query", 
+                                    "negate": false, 
+                                    "type": "custom", 
+                                    "value": "{\"exists\":{\"field\":\"tls\"}}"
+                                }, 
+                                "query": {
+                                    "exists": {
+                                        "field": "tls"
+                                    }
+                                }
+                            }
+                        ], 
+                        "index": "packetbeat-*", 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "title": "TLS Alerts", 
+                "uiStateJSON": {
+                    "vis": {
+                        "colors": {
+                            "None": "#7EB26D", 
+                            "handshake_failure": "#E24D42"
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "field": "tls.alert_types", 
+                                "include": ".*", 
+                                "json": "{\"missing\": \"None\"}", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTooltip": true, 
+                        "isDonut": true, 
+                        "legendPosition": "right", 
+                        "type": "pie"
+                    }, 
+                    "title": "TLS Alerts", 
+                    "type": "pie"
+                }
+            }, 
+            "id": "c14377a0-d353-11e7-9914-4982455b3063", 
+            "type": "visualization", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "exists": {
+                                    "field": "tls.handshake_completed"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "packetbeat-*", 
+                                    "key": "tls.handshake_completed", 
+                                    "negate": false, 
+                                    "type": "exists", 
+                                    "value": "exists"
+                                }
+                            }
+                        ], 
+                        "index": "packetbeat-*", 
+                        "query": {
+                            "language": "lucene", 
+                            "query": {
+                                "query_string": {
+                                    "analyze_wildcard": true, 
+                                    "query": "*"
+                                }
+                            }
+                        }
+                    }
+                }, 
+                "title": "Total Number of TLS Sessions", 
+                "uiStateJSON": {
+                    "P-5": {
+                        "vis": {
+                            "defaultColors": {
+                                "0 - 100": "rgb(0,104,55)"
+                            }
+                        }
+                    }, 
+                    "P-7": {
+                        "vis": {
+                            "params": {
+                                "sort": {
+                                    "columnIndex": null, 
+                                    "direction": null
+                                }
+                            }
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": false, 
+                        "addTooltip": true, 
+                        "metric": {
+                            "colorSchema": "Green to Red", 
+                            "colorsRange": [
+                                {
+                                    "from": 0, 
+                                    "to": 10000
+                                }
+                            ], 
+                            "invertColors": false, 
+                            "labels": {
+                                "show": true
+                            }, 
+                            "metricColorMode": "None", 
+                            "percentageMode": false, 
+                            "style": {
+                                "bgColor": false, 
+                                "bgFill": "#000", 
+                                "fontSize": 60, 
+                                "labelColor": false, 
+                                "subText": ""
+                            }, 
+                            "useRanges": false
+                        }, 
+                        "type": "metric"
+                    }, 
+                    "title": "Total Number of TLS Sessions", 
+                    "type": "metric"
+                }
+            }, 
+            "id": "061de380-d361-11e7-9914-4982455b3063", 
+            "type": "visualization", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "94908e80-d2d8-11e7-9914-4982455b3063", 
+                "title": "TLS Server Name Indication", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customLabel": "Server Name Indication", 
+                                "field": "tls.client_hello.extensions.server_name_indication", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "hideLabel": false, 
+                        "maxFontSize": 64, 
+                        "minFontSize": 14, 
+                        "orientation": "single", 
+                        "scale": "linear"
+                    }, 
+                    "title": "TLS Server Name Indication", 
+                    "type": "tagcloud"
+                }
+            }, 
+            "id": "a28d09d0-d361-11e7-9914-4982455b3063", 
+            "type": "visualization", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "bf3d23b0-d37c-11e7-9914-4982455b3063", 
+                "title": "TLS Versions", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customLabel": "TLS version", 
+                                "field": "tls.server_hello.version", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTooltip": true, 
+                        "isDonut": true, 
+                        "legendPosition": "right", 
+                        "type": "pie"
+                    }, 
+                    "title": "TLS Versions", 
+                    "type": "pie"
+                }
+            }, 
+            "id": "0af0b790-d37d-11e7-9914-4982455b3063", 
+            "type": "visualization", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "8f0ff590-d37d-11e7-9914-4982455b3063", 
+                "title": "TLS Client Version", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customLabel": "Client version", 
+                                "field": "tls.client_hello.version", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTooltip": true, 
+                        "isDonut": true, 
+                        "legendPosition": "right", 
+                        "type": "pie"
+                    }, 
+                    "title": "TLS Client Version", 
+                    "type": "pie"
+                }
+            }, 
+            "id": "ae6e33c0-d37d-11e7-9914-4982455b3063", 
+            "type": "visualization", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063", 
+                "title": "TLS Session Resume", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "exclude": "xxx-nope", 
+                                "field": "tls.resumption_method", 
+                                "json": "{\n\"missing\": \"none\"\n}", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTooltip": true, 
+                        "isDonut": true, 
+                        "legendPosition": "right", 
+                        "type": "pie"
+                    }, 
+                    "title": "TLS Session Resume", 
+                    "type": "pie"
+                }
+            }, 
+            "id": "2c467370-d392-11e7-8fa0-232aa9259081", 
+            "type": "visualization", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063", 
+                "title": "TLS Server Certificates", 
+                "uiStateJSON": {
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null, 
+                                "direction": null
+                            }
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": ""
+                            }, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "4", 
+                            "params": {
+                                "customLabel": "Subject Common Name", 
+                                "field": "tls.server_certificate.subject.common_name", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 10
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "Organization", 
+                                "field": "tls.server_certificate.subject.organization", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "perPage": 10, 
+                        "showMeticsAtAllLevels": false, 
+                        "showPartialRows": false, 
+                        "showTotal": false, 
+                        "sort": {
+                            "columnIndex": null, 
+                            "direction": null
+                        }, 
+                        "totalFunc": "sum"
+                    }, 
+                    "title": "TLS Server Certificates", 
+                    "type": "table"
+                }
+            }, 
+            "id": "0958a910-d396-11e7-8fa0-232aa9259081", 
+            "type": "visualization", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063", 
+                "title": "TLS Client Certificates", 
+                "uiStateJSON": {
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null, 
+                                "direction": null
+                            }
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customLabel": "Subject Common Name", 
+                                "field": "tls.client_certificate.subject.common_name", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "Signature Algorithm", 
+                                "field": "tls.client_certificate.signature_algorithm", 
+                                "json": "{ \"missing\": \"N/A\" }", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "perPage": 10, 
+                        "showMeticsAtAllLevels": false, 
+                        "showPartialRows": false, 
+                        "showTotal": false, 
+                        "sort": {
+                            "columnIndex": null, 
+                            "direction": null
+                        }, 
+                        "totalFunc": "sum"
+                    }, 
+                    "title": "TLS Client Certificates", 
+                    "type": "table"
+                }
+            }, 
+            "id": "86743f90-d396-11e7-8fa0-232aa9259081", 
+            "type": "visualization", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063", 
+                "title": "TLS Cipher", 
+                "uiStateJSON": {
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null, 
+                                "direction": null
+                            }
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customLabel": "Cipher", 
+                                "field": "tls.server_hello.selected_cipher", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "perPage": 10, 
+                        "showMeticsAtAllLevels": false, 
+                        "showPartialRows": false, 
+                        "showTotal": false, 
+                        "sort": {
+                            "columnIndex": null, 
+                            "direction": null
+                        }, 
+                        "totalFunc": "sum"
+                    }, 
+                    "title": "TLS Cipher", 
+                    "type": "table"
+                }
+            }, 
+            "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961", 
+            "type": "visualization", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b", 
+                "title": "TLS Fingerprint", 
+                "uiStateJSON": {
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null, 
+                                "direction": null
+                            }
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customLabel": "JA3 Fingerprint", 
+                                "field": "tls.fingerprints.ja3.hash", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "perPage": 10, 
+                        "showMeticsAtAllLevels": false, 
+                        "showPartialRows": false, 
+                        "showTotal": false, 
+                        "sort": {
+                            "columnIndex": null, 
+                            "direction": null
+                        }, 
+                        "totalFunc": "sum"
+                    }, 
+                    "title": "TLS Fingerprint", 
+                    "type": "table"
+                }
+            }, 
+            "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b", 
+            "type": "visualization", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "packetbeat-*", 
+                                    "key": "responsetime", 
+                                    "negate": false, 
+                                    "params": {
+                                        "gte": 0, 
+                                        "lt": 1000
+                                    }, 
+                                    "type": "range", 
+                                    "value": "0 to 1,000"
+                                }, 
+                                "range": {
+                                    "responsetime": {
+                                        "gte": 0, 
+                                        "lt": 1000
+                                    }
+                                }
+                            }
+                        ], 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "8e2af860-d520-11e7-9fff-7b1ebf397ba9", 
+                "title": "TLS handshake latency", 
+                "uiStateJSON": {
+                    "vis": {
+                        "legendOpen": false
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customLabel": "Handshake latency (milliseconds)", 
+                                "extended_bounds": {}, 
+                                "field": "responsetime", 
+                                "interval": 2
+                            }, 
+                            "schema": "segment", 
+                            "type": "histogram"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "filter": true, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {}, 
+                                "type": "category"
+                            }
+                        ], 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }
+                        }, 
+                        "legendPosition": "right", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Count"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "interpolate": "linear", 
+                                "mode": "stacked", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "area", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "times": [], 
+                        "type": "area", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Count"
+                                }, 
+                                "type": "value"
+                            }
+                        ]
+                    }, 
+                    "title": "TLS handshake latency", 
+                    "type": "area"
+                }
+            }, 
+            "id": "d2e15950-d560-11e7-9fff-7b1ebf397ba9", 
+            "type": "visualization", 
+            "updated_at": "2017-11-30T00:10:49.715Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "_source"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "exists": {
+                                    "field": "tls.handshake_completed"
+                                }, 
+                                "meta": {
+                                    "alias": "TLS sessions", 
+                                    "disabled": false, 
+                                    "index": "packetbeat-*", 
+                                    "key": "tls.handshake_completed", 
+                                    "negate": false, 
+                                    "type": "exists", 
+                                    "value": "exists"
+                                }
+                            }
+                        ], 
+                        "highlightAll": true, 
+                        "index": "packetbeat-*", 
+                        "query": {
+                            "language": "lucene", 
+                            "query": {
+                                "query_string": {
+                                    "analyze_wildcard": true, 
+                                    "query": "*"
+                                }
+                            }
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "TLS Sessions", 
+                "version": 1
+            }, 
+            "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063", 
+            "type": "search", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "_source"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "exists": {
+                                    "field": "tls.client_hello.extensions.server_name_indication"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "packetbeat-*", 
+                                    "key": "tls.client_hello.extensions.server_name_indication", 
+                                    "negate": false, 
+                                    "type": "exists", 
+                                    "value": "exists"
+                                }
+                            }
+                        ], 
+                        "highlightAll": true, 
+                        "index": "packetbeat-*", 
+                        "query": {
+                            "language": "lucene", 
+                            "query": {
+                                "query_string": {
+                                    "analyze_wildcard": true, 
+                                    "query": "*"
+                                }
+                            }
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "TLS Server Name Indication", 
+                "version": 1
+            }, 
+            "id": "94908e80-d2d8-11e7-9914-4982455b3063", 
+            "type": "search", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "_source"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "exists": {
+                                    "field": "tls.server_hello.version"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "packetbeat-*", 
+                                    "key": "tls.server_hello.version", 
+                                    "negate": false, 
+                                    "type": "exists", 
+                                    "value": "exists"
+                                }
+                            }
+                        ], 
+                        "highlightAll": true, 
+                        "index": "packetbeat-*", 
+                        "query": {
+                            "language": "lucene", 
+                            "query": {
+                                "query_string": {
+                                    "analyze_wildcard": true, 
+                                    "query": "*"
+                                }
+                            }
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "TLS Version", 
+                "version": 1
+            }, 
+            "id": "bf3d23b0-d37c-11e7-9914-4982455b3063", 
+            "type": "search", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "_source"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "exists": {
+                                    "field": "tls.client_hello.version"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "packetbeat-*", 
+                                    "key": "tls.client_hello.version", 
+                                    "negate": false, 
+                                    "type": "exists", 
+                                    "value": "exists"
+                                }
+                            }
+                        ], 
+                        "highlightAll": true, 
+                        "index": "packetbeat-*", 
+                        "query": {
+                            "language": "lucene", 
+                            "query": {
+                                "query_string": {
+                                    "analyze_wildcard": true, 
+                                    "query": "*"
+                                }
+                            }
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "TLS Client Version", 
+                "version": 1
+            }, 
+            "id": "8f0ff590-d37d-11e7-9914-4982455b3063", 
+            "type": "search", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "_source"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "exists": {
+                                    "field": "tls.fingerprints.ja3.hash"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "packetbeat-*", 
+                                    "key": "tls.fingerprints.ja3.hash", 
+                                    "negate": false, 
+                                    "type": "exists", 
+                                    "value": "exists"
+                                }
+                            }
+                        ], 
+                        "highlightAll": true, 
+                        "index": "packetbeat-*", 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "TLS Fingerprint", 
+                "version": 1
+            }, 
+            "id": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b", 
+            "type": "search", 
+            "updated_at": "2017-11-29T15:31:44.592Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "_source"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "exists": {
+                                    "field": "tls.handshake_completed"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "packetbeat-*", 
+                                    "key": "tls.handshake_completed", 
+                                    "negate": false, 
+                                    "type": "exists", 
+                                    "value": "exists"
+                                }
+                            }, 
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "exists": {
+                                    "field": "responsetime"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "packetbeat-*", 
+                                    "key": "responsetime", 
+                                    "negate": false, 
+                                    "type": "exists", 
+                                    "value": "exists"
+                                }
+                            }
+                        ], 
+                        "highlightAll": true, 
+                        "index": "packetbeat-*", 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "TLS handshake latency", 
+                "version": 1
+            }, 
+            "id": "8e2af860-d520-11e7-9fff-7b1ebf397ba9", 
+            "type": "search", 
+            "updated_at": "2017-11-29T16:33:23.311Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "TLS Sessions", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "query": {
+                            "language": "lucene", 
+                            "query": {
+                                "query_string": {
+                                    "analyze_wildcard": true, 
+                                    "query": "*"
+                                }
+                            }
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "optionsJSON": {
+                    "darkTheme": false, 
+                    "useMargins": false
+                }, 
+                "panelsJSON": [
+                    {
+                        "gridData": {
+                            "h": 4, 
+                            "i": "4", 
+                            "w": 3, 
+                            "x": 0, 
+                            "y": 0
+                        }, 
+                        "id": "Navigation", 
+                        "panelIndex": "4", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 4, 
+                            "i": "8", 
+                            "w": 9, 
+                            "x": 3, 
+                            "y": 0
+                        }, 
+                        "id": "059fe5e0-d2dd-11e7-9914-4982455b3063", 
+                        "panelIndex": "8", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "9", 
+                            "w": 3, 
+                            "x": 3, 
+                            "y": 7
+                        }, 
+                        "id": "c14377a0-d353-11e7-9914-4982455b3063", 
+                        "panelIndex": "9", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "10", 
+                            "w": 3, 
+                            "x": 0, 
+                            "y": 4
+                        }, 
+                        "id": "061de380-d361-11e7-9914-4982455b3063", 
+                        "panelIndex": "10", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "11", 
+                            "w": 12, 
+                            "x": 0, 
+                            "y": 10
+                        }, 
+                        "id": "a28d09d0-d361-11e7-9914-4982455b3063", 
+                        "panelIndex": "11", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "12", 
+                            "w": 3, 
+                            "x": 6, 
+                            "y": 7
+                        }, 
+                        "id": "0af0b790-d37d-11e7-9914-4982455b3063", 
+                        "panelIndex": "12", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "13", 
+                            "w": 3, 
+                            "x": 9, 
+                            "y": 7
+                        }, 
+                        "id": "ae6e33c0-d37d-11e7-9914-4982455b3063", 
+                        "panelIndex": "13", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "14", 
+                            "w": 3, 
+                            "x": 0, 
+                            "y": 7
+                        }, 
+                        "id": "2c467370-d392-11e7-8fa0-232aa9259081", 
+                        "panelIndex": "14", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "15", 
+                            "w": 6, 
+                            "x": 0, 
+                            "y": 13
+                        }, 
+                        "id": "0958a910-d396-11e7-8fa0-232aa9259081", 
+                        "panelIndex": "15", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "16", 
+                            "w": 6, 
+                            "x": 0, 
+                            "y": 16
+                        }, 
+                        "id": "86743f90-d396-11e7-8fa0-232aa9259081", 
+                        "panelIndex": "16", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "17", 
+                            "w": 6, 
+                            "x": 6, 
+                            "y": 13
+                        }, 
+                        "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961", 
+                        "panelIndex": "17", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "18", 
+                            "w": 6, 
+                            "x": 6, 
+                            "y": 16
+                        }, 
+                        "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b", 
+                        "panelIndex": "18", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "19", 
+                            "w": 9, 
+                            "x": 3, 
+                            "y": 4
+                        }, 
+                        "id": "d2e15950-d560-11e7-9fff-7b1ebf397ba9", 
+                        "panelIndex": "19", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }
+                ], 
+                "timeRestore": false, 
+                "title": "[Packetbeat] TLS Sessions", 
+                "uiStateJSON": {
+                    "P-15": {
+                        "vis": {
+                            "params": {
+                                "sort": {
+                                    "columnIndex": null, 
+                                    "direction": null
+                                }
+                            }
+                        }
+                    }, 
+                    "P-16": {
+                        "vis": {
+                            "params": {
+                                "sort": {
+                                    "columnIndex": null, 
+                                    "direction": null
+                                }
+                            }
+                        }
+                    }, 
+                    "P-17": {
+                        "vis": {
+                            "params": {
+                                "sort": {
+                                    "columnIndex": null, 
+                                    "direction": null
+                                }
+                            }
+                        }
+                    }, 
+                    "P-18": {
+                        "vis": {
+                            "params": {
+                                "sort": {
+                                    "columnIndex": null, 
+                                    "direction": null
+                                }
+                            }
+                        }
+                    }, 
+                    "P-5": {
+                        "vis": {
+                            "defaultColors": {
+                                "0 - 100": "rgb(0,104,55)"
+                            }
+                        }
+                    }, 
+                    "P-7": {
+                        "vis": {
+                            "params": {
+                                "sort": {
+                                    "columnIndex": null, 
+                                    "direction": null
+                                }
+                            }
+                        }
+                    }
+                }, 
+                "version": 1
+            }, 
+            "id": "tls-sessions", 
+            "type": "dashboard", 
+            "updated_at": "2017-11-30T00:16:42.402Z", 
+            "version": 2
+        }
+    ], 
+    "version": "6.2.4"
+}

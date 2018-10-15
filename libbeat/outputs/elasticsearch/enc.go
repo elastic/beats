@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package elasticsearch
 
 import (
@@ -7,8 +24,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/urso/go-structform/gotype"
-	"github.com/urso/go-structform/json"
+	"github.com/elastic/go-structform/gotype"
+	"github.com/elastic/go-structform/json"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -36,12 +53,16 @@ type bulkWriter interface {
 type jsonEncoder struct {
 	buf    *bytes.Buffer
 	folder *gotype.Iterator
+
+	escapeHTML bool
 }
 
 type gzipEncoder struct {
 	buf    *bytes.Buffer
 	gzip   *gzip.Writer
 	folder *gotype.Iterator
+
+	escapeHTML bool
 }
 
 type event struct {
@@ -49,11 +70,11 @@ type event struct {
 	Fields    common.MapStr `struct:",inline"`
 }
 
-func newJSONEncoder(buf *bytes.Buffer) *jsonEncoder {
+func newJSONEncoder(buf *bytes.Buffer, escapeHTML bool) *jsonEncoder {
 	if buf == nil {
 		buf = bytes.NewBuffer(nil)
 	}
-	e := &jsonEncoder{buf: buf}
+	e := &jsonEncoder{buf: buf, escapeHTML: escapeHTML}
 	e.resetState()
 	return e
 }
@@ -65,6 +86,8 @@ func (b *jsonEncoder) Reset() {
 func (b *jsonEncoder) resetState() {
 	var err error
 	visitor := json.NewVisitor(b.buf)
+	visitor.SetEscapeHTML(b.escapeHTML)
+
 	b.folder, err = gotype.NewIterator(visitor,
 		gotype.Folders(
 			codec.MakeTimestampEncoder(),
@@ -120,7 +143,7 @@ func (b *jsonEncoder) Add(meta, obj interface{}) error {
 	return nil
 }
 
-func newGzipEncoder(level int, buf *bytes.Buffer) (*gzipEncoder, error) {
+func newGzipEncoder(level int, buf *bytes.Buffer, escapeHTML bool) (*gzipEncoder, error) {
 	if buf == nil {
 		buf = bytes.NewBuffer(nil)
 	}
@@ -129,7 +152,7 @@ func newGzipEncoder(level int, buf *bytes.Buffer) (*gzipEncoder, error) {
 		return nil, err
 	}
 
-	g := &gzipEncoder{buf: buf, gzip: w}
+	g := &gzipEncoder{buf: buf, gzip: w, escapeHTML: escapeHTML}
 	g.resetState()
 	return g, nil
 }
@@ -137,6 +160,8 @@ func newGzipEncoder(level int, buf *bytes.Buffer) (*gzipEncoder, error) {
 func (g *gzipEncoder) resetState() {
 	var err error
 	visitor := json.NewVisitor(g.gzip)
+	visitor.SetEscapeHTML(g.escapeHTML)
+
 	g.folder, err = gotype.NewIterator(visitor,
 		gotype.Folders(
 			codec.MakeTimestampEncoder(),

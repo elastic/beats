@@ -1,0 +1,59 @@
+{
+  "description": "Pipeline for parsing Elasticsearch JVM garbage collection logs",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "(?:%{JVM8HEADER}|%{JVM9HEADER}) Total time for which application threads were stopped: %{BASE10NUM:elasticsearch.gc.threads_total_stop_time_sec} seconds, Stopping threads took: %{BASE10NUM:elasticsearch.gc.stopping_threads_time_sec} seconds",
+          "(?:%{JVM8HEADER}) \\[GC \\(%{DATA:elasticsearch.gc.phase.name}\\) \\[YG occupancy: %{BASE10NUM:elasticsearch.gc.young_gen.used_kb} K \\(%{BASE10NUM:elasticsearch.gc.young_gen.size_kb} K\\)\\]%{BASE10NUM}: \\[Rescan \\(parallel\\) , %{BASE10NUM:elasticsearch.gc.phase.parallel_rescan_time_sec} secs\\]%{BASE10NUM}: \\[weak refs processing, %{BASE10NUM:elasticsearch.gc.phase.weak_refs_processing_time_sec} secs\\]%{BASE10NUM}: \\[class unloading, %{BASE10NUM:elasticsearch.gc.phase.class_unload_time_sec} secs\\]%{BASE10NUM}: \\[scrub symbol table, %{BASE10NUM:elasticsearch.gc.phase.scrub_symbol_table_time_sec} secs\\]%{BASE10NUM}: \\[scrub string table, %{BASE10NUM:elasticsearch.gc.phase.scrub_string_table_time_sec} secs\\]\\[1 CMS-remark: %{BASE10NUM:elasticsearch.gc.old_gen.used_kb}K\\(%{BASE10NUM:elasticsearch.gc.old_gen.size_kb}K\\)\\] %{BASE10NUM:elasticsearch.gc.heap.used_kb}K\\(%{BASE10NUM:elasticsearch.gc.heap.size_kb}K\\), %{BASE10NUM:elasticsearch.gc.phase.duration_sec} secs\\] %{PROCTIME}",
+          "(?:%{JVM8HEADER}) \\[GC \\(%{DATA:elasticsearch.gc.phase.name}\\) \\[%{BASE10NUM} CMS-initial-mark: %{BASE10NUM:elasticsearch.gc.old_gen.used_kb}K\\(%{BASE10NUM:elasticsearch.gc.old_gen.size_kb}K\\)\\] %{BASE10NUM:elasticsearch.gc.heap.used_kb}K\\(%{BASE10NUM:elasticsearch.gc.heap.size_kb}K\\), %{BASE10NUM:elasticsearch.gc.phase.duration_sec} secs\\] %{PROCTIME}",
+          "%{JVM9HEADER} GC\\(%{BASE10NUM}\\) ParNew: %{BASE10NUM}K-\\>%{BASE10NUM:elasticsearch.gc.young_gen.used_kb}K\\(%{BASE10NUM:elasticsearch.gc.young_gen.size_kb}K\\)",
+          "%{JVM9HEADER} GC\\(%{BASE10NUM}\\) Old: %{BASE10NUM}K-\\>%{BASE10NUM:elasticsearch.gc.old_gen.used_kb}K\\(%{BASE10NUM:elasticsearch.gc.old_gen.size_kb}K\\)",
+          "(?:%{JVM8HEADER}|%{JVM9HEADER}) %{GREEDYMULTILINE:message}"
+        ],
+        "pattern_definitions": {
+          "GREEDYMULTILINE": "(.|\n)*",
+          "JVM8HEADER": "%{TIMESTAMP_ISO8601:timestamp}: %{BASE10NUM:elasticsearch.gc.jvm_runtime_sec}:",
+          "JVM9HEADER": "\\[%{TIMESTAMP_ISO8601:timestamp}\\]\\[%{POSINT:process.pid}\\]\\[%{DATA:elasticsearch.gc.tags}%{SPACE}*\\]",
+          "PROCTIME": "\\[Times: user=%{BASE10NUM:elasticsearch.gc.phase.cpu_time.user_sec} sys=%{BASE10NUM:elasticsearch.gc.phase.cpu_time.sys_sec}, real=%{BASE10NUM:elasticsearch.gc.phase.cpu_time.real_sec} secs\\]"
+        }
+      }
+    },
+    {
+      "rename": {
+        "field": "@timestamp",
+        "target_field": "event.created"
+      }
+    },
+    {
+      "date": {
+        "field": "timestamp",
+        "target_field": "@timestamp",
+        "formats": [
+          "ISO8601"
+        ]
+      }
+    },
+    {
+      "remove": {
+        "field": "timestamp"
+      }
+    },
+    {
+      "split": {
+        "field": "elasticsearch.gc.tags",
+        "separator": ",",
+        "ignore_missing": true
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ]
+}

@@ -14,12 +14,30 @@
 
 :global-flags: Also see <<global-flags,Global flags>>.
 
-:export-command-short-desc: Exports the configuration or index template to stdout
+:export-command-short-desc: Exports the configuration, index template or a dashboard to stdout
 :help-command-short-desc: Shows help for any command
 :keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
 :modules-command-short-desc: Manages configured modules
 :run-command-short-desc: Runs {beatname_uc}. This command is used by default if you start {beatname_uc} without specifying a command
+
+ifndef::deprecate_dashboard_loading[]
+
+ifdef::has_ml_jobs[]
 :setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available), and machine learning jobs (when available)
+endif::[]
+
+ifndef::has_ml_jobs[]
+:setup-command-short-desc: Sets up the initial environment, including the index template and Kibana dashboards (when available)
+endif::[]
+
+endif::[]
+
+ifdef::deprecate_dashboard_loading[]
+
+:setup-command-short-desc: Sets up the initial environment, including the ES index template and Kibana dashboards (deprecated).
+
+endif::[]
+
 :test-command-short-desc: Tests the configuration
 :version-command-short-desc: Shows information about the current version
 
@@ -31,9 +49,17 @@
 <titleabbrev>Command reference</titleabbrev>
 ++++
 
-{beatname_uc} provides a command-line interface for running the Beat and
-performing common tasks, like testing configuration files and loading
-dashboards. The command-line also supports <<global-flags,global flags>>
+ifndef::deprecate_dashboard_loading[]
+{beatname_uc} provides a command-line interface for starting {beatname_uc} and
+performing common tasks, like testing configuration files and loading dashboards.
+endif::[]
+
+ifdef::deprecate_dashboard_loading[]
+{beatname_uc} provides a command-line interface for starting {beatname_uc} and
+performing common tasks, like testing configuration files and loading dashboards (deprecated).
+endif::[]
+
+The command-line also supports <<global-flags,global flags>>
 for controlling global behaviors.
 
 ifeval::["{beatname_lc}"!="winlogbeat"]
@@ -49,34 +75,20 @@ Use `sudo` to run the following commands if:
 
 endif::[]
 
-[horizontal]
-<<export-command,`export`>>::
-{export-command-short-desc}.
-
-<<help-command,`help`>>::
-{help-command-short-desc}.
-
-<<keystore-command,`keystore`>>::
-{keystore-command-short-desc}.
-
+[options="header"]
+|=======================
+|Commands |
+|<<export-command,`export`>> |{export-command-short-desc}.
+|<<help-command,`help`>> |{help-command-short-desc}.
+|<<keystore-command,`keystore`>> |{keystore-command-short-desc}.
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
-
-<<modules-command,`modules`>>::
-{modules-command-short-desc}.
-
+|<<modules-command,`modules`>> |{modules-command-short-desc}.
 endif::[]
-
-<<run-command,`run`>>::
-{run-command-short-desc}.
-
-<<setup-command,`setup`>>::
-{setup-command-short-desc}.
-
-<<test-command,`test`>>::
-{test-command-short-desc}.
-
-<<version-command,`version`>>::
-{version-command-short-desc}.
+|<<run-command,`run`>> |{run-command-short-desc}.
+|<<setup-command,`setup`>> |{setup-command-short-desc}.
+|<<test-command,`test`>> |{test-command-short-desc}.
+|<<version-command,`version`>> |{version-command-short-desc}.
+|=======================
 
 Also see <<global-flags,Global flags>>.
 
@@ -84,8 +96,8 @@ Also see <<global-flags,Global flags>>.
 ==== `export` command
 
 {export-command-short-desc}. You can use this
-command to quickly view your configuration or the contents of the index
-template.
+command to quickly view your configuration, see the contents of the index
+template or export a dashboard from Kibana.
 
 *SYNOPSIS*
 
@@ -100,6 +112,30 @@ template.
 *`config`*::
 Exports the current configuration to stdout. If you use the `-c` flag, this
 command exports the configuration that's defined in the specified file.
+
+
+
+*`dashboard`*::
+Exporting a dashboard allows to store a dashboard on disk in a
+module and load it automatically. The following command can be used:
++
+["source","shell",subs="attributes"]
+----
+{beatname_lc} export dashboard --id="dashboard-id" > dashboard.json
+----
++
+The `dashboard-id` can be found in the Kibana URL. By default `export dashboard`
+will write the dashboard to stdout. Above it's written into `dashboard.json` so
+it can later imported again. The file contains the dashboard with all
+visualizations and searches. The index pattern is removed as it is
+expected to be loaded separately for {beatname_uc}.
++
+The generated `dashboard.json` file can be copied into the `kibana/6/dashboard`
+directory of {beatname_lc} and next time +{beatname_lc} setup dashboards+ is
+run the dashboard will be imported.
++
+In case Kibana is not running on `localhost:5061` the {beatname_uc}
+configuration under `setup.kibana` must be adjusted.
 
 [[template-subcommand]]
 *`template`*::
@@ -164,7 +200,7 @@ Specifies the name of the command to show help for.
 [[keystore-command]]
 ==== `keystore` command
 
-{keystore-command-short-desc}. 
+{keystore-command-short-desc}.
 
 *SYNOPSIS*
 
@@ -389,16 +425,27 @@ ifeval::["{beatname_lc}"=="filebeat"]
 
 *`--once`*::
 When the `--once` flag is used, {beatname_uc} starts all configured harvesters
-and prospectors, and runs each prospector until the harvesters are closed. If
-you set the `--once` flag, you should also set `close_eof` so the harvester is
-closed when the end of the file is reached. By default harvesters are closed
-after `close_inactive` is reached.
+and inputs, and runs each input until the harvesters are closed. If you set the
+`--once` flag, you should also set `close_eof` so the harvester is closed when
+the end of the file is reached. By default harvesters are closed after
+`close_inactive` is reached.
 
 endif::[]
 
 *`--setup`*::
-Loads the sample Kibana dashboards. If you want to load the dashboards without
-running {beatname_uc}, use the <<setup-command,`setup`>> command instead.
+ifdef::deprecate_dashboard_loading[]
+deprecated[{deprecate_dashboard_loading}]
+endif::[]
++
+ifdef::has_ml_jobs[]
+Loads the initial setup, including Elasticsearch template, Kibana index pattern,
+Kibana dashboards and Machine learning jobs.
+endif::[]
+ifndef::has_ml_jobs[]
+Loads the initial setup, including Elasticsearch template, Kibana index pattern and Kibana dashboards.
+endif::[]
+If you want to use the command without running {beatname_uc}, use the <<setup-command,`setup`>> command instead.
+
 
 ifeval::["{beatname_lc}"=="metricbeat"]
 
@@ -437,13 +484,17 @@ Or:
 [[setup-command]]
 ==== `setup` command
 
-{setup-command-short-desc}.
+{setup-command-short-desc}
 
 * The index template ensures that fields are mapped correctly in Elasticsearch.
+
 * The Kibana dashboards make it easier for you to visualize {beatname_uc} data
 in Kibana.
+
+ifdef::has_ml_jobs[]
 * The machine learning jobs contain the configuration information and metadata
 necessary to analyze data for anomalies.
+endif::[]
 
 Use this command instead of `run --setup` when you want to set up the
 environment without actually running {beatname_uc} and ingesting data.
@@ -458,20 +509,40 @@ environment without actually running {beatname_uc} and ingesting data.
 
 *FLAGS*
 
+ifndef::deprecate_dashboard_loading[]
 *`--dashboards`*::
+Sets up the Kibana dashboards only. This option loads the dashboards from the
+{beatname_uc} package. For more options, such as loading customized dashboards,
+see {beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards]
+in the _Beats Developer Guide_.
+endif::[]
+
+ifdef::deprecate_dashboard_loading[]
+*`--dashboards`*::
+
+deprecated[{deprecate_dashboard_loading}]
++
 Sets up the Kibana dashboards only.
+endif::[]
 
 *`-h, --help`*::
 Shows help for the `setup` command.
 
+ifdef::has_ml_jobs[]
+
 *`--machine-learning`*::
 Sets up machine learning job configurations only.
+
+endif::[]
 
 ifeval::["{beatname_lc}"=="filebeat"]
 
 *`--modules MODULE_LIST`*::
 Specifies a comma-separated list of modules. Use this flag to avoid errors when
 there are no modules defined in the +{beatname_lc}.yml+ file.
+
+*`--pipelines`*::
+Sets up ingest pipelines for configured filesets.
 
 endif::[]
 
@@ -643,4 +714,3 @@ the _Beats Platform Reference_ for more information.
 
 *`-v, --v`*::
 Logs INFO-level messages.
-

@@ -9,6 +9,8 @@ import signal
 import sys
 import time
 import yaml
+import hashlib
+import re
 from datetime import datetime, timedelta
 
 from .compose import ComposeMixin
@@ -18,6 +20,10 @@ BEAT_REQUIRED_FIELDS = ["@timestamp",
                         "beat.name", "beat.hostname", "beat.version"]
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
+
+yaml_cache = {}
+
+REGEXP_TYPE = type(re.compile("t"))
 
 
 class TimeoutError(Exception):
@@ -210,7 +216,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         output_path = os.path.join(self.working_dir, output)
         with open(output_path, "wb") as f:
-            os.chmod(output_path, 0600)
+            os.chmod(output_path, 0o600)
             f.write(output_str.encode('utf8'))
 
     # Returns output as JSON object with flattened fields (. notation)
@@ -277,7 +283,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def setUp(self):
 
         self.template_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(self.beat_path)
+            loader=jinja2.FileSystemLoader([
+                self.beat_path,
+                os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
+            ])
         )
 
         # create working dir
@@ -333,27 +342,31 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def wait_log_contains(self, msg, logfile=None,
                           max_timeout=10, poll_interval=0.1,
-                          name="log_contains"):
+                          name="log_contains",
+                          ignore_case=False):
         self.wait_until(
-            cond=lambda: self.log_contains(msg, logfile),
+            cond=lambda: self.log_contains(msg, logfile, ignore_case=ignore_case),
             max_timeout=max_timeout,
             poll_interval=poll_interval,
             name=name)
 
-    def log_contains(self, msg, logfile=None):
+    def log_contains(self, msg, logfile=None, ignore_case=False):
         """
         Returns true if the give logfile contains the given message.
         Note that the msg must be present in a single line.
         """
 
-        return self.log_contains_count(msg, logfile) > 0
+        return self.log_contains_count(msg, logfile, ignore_case=ignore_case) > 0
 
-    def log_contains_count(self, msg, logfile=None):
+    def log_contains_count(self, msg, logfile=None, ignore_case=False):
         """
         Returns the number of appearances of the given string in the log file
         """
+        is_regexp = type(msg) == REGEXP_TYPE
 
         counter = 0
+        if ignore_case:
+            msg = msg.lower()
 
         # Init defaults
         if logfile is None:
@@ -362,6 +375,12 @@ class TestCase(unittest.TestCase, ComposeMixin):
         try:
             with open(os.path.join(self.working_dir, logfile), "r") as f:
                 for line in f:
+                    if is_regexp:
+                        if msg.search(line) is not None:
+                            counter = counter + 1
+                        continue
+                    if ignore_case:
+                        line = line.lower()
                     if line.find(msg) >= 0:
                         counter = counter + 1
         except IOError:
@@ -449,7 +468,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
 
         if fields_doc is None:
-            fields_doc = self.beat_path + "/_meta/fields.generated.yml"
+            fields_doc = self.beat_path + "/fields.yml"
 
         def extract_fields(doc_list, name):
             fields = []
@@ -480,21 +499,25 @@ class TestCase(unittest.TestCase, ComposeMixin):
                         dictfields.append(newName)
             return fields, dictfields
 
-        # Not all beats have a fields.generated.yml. Fall back to fields.yml
-        if not os.path.isfile(fields_doc):
-            fields_doc = self.beat_path + "/_meta/fields.yml"
+        global yaml_cache
 
         # TODO: Make fields_doc path more generic to work with beat-generator
         with open(fields_doc, "r") as f:
-            path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.generated.yml")
+            path = os.path.abspath(os.path.dirname(__file__) + "../../../../fields.yml")
             if not os.path.isfile(path):
                 path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")
             with open(path) as f2:
                 content = f2.read()
 
-            #content = "fields:\n"
             content += f.read()
-            doc = yaml.load(content)
+
+            hash = hashlib.md5(content).hexdigest()
+            doc = ""
+            if hash in yaml_cache:
+                doc = yaml_cache[hash]
+            else:
+                doc = yaml.safe_load(content)
+                yaml_cache[hash] = doc
 
             fields = []
             dictfields = []
@@ -516,7 +539,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 result[prefix + key] = value
         return result
 
-    def copy_files(self, files, source_dir="files/", target_dir=""):
+    def copy_files(self, files, source_dir="", target_dir=""):
+        if not source_dir:
+            source_dir = self.beat_path + "/tests/files/"
         if target_dir:
             target_dir = os.path.join(self.working_dir, target_dir)
         else:
@@ -558,3 +583,36 @@ class TestCase(unittest.TestCase, ComposeMixin):
             host=os.getenv("KIBANA_HOST", "localhost"),
             port=os.getenv("KIBANA_PORT", "5601"),
         )
+
+    def assert_fields_are_documented(self, evt):
+        """
+        Assert that all keys present in evt are documented in fields.yml.
+        This reads from the global fields.yml, means `make collect` has to be run before the check.
+        """
+        expected_fields, dict_fields = self.load_fields()
+        flat = self.flatten_object(evt, dict_fields)
+
+        def field_pattern_match(pattern, key):
+            pattern_fields = pattern.split(".")
+            key_fields = key.split(".")
+            if len(pattern_fields) != len(key_fields):
+                return False
+            for i in range(len(pattern_fields)):
+                if pattern_fields[i] == "*":
+                    continue
+                if pattern_fields[i] != key_fields[i]:
+                    return False
+            return True
+
+        def is_documented(key):
+            if key in expected_fields:
+                return True
+            for pattern in (f for f in expected_fields if "*" in f):
+                if field_pattern_match(pattern, key):
+                    return True
+            return False
+
+        for key in flat.keys():
+            metaKey = key.startswith('@metadata.')
+            if not(is_documented(key) or metaKey):
+                raise Exception("Key '{}' found in event is not documented!".format(key))

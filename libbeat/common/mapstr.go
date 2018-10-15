@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package common
 
 import (
@@ -80,20 +97,28 @@ func deepUpdateValue(old interface{}, val MapStr) interface{} {
 
 // Delete deletes the given key from the map.
 func (m MapStr) Delete(key string) error {
-	_, err := walkMap(key, m, opDelete)
-	return err
+	k, d, _, found, err := mapFind(key, m, false)
+	if err != nil {
+		return err
+	}
+	if !found {
+		return ErrKeyNotFound
+	}
+
+	delete(d, k)
+	return nil
 }
 
 // CopyFieldsTo copies the field specified by key to the given map. It will
 // overwrite the key if it exists. An error is returned if the key does not
 // exist in the source map.
 func (m MapStr) CopyFieldsTo(to MapStr, key string) error {
-	v, err := walkMap(key, m, opGet)
+	v, err := m.GetValue(key)
 	if err != nil {
 		return err
 	}
 
-	_, err = walkMap(key, to, mapStrOperation{putOperation{v}, true})
+	_, err = to.Put(key, v)
 	return err
 }
 
@@ -115,18 +140,21 @@ func (m MapStr) Clone() MapStr {
 // HasKey returns true if the key exist. If an error occurs then false is
 // returned with a non-nil error.
 func (m MapStr) HasKey(key string) (bool, error) {
-	hasKey, err := walkMap(key, m, opHasKey)
-	if err != nil {
-		return false, err
-	}
-
-	return hasKey.(bool), nil
+	_, _, _, hasKey, err := mapFind(key, m, false)
+	return hasKey, err
 }
 
 // GetValue gets a value from the map. If the key does not exist then an error
 // is returned.
 func (m MapStr) GetValue(key string) (interface{}, error) {
-	return walkMap(key, m, opGet)
+	_, _, v, found, err := mapFind(key, m, false)
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		return nil, ErrKeyNotFound
+	}
+	return v, nil
 }
 
 // Put associates the specified value with the specified key. If the map
@@ -137,7 +165,14 @@ func (m MapStr) GetValue(key string) (interface{}, error) {
 // If you need insert keys containing dots then you must use bracket notation
 // to insert values (e.g. m[key] = value).
 func (m MapStr) Put(key string, value interface{}) (interface{}, error) {
-	return walkMap(key, m, mapStrOperation{putOperation{value}, true})
+	// XXX `safemapstr.Put` mimics this implementation, both should be updated to have similar behavior
+	k, d, old, _, err := mapFind(key, m, true)
+	if err != nil {
+		return nil, err
+	}
+
+	d[k] = value
+	return old, nil
 }
 
 // StringToPrint returns the MapStr as pretty JSON.
@@ -270,25 +305,38 @@ func MergeFields(ms, fields MapStr, underRoot bool) error {
 // exist then it will be created. If the tags field exists and is not a []string
 // then an error will be returned. It does not deduplicate the list of tags.
 func AddTags(ms MapStr, tags []string) error {
+	return AddTagsWithKey(ms, TagsKey, tags)
+}
+
+// AddTagsWithKey appends a tag to the key field of ms. If the field does not
+// exist then it will be created. If the field exists and is not a []string
+// then an error will be returned. It does not deduplicate the list.
+func AddTagsWithKey(ms MapStr, key string, tags []string) error {
 	if ms == nil || len(tags) == 0 {
 		return nil
 	}
-	eventTags, exists := ms[TagsKey]
-	if !exists {
-		ms[TagsKey] = tags
+
+	k, subMap, oldTags, present, err := mapFind(key, ms, true)
+	if err != nil {
+		return err
+	}
+
+	if !present {
+		subMap[k] = tags
 		return nil
 	}
 
-	switch arr := eventTags.(type) {
+	switch arr := oldTags.(type) {
 	case []string:
-		ms[TagsKey] = append(arr, tags...)
+		subMap[k] = append(arr, tags...)
 	case []interface{}:
 		for _, tag := range tags {
 			arr = append(arr, tag)
 		}
-		ms[TagsKey] = arr
+		subMap[k] = arr
 	default:
-		return errors.Errorf("expected string array by type is %T", eventTags)
+		return errors.Errorf("expected string array by type is %T", oldTags)
+
 	}
 	return nil
 }
@@ -315,110 +363,50 @@ func tryToMapStr(v interface{}) (MapStr, bool) {
 	}
 }
 
-// walkMapRecursive walks the data MapStr to arrive at the value specified by the key.
-// The key is expressed in dot-notation (eg. x.y.z). When the key is found then
-// the given mapStrOperation is invoked.
-func walkMapRecursive(key string, data MapStr, op mapStrOperation) (interface{}, error) {
+// mapFind iterates a MapStr based on a the given dotted key, finding the final
+// subMap and subKey to operate on.
+// An error is returned if some intermediate is no map or the key doesn't exist.
+// If createMissing is set to true, intermediate maps are created.
+// The final map and un-dotted key to run further operations on are returned in
+// subKey and subMap. The subMap already contains a value for subKey, the
+// present flag is set to true and the oldValue return will hold
+// the original value.
+func mapFind(
+	key string,
+	data MapStr,
+	createMissing bool,
+) (subKey string, subMap MapStr, oldValue interface{}, present bool, err error) {
+	// XXX `safemapstr.mapFind` mimics this implementation, both should be updated to have similar behavior
 
-	// Splits up the key in two parts: full key and first part before the dot
-	_, exists := data[key]
-	// If leave node or key exists directly
-	if exists {
-		// Execute the mapStrOperator on the leaf object.
-		return op.Do(key, data)
-	}
-
-	keyParts := strings.SplitN(key, ".", 2)
-	// If leave node or key exists directly
-	if len(keyParts) == 1 {
-		// Execute the mapStrOperator on the leaf object.
-		return op.Do(key, data)
-	}
-
-	// Checks if first part of the key exists
-	k := keyParts[0]
-	d, keyExist := data[k]
-	if !keyExist {
-		if op.CreateMissingKeys {
-			d = MapStr{}
-			data[k] = d
-		} else {
-			return nil, ErrKeyNotFound
+	for {
+		// Fast path, key is present as is.
+		if v, exists := data[key]; exists {
+			return key, data, v, true, nil
 		}
+
+		idx := strings.IndexRune(key, '.')
+		if idx < 0 {
+			return key, data, nil, false, nil
+		}
+
+		k := key[:idx]
+		d, exists := data[k]
+		if !exists {
+			if createMissing {
+				d = MapStr{}
+				data[k] = d
+			} else {
+				return "", nil, nil, false, ErrKeyNotFound
+			}
+		}
+
+		v, err := toMapStr(d)
+		if err != nil {
+			return "", nil, nil, false, err
+		}
+
+		// advance to sub-map
+		key = key[idx+1:]
+		data = v
 	}
-
-	v, err := toMapStr(d)
-	if err != nil {
-		return nil, err
-	}
-
-	return walkMapRecursive(keyParts[1], v, op)
-}
-
-func walkMap(key string, data MapStr, op mapStrOperation) (interface{}, error) {
-	v, err := walkMapRecursive(key, data, op)
-	if err != nil {
-		// Add key to error
-		err = errors.Wrapf(err, "key=%v", key)
-	}
-	return v, err
-}
-
-// mapStrOperation types
-
-// These are static mapStrOperation types that store no state and are reusable.
-var (
-	opDelete = mapStrOperation{deleteOperation{}, false}
-	opGet    = mapStrOperation{getOperation{}, false}
-	opHasKey = mapStrOperation{hasKeyOperation{}, false}
-)
-
-// mapStrOperation represents an operation that can be applied to map.
-type mapStrOperation struct {
-	mapStrOperator
-	CreateMissingKeys bool
-}
-
-// mapStrOperator is an interface with a single function that performs an
-// operation on a MapStr.
-type mapStrOperator interface {
-	Do(key string, data MapStr) (value interface{}, err error)
-}
-
-type deleteOperation struct{}
-
-func (op deleteOperation) Do(key string, data MapStr) (interface{}, error) {
-	value, found := data[key]
-	if !found {
-		return nil, ErrKeyNotFound
-	}
-	delete(data, key)
-	return value, nil
-}
-
-type getOperation struct{}
-
-func (op getOperation) Do(key string, data MapStr) (interface{}, error) {
-	value, found := data[key]
-	if !found {
-		return nil, ErrKeyNotFound
-	}
-	return value, nil
-}
-
-type hasKeyOperation struct{}
-
-func (op hasKeyOperation) Do(key string, data MapStr) (interface{}, error) {
-	_, found := data[key]
-	return found, nil
-}
-
-type putOperation struct {
-	Value interface{}
-}
-
-func (op putOperation) Do(key string, data MapStr) (interface{}, error) {
-	existingValue, _ := data[key]
-	data[key] = op.Value
-	return existingValue, nil
 }

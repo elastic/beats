@@ -1,0 +1,53 @@
+- name: socket.summary
+  title: Socket summary
+  type: group
+  description: >
+    Summary metrics of open sockets in the host system
+  fields:
+    - name: all
+      type: group
+      description: >
+        All connections
+      fields:
+        - name: count
+          type: integer
+          description: >
+            All open connections
+        - name: listening
+          type: integer
+          description: >
+            All listening ports
+    - name: tcp
+      type: group
+      description: >
+        All TCP connections
+      fields:
+        - name: all
+          type: group
+          description: >
+            All TCP connections
+          fields:
+            - name: count
+              type: integer
+              description: >
+                All open TCP connections
+            - name: listening
+              type: integer
+              description: >
+                All TCP listening ports
+    - name: udp
+      type: group
+      description: >
+        All UDP connections
+      fields:
+        - name: all
+          type: group
+          description: >
+            All UDP connections
+          fields:
+            - name: count
+              type: integer
+              description: >
+                All open TCP connections
+
+

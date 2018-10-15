@@ -1,0 +1,48 @@
+- name: index.recovery
+  type: group
+  description: >
+    index
+  release: beta
+  fields:
+    - name: id
+      type: long
+      description: >
+        Shard recovery id.
+    - name: type
+      type: keyword
+      description: >
+        Shard recovery type.
+    - name: primary
+      type: boolean
+      description: >
+        True if primary shard.
+    - name: stage
+      type: keyword
+      description: >
+        Recovery stage.
+
+    - name: target.id
+      type: keyword
+      description: >
+        Target node id.
+    - name: target.host
+      type: ip
+      description: >
+        Target node host address.
+    - name: target.name
+      type: keyword
+      description: >
+        Target node name.
+
+    - name: source.id
+      type: keyword
+      description: >
+        Source node id.
+    - name: source.host
+      type: ip
+      description: >
+        Source node host address.
+    - name: source.name
+      type: keyword
+      description: >
+        Source node name.

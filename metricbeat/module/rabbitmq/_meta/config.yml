@@ -1,7 +1,9 @@
 - module: rabbitmq
-  metricsets: ["node", "queue"]
+  #metricsets:
+  #  - node
+  #  - queue
+  #  - connection
   period: 10s
   hosts: ["localhost:15672"]
-
-  username: guest
-  password: guest
+  #username: guest
+  #password: guest

@@ -1,0 +1,10 @@
+{
+  "description": "",
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{}"
+  },
+  "title": "Overview [Metricbeat uWSGI]",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "visState": "{\"type\":\"timelion\",\"title\":\"Overview [Metricbeat uWSGI]\",\"params\":{\"expression\":\".es(metric=avg:uwsgi.status.total.requests).derivative().label('Requests').title('Overview of requests per period'),.es(metric=avg:uwsgi.status.total.exceptions).derivative().label('Exceptions'),.es(metric=max:uwsgi.status.worker.avg_rt).label('Average response time').yaxis(2)\",\"interval\":\"15s\"}}"
+}

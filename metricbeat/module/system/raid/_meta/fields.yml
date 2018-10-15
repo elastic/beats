@@ -2,7 +2,7 @@
   type: group
   description: >
     raid
-  release: experimental
+  release: ga
   fields:
     - name: name
       type: keyword

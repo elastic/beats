@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build ignore
 
 package service
@@ -116,7 +133,7 @@ const (
 	// Includes STANDARD_RIGHTS_REQUIRED in addition to all access rights in this table.
 	ServiceAllAccess ServiceAccessRight = C.SERVICE_ALL_ACCESS
 	// Required to call the ChangeServiceConfig or ChangeServiceConfig2 function to change the service configuration. Because this grants the caller the right to change the executable file that the system runs, it should be granted only to administrators.
-	ServcieChangeConfig ServiceAccessRight = C.SERVICE_CHANGE_CONFIG
+	ServiceChangeConfig ServiceAccessRight = C.SERVICE_CHANGE_CONFIG
 	// Required to call the EnumDependentServices function to enumerate all the services dependent on the service.
 	ServiceEnumerateDependents ServiceAccessRight = C.SERVICE_ENUMERATE_DEPENDENTS
 	// Required to call the ControlService function to ask the service to report its status immediately.

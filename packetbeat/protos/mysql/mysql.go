@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package mysql
 
 import (
@@ -191,8 +208,16 @@ func (stream *mysqlStream) prepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
 	stream.parseState = mysqlStateStart
 	stream.parseOffset = 0
-	stream.isClient = false
 	stream.message = nil
+}
+
+func (mysql *mysqlPlugin) isServerPort(port uint16) bool {
+	for _, sPort := range mysql.ports {
+		if uint16(sPort) == port {
+			return true
+		}
+	}
+	return false
 }
 
 func mysqlMessageParser(s *mysqlStream) (bool, bool) {
@@ -212,27 +237,20 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			m.seq = hdr[3]
 			m.typ = hdr[4]
 
-			logp.Debug("mysqldetailed", "MySQL Header: Packet length %d, Seq %d, Type=%d", m.packetLength, m.seq, m.typ)
+			logp.Debug("mysqldetailed", "MySQL Header: Packet length %d, Seq %d, Type=%d isClient=%v", m.packetLength, m.seq, m.typ, s.isClient)
 
-			if m.seq == 0 {
+			if s.isClient {
 				// starts Command Phase
-
-				if m.typ == mysqlCmdQuery {
+				if m.seq == 0 && m.typ == mysqlCmdQuery {
 					// parse request
 					m.isRequest = true
 					m.start = s.parseOffset
 					s.parseState = mysqlStateEatMessage
-
 				} else {
 					// ignore command
 					m.ignoreMessage = true
 					s.parseState = mysqlStateEatMessage
 				}
-
-				if !s.isClient {
-					s.isClient = true
-				}
-
 			} else if !s.isClient {
 				// parse response
 				m.isRequest = false
@@ -258,11 +276,6 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					m.ignoreMessage = true
 					s.parseState = mysqlStateEatMessage
 				}
-
-			} else {
-				// something else, not expected
-				logp.Debug("mysql", "Unexpected MySQL message of type %d received.", m.typ)
-				return false, false
 			}
 
 		case mysqlStateEatMessage:
@@ -483,9 +496,14 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	}
 
 	if priv.data[dir] == nil {
+		dstPort := tcptuple.DstPort
+		if dir == tcp.TCPDirectionReverse {
+			dstPort = tcptuple.SrcPort
+		}
 		priv.data[dir] = &mysqlStream{
-			data:    pkt.Payload,
-			message: &mysqlMessage{ts: pkt.Ts},
+			data:     pkt.Payload,
+			message:  &mysqlMessage{ts: pkt.Ts},
+			isClient: mysql.isServerPort(dstPort),
 		}
 	} else {
 		// concatenate bytes
@@ -504,7 +522,7 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 		}
 
 		ok, complete := mysqlMessageParser(priv.data[dir])
-		//logp.Debug("mysqldetailed", "mysqlMessageParser returned ok=%b complete=%b", ok, complete)
+		logp.Debug("mysqldetailed", "mysqlMessageParser returned ok=%v complete=%v", ok, complete)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
@@ -565,7 +583,7 @@ func handleMysql(mysql *mysqlPlugin, m *mysqlMessage, tcptuple *common.TCPTuple,
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 	m.raw = rawMsg
 
 	if m.isRequest {
@@ -589,16 +607,7 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 	}
 
 	trans.ts = msg.ts
-	trans.src = common.Endpoint{
-		IP:   msg.tcpTuple.SrcIP.String(),
-		Port: msg.tcpTuple.SrcPort,
-		Proc: string(msg.cmdlineTuple.Src),
-	}
-	trans.dst = common.Endpoint{
-		IP:   msg.tcpTuple.DstIP.String(),
-		Port: msg.tcpTuple.DstPort,
-		Proc: string(msg.cmdlineTuple.Dst),
-	}
+	trans.src, trans.dst = common.MakeEndpointPair(msg.tcpTuple.BaseTuple, msg.cmdlineTuple)
 	if msg.direction == tcp.TCPDirectionReverse {
 		trans.src, trans.dst = trans.dst, trans.src
 	}

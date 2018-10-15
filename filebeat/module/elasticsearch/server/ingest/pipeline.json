@@ -1,0 +1,37 @@
+{
+    "description": "Pipeline for parsing the Elasticsearch server log file.",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
+    "processors": [
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "grok": {
+                "field": "message",
+                "pattern_definitions": {
+                    "GREEDYMULTILINE": "(.|\n)*",
+                    "INDEXNAME": "[a-zA-Z0-9_.-]*"
+                },
+                "patterns": [
+                    "\\[%{TIMESTAMP_ISO8601:elasticsearch.server.timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}?\\]\\[%{DATA:elasticsearch.server.component}%{SPACE}\\](%{SPACE})?(\\[%{DATA:elasticsearch.node.name}\\])?(%{SPACE})?(\\[gc\\](\\[young\\]\\[%{NUMBER:elasticsearch.server.gc.young.one}\\]\\[%{NUMBER:elasticsearch.server.gc.young.two}\\]|\\[%{NUMBER:elasticsearch.server.gc_overhead}\\]))?%{SPACE}((\\[%{INDEXNAME:elasticsearch.index.name}\\]|\\[%{INDEXNAME:elasticsearch.index.name}\\/%{DATA:elasticsearch.index.id}\\]))?%{SPACE}%{GREEDYMULTILINE:message}"
+                ]
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.server.timestamp",
+                "target_field": "@timestamp"
+            }
+        }
+    ]
+}

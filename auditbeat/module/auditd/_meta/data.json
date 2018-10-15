@@ -32,9 +32,15 @@
         "module": "auditd",
         "type": "user_login"
     },
+    "network": {
+        "direction": "incoming"
+    },
     "process": {
         "exe": "/usr/sbin/sshd",
         "pid": "12635"
+    },
+    "source": {
+        "ip": "179.38.151.221"
     },
     "user": {
         "auid": "unset",

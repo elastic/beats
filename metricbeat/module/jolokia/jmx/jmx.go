@@ -1,8 +1,26 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package jmx
 
 import (
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -11,7 +29,6 @@ import (
 
 var (
 	metricsetName = "jolokia.jmx"
-	debugf        = logp.MakeDebug(metricsetName)
 )
 
 // init registers the MetricSet with the central registry.
@@ -22,12 +39,8 @@ func init() {
 }
 
 const (
-	// defaultScheme is the default scheme to use when it is not specified in
-	// the host config.
 	defaultScheme = "http"
-
-	// defaultPath is the default path to the ngx_http_stub_status_module endpoint on Nginx.
-	defaultPath = "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+	defaultPath   = "/jolokia/"
 )
 
 var (
@@ -41,16 +54,14 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	mapping   map[string]string
+	mapping   AttributeMapping
 	namespace string
 	http      *helper.HTTP
+	log       *logp.Logger
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The jolokia jmx metricset is beta")
-
-	// Additional configuration options
 	config := struct {
 		Namespace string       `config:"namespace" validate:"required"`
 		Mappings  []JMXMapping `config:"jmx.mappings" validate:"required"`
@@ -72,9 +83,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	http.SetMethod("POST")
 	http.SetBody(body)
 
+	log := logp.NewLogger(metricsetName).With("host", base.HostData().Host)
+
 	if logp.IsDebug(metricsetName) {
-		debugf("The body for POST requests to jolokia host %v is: %v",
-			base.HostData().Host, string(body))
+		log.Debugw("Jolokia request body",
+			"body", string(body), "type", "request")
 	}
 
 	return &MetricSet{
@@ -82,28 +95,35 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		mapping:       mapping,
 		namespace:     config.Namespace,
 		http:          http,
+		log:           log,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	body, err := m.http.FetchContent()
 	if err != nil {
 		return nil, err
 	}
 
 	if logp.IsDebug(metricsetName) {
-		debugf("The response body from jolokia host %v is: %v",
-			m.HostData().Host, string(body))
+		m.log.Debugw("Jolokia response body",
+			"host", m.HostData().Host, "body", string(body), "type", "response")
 	}
 
-	event, err := eventMapping(body, m.mapping)
+	events, err := eventMapping(body, m.mapping)
 	if err != nil {
 		return nil, err
 	}
 
 	// Set dynamic namespace.
-	event[mb.NamespaceKey] = m.namespace
+	var errs multierror.Errors
+	for _, event := range events {
+		_, err = event.Put(mb.NamespaceKey, m.namespace)
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
 
-	return event, nil
+	return events, errs.Err()
 }

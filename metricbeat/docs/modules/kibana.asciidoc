@@ -7,7 +7,14 @@ This file is generated! See scripts/docs_collector.py
 
 beta[]
 
-The Kibana module only tracks the high-level metrics. To monitor more Kibana metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
+The Kibana module only tracks the high-level metrics. To monitor more Kibana metrics, use our {monitoringdoc}/xpack-monitoring.html[monitoring] feature.
+
+The default metricset is `status`.
+
+[float]
+=== Compatibility
+
+The Kibana module is tested with Kibana 6.3.
 
 
 [float]
@@ -23,16 +30,23 @@ metricbeat.modules:
   metricsets: ["status"]
   period: 10s
   hosts: ["localhost:5601"]
+  basepath: ""
+  enabled: true
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-kibana-stats,stats>>
+
 * <<metricbeat-metricset-kibana-status,status>>
+
+include::kibana/stats.asciidoc[]
 
 include::kibana/status.asciidoc[]
 

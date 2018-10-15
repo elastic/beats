@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 /*
 Package testing provides utility functions for testing Module and MetricSet
 implementations.
@@ -138,6 +155,55 @@ func ReportingFetch(metricSet mb.ReportingMetricSet) ([]common.MapStr, []error) 
 	return r.events, r.errs
 }
 
+// NewReportingMetricSetV2 returns a new ReportingMetricSetV2 instance. Then
+// you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
+func NewReportingMetricSetV2(t testing.TB, config interface{}) mb.ReportingMetricSetV2 {
+	metricSet := newMetricSet(t, config)
+
+	reportingMetricSetV2, ok := metricSet.(mb.ReportingMetricSetV2)
+	if !ok {
+		t.Fatal("MetricSet does not implement ReportingMetricSetV2")
+	}
+
+	return reportingMetricSetV2
+}
+
+// CapturingReporterV2 is a reporter used for testing which stores all events and errors
+type CapturingReporterV2 struct {
+	events []mb.Event
+	errs   []error
+}
+
+// Event is used to report an event
+func (r *CapturingReporterV2) Event(event mb.Event) bool {
+	r.events = append(r.events, event)
+	return true
+}
+
+// Error is used to report an error
+func (r *CapturingReporterV2) Error(err error) bool {
+	r.errs = append(r.errs, err)
+	return true
+}
+
+// GetEvents returns all reported events
+func (r *CapturingReporterV2) GetEvents() []mb.Event {
+	return r.events
+}
+
+// GetErrors returns all reported errors
+func (r *CapturingReporterV2) GetErrors() []error {
+	return r.errs
+}
+
+// ReportingFetchV2 runs the given reporting metricset and returns all of the
+// events and errors that occur during that period.
+func ReportingFetchV2(metricSet mb.ReportingMetricSetV2) ([]mb.Event, []error) {
+	r := &CapturingReporterV2{}
+	metricSet.Fetch(r)
+	return r.events, r.errs
+}
+
 // NewPushMetricSet instantiates a new PushMetricSet using the given
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
@@ -217,16 +283,16 @@ func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
 	return pushMetricSet
 }
 
-// capturingReporterV2 stores all the events and errors from a metricset's
+// capturingPushReporterV2 stores all the events and errors from a metricset's
 // Run method.
-type capturingReporterV2 struct {
+type capturingPushReporterV2 struct {
 	doneC   chan struct{}
 	eventsC chan mb.Event
 }
 
 // report writes an event to the output channel and returns true. If the output
 // is closed it returns false.
-func (r *capturingReporterV2) report(event mb.Event) bool {
+func (r *capturingPushReporterV2) report(event mb.Event) bool {
 	select {
 	case <-r.doneC:
 		// Publisher is stopped.
@@ -237,17 +303,17 @@ func (r *capturingReporterV2) report(event mb.Event) bool {
 }
 
 // Event stores the passed-in event into the events array
-func (r *capturingReporterV2) Event(event mb.Event) bool {
+func (r *capturingPushReporterV2) Event(event mb.Event) bool {
 	return r.report(event)
 }
 
 // Error stores the given error into the errors array.
-func (r *capturingReporterV2) Error(err error) bool {
+func (r *capturingPushReporterV2) Error(err error) bool {
 	return r.report(mb.Event{Error: err})
 }
 
 // Done returns the Done channel for this reporter.
-func (r *capturingReporterV2) Done() <-chan struct{} {
+func (r *capturingPushReporterV2) Done() <-chan struct{} {
 	return r.doneC
 }
 
@@ -255,7 +321,7 @@ func (r *capturingReporterV2) Done() <-chan struct{} {
 // time and returns all of the events and errors that occur during that period.
 func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
 	var (
-		r      = &capturingReporterV2{doneC: make(chan struct{}), eventsC: make(chan mb.Event)}
+		r      = &capturingPushReporterV2{doneC: make(chan struct{}), eventsC: make(chan mb.Event)}
 		wg     sync.WaitGroup
 		events []mb.Event
 	)

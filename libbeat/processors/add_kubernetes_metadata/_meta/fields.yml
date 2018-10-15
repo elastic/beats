@@ -13,6 +13,11 @@
           description: >
             Kubernetes pod name
 
+        - name: pod.uid
+          type: keyword
+          description: >
+            Kubernetes Pod UID
+
         - name: namespace
           type: keyword
           description: >

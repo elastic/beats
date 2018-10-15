@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package pipeline
 
 import (
@@ -55,8 +72,10 @@ func newProcessorPipeline(
 
 	needsCopy := global.alwaysCopy || localProcessors != nil || global.processors != nil
 
-	// setup 1: generalize/normalize output (P)
-	processors.add(generalizeProcessor)
+	if !config.SkipNormalization {
+		// setup 1: generalize/normalize output (P)
+		processors.add(generalizeProcessor)
+	}
 
 	// setup 2: add Meta from client config (C)
 	if m := clientMeta; len(m) > 0 {
@@ -79,18 +98,26 @@ func newProcessorPipeline(
 	}
 
 	if len(fields) > 0 {
-		processors.add(makeAddFieldsProcessor("fields", fields, needsCopy))
+		// Enforce a copy of fields if dynamic fields are configured or beats
+		// metadata will be merged into the fields.
+		// With dynamic fields potentially changing at any time, we need to copy,
+		// so we do not change shared structures be accident.
+		fieldsNeedsCopy := needsCopy || config.DynamicFields != nil || fields["beat"] != nil
+		processors.add(makeAddFieldsProcessor("fields", fields, fieldsNeedsCopy))
 	}
 
 	if config.DynamicFields != nil {
-		processors.add(makeAddDynMetaProcessor("dynamicFields", config.DynamicFields, needsCopy))
+		checkCopy := func(m common.MapStr) bool {
+			return needsCopy || hasKey(m, "beat")
+		}
+		processors.add(makeAddDynMetaProcessor("dynamicFields", config.DynamicFields, checkCopy))
 	}
 
 	// setup 5: client processor list
 	processors.add(localProcessors)
 
-	// setup 6: add beats metadata
-	if meta := global.beatsMeta; len(meta) > 0 {
+	// setup 6: add beats and host metadata
+	if meta := global.builtinMeta; len(meta) > 0 {
 		processors.add(makeAddFieldsProcessor("beatsMeta", meta, needsCopy))
 	}
 
@@ -248,13 +275,19 @@ func makeAddFieldsProcessor(name string, fields common.MapStr, copy bool) *proce
 	return newAnnotateProcessor(name, fn)
 }
 
-func makeAddDynMetaProcessor(name string, meta *common.MapStrPointer, copy bool) *processorFn {
-	fn := func(event *beat.Event) { event.Fields.DeepUpdate(meta.Get()) }
-	if copy {
-		fn = func(event *beat.Event) { event.Fields.DeepUpdate(meta.Get().Clone()) }
-	}
+func makeAddDynMetaProcessor(
+	name string,
+	meta *common.MapStrPointer,
+	checkCopy func(m common.MapStr) bool,
+) *processorFn {
+	return newAnnotateProcessor(name, func(event *beat.Event) {
+		dynFields := meta.Get()
+		if checkCopy(dynFields) {
+			dynFields = dynFields.Clone()
+		}
 
-	return newAnnotateProcessor(name, fn)
+		event.Fields.DeepUpdate(dynFields)
+	})
 }
 
 func debugPrintProcessor(info beat.Info) *processorFn {
@@ -262,7 +295,7 @@ func debugPrintProcessor(info beat.Info) *processorFn {
 	// beat.Client is shared between multiple go-routines by accident)
 	var mux sync.Mutex
 
-	encoder := json.New(true, info.Version)
+	encoder := json.New(true, false, info.Version)
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
 		mux.Lock()
 		defer mux.Unlock()
@@ -287,4 +320,9 @@ func makeClientProcessors(config beat.ClientConfig) processors.Processor {
 		title: "client",
 		list:  procs.All(),
 	}
+}
+
+func hasKey(m common.MapStr, key string) bool {
+	_, exists := m[key]
+	return exists
 }

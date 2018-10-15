@@ -4,7 +4,7 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "^# User@Host: %{USER:mysql.slowlog.user}(\\[[^\\]]+\\])? @ %{HOSTNAME:mysql.slowlog.host} \\[(%{IP:mysql.slowlog.ip})?\\](\\s*Id:\\s* %{NUMBER:mysql.slowlog.id})?\n# Query_time: %{NUMBER:mysql.slowlog.query_time.sec}\\s* Lock_time: %{NUMBER:mysql.slowlog.lock_time.sec}\\s* Rows_sent: %{NUMBER:mysql.slowlog.rows_sent}\\s* Rows_examined: %{NUMBER:mysql.slowlog.rows_examined}\n(SET timestamp=%{NUMBER:mysql.slowlog.timestamp};\n)?%{GREEDYMULTILINE:mysql.slowlog.query}"
+        "^# User@Host: %{USER:mysql.slowlog.user}(\\[[^\\]]+\\])? @ (%{HOSTNAME:mysql.slowlog.host})? \\[(%{IP:mysql.slowlog.ip})?\\](\\s*Id:\\s* %{NUMBER:mysql.slowlog.id})?\n# Query_time: %{NUMBER:mysql.slowlog.query_time.sec}\\s* Lock_time: %{NUMBER:mysql.slowlog.lock_time.sec}\\s* Rows_sent: %{NUMBER:mysql.slowlog.rows_sent}\\s* Rows_examined: %{NUMBER:mysql.slowlog.rows_examined}\n(SET timestamp=%{NUMBER:mysql.slowlog.timestamp};\n)?%{GREEDYMULTILINE:mysql.slowlog.query}"
         ],
       "pattern_definitions" : {
         "GREEDYMULTILINE" : "(.|\n)*"

@@ -32,13 +32,32 @@ It is not possible to use a symlink as registry file.
 NOTE: The registry file is only updated when new events are flushed and not on a predefined period.
 That means in case there are some states where the TTL expired, these are only removed when new event are processed.
 
+[float]
+==== `registry_file_permissions`
+
+The permissions mask to apply on registry file. The default value is 0600. The permissions option must be a valid Unix-style file permissions mask expressed in octal notation. In Go, numbers in octal notation must start with 0.
+
+This option is not supported on Windows.
+
+Examples:
+
+    0644: give read and write access to the file owner, and read access to all others.
+    0600: give read and write access to the file owner, and no access to all others.
+    0664: give read and write access to the file owner and members of the group associated with the file, as well as read access to all other users.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.registry_file_permissions: 0600
+-------------------------------------------------------------------------------------
 
 [float]
 ==== `config_dir`
 
-The full path to the directory that contains additional prospector configuration files.
+deprecated[6.0.0, Use <<load-input-config>> instead.]
+
+The full path to the directory that contains additional input configuration files.
 Each configuration file must end with `.yml`. Each config file must also specify the full Filebeat
-config hierarchy even though only the prospector part of the file is processed. All global
+config hierarchy even though only the `inputs` part of each file is processed. All global
 options, such as `registry_file`, are ignored.
 
 The `config_dir` option MUST point to a directory other than the directory where the main Filebeat config file resides.
@@ -81,4 +100,3 @@ filebeat.shutdown_timeout: 5s
 -------------------------------------------------------------------------------------
 
 include::../../libbeat/docs/generalconfig.asciidoc[]
-

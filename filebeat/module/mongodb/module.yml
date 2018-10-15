@@ -1,0 +1,3 @@
+dashboards:
+- id: 158be870-87f4-11e7-ad9c-db80de0bf8d3
+  file: Filebeat-Mongodb-overview.json

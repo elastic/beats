@@ -1,0 +1,75 @@
+[
+    {
+        "@timestamp": "2018-05-09T10:57:55.000Z", 
+        "fileset.module": "kibana", 
+        "fileset.name": "log", 
+        "http.request.method": "get", 
+        "http.response.content_length": 9, 
+        "http.response.elapsed_time": 26, 
+        "http.response.status_code": 304, 
+        "input.type": "log", 
+        "kibana.log.meta.method": "get", 
+        "kibana.log.meta.req.headers.accept": "*/*", 
+        "kibana.log.meta.req.headers.accept-encoding": "gzip, deflate, br", 
+        "kibana.log.meta.req.headers.accept-language": "en-US,en;q=0.9,de;q=0.8", 
+        "kibana.log.meta.req.headers.connection": "keep-alive", 
+        "kibana.log.meta.req.headers.host": "localhost:5601", 
+        "kibana.log.meta.req.headers.if-modified-since": "Thu, 03 May 2018 09:45:28 GMT", 
+        "kibana.log.meta.req.headers.if-none-match": "\"24234c1c81b3948758c1a0be8e5a65386ca94c52\"", 
+        "kibana.log.meta.req.headers.origin": "http://localhost:5601", 
+        "kibana.log.meta.req.headers.referer": "http://localhost:5601/app/kibana", 
+        "kibana.log.meta.req.headers.user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36", 
+        "kibana.log.meta.req.referer": "http://localhost:5601/app/kibana", 
+        "kibana.log.meta.req.remoteAddress": "127.0.0.1", 
+        "kibana.log.meta.req.url": "/ui/fonts/open_sans/open_sans_v15_latin_600.woff2", 
+        "kibana.log.meta.req.userAgent": "127.0.0.1", 
+        "kibana.log.meta.statusCode": 304, 
+        "kibana.log.meta.type": "response", 
+        "kibana.log.tags": [], 
+        "message": "GET /ui/fonts/open_sans/open_sans_v15_latin_600.woff2 304 26ms - 9.0B", 
+        "offset": 0, 
+        "process.pid": 69410, 
+        "prospector.type": "log", 
+        "service.name": [
+            "kibana"
+        ]
+    }, 
+    {
+        "@timestamp": "2018-05-09T10:59:12.000Z", 
+        "fileset.module": "kibana", 
+        "fileset.name": "log", 
+        "input.type": "log", 
+        "kibana.log.meta.type": "log", 
+        "kibana.log.tags": [
+            "debug", 
+            "monitoring-ui", 
+            "kibana-monitoring"
+        ], 
+        "message": "Fetching data from kibana_stats collector", 
+        "offset": 920, 
+        "process.pid": 69776, 
+        "prospector.type": "log", 
+        "service.name": [
+            "kibana"
+        ]
+    }, 
+    {
+        "@timestamp": "2018-05-09T10:59:12.000Z", 
+        "fileset.module": "kibana", 
+        "fileset.name": "log", 
+        "input.type": "log", 
+        "kibana.log.meta.type": "log", 
+        "kibana.log.tags": [
+            "reporting", 
+            "debug", 
+            "exportTypes"
+        ], 
+        "message": "Found exportType at /Users/ruflin/Downloads/6.3/kibana-6.3.0-darwin-x86_64/node_modules/x-pack/plugins/reporting/export_types/csv/server/index.js", 
+        "offset": 1090, 
+        "process.pid": 69776, 
+        "prospector.type": "log", 
+        "service.name": [
+            "kibana"
+        ]
+    }
+]

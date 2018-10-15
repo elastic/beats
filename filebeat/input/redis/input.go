@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package redis
 
 import (
@@ -31,7 +48,7 @@ type Input struct {
 }
 
 // NewInput creates a new redis input
-func NewInput(cfg *common.Config, outletFactory channel.Factory, context input.Context) (input.Input, error) {
+func NewInput(cfg *common.Config, outletFactory channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Experimental("Redis slowlog input is enabled.")
 
 	config := defaultConfig
@@ -76,7 +93,11 @@ func (p *Input) Run() {
 		pool := CreatePool(host, p.config.Password, p.config.Network,
 			p.config.MaxConn, p.config.IdleTimeout, p.config.IdleTimeout)
 
-		h := NewHarvester(pool.Get())
+		h, err := NewHarvester(pool.Get())
+		if err != nil {
+			logp.Err("Failed to create harvester: %v", err)
+			continue
+		}
 		h.forwarder = forwarder
 
 		if err := p.registry.Start(h); err != nil {

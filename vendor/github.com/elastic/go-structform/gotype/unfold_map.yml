@@ -1,0 +1,178 @@
+# Licensed to Elasticsearch B.V. under one or more contributor
+# license agreements. See the NOTICE file distributed with
+# this work for additional information regarding copyright
+# ownership. Elasticsearch B.V. licenses this file to you under
+# the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+import:
+  - unfold_templates.yml
+
+main: |
+  package gotype
+
+  import "github.com/urso/go-structform"
+
+  {{/* defined 'lifted' pointer map unfolders into reflection based unfolders */}}
+  var (
+    unfolderReflMapIfc = liftGoUnfolder(newUnfolderMapIfc())
+    {{ range data.primitiveTypes }}
+    {{ $t := capitalize . }}
+      unfolderReflMap{{ $t }} = liftGoUnfolder(newUnfolderMap{{ $t }}())
+    {{ end }}
+  )
+
+  {{/* define pointer based unfolder types */}}
+  {{ invoke "makeTypeWithName" "name" "Ifc" "type" "interface{}" }}
+  {{ template "makeType" "bool" }}
+  {{ template "makeType" "string" }}
+  {{ range .numTypes }}
+    {{ template "makeType" . }}
+  {{ end }}
+
+  {{/* create value visitor callbacks */}}
+  {{ invoke "onIfcFns" "name" "unfolderMapIfc" "fn" "put" }}
+  {{ invoke "onBoolFns" "name" "unfolderMapBool" "fn" "put" }}
+  {{ invoke "onStringFns" "name" "unfolderMapString" "fn" "put" }}
+  {{ range .numTypes }}
+    {{ $type := . }}
+    {{ $name := capitalize $type | printf "unfolderMap%v" }}
+    {{ invoke "onNumberFns" "name" $name "type" $type "fn" "put" }}
+  {{ end }}
+
+  {{ template "mapIfc" }}
+
+
+# makeTypeWithName(name, type)
+templates.makeTypeWithName: |
+  {{ $type := .type }}
+  {{ $name := capitalize .name | printf "unfolderMap%v" }}
+  {{ $startName := capitalize .name | printf "unfoldMapStart%v" }}
+  {{ $keyName := capitalize .name | printf "unfoldMapKey%v" }}
+
+  {{ invoke "makeUnfoldType" "name" $name }}
+  {{ invoke "makeUnfoldType" "name" $startName "base" "unfolderErrObjectStart" }}
+  {{ invoke "makeUnfoldType" "name" $keyName "base" "unfolderErrExpectKey" }}
+
+  func (u *{{ $name }} ) initState(ctx *unfoldCtx, ptr unsafe.Pointer) {
+    ctx.unfolder.push(new{{ $keyName | capitalize}}())
+    ctx.unfolder.push(new{{ $startName | capitalize}}())
+    ctx.ptr.push(ptr)
+  }
+
+  func (u * {{ $keyName }} ) cleanup(ctx *unfoldCtx) {
+    ctx.unfolder.pop()
+    ctx.ptr.pop()
+  }
+
+  func (u * {{ $startName }}) cleanup(ctx *unfoldCtx) {
+    ctx.unfolder.pop()
+  }
+
+
+  func (u *{{ $name }} ) ptr(ctx *unfoldCtx) *map[string]{{ $type }} {
+    return (*map[string]{{ $type }})(ctx.ptr.current)
+  }
+
+
+  func (u *{{ $startName }} ) OnObjectStart(ctx *unfoldCtx, l int, baseType structform.BaseType) error {
+    // TODO: validate baseType
+
+    u.cleanup(ctx)
+    return nil
+  }
+
+  func (u *{{ $keyName }} ) OnKeyRef(ctx *unfoldCtx, key []byte) error {
+    return u.OnKey(ctx, ctx.keyCache.get(key))
+  }
+
+  func (u *{{ $keyName }} ) OnKey(ctx *unfoldCtx, key string) error {
+    ctx.key.push(key)
+    ctx.unfolder.current = new{{ $name | capitalize }}()
+    return nil
+  }
+
+  func (u *{{ $keyName }} ) OnObjectFinished(ctx *unfoldCtx) error {
+    u.cleanup(ctx)
+    return nil
+  }
+
+  func (u *{{ $name }} ) put(ctx *unfoldCtx, v {{ $type }}) error {
+    to := u.ptr(ctx)
+    if *to == nil {
+      *to = map[string]{{ $type }}{}
+    }
+    (*to)[ctx.key.pop()] = v
+
+    ctx.unfolder.current = new{{ $keyName | capitalize }}()
+    return nil
+  }
+
+templates.mapIfc: |
+  func unfoldIfcStartSubMap(ctx *unfoldCtx, l int, baseType structform.BaseType) error {
+    _, ptr, unfolder := makeMapPtr(ctx, l, baseType)
+    ctx.ptr.push(ptr)
+    ctx.baseType.push(baseType)
+    unfolder.initState(ctx, ptr)
+    return ctx.unfolder.current.OnObjectStart(ctx, l, baseType)
+  }
+
+  func unfoldIfcFinishSubMap(ctx *unfoldCtx) (interface{}, error) {
+    child := ctx.ptr.pop()
+    bt := ctx.baseType.pop()
+    switch bt {
+    {{ range $bt, $gt := data.mapTypes }}
+    case structform.{{ $bt }}:
+      value := *(*map[string]{{ $gt }})(child) 
+      {{- if or (eq $bt "AnyType")  (eq $bt "ZeroType") }}
+        last := len(ctx.valueBuffer.mapAny)-1
+        ctx.valueBuffer.mapAny = ctx.valueBuffer.mapAny[:last]
+      {{ else }}
+        last := len(ctx.valueBuffer.mapPrimitive)-1
+        ctx.valueBuffer.mapPrimitive = ctx.valueBuffer.mapPrimitive[:last]
+      {{ end -}}
+      return value, nil
+
+    {{ end }}
+    default:
+      return nil, errTODO()
+    }
+  }
+
+  func makeMapPtr(ctx *unfoldCtx, l int, bt structform.BaseType) (interface{}, unsafe.Pointer, ptrUnfolder) {
+    switch bt {
+    {{ range $bt, $gt := data.mapTypes }}
+    case structform.{{ $bt }}:
+      {{- if or (eq $bt "AnyType")  (eq $bt "ZeroType") }}
+        idx := len(ctx.valueBuffer.mapAny)
+        ctx.valueBuffer.mapAny = append(ctx.valueBuffer.mapAny, nil)
+        to := &ctx.valueBuffer.mapAny[idx]
+        ptr := unsafe.Pointer(to)
+        unfolder := newUnfolderMapIfc()
+        return to, ptr, unfolder
+      {{ else }}
+        idx := len(ctx.valueBuffer.mapPrimitive)
+        ctx.valueBuffer.mapPrimitive = append(ctx.valueBuffer.mapPrimitive, nil)
+        mapPtr := &ctx.valueBuffer.mapPrimitive[idx]
+        ptr := unsafe.Pointer(mapPtr)
+        to := (*map[string]{{ $gt }})(ptr)
+        unfolder := newUnfolderMap{{ $gt | capitalize }}()
+        return to, ptr, unfolder
+      {{ end }}
+
+    {{ end }}
+    default:
+      panic("invalid type code")
+      return nil, nil, nil
+    }
+  }

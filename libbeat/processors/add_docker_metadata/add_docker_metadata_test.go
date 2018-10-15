@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package add_docker_metadata
 
 import (
@@ -6,6 +23,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"runtime"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -96,8 +115,9 @@ func TestMatchContainer(t *testing.T) {
 				Image: "image",
 				Name:  "name",
 				Labels: map[string]string{
-					"a": "1",
-					"b": "2",
+					"a.x":   "1",
+					"b":     "2",
+					"b.foo": "3",
 				},
 			},
 		}))
@@ -115,8 +135,13 @@ func TestMatchContainer(t *testing.T) {
 				"id":    "container_id",
 				"image": "image",
 				"labels": common.MapStr{
-					"a": "1",
-					"b": "2",
+					"a": common.MapStr{
+						"x": "1",
+					},
+					"b": common.MapStr{
+						"value": "2",
+						"foo":   "3",
+					},
 				},
 				"name": "name",
 			},
@@ -144,9 +169,17 @@ func TestMatchSource(t *testing.T) {
 		}))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	input := common.MapStr{
-		"source": "/var/lib/docker/containers/FABADA/foo.log",
+	var inputSource string
+	switch runtime.GOOS {
+	case "windows":
+		inputSource = "C:\\ProgramData\\docker\\containers\\FABADA\\foo.log"
+	default:
+		inputSource = "/var/lib/docker/containers/FABADA/foo.log"
 	}
+	input := common.MapStr{
+		"source": inputSource,
+	}
+
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 
@@ -162,7 +195,7 @@ func TestMatchSource(t *testing.T) {
 				"name": "name",
 			},
 		},
-		"source": "/var/lib/docker/containers/FABADA/foo.log",
+		"source": inputSource,
 	}, result.Fields)
 }
 

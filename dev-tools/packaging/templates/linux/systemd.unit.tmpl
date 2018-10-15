@@ -1,0 +1,12 @@
+[Unit]
+Description={{.Description}}
+Documentation={{.URL}}
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/share/{{.BeatName}}/bin/{{.BeatName}} -c /etc/{{.BeatName}}/{{.BeatName}}.yml -path.home /usr/share/{{.BeatName}} -path.config /etc/{{.BeatName}} -path.data /var/lib/{{.BeatName}} -path.logs /var/log/{{.BeatName}}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

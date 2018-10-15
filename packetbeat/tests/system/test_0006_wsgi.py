@@ -30,7 +30,7 @@ class Test(BaseTest):
         assert "request" not in objs[0]
         assert "response" not in objs[0]
 
-    def test_drum_interraction(self):
+    def test_drum_interaction(self):
         self.render_config_template(
             http_ports=[8888]
         )

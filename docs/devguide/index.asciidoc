@@ -3,8 +3,11 @@
 
 include::../../libbeat/docs/version.asciidoc[]
 
+:dev-guide: true
 :beatname_lc: beatname
 :beatname_uc: a Beat
+
+include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 

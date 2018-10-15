@@ -17,12 +17,18 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
+* <<exported-fields-ecs>>
+* <<exported-fields-elasticsearch>>
+* <<exported-fields-haproxy>>
+* <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
 * <<exported-fields-kafka>>
+* <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
+* <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
@@ -53,25 +59,29 @@ Contains fields for the Apache2 HTTPD access logs.
 
 
 
-[float]
-=== `apache2.access.remote_ip`
-
+*`apache2.access.remote_ip`*::
++
+--
 type: keyword
 
 Client IP address.
 
 
-[float]
-=== `apache2.access.user_name`
+--
 
+*`apache2.access.user_name`*::
++
+--
 type: keyword
 
 The user name used when basic authentication is used.
 
 
-[float]
-=== `apache2.access.method`
+--
 
+*`apache2.access.method`*::
++
+--
 type: keyword
 
 example: GET
@@ -79,33 +89,41 @@ example: GET
 The request HTTP method.
 
 
-[float]
-=== `apache2.access.url`
+--
 
+*`apache2.access.url`*::
++
+--
 type: keyword
 
 The request HTTP URL.
 
 
-[float]
-=== `apache2.access.http_version`
+--
 
+*`apache2.access.http_version`*::
++
+--
 type: keyword
 
 The HTTP version.
 
 
-[float]
-=== `apache2.access.response_code`
+--
 
+*`apache2.access.response_code`*::
++
+--
 type: long
 
 The HTTP response code.
 
 
-[float]
-=== `apache2.access.body_sent.bytes`
+--
 
+*`apache2.access.body_sent.bytes`*::
++
+--
 type: long
 
 format: bytes
@@ -113,21 +131,27 @@ format: bytes
 The number of bytes of the server response body.
 
 
-[float]
-=== `apache2.access.referrer`
+--
 
+*`apache2.access.referrer`*::
++
+--
 type: keyword
 
 The HTTP referrer.
 
 
-[float]
-=== `apache2.access.agent`
+--
 
+*`apache2.access.agent`*::
++
+--
 type: text
 
 Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
 
+
+--
 
 [float]
 == user_agent fields
@@ -136,41 +160,49 @@ Contains the parsed User agent field. Only present if the user agent Elasticsear
 
 
 
-[float]
-=== `apache2.access.user_agent.device`
-
+*`apache2.access.user_agent.device`*::
++
+--
 type: keyword
 
 The name of the physical device.
 
 
-[float]
-=== `apache2.access.user_agent.major`
+--
 
+*`apache2.access.user_agent.major`*::
++
+--
 type: long
 
 The major version of the user agent.
 
 
-[float]
-=== `apache2.access.user_agent.minor`
+--
 
+*`apache2.access.user_agent.minor`*::
++
+--
 type: long
 
 The minor version of the user agent.
 
 
-[float]
-=== `apache2.access.user_agent.patch`
+--
 
+*`apache2.access.user_agent.patch`*::
++
+--
 type: keyword
 
 The patch version of the user agent.
 
 
-[float]
-=== `apache2.access.user_agent.name`
+--
 
+*`apache2.access.user_agent.name`*::
++
+--
 type: keyword
 
 example: Chrome
@@ -178,37 +210,59 @@ example: Chrome
 The name of the user agent.
 
 
-[float]
-=== `apache2.access.user_agent.os`
+--
 
+*`apache2.access.user_agent.os`*::
++
+--
 type: keyword
 
 The name of the operating system.
 
 
-[float]
-=== `apache2.access.user_agent.os_major`
+--
 
+*`apache2.access.user_agent.os_major`*::
++
+--
 type: long
 
 The major version of the operating system.
 
 
-[float]
-=== `apache2.access.user_agent.os_minor`
+--
 
+*`apache2.access.user_agent.os_minor`*::
++
+--
 type: long
 
 The minor version of the operating system.
 
 
-[float]
-=== `apache2.access.user_agent.os_name`
+--
 
+*`apache2.access.user_agent.os_name`*::
++
+--
 type: keyword
 
 The name of the operating system.
 
+
+--
+
+*`apache2.access.user_agent.original`*::
++
+--
+type: text
+
+Original user agent value before parsing by ingest-user-agent plugin.
+
+
+Field is not indexed.
+
+--
 
 [float]
 == geoip fields
@@ -217,45 +271,65 @@ Contains GeoIP information gathered based on the remote_ip field. Only present i
 
 
 
-[float]
-=== `apache2.access.geoip.continent_name`
-
+*`apache2.access.geoip.continent_name`*::
++
+--
 type: keyword
 
 The name of the continent.
 
 
-[float]
-=== `apache2.access.geoip.country_iso_code`
+--
 
+*`apache2.access.geoip.country_iso_code`*::
++
+--
 type: keyword
 
 Country ISO code.
 
 
-[float]
-=== `apache2.access.geoip.location`
+--
 
+*`apache2.access.geoip.location`*::
++
+--
 type: geo_point
 
 The longitude and latitude.
 
 
-[float]
-=== `apache2.access.geoip.region_name`
+--
 
+*`apache2.access.geoip.region_name`*::
++
+--
 type: keyword
 
 The region name.
 
 
-[float]
-=== `apache2.access.geoip.city_name`
+--
 
+*`apache2.access.geoip.city_name`*::
++
+--
 type: keyword
 
 The city name.
 
+
+--
+
+*`apache2.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
 
 [float]
 == error fields
@@ -264,53 +338,65 @@ Fields from the Apache error logs.
 
 
 
-[float]
-=== `apache2.error.level`
-
+*`apache2.error.level`*::
++
+--
 type: keyword
 
 The severity level of the message.
 
 
-[float]
-=== `apache2.error.client`
+--
 
+*`apache2.error.client`*::
++
+--
 type: keyword
 
 The IP address of the client that generated the error.
 
 
-[float]
-=== `apache2.error.message`
+--
 
+*`apache2.error.message`*::
++
+--
 type: text
 
 The logged message.
 
 
-[float]
-=== `apache2.error.pid`
+--
 
+*`apache2.error.pid`*::
++
+--
 type: long
 
 The process ID.
 
 
-[float]
-=== `apache2.error.tid`
+--
 
+*`apache2.error.tid`*::
++
+--
 type: long
 
 The thread ID.
 
 
-[float]
-=== `apache2.error.module`
+--
 
+*`apache2.error.module`*::
++
+--
 type: keyword
 
 The module producing the logged message.
 
+
+--
 
 [[exported-fields-auditd]]
 == Auditd fields
@@ -333,85 +419,111 @@ Fields from the Linux audit log. Not all fields are documented here because they
 
 
 
-[float]
-=== `auditd.log.record_type`
-
+*`auditd.log.record_type`*::
++
+--
 The audit event type.
 
 
-[float]
-=== `auditd.log.old_auid`
+--
 
+*`auditd.log.old_auid`*::
++
+--
 For login events this is the old audit ID used for the user prior to this login.
 
 
-[float]
-=== `auditd.log.new_auid`
+--
 
+*`auditd.log.new_auid`*::
++
+--
 For login events this is the new audit ID. The audit ID can be used to trace future events to the user even if their identity changes (like becoming root).
 
 
-[float]
-=== `auditd.log.old_ses`
+--
 
+*`auditd.log.old_ses`*::
++
+--
 For login events this is the old session ID used for the user prior to this login.
 
 
-[float]
-=== `auditd.log.new_ses`
+--
 
+*`auditd.log.new_ses`*::
++
+--
 For login events this is the new session ID. It can be used to tie a user to future events by session ID.
 
 
-[float]
-=== `auditd.log.sequence`
+--
 
+*`auditd.log.sequence`*::
++
+--
 type: long
 
 The audit event sequence number.
 
 
-[float]
-=== `auditd.log.acct`
+--
 
+*`auditd.log.acct`*::
++
+--
 The user account name associated with the event.
 
 
-[float]
-=== `auditd.log.pid`
+--
 
+*`auditd.log.pid`*::
++
+--
 The ID of the process.
 
 
-[float]
-=== `auditd.log.ppid`
+--
 
+*`auditd.log.ppid`*::
++
+--
 The ID of the process.
 
 
-[float]
-=== `auditd.log.items`
+--
 
+*`auditd.log.items`*::
++
+--
 The number of items in an event.
 
 
-[float]
-=== `auditd.log.item`
+--
 
+*`auditd.log.item`*::
++
+--
 The item field indicates which item out of the total number of items. This number is zero-based; a value of 0 means it is the first item.
 
 
-[float]
-=== `auditd.log.a0`
+--
 
+*`auditd.log.a0`*::
++
+--
 The first argument to the system call.
 
 
-[float]
-=== `auditd.log.res`
+--
 
+*`auditd.log.res`*::
++
+--
 The result of the system call (success or failure).
 
+
+--
 
 [float]
 == geoip fields
@@ -420,45 +532,65 @@ Contains GeoIP information gathered based on the `auditd.log.addr` field. Only p
 
 
 
-[float]
-=== `auditd.log.geoip.continent_name`
-
+*`auditd.log.geoip.continent_name`*::
++
+--
 type: keyword
 
 The name of the continent.
 
 
-[float]
-=== `auditd.log.geoip.city_name`
+--
 
+*`auditd.log.geoip.city_name`*::
++
+--
 type: keyword
 
 The name of the city.
 
 
-[float]
-=== `auditd.log.geoip.region_name`
+--
 
+*`auditd.log.geoip.region_name`*::
++
+--
 type: keyword
 
 The name of the region.
 
 
-[float]
-=== `auditd.log.geoip.country_iso_code`
+--
 
+*`auditd.log.geoip.country_iso_code`*::
++
+--
 type: keyword
 
 Country ISO code.
 
 
-[float]
-=== `auditd.log.geoip.location`
+--
 
+*`auditd.log.geoip.location`*::
++
+--
 type: geo_point
 
 The longitude and latitude.
 
+
+--
+
+*`auditd.log.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
 
 [[exported-fields-beat]]
 == Beat fields
@@ -467,33 +599,41 @@ Contains common beat fields available in all event types.
 
 
 
-[float]
-=== `beat.name`
-
+*`beat.name`*::
++
+--
 The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
 
 
-[float]
-=== `beat.hostname`
+--
 
+*`beat.hostname`*::
++
+--
 The hostname as returned by the operating system on which the Beat is running.
 
 
-[float]
-=== `beat.timezone`
+--
 
+*`beat.timezone`*::
++
+--
 The timezone as returned by the operating system on which the Beat is running.
 
 
-[float]
-=== `beat.version`
+--
 
+*`beat.version`*::
++
+--
 The version of the beat that generated this event.
 
 
-[float]
-=== `@timestamp`
+--
 
+*`@timestamp`*::
++
+--
 type: date
 
 example: August 26th 2016, 12:35:53.332
@@ -505,19 +645,25 @@ required: True
 The timestamp when the event log record was generated.
 
 
-[float]
-=== `tags`
+--
 
+*`tags`*::
++
+--
 Arbitrary tags that can be set per Beat and per transaction type.
 
 
-[float]
-=== `fields`
+--
 
+*`fields`*::
++
+--
 type: object
 
 Contains user configurable fields.
 
+
+--
 
 [float]
 == error fields
@@ -526,29 +672,15 @@ Error fields containing additional info in case of errors.
 
 
 
-[float]
-=== `error.message`
-
-type: text
-
-Error message.
-
-
-[float]
-=== `error.code`
-
-type: long
-
-Error code.
-
-
-[float]
-=== `error.type`
-
+*`error.type`*::
++
+--
 type: keyword
 
 Error type.
 
+
+--
 
 [[exported-fields-cloud]]
 == Cloud provider metadata fields
@@ -557,55 +689,69 @@ Metadata from cloud providers added by the add_cloud_metadata processor.
 
 
 
-[float]
-=== `meta.cloud.provider`
-
+*`meta.cloud.provider`*::
++
+--
 example: ec2
 
 Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
 
 
-[float]
-=== `meta.cloud.instance_id`
+--
 
+*`meta.cloud.instance_id`*::
++
+--
 Instance ID of the host machine.
 
 
-[float]
-=== `meta.cloud.instance_name`
+--
 
+*`meta.cloud.instance_name`*::
++
+--
 Instance name of the host machine.
 
 
-[float]
-=== `meta.cloud.machine_type`
+--
 
+*`meta.cloud.machine_type`*::
++
+--
 example: t2.medium
 
 Machine type of the host machine.
 
 
-[float]
-=== `meta.cloud.availability_zone`
+--
 
+*`meta.cloud.availability_zone`*::
++
+--
 example: us-east-1c
 
 Availability zone in which this host is running.
 
 
-[float]
-=== `meta.cloud.project_id`
+--
 
+*`meta.cloud.project_id`*::
++
+--
 example: project-x
 
 Name of the project in Google Cloud.
 
 
-[float]
-=== `meta.cloud.region`
+--
 
+*`meta.cloud.region`*::
++
+--
 Region in which this host is running.
 
+
+--
 
 [[exported-fields-docker-processor]]
 == Docker fields
@@ -615,37 +761,2833 @@ Docker stats collected from Docker.
 
 
 
-[float]
-=== `docker.container.id`
-
+*`docker.container.id`*::
++
+--
 type: keyword
 
 Unique container id.
 
 
-[float]
-=== `docker.container.image`
+--
 
+*`docker.container.image`*::
++
+--
 type: keyword
 
 Name of the image the container was built on.
 
 
-[float]
-=== `docker.container.name`
+--
 
+*`docker.container.name`*::
++
+--
 type: keyword
 
 Container name.
 
 
-[float]
-=== `docker.container.labels`
+--
 
+*`docker.container.labels`*::
++
+--
 type: object
 
 Image labels.
 
+
+--
+
+[[exported-fields-ecs]]
+== ECS fields
+
+ECS fields.
+
+
+
+[float]
+== agent fields
+
+The agent fields contain the data about the agent/client/shipper that created the event.
+
+
+
+*`agent.version`*::
++
+--
+type: keyword
+
+example: 6.0.0-rc2
+
+Version of the agent.
+
+
+--
+
+*`agent.name`*::
++
+--
+type: keyword
+
+example: filebeat
+
+Name of the agent.
+
+
+--
+
+*`agent.id`*::
++
+--
+type: keyword
+
+example: 8a4f500d
+
+Unique identifier of this agent (if one exists).
+Example: For Beats this would be beat.id.
+
+
+--
+
+*`agent.ephemeral_id`*::
++
+--
+type: keyword
+
+example: 8a4f500f
+
+Ephemeral identifier of this agent (if one exists).
+This id normally changes across restarts, but `agent.id` does not.
+
+
+--
+
+[float]
+== base fields
+
+The base set contains all fields which are on the top level. These fields are common across all types of events.
+
+
+
+*`base.@timestamp`*::
++
+--
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+required: True
+
+Date/time when the event originated.
+For log events this is the date/time when the event was generated, and not when it was read.
+Required field for all events.
+
+
+--
+
+*`base.tags`*::
++
+--
+type: keyword
+
+example: ["production", "env2"]
+
+List of keywords used to tag each event.
+
+
+--
+
+*`base.labels`*::
++
+--
+type: object
+
+example: {'key2': 'value2', 'key1': 'value1'}
+
+Key/value pairs.
+Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
+Example: `docker` and `k8s` labels.
+
+
+--
+
+*`base.message`*::
++
+--
+type: text
+
+example: Hello World
+
+For log events the message field contains the log message.
+In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
+
+
+--
+
+[float]
+== cloud fields
+
+Fields related to the cloud or infrastructure the events are coming from.
+
+
+
+*`cloud.provider`*::
++
+--
+type: keyword
+
+example: ec2
+
+Name of the cloud provider. Example values are ec2, gce, or digitalocean.
+
+
+--
+
+*`cloud.availability_zone`*::
++
+--
+type: keyword
+
+example: us-east-1c
+
+Availability zone in which this host is running.
+
+
+--
+
+*`cloud.region`*::
++
+--
+type: keyword
+
+example: us-east-1
+
+Region in which this host is running.
+
+
+--
+
+*`cloud.instance.id`*::
++
+--
+type: keyword
+
+example: i-1234567890abcdef0
+
+Instance ID of the host machine.
+
+
+--
+
+*`cloud.instance.name`*::
++
+--
+type: keyword
+
+Instance name of the host machine.
+
+
+--
+
+*`cloud.machine.type`*::
++
+--
+type: keyword
+
+example: t2.medium
+
+Machine type of the host machine.
+
+
+--
+
+*`cloud.account.id`*::
++
+--
+type: keyword
+
+example: 666777888999
+
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+
+--
+
+[float]
+== container fields
+
+Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
+
+
+
+*`container.runtime`*::
++
+--
+type: keyword
+
+example: docker
+
+Runtime managing this container.
+
+
+--
+
+*`container.id`*::
++
+--
+type: keyword
+
+Unique container id.
+
+
+--
+
+*`container.image.name`*::
++
+--
+type: keyword
+
+Name of the image the container was built on.
+
+
+--
+
+*`container.image.tag`*::
++
+--
+type: keyword
+
+Container image tag.
+
+
+--
+
+*`container.name`*::
++
+--
+type: keyword
+
+Container name.
+
+
+--
+
+*`container.labels`*::
++
+--
+type: object
+
+Image labels.
+
+
+--
+
+[float]
+== destination fields
+
+Destination fields describe details about the destination of a packet/event.
+
+
+
+*`destination.ip`*::
++
+--
+type: ip
+
+IP address of the destination.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`destination.hostname`*::
++
+--
+type: keyword
+
+Hostname of the destination.
+
+
+--
+
+*`destination.port`*::
++
+--
+type: long
+
+Port of the destination.
+
+
+--
+
+*`destination.mac`*::
++
+--
+type: keyword
+
+MAC address of the destination.
+
+
+--
+
+*`destination.domain`*::
++
+--
+type: keyword
+
+Destination domain.
+
+
+--
+
+*`destination.subdomain`*::
++
+--
+type: keyword
+
+Destination subdomain.
+
+
+--
+
+[float]
+== device fields
+
+Device fields are used to provide additional information about the device that is the source of the information. This could be a firewall, network device, etc.
+
+
+
+*`device.mac`*::
++
+--
+type: keyword
+
+MAC address of the device
+
+
+--
+
+*`device.ip`*::
++
+--
+type: ip
+
+IP address of the device.
+
+
+--
+
+*`device.hostname`*::
++
+--
+type: keyword
+
+Hostname of the device.
+
+
+--
+
+*`device.vendor`*::
++
+--
+type: text
+
+Device vendor information.
+
+
+--
+
+*`device.version`*::
++
+--
+type: keyword
+
+Device version.
+
+
+--
+
+*`device.serial_number`*::
++
+--
+type: keyword
+
+Device serial number.
+
+
+--
+
+*`device.timezone.offset.sec`*::
++
+--
+type: long
+
+example: -5400
+
+Timezone offset of the host in seconds.
+Number of seconds relative to UTC. If the offset is -01:30 the value will be -5400.
+
+
+--
+
+*`device.type`*::
++
+--
+type: keyword
+
+example: firewall
+
+The type of the device the data is coming from.
+There is no predefined list of device types. Some examples are `endpoint`, `firewall`, `ids`, `ips`, `proxy`.
+
+
+--
+
+[float]
+== error fields
+
+These fields can represent errors of any kind. Use them for errors that happen while fetching events or in cases where the event itself contains an error.
+
+
+
+*`error.id`*::
++
+--
+type: keyword
+
+Unique identifier for the error.
+
+
+--
+
+*`error.message`*::
++
+--
+type: text
+
+Error message.
+
+
+--
+
+*`error.code`*::
++
+--
+type: keyword
+
+Error code describing the error.
+
+
+--
+
+[float]
+== event fields
+
+The event fields are used for context information about the data itself.
+
+
+
+*`event.id`*::
++
+--
+type: keyword
+
+example: 8a4f500d
+
+Unique ID to describe the event.
+
+
+--
+
+*`event.category`*::
++
+--
+type: keyword
+
+example: metrics
+
+Event category.
+This can be a user defined category.
+
+
+--
+
+*`event.type`*::
++
+--
+type: keyword
+
+example: nginx-stats-metrics
+
+A type given to this kind of event which can be used for grouping.
+This is normally defined by the user.
+
+
+--
+
+*`event.action`*::
++
+--
+type: keyword
+
+example: reject
+
+The action captured by the event. The type of action will vary from system to system but is likely to include actions by security services, such as blocking or quarantining; as well as more generic actions such as login events, file i/o or proxy forwarding events.
+The value is normally defined by the user.
+
+
+--
+
+*`event.module`*::
++
+--
+type: keyword
+
+example: mysql
+
+Name of the module this data is coming from.
+This information is coming from the modules used in Beats or Logstash.
+
+
+--
+
+*`event.dataset`*::
++
+--
+type: keyword
+
+example: stats
+
+Name of the dataset.
+The concept of a `dataset` (fileset / metricset) is used in Beats as a subset of modules. It contains the information which is currently stored in metricset.name and metricset.module or fileset.name.
+
+
+--
+
+*`event.severity`*::
++
+--
+type: long
+
+example: 7
+
+Severity describes the severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
+
+
+--
+
+*`event.original`*::
++
+--
+type: keyword
+
+example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#124;100&#124; worm successfully stopped&#124;10&#124;src=10.0.0.1 dst=2.1.2.2spt=1232
+
+Raw text message of entire event. Used to demonstrate log integrity.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+
+
+Field is not indexed.
+
+--
+
+*`event.hash`*::
++
+--
+type: keyword
+
+example: 123456789012345678901234567890ABCD
+
+Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log integrity.
+
+
+--
+
+*`event.version`*::
++
+--
+type: keyword
+
+example: 0.1.0
+
+required: True
+
+The version field contains the version an event for ECS adheres to.
+This field should be provided as part of each event to make it possible to detect to which ECS version an event belongs.
+event.version is a required field and must exist in all events. It describes which ECS version the event adheres to.
+The current version is 0.1.0.
+
+
+--
+
+*`event.duration`*::
++
+--
+type: long
+
+Duration of the event in nanoseconds.
+
+
+--
+
+*`event.created`*::
++
+--
+type: date
+
+event.created contains the date when the event was created.
+This timestamp is distinct from @timestamp in that @timestamp contains the processed timestamp. For logs these two timestamps can be different as the timestamp in the log line and when the event is read for example by Filebeat are not identical. `@timestamp` must contain the timestamp extracted from the log line, event.created when the log line is read. The same could apply to package capturing where @timestamp contains the timestamp extracted from the network package and event.created when the event was created.
+In case the two timestamps are identical, @timestamp should be used.
+
+
+--
+
+*`event.risk_score`*::
++
+--
+type: float
+
+Risk score or priority of the event (e.g. security solutions). Use your system's original value here.
+
+
+--
+
+*`event.risk_score_norm`*::
++
+--
+type: float
+
+Normalized risk score or priority of the event, on a scale of 0 to 100.
+This is mainly useful if you use more than one system that assigns risk scores, and you want to see a normalized value across all systems.
+
+
+--
+
+[float]
+== file fields
+
+File fields provide details about each file.
+
+
+
+*`file.path`*::
++
+--
+type: text
+
+Path to the file.
+
+*`file.path.raw`*::
++
+--
+type: keyword
+
+Path to the file. This is a non-analyzed field that is useful for aggregations.
+
+
+--
+
+--
+
+*`file.target_path`*::
++
+--
+type: text
+
+Target path for symlinks.
+
+*`file.target_path.raw`*::
++
+--
+type: keyword
+
+Path to the file. This is a non-analyzed field that is useful for aggregations.
+
+
+--
+
+--
+
+*`file.extension`*::
++
+--
+type: keyword
+
+example: png
+
+File extension.
+This should allow easy filtering by file extensions.
+
+
+--
+
+*`file.type`*::
++
+--
+type: keyword
+
+File type (file, dir, or symlink).
+
+--
+
+*`file.device`*::
++
+--
+type: keyword
+
+Device that is the source of the file.
+
+--
+
+*`file.inode`*::
++
+--
+type: keyword
+
+Inode representing the file in the filesystem.
+
+--
+
+*`file.uid`*::
++
+--
+type: keyword
+
+The user ID (UID) or security identifier (SID) of the file owner.
+
+
+--
+
+*`file.owner`*::
++
+--
+type: keyword
+
+File owner's username.
+
+--
+
+*`file.gid`*::
++
+--
+type: keyword
+
+Primary group ID (GID) of the file.
+
+--
+
+*`file.group`*::
++
+--
+type: keyword
+
+Primary group name of the file.
+
+--
+
+*`file.mode`*::
++
+--
+type: keyword
+
+example: 416
+
+Mode of the file in octal representation.
+
+--
+
+*`file.size`*::
++
+--
+type: long
+
+File size in bytes (field is only added when `type` is `file`).
+
+--
+
+*`file.mtime`*::
++
+--
+type: date
+
+Last time file content was modified.
+
+--
+
+*`file.ctime`*::
++
+--
+type: date
+
+Last time file metadata changed.
+
+--
+
+[float]
+== geo fields
+
+Geo fields can carry data about a specific location related to an event or geo information for an IP field.
+
+
+
+*`geo.continent_name`*::
++
+--
+type: keyword
+
+Name of the continent.
+
+
+--
+
+*`geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+[float]
+== host fields
+
+Host fields provide information related to a host. A host can be a physical machine, a virtual machine, or a Docker container.
+Normally the host information is related to the machine on which the event was generated/collected, but they can be used differently if needed.
+
+
+
+*`host.timezone.offset.sec`*::
++
+--
+type: long
+
+example: -5400
+
+Timezone offset of the host in seconds.
+Number of seconds relative to UTC. If the offset is -01:30 the value will be -5400.
+
+
+--
+
+*`host.name`*::
++
+--
+type: keyword
+
+host.name is the hostname of the host.
+It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
+
+
+--
+
+*`host.id`*::
++
+--
+type: keyword
+
+Unique host id.
+As hostname is not always unique, use values that are meaningful in your environment.
+Example: The current usage of `beat.name`.
+
+
+--
+
+*`host.ip`*::
++
+--
+type: ip
+
+Host ip address.
+
+
+--
+
+*`host.mac`*::
++
+--
+type: keyword
+
+Host mac address.
+
+
+--
+
+*`host.type`*::
++
+--
+type: keyword
+
+Type of host.
+For Cloud providers this can be the machine type like `t2.medium`. If vm, this could be the container, for example, or other information meaningful in your environment.
+
+
+--
+
+*`host.os.platform`*::
++
+--
+type: keyword
+
+example: darwin
+
+Operating system platform (centos, ubuntu, windows, etc.)
+
+
+--
+
+*`host.os.name`*::
++
+--
+type: keyword
+
+example: Mac OS X
+
+Operating system name.
+
+
+--
+
+*`host.os.family`*::
++
+--
+type: keyword
+
+example: debian
+
+OS family (redhat, debian, freebsd, windows, etc.)
+
+
+--
+
+*`host.os.version`*::
++
+--
+type: keyword
+
+example: 10.12.6
+
+Operating system version.
+
+
+--
+
+*`host.architecture`*::
++
+--
+type: keyword
+
+example: x86_64
+
+Operating system architecture.
+
+
+--
+
+[float]
+== http fields
+
+Fields related to HTTP requests and responses.
+
+
+
+*`http.request.method`*::
++
+--
+type: keyword
+
+example: GET, POST, PUT
+
+Http request method.
+
+
+--
+
+*`http.response.status_code`*::
++
+--
+type: long
+
+example: 404
+
+Http response status code.
+
+
+--
+
+*`http.response.body`*::
++
+--
+type: text
+
+example: Hello world
+
+The full http response body.
+
+
+--
+
+*`http.version`*::
++
+--
+type: keyword
+
+example: 1.1
+
+Http version.
+
+
+--
+
+[float]
+== log fields
+
+Fields which are specific to log events.
+
+
+
+*`log.level`*::
++
+--
+type: keyword
+
+example: ERR
+
+Log level of the log event.
+Some examples are `WARN`, `ERR`, `INFO`.
+
+
+--
+
+*`log.original`*::
++
+--
+type: keyword
+
+example: Sep 19 08:26:10 localhost My log
+
+
+This is the original log message and contains the full log message before splitting it up in multiple parts.
+In contrast to the `message` field which can contain an extracted part of the log message, this field contains the original, full log message. It can have already some modifications applied like encoding or new lines removed to clean up the log message.
+This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
+
+
+Field is not indexed.
+
+--
+
+[float]
+== network fields
+
+Fields related to network data.
+
+
+
+*`network.name`*::
++
+--
+type: text
+
+example: Guest Wifi
+
+Name given by operators to sections of their network.
+
+
+*`network.name.raw`*::
++
+--
+type: keyword
+
+Name given by operators to sections of their network.
+
+
+--
+
+--
+
+*`network.protocol`*::
++
+--
+type: keyword
+
+example: http
+
+Network protocol name.
+
+
+--
+
+*`network.direction`*::
++
+--
+type: keyword
+
+example: inbound
+
+Direction of the network traffic.
+Recommended values are:
+  * inbound
+  * outbound
+  * unknown
+
+
+--
+
+*`network.forwarded_ip`*::
++
+--
+type: ip
+
+example: 192.1.1.2
+
+Host IP address when the source IP address is the proxy.
+
+
+--
+
+*`network.inbound.bytes`*::
++
+--
+type: long
+
+example: 184
+
+Network inbound bytes.
+
+
+--
+
+*`network.inbound.packets`*::
++
+--
+type: long
+
+example: 12
+
+Network inbound packets.
+
+
+--
+
+*`network.outbound.bytes`*::
++
+--
+type: long
+
+example: 184
+
+Network outbound bytes.
+
+
+--
+
+*`network.outbound.packets`*::
++
+--
+type: long
+
+example: 12
+
+Network outbound packets.
+
+
+--
+
+*`network.total.bytes`*::
++
+--
+type: long
+
+example: 368
+
+Network total bytes. The sum of inbound.bytes + outbound.bytes.
+
+
+--
+
+*`network.total.packets`*::
++
+--
+type: long
+
+example: 24
+
+Network outbound packets. The sum of inbound.packets + outbound.packets
+
+
+--
+
+[float]
+== organization fields
+
+The organization fields enrich data with information about the company or entity the data is associated with. These fields help you arrange or filter data stored in an index by one or multiple organizations.
+
+
+
+*`organization.name`*::
++
+--
+type: text
+
+Organization name.
+
+
+--
+
+*`organization.id`*::
++
+--
+type: keyword
+
+Unique identifier for the organization.
+
+
+--
+
+[float]
+== os fields
+
+The OS fields contain information about the operating system. These fields are often used inside other prefixes, such as `host.os.*` or `user_agent.os.*`.
+
+
+
+*`os.platform`*::
++
+--
+type: keyword
+
+example: darwin
+
+Operating system platform (such centos, ubuntu, windows).
+
+
+--
+
+*`os.name`*::
++
+--
+type: keyword
+
+example: Mac OS X
+
+Operating system name.
+
+
+--
+
+*`os.family`*::
++
+--
+type: keyword
+
+example: debian
+
+OS family (such as redhat, debian, freebsd, windows).
+
+
+--
+
+*`os.version`*::
++
+--
+type: keyword
+
+example: 10.12.6-rc2
+
+Operating system version as a raw string.
+
+
+--
+
+*`os.kernel`*::
++
+--
+type: keyword
+
+example: 4.4.0-112-generic
+
+Operating system kernel version as a raw string.
+
+
+--
+
+[float]
+== process fields
+
+These fields contain information about a process. These fields can help you correlate metrics information with a process id/name from a log message.  The `process.pid` often stays in the metric itself and is copied to the global field for correlation.
+
+
+
+*`process.args`*::
++
+--
+type: keyword
+
+example: ['-l', 'user', '10.0.0.16']
+
+Process arguments.
+May be filtered to protect sensitive information.
+
+
+--
+
+*`process.name`*::
++
+--
+type: keyword
+
+example: ssh
+
+Process name.
+Sometimes called program name or similar.
+
+
+--
+
+*`process.pid`*::
++
+--
+type: long
+
+Process id.
+
+
+--
+
+*`process.ppid`*::
++
+--
+type: long
+
+Process parent id.
+
+
+--
+
+*`process.title`*::
++
+--
+type: keyword
+
+Process title.
+The proctitle, often the same as process name.
+
+
+--
+
+[float]
+== service fields
+
+The service fields describe the service for or from which the data was collected. These fields help you find and correlate logs for a specific service and version.
+
+
+
+*`service.id`*::
++
+--
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+Unique identifier of the running service.
+This id should uniquely identify this service. This makes it possible to correlate logs and metrics for one specific service.
+Example: If you are experiencing issues with one redis instance, you can filter on that id to see metrics and logs for that single instance.
+
+
+--
+
+*`service.name`*::
++
+--
+type: keyword
+
+example: elasticsearch
+
+Name of the service data is collected from.
+The name can be used to group and correlate logs and metrics from one service.
+Example: If logs or metrics are collected from Redis, `service.name` would be `redis`.
+
+
+--
+
+*`service.type`*::
++
+--
+type: keyword
+
+Service type.
+
+
+--
+
+*`service.state`*::
++
+--
+type: keyword
+
+Current state of the service.
+
+
+--
+
+*`service.version`*::
++
+--
+type: keyword
+
+example: 3.2.4
+
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+
+--
+
+*`service.ephemeral_id`*::
++
+--
+type: keyword
+
+example: 8a4f500f
+
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+
+--
+
+[float]
+== url fields
+
+URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
+
+
+
+*`url.href`*::
++
+--
+type: text
+
+example: https://elastic.co:443/search?q=elasticsearch#top
+
+Full url. The field is stored as keyword.
+`url.href` is a [multi field](https://www.elastic.co/guide/en/ elasticsearch/reference/6.2/ multi-fields.html#_multi_fields_with_multiple_analyzers). The data is stored as keyword `url.href` and test `url.href.analyzed`. These fields enable you to run a query against part of the url still works splitting up the URL at ingest time.
+`href` is an analyzed field so the parsed information can be accessed through `href.analyzed` in queries.
+
+
+*`url.href.raw`*::
++
+--
+type: keyword
+
+The full URL. This is a non-analyzed field that is useful for aggregations.
+
+
+--
+
+--
+
+*`url.scheme`*::
++
+--
+type: keyword
+
+example: https
+
+Scheme of the request, such as "https".
+Note: The `:` is not part of the scheme.
+
+
+--
+
+*`url.host.name`*::
++
+--
+type: keyword
+
+example: elastic.co
+
+Hostname of the request, such as "example.com".
+For correlation the this field can be copied into the `host.name` field.
+
+
+--
+
+*`url.port`*::
++
+--
+type: integer
+
+example: 443
+
+Port of the request, such as 443.
+
+
+--
+
+*`url.path`*::
++
+--
+type: text
+
+Path of the request, such as "/search".
+
+
+*`url.path.raw`*::
++
+--
+type: keyword
+
+URL path. A non-analyzed field that is useful for aggregations.
+
+
+--
+
+--
+
+*`url.query`*::
++
+--
+type: text
+
+The query field describes the query string of the request, such as "q=elasticsearch".
+The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
+
+
+*`url.query.raw`*::
++
+--
+type: keyword
+
+URL query part. A non-analyzed field that is useful for aggregations.
+
+
+--
+
+--
+
+*`url.fragment`*::
++
+--
+type: keyword
+
+Portion of the url after the `#`, such as "top".
+The `#` is not part of the fragment.
+
+
+--
+
+*`url.username`*::
++
+--
+type: keyword
+
+Username of the request.
+
+
+--
+
+*`url.password`*::
++
+--
+type: keyword
+
+Password of the request.
+
+
+--
+
+[float]
+== user fields
+
+The user fields describe information about the user that is relevant to  the event. Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
+
+
+
+*`user.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.name`*::
++
+--
+type: keyword
+
+Name of the user.
+The field is a keyword, and will not be tokenized.
+
+
+--
+
+*`user.email`*::
++
+--
+type: keyword
+
+User email address.
+
+
+--
+
+*`user.hash`*::
++
+--
+type: keyword
+
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+
+--
+
+[float]
+== user_agent fields
+
+The user_agent fields normally come from a browser request. They often show up in web service logs coming from the parsed user agent string.
+
+
+
+*`user_agent.original`*::
++
+--
+type: text
+
+Unparsed version of the user_agent.
+
+
+--
+
+*`user_agent.device`*::
++
+--
+type: keyword
+
+Name of the physical device.
+
+
+--
+
+*`user_agent.version`*::
++
+--
+type: keyword
+
+Version of the physical device.
+
+
+--
+
+*`user_agent.major`*::
++
+--
+type: long
+
+Major version of the user agent.
+
+
+--
+
+*`user_agent.minor`*::
++
+--
+type: long
+
+Minor version of the user agent.
+
+
+--
+
+*`user_agent.patch`*::
++
+--
+type: keyword
+
+Patch version of the user agent.
+
+
+--
+
+*`user_agent.name`*::
++
+--
+type: keyword
+
+example: Chrome
+
+Name of the user agent.
+
+
+--
+
+*`user_agent.os.name`*::
++
+--
+type: keyword
+
+Name of the operating system.
+
+
+--
+
+*`user_agent.os.version`*::
++
+--
+type: keyword
+
+Version of the operating system.
+
+
+--
+
+*`user_agent.os.major`*::
++
+--
+type: long
+
+Major version of the operating system.
+
+
+--
+
+*`user_agent.os.minor`*::
++
+--
+type: long
+
+Minor version of the operating system.
+
+
+--
+
+[[exported-fields-elasticsearch]]
+== elasticsearch fields
+
+elasticsearch Module
+
+
+
+[float]
+== elasticsearch fields
+
+
+
+
+*`elasticsearch.node.name`*::
++
+--
+type: keyword
+
+example: vWNJsZ3
+
+Name of the node
+
+--
+
+*`elasticsearch.index.name`*::
++
+--
+type: keyword
+
+example: filebeat-test-input
+
+Index name
+
+--
+
+*`elasticsearch.index.id`*::
++
+--
+type: keyword
+
+example: aOGgDwbURfCV57AScqbCgw
+
+Index id
+
+--
+
+*`elasticsearch.shard.id`*::
++
+--
+type: keyword
+
+example: 0
+
+Id of the shard
+
+--
+
+[float]
+== audit fields
+
+
+
+
+*`elasticsearch.audit.layer`*::
++
+--
+type: keyword
+
+example: rest
+
+The layer from which this event originated: rest, transport or ip_filter
+
+--
+
+*`elasticsearch.audit.event_type`*::
++
+--
+type: keyword
+
+example: access_granted
+
+The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied
+
+--
+
+*`elasticsearch.audit.origin_type`*::
++
+--
+type: keyword
+
+example: local_node
+
+Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)
+
+--
+
+*`elasticsearch.audit.origin_address`*::
++
+--
+type: ip
+
+example: 192.168.1.42
+
+The IP address from which the request originated
+
+--
+
+*`elasticsearch.audit.principal`*::
++
+--
+type: keyword
+
+example: _anonymous
+
+The principal (username) that failed authentication
+
+--
+
+*`elasticsearch.audit.action`*::
++
+--
+type: keyword
+
+example: cluster:monitor/main
+
+The name of the action that was executed
+
+--
+
+*`elasticsearch.audit.uri`*::
++
+--
+type: keyword
+
+example: /_xpack/security/_authenticate
+
+The REST endpoint URI
+
+--
+
+*`elasticsearch.audit.request`*::
++
+--
+type: keyword
+
+example: ClearScrollRequest
+
+The type of request that was executed
+
+--
+
+*`elasticsearch.audit.request_body`*::
++
+--
+type: text
+
+example: body
+
+The body of the request, if enabled
+
+--
+
+[float]
+== deprecation fields
+
+
+
+[float]
+== gc fields
+
+GC fileset fields.
+
+
+
+[float]
+== phase fields
+
+Fields specific to GC phase.
+
+
+
+*`elasticsearch.gc.phase.name`*::
++
+--
+type: keyword
+
+Name of the GC collection phase.
+
+
+--
+
+*`elasticsearch.gc.phase.duration_sec`*::
++
+--
+type: float
+
+Collection phase duration according to the Java virtual machine.
+
+
+--
+
+*`elasticsearch.gc.phase.scrub_symbol_table_time_sec`*::
++
+--
+type: float
+
+Pause time in seconds cleaning up symbol tables.
+
+
+--
+
+*`elasticsearch.gc.phase.scrub_string_table_time_sec`*::
++
+--
+type: float
+
+Pause time in seconds cleaning up string tables.
+
+
+--
+
+*`elasticsearch.gc.phase.weak_refs_processing_time_sec`*::
++
+--
+type: float
+
+Time spent processing weak references in seconds.
+
+
+--
+
+*`elasticsearch.gc.phase.parallel_rescan_time_sec`*::
++
+--
+type: float
+
+Time spent in seconds marking live objects while application is stopped.
+
+
+--
+
+*`elasticsearch.gc.phase.class_unload_time_sec`*::
++
+--
+type: float
+
+Time spent unloading unused classes in seconds.
+
+
+--
+
+[float]
+== cpu_time fields
+
+Process CPU time spent performing collections.
+
+
+
+*`elasticsearch.gc.phase.cpu_time.user_sec`*::
++
+--
+type: float
+
+CPU time spent outside the kernel.
+
+
+--
+
+*`elasticsearch.gc.phase.cpu_time.sys_sec`*::
++
+--
+type: float
+
+CPU time spent inside the kernel. 
+
+
+--
+
+*`elasticsearch.gc.phase.cpu_time.real_sec`*::
++
+--
+type: float
+
+Total elapsed CPU time spent to complete the collection from start to finish.
+
+
+--
+
+*`elasticsearch.gc.jvm_runtime_sec`*::
++
+--
+type: float
+
+The time from JVM start up in seconds, as a floating point number.
+
+
+--
+
+*`elasticsearch.gc.threads_total_stop_time_sec`*::
++
+--
+type: float
+
+Garbage collection threads total stop time seconds.
+
+
+--
+
+*`elasticsearch.gc.stopping_threads_time_sec`*::
++
+--
+type: float
+
+Time took to stop threads seconds.
+
+
+--
+
+*`elasticsearch.gc.tags`*::
++
+--
+type: keyword
+
+GC logging tags.
+
+
+--
+
+[float]
+== heap fields
+
+Heap allocation and total size.
+
+
+
+*`elasticsearch.gc.heap.size_kb`*::
++
+--
+type: integer
+
+Total heap size in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.heap.used_kb`*::
++
+--
+type: integer
+
+Used heap in kilobytes.
+
+
+--
+
+[float]
+== old_gen fields
+
+Old generation occupancy and total size.
+
+
+
+*`elasticsearch.gc.old_gen.size_kb`*::
++
+--
+type: integer
+
+Total size of old generation in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.old_gen.used_kb`*::
++
+--
+type: integer
+
+Old generation occupancy in kilobytes.
+
+
+--
+
+[float]
+== young_gen fields
+
+Young generation occupancy and total size.
+
+
+
+*`elasticsearch.gc.young_gen.size_kb`*::
++
+--
+type: integer
+
+Total size of young generation in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.young_gen.used_kb`*::
++
+--
+type: integer
+
+Young generation occupancy in kilobytes.
+
+
+--
+
+[float]
+== server fields
+
+Server log file
+
+
+*`elasticsearch.server.component`*::
++
+--
+type: keyword
+
+example: o.e.c.m.MetaDataCreateIndexService
+
+Log component
+
+--
+
+[float]
+== gc fields
+
+GC log
+
+
+[float]
+== young fields
+
+Young GC
+
+
+*`elasticsearch.server.gc.young.one`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+*`elasticsearch.server.gc.young.two`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+*`elasticsearch.server.gc_overhead`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+[float]
+== slowlog fields
+
+Slowlog events from Elasticsearch
+
+
+*`elasticsearch.slowlog.logger`*::
++
+--
+type: keyword
+
+example: index.search.slowlog.fetch
+
+Logger name
+
+--
+
+*`elasticsearch.slowlog.took`*::
++
+--
+type: text
+
+example: 300ms
+
+Time it took to execute the query
+
+--
+
+*`elasticsearch.slowlog.types`*::
++
+--
+type: keyword
+
+example: 
+
+Types
+
+--
+
+*`elasticsearch.slowlog.stats`*::
++
+--
+type: text
+
+example: 
+
+Statistics
+
+--
+
+*`elasticsearch.slowlog.search_type`*::
++
+--
+type: keyword
+
+example: QUERY_THEN_FETCH
+
+Search type
+
+--
+
+*`elasticsearch.slowlog.source_query`*::
++
+--
+type: text
+
+example: {"query":{"match_all":{"boost":1.0}}}
+
+Slow query
+
+--
+
+*`elasticsearch.slowlog.extra_source`*::
++
+--
+type: text
+
+example: 
+
+Extra source information
+
+--
+
+*`elasticsearch.slowlog.took_millis`*::
++
+--
+type: keyword
+
+example: 42
+
+Time took in milliseconds
+
+--
+
+*`elasticsearch.slowlog.total_hits`*::
++
+--
+type: keyword
+
+example: 42
+
+Total hits
+
+--
+
+*`elasticsearch.slowlog.total_shards`*::
++
+--
+type: keyword
+
+example: 22
+
+Total queried shards
+
+--
+
+*`elasticsearch.slowlog.routing`*::
++
+--
+type: keyword
+
+example: s01HZ2QBk9jw4gtgaFtn
+
+Routing
+
+--
+
+*`elasticsearch.slowlog.id`*::
++
+--
+type: keyword
+
+example: 
+
+Id
+
+--
+
+*`elasticsearch.slowlog.type`*::
++
+--
+type: keyword
+
+example: doc
+
+Type
+
+--
+
+[[exported-fields-haproxy]]
+== haproxy fields
+
+haproxy Module
+
+
+
+[float]
+== haproxy fields
+
+
+
+
+*`haproxy.process_name`*::
++
+--
+Name of the process
+
+--
+
+*`haproxy.pid`*::
++
+--
+type: long
+
+Process ID
+
+--
+
+*`haproxy.client_ip`*::
++
+--
+client_ip is the IP address of the client which initiated the TCP connection to haproxy.
+
+--
+
+*`haproxy.client_port`*::
++
+--
+type: long
+
+client_port is the TCP port of the client which initiated the connection.
+
+--
+
+*`haproxy.frontend_name`*::
++
+--
+frontend_name is the name of the frontend (or listener) which received and processed the connection.
+
+--
+
+*`haproxy.backend_name`*::
++
+--
+backend_name is the name of the backend (or listener) which was selected to manage the connection to the server.
+
+--
+
+*`haproxy.server_name`*::
++
+--
+server_name is the name of the last server to which the connection was sent.
+
+--
+
+*`haproxy.time_client_req`*::
++
+--
+type: long
+
+time_client_req is the total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+
+--
+
+*`haproxy.time_queue`*::
++
+--
+type: long
+
+time_queue is the total time in milliseconds spent waiting in the various queues.
+
+--
+
+*`haproxy.time_backend_connect`*::
++
+--
+type: long
+
+time_backend_connect is the total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
+
+--
+
+*`haproxy.time_server_response`*::
++
+--
+type: long
+
+time_server_response is the total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
+
+--
+
+*`haproxy.time_duration`*::
++
+--
+type: long
+
+time_duration is the time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+
+--
+
+*`haproxy.server_queue`*::
++
+--
+type: long
+
+server_queue is the total number of requests which were processed before this one in the server queue.
+
+--
+
+*`haproxy.backend_queue`*::
++
+--
+type: long
+
+backend_queue is the total number of requests which were processed before this one in the backend's global queue.
+
+--
+
+*`haproxy.bind_name`*::
++
+--
+bind_name is the name of the listening address which received the connection.
+
+--
+
+*`haproxy.error_message`*::
++
+--
+type: text
+
+error_message is the error message logged by HAProxy in case of error.
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the client_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`haproxy.geoip.continent_name`*::
++
+--
+type: keyword
+
+The name of the continent.
+
+
+--
+
+*`haproxy.geoip.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`haproxy.geoip.location`*::
++
+--
+type: geo_point
+
+The longitude and latitude.
+
+
+--
+
+*`haproxy.geoip.region_name`*::
++
+--
+type: keyword
+
+The region name.
+
+
+--
+
+*`haproxy.geoip.city_name`*::
++
+--
+type: keyword
+
+The city name.
+
+
+--
+
+*`haproxy.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+*`haproxy.termination_state`*::
++
+--
+termination_state is the condition the session was in when the session ended.
+
+--
+
+[float]
+== connections fields
+
+Contains various counts of connections active in the process.
+
+
+*`haproxy.connections.active`*::
++
+--
+type: long
+
+active is the total number of concurrent connections on the process when the session was logged.
+
+--
+
+*`haproxy.connections.frontend`*::
++
+--
+type: long
+
+frontend is the total number of concurrent connections on the frontend when the session was logged.
+
+--
+
+*`haproxy.connections.backend`*::
++
+--
+type: long
+
+backend is the total number of concurrent connections handled by the backend when the session was logged.
+
+--
+
+*`haproxy.connections.server`*::
++
+--
+type: long
+
+server is the total number of concurrent connections still active on the server when the session was logged.
+
+--
+
+*`haproxy.connections.retries`*::
++
+--
+type: long
+
+retries is the number of connection retries experienced by this session when trying to connect to the server.
+
+--
+
+[float]
+== http fields
+
+Please add description
+
+
+[float]
+== response fields
+
+Fields related to the HTTP response
+
+
+*`haproxy.http.response.status_code`*::
++
+--
+type: long
+
+status_code is the HTTP status code returned to the client.
+
+--
+
+*`haproxy.http.response.bytes_read`*::
++
+--
+type: long
+
+bytes_read is the total number of bytes transmitted to the client when the log is emitted.
+
+--
+
+*`haproxy.http.response.captured_cookie`*::
++
+--
+captured_cookie is an optional "name=value" entry indicating that the client had this cookie in the response.
+
+
+--
+
+*`haproxy.http.response.captured_headers`*::
++
+--
+type: text
+
+captured_response_headers is a list of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
+
+
+--
+
+[float]
+== request fields
+
+Fields related to the HTTP request
+
+
+*`haproxy.http.request.captured_cookie`*::
++
+--
+captured_cookie is an optional "name=value" entry indicating that the server has returned a cookie with its request.
+
+
+--
+
+*`haproxy.http.request.captured_headers`*::
++
+--
+type: text
+
+captured_request_headers is a list of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
+
+
+--
+
+*`haproxy.http.request.raw_request_line`*::
++
+--
+type: text
+
+raw_request_line is the complete HTTP request line, including the method, request and HTTP version string.
+
+--
+
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+*`host.os.kernel`*::
++
+--
+type: keyword
+
+The operating system's kernel version.
+
+
+--
 
 [[exported-fields-icinga]]
 == Icinga fields
@@ -667,29 +3609,35 @@ Contains fields for the Icinga debug logs.
 
 
 
-[float]
-=== `icinga.debug.facility`
-
+*`icinga.debug.facility`*::
++
+--
 type: keyword
 
 Specifies what component of Icinga logged the message.
 
 
-[float]
-=== `icinga.debug.severity`
+--
 
+*`icinga.debug.severity`*::
++
+--
 type: keyword
 
 Possible values are "debug", "notice", "information", "warning" or "critical".
 
 
-[float]
-=== `icinga.debug.message`
+--
 
+*`icinga.debug.message`*::
++
+--
 type: text
 
 The logged message.
 
+
+--
 
 [float]
 == main fields
@@ -698,29 +3646,35 @@ Contains fields for the Icinga main logs.
 
 
 
-[float]
-=== `icinga.main.facility`
-
+*`icinga.main.facility`*::
++
+--
 type: keyword
 
 Specifies what component of Icinga logged the message.
 
 
-[float]
-=== `icinga.main.severity`
+--
 
+*`icinga.main.severity`*::
++
+--
 type: keyword
 
 Possible values are "debug", "notice", "information", "warning" or "critical".
 
 
-[float]
-=== `icinga.main.message`
+--
 
+*`icinga.main.message`*::
++
+--
 type: text
 
 The logged message.
 
+
+--
 
 [float]
 == startup fields
@@ -729,29 +3683,35 @@ Contains fields for the Icinga startup logs.
 
 
 
-[float]
-=== `icinga.startup.facility`
-
+*`icinga.startup.facility`*::
++
+--
 type: keyword
 
 Specifies what component of Icinga logged the message.
 
 
-[float]
-=== `icinga.startup.severity`
+--
 
+*`icinga.startup.severity`*::
++
+--
 type: keyword
 
 Possible values are "debug", "notice", "information", "warning" or "critical".
 
 
-[float]
-=== `icinga.startup.message`
+--
 
+*`icinga.startup.message`*::
++
+--
 type: text
 
 The logged message.
 
+
+--
 
 [[exported-fields-iis]]
 == IIS fields
@@ -774,17 +3734,19 @@ Contains fields for IIS access logs.
 
 
 
-[float]
-=== `iis.access.server_ip`
-
+*`iis.access.server_ip`*::
++
+--
 type: keyword
 
 The server IP address.
 
 
-[float]
-=== `iis.access.method`
+--
 
+*`iis.access.method`*::
++
+--
 type: keyword
 
 example: GET
@@ -792,129 +3754,161 @@ example: GET
 The request HTTP method.
 
 
-[float]
-=== `iis.access.url`
+--
 
+*`iis.access.url`*::
++
+--
 type: keyword
 
 The request HTTP URL.
 
 
-[float]
-=== `iis.access.query_string`
+--
 
+*`iis.access.query_string`*::
++
+--
 type: keyword
 
 The request query string, if any.
 
 
-[float]
-=== `iis.access.port`
+--
 
+*`iis.access.port`*::
++
+--
 type: long
 
 The request port number.
 
 
-[float]
-=== `iis.access.user_name`
+--
 
+*`iis.access.user_name`*::
++
+--
 type: keyword
 
 The user name used when basic authentication is used.
 
 
-[float]
-=== `iis.access.remote_ip`
+--
 
+*`iis.access.remote_ip`*::
++
+--
 type: keyword
 
 The client IP address.
 
 
-[float]
-=== `iis.access.referrer`
+--
 
+*`iis.access.referrer`*::
++
+--
 type: keyword
 
 The HTTP referrer.
 
 
-[float]
-=== `iis.access.response_code`
+--
 
+*`iis.access.response_code`*::
++
+--
 type: long
 
 The HTTP response code.
 
 
-[float]
-=== `iis.access.sub_status`
+--
 
+*`iis.access.sub_status`*::
++
+--
 type: long
 
 The HTTP substatus code.
 
 
-[float]
-=== `iis.access.win32_status`
+--
 
+*`iis.access.win32_status`*::
++
+--
 type: long
 
 The Windows status code.
 
 
-[float]
-=== `iis.access.request_time_ms`
+--
 
+*`iis.access.request_time_ms`*::
++
+--
 type: long
 
 The request time in milliseconds.
 
 
-[float]
-=== `iis.access.site_name`
+--
 
+*`iis.access.site_name`*::
++
+--
 type: keyword
 
 The site name and instance number.
 
 
-[float]
-=== `iis.access.server_name`
+--
 
+*`iis.access.server_name`*::
++
+--
 type: keyword
 
 The name of the server on which the log file entry was generated.
 
 
-[float]
-=== `iis.access.http_version`
+--
 
+*`iis.access.http_version`*::
++
+--
 type: keyword
 
 The HTTP version.
 
 
-[float]
-=== `iis.access.cookie`
+--
 
+*`iis.access.cookie`*::
++
+--
 type: keyword
 
 The content of the cookie sent or received, if any.
 
 
-[float]
-=== `iis.access.hostname`
+--
 
+*`iis.access.hostname`*::
++
+--
 type: keyword
 
 The host header name, if any.
 
 
-[float]
-=== `iis.access.body_sent.bytes`
+--
 
+*`iis.access.body_sent.bytes`*::
++
+--
 type: long
 
 format: bytes
@@ -922,9 +3916,11 @@ format: bytes
 The number of bytes of the server response body.
 
 
-[float]
-=== `iis.access.body_received.bytes`
+--
 
+*`iis.access.body_received.bytes`*::
++
+--
 type: long
 
 format: bytes
@@ -932,13 +3928,17 @@ format: bytes
 The number of bytes of the server request body.
 
 
-[float]
-=== `iis.access.agent`
+--
 
+*`iis.access.agent`*::
++
+--
 type: text
 
 Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
 
+
+--
 
 [float]
 == user_agent fields
@@ -947,41 +3947,49 @@ Contains the parsed user agent field. Only present if the user agent Elasticsear
 
 
 
-[float]
-=== `iis.access.user_agent.device`
-
+*`iis.access.user_agent.device`*::
++
+--
 type: keyword
 
 The name of the physical device.
 
 
-[float]
-=== `iis.access.user_agent.major`
+--
 
+*`iis.access.user_agent.major`*::
++
+--
 type: long
 
 The major version of the user agent.
 
 
-[float]
-=== `iis.access.user_agent.minor`
+--
 
+*`iis.access.user_agent.minor`*::
++
+--
 type: long
 
 The minor version of the user agent.
 
 
-[float]
-=== `iis.access.user_agent.patch`
+--
 
+*`iis.access.user_agent.patch`*::
++
+--
 type: keyword
 
 The patch version of the user agent.
 
 
-[float]
-=== `iis.access.user_agent.name`
+--
 
+*`iis.access.user_agent.name`*::
++
+--
 type: keyword
 
 example: Chrome
@@ -989,37 +3997,59 @@ example: Chrome
 The name of the user agent.
 
 
-[float]
-=== `iis.access.user_agent.os`
+--
 
+*`iis.access.user_agent.os`*::
++
+--
 type: keyword
 
 The name of the operating system.
 
 
-[float]
-=== `iis.access.user_agent.os_major`
+--
 
+*`iis.access.user_agent.os_major`*::
++
+--
 type: long
 
 The major version of the operating system.
 
 
-[float]
-=== `iis.access.user_agent.os_minor`
+--
 
+*`iis.access.user_agent.os_minor`*::
++
+--
 type: long
 
 The minor version of the operating system.
 
 
-[float]
-=== `iis.access.user_agent.os_name`
+--
 
+*`iis.access.user_agent.os_name`*::
++
+--
 type: keyword
 
 The name of the operating system.
 
+
+--
+
+*`iis.access.user_agent.original`*::
++
+--
+type: text
+
+Original user agent value before parsing by ingest-user-agent plugin.
+
+
+Field is not indexed.
+
+--
 
 [float]
 == geoip fields
@@ -1028,45 +4058,65 @@ Contains GeoIP information gathered based on the remote_ip field. Only present i
 
 
 
-[float]
-=== `iis.access.geoip.continent_name`
-
+*`iis.access.geoip.continent_name`*::
++
+--
 type: keyword
 
 The name of the continent.
 
 
-[float]
-=== `iis.access.geoip.country_iso_code`
+--
 
+*`iis.access.geoip.country_iso_code`*::
++
+--
 type: keyword
 
 Country ISO code.
 
 
-[float]
-=== `iis.access.geoip.location`
+--
 
+*`iis.access.geoip.location`*::
++
+--
 type: geo_point
 
 The longitude and latitude.
 
 
-[float]
-=== `iis.access.geoip.region_name`
+--
 
+*`iis.access.geoip.region_name`*::
++
+--
 type: keyword
 
 The region name.
 
 
-[float]
-=== `iis.access.geoip.city_name`
+--
 
+*`iis.access.geoip.city_name`*::
++
+--
 type: keyword
 
 The city name.
 
+
+--
+
+*`iis.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
 
 [float]
 == error fields
@@ -1075,49 +4125,59 @@ Contains fields for IIS error logs.
 
 
 
-[float]
-=== `iis.error.remote_ip`
-
+*`iis.error.remote_ip`*::
++
+--
 type: keyword
 
 The client IP address.
 
 
-[float]
-=== `iis.error.remote_port`
+--
 
+*`iis.error.remote_port`*::
++
+--
 type: long
 
 The client port number.
 
 
-[float]
-=== `iis.error.server_ip`
+--
 
+*`iis.error.server_ip`*::
++
+--
 type: keyword
 
 The server IP address.
 
 
-[float]
-=== `iis.error.server_port`
+--
 
+*`iis.error.server_port`*::
++
+--
 type: long
 
 The server port number.
 
 
-[float]
-=== `iis.error.http_version`
+--
 
+*`iis.error.http_version`*::
++
+--
 type: keyword
 
 The HTTP version.
 
 
-[float]
-=== `iis.error.method`
+--
 
+*`iis.error.method`*::
++
+--
 type: keyword
 
 example: GET
@@ -1125,37 +4185,47 @@ example: GET
 The request HTTP method.
 
 
-[float]
-=== `iis.error.url`
+--
 
+*`iis.error.url`*::
++
+--
 type: keyword
 
 The request HTTP URL.
 
 
-[float]
-=== `iis.error.response_code`
+--
 
+*`iis.error.response_code`*::
++
+--
 type: long
 
 The HTTP response code.
 
 
-[float]
-=== `iis.error.reason_phrase`
+--
 
+*`iis.error.reason_phrase`*::
++
+--
 type: keyword
 
 The HTTP reason phrase.
 
 
-[float]
-=== `iis.error.queue_name`
+--
 
+*`iis.error.queue_name`*::
++
+--
 type: keyword
 
 The IIS application pool name.
 
+
+--
 
 [float]
 == geoip fields
@@ -1164,45 +4234,65 @@ Contains GeoIP information gathered based on the remote_ip field. Only present i
 
 
 
-[float]
-=== `iis.error.geoip.continent_name`
-
+*`iis.error.geoip.continent_name`*::
++
+--
 type: keyword
 
 The name of the continent.
 
 
-[float]
-=== `iis.error.geoip.country_iso_code`
+--
 
+*`iis.error.geoip.country_iso_code`*::
++
+--
 type: keyword
 
 Country ISO code.
 
 
-[float]
-=== `iis.error.geoip.location`
+--
 
+*`iis.error.geoip.location`*::
++
+--
 type: geo_point
 
 The longitude and latitude.
 
 
-[float]
-=== `iis.error.geoip.region_name`
+--
 
+*`iis.error.geoip.region_name`*::
++
+--
 type: keyword
 
 The region name.
 
 
-[float]
-=== `iis.error.geoip.city_name`
+--
 
+*`iis.error.geoip.city_name`*::
++
+--
 type: keyword
 
 The city name.
 
+
+--
+
+*`iis.error.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
 
 [[exported-fields-kafka]]
 == Kafka fields
@@ -1224,43 +4314,53 @@ Kafka log lines.
 
 
 
-[float]
-=== `kafka.log.timestamp`
-
+*`kafka.log.timestamp`*::
++
+--
 The timestamp from the log line.
 
 
-[float]
-=== `kafka.log.level`
+--
 
+*`kafka.log.level`*::
++
+--
 example: WARN
 
 The log level.
 
 
-[float]
-=== `kafka.log.message`
+--
 
+*`kafka.log.message`*::
++
+--
 type: text
 
 The logged message.
 
 
-[float]
-=== `kafka.log.component`
+--
 
+*`kafka.log.component`*::
++
+--
 type: keyword
 
 Component the log is coming from.
 
 
-[float]
-=== `kafka.log.class`
+--
 
+*`kafka.log.class`*::
++
+--
 type: text
 
 Java class the log is coming from.
 
+
+--
 
 [float]
 == trace fields
@@ -1269,29 +4369,82 @@ Trace in the log line.
 
 
 
-[float]
-=== `kafka.log.trace.class`
-
+*`kafka.log.trace.class`*::
++
+--
 type: keyword
 
 Java class the trace is coming from.
 
 
-[float]
-=== `kafka.log.trace.message`
+--
 
+*`kafka.log.trace.message`*::
++
+--
 type: text
 
 Message part of the trace.
 
 
-[float]
-=== `kafka.log.trace.full`
+--
 
+*`kafka.log.trace.full`*::
++
+--
 type: text
 
 The full trace in the log line.
 
+
+--
+
+[[exported-fields-kibana]]
+== kibana fields
+
+kibana Module
+
+
+
+[float]
+== kibana fields
+
+
+
+
+[float]
+== log fields
+
+Kafka log lines.
+
+
+
+*`kibana.log.tags`*::
++
+--
+type: keyword
+
+Kibana logging tags.
+
+
+--
+
+*`kibana.log.state`*::
++
+--
+type: keyword
+
+Current state of Kibana.
+
+
+--
+
+*`kibana.log.meta`*::
++
+--
+type: object
+
+--
 
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
@@ -1301,61 +4454,85 @@ Kubernetes metadata added by the kubernetes processor
 
 
 
-[float]
-=== `kubernetes.pod.name`
-
+*`kubernetes.pod.name`*::
++
+--
 type: keyword
 
 Kubernetes pod name
 
 
-[float]
-=== `kubernetes.namespace`
+--
 
+*`kubernetes.pod.uid`*::
++
+--
+type: keyword
+
+Kubernetes Pod UID
+
+
+--
+
+*`kubernetes.namespace`*::
++
+--
 type: keyword
 
 Kubernetes namespace
 
 
-[float]
-=== `kubernetes.node.name`
+--
 
+*`kubernetes.node.name`*::
++
+--
 type: keyword
 
 Kubernetes node name
 
 
-[float]
-=== `kubernetes.labels`
+--
 
+*`kubernetes.labels`*::
++
+--
 type: object
 
 Kubernetes labels map
 
 
-[float]
-=== `kubernetes.annotations`
+--
 
+*`kubernetes.annotations`*::
++
+--
 type: object
 
 Kubernetes annotations map
 
 
-[float]
-=== `kubernetes.container.name`
+--
 
+*`kubernetes.container.name`*::
++
+--
 type: keyword
 
 Kubernetes container name
 
 
-[float]
-=== `kubernetes.container.image`
+--
 
+*`kubernetes.container.image`*::
++
+--
 type: keyword
 
 Kubernetes container image
 
+
+--
 
 [[exported-fields-log]]
 == Log file content fields
@@ -1364,9 +4541,9 @@ Contains log file lines.
 
 
 
-[float]
-=== `source`
-
+*`source`*::
++
+--
 type: keyword
 
 required: True
@@ -1374,9 +4551,11 @@ required: True
 The file from which the line was read. This field contains the absolute path to the file. For example: `/var/log/system.log`.
 
 
-[float]
-=== `offset`
+--
 
+*`offset`*::
++
+--
 type: long
 
 required: False
@@ -1384,9 +4563,11 @@ required: False
 The file offset the reported line starts at.
 
 
-[float]
-=== `message`
+--
 
+*`message`*::
++
+--
 type: text
 
 required: True
@@ -1394,9 +4575,11 @@ required: True
 The content of the line read from the log file.
 
 
-[float]
-=== `stream`
+--
 
+*`stream`*::
++
+--
 type: keyword
 
 required: False
@@ -1404,39 +4587,142 @@ required: False
 Log stream when reading container logs, can be 'stdout' or 'stderr'
 
 
-[float]
-=== `prospector.type`
+--
+
+*`prospector.type`*::
++
+--
+
+deprecated[6.3]
 
 required: True
 
 The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `input.type`)
 
 
-[float]
-=== `input.type`
+--
 
+*`input.type`*::
++
+--
 required: True
 
 The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file.
 
 
-[float]
-=== `read_timestamp`
+--
 
+*`read_timestamp`*::
++
+--
 In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
 
 
-[float]
-=== `fileset.module`
+--
 
+*`fileset.module`*::
++
+--
 The Filebeat module that generated this event.
 
 
-[float]
-=== `fileset.name`
+--
 
+*`fileset.name`*::
++
+--
 The Filebeat fileset that generated this event.
 
+
+--
+
+*`syslog.facility`*::
++
+--
+type: long
+
+required: False
+
+The facility extracted from the priority.
+
+
+--
+
+*`syslog.priority`*::
++
+--
+type: long
+
+required: False
+
+The priority of the syslog event.
+
+
+--
+
+*`syslog.severity_label`*::
++
+--
+type: keyword
+
+required: False
+
+The human readable severity.
+
+
+--
+
+*`syslog.facility_label`*::
++
+--
+type: keyword
+
+required: False
+
+The human readable facility.
+
+
+--
+
+*`process.program`*::
++
+--
+type: keyword
+
+required: False
+
+The name of the program.
+
+
+--
+
+*`log.flags`*::
++
+--
+This field contains the flags of the event.
+
+
+--
+
+*`http.response.elapsed_time`*::
++
+--
+type: long
+
+Elapsed time between request and response in milli seconds.
+
+
+--
+
+*`http.response.content_length`*::
++
+--
+type: long
+
+Content length of the HTTP response body.
+
+
+--
 
 [[exported-fields-logstash]]
 == logstash fields
@@ -1458,45 +4744,55 @@ Fields from the Logstash logs.
 
 
 
-[float]
-=== `logstash.log.message`
-
+*`logstash.log.message`*::
++
+--
 type: text
 
 Contains the un-parsed log message
 
 
-[float]
-=== `logstash.log.level`
+--
 
+*`logstash.log.level`*::
++
+--
 type: keyword
 
 The log level of the message, this correspond to Log4j levels.
 
 
-[float]
-=== `logstash.log.module`
+--
 
+*`logstash.log.module`*::
++
+--
 type: keyword
 
 The module or class where the event originate.
 
 
-[float]
-=== `logstash.log.thread`
+--
 
+*`logstash.log.thread`*::
++
+--
 type: text
 
 Information about the running thread where the log originate.
 
 
-[float]
-=== `logstash.log.log_event`
+--
 
+*`logstash.log.log_event`*::
++
+--
 type: object
 
 key and value debugging information.
 
+
+--
 
 [float]
 == slowlog fields
@@ -1505,93 +4801,182 @@ slowlog
 
 
 
-[float]
-=== `logstash.slowlog.message`
-
+*`logstash.slowlog.message`*::
++
+--
 type: text
 
 Contains the un-parsed log message
 
 
-[float]
-=== `logstash.slowlog.level`
+--
 
+*`logstash.slowlog.level`*::
++
+--
 type: keyword
 
 The log level of the message, this correspond to Log4j levels.
 
 
-[float]
-=== `logstash.slowlog.module`
+--
 
+*`logstash.slowlog.module`*::
++
+--
 type: keyword
 
 The module or class where the event originate.
 
 
-[float]
-=== `logstash.slowlog.thread`
+--
 
+*`logstash.slowlog.thread`*::
++
+--
 type: text
 
 Information about the running thread where the log originate.
 
 
-[float]
-=== `logstash.slowlog.event`
+--
 
+*`logstash.slowlog.event`*::
++
+--
 type: text
 
 Raw dump of the original event
 
 
-[float]
-=== `logstash.slowlog.plugin_name`
+--
 
+*`logstash.slowlog.plugin_name`*::
++
+--
 type: keyword
 
 Name of the plugin
 
 
-[float]
-=== `logstash.slowlog.plugin_type`
+--
 
+*`logstash.slowlog.plugin_type`*::
++
+--
 type: keyword
 
 Type of the plugin: Inputs, Filters, Outputs or Codecs.
 
 
-[float]
-=== `logstash.slowlog.took_in_millis`
+--
 
+*`logstash.slowlog.took_in_millis`*::
++
+--
 type: long
 
 Execution time for the plugin in milliseconds.
 
 
-[float]
-=== `logstash.slowlog.took_in_nanos`
+--
 
+*`logstash.slowlog.took_in_nanos`*::
++
+--
 type: long
 
 Execution time for the plugin in nanoseconds.
 
 
-[float]
-=== `logstash.slowlog.plugin_params`
+--
 
+*`logstash.slowlog.plugin_params`*::
++
+--
 type: text
 
 String value of the plugin configuration
 
 
-[float]
-=== `logstash.slowlog.plugin_params_object`
+--
 
+*`logstash.slowlog.plugin_params_object`*::
++
+--
 type: object
 
 key -> value of the configuration used by the plugin.
 
+
+--
+
+[[exported-fields-mongodb]]
+== mongodb fields
+
+Module for parsing MongoDB log files.
+
+
+
+[float]
+== mongodb fields
+
+Fields from MongoDB logs.
+
+
+
+[float]
+== log fields
+
+Contains fields from MongoDB logs.
+
+
+
+*`mongodb.log.severity`*::
++
+--
+type: keyword
+
+example: I
+
+Severity level of message
+
+
+--
+
+*`mongodb.log.component`*::
++
+--
+type: keyword
+
+example: COMMAND
+
+Functional categorization of message
+
+
+--
+
+*`mongodb.log.context`*::
++
+--
+type: keyword
+
+example: initandlisten
+
+Context of message
+
+
+--
+
+*`mongodb.log.message`*::
++
+--
+type: text
+
+The message in the log line.
+
+
+--
 
 [[exported-fields-mysql]]
 == MySQL fields
@@ -1614,34 +4999,42 @@ Contains fields from the MySQL error logs.
 
 
 
-[float]
-=== `mysql.error.timestamp`
-
+*`mysql.error.timestamp`*::
++
+--
 The timestamp from the log line.
 
 
-[float]
-=== `mysql.error.thread_id`
+--
 
+*`mysql.error.thread_id`*::
++
+--
 type: long
 
 As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this field contains the process id.
 
 
-[float]
-=== `mysql.error.level`
+--
 
+*`mysql.error.level`*::
++
+--
 example: Warning
 
 The log level.
 
-[float]
-=== `mysql.error.message`
+--
 
+*`mysql.error.message`*::
++
+--
 type: text
 
 The logged message.
 
+
+--
 
 [float]
 == slowlog fields
@@ -1650,77 +5043,97 @@ Contains fields from the MySQL slow logs.
 
 
 
-[float]
-=== `mysql.slowlog.user`
-
+*`mysql.slowlog.user`*::
++
+--
 The MySQL user that created the query.
 
 
-[float]
-=== `mysql.slowlog.host`
+--
 
+*`mysql.slowlog.host`*::
++
+--
 The host from where the user that created the query logged in.
 
 
-[float]
-=== `mysql.slowlog.ip`
+--
 
+*`mysql.slowlog.ip`*::
++
+--
 The IP address from where the user that created the query logged in.
 
 
-[float]
-=== `mysql.slowlog.query_time.sec`
+--
 
+*`mysql.slowlog.query_time.sec`*::
++
+--
 type: float
 
 The total time the query took, in seconds, as a floating point number.
 
 
-[float]
-=== `mysql.slowlog.lock_time.sec`
+--
 
+*`mysql.slowlog.lock_time.sec`*::
++
+--
 type: float
 
 The amount of time the query waited for the lock to be available. The value is in seconds, as a floating point number.
 
 
-[float]
-=== `mysql.slowlog.rows_sent`
+--
 
+*`mysql.slowlog.rows_sent`*::
++
+--
 type: long
 
 The number of rows returned by the query.
 
 
-[float]
-=== `mysql.slowlog.rows_examined`
+--
 
+*`mysql.slowlog.rows_examined`*::
++
+--
 type: long
 
 The number of rows scanned by the query.
 
 
-[float]
-=== `mysql.slowlog.timestamp`
+--
 
+*`mysql.slowlog.timestamp`*::
++
+--
 type: long
 
 The unix timestamp taken from the `SET timestamp` query.
 
 
-[float]
-=== `mysql.slowlog.query`
+--
 
+*`mysql.slowlog.query`*::
++
+--
 The slow query.
 
 
-[float]
-=== `mysql.slowlog.id`
+--
 
+*`mysql.slowlog.id`*::
++
+--
 type: long
 
 The connection ID for the query.
 
+
+--
 
 [[exported-fields-nginx]]
 == Nginx fields
@@ -1743,33 +5156,39 @@ Contains fields for the Nginx access logs.
 
 
 
-[float]
-=== `nginx.access.remote_ip_list`
-
+*`nginx.access.remote_ip_list`*::
++
+--
 type: array
 
 An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.
 
 
-[float]
-=== `nginx.access.remote_ip`
+--
 
+*`nginx.access.remote_ip`*::
++
+--
 type: keyword
 
 Client IP address. The first public IP address from the `remote_ip_list` array. If no public IP addresses are present, this field contains the first private IP address from the `remote_ip_list` array.
 
 
-[float]
-=== `nginx.access.user_name`
+--
 
+*`nginx.access.user_name`*::
++
+--
 type: keyword
 
 The user name used when basic authentication is used.
 
 
-[float]
-=== `nginx.access.method`
+--
 
+*`nginx.access.method`*::
++
+--
 type: keyword
 
 example: GET
@@ -1777,33 +5196,41 @@ example: GET
 The request HTTP method.
 
 
-[float]
-=== `nginx.access.url`
+--
 
+*`nginx.access.url`*::
++
+--
 type: keyword
 
 The request HTTP URL.
 
 
-[float]
-=== `nginx.access.http_version`
+--
 
+*`nginx.access.http_version`*::
++
+--
 type: keyword
 
 The HTTP version.
 
 
-[float]
-=== `nginx.access.response_code`
+--
 
+*`nginx.access.response_code`*::
++
+--
 type: long
 
 The HTTP response code.
 
 
-[float]
-=== `nginx.access.body_sent.bytes`
+--
 
+*`nginx.access.body_sent.bytes`*::
++
+--
 type: long
 
 format: bytes
@@ -1811,21 +5238,27 @@ format: bytes
 The number of bytes of the server response body.
 
 
-[float]
-=== `nginx.access.referrer`
+--
 
+*`nginx.access.referrer`*::
++
+--
 type: keyword
 
 The HTTP referrer.
 
 
-[float]
-=== `nginx.access.agent`
+--
 
+*`nginx.access.agent`*::
++
+--
 type: text
 
 Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
 
+
+--
 
 [float]
 == user_agent fields
@@ -1834,41 +5267,49 @@ Contains the parsed User agent field. Only present if the user agent Elasticsear
 
 
 
-[float]
-=== `nginx.access.user_agent.device`
-
+*`nginx.access.user_agent.device`*::
++
+--
 type: keyword
 
 The name of the physical device.
 
 
-[float]
-=== `nginx.access.user_agent.major`
+--
 
+*`nginx.access.user_agent.major`*::
++
+--
 type: long
 
 The major version of the user agent.
 
 
-[float]
-=== `nginx.access.user_agent.minor`
+--
 
+*`nginx.access.user_agent.minor`*::
++
+--
 type: long
 
 The minor version of the user agent.
 
 
-[float]
-=== `nginx.access.user_agent.patch`
+--
 
+*`nginx.access.user_agent.patch`*::
++
+--
 type: keyword
 
 The patch version of the user agent.
 
 
-[float]
-=== `nginx.access.user_agent.name`
+--
 
+*`nginx.access.user_agent.name`*::
++
+--
 type: keyword
 
 example: Chrome
@@ -1876,37 +5317,59 @@ example: Chrome
 The name of the user agent.
 
 
-[float]
-=== `nginx.access.user_agent.os`
+--
 
+*`nginx.access.user_agent.os`*::
++
+--
 type: keyword
 
 The name of the operating system.
 
 
-[float]
-=== `nginx.access.user_agent.os_major`
+--
 
+*`nginx.access.user_agent.os_major`*::
++
+--
 type: long
 
 The major version of the operating system.
 
 
-[float]
-=== `nginx.access.user_agent.os_minor`
+--
 
+*`nginx.access.user_agent.os_minor`*::
++
+--
 type: long
 
 The minor version of the operating system.
 
 
-[float]
-=== `nginx.access.user_agent.os_name`
+--
 
+*`nginx.access.user_agent.os_name`*::
++
+--
 type: keyword
 
 The name of the operating system.
 
+
+--
+
+*`nginx.access.user_agent.original`*::
++
+--
+type: text
+
+Original user agent value before parsing by ingest-user-agent plugin.
+
+
+Field is not indexed.
+
+--
 
 [float]
 == geoip fields
@@ -1915,45 +5378,65 @@ Contains GeoIP information gathered based on the remote_ip field. Only present i
 
 
 
-[float]
-=== `nginx.access.geoip.continent_name`
-
+*`nginx.access.geoip.continent_name`*::
++
+--
 type: keyword
 
 The name of the continent.
 
 
-[float]
-=== `nginx.access.geoip.country_iso_code`
+--
 
+*`nginx.access.geoip.country_iso_code`*::
++
+--
 type: keyword
 
 Country ISO code.
 
 
-[float]
-=== `nginx.access.geoip.location`
+--
 
+*`nginx.access.geoip.location`*::
++
+--
 type: geo_point
 
 The longitude and latitude.
 
 
-[float]
-=== `nginx.access.geoip.region_name`
+--
 
+*`nginx.access.geoip.region_name`*::
++
+--
 type: keyword
 
 The region name.
 
 
-[float]
-=== `nginx.access.geoip.city_name`
+--
 
+*`nginx.access.geoip.city_name`*::
++
+--
 type: keyword
 
 The city name.
 
+
+--
+
+*`nginx.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
 
 [float]
 == error fields
@@ -1962,45 +5445,55 @@ Contains fields for the Nginx error logs.
 
 
 
-[float]
-=== `nginx.error.level`
-
+*`nginx.error.level`*::
++
+--
 type: keyword
 
 Error level (e.g. error, critical).
 
 
-[float]
-=== `nginx.error.pid`
+--
 
+*`nginx.error.pid`*::
++
+--
 type: long
 
 Process identifier (PID).
 
 
-[float]
-=== `nginx.error.tid`
+--
 
+*`nginx.error.tid`*::
++
+--
 type: long
 
 Thread identifier.
 
 
-[float]
-=== `nginx.error.connection_id`
+--
 
+*`nginx.error.connection_id`*::
++
+--
 type: long
 
 Connection identifier.
 
 
-[float]
-=== `nginx.error.message`
+--
 
+*`nginx.error.message`*::
++
+--
 type: text
 
 The error message
 
+
+--
 
 [[exported-fields-osquery]]
 == Osquery fields
@@ -2022,43 +5515,53 @@ Common fields exported by the result metricset.
 
 
 
-[float]
-=== `osquery.result.name`
-
+*`osquery.result.name`*::
++
+--
 type: keyword
 
 The name of the query that generated this event.
 
 
-[float]
-=== `osquery.result.action`
+--
 
+*`osquery.result.action`*::
++
+--
 type: keyword
 
 For incremental data, marks whether the entry was added or removed. It can be one of "added", "removed", or "snapshot".
 
 
-[float]
-=== `osquery.result.host_identifier`
+--
 
+*`osquery.result.host_identifier`*::
++
+--
 type: keyword
 
 The identifier for the host on which the osquery agent is running. Normally the hostname.
 
 
-[float]
-=== `osquery.result.unix_time`
+--
 
+*`osquery.result.unix_time`*::
++
+--
 type: long
 
 Unix timestamp of the event, in seconds since the epoch. Used for computing the `@timestamp` column.
 
 
-[float]
-=== `osquery.result.calendar_time`
+--
 
+*`osquery.result.calendar_time`*::
++
+--
 String representation of the collection time, as formatted by osquery.
 
+
+--
 
 [[exported-fields-postgresql]]
 == PostgreSQL fields
@@ -2081,70 +5584,88 @@ Fields from the PostgreSQL log files.
 
 
 
-[float]
-=== `postgresql.log.timestamp`
-
+*`postgresql.log.timestamp`*::
++
+--
 The timestamp from the log line.
 
 
-[float]
-=== `postgresql.log.timezone`
+--
 
+*`postgresql.log.timezone`*::
++
+--
 The timezone of timestamp.
 
 
-[float]
-=== `postgresql.log.thread_id`
+--
 
+*`postgresql.log.thread_id`*::
++
+--
 type: long
 
 Process id
 
 
-[float]
-=== `postgresql.log.user`
+--
 
+*`postgresql.log.user`*::
++
+--
 example: admin
 
 Name of user
 
-[float]
-=== `postgresql.log.database`
+--
 
+*`postgresql.log.database`*::
++
+--
 example: mydb
 
 Name of database
 
-[float]
-=== `postgresql.log.level`
+--
 
+*`postgresql.log.level`*::
++
+--
 example: FATAL
 
 The log level.
 
-[float]
-=== `postgresql.log.duration`
+--
 
+*`postgresql.log.duration`*::
++
+--
 type: float
 
 example: 30.0
 
 Duration of a query.
 
-[float]
-=== `postgresql.log.query`
+--
 
+*`postgresql.log.query`*::
++
+--
 example: SELECT * FROM users;
 
 Query statement.
 
-[float]
-=== `postgresql.log.message`
+--
 
+*`postgresql.log.message`*::
++
+--
 type: text
 
 The logged message.
 
+
+--
 
 [[exported-fields-redis]]
 == Redis fields
@@ -2166,37 +5687,45 @@ Redis log files
 
 
 
-[float]
-=== `redis.log.pid`
-
+*`redis.log.pid`*::
++
+--
 type: long
 
 The process ID of the Redis server.
 
 
-[float]
-=== `redis.log.role`
+--
 
+*`redis.log.role`*::
++
+--
 type: keyword
 
 The role of the Redis instance. Can be one of `master`, `slave`, `child` (for RDF/AOF writing child), or `sentinel`.
 
 
-[float]
-=== `redis.log.level`
+--
 
+*`redis.log.level`*::
++
+--
 type: keyword
 
 The log level. Can be one of `debug`, `verbose`, `notice`, or `warning`.
 
 
-[float]
-=== `redis.log.message`
+--
 
+*`redis.log.message`*::
++
+--
 type: text
 
 The log message
 
+
+--
 
 [float]
 == slowlog fields
@@ -2205,45 +5734,55 @@ Slow logs are retrieved from Redis via a network connection.
 
 
 
-[float]
-=== `redis.slowlog.cmd`
-
+*`redis.slowlog.cmd`*::
++
+--
 type: keyword
 
 The command executed.
 
 
-[float]
-=== `redis.slowlog.duration.us`
+--
 
+*`redis.slowlog.duration.us`*::
++
+--
 type: long
 
 How long it took to execute the command in microseconds.
 
 
-[float]
-=== `redis.slowlog.id`
+--
 
+*`redis.slowlog.id`*::
++
+--
 type: long
 
 The ID of the query.
 
 
-[float]
-=== `redis.slowlog.key`
+--
 
+*`redis.slowlog.key`*::
++
+--
 type: keyword
 
 The key on which the command was executed.
 
 
-[float]
-=== `redis.slowlog.args`
+--
 
+*`redis.slowlog.args`*::
++
+--
 type: keyword
 
 The arguments with which the command was called.
 
+
+--
 
 [[exported-fields-system]]
 == System fields
@@ -2266,43 +5805,57 @@ Fields from the Linux authorization logs.
 
 
 
-[float]
-=== `system.auth.timestamp`
-
+*`system.auth.timestamp`*::
++
+--
 The timestamp as read from the auth message.
 
 
-[float]
-=== `system.auth.hostname`
+--
 
+*`system.auth.hostname`*::
++
+--
 The hostname as read from the auth message.
 
 
-[float]
-=== `system.auth.program`
+--
 
+*`system.auth.program`*::
++
+--
 The process name as read from the auth message.
 
 
-[float]
-=== `system.auth.pid`
+--
 
+*`system.auth.pid`*::
++
+--
 type: long
 
 The PID of the process that sent the auth message.
 
 
-[float]
-=== `system.auth.message`
+--
+
+*`system.auth.message`*::
++
+--
+type: text
 
 The message in the log line.
 
 
-[float]
-=== `system.auth.user`
+--
 
+*`system.auth.user`*::
++
+--
 The Unix user that this event refers to.
 
+
+--
 
 [float]
 == ssh fields
@@ -2311,47 +5864,59 @@ Fields specific to SSH login events.
 
 
 
-[float]
-=== `system.auth.ssh.event`
-
+*`system.auth.ssh.event`*::
++
+--
 The SSH login event. Can be one of "Accepted", "Failed", or "Invalid". "Accepted" means a successful login. "Invalid" means that the user is not configured on the system. "Failed" means that the SSH login attempt has failed.
 
 
-[float]
-=== `system.auth.ssh.method`
+--
 
+*`system.auth.ssh.method`*::
++
+--
 The SSH authentication method. Can be one of "password" or "publickey".
 
 
-[float]
-=== `system.auth.ssh.ip`
+--
 
+*`system.auth.ssh.ip`*::
++
+--
 type: ip
 
 The client IP from where the login attempt was made.
 
 
-[float]
-=== `system.auth.ssh.dropped_ip`
+--
 
+*`system.auth.ssh.dropped_ip`*::
++
+--
 type: ip
 
 The client IP from SSH connections that are open and immediately dropped.
 
 
-[float]
-=== `system.auth.ssh.port`
+--
 
+*`system.auth.ssh.port`*::
++
+--
 type: long
 
 The client port from where the login attempt was made.
 
 
-[float]
-=== `system.auth.ssh.signature`
+--
 
+*`system.auth.ssh.signature`*::
++
+--
 The signature of the client public key.
 
+
+--
 
 [float]
 == geoip fields
@@ -2360,45 +5925,65 @@ Contains GeoIP information gathered based on the `system.auth.ip` field. Only pr
 
 
 
-[float]
-=== `system.auth.ssh.geoip.continent_name`
-
+*`system.auth.ssh.geoip.continent_name`*::
++
+--
 type: keyword
 
 The name of the continent.
 
 
-[float]
-=== `system.auth.ssh.geoip.city_name`
+--
 
+*`system.auth.ssh.geoip.city_name`*::
++
+--
 type: keyword
 
 The name of the city.
 
 
-[float]
-=== `system.auth.ssh.geoip.region_name`
+--
 
+*`system.auth.ssh.geoip.region_name`*::
++
+--
 type: keyword
 
 The name of the region.
 
 
-[float]
-=== `system.auth.ssh.geoip.country_iso_code`
+--
 
+*`system.auth.ssh.geoip.country_iso_code`*::
++
+--
 type: keyword
 
 Country ISO code.
 
 
-[float]
-=== `system.auth.ssh.geoip.location`
+--
 
+*`system.auth.ssh.geoip.location`*::
++
+--
 type: geo_point
 
 The longitude and latitude.
 
+
+--
+
+*`system.auth.ssh.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
 
 [float]
 == sudo fields
@@ -2407,39 +5992,49 @@ Fields specific to events created by the `sudo` command.
 
 
 
-[float]
-=== `system.auth.sudo.error`
-
+*`system.auth.sudo.error`*::
++
+--
 example: user NOT in sudoers
 
 The error message in case the sudo command failed.
 
 
-[float]
-=== `system.auth.sudo.tty`
+--
 
+*`system.auth.sudo.tty`*::
++
+--
 The TTY where the sudo command is executed.
 
 
-[float]
-=== `system.auth.sudo.pwd`
+--
 
+*`system.auth.sudo.pwd`*::
++
+--
 The current directory where the sudo command is executed.
 
 
-[float]
-=== `system.auth.sudo.user`
+--
 
+*`system.auth.sudo.user`*::
++
+--
 example: root
 
 The target user to which the sudo command is switching.
 
 
-[float]
-=== `system.auth.sudo.command`
+--
 
+*`system.auth.sudo.command`*::
++
+--
 The command executed via sudo.
 
+
+--
 
 [float]
 == useradd fields
@@ -2448,35 +6043,45 @@ Fields specific to events created by the `useradd` command.
 
 
 
-[float]
-=== `system.auth.useradd.name`
-
+*`system.auth.useradd.name`*::
++
+--
 The user name being added.
 
 
-[float]
-=== `system.auth.useradd.uid`
+--
 
+*`system.auth.useradd.uid`*::
++
+--
 type: long
 
 The user ID.
 
-[float]
-=== `system.auth.useradd.gid`
+--
 
+*`system.auth.useradd.gid`*::
++
+--
 type: long
 
 The group ID.
 
-[float]
-=== `system.auth.useradd.home`
+--
 
+*`system.auth.useradd.home`*::
++
+--
 The home folder for the new user.
 
-[float]
-=== `system.auth.useradd.shell`
+--
 
+*`system.auth.useradd.shell`*::
++
+--
 The default shell for the new user.
+
+--
 
 [float]
 == groupadd fields
@@ -2485,19 +6090,23 @@ Fields specific to events created by the `groupadd` command.
 
 
 
-[float]
-=== `system.auth.groupadd.name`
-
+*`system.auth.groupadd.name`*::
++
+--
 The name of the new group.
 
 
-[float]
-=== `system.auth.groupadd.gid`
+--
 
+*`system.auth.groupadd.gid`*::
++
+--
 type: long
 
 The ID of the new group.
 
+
+--
 
 [float]
 == syslog fields
@@ -2506,35 +6115,47 @@ Contains fields from the syslog system logs.
 
 
 
-[float]
-=== `system.syslog.timestamp`
-
+*`system.syslog.timestamp`*::
++
+--
 The timestamp as read from the syslog message.
 
 
-[float]
-=== `system.syslog.hostname`
+--
 
+*`system.syslog.hostname`*::
++
+--
 The hostname as read from the syslog message.
 
 
-[float]
-=== `system.syslog.program`
+--
 
+*`system.syslog.program`*::
++
+--
 The process name as read from the syslog message.
 
 
-[float]
-=== `system.syslog.pid`
+--
 
+*`system.syslog.pid`*::
++
+--
 The PID of the process that sent the syslog message.
 
 
-[float]
-=== `system.syslog.message`
+--
+
+*`system.syslog.message`*::
++
+--
+type: text
 
 The message in the log line.
 
+
+--
 
 [[exported-fields-traefik]]
 == Traefik fields
@@ -2557,25 +6178,29 @@ Contains fields for the Traefik access logs.
 
 
 
-[float]
-=== `traefik.access.remote_ip`
-
+*`traefik.access.remote_ip`*::
++
+--
 type: keyword
 
 Client IP address.
 
 
-[float]
-=== `traefik.access.user_name`
+--
 
+*`traefik.access.user_name`*::
++
+--
 type: keyword
 
 The user name used when basic authentication is used.
 
 
-[float]
-=== `traefik.access.method`
+--
 
+*`traefik.access.method`*::
++
+--
 type: keyword
 
 example: GET
@@ -2583,33 +6208,41 @@ example: GET
 The request HTTP method.
 
 
-[float]
-=== `traefik.access.url`
+--
 
+*`traefik.access.url`*::
++
+--
 type: keyword
 
 The request HTTP URL.
 
 
-[float]
-=== `traefik.access.http_version`
+--
 
+*`traefik.access.http_version`*::
++
+--
 type: keyword
 
 The HTTP version.
 
 
-[float]
-=== `traefik.access.response_code`
+--
 
+*`traefik.access.response_code`*::
++
+--
 type: long
 
 The HTTP response code.
 
 
-[float]
-=== `traefik.access.body_sent.bytes`
+--
 
+*`traefik.access.body_sent.bytes`*::
++
+--
 type: long
 
 format: bytes
@@ -2617,21 +6250,27 @@ format: bytes
 The number of bytes of the server response body.
 
 
-[float]
-=== `traefik.access.referrer`
+--
 
+*`traefik.access.referrer`*::
++
+--
 type: keyword
 
 The HTTP referrer.
 
 
-[float]
-=== `traefik.access.agent`
+--
 
+*`traefik.access.agent`*::
++
+--
 type: text
 
 Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
 
+
+--
 
 [float]
 == user_agent fields
@@ -2640,41 +6279,49 @@ Contains the parsed User agent field. Only present if the user agent Elasticsear
 
 
 
-[float]
-=== `traefik.access.user_agent.device`
-
+*`traefik.access.user_agent.device`*::
++
+--
 type: keyword
 
 The name of the physical device.
 
 
-[float]
-=== `traefik.access.user_agent.major`
+--
 
+*`traefik.access.user_agent.major`*::
++
+--
 type: long
 
 The major version of the user agent.
 
 
-[float]
-=== `traefik.access.user_agent.minor`
+--
 
+*`traefik.access.user_agent.minor`*::
++
+--
 type: long
 
 The minor version of the user agent.
 
 
-[float]
-=== `traefik.access.user_agent.patch`
+--
 
+*`traefik.access.user_agent.patch`*::
++
+--
 type: keyword
 
 The patch version of the user agent.
 
 
-[float]
-=== `traefik.access.user_agent.name`
+--
 
+*`traefik.access.user_agent.name`*::
++
+--
 type: keyword
 
 example: Chrome
@@ -2682,37 +6329,59 @@ example: Chrome
 The name of the user agent.
 
 
-[float]
-=== `traefik.access.user_agent.os`
+--
 
+*`traefik.access.user_agent.os`*::
++
+--
 type: keyword
 
 The name of the operating system.
 
 
-[float]
-=== `traefik.access.user_agent.os_major`
+--
 
+*`traefik.access.user_agent.os_major`*::
++
+--
 type: long
 
 The major version of the operating system.
 
 
-[float]
-=== `traefik.access.user_agent.os_minor`
+--
 
+*`traefik.access.user_agent.os_minor`*::
++
+--
 type: long
 
 The minor version of the operating system.
 
 
-[float]
-=== `traefik.access.user_agent.os_name`
+--
 
+*`traefik.access.user_agent.os_name`*::
++
+--
 type: keyword
 
 The name of the operating system.
 
+
+--
+
+*`traefik.access.user_agent.original`*::
++
+--
+type: text
+
+Original user agent value before parsing by ingest-user-agent plugin.
+
+
+Field is not indexed.
+
+--
 
 [float]
 == geoip fields
@@ -2721,66 +6390,92 @@ Contains GeoIP information gathered based on the remote_ip field. Only present i
 
 
 
-[float]
-=== `traefik.access.geoip.continent_name`
-
+*`traefik.access.geoip.continent_name`*::
++
+--
 type: keyword
 
 The name of the continent.
 
 
-[float]
-=== `traefik.access.geoip.country_iso_code`
+--
 
+*`traefik.access.geoip.country_iso_code`*::
++
+--
 type: keyword
 
 Country ISO code.
 
 
-[float]
-=== `traefik.access.geoip.location`
+--
 
+*`traefik.access.geoip.location`*::
++
+--
 type: geo_point
 
 The longitude and latitude.
 
 
-[float]
-=== `traefik.access.geoip.region_name`
+--
 
+*`traefik.access.geoip.region_name`*::
++
+--
 type: keyword
 
 The region name.
 
 
-[float]
-=== `traefik.access.geoip.city_name`
+--
 
+*`traefik.access.geoip.city_name`*::
++
+--
 type: keyword
 
 The city name.
 
 
-[float]
-=== `traefik.access.request_count`
+--
 
+*`traefik.access.geoip.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+*`traefik.access.request_count`*::
++
+--
 type: long
 
 The number of requests
 
 
-[float]
-=== `traefik.access.frontend_name`
+--
 
+*`traefik.access.frontend_name`*::
++
+--
 type: text
 
 The name of the frontend used
 
 
-[float]
-=== `traefik.access.backend_url`
+--
 
+*`traefik.access.backend_url`*::
++
+--
 type: text
 
 The url of the backend where request is forwarded
+
+--
 

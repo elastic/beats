@@ -31,14 +31,23 @@ configuring template loading options in the {beatname_uc} configuration file.
 
 You can also set options to change the name of the index and index template.
 
+ifndef::only-elasticsearch[]
 NOTE: A connection to Elasticsearch is required to load the index template. If
-the output is Logstash, you must
+the output is not Elasticsearch, you must
 <<load-template-manually,load the template manually>>. 
+endif::[]
 
 For more information, see:
 
-* <<load-template-auto>> 
-* <<load-template-manually>> - required for Logstash output
+ifdef::only-elasticsearch[]
+* <<load-template-auto>>
+* <<load-template-manually>>
+endif::[]
+
+ifndef::only-elasticsearch[]
+* <<load-template-auto>>
+* <<load-template-manually>> - required for non-Elasticsearch output
+endif::[]
 
 [[load-template-auto]]
 ==== Configure template loading
@@ -85,6 +94,8 @@ that you specify should include the root name of the index plus version and
 date information. You also need to configure the `setup.template.name` and
 `setup.template.pattern` options to match the new name. For example:
 +
+ifndef::deprecate_dashboard_loading[]
+
 ["source","sh",subs="attributes,callouts"]
 -----
 output.elasticsearch.index: "customname-%{[beat.version]}-%{+yyyy.MM.dd}"
@@ -92,10 +103,27 @@ setup.template.name: "customname"
 setup.template.pattern: "customname-*"
 setup.dashboards.index: "customname-*" <1>
 -----
+
 <1> If you plan to
 <<load-kibana-dashboards, set up the Kibana dashboards>>, also set
 this option to overwrite the index name defined in the dashboards and index
 pattern.
+
+endif::[]
+
+ifdef::deprecate_dashboard_loading[]
+
+["source","sh",subs="attributes,callouts"]
+-----
+output.elasticsearch.index: "customname-%{[beat.version]}-%{+yyyy.MM.dd}"
+setup.template.name: "customname"
+setup.template.pattern: "customname-*"
+-----
++
+Also ensure to change the index name accordingly in the Kibana dashboards,
+when loading via the Kibana UI.
+
+endif::[]
 
 See <<configuration-template>> for the full list of configuration options.
 
@@ -104,10 +132,13 @@ See <<configuration-template>> for the full list of configuration options.
 ==== Load the template manually
 
 To load the template manually, run the <<setup-command,`setup`>> command. A
-connection to Elasticsearch is required. If Logstash output is enabled, you need
-to temporarily disable the Logstash output and enable Elasticsearch by using the
+connection to Elasticsearch is required. 
+ifndef::only-elasticsearch[]
+If another output is enabled, you need
+to temporarily disable that output and enable Elasticsearch by using the
 `-E` option. The examples here assume that Logstash output is enabled. You can
 omit the `-E` flags if Elasticsearch output is already enabled.
+endif::[]
 
 If you are connecting to a secured Elasticsearch cluster, make sure you've
 configured credentials as described in <<{beatname_lc}-configuration>>.
@@ -116,6 +147,14 @@ If the host running {beatname_uc} does not have direct connectivity to
 Elasticsearch, see <<load-template-manually-alternate>>.
 
 To load the template, use the appropriate command for your system.
+
+ifndef::only-elasticsearch[]
+:disable_logstash: {sp}-E output.logstash.enabled=false
+endif::[]
+
+ifdef::only-elasticsearch[]
+:disable_logstash:
+endif::[]
 
 ifdef::allplatforms[]
 
@@ -126,46 +165,40 @@ include::./shared-note-sudo.asciidoc[]
 endif::[]
 
 *deb and rpm:*
-
 ["source","sh",subs="attributes"]
 ----
-{beatname_lc} setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 
 *mac:*
 
 ["source","sh",subs="attributes"]
 ----
-./{beatname_lc} setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+./{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 
-
-ifeval::["{beatname_lc}"!="auditbeat"]
 
 *docker:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-docker run {dockerimage} setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run {dockerimage} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 
-
-endif::[]
 
 *win:*
 
 endif::allplatforms[]
 
 Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
-and select *Run As Administrator*). If you are running Windows XP, you may need
-to download and install PowerShell.
+and select *Run As Administrator*).
 
 From the PowerShell prompt, change to the directory where you installed {beatname_uc},
 and run:
 
-["source","sh",subs="attributes,callouts"]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-PS > {beatname_lc} setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+PS > .{backslash}{beatname_lc}.exe setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 
 
@@ -192,7 +225,7 @@ PS > Invoke-RestMethod -Method Delete "http://localhost:9200/{beatname_lc}-*"
 ----------------------------------------------------------------------
 
 
-This command deletes all indices that match the pattern +{beatname_lc}-*+.
+This command deletes all indices that match the pattern +{beat_default_index_prefix}-*+.
 Before running this command, make sure you want to delete all indices that match
 the pattern.
 
@@ -220,12 +253,12 @@ ifdef::allplatforms[]
 ./{beatname_lc} export template > {beatname_lc}.template.json
 ----
 +
-*win*:
+*win:*
 +
 endif::allplatforms[]
 ["source","sh",subs="attributes"]
 ----
-PS> .{backslash}{beatname_lc}.exe export template --es.version {stack-version} | Out-File -Encoding UTF8 {beatname_lc}.template.json
+PS > .{backslash}{beatname_lc}.exe export template --es.version {stack-version} | Out-File -Encoding UTF8 {beatname_lc}.template.json
 ----
 
 . Install the template:
@@ -237,7 +270,7 @@ PS> .{backslash}{beatname_lc}.exe export template --es.version {stack-version} |
 curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
 ----
 +
-*win*:
+*win:*
 +
 ["source","sh",subs="attributes"]
 ----

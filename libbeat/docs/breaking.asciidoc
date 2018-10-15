@@ -1,3 +1,5 @@
+:see-relnotes: See the <<release-notes,release notes>> for a complete list of breaking changes, including changes to beta or experimental functionality.
+
 [[breaking-changes]]
 == Breaking changes
 
@@ -9,16 +11,184 @@ changes, but there are breaking changes between major versions (e.g. 5.x to
 
 See the following topics for a description of breaking changes:
 
+* <<breaking-changes-6.3>>
+* <<breaking-changes-6.2>>
+* <<breaking-changes-6.1>>
 * <<breaking-changes-6.0>>
 * {auditbeat}/auditbeat-breaking-changes.html[Breaking changes in Auditbeat 6.2]
 
+[[breaking-changes-6.3]]
+=== Breaking changes in 6.3
+
+This section discusses the main changes that you should be aware of if you
+upgrade the Beats to version 6.3. {see-relnotes}
+
+[[breaking-changes-monitoring]]
+==== Beats monitoring schema changes
+
+Starting with version 6.3, the monitoring field `beat.cpu.*.time.metrics` is
+renamed to `beat.cpu.*.time.ms`. As a result of this change, Beats shippers
+released prior to version 6.3 are unable to send monitoring data to clusters
+running on Elasticsearch 6.3 and later. {see-relnotes}
+
+[[breaking-changes-mapping-conflict]]
+==== New `host` namespace may cause mapping conflicts for Logstash
+
+This breaking change applies only to users who send Beats events to Logstash.
+
+Starting with version 6.3, Beats provides an `add_host_metadata` processor for
+adding fields, such as `host.name` and `host.id`, to Beats events. These fields
+are grouped under a `host` prefix and conform to the
+https://github.com/elastic/ecs[Elastic Common Schema (ECS)]. The `host` object
+is defined in the Elasticsearch index template even if the processor is not
+used.
+
+We've also added a `host.name` field to all events sent by Beats. This field
+prevents the Beats input plugin in Logstash from adding a default `host` field.
+(By default, the plugin adds a `host` field if the event doesn't already have
+one. We don't want the plugin to add this field because it causes a mapping
+conflict with the `host` object defined in the index template.)
+
+*What does this mean to you?*
+
+See the info for your particular use case:
+
+* <<beats-template-versioned-indices>>
+* <<custom-template-non-versioned-indices>>
+* <<beats-template-non-versioned-indices>>
+
+[[beats-template-versioned-indices]]
+===== Use case: You use the Beats index template and versioned indices
+
+In this use case, you load the versioned template manually and use the Beats
+versioned index pattern, `%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}`,
+as recommended in the {logstash-ref}/plugins-inputs-beats.html[Beats input
+plugin] documentation. This results in a `host` field in 6.2 indices, and a
+`host.name` field in 6.3 indices. There are no mapping conflicts, but
+any visualizations or searches that use `host` will no longer show results for
+6.3 indices. 
+
+*What do you need to change?*
+
+If you searched for the `host` field previously, modify your searches to use the
+`beat.hostname` field instead. The `beat.hostname` field existed prior to 6.3
+and contains the same information as `host.name`. Using this field ensures that
+your queries and aggregations will work as expected in earlier releases and 6.3.
+
+To save time when you have a large number of objects to update, you can batch
+this process. Use either the Kibana UI or API to export the objects to JSON,
+make the JSON modification, and then re-import the objects. For more
+information, see:
+
+* {kibana-ref}/managing-saved-objects.html[Managing Saved Objects]
+* {kibana-ref}/saved-objects-api.html[Kibana Saved Objects API]
+
+
+[[custom-template-non-versioned-indices]]
+===== Use case: You use a custom template and your indices are not versioned
+
+Mapping conflicts are likely in this use case because two different Beats
+versions (6.2 and 6.3) are sending data to the same index. For 6.2, Logstash
+adds the default `host` field, and for 6.3, Beats adds the `host.name` field,
+which results in a mapping conflict.
+
+*What do you need to change?*
+
+To resolve the mapping issue, do *one* of the following:
+
+* Use versioned indices to prevent the mapping conflict. In the Logstash
+pipeline configuration, set `manage_template => false` and use an index naming
+pattern that includes `[version]` metadata:
++
+[source,yaml]
+----
+manage_template => false
+index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+----
++
+For more information, see the documentation for the
+{logstash-ref}/plugins-inputs-beats.html[Beats input plugin].
+
+* Or, in the Beats config file, configure Beats to drop all `host.*` fields: 
++
+[source,yaml]
+----
+  processors:
+   - drop_fields:
+      fields: ["host"]
+----
++
+--
+IMPORTANT: If you drop the `host` fields, you cannot use the `add_host_metadata`
+processor.
+
+--
++
+With this configuration, Beats drops the `host` fields before sending the
+event to Logstash, and Logstash adds a default `host` field, as it did with
+previous Beats versions. This approach resolves the mapping conflict, but you
+should plan to migrate your Logstash configurations to use `host.name` in
+future releases. 
+
+[[beats-template-non-versioned-indices]]
+===== Use case: You use the Beats index template and your indices are not versioned
+
+In this use case, you load the Beats index template manually into Elasticsearch,
+and send your data through Logstash, but you don’t use the versioned index
+pattern to create versioned indices.
+
+You cannot resolve the problem by dropping the `host.*` fields, because Logstash
+will add a default `host` field, resulting in a mapping conflict with the
+`host` field defined as an object in the index template. 
+
+*What do you need to change?*
+
+To resolve the mapping issue, do *one* of the following:
+
+* Drop the `host.*` fields in a Logstash filter. For example:
++
+[source,yaml]
+----
+filter {
+  mutate {
+    remove_field => [ "[host]" ]
+  }
+}
+----
++
+With this configuration, there will be no `host` field in the final event at
+ingestion time, and the mapping conflict is avoided.
+
+* Or:
+** Modify the Beats index template by removing the `host.*` fields, and
+** Configure Beats to drop all `host.*` fields, as described in
+<<custom-template-non-versioned-indices,this section>>.
++
+This solution prevents a mapping conflict because the fields are no longer
+defined in the Elasticsearch template. Elasticsearch can use the `host`
+mapping created when Logstash added a default `host` field.
+
+The difference between these two approaches is that the first approach, using
+a Logstash filter, drops the `host` fields completely. There will be no `host`
+field in the final event. The second approach drops the `host` fields from the
+Beats event, but because Logstash adds a default `host` field, there will be a
+`host` field in the final event.
+
+[[breaking-changes-6.2]]
+=== Breaking changes in 6.2
+
+{see-relnotes}
+
+[[breaking-changes-6.1]]
+=== Breaking changes in 6.1
+
+{see-relnotes}
 
 [[breaking-changes-6.0]]
 === Breaking changes in 6.0
 
 This section discusses the main changes that you should be aware of if you
-upgrade the Beats from version 5.x to 6.x. Please also review the relevant
-Breaking Changes sections of the <<release-notes,release notes>>.
+upgrade the Beats from version 5.x to 6.x. {see-relnotes}
 
 // TODO: better link to the consolidated release notes for 6.0.0.
 
@@ -108,7 +278,7 @@ Prior to 6.0, the recommended setting was:
 ----
 
 
-The index templates that ship with 6.0 are applied to new indexes that match the
+The index templates that ship with 6.0 are applied to new indices that match the
 pattern `[beat]-[version]-*`. You must update your Logstash config, or the
 templates will not be applied.
 

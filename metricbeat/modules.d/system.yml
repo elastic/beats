@@ -1,3 +1,6 @@
+# Module: system
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-system.html
+
 - module: system
   period: 10s
   metricsets:
@@ -10,7 +13,6 @@
     #- core
     #- diskio
     #- socket
-  processes: ['.*']
   process.include_top_n:
     by_cpu: 5      # include top 5 processes by CPU
     by_memory: 5   # include top 5 processes by memory
@@ -28,3 +30,9 @@
   period: 15m
   metricsets:
     - uptime
+
+#- module: system
+#  period: 5m
+#  metricsets:
+#    - raid
+#  raid.mount_point: '/'

@@ -1,10 +1,26 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package add_docker_metadata
 
 import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -13,6 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
@@ -68,7 +85,7 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 	if config.MatchSource {
 		var procConf, _ = common.NewConfigFrom(map[string]interface{}{
 			"field":     "source",
-			"separator": "/",
+			"separator": string(os.PathSeparator),
 			"index":     config.SourceIndex,
 			"target":    "docker.container.id",
 		})
@@ -156,7 +173,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		if len(container.Labels) > 0 {
 			labels := common.MapStr{}
 			for k, v := range container.Labels {
-				labels.Put(k, v)
+				safemapstr.Put(labels, k, v)
 			}
 			meta.Put("container.labels", labels)
 		}
@@ -164,7 +181,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		meta.Put("container.id", container.ID)
 		meta.Put("container.image", container.Image)
 		meta.Put("container.name", container.Name)
-		event.Fields["docker"] = meta
+		event.Fields["docker"] = meta.Clone()
 	} else {
 		d.log.Debugf("Container not found: cid=%s", cid)
 	}
@@ -187,7 +204,7 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) string {
 			continue
 		}
 
-		pid, ok := tryToInt(v)
+		pid, ok := common.TryToInt(v)
 		if !ok {
 			d.log.Debugf("field %v is not a PID (type=%T, value=%v)", field, v, v)
 			continue
@@ -240,41 +257,4 @@ func getContainerIDFromCgroups(cgroups map[string]string) string {
 	}
 
 	return ""
-}
-
-// tryToInt tries to coerce the given interface to an int. On success it returns
-// the int value and true.
-func tryToInt(number interface{}) (int, bool) {
-	var rtn int
-	switch v := number.(type) {
-	case int:
-		rtn = int(v)
-	case int8:
-		rtn = int(v)
-	case int16:
-		rtn = int(v)
-	case int32:
-		rtn = int(v)
-	case int64:
-		rtn = int(v)
-	case uint:
-		rtn = int(v)
-	case uint8:
-		rtn = int(v)
-	case uint16:
-		rtn = int(v)
-	case uint32:
-		rtn = int(v)
-	case uint64:
-		rtn = int(v)
-	case string:
-		var err error
-		rtn, err = strconv.Atoi(v)
-		if err != nil {
-			return 0, false
-		}
-	default:
-		return 0, false
-	}
-	return rtn, true
 }

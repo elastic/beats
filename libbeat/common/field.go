@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package common
 
 import (
@@ -17,22 +34,25 @@ import (
 type Fields []Field
 
 type Field struct {
-	Name           string      `config:"name"`
-	Type           string      `config:"type"`
-	Description    string      `config:"description"`
-	Format         string      `config:"format"`
-	ScalingFactor  int         `config:"scaling_factor"`
-	Fields         Fields      `config:"fields"`
-	MultiFields    Fields      `config:"multi_fields"`
-	ObjectType     string      `config:"object_type"`
-	Enabled        *bool       `config:"enabled"`
-	Analyzer       string      `config:"analyzer"`
-	SearchAnalyzer string      `config:"search_analyzer"`
-	Norms          bool        `config:"norms"`
-	Dynamic        DynamicType `config:"dynamic"`
-	Index          *bool       `config:"index"`
-	DocValues      *bool       `config:"doc_values"`
-	CopyTo         string      `config:"copy_to"`
+	Name                  string      `config:"name"`
+	Type                  string      `config:"type"`
+	Description           string      `config:"description"`
+	Format                string      `config:"format"`
+	ScalingFactor         int         `config:"scaling_factor"`
+	Fields                Fields      `config:"fields"`
+	MultiFields           Fields      `config:"multi_fields"`
+	ObjectType            string      `config:"object_type"`
+	ObjectTypeMappingType string      `config:"object_type_mapping_type"`
+	Enabled               *bool       `config:"enabled"`
+	Analyzer              string      `config:"analyzer"`
+	SearchAnalyzer        string      `config:"search_analyzer"`
+	Norms                 bool        `config:"norms"`
+	Dynamic               DynamicType `config:"dynamic"`
+	Index                 *bool       `config:"index"`
+	DocValues             *bool       `config:"doc_values"`
+	CopyTo                string      `config:"copy_to"`
+	IgnoreAbove           int         `config:"ignore_above"`
+	AliasPath             string      `config:"path"`
 
 	// Kibana specific
 	Analyzed     *bool  `config:"analyzed"`
@@ -99,6 +119,44 @@ func (f Fields) HasKey(key string) bool {
 	return f.hasKey(keys)
 }
 
+// HasNode checks if inside fields the given node exists
+// In contrast to HasKey it not only compares the leaf nodes but
+// every single key it traverses.
+func (f Fields) HasNode(key string) bool {
+	keys := strings.Split(key, ".")
+	return f.hasNode(keys)
+}
+
+func (f Fields) hasNode(keys []string) bool {
+
+	// Nothing to compare, so does not contain it
+	if len(keys) == 0 {
+		return false
+	}
+
+	key := keys[0]
+	keys = keys[1:]
+
+	for _, field := range f {
+
+		if field.Name == key {
+
+			//// It's the last key to compare
+			if len(keys) == 0 {
+				return true
+			}
+
+			// It's the last field to compare
+			if len(field.Fields) == 0 {
+				return true
+			}
+
+			return field.Fields.hasNode(keys)
+		}
+	}
+	return false
+}
+
 // Recursively generates the correct key based on the dots
 // The mapping requires "properties" between each layer. This is added here.
 func GenerateKey(key string) string {
@@ -133,4 +191,28 @@ func (f Fields) hasKey(keys []string) bool {
 		}
 	}
 	return false
+}
+
+// GetKeys returns a flat list of keys this Fields contains
+func (f Fields) GetKeys() []string {
+	return f.getKeys("")
+}
+
+func (f Fields) getKeys(namespace string) []string {
+
+	var keys []string
+
+	for _, field := range f {
+		fieldName := namespace + "." + field.Name
+		if namespace == "" {
+			fieldName = field.Name
+		}
+		if len(field.Fields) == 0 {
+			keys = append(keys, fieldName)
+		} else {
+			keys = append(keys, field.Fields.getKeys(fieldName)...)
+		}
+	}
+
+	return keys
 }

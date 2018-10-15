@@ -1,15 +1,38 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package kubernetes
 
 import (
 	"context"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/ericchiang/k8s"
+	appsv1 "github.com/ericchiang/k8s/apis/apps/v1beta1"
 	"github.com/ericchiang/k8s/apis/core/v1"
+	extv1 "github.com/ericchiang/k8s/apis/extensions/v1beta1"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
+
+// Max back off time for retries
+const maxBackoff = 30 * time.Second
 
 func filterByNode(node string) k8s.Option {
 	return k8s.QueryParam("fieldSelector", "spec.nodeName="+node)
@@ -45,7 +68,6 @@ type watcher struct {
 	stop                context.CancelFunc
 	resourceList        k8s.ResourceList
 	k8sResourceFactory  func() k8s.Resource
-	resourceFactory     func() Resource
 	items               func() []k8s.Resource
 	handler             ResourceEventHandler
 }
@@ -71,7 +93,6 @@ func NewWatcher(client *k8s.Client, resource Resource, options WatchOptions) (Wa
 		list := &v1.PodList{}
 		w.resourceList = list
 		w.k8sResourceFactory = func() k8s.Resource { return &v1.Pod{} }
-		w.resourceFactory = func() Resource { return &Pod{} }
 		w.items = func() []k8s.Resource {
 			rs := make([]k8s.Resource, 0, len(list.Items))
 			for _, item := range list.Items {
@@ -83,7 +104,50 @@ func NewWatcher(client *k8s.Client, resource Resource, options WatchOptions) (Wa
 		list := &v1.EventList{}
 		w.resourceList = list
 		w.k8sResourceFactory = func() k8s.Resource { return &v1.Event{} }
-		w.resourceFactory = func() Resource { return &Event{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
+	case *Node:
+		list := &v1.NodeList{}
+		w.resourceList = list
+		w.k8sResourceFactory = func() k8s.Resource { return &v1.Node{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
+	case *Deployment:
+		list := &appsv1.DeploymentList{}
+		w.resourceList = list
+		w.k8sResourceFactory = func() k8s.Resource { return &appsv1.Deployment{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
+	case *ReplicaSet:
+		list := &extv1.ReplicaSetList{}
+		w.resourceList = list
+		w.k8sResourceFactory = func() k8s.Resource { return &extv1.ReplicaSet{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
+	case *StatefulSet:
+		list := &appsv1.StatefulSetList{}
+		w.resourceList = list
+		w.k8sResourceFactory = func() k8s.Resource { return &appsv1.StatefulSet{} }
 		w.items = func() []k8s.Resource {
 			rs := make([]k8s.Resource, 0, len(list.Items))
 			for _, item := range list.Items {
@@ -114,7 +178,6 @@ func (w *watcher) sync() error {
 	defer cancel()
 
 	logp.Info("kubernetes: Performing a resource sync for %T", w.resourceList)
-
 	err := w.client.List(ctx, w.options.Namespace, w.resourceList, w.buildOpts()...)
 	if err != nil {
 		logp.Err("kubernetes: Performing a resource sync err %s for %T", err.Error(), w.resourceList)
@@ -132,21 +195,20 @@ func (w *watcher) sync() error {
 	return nil
 }
 
-func (w *watcher) onAdd(obj k8s.Resource) {
-	w.handler.OnAdd(resourceConverter(obj, w.resourceFactory()))
+func (w *watcher) onAdd(obj Resource) {
+	w.handler.OnAdd(obj)
 }
 
-func (w *watcher) onUpdate(obj k8s.Resource) {
-	w.handler.OnUpdate(resourceConverter(obj, w.resourceFactory()))
+func (w *watcher) onUpdate(obj Resource) {
+	w.handler.OnUpdate(obj)
 }
 
-func (w *watcher) onDelete(obj k8s.Resource) {
-	w.handler.OnDelete(resourceConverter(obj, w.resourceFactory()))
+func (w *watcher) onDelete(obj Resource) {
+	w.handler.OnDelete(obj)
 }
 
 // Start watching pods
 func (w *watcher) Start() error {
-
 	// Make sure that events don't flow into the annotator before informer is fully set up
 	// Sync initial state:
 	err := w.sync()
@@ -162,6 +224,9 @@ func (w *watcher) Start() error {
 }
 
 func (w *watcher) watch() {
+	// Failures counter, do exponential backoff on retries
+	var failures uint
+
 	for {
 		select {
 		case <-w.ctx.Done():
@@ -177,7 +242,8 @@ func (w *watcher) watch() {
 			//watch failures should be logged and gracefully failed over as metadata retrieval
 			//should never stop.
 			logp.Err("kubernetes: Watching API error %v", err)
-			time.Sleep(time.Second)
+			backoff(failures)
+			failures++
 			continue
 		}
 
@@ -187,8 +253,14 @@ func (w *watcher) watch() {
 			if err != nil {
 				logp.Err("kubernetes: Watching API error %v", err)
 				watcher.Close()
+				if !(err == io.EOF || err == io.ErrUnexpectedEOF) {
+					// This is an error event which can be recovered by moving to the latest resource version
+					logp.Info("kubernetes: Ignoring event, moving to most recent resource version")
+					w.lastResourceVersion = ""
+				}
 				break
 			}
+			failures = 0
 			switch eventType {
 			case k8s.EventAdded:
 				w.onAdd(r)
@@ -205,4 +277,11 @@ func (w *watcher) watch() {
 
 func (w *watcher) Stop() {
 	w.stop()
+}
+func backoff(failures uint) {
+	wait := 1 << failures * time.Second
+	if wait > maxBackoff {
+		wait = maxBackoff
+	}
+	time.Sleep(wait)
 }

@@ -1,0 +1,12 @@
+- module: vsphere
+  enabled: true
+  metricsets: ["datastore", "host", "virtualmachine"]
+  period: 10s
+  hosts: ["https://localhost/sdk"]
+
+  username: "user"
+  password: "password"
+  # If insecure is true, don't verify the server's certificate chain
+  insecure: false
+  # Get custom fields when using virtualmachine metric set. Default false.
+  # get_custom_fields: false

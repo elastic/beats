@@ -5,11 +5,13 @@
         "name": "host.example.com"
     },
     "logstash": {
-        "node_stats": {
-            "events": {
-                "filtered": 0,
-                "in": 0,
-                "out": 0
+        "node": {
+            "stats": {
+                "events": {
+                    "filtered": 0,
+                    "in": 0,
+                    "out": 0
+                }
             }
         }
     },
@@ -17,6 +19,7 @@
         "host": "127.0.0.1:9600",
         "module": "logstash",
         "name": "node_stats",
+        "namespace": "logstash.node.stats",
         "rtt": 115
     }
 }

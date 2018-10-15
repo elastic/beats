@@ -1,0 +1,70 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "cluster": {
+            "id": "njqU4EQaTROIDlWPeUMQyw"
+        }
+    },
+    "kibana": {
+        "stats": {
+            "concurrent_connections": 6,
+            "host": {
+                "name": "localhost"
+            },
+            "index": "Shaunaks-MBP-2",
+            "name": "Shaunaks-MBP-2",
+            "process": {
+                "event_loop_delay": {
+                    "ms": 0.23628300055861473
+                },
+                "memory": {
+                    "heap": {
+                        "size_limit": {
+                            "bytes": 1501560832
+                        },
+                        "total": {
+                            "bytes": 215003136
+                        },
+                        "used": {
+                            "bytes": 185343400
+                        }
+                    }
+                },
+                "uptime": {
+                    "ms": 1343714
+                }
+            },
+            "request": {
+                "disconnects": 0,
+                "total": 0
+            },
+            "response_time": {
+                "avg": {},
+                "max": {
+                    "ms": 0
+                }
+            },
+            "snapshot": false,
+            "status": "green",
+            "transport_address": "localhost:5601",
+            "uuid": "5b2de169-2785-441b-ae8c-186a1936b17d",
+            "version": "7.0.0-alpha1"
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:5601",
+        "module": "kibana",
+        "name": "stats",
+        "rtt": 115
+    },
+    "process": {
+        "pid": 20173
+    },
+    "service": {
+        "name": "kibana"
+    }
+}

@@ -1,0 +1,40 @@
+- name: audit
+  type: group
+  description: >
+  fields:
+    - name: layer
+      description: "The layer from which this event originated: rest, transport or ip_filter"
+      example: "rest"
+      type: keyword
+    - name: event_type
+      description: "The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied"
+      example: "access_granted"
+      type: keyword
+    - name: origin_type
+      description: "Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)"
+      example: "local_node"
+      type: keyword
+    - name: origin_address
+      description: "The IP address from which the request originated"
+      example: "192.168.1.42"
+      type: ip
+    - name: principal
+      description: "The principal (username) that failed authentication"
+      example: "_anonymous"
+      type: keyword
+    - name: action
+      description: "The name of the action that was executed"
+      example: "cluster:monitor/main"
+      type: keyword
+    - name: uri
+      description: "The REST endpoint URI"
+      example: /_xpack/security/_authenticate
+      type: keyword
+    - name: request
+      description: "The type of request that was executed"
+      example: "ClearScrollRequest"
+      type: keyword
+    - name: request_body
+      description: "The body of the request, if enabled"
+      example: "body"
+      type: text

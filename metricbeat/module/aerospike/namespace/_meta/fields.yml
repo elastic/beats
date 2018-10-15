@@ -133,7 +133,7 @@
         Namespace name
     - name: node.host
       type: keyword
-      desription: >
+      description: >
         Node host
     - name: node.name
       type: keyword

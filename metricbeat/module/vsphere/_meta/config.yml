@@ -1,5 +1,8 @@
 - module: vsphere
-  metricsets: ["datastore", "host", "virtualmachine"]
+  #metricsets:
+  #  - datastore
+  #  - host
+  #  - virtualmachine
   period: 10s
   hosts: ["https://localhost/sdk"]
 
@@ -9,4 +12,3 @@
   insecure: false
   # Get custom fields when using virtualmachine metric set. Default false.
   # get_custom_fields: false
-  

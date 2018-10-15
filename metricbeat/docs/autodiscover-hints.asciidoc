@@ -1,0 +1,138 @@
+{beatname_uc} supports autodiscover based on hints from the provider. The `hints` system looks for
+hints in Kubernetes Pod annotations or Docker labels which have the prefix `co.elastic.metrics`. As soon as
+the container starts, {beatname_uc} will check if it contains any hints and launch the proper config for
+it. Hints tell {beatname_uc} how to get metrics for the given container. This is the full list of supported hints:
+
+[float]
+===== `co.elastic.metrics/module`
+
+{beatname_uc} module to use to fetch metrics. See <<metricbeat-modules>> for the list of supported modules.
+
+[float]
+===== `co.elastic.metrics/hosts`
+
+Hosts setting to use with the given module. Hosts can include `${data.host}` and `${data.port}`
+values from the autodiscover event, ie: `${data.host}:80`.
+
+[float]
+===== `co.elastic.metrics/metricsets`
+
+List of metricsets to use, comma separated. If no metricsets are provided, default metricsets for the module
+are used.
+
+[float]
+===== `co.elastic.metrics/period`
+
+The time interval for metrics retrieval, ie: 10s
+
+[float]
+===== `co.elastic.metrics/timeout`
+
+Metrics retrieval timeout, default: 3s
+
+[float]
+===== `co.elastic.metrics/ssl.*`
+
+SSL parameters, as seen in <<configuration-ssl>>.
+
+[float]
+===== `co.elastic.logs/raw`
+When an entire module configuration needs to be completely set the `raw` hint can be used. You can provide a
+stringified JSON of the input configuration. `raw` overrides every other hint and can be used to create bot a single or
+a list of configurations.
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.metrics/raw: "[{\"enabled\":true,\"metricsets\":[\"default\"],\"module\":\"mockmoduledefaults\",\"period\":\"1m\",\"timeout\":\"3s\"}]"
+-------------------------------------------------------------------------------------
+
+[float]
+===== `co.elastic.metrics/processors`
+
+Define a processor to be added to the {beatname_uc} module configuration. See <<filtering-and-enhancing-data>> for the list
+of supported processors.
+
+In order to provide ordering of the processor definition, numbers can be provided. If not, the hints builder will do
+arbitrary ordering:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.logs/processors.1.add_locale.abbrevation: "MST"
+co.elastic.logs/processors.add_locale.abbrevation: "PST"
+-------------------------------------------------------------------------------------
+
+In the above sample the processor definition tagged with `1` would be executed first.
+
+[float]
+=== Kubernetes
+
+Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+-------------------------------------------------------------------------------------
+
+This configuration enables the `hints` autodiscover for Kubernetes. The `hints` system looks for
+hints in Kubernetes annotations or Docker labels which have the prefix `co.elastic.metrics`.
+
+You can annotate Kubernetes Pods with useful info to spin up {beatname_uc} modules:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.metrics/module: prometheus
+  co.elastic.metrics/metricsets: collector
+  co.elastic.metrics/hosts: '${data.host}:9090'
+  co.elastic.metrics/period: 1m
+-------------------------------------------------------------------------------------
+
+The above annotations are used to spin up a Prometheus collector metricset and it polls the
+parent container on port `9090` at a 1 minute interval.
+
+[float]
+===== Multiple containers
+
+When a Pod has multiple containers, these settings are shared. To set hints specific to a container in
+the pod you can put the container name in the hint.
+
+When a pod has multiple containers, the settings are shared unless you put the container name in the
+hint. For example, these hints configure a common behavior for all containers in the Pod, and sets a specific
+`hosts` hint for the container called `sidecar`.
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.metrics/module: apache
+  co.elastic.metrics/hosts: '${data.host}:80'
+  co.elastic.metrics.sidecar/hosts: '${data.host}:8080'
+-------------------------------------------------------------------------------------
+
+[float]
+=== Docker
+
+Docker autodiscover provider supports hints in labels. To enable it just set `hints.enabled`:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+-------------------------------------------------------------------------------------
+
+You can label Docker containers with useful info to spin up {beatname_uc} modules, for example:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+  co.elastic.metrics/module: nginx
+  co.elastic.metrics/metricsets: stubstatus
+  co.elastic.metrics/hosts: '${data.host}:80'
+  co.elastic.metrics/period: 10s
+-------------------------------------------------------------------------------------
+
+The above labels would allow {beatname_uc} to configure a Prometheus collector to poll port `9090`
+of the Docker container every 1 minute.

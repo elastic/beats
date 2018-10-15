@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package common
 
 import (
@@ -5,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -181,7 +199,12 @@ func TestNormalizeValue(t *testing.T) {
 	logp.TestingSetup()
 
 	var nilStringPtr *string
+	var nilTimePtr *time.Time
 	someString := "foo"
+	uuidValue, err := uuid.NewV1()
+	if err != nil {
+		t.Fatalf("error while generating uuid: %v", err)
+	}
 
 	type mybool bool
 	type myint int32
@@ -192,9 +215,11 @@ func TestNormalizeValue(t *testing.T) {
 		out interface{}
 	}{
 		{nil, nil},
-		{&someString, someString},   // Pointers are dereferenced.
-		{nilStringPtr, nil},         // Nil pointers are dropped.
-		{NetString("test"), "test"}, // It honors the TextMarshaler contract.
+		{&someString, someString},       // Pointers are dereferenced.
+		{nilStringPtr, nil},             // Nil pointers are dropped.
+		{nilTimePtr, nil},               // Nil pointers are dropped.
+		{uuidValue, uuidValue.String()}, // Struct that honors the TextMarshaler contract.
+		{NetString("test"), "test"},     // It honors the TextMarshaler contract.
 		{true, true},
 		{int8(8), int8(8)},
 		{uint8(8), uint8(8)},

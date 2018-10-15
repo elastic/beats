@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package main
 
 import (
@@ -6,13 +23,16 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/kibana"
 )
 
 var exportAPI = "/api/kibana/dashboards/export"
@@ -29,46 +49,18 @@ func makeURL(url, path string, params url.Values) string {
 	return strings.Join([]string{url, path, "?", params.Encode()}, "")
 }
 
-func ExtractIndexPattern(body []byte) ([]byte, error) {
-	var contents common.MapStr
-
-	err := json.Unmarshal(body, &contents)
-	if err != nil {
-		return nil, err
-	}
-
-	objects, ok := contents["objects"].([]interface{})
-	if !ok {
-		return nil, fmt.Errorf("Key objects not found or wrong type")
-	}
-
-	var result []interface{}
-	for _, obj := range objects {
-		_type, ok := obj.(map[string]interface{})["type"].(string)
-		if !ok {
-			return nil, fmt.Errorf("type key not found or not string")
-		}
-		if _type != "index-pattern" {
-			result = append(result, obj)
-		}
-	}
-	contents["objects"] = result
-
-	newBody, err := json.MarshalIndent(contents, "", "  ")
-	if err != nil {
-		return nil, fmt.Errorf("Error mashaling: %v", err)
-	}
-
-	return newBody, nil
-}
-
-func Export(client *http.Client, conn string, dashboard string, out string) error {
+func Export(client *http.Client, conn string, spaceID string, dashboard string, out string) error {
 	params := url.Values{}
 
 	params.Add("dashboard", dashboard)
 
+	if spaceID != "" {
+		exportAPI = path.Join("/s", spaceID, exportAPI)
+	}
 	fullURL := makeURL(conn, exportAPI, params)
-	fmt.Printf("Calling HTTP GET %v\n", fullURL)
+	if !quiet {
+		log.Printf("Calling HTTP GET %v\n", fullURL)
+	}
 
 	req, err := http.NewRequest("GET", fullURL, nil)
 
@@ -88,15 +80,47 @@ func Export(client *http.Client, conn string, dashboard string, out string) erro
 		return fmt.Errorf("HTTP GET %s fails with %s, %s", fullURL, resp.Status, body)
 	}
 
-	body, err = ExtractIndexPattern(body)
+	data, err := kibana.RemoveIndexPattern(body)
 	if err != nil {
 		return fmt.Errorf("fail to extract the index pattern: %v", err)
 	}
 
-	err = ioutil.WriteFile(out, body, 0666)
+	objects := data["objects"].([]interface{})
+	for _, obj := range objects {
+		o := obj.(common.MapStr)
 
-	fmt.Printf("The dashboard %s was exported under the %s file\n", dashboard, out)
+		decodeValue(o, "attributes.uiStateJSON")
+		decodeValue(o, "attributes.visState")
+		decodeValue(o, "attributes.optionsJSON")
+		decodeValue(o, "attributes.panelsJSON")
+		decodeValue(o, "attributes.kibanaSavedObjectMeta.searchSourceJSON")
+	}
+
+	data["objects"] = objects
+
+	// Create all missing directories
+	err = os.MkdirAll(filepath.Dir(out), 0755)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(out, []byte(data.StringToPrint()), 0666)
+	if !quiet {
+		log.Printf("The dashboard %s was exported under the %s file\n", dashboard, out)
+	}
 	return err
+}
+
+func decodeValue(data common.MapStr, key string) {
+	v, err := data.GetValue(key)
+	if err != nil {
+		return
+	}
+	s := v.(string)
+	var d common.MapStr
+	json.Unmarshal([]byte(s), &d)
+
+	data.Put(key, d)
 }
 
 func ReadManifest(file string) ([]map[string]string, error) {
@@ -113,13 +137,20 @@ func ReadManifest(file string) ([]map[string]string, error) {
 	return manifest.Dashboards, nil
 }
 
+var indexPattern = false
+var quiet = false
+
 func main() {
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
+	spaceID := flag.String("space-id", "", "Space ID")
 	dashboard := flag.String("dashboard", "", "Dashboard ID")
 	fileOutput := flag.String("output", "output.json", "Output file")
 	ymlFile := flag.String("yml", "", "Path to the module.yml file containing the dashboards")
+	flag.BoolVar(&indexPattern, "indexPattern", false, "include index-pattern in output")
+	flag.BoolVar(&quiet, "quiet", false, "be quiet")
 
 	flag.Parse()
+	log.SetFlags(0)
 
 	transCfg := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
@@ -128,37 +159,35 @@ func main() {
 	client := &http.Client{Transport: transCfg}
 
 	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
-		fmt.Printf("Please specify a dashboard ID (-dashboard) or a manifest file (-yml)\n\n")
 		flag.Usage()
-		os.Exit(0)
+		log.Fatalf("Please specify a dashboard ID (-dashboard) or a manifest file (-yml)")
 	}
 
 	if len(*ymlFile) > 0 {
 		dashboards, err := ReadManifest(*ymlFile)
 		if err != nil {
-			fmt.Printf("ERROR: %s\n", err)
-			os.Exit(1)
+			log.Fatalf("%s", err)
 		}
 
 		for _, dashboard := range dashboards {
-			fmt.Printf("id=%s, name=%s\n", dashboard["id"], dashboard["file"])
-			directory := path.Join(path.Dir(*ymlFile), "_meta/kibana/6/dashboard")
+			log.Printf("id=%s, name=%s\n", dashboard["id"], dashboard["file"])
+			directory := filepath.Join(filepath.Dir(*ymlFile), "_meta/kibana/6/dashboard")
 			err := os.MkdirAll(directory, 0755)
 			if err != nil {
-				fmt.Printf("ERROR: fail to create directory %s: %v", directory, err)
+				log.Fatalf("fail to create directory %s: %v", directory, err)
 			}
-			err = Export(client, *kibanaURL, dashboard["id"], path.Join(directory, dashboard["file"]))
+			err = Export(client, *kibanaURL, *spaceID, dashboard["id"], filepath.Join(directory, dashboard["file"]))
 			if err != nil {
-				fmt.Printf("ERROR: fail to export the dashboards: %s\n", err)
+				log.Fatalf("fail to export the dashboards: %s", err)
 			}
 		}
 		os.Exit(0)
 	}
 
 	if len(*dashboard) > 0 {
-		err := Export(client, *kibanaURL, *dashboard, *fileOutput)
+		err := Export(client, *kibanaURL, *spaceID, *dashboard, *fileOutput)
 		if err != nil {
-			fmt.Printf("ERROR: fail to export the dashboards: %s\n", err)
+			log.Fatalf("fail to export the dashboards: %s", err)
 		}
 	}
 }

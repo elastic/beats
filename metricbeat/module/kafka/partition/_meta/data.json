@@ -5,9 +5,13 @@
         "name": "host.example.com"
     },
     "kafka": {
+        "broker": {
+            "address": "172.18.0.2:9092",
+            "id": 0
+        },
         "partition": {
             "broker": {
-                "address": "kafka:9092",
+                "address": "172.18.0.2:9092",
                 "id": 0
             },
             "offset": {
@@ -17,12 +21,16 @@
             "partition": {
                 "id": 0,
                 "insync_replica": true,
+                "is_leader": true,
                 "leader": 0,
                 "replica": 0
             },
             "topic": {
-                "name": "foo-1512631793-855878006"
+                "name": "foo-1532945633-185372965"
             }
+        },
+        "topic": {
+            "name": "foo-1532945633-185372965"
         }
     },
     "metricset": {

@@ -36,6 +36,7 @@ The following topics describe how to configure Metricbeat:
 * <<configuration-autodiscover>>
 * <<yaml-tips>>
 * <<regexp-support>>
+* <<http-endpoint>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -75,5 +76,7 @@ include::../../libbeat/docs/shared-autodiscover.asciidoc[]
 include::../../libbeat/docs/yaml.asciidoc[]
 
 include::../../libbeat/docs/regexp.asciidoc[]
+
+include::../../libbeat/docs/http-endpoint.asciidoc[]
 
 include::../../libbeat/docs/reference-yml.asciidoc[]

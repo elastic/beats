@@ -1,0 +1,516 @@
+{
+    "_nodes": {
+        "total": 1,
+        "successful": 1,
+        "failed": 0
+    },
+    "cluster_name": "842d2a3cdf39e9ae2e0b2c7ca7cea075",
+    "nodes": {
+        "r4XD9O8eTrCHyN_GJswZ5A": {
+            "timestamp": 1524464610026,
+            "name": "instance-0000000016",
+            "transport_address": "172.25.133.112:19608",
+            "host": "172.25.133.112",
+            "ip": "172.25.133.112:19608",
+            "roles": [
+                "master",
+                "data",
+                "ingest"
+            ],
+            "attributes": {
+                "logical_availability_zone": "zone-0",
+                "availability_zone": "us-east-1e",
+                "region": "us-east-1"
+            },
+            "indices": {
+                "docs": {
+                    "count": 34283257,
+                    "deleted": 25991
+                },
+                "store": {
+                    "size_in_bytes": 11772256011
+                },
+                "indexing": {
+                    "index_total": 95855239,
+                    "index_time_in_millis": 14070223,
+                    "index_current": 0,
+                    "index_failed": 107,
+                    "delete_total": 164420,
+                    "delete_time_in_millis": 7426,
+                    "delete_current": 0,
+                    "noop_update_total": 127,
+                    "is_throttled": false,
+                    "throttle_time_in_millis": 31
+                },
+                "get": {
+                    "total": 585810,
+                    "time_in_millis": 104059,
+                    "exists_total": 585742,
+                    "exists_time_in_millis": 104059,
+                    "missing_total": 68,
+                    "missing_time_in_millis": 0,
+                    "current": 0
+                },
+                "search": {
+                    "open_contexts": 0,
+                    "query_total": 1926212,
+                    "query_time_in_millis": 7629899,
+                    "query_current": 0,
+                    "fetch_total": 1014673,
+                    "fetch_time_in_millis": 146067,
+                    "fetch_current": 0,
+                    "scroll_total": 160754,
+                    "scroll_time_in_millis": 43277,
+                    "scroll_current": 0,
+                    "suggest_total": 0,
+                    "suggest_time_in_millis": 0,
+                    "suggest_current": 0
+                },
+                "merges": {
+                    "current": 0,
+                    "current_docs": 0,
+                    "current_size_in_bytes": 0,
+                    "total": 127608,
+                    "total_time_in_millis": 37529833,
+                    "total_docs": 2330861529,
+                    "total_size_in_bytes": 717037012447,
+                    "total_stopped_time_in_millis": 0,
+                    "total_throttled_time_in_millis": 281485,
+                    "total_auto_throttle_in_bytes": 9324199696
+                },
+                "refresh": {
+                    "total": 1402567,
+                    "total_time_in_millis": 27376569,
+                    "listeners": 0
+                },
+                "flush": {
+                    "total": 299,
+                    "total_time_in_millis": 7005
+                },
+                "warmer": {
+                    "current": 0,
+                    "total": 960058,
+                    "total_time_in_millis": 155434
+                },
+                "query_cache": {
+                    "memory_size_in_bytes": 1698624,
+                    "total_count": 1222084,
+                    "hit_count": 148958,
+                    "miss_count": 1073126,
+                    "cache_size": 131,
+                    "cache_count": 2115,
+                    "evictions": 1984
+                },
+                "fielddata": {
+                    "memory_size_in_bytes": 8256,
+                    "evictions": 0
+                },
+                "completion": {
+                    "size_in_bytes": 0
+                },
+                "segments": {
+                    "count": 1661,
+                    "memory_in_bytes": 39764743,
+                    "terms_memory_in_bytes": 22195943,
+                    "stored_fields_memory_in_bytes": 3200936,
+                    "term_vectors_memory_in_bytes": 0,
+                    "norms_memory_in_bytes": 343040,
+                    "points_memory_in_bytes": 4009732,
+                    "doc_values_memory_in_bytes": 10015092,
+                    "index_writer_memory_in_bytes": 3147663,
+                    "version_map_memory_in_bytes": 2536,
+                    "fixed_bit_set_memory_in_bytes": 1126224,
+                    "max_unsafe_auto_id_timestamp": 1524441609889,
+                    "file_sizes": {}
+                },
+                "translog": {
+                    "operations": 1838361,
+                    "size_in_bytes": 1525215881,
+                    "uncommitted_operations": 24969,
+                    "uncommitted_size_in_bytes": 15857511
+                },
+                "request_cache": {
+                    "memory_size_in_bytes": 15608,
+                    "evictions": 0,
+                    "hit_count": 461937,
+                    "miss_count": 113
+                },
+                "recovery": {
+                    "current_as_source": 0,
+                    "current_as_target": 0,
+                    "throttle_time_in_millis": 366610
+                }
+            },
+            "os": {
+                "timestamp": 1524464610097,
+                "cpu": {
+                    "percent": 17,
+                    "load_average": {
+                        "1m": 7.15,
+                        "5m": 4.67,
+                        "15m": 3.5
+                    }
+                },
+                "mem": {
+                    "total_in_bytes": 257796820992,
+                    "free_in_bytes": 5525663744,
+                    "used_in_bytes": 252271157248,
+                    "free_percent": 2,
+                    "used_percent": 98
+                },
+                "swap": {
+                    "total_in_bytes": 10737414144,
+                    "free_in_bytes": 10246205440,
+                    "used_in_bytes": 491208704
+                },
+                "cgroup": {
+                    "cpuacct": {
+                        "control_group": "/",
+                        "usage_nanos": 292079722854156
+                    },
+                    "cpu": {
+                        "control_group": "/",
+                        "cfs_period_micros": 100000,
+                        "cfs_quota_micros": 236945,
+                        "stat": {
+                            "number_of_elapsed_periods": 15278067,
+                            "number_of_times_throttled": 155945,
+                            "time_throttled_nanos": 14606886791788
+                        }
+                    },
+                    "memory": {
+                        "control_group": "/",
+                        "limit_in_bytes": "2147483648",
+                        "usage_in_bytes": "2145837056"
+                    }
+                }
+            },
+            "process": {
+                "timestamp": 1524464610098,
+                "open_file_descriptors": 1434,
+                "max_file_descriptors": 1048576,
+                "cpu": {
+                    "percent": 2,
+                    "total_in_millis": 291781030
+                },
+                "mem": {
+                    "total_virtual_in_bytes": 14964170752
+                }
+            },
+            "jvm": {
+                "timestamp": 1524464610099,
+                "uptime_in_millis": 2026428424,
+                "mem": {
+                    "heap_used_in_bytes": 581971648,
+                    "heap_used_percent": 55,
+                    "heap_committed_in_bytes": 1056309248,
+                    "heap_max_in_bytes": 1056309248,
+                    "non_heap_used_in_bytes": 247342320,
+                    "non_heap_committed_in_bytes": 281911296,
+                    "pools": {
+                        "young": {
+                            "used_in_bytes": 17064904,
+                            "max_in_bytes": 139591680,
+                            "peak_used_in_bytes": 139591680,
+                            "peak_max_in_bytes": 139591680
+                        },
+                        "survivor": {
+                            "used_in_bytes": 7227224,
+                            "max_in_bytes": 17432576,
+                            "peak_used_in_bytes": 17432576,
+                            "peak_max_in_bytes": 17432576
+                        },
+                        "old": {
+                            "used_in_bytes": 557679520,
+                            "max_in_bytes": 899284992,
+                            "peak_used_in_bytes": 707779408,
+                            "peak_max_in_bytes": 899284992
+                        }
+                    }
+                },
+                "threads": {
+                    "count": 95,
+                    "peak_count": 130
+                },
+                "gc": {
+                    "collectors": {
+                        "young": {
+                            "collection_count": 678990,
+                            "collection_time_in_millis": 9599952
+                        },
+                        "old": {
+                            "collection_count": 3424,
+                            "collection_time_in_millis": 376853
+                        }
+                    }
+                },
+                "buffer_pools": {
+                    "direct": {
+                        "count": 71,
+                        "used_in_bytes": 1364951,
+                        "total_capacity_in_bytes": 1364949
+                    },
+                    "mapped": {
+                        "count": 3729,
+                        "used_in_bytes": 11713431232,
+                        "total_capacity_in_bytes": 11713431232
+                    }
+                },
+                "classes": {
+                    "current_loaded_count": 19772,
+                    "total_loaded_count": 28207,
+                    "total_unloaded_count": 8435
+                }
+            },
+            "thread_pool": {
+                "bulk": {
+                    "threads": 2,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 2,
+                    "completed": 2968468
+                },
+                "fetch_shard_started": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 4,
+                    "completed": 17664
+                },
+                "fetch_shard_store": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 4,
+                    "completed": 2531
+                },
+                "flush": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 1,
+                    "completed": 652262
+                },
+                "force_merge": {
+                    "threads": 0,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 0,
+                    "completed": 0
+                },
+                "generic": {
+                    "threads": 31,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 56,
+                    "completed": 10701102
+                },
+                "get": {
+                    "threads": 2,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 2,
+                    "completed": 422867
+                },
+                "index": {
+                    "threads": 2,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 2,
+                    "completed": 162943
+                },
+                "listener": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 1,
+                    "completed": 3
+                },
+                "management": {
+                    "threads": 5,
+                    "queue": 0,
+                    "active": 1,
+                    "rejected": 0,
+                    "largest": 5,
+                    "completed": 10422508
+                },
+                "refresh": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 1,
+                    "completed": 145364755
+                },
+                "search": {
+                    "threads": 4,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 4,
+                    "completed": 3248375
+                },
+                "security-token-key": {
+                    "threads": 0,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 0,
+                    "completed": 0
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 66,
+                    "active": 1,
+                    "rejected": 0,
+                    "largest": 1,
+                    "completed": 156934
+                },
+                "warmer": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 1,
+                    "completed": 954865
+                },
+                "watcher": {
+                    "threads": 10,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 164130
+                }
+            },
+            "fs": {
+                "timestamp": 1524464610101,
+                "total": {
+                    "total_in_bytes": 55834574848,
+                    "free_in_bytes": 42471211008,
+                    "available_in_bytes": 42471211008
+                },
+                "data": [
+                    {
+                        "path": "/app/data/nodes/0",
+                        "mount": "QuotaAwareFileStore(/app (/dev/mapper/data))",
+                        "type": "xfs",
+                        "total_in_bytes": 55834574848,
+                        "free_in_bytes": 42471211008,
+                        "available_in_bytes": 42471211008
+                    }
+                ],
+                "io_stats": {}
+            },
+            "transport": {
+                "server_open": 0,
+                "rx_count": 852163,
+                "rx_size_in_bytes": 37599508177,
+                "tx_count": 896154,
+                "tx_size_in_bytes": 39437993670
+            },
+            "http": {
+                "current_open": 85,
+                "total_opened": 53188
+            },
+            "breakers": {
+                "request": {
+                    "limit_size_in_bytes": 633785548,
+                    "limit_size": "604.4mb",
+                    "estimated_size_in_bytes": 0,
+                    "estimated_size": "0b",
+                    "overhead": 1,
+                    "tripped": 0
+                },
+                "fielddata": {
+                    "limit_size_in_bytes": 633785548,
+                    "limit_size": "604.4mb",
+                    "estimated_size_in_bytes": 8256,
+                    "estimated_size": "8kb",
+                    "overhead": 1.03,
+                    "tripped": 0
+                },
+                "in_flight_requests": {
+                    "limit_size_in_bytes": 1056309248,
+                    "limit_size": "1007.3mb",
+                    "estimated_size_in_bytes": 0,
+                    "estimated_size": "0b",
+                    "overhead": 1,
+                    "tripped": 0
+                },
+                "accounting": {
+                    "limit_size_in_bytes": 1056309248,
+                    "limit_size": "1007.3mb",
+                    "estimated_size_in_bytes": 39764743,
+                    "estimated_size": "37.9mb",
+                    "overhead": 1,
+                    "tripped": 0
+                },
+                "parent": {
+                    "limit_size_in_bytes": 739416473,
+                    "limit_size": "705.1mb",
+                    "estimated_size_in_bytes": 39772999,
+                    "estimated_size": "37.9mb",
+                    "overhead": 1,
+                    "tripped": 0
+                }
+            },
+            "script": {
+                "compilations": 31,
+                "cache_evictions": 0
+            },
+            "discovery": {
+                "cluster_state_queue": {
+                    "total": 1,
+                    "pending": 0,
+                    "committed": 1
+                },
+                "published_cluster_states": {
+                    "full_states": 7,
+                    "incompatible_diffs": 6,
+                    "compatible_diffs": 247
+                }
+            },
+            "ingest": {
+                "total": {
+                    "count": 0,
+                    "time_in_millis": 0,
+                    "current": 0,
+                    "failed": 0
+                },
+                "pipelines": {
+                    "xpack_monitoring_2": {
+                        "count": 0,
+                        "time_in_millis": 0,
+                        "current": 0,
+                        "failed": 0
+                    },
+                    "xpack_monitoring_6": {
+                        "count": 0,
+                        "time_in_millis": 0,
+                        "current": 0,
+                        "failed": 0
+                    }
+                }
+            },
+            "adaptive_selection": {
+                "r4XD9O8eTrCHyN_GJswZ5A": {
+                    "outgoing_searches": 0,
+                    "avg_queue_size": 0,
+                    "avg_service_time_ns": 79338,
+                    "avg_response_time_ns": 235770,
+                    "rank": "0.2"
+                }
+            }
+        }
+    }
+}

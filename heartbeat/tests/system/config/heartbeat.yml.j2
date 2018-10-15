@@ -1,6 +1,17 @@
+logging.level: debug
+
 heartbeat.monitors:
 {% for monitor in monitors -%}
 - type: {{ monitor.type }}
+  schedule: '{{ monitor.schedule|default("@every 1s") }}'
+
+  {%- if monitor.tags is defined %}
+  tags:
+    {% for tag in monitor.tags -%}
+    - '{{ tag }}'
+    {% endfor %}
+  {% endif -%}
+
   {%- if monitor.hosts is defined %}
   hosts:
     {%- for host in monitor.hosts %}
@@ -15,19 +26,6 @@ heartbeat.monitors:
     {% endfor %}
   {% endif -%}
 
-  {%- if monitor.schedule is defined %}
-  schedule: '{{ monitor.schedule }}'
-  {%- else -%}
-  schedule: '@every 1s'
-  {% endif -%}
-
-  {%- if monitor.tags is defined %}
-  tags:
-    {% for tag in monitor.tags -%}
-    - '{{ tag }}'
-    {% endfor %}
-  {% endif -%}
-
   {%- if monitor.fields is defined %}
   {% if monitor.fields_under_root %}fields_under_root: true{% endif %}
   fields:
@@ -36,6 +34,26 @@ heartbeat.monitors:
     {% endfor %}
   {% endif %}
 {% endfor -%}
+
+{% if reload or reload_path -%}
+heartbeat.config.monitors:
+  path: {{ reload_path|default("${path.config}/monitors.d/*.yml") }}
+  reload.period: 1s
+  reload.enabled: {{ reload|default("false")}}
+{% endif -%}
+
+{% if autodiscover %}
+heartbeat.autodiscover:
+  providers:
+  {%- for provider, settings in autodiscover.items() %}
+  - type: {{provider}}
+    {%- if settings %}
+    {%- for k, v in settings.items() %}
+    {{k}}: {{v | default([])}}
+    {%- endfor %}
+    {%- endif %}
+  {%- endfor %}
+{% endif %}
 
 {%- if shipper_name %}
 name: {{ shipper_name }}

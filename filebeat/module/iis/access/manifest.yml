@@ -10,7 +10,7 @@ var:
       - C:/inetpub/logs/LogFiles/*/*.log
 
 ingest_pipeline: ingest/default.json
-prospector: config/iis-access.yml
+input: config/iis-access.yml
 
 requires.processors:
 - name: user_agent

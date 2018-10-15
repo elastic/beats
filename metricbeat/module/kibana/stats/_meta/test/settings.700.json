@@ -1,0 +1,18 @@
+{
+    "cluster_uuid":"u5ii0pnQRka_P0gimfmthg",
+    "settings":{
+      "xpack":{
+        "default_admin_email":"jane@doe.com"
+      },
+      "kibana":{
+        "uuid":"5b2de169-2785-441b-ae8c-186a1936b17d",
+        "name":"Janes-MBP-2",
+        "index":".kibana",
+        "host":"localhost",
+        "transport_address":"localhost:5601",
+        "version":"7.0.0-alpha1",
+        "snapshot":false,
+        "status":"green"
+      }
+    }
+  }

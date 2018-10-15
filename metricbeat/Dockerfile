@@ -1,4 +1,4 @@
-FROM golang:1.9.4
+FROM golang:1.10.3
 MAINTAINER Nicolas Ruflin <ruflin@elastic.co>
 
 RUN set -x && \
@@ -7,7 +7,9 @@ RUN set -x && \
          netcat python-pip virtualenv && \
     apt-get clean
 
+RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
+RUN pip install --upgrade docker-compose==1.21.0
 
 # Setup work environment
 ENV METRICBEAT_PATH /go/src/github.com/elastic/beats/metricbeat

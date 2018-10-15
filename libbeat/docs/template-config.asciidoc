@@ -8,9 +8,13 @@ mappings in Elasticsearch. If template loading is enabled (the default),
 {beatname_uc} loads the index template automatically after successfully
 connecting to Elasticsearch.
 
+ifndef::only-elasticsearch[]
+
 NOTE: A connection to Elasticsearch is required to load the index template. If
 the output is Logstash, you must <<load-template-manually,load the template
 manually>>.
+
+endif::[]
 
 You can adjust the following settings to load your own template or overwrite an
 existing one.
@@ -19,7 +23,7 @@ existing one.
 you must <<load-template-manually,load the template manually>>.
 
 *`setup.template.name`*:: The name of the template. The default is
-+{beatname_lc}+. The Beat version is always appended to the given
++{beatname_lc}+. The {beatname_uc} version is always appended to the given
 name, so the final name is +{beatname_lc}-%\{[beat.version]\}+.
 
 // Maintainers: a backslash character is required to escape curly braces and
@@ -29,9 +33,9 @@ name, so the final name is +{beatname_lc}-%\{[beat.version]\}+.
 // the example as expected.
 
 *`setup.template.pattern`*:: The template pattern to apply to the default index
-settings. The default pattern is +{beatname_lc}-\*+. The Beat version is always
+settings. The default pattern is +{beat_default_index_prefix}-\*+. The {beatname_uc} version is always
 included in the pattern, so the final pattern is
-+{beatname_lc}-%\{[beat.version]\}-*+. The wildcard character `-*` is used to
++{beat_default_index_prefix}-%\{[beat.version]\}-*+. The wildcard character `-*` is used to
 match all daily indices.
 +
 Example:
@@ -39,7 +43,7 @@ Example:
 ["source","yaml",subs="attributes"]
 ----------------------------------------------------------------------
 setup.template.name: "{beatname_lc}"
-setup.template.pattern: "{beatname_lc}-*"
+setup.template.pattern: "{beat_default_index_prefix}-*"
 ----------------------------------------------------------------------
 
 *`setup.template.fields`*:: The path to the YAML file describing the fields. The default is +fields.yml+. If a
@@ -78,3 +82,52 @@ setup.template.overwrite: false
 setup.template.settings:
   _source.enabled: false
 ----------------------------------------------------------------------
+
+ifeval::["{beatname_lc}"!="apm-server"]
+*`setup.template.append_fields`* experimental[]:: A list of fields to be added
+to the template and {kib} index pattern. This setting adds new fields. It does
+not overwrite or change existing fields. 
++
+This setting is useful when your data contains fields that {beatname_uc} doesn't
+know about in advance. 
+ifeval::["{beatname_lc}"=="metricbeat"]
+For example, you might want to append fields to the template when you're using
+a metricset, such as the <<metricbeat-metricset-http-json>>, and the full data
+structure is not known in advance. 
+endif::[]
++
+If `append_fields` is specified along with `overwrite: true`, {beatname_uc}
+overwrites the existing template and applies the new template when creating new
+indices. Existing indices are not affected. If you're running multiple
+instances of {beatname_uc} with different `append_fields` settings, the last one
+writing the template takes precedence.
++
+Any changes to this setting also affect the {kib} index pattern.
++
+Example config:
++
+[source,yaml]
+----
+setup.template.overwrite: true
+setup.template.append_fields:
+- name: test.name
+  type: keyword
+- name: test.hostname
+  type: long
+----
+
+*`setup.template.json.enabled`*:: Set to `true` to load a
+JSON-based template file. Specify the path to your {es} index template file and
+set the name of the template. 
++
+["source","yaml",subs="attributes"]
+----------------------------------------------------------------------
+setup.template.json.enabled: true
+setup.template.json.path: "template.json"
+setup.template.json.name: "template-name
+----------------------------------------------------------------------
+
+NOTE: If the JSON template is used, the `fields.yml` is skipped for the template
+generation.
+
+endif::[]

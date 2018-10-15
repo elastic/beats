@@ -1,4 +1,8 @@
+# Module: zookeeper
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-zookeeper.html
+
 - module: zookeeper
-  metricsets: ["mntr"]
+  #metricsets:
+  #  - mntr
   period: 10s
   hosts: ["localhost:2181"]

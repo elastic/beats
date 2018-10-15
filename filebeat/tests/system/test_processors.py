@@ -115,3 +115,80 @@ class Test(BaseTest):
         assert "beat.name" in output
         assert "message" in output
         assert "test" in output["message"]
+
+    def test_dissect_good_tokenizer(self):
+        """
+        Check dissect with a good tokenizer
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "dissect": {
+                    "tokenizer": "\"%{key} world\"",
+                    "field": "message",
+                    "target_prefix": "extracted"
+                },
+            }]
+        )
+        with open(self.working_dir + "/test.log", "w") as f:
+            f.write("Hello world\n")
+
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=1))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output(
+            required_fields=["@timestamp"],
+        )[0]
+        assert output["extracted.key"] == "Hello"
+
+    def test_dissect_defaults(self):
+        """
+        Check dissect defaults
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "dissect": {
+                    "tokenizer": "\"%{key} world\"",
+                },
+            }]
+        )
+        with open(self.working_dir + "/test.log", "w") as f:
+            f.write("Hello world\n")
+
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=1))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output(
+            required_fields=["@timestamp"],
+        )[0]
+        assert output["dissect.key"] == "Hello"
+
+    def test_dissect_bad_tokenizer(self):
+        """
+        Check dissect with a bad tokenizer
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "dissect": {
+                    "tokenizer": "\"not %{key} world\"",
+                    "field": "message",
+                    "target_prefix": "extracted"
+                },
+            }]
+        )
+        with open(self.working_dir + "/test.log", "w") as f:
+            f.write("Hello world\n")
+
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=1))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output(
+            required_fields=["@timestamp"],
+        )[0]
+        assert "extracted.key" not in output
+        assert output["message"] == "Hello world"

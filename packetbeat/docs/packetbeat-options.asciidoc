@@ -204,7 +204,7 @@ You can use the `bpf_filter` setting to overwrite the generated BPF filter. For 
 [source,yaml]
 ------------------------------------------------------------------------------
 packetbeat.interfaces.device: eth0
-packetbeat.interfaces.bpf_filter: "net 192.168.238.0/0 and port 80 and port 3306"
+packetbeat.interfaces.bpf_filter: "net 192.168.238.0/0 and port 80 or port 3306"
 ------------------------------------------------------------------------------
 
 NOTE: This setting disables automatic generation of the BPF filter. If
@@ -410,6 +410,9 @@ packetbeat.protocols:
 - type: icmp
   enabled: true
 
+- type: dhcpv4
+  ports: [67, 68]
+
 - type: dns
   ports: [53]
 
@@ -570,7 +573,7 @@ If enabled Packetbeat will generate the following BPF filter: `"icmp or icmp6"`.
 <titleabbrev>DNS</titleabbrev>
 ++++
 
-The `dns` section of the +{beatname_lc}.yml+ config file specifies configuration options for the DNS protocol. The DNS protocol supports processing DNS messages on UDP. Here is a sample configuration section for DNS:
+The `dns` section of the +{beatname_lc}.yml+ config file specifies configuration options for the DNS protocol. The DNS protocol supports processing DNS messages on TCP and UDP. Here is a sample configuration section for DNS:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -678,7 +681,14 @@ packetbeat.protocols:
   include_body_for: ["text/html"]
 ------------------------------------------------------------------------------
 
+===== `decode_body`
 
+A boolean flag that controls decoding of HTTP payload. It interprets the
+`Content-Encoding` and `Transfer-Encoding` headers and uncompresses the entity
+body. Supported encodings are `gzip` and `deflate`. This option is only
+applicable in the cases where the HTTP payload is exported, that is, when
+one of the `include_*_body_for` options is specified or a POST request
+contains url-encoded parameters.
 
 ===== `split_cookie`
 
@@ -1241,7 +1251,8 @@ configuration for the `tls` section of the +{beatname_lc}.yml+ config file:
 packetbeat.protocols:
 - type: tls
   send_certificates: true
-  include_raw_certificates: true
+  include_raw_certificates: false
+  fingerprints: [ sha1, sha256 ]
 ------------------------------------------------------------------------------
 
 ==== Configuration options
@@ -1270,6 +1281,14 @@ include the raw certificate encoded in PEM format as a `raw` field.
 
 If `send_certificates` is false, this setting is ignored. The default is false.
 
+==== `fingerprints`
+
+Defines a list of hash algorithms to calculate the certificate's fingerprints.
+Valid values are `sha1`, `sha256` and `md5`.
+
+If `send_certificates` is false, this setting is ignored. The default is to
+output SHA-1 fingerprints.
+
 [[configuration-processes]]
 == Specify which processes to monitor
 
@@ -1283,15 +1302,15 @@ process matching is disabled.
 When Packetbeat starts, and then periodically afterwards, it scans the process table for
 processes that match the configuration file. For each of these processes, it
 monitors which file descriptors it has opened. When a new packet is captured,
-it reads the list of active TCP connections and matches the corresponding one
+it reads the list of active TCP and UDP connections and matches the corresponding one
 with the list of file descriptors.
 
-On a Linux system, all this information is available via the `/proc`
-file system, so Packetbeat doesn't need a kernel module.
-
+All this information is available via system interfaces: The `/proc` file system
+in Linux and the IP Helper API (`iphlpapi.dll`) on Windows, so {beatname_uc}
+doesn't need a kernel module.
 
 NOTE: Process monitoring is currently only supported on
-      Linux systems. Packetbeat automatically disables
+      Linux and Windows systems. Packetbeat automatically disables
       process monitoring when it detects other operating systems.
 
 Example configuration:
@@ -1313,6 +1332,14 @@ packetbeat.procs:
     - process: app
       cmdline_grep: gunicorn
 ------------------------------------------------------------------------------
+
+When the process monitor is enabled, it will enrich all the events whose source
+or destination is a local process. The `cmdline` and/or `client_cmdline` fields
+will be added to an event, when the server side or client side of the connection
+belong to a local process, respectively. Additionally, you can specify a pattern
+using the `cmdline_grep` option, to also name those processes. This will cause
+the `proc` and `client_proc` fields to be added to an event, with the name of
+the matched process.
 
 [float]
 === Configuration options
@@ -1350,6 +1377,3 @@ Example configuration:
 -------------------------------------------------------------------------------------
 packetbeat.shutdown_timeout: 5s
 -------------------------------------------------------------------------------------
-
-
-

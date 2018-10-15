@@ -33,4 +33,3 @@
       example: metricsets
       description: >
         The document type. Always set to "doc".
-

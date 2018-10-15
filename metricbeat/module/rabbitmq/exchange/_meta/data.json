@@ -1,0 +1,45 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "localhost:15672",
+        "module": "rabbitmq",
+        "name": "exchange",
+        "rtt": 115
+    },
+    "rabbitmq": {
+        "exchange": {
+            "arguments": {},
+            "auto_delete": false,
+            "durable": true,
+            "internal": false,
+            "messages": {
+                "ack": {},
+                "confirm": {},
+                "deliver_get": {},
+                "publish": {},
+                "publish_in": {
+                    "count": 607,
+                    "details": {
+                        "rate": 4
+                    }
+                },
+                "publish_out": {
+                    "count": 547,
+                    "details": {
+                        "rate": 4
+                    }
+                },
+                "redeliver": {},
+                "return_unroutable": {}
+            },
+            "name": "",
+            "type": "direct",
+            "user": "rmq-internal",
+            "vhost": "/"
+        }
+    }
+}

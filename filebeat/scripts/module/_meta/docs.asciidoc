@@ -1,4 +1,5 @@
 :modulename: {module}
+:has-dashboards: true
 
 == {module} module
 
@@ -19,7 +20,8 @@ include::../include/running-modules.asciidoc[]
 
 This module comes with a sample dashboard. For example:
 
-TODO: include an image of a sample dashboard
+TODO: include an image of a sample dashboard. If you do not include a dashboard,
+remove this section and set `:has-dashboards: false` at the top of this file.
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -37,3 +39,9 @@ the relevant file. For example:
 ==== `{fileset}` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
