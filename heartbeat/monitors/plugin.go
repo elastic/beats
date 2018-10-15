@@ -48,7 +48,7 @@ func init() {
 
 // PluginBuilder is the signature of functions used to build active
 // monitors
-type PluginBuilder func(string, *common.Config) ([]Job, error)
+type PluginBuilder func(string, *common.Config) (jobs []Job, endpoints int, err error)
 
 // Type represents whether a plugin is active or passive.
 type Type uint8
@@ -129,7 +129,7 @@ func (r *pluginsReg) monitorNames() []string {
 	return names
 }
 
-func (e *pluginBuilder) create(cfg *common.Config) ([]Job, error) {
+func (e *pluginBuilder) create(cfg *common.Config) (jobs []Job, endpoints int, err error) {
 	return e.builder(e.name, cfg)
 }
 

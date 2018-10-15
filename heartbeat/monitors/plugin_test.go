@@ -20,8 +20,6 @@ package monitors
 import (
 	"reflect"
 	"testing"
-
-	"github.com/elastic/beats/libbeat/common"
 )
 
 func Test_newPluginsReg(t *testing.T) {
@@ -189,43 +187,6 @@ func Test_pluginsReg_String(t *testing.T) {
 			}
 			if got := r.String(); got != tt.want {
 				t.Errorf("pluginsReg.String() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_pluginBuilder_create(t *testing.T) {
-	type fields struct {
-		name    string
-		typ     Type
-		builder PluginBuilder
-	}
-	type args struct {
-		cfg *common.Config
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    []Job
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			e := &pluginBuilder{
-				name:    tt.fields.name,
-				typ:     tt.fields.typ,
-				builder: tt.fields.builder,
-			}
-			got, err := e.create(tt.args.cfg)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("pluginBuilder.create() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("pluginBuilder.create() = %v, want %v", got, tt.want)
 			}
 		})
 	}

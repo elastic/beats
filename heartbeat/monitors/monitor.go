@@ -30,7 +30,37 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
+
+var teleRegistry *monitoring.Registry = monitoring.Default.NewRegistry("heartbeat")
+var httpRegistry *monitoring.Registry = teleRegistry.NewRegistry("heartbeat.http")
+var tcpRegistry *monitoring.Registry = teleRegistry.NewRegistry("heartbeat.tcp")
+var icmpRegistry *monitoring.Registry = teleRegistry.NewRegistry("heartbeat.icmp")
+
+type protocolStats struct {
+	monitors  *monitoring.Int
+	endpoints *monitoring.Int
+}
+
+func newProtocolStats(reg *monitoring.Registry) protocolStats {
+	return protocolStats{
+		monitoring.NewInt(reg, "monitors"),
+		monitoring.NewInt(reg, "endpoints"),
+	}
+}
+
+var teleStats = struct {
+	monitors  *monitoring.Int
+	protocols map[string]protocolStats
+}{
+	monitors: monitoring.NewInt(teleRegistry, "monitors"),
+	protocols: map[string]protocolStats{
+		"http": newProtocolStats(teleRegistry.NewRegistry("http")),
+		"tcp":  newProtocolStats(teleRegistry.NewRegistry("tcp")),
+		"icmp": newProtocolStats(teleRegistry.NewRegistry("icmp")),
+	},
+}
 
 // Monitor represents a configured recurring monitoring task loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
@@ -42,6 +72,8 @@ type Monitor struct {
 	scheduler  *scheduler.Scheduler
 	jobTasks   []*task
 	enabled    bool
+	// endpoints is a count of endpoints this monitor measures.
+	endpoints int
 	// internalsMtx is used to synchronize access to critical
 	// internal datastructures
 	internalsMtx sync.Mutex
@@ -97,7 +129,8 @@ func newMonitor(
 		config:            config,
 	}
 
-	jobs, err := monitorPlugin.create(config)
+	jobs, endpoints, err := monitorPlugin.create(config)
+	m.endpoints = endpoints
 	if err != nil {
 		return nil, fmt.Errorf("job err %v", err)
 	}
@@ -181,7 +214,8 @@ func (m *Monitor) makeWatchTasks(monitorPlugin pluginBuilder) error {
 					return
 				}
 
-				watchJobs, err := monitorPlugin.create(merged)
+				watchJobs, endpoints, err := monitorPlugin.create(merged)
+				m.endpoints = endpoints
 				if err != nil {
 					logp.Err("Could not create job from watch file: %v", err)
 				}
@@ -227,6 +261,15 @@ func (m *Monitor) Start() {
 	for _, t := range m.watchPollTasks {
 		t.Start()
 	}
+
+	teleStats.monitors.Inc()
+
+	if stats, ok := teleStats.protocols[m.name]; !ok {
+		panic(fmt.Sprintf("Unknown protocol for monitor stats: %s", m.name))
+	} else {
+		stats.monitors.Inc()
+		stats.endpoints.Add(int64(m.endpoints))
+	}
 }
 
 // Stop stops the Monitor's execution in its configured scheduler.
@@ -241,5 +284,14 @@ func (m *Monitor) Stop() {
 
 	for _, t := range m.watchPollTasks {
 		t.Stop()
+	}
+
+	teleStats.monitors.Dec()
+
+	if stats, ok := teleStats.protocols[m.name]; !ok {
+		panic(fmt.Sprintf("Unknown protocol for monitor stats: %s", m.name))
+	} else {
+		stats.monitors.Dec()
+		stats.endpoints.Sub(int64(m.endpoints))
 	}
 }
