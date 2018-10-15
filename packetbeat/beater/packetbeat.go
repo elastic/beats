@@ -31,17 +31,20 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/service"
+
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/decoder"
 	"github.com/elastic/beats/packetbeat/flows"
-	_ "github.com/elastic/beats/packetbeat/processor/add_kubernetes_metadata"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/icmp"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/protos/udp"
 	"github.com/elastic/beats/packetbeat/publish"
-	"github.com/elastic/beats/packetbeat/sniffer" // Add packetbeat default processors
+	"github.com/elastic/beats/packetbeat/sniffer"
+
+	// Add packetbeat default processors
+	_ "github.com/elastic/beats/packetbeat/processor/add_kubernetes_metadata"
 )
 
 // Beater object. Contains all objects needed to run the beat

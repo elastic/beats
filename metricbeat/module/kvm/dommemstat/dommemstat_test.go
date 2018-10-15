@@ -20,10 +20,11 @@ package dommemstat
 import (
 	"testing"
 
-	"github.com/digitalocean/go-libvirt/libvirttest"
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
+	"github.com/digitalocean/go-libvirt/libvirttest"
 )
 
 func TestFetchEventContents(t *testing.T) {

@@ -24,9 +24,9 @@ import (
 	"strings"
 	"time"
 
-	rd "github.com/garyburd/redigo/redis"
-
 	"github.com/elastic/beats/libbeat/logp"
+
+	rd "github.com/garyburd/redigo/redis"
 )
 
 // ParseRedisInfo parses the string returned by the INFO command

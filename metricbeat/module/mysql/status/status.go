@@ -26,12 +26,12 @@ package status
 import (
 	"database/sql"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mysql"
+
+	"github.com/pkg/errors"
 )
 
 var (

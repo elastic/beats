@@ -23,7 +23,6 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/fileset"
-	_ "github.com/elastic/beats/filebeat/include"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/registrar"
@@ -31,6 +30,8 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+
+	_ "github.com/elastic/beats/filebeat/include"
 )
 
 type Crawler struct {

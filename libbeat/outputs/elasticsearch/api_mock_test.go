@@ -20,11 +20,12 @@
 package elasticsearch
 
 import (
-	"encoding/json"
 	"fmt"
+	"os"
+
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 

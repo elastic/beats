@@ -27,15 +27,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/garyburd/redigo/redis"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/outest"
+
 	_ "github.com/elastic/beats/libbeat/outputs/codec/format"
 	_ "github.com/elastic/beats/libbeat/outputs/codec/json"
-	"github.com/elastic/beats/libbeat/outputs/outest"
 )
 
 const (

@@ -18,9 +18,10 @@
 package look
 
 import (
-	"fmt"
 	"testing"
 	"time"
+
+	"fmt"
 
 	"github.com/stretchr/testify/assert"
 

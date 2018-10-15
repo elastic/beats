@@ -27,11 +27,11 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/elastic/beats/metricbeat/mb/parse"
+
 	"github.com/gocarina/gocsv"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/metricbeat/mb/parse"
 )
 
 // HostParser is used for parsing the configured HAProxy hosts.

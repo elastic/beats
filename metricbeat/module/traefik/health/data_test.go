@@ -22,9 +22,9 @@ package health
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/common"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEventMapping(t *testing.T) {

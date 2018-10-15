@@ -21,6 +21,7 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/libbeat/plugin"
+
 	"github.com/elastic/beats/metricbeat/mb"
 )
 

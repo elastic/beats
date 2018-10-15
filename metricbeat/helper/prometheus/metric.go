@@ -22,9 +22,9 @@ import (
 	"strconv"
 	"strings"
 
-	dto "github.com/prometheus/client_model/go"
-
 	"github.com/elastic/beats/libbeat/common"
+
+	dto "github.com/prometheus/client_model/go"
 )
 
 // MetricMap defines the mapping from Prometheus metric to a Metricbeat field

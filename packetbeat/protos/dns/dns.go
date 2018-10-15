@@ -31,14 +31,15 @@ import (
 	"strings"
 	"time"
 
-	mkdns "github.com/miekg/dns"
-	"golang.org/x/net/publicsuffix"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+
 	"github.com/elastic/beats/packetbeat/protos"
+
+	mkdns "github.com/miekg/dns"
+	"golang.org/x/net/publicsuffix"
 )
 
 type dnsPlugin struct {

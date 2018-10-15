@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/libbeat/common"
+
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 )

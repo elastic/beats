@@ -24,14 +24,16 @@ import (
 	"net"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/packetbeat/protos"
+
+	"github.com/tsg/gopacket"
+	"github.com/tsg/gopacket/layers"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIcmpIsLocalIp(t *testing.T) {

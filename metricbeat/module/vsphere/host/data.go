@@ -18,9 +18,9 @@
 package host
 
 import (
-	"github.com/vmware/govmomi/vim25/mo"
-
 	"github.com/elastic/beats/libbeat/common"
+
+	"github.com/vmware/govmomi/vim25/mo"
 )
 
 func eventMapping(hs mo.HostSystem) common.MapStr {

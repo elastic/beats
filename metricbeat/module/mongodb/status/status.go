@@ -18,12 +18,12 @@
 package status
 
 import (
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 /*

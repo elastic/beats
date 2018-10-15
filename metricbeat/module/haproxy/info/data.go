@@ -18,14 +18,14 @@
 package info
 
 import (
-	"reflect"
-	"strconv"
-	"strings"
-
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
+
+	"reflect"
+	"strconv"
+	"strings"
 )
 
 var (

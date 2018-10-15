@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/filebeat/beater"
+
 	cmd "github.com/elastic/beats/libbeat/cmd"
 )
 

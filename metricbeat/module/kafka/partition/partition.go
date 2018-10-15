@@ -21,8 +21,6 @@ import (
 	"crypto/tls"
 	"errors"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
@@ -30,6 +28,8 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/kafka"
+
+	"github.com/Shopify/sarama"
 )
 
 // init registers the partition MetricSet with the central registry.

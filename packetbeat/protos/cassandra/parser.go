@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
+
 	gocql "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 )
 

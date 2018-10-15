@@ -19,6 +19,7 @@ package state_deployment
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"

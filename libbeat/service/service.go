@@ -23,8 +23,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
-	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"runtime"
@@ -34,6 +32,9 @@ import (
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+
+	"net/http"
+	_ "net/http/pprof"
 )
 
 // HandleSignals manages OS signals that ask the service/daemon to stop.

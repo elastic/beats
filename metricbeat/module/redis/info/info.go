@@ -21,13 +21,13 @@ import (
 	"strconv"
 	"time"
 
-	rd "github.com/garyburd/redigo/redis"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/redis"
+
+	rd "github.com/garyburd/redigo/redis"
 )
 
 var (

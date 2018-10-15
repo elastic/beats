@@ -23,10 +23,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // These tests are running with prometheus metrics as an example as this container is already available

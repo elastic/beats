@@ -20,9 +20,9 @@ package thrift
 import (
 	"fmt"
 
-	"github.com/samuel/go-thrift/parser"
-
 	"github.com/elastic/beats/libbeat/logp"
+
+	"github.com/samuel/go-thrift/parser"
 )
 
 type thriftIdlMethod struct {

@@ -20,12 +20,12 @@ package rabbitmq
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {

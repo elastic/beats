@@ -21,9 +21,9 @@ import (
 	"math"
 	"strconv"
 
-	dto "github.com/prometheus/client_model/go"
-
 	"github.com/elastic/beats/libbeat/common"
+
+	dto "github.com/prometheus/client_model/go"
 )
 
 type PromEvent struct {

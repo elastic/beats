@@ -22,11 +22,11 @@ import (
 	"net/url"
 	"strings"
 
-	mgo "gopkg.in/mgo.v2"
-
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+
+	mgo "gopkg.in/mgo.v2"
 )
 
 func init() {

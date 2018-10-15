@@ -24,9 +24,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/auditbeat/cmd"
 	"github.com/elastic/go-libaudit"
 	"github.com/elastic/go-libaudit/rule"
+
+	"github.com/elastic/beats/auditbeat/cmd"
 )
 
 var (

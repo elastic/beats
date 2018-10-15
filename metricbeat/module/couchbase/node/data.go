@@ -19,6 +19,7 @@ package node
 
 import (
 	"encoding/json"
+
 	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"

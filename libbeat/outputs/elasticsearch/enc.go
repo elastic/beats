@@ -24,11 +24,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/elastic/go-structform/gotype"
+	"github.com/elastic/go-structform/json"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/go-structform/gotype"
-	"github.com/elastic/go-structform/json"
 )
 
 type bodyEncoder interface {

@@ -21,6 +21,7 @@ package fsstat
 
 import (
 	"testing"
+
 	"time"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"

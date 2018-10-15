@@ -20,9 +20,9 @@ package docker
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/common"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDeDotLabels(t *testing.T) {

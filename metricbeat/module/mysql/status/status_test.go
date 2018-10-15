@@ -20,10 +20,10 @@ package status
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // TestConfigValidation validates that the configuration and the DSN are

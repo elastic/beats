@@ -21,8 +21,9 @@ import (
 	"errors"
 	"testing"
 
-	as "github.com/aerospike/aerospike-client-go"
 	"github.com/stretchr/testify/assert"
+
+	as "github.com/aerospike/aerospike-client-go"
 )
 
 func TestParseHost(t *testing.T) {

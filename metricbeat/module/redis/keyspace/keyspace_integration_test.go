@@ -23,12 +23,12 @@ import (
 	"strings"
 	"testing"
 
-	rd "github.com/garyburd/redigo/redis"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/redis"
+
+	rd "github.com/garyburd/redigo/redis"
+	"github.com/stretchr/testify/assert"
 )
 
 var host = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()

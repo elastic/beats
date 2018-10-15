@@ -22,14 +22,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/go-structform"
 	"github.com/elastic/go-structform/cborl"
 	"github.com/elastic/go-structform/gotype"
 	"github.com/elastic/go-structform/json"
 	"github.com/elastic/go-structform/ubjson"
+
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher"
 )
 
 type encoder struct {

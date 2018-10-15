@@ -22,8 +22,9 @@ package icmp
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/tsg/gopacket/layers"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIcmpMessageIsRequestICMPv4(t *testing.T) {

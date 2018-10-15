@@ -20,10 +20,11 @@ package add_docker_metadata
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"runtime"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"

@@ -23,11 +23,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/traefik/mtest"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func makeBadRequest(config map[string]interface{}) error {

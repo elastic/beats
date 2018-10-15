@@ -39,11 +39,12 @@ import (
 	"testing"
 	"time"
 
-	mkdns "github.com/miekg/dns"
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/packetbeat/protos"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/packetbeat/protos"
+
+	mkdns "github.com/miekg/dns"
+	"github.com/stretchr/testify/assert"
 )
 
 // Verify that the interface for UDP has been satisfied.

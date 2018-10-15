@@ -23,10 +23,11 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/docker"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMemoryService_GetMemoryStats(t *testing.T) {

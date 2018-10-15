@@ -22,9 +22,10 @@ import (
 	"io"
 	"math/rand"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
+
+	"strconv"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"

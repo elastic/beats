@@ -22,11 +22,12 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
+
+	"github.com/elastic/beats/heartbeat/monitors"
 )
 
 func init() {

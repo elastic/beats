@@ -20,12 +20,12 @@
 package diskio
 
 import (
-	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/disk"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+
+	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/disk"
 )
 
 func init() {

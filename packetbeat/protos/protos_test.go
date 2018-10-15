@@ -23,9 +23,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/common"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type TestProtocol struct {

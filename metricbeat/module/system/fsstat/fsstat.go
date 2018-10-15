@@ -22,13 +22,13 @@ package fsstat
 import (
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system/filesystem"
+
+	"github.com/pkg/errors"
 )
 
 var debugf = logp.MakeDebug("system-fsstat")
