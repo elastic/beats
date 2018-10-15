@@ -57,9 +57,3 @@
       type: keyword
       description: >
         Unique string representing the vantage point of this monitor.
-
-    - name: geo.location
-      required: false
-      type: geo_point
-      description: >
-        Longitude and latitude of the machine executing this monitoring check.

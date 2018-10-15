@@ -22,7 +22,8 @@ heartbeat.monitors:
   # Total test connection and data exchange timeout
   #timeout: 16s
 
-location: scout
+location: minneapolis
+geo.location: "44.8897,-93.3500"
 
 #==================== Elasticsearch template setting ==========================
 

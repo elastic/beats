@@ -117,6 +117,18 @@ Error type.
 
 --
 
+*`location`*::
++
+--
+type: keyword
+
+required: False
+
+Unique string representing the vantage point of this monitor.
+
+
+--
+
 [[exported-fields-cloud]]
 == Cloud provider metadata fields
 
