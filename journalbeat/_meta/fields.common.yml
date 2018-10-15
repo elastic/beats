@@ -34,7 +34,7 @@
               description: >
                   Audit fields of event.
               fields:
-                - name: loginuid
+                - name: login_uid
                   type: long
                   required: false
                   example: 1000
