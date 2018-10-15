@@ -22,11 +22,11 @@ package log
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common/match"
-
-	"github.com/stretchr/testify/assert"
 )
 
 var matchTests = []struct {

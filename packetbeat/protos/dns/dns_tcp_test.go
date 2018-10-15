@@ -31,12 +31,11 @@ import (
 	"net"
 	"testing"
 
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
 // Verify that the interface TCP has been satisfied.

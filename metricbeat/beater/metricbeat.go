@@ -20,9 +20,6 @@ package beater
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/management"
-
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
@@ -31,14 +28,12 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/management"
+	_ "github.com/elastic/beats/metricbeat/autodiscover" // Add metricbeat default processors
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/module"
-
-	// Add autodiscover builders / appenders
-	_ "github.com/elastic/beats/metricbeat/autodiscover"
-
-	// Add metricbeat default processors
+	"github.com/elastic/beats/metricbeat/mb/module" // Add autodiscover builders / appenders
 	_ "github.com/elastic/beats/metricbeat/processor/add_kubernetes_metadata"
 )
 

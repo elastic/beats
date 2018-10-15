@@ -20,14 +20,13 @@ package dns
 import (
 	"encoding/binary"
 
+	mkdns "github.com/miekg/dns"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
-
-	mkdns "github.com/miekg/dns"
 )
 
 const maxDNSMessageSize = (1 << 16) - 1

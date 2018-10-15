@@ -22,10 +22,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-
-	"github.com/elastic/beats/heartbeat/monitors"
 )
 
 type Config struct {

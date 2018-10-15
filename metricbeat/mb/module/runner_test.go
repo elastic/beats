@@ -22,13 +22,13 @@ package module_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	pubtest "github.com/elastic/beats/libbeat/publisher/testing"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestRunner(t *testing.T) {

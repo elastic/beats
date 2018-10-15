@@ -21,11 +21,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/simulator"
+
+	"github.com/elastic/beats/libbeat/common"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestFetchEventContents(t *testing.T) {

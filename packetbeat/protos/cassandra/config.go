@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/protos"
-
 	gocql "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 )
 

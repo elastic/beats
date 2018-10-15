@@ -21,9 +21,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	as "github.com/aerospike/aerospike-client-go"
+	"github.com/pkg/errors"
 )
 
 func ParseHost(host string) (*as.Host, error) {

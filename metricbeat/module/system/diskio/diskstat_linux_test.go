@@ -22,13 +22,12 @@ package diskio
 import (
 	"testing"
 
-	sigar "github.com/elastic/gosigar"
-
 	"github.com/shirou/gopsutil/disk"
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/system"
+	sigar "github.com/elastic/gosigar"
 )
 
 func Test_Get_CLK_TCK(t *testing.T) {

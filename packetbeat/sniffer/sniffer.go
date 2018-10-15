@@ -31,7 +31,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/elastic/beats/packetbeat/config"
 )
 

@@ -20,9 +20,9 @@ package haproxy
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
 	"github.com/stretchr/testify/assert"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestHostParser(t *testing.T) {

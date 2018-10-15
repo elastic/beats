@@ -25,11 +25,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/packetbeat/protos"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/tsg/gopacket/layers"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/packetbeat/protos"
 )
 
 // Test Constants

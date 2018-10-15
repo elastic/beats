@@ -24,7 +24,6 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"

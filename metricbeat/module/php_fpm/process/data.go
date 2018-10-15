@@ -20,9 +20,8 @@ package process
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/metricbeat/mb"
-
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 type phpFpmStatus struct {

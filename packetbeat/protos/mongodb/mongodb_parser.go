@@ -22,10 +22,10 @@ import (
 	"errors"
 	"strings"
 
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
 func mongodbMessageParser(s *stream) (bool, bool) {

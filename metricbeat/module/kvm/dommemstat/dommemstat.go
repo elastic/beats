@@ -22,10 +22,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/digitalocean/go-libvirt"
 	"github.com/digitalocean/go-libvirt/libvirttest"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"

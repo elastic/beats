@@ -30,9 +30,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-
-	// import queue types
+	"github.com/elastic/beats/libbeat/common" // import queue types
 	"github.com/elastic/beats/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/libbeat/publisher/queue/memqueue"
 	_ "github.com/elastic/beats/libbeat/publisher/queue/spool"

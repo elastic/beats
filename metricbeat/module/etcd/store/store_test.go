@@ -22,13 +22,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	"testing"
 )
 
 func TestEventMapping(t *testing.T) {

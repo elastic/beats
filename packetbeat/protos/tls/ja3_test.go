@@ -23,9 +23,9 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/elastic/beats/packetbeat/protos"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/packetbeat/protos"
 )
 
 var ja3test = []struct {

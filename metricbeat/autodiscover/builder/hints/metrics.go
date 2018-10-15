@@ -19,7 +19,6 @@ package hints
 
 import (
 	"fmt"
-
 	"strings"
 
 	"github.com/elastic/beats/libbeat/autodiscover"

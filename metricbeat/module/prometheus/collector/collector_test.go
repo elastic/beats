@@ -22,11 +22,11 @@ package collector
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/golang/protobuf/proto"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 func TestGetPromEventsFromMetricFamily(t *testing.T) {

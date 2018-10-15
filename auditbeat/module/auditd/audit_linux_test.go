@@ -27,9 +27,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/prometheus/procfs"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/auditbeat/core"
 	"github.com/elastic/beats/libbeat/logp"

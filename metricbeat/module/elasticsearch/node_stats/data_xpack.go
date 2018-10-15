@@ -19,7 +19,6 @@ package node_stats
 
 import (
 	"encoding/json"
-
 	"time"
 
 	"github.com/pkg/errors"

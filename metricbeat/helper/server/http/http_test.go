@@ -27,9 +27,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/metricbeat/helper/server"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/metricbeat/helper/server"
 )
 
 func GetHttpServer(host string, port int) (server.Server, error) {

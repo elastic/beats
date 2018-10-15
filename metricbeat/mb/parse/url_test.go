@@ -20,11 +20,10 @@ package parse
 import (
 	"testing"
 
-	"github.com/elastic/beats/metricbeat/mb"
-
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/metricbeat/mb"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestParseURL(t *testing.T) {

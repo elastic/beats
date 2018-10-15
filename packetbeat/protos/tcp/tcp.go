@@ -22,14 +22,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/tsg/gopacket/layers"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-
 	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/protos"
-
-	"github.com/tsg/gopacket/layers"
 )
 
 const TCPMaxDataInStream = 10 * (1 << 20)

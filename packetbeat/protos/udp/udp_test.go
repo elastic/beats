@@ -24,16 +24,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/protos"
-
-	// import plugins for testing
+	"github.com/elastic/beats/packetbeat/protos" // import plugins for testing
 	_ "github.com/elastic/beats/packetbeat/protos/http"
 	_ "github.com/elastic/beats/packetbeat/protos/mysql"
 	_ "github.com/elastic/beats/packetbeat/protos/redis"
-
-	"github.com/stretchr/testify/assert"
 )
 
 // Protocol ID and port number used by TestProtocol in various tests.

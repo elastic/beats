@@ -44,12 +44,12 @@ ZooKeeper mntr Command Output
 package mntr
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/zookeeper"
-
-	"github.com/pkg/errors"
 )
 
 func init() {

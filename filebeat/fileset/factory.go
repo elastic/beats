@@ -19,6 +19,7 @@ package fileset
 
 import (
 	"github.com/gofrs/uuid"
+	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/filebeat/channel"
 	input "github.com/elastic/beats/filebeat/prospector"
@@ -29,8 +30,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-
-	"github.com/mitchellh/hashstructure"
 )
 
 var (

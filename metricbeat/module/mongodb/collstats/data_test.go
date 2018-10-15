@@ -24,9 +24,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 func TestEventMapping(t *testing.T) {
