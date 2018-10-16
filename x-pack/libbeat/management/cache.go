@@ -5,6 +5,7 @@
 package management
 
 import (
+	"io/ioutil"
 	"os"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -51,18 +52,10 @@ func (c *Cache) Save() error {
 
 	// write temporary file first
 	tempFile := path + ".new"
-	f, err := os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
+	if err := ioutil.WriteFile(tempFile, data, 0600); err != nil {
 		return errors.Wrap(err, "failed to store central management settings")
 	}
 
-	_, err = f.Write(data)
-	f.Close()
-	if err != nil {
-		return err
-	}
-
 	// move temporary file into final location
-	err = file.SafeFileRotate(path, tempFile)
-	return err
+	return file.SafeFileRotate(path, tempFile)
 }
