@@ -25,7 +25,7 @@ import (
 
 // Config defines the user configurable options in the yaml file.
 type Config struct {
-	Enabled          *bool                   `config:"enabled" yml:"enabled"`
+	Enabled          *bool                   `config:"enabled" yaml:"enabled"`
 	VerificationMode TLSVerificationMode     `config:"verification_mode" yaml:"verification_mode"` // one of 'none', 'full'
 	Versions         []TLSVersion            `config:"supported_protocols" yaml:"supported_protocols"`
 	CipherSuites     []tlsCipherSuite        `config:"cipher_suites" yaml:"cipher_suites"`
