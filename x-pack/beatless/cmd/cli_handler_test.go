@@ -57,9 +57,9 @@ func testDeploy(t *testing.T) {
 		errOut, output := outputs()
 		myErr := errors.New("my error")
 		m := &mockCLIManager{}
-		m.On("Deploy", "ninja").Return(myErr)
+		m.On("Deploy", "saiyajin").Return(myErr)
 		handler := newCLIHandler(m, errOut, output)
-		err := handler.Deploy([]string{"ninja"})
+		err := handler.Deploy([]string{"saiyajin"})
 		assert.Error(t, err)
 	})
 
@@ -67,9 +67,9 @@ func testDeploy(t *testing.T) {
 		errOut, output := outputs()
 		m := &mockCLIManager{}
 		m.On("Deploy", "super").Return(nil)
-		m.On("Deploy", "ninja").Return(nil)
+		m.On("Deploy", "saiyajin").Return(nil)
 		handler := newCLIHandler(m, errOut, output)
-		err := handler.Deploy([]string{"super", "ninja"})
+		err := handler.Deploy([]string{"super", "saiyajin"})
 		assert.NoError(t, err)
 		m.AssertExpectations(t)
 	})
@@ -87,9 +87,9 @@ func testUpdate(t *testing.T) {
 		errOut, output := outputs()
 		myErr := errors.New("my error")
 		m := &mockCLIManager{}
-		m.On("Update", "ninja").Return(myErr)
+		m.On("Update", "saiyajin").Return(myErr)
 		handler := newCLIHandler(m, errOut, output)
-		err := handler.Update([]string{"ninja"})
+		err := handler.Update([]string{"saiyajin"})
 		assert.Error(t, err)
 	})
 
@@ -97,9 +97,9 @@ func testUpdate(t *testing.T) {
 		errOut, output := outputs()
 		m := &mockCLIManager{}
 		m.On("Update", "super").Return(nil)
-		m.On("Update", "ninja").Return(nil)
+		m.On("Update", "saiyajin").Return(nil)
 		handler := newCLIHandler(m, errOut, output)
-		err := handler.Update([]string{"super", "ninja"})
+		err := handler.Update([]string{"super", "saiyajin"})
 		assert.NoError(t, err)
 		m.AssertExpectations(t)
 	})
@@ -117,9 +117,9 @@ func testRemove(t *testing.T) {
 		errOut, output := outputs()
 		myErr := errors.New("my error")
 		m := &mockCLIManager{}
-		m.On("Remove", "ninja").Return(myErr)
+		m.On("Remove", "saiyajin").Return(myErr)
 		handler := newCLIHandler(m, errOut, output)
-		err := handler.Remove([]string{"ninja"})
+		err := handler.Remove([]string{"saiyajin"})
 		assert.Error(t, err)
 	})
 
@@ -127,9 +127,9 @@ func testRemove(t *testing.T) {
 		errOut, output := outputs()
 		m := &mockCLIManager{}
 		m.On("Remove", "super").Return(nil)
-		m.On("Remove", "ninja").Return(nil)
+		m.On("Remove", "saiyajin").Return(nil)
 		handler := newCLIHandler(m, errOut, output)
-		err := handler.Remove([]string{"super", "ninja"})
+		err := handler.Remove([]string{"super", "saiyajin"})
 		assert.NoError(t, err)
 		m.AssertExpectations(t)
 	})
