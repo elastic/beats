@@ -68,7 +68,6 @@ def gather_dependencies(vendor_dirs, overrides=None):
                 lib["license_contents"] = read_file(lib["license_file"])
                 lib["license_summary"] = detect_license_summary(lib["license_contents"])
                 if lib["license_summary"] == "UNKNOWN":
-                    print("no valid: {}".format(lib["license_file"]))
                     print("WARNING: Unknown license for: {}".format(lib_path))
 
                 revision = overrides.get(lib_path, {}).get("revision")
