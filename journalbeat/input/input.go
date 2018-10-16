@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"sync"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/journalbeat/checkpoint"
 	"github.com/elastic/beats/journalbeat/reader"
@@ -56,7 +56,11 @@ func New(
 		return nil, err
 	}
 
-	id := uuid.NewV4()
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, fmt.Errorf("error while generating ID for input: %v", err)
+	}
+
 	logger := logp.NewLogger("input").With("id", id)
 
 	var readers []*reader.Reader
