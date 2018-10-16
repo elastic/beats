@@ -43,8 +43,11 @@ type SyncClient struct {
 
 // NewSyncClient creates a new sync clients from the provided configuration, existing ACKs handlers
 // defined in the configuration will be proxied by this object.
-func NewSyncClient(pipeline beat.Pipeline, cfg beat.ClientConfig) (*SyncClient, error) {
-	s := &SyncClient{log: logp.NewLogger("sync client")}
+func NewSyncClient(log *logp.Logger, pipeline beat.Pipeline, cfg beat.ClientConfig) (*SyncClient, error) {
+	if log == nil {
+		log = logp.NewLogger("")
+	}
+	s := &SyncClient{log: log.Named("sync client")}
 
 	// Proxy any callbacks to the original client.
 	//

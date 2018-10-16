@@ -89,7 +89,7 @@ func (bt *Beatless) Run(b *beat.Beat) error {
 		return err
 	}
 
-	clientFactory := makeClientFactory(manager, b.Publisher)
+	clientFactory := makeClientFactory(bt.log, manager, b.Publisher)
 
 	enabledFunctions := bt.enabledFunctions()
 	bt.log.Infof("enabled functions: %s", strings.Join(enabledFunctions, ", "))
@@ -126,7 +126,7 @@ func (bt *Beatless) Stop() {
 	bt.cancel()
 }
 
-func makeClientFactory(manager *licenser.Manager, pipeline beat.Pipeline) func(*common.Config) (core.Client, error) {
+func makeClientFactory(log *logp.Logger, manager *licenser.Manager, pipeline beat.Pipeline) func(*common.Config) (core.Client, error) {
 	// Each function has his own client to the publisher pipeline,
 	// publish operation will block the calling thread, when the method unwrap we have received the
 	// ACK for the batch.
@@ -145,7 +145,7 @@ func makeClientFactory(manager *licenser.Manager, pipeline beat.Pipeline) func(*
 			return nil, err
 		}
 
-		client, err := core.NewSyncClient(pipeline, beat.ClientConfig{
+		client, err := core.NewSyncClient(log, pipeline, beat.ClientConfig{
 			PublishMode:   beat.GuaranteedSend,
 			Processor:     processors,
 			EventMetadata: c.EventMetadata,

@@ -262,7 +262,7 @@ func (m *Manager) update() {
 		default:
 			license, err := m.fetcher.Fetch()
 			if err != nil {
-				m.log.Infof("cannot retrieve license, retrying later, error: %s", err)
+				m.log.Infof("cannot retrieve license, retrying later, error: %+v", err)
 
 				// check if the license is still in the grace period.
 				// permit some operations if the license could not be checked
@@ -279,10 +279,13 @@ func (m *Manager) update() {
 			}
 
 			// we have a valid license, notify watchers and sleep until next check.
-			m.log.Infof(
-				"valid license retrieved, license mode: %v, type: %v, status: %v",
+			m.log.Infow(
+				"valid license retrieved",
+				"license mode",
 				license.Get(),
+				"type",
 				license.Type,
+				"status",
 				license.Status,
 			)
 			m.saveAndNotify(license)
