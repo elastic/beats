@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/libbeat/metric/system/process"
@@ -39,13 +40,7 @@ func init() {
 }
 
 func setupMetrics(name string) error {
-	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
-	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
-
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
-	if runtime.GOOS != "windows" {
-		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
-	}
 
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
@@ -54,9 +49,28 @@ func setupMetrics(name string) error {
 		CacheCmdLine: true,
 		IncludeTop:   process.IncludeTopConfig{},
 	}
-	err := beatProcessStats.Init()
 
-	return err
+	err := beatProcessStats.Init()
+	if err != nil {
+		return err
+	}
+
+	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
+	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
+
+	setupPlatformSpecificMetrics()
+
+	return nil
+}
+
+func setupPlatformSpecificMetrics() {
+	if runtime.GOOS != "windows" {
+		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
+	} else {
+		setupWindowsHandlesMetrics()
+	}
+
+	setupLinuxBSDFDMetrics()
 }
 
 func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
@@ -81,14 +95,9 @@ func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
 }
 
 func getRSSSize() (uint64, error) {
-	pid, err := process.GetSelfPid()
+	state, err := getBeatProcessState()
 	if err != nil {
-		return 0, fmt.Errorf("error getting PID for self process: %v", err)
-	}
-
-	state, err := beatProcessStats.GetOne(pid)
-	if err != nil {
-		return 0, fmt.Errorf("error retrieving process stats: %v", err)
+		return 0, err
 	}
 
 	iRss, err := state.GetValue("memory.rss.bytes")
@@ -101,6 +110,20 @@ func getRSSSize() (uint64, error) {
 		return 0, fmt.Errorf("error converting Resident Set Size to uint64: %v", iRss)
 	}
 	return rss, nil
+}
+
+func getBeatProcessState() (common.MapStr, error) {
+	pid, err := process.GetSelfPid()
+	if err != nil {
+		return nil, fmt.Errorf("error getting PID for self process: %v", err)
+	}
+
+	state, err := beatProcessStats.GetOne(pid)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving process stats: %v", err)
+	}
+
+	return state, nil
 }
 
 func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
@@ -141,14 +164,9 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 }
 
 func getCPUUsage() (float64, *process.Ticks, error) {
-	pid, err := process.GetSelfPid()
+	state, err := getBeatProcessState()
 	if err != nil {
-		return 0.0, nil, fmt.Errorf("error getting PID for self process: %v", err)
-	}
-
-	state, err := beatProcessStats.GetOne(pid)
-	if err != nil {
-		return 0.0, nil, fmt.Errorf("error retrieving process stats: %v", err)
+		return 0.0, nil, err
 	}
 
 	iTotalCPUUsage, err := state.GetValue("cpu.total.value")

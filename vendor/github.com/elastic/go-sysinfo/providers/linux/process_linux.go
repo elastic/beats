@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -19,7 +19,6 @@ package linux
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -127,38 +126,37 @@ func (p *process) Info() (types.ProcessInfo, error) {
 	return *p.info, nil
 }
 
-func (p *process) Memory() types.MemoryInfo {
+func (p *process) Memory() (types.MemoryInfo, error) {
 	stat, err := p.NewStat()
 	if err != nil {
-		return types.MemoryInfo{}
+		return types.MemoryInfo{}, err
 	}
 
 	return types.MemoryInfo{
-		Timestamp: time.Now(),
-		Resident:  uint64(stat.ResidentMemory()),
-		Virtual:   uint64(stat.VirtualMemory()),
-	}
+		Resident: uint64(stat.ResidentMemory()),
+		Virtual:  uint64(stat.VirtualMemory()),
+	}, nil
 }
 
-func (p *process) CPUTime() types.CPUTimes {
+func (p *process) CPUTime() (types.CPUTimes, error) {
 	stat, err := p.NewStat()
 	if err != nil {
-		return types.CPUTimes{}
+		return types.CPUTimes{}, err
 	}
 
-	fmt.Println("UTime", stat.UTime, "STime", stat.STime)
 	return types.CPUTimes{
-		Timestamp: time.Now(),
-		User:      ticksToDuration(uint64(stat.UTime)),
-		System:    ticksToDuration(uint64(stat.STime)),
-	}
+		User:   ticksToDuration(uint64(stat.UTime)),
+		System: ticksToDuration(uint64(stat.STime)),
+	}, nil
 }
 
-func (p *process) FileDescriptors() ([]string, error) {
+// OpenHandles returns the list of open file descriptors of the process.
+func (p *process) OpenHandles() ([]string, error) {
 	return p.Proc.FileDescriptorTargets()
 }
 
-func (p *process) FileDescriptorCount() (int, error) {
+// OpenHandles returns the number of open file descriptors of the process.
+func (p *process) OpenHandleCount() (int, error) {
 	return p.Proc.FileDescriptorsLen()
 }
 

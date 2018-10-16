@@ -121,6 +121,13 @@ func (r *pluginsReg) String() string {
 	return fmt.Sprintf("globalPluginsReg, monitor: %v",
 		strings.Join(monitors, ", "))
 }
+func (r *pluginsReg) monitorNames() []string {
+	names := make([]string, 0, len(r.monitors))
+	for k := range r.monitors {
+		names = append(names, k)
+	}
+	return names
+}
 
 func (e *pluginBuilder) create(cfg *common.Config) ([]Job, error) {
 	return e.builder(e.name, cfg)

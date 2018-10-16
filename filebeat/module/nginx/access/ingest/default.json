@@ -59,8 +59,9 @@
       "target_field": "nginx.access.user_agent"
     }
   }, {
-    "remove": {
-      "field": "nginx.access.agent"
+    "rename": {
+      "field": "nginx.access.agent",
+      "target_field": "nginx.access.user_agent.original"
     }
   }, {
     "geoip": {

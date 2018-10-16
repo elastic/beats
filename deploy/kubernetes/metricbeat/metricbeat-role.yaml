@@ -14,10 +14,10 @@ rules:
   verbs: ["get", "list", "watch"]
 - apiGroups: ["extensions"]
   resources:
-  - deployments
   - replicasets
   verbs: ["get", "list", "watch"]
 - apiGroups: ["apps"]
   resources:
   - statefulsets
+  - deployments
   verbs: ["get", "list", "watch"]

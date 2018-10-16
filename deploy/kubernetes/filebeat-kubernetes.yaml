@@ -19,6 +19,12 @@ data:
         # Reload module configs as they change:
         reload.enabled: false
 
+    # To enable hints based autodiscover, remove `filebeat.config.inputs` configuration and uncomment this:
+    #filebeat.autodiscover:
+    #  providers:
+    #    - type: kubernetes
+    #      hints.enabled: true
+
     processors:
       - add_cloud_metadata:
 

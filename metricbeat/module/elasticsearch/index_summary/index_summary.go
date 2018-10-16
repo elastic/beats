@@ -18,6 +18,8 @@
 package index_summary
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -28,7 +30,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "index_summary", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "index_summary", New,
 		mb.WithHostParser(hostParser),
 		mb.WithNamespace("elasticsearch.index.summary"),
 	)
@@ -52,7 +54,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch index_summary metricset is beta")
+	cfgwarn.Beta("The  " + base.FullyQualifiedName() + " metricset is beta")
 
 	// Get the stats from the local node
 	ms, err := elasticsearch.NewMetricSet(base, statsPath)
@@ -66,13 +68,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statsPath)
 	if err != nil {
-		r.Error(err)
+		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch index summary stats from a none master node.")
+		logp.Debug(elasticsearch.ModuleName, "Trying to fetch index summary stats from a non-master node.")
 		return
 	}
 
@@ -84,7 +86,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+statsPath)
 	if err != nil {
-		r.Error(err)
+		r.Error(errors.Wrap(err, "failed to get info from Elasticsearch"))
 		return
 	}
 

@@ -48,8 +48,9 @@
             }
         },
         {
-            "remove": {
-                "field": "traefik.access.agent"
+            "rename": {
+                "field": "traefik.access.agent",
+                "target_field": "traefik.access.user_agent.original"
             }
         },
         {
