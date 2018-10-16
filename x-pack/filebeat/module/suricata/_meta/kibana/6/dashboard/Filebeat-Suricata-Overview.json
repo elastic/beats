@@ -400,9 +400,9 @@
                     "suricata.eve.flow_id", 
                     "suricata.eve.proto", 
                     "source_ecs.ip", 
-                    "suricata.eve.src_port", 
-                    "suricata.eve.dest_ip", 
-                    "suricata.eve.dest_port", 
+                    "source_ecs.port",
+                    "destination.ip",
+                    "destination.port",
                     "destination.geo.region_name", 
                     "destination.geo.country_iso_code"
                 ], 
