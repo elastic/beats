@@ -157,7 +157,7 @@ func TestCheckStatusInterval(t *testing.T) {
 	buf := make([]byte, 10)
 
 	i := 0
-	var receivedError error = nil
+	var receivedError error
 	for {
 		if i > 20 {
 			assert.Fail(t, "Should notice that file is removed before 20th iteration or 2 secs")
@@ -219,7 +219,7 @@ func TestDisableCheckStatus(t *testing.T) {
 	buf := make([]byte, 10)
 
 	i := 0
-	var receivedError error = nil
+	var receivedError error
 	for {
 		if i >= 100 {
 			break

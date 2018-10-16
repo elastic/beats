@@ -52,7 +52,7 @@ func NewLog(
 		}
 	}
 
-	var checkTicker *time.Ticker = nil
+	var checkTicker *time.Ticker
 	// starts close_timeout timer
 	if config.CheckStatusInterval > 0 {
 		checkTicker = time.NewTicker(config.CheckStatusInterval)
