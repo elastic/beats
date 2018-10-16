@@ -191,9 +191,20 @@ func (mux *esClientMux) Request(
 	return status, response, err
 }
 
+// newESClientMux takes a list of clients and randomize where we start and the list of  host we are
+// querying.
 func newESClientMux(clients []elasticsearch.Client) *esClientMux {
+	// randomize where we start
 	idx := rand.Intn(len(clients))
-	return &esClientMux{idx: idx, clients: clients}
+
+	// randomize the list of round robin hosts.
+	tmp := make([]elasticsearch.Client, len(clients))
+	copy(tmp, clients)
+	rand.Shuffle(len(tmp), func(i, j int) {
+		tmp[i], tmp[j] = tmp[j], tmp[i]
+	})
+
+	return &esClientMux{idx: idx, clients: tmp}
 }
 
 // Create takes a raw configuration and will create a a license manager based on the elasticsearch
