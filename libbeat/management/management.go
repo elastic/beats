@@ -18,7 +18,7 @@
 package management
 
 import (
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/reload"
