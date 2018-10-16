@@ -8,6 +8,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -96,4 +97,54 @@ func testArtifact(maxSizeUncompressed, maxSizeCompressed int64) func(t *testing.
 			assert.True(t, bytes.Equal(r.Raw, raw), "bytes doesn't match")
 		}
 	}
+}
+
+func TestLocalFile(t *testing.T) {
+	local := LocalFile{Path: "testdata/lipsum.txt", FileMode: 755}
+
+	assert.Equal(t, "lipsum.txt", local.Name())
+	assert.Equal(t, os.FileMode(755), local.Mode())
+
+	reader, err := local.Open()
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	defer func() {
+		err := reader.Close()
+		assert.NoError(t, err)
+	}()
+
+	content, err := ioutil.ReadAll(reader)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	raw, _ := ioutil.ReadFile("testdata/lipsum.txt")
+	assert.Equal(t, raw, content)
+}
+
+func TestMemoryFile(t *testing.T) {
+	raw := []byte("hello world")
+	memory := MemoryFile{Path: "lipsum.txt", FileMode: 755, Raw: raw}
+
+	assert.Equal(t, "lipsum.txt", memory.Name())
+	assert.Equal(t, os.FileMode(755), memory.Mode())
+
+	reader, err := memory.Open()
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	defer func() {
+		err := reader.Close()
+		assert.NoError(t, err)
+	}()
+
+	content, err := ioutil.ReadAll(reader)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	assert.Equal(t, raw, content)
 }

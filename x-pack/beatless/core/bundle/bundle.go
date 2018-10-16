@@ -11,51 +11,41 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
-// FileReadCloser wraps a io.Reader and a file handle into a FileReadCloser interface,
+// ReadCloserWith takes a reader and a closer for the specific reader and return an io.ReaderCloser.
+func ReadCloserWith(reader io.Reader, closer io.Closer) io.ReadCloser {
+	return &ReadCloser{reader: reader, closer: closer}
+}
+
+// ReadCloser wraps a io.Reader and a file handle into a FileReadCloser interface,
 // this leave the responsability on the consumer to close the handle when its done consuming the
 // io.Reader.
-type FileReadCloser struct {
+type ReadCloser struct {
 	reader io.Reader
-	fd     *os.File
+	closer io.Closer
 }
 
 // Read proxies the Read to the original io.Reader.
-func (f *FileReadCloser) Read(p []byte) (int, error) {
+func (f *ReadCloser) Read(p []byte) (int, error) {
 	return f.reader.Read(p)
 }
 
 // Close closes the file handle this must be called after consuming the io.Reader to make sure we
 // don't leak any file handle.
-func (f *FileReadCloser) Close() error {
-	return f.fd.Close()
-}
-
-// NoOpCloser wrap an io.Reader into a io.ReadClose and make the close operation do nothing.
-type NoOpCloser struct {
-	reader io.Reader
-}
-
-// Read proxies the Read to the original io.Reader.
-func (f *NoOpCloser) Read(p []byte) (int, error) {
-	return f.reader.Read(p)
-}
-
-// Close closes the file handle this must be called after consuming the io.Reader to make sure we
-// don't leak any file handle.
-func (f *NoOpCloser) Close() error {
-	return nil
+func (f *ReadCloser) Close() error {
+	return f.closer.Close()
 }
 
 // Resource is the interface used to bundle the resource, a resource can be a local or a remote file.
 // Reader must be a io.ReadCloser, this make it easier to deal with streaming of remote data.
 type Resource interface {
-	// Reader return an io.ReadCloser of the original resource, this will be used to stream content to
+	// Open return an io.ReadCloser of the original resource, this will be used to stream content to
 	// The compressed file.
-	Reader() (io.ReadCloser, error)
+	Open() (io.ReadCloser, error)
 
 	// Name return the string that will be used as the file name inside the Zip file.
 	Name() string
@@ -70,15 +60,15 @@ type LocalFile struct {
 	FileMode os.FileMode
 }
 
-// Reader return a reader for the opened file.
-func (l *LocalFile) Reader() (io.ReadCloser, error) {
+// Open return a reader for the opened file.
+func (l *LocalFile) Open() (io.ReadCloser, error) {
 	fd, err := os.Open(l.Path)
 	if err != nil {
 		return nil, err
 	}
 
 	reader := bufio.NewReader(fd)
-	return &FileReadCloser{reader: reader, fd: fd}, nil
+	return ReadCloserWith(reader, fd), nil
 }
 
 // Name return the basename of the file to be used as the name of the file in the archive.
@@ -98,10 +88,10 @@ type MemoryFile struct {
 	Raw      []byte
 }
 
-// Reader the reader for the raw byte slice.
-func (m *MemoryFile) Reader() (io.ReadCloser, error) {
+// Open the reader for the raw byte slice.
+func (m *MemoryFile) Open() (io.ReadCloser, error) {
 	reader := bytes.NewReader(m.Raw)
-	return &NoOpCloser{reader: reader}, nil
+	return ioutil.NopCloser(reader), nil
 }
 
 // Name returns the path to use in the zip.
@@ -122,6 +112,22 @@ type ZipBundle struct {
 	maxSizeCompressed   int64
 }
 
+// NewZipWithoutLimits creates a bundle that doesn't impose any limit on the uncompressed data and the
+// compressed data.
+func NewZipWithoutLimits(resources ...Resource) *ZipBundle {
+	return NewZipWithLimits(-1, -1, resources...)
+}
+
+// NewZipWithLimits creates a Bundle that impose limit for the uncompressed data and the compressed data,
+// using a limit of -1 with desactivate the check.
+func NewZipWithLimits(maxSizeUncompressed, maxSizeCompressed int64, resources ...Resource) *ZipBundle {
+	return &ZipBundle{
+		resources:           resources,
+		maxSizeUncompressed: maxSizeUncompressed,
+		maxSizeCompressed:   maxSizeCompressed,
+	}
+}
+
 // Bytes takes the resources and bundle them into a zip and validates if needed that the
 // created resources doesn't go over any predefined size limits.
 func (p *ZipBundle) Bytes() ([]byte, error) {
@@ -130,7 +136,7 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 
 	var uncompressed int64
 	for _, file := range p.resources {
-		r, err := file.Reader()
+		r, err := file.Open()
 		if err != nil {
 			return nil, err
 		}
@@ -187,20 +193,4 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 	// Flush bytes/writes headers, the zip is valid at this point.
 	zipWriter.Close()
 	return buf.Bytes(), nil
-}
-
-// NewZipWithoutLimits creates a bundle that doesn't impose any limit on the uncompressed data and the
-// compressed data.
-func NewZipWithoutLimits(resources ...Resource) *ZipBundle {
-	return NewZipWithLimits(-1, -1, resources...)
-}
-
-// NewZipWithLimits creates a Bundle that impose limit for the uncompressed data and the compressed data,
-// using a limit of -1 with desactivate the check.
-func NewZipWithLimits(maxSizeUncompressed, maxSizeCompressed int64, resources ...Resource) *ZipBundle {
-	return &ZipBundle{
-		resources:           resources,
-		maxSizeUncompressed: maxSizeUncompressed,
-		maxSizeCompressed:   maxSizeCompressed,
-	}
 }
