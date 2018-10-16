@@ -4,7 +4,4 @@
 
 package include
 
-import (
-	// Include modules to register their fields.go.
-	_ "github.com/elastic/beats/x-pack/filebeat/module/suricata"
-)
+// Include modules to register their fields.go.
