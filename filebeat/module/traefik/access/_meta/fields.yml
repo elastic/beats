@@ -85,6 +85,11 @@
           type: keyword
           description: >
             The name of the operating system.
+        - name: original
+          type: text
+          index: false
+          description: >
+            Original user agent value before parsing by ingest-user-agent plugin.
     - name: geoip
       type: group
       description: >

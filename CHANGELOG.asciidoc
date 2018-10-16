@@ -110,6 +110,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Add haproxy module. {pull}8014[8014]
 - Add tag "multiline" to "log.flags" if event consists of multiple lines. {pull}7997[7997]
 - Release `docker` input as GA. {pull}8328[8328]
+- Keep unparsed user agent information in user_agent.original. {pull}7823[7832]
 
 *Heartbeat*
 

@@ -251,6 +251,18 @@ The name of the operating system.
 
 --
 
+*`apache2.access.user_agent.original`*::
++
+--
+type: text
+
+Original user agent value before parsing by ingest-user-agent plugin.
+
+
+Field is not indexed.
+
+--
+
 [float]
 == geoip fields
 
@@ -2317,6 +2329,18 @@ The name of the operating system.
 
 --
 
+*`iis.access.user_agent.original`*::
++
+--
+type: text
+
+Original user agent value before parsing by ingest-user-agent plugin.
+
+
+Field is not indexed.
+
+--
+
 [float]
 == geoip fields
 
@@ -3701,6 +3725,18 @@ The name of the operating system.
 
 --
 
+*`nginx.access.user_agent.original`*::
++
+--
+type: text
+
+Original user agent value before parsing by ingest-user-agent plugin.
+
+
+Field is not indexed.
+
+--
+
 [float]
 == geoip fields
 
@@ -4698,6 +4734,18 @@ type: keyword
 
 The name of the operating system.
 
+
+--
+
+*`traefik.access.user_agent.original`*::
++
+--
+type: text
+
+Original user agent value before parsing by ingest-user-agent plugin.
+
+
+Field is not indexed.
 
 --
 
