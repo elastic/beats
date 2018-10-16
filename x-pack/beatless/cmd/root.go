@@ -36,4 +36,5 @@ func init() {
 	functionCmd.AddCommand(genPackageCmd())
 
 	RootCmd.AddCommand(functionCmd)
+
 }

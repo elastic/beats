@@ -22,10 +22,11 @@ var ConfigOverrides = common.MustNewConfigFrom(map[string]interface{}{
 	"logging.level":          "debug",
 	"setup.template.enabled": true,
 	"queue.mem": map[string]interface{}{
-		"events":           50,
-		"flush.min_events": 1,
-		"flush.timeout":    "0.1s",
+		"events":           "${output.elasticsearch.bulk_max_size}",
+		"flush.min_events": 10,
+		"flush.timeout":    "0.01s",
 	},
+	"output.elasticsearch.bulk_max_size": 50,
 })
 
 // Config default configuration for Beatless.
