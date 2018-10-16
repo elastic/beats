@@ -226,12 +226,12 @@
                 "columns": [
                     "host.name", 
                     "suricata.eve.flow_id", 
-                    "suricata.eve.src_ip", 
-                    "suricata.eve.src_port", 
-                    "suricata.eve.dest_ip", 
-                    "suricata.eve.dest_port", 
-                    "ecs.source.geo.country_iso_code", 
-                    "ecs.destination.geo.country_iso_code"
+                    "source_ecs.ip",
+                    "source_ecs.port",
+                    "destination.ip",
+                    "destination.port",
+                    "source_ecs.geo.country_iso_code",
+                    "destination.geo.country_iso_code"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -246,7 +246,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "ecs.event.type", 
+                                    "key": "event.type",
                                     "negate": false, 
                                     "params": {
                                         "query": "alert", 
@@ -257,7 +257,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "ecs.event.type": {
+                                        "event.type": {
                                             "query": "alert", 
                                             "type": "phrase"
                                         }
@@ -342,7 +342,7 @@
                             "id": "2", 
                             "params": {
                                 "autoPrecision": true, 
-                                "field": "suricata.eve.src_geo.location", 
+                                "field": "source_ecs.geo.location",
                                 "isFilteredByCollar": true, 
                                 "precision": 2, 
                                 "useGeocentroid": true
@@ -428,7 +428,7 @@
                             "id": "2", 
                             "params": {
                                 "autoPrecision": true, 
-                                "field": "suricata.eve.dest_geo.location", 
+                                "field": "destination.geo.location",
                                 "isFilteredByCollar": true, 
                                 "precision": 2, 
                                 "useGeocentroid": true
@@ -523,7 +523,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Source Country", 
-                                "field": "suricata.eve.dest_geo.country_iso_code", 
+                                "field": "destination.geo.country_iso_code",
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
@@ -595,7 +595,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Source Country", 
-                                "field": "suricata.eve.src_geo.country_iso_code", 
+                                "field": "source_ecs.geo.country_iso_code",
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 

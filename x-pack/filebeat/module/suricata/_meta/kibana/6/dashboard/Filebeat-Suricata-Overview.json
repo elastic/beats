@@ -42,7 +42,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "ecs.event.type", 
+                                "field": "event.type",
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
@@ -161,7 +161,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "ecs.event.type", 
+                                "field": "event.type",
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
@@ -396,15 +396,15 @@
             "attributes": {
                 "columns": [
                     "host.name", 
-                    "ecs.event.type", 
+                    "event.type", 
                     "suricata.eve.flow_id", 
                     "suricata.eve.proto", 
-                    "suricata.eve.src_ip", 
-                    "suricata.eve.src_port", 
-                    "suricata.eve.dest_ip", 
-                    "suricata.eve.dest_port", 
-                    "ecs.destination.geo.region_name", 
-                    "ecs.destination.geo.country_iso_code"
+                    "source_ecs.ip", 
+                    "source_ecs.port",
+                    "destination.ip",
+                    "destination.port",
+                    "destination.geo.region_name", 
+                    "destination.geo.country_iso_code"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -419,7 +419,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "ecs.event.type", 
+                                    "key": "event.type", 
                                     "negate": true, 
                                     "params": {
                                         "query": "stats", 
@@ -430,7 +430,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "ecs.event.type": {
+                                        "event.type": {
                                             "query": "stats", 
                                             "type": "phrase"
                                         }
@@ -515,7 +515,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Top Connection Source Countries", 
-                                "field": "suricata.eve.src_geo.country_iso_code", 
+                                "field": "source_ecs.geo.country_iso_code",
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
@@ -574,7 +574,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Top Connection Destination Countries", 
-                                "field": "suricata.eve.dest_geo.country_iso_code", 
+                                "field": "destination.geo.country_iso_code",
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
@@ -717,7 +717,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "ecs.event.type", 
+                                    "key": "event.type", 
                                     "negate": false, 
                                     "params": {
                                         "query": "stats", 
@@ -728,7 +728,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "ecs.event.type": {
+                                        "event.type": {
                                             "query": "stats", 
                                             "type": "phrase"
                                         }
