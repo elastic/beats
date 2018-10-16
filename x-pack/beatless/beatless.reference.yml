@@ -18,16 +18,16 @@ beatless.provider.aws.functions:
 
     # Description of the method to help identify them when you run multiples functions.
     description: "lambda function for cloudwatch logs"
-    #
-    # Concurrency, is the reserved number of instance for that function.
+
+    # Concurrency, is the reserved number of instances for that function.
     # Default is unreserved.
     #
     # Note: There is a hard limit of 1000 functions of any kind per account.
-    # concurrency: 5
+    #concurrency: 5
     #
     # The maximum memory allocated for this function, the configured size must be a factor of 64.
     # There is a hard limit of 3008MiB for each function. Default is 128MiB.
-    # memory_size: 128MiB
+    #memory_size: 128MiB
     #
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     # dead_letter_config.target_arn:
