@@ -62,7 +62,7 @@ func (r *Runnable) String() string {
 func NewProvider(cfg *config.Config) (Provider, error) {
 	// Configure the provider, the provider will take care of the configuration for the
 	// functions.
-	registry := NewRegistry(feature.Registry)
+	registry := NewRegistry(feature.GlobalRegistry())
 	providerFunc, err := registry.Lookup(cfg.Provider.Name())
 	if err != nil {
 		return nil, fmt.Errorf("error finding the provider '%s', error: %v", cfg.Provider.Name(), err)

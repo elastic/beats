@@ -35,11 +35,11 @@ type FunctionFactory func(Provider, *common.Config) (Function, error)
 // the right providers and will do the type assertion for the providers, we hide the fact that
 // we are actually accessing a global registry.
 type Registry struct {
-	registry *feature.FeatureRegistry
+	registry *feature.Registry
 }
 
 // NewRegistry return a new registry.
-func NewRegistry(registry *feature.FeatureRegistry) *Registry {
+func NewRegistry(registry *feature.Registry) *Registry {
 	return &Registry{registry: registry}
 }
 
