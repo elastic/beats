@@ -333,7 +333,7 @@ ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && ec
 	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
 ifeq ($(shell [[ -e ${ES_BEATS}/x-pack/$(BEAT_NAME)/fields.yml ]] && echo true ),true)
 	mkdir -p include
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in ${ES_BEATS}/x-pack/$(BEAT_NAME)/fields.yml -out ${ES_BEATS}/x-pack/$(BEAT_NAME)/include/fields.go -name fields.yml $(BEAT_NAME)
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in ${ES_BEATS}/x-pack/$(BEAT_NAME)/fields.yml -out ${ES_BEATS}/x-pack/$(BEAT_NAME)/include/fields.go -name fields.yml -license Elastic $(BEAT_NAME)
 endif
 
 endif
