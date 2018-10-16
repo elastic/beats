@@ -48,7 +48,7 @@ LIBCOMPOSE_TOOL_REPO?=github.com/docker/libcompose
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 GOBUILD_FLAGS?=-i -ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 GOIMPORTS=goimports
-GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
+GOIMPORTS_REPO?=github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
 GOLINT=golint
 GOLINT_REPO?=github.com/golang/lint/golint
@@ -113,7 +113,7 @@ crosscompile: $(GOFILES)
 .PHONY: check
 check: check-headers python-env prepare-tests ## @build Checks project and source code if everything is according to standard
 	@go vet ${GOPACKAGES}
-	@go get $(ES_BEATS)/vendor/$(GOIMPORTS_REPO)
+	@go get $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep .) || (echo "Code differs from goimports' style ^" && false)
 	@${FIND} -name '*.py' -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@${FIND} -wholename "*tests/system/test_*.py" -perm ${PERM_EXEC} -exec false {} + || (echo "Python test files shouldn't be executable, otherwise nose doesn't find them" && false)
