@@ -99,7 +99,7 @@ func (bt *Beatless) Run(b *beat.Beat) error {
 		return fmt.Errorf("error when creating the functions, error: %v", err)
 	}
 
-	// manages the goroutine related to the function handlers, if an errors occurs and its not handled
+	// manages the goroutine related to the function handlers, if an error occurs and its not handled
 	// by the function itself, it will reach the coordinator, we log the error and shutdown beats.
 	// When an error reach the coordinator we assume that we cannot recover from it and we initiate
 	// a shutdown and return an aggregated errors.
