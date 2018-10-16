@@ -35,6 +35,7 @@ var stateLookup = map[string]State{
 var licenseLookup = map[string]LicenseType{
 	"oss":      OSS,
 	"trial":    Trial,
+	"standard": Standard,
 	"basic":    Basic,
 	"gold":     Gold,
 	"platinum": Platinum,
