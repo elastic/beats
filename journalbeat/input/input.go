@@ -178,7 +178,10 @@ func (i *Input) readEvents(wg *sync.WaitGroup, r *reader.Reader, out chan *beat.
 			continue
 		}
 
-		out <- event
+		select {
+		case <-i.done:
+		case out <- event:
+		}
 	}
 }
 
