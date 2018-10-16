@@ -89,41 +89,7 @@ func (bt *Beatless) Run(b *beat.Beat) error {
 		return err
 	}
 
-	// Each function has his own client to the publisher pipeline,
-	// publish operation will block the calling thread, when the method unwrap we have received the
-	// ACK for the batch.
-	clientFactory := func(cfg *common.Config) (core.Client, error) {
-		c := struct {
-			Processors           processors.PluginConfig `config:"processors"`
-			common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
-		}{}
-
-		if err := cfg.Unpack(&c); err != nil {
-			return nil, err
-		}
-
-		processors, err := processors.New(c.Processors)
-		if err != nil {
-			return nil, err
-		}
-
-		client, err := core.NewSyncClient(b.Publisher, beat.ClientConfig{
-			PublishMode:   beat.GuaranteedSend,
-			Processor:     processors,
-			EventMetadata: c.EventMetadata,
-		})
-
-		if err != nil {
-			return nil, err
-		}
-
-		// Make the client aware of the current license, the client will accept sending events to the
-		// pipeline until the client is closed or if the license change and is not valid.
-		licenseAware := core.NewLicenseAwareClient(client, checkLicense)
-		manager.AddWatcher(licenseAware)
-
-		return licenseAware, nil
-	}
+	clientFactory := makeClientFactory(manager, b.Publisher)
 
 	enabledFunctions := bt.enabledFunctions()
 	bt.log.Infof("enabled functions: %s", strings.Join(enabledFunctions, ", "))
@@ -158,4 +124,44 @@ func (bt *Beatless) Stop() {
 	bt.log.Info("beatless is stopping")
 	defer bt.log.Info("beatless is stopped")
 	bt.cancel()
+}
+
+func makeClientFactory(manager *licenser.Manager, pipeline beat.Pipeline) func(*common.Config) (core.Client, error) {
+	// Each function has his own client to the publisher pipeline,
+	// publish operation will block the calling thread, when the method unwrap we have received the
+	// ACK for the batch.
+	clientFactory := func(cfg *common.Config) (core.Client, error) {
+		c := struct {
+			Processors           processors.PluginConfig `config:"processors"`
+			common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
+		}{}
+
+		if err := cfg.Unpack(&c); err != nil {
+			return nil, err
+		}
+
+		processors, err := processors.New(c.Processors)
+		if err != nil {
+			return nil, err
+		}
+
+		client, err := core.NewSyncClient(pipeline, beat.ClientConfig{
+			PublishMode:   beat.GuaranteedSend,
+			Processor:     processors,
+			EventMetadata: c.EventMetadata,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		// Make the client aware of the current license, the client will accept sending events to the
+		// pipeline until the client is closed or if the license change and is not valid.
+		licenseAware := core.NewLicenseAwareClient(client, checkLicense)
+		manager.AddWatcher(licenseAware)
+
+		return licenseAware, nil
+	}
+
+	return clientFactory
 }
