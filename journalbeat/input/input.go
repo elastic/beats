@@ -142,45 +142,41 @@ func (i *Input) publishAll(client beat.Client) {
 	defer close(out)
 
 	var wg sync.WaitGroup
+	defer wg.Wait()
 	for _, r := range i.readers {
 		wg.Add(1)
-		go i.readEvents(&wg, r, out)
-	}
+		go func() {
+			defer wg.Done()
 
-loop:
-	for {
-		select {
-		case <-i.done:
-			break loop
-		case e := <-out:
-			client.Publish(*e)
-		}
-	}
-	wg.Wait()
-}
+			for {
+				select {
+				case <-i.done:
+					return
+				default:
+				}
 
-// readEvents reads events from a reader.
-func (i *Input) readEvents(wg *sync.WaitGroup, r *reader.Reader, out chan *beat.Event) {
-	defer wg.Done()
+				event, err := r.Next()
+				if event == nil {
+					if err != nil {
+						i.logger.Errorf("Error while reading event: %v", err)
+					}
+					continue
+				}
+
+				select {
+				case <-i.done:
+				case out <- event:
+				}
+			}
+		}()
+	}
 
 	for {
 		select {
 		case <-i.done:
 			return
-		default:
-		}
-
-		event, err := r.Next()
-		if event == nil {
-			if err != nil {
-				i.logger.Errorf("Error while reading event: %v", err)
-			}
-			continue
-		}
-
-		select {
-		case <-i.done:
-		case out <- event:
+		case e := <-out:
+			client.Publish(*e)
 		}
 	}
 }
