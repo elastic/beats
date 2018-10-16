@@ -38,7 +38,7 @@ func NewLicenseAwareClient(
 // if we can send events to the client or not.
 func (lac *LicenseAwareClient) OnNewLicense(license licenser.License) {
 	valid := licenser.Validate(lac.log, license, lac.checks...)
-	lac.valid.CAS(lac.valid.Load(), valid)
+	lac.valid.Swap(valid)
 }
 
 // OnManagerStopped receives a callback from the license manager when the manager is stopped.
