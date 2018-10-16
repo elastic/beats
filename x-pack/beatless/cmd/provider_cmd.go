@@ -52,49 +52,30 @@ func handler() (*cliHandler, error) {
 	return handler, nil
 }
 
-func genDeployCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "deploy",
-		Short: "Deploy a function",
-		Run: cli.RunWith(func(cmd *cobra.Command, args []string) error {
+func genCLICmd(use, short string, fn func(*cliHandler, []string) error) *cobra.Command {
+	return &cobra.Command{
+		Use:   use,
+		Short: short,
+		Run: cli.RunWith(func(_ *cobra.Command, args []string) error {
 			h, err := handler()
 			if err != nil {
 				return err
 			}
-			return h.Deploy(args)
+			return fn(h, args)
 		}),
 	}
-	return cmd
+}
+
+func genDeployCmd() *cobra.Command {
+	return genCLICmd("deploy", "Deploy a function", (*cliHandler).Deploy)
 }
 
 func genUpdateCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "update",
-		Short: "Update a function",
-		Run: cli.RunWith(func(cmd *cobra.Command, args []string) error {
-			h, err := handler()
-			if err != nil {
-				return err
-			}
-			return h.Update(args)
-		}),
-	}
-	return cmd
+	return genCLICmd("update", "Update a function", (*cliHandler).Update)
 }
 
 func genRemoveCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "remove",
-		Short: "Remove a function",
-		Run: cli.RunWith(func(cmd *cobra.Command, args []string) error {
-			h, err := handler()
-			if err != nil {
-				return err
-			}
-			return h.Remove(args)
-		}),
-	}
-	return cmd
+	return genCLICmd("remove", "Remove a function", (*cliHandler).Remove)
 }
 
 func genPackageCmd() *cobra.Command {
