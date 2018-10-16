@@ -78,11 +78,17 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 		return err
 	}
 
+	licenseType := BeatLicense
+	if licenseType == "ASL 2.0" {
+		licenseType = "ASL2"
+	}
+
 	assetCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, assetCmdPath),
 		"-pkg", "include",
 		"-in", fieldsYML,
 		"-out", createDir(out),
+		"-license", licenseType,
 		BeatName,
 	)
 
