@@ -45,8 +45,7 @@ func (r *Coordinator) Run(ctx context.Context) error {
 	defer r.log.Debug("coordinator stopped")
 
 	// When an errors happen in a function and its not handled by the running function, we log an error
-	// and we trigger a shutdown of all the others goroutine and start will return and beatless
-	// will stop.
+	// and we trigger a shutdown of all the others goroutine.
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -55,41 +54,42 @@ func (r *Coordinator) Run(ctx context.Context) error {
 
 	r.log.Debugf("starting %d functions", len(r.runners))
 	for _, rfn := range r.runners {
-		go r.startFunc(ctx, cancel, rfn, results)
+		go func(ctx context.Context, rfn Runner) {
+			var err error
+			defer func() { results <- err }()
+			err = r.runFunc(ctx, rfn)
+			if err != nil {
+				cancel()
+			}
+		}(ctx, rfn)
 	}
 
 	// Wait for goroutine to complete and aggregate any errors from the goroutine and
 	// raise them back to the main program.
-	var aggErr multierror.Errors
-	for i := 0; i < len(r.runners); i++ {
-		select {
-		case err := <-results:
-			if err != nil {
-				aggErr = append(aggErr, err)
-			}
+	var errors multierror.Errors
+	for range r.runners {
+		err := <-results
+		if err != nil {
+			errors = append(errors, err)
 		}
 	}
-	return aggErr.Err()
+	return errors.Err()
 }
 
-func (r *Coordinator) startFunc(
+func (r *Coordinator) runFunc(
 	ctx context.Context,
-	cancel context.CancelFunc,
 	rfn Runner,
-	output chan<- error,
-) {
-	r.log.Infof("starting function: %s", rfn)
-	defer r.log.Infof("function stopped: %s", rfn)
+) error {
+	r.log.Infof("starting function: %s", rfn.String())
+	defer r.log.Infof("function stopped: %s", rfn.String())
 
 	err := rfn.Run(ctx)
-	defer func() { output <- err }()
-
 	if err != nil {
 		r.log.Error(
-			"nonrecoverable error when executing the function: '%s', error: '%s', terminating all the functions",
+			"nonrecoverable error when executing the function: '%s', error: '%+v', terminating all the functions",
 			rfn,
 			err,
 		)
-		cancel()
 	}
+	return err
 }
