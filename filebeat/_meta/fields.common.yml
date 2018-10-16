@@ -86,45 +86,9 @@
       description: >
         The name of the program.
 
-    - name: process.pid
-      type: long
-      required: false
-      description: >
-        The pid of the process.
-
-    - name: event.severity
-      type: long
-      required: false
-      description: >
-        The severity of the event.
-
-    - name: service.name
-      type: keyword
-      description: >
-        Service name.
-
-    - name: log.level
-      type: keyword
-      description: >
-        Logging level.
-
     - name: log.flags
       description: >
         This field contains the flags of the event.
-
-    - name: event.created
-      type: date
-      description: >
-        event.created contains the date on which the event was created. In case of
-        log events this is when the log line was read by Filebeat. In comparison
-        @timestamp is the processed timestamp from the log line. If both are identical
-        only @timestamp should be used.
-
-    - name: http.response.status_code
-      type: long
-      description: >
-        HTTP response status_code.
-      example: 404
 
     - name: http.response.elapsed_time
       type: long
@@ -136,7 +100,3 @@
       description: >
         Content length of the HTTP response body.
 
-    - name: http.request.method
-      type: keyword
-      description: >
-        Request method.

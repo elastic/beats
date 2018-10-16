@@ -18,6 +18,9 @@
 package pipeline
 
 import (
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher/queue"
@@ -28,6 +31,8 @@ import (
 // - stop
 // - reload
 type outputController struct {
+	beat     beat.Info
+	monitors Monitors
 	logger   *logp.Logger
 	observer outputObserver
 
@@ -56,11 +61,15 @@ type outputWorker interface {
 }
 
 func newOutputController(
+	beat beat.Info,
+	monitors Monitors,
 	log *logp.Logger,
 	observer outputObserver,
 	b queue.Queue,
 ) *outputController {
 	c := &outputController{
+		beat:     beat,
+		monitors: monitors,
 		logger:   log,
 		observer: observer,
 		queue:    b,
@@ -128,6 +137,8 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		}
 	}
 
+	c.out = grp
+
 	// restart consumer (potentially blocked by retryer)
 	c.consumer.sigContinue()
 
@@ -136,4 +147,22 @@ func (c *outputController) Set(outGrp outputs.Group) {
 
 func makeWorkQueue() workQueue {
 	return workQueue(make(chan *Batch, 0))
+}
+
+// Reload the output
+func (c *outputController) Reload(cfg *reload.ConfigWithMeta) error {
+	outputCfg := common.ConfigNamespace{}
+
+	if err := cfg.Config.Unpack(&outputCfg); err != nil {
+		return err
+	}
+
+	output, err := loadOutput(c.beat, c.monitors, outputCfg)
+	if err != nil {
+		return err
+	}
+
+	c.Set(output)
+
+	return nil
 }

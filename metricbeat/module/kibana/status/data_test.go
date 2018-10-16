@@ -23,16 +23,19 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("./_meta/test/input.json")
+	f := "./_meta/test/input.json"
+	content, err := ioutil.ReadFile(f)
 	assert.NoError(t, err)
 
-	event := eventMapping(content)
-
-	assert.Equal(t, event["metrics"].(common.MapStr)["concurrent_connections"], int64(12))
+	reporter := &mbtest.CapturingReporterV2{}
+	err = eventMapping(reporter, content)
+	assert.NoError(t, err, f)
+	assert.True(t, len(reporter.GetEvents()) >= 1, f)
+	assert.Equal(t, 0, len(reporter.GetErrors()), f)
 }

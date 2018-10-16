@@ -22,12 +22,13 @@ import (
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "node", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "node", New,
 		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
@@ -50,7 +51,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch node metricset is beta")
+	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
 
 	http, err := helper.NewHTTP(base)
 	if err != nil {

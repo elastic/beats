@@ -20,6 +20,8 @@ package index_summary
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -73,19 +75,21 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) erro
 
 	err := json.Unmarshal(content, &all)
 	if err != nil {
+		err = errors.Wrap(err, "failure parsing Elasticsearch Stats API response")
 		r.Error(err)
 		return err
 	}
 
 	fields, err := schema.Apply(all.Data, s.FailOnRequired)
 	if err != nil {
+		err = errors.Wrap(err, "failure applying stats schema")
 		r.Error(err)
 		return err
 	}
 
 	var event mb.Event
 	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", "elasticsearch")
+	event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
 	event.ModuleFields = common.MapStr{}
 	event.ModuleFields.Put("cluster.name", info.ClusterName)
@@ -94,6 +98,5 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) erro
 	event.MetricSetFields = fields
 
 	r.Event(event)
-
 	return nil
 }
