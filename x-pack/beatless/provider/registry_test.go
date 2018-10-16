@@ -63,7 +63,7 @@ func testProviderLookup(t *testing.T) {
 
 	t.Run("adding and retrieving a provider", withRegistry(func(
 		t *testing.T,
-		global *feature.FeatureRegistry,
+		global *feature.Registry,
 		wrapper *Registry,
 	) {
 		err := global.Register(f)
@@ -82,7 +82,7 @@ func testProviderLookup(t *testing.T) {
 
 	t.Run("retrieving a non existing provider", withRegistry(func(
 		t *testing.T,
-		global *feature.FeatureRegistry,
+		global *feature.Registry,
 		wrapper *Registry,
 	) {
 		_, err := wrapper.Lookup("unknown")
@@ -91,7 +91,7 @@ func testProviderLookup(t *testing.T) {
 
 	t.Run("invalid provider name when doing lookup", withRegistry(func(
 		t *testing.T,
-		global *feature.FeatureRegistry,
+		global *feature.Registry,
 		wrapper *Registry,
 	) {
 		_, err := wrapper.Lookup("")
@@ -127,7 +127,7 @@ func testFunctionLookup(t *testing.T) {
 
 	t.Run("adding and retrieving a function", withRegistry(func(
 		t *testing.T,
-		global *feature.FeatureRegistry,
+		global *feature.Registry,
 		wrapper *Registry,
 	) {
 		err := global.Register(f)
@@ -151,7 +151,7 @@ func testFunctionLookup(t *testing.T) {
 
 	t.Run("return an error if the provider doesn't exist", withRegistry(func(
 		t *testing.T,
-		global *feature.FeatureRegistry,
+		global *feature.Registry,
 		wrapper *Registry,
 	) {
 		err := global.Register(f)
@@ -170,7 +170,7 @@ func testFunctionLookup(t *testing.T) {
 
 	t.Run("return an error if the function doesn't exist", withRegistry(func(
 		t *testing.T,
-		global *feature.FeatureRegistry,
+		global *feature.Registry,
 		wrapper *Registry,
 	) {
 		err := global.Register(f)
@@ -188,7 +188,7 @@ func testFunctionLookup(t *testing.T) {
 	}))
 }
 
-func withRegistry(fn func(t *testing.T, global *feature.FeatureRegistry, registry *Registry)) func(t *testing.T) {
+func withRegistry(fn func(t *testing.T, global *feature.Registry, registry *Registry)) func(t *testing.T) {
 	return func(t *testing.T) {
 		global := feature.NewRegistry()
 		wrapped := NewRegistry(global)
