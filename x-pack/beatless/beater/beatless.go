@@ -158,7 +158,9 @@ func makeClientFactory(log *logp.Logger, manager *licenser.Manager, pipeline bea
 		// Make the client aware of the current license, the client will accept sending events to the
 		// pipeline until the client is closed or if the license change and is not valid.
 		licenseAware := core.NewLicenseAwareClient(client, checkLicense)
-		manager.AddWatcher(licenseAware)
+		if err := manager.AddWatcher(licenseAware); err != nil {
+			return nil, err
+		}
 
 		return licenseAware, nil
 	}
