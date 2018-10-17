@@ -117,7 +117,7 @@ The Kubernetes autodiscover provider watches for Kubernetes pods to start, updat
 event:
 
   * host
-  * port
+  * port (if exposed)
   * kubernetes.container.id
   * kubernetes.container.image
   * kubernetes.container.name
@@ -171,6 +171,25 @@ The `kubernetes` autodiscover provider has the following configuration settings:
   client.
 
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
+
+====== Manually Defining Ports with Kubernetes
+
+If you need to work with Kubernetes containers that don't have a defined port in
+the pod spec you can hard code the port in your autodiscover config. In this case you would
+interpolate a value like `{data.host}:1234` instead of `{data.host}:{data.port}`.
+
+It is important to understand that autodiscover configs are de-duplicated after they
+are generated. This means that if your configuration yields an identical config for
+two different Kubernetes containers, only one will be used. Since pods share an identical
+host that means that even with multiple containers, if only the `{data.host}` variable is
+interpolated only one config will be generated. This is generally the correct behavior.
+
+Internally, Beats' Kubernetes autodiscover feature triggers config generation for
+two different types of metadata events: pod events and container events.
+If you have one pod with two containers three configs will be generated, but only
+unique ones will be used. This is important to understand in the context of containers with no declared ports, or where the `{port}` variable is not used. In that situation you may
+need to hardcode a port, but be aware that if the generated configs for multiple
+containers are identical, they will be merged into one config.
 
 ifdef::autodiscoverJolokia[]
 [float]
