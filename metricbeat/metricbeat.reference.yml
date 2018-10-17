@@ -205,6 +205,9 @@ metricbeat.modules:
     #- ml_job
   period: 10s
   hosts: ["localhost:9200"]
+  #username: "elastic"
+  #password: "changeme"
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Set to false to fetch all entries
   #index_recovery.active_only: true
