@@ -94,8 +94,8 @@
             }, 
             "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-09-11T14:23:50.360Z", 
-            "version": 12
+            "updated_at": "2018-10-17T08:42:10.301Z", 
+            "version": 7
         }, 
         {
             "attributes": {
@@ -154,6 +154,32 @@
                                         }
                                     }
                                 }
+                            }, 
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "metricbeat-*", 
+                                    "key": "kafka.topic.name", 
+                                    "negate": false, 
+                                    "params": {
+                                        "query": "test", 
+                                        "type": "phrase"
+                                    }, 
+                                    "type": "phrase", 
+                                    "value": "test"
+                                }, 
+                                "query": {
+                                    "match": {
+                                        "kafka.topic.name": {
+                                            "query": "test", 
+                                            "type": "phrase"
+                                        }
+                                    }
+                                }
                             }
                         ], 
                         "index": "metricbeat-*", 
@@ -165,6 +191,11 @@
                 }, 
                 "title": "Kafka Broker Details [Metricbeat Kafka]", 
                 "uiStateJSON": {
+                    "spy": {
+                        "mode": {
+                            "name": "table"
+                        }
+                    }, 
                     "vis": {
                         "params": {
                             "sort": {
@@ -186,7 +217,7 @@
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
-                                "orderBy": "1", 
+                                "orderBy": "_term", 
                                 "otherBucket": false, 
                                 "otherBucketLabel": "Other", 
                                 "size": 5
@@ -208,8 +239,8 @@
                             "enabled": true, 
                             "id": "5", 
                             "params": {
-                                "customLabel": "Number of Leader Partitions", 
-                                "field": "kafka.partition.partition.id"
+                                "customLabel": "Number of Partitions", 
+                                "field": "kafka.partition.topic_id"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -218,31 +249,11 @@
                             "enabled": true, 
                             "id": "6", 
                             "params": {
-                                "customLabel": "Number of Partitions", 
+                                "customLabel": "Number of Replicas", 
                                 "field": "kafka.partition.topic_broker_id"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "1", 
-                            "params": {
-                                "customLabel": "Newest Offset", 
-                                "field": "kafka.partition.offset.newest"
-                            }, 
-                            "schema": "metric", 
-                            "type": "max"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "3", 
-                            "params": {
-                                "customLabel": "Oldest Offset", 
-                                "field": "kafka.partition.offset.oldest"
-                            }, 
-                            "schema": "metric", 
-                            "type": "min"
                         }
                     ], 
                     "params": {
@@ -262,7 +273,7 @@
             }, 
             "id": "06355640-8e65-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-09-11T14:23:50.360Z", 
+            "updated_at": "2018-10-17T09:36:06.102Z", 
             "version": 12
         }, 
         {
@@ -303,8 +314,8 @@
             }, 
             "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-09-11T14:23:50.360Z", 
-            "version": 12
+            "updated_at": "2018-10-17T08:42:10.301Z", 
+            "version": 8
         }, 
         {
             "attributes": {
@@ -382,8 +393,8 @@
             }, 
             "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-09-11T14:23:50.360Z", 
-            "version": 12
+            "updated_at": "2018-10-17T08:42:10.301Z", 
+            "version": 7
         }, 
         {
             "attributes": {
@@ -480,7 +491,7 @@
                             "enabled": true, 
                             "id": "5", 
                             "params": {
-                                "customLabel": "Leader Partitions", 
+                                "customLabel": "Partitions", 
                                 "field": "kafka.partition.topic_id"
                             }, 
                             "schema": "metric", 
@@ -490,7 +501,7 @@
                             "enabled": true, 
                             "id": "6", 
                             "params": {
-                                "customLabel": "Partitions", 
+                                "customLabel": "Replicas", 
                                 "field": "kafka.partition.topic_broker_id"
                             }, 
                             "schema": "metric", 
@@ -531,8 +542,8 @@
             }, 
             "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-09-11T14:23:50.360Z", 
-            "version": 12
+            "updated_at": "2018-10-17T09:35:08.274Z", 
+            "version": 9
         }, 
         {
             "attributes": {
@@ -699,8 +710,8 @@
             }, 
             "id": "77f31970-8e92-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-09-11T14:23:50.360Z", 
-            "version": 12
+            "updated_at": "2018-10-17T08:42:10.301Z", 
+            "version": 7
         }, 
         {
             "attributes": {
@@ -778,8 +789,8 @@
             }, 
             "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-09-11T14:23:50.360Z", 
-            "version": 12
+            "updated_at": "2018-10-17T08:42:10.301Z", 
+            "version": 7
         }, 
         {
             "attributes": {
@@ -871,107 +882,8 @@
             }, 
             "id": "1681f1a0-90e7-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-09-11T14:23:50.360Z", 
-            "version": 12
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {}
-                }, 
-                "title": "Kafka Current Consumer Group Lag by Topic [Metricbeat Kafka]", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [], 
-                    "params": {
-                        "axis_formatter": "number", 
-                        "axis_position": "left", 
-                        "drop_last_bucket": 0, 
-                        "filter": "((metricset.name: partition AND kafka.partition.partition.is_leader: true) OR metricset.name: consumergroup) AND NOT kafka.topic.name:__consumer_offsets", 
-                        "gauge_color_rules": [
-                            {
-                                "gauge": "rgba(244,78,59,0.5)", 
-                                "id": "1ce13da0-90f9-11e8-a7cd-fd432c54afa8", 
-                                "opperator": "gte", 
-                                "text": "rgba(244,78,59,1)", 
-                                "value": 0
-                            }
-                        ], 
-                        "gauge_inner_width": "8", 
-                        "gauge_max": "1000", 
-                        "gauge_style": "half", 
-                        "gauge_width": "8", 
-                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
-                        "index_pattern": "metricbeat-*", 
-                        "interval": "10s", 
-                        "series": [
-                            {
-                                "axis_position": "right", 
-                                "chart_type": "line", 
-                                "color": "rgba(0,156,224,1)", 
-                                "fill": "0.2", 
-                                "formatter": "number", 
-                                "id": "0dcb8020-8e6d-11e8-bfab-6f29bad3a6f2", 
-                                "label": "Consumer Groups", 
-                                "line_width": 1, 
-                                "metrics": [
-                                    {
-                                        "field": "kafka.partition.offset.newest", 
-                                        "id": "0dcb8021-8e6d-11e8-bfab-6f29bad3a6f2", 
-                                        "type": "sum"
-                                    }, 
-                                    {
-                                        "field": "kafka.consumergroup.offset", 
-                                        "id": "4bd11db0-8e6f-11e8-bfab-6f29bad3a6f2", 
-                                        "type": "sum"
-                                    }, 
-                                    {
-                                        "id": "e0742d50-8e78-11e8-abb3-cf57ca7a810c", 
-                                        "script": "def lag = params.partition - params.consumergroup; if (lag < 0) { return 0 } return lag", 
-                                        "type": "calculation", 
-                                        "variables": [
-                                            {
-                                                "field": "0dcb8021-8e6d-11e8-bfab-6f29bad3a6f2", 
-                                                "id": "e20d6af0-8e78-11e8-abb3-cf57ca7a810c", 
-                                                "name": "partition"
-                                            }, 
-                                            {
-                                                "field": "4bd11db0-8e6f-11e8-bfab-6f29bad3a6f2", 
-                                                "id": "e6cc2b80-8e78-11e8-abb3-cf57ca7a810c", 
-                                                "name": "consumergroup"
-                                            }
-                                        ]
-                                    }, 
-                                    {
-                                        "field": "e0742d50-8e78-11e8-abb3-cf57ca7a810c", 
-                                        "id": "cfd3bf10-90f8-11e8-a7cd-fd432c54afa8", 
-                                        "sigma": "", 
-                                        "type": "avg_bucket"
-                                    }
-                                ], 
-                                "point_size": "0", 
-                                "seperate_axis": 0, 
-                                "split_color_mode": "rainbow", 
-                                "split_mode": "terms", 
-                                "stacked": "none", 
-                                "terms_field": "kafka.topic.name"
-                            }
-                        ], 
-                        "show_grid": 1, 
-                        "show_legend": 1, 
-                        "time_field": "@timestamp", 
-                        "type": "gauge"
-                    }, 
-                    "title": "Kafka Current Consumer Group Lag by Topic [Metricbeat Kafka]", 
-                    "type": "metrics"
-                }
-            }, 
-            "id": "c9c4d7d0-90f8-11e8-8fa2-3d5f811fbd0f", 
-            "type": "visualization", 
-            "updated_at": "2018-09-11T14:23:50.360Z", 
-            "version": 13
+            "updated_at": "2018-10-17T08:42:10.301Z", 
+            "version": 7
         }, 
         {
             "attributes": {
@@ -1000,7 +912,7 @@
                             "i": "1", 
                             "w": 24, 
                             "x": 24, 
-                            "y": 16
+                            "y": 6
                         }, 
                         "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "1", 
@@ -1025,7 +937,7 @@
                             "i": "2", 
                             "w": 24, 
                             "x": 0, 
-                            "y": 7
+                            "y": 19
                         }, 
                         "id": "06355640-8e65-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "2", 
@@ -1035,7 +947,7 @@
                     }, 
                     {
                         "gridData": {
-                            "h": 7, 
+                            "h": 6, 
                             "i": "3", 
                             "w": 11, 
                             "x": 0, 
@@ -1049,11 +961,11 @@
                     }, 
                     {
                         "gridData": {
-                            "h": 15, 
+                            "h": 13, 
                             "i": "6", 
                             "w": 24, 
                             "x": 0, 
-                            "y": 29
+                            "y": 6
                         }, 
                         "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "6", 
@@ -1066,7 +978,7 @@
                             "spy": null
                         }, 
                         "gridData": {
-                            "h": 7, 
+                            "h": 6, 
                             "i": "10", 
                             "w": 30, 
                             "x": 11, 
@@ -1081,11 +993,11 @@
                     {
                         "embeddableConfig": {}, 
                         "gridData": {
-                            "h": 13, 
+                            "h": 9, 
                             "i": "11", 
                             "w": 24, 
                             "x": 0, 
-                            "y": 16
+                            "y": 28
                         }, 
                         "id": "77f31970-8e92-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "11", 
@@ -1096,11 +1008,11 @@
                     {
                         "embeddableConfig": {}, 
                         "gridData": {
-                            "h": 15, 
+                            "h": 9, 
                             "i": "12", 
                             "w": 24, 
                             "x": 24, 
-                            "y": 29
+                            "y": 19
                         }, 
                         "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "12", 
@@ -1111,7 +1023,7 @@
                     {
                         "embeddableConfig": {}, 
                         "gridData": {
-                            "h": 7, 
+                            "h": 6, 
                             "i": "13", 
                             "w": 7, 
                             "x": 41, 
@@ -1122,27 +1034,13 @@
                         "title": "Consumer Metrics", 
                         "type": "visualization", 
                         "version": "6.3.1"
-                    }, 
-                    {
-                        "embeddableConfig": {}, 
-                        "gridData": {
-                            "h": 9, 
-                            "i": "14", 
-                            "w": 24, 
-                            "x": 24, 
-                            "y": 7
-                        }, 
-                        "id": "c9c4d7d0-90f8-11e8-8fa2-3d5f811fbd0f", 
-                        "panelIndex": "14", 
-                        "title": "Kafka Current Topic Lag", 
-                        "type": "visualization", 
-                        "version": "6.3.1"
                     }
                 ], 
                 "refreshInterval": {
-                    "display": "Off", 
+                    "display": "10 seconds", 
                     "pause": false, 
-                    "value": 0
+                    "section": 1, 
+                    "value": 10000
                 }, 
                 "timeFrom": "now-4h", 
                 "timeRestore": true, 
@@ -1152,9 +1050,9 @@
             }, 
             "id": "ea488d90-8e63-11e8-8fa2-3d5f811fbd0f", 
             "type": "dashboard", 
-            "updated_at": "2018-09-11T14:23:50.360Z", 
-            "version": 12
+            "updated_at": "2018-10-17T09:47:22.846Z", 
+            "version": 9
         }
     ], 
-    "version": "6.3.1"
+    "version": "6.3.0"
 }
