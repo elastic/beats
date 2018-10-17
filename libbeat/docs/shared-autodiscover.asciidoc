@@ -172,6 +172,7 @@ The `kubernetes` autodiscover provider has the following configuration settings:
 
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
 
+[float]
 ===== Manually Defining Ports with Kubernetes
 
 If you need to work with Kubernetes containers that don't have a defined port in

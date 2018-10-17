@@ -68,6 +68,8 @@ include::../../libbeat/docs/loggingconfig.asciidoc[]
 :standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
+include::../../libbeat/docs/shared-autodiscover.asciidoc[]
+
 :standalone:
 :allplatforms:
 include::../../libbeat/docs/yaml.asciidoc[]
