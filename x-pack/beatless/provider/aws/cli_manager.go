@@ -185,12 +185,12 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	fnTemplate := function.Template()
 
-	template, err := mergeTemplate(c.template(function, name), fnTemplate)
-	if err != nil {
+	to := c.template(function, name)
+	if err := mergeTemplate(to, fnTemplate); err != nil {
 		return err
 	}
 
-	json, err := template.JSON()
+	json, err := to.JSON()
 	if err != nil {
 		return err
 	}
@@ -296,47 +296,41 @@ func NewCLI(
 }
 
 // mergeTemplate takes two cloudformation and merge them, if a key already exist we return an error.
-func mergeTemplate(one, two *cloudformation.Template) (*cloudformation.Template, error) {
-	merge := func(m1 map[string]interface{}, m2 map[string]interface{}) (map[string]interface{}, error) {
+func mergeTemplate(to, from *cloudformation.Template) error {
+	merge := func(m1 map[string]interface{}, m2 map[string]interface{}) error {
 		for k, v := range m2 {
 			if _, ok := m1[k]; ok {
-				return nil, fmt.Errorf("key %s already exist in the template map", k)
+				return fmt.Errorf("key %s already exist in the template map", k)
 			}
 			m1[k] = v
 		}
-		return m1, nil
+		return nil
 	}
 
-	v, err := merge(one.Parameters, two.Parameters)
+	err := merge(to.Parameters, from.Parameters)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	one.Parameters = v
-
-	v, err = merge(one.Mappings, two.Mappings)
+	err = merge(to.Mappings, from.Mappings)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	one.Mappings = v
 
-	v, err = merge(one.Conditions, two.Conditions)
+	err = merge(to.Conditions, from.Conditions)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	one.Conditions = v
 
-	v, err = merge(one.Resources, two.Resources)
+	err = merge(to.Resources, from.Resources)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	one.Resources = v
 
-	v, err = merge(one.Outputs, two.Outputs)
+	err = merge(to.Outputs, from.Outputs)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	one.Outputs = v
-	return one, nil
+	return nil
 }
