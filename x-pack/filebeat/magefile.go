@@ -39,7 +39,7 @@ func CrossBuild() error {
 
 // Fields generates a fields.yml and fields.go for each module.
 func Fields() {
-	mg.Deps(fieldsYML, mage.GenerateAllInOneFieldsGo)
+	mg.Deps(fieldsYML, mage.GenerateModuleFieldsGo)
 }
 
 // fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.
