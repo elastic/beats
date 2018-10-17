@@ -43,5 +43,3 @@ var Bundle = provider.MustCreate(
 		feature.Experimental,
 	),
 ).Bundle()
-
-type handler interface{}

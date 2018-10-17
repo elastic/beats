@@ -41,7 +41,9 @@ func (a *APIGatewayProxy) Run(_ context.Context, client core.Client) error {
 	return nil
 }
 
-func (a *APIGatewayProxy) createHandler(client core.Client) handler {
+func (a *APIGatewayProxy) createHandler(
+	client core.Client,
+) func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	return func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 		a.log.Debugf("received event (requestID: %s)", request.RequestContext.RequestID)
 		event := transformer.APIGatewayProxyRequest(request)

@@ -58,8 +58,7 @@ func TestAPIGatewayProxy(t *testing.T) {
 		}
 
 		c, _ := s.(*APIGatewayProxy)
-		handler := c.createHandler(client)
-		res, err := handler(generateAPIGatewayProxyEvent())
+		res, err := c.createHandler(client)(generateAPIGatewayProxyEvent())
 		assert.Equal(t, e, err)
 		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 		ty, _ := res.Headers["Content-Type"]

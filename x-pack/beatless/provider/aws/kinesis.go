@@ -33,7 +33,7 @@ func (k *Kinesis) Run(_ context.Context, client core.Client) error {
 	return nil
 }
 
-func (k *Kinesis) createHandler(client core.Client) handler {
+func (k *Kinesis) createHandler(client core.Client) func(request events.KinesisEvent) error {
 	return func(request events.KinesisEvent) error {
 		k.log.Debugf("received %d events", len(request.Records))
 

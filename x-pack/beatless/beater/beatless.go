@@ -17,14 +17,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-
 	"github.com/elastic/beats/x-pack/beatless/config"
 	"github.com/elastic/beats/x-pack/beatless/core"
-	"github.com/elastic/beats/x-pack/beatless/licenser"
-	"github.com/elastic/beats/x-pack/beatless/provider"
-
-	// Imports providers and functions.
 	_ "github.com/elastic/beats/x-pack/beatless/include"
+	"github.com/elastic/beats/x-pack/beatless/licenser"
+	"github.com/elastic/beats/x-pack/beatless/provider" // Imports providers and functions.
 )
 
 var (
