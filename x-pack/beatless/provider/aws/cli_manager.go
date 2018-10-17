@@ -277,7 +277,7 @@ func (c *CLIManager) Remove(name string) error {
 	return nil
 }
 
-// NewCLI returns the interface to managa function on Amazon lambda.
+// NewCLI returns the interface to manage function on Amazon lambda.
 func NewCLI(
 	log *logp.Logger,
 	cfg *common.Config,
