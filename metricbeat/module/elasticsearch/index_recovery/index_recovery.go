@@ -18,7 +18,7 @@
 package index_recovery
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -27,7 +27,7 @@ import (
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "index_recovery", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "index_recovery", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 		mb.WithNamespace("elasticsearch.index.recovery"),
 	)
@@ -45,7 +45,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch index_recovery metricset is beta")
+	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
 
 	config := struct {
 		ActiveOnly bool `config:"index_recovery.active_only"`
@@ -75,13 +75,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+m.recoveryPath)
 	if err != nil {
-		r.Error(fmt.Errorf("Error fetch master info: %s", err))
+		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch index recovery stats from a non master node.")
+		logp.Debug(elasticsearch.ModuleName, "Trying to fetch index recovery stats from a non-master node.")
 		return
 	}
 
