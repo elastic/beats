@@ -170,7 +170,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 				// Helpful IDs to avoid scripts on queries
 				partitionTopicID := fmt.Sprintf("%d-%s", partition.ID, topic.Name)
-				partitionTopicBrokerID := fmt.Sprintf("%s-%d", partitionTopicID, b.ID())
+				partitionTopicBrokerID := fmt.Sprintf("%s-%d", partitionTopicID, id)
 
 				// create event
 				event := common.MapStr{
