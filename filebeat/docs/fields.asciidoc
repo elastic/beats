@@ -3611,15 +3611,6 @@ Self descriptive
 
 --
 
-*`haproxy.default.frontend_name`*::
-+
---
-type: text
-
-Name of the frontend (or listener) which received and processed the connection
-
---
-
 *`haproxy.default.mode`*::
 +
 --

@@ -50,9 +50,6 @@
   - name: priority
     type: long
     description: Self descriptive
-  - name: frontend_name
-    type: text
-    description: Name of the frontend (or listener) which received and processed the connection
   - name: mode
     type: text
     description: The mode the frontend is operating (TCP or HTTP)
