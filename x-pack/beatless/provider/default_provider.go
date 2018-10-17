@@ -68,19 +68,19 @@ func (d *DefaultProvider) CLIManager() (CLIManager, error) {
 	return d.managerFactory(nil, d.rawConfig, d)
 }
 
-// NullCLI is used when a provider doesn't implement the CLI to manager functions on the service provider.
-type NullCLI struct{}
+// nullCLI is used when a provider doesn't implement the CLI to manager functions on the service provider.
+type nullCLI struct{}
 
 // NewNullCli returns a NOOP CliManager.
 func NewNullCli(_ *logp.Logger, _ *common.Config, _ Provider) (CLIManager, error) {
-	return &NullCLI{}, nil
+	return (*nullCLI)(nil), nil
 }
 
 // Deploy returns not implemented.
-func (n *NullCLI) Deploy(_ string) error { return fmt.Errorf("deploy not implemented") }
+func (*nullCLI) Deploy(_ string) error { return fmt.Errorf("deploy not implemented") }
 
 // Update returns not implemented.
-func (n *NullCLI) Update(_ string) error { return fmt.Errorf("update not implemented") }
+func (*nullCLI) Update(_ string) error { return fmt.Errorf("update not implemented") }
 
 // Remove returns not implemented.
-func (n *NullCLI) Remove(_ string) error { return fmt.Errorf("remove not implemented") }
+func (*nullCLI) Remove(_ string) error { return fmt.Errorf("remove not implemented") }
