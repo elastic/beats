@@ -1,5 +1,5 @@
 [[configuring-howto-heartbeat]]
-= Configuring Heartbeat
+= Configuring {beatname_uc}
 
 [partintro]
 --
@@ -34,6 +34,7 @@ The following topics describe how to configure Heartbeat:
 * <<configuration-template>>
 * <<configuration-logging>>
 * <<using-environ-vars>>
+* <<configuration-autodiscover>>
 * <<yaml-tips>>
 * <<regexp-support>>
 * <<http-endpoint>>
