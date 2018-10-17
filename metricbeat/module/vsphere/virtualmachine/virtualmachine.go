@@ -141,7 +141,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			event := common.MapStr{
 				"host": vm.Summary.Runtime.Host.Value,
 				"name": vm.Summary.Config.Name,
-				"os": vm.Summary.Config.GuestFullName,
+				"os":   vm.Summary.Config.GuestFullName,
 				"cpu": common.MapStr{
 					"used": common.MapStr{
 						"mhz": vm.Summary.QuickStats.OverallCpuUsage,
