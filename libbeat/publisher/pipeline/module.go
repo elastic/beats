@@ -125,6 +125,7 @@ func loadOutput(
 	}
 
 	if publishDisabled {
+		log.Info("No outputs are configured, starting in paused mode.")
 		return outputs.Group{}, nil
 	}
 
