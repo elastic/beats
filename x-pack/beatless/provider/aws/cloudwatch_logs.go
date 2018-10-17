@@ -135,6 +135,7 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 
 	template := cloudformation.NewTemplate()
 	for idx, trigger := range c.config.Triggers {
+		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-permission.html
 		template.Resources[prefix("Permission"+strconv.Itoa(idx))] = &cloudformation.AWSLambdaPermission{
 			Action:       "lambda:InvokeFunction",
 			FunctionName: cloudformation.GetAtt(prefix(""), "Arn"),
@@ -164,6 +165,7 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 			return strings.Replace(c, "/", "", -1)
 		}
 
+		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-subscriptionfilter.html
 		template.Resources[prefix("SubscriptionFilter"+normalize(trigger.LogGroupName))] = &AWSLogsSubscriptionFilter{
 			DestinationArn: cloudformation.GetAtt(prefix(""), "Arn"),
 			FilterPattern:  trigger.FilterPattern,

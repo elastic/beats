@@ -68,11 +68,20 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 		return "btl" + name + s
 	}
 
-	// Create the generate cloudformation template for the lambda itself.
+	// AWS variables references:.
+	// AWS::Partition: aws, aws-cn, aws-gov.
+	// AWS::Region: us-east-1, us-east-2, ap-northeast-3,
+	// AWS::AccountId: account id for the current request.
+	// AWS::URLSuffix: amazonaws.com
+	//
+	// Documentation: https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/Welcome.html
+	// Intrinsic function reference: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html
+
+	// Create the roles for the lambda.
 	template := cloudformation.NewTemplate()
+	// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
 	template.Resources["IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
 		AssumeRolePolicyDocument: map[string]interface{}{
-			"Version": "2012-10-17",
 			"Statement": []interface{}{
 				map[string]interface{}{
 					"Action": "sts:AssumeRole",
@@ -88,6 +97,8 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 		},
 		Path:     "/",
 		RoleName: "beatless-lambda",
+		// Allow the lambda to write log to cloudwatch logs.
+		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html
 		Policies: []cloudformation.AWSIAMRole_Policy{
 			cloudformation.AWSIAMRole_Policy{
 				PolicyName: cloudformation.Join("-", []string{"btl", "lambda", name}),
@@ -106,6 +117,7 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 		},
 	}
 
+	// Configure the Dead letter, any failed events will be send to the configured amazon resource name.
 	var dlc *cloudformation.AWSLambdaFunction_DeadLetterConfig
 	if lambdaConfig.DeadLetterConfig != nil && len(lambdaConfig.DeadLetterConfig.TargetArn) != 0 {
 		dlc = &cloudformation.AWSLambdaFunction_DeadLetterConfig{
@@ -114,6 +126,7 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 	}
 
 	// Create the lambda
+	// Doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
 	template.Resources[prefix("")] = &AWSLambdaFunction{
 		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
 			Code: &cloudformation.AWSLambdaFunction_Code{
@@ -122,8 +135,9 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 			},
 			Description: lambdaConfig.Description,
 			Environment: &cloudformation.AWSLambdaFunction_Environment{
+				// Configure which function need to be run by the lambda function.
 				Variables: map[string]string{
-					"BEAT_STRICT_PERMS": "false",
+					"BEAT_STRICT_PERMS": "false", // Disable any check on disk, we are running with really differents permission on lambda.
 					"ENABLED_FUNCTIONS": name,
 				},
 			},
