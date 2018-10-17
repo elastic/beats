@@ -30,7 +30,6 @@
         },
         "partition": {
             "id": 0,
-            "topic_broker_id": "0-metricbeat-test-0",
             "topic_id": "0-metricbeat-test"
         },
         "topic": {
