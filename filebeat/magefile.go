@@ -95,7 +95,15 @@ func TestPackages() error {
 
 // Update updates the generated files (aka make update).
 func Update() error {
-	return sh.Run("make", "update")
+	if err := sh.Run("make", "update"); err != nil {
+		return err
+	}
+
+	// XXX (andrewkroh on 2018-10-14): This is a temporary solution for enabling
+	// X-Pack modules for Filebeat. Packaging for X-Pack will be fully migrated
+	// to a magefile.go in the x-pack/filebeat directory and this will be
+	// removed.
+	return mage.Mage("../x-pack/filebeat", "update")
 }
 
 // Fields generates a fields.yml for the Beat.
@@ -122,9 +130,33 @@ func GoTestIntegration(ctx context.Context) error {
 // - Include modules directory in packages (minus _meta and test files).
 // - Include modules.d directory in packages.
 
-var modulesDirGeneratedOSS = filepath.Clean("build/packaging/modules-oss")
-var modulesDirGeneratedXPack = filepath.Clean("build/packaging/modules-x-pack")
-var modules_D_DirGeneratedXpack = filepath.Clean("build/packaging/modules.d-x-pack")
+var (
+	dirModuleGeneratedOSS     = filepath.Clean("build/package/modules-oss")
+	dirModuleGeneratedXPack   = filepath.Clean("build/package/modules-x-pack")
+	dirModulesDGeneratedXPack = filepath.Clean("build/packaging/modules.d-x-pack")
+)
+
+func replacePackageFileSource(args mage.OSPackageArgs, replacements map[string]string) {
+	missing := make(map[string]struct{})
+	for key := range replacements {
+		missing[key] = struct{}{}
+	}
+	for key, contents := range args.Spec.Files {
+		oldSource := args.Spec.Files[key].Source
+		if newSource, found := replacements[oldSource]; found {
+			contents.Source = newSource
+			args.Spec.Files[key] = contents
+			delete(missing, oldSource)
+		}
+	}
+	if len(missing) > 0 {
+		asList := make([]string, 0, len(missing))
+		for path := range missing {
+			asList = append(asList, path)
+		}
+		panic(errors.Errorf("the following file sources were not found for replacement: %v", asList))
+	}
+}
 
 // customizePackaging modifies the package specs to add the modules and
 // modules.d directory.
@@ -133,12 +165,13 @@ func customizePackaging() {
 		moduleTarget = "module"
 		module       = mage.PackageFile{
 			Mode:   0644,
-			Source: modulesDirGeneratedOSS,
+			Source: dirModuleGeneratedOSS,
 		}
 		moduleXPack = mage.PackageFile{
 			Mode:   0644,
-			Source: modulesDirGeneratedXPack,
+			Source: dirModuleGeneratedXPack,
 		}
+
 		modulesDTarget = "modules.d"
 		modulesD       = mage.PackageFile{
 			Mode:   0644,
@@ -147,7 +180,7 @@ func customizePackaging() {
 		}
 		modulesDXPack = mage.PackageFile{
 			Mode:   0644,
-			Source: modules_D_DirGeneratedXpack,
+			Source: dirModulesDGeneratedXPack,
 			Config: true,
 		}
 	)
@@ -158,7 +191,14 @@ func customizePackaging() {
 		if args.Spec.License == "Elastic License" {
 			mods = moduleXPack
 			modsD = modulesDXPack
+			replacePackageFileSource(args, map[string]string{
+				"fields.yml":                  "../x-pack/{{.BeatName}}/fields.yml",
+				"{{.BeatName}}.yml":           "../x-pack/{{.BeatName}}/{{.BeatName}}.yml",
+				"{{.BeatName}}.reference.yml": "../x-pack/{{.BeatName}}/{{.BeatName}}.reference.yml",
+				"_meta/kibana.generated":      "../x-pack/{{.BeatName}}/build/kibana",
+			})
 		}
+
 		pkgType := args.Types[0]
 		switch pkgType {
 		case mage.TarGz, mage.Zip:
@@ -179,18 +219,19 @@ func customizePackaging() {
 // prepareModulePackagingOSS copies the module dir to the build dir and excludes
 // _meta and test files so that they are not included in packages.
 func prepareModulePackagingOSS() error {
-	if err := sh.Rm(modulesDirGeneratedOSS); err != nil {
+	if err := sh.Rm(dirModuleGeneratedOSS); err != nil {
 		return err
 	}
 
 	copy := &mage.CopyTask{
 		Source:  "module",
-		Dest:    modulesDirGeneratedOSS,
+		Dest:    dirModuleGeneratedOSS,
 		Mode:    0644,
 		DirMode: 0755,
 		Exclude: []string{
 			"/_meta",
 			"/test",
+			"fields.go",
 		},
 	}
 	return copy.Execute()
@@ -200,18 +241,21 @@ func prepareModulePackagingOSS() error {
 // for an x-pack distribution, excluding _meta and test files so that they are
 // not included in packages.
 func prepareModulePackagingXPack() error {
-	for _, dir := range []string{modulesDirGeneratedXPack, modules_D_DirGeneratedXpack} {
-		if err := sh.Rm(dir); err != nil {
-			return err
-		}
+	err := mage.Clean([]string{
+		dirModuleGeneratedXPack,
+		dirModulesDGeneratedXPack,
+	})
+	if err != nil {
+		return err
 	}
+
 	for _, copyAction := range []struct {
 		src, dst string
 	}{
-		{"module", modulesDirGeneratedXPack},
-		{"../x-pack/filebeat/module", modulesDirGeneratedXPack},
-		{"modules.d", modules_D_DirGeneratedXpack},
-		{"../x-pack/filebeat/modules.d", modules_D_DirGeneratedXpack},
+		{"module", dirModuleGeneratedXPack},
+		{"../x-pack/filebeat/module", dirModuleGeneratedXPack},
+		{"modules.d", dirModulesDGeneratedXPack},
+		{"../x-pack/filebeat/modules.d", dirModulesDGeneratedXPack},
 	} {
 		err := (&mage.CopyTask{
 			Source:  copyAction.src,
@@ -221,6 +265,7 @@ func prepareModulePackagingXPack() error {
 			Exclude: []string{
 				"/_meta",
 				"/test",
+				"fields.go",
 			},
 		}).Execute()
 		if err != nil {

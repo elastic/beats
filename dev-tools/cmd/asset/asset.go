@@ -37,6 +37,7 @@ var (
 	pkg     string
 	input   string
 	output  string
+	name    string
 	license = "ASL2"
 )
 
@@ -45,6 +46,7 @@ func init() {
 	flag.StringVar(&input, "in", "-", "Source of input. \"-\" means reading from stdin")
 	flag.StringVar(&output, "out", "-", "Output path. \"-\" means writing to stdout")
 	flag.StringVar(&license, "license", "ASL2", "License header for generated file.")
+	flag.StringVar(&name, "name", "", "Asset name")
 }
 
 func main() {
@@ -94,9 +96,12 @@ func main() {
 		os.Exit(1)
 	}
 	var buf bytes.Buffer
+	if name == "" {
+		name = file
+	}
 	asset.Template.Execute(&buf, asset.Data{
 		Beat:    beatName,
-		Name:    file,
+		Name:    name,
 		Data:    encData,
 		License: licenseHeader,
 		Package: pkg,
