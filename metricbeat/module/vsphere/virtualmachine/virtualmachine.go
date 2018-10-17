@@ -130,7 +130,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024)
 
 		event := common.MapStr{
-			"host": vm.Summary.Runtime.Host.Value,
 			"name": vm.Summary.Config.Name,
 			"os":   vm.Summary.Config.GuestFullName,
 			"cpu": common.MapStr{
