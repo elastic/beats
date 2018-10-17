@@ -33,7 +33,7 @@ func (s *SQS) Run(_ context.Context, client core.Client) error {
 	return nil
 }
 
-func (s *SQS) createHandler(client core.Client) func(request events.SQSEvent) error {
+func (s *SQS) createHandler(client core.Client) handler {
 	return func(request events.SQSEvent) error {
 		s.log.Debugf("received %d events", len(request.Records))
 

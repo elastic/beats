@@ -20,22 +20,28 @@ var Bundle = provider.MustCreate(
 		"Cloudwatch Logs trigger",
 		"receive events from cloudwatch logs.",
 		feature.Experimental,
-	)).MustAddFunction("api_gateway_proxy",
+	),
+).MustAddFunction("api_gateway_proxy",
 	NewAPIGatewayProxy,
 	feature.NewDetails(
 		"API Gateway proxy trigger",
 		"receive events from the api gateway proxy",
 		feature.Experimental,
-	)).MustAddFunction("kinesis",
+	),
+).MustAddFunction("kinesis",
 	NewKinesis,
 	feature.NewDetails(
 		"Kinesis trigger",
 		"receive events from a Kinesis stream",
 		feature.Experimental,
-	)).MustAddFunction("sqs",
+	),
+).MustAddFunction("sqs",
 	NewSQS,
 	feature.NewDetails(
 		"SQS trigger",
 		"receive events from a SQS queue",
 		feature.Experimental,
-	)).Bundle()
+	),
+).Bundle()
+
+type handler interface{}

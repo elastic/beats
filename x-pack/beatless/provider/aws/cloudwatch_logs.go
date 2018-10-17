@@ -68,7 +68,7 @@ func (c *CloudwatchLogs) Run(_ context.Context, client core.Client) error {
 	return nil
 }
 
-func (c *CloudwatchLogs) createHandler(client core.Client) func(request events.CloudwatchLogsEvent) error {
+func (c *CloudwatchLogs) createHandler(client core.Client) handler {
 	return func(request events.CloudwatchLogsEvent) error {
 		parsedEvent, err := request.AWSLogs.Parse()
 		if err != nil {
