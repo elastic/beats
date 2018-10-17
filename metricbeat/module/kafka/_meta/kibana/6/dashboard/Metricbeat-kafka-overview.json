@@ -219,7 +219,7 @@
                             "id": "6", 
                             "params": {
                                 "customLabel": "Number of Partitions", 
-                                "field": "kafka.topic_partition_broker_id"
+                                "field": "kafka.partition.topic_broker_id"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -481,7 +481,7 @@
                             "id": "5", 
                             "params": {
                                 "customLabel": "Leader Partitions", 
-                                "field": "kafka.topic_partition_id"
+                                "field": "kafka.partition.topic_id"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -491,7 +491,7 @@
                             "id": "6", 
                             "params": {
                                 "customLabel": "Partitions", 
-                                "field": "kafka.topic_partition_broker_id"
+                                "field": "kafka.partition.topic_broker_id"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -656,7 +656,7 @@
                             "id": "6", 
                             "params": {
                                 "customLabel": "Number of Partitions", 
-                                "field": "kafka.topic_partition_broker_id"
+                                "field": "kafka.partition.topic_broker_id"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
