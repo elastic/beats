@@ -81,6 +81,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/dns"
 
 	// Register autodiscover providers
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/aws/elb"
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"

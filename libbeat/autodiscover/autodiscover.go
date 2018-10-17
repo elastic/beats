@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mitchellh/hashstructure"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/autodiscover/meta"
@@ -164,10 +166,9 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 
 	meta := getMeta(event)
 	for _, config := range configs {
-		hash, err := cfgfile.HashConfig(config)
+		hash, err := hashKeyOrConfig(event, config)
 		if err != nil {
-			logp.Debug(debugK, "Could not hash config %v: %v", config, err)
-			continue
+			logp.Error(err)
 		}
 
 		err = a.adapter.CheckConfig(config)
@@ -205,7 +206,11 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 	logp.Debug(debugK, "Got a stop event: %v, generated configs: %+v", event, configs)
 
 	for _, config := range configs {
-		hash, err := cfgfile.HashConfig(config)
+		hash, err := hashKeyOrConfig(event, config)
+		if err != nil {
+			logp.Error(err)
+		}
+
 		if err != nil {
 			logp.Debug(debugK, "Could not hash config %v: %v", config, err)
 			continue
@@ -225,6 +230,24 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 	}
 
 	return updated
+}
+
+// Hash using the special "hashKey" key if available, otherwise hash the given config
+func hashKeyOrConfig(event bus.Event, config *common.Config) (hash uint64, err error) {
+	if hk, ok := event["hashKey"]; ok {
+		hash, err = hashstructure.Hash(hk, nil)
+		fmt.Printf("HASHOF %v\n", hk)
+		if err != nil {
+			errors.Wrapf(err, "Could not hash key %s:", hk)
+		}
+	} else {
+		fmt.Printf("LEGACY HASH\n")
+		hash, err = cfgfile.HashConfig(config)
+		if err != nil {
+			errors.Wrapf(err, "Could not hash config %v", config)
+		}
+	}
+	return hash, err
 }
 
 func getMeta(event bus.Event) common.MapStr {
