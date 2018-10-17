@@ -33,6 +33,11 @@
             }
         },
         {
+            "remove": {
+                "field": "message"
+            }
+        },
+        {
             "geoip": {
                 "field": "haproxy.client_ip",
                 "target_field": "haproxy.geoip"
