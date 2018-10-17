@@ -48,7 +48,7 @@
                                 "stacked": "none", 
                                 "terms_field": "kafka.topic.name", 
                                 "terms_order_by": "_term", 
-                                "value_template": "topic - {{value}}"
+                                "value_template": "{{value}}"
                             }, 
                             {
                                 "axis_position": "right", 
@@ -80,7 +80,7 @@
                                 "stacked": "none", 
                                 "terms_field": "kafka.consumergroup.id", 
                                 "terms_order_by": "_term", 
-                                "value_template": "consumer - {{value}}"
+                                "value_template": "{{value}}"
                             }
                         ], 
                         "show_grid": 1, 
@@ -94,94 +94,15 @@
             }, 
             "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T08:42:10.301Z", 
-            "version": 7
+            "updated_at": "2018-10-17T10:29:34.993Z", 
+            "version": 8
         }, 
         {
             "attributes": {
                 "description": "", 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [
-                            {
-                                "$state": {
-                                    "store": "appState"
-                                }, 
-                                "meta": {
-                                    "alias": null, 
-                                    "disabled": false, 
-                                    "index": "metricbeat-*", 
-                                    "key": "metricset.name", 
-                                    "negate": false, 
-                                    "params": {
-                                        "query": "partition", 
-                                        "type": "phrase"
-                                    }, 
-                                    "type": "phrase", 
-                                    "value": "partition"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "metricset.name": {
-                                            "query": "partition", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }, 
-                            {
-                                "$state": {
-                                    "store": "appState"
-                                }, 
-                                "meta": {
-                                    "alias": null, 
-                                    "disabled": false, 
-                                    "index": "metricbeat-*", 
-                                    "key": "kafka.topic.name", 
-                                    "negate": true, 
-                                    "params": {
-                                        "query": "__consumer_offsets", 
-                                        "type": "phrase"
-                                    }, 
-                                    "type": "phrase", 
-                                    "value": "__consumer_offsets"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "kafka.topic.name": {
-                                            "query": "__consumer_offsets", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }, 
-                            {
-                                "$state": {
-                                    "store": "appState"
-                                }, 
-                                "meta": {
-                                    "alias": null, 
-                                    "disabled": false, 
-                                    "index": "metricbeat-*", 
-                                    "key": "kafka.topic.name", 
-                                    "negate": false, 
-                                    "params": {
-                                        "query": "test", 
-                                        "type": "phrase"
-                                    }, 
-                                    "type": "phrase", 
-                                    "value": "test"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "kafka.topic.name": {
-                                            "query": "test", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }
-                        ], 
+                        "filter": [], 
                         "index": "metricbeat-*", 
                         "query": {
                             "language": "kuery", 
@@ -191,11 +112,7 @@
                 }, 
                 "title": "Kafka Broker Details [Metricbeat Kafka]", 
                 "uiStateJSON": {
-                    "spy": {
-                        "mode": {
-                            "name": "table"
-                        }
-                    }, 
+                    "spy": null, 
                     "vis": {
                         "params": {
                             "sort": {
@@ -217,7 +134,40 @@
                                 "missingBucket": false, 
                                 "missingBucketLabel": "Missing", 
                                 "order": "desc", 
-                                "orderBy": "_term", 
+                                "orderAgg": {
+                                    "enabled": true, 
+                                    "id": "2-orderAgg", 
+                                    "params": {
+                                        "field": "kafka.partition.topic_id"
+                                    }, 
+                                    "schema": {
+                                        "aggFilter": [
+                                            "!top_hits", 
+                                            "!percentiles", 
+                                            "!median", 
+                                            "!std_dev", 
+                                            "!derivative", 
+                                            "!moving_avg", 
+                                            "!serial_diff", 
+                                            "!cumulative_sum", 
+                                            "!avg_bucket", 
+                                            "!max_bucket", 
+                                            "!min_bucket", 
+                                            "!sum_bucket"
+                                        ], 
+                                        "deprecate": false, 
+                                        "editor": false, 
+                                        "group": "none", 
+                                        "hideCustomLabel": true, 
+                                        "max": null, 
+                                        "min": 0, 
+                                        "name": "orderAgg", 
+                                        "params": [], 
+                                        "title": "Order Agg"
+                                    }, 
+                                    "type": "cardinality"
+                                }, 
+                                "orderBy": "custom", 
                                 "otherBucket": false, 
                                 "otherBucketLabel": "Other", 
                                 "size": 5
@@ -273,8 +223,8 @@
             }, 
             "id": "06355640-8e65-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T09:36:06.102Z", 
-            "version": 12
+            "updated_at": "2018-10-17T16:28:52.588Z", 
+            "version": 14
         }, 
         {
             "attributes": {
@@ -542,8 +492,8 @@
             }, 
             "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T09:35:08.274Z", 
-            "version": 9
+            "updated_at": "2018-10-17T15:40:57.896Z", 
+            "version": 11
         }, 
         {
             "attributes": {
@@ -551,32 +501,6 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
                         "filter": [
-                            {
-                                "$state": {
-                                    "store": "appState"
-                                }, 
-                                "meta": {
-                                    "alias": null, 
-                                    "disabled": false, 
-                                    "index": "metricbeat-*", 
-                                    "key": "metricset.name", 
-                                    "negate": false, 
-                                    "params": {
-                                        "query": "partition", 
-                                        "type": "phrase"
-                                    }, 
-                                    "type": "phrase", 
-                                    "value": "partition"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "metricset.name": {
-                                            "query": "partition", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }, 
                             {
                                 "$state": {
                                     "store": "appState"
@@ -656,7 +580,7 @@
                             "enabled": true, 
                             "id": "5", 
                             "params": {
-                                "customLabel": "Number of Leader Partitions", 
+                                "customLabel": "Number of Partitions", 
                                 "field": "kafka.partition.partition.id"
                             }, 
                             "schema": "metric", 
@@ -666,7 +590,7 @@
                             "enabled": true, 
                             "id": "6", 
                             "params": {
-                                "customLabel": "Number of Partitions", 
+                                "customLabel": "Number of Replicas", 
                                 "field": "kafka.partition.topic_broker_id"
                             }, 
                             "schema": "metric", 
@@ -710,8 +634,8 @@
             }, 
             "id": "77f31970-8e92-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T08:42:10.301Z", 
-            "version": 7
+            "updated_at": "2018-10-17T17:16:03.999Z", 
+            "version": 14
         }, 
         {
             "attributes": {
@@ -887,11 +811,148 @@
         }, 
         {
             "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "index": "metricbeat-*", 
+                        "query": {
+                            "language": "lucene", 
+                            "query": ""
+                        }
+                    }
+                }, 
+                "title": "Kafka Consumer Group Clients [Metricbeat Kafka]", 
+                "uiStateJSON": {
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null, 
+                                "direction": null
+                            }
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Newest offset", 
+                                "field": "kafka.consumergroup.offset"
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customLabel": "Consumer group client", 
+                                "field": "kafka.consumergroup.client.id", 
+                                "missingBucket": false, 
+                                "missingBucketLabel": "Missing", 
+                                "order": "desc", 
+                                "orderBy": "_term", 
+                                "otherBucket": false, 
+                                "otherBucketLabel": "Other", 
+                                "size": 64
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "Topic", 
+                                "field": "kafka.topic.name", 
+                                "missingBucket": false, 
+                                "missingBucketLabel": "Missing", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "otherBucket": false, 
+                                "otherBucketLabel": "Other", 
+                                "size": 64
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "4", 
+                            "params": {
+                                "customLabel": "Partition", 
+                                "field": "kafka.partition.id", 
+                                "missingBucket": false, 
+                                "missingBucketLabel": "Missing", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "otherBucket": false, 
+                                "otherBucketLabel": "Other", 
+                                "size": 256
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "perPage": 10, 
+                        "showMeticsAtAllLevels": false, 
+                        "showPartialRows": false, 
+                        "showTotal": false, 
+                        "sort": {
+                            "columnIndex": null, 
+                            "direction": null
+                        }, 
+                        "totalFunc": "sum"
+                    }, 
+                    "title": "Kafka Consumer Group Clients [Metricbeat Kafka]", 
+                    "type": "table"
+                }
+            }, 
+            "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9", 
+            "type": "visualization", 
+            "updated_at": "2018-10-17T17:25:12.132Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
                 "description": "Kafka analysis of topics and consumer groups", 
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [], 
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "apply": true, 
+                                    "disabled": false, 
+                                    "index": "metricbeat-*", 
+                                    "key": "kafka.topic.name", 
+                                    "negate": false, 
+                                    "params": {
+                                        "query": "filebeat-kafka", 
+                                        "type": "phrase"
+                                    }, 
+                                    "type": "phrase", 
+                                    "value": "filebeat-kafka"
+                                }, 
+                                "query": {
+                                    "match": {
+                                        "kafka.topic.name": {
+                                            "query": "filebeat-kafka", 
+                                            "type": "phrase"
+                                        }
+                                    }
+                                }
+                            }
+                        ], 
                         "highlightAll": true, 
                         "query": {
                             "language": "kuery", 
@@ -911,8 +972,8 @@
                             "h": 13, 
                             "i": "1", 
                             "w": 24, 
-                            "x": 24, 
-                            "y": 6
+                            "x": 0, 
+                            "y": 20
                         }, 
                         "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "1", 
@@ -933,11 +994,11 @@
                             }
                         }, 
                         "gridData": {
-                            "h": 9, 
+                            "h": 10, 
                             "i": "2", 
                             "w": 24, 
-                            "x": 0, 
-                            "y": 19
+                            "x": 24, 
+                            "y": 6
                         }, 
                         "id": "06355640-8e65-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "2", 
@@ -961,7 +1022,7 @@
                     }, 
                     {
                         "gridData": {
-                            "h": 13, 
+                            "h": 14, 
                             "i": "6", 
                             "w": 24, 
                             "x": 0, 
@@ -993,11 +1054,11 @@
                     {
                         "embeddableConfig": {}, 
                         "gridData": {
-                            "h": 9, 
+                            "h": 11, 
                             "i": "11", 
                             "w": 24, 
-                            "x": 0, 
-                            "y": 28
+                            "x": 24, 
+                            "y": 16
                         }, 
                         "id": "77f31970-8e92-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "11", 
@@ -1008,11 +1069,11 @@
                     {
                         "embeddableConfig": {}, 
                         "gridData": {
-                            "h": 9, 
+                            "h": 7, 
                             "i": "12", 
                             "w": 24, 
-                            "x": 24, 
-                            "y": 19
+                            "x": 0, 
+                            "y": 33
                         }, 
                         "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "12", 
@@ -1034,24 +1095,30 @@
                         "title": "Consumer Metrics", 
                         "type": "visualization", 
                         "version": "6.3.1"
+                    }, 
+                    {
+                        "embeddableConfig": {}, 
+                        "gridData": {
+                            "h": 13, 
+                            "i": "14", 
+                            "w": 24, 
+                            "x": 24, 
+                            "y": 27
+                        }, 
+                        "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9", 
+                        "panelIndex": "14", 
+                        "type": "visualization", 
+                        "version": "6.3.0"
                     }
                 ], 
-                "refreshInterval": {
-                    "display": "10 seconds", 
-                    "pause": false, 
-                    "section": 1, 
-                    "value": 10000
-                }, 
-                "timeFrom": "now-4h", 
-                "timeRestore": true, 
-                "timeTo": "now", 
+                "timeRestore": false, 
                 "title": "[Metricbeat Kafka] Overview", 
                 "version": 1
             }, 
             "id": "ea488d90-8e63-11e8-8fa2-3d5f811fbd0f", 
             "type": "dashboard", 
-            "updated_at": "2018-10-17T09:47:22.846Z", 
-            "version": 9
+            "updated_at": "2018-10-17T17:26:23.478Z", 
+            "version": 15
         }
     ], 
     "version": "6.3.0"
