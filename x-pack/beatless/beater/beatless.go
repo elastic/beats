@@ -19,9 +19,9 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/x-pack/beatless/config"
 	"github.com/elastic/beats/x-pack/beatless/core"
-	_ "github.com/elastic/beats/x-pack/beatless/include"
+	_ "github.com/elastic/beats/x-pack/beatless/include" // imports features
 	"github.com/elastic/beats/x-pack/beatless/licenser"
-	"github.com/elastic/beats/x-pack/beatless/provider" // Imports providers and functions.
+	"github.com/elastic/beats/x-pack/beatless/provider"
 )
 
 var (
