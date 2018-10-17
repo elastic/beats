@@ -265,7 +265,7 @@ func (m *Monitor) Start() {
 	teleStats.monitors.Inc()
 
 	if stats, ok := teleStats.protocols[m.name]; !ok {
-		panic(fmt.Sprintf("Unknown protocol for monitor stats: %s", m.name))
+		logp.Err("Unknown protocol for monitor stats: %s", m.name)
 	} else {
 		stats.monitors.Inc()
 		stats.endpoints.Add(int64(m.endpoints))
@@ -289,7 +289,7 @@ func (m *Monitor) Stop() {
 	teleStats.monitors.Dec()
 
 	if stats, ok := teleStats.protocols[m.name]; !ok {
-		panic(fmt.Sprintf("Unknown protocol for monitor stats: %s", m.name))
+		logp.Err("Unknown protocol for monitor stats: %s", m.name)
 	} else {
 		stats.monitors.Dec()
 		stats.endpoints.Sub(int64(m.endpoints))
