@@ -91,7 +91,7 @@ func create(
 		}
 	} else {
 		for i, url := range config.URLs {
-			jobs[i], err = newHTTPMonitorIPsJob(&config, url, tls, enc, body, validator)
+			jobs[i], err = NewHTTPMonitorIPsJob(&config, url, tls, enc, body, validator)
 			if err != nil {
 				return nil, 0, err
 			}

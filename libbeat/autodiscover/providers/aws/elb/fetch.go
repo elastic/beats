@@ -1,0 +1,148 @@
+package elb
+
+import (
+	"sync"
+
+	"go.uber.org/multierr"
+
+	"github.com/aws/aws-sdk-go-v2/service/elbv2"
+
+	"github.com/elastic/beats/libbeat/common/atomic"
+)
+
+// fetcher is an interface that can fetch a full list of lbListener (load balancer + listener) objects.
+// representing the current state of the API.
+type fetcher interface {
+	fetch() ([]*lbListener, error)
+}
+
+// apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
+type apiFetcher struct {
+	client *elbv2.ELBV2
+}
+
+func newAPIFetcher(client *elbv2.ELBV2) fetcher {
+	return &apiFetcher{client}
+}
+
+// fetch attempts to request the full list of lbListener objects.
+// It accomplishes this by fetching a page of load balancers, then one go routine
+// per listener API request. Each page of results has O(n)+1 perf since we need that
+// additional fetch per lb. We let the goroutine scheduler sort things out, and use
+// a sync.Pool to limit the number of in-flight requests.
+func (f *apiFetcher) fetch() ([]*lbListener, error) {
+	var pageSize int64 = 50
+	req := f.client.DescribeLoadBalancersRequest(&elbv2.DescribeLoadBalancersInput{PageSize: &pageSize})
+
+	// Limit concurrency against the AWS API by creating a pool of objects
+	// This is hard coded for now. If, in the future, we decide to uncape this
+	// we can do this elsewhere.
+	taskPool := sync.Pool{}
+	for i := 0; i < 6; i++ {
+		taskPool.Put(nil)
+	}
+
+	ir := &fetchRequest{
+		req.Paginate(),
+		f.client,
+		atomic.MakeBool(true),
+		[]*lbListener{},
+		[]error{},
+		sync.Mutex{},
+		taskPool,
+		sync.WaitGroup{},
+	}
+
+	return ir.fetch()
+}
+
+// fetchRequest provides a way to get all pages from a
+// elbv2.DescribeLoadBalancersPager and all listeners for the given LoadBalancers.
+type fetchRequest struct {
+	paginator    elbv2.DescribeLoadBalancersPager
+	client       *elbv2.ELBV2
+	running      atomic.Bool
+	lbListeners  []*lbListener
+	errs         []error
+	resultsLock  sync.Mutex
+	taskPool     sync.Pool
+	pendingTasks sync.WaitGroup
+}
+
+func (p *fetchRequest) fetch() ([]*lbListener, error) {
+	p.dispatch(p.fetchNextPage)
+
+	p.pendingTasks.Wait()
+
+	// Acquire the results lock to ensure memory
+	// consistency between the last write and this read
+	p.resultsLock.Lock()
+	defer p.resultsLock.Unlock()
+
+	if len(p.errs) > 0 {
+		return nil, multierr.Combine(p.errs...)
+	}
+
+	return p.lbListeners, nil
+}
+
+func (p *fetchRequest) fetchNextPage() {
+	if !p.running.Load() {
+		return
+	}
+
+	if p.paginator.Next() {
+		for _, lb := range p.paginator.CurrentPage().LoadBalancers {
+			p.dispatch(func() { p.fetchListeners(lb) })
+		}
+	}
+
+	if p.paginator.Err() != nil {
+		p.recordErrResult(p.paginator.Err())
+	}
+}
+
+// dispatch runs the given func in a new goroutine, properly throttling requests
+// with the taskPool and also managing the pendingTasks waitGroup to ensure all
+// results are accumulated.
+func (p *fetchRequest) dispatch(fn func()) {
+	p.pendingTasks.Add(1)
+
+	go func() {
+		slot := p.taskPool.Get()
+		defer p.taskPool.Put(slot)
+		defer p.pendingTasks.Done()
+
+		fn()
+	}()
+}
+
+func (p *fetchRequest) fetchListeners(lb elbv2.LoadBalancer) {
+	listenReq := p.client.DescribeListenersRequest(&elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
+	listen := listenReq.Paginate()
+	for listen.Next() && p.running.Load() {
+		for _, listener := range listen.CurrentPage().Listeners {
+			p.recordGoodResult(&lb, &listener)
+		}
+	}
+	if listen.Err() != nil {
+		p.recordErrResult(listen.Err())
+	}
+}
+
+func (p *fetchRequest) recordGoodResult(lb *elbv2.LoadBalancer, lbl *elbv2.Listener) {
+	p.resultsLock.Lock()
+	defer p.resultsLock.Unlock()
+
+	p.lbListeners = append(p.lbListeners, &lbListener{lb, lbl})
+}
+
+func (p *fetchRequest) recordErrResult(err error) {
+	p.resultsLock.Lock()
+	defer p.resultsLock.Unlock()
+
+	p.errs = append(p.errs, err)
+
+	// Try to stop execution early
+	p.running.Store(false)
+}
