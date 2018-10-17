@@ -252,6 +252,20 @@
                                 }, 
                                 "parent": "", 
                                 "type": "list"
+                            }, 
+                            {
+                                "fieldName": "kafka.partition.id", 
+                                "id": "1539799686678", 
+                                "indexPattern": "metricbeat-*", 
+                                "label": "Partition", 
+                                "options": {
+                                    "multiselect": true, 
+                                    "order": "desc", 
+                                    "size": 5, 
+                                    "type": "terms"
+                                }, 
+                                "parent": "1532342651170", 
+                                "type": "list"
                             }
                         ], 
                         "pinFilters": false, 
@@ -264,8 +278,8 @@
             }, 
             "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T08:42:10.301Z", 
-            "version": 8
+            "updated_at": "2018-10-17T18:09:11.211Z", 
+            "version": 9
         }, 
         {
             "attributes": {
@@ -924,35 +938,7 @@
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [
-                            {
-                                "$state": {
-                                    "store": "appState"
-                                }, 
-                                "meta": {
-                                    "alias": null, 
-                                    "apply": true, 
-                                    "disabled": false, 
-                                    "index": "metricbeat-*", 
-                                    "key": "kafka.topic.name", 
-                                    "negate": false, 
-                                    "params": {
-                                        "query": "filebeat-kafka", 
-                                        "type": "phrase"
-                                    }, 
-                                    "type": "phrase", 
-                                    "value": "filebeat-kafka"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "kafka.topic.name": {
-                                            "query": "filebeat-kafka", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }
-                        ], 
+                        "filter": [], 
                         "highlightAll": true, 
                         "query": {
                             "language": "kuery", 
@@ -1010,7 +996,7 @@
                         "gridData": {
                             "h": 6, 
                             "i": "3", 
-                            "w": 11, 
+                            "w": 16, 
                             "x": 0, 
                             "y": 0
                         }, 
@@ -1041,8 +1027,8 @@
                         "gridData": {
                             "h": 6, 
                             "i": "10", 
-                            "w": 30, 
-                            "x": 11, 
+                            "w": 25, 
+                            "x": 16, 
                             "y": 0
                         }, 
                         "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f", 
@@ -1117,8 +1103,8 @@
             }, 
             "id": "ea488d90-8e63-11e8-8fa2-3d5f811fbd0f", 
             "type": "dashboard", 
-            "updated_at": "2018-10-17T17:26:23.478Z", 
-            "version": 15
+            "updated_at": "2018-10-17T18:09:57.322Z", 
+            "version": 16
         }
     ], 
     "version": "6.3.0"
