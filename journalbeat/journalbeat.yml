@@ -20,8 +20,6 @@ journalbeat.inputs:
 
   # The number of seconds to wait before trying to read again from journals.
   #backoff: 1s
-  # Multiplier of backoff value.
-  #backoff_factor: 2
   # The maximum number of seconds to wait before attempting to read again from journals.
   #max_backoff: 60s
 
@@ -47,8 +45,6 @@ journalbeat.inputs:
 
   # The number of seconds to wait before trying to read again from journals.
   #backoff: 1s
-  # Multiplier of backoff value.
-  #backoff_factor: 2
   # The maximum number of seconds to wait before attempting to read again from journals.
   #max_backoff: 60s
 
@@ -98,6 +94,11 @@ setup.kibana:
   # In case you specify and additional path, the scheme is required: http://localhost:5601/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
   #host: "localhost:5601"
+
+  # Kibana Space ID
+  # ID of the Kibana Space into which the dashboards should be loaded. By default,
+  # the Default Space will be used.
+  #space.id:
 
 #============================= Elastic Cloud ==================================
 

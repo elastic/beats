@@ -52,8 +52,6 @@ type Config struct {
 	// Backoff is the current interval to wait before
 	// attemting to read again from the journal.
 	Backoff time.Duration
-	// BackoffFactor is the multiplier of Backoff.
-	BackoffFactor int
 	// Matches store the key value pairs to match entries.
 	Matches []string
 }
@@ -64,63 +62,61 @@ type Reader struct {
 	config  Config
 	done    chan struct{}
 	logger  *logp.Logger
-	backoff time.Duration
+	backoff *common.Backoff
 }
+
+// journalOpener is a function which tries to open the configured systemd journal.
+// If it is successful, a new logger instance is created also.
+type journalOpener func() (*sdjournal.Journal, *logp.Logger, error)
 
 // New creates a new journal reader and moves the FP to the configured position.
 func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *logp.Logger) (*Reader, error) {
-	f, err := os.Stat(c.Path)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open file")
-	}
-
-	logger = logger.With("path", c.Path)
-
-	var j *sdjournal.Journal
-	if f.IsDir() {
-		j, err = sdjournal.NewJournalFromDir(c.Path)
+	opener := func() (*sdjournal.Journal, *logp.Logger, error) {
+		f, err := os.Stat(c.Path)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to open journal directory")
+			return nil, nil, errors.Wrap(err, "failed to open file")
 		}
-	} else {
-		j, err = sdjournal.NewJournalFromFiles(c.Path)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to open journal file")
+
+		var j *sdjournal.Journal
+		if f.IsDir() {
+			j, err = sdjournal.NewJournalFromDir(c.Path)
+			if err != nil {
+				return nil, nil, errors.Wrap(err, "failed to open journal directory")
+			}
+		} else {
+			j, err = sdjournal.NewJournalFromFiles(c.Path)
+			if err != nil {
+				return nil, nil, errors.Wrap(err, "failed to open journal file")
+			}
 		}
+		return j, logger.With("path", c.Path), nil
 	}
 
-	err = setupMatches(j, c.Matches)
-	if err != nil {
-		return nil, err
-	}
-
-	r := &Reader{
-		journal: j,
-		config:  c,
-		done:    done,
-		logger:  logger,
-		backoff: c.Backoff,
-	}
-	r.seek(state.Cursor)
-
-	instance.AddJournalToMonitor(c.Path, j)
-
-	r.logger.Debug("New journal is opened for reading")
-
-	return r, nil
+	return newReader(opener, c, done, state, logger)
 }
 
 // NewLocal creates a reader to read form the local journal and moves the FP
 // to the configured position.
 func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logger *logp.Logger) (*Reader, error) {
-	j, err := sdjournal.NewJournal()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open local journal")
+	localOpener := func() (*sdjournal.Journal, *logp.Logger, error) {
+		j, err := sdjournal.NewJournal()
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "failed to open local journal")
+		}
+
+		logger = logger.With("path", "local")
+		logger.Debug("New local journal is opened for reading")
+		return j, logger, nil
 	}
 
-	c.Path = LocalSystemJournalID
-	logger = logger.With("path", "local")
-	logger.Debug("New local journal is opened for reading")
+	return newReader(localOpener, c, done, state, logger)
+}
+
+func newReader(opener journalOpener, c Config, done chan struct{}, state checkpoint.JournalState, logger *logp.Logger) (*Reader, error) {
+	j, logger, err := opener()
+	if err != nil {
+		return nil, err
+	}
 
 	err = setupMatches(j, c.Matches)
 	if err != nil {
@@ -132,6 +128,7 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 		config:  c,
 		done:    done,
 		logger:  logger,
+		backoff: common.NewBackoff(done, c.Backoff, c.MaxBackoff),
 	}
 	r.seek(state.Cursor)
 
@@ -198,7 +195,7 @@ func (r *Reader) seek(cursor string) {
 }
 
 // Next waits until a new event shows up and returns it.
-// It block until an event is returned or an error occurs.
+// It blocks until an event is returned or an error occurs.
 func (r *Reader) Next() (*beat.Event, error) {
 	for {
 		select {
@@ -211,12 +208,11 @@ func (r *Reader) Next() (*beat.Event, error) {
 			}
 
 			if event == nil {
-				r.wait()
+				r.backoff.Wait()
 				continue
 			}
 
-			// reset backoff when new event is available
-			r.backoff = r.config.Backoff
+			r.backoff.Reset()
 			return event, nil
 		}
 	}
@@ -244,24 +240,13 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	fields := common.MapStr{}
 	custom := common.MapStr{}
 
-	for k, v := range entry.Fields {
-		if kk, ok := journaldEventFields[k]; !ok {
-			normalized := strings.ToLower(strings.TrimLeft(k, "_"))
+	for entryKey, v := range entry.Fields {
+		if fieldConversionInfo, ok := journaldEventFields[entryKey]; !ok {
+			normalized := strings.ToLower(strings.TrimLeft(entryKey, "_"))
 			custom.Put(normalized, v)
-		} else {
-			if !kk.dropped {
-				if kk.isInteger {
-					vv, err := strconv.ParseInt(v, 10, 64)
-					if err != nil {
-						r.logger.Debug("Failed to convert field: %s %v to int: %v", kk.name, v, err)
-						fields.Put(kk.name, v)
-						continue
-					}
-					fields.Put(kk.name, vv)
-				} else {
-					fields.Put(kk.name, v)
-				}
-			}
+		} else if !fieldConversionInfo.dropped {
+			value := r.convertNamedField(fieldConversionInfo, v)
+			fields.Put(fieldConversionInfo.name, value)
 		}
 	}
 
@@ -287,20 +272,16 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	return &event
 }
 
-func (r *Reader) wait() {
-	select {
-	case <-r.done:
-		return
-	case <-time.After(r.backoff):
-	}
-
-	if r.backoff < r.config.MaxBackoff {
-		r.backoff = r.backoff * time.Duration(r.config.BackoffFactor)
-		if r.backoff > r.config.MaxBackoff {
-			r.backoff = r.config.MaxBackoff
+func (r *Reader) convertNamedField(fc fieldConversion, value string) interface{} {
+	if fc.isInteger {
+		v, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			r.logger.Debugf("Failed to convert field: %s \"%v\" to int: %v", fc.name, value, err)
+			return value
 		}
-		r.logger.Debugf("Increasing backoff time to: %v factor: %v", r.backoff, r.config.BackoffFactor)
+		return v
 	}
+	return value
 }
 
 // Close closes the underlying journal reader.
