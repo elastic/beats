@@ -3233,6 +3233,22 @@ haproxy Module
 
 
 
+*`haproxy.destination_port`*::
++
+--
+type: long
+
+Port of the destination host
+
+--
+
+*`haproxy.destination_ip`*::
++
+--
+IP of the destination host
+
+--
+
 *`haproxy.process_name`*::
 +
 --
@@ -3286,12 +3302,30 @@ server_name is the name of the last server to which the connection was sent.
 
 --
 
-*`haproxy.time_client_req`*::
+*`haproxy.total_waiting_time_ms`*::
 +
 --
 type: long
 
-time_client_req is the total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+Total time in milliseconds spent waiting in the various queues
+
+--
+
+*`haproxy.connection_wait_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting for the connection to establish to the final server
+
+--
+
+*`haproxy.bytes_read`*::
++
+--
+type: long
+
+bytes_read is the total number of bytes transmitted to the client when the log is emitted.
 
 --
 
@@ -3310,24 +3344,6 @@ time_queue is the total time in milliseconds spent waiting in the various queues
 type: long
 
 time_backend_connect is the total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
-
---
-
-*`haproxy.time_server_response`*::
-+
---
-type: long
-
-time_server_response is the total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
-
---
-
-*`haproxy.time_duration`*::
-+
---
-type: long
-
-time_duration is the time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
 
 --
 
@@ -3511,15 +3527,6 @@ status_code is the HTTP status code returned to the client.
 
 --
 
-*`haproxy.http.response.bytes_read`*::
-+
---
-type: long
-
-bytes_read is the total number of bytes transmitted to the client when the log is emitted.
-
---
-
 *`haproxy.http.response.captured_cookie`*::
 +
 --
@@ -3568,6 +3575,108 @@ captured_request_headers is a list of headers captured in the request due to the
 type: text
 
 raw_request_line is the complete HTTP request line, including the method, request and HTTP version string.
+
+--
+
+*`haproxy.http.request.time_active_ms`*::
++
+--
+type: long
+
+time_active_ms is the time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+
+--
+
+*`haproxy.http.request.time_wait_without_data_ms`*::
++
+--
+type: long
+
+time_wait_without_data_ms is the total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
+
+--
+
+*`haproxy.http.request.time_wait_ms`*::
++
+--
+type: long
+
+time_wait_ms is the total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+
+--
+
+[float]
+== default fields
+
+Default HAProxy log format
+
+
+*`haproxy.default.facility`*::
++
+--
+type: text
+
+One of the 24 standard syslog facilities. Refer to https://cbonte.github.io/haproxy-dconv/1.7/configuration.html#3.1 for more information
+
+--
+
+*`haproxy.default.priority`*::
++
+--
+type: long
+
+Self descriptive
+
+--
+
+*`haproxy.default.frontend_name`*::
++
+--
+type: text
+
+Name of the frontend (or listener) which received and processed the connection
+
+--
+
+*`haproxy.default.mode`*::
++
+--
+type: text
+
+The mode the frontend is operating (TCP or HTTP)
+
+--
+
+*`haproxy.default.logsource`*::
++
+--
+type: text
+
+The HAProxy source of the log
+
+--
+
+[float]
+== tcp fields
+
+TCP log format
+
+
+*`haproxy.tcp.processing_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds elapsed between the accept and the last close
+
+--
+
+*`haproxy.tcp.connection_waiting_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds elapsed between the accept and the last close
 
 --
 
