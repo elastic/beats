@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Fix incorrect type conversion of average response time in Haproxy dashboards {pull}8404[8404]
 - Added io disk read and write times to system module {issue}8473[8473] {pull}8508[8508]
 - Avoid mapping issues in kubernetes module. {pull}8487[8487]
+- Recover metrics for old apache versions removed by mistake on #6450. {pull}7871[7871]
 - Fix dropwizard module parsing of metric names. {issue}8365[8365] {pull}6385[8385]
 
 *Packetbeat*
