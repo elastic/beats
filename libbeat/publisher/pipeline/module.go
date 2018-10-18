@@ -18,7 +18,6 @@
 package pipeline
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 
@@ -57,7 +56,6 @@ func Load(
 	monitors Monitors,
 	config Config,
 	outcfg common.ConfigNamespace,
-	outRequired bool,
 ) (*Pipeline, error) {
 	log := monitors.Logger
 	if log == nil {
@@ -99,7 +97,7 @@ func Load(
 		return nil, err
 	}
 
-	out, err := loadOutput(beatInfo, monitors, outcfg, outRequired)
+	out, err := loadOutput(beatInfo, monitors, outcfg)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +115,6 @@ func loadOutput(
 	beatInfo beat.Info,
 	monitors Monitors,
 	outcfg common.ConfigNamespace,
-	outRequired bool,
 ) (outputs.Group, error) {
 	log := monitors.Logger
 	if log == nil {
@@ -125,18 +122,11 @@ func loadOutput(
 	}
 
 	if publishDisabled {
-		log.Info("No outputs are configured, starting in paused mode.")
 		return outputs.Group{}, nil
 	}
 
 	if !outcfg.IsSet() {
-		if !outRequired {
-			return outputs.Group{}, nil
-		}
-
-		msg := "No outputs are defined. Please define one under the output section."
-		log.Info(msg)
-		return outputs.Fail(errors.New(msg))
+		return outputs.Group{}, nil
 	}
 
 	var (
