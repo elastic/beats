@@ -7,7 +7,7 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -20,7 +20,10 @@ type opUpdateCloudFormation struct {
 }
 
 func (o *opUpdateCloudFormation) Execute() error {
-	uuid := uuid.NewV4()
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		return err
+	}
 	input := &cloudformation.UpdateStackInput{
 		ClientRequestToken: aws.String(uuid.String()),
 		StackName:          aws.String(o.stackName),
