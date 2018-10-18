@@ -26,7 +26,7 @@ import (
 )
 
 // Register holds a registry of reloadable objects
-var Register = newRegistry()
+var Register = NewRegistry()
 
 // ConfigWithMeta holds a pair of common.Config and optional metadata for it
 type ConfigWithMeta struct {
@@ -47,21 +47,23 @@ type Reloadable interface {
 	Reload(config *ConfigWithMeta) error
 }
 
-type registry struct {
+// Registry of reloadable objects and lists
+type Registry struct {
 	sync.RWMutex
 	confsLists map[string]ReloadableList
 	confs      map[string]Reloadable
 }
 
-func newRegistry() *registry {
-	return &registry{
+// NewRegistry initializes and returns a reload registry
+func NewRegistry() *Registry {
+	return &Registry{
 		confsLists: make(map[string]ReloadableList),
 		confs:      make(map[string]Reloadable),
 	}
 }
 
 // Register declares a reloadable object
-func (r *registry) Register(name string, obj Reloadable) error {
+func (r *Registry) Register(name string, obj Reloadable) error {
 	r.Lock()
 	defer r.Unlock()
 
@@ -78,7 +80,7 @@ func (r *registry) Register(name string, obj Reloadable) error {
 }
 
 // RegisterList declares a reloadable list of configurations
-func (r *registry) RegisterList(name string, list ReloadableList) error {
+func (r *Registry) RegisterList(name string, list ReloadableList) error {
 	r.Lock()
 	defer r.Unlock()
 
@@ -95,34 +97,34 @@ func (r *registry) RegisterList(name string, list ReloadableList) error {
 }
 
 // MustRegister declares a reloadable object
-func (r *registry) MustRegister(name string, obj Reloadable) {
+func (r *Registry) MustRegister(name string, obj Reloadable) {
 	if err := r.Register(name, obj); err != nil {
 		panic(err)
 	}
 }
 
 // MustRegisterList declares a reloadable object list
-func (r *registry) MustRegisterList(name string, list ReloadableList) {
+func (r *Registry) MustRegisterList(name string, list ReloadableList) {
 	if err := r.RegisterList(name, list); err != nil {
 		panic(err)
 	}
 }
 
-// Get returns the reloadable object with the given name, nil if not found
-func (r *registry) Get(name string) Reloadable {
+// GetReloadable returns the reloadable object with the given name, nil if not found
+func (r *Registry) GetReloadable(name string) Reloadable {
 	r.RLock()
 	defer r.RUnlock()
 	return r.confs[name]
 }
 
-// GetList returns the reloadable list with the given name, nil if not found
-func (r *registry) GetList(name string) ReloadableList {
+// GetReloadableList returns the reloadable list with the given name, nil if not found
+func (r *Registry) GetReloadableList(name string) ReloadableList {
 	r.RLock()
 	defer r.RUnlock()
 	return r.confsLists[name]
 }
 
-func (r *registry) nameTaken(name string) bool {
+func (r *Registry) nameTaken(name string) bool {
 	if _, ok := r.confs[name]; ok {
 		return true
 	}

@@ -35,6 +35,9 @@ import (
 	"github.com/satori/go.uuid"
 	"go.uber.org/zap"
 
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
+
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
@@ -43,11 +46,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/logp/configure"
+	"github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
@@ -59,8 +64,6 @@ import (
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
-	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
 
 	// Register publisher pipeline modules
 	_ "github.com/elastic/beats/libbeat/publisher/includes"
@@ -306,6 +309,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, fmt.Errorf("error initializing publisher: %+v", err)
 	}
 
+	reload.Register.MustRegister("output", pipeline.OutputReloader())
+
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
 	// defer pipeline.Close()
@@ -385,6 +390,10 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if b.Config.HTTP.Enabled() {
 		api.Start(b.Config.HTTP)
 	}
+
+	// Launch config manager
+	b.ConfigManager.Start()
+	defer b.ConfigManager.Stop()
 
 	return beater.Run(&b.Beat)
 }
@@ -565,6 +574,16 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	logp.Info("Beat UUID: %v", b.Info.UUID)
+
+	// initialize config manager
+	b.ConfigManager, err = management.Factory()(reload.Register, b.Beat.Info.UUID)
+	if err != nil {
+		return err
+	}
+
+	if err := b.ConfigManager.CheckRawConfig(b.RawConfig); err != nil {
+		return err
+	}
 
 	if maxProcs := b.Config.MaxProcs; maxProcs > 0 {
 		runtime.GOMAXPROCS(maxProcs)
