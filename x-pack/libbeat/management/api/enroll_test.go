@@ -11,12 +11,15 @@ import (
 	"net/http"
 	"testing"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestEnrollValid(t *testing.T) {
-	beatUUID := uuid.NewV4()
+	beatUUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatalf("error while generating Beat UUID: %v", err)
+	}
 
 	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()

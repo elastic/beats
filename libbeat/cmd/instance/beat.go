@@ -32,7 +32,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"go.uber.org/zap"
 
 	"github.com/elastic/go-sysinfo"
@@ -217,6 +217,11 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		return nil, err
 	}
 
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
 	b := beat.Beat{
 		Info: beat.Info{
 			Beat:        name,
@@ -224,7 +229,7 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 			Version:     v,
 			Name:        hostname,
 			Hostname:    hostname,
-			UUID:        uuid.NewV4(),
+			UUID:        id,
 		},
 		Fields: fields,
 	}
@@ -618,7 +623,7 @@ func (b *Beat) loadMeta() error {
 		}
 
 		f.Close()
-		valid := !uuid.Equal(m.UUID, uuid.Nil)
+		valid := m.UUID != uuid.Nil
 		if valid {
 			b.Info.UUID = m.UUID
 			return nil
