@@ -50,12 +50,12 @@ func create(
 ) (jobs []monitors.Job, endpoints int, err error) {
 	config := DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, -1, err
+		return nil, 0, err
 	}
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
-		return nil, -1, err
+		return nil, 0, err
 	}
 
 	defaultScheme := "tcp"
@@ -65,7 +65,7 @@ func create(
 
 	schemeHosts, err := collectHosts(&config, defaultScheme)
 	if err != nil {
-		return nil, -1, err
+		return nil, 0, err
 	}
 
 	typ := config.Name
@@ -84,7 +84,7 @@ func create(
 			TLS:     schemeTLS,
 		})
 		if err != nil {
-			return nil, -1, err
+			return nil, 0, err
 		}
 
 		epJobs, err := dialchain.MakeDialerJobs(db, typ, scheme, eps, config.Mode,
@@ -92,7 +92,7 @@ func create(
 				return pingHost(dialer, addr, timeout, validator)
 			})
 		if err != nil {
-			return nil, -1, err
+			return nil, 0, err
 		}
 
 		jobs = append(jobs, epJobs...)

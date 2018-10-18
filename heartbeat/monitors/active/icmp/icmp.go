@@ -40,7 +40,7 @@ func create(
 ) (jobs []monitors.Job, endpoints int, err error) {
 	config := DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, -1, err
+		return nil, 0, err
 	}
 
 	// TODO: check icmp is support by OS + check we've
@@ -60,7 +60,7 @@ func create(
 	ipVersion := config.Mode.Network()
 	if len(config.Hosts) > 0 && ipVersion == "" {
 		err := fmt.Errorf("pinging hosts requires ipv4 or ipv6 mode enabled")
-		return nil, -1, err
+		return nil, 0, err
 	}
 
 	var loopErr error
@@ -70,11 +70,11 @@ func create(
 	})
 	if loopErr != nil {
 		debugf("Failed to initialize ICMP loop %v", loopErr)
-		return nil, -1, loopErr
+		return nil, 0, loopErr
 	}
 
 	if err := loop.checkNetworkMode(ipVersion); err != nil {
-		return nil, -1, err
+		return nil, 0, err
 	}
 
 	network := config.Mode.Network()
@@ -89,7 +89,7 @@ func create(
 		settings := monitors.MakeHostJobSettings(jobName, host, config.Mode)
 		err := addJob(monitors.MakeByHostJob(settings, pingFactory))
 		if err != nil {
-			return nil, -1, err
+			return nil, 0, err
 		}
 	}
 
