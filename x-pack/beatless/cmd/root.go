@@ -5,8 +5,6 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/x-pack/beatless/beater"
@@ -25,16 +23,8 @@ func init() {
 		ConfigOverrides: config.ConfigOverrides,
 	})
 
-	functionCmd := &cobra.Command{
-		Use:   "function",
-		Short: "Manage functions",
-	}
-
-	functionCmd.AddCommand(genDeployCmd())
-	functionCmd.AddCommand(genUpdateCmd())
-	functionCmd.AddCommand(genRemoveCmd())
-	functionCmd.AddCommand(genPackageCmd())
-
-	RootCmd.AddCommand(functionCmd)
-
+	RootCmd.AddCommand(genDeployCmd())
+	RootCmd.AddCommand(genUpdateCmd())
+	RootCmd.AddCommand(genRemoveCmd())
+	RootCmd.AddCommand(genPackageCmd())
 }
