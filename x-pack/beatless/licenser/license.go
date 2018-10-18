@@ -7,7 +7,7 @@ package licenser
 import (
 	"time"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 )
 
 // License represents the license of this beat, the license is fetched and returned from

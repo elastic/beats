@@ -10,17 +10,25 @@ import (
 	"sync"
 	"time"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
+func mustUUIDV4() uuid.UUID {
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		panic(err)
+	}
+	return uuid
+}
+
 // OSSLicense default license to use.
 var (
 	OSSLicense = &License{
-		UUID:   uuid.NewV4(),
+		UUID:   mustUUIDV4(),
 		Type:   OSS,
 		Mode:   OSS,
 		Status: Active,
