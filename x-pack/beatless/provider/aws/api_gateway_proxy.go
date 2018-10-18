@@ -49,14 +49,14 @@ func (a *APIGatewayProxy) createHandler(
 		event := transformer.APIGatewayProxyRequest(request)
 		if err := client.Publish(event); err != nil {
 			a.log.Errorf("could not publish event to the pipeline, error: %s")
-			return a.buildResponse(
+			return buildResponse(
 				http.StatusInternalServerError,
 				"an error occurred when sending the event.",
 				request.RequestContext.RequestID,
 			), err
 		}
 		client.Wait()
-		return a.buildResponse(
+		return buildResponse(
 			http.StatusOK,
 			"event received successfully.",
 			request.RequestContext.RequestID,
@@ -64,7 +64,7 @@ func (a *APIGatewayProxy) createHandler(
 	}
 }
 
-func (a *APIGatewayProxy) buildResponse(
+func buildResponse(
 	statusCode int,
 	responseMsg string,
 	requestID string,
