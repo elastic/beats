@@ -42,6 +42,7 @@ class Test(BaseTest):
 
             self.assert_stats(tcp_monitors=1, tcp_endpoints=2)
         finally:
+            self.proc.check_kill_and_wait()
             server.shutdown()
 
     def assert_stats(self, http_endpoints=0, http_monitors=0, tcp_endpoints=0, tcp_monitors=0, icmp_endpoints=0, icmp_monitors=0):
