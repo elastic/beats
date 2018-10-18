@@ -17,7 +17,7 @@
 
 // +build integration
 
-package pool
+package process
 
 import (
 	"os"
@@ -39,7 +39,7 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "php_fpm",
-		"metricsets": []string{"pool"},
+		"metricsets": []string{"process"},
 		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
 	}
 }

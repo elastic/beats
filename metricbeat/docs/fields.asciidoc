@@ -14332,6 +14332,13 @@ The name of the pool.
 
 --
 
+[float]
+== pool fields
+
+`pool` contains the metrics that were obtained from the PHP-FPM process pool.
+
+
+
 *`php_fpm.pool.process_manager`*::
 +
 --
@@ -14474,6 +14481,145 @@ type: date
 format: epoch_second
 
 The date and time FPM has started.
+
+
+--
+
+[float]
+== process fields
+
+process contains the metrics that were obtained from the PHP-FPM process.
+
+
+
+*`php_fpm.process.pid`*::
++
+--
+type: integer
+
+The PID of the process
+
+
+--
+
+*`php_fpm.process.state`*::
++
+--
+type: keyword
+
+The state of the process (Idle, Running, etc)
+
+
+--
+
+*`php_fpm.process.start_time`*::
++
+--
+type: date
+
+format: epoch_second
+
+The date and time the process has started
+
+
+--
+
+*`php_fpm.process.start_since`*::
++
+--
+type: integer
+
+The number of seconds since the process has started
+
+
+--
+
+*`php_fpm.process.requests`*::
++
+--
+type: integer
+
+The number of requests the process has served
+
+
+--
+
+*`php_fpm.process.request_duration`*::
++
+--
+type: integer
+
+The duration in microseconds (1 million in a second) of the current request (my own definition)
+
+
+--
+
+*`php_fpm.process.request_method`*::
++
+--
+type: keyword
+
+The request method (GET, POST, etc) (of the current request)
+
+
+--
+
+*`php_fpm.process.request_uri`*::
++
+--
+type: text
+
+The request URI with the query string (of the current request)
+
+
+--
+
+*`php_fpm.process.content_length`*::
++
+--
+type: integer
+
+The content length of the request (only with POST) (of the current request)
+
+
+--
+
+*`php_fpm.process.user`*::
++
+--
+type: keyword
+
+The user (PHP_AUTH_USER) (or - if not set) (for the current request)
+
+
+--
+
+*`php_fpm.process.script`*::
++
+--
+type: text
+
+The main script called (or - if not set) (for the current request)
+
+
+--
+
+*`php_fpm.process.last_request_cpu`*::
++
+--
+type: long
+
+The max amount of memory the last request consumed (it is always 0 if the process is not in Idle state because memory calculation is done when the request processing has terminated)
+
+
+--
+
+*`php_fpm.process.last_request_memory`*::
++
+--
+type: integer
+
+The content length of the request (only with POST) (of the current request)
 
 
 --
