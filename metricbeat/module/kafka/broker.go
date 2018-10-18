@@ -122,7 +122,8 @@ func (b *Broker) Connect() error {
 		return err
 	}
 
-	other := findMatchingBroker(brokerAddress(b.broker), meta.Brokers)
+	finder := brokerFinder{Net: &defaultNet{}}
+	other := finder.findBroker(brokerAddress(b.broker), meta.Brokers)
 	if other == nil { // no broker found
 		closeBroker(b.broker)
 		return fmt.Errorf("No advertised broker with address %v found", b.Addr())
@@ -352,36 +353,65 @@ func checkRetryQuery(err error) (retry, reconnect bool) {
 	return false, false
 }
 
-func findMatchingBroker(
-	addr string,
-	brokers []*sarama.Broker,
-) *sarama.Broker {
+// NetInfo can be used to obtain network information
+type NetInfo interface {
+	LookupIP(string) ([]net.IP, error)
+	LookupAddr(string) ([]string, error)
+	LocalIPAddrs() ([]net.IP, error)
+	Hostname() (string, error)
+}
+
+type defaultNet struct{}
+
+// LookupIP looks up a host using the local resolver
+func (m *defaultNet) LookupIP(addr string) ([]net.IP, error) {
+	return net.LookupIP(addr)
+}
+
+// LookupAddr returns the list of hosts resolving to an specific address
+func (m *defaultNet) LookupAddr(address string) ([]string, error) {
+	return net.LookupAddr(address)
+}
+
+// LocalIPAddrs return the list of IP addresses configured in local network interfaces
+func (m *defaultNet) LocalIPAddrs() ([]net.IP, error) {
+	return common.LocalIPAddrs()
+}
+
+// Hostname returns the hostname reported by the OS
+func (m *defaultNet) Hostname() (string, error) {
+	return os.Hostname()
+}
+
+type brokerFinder struct {
+	Net NetInfo
+}
+
+func (m *brokerFinder) findBroker(addr string, brokers []*sarama.Broker) *sarama.Broker {
 	lst := brokerAddresses(brokers)
-	if idx, found := findMatchingAddress(addr, lst); found {
+	if idx, found := m.findAddress(addr, lst); found {
 		return brokers[idx]
 	}
 	return nil
 }
 
-func findMatchingAddress(
-	addr string,
-	brokers []string,
-) (int, bool) {
+func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
 	debugf("Try to match broker to: %v", addr)
-
-	// compare connection address to list of broker addresses
-	if i, found := indexOf(addr, brokers); found {
-		return i, true
-	}
 
 	// get connection 'port'
 	host, port, err := net.SplitHostPort(addr)
 	if err != nil || port == "" {
+		host = addr
 		port = "9092"
 	}
 
+	// compare connection address to list of broker addresses
+	if i, found := indexOf(net.JoinHostPort(host, port), brokers); found {
+		return i, true
+	}
+
 	// lookup local machines ips for comparing with broker addresses
-	localIPs, err := common.LocalIPAddrs()
+	localIPs, err := m.Net.LocalIPAddrs()
 	if err != nil || len(localIPs) == 0 {
 		return -1, false
 	}
@@ -389,7 +419,7 @@ func findMatchingAddress(
 
 	// try to find broker by comparing the fqdn for each known ip to list of
 	// brokers
-	localHosts := lookupHosts(localIPs)
+	localHosts := m.lookupHosts(localIPs)
 	debugf("local machine addresses: %v", localHosts)
 	for _, host := range localHosts {
 		debugf("try to match with fqdn: %v (%v)", host, port)
@@ -401,7 +431,7 @@ func findMatchingAddress(
 	// try matching ip of configured host with broker list, this would
 	// match if hosts of advertised addresses are IPs, but configured host
 	// is a hostname
-	ips, err := net.LookupIP(host)
+	ips, err := m.Net.LookupIP(host)
 	if err == nil {
 		for _, ip := range ips {
 			addr := net.JoinHostPort(ip.String(), port)
@@ -413,7 +443,7 @@ func findMatchingAddress(
 
 	// try to find broker id by comparing the machines local hostname to
 	// broker hostnames in metadata
-	if host, err := os.Hostname(); err == nil {
+	if host, err := m.Net.Hostname(); err == nil {
 		debugf("try to match with hostname only: %v (%v)", host, port)
 
 		tmp := net.JoinHostPort(strings.ToLower(host), port)
@@ -437,7 +467,7 @@ func findMatchingAddress(
 		}
 
 		// lookup all ips for brokers host:
-		ips, err := net.LookupIP(bh)
+		ips, err := m.Net.LookupIP(bh)
 		debugf("broker %v ips: %v, %v", bh, ips, err)
 		if err != nil {
 			continue
@@ -454,7 +484,7 @@ func findMatchingAddress(
 	return -1, false
 }
 
-func lookupHosts(ips []net.IP) []string {
+func (m *brokerFinder) lookupHosts(ips []net.IP) []string {
 	set := map[string]struct{}{}
 	for _, ip := range ips {
 		txt, err := ip.MarshalText()
@@ -462,7 +492,7 @@ func lookupHosts(ips []net.IP) []string {
 			continue
 		}
 
-		hosts, err := net.LookupAddr(string(txt))
+		hosts, err := m.Net.LookupAddr(string(txt))
 		debugf("lookup %v => %v, %v", string(txt), hosts, err)
 		if err != nil {
 			continue
