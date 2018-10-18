@@ -7110,6 +7110,24 @@ Partition id.
 
 --
 
+*`kafka.partition.topic_id`*::
++
+--
+type: keyword
+
+Unique id of the partition in the topic.
+
+--
+
+*`kafka.partition.topic_broker_id`*::
++
+--
+type: keyword
+
+Unique id of the partition in the topic and the broker.
+
+--
+
 [float]
 == consumergroup fields
 
