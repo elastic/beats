@@ -185,3 +185,12 @@
             type: keyword
             description: >
               Region ISO code.
+
+    - name: user_agent
+      type: group
+      fields:
+      - name: os
+        type: group
+        fields:
+        - name: full_name
+          type: keyword

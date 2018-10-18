@@ -707,3 +707,6 @@
 
     - name: app_proto_expected
       type: keyword
+
+  - name: flags
+    type: group
