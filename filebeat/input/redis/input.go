@@ -93,7 +93,11 @@ func (p *Input) Run() {
 		pool := CreatePool(host, p.config.Password, p.config.Network,
 			p.config.MaxConn, p.config.IdleTimeout, p.config.IdleTimeout)
 
-		h := NewHarvester(pool.Get())
+		h, err := NewHarvester(pool.Get())
+		if err != nil {
+			logp.Err("Failed to create harvester: %v", err)
+			continue
+		}
 		h.forwarder = forwarder
 
 		if err := p.registry.Start(h); err != nil {

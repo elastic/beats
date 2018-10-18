@@ -191,9 +191,9 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	callback := func(esClient *elasticsearch.Client) error {
 		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
-	elasticsearch.RegisterConnectCallback(callback)
+	_, err := elasticsearch.RegisterConnectCallback(callback)
 
-	return nil
+	return err
 }
 
 func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) error {
