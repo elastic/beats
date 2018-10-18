@@ -62,9 +62,10 @@ Processors are valid:
 * At the top-level in the configuration. The processor is applied to all data
 collected by {beatname_uc}.
 * Under a specific {processor-scope}. The processor is applied to the data
-collected for that {processor-scope}. For example:
-+
+collected for that {processor-scope}.
 ifeval::["{beatname_lc}"=="filebeat"]
+For example:
++
 [source,yaml]
 ------
 - type: <input_type>
@@ -92,6 +93,8 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
+For example:
++
 [source,yaml]
 ----
 auditbeat.modules:
@@ -104,6 +107,8 @@ auditbeat.modules:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
+For example:
++
 [source,yaml]
 ----
 packetbeat.protocols:
@@ -129,6 +134,8 @@ packetbeat.flows:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
+For example:
++
 [source,yaml]
 ----
 heartbeat.monitors:
@@ -141,6 +148,8 @@ heartbeat.monitors:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="winlogbeat"]
+For example:
++
 [source,yaml]
 ----
 winlogbeat.event_logs:
@@ -813,6 +822,20 @@ from Docker containers:
 * Image
 * Labels
 
+[NOTE]
+=====
+When running {beatname_uc} in a container, you need to provide access to
+Docker’s unix socket in order for the `add_docker_metadata` processor to work.
+You can do this by mounting the socket inside the container. For example:
+
+`docker run -v /var/run/docker.sock:/var/run/docker.sock ...`
+
+To avoid privilege issues, you may also need to add `--user=root` to the
+`docker run` flags. Because the user must be part of the docker group in order
+to access `/var/run/docker.sock`, root access is required if {beatname_uc} is
+running as non-root inside the container. 
+=====
+
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
@@ -860,7 +883,6 @@ for container ID. It defaults to 4 to match
 
 `cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
 forget metadata for a container, 60s by default.
-
 
 [[add-host-metadata]]
 === Add Host metadata
