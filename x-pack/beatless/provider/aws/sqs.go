@@ -39,7 +39,7 @@ func (s *SQS) createHandler(client core.Client) func(request events.SQSEvent) er
 
 		events := transformer.SQS(request)
 		if err := client.PublishAll(events); err != nil {
-			s.log.Errorf("could not publish events to the pipeline, error: %s")
+			s.log.Errorf("could not publish events to the pipeline, error: %+v", err)
 			return err
 		}
 		client.Wait()

@@ -76,11 +76,6 @@ func NewNullCli(_ *logp.Logger, _ *common.Config, _ Provider) (CLIManager, error
 	return (*nullCLI)(nil), nil
 }
 
-// Deploy returns not implemented.
 func (*nullCLI) Deploy(_ string) error { return fmt.Errorf("deploy not implemented") }
-
-// Update returns not implemented.
 func (*nullCLI) Update(_ string) error { return fmt.Errorf("update not implemented") }
-
-// Remove returns not implemented.
 func (*nullCLI) Remove(_ string) error { return fmt.Errorf("remove not implemented") }

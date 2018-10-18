@@ -33,8 +33,9 @@ func NewCoordinator(log *logp.Logger,
 	runners ...Runner,
 ) *Coordinator {
 	if log == nil {
-		log = logp.NewLogger("coordinator")
+		log = logp.NewLogger("")
 	}
+	log = log.Named("coordinator")
 	return &Coordinator{log: log, runners: runners}
 }
 

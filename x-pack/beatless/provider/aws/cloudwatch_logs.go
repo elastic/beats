@@ -74,7 +74,7 @@ func (c *CloudwatchLogs) createHandler(
 	return func(request events.CloudwatchLogsEvent) error {
 		parsedEvent, err := request.AWSLogs.Parse()
 		if err != nil {
-			c.log.Errorf("could not parse events from cloudwatch logs, error: %s", err)
+			c.log.Errorf("could not parse events from cloudwatch logs, error: %+v", err)
 			return err
 		}
 
@@ -89,7 +89,7 @@ func (c *CloudwatchLogs) createHandler(
 
 		events := transformer.CloudwatchLogs(parsedEvent)
 		if err := client.PublishAll(events); err != nil {
-			c.log.Errorf("could not publish events to the pipeline, error: %s")
+			c.log.Errorf("could not publish events to the pipeline, error: %+v", err)
 			return err
 		}
 		client.Wait()

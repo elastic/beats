@@ -39,7 +39,7 @@ func (k *Kinesis) createHandler(client core.Client) func(request events.KinesisE
 
 		events := transformer.KinesisEvent(request)
 		if err := client.PublishAll(events); err != nil {
-			k.log.Errorf("could not publish events to the pipeline, error: %s")
+			k.log.Errorf("could not publish events to the pipeline, error: %+v", err)
 			return err
 		}
 		client.Wait()

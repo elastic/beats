@@ -49,7 +49,7 @@ type Beatless struct {
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	c := &config.DefaultConfig
 	if err := cfg.Unpack(c); err != nil {
-		return nil, fmt.Errorf("xerror reading config file: %v", err)
+		return nil, fmt.Errorf("xerror reading config file: %+v", err)
 	}
 
 	provider, err := provider.NewProvider(c)
@@ -93,7 +93,7 @@ func (bt *Beatless) Run(b *beat.Beat) error {
 	// Create a client per function and wrap them into a runnable function by the coordinator.
 	functions, err := bt.Provider.CreateFunctions(clientFactory, enabledFunctions)
 	if err != nil {
-		return fmt.Errorf("error when creating the functions, error: %v", err)
+		return fmt.Errorf("error when creating the functions, error: %+v", err)
 	}
 
 	// manages the goroutine related to the function handlers, if an error occurs and its not handled
