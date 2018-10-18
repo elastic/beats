@@ -288,7 +288,7 @@ func TestWatcher(t *testing.T) {
 
 func TestWaitForLicense(t *testing.T) {
 	i := &License{
-		UUID:   uuid.NewV4(),
+		UUID:   mustUUIDV4(),
 		Type:   Basic,
 		Mode:   Basic,
 		Status: Active,
