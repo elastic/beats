@@ -607,7 +607,6 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Release config reloading feature as GA. {pull}6891[6891]
 - Kubernetes deployment: Add ServiceAccount config to system metricbeat. {pull}6824[6824]
 - Kubernetes deployment: Add DNS Policy to system metricbeat. {pull}6656[6656]
-- Added 
 
 *Packetbeat*
 
