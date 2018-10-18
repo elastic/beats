@@ -331,8 +331,32 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
+			"checksumSHA1": "ySXaN6sOslbV1KjvtZE9ColsPwU=",
+			"path": "github.com/aws/aws-sdk-go-v2/private/protocol/restxml",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
+			"checksumSHA1": "yVqzN5KLeyxDlQmTyhMziIgVw+4=",
+			"path": "github.com/aws/aws-sdk-go-v2/private/protocol/xml",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
 			"checksumSHA1": "aUgbxpCz2vi9bxm+YHnz3GojvAY=",
 			"path": "github.com/aws/aws-sdk-go-v2/private/protocol/xml/xmlutil",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
+			"checksumSHA1": "yo32Zcq1rjutOJYfrSqKDGx/i44=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/cloudformation",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
 			"revisionTime": "2018-09-27T22:51:20Z",
 			"version": "v2.0.0-preview.5",
@@ -349,6 +373,14 @@
 		{
 			"checksumSHA1": "QX85Yp1ihkxh8ye/FktHZUVsT6A=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/lambda",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
+			"checksumSHA1": "/1ueZe/ATSjk0EEVbEkkROXC/hk=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/s3",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
 			"revisionTime": "2018-09-27T22:51:20Z",
 			"version": "v2.0.0-preview.5",
