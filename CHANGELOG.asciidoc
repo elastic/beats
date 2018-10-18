@@ -153,6 +153,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Support for Kafka 2.0.0 {pull}8399[8399]
 - Add container image for docker metricsets. {issue}8214[8214] {pull}8438[8438]
 - Add support for `full` status page output for php-fpm module as a separate metricset called `process`. {pull}8394[8394]
+- Add Vsphere Virtual Machine operating system to `os` field in Vsphere virtualmachine module. {pull}8543[8543]
 
 *Packetbeat*
 
@@ -606,6 +607,7 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Release config reloading feature as GA. {pull}6891[6891]
 - Kubernetes deployment: Add ServiceAccount config to system metricbeat. {pull}6824[6824]
 - Kubernetes deployment: Add DNS Policy to system metricbeat. {pull}6656[6656]
+- Added 
 
 *Packetbeat*
 
