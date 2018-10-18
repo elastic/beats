@@ -30,37 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
 )
-
-var teleRegistry *monitoring.Registry = monitoring.Default.NewRegistry("heartbeat")
-var httpRegistry *monitoring.Registry = teleRegistry.NewRegistry("heartbeat.http")
-var tcpRegistry *monitoring.Registry = teleRegistry.NewRegistry("heartbeat.tcp")
-var icmpRegistry *monitoring.Registry = teleRegistry.NewRegistry("heartbeat.icmp")
-
-type protocolStats struct {
-	monitors  *monitoring.Int
-	endpoints *monitoring.Int
-}
-
-func newProtocolStats(reg *monitoring.Registry) protocolStats {
-	return protocolStats{
-		monitoring.NewInt(reg, "monitors"),
-		monitoring.NewInt(reg, "endpoints"),
-	}
-}
-
-var teleStats = struct {
-	monitors  *monitoring.Int
-	protocols map[string]protocolStats
-}{
-	monitors: monitoring.NewInt(teleRegistry, "monitors"),
-	protocols: map[string]protocolStats{
-		"http": newProtocolStats(teleRegistry.NewRegistry("http")),
-		"tcp":  newProtocolStats(teleRegistry.NewRegistry("tcp")),
-		"icmp": newProtocolStats(teleRegistry.NewRegistry("icmp")),
-	},
-}
 
 // Monitor represents a configured recurring monitoring task loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
@@ -83,6 +53,10 @@ type Monitor struct {
 	watch          watcher.Watch
 
 	pipelineConnector beat.PipelineConnector
+
+	// stats is the pluginStatsRecorder used to record lifecycle events
+	// for global metrics + telemetry
+	stats statsRecorder
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -127,6 +101,7 @@ func newMonitor(
 		watchPollTasks:    []*task{},
 		internalsMtx:      sync.Mutex{},
 		config:            config,
+		stats:             monitorPlugin.stats,
 	}
 
 	jobs, endpoints, err := monitorPlugin.create(config)
@@ -262,14 +237,7 @@ func (m *Monitor) Start() {
 		t.Start()
 	}
 
-	teleStats.monitors.Inc()
-
-	if stats, ok := teleStats.protocols[m.name]; !ok {
-		logp.Err("Unknown protocol for monitor stats: %s", m.name)
-	} else {
-		stats.monitors.Inc()
-		stats.endpoints.Add(int64(m.endpoints))
-	}
+	m.stats.startMonitor(int64(m.endpoints))
 }
 
 // Stop stops the Monitor's execution in its configured scheduler.
@@ -286,12 +254,5 @@ func (m *Monitor) Stop() {
 		t.Stop()
 	}
 
-	teleStats.monitors.Dec()
-
-	if stats, ok := teleStats.protocols[m.name]; !ok {
-		logp.Err("Unknown protocol for monitor stats: %s", m.name)
-	} else {
-		stats.monitors.Dec()
-		stats.endpoints.Sub(int64(m.endpoints))
-	}
+	m.stats.stopMonitor(int64(m.endpoints))
 }

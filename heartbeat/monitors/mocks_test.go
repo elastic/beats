@@ -22,6 +22,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/monitoring"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -99,11 +101,13 @@ func createMockJob(name string, cfg *common.Config) ([]Job, error) {
 }
 
 func mockPluginBuilder() pluginBuilder {
+	reg := monitoring.NewRegistry()
+
 	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]Job, int, error) {
 		c := common.Config{}
 		j, err := createMockJob("test", &c)
 		return j, 1, err
-	}}
+	}, newPluginStatsRecorder("test", reg)}
 }
 
 func mockPluginsReg() *pluginsReg {

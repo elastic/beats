@@ -50,6 +50,7 @@ class Test(BaseTest):
 
         stats = json.loads(urllib2.urlopen(
             "http://localhost:5066/stats").read())
+
         nose.tools.assert_dict_equal(stats['heartbeat'], {
             'monitors': total_monitors,
             'http': {

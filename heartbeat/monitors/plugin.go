@@ -23,6 +23,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/monitoring"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/plugin"
 )
@@ -31,9 +33,25 @@ type pluginBuilder struct {
 	name    string
 	typ     Type
 	builder PluginBuilder
+	stats   statsRecorder
 }
 
 var pluginKey = "heartbeat.monitor"
+var metricsRegistry = monitoring.Default.NewRegistry("heartbeat")
+var metricsGsr = globalMonitorsRecorder{monitoring.NewInt(metricsRegistry, "monitors")}
+var telemetryRegistry = monitoring.GetNamespace("state").GetRegistry()
+var telemetryGsr = globalMonitorsRecorder{monitoring.NewInt(telemetryRegistry, "monitors")}
+
+func statsForPlugin(pluginName string) statsRecorder {
+	return multiStatsRecorder{
+		recorders: []statsRecorder{
+			telemetryGsr,
+			metricsGsr,
+			newPluginStatsRecorder(pluginName, telemetryRegistry),
+			newPluginStatsRecorder(pluginName, metricsRegistry),
+		},
+	}
+}
 
 func init() {
 	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
@@ -42,7 +60,8 @@ func init() {
 			return errors.New("plugin does not match monitor plugin type")
 		}
 
-		return globalPluginsReg.register(pluginBuilder{p.name, p.typ, p.builder})
+		stats := statsForPlugin(p.name)
+		return globalPluginsReg.register(pluginBuilder{p.name, p.typ, p.builder, stats})
 	})
 }
 
@@ -75,7 +94,8 @@ func newPluginsReg() *pluginsReg {
 
 // RegisterActive registers a new active (as opposed to passive) monitor.
 func RegisterActive(name string, builder PluginBuilder) {
-	if err := globalPluginsReg.add(pluginBuilder{name, ActiveMonitor, builder}); err != nil {
+	stats := statsForPlugin(name)
+	if err := globalPluginsReg.add(pluginBuilder{name, ActiveMonitor, builder, stats}); err != nil {
 		panic(err)
 	}
 }
