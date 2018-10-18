@@ -120,11 +120,11 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 				"_routing": nil,
 			},
 		}
-		event := report.Event{
+		document := report.Event{
 			Timestamp: event.Content.Timestamp,
 			Fields:    event.Content.Fields,
 		}
-		bulk := [2]interface{}{action, event}
+		bulk := [2]interface{}{action, document}
 
 		// Currently one request per event is sent. Reason is that each event can contain different
 		// interval params and X-Pack requires to send the interval param.
