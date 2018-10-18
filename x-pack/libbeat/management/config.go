@@ -95,7 +95,7 @@ func (c *Config) OverwriteConfigFile(wr io.Writer, beatName string) error {
 	t := template.Must(template.New("beat.management.yml").Parse(ManagedConfigTemplate))
 
 	tmp := struct {
-		Management *Config `yaml:"xpack.management"`
+		Management *Config `yaml:"management"`
 	}{
 		Management: c,
 	}

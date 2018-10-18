@@ -119,7 +119,7 @@ type beatConfig struct {
 	Monitoring *common.Config  `config:"xpack.monitoring"`
 
 	// central managmenet settings
-	Management *common.Config `config:"xpack.management"`
+	Management *common.Config `config:"management"`
 
 	// elastic stack 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`
