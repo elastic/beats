@@ -569,6 +569,18 @@ The logged message.
 
 --
 
+*`custom`*::
++
+--
+type: nested
+
+required: False
+
+Arbitrary fields coming from processes.
+
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 
