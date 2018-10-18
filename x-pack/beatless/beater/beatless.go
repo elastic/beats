@@ -127,7 +127,7 @@ func makeClientFactory(log *logp.Logger, manager *licenser.Manager, pipeline bea
 	// Each function has his own client to the publisher pipeline,
 	// publish operation will block the calling thread, when the method unwrap we have received the
 	// ACK for the batch.
-	clientFactory := func(cfg *common.Config) (core.Client, error) {
+	return func(cfg *common.Config) (core.Client, error) {
 		c := struct {
 			Processors           processors.PluginConfig `config:"processors"`
 			common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
@@ -161,6 +161,4 @@ func makeClientFactory(log *logp.Logger, manager *licenser.Manager, pipeline bea
 
 		return licenseAware, nil
 	}
-
-	return clientFactory
 }
