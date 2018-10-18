@@ -13,8 +13,10 @@ This document describes the fields that are exported by Beatless. They are
 grouped in the following categories:
 
 * <<exported-fields-beat>>
+* <<exported-fields-beatless>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
+* <<exported-fields-ecs>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-kubernetes-processor>>
 
@@ -99,32 +101,30 @@ Error fields containing additional info in case of errors.
 
 
 
-*`error.message`*::
-+
---
-type: text
-
-Error message.
-
-
---
-
-*`error.code`*::
-+
---
-type: long
-
-Error code.
-
-
---
-
 *`error.type`*::
 +
 --
 type: keyword
 
 Error type.
+
+
+--
+
+[[exported-fields-beatless]]
+== beatless fields
+
+None
+
+
+*`counter`*::
++
+--
+type: long
+
+required: True
+
+PLEASE UPDATE DOCUMENTATION
 
 
 --
@@ -248,20 +248,917 @@ Image labels.
 
 --
 
-[[exported-fields-host-processor]]
-== Host fields
+[[exported-fields-ecs]]
+== ECS fields
 
-Info collected for the host machine.
+ECS fields.
 
 
 
+[float]
+== agent fields
+
+The agent fields contain the data about the agent/client/shipper that created the event.
+
+
+
+*`agent.version`*::
++
+--
+type: keyword
+
+example: 6.0.0-rc2
+
+Version of the agent.
+
+
+--
+
+*`agent.name`*::
++
+--
+type: keyword
+
+example: filebeat
+
+Name of the agent.
+
+
+--
+
+*`agent.id`*::
++
+--
+type: keyword
+
+example: 8a4f500d
+
+Unique identifier of this agent (if one exists).
+Example: For Beats this would be beat.id.
+
+
+--
+
+*`agent.ephemeral_id`*::
++
+--
+type: keyword
+
+example: 8a4f500f
+
+Ephemeral identifier of this agent (if one exists).
+This id normally changes across restarts, but `agent.id` does not.
+
+
+--
+
+[float]
+== base fields
+
+The base set contains all fields which are on the top level. These fields are common across all types of events.
+
+
+
+*`base.@timestamp`*::
++
+--
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+required: True
+
+Date/time when the event originated.
+For log events this is the date/time when the event was generated, and not when it was read.
+Required field for all events.
+
+
+--
+
+*`base.tags`*::
++
+--
+type: keyword
+
+example: ["production", "env2"]
+
+List of keywords used to tag each event.
+
+
+--
+
+*`base.labels`*::
++
+--
+type: object
+
+example: {'key2': 'value2', 'key1': 'value1'}
+
+Key/value pairs.
+Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
+Example: `docker` and `k8s` labels.
+
+
+--
+
+*`base.message`*::
++
+--
+type: text
+
+example: Hello World
+
+For log events the message field contains the log message.
+In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
+
+
+--
+
+[float]
+== cloud fields
+
+Fields related to the cloud or infrastructure the events are coming from.
+
+
+
+*`cloud.provider`*::
++
+--
+type: keyword
+
+example: ec2
+
+Name of the cloud provider. Example values are ec2, gce, or digitalocean.
+
+
+--
+
+*`cloud.availability_zone`*::
++
+--
+type: keyword
+
+example: us-east-1c
+
+Availability zone in which this host is running.
+
+
+--
+
+*`cloud.region`*::
++
+--
+type: keyword
+
+example: us-east-1
+
+Region in which this host is running.
+
+
+--
+
+*`cloud.instance.id`*::
++
+--
+type: keyword
+
+example: i-1234567890abcdef0
+
+Instance ID of the host machine.
+
+
+--
+
+*`cloud.instance.name`*::
++
+--
+type: keyword
+
+Instance name of the host machine.
+
+
+--
+
+*`cloud.machine.type`*::
++
+--
+type: keyword
+
+example: t2.medium
+
+Machine type of the host machine.
+
+
+--
+
+*`cloud.account.id`*::
++
+--
+type: keyword
+
+example: 666777888999
+
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+
+--
+
+[float]
+== container fields
+
+Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
+
+
+
+*`container.runtime`*::
++
+--
+type: keyword
+
+example: docker
+
+Runtime managing this container.
+
+
+--
+
+*`container.id`*::
++
+--
+type: keyword
+
+Unique container id.
+
+
+--
+
+*`container.image.name`*::
++
+--
+type: keyword
+
+Name of the image the container was built on.
+
+
+--
+
+*`container.image.tag`*::
++
+--
+type: keyword
+
+Container image tag.
+
+
+--
+
+*`container.name`*::
++
+--
+type: keyword
+
+Container name.
+
+
+--
+
+*`container.labels`*::
++
+--
+type: object
+
+Image labels.
+
+
+--
+
+[float]
+== destination fields
+
+Destination fields describe details about the destination of a packet/event.
+
+
+
+*`destination.ip`*::
++
+--
+type: ip
+
+IP address of the destination.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`destination.hostname`*::
++
+--
+type: keyword
+
+Hostname of the destination.
+
+
+--
+
+*`destination.port`*::
++
+--
+type: long
+
+Port of the destination.
+
+
+--
+
+*`destination.mac`*::
++
+--
+type: keyword
+
+MAC address of the destination.
+
+
+--
+
+*`destination.domain`*::
++
+--
+type: keyword
+
+Destination domain.
+
+
+--
+
+*`destination.subdomain`*::
++
+--
+type: keyword
+
+Destination subdomain.
+
+
+--
+
+[float]
+== device fields
+
+Device fields are used to provide additional information about the device that is the source of the information. This could be a firewall, network device, etc.
+
+
+
+*`device.mac`*::
++
+--
+type: keyword
+
+MAC address of the device
+
+
+--
+
+*`device.ip`*::
++
+--
+type: ip
+
+IP address of the device.
+
+
+--
+
+*`device.hostname`*::
++
+--
+type: keyword
+
+Hostname of the device.
+
+
+--
+
+*`device.vendor`*::
++
+--
+type: text
+
+Device vendor information.
+
+
+--
+
+*`device.version`*::
++
+--
+type: keyword
+
+Device version.
+
+
+--
+
+*`device.serial_number`*::
++
+--
+type: keyword
+
+Device serial number.
+
+
+--
+
+*`device.timezone.offset.sec`*::
++
+--
+type: long
+
+example: -5400
+
+Timezone offset of the host in seconds.
+Number of seconds relative to UTC. If the offset is -01:30 the value will be -5400.
+
+
+--
+
+*`device.type`*::
++
+--
+type: keyword
+
+example: firewall
+
+The type of the device the data is coming from.
+There is no predefined list of device types. Some examples are `endpoint`, `firewall`, `ids`, `ips`, `proxy`.
+
+
+--
+
+[float]
+== error fields
+
+These fields can represent errors of any kind. Use them for errors that happen while fetching events or in cases where the event itself contains an error.
+
+
+
+*`error.id`*::
++
+--
+type: keyword
+
+Unique identifier for the error.
+
+
+--
+
+*`error.message`*::
++
+--
+type: text
+
+Error message.
+
+
+--
+
+*`error.code`*::
++
+--
+type: keyword
+
+Error code describing the error.
+
+
+--
+
+[float]
+== event fields
+
+The event fields are used for context information about the data itself.
+
+
+
+*`event.id`*::
++
+--
+type: keyword
+
+example: 8a4f500d
+
+Unique ID to describe the event.
+
+
+--
+
+*`event.category`*::
++
+--
+type: keyword
+
+example: metrics
+
+Event category.
+This can be a user defined category.
+
+
+--
+
+*`event.type`*::
++
+--
+type: keyword
+
+example: nginx-stats-metrics
+
+A type given to this kind of event which can be used for grouping.
+This is normally defined by the user.
+
+
+--
+
+*`event.action`*::
++
+--
+type: keyword
+
+example: reject
+
+The action captured by the event. The type of action will vary from system to system but is likely to include actions by security services, such as blocking or quarantining; as well as more generic actions such as login events, file i/o or proxy forwarding events.
+The value is normally defined by the user.
+
+
+--
+
+*`event.module`*::
++
+--
+type: keyword
+
+example: mysql
+
+Name of the module this data is coming from.
+This information is coming from the modules used in Beats or Logstash.
+
+
+--
+
+*`event.dataset`*::
++
+--
+type: keyword
+
+example: stats
+
+Name of the dataset.
+The concept of a `dataset` (fileset / metricset) is used in Beats as a subset of modules. It contains the information which is currently stored in metricset.name and metricset.module or fileset.name.
+
+
+--
+
+*`event.severity`*::
++
+--
+type: long
+
+example: 7
+
+Severity describes the severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
+
+
+--
+
+*`event.original`*::
++
+--
+type: keyword
+
+example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#124;100&#124; worm successfully stopped&#124;10&#124;src=10.0.0.1 dst=2.1.2.2spt=1232
+
+Raw text message of entire event. Used to demonstrate log integrity.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+
+
+Field is not indexed.
+
+--
+
+*`event.hash`*::
++
+--
+type: keyword
+
+example: 123456789012345678901234567890ABCD
+
+Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log integrity.
+
+
+--
+
+*`event.version`*::
++
+--
+type: keyword
+
+example: 0.1.0
+
+required: True
+
+The version field contains the version an event for ECS adheres to.
+This field should be provided as part of each event to make it possible to detect to which ECS version an event belongs.
+event.version is a required field and must exist in all events. It describes which ECS version the event adheres to.
+The current version is 0.1.0.
+
+
+--
+
+*`event.duration`*::
++
+--
+type: long
+
+Duration of the event in nanoseconds.
+
+
+--
+
+*`event.created`*::
++
+--
+type: date
+
+event.created contains the date when the event was created.
+This timestamp is distinct from @timestamp in that @timestamp contains the processed timestamp. For logs these two timestamps can be different as the timestamp in the log line and when the event is read for example by Filebeat are not identical. `@timestamp` must contain the timestamp extracted from the log line, event.created when the log line is read. The same could apply to package capturing where @timestamp contains the timestamp extracted from the network package and event.created when the event was created.
+In case the two timestamps are identical, @timestamp should be used.
+
+
+--
+
+*`event.risk_score`*::
++
+--
+type: float
+
+Risk score or priority of the event (e.g. security solutions). Use your system's original value here.
+
+
+--
+
+*`event.risk_score_norm`*::
++
+--
+type: float
+
+Normalized risk score or priority of the event, on a scale of 0 to 100.
+This is mainly useful if you use more than one system that assigns risk scores, and you want to see a normalized value across all systems.
+
+
+--
+
+[float]
+== file fields
+
+File fields provide details about each file.
+
+
+
+*`file.path`*::
++
+--
+type: text
+
+Path to the file.
+
+*`file.path.raw`*::
++
+--
+type: keyword
+
+Path to the file. This is a non-analyzed field that is useful for aggregations.
+
+
+--
+
+--
+
+*`file.target_path`*::
++
+--
+type: text
+
+Target path for symlinks.
+
+*`file.target_path.raw`*::
++
+--
+type: keyword
+
+Path to the file. This is a non-analyzed field that is useful for aggregations.
+
+
+--
+
+--
+
+*`file.extension`*::
++
+--
+type: keyword
+
+example: png
+
+File extension.
+This should allow easy filtering by file extensions.
+
+
+--
+
+*`file.type`*::
++
+--
+type: keyword
+
+File type (file, dir, or symlink).
+
+--
+
+*`file.device`*::
++
+--
+type: keyword
+
+Device that is the source of the file.
+
+--
+
+*`file.inode`*::
++
+--
+type: keyword
+
+Inode representing the file in the filesystem.
+
+--
+
+*`file.uid`*::
++
+--
+type: keyword
+
+The user ID (UID) or security identifier (SID) of the file owner.
+
+
+--
+
+*`file.owner`*::
++
+--
+type: keyword
+
+File owner's username.
+
+--
+
+*`file.gid`*::
++
+--
+type: keyword
+
+Primary group ID (GID) of the file.
+
+--
+
+*`file.group`*::
++
+--
+type: keyword
+
+Primary group name of the file.
+
+--
+
+*`file.mode`*::
++
+--
+type: keyword
+
+example: 416
+
+Mode of the file in octal representation.
+
+--
+
+*`file.size`*::
++
+--
+type: long
+
+File size in bytes (field is only added when `type` is `file`).
+
+--
+
+*`file.mtime`*::
++
+--
+type: date
+
+Last time file content was modified.
+
+--
+
+*`file.ctime`*::
++
+--
+type: date
+
+Last time file metadata changed.
+
+--
+
+[float]
+== geo fields
+
+Geo fields can carry data about a specific location related to an event or geo information for an IP field.
+
+
+
+*`geo.continent_name`*::
++
+--
+type: keyword
+
+Name of the continent.
+
+
+--
+
+*`geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+[float]
+== host fields
+
+Host fields provide information related to a host. A host can be a physical machine, a virtual machine, or a Docker container.
+Normally the host information is related to the machine on which the event was generated/collected, but they can be used differently if needed.
+
+
+
+*`host.timezone.offset.sec`*::
++
+--
+type: long
+
+example: -5400
+
+Timezone offset of the host in seconds.
+Number of seconds relative to UTC. If the offset is -01:30 the value will be -5400.
+
+
+--
 
 *`host.name`*::
 +
 --
 type: keyword
 
-Hostname.
+host.name is the hostname of the host.
+It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
 
 
 --
@@ -272,56 +1169,8 @@ Hostname.
 type: keyword
 
 Unique host id.
-
-
---
-
-*`host.architecture`*::
-+
---
-type: keyword
-
-Host architecture (e.g. x86_64, arm, ppc, mips).
-
-
---
-
-*`host.os.platform`*::
-+
---
-type: keyword
-
-OS platform (e.g. centos, ubuntu, windows).
-
-
---
-
-*`host.os.version`*::
-+
---
-type: keyword
-
-OS version.
-
-
---
-
-*`host.os.family`*::
-+
---
-type: keyword
-
-OS family (e.g. redhat, debian, freebsd, windows).
-
-
---
-
-*`host.os.kernel`*::
-+
---
-type: keyword
-
-The operating system's kernel version.
+As hostname is not always unique, use values that are meaningful in your environment.
+Example: The current usage of `beat.name`.
 
 
 --
@@ -331,7 +1180,7 @@ The operating system's kernel version.
 --
 type: ip
 
-List of IP-addresses.
+Host ip address.
 
 
 --
@@ -341,7 +1190,877 @@ List of IP-addresses.
 --
 type: keyword
 
-List of hardware-addresses, usually MAC-addresses.
+Host mac address.
+
+
+--
+
+*`host.type`*::
++
+--
+type: keyword
+
+Type of host.
+For Cloud providers this can be the machine type like `t2.medium`. If vm, this could be the container, for example, or other information meaningful in your environment.
+
+
+--
+
+*`host.os.platform`*::
++
+--
+type: keyword
+
+example: darwin
+
+Operating system platform (centos, ubuntu, windows, etc.)
+
+
+--
+
+*`host.os.name`*::
++
+--
+type: keyword
+
+example: Mac OS X
+
+Operating system name.
+
+
+--
+
+*`host.os.family`*::
++
+--
+type: keyword
+
+example: debian
+
+OS family (redhat, debian, freebsd, windows, etc.)
+
+
+--
+
+*`host.os.version`*::
++
+--
+type: keyword
+
+example: 10.12.6
+
+Operating system version.
+
+
+--
+
+*`host.architecture`*::
++
+--
+type: keyword
+
+example: x86_64
+
+Operating system architecture.
+
+
+--
+
+[float]
+== http fields
+
+Fields related to HTTP requests and responses.
+
+
+
+*`http.request.method`*::
++
+--
+type: keyword
+
+example: GET, POST, PUT
+
+Http request method.
+
+
+--
+
+*`http.response.status_code`*::
++
+--
+type: long
+
+example: 404
+
+Http response status code.
+
+
+--
+
+*`http.response.body`*::
++
+--
+type: text
+
+example: Hello world
+
+The full http response body.
+
+
+--
+
+*`http.version`*::
++
+--
+type: keyword
+
+example: 1.1
+
+Http version.
+
+
+--
+
+[float]
+== log fields
+
+Fields which are specific to log events.
+
+
+
+*`log.level`*::
++
+--
+type: keyword
+
+example: ERR
+
+Log level of the log event.
+Some examples are `WARN`, `ERR`, `INFO`.
+
+
+--
+
+*`log.original`*::
++
+--
+type: keyword
+
+example: Sep 19 08:26:10 localhost My log
+
+
+This is the original log message and contains the full log message before splitting it up in multiple parts.
+In contrast to the `message` field which can contain an extracted part of the log message, this field contains the original, full log message. It can have already some modifications applied like encoding or new lines removed to clean up the log message.
+This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
+
+
+Field is not indexed.
+
+--
+
+[float]
+== network fields
+
+Fields related to network data.
+
+
+
+*`network.name`*::
++
+--
+type: text
+
+example: Guest Wifi
+
+Name given by operators to sections of their network.
+
+
+*`network.name.raw`*::
++
+--
+type: keyword
+
+Name given by operators to sections of their network.
+
+
+--
+
+--
+
+*`network.protocol`*::
++
+--
+type: keyword
+
+example: http
+
+Network protocol name.
+
+
+--
+
+*`network.direction`*::
++
+--
+type: keyword
+
+example: inbound
+
+Direction of the network traffic.
+Recommended values are:
+  * inbound
+  * outbound
+  * unknown
+
+
+--
+
+*`network.forwarded_ip`*::
++
+--
+type: ip
+
+example: 192.1.1.2
+
+Host IP address when the source IP address is the proxy.
+
+
+--
+
+*`network.inbound.bytes`*::
++
+--
+type: long
+
+example: 184
+
+Network inbound bytes.
+
+
+--
+
+*`network.inbound.packets`*::
++
+--
+type: long
+
+example: 12
+
+Network inbound packets.
+
+
+--
+
+*`network.outbound.bytes`*::
++
+--
+type: long
+
+example: 184
+
+Network outbound bytes.
+
+
+--
+
+*`network.outbound.packets`*::
++
+--
+type: long
+
+example: 12
+
+Network outbound packets.
+
+
+--
+
+*`network.total.bytes`*::
++
+--
+type: long
+
+example: 368
+
+Network total bytes. The sum of inbound.bytes + outbound.bytes.
+
+
+--
+
+*`network.total.packets`*::
++
+--
+type: long
+
+example: 24
+
+Network outbound packets. The sum of inbound.packets + outbound.packets
+
+
+--
+
+[float]
+== organization fields
+
+The organization fields enrich data with information about the company or entity the data is associated with. These fields help you arrange or filter data stored in an index by one or multiple organizations.
+
+
+
+*`organization.name`*::
++
+--
+type: text
+
+Organization name.
+
+
+--
+
+*`organization.id`*::
++
+--
+type: keyword
+
+Unique identifier for the organization.
+
+
+--
+
+[float]
+== os fields
+
+The OS fields contain information about the operating system. These fields are often used inside other prefixes, such as `host.os.*` or `user_agent.os.*`.
+
+
+
+*`os.platform`*::
++
+--
+type: keyword
+
+example: darwin
+
+Operating system platform (such centos, ubuntu, windows).
+
+
+--
+
+*`os.name`*::
++
+--
+type: keyword
+
+example: Mac OS X
+
+Operating system name.
+
+
+--
+
+*`os.family`*::
++
+--
+type: keyword
+
+example: debian
+
+OS family (such as redhat, debian, freebsd, windows).
+
+
+--
+
+*`os.version`*::
++
+--
+type: keyword
+
+example: 10.12.6-rc2
+
+Operating system version as a raw string.
+
+
+--
+
+*`os.kernel`*::
++
+--
+type: keyword
+
+example: 4.4.0-112-generic
+
+Operating system kernel version as a raw string.
+
+
+--
+
+[float]
+== process fields
+
+These fields contain information about a process. These fields can help you correlate metrics information with a process id/name from a log message.  The `process.pid` often stays in the metric itself and is copied to the global field for correlation.
+
+
+
+*`process.args`*::
++
+--
+type: keyword
+
+example: ['-l', 'user', '10.0.0.16']
+
+Process arguments.
+May be filtered to protect sensitive information.
+
+
+--
+
+*`process.name`*::
++
+--
+type: keyword
+
+example: ssh
+
+Process name.
+Sometimes called program name or similar.
+
+
+--
+
+*`process.pid`*::
++
+--
+type: long
+
+Process id.
+
+
+--
+
+*`process.ppid`*::
++
+--
+type: long
+
+Process parent id.
+
+
+--
+
+*`process.title`*::
++
+--
+type: keyword
+
+Process title.
+The proctitle, often the same as process name.
+
+
+--
+
+[float]
+== service fields
+
+The service fields describe the service for or from which the data was collected. These fields help you find and correlate logs for a specific service and version.
+
+
+
+*`service.id`*::
++
+--
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+Unique identifier of the running service.
+This id should uniquely identify this service. This makes it possible to correlate logs and metrics for one specific service.
+Example: If you are experiencing issues with one redis instance, you can filter on that id to see metrics and logs for that single instance.
+
+
+--
+
+*`service.name`*::
++
+--
+type: keyword
+
+example: elasticsearch
+
+Name of the service data is collected from.
+The name can be used to group and correlate logs and metrics from one service.
+Example: If logs or metrics are collected from Redis, `service.name` would be `redis`.
+
+
+--
+
+*`service.type`*::
++
+--
+type: keyword
+
+Service type.
+
+
+--
+
+*`service.state`*::
++
+--
+type: keyword
+
+Current state of the service.
+
+
+--
+
+*`service.version`*::
++
+--
+type: keyword
+
+example: 3.2.4
+
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+
+--
+
+*`service.ephemeral_id`*::
++
+--
+type: keyword
+
+example: 8a4f500f
+
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+
+--
+
+[float]
+== url fields
+
+URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
+
+
+
+*`url.href`*::
++
+--
+type: text
+
+example: https://elastic.co:443/search?q=elasticsearch#top
+
+Full url. The field is stored as keyword.
+`url.href` is a [multi field](https://www.elastic.co/guide/en/ elasticsearch/reference/6.2/ multi-fields.html#_multi_fields_with_multiple_analyzers). The data is stored as keyword `url.href` and test `url.href.analyzed`. These fields enable you to run a query against part of the url still works splitting up the URL at ingest time.
+`href` is an analyzed field so the parsed information can be accessed through `href.analyzed` in queries.
+
+
+*`url.href.raw`*::
++
+--
+type: keyword
+
+The full URL. This is a non-analyzed field that is useful for aggregations.
+
+
+--
+
+--
+
+*`url.scheme`*::
++
+--
+type: keyword
+
+example: https
+
+Scheme of the request, such as "https".
+Note: The `:` is not part of the scheme.
+
+
+--
+
+*`url.host.name`*::
++
+--
+type: keyword
+
+example: elastic.co
+
+Hostname of the request, such as "example.com".
+For correlation the this field can be copied into the `host.name` field.
+
+
+--
+
+*`url.port`*::
++
+--
+type: integer
+
+example: 443
+
+Port of the request, such as 443.
+
+
+--
+
+*`url.path`*::
++
+--
+type: text
+
+Path of the request, such as "/search".
+
+
+*`url.path.raw`*::
++
+--
+type: keyword
+
+URL path. A non-analyzed field that is useful for aggregations.
+
+
+--
+
+--
+
+*`url.query`*::
++
+--
+type: text
+
+The query field describes the query string of the request, such as "q=elasticsearch".
+The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
+
+
+*`url.query.raw`*::
++
+--
+type: keyword
+
+URL query part. A non-analyzed field that is useful for aggregations.
+
+
+--
+
+--
+
+*`url.fragment`*::
++
+--
+type: keyword
+
+Portion of the url after the `#`, such as "top".
+The `#` is not part of the fragment.
+
+
+--
+
+*`url.username`*::
++
+--
+type: keyword
+
+Username of the request.
+
+
+--
+
+*`url.password`*::
++
+--
+type: keyword
+
+Password of the request.
+
+
+--
+
+[float]
+== user fields
+
+The user fields describe information about the user that is relevant to  the event. Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
+
+
+
+*`user.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.name`*::
++
+--
+type: keyword
+
+Name of the user.
+The field is a keyword, and will not be tokenized.
+
+
+--
+
+*`user.email`*::
++
+--
+type: keyword
+
+User email address.
+
+
+--
+
+*`user.hash`*::
++
+--
+type: keyword
+
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+
+--
+
+[float]
+== user_agent fields
+
+The user_agent fields normally come from a browser request. They often show up in web service logs coming from the parsed user agent string.
+
+
+
+*`user_agent.original`*::
++
+--
+type: text
+
+Unparsed version of the user_agent.
+
+
+--
+
+*`user_agent.device`*::
++
+--
+type: keyword
+
+Name of the physical device.
+
+
+--
+
+*`user_agent.version`*::
++
+--
+type: keyword
+
+Version of the physical device.
+
+
+--
+
+*`user_agent.major`*::
++
+--
+type: long
+
+Major version of the user agent.
+
+
+--
+
+*`user_agent.minor`*::
++
+--
+type: long
+
+Minor version of the user agent.
+
+
+--
+
+*`user_agent.patch`*::
++
+--
+type: keyword
+
+Patch version of the user agent.
+
+
+--
+
+*`user_agent.name`*::
++
+--
+type: keyword
+
+example: Chrome
+
+Name of the user agent.
+
+
+--
+
+*`user_agent.os.name`*::
++
+--
+type: keyword
+
+Name of the operating system.
+
+
+--
+
+*`user_agent.os.version`*::
++
+--
+type: keyword
+
+Version of the operating system.
+
+
+--
+
+*`user_agent.os.major`*::
++
+--
+type: long
+
+Major version of the operating system.
+
+
+--
+
+*`user_agent.os.minor`*::
++
+--
+type: long
+
+Minor version of the operating system.
+
+
+--
+
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+*`host.os.kernel`*::
++
+--
+type: keyword
+
+The operating system's kernel version.
 
 
 --

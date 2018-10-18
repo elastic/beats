@@ -121,8 +121,8 @@ beatless:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, and
-# add_cloud_metadata.
+# The supported processors are drop_fields, drop_event, include_fields, 
+# decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
 # contain CPU load percentages, but remove the fields that contain CPU ticks
@@ -203,6 +203,24 @@ beatless:
 #- add_host_metadata:
 #   netinfo.enabled: false
 #
+# The following example enriches each event with process metadata using
+# process IDs included in the event.
+#
+#processors:
+#- add_process_metadata:
+#    match_pids: ["system.process.ppid"]
+#    target: system.process.parent
+#
+# The following example decodes fields containing JSON strings 
+# and replaces the strings with valid JSON objects.
+#
+#processors:
+#- decode_json_fields:
+#    fields: ["field1", "field2", ...]
+#    process_array: false
+#    max_depth: 1
+#    target: ""
+#    overwrite_keys: false
 
 #============================= Elastic Cloud ==================================
 
@@ -421,6 +439,21 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # The number of times to retry publishing an event after a publishing failure.
+  # After the specified number of retries, the events are typically dropped.
+  # Some Beats, such as Filebeat and Winlogbeat, ignore the max_retries setting
+  # and retry until all events are published.  Set max_retries to a value less
+  # than 0 to retry until all events are published. The default is 3.
+  #max_retries: 3
+
+  # The maximum number of events to bulk in a single Logstash request. The
+  # default is 2048.
+  #bulk_max_size: 2048
+
+  # The number of seconds to wait for responses from the Logstash server before
+  # timing out. The default is 30s.
+  #timeout: 30s
 
 #------------------------------- Kafka output ----------------------------------
 #output.kafka:
@@ -833,6 +866,13 @@ output.elasticsearch:
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
 
+# A list of fields to be added to the template and Kibana index pattern. Also
+# specify setup.template.overwrite: true to overwrite the existing template.
+# This setting is experimental.
+#setup.template.append_fields:
+#- name: field_name
+#  type: field_type
+
 # Enable json template loading. If this is enabled, the fields.yml is ignored.
 #setup.template.json.enabled: false
 
@@ -965,6 +1005,13 @@ logging.files:
   # Must be a valid Unix-style file permissions mask expressed in octal notation.
   #permissions: 0600
 
+  # Enable log file rotation on time intervals in addition to size-based rotation.
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # are boundary-aligned with minutes, hours, days, weeks, months, and years as
+  # reported by the local system clock. All other intervals are calculated from the
+  # unix epoch. Defaults to disabled.
+  #interval: 0
+
 # Set to true to log messages in json format.
 #logging.json: false
 
@@ -1018,6 +1065,17 @@ logging.files:
   # The maximum number of events to bulk in a single Elasticsearch bulk API index request.
   # The default is 50.
   #bulk_max_size: 50
+
+  # The number of seconds to wait before trying to reconnect to Elasticsearch
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Elasticsearch after a network error. The default is 60s.
+  #backoff.max: 60s
 
   # Configure http request timeout before failing an request to Elasticsearch.
   #timeout: 90
