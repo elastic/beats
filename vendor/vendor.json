@@ -363,6 +363,30 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
+			"checksumSHA1": "bYNIHZ2HowxKRrXRFVzNh2A12i4=",
+			"path": "github.com/awslabs/goformation",
+			"revision": "d42502ef32a8892bf380256e2f57c6f69190d802",
+			"revisionTime": "2018-09-16T20:29:49Z",
+			"version": "1.2.2",
+			"versionExact": "1.2.2"
+		},
+		{
+			"checksumSHA1": "fF1BZ9eAf5RxXXos9/30RKhbSr8=",
+			"path": "github.com/awslabs/goformation/cloudformation",
+			"revision": "d42502ef32a8892bf380256e2f57c6f69190d802",
+			"revisionTime": "2018-09-16T20:29:49Z",
+			"version": "1.2.2",
+			"versionExact": "1.2.2"
+		},
+		{
+			"checksumSHA1": "iAlvZoyOROLal7D0Zh8K32bQJwE=",
+			"path": "github.com/awslabs/goformation/intrinsics",
+			"revision": "d42502ef32a8892bf380256e2f57c6f69190d802",
+			"revisionTime": "2018-09-16T20:29:49Z",
+			"version": "1.2.2",
+			"versionExact": "1.2.2"
+		},
+		{
 			"checksumSHA1": "al43W4TWRdznwfxOWp4egKcL39c=",
 			"path": "github.com/bsm/sarama-cluster",
 			"revision": "7e67d87a6b3f83fe08c096fd084691bd9dca112f",
@@ -1374,6 +1398,12 @@
 			"revisionTime": "2016-12-05T14:13:22Z"
 		},
 		{
+			"checksumSHA1": "3LWNcQT7yTaLpEmjhI/3fi8puv0=",
+			"path": "github.com/imdario/mergo",
+			"revision": "9f23e2d6bd2a77f959b2bf6acdbefd708a83a4a4",
+			"revisionTime": "2018-07-30T21:26:40Z"
+		},
+		{
 			"checksumSHA1": "40vJyUB4ezQSn/NSadsKEOrudMc=",
 			"path": "github.com/inconshreveable/mousetrap",
 			"revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
@@ -1390,6 +1420,14 @@
 			"path": "github.com/insomniacslk/dhcp/iana",
 			"revision": "633285ba52b2a67b98a3026eb87ee1a76ab60f3c",
 			"revisionTime": "2018-07-16T14:52:14Z"
+		},
+		{
+			"checksumSHA1": "9dPHJ2IqSJok9bKZ6btWALYE/pA=",
+			"path": "github.com/jmespath/go-jmespath",
+			"revision": "3433f3ea46d9f8019119e7dd41274e112a2359a9",
+			"revisionTime": "2015-11-17T17:58:22Z",
+			"version": "0.2.2",
+			"versionExact": "0.2.2"
 		},
 		{
 			"checksumSHA1": "l9wW52CYGbmO/NGwYZ/Op2QTmaA=",
@@ -1629,6 +1667,20 @@
 			"path": "github.com/samuel/go-thrift/parser",
 			"revision": "2187045faa54fce7f5028706ffeb2f2fc342aa7e",
 			"revisionTime": "2014-05-22T04:34:39Z"
+		},
+		{
+			"checksumSHA1": "SjPjmaPGaIWKtmvyv6cJ7Fdzy50=",
+			"path": "github.com/sanathkr/go-yaml",
+			"revision": "ed9d249f429b3f5a69f80a7abef6bfce81fef894",
+			"revisionTime": "2017-08-19T19:51:28Z",
+			"version": "v2",
+			"versionExact": "v2"
+		},
+		{
+			"checksumSHA1": "owQ87BVbqaio1VTCXy6hnD68Cxo=",
+			"path": "github.com/sanathkr/yaml",
+			"revision": "0056894fa522748ca336761ffeeeb6bbae654d07",
+			"revisionTime": "2017-08-19T20:10:35Z"
 		},
 		{
 			"checksumSHA1": "wZ7Q/3JyIlVKeYVqRUGh1zuLa9E=",
