@@ -135,6 +135,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Support for Kafka 2.0.0 {pull}8399[8399]
 - Added support for query params in configuration {issue}8286[8286] {pull}8292[8292]
 - Add container image for docker metricsets. {issue}8214[8214] {pull}8438[8438]
+- Precalculate composed id fields for kafka dashboards. {pull}8504[8504]
 - Add support for `full` status page output for php-fpm module as a separate metricset called `process`. {pull}8394[8394]
 
 *Packetbeat*
