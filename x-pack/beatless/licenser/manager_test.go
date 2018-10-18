@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -59,7 +58,7 @@ func (m *mockFetcher) Close() {
 
 func TestRetrieveLicense(t *testing.T) {
 	i := &License{
-		UUID:   uuid.NewV4(),
+		UUID:   mustUUIDV4(),
 		Type:   Basic,
 		Mode:   Basic,
 		Status: Active,
@@ -122,7 +121,7 @@ func TestRetrieveLicense(t *testing.T) {
 		}
 
 		i := &License{
-			UUID:   uuid.NewV4(),
+			UUID:   mustUUIDV4(),
 			Type:   Platinum,
 			Mode:   Platinum,
 			Status: Active,
@@ -142,7 +141,7 @@ func TestRetrieveLicense(t *testing.T) {
 
 func TestWatcher(t *testing.T) {
 	i := &License{
-		UUID:   uuid.NewV4(),
+		UUID:   mustUUIDV4(),
 		Type:   Basic,
 		Mode:   Basic,
 		Status: Active,
@@ -244,7 +243,7 @@ func TestWatcher(t *testing.T) {
 				if c == 0 {
 					assert.Equal(t, Basic, license.Get())
 					mock.Insert(&License{
-						UUID:   uuid.NewV4(),
+						UUID:   mustUUIDV4(),
 						Type:   Platinum,
 						Mode:   Platinum,
 						Status: Active,
