@@ -94,137 +94,8 @@
             }, 
             "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T10:29:34.993Z", 
-            "version": 8
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "index": "metricbeat-*", 
-                        "query": {
-                            "language": "kuery", 
-                            "query": "metricset.module: kafka AND metricset.name: partition"
-                        }
-                    }
-                }, 
-                "title": "Kafka Broker Details [Metricbeat Kafka]", 
-                "uiStateJSON": {
-                    "spy": null, 
-                    "vis": {
-                        "params": {
-                            "sort": {
-                                "columnIndex": null, 
-                                "direction": null
-                            }
-                        }
-                    }
-                }, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "enabled": true, 
-                            "id": "2", 
-                            "params": {
-                                "customLabel": "Broker Id", 
-                                "field": "kafka.broker.id", 
-                                "missingBucket": false, 
-                                "missingBucketLabel": "Missing", 
-                                "order": "desc", 
-                                "orderAgg": {
-                                    "enabled": true, 
-                                    "id": "2-orderAgg", 
-                                    "params": {
-                                        "field": "kafka.partition.topic_id"
-                                    }, 
-                                    "schema": {
-                                        "aggFilter": [
-                                            "!top_hits", 
-                                            "!percentiles", 
-                                            "!median", 
-                                            "!std_dev", 
-                                            "!derivative", 
-                                            "!moving_avg", 
-                                            "!serial_diff", 
-                                            "!cumulative_sum", 
-                                            "!avg_bucket", 
-                                            "!max_bucket", 
-                                            "!min_bucket", 
-                                            "!sum_bucket"
-                                        ], 
-                                        "deprecate": false, 
-                                        "editor": false, 
-                                        "group": "none", 
-                                        "hideCustomLabel": true, 
-                                        "max": null, 
-                                        "min": 0, 
-                                        "name": "orderAgg", 
-                                        "params": [], 
-                                        "title": "Order Agg"
-                                    }, 
-                                    "type": "cardinality"
-                                }, 
-                                "orderBy": "custom", 
-                                "otherBucket": false, 
-                                "otherBucketLabel": "Other", 
-                                "size": 5
-                            }, 
-                            "schema": "bucket", 
-                            "type": "terms"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "4", 
-                            "params": {
-                                "customLabel": "Number of Topics", 
-                                "field": "kafka.topic.name"
-                            }, 
-                            "schema": "metric", 
-                            "type": "cardinality"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "5", 
-                            "params": {
-                                "customLabel": "Number of Partitions", 
-                                "field": "kafka.partition.topic_id"
-                            }, 
-                            "schema": "metric", 
-                            "type": "cardinality"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "6", 
-                            "params": {
-                                "customLabel": "Number of Replicas", 
-                                "field": "kafka.partition.topic_broker_id"
-                            }, 
-                            "schema": "metric", 
-                            "type": "cardinality"
-                        }
-                    ], 
-                    "params": {
-                        "perPage": 10, 
-                        "showMeticsAtAllLevels": false, 
-                        "showPartialRows": false, 
-                        "showTotal": false, 
-                        "sort": {
-                            "columnIndex": null, 
-                            "direction": null
-                        }, 
-                        "totalFunc": "sum"
-                    }, 
-                    "title": "Kafka Broker Details [Metricbeat Kafka]", 
-                    "type": "table"
-                }
-            }, 
-            "id": "06355640-8e65-11e8-8fa2-3d5f811fbd0f", 
-            "type": "visualization", 
-            "updated_at": "2018-10-17T16:28:52.588Z", 
-            "version": 14
+            "updated_at": "2018-10-18T16:12:14.222Z", 
+            "version": 9
         }, 
         {
             "attributes": {
@@ -278,8 +149,8 @@
             }, 
             "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T18:09:11.211Z", 
-            "version": 9
+            "updated_at": "2018-10-18T16:12:14.222Z", 
+            "version": 10
         }, 
         {
             "attributes": {
@@ -357,8 +228,8 @@
             }, 
             "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T08:42:10.301Z", 
-            "version": 7
+            "updated_at": "2018-10-18T16:12:14.222Z", 
+            "version": 8
         }, 
         {
             "attributes": {
@@ -506,150 +377,8 @@
             }, 
             "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T15:40:57.896Z", 
-            "version": 11
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [
-                            {
-                                "$state": {
-                                    "store": "appState"
-                                }, 
-                                "meta": {
-                                    "alias": null, 
-                                    "disabled": false, 
-                                    "index": "metricbeat-*", 
-                                    "key": "kafka.topic.name", 
-                                    "negate": true, 
-                                    "params": {
-                                        "query": "__consumer_offsets", 
-                                        "type": "phrase"
-                                    }, 
-                                    "type": "phrase", 
-                                    "value": "__consumer_offsets"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "kafka.topic.name": {
-                                            "query": "__consumer_offsets", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }
-                        ], 
-                        "index": "metricbeat-*", 
-                        "query": {
-                            "language": "kuery", 
-                            "query": "metricset.module: kafka AND metricset.name: partition"
-                        }
-                    }
-                }, 
-                "title": "Kafka Topic Details [Metricbeat Kafka]", 
-                "uiStateJSON": {
-                    "vis": {
-                        "params": {
-                            "sort": {
-                                "columnIndex": null, 
-                                "direction": null
-                            }
-                        }
-                    }
-                }, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "enabled": true, 
-                            "id": "2", 
-                            "params": {
-                                "customLabel": "Topic Name", 
-                                "field": "kafka.topic.name", 
-                                "missingBucket": false, 
-                                "missingBucketLabel": "Missing", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "otherBucket": false, 
-                                "otherBucketLabel": "Other", 
-                                "size": 5
-                            }, 
-                            "schema": "bucket", 
-                            "type": "terms"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "4", 
-                            "params": {
-                                "customLabel": "Number of Brokers", 
-                                "field": "kafka.broker.id"
-                            }, 
-                            "schema": "metric", 
-                            "type": "cardinality"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "5", 
-                            "params": {
-                                "customLabel": "Number of Partitions", 
-                                "field": "kafka.partition.partition.id"
-                            }, 
-                            "schema": "metric", 
-                            "type": "cardinality"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "6", 
-                            "params": {
-                                "customLabel": "Number of Replicas", 
-                                "field": "kafka.partition.topic_broker_id"
-                            }, 
-                            "schema": "metric", 
-                            "type": "cardinality"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "1", 
-                            "params": {
-                                "customLabel": "Newest Offset", 
-                                "field": "kafka.partition.offset.newest"
-                            }, 
-                            "schema": "metric", 
-                            "type": "max"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "3", 
-                            "params": {
-                                "customLabel": "Oldest Offset", 
-                                "field": "kafka.partition.offset.oldest"
-                            }, 
-                            "schema": "metric", 
-                            "type": "min"
-                        }
-                    ], 
-                    "params": {
-                        "perPage": 10, 
-                        "showMeticsAtAllLevels": false, 
-                        "showPartialRows": false, 
-                        "showTotal": false, 
-                        "sort": {
-                            "columnIndex": null, 
-                            "direction": null
-                        }, 
-                        "totalFunc": "sum"
-                    }, 
-                    "title": "Kafka Topic Details [Metricbeat Kafka]", 
-                    "type": "table"
-                }
-            }, 
-            "id": "77f31970-8e92-11e8-8fa2-3d5f811fbd0f", 
-            "type": "visualization", 
-            "updated_at": "2018-10-17T17:16:03.999Z", 
-            "version": 14
+            "updated_at": "2018-10-18T16:12:14.222Z", 
+            "version": 12
         }, 
         {
             "attributes": {
@@ -727,8 +456,8 @@
             }, 
             "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T08:42:10.301Z", 
-            "version": 7
+            "updated_at": "2018-10-18T16:12:14.222Z", 
+            "version": 8
         }, 
         {
             "attributes": {
@@ -820,8 +549,8 @@
             }, 
             "id": "1681f1a0-90e7-11e8-8fa2-3d5f811fbd0f", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T08:42:10.301Z", 
-            "version": 7
+            "updated_at": "2018-10-18T16:12:14.222Z", 
+            "version": 8
         }, 
         {
             "attributes": {
@@ -929,8 +658,344 @@
             }, 
             "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9", 
             "type": "visualization", 
-            "updated_at": "2018-10-17T17:25:12.132Z", 
-            "version": 1
+            "updated_at": "2018-10-18T16:12:14.222Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Kafka Broker Details [Metricbeat Kafka]", 
+                "uiStateJSON": {
+                    "table": {
+                        "sort": {
+                            "column": "cf09c940-d2ec-11e8-88c8-af5b2a9ee6b2", 
+                            "order": "asc"
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "bar_color_rules": [
+                            {
+                                "id": "7fb31e00-d2ec-11e8-88c8-af5b2a9ee6b2"
+                            }
+                        ], 
+                        "filter": "", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "pivot_id": "kafka.partition.partition.replica", 
+                        "pivot_label": "Broker ID", 
+                        "pivot_rows": "256", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Number of topics", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "kafka.topic.name", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "cardinality"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "terms", 
+                                "stacked": "none", 
+                                "terms_field": "kafka.broker.id", 
+                                "terms_size": "100"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "color_rules": [
+                                    {
+                                        "id": "7e9ee780-d2ef-11e8-9dd4-c5f03280d7b0"
+                                    }
+                                ], 
+                                "fill": 0.5, 
+                                "filter": "kafka.partition.partition.is_leader: true", 
+                                "formatter": "number", 
+                                "id": "b38e91a0-d2ec-11e8-88c8-af5b2a9ee6b2", 
+                                "label": "Number of leader partitions", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "kafka.partition.topic_id", 
+                                        "id": "b38eb8b0-d2ec-11e8-88c8-af5b2a9ee6b2", 
+                                        "type": "cardinality"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "color_rules": [
+                                    {
+                                        "id": "d4d9d2c0-d2ec-11e8-88c8-af5b2a9ee6b2"
+                                    }
+                                ], 
+                                "fill": 0.5, 
+                                "filter": "", 
+                                "formatter": "number", 
+                                "id": "cf09c940-d2ec-11e8-88c8-af5b2a9ee6b2", 
+                                "label": "Number of replicas", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "kafka.partition.topic_broker_id", 
+                                        "id": "cf09f050-d2ec-11e8-88c8-af5b2a9ee6b2", 
+                                        "type": "cardinality"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "table"
+                    }, 
+                    "title": "Kafka Broker Details [Metricbeat Kafka]", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9", 
+            "type": "visualization", 
+            "updated_at": "2018-10-18T16:28:30.809Z", 
+            "version": 6
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Kafka Topic Details [Metricbeat Kafka]", 
+                "uiStateJSON": {
+                    "table": {
+                        "sort": {
+                            "column": "_default_", 
+                            "order": "asc"
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "bar_color_rules": [
+                            {
+                                "id": "f81e47a0-d2f3-11e8-9dd4-c5f03280d7b0"
+                            }
+                        ], 
+                        "filter": "NOT kafka.topic.name: __consumer_offsets", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "pivot_id": "kafka.topic.name", 
+                        "pivot_label": "Topic Name", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "color_rules": [
+                                    {
+                                        "id": "f07881d0-d2f5-11e8-95b9-eb9260148efc"
+                                    }
+                                ], 
+                                "fill": 0.5, 
+                                "filter": " metricset.name: partition", 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Number of Brokers", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "kafka.broker.id", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "cardinality"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "color_rules": [
+                                    {
+                                        "id": "fb759e10-d2f5-11e8-95b9-eb9260148efc"
+                                    }
+                                ], 
+                                "fill": 0.5, 
+                                "filter": " metricset.name: partition", 
+                                "formatter": "number", 
+                                "id": "7d640440-d2f4-11e8-9dd4-c5f03280d7b0", 
+                                "label": "Number of Partitions", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "kafka.partition.id", 
+                                        "id": "7d640441-d2f4-11e8-9dd4-c5f03280d7b0", 
+                                        "type": "cardinality"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "color_rules": [
+                                    {
+                                        "id": "fdb1ab60-d2f5-11e8-95b9-eb9260148efc"
+                                    }
+                                ], 
+                                "fill": 0.5, 
+                                "filter": " metricset.name: partition", 
+                                "formatter": "number", 
+                                "id": "ad26e260-d2f4-11e8-9dd4-c5f03280d7b0", 
+                                "label": "Number of Replicas", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "kafka.partition.topic_broker_id", 
+                                        "id": "ad26e261-d2f4-11e8-9dd4-c5f03280d7b0", 
+                                        "type": "cardinality"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "color_rules": [
+                                    {
+                                        "id": "ff90f2b0-d2f5-11e8-95b9-eb9260148efc"
+                                    }
+                                ], 
+                                "fill": 0.5, 
+                                "filter": " metricset.name: consumergroup", 
+                                "formatter": "number", 
+                                "id": "26d2cd90-d2f5-11e8-9dd4-c5f03280d7b0", 
+                                "label": "Number of consumers", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "kafka.consumergroup.client.id", 
+                                        "id": "26d2cd91-d2f5-11e8-9dd4-c5f03280d7b0", 
+                                        "type": "cardinality"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "color_rules": [
+                                    {
+                                        "id": "ea4984e0-d2f4-11e8-9dd4-c5f03280d7b0"
+                                    }
+                                ], 
+                                "fill": 0.5, 
+                                "filter": " metricset.name: partition", 
+                                "formatter": "number", 
+                                "id": "dc390e20-d2f4-11e8-9dd4-c5f03280d7b0", 
+                                "label": "Newest Offset", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "kafka.partition.offset.newest", 
+                                        "id": "dc393530-d2f4-11e8-9dd4-c5f03280d7b0", 
+                                        "type": "max"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "color_rules": [
+                                    {
+                                        "id": "043b67f0-d2f6-11e8-95b9-eb9260148efc"
+                                    }
+                                ], 
+                                "fill": 0.5, 
+                                "filter": " metricset.name: partition", 
+                                "formatter": "number", 
+                                "id": "11366c80-d2f5-11e8-9dd4-c5f03280d7b0", 
+                                "label": "Oldest Offset", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "kafka.partition.offset.oldest", 
+                                        "id": "11366c81-d2f5-11e8-9dd4-c5f03280d7b0", 
+                                        "type": "min"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "table"
+                    }, 
+                    "title": "Kafka Topic Details [Metricbeat Kafka]", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "491fee50-d2f5-11e8-8766-dbbdc39e7ba9", 
+            "type": "visualization", 
+            "updated_at": "2018-10-18T16:51:33.352Z", 
+            "version": 3
         }, 
         {
             "attributes": {
@@ -964,31 +1029,6 @@
                         "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "1", 
                         "title": "Kafka Topic & Consumer Offsets", 
-                        "type": "visualization", 
-                        "version": "6.3.1"
-                    }, 
-                    {
-                        "embeddableConfig": {
-                            "spy": null, 
-                            "vis": {
-                                "params": {
-                                    "sort": {
-                                        "columnIndex": null, 
-                                        "direction": null
-                                    }
-                                }
-                            }
-                        }, 
-                        "gridData": {
-                            "h": 10, 
-                            "i": "2", 
-                            "w": 24, 
-                            "x": 24, 
-                            "y": 6
-                        }, 
-                        "id": "06355640-8e65-11e8-8fa2-3d5f811fbd0f", 
-                        "panelIndex": "2", 
-                        "title": "Kafka Brokers", 
                         "type": "visualization", 
                         "version": "6.3.1"
                     }, 
@@ -1040,21 +1080,6 @@
                     {
                         "embeddableConfig": {}, 
                         "gridData": {
-                            "h": 11, 
-                            "i": "11", 
-                            "w": 24, 
-                            "x": 24, 
-                            "y": 16
-                        }, 
-                        "id": "77f31970-8e92-11e8-8fa2-3d5f811fbd0f", 
-                        "panelIndex": "11", 
-                        "title": "Kafka Topic Details", 
-                        "type": "visualization", 
-                        "version": "6.3.1"
-                    }, 
-                    {
-                        "embeddableConfig": {}, 
-                        "gridData": {
                             "h": 7, 
                             "i": "12", 
                             "w": 24, 
@@ -1083,7 +1108,17 @@
                         "version": "6.3.1"
                     }, 
                     {
-                        "embeddableConfig": {}, 
+                        "embeddableConfig": {
+                            "spy": null, 
+                            "vis": {
+                                "params": {
+                                    "sort": {
+                                        "columnIndex": null, 
+                                        "direction": null
+                                    }
+                                }
+                            }
+                        }, 
                         "gridData": {
                             "h": 13, 
                             "i": "14", 
@@ -1093,6 +1128,44 @@
                         }, 
                         "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9", 
                         "panelIndex": "14", 
+                        "title": "Kafka Consumer Group Clients", 
+                        "type": "visualization", 
+                        "version": "6.3.0"
+                    }, 
+                    {
+                        "embeddableConfig": {}, 
+                        "gridData": {
+                            "h": 10, 
+                            "i": "15", 
+                            "w": 24, 
+                            "x": 24, 
+                            "y": 6
+                        }, 
+                        "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9", 
+                        "panelIndex": "15", 
+                        "title": "Kafka Brokers", 
+                        "type": "visualization", 
+                        "version": "6.3.0"
+                    }, 
+                    {
+                        "embeddableConfig": {
+                            "table": {
+                                "sort": {
+                                    "column": "26d2cd90-d2f5-11e8-9dd4-c5f03280d7b0", 
+                                    "order": "desc"
+                                }
+                            }
+                        }, 
+                        "gridData": {
+                            "h": 11, 
+                            "i": "16", 
+                            "w": 24, 
+                            "x": 24, 
+                            "y": 16
+                        }, 
+                        "id": "491fee50-d2f5-11e8-8766-dbbdc39e7ba9", 
+                        "panelIndex": "16", 
+                        "title": "Kafka Topic Details", 
                         "type": "visualization", 
                         "version": "6.3.0"
                     }
@@ -1103,8 +1176,8 @@
             }, 
             "id": "ea488d90-8e63-11e8-8fa2-3d5f811fbd0f", 
             "type": "dashboard", 
-            "updated_at": "2018-10-17T18:09:57.322Z", 
-            "version": 16
+            "updated_at": "2018-10-18T17:11:35.895Z", 
+            "version": 23
         }
     ], 
     "version": "6.3.0"
