@@ -20,6 +20,7 @@ package partition
 import (
 	"crypto/tls"
 	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -167,8 +168,17 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 					}
 				}
 
+				// Helpful IDs to avoid scripts on queries
+				partitionTopicID := fmt.Sprintf("%d-%s", partition.ID, topic.Name)
+				partitionTopicBrokerID := fmt.Sprintf("%s-%d", partitionTopicID, id)
+
 				// create event
 				event := common.MapStr{
+					// Common `kafka.partition` fields
+					"id":              partition.ID,
+					"topic_id":        partitionTopicID,
+					"topic_broker_id": partitionTopicBrokerID,
+
 					"topic":     evtTopic,
 					"broker":    evtBroker,
 					"partition": partitionEvent,
@@ -183,9 +193,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 					ModuleFields: common.MapStr{
 						"broker": evtBroker,
 						"topic":  evtTopic,
-						"partition": common.MapStr{
-							"id": partition.ID,
-						},
 					},
 					MetricSetFields: event,
 				})
