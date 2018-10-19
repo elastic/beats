@@ -34,16 +34,6 @@ type publishClient struct {
 	params map[string]string
 }
 
-var (
-	// monitoring beats action
-	actMonitoringBeats = common.MapStr{
-		"index": common.MapStr{
-			"_index":   "",
-			"_routing": nil,
-		},
-	}
-)
-
 func newPublishClient(
 	es *esout.Client,
 	params map[string]string,
@@ -122,15 +112,19 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 				}
 			}
 		}
-		actMonitoringBeats.Put("index._type", t)
 
-		bulk := [2]interface{}{
-			actMonitoringBeats,
-			report.Event{
-				Timestamp: event.Content.Timestamp,
-				Fields:    event.Content.Fields,
+		action := common.MapStr{
+			"index": common.MapStr{
+				"_type":    t,
+				"_index":   "",
+				"_routing": nil,
 			},
 		}
+		document := report.Event{
+			Timestamp: event.Content.Timestamp,
+			Fields:    event.Content.Fields,
+		}
+		bulk := [2]interface{}{action, document}
 
 		// Currently one request per event is sent. Reason is that each event can contain different
 		// interval params and X-Pack requires to send the interval param.
