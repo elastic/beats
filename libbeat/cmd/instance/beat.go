@@ -21,6 +21,7 @@ import (
 	"context"
 	cryptRand "crypto/rand"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"math"
@@ -309,6 +310,17 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 
 	debugf("Initializing output plugins")
+	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
+	if !outputEnabled {
+		if b.ConfigManager.Enabled() {
+			logp.Info("Output is configured through Central Management")
+		} else {
+			msg := "No outputs are defined. Please define one under the output section."
+			logp.Info(msg)
+			return nil, errors.New(msg)
+		}
+	}
+
 	pipeline, err := pipeline.Load(b.Info,
 		pipeline.Monitors{
 			Metrics:   reg,
@@ -317,6 +329,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		},
 		b.Config.Pipeline,
 		b.Config.Output)
+
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %+v", err)
 	}
