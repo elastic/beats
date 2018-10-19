@@ -171,12 +171,12 @@ func (c *CLIManager) codeKey(name string) string {
 }
 
 func (c *CLIManager) deployTemplate(update bool, name string) error {
-	c.log.Debug("Compressing assets")
+	c.log.Debug("Compressing all assets into an artifact")
 	content, err := core.MakeZip()
 	if err != nil {
 		return err
 	}
-	c.log.Debugf("Compression successful, zip size: %d bytes", len(content))
+	c.log.Debugf("Compression was successful (zip size: %d bytes)", len(content))
 
 	function, err := c.findFunction(name)
 	if err != nil {
@@ -195,7 +195,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		return err
 	}
 
-	c.log.Debugf("Cloudformation template:\n%s", json)
+	c.log.Debugf("Created cloudformation template:\n%s", json)
 
 	executer := newExecutor(c.log)
 	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, bucket))
