@@ -69,6 +69,7 @@ func newHostMetadataProcessor(cfg *common.Config) (processors.Processor, error) 
 		config: config,
 		data:   common.NewMapStrPointer(nil),
 	}
+	p.loadData()
 	return p, nil
 }
 
