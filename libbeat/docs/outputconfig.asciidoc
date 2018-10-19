@@ -66,8 +66,6 @@ output.elasticsearch:
   ssl.key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
 
-//
-
 To enable SSL, just add `https` to all URLs defined under __hosts__.
 
 ["source","yaml",subs="attributes,callouts"]
@@ -215,12 +213,37 @@ for more information about the environment variables.
 
 The index name to write events to. The default is
 +"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
-+"{beatname_lc}-{version}-2017.04.26"+). If you change this setting, you also
++"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
-(see <<configuration-template>>).
+(see <<configuration-template>>). If you are using the pre-built Kibana
+dashboards, you also need to set the `setup.dashboards.index` option (see
+<<configuration-dashboards>>).
 
-If you are using the pre-built Kibana dashboards,
-you also need to set the `setup.dashboards.index` option (see <<configuration-dashboards>>).
+You can set the index dynamically by using a format string to access any event
+field. For example, this configuration uses a custom field, `fields.log_type`,
+to set the index: 
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  index: "%\{[fields.log_type]\}-%\{[beat.version]\}-%\{+yyyy.MM.dd}\" <1>
+------------------------------------------------------------------------------
+
+<1> We recommend including `beat.version` in the name to avoid mapping issues
+when you upgrade.
+
+With this configuration, all events with `log_type: normal` are sent to an 
+index named +normal-{version}-{localdate}+, and all events with
+`log_type: critical` are sent to an index named
++critical-{version}-{localdate}+.
+
+TIP: To learn how to add custom fields to events, see the
+<<libbeat-configuration-fields,`fields`>> option.  
+
+See the <<indices-option-es,`indices`>> setting for other ways to set the index
+dynamically.
+
 
 ifdef::deprecate_dashboard_loading[]
 
@@ -228,40 +251,74 @@ deprecated[{deprecate_dashboard_loading}]
 
 endif::[]
 
+[[indices-option-es]]
 ===== `indices`
 
-Array of index selector rules supporting conditionals, format string
-based field access and name mappings. The first rule matching will be used to
-set the `index` for the event to be published. If `indices` is missing or no
-rule matches, the `index` field will be used.
+An array of index selector rules. Each rule specifies the index to use for
+events that match the rule. During publishing, {beatname_uc} uses the first
+matching rule in the array. Rules can contain conditionals, format string-based
+fields, and name mappings. If the `indices` setting is missing or no rule
+matches, the <<index-option-es,`index`>> setting is used.
 
 Rule settings:
 
-*`index`*: The index format string to use. If the fields used are missing, the rule fails.
+*`index`*:: The index format string to use. If this string contains field
+references, such as `%{[fields.name]}`, the fields must exist, or the rule fails. 
 
-*`mapping`*: Dictionary mapping index names to new names
+*`mappings`*:: A dictionary that takes the value returned by `index` and maps it
+to a new name.
 
-*`default`*: Default string value if `mapping` does not find a match.
+*`default`*:: The default string value to use if `mappings` does not find a
+match.
 
-*`when`*: Condition which must succeed in order to execute the current rule.
+*`when`*:: A condition that must succeed in order to execute the current rule.
+All the <<conditions,conditions>> supported by processors are also supported
+here. 
 
-Examples elasticsearch output with `indices`:
+The following example sets the index based on whether the `message` field
+contains the specified string:
 
 ["source","yaml"]
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "logs-%{[beat.version]}-%{+yyyy.MM.dd}"
   indices:
-    - index: "critical-%{[beat.version]}-%{+yyyy.MM.dd}"
+    - index: "warning-%{[beat.version]}-%{+yyyy.MM.dd}"
       when.contains:
-        message: "CRITICAL"
+        message: "WARN"
     - index: "error-%{[beat.version]}-%{+yyyy.MM.dd}"
       when.contains:
         message: "ERR"
 ------------------------------------------------------------------------------
 
+
+This configuration results in indices named +warning-{version}-{localdate}+
+and +error-{version}-{localdate}+ (plus the default index if no matches are
+found).
+
+The following example sets the index by taking the name returned by the `index`
+format string and mapping it to a new name that's used for the index:
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  indices:
+    - index: "%{[fields.log_type]}"
+      mappings:
+        critical: "sev1"
+        normal: "sev2"
+      default: "sev3"
+------------------------------------------------------------------------------
+
+
+This configuration results in indices named `sev1`, `sev2`, and `sev3`.
+
+The `mappings` setting simplifies the configuration, but is limited to string
+values. You cannot specify format strings within the mapping pairs.
+
 ifndef::no-pipeline[]
+[[pipeline-option-es]]
 ===== `pipeline`
 
 A format string value that specifies the ingest node pipeline to write events to.
@@ -275,39 +332,95 @@ output.elasticsearch:
 
 For more information, see <<configuring-ingest-node>>.
 
+You can set the ingest node pipeline dynamically by using a format string to
+access any event field. For example, this configuration uses a custom field,
+`fields.log_type`, to set the pipeline for each event: 
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  pipeline: "%\{[fields.log_type]\}_pipeline"
+------------------------------------------------------------------------------
+
+
+With this configuration, all events with `log_type: normal` are sent to a pipeline
+named `normal_pipeline`, and all events with `log_type: critical` are sent to a
+pipeline named `critical_pipeline`.
+
+TIP: To learn how to add custom fields to events, see the
+<<libbeat-configuration-fields,`fields`>> option.   
+
+See the <<pipelines-option-es,`pipelines`>> setting for other ways to set the
+ingest node pipeline dynamically.
+
+[[pipelines-option-es]]
 ===== `pipelines`
 
-Similar to the `indices` array, this is an array of pipeline selector
-configurations supporting conditionals, format string based field access
-and name mappings. The first rule matching will be used to set the
-`pipeline` for the event to be published. If `pipelines` is missing or
-no rule matches, the `pipeline` field will be used.
+An array of pipeline selector rules. Each rule specifies the ingest node
+pipeline to use for events that match the rule. During publishing, {beatname_uc}
+uses the first matching rule in the array. Rules can contain conditionals,
+format string-based fields, and name mappings. If the `pipelines` setting is
+missing or no rule matches, the <<pipeline-option-es,`pipeline`>> setting is
+used.
 
-Example elasticsearch output with `pipelines`:
+Rule settings:
+
+*`pipeline`*:: The pipeline format string to use. If this string contains field
+references, such as `%{[fields.name]}`, the fields must exist, or the rule
+fails.  
+
+*`mappings`*:: A dictionary that takes the value returned by `pipeline` and maps
+it to a new name.
+
+*`default`*:: The default string value to use if `mappings` does not find a
+match.
+
+*`when`*:: A condition that must succeed in order to execute the current rule.
+All the <<conditions,conditions>> supported by processors are also supported
+here. 
+
+The following example sends events to a specific pipeline based on whether the
+`message` field contains the specified string:
 
 ["source","yaml"]
 ------------------------------------------------------------------------------
-filebeat.inputs:
-- type: log
-  paths: ["/var/log/app/normal/*.log"]
-  fields:
-    type: "normal"
-- type: log
-  paths: ["/var/log/app/critical/*.log"]
-  fields:
-    type: "critical"
-
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "filebeat-%{[beat.version]}-%{+yyyy.MM.dd}"
   pipelines:
-    - pipeline: critical_pipeline
-      when.equals:
-        fields.type: "critical"
-    - pipeline: normal_pipeline
-      when.equals:
-        fields.type: "normal"
+    - pipeline: "warning_pipeline"
+      when.contains:
+        message: "WARN"
+    - pipeline: "error_pipeline"
+      when.contains:
+        message: "ERR"
 ------------------------------------------------------------------------------
+
+
+The following example sets the pipeline by taking the name returned by the
+`pipeline` format string and mapping it to a new name that's used for the
+pipeline:
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  pipelines:
+    - pipeline: "%{[fields.log_type]}"
+      mappings:
+        critical: "sev1_pipeline"
+        normal: "sev2_pipeline"
+      default: "sev3_pipeline"
+------------------------------------------------------------------------------
+
+
+With this configuration, all events with `log_type: critical` are sent to
+`sev1_pipeline`, all events with `log_type: normal` are sent to a
+`sev2_pipeline`, and all other events are sent to `sev3_pipeline`.
+
+For more information about ingest node pipelines, see
+<<configuring-ingest-node>>.
+
 endif::[]
 
 ===== `max_retries`
@@ -710,37 +823,52 @@ must be configured as well. Only SASL/PLAIN is supported.
 
 The password for connecting to Kafka.
 
+[[topic-option-kafka]]
 ===== `topic`
 
-The Kafka topic used for produced events. The setting can be a format string
-using any event field. For example, you can use the
-<<libbeat-configuration-fields,`fields`>> configuration option to add a custom
-field called `log_topic` to the event, and then set `topic` to the value of the
-custom field:
+The Kafka topic used for produced events.
+
+You can set the topic dynamically by using a format string to access any
+event field. For example, this configuration uses a custom field,
+`fields.log_topic`, to set the topic for each event:
 
 [source,yaml]
 -----
 topic: '%{[fields.log_topic]}'
 -----
 
+TIP: To learn how to add custom fields to events, see the
+<<libbeat-configuration-fields,`fields`>> option.  
 
+See the <<topics-option-kafka,`topics`>> setting for other ways to set the
+topic dynamically.
+
+[[topics-option-kafka]]
 ===== `topics`
 
-Array of topic selector rules supporting conditionals, format string
-based field access and name mappings. The first rule matching will be used to
-set the `topic` for the event to be published. If `topics` is missing or no
-rule matches, the `topic` field will be used.
+An array of topic selector rules. Each rule specifies the `topic` to use for
+events that match the rule. During publishing, {beatname_uc} sets the `topic`
+for each event based on the first matching rule in the array. Rules
+can contain conditionals, format string-based fields, and name mappings. If the
+`topics` setting is missing or no rule matches, the
+<<topic-option-kafka,`topic`>> field is used.
 
 Rule settings:
 
-*`topic`*: The topic format string to use. If the fields used are missing, the
- rule fails.
+*`topic`*:: The topic format string to use.  If this string contains field
+references, such as `%{[fields.name]}`, the fields must exist, or the rule
+fails. 
 
-*`mapping`*: Dictionary mapping index names to new names
+*`mappings`*:: A dictionary that takes the value returned by `topic` and maps it
+to a new name.
 
-*`default`*: Default string value if `mapping` does not find a match.
+*`default`*:: The default string value to use if `mappings` does not find a
+match.
 
-*`when`*: Condition which must succeed in order to execute the current rule.
+*`when`*:: A condition that must succeed in order to execute the current rule.
+All the <<conditions,conditions>> supported by processors are also supported
+here. 
+
 
 ===== `key`
 
@@ -923,16 +1051,15 @@ The Redis port to use if `hosts` does not contain a port number. The default is 
 
 The index name added to the events metadata for use by Logstash. The default is "{beatname_lc}".
 
+[[key-option-redis]]
 ===== `key`
 
 The name of the Redis list or channel the events are published to. If not
 configured, the value of the `index` setting is used.
 
-The redis key can be set dynamically using a format string accessing any
-fields in the event to be published.
-
-This configuration will use the `fields.list` field to set the redis list key. If
-`fields.list` is missing, `fallback` will be used.
+You can set the key dynamically by using a format string to access any event
+field. For example, this configuration uses a custom field, `fields.list`, to
+set the Redis list key. If `fields.list` is missing, `fallback` is used:
 
 ["source","yaml"]
 ------------------------------------------------------------------------------
@@ -941,22 +1068,36 @@ output.redis:
   key: "%{[fields.list]:fallback}"
 ------------------------------------------------------------------------------
 
+
+TIP: To learn how to add custom fields to events, see the
+<<libbeat-configuration-fields,`fields`>> option.  
+
+See the <<keys-option-redis,`keys`>> setting for other ways to set the key
+dynamically.
+
+[[keys-option-redis]]
 ===== `keys`
 
-Array of key selector configurations supporting conditionals, format string
-based field access and name mappings. The first rule matching will be used to
-set the `key` for the event to be published. If `keys` is missing or no
-rule matches, the `key` field will be used.
+An array of key selector rules. Each rule specifies the `key` to use for events
+that match the rule. During publishing, {beatname_uc} uses the first matching
+rule in the array. Rules can contain conditionals, format string-based fields,
+and name mappings. If the `keys` setting is missing or no rule matches, the
+<<key-option-redis,`key`>> setting is used.
 
 Rule settings:
 
-*`key`*: The key format string. If the fields used in the format string are missing, the rule fails.
+*`index`*:: The key format string to use. If this string contains field
+references, such as `%{[fields.name]}`, the fields must exist, or the rule
+fails.
 
-*`mapping`*: Dictionary mapping key values to new names
+*`mappings`*:: A dictionary that takes the value returned by `key` and maps it to
+a new name.
 
-*`default`*: Default string value if `mapping` does not find a match.
+*`default`*:: The default string value to use if `mappings` does not find a match.
 
-*`when`*: Condition which must succeed in order to execute the current rule.
+*`when`*:: A condition that must succeed in order to execute the current rule.
+All the <<conditions,conditions>> supported by processors are also supported
+here. 
 
 Example `keys` settings:
 
@@ -973,10 +1114,10 @@ output.redis:
       when.contains:
         message: "DEBUG"
     - key: "%{[fields.list]}"
-      mapping:
-        "http": "frontend_list"
-        "nginx": "frontend_list"
-        "mysql": "backend_list"
+      mappings:
+        http: "frontend_list"
+        nginx: "frontend_list"
+        mysql: "backend_list"
 ------------------------------------------------------------------------------
 
 ===== `password`
