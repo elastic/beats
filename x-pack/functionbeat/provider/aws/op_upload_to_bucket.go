@@ -57,5 +57,8 @@ func (o *opUploadToBucket) Execute() error {
 }
 
 func (o *opUploadToBucket) Rollback() error {
-	return newOpDeleteFileBucket(o.log, o.config, o.bucketName, o.path).Execute()
+	// The error will be logged but do not enforce a failure because the file could have been removed
+	// before.
+	newOpDeleteFileBucket(o.log, o.config, o.bucketName, o.path).Execute()
+	return nil
 }
