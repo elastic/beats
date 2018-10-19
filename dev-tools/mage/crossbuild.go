@@ -149,7 +149,7 @@ func buildMage() error {
 	return sh.RunWith(env, "mage", "-f", "-compile", filepath.Join("build", "mage-linux-amd64"))
 }
 
-func crossBuildImage(platform string) (string, error) {
+func crossBuildImage(platform, beatName string) (string, error) {
 	tagSuffix := "main"
 
 	switch {
@@ -167,6 +167,10 @@ func crossBuildImage(platform string) (string, error) {
 		// Use an older version of libc to gain greater OS compatibility.
 		// Debian 7 uses glibc 2.13.
 		tagSuffix = "main-debian7"
+		// journalbeat requires Debian 8 due to systemd support.
+		if beatName == "journalbeat" {
+			tagSuffix = "main-debian8"
+		}
 	}
 
 	goVersion, err := GoVersion()
@@ -208,7 +212,8 @@ func (b GolangCrossBuilder) Build() error {
 	}
 
 	dockerRun := sh.RunCmd("docker", "run")
-	image, err := crossBuildImage(b.Platform)
+	beatName := filepath.Base(repoInfo.RootDir)
+	image, err := crossBuildImage(b.Platform, beatName)
 	if err != nil {
 		return errors.Wrap(err, "failed to determine golang-crossbuild image tag")
 	}

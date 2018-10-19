@@ -33,7 +33,7 @@ import (
 func init() {
 	mage.BeatDescription = "Journalbeat ships systemd journal entries to Elasticsearch or Logstash."
 
-	// TODO filter platforms
+	mage.Platforms = mage.Platforms.Filter("linux")
 }
 
 // Build builds the Beat binary.
@@ -44,7 +44,16 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
+	mg.Deps(installDependencies)
 	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
+}
+
+func installDependencies() error {
+	if err := sh.Run("apt-get", "update"); err != nil {
+		return err
+	}
+
+	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", "libsystemd-dev")
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
