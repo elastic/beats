@@ -34,7 +34,7 @@ var (
 		"metricbeat",
 		"packetbeat",
 		"winlogbeat",
-		"x-pack/beatless",
+		"x-pack/functionbeat",
 	}
 )
 
