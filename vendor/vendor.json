@@ -433,8 +433,10 @@
 		{
 			"checksumSHA1": "cEszpxh1szqTb440ze4hm/Vfm40=",
 			"path": "github.com/coreos/go-systemd/sdjournal",
-			"revision": "eee3db372b31153ca0b90702e165948699803fd0",
-			"revisionTime": "2018-08-28T14:03:53Z"
+			"revision": "39ca1b05acc7ad1220e09f133283b8859a8b71ab",
+			"revisionTime": "2018-05-11T13:34:05Z",
+			"version": "v17",
+			"versionExact": "v17"
 		},
 		{
 			"checksumSHA1": "nwll5KjH9SKrWxB45OmN09wdipI=",

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -51,8 +52,6 @@ type Config struct {
 	// Backoff is the current interval to wait before
 	// attemting to read again from the journal.
 	Backoff time.Duration
-	// BackoffFactor is the multiplier of Backoff.
-	BackoffFactor int
 	// Matches store the key value pairs to match entries.
 	Matches []string
 }
@@ -61,9 +60,9 @@ type Config struct {
 type Reader struct {
 	journal *sdjournal.Journal
 	config  Config
-	changes chan int
 	done    chan struct{}
 	logger  *logp.Logger
+	backoff *common.Backoff
 }
 
 // New creates a new journal reader and moves the FP to the configured position.
@@ -72,8 +71,6 @@ func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *lo
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open file")
 	}
-
-	logger = logger.With("path", c.Path)
 
 	var j *sdjournal.Journal
 	if f.IsDir() {
@@ -88,25 +85,10 @@ func New(c Config, done chan struct{}, state checkpoint.JournalState, logger *lo
 		}
 	}
 
-	err = setupMatches(j, c.Matches)
-	if err != nil {
-		return nil, err
-	}
+	l := logger.With("path", c.Path)
+	l.Debug("New journal is opened for reading")
 
-	r := &Reader{
-		journal: j,
-		changes: make(chan int),
-		config:  c,
-		done:    done,
-		logger:  logger,
-	}
-	r.seek(state.Cursor)
-
-	instance.AddJournalToMonitor(c.Path, j)
-
-	r.logger.Debug("New journal is opened for reading")
-
-	return r, nil
+	return newReader(l, done, c, j, state)
 }
 
 // NewLocal creates a reader to read form the local journal and moves the FP
@@ -117,25 +99,28 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 		return nil, errors.Wrap(err, "failed to open local journal")
 	}
 
-	c.Path = LocalSystemJournalID
-	logger = logger.With("path", "local")
-	logger.Debug("New local journal is opened for reading")
+	l := logger.With("path", "local")
+	l.Debug("New local journal is opened for reading")
 
-	err = setupMatches(j, c.Matches)
+	return newReader(l, done, c, j, state)
+}
+
+func newReader(logger *logp.Logger, done chan struct{}, c Config, journal *sdjournal.Journal, state checkpoint.JournalState) (*Reader, error) {
+	err := setupMatches(journal, c.Matches)
 	if err != nil {
 		return nil, err
 	}
 
 	r := &Reader{
-		journal: j,
-		changes: make(chan int),
+		journal: journal,
 		config:  c,
 		done:    done,
 		logger:  logger,
+		backoff: common.NewBackoff(done, c.Backoff, c.MaxBackoff),
 	}
 	r.seek(state.Cursor)
 
-	instance.AddJournalToMonitor(c.Path, j)
+	instance.AddJournalToMonitor(c.Path, journal)
 
 	return r, nil
 }
@@ -148,8 +133,8 @@ func setupMatches(j *sdjournal.Journal, matches []string) error {
 		}
 
 		var p string
-		for journalKey, eventKey := range journaldEventFields {
-			if elems[0] == eventKey {
+		for journalKey, eventField := range journaldEventFields {
+			if elems[0] == eventField.name {
 				p = journalKey + "=" + elems[1]
 			}
 		}
@@ -197,72 +182,45 @@ func (r *Reader) seek(cursor string) {
 	}
 }
 
-// Follow reads entries from journals.
-func (r *Reader) Follow() chan *beat.Event {
-	out := make(chan *beat.Event)
-	go r.readEntriesFromJournal(out)
-
-	return out
-}
-
-func (r *Reader) readEntriesFromJournal(entries chan *beat.Event) {
-	defer close(entries)
-
-process:
+// Next waits until a new event shows up and returns it.
+// It blocks until an event is returned or an error occurs.
+func (r *Reader) Next() (*beat.Event, error) {
 	for {
 		select {
 		case <-r.done:
-			return
+			return nil, nil
 		default:
-			err := r.readUntilNotNull(entries)
+			event, err := r.readEvent()
 			if err != nil {
-				r.logger.Error("Unexpected error while reading from journal: %v", err)
+				return nil, err
 			}
-		}
 
-		for {
-			go r.stopOrWait()
-
-			select {
-			case <-r.done:
-				return
-			case e := <-r.changes:
-				switch e {
-				case sdjournal.SD_JOURNAL_NOP:
-					r.wait()
-				case sdjournal.SD_JOURNAL_APPEND, sdjournal.SD_JOURNAL_INVALIDATE:
-					continue process
-				default:
-					if e < 0 {
-						//r.logger.Error("Unexpected error: %v", syscall.Errno(-e))
-					}
-					r.wait()
-				}
+			if event == nil {
+				r.backoff.Wait()
+				continue
 			}
+
+			r.backoff.Reset()
+			return event, nil
 		}
 	}
 }
 
-func (r *Reader) readUntilNotNull(entries chan<- *beat.Event) error {
+func (r *Reader) readEvent() (*beat.Event, error) {
 	n, err := r.journal.Next()
 	if err != nil && err != io.EOF {
-		return err
+		return nil, err
 	}
 
-	for n != 0 {
+	for n == 1 {
 		entry, err := r.journal.GetEntry()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		event := r.toEvent(entry)
-		entries <- event
-
-		n, err = r.journal.Next()
-		if err != nil && err != io.EOF {
-			return err
-		}
+		return event, nil
 	}
-	return nil
+	return nil, nil
 }
 
 // toEvent creates a beat.Event from journal entries.
@@ -270,14 +228,13 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	fields := common.MapStr{}
 	custom := common.MapStr{}
 
-	for k, v := range entry.Fields {
-		if kk, ok := journaldEventFields[k]; !ok {
-			normalized := strings.ToLower(strings.TrimLeft(k, "_"))
+	for entryKey, v := range entry.Fields {
+		if fieldConversionInfo, ok := journaldEventFields[entryKey]; !ok {
+			normalized := strings.ToLower(strings.TrimLeft(entryKey, "_"))
 			custom.Put(normalized, v)
-		} else {
-			if isKept(kk) {
-				fields.Put(kk, v)
-			}
+		} else if !fieldConversionInfo.dropped {
+			value := r.convertNamedField(fieldConversionInfo, v)
+			fields.Put(fieldConversionInfo.name, value)
 		}
 	}
 
@@ -303,32 +260,16 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	return &event
 }
 
-func isKept(key string) bool {
-	return key != ""
-}
-
-// stopOrWait waits for a journal event.
-func (r *Reader) stopOrWait() {
-	select {
-	case <-r.done:
-	case r.changes <- r.journal.Wait(100 * time.Millisecond):
-	}
-}
-
-func (r *Reader) wait() {
-	select {
-	case <-r.done:
-		return
-	case <-time.After(r.config.Backoff):
-	}
-
-	if r.config.Backoff < r.config.MaxBackoff {
-		r.config.Backoff = r.config.Backoff * time.Duration(r.config.BackoffFactor)
-		if r.config.Backoff > r.config.MaxBackoff {
-			r.config.Backoff = r.config.MaxBackoff
+func (r *Reader) convertNamedField(fc fieldConversion, value string) interface{} {
+	if fc.isInteger {
+		v, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			r.logger.Debugf("Failed to convert field: %s \"%v\" to int: %v", fc.name, value, err)
+			return value
 		}
-		r.logger.Debugf("Increasing backoff time to: %v factor: %v", r.config.Backoff, r.config.BackoffFactor)
+		return v
 	}
+	return value
 }
 
 // Close closes the underlying journal reader.

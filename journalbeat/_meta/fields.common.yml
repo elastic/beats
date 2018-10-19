@@ -34,7 +34,7 @@
               description: >
                   Audit fields of event.
               fields:
-                - name: loginuid
+                - name: login_uid
                   type: long
                   required: false
                   example: 1000
@@ -314,3 +314,8 @@
       required: true
       description: >
         The logged message.
+    - name: custom
+      type: nested
+      required: false
+      description: >
+        Arbitrary fields coming from processes.

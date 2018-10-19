@@ -233,7 +233,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/coreos/go-systemd
-Revision: eee3db372b31153ca0b90702e165948699803fd0
+Version: v17
+Revision: 39ca1b05acc7ad1220e09f133283b8859a8b71ab
 License type (autodetected): Apache-2.0
 ./vendor/github.com/coreos/go-systemd/LICENSE:
 --------------------------------------------------------------------

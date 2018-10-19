@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"sync"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/journalbeat/checkpoint"
 	"github.com/elastic/beats/journalbeat/reader"
@@ -56,18 +56,21 @@ func New(
 		return nil, err
 	}
 
-	id := uuid.NewV4()
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, fmt.Errorf("error while generating ID for input: %v", err)
+	}
+
 	logger := logp.NewLogger("input").With("id", id)
 
 	var readers []*reader.Reader
 	if len(config.Paths) == 0 {
 		cfg := reader.Config{
-			Path:          reader.LocalSystemJournalID, // used to identify the state in the registry
-			Backoff:       config.Backoff,
-			MaxBackoff:    config.MaxBackoff,
-			BackoffFactor: config.BackoffFactor,
-			Seek:          config.Seek,
-			Matches:       config.Matches,
+			Path:       reader.LocalSystemJournalID, // used to identify the state in the registry
+			Backoff:    config.Backoff,
+			MaxBackoff: config.MaxBackoff,
+			Seek:       config.Seek,
+			Matches:    config.Matches,
 		}
 
 		state := states[reader.LocalSystemJournalID]
@@ -80,12 +83,11 @@ func New(
 
 	for _, p := range config.Paths {
 		cfg := reader.Config{
-			Path:          p,
-			Backoff:       config.Backoff,
-			MaxBackoff:    config.MaxBackoff,
-			BackoffFactor: config.BackoffFactor,
-			Seek:          config.Seek,
-			Matches:       config.Matches,
+			Path:       p,
+			Backoff:    config.Backoff,
+			MaxBackoff: config.MaxBackoff,
+			Seek:       config.Seek,
+			Matches:    config.Matches,
 		}
 		state := states[p]
 		r, err := reader.New(cfg, done, state, logger)
@@ -99,7 +101,6 @@ func New(
 	if err != nil {
 		return nil, err
 	}
-	logp.Info(">>> %v", config.EventMetadata)
 
 	logger.Debugf("New input is created for paths %v", config.Paths)
 
@@ -137,46 +138,50 @@ func (i *Input) Run() {
 	i.publishAll(client)
 }
 
+// publishAll reads events from all readers and publishes them.
 func (i *Input) publishAll(client beat.Client) {
 	out := make(chan *beat.Event)
 	defer close(out)
 
 	var wg sync.WaitGroup
-	merge := func(in chan *beat.Event) {
+	defer wg.Wait()
+	for _, r := range i.readers {
 		wg.Add(1)
-
-		go func(c chan *beat.Event) {
+		r := r
+		go func() {
 			defer wg.Done()
+
 			for {
 				select {
 				case <-i.done:
 					return
-				case v, ok := <-c:
-					if !ok {
-						return
+				default:
+				}
+
+				event, err := r.Next()
+				if event == nil {
+					if err != nil {
+						i.logger.Errorf("Error while reading event: %v", err)
 					}
-					out <- v
+					continue
+				}
+
+				select {
+				case <-i.done:
+				case out <- event:
 				}
 			}
-		}(in)
+		}()
 	}
 
-	// merge channels of readers into a single output channel
-	for _, r := range i.readers {
-		c := r.Follow()
-		merge(c)
-	}
-
-loop:
 	for {
 		select {
 		case <-i.done:
-			break loop
+			return
 		case e := <-out:
 			client.Publish(*e)
 		}
 	}
-	wg.Wait()
 }
 
 // Stop stops all readers of the input.
