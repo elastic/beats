@@ -12,6 +12,7 @@ const (
 	OSS      LicenseType = iota // Open source
 	Trial                       // Trial
 	Basic                       // Basic
+	Standard                    // Standard
 	Gold                        // Gold
 	Platinum                    // Platinum
 )

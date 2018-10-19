@@ -5,7 +5,9 @@
 package licenser
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"math/rand"
 	"sync"
 	"time"
@@ -14,7 +16,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
 func mustUUIDV4() uuid.UUID {
@@ -63,12 +64,14 @@ var (
 
 	ErrManagerStopped = errors.New("license manager is stopped")
 	ErrNoLicenseFound = errors.New("no license found")
+
+	ErrNoElasticsearchConfig = errors.New("no elasticsearch output configuration found, verify your configuration")
 )
 
 // Backoff values when the remote cluster is not responding.
 var (
-	maxBackoff  = time.Duration(60)
-	initBackoff = time.Duration(5)
+	maxBackoff  = 60 * time.Second
+	initBackoff = 1 * time.Second
 	jitterCap   = 1000 // 1000 milliseconds
 )
 
@@ -106,7 +109,7 @@ type Manager struct {
 
 // New takes an elasticsearch client and wraps it into a fetcher, the fetch will handle the JSON
 // and response code from the cluster.
-func New(client *elasticsearch.Client, duration time.Duration, gracePeriod time.Duration) *Manager {
+func New(client esclient, duration time.Duration, gracePeriod time.Duration) *Manager {
 	fetcher := NewElasticFetcher(client)
 	return NewWithFetcher(fetcher, duration, gracePeriod)
 }
@@ -178,7 +181,7 @@ func (m *Manager) Get() (*License, error) {
 func (m *Manager) Start() {
 	// First update should be in sync at startup to ensure a
 	// consistent state.
-	m.log.Info("license manager started, no license found.")
+	m.log.Info("License manager started, retrieving initial license")
 	m.wg.Add(1)
 	go m.worker()
 }
@@ -188,11 +191,11 @@ func (m *Manager) Start() {
 func (m *Manager) Stop() {
 	select {
 	case <-m.done:
-		m.log.Error("license manager already stopped")
+		m.log.Error("License manager already stopped")
 	default:
 	}
 
-	defer m.log.Info("license manager stopped")
+	defer m.log.Info("License manager stopped")
 	defer m.notify(func(w Watcher) {
 		w.OnManagerStopped()
 	})
@@ -212,11 +215,11 @@ func (m *Manager) notify(op func(Watcher)) {
 	defer m.RUnlock()
 
 	if len(m.watchers) == 0 {
-		m.log.Debugf("no watchers configured")
+		m.log.Debugf("No watchers configured")
 		return
 	}
 
-	m.log.Debugf("notifying %d watchers", len(m.watchers))
+	m.log.Debugf("Notifying %d watchers", len(m.watchers))
 	for _, w := range m.watchers {
 		op(w)
 	}
@@ -224,8 +227,8 @@ func (m *Manager) notify(op func(Watcher)) {
 
 func (m *Manager) worker() {
 	defer m.wg.Done()
-	m.log.Debug("starting periodic license check")
-	defer m.log.Debug("periodic license check is stopped")
+	m.log.Debugf("Starting periodic license check, refresh: %s grace: %s ", m.duration, m.gracePeriod)
+	defer m.log.Debug("Periodic license check is stopped")
 
 	jitter := rand.Intn(jitterCap)
 
@@ -243,7 +246,7 @@ func (m *Manager) worker() {
 		case <-m.done:
 			return
 		case <-time.After(m.duration):
-			m.log.Debug("license is too old, updating, grace period: %s", m.gracePeriod)
+			m.log.Debug("License is too old, updating, grace period: %s", m.gracePeriod)
 			m.update()
 		}
 	}
@@ -259,16 +262,16 @@ func (m *Manager) update() {
 		default:
 			license, err := m.fetcher.Fetch()
 			if err != nil {
-				m.log.Info("cannot retrieve license, retrying later, error: %s", err)
+				m.log.Infof("Cannot retrieve license, retrying later, error: %+v", err)
 
 				// check if the license is still in the grace period.
 				// permit some operations if the license could not be checked
 				// right away. This is to smooth any networks problems.
 				if grace := time.Now().Sub(startedAt); grace > m.gracePeriod {
-					m.log.Info("grace period expired, invalidating license")
+					m.log.Info("Grace period expired, invalidating license")
 					m.invalidate()
 				} else {
-					m.log.Debugf("license is too old, grace time remaining: %s", m.gracePeriod-grace)
+					m.log.Debugf("License is too old, grace time remaining: %s", m.gracePeriod-grace)
 				}
 
 				backoff.Wait()
@@ -276,10 +279,13 @@ func (m *Manager) update() {
 			}
 
 			// we have a valid license, notify watchers and sleep until next check.
-			m.log.Info(
-				"valid license retrieved, license mode: %s, type: %s, status: %s",
+			m.log.Infow(
+				"Valid license retrieved",
+				"license mode",
 				license.Get(),
+				"type",
 				license.Type,
+				"status",
 				license.Status,
 			)
 			m.saveAndNotify(license)
@@ -307,13 +313,42 @@ func (m *Manager) save(license *License) bool {
 	if m.license != nil && m.license.EqualTo(license) {
 		return false
 	}
-	defer m.log.Debug("license information updated")
+	defer m.log.Debug("License information updated")
 
 	m.license = license
 	return true
 }
 
 func (m *Manager) invalidate() {
-	defer m.log.Debug("invalidate cached license, fallback to OSS")
+	defer m.log.Debug("Invalidate cached license, fallback to OSS")
 	m.saveAndNotify(OSSLicense)
+}
+
+// WaitForLicense transforms the async manager into a sync check, this is useful if you want
+// to block you application until you have received an initial license from the cluster, the manager
+// is not affected and will stay asynchronous.
+func WaitForLicense(ctx context.Context, log *logp.Logger, manager *Manager, checks ...CheckFunc) (err error) {
+	log.Info("Waiting on synchronous license check")
+	received := make(chan struct{})
+	callback := CallbackWatcher{New: func(license License) {
+		log.Debug("Validating license")
+		if !Validate(log, license, checks...) {
+			err = errors.New("invalid license")
+		}
+		close(received)
+		log.Infof("License is valid, mode: %s", license.Get())
+	}}
+
+	if err := manager.AddWatcher(&callback); err != nil {
+		return err
+	}
+	defer manager.RemoveWatcher(&callback)
+
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf("license check was interrupted")
+	case <-received:
+	}
+
+	return err
 }

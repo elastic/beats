@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Client implements the interface used by all the beatless function, we only implement a synchronous
@@ -22,7 +23,7 @@ type Client interface {
 
 	// Close closes the current client, no events will be accepted, this method can block if we still
 	// need to ACK on events.
-	Close()
+	Close() error
 
 	// Wait blocks until the publisher pipeline send the ACKS for all the events.
 	Wait()
@@ -37,12 +38,16 @@ type SyncClient struct {
 
 	client beat.Client
 	wg     sync.WaitGroup
+	log    *logp.Logger
 }
 
 // NewSyncClient creates a new sync clients from the provided configuration, existing ACKs handlers
 // defined in the configuration will be proxied by this object.
-func NewSyncClient(pipeline beat.Pipeline, cfg beat.ClientConfig) (*SyncClient, error) {
-	s := &SyncClient{}
+func NewSyncClient(log *logp.Logger, pipeline beat.Pipeline, cfg beat.ClientConfig) (*SyncClient, error) {
+	if log == nil {
+		log = logp.NewLogger("")
+	}
+	s := &SyncClient{log: log.Named("sync client")}
 
 	// Proxy any callbacks to the original client.
 	//
@@ -83,6 +88,7 @@ func NewSyncClient(pipeline beat.Pipeline, cfg beat.ClientConfig) (*SyncClient, 
 
 // Publish publishes one event to the pipeline and return.
 func (s *SyncClient) Publish(event beat.Event) error {
+	s.log.Debug("Publish 1 event")
 	s.wg.Add(1)
 	s.client.Publish(event)
 	return nil
@@ -90,6 +96,7 @@ func (s *SyncClient) Publish(event beat.Event) error {
 
 // PublishAll publish a slice of events to the pipeline and return.
 func (s *SyncClient) PublishAll(events []beat.Event) error {
+	s.log.Debugf("Publish %d events", len(events))
 	s.wg.Add(len(events))
 	s.client.PublishAll(events)
 	return nil
@@ -109,6 +116,7 @@ func (s *SyncClient) Wait() {
 
 // AckEvents receives an array with all the event acked for this client.
 func (s *SyncClient) onACKEvents(data []interface{}) {
+	s.log.Debugf("onACKEvents callback receives with events count of %d", len(data))
 	count := len(data)
 	if count == 0 {
 		return
@@ -125,6 +133,7 @@ func (s *SyncClient) onACKEvents(data []interface{}) {
 }
 
 func (s *SyncClient) onACKCount(c int) {
+	s.log.Debugf("onACKCount callback receives with events count of %d", c)
 	s.wg.Add(c * -1)
 	if s.ackCount != nil {
 		s.ackCount(c)
