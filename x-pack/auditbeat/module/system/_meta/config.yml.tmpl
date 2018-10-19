@@ -1,15 +1,17 @@
 {{ if .Reference -}}
 {{ end -}}
 - module: system
+  
+  metricsets:
+    - host
+    - packages
+    - processes
+
+  report_changes: true
+  
   {{ if eq .GOOS "darwin" -}}
-  metricsets:
-    - host
   {{ else if eq .GOOS "windows" -}}
-  metricsets:
-    - host
   {{ else -}}
-  metricsets:
-    - host
   {{- end }}
 {{ if .Reference }}
 {{- end }}
