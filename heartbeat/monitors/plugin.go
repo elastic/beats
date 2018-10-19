@@ -23,9 +23,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/monitoring"
-
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/plugin"
 )
 
