@@ -71,7 +71,7 @@ func newHostMetadataProcessor(cfg *common.Config) (processors.Processor, error) 
 // Run enriches the given event with the host meta data
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	p.loadData()
-	event.Fields.DeepUpdate(p.data.Get())
+	event.Fields.DeepUpdate(p.data.Get().Clone())
 	return event, nil
 }
 
