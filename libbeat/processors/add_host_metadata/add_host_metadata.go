@@ -106,7 +106,7 @@ func (p *addHostMetadata) loadData() {
 	p.lastUpdate = time.Now()
 }
 
-func (p addHostMetadata) getNetInfo() ([]string, []string, error) {
+func (p *addHostMetadata) getNetInfo() ([]string, []string, error) {
 	var ipList []string
 	var hwList []string
 
@@ -151,7 +151,7 @@ func (p addHostMetadata) getNetInfo() ([]string, []string, error) {
 	return ipList, hwList, errs.Err()
 }
 
-func (p addHostMetadata) String() string {
+func (p *addHostMetadata) String() string {
 	return fmt.Sprintf("%v=[netinfo.enabled=[%v]]",
 		processorName, p.config.NetInfoEnabled)
 }
