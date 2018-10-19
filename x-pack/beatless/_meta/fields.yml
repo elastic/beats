@@ -1,9 +1,0 @@
-- key: beatless
-  title: beatless
-  description:
-  fields:
-    - name: counter
-      type: long
-      required: true
-      description: >
-        PLEASE UPDATE DOCUMENTATION
