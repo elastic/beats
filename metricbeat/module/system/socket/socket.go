@@ -24,7 +24,6 @@ import (
 	"net"
 	"os"
 	"path/filepath"
-	"sync/atomic"
 	"syscall"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -50,8 +49,7 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	readBuffer    []byte
-	seq           uint32
+	netlink       *NetlinkSession
 	ptable        *ProcTable
 	euid          int
 	previousConns hashSet
@@ -83,7 +81,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	m := &MetricSet{
 		BaseMetricSet: base,
-		readBuffer:    make([]byte, os.Getpagesize()),
+		netlink:       NewNetlinkSession(),
 		ptable:        ptable,
 		euid:          os.Geteuid(),
 		previousConns: hashSet{},
@@ -114,10 +112,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		debugf("process table refresh had failures: %v", err)
 	}
 
-	// Send request over netlink and parse responses.
-	req := linux.NewInetDiagReq()
-	req.Header.Seq = atomic.AddUint32(&m.seq, 1)
-	sockets, err := linux.NetlinkInetDiagWithBuf(req, m.readBuffer, nil)
+	sockets, err := m.netlink.GetSocketList()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed requesting socket dump")
 	}
@@ -129,7 +124,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	// Enrich sockets with direction/pid/process/user/hostname and convert to MapStr.
 	rtn := make([]common.MapStr, 0, len(sockets))
 	for _, s := range sockets {
-		c := newConnection(s)
+		c := NewConnection(s)
 		m.enrichConnectionData(c)
 		rtn = append(rtn, c.ToMapStr())
 	}
@@ -184,7 +179,7 @@ func (m *MetricSet) isNewSocket(diag *linux.InetDiagMsg) bool {
 // enrichConnectionData enriches the connection with username, direction,
 // hostname of the remote IP (if enabled), eTLD + 1 of the hostname, and the
 // process owning the socket.
-func (m *MetricSet) enrichConnectionData(c *connection) {
+func (m *MetricSet) enrichConnectionData(c *Connection) {
 	c.Username = m.users.LookupUID(int(c.UID))
 
 	// Determine direction (incoming, outgoing, or listening).
@@ -219,7 +214,7 @@ func (m *MetricSet) enrichConnectionData(c *connection) {
 	}
 }
 
-type connection struct {
+type Connection struct {
 	Family     linux.AddressFamily
 	LocalIP    net.IP
 	LocalPort  int
@@ -246,8 +241,8 @@ type connection struct {
 	Username string // Username of the socket.
 }
 
-func newConnection(diag *linux.InetDiagMsg) *connection {
-	return &connection{
+func NewConnection(diag *linux.InetDiagMsg) *Connection {
+	return &Connection{
 		Family:     linux.AddressFamily(diag.Family),
 		State:      linux.TCPState(diag.State),
 		LocalIP:    diag.SrcIP(),
@@ -260,7 +255,7 @@ func newConnection(diag *linux.InetDiagMsg) *connection {
 	}
 }
 
-func (c *connection) ToMapStr() common.MapStr {
+func (c *Connection) ToMapStr() common.MapStr {
 	evt := common.MapStr{
 		"family": c.Family.String(),
 		"local": common.MapStr{
