@@ -1,0 +1,20 @@
+= Functionbeat Reference
+
+include::../../../libbeat/docs/version.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
+
+:version: {stack-version}
+:beatname_lc: functionbeat
+:beatname_uc: Functionbeat
+:beatname_pkg: {beatname_lc}
+:github_repo_name: beats
+:discuss_forum: beats/{beatname_lc}
+:beat_default_index_prefix: {beatname_lc}
+:has_ml_jobs: no
+
+
+include::../../../libbeat/docs/shared-beats-attributes.asciidoc[]
+
+include::./overview.asciidoc[]
+
