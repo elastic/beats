@@ -1,6 +1,6 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
-BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat
+BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat x-pack/beatless
 PROJECTS=libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
@@ -11,6 +11,7 @@ GOLINT_REPO=github.com/golang/lint/golint
 REVIEWDOG=reviewdog
 REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
+XPACK_SUFFIX=x-pack/
 
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
@@ -152,7 +153,7 @@ release: beats-dashboards
 	@$(foreach var,$(BEATS),$(MAKE) -C $(var) release || exit 1;)
 	@$(foreach var,$(BEATS), \
       test -d $(var)/build/distributions && test -n "$$(ls $(var)/build/distributions)" || exit 0; \
-      mkdir -p build/distributions/$(var) && mv -f $(var)/build/distributions/* build/distributions/$(var)/ || exit 1;)
+      mkdir -p build/distributions/$(subst $(XPACK_SUFFIX),'',$(var)) && mv -f $(var)/build/distributions/* build/distributions/$(subst $(XPACK_SUFFIX),'',$(var))/ || exit 1;)
 
 # Builds a snapshot release. The Go version defined in .go-version will be
 # installed and used for the build.
