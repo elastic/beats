@@ -8,9 +8,9 @@ package licenser
 
 import "strconv"
 
-const _LicenseType_name = "Open sourceTrialBasicGoldPlatinum"
+const _LicenseType_name = "Open sourceTrialBasicStandardGoldPlatinum"
 
-var _LicenseType_index = [...]uint8{0, 11, 16, 21, 25, 33}
+var _LicenseType_index = [...]uint8{0, 11, 16, 21, 29, 33, 41}
 
 func (i LicenseType) String() string {
 	if i < 0 || i >= LicenseType(len(_LicenseType_index)-1) {

@@ -3,6 +3,7 @@
 .vscode
 /*/_meta/kibana.generated
 beatless
+beatless.test
 build
 data
 fields.yml

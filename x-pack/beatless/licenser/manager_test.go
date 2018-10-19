@@ -5,12 +5,15 @@
 package licenser
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type message struct {
@@ -280,5 +283,63 @@ func TestWatcher(t *testing.T) {
 		m.Stop()
 
 		wg.Wait()
+	})
+}
+
+func TestWaitForLicense(t *testing.T) {
+	i := &License{
+		UUID:   mustUUIDV4(),
+		Type:   Basic,
+		Mode:   Basic,
+		Status: Active,
+	}
+
+	t.Run("when license is available and valid", func(t *testing.T) {
+		mock := newMockFetcher()
+		mock.Insert(i, nil)
+		defer mock.Close()
+
+		m := NewWithFetcher(mock, time.Duration(1), time.Duration(1*time.Second))
+
+		m.Start()
+		defer m.Stop()
+
+		err := WaitForLicense(context.Background(), logp.NewLogger(""), m, CheckBasic)
+		assert.NoError(t, err)
+	})
+
+	t.Run("when license is available and not valid", func(t *testing.T) {
+		mock := newMockFetcher()
+		mock.Insert(i, nil)
+		defer mock.Close()
+
+		m := NewWithFetcher(mock, time.Duration(1), time.Duration(1*time.Second))
+
+		m.Start()
+		defer m.Stop()
+
+		err := WaitForLicense(context.Background(), logp.NewLogger(""), m, CheckLicenseCover(Platinum))
+		assert.Error(t, err)
+	})
+
+	t.Run("when license is not available we can still interrupt", func(t *testing.T) {
+		mock := newMockFetcher()
+		mock.Insert(i, nil)
+		defer mock.Close()
+
+		m := NewWithFetcher(mock, time.Duration(1), time.Duration(1*time.Second))
+
+		m.Start()
+		defer m.Stop()
+
+		ctx, cancel := context.WithCancel(context.Background())
+		executed := make(chan struct{})
+		go func() {
+			err := WaitForLicense(ctx, logp.NewLogger(""), m, CheckLicenseCover(Platinum))
+			assert.Error(t, err)
+			close(executed)
+		}()
+		cancel()
+		<-executed
 	})
 }
