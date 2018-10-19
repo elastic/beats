@@ -35,7 +35,7 @@ func (k *Kinesis) Run(_ context.Context, client core.Client) error {
 
 func (k *Kinesis) createHandler(client core.Client) func(request events.KinesisEvent) error {
 	return func(request events.KinesisEvent) error {
-		k.log.Debugf("Received %d events", len(request.Records))
+		k.log.Debugf("The handler receives %d events", len(request.Records))
 
 		events := transformer.KinesisEvent(request)
 		if err := client.PublishAll(events); err != nil {

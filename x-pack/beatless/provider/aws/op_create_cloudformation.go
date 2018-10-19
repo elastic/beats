@@ -33,7 +33,7 @@ func newOpCreateCloudFormation(
 }
 
 func (o *opCreateCloudFormation) Execute() error {
-	o.log.Debug("Creating CloudFormation create request")
+	o.log.Debug("Creating CloudFormation create stack request")
 	uuid, err := uuid.NewV4()
 	if err != nil {
 		return err

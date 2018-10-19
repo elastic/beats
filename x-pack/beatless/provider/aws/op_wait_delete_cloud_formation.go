@@ -22,7 +22,7 @@ type opWaitDeleteCloudFormation struct {
 }
 
 func (o *opWaitDeleteCloudFormation) Execute() error {
-	o.log.Debug("Waiting for cloudformation confirmation")
+	o.log.Debug("Waiting for cloudformation delete confirmation")
 	status, _, err := queryStackStatus(o.svc, o.stackName)
 
 	for err == nil && strings.Index(string(*status), "FAILED") == -1 {

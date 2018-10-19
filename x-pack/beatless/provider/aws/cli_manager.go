@@ -176,7 +176,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 	if err != nil {
 		return err
 	}
-	c.log.Debugf("Compression was successful (zip size: %d bytes)", len(content))
+	c.log.Debugf("Compression is successful (zip size: %d bytes)", len(content))
 
 	function, err := c.findFunction(name)
 	if err != nil {
@@ -195,7 +195,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		return err
 	}
 
-	c.log.Debugf("Created cloudformation template:\n%s", json)
+	c.log.Debugf("Using cloudformation template:\n%s", json)
 
 	executer := newExecutor(c.log)
 	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, bucket))
@@ -236,33 +236,33 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 // Deploy delegate deploy to the actual function implementation.
 func (c *CLIManager) Deploy(name string) error {
-	c.log.Debugf("Function: %s, starting deploy", name)
-	defer c.log.Debugf("Function: %s, deploy execution ended", name)
+	c.log.Debugf("Deploying function: %s", name)
+	defer c.log.Debugf("Deploy finish for function '%s'", name)
 
 	if err := c.deployTemplate(false, name); err != nil {
 		return err
 	}
-	c.log.Debugf("Successfully created function: %s", name)
+	c.log.Debugf("Successfully created function '%s'", name)
 	return nil
 }
 
 // Update updates lambda using cloudformation.
 func (c *CLIManager) Update(name string) error {
-	c.log.Debugf("Function: %s, starting update", name)
-	defer c.log.Debugf("Function: %s, update execution ended", name)
+	c.log.Debugf("Starting updating function '%s'", name)
+	defer c.log.Debugf("Update complete for function '%s'", name)
 
 	if err := c.deployTemplate(true, name); err != nil {
 		return err
 	}
 
-	c.log.Debugf("Successfully updated function: %s")
+	c.log.Debugf("Successfully updated function: '%s'")
 	return nil
 }
 
 // Remove removes a stack and unregister any resources created.
 func (c *CLIManager) Remove(name string) error {
-	c.log.Debugf("Function: %s, starting remove", name)
-	defer c.log.Debugf("Function: %s, remove execution ended", name)
+	c.log.Debugf("Removing function: %s", name)
+	defer c.log.Debugf("Removal of function '%s' complete", name)
 
 	executer := newExecutor(c.log)
 	executer.Add(newOpDeleteCloudFormation(c.log, c.awsCfg, c.stackName(name)))

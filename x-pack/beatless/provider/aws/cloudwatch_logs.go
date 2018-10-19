@@ -79,7 +79,7 @@ func (c *CloudwatchLogs) createHandler(
 		}
 
 		c.log.Debugf(
-			"Received %d events (logStream: %s, owner: %s, logGroup: %s, messageType: %s)",
+			"The handler receives %d events (logStream: %s, owner: %s, logGroup: %s, messageType: %s)",
 			len(parsedEvent.LogEvents),
 			parsedEvent.LogStream,
 			parsedEvent.Owner,

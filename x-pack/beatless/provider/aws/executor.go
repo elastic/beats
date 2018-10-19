@@ -41,7 +41,7 @@ func newExecutor(log *logp.Logger) *executor {
 }
 
 func (e *executor) Execute() (err error) {
-	e.log.Debugf("Executing %d operations", len(e.operations))
+	e.log.Debugf("The executor is executing '%d' operations for converging state", len(e.operations))
 	if e.IsCompleted() {
 		return errAlreadyExecuted
 	}
@@ -56,14 +56,14 @@ func (e *executor) Execute() (err error) {
 		}
 	}
 	if err == nil {
-		e.log.Debug("All operations have been successful")
+		e.log.Debug("All operations successful")
 	}
 	e.markCompleted()
 	return err
 }
 
 func (e *executor) Rollback() (err error) {
-	e.log.Debugf("Rolling back previous execution, %d operations", len(e.undos))
+	e.log.Debugf("The executor is rolling back previous execution, '%d' operations to rollback", len(e.undos))
 	if !e.IsCompleted() {
 		return errNeverRun
 	}
@@ -76,9 +76,9 @@ func (e *executor) Rollback() (err error) {
 	}
 
 	if err == nil {
-		e.log.Debug("Rollback successful")
+		e.log.Debug("The rollback is successful")
 	} else {
-		e.log.Debug("Rollback incomplete")
+		e.log.Debug("The rollback is incomplete")
 	}
 	return err
 }

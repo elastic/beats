@@ -89,7 +89,7 @@ func (bt *Beatless) Run(b *beat.Beat) error {
 	clientFactory := makeClientFactory(bt.log, manager, b.Publisher)
 
 	enabledFunctions := bt.enabledFunctions()
-	bt.log.Infof("Enabled functions: %s", strings.Join(enabledFunctions, ", "))
+	bt.log.Infof("Beatless is configuring enabled functions: %s", strings.Join(enabledFunctions, ", "))
 	// Create a client per function and wrap them into a runnable function by the coordinator.
 	functions, err := bt.Provider.CreateFunctions(clientFactory, enabledFunctions)
 	if err != nil {

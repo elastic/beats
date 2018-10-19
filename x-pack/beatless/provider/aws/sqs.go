@@ -35,7 +35,7 @@ func (s *SQS) Run(_ context.Context, client core.Client) error {
 
 func (s *SQS) createHandler(client core.Client) func(request events.SQSEvent) error {
 	return func(request events.SQSEvent) error {
-		s.log.Debugf("Received %d events", len(request.Records))
+		s.log.Debugf("The handler receives %d events", len(request.Records))
 
 		events := transformer.SQS(request)
 		if err := client.PublishAll(events); err != nil {
