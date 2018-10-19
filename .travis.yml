@@ -99,13 +99,13 @@ jobs:
       go: $GO_VERSION
       stage: test
 
-    # Beatless
+    # Functionbeat
     - os: linux
-      env: TARGETS="-C x-pack/beatless testsuite"
+      env: TARGETS="-C x-pack/functionbeat testsuite"
       go: $GO_VERSION
       stage: test
     - os: osx
-      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/beatless testsuite"
+      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite"
       go: $GO_VERSION
       stage: test
 
