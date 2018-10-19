@@ -168,12 +168,6 @@ func (c *CLIManager) stackName(name string) string {
 	return "fnb-" + name + "-stack"
 }
 
-func (c *CLIManager) codeKey(name string, content []byte) string {
-	sha := sha256.Sum256(content)
-	checksum := base64.RawURLEncoding.EncodeToString(sha[:])
-	return "functionbeat-deployment/" + name + "-" + checksum + "/functionbeat.zip"
-}
-
 func (c *CLIManager) deployTemplate(update bool, name string) error {
 	c.log.Debug("Compressing all assets into an artifact")
 	content, err := core.MakeZip()
@@ -189,7 +183,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	fnTemplate := function.Template()
 
-	templateLoc := c.codeKey(name, content)
+	templateLoc := codeKey(name, content)
 
 	to := c.template(function, name, templateLoc)
 	if err := mergeTemplate(to, fnTemplate); err != nil {
@@ -339,4 +333,10 @@ func mergeTemplate(to, from *cloudformation.Template) error {
 	}
 
 	return nil
+}
+
+func codeKey(name string, content []byte) string {
+	sha := sha256.Sum256(content)
+	checksum := base64.RawURLEncoding.EncodeToString(sha[:])
+	return "functionbeat-deployment/" + name + "-" + checksum + "/functionbeat.zip"
 }
