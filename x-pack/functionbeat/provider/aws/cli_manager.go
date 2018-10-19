@@ -98,7 +98,7 @@ func (c *CLIManager) template(function installer, name, templateLoc string) *clo
 			},
 		},
 		Path:     "/",
-		RoleName: "functionbeat-lambda",
+		RoleName: "functionbeat-lambda-" + name,
 		// Allow the lambda to write log to cloudwatch logs.
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html
 		Policies: []cloudformation.AWSIAMRole_Policy{

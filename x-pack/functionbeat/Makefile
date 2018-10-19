@@ -15,8 +15,7 @@ include $(ES_BEATS)/libbeat/scripts/Makefile
 .PHONY: collect
 collect:
 
-# TODO(ph) This is used for debugging until we change the build to create 2 artifacts,
-# we will do this in another PR.
+# Generate an artifact to be push on serverless provider.
 .PHONY: linux
 linux:
 	GOOS=linux go build -o pkg/functionbeat
