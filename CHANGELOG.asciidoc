@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Fix a race condition with the `add_host_metadata` and the event serialization. {pull}8223[8223]
 - Enforce that data used by k8s or docker doesn't use any reference. {pull}8240[8240]
 - Switch to different UUID lib due to to non-random generated UUIDs. {pull}8485[8485]
+- Fix race condition when publishing monitoring data. {pull}8646[8646]
 
 *Auditbeat*
 
