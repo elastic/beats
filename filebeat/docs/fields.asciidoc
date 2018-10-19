@@ -4874,6 +4874,15 @@ Region ISO code.
 
 --
 
+
+
+*`user_agent.os.full_name`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-logstash]]
 == logstash fields
 
