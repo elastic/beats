@@ -20,6 +20,7 @@ package add_host_metadata
 import (
 	"fmt"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/joeshaw/multierror"
@@ -39,6 +40,8 @@ func init() {
 }
 
 type addHostMetadata struct {
+	sync.Mutex
+
 	info       types.HostInfo
 	lastUpdate time.Time
 	data       common.MapStr
@@ -64,38 +67,43 @@ func newHostMetadataProcessor(cfg *common.Config) (processors.Processor, error) 
 		info:   h.Info(),
 		config: config,
 	}
+	p.loadData()
 	return p, nil
 }
 
 // Run enriches the given event with the host meta data
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
+	p.Lock()
+	defer p.Unlock()
+
 	p.loadData()
-	event.Fields.DeepUpdate(p.data.Clone())
+	event.Fields.DeepUpdate(p.data)
 	return event, nil
 }
 
 func (p *addHostMetadata) loadData() {
-
 	// Check if cache is expired
-	if p.lastUpdate.Add(cacheExpiration).Before(time.Now()) {
-		p.data = host.MapHostInfo(p.info)
-
-		if p.config.NetInfoEnabled {
-			// IP-address and MAC-address
-			var ipList, hwList, err = p.getNetInfo()
-			if err != nil {
-				logp.Info("Error when getting network information %v", err)
-			}
-
-			if len(ipList) > 0 {
-				p.data.Put("host.ip", ipList)
-			}
-			if len(hwList) > 0 {
-				p.data.Put("host.mac", hwList)
-			}
-		}
-		p.lastUpdate = time.Now()
+	if p.lastUpdate.Add(cacheExpiration).After(time.Now()) {
+		return
 	}
+
+	p.data = host.MapHostInfo(p.info)
+
+	if p.config.NetInfoEnabled {
+		// IP-address and MAC-address
+		var ipList, hwList, err = p.getNetInfo()
+		if err != nil {
+			logp.Info("Error when getting network information %v", err)
+		}
+
+		if len(ipList) > 0 {
+			p.data.Put("host.ip", ipList)
+		}
+		if len(hwList) > 0 {
+			p.data.Put("host.mac", hwList)
+		}
+	}
+	p.lastUpdate = time.Now()
 }
 
 func (p addHostMetadata) getNetInfo() ([]string, []string, error) {
