@@ -20,7 +20,6 @@ package add_host_metadata
 import (
 	"fmt"
 	"net"
-	"sync"
 	"time"
 
 	"github.com/joeshaw/multierror"
@@ -40,11 +39,9 @@ func init() {
 }
 
 type addHostMetadata struct {
-	sync.Mutex
-
 	info       types.HostInfo
 	lastUpdate time.Time
-	data       common.MapStr
+	data       common.MapStrPointer
 	config     Config
 }
 
@@ -66,18 +63,15 @@ func newHostMetadataProcessor(cfg *common.Config) (processors.Processor, error) 
 	p := &addHostMetadata{
 		info:   h.Info(),
 		config: config,
+		data:   common.NewMapStrPointer(nil),
 	}
-	p.loadData()
 	return p, nil
 }
 
 // Run enriches the given event with the host meta data
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
-	p.Lock()
-	defer p.Unlock()
-
 	p.loadData()
-	event.Fields.DeepUpdate(p.data)
+	event.Fields.DeepUpdate(p.data.Get())
 	return event, nil
 }
 
@@ -87,8 +81,7 @@ func (p *addHostMetadata) loadData() {
 		return
 	}
 
-	p.data = host.MapHostInfo(p.info)
-
+	data := host.MapHostInfo(p.info)
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
 		var ipList, hwList, err = p.getNetInfo()
@@ -97,16 +90,18 @@ func (p *addHostMetadata) loadData() {
 		}
 
 		if len(ipList) > 0 {
-			p.data.Put("host.ip", ipList)
+			data.Put("host.ip", ipList)
 		}
 		if len(hwList) > 0 {
-			p.data.Put("host.mac", hwList)
+			data.Put("host.mac", hwList)
 		}
 	}
+
+	p.data.Set(data)
 	p.lastUpdate = time.Now()
 }
 
-func (p *addHostMetadata) getNetInfo() ([]string, []string, error) {
+func (p addHostMetadata) getNetInfo() ([]string, []string, error) {
 	var ipList []string
 	var hwList []string
 
@@ -151,7 +146,7 @@ func (p *addHostMetadata) getNetInfo() ([]string, []string, error) {
 	return ipList, hwList, errs.Err()
 }
 
-func (p *addHostMetadata) String() string {
+func (p addHostMetadata) String() string {
 	return fmt.Sprintf("%v=[netinfo.enabled=[%v]]",
 		processorName, p.config.NetInfoEnabled)
 }
