@@ -5,6 +5,8 @@
 package aws
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"errors"
 	"fmt"
 
@@ -61,7 +63,7 @@ func (c *CLIManager) findFunction(name string) (installer, error) {
 	return function, nil
 }
 
-func (c *CLIManager) template(function installer, name string) *cloudformation.Template {
+func (c *CLIManager) template(function installer, name, templateLoc string) *cloudformation.Template {
 	lambdaConfig := function.LambdaConfig()
 
 	prefix := func(s string) string {
@@ -131,7 +133,7 @@ func (c *CLIManager) template(function installer, name string) *cloudformation.T
 		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
 			Code: &cloudformation.AWSLambdaFunction_Code{
 				S3Bucket: bucket,
-				S3Key:    c.codeKey(name),
+				S3Key:    templateLoc,
 			},
 			Description: lambdaConfig.Description,
 			Environment: &cloudformation.AWSLambdaFunction_Environment{
@@ -166,8 +168,10 @@ func (c *CLIManager) stackName(name string) string {
 	return "fnb-" + name + "-stack"
 }
 
-func (c *CLIManager) codeKey(name string) string {
-	return "functionbeat-deployment/" + name + "/functionbeat.zip"
+func (c *CLIManager) codeKey(name string, content []byte) string {
+	sha := sha256.Sum256(content)
+	checksum := base64.RawURLEncoding.EncodeToString(sha[:])
+	return "functionbeat-deployment/" + name + "-" + checksum + "/functionbeat.zip"
 }
 
 func (c *CLIManager) deployTemplate(update bool, name string) error {
@@ -185,7 +189,9 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	fnTemplate := function.Template()
 
-	to := c.template(function, name)
+	templateLoc := c.codeKey(name, content)
+
+	to := c.template(function, name, templateLoc)
 	if err := mergeTemplate(to, fnTemplate); err != nil {
 		return err
 	}
@@ -199,7 +205,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	executer := newExecutor(c.log)
 	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, bucket))
-	executer.Add(newOpUploadToBucket(c.log, c.awsCfg, bucket, c.codeKey(name), content))
+	executer.Add(newOpUploadToBucket(c.log, c.awsCfg, bucket, templateLoc, content))
 	executer.Add(newOpUploadToBucket(
 		c.log,
 		c.awsCfg,
