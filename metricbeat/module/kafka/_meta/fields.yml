@@ -39,3 +39,13 @@
           type: long
           description: >
             Partition id.
+
+        - name: partition.topic_id
+          type: keyword
+          description:
+            Unique id of the partition in the topic.
+
+        - name: partition.topic_broker_id
+          type: keyword
+          description:
+            Unique id of the partition in the topic and the broker.
