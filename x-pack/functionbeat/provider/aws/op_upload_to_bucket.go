@@ -19,6 +19,7 @@ type opUploadToBucket struct {
 	bucketName string
 	path       string
 	raw        []byte
+	config     aws.Config
 }
 
 func newOpUploadToBucket(
@@ -33,6 +34,7 @@ func newOpUploadToBucket(
 		bucketName: bucketName,
 		path:       path,
 		raw:        raw,
+		config:     config,
 	}
 }
 
@@ -52,4 +54,8 @@ func (o *opUploadToBucket) Execute() error {
 	}
 	o.log.Debug("Upload successful")
 	return nil
+}
+
+func (o *opUploadToBucket) Rollback() error {
+	return newOpDeleteFileBucket(o.log, o.config, o.bucketName, o.path).Execute()
 }

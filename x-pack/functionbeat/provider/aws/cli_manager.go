@@ -183,9 +183,9 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	fnTemplate := function.Template()
 
-	templateLoc := codeKey(name, content)
+	codeLoc := codeKey(name, content)
 
-	to := c.template(function, name, templateLoc)
+	to := c.template(function, name, codeLoc)
 	if err := mergeTemplate(to, fnTemplate); err != nil {
 		return err
 	}
@@ -199,7 +199,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	executer := newExecutor(c.log)
 	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, bucket))
-	executer.Add(newOpUploadToBucket(c.log, c.awsCfg, bucket, templateLoc, content))
+	executer.Add(newOpUploadToBucket(c.log, c.awsCfg, bucket, codeLoc, content))
 	executer.Add(newOpUploadToBucket(
 		c.log,
 		c.awsCfg,
@@ -224,6 +224,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 	}
 
 	executer.Add(newOpWaitCloudFormation(c.log, c.awsCfg, c.stackName(name)))
+	executer.Add(newOpDeleteFileBucket(c.log, c.awsCfg, bucket, codeLoc))
 
 	if err := executer.Execute(); err != nil {
 		if rollbackErr := executer.Rollback(); rollbackErr != nil {
