@@ -66,7 +66,7 @@ func TestSyncClient(t *testing.T) {
 		c := newDummyClient()
 
 		pipeline := newDummyPipeline(c)
-		sc, err := NewSyncClient(pipeline, beat.ClientConfig{})
+		sc, err := NewSyncClient(nil, pipeline, beat.ClientConfig{})
 		if !assert.NoError(t, err) {
 			return
 		}
@@ -85,7 +85,7 @@ func TestSyncClient(t *testing.T) {
 		c := newDummyClient()
 
 		pipeline := newDummyPipeline(c)
-		sc, err := NewSyncClient(pipeline, beat.ClientConfig{})
+		sc, err := NewSyncClient(nil, pipeline, beat.ClientConfig{})
 		if !assert.NoError(t, err) {
 			return
 		}
@@ -104,7 +104,7 @@ func TestSyncClient(t *testing.T) {
 		c := newDummyClient()
 
 		pipeline := newDummyPipeline(c)
-		sc, err := NewSyncClient(pipeline, beat.ClientConfig{})
+		sc, err := NewSyncClient(nil, pipeline, beat.ClientConfig{})
 		if !assert.NoError(t, err) {
 			return
 		}
@@ -133,7 +133,7 @@ func TestCallbacksPropagation(t *testing.T) {
 		c := newDummyClient()
 
 		pipeline := newDummyPipeline(c)
-		sc, err := NewSyncClient(pipeline, config)
+		sc, err := NewSyncClient(nil, pipeline, config)
 		if !assert.NoError(t, err) {
 			return
 		}
