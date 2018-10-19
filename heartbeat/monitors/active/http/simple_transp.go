@@ -85,7 +85,6 @@ func (t *SimpleTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
 
 	requestedGzip := false
 	if t.DisableCompression &&
@@ -147,6 +146,22 @@ func (t *SimpleTransport) writeRequest(conn net.Conn, req *http.Request) error {
 	return err
 }
 
+// comboConnReadCloser wraps a ReadCloser that is backed by
+// on a net.Conn. It will close the net.Conn when the ReadCloser is closed.
+type comboConnReadCloser struct {
+	conn net.Conn
+	rc   io.ReadCloser
+}
+
+func (c comboConnReadCloser) Read(p []byte) (n int, err error) {
+	return c.rc.Read(p)
+}
+
+func (c comboConnReadCloser) Close() error {
+	defer c.conn.Close()
+	return c.rc.Close()
+}
+
 func (t *SimpleTransport) readResponse(
 	conn net.Conn,
 	req *http.Request,
@@ -154,6 +169,7 @@ func (t *SimpleTransport) readResponse(
 ) (*http.Response, error) {
 	reader := bufio.NewReader(conn)
 	resp, err := http.ReadResponse(reader, req)
+	resp.Body = comboConnReadCloser{conn, resp.Body}
 	if err != nil {
 		return nil, err
 	}
