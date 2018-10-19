@@ -211,7 +211,7 @@ func TestDownStatuses(t *testing.T) {
 }
 
 func TestLargeResponse(t *testing.T) {
-	server := httptest.NewServer(hbtest.LargeResponseHandler(1024 * 1024))
+	server := httptest.NewServer(hbtest.SizedResponseHandler(1024 * 1024))
 	defer server.Close()
 
 	configSrc := map[string]interface{}{
