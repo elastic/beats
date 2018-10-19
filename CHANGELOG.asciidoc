@@ -29,6 +29,8 @@ https://github.com/elastic/beats/compare/v6.4.1...6.4[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix race condition when publishing monitoring data. {pull}8646[8646]
+
 *Auditbeat*
 
 *Filebeat*
