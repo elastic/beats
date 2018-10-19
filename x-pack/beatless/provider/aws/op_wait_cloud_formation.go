@@ -36,7 +36,7 @@ func newOpWaitCloudFormation(
 }
 
 func (o *opCloudWaitCloudFormation) Execute() error {
-	o.log.Debug("waiting for cloudformation confirmation")
+	o.log.Debug("Waiting for cloudformation confirmation")
 	status, reason, err := queryStackStatus(o.svc, o.stackName)
 
 	for strings.Index(string(*status), "FAILED") == -1 && *status != cloudformation.StackStatusUpdateComplete && *status != cloudformation.StackStatusCreateComplete && err == nil {
@@ -48,7 +48,7 @@ func (o *opCloudWaitCloudFormation) Execute() error {
 
 	// Multiple status, setup a catch all for all errors.
 	if strings.Index(string(*status), "FAILED") != -1 {
-		return fmt.Errorf("could not create the stack, status: %s, reason: %s", *status, reason)
+		return fmt.Errorf("Could not create the stack, status: %s, reason: %s", *status, reason)
 	}
 
 	if err != nil {

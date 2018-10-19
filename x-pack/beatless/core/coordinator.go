@@ -35,15 +35,15 @@ func NewCoordinator(log *logp.Logger,
 	if log == nil {
 		log = logp.NewLogger("")
 	}
-	log = log.Named("coordinator")
+	log = log.Named("Coordinator")
 	return &Coordinator{log: log, runners: runners}
 }
 
 // Run starts each functions into an independent goroutine and wait until all the goroutine are
 // stopped to exit.
 func (r *Coordinator) Run(ctx context.Context) error {
-	r.log.Debug("coordinator started")
-	defer r.log.Debug("coordinator stopped")
+	r.log.Debug("Coordinator started")
+	defer r.log.Debug("Coordinator stopped")
 
 	// When an errors happen in a function and its not handled by the running function, we log an error
 	// and we trigger a shutdown of all the others goroutine.
@@ -53,7 +53,7 @@ func (r *Coordinator) Run(ctx context.Context) error {
 	results := make(chan error)
 	defer close(results)
 
-	r.log.Debugf("starting %d functions", len(r.runners))
+	r.log.Debugf("Starting %d functions", len(r.runners))
 	for _, rfn := range r.runners {
 		go func(ctx context.Context, rfn Runner) {
 			var err error
@@ -81,13 +81,13 @@ func (r *Coordinator) runFunc(
 	ctx context.Context,
 	rfn Runner,
 ) error {
-	r.log.Infof("starting function: %s", rfn.String())
-	defer r.log.Infof("function stopped: %s", rfn.String())
+	r.log.Infof("Starting function: %s", rfn.String())
+	defer r.log.Infof("Function stopped: %s", rfn.String())
 
 	err := rfn.Run(ctx)
 	if err != nil {
-		r.log.Error(
-			"nonrecoverable error when executing the function: '%s', error: '%+v', terminating all the functions",
+		r.log.Errorf(
+			"Nonrecoverable error when executing the function: '%s', error: '%+v', terminating all the functions",
 			rfn,
 			err,
 		)

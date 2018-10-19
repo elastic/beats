@@ -50,7 +50,7 @@ func (o *opCreateCloudFormation) Execute() error {
 	req := o.svc.CreateStackRequest(input)
 	resp, err := req.Send()
 	if err != nil {
-		o.log.Debugf("could not create the cloud formation stack request, resp: %v", resp)
+		o.log.Debugf("Could not create the cloud formation stack request, resp: %v", resp)
 		return err
 	}
 	return nil

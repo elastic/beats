@@ -49,7 +49,7 @@ type Beatless struct {
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	c := &config.DefaultConfig
 	if err := cfg.Unpack(c); err != nil {
-		return nil, fmt.Errorf("xerror reading config file: %+v", err)
+		return nil, fmt.Errorf("error reading config file: %+v", err)
 	}
 
 	provider, err := provider.NewProvider(c)
@@ -71,8 +71,8 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 // Run starts beatless.
 func (bt *Beatless) Run(b *beat.Beat) error {
 	defer bt.cancel()
-	bt.log.Info("beatless is running")
-	defer bt.log.Info("beatless stopped running")
+	bt.log.Info("Beatless is running")
+	defer bt.log.Info("Beatless stopped running")
 
 	manager, err := licenser.Create(&b.Config.Output, refreshDelay, graceDelay)
 	if err != nil {
@@ -89,7 +89,7 @@ func (bt *Beatless) Run(b *beat.Beat) error {
 	clientFactory := makeClientFactory(bt.log, manager, b.Publisher)
 
 	enabledFunctions := bt.enabledFunctions()
-	bt.log.Infof("enabled functions: %s", strings.Join(enabledFunctions, ", "))
+	bt.log.Infof("Enabled functions: %s", strings.Join(enabledFunctions, ", "))
 	// Create a client per function and wrap them into a runnable function by the coordinator.
 	functions, err := bt.Provider.CreateFunctions(clientFactory, enabledFunctions)
 	if err != nil {
@@ -118,8 +118,8 @@ func (bt *Beatless) enabledFunctions() (values []string) {
 
 // Stop stops beatless.
 func (bt *Beatless) Stop() {
-	bt.log.Info("beatless is stopping")
-	defer bt.log.Info("beatless is stopped")
+	bt.log.Info("Beatless is stopping")
+	defer bt.log.Info("Beatless is stopped")
 	bt.cancel()
 }
 

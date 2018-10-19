@@ -36,7 +36,7 @@ func (o *opUpdateCloudFormation) Execute() error {
 	req := o.svc.UpdateStackRequest(input)
 	resp, err := req.Send()
 	if err != nil {
-		o.log.Debug("could not update the cloudformation stack, resp: %s", resp)
+		o.log.Debug("Could not update the cloudformation stack, resp: %s", resp)
 		return err
 	}
 	return nil

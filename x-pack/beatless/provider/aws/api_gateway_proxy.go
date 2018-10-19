@@ -45,7 +45,7 @@ func (a *APIGatewayProxy) createHandler(
 	client core.Client,
 ) func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	return func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-		a.log.Debugf("received event (requestID: %s)", request.RequestContext.RequestID)
+		a.log.Debugf("Received event (requestID: %s)", request.RequestContext.RequestID)
 		event := transformer.APIGatewayProxyRequest(request)
 		if err := client.Publish(event); err != nil {
 			a.log.Errorf("could not publish event to the pipeline, error: %+v", err)

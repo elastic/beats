@@ -43,8 +43,8 @@ func newCLIHandler(cli provider.CLIManager, errOutput io.Writer, output io.Write
 }
 
 func (c *cliHandler) Deploy(names []string) error {
-	c.log.Debugf("starting deploy for: %s", strings.Join(names, ", "))
-	defer c.log.Debug("deploy execution ended")
+	c.log.Debugf("Starting deploy for: %s", strings.Join(names, ", "))
+	defer c.log.Debug("Deploy execution ended")
 
 	if len(names) == 0 {
 		return errNoFunctionGiven
@@ -53,22 +53,22 @@ func (c *cliHandler) Deploy(names []string) error {
 	errCount := 0
 	for _, name := range names {
 		if err := c.cli.Deploy(name); err != nil {
-			fmt.Fprintf(c.errOutput, "function: %s, could not deploy, error: %s\n", name, err)
+			fmt.Fprintf(c.errOutput, "Function: %s, could not deploy, error: %s\n", name, err)
 			errCount++
 			continue
 		}
-		fmt.Fprintf(c.output, "function: %s, deploy successful\n", name)
+		fmt.Fprintf(c.output, "Function: %s, deploy successful\n", name)
 	}
 
 	if errCount > 0 {
-		return fmt.Errorf("fail to deploy %d function(s)", errCount)
+		return fmt.Errorf("Fail to deploy %d function(s)", errCount)
 	}
 	return nil
 }
 
 func (c *cliHandler) Update(names []string) error {
-	c.log.Debugf("starting update for: %s", strings.Join(names, ", "))
-	defer c.log.Debug("update execution ended")
+	c.log.Debugf("Starting update for: %s", strings.Join(names, ", "))
+	defer c.log.Debug("Update execution ended")
 
 	if len(names) == 0 {
 		return errNoFunctionGiven
@@ -77,11 +77,11 @@ func (c *cliHandler) Update(names []string) error {
 	errCount := 0
 	for _, name := range names {
 		if err := c.cli.Update(name); err != nil {
-			fmt.Fprintf(c.errOutput, "function: %s, could not update, error: %s\n", name, err)
+			fmt.Fprintf(c.errOutput, "Function: %s, could not update, error: %s\n", name, err)
 			errCount++
 			continue
 		}
-		fmt.Fprintf(c.output, "function: %s, update successful\n", name)
+		fmt.Fprintf(c.output, "Function: %s, update successful\n", name)
 	}
 
 	if errCount > 0 {
@@ -91,8 +91,8 @@ func (c *cliHandler) Update(names []string) error {
 }
 
 func (c *cliHandler) Remove(names []string) error {
-	c.log.Debugf("starting remove for: %s", strings.Join(names, ", "))
-	defer c.log.Debug("remove execution ended")
+	c.log.Debugf("Starting remove for: %s", strings.Join(names, ", "))
+	defer c.log.Debug("Remove execution ended")
 
 	if len(names) == 0 {
 		return errNoFunctionGiven
@@ -101,11 +101,11 @@ func (c *cliHandler) Remove(names []string) error {
 	errCount := 0
 	for _, name := range names {
 		if err := c.cli.Remove(name); err != nil {
-			fmt.Fprintf(c.errOutput, "function: %s, could not remove, error: %s\n", name, err)
+			fmt.Fprintf(c.errOutput, "Function: %s, could not remove, error: %s\n", name, err)
 			errCount++
 			continue
 		}
-		fmt.Fprintf(c.output, "function: %s, remove successful\n", name)
+		fmt.Fprintf(c.output, "Function: %s, remove successful\n", name)
 	}
 
 	if errCount > 0 {
@@ -126,6 +126,6 @@ func (c *cliHandler) BuildPackage(output string) error {
 		return err
 	}
 
-	fmt.Fprintf(c.output, "Generated pacakge at: %s\n", output)
+	fmt.Fprintf(c.output, "Generated package at: %s\n", output)
 	return nil
 }

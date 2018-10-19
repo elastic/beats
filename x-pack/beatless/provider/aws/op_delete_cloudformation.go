@@ -31,7 +31,7 @@ func (o *opDeleteCloudFormation) Execute() error {
 	req := o.svc.DeleteStackRequest(input)
 	resp, err := req.Send()
 	if err != nil {
-		o.log.Debugf("could not delete the stack, response: %v", resp)
+		o.log.Debugf("Could not delete the stack, response: %v", resp)
 		return err
 	}
 	return nil

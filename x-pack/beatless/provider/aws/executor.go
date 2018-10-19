@@ -33,14 +33,15 @@ type undoer interface {
 
 func newExecutor(log *logp.Logger) *executor {
 	if log == nil {
-		log = logp.NewLogger("executor")
+		log = logp.NewLogger("")
 	}
 
+	log = log.Named("executor")
 	return &executor{log: log}
 }
 
 func (e *executor) Execute() (err error) {
-	e.log.Debugf("executing %d operations", len(e.operations))
+	e.log.Debugf("Executing %d operations", len(e.operations))
 	if e.IsCompleted() {
 		return errAlreadyExecuted
 	}
@@ -55,14 +56,14 @@ func (e *executor) Execute() (err error) {
 		}
 	}
 	if err == nil {
-		e.log.Debug("all operations have been successful")
+		e.log.Debug("All operations have been successful")
 	}
 	e.markCompleted()
 	return err
 }
 
 func (e *executor) Rollback() (err error) {
-	e.log.Debugf("rolling back previous execution, %d operations", len(e.undos))
+	e.log.Debugf("Rolling back previous execution, %d operations", len(e.undos))
 	if !e.IsCompleted() {
 		return errNeverRun
 	}
@@ -75,9 +76,9 @@ func (e *executor) Rollback() (err error) {
 	}
 
 	if err == nil {
-		e.log.Debug("rollback successful")
+		e.log.Debug("Rollback successful")
 	} else {
-		e.log.Debug("rollback incomplete")
+		e.log.Debug("Rollback incomplete")
 	}
 	return err
 }

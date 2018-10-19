@@ -37,7 +37,7 @@ func newOpUploadToBucket(
 }
 
 func (o *opUploadToBucket) Execute() error {
-	o.log.Debugf("uploading file '%s' to bucket '%s' with size %d bytes", o.path, o.bucketName, len(o.raw))
+	o.log.Debugf("Uploading file '%s' to bucket '%s' with size %d bytes", o.path, o.bucketName, len(o.raw))
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(o.bucketName),
 		Body:   bytes.NewReader(o.raw),
@@ -47,9 +47,9 @@ func (o *opUploadToBucket) Execute() error {
 	resp, err := req.Send()
 
 	if err != nil {
-		o.log.Debugf("could not upload object to S3, resp: %v", resp)
+		o.log.Debugf("Could not upload object to S3, resp: %v", resp)
 		return err
 	}
-	o.log.Debug("upload successful")
+	o.log.Debug("Upload successful")
 	return nil
 }

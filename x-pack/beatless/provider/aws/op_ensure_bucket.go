@@ -22,7 +22,7 @@ func newOpEnsureBucket(log *logp.Logger, cfg aws.Config, bucketName string) *opE
 }
 
 func (o *opEnsureBucket) Execute() error {
-	o.log.Debugf("creating bucket: %s", o.bucketName)
+	o.log.Debugf("Creating bucket: %s", o.bucketName)
 
 	check := &s3.HeadBucketInput{Bucket: aws.String(o.bucketName)}
 	reqCheck := o.svc.HeadBucketRequest(check)
@@ -33,7 +33,7 @@ func (o *opEnsureBucket) Execute() error {
 		req := o.svc.CreateBucketRequest(input)
 		resp, err := req.Send()
 		if err != nil {
-			o.log.Debugf("could not create bucket, resp: %v", resp)
+			o.log.Debugf("Could not create bucket, resp: %v", resp)
 			return err
 		}
 	}
