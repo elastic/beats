@@ -19,69 +19,75 @@ package reader
 
 import "github.com/coreos/go-systemd/sdjournal"
 
+type fieldConversion struct {
+	name      string
+	isInteger bool
+	dropped   bool
+}
+
 var (
-	journaldEventFields = map[string]string{
+	journaldEventFields = map[string]fieldConversion{
 		// provided by systemd journal
-		"COREDUMP_UNIT":                              "journald.coredump.unit",
-		"COREDUMP_USER_UNIT":                         "journald.coredump.user_unit",
-		"OBJECT_AUDIT_LOGINUID":                      "journald.object.audit.login_uid",
-		"OBJECT_AUDIT_SESSION":                       "journald.object.audit.session",
-		"OBJECT_CMDLINE":                             "journald.object.cmd",
-		"OBJECT_COMM":                                "journald.object.name",
-		"OBJECT_EXE":                                 "journald.object.executable",
-		"OBJECT_GID":                                 "journald.object.gid",
-		"OBJECT_PID":                                 "journald.object.pid",
-		"OBJECT_SYSTEMD_OWNER_UID":                   "journald.object.systemd.owner_uid",
-		"OBJECT_SYSTEMD_SESSION":                     "journald.object.systemd.session",
-		"OBJECT_SYSTEMD_UNIT":                        "journald.object.systemd.unit",
-		"OBJECT_SYSTEMD_USER_UNIT":                   "journald.object.systemd.user_unit",
-		"OBJECT_UID":                                 "journald.object.uid",
-		"_KERNEL_DEVICE":                             "journald.kernel.device",
-		"_KERNEL_SUBSYSTEM":                          "journald.kernel.subsystem",
-		"_SYSTEMD_INVOCATION_ID":                     "systemd.invocation_id",
-		"_SYSTEMD_USER_SLICE":                        "systemd.user_slice",
-		"_UDEV_DEVLINK":                              "journald.kernel.device_symlinks", // TODO aggregate multiple elements
-		"_UDEV_DEVNODE":                              "journald.kernel.device_node_path",
-		"_UDEV_SYSNAME":                              "journald.kernel.device_name",
-		sdjournal.SD_JOURNAL_FIELD_AUDIT_LOGINUID:    "process.audit.login_uid",
-		sdjournal.SD_JOURNAL_FIELD_AUDIT_SESSION:     "process.audit.session",
-		sdjournal.SD_JOURNAL_FIELD_BOOT_ID:           "host.boot_id",
-		sdjournal.SD_JOURNAL_FIELD_CAP_EFFECTIVE:     "process.capabilites",
-		sdjournal.SD_JOURNAL_FIELD_CMDLINE:           "process.cmd",
-		sdjournal.SD_JOURNAL_FIELD_CODE_FILE:         "journald.code.file",
-		sdjournal.SD_JOURNAL_FIELD_CODE_FUNC:         "journald.code.func",
-		sdjournal.SD_JOURNAL_FIELD_CODE_LINE:         "journald.code.line",
-		sdjournal.SD_JOURNAL_FIELD_COMM:              "process.name",
-		sdjournal.SD_JOURNAL_FIELD_EXE:               "process.executable",
-		sdjournal.SD_JOURNAL_FIELD_GID:               "process.uid",
-		sdjournal.SD_JOURNAL_FIELD_HOSTNAME:          "host.name",
-		sdjournal.SD_JOURNAL_FIELD_MACHINE_ID:        "host.id",
-		sdjournal.SD_JOURNAL_FIELD_MESSAGE:           "message",
-		sdjournal.SD_JOURNAL_FIELD_PID:               "process.pid",
-		sdjournal.SD_JOURNAL_FIELD_PRIORITY:          "syslog.priority",
-		sdjournal.SD_JOURNAL_FIELD_SYSLOG_FACILITY:   "syslog.facility",
-		sdjournal.SD_JOURNAL_FIELD_SYSLOG_IDENTIFIER: "syslog.identifier",
-		sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID:        "syslog.pid",
-		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_CGROUP:    "systemd.cgroup",
-		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_OWNER_UID: "systemd.owner_uid",
-		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_SESSION:   "systemd.session",
-		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_SLICE:     "systemd.slice",
-		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_UNIT:      "systemd.unit",
-		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_USER_UNIT: "systemd.user_unit",
-		sdjournal.SD_JOURNAL_FIELD_TRANSPORT:         "systemd.transport",
-		sdjournal.SD_JOURNAL_FIELD_UID:               "process.uid",
+		"COREDUMP_UNIT":                              fieldConversion{"journald.coredump.unit", false, false},
+		"COREDUMP_USER_UNIT":                         fieldConversion{"journald.coredump.user_unit", false, false},
+		"OBJECT_AUDIT_LOGINUID":                      fieldConversion{"journald.object.audit.login_uid", true, false},
+		"OBJECT_AUDIT_SESSION":                       fieldConversion{"journald.object.audit.session", true, false},
+		"OBJECT_CMDLINE":                             fieldConversion{"journald.object.cmd", false, false},
+		"OBJECT_COMM":                                fieldConversion{"journald.object.name", false, false},
+		"OBJECT_EXE":                                 fieldConversion{"journald.object.executable", false, false},
+		"OBJECT_GID":                                 fieldConversion{"journald.object.gid", true, false},
+		"OBJECT_PID":                                 fieldConversion{"journald.object.pid", true, false},
+		"OBJECT_SYSTEMD_OWNER_UID":                   fieldConversion{"journald.object.systemd.owner_uid", true, false},
+		"OBJECT_SYSTEMD_SESSION":                     fieldConversion{"journald.object.systemd.session", false, false},
+		"OBJECT_SYSTEMD_UNIT":                        fieldConversion{"journald.object.systemd.unit", false, false},
+		"OBJECT_SYSTEMD_USER_UNIT":                   fieldConversion{"journald.object.systemd.user_unit", false, false},
+		"OBJECT_UID":                                 fieldConversion{"journald.object.uid", true, false},
+		"_KERNEL_DEVICE":                             fieldConversion{"journald.kernel.device", false, false},
+		"_KERNEL_SUBSYSTEM":                          fieldConversion{"journald.kernel.subsystem", false, false},
+		"_SYSTEMD_INVOCATION_ID":                     fieldConversion{"systemd.invocation_id", false, false},
+		"_SYSTEMD_USER_SLICE":                        fieldConversion{"systemd.user_slice", false, false},
+		"_UDEV_DEVLINK":                              fieldConversion{"journald.kernel.device_symlinks", false, false}, // TODO aggregate multiple elements
+		"_UDEV_DEVNODE":                              fieldConversion{"journald.kernel.device_node_path", false, false},
+		"_UDEV_SYSNAME":                              fieldConversion{"journald.kernel.device_name", false, false},
+		sdjournal.SD_JOURNAL_FIELD_AUDIT_LOGINUID:    fieldConversion{"process.audit.login_uid", true, false},
+		sdjournal.SD_JOURNAL_FIELD_AUDIT_SESSION:     fieldConversion{"process.audit.session", false, false},
+		sdjournal.SD_JOURNAL_FIELD_BOOT_ID:           fieldConversion{"host.boot_id", false, false},
+		sdjournal.SD_JOURNAL_FIELD_CAP_EFFECTIVE:     fieldConversion{"process.capabilites", false, false},
+		sdjournal.SD_JOURNAL_FIELD_CMDLINE:           fieldConversion{"process.cmd", false, false},
+		sdjournal.SD_JOURNAL_FIELD_CODE_FILE:         fieldConversion{"journald.code.file", false, false},
+		sdjournal.SD_JOURNAL_FIELD_CODE_FUNC:         fieldConversion{"journald.code.func", false, false},
+		sdjournal.SD_JOURNAL_FIELD_CODE_LINE:         fieldConversion{"journald.code.line", true, false},
+		sdjournal.SD_JOURNAL_FIELD_COMM:              fieldConversion{"process.name", false, false},
+		sdjournal.SD_JOURNAL_FIELD_EXE:               fieldConversion{"process.executable", false, false},
+		sdjournal.SD_JOURNAL_FIELD_GID:               fieldConversion{"process.uid", true, false},
+		sdjournal.SD_JOURNAL_FIELD_HOSTNAME:          fieldConversion{"host.name", false, false},
+		sdjournal.SD_JOURNAL_FIELD_MACHINE_ID:        fieldConversion{"host.id", false, false},
+		sdjournal.SD_JOURNAL_FIELD_MESSAGE:           fieldConversion{"message", false, false},
+		sdjournal.SD_JOURNAL_FIELD_PID:               fieldConversion{"process.pid", true, false},
+		sdjournal.SD_JOURNAL_FIELD_PRIORITY:          fieldConversion{"syslog.priority", true, false},
+		sdjournal.SD_JOURNAL_FIELD_SYSLOG_FACILITY:   fieldConversion{"syslog.facility", true, false},
+		sdjournal.SD_JOURNAL_FIELD_SYSLOG_IDENTIFIER: fieldConversion{"syslog.identifier", false, false},
+		sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID:        fieldConversion{"syslog.pid", true, false},
+		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_CGROUP:    fieldConversion{"systemd.cgroup", false, false},
+		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_OWNER_UID: fieldConversion{"systemd.owner_uid", true, false},
+		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_SESSION:   fieldConversion{"systemd.session", false, false},
+		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_SLICE:     fieldConversion{"systemd.slice", false, false},
+		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_UNIT:      fieldConversion{"systemd.unit", false, false},
+		sdjournal.SD_JOURNAL_FIELD_SYSTEMD_USER_UNIT: fieldConversion{"systemd.user_unit", false, false},
+		sdjournal.SD_JOURNAL_FIELD_TRANSPORT:         fieldConversion{"systemd.transport", false, false},
+		sdjournal.SD_JOURNAL_FIELD_UID:               fieldConversion{"process.uid", true, false},
 
 		// docker journald fields from: https://docs.docker.com/config/containers/logging/journald/
-		"CONTAINER_ID":              "conatiner.id_truncated",
-		"CONTAINER_ID_FULL":         "container.id",
-		"CONTAINER_NAME":            "container.name",
-		"CONTAINER_TAG":             "container.image.tag",
-		"CONTAINER_PARTIAL_MESSAGE": "container.partial",
+		"CONTAINER_ID":              fieldConversion{"conatiner.id_truncated", false, false},
+		"CONTAINER_ID_FULL":         fieldConversion{"container.id", false, false},
+		"CONTAINER_NAME":            fieldConversion{"container.name", false, false},
+		"CONTAINER_TAG":             fieldConversion{"container.image.tag", false, false},
+		"CONTAINER_PARTIAL_MESSAGE": fieldConversion{"container.partial", false, false},
 
 		// dropped fields
-		sdjournal.SD_JOURNAL_FIELD_MONOTONIC_TIMESTAMP:       "", // saved in the registry
-		sdjournal.SD_JOURNAL_FIELD_SOURCE_REALTIME_TIMESTAMP: "", // saved in the registry
-		sdjournal.SD_JOURNAL_FIELD_CURSOR:                    "", // saved in the registry
-		"_SOURCE_MONOTONIC_TIMESTAMP":                        "", // received timestamp stored in @timestamp
+		sdjournal.SD_JOURNAL_FIELD_MONOTONIC_TIMESTAMP:       fieldConversion{"", false, true}, // saved in the registry
+		sdjournal.SD_JOURNAL_FIELD_SOURCE_REALTIME_TIMESTAMP: fieldConversion{"", false, true}, // saved in the registry
+		sdjournal.SD_JOURNAL_FIELD_CURSOR:                    fieldConversion{"", false, true}, // saved in the registry
+		"_SOURCE_MONOTONIC_TIMESTAMP":                        fieldConversion{"", false, true}, // received timestamp stored in @timestamp
 	}
 )
