@@ -20,6 +20,7 @@ package add_host_metadata
 import (
 	"fmt"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/joeshaw/multierror"
@@ -40,9 +41,12 @@ func init() {
 
 type addHostMetadata struct {
 	info       types.HostInfo
-	lastUpdate time.Time
-	data       common.MapStrPointer
-	config     Config
+	lastUpdate struct {
+		time.Time
+		sync.Mutex
+	}
+	data   common.MapStrPointer
+	config Config
 }
 
 const (
@@ -75,9 +79,19 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *addHostMetadata) loadData() {
-	// Check if cache is expired
+func (p *addHostMetadata) expired() bool {
+	p.lastUpdate.Lock()
+	defer p.lastUpdate.Unlock()
+
 	if p.lastUpdate.Add(cacheExpiration).After(time.Now()) {
+		return false
+	}
+	p.lastUpdate.Time = time.Now()
+	return true
+}
+
+func (p *addHostMetadata) loadData() {
+	if !p.expired() {
 		return
 	}
 
@@ -98,7 +112,6 @@ func (p *addHostMetadata) loadData() {
 	}
 
 	p.data.Set(data)
-	p.lastUpdate = time.Now()
 }
 
 func (p addHostMetadata) getNetInfo() ([]string, []string, error) {
