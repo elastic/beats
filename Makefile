@@ -18,6 +18,8 @@ REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 .PHONY: testsuite
 testsuite:
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
+	@# TODO: injecting x-pack tests. Make this nice.
+	$(MAKE) -C x-pack/filebeat -e INTEGRATION_TESTS=1 MODULES_PATH=$(PWD)/x-pack/filebeat/module system-tests
 
 .PHONY: setup-commit-hook
 setup-commit-hook:
