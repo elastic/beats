@@ -702,7 +702,7 @@
                                 "fill": 0.5, 
                                 "formatter": "number", 
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
-                                "label": "Number of Topics", 
+                                "label": "Topics", 
                                 "line_width": 1, 
                                 "metrics": [
                                     {
@@ -731,7 +731,7 @@
                                 "filter": "kafka.partition.partition.is_leader: true", 
                                 "formatter": "number", 
                                 "id": "b38e91a0-d2ec-11e8-88c8-af5b2a9ee6b2", 
-                                "label": "Number of Leader Partitions", 
+                                "label": "Leader Partitions", 
                                 "line_width": 1, 
                                 "metrics": [
                                     {
@@ -758,7 +758,7 @@
                                 "filter": "", 
                                 "formatter": "number", 
                                 "id": "cf09c940-d2ec-11e8-88c8-af5b2a9ee6b2", 
-                                "label": "Number of Replicas", 
+                                "label": "Replicas", 
                                 "line_width": 1, 
                                 "metrics": [
                                     {
@@ -833,7 +833,7 @@
                                 "filter": " metricset.name: partition", 
                                 "formatter": "number", 
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
-                                "label": "Number of Brokers", 
+                                "label": "Brokers", 
                                 "line_width": 1, 
                                 "metrics": [
                                     {
@@ -860,7 +860,7 @@
                                 "filter": " metricset.name: partition", 
                                 "formatter": "number", 
                                 "id": "7d640440-d2f4-11e8-9dd4-c5f03280d7b0", 
-                                "label": "Number of Partitions", 
+                                "label": "Partitions", 
                                 "line_width": 1, 
                                 "metrics": [
                                     {
@@ -887,7 +887,7 @@
                                 "filter": " metricset.name: partition", 
                                 "formatter": "number", 
                                 "id": "ad26e260-d2f4-11e8-9dd4-c5f03280d7b0", 
-                                "label": "Number of Replicas", 
+                                "label": "Replicas", 
                                 "line_width": 1, 
                                 "metrics": [
                                     {
@@ -914,7 +914,7 @@
                                 "filter": " metricset.name: consumergroup", 
                                 "formatter": "number", 
                                 "id": "26d2cd90-d2f5-11e8-9dd4-c5f03280d7b0", 
-                                "label": "Number of Consumers", 
+                                "label": "Consumers", 
                                 "line_width": 1, 
                                 "metrics": [
                                     {
