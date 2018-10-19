@@ -58,6 +58,8 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
+	mage.MustUsePackaging("beatless", "x-pack/beatless/dev-tools/packaging/packages.yml")
+
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
