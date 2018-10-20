@@ -106,6 +106,11 @@ ${BEAT_NAME}.test: $(GOFILES_ALL)
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
 crosscompile: $(GOFILES)
+	# If CGO is enabled when cross-compiling, it is possible that each platform requires a different compiler.
+	# Right now github.com/mitchell/gox only supports setting one global C cross-compiler for every platform.
+	# My fork includes a flag which cat set different C compilers.
+	# After my PR gets merged or the functionality becomes available in the original tool, we are switching back.
+	# My PR: https://github.com/mitchellh/gox/pull/116
 	go get github.com/kvch/gox
 	mkdir -p ${BUILD_DIR}/bin
 	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
