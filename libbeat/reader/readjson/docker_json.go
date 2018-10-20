@@ -37,6 +37,9 @@ type DockerJSONReader struct {
 	// join partial lines
 	partial bool
 
+	// Force log format: json-file | cri
+	forceCRI bool
+
 	// parse CRI flags
 	criflags bool
 }
@@ -50,11 +53,12 @@ type logLine struct {
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool, CRIFlags bool) *DockerJSONReader {
+func New(r reader.Reader, stream string, partial bool, forceCRI bool, CRIFlags bool) *DockerJSONReader {
 	return &DockerJSONReader{
 		stream:   stream,
 		partial:  partial,
 		reader:   r,
+		forceCRI: forceCRI,
 		criflags: CRIFlags,
 	}
 }
@@ -105,13 +109,10 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	message.AddFields(common.MapStr{
 		"stream": msg.Stream,
 	})
-	// Remove ending \n for partial messages
+	// Remove \n ending for partial messages
 	message.Content = log[i]
 	if partial {
-		l := len(message.Content)
-		if l > 0 && message.Content[l] == '\n' || message.Content[l] == '\r' {
-			message.Content = message.Content[:l-1]
-		}
+		stripNewLine(message)
 	}
 
 	return nil
@@ -144,7 +145,12 @@ func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *logL
 }
 
 func (p *DockerJSONReader) parseLine(message *reader.Message, msg *logLine) error {
-	if !p.criflags || len(message.Content) > 0 && message.Content[0] == '{' {
+	if p.forceCRI {
+		return p.parseCRILog(message, msg)
+	}
+
+	// If froceCRI isn't set, autodetect file type
+	if len(message.Content) > 0 && message.Content[0] == '{' {
 		return p.parseDockerJSONLog(message, msg)
 	}
 
