@@ -113,7 +113,7 @@
                             {
                                 "color": "rgba(255,0,6,1)", 
                                 "id": "1ec0dde0-471d-11e8-9876-09cc6c85f5f2", 
-                                "opperator": "lte", 
+                                "operator": "lte", 
                                 "value": 0
                             }
                         ], 
@@ -127,14 +127,14 @@
                             {
                                 "gauge": "rgba(255,0,5,1)", 
                                 "id": "4ce156a0-471d-11e8-9876-09cc6c85f5f2", 
-                                "opperator": "lte", 
+                                "operator": "lte", 
                                 "text": null, 
                                 "value": 0
                             }, 
                             {
                                 "gauge": "rgba(255,196,0,1)", 
                                 "id": "f8458a80-4721-11e8-b854-2f6d2b452362", 
-                                "opperator": "lte", 
+                                "operator": "lte", 
                                 "value": 0.5
                             }
                         ], 
