@@ -24,7 +24,7 @@ import (
 
 func stripNewLine(msg *reader.Message) {
 	l := len(msg.Content)
-	if l > 0 && msg.Content[l] == '\n' {
+	if l > 0 && msg.Content[l-1] == '\n' {
 		msg.Content = msg.Content[:l-1]
 	}
 }
