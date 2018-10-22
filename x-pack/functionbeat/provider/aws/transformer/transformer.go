@@ -27,13 +27,13 @@ func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
 		events[idx] = beat.Event{
 			Timestamp: ts,
 			Fields: common.MapStr{
-				"message":              logEvent.Message,
-				"id":                   logEvent.ID,
-				"owner":                request.Owner,
-				"log_stream":           request.LogStream,
-				"log_group":            request.LogGroup,
-				"message_type":         request.MessageType,
-				"subscription_filters": request.SubscriptionFilters,
+				"functionbeat.aws.id":                             logEvent.ID,
+				"message":                                         logEvent.Message,
+				"functionbeat.cloudwatchlog.owner":                request.Owner,
+				"functionbeat.cloudwatch.log_stream":              request.LogStream,
+				"functionbeat.cloudwatch.log_group":               request.LogGroup,
+				"functionbeat.cloudwatchlog.message_type":         request.MessageType,
+				"functionbeat.cloudwatchlog.subscription_filters": request.SubscriptionFilters,
 			},
 		}
 	}
@@ -41,37 +41,40 @@ func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
 	return events
 }
 
-// APIGatewayProxyRequest takes a web request on the api gateway proxy and transform it into a beat event.
-func APIGatewayProxyRequest(request events.APIGatewayProxyRequest) beat.Event {
+// APIGatewayProxy takes a web request on the api gateway proxy and transform it into a beat event.
+func APIGatewayProxy(request events.APIGatewayProxyRequest) beat.Event {
 	return beat.Event{
 		Timestamp: time.Now(),
 		Fields: common.MapStr{
-			"resource":          request.Resource,
-			"path":              request.Path,
-			"method":            request.HTTPMethod,
-			"headers":           request.Headers,               // TODO: ECS map[string]
-			"query_string":      request.QueryStringParameters, // TODO: map[string], might conflict with ECS
-			"path_parameters":   request.PathParameters,
-			"body":              request.Body, // TODO: could be JSON, json processor? could be used by other functions.
-			"is_base64_encoded": request.IsBase64Encoded,
+			"functionbeat.aws.id":                            request.RequestContext.RequestID,
+			"functionbeat.api_gateway_proxy.resource":        request.Resource,
+			"functionbeat.api_gateway_proxy.path":            request.Path,
+			"functionbeat.api_gateway_proxy.method":          request.HTTPMethod,
+			"functionbeat.api_gateway_proxy.headers":         request.Headers,
+			"functionbeat.api_gateway_proxy.query_string":    request.QueryStringParameters,
+			"functionbeat.api_gateway_proxy.path_parameters": request.PathParameters,
+			"message":                         request.Body,
+			"function.beat.is_base64_encoded": request.IsBase64Encoded,
 		},
 	}
 }
 
-// KinesisEvent takes a kinesis event and create multiples beat events.
-func KinesisEvent(request events.KinesisEvent) []beat.Event {
+// Kinesis takes a kinesis event and create multiples beat events.
+func Kinesis(request events.KinesisEvent) []beat.Event {
 	events := make([]beat.Event, len(request.Records))
 	for idx, record := range request.Records {
 		events[idx] = beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
-				"event_id":         record.EventID,
-				"event_name":       record.EventName,
-				"event_source":     record.EventSource,
-				"event_source_arn": record.EventSourceArn,
-				"event_version":    record.EventVersion,
-				"aws_region":       record.AwsRegion,
-				// TODO: more meta data at KinesisRecord, need to check doc
+				"functionbeat.aws": common.MapStr{
+					"id":               record.EventID,
+					"event_name":       record.EventName,
+					"event_source":     record.EventSource,
+					"event_source_arn": record.EventSourceArn,
+					"region":           record.AwsRegion,
+				},
+				"message": record.Kinesis.Data,
+				"functionbeat.kinesis.event_version": record.EventVersion,
 			},
 		}
 	}
@@ -85,15 +88,16 @@ func SQS(request events.SQSEvent) []beat.Event {
 		events[idx] = beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
-				"message_id":       record.MessageId,
-				"receipt_handle":   record.ReceiptHandle,
-				"message":          record.Body,
-				"attributes":       record.Attributes,
-				"event_source":     record.EventSource,
-				"event_source_arn": record.EventSourceARN,
-				"aws_region":       record.AWSRegion,
+				"functionbeat.aws": common.MapStr{
+					"id":               record.MessageId,
+					"event_source":     record.EventSource,
+					"event_source_arn": record.EventSourceARN,
+					"region":           record.AWSRegion,
+				},
+				"functionbeat.sqs.receipt_handle": record.ReceiptHandle,
+				"functionbeat.sqs.attributes":     record.Attributes,
+				"message":                         record.Body,
 			},
-			// TODO: SQS message attributes missing, need to check doc
 		}
 	}
 	return events

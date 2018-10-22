@@ -1,4 +1,108 @@
 - key: functionbeat
-  title: Functionbeat
+  title: Functionbeat fields
   description:
   fields:
+    - name: functionbeat
+      type: group
+      description: >
+        Fields provided by Functionbeat.
+      fields:
+        # common AWS
+        - name: aws.event_id
+          type: keyword
+          description: >
+            Unique ID for the event.
+
+        - name: aws.event_name
+          type: keyword
+          description: >
+            Name of the event.
+
+        - name: aws.event_source
+          type: keyword
+          description: >
+            Source of the event.
+
+        - name: aws.event_source_arn
+          type: keyword
+          description: >
+            Amazon resource name for the source of the event.
+
+        - name: aws.region
+          type: keyword
+          description: >
+            Name of the region.
+
+        # Cloudwatchlog
+        - name: cloudwatchlog.owner
+          type: keyword
+          description: >
+            Owner of the log group.
+
+        - name: cloudwatchlog.log_stream
+          type: keyword
+          description: >
+            Log stream for this event.
+
+        - name: cloudwatchlog.log_group
+          type: keyword
+          description: >
+            Log group associated with this event.
+
+        - name: message_type
+          type: keyword
+          description: >
+            Identify the kind of message from cloudwatchlog.
+
+        - name: subscription_filters
+          type: keyword
+          description: >
+            List of the subscription filters associated with this log event.
+
+        # SQS
+        - name: sqs.receipt_handle
+          type: keyword
+          description: >
+            Receipt handle for the SQS event.
+
+        - name: sqs.attributes
+          type: object
+          description: >
+            Attributes for the SQS event.
+
+        # Kinesis
+        - name: kinesis.version
+          type: keyword
+          description: >
+            Version of the event.
+
+        # ApiGateway
+        - name: api_gateway_proxy.resource
+          type: keyword
+          description: >
+            The web resource accessed by the request.
+
+        - name: api_gateway_proxy.path
+          type: keyword
+          description: >
+            The path accessed by the request.
+
+        - name: api_gateway_proxy.method
+          type: keyword
+          description: >
+            The HTTP verb used to access the resource.
+
+        - name: api_gateway_proxy.headers
+          type: object
+          description: >
+            The headers send with the request.
+
+        - name: api_gateway_proxy.query_string
+          type: object
+          description: >
+            Headers received with the request.
+
+        - name: api_gateway_proxy.is_based64_encoded
+          type: bool
+          description: >
+            Flag to know if the request is base64 encoded.

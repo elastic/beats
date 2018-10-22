@@ -2030,9 +2030,207 @@ Minor version of the operating system.
 --
 
 [[exported-fields-functionbeat]]
-== Functionbeat fields
+== Functionbeat fields fields
 
 None
+
+
+[float]
+== functionbeat fields
+
+Fields provided by Functionbeat.
+
+
+
+*`functionbeat.aws.event_id`*::
++
+--
+type: keyword
+
+Unique ID for the event.
+
+
+--
+
+*`functionbeat.aws.event_name`*::
++
+--
+type: keyword
+
+Name of the event.
+
+
+--
+
+*`functionbeat.aws.event_source`*::
++
+--
+type: keyword
+
+Source of the event.
+
+
+--
+
+*`functionbeat.aws.event_source_arn`*::
++
+--
+type: keyword
+
+Amazon resource name for the source of the event.
+
+
+--
+
+*`functionbeat.aws.region`*::
++
+--
+type: keyword
+
+Name of the region.
+
+
+--
+
+*`functionbeat.cloudwatchlog.owner`*::
++
+--
+type: keyword
+
+Owner of the log group.
+
+
+--
+
+*`functionbeat.cloudwatchlog.log_stream`*::
++
+--
+type: keyword
+
+Log stream for this event.
+
+
+--
+
+*`functionbeat.cloudwatchlog.log_group`*::
++
+--
+type: keyword
+
+Log group associated with this event.
+
+
+--
+
+*`functionbeat.message_type`*::
++
+--
+type: keyword
+
+Identify the kind of message from cloudwatchlog.
+
+
+--
+
+*`functionbeat.subscription_filters`*::
++
+--
+type: keyword
+
+List of the subscription filters associated with this log event.
+
+
+--
+
+*`functionbeat.sqs.receipt_handle`*::
++
+--
+type: keyword
+
+Receipt handle for the SQS event.
+
+
+--
+
+*`functionbeat.sqs.attributes`*::
++
+--
+type: object
+
+Attributes for the SQS event.
+
+
+--
+
+*`functionbeat.kinesis.version`*::
++
+--
+type: keyword
+
+Version of the event.
+
+
+--
+
+*`functionbeat.api_gateway_proxy.resource`*::
++
+--
+type: keyword
+
+The web resource accessed by the request.
+
+
+--
+
+*`functionbeat.api_gateway_proxy.path`*::
++
+--
+type: keyword
+
+The path accessed by the request.
+
+
+--
+
+*`functionbeat.api_gateway_proxy.method`*::
++
+--
+type: keyword
+
+The HTTP verb used to access the resource.
+
+
+--
+
+*`functionbeat.api_gateway_proxy.headers`*::
++
+--
+type: object
+
+The headers send with the request.
+
+
+--
+
+*`functionbeat.api_gateway_proxy.query_string`*::
++
+--
+type: object
+
+Headers received with the request.
+
+
+--
+
+*`functionbeat.api_gateway_proxy.is_based64_encoded`*::
++
+--
+type: bool
+
+Flag to know if the request is base64 encoded.
+
+
+--
 
 [[exported-fields-host-processor]]
 == Host fields
