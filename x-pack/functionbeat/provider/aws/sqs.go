@@ -7,7 +7,6 @@ package aws
 import (
 	"context"
 	"errors"
-	"regexp"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -21,6 +20,7 @@ import (
 )
 
 const batchSize = 10
+const invalidChars = ":-"
 
 // SQSConfig is the configuration for the SQS event type.
 type SQSConfig struct {
@@ -91,13 +91,9 @@ func (s *SQS) Template() *cloudformation.Template {
 		return "fnb" + s.config.Name + suffix
 	}
 
-	re := regexp.MustCompile("[:/-]")
-	normalize := func(c string) string {
-		return re.ReplaceAllString(c, "")
-	}
-
 	for _, trigger := range s.config.Triggers {
-		template.Resources[prefix("SQS")+normalize(trigger.EventSourceArn)] = &cloudformation.AWSLambdaEventSourceMapping{
+		resourceName := prefix("SQS") + common.RemoveChars(trigger.EventSourceArn, invalidChars)
+		template.Resources[resourceName] = &cloudformation.AWSLambdaEventSourceMapping{
 			BatchSize:      batchSize,
 			EventSourceArn: trigger.EventSourceArn,
 			FunctionName:   cloudformation.GetAtt(prefix(""), "Arn"),
