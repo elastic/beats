@@ -48,14 +48,6 @@
     - name: time_wait_ms
       description: Total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
       type: long
-  
-- name: default
-  description: Default HAProxy log format https://cbonte.github.io/haproxy-dconv/1.7/configuration.html#8.2.1
-  type: group
-  fields:
-  - name: mode
-    type: text
-    description: mode that the frontend is operating (TCP or HTTP)
 
 - name: tcp
   description: TCP log format

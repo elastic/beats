@@ -3521,6 +3521,15 @@ Number of connection retries experienced by this session when trying to connect 
 
 --
 
+*`haproxy.mode`*::
++
+--
+type: text
+
+mode that the frontend is operating (TCP or HTTP)
+
+--
+
 [float]
 == http fields
 
@@ -3617,21 +3626,6 @@ Total time in milliseconds spent waiting for the server to send a full HTTP resp
 type: long
 
 Total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
-
---
-
-[float]
-== default fields
-
-Default HAProxy log format https://cbonte.github.io/haproxy-dconv/1.7/configuration.html#8.2.1
-
-
-*`haproxy.default.mode`*::
-+
---
-type: text
-
-mode that the frontend is operating (TCP or HTTP)
 
 --
 

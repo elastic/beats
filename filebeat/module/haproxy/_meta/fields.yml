@@ -137,4 +137,7 @@
             - name: retries
               description: Number of connection retries experienced by this session when trying to connect to the server.
               type: long
+        - name: mode
+          type: text
+          description: mode that the frontend is operating (TCP or HTTP)
       
