@@ -45,7 +45,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Replace index patterns in TSVB visualizations. {pull}7929[7929]
 - Fixed Support `add_docker_metadata` in Windows by identifying systems' path separator. {issue}7797[7797]
 - Add backoff support to x-pack monitoring outputs. {issue}7966[7966]
-- Fix a race condition with the `add_host_metadata` and the event serialization. {pull}8223[8223]
+- Fix a race condition with the `add_host_metadata` and the event serialization. {pull}8223[8223] {pull}8653[8653]
 - Enforce that data used by k8s or docker doesn't use any reference. {pull}8240[8240]
 - Switch to different UUID lib due to to non-random generated UUIDs. {pull}8485[8485]
 - Fix race condition when publishing monitoring data. {pull}8646[8646]
@@ -138,10 +138,12 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Release `docker` input as GA. {pull}8328[8328]
 - Keep unparsed user agent information in user_agent.original. {pull}8537[8537]
 - Better tracking of number of open file descriptors. {pull}7986[7986]
+- Added default and TCP parsing formats to HAproxy module {issue}8311[8311] {pull}8637[8637]
 
 *Heartbeat*
 
 *Metricbeat*
+
 - Add metrics about cache size to memcached module {pull}7740[7740]
 - Add `replstatus` metricset to MongoDB module {pull}7604[7604]
 - Move common kafka fields (broker, topic and partition.id) to the module level to facilitate events correlation {pull}7767[7767]
@@ -158,6 +160,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Add container image for docker metricsets. {issue}8214[8214] {pull}8438[8438]
 - Add support for `full` status page output for php-fpm module as a separate metricset called `process`. {pull}8394[8394]
 - Precalculate composed id fields for kafka dashboards. {pull}8504[8504]
+- Add Kafka dashboard. {pull}8457[8457]
 
 *Packetbeat*
 
