@@ -73,6 +73,10 @@ func ChangeDefaultCfgfileFlag(beatName string) error {
 // GetDefaultCfgfile gets the full path of the default config file. Understood
 // as the first value for the `-c` flag. By default this will be `<beatname>.yml`
 func GetDefaultCfgfile() string {
+	if len(configfiles.List()) == 0 {
+		return ""
+	}
+
 	cfg := configfiles.List()[0]
 	cfgpath := GetPathConfig()
 

@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
 )
 
-const accessTokenK = "management.accesstoken"
+const accessTokenKey = "management.accesstoken"
 
 // Enroll this beat to the given kibana
 // This will use Central Management API to enroll and retrieve an access key for config retrieval
@@ -48,7 +48,7 @@ func Enroll(beat *instance.Beat, kibanaURL, enrollmentToken string, force bool) 
 	// Enrolled, persist state
 	config := defaultConfig()
 	config.Enabled = true
-	config.AccessToken = "${" + accessTokenK + "}"
+	config.AccessToken = "${" + accessTokenKey + "}"
 	config.Kibana = kibanaConfig
 
 	confirm, err := confirmConfigOverwrite(force)
@@ -90,7 +90,7 @@ func storeAccessToken(beat *instance.Beat, accessToken string) error {
 		}
 	}
 
-	if err := keystore.Store(accessTokenK, []byte(accessToken)); err != nil {
+	if err := keystore.Store(accessTokenKey, []byte(accessToken)); err != nil {
 		return errors.Wrap(err, "error storing the access token")
 	}
 

@@ -92,7 +92,7 @@ func genEnrollCmd(name, version string) *cobra.Command {
 			if enrolled {
 				fmt.Println("Enrolled and ready to retrieve settings from Kibana")
 			} else {
-				fmt.Println("Operation canceled by the user")
+				fmt.Println("Enrollment was canceled by the user")
 			}
 			return nil
 		}),
