@@ -37,12 +37,12 @@ type pluginBuilder struct {
 
 var pluginKey = "heartbeat.monitor"
 var telemetryRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")
-var telemetryGsr = globalMonitorsRecorder{monitoring.NewInt(telemetryRegistry, "monitorStarts")}
+
+//var metricsGsr = globalMonitorsRecorder{monitoring.NewInt(telemetryRegistry, "monitorStarts")}
 
 func statsForPlugin(pluginName string) statsRecorder {
 	return multiStatsRecorder{
 		recorders: []statsRecorder{
-			telemetryGsr,
 			newPluginStatsRecorder(pluginName, telemetryRegistry),
 		},
 	}
