@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher"
@@ -53,7 +52,8 @@ import (
 type Pipeline struct {
 	beatInfo beat.Info
 
-	logger *logp.Logger
+	monitors Monitors
+
 	queue  queue.Queue
 	output *outputController
 
@@ -153,20 +153,22 @@ type queueFactory func(queue.Eventer) (queue.Queue, error)
 func New(
 	beat beat.Info,
 	monitors Monitors,
-	metrics *monitoring.Registry,
 	queueFactory queueFactory,
 	out outputs.Group,
 	settings Settings,
 ) (*Pipeline, error) {
 	var err error
 
-	log := logp.NewLogger("publish")
+	if monitors.Logger == nil {
+		monitors.Logger = logp.NewLogger("publish")
+	}
+
 	annotations := settings.Annotations
 	processors := settings.Processors
 	disabledOutput := settings.Disabled
 	p := &Pipeline{
 		beatInfo:         beat,
-		logger:           log,
+		monitors:         monitors,
 		observer:         nilObserver,
 		waitCloseMode:    settings.WaitCloseMode,
 		waitCloseTimeout: settings.WaitClose,
@@ -175,8 +177,8 @@ func New(
 	p.ackBuilder = &pipelineEmptyACK{p}
 	p.ackActive = atomic.MakeBool(true)
 
-	if metrics != nil {
-		p.observer = newMetricsObserver(metrics)
+	if monitors.Metrics != nil {
+		p.observer = newMetricsObserver(monitors.Metrics)
 	}
 	p.eventer.observer = p.observer
 	p.eventer.modifyable = true
@@ -205,7 +207,7 @@ func New(
 	}
 	p.eventSema = newSema(maxEvents)
 
-	p.output = newOutputController(beat, monitors, log, p.observer, p.queue)
+	p.output = newOutputController(beat, monitors, p.observer, p.queue)
 	p.output.Set(out)
 
 	return p, nil
@@ -255,7 +257,7 @@ func (p *Pipeline) SetACKHandler(handler beat.PipelineACKHandler) error {
 // for a duration of WaitClose, if there are still active events in the pipeline.
 // Note: clients must be closed before calling Close.
 func (p *Pipeline) Close() error {
-	log := p.logger
+	log := p.monitors.Logger
 
 	log.Debug("close pipeline")
 
@@ -335,7 +337,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		}
 	}
 
-	processors := newProcessorPipeline(p.beatInfo, p.processors, cfg)
+	processors := newProcessorPipeline(p.beatInfo, p.monitors, p.processors, cfg)
 	acker := p.makeACKer(processors != nil, &cfg, waitClose)
 	producerCfg := queue.ProducerConfig{
 		// Cancel events from queue if acker is configured
