@@ -20,7 +20,6 @@ import (
 )
 
 const batchSize = 10
-const invalidChars = ":-"
 
 // SQSConfig is the configuration for the SQS event type.
 type SQSConfig struct {
@@ -92,7 +91,7 @@ func (s *SQS) Template() *cloudformation.Template {
 	}
 
 	for _, trigger := range s.config.Triggers {
-		resourceName := prefix("SQS") + common.RemoveChars(trigger.EventSourceArn, invalidChars)
+		resourceName := prefix("SQS") + normalize(trigger.EventSourceArn)
 		template.Resources[resourceName] = &cloudformation.AWSLambdaEventSourceMapping{
 			BatchSize:      batchSize,
 			EventSourceArn: trigger.EventSourceArn,

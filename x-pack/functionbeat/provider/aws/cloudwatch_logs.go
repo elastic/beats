@@ -197,7 +197,7 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 		}
 
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-subscriptionfilter.html
-		template.Resources[prefix("SubscriptionFilter"+common.RemoveChars(string(trigger.LogGroupName), "/"))] = &AWSLogsSubscriptionFilter{
+		template.Resources[prefix("SubscriptionFilter"+normalize(trigger.LogGroupName))] = &AWSLogsSubscriptionFilter{
 			DestinationArn: cloudformation.GetAtt(prefix(""), "Arn"),
 			FilterPattern:  trigger.FilterPattern,
 			LogGroupName:   string(trigger.LogGroupName),
