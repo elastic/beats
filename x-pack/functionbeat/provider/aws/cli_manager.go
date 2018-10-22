@@ -349,7 +349,7 @@ func mergeTemplate(to, from *cloudformation.Template) error {
 	return nil
 }
 
-func normalize(s string) string {
+func normalizeResourceName(s string) string {
 	return common.RemoveChars(s, invalidChars)
 }
 

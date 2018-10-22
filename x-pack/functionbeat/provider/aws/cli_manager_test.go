@@ -65,7 +65,7 @@ func TestNormalize(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.title, func(t *testing.T) {
-			assert.Equal(t, test.expected, normalize(test.candidate))
+			assert.Equal(t, test.expected, normalizeResourceName(test.candidate))
 		})
 	}
 }

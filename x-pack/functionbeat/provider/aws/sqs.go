@@ -91,7 +91,7 @@ func (s *SQS) Template() *cloudformation.Template {
 	}
 
 	for _, trigger := range s.config.Triggers {
-		resourceName := prefix("SQS") + normalize(trigger.EventSourceArn)
+		resourceName := prefix("SQS") + normalizeResourceName(trigger.EventSourceArn)
 		template.Resources[resourceName] = &cloudformation.AWSLambdaEventSourceMapping{
 			BatchSize:      batchSize,
 			EventSourceArn: trigger.EventSourceArn,
