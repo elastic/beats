@@ -146,3 +146,7 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 func (c *publishClient) Test(d testing.Driver) {
 	c.es.Test(d)
 }
+
+func (c *publishClient) String() string {
+	return "publish(" + c.es.String() + ")"
+}

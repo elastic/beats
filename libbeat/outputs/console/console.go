@@ -160,3 +160,7 @@ func (c *console) writeBuffer(buf []byte) error {
 	}
 	return nil
 }
+
+func (c *console) String() string {
+	return "console"
+}
