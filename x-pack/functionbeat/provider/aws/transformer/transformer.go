@@ -23,8 +23,9 @@ func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
 	events := make([]beat.Event, len(request.LogEvents))
 
 	for idx, logEvent := range request.LogEvents {
+		ts := time.Unix(0, logEvent.Timestamp*int64(time.Millisecond))
 		events[idx] = beat.Event{
-			Timestamp: time.Now(), // TODO: time.Unix(logEvent.Timestamp, 0),
+			Timestamp: ts,
 			Fields: common.MapStr{
 				"message":              logEvent.Message,
 				"id":                   logEvent.ID,
