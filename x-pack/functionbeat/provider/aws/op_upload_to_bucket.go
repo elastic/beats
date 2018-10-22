@@ -57,8 +57,11 @@ func (o *opUploadToBucket) Execute() error {
 }
 
 func (o *opUploadToBucket) Rollback() error {
-	// The error will be logged but do not enforce a failure because the file could have been removed
-	// before.
-	newOpDeleteFileBucket(o.log, o.config, o.bucketName, o.path).Execute()
+	// The error will be logged but we do not enforce a hard failure because the file could have
+	// been removed before.
+	err := newOpDeleteFileBucket(o.log, o.config, o.bucketName, o.path).Execute()
+	if err != nil {
+		o.log.Debugf("Fail to delete file on bucket, error: %+v", err)
+	}
 	return nil
 }
