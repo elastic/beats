@@ -512,7 +512,7 @@
                             {
                                 "bar_color": "rgba(104,188,0,1)", 
                                 "id": "60e11be0-1b18-11e7-b09e-037021c4f8df", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0
                             }
                         ], 
@@ -586,19 +586,19 @@
                             {
                                 "bar_color": "rgba(104,188,0,1)", 
                                 "id": "efb9b660-1b18-11e7-b09e-037021c4f8df", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0
                             }, 
                             {
                                 "bar_color": "rgba(254,146,0,1)", 
                                 "id": "17fcb820-1b19-11e7-b09e-037021c4f8df", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.7
                             }, 
                             {
                                 "bar_color": "rgba(211,49,21,1)", 
                                 "id": "1dd61070-1b19-11e7-b09e-037021c4f8df", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.85
                             }
                         ], 
@@ -1034,19 +1034,19 @@
                             {
                                 "gauge": "rgba(104,188,0,1)", 
                                 "id": "4ef2c3b0-1b91-11e7-bec4-a5e9ec5cab8b", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0
                             }, 
                             {
                                 "gauge": "rgba(254,146,0,1)", 
                                 "id": "e6561ae0-1b91-11e7-bec4-a5e9ec5cab8b", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.7
                             }, 
                             {
                                 "gauge": "rgba(211,49,21,1)", 
                                 "id": "ec655040-1b91-11e7-bec4-a5e9ec5cab8b", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.85
                             }
                         ], 
@@ -1154,19 +1154,19 @@
                             {
                                 "gauge": "rgba(104,188,0,1)", 
                                 "id": "a0d522e0-1b91-11e7-bec4-a5e9ec5cab8b", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0
                             }, 
                             {
                                 "gauge": "rgba(254,146,0,1)", 
                                 "id": "b45ad8f0-1b91-11e7-bec4-a5e9ec5cab8b", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.7
                             }, 
                             {
                                 "gauge": "rgba(211,49,21,1)", 
                                 "id": "c06e9550-1b91-11e7-bec4-a5e9ec5cab8b", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.85
                             }
                         ], 
@@ -1501,19 +1501,19 @@
                             {
                                 "bar_color": "rgba(104,188,0,1)", 
                                 "id": "bf525310-1b95-11e7-8ada-3df93aab833e", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0
                             }, 
                             {
                                 "bar_color": "rgba(254,146,0,1)", 
                                 "id": "125fc4c0-1b96-11e7-8ada-3df93aab833e", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.7
                             }, 
                             {
                                 "bar_color": "rgba(211,49,21,1)", 
                                 "id": "1a5c7240-1b96-11e7-8ada-3df93aab833e", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.85
                             }
                         ], 
@@ -1621,19 +1621,19 @@
                             {
                                 "gauge": "rgba(104,188,0,1)", 
                                 "id": "d17c1e90-4d59-11e7-aee5-fdc812cc3bec", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0
                             }, 
                             {
                                 "gauge": "rgba(251,158,0,1)", 
                                 "id": "fc1d3490-4d59-11e7-aee5-fdc812cc3bec", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.7
                             }, 
                             {
                                 "gauge": "rgba(211,49,21,1)", 
                                 "id": "0e204240-4d5a-11e7-aee5-fdc812cc3bec", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.85
                             }
                         ], 
@@ -1795,19 +1795,19 @@
                             {
                                 "gauge": "rgba(104,188,0,1)", 
                                 "id": "51921d10-4d1d-11e7-b5f2-2b7c1895bf32", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0
                             }, 
                             {
                                 "gauge": "rgba(251,158,0,1)", 
                                 "id": "f26de750-4d54-11e7-b5f2-2b7c1895bf32", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.7
                             }, 
                             {
                                 "gauge": "rgba(211,49,21,1)", 
                                 "id": "fa31d190-4d54-11e7-b5f2-2b7c1895bf32", 
-                                "opperator": "gte", 
+                                "operator": "gte", 
                                 "value": 0.85
                             }
                         ], 

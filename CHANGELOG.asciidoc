@@ -79,6 +79,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Recover metrics for old apache versions removed by mistake on #6450. {pull}7871[7871]
 - Fix dropwizard module parsing of metric names. {issue}8365[8365] {pull}6385[8385]
 - Fix issue that would prevent kafka module to find a proper broker when port is not set {pull}8613[8613]
+- Fix range colors in multiple visualizations. {issue}8633[8633] {pull}8634[8634]
 - Add Kafka dashboard. {pull}8457[8457]
 
 *Packetbeat*
