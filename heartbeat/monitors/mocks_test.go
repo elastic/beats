@@ -106,7 +106,7 @@ func mockPluginBuilder() pluginBuilder {
 		c := common.Config{}
 		j, err := createMockJob("test", &c)
 		return j, 1, err
-	}, newPluginStatsRecorder("test", reg)}
+	}, newPluginCountersRecorder("test", reg)}
 }
 
 func mockPluginsReg() *pluginsReg {

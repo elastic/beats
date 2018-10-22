@@ -32,18 +32,22 @@ type pluginBuilder struct {
 	name    string
 	typ     Type
 	builder PluginBuilder
-	stats   statsRecorder
+	stats   registryRecorder
 }
 
 var pluginKey = "heartbeat.monitor"
-var telemetryRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")
+var stateRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")
+var statsRegistry = monitoring.Default
 
-//var metricsGsr = globalMonitorsRecorder{monitoring.NewInt(telemetryRegistry, "monitorStarts")}
-
-func statsForPlugin(pluginName string) statsRecorder {
-	return multiStatsRecorder{
-		recorders: []statsRecorder{
-			newPluginStatsRecorder(pluginName, telemetryRegistry),
+func statsForPlugin(pluginName string) registryRecorder {
+	return multiRegistryRecorder{
+		recorders: []registryRecorder{
+			// state (telemetry)
+			newRootGaugeRecorder(stateRegistry),
+			newPluginGaugeRecorder(pluginName, stateRegistry),
+			// stats
+			// Record global monitors / endpoints count
+			newPluginCountersRecorder(pluginName, statsRegistry),
 		},
 	}
 }

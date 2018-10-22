@@ -25,12 +25,18 @@ class Test(BaseTest):
 
             self.wait_until(lambda: self.output_has(lines=1))
 
-            self.assert_state({
+            self.assert_stats({
                 "http": {
                     "monitor_starts": 1,
                     "monitor_stops": 0,
                     "endpoint_starts": 1,
                     "endpoint_stops": 0,
+                }
+            })
+            self.assert_state({
+                "http": {
+                    "monitors": 1,
+                    "endpoints": 1,
                 }
             })
 
@@ -47,7 +53,7 @@ class Test(BaseTest):
             init_lines = self.output_lines()
             self.wait_until(lambda: self.output_has(lines=init_lines+2))
 
-            self.assert_state({
+            self.assert_stats({
                 "http": {
                     "monitor_starts": 1,
                     "monitor_stops": 1,
@@ -59,6 +65,12 @@ class Test(BaseTest):
                     "monitor_stops": 0,
                     "endpoint_starts": 2,
                     "endpoint_stops": 0,
+                }
+            })
+            self.assert_state({
+                "tcp": {
+                    "monitors": 1,
+                    "endpoints": 2,
                 }
             })
         finally:
@@ -77,4 +89,15 @@ class Test(BaseTest):
                 'monitor_stops': proto_expected.get("monitor_stops", 0),
                 'endpoint_starts': proto_expected.get("endpoint_starts", 0),
                 'endpoint_stops': proto_expected.get("endpoint_stops", 0),
+            })
+
+    def assert_stats(expected={}):
+        stats = json.loads(urllib2.urlopen(
+            "http://localhost:5066/stats").read())
+
+        for proto in ("http", "tcp", "icmp"):
+            proto_expected = expected.get(proto, {})
+            nose.tools.assert_dict_equal(stats['heartbeat'][proto], {
+                'monitors': proto_expected.get("monitors", 0),
+                'endpoints': proto_expected.get("endpoints", 0),
             })

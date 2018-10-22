@@ -54,9 +54,9 @@ type Monitor struct {
 
 	pipelineConnector beat.PipelineConnector
 
-	// stats is the pluginStatsRecorder used to record lifecycle events
+	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
-	stats statsRecorder
+	stats registryRecorder
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
