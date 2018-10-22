@@ -5,6 +5,7 @@
 package management
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -38,6 +39,8 @@ type ConfigManager struct {
 	done     chan struct{}
 	registry *reload.Registry
 	wg       sync.WaitGroup
+	// true if last config update was successful
+	configOK bool
 }
 
 // NewConfigManager returns a X-Pack Beats Central Management manager
@@ -81,6 +84,7 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 		done:     make(chan struct{}),
 		beatUUID: beatUUID,
 		registry: registry,
+		configOK: true,
 	}, nil
 }
 
@@ -159,7 +163,7 @@ func (cm *ConfigManager) worker() {
 // fetch configurations from kibana, return true if they changed
 func (cm *ConfigManager) fetch() bool {
 	cm.logger.Debug("Retrieving new configurations from Kibana")
-	configs, err := cm.client.Configuration(cm.config.AccessToken, cm.beatUUID)
+	configs, err := cm.client.Configuration(cm.config.AccessToken, cm.beatUUID, cm.configOK)
 	if err != nil {
 		cm.logger.Errorf("error retriving new configurations, will use cached ones: %s", err)
 		return false
@@ -177,28 +181,39 @@ func (cm *ConfigManager) fetch() bool {
 }
 
 func (cm *ConfigManager) apply() {
+	configOK := true
 	for _, b := range cm.cache.Configs {
-		cm.reload(b.Type, b.Blocks)
+		err := cm.reload(b.Type, b.Blocks)
+		configOK = configOK && err == nil
 	}
+
+	if !configOK {
+		logp.Info("Failed to apply settings, reporting error on next fetch")
+	}
+
+	// Update configOK flag with the result of this apply
+	cm.configOK = configOK
 }
 
-func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) {
+func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) error {
 	cm.logger.Infof("Applying settings for %s", t)
 
 	if obj := cm.registry.GetReloadable(t); obj != nil {
 		// Single object
 		if len(blocks) != 1 {
-			cm.logger.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
-			return
+			err := fmt.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
+			cm.logger.Error(err)
+			return err
 		}
 		config, err := blocks[0].ConfigWithMeta()
 		if err != nil {
 			cm.logger.Error(err)
-			return
+			return err
 		}
 
 		if err := obj.Reload(config); err != nil {
 			cm.logger.Error(err)
+			return err
 		}
 	} else if obj := cm.registry.GetReloadableList(t); obj != nil {
 		// List
@@ -214,6 +229,9 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) {
 
 		if err := obj.Reload(configs); err != nil {
 			cm.logger.Error(err)
+			return err
 		}
 	}
+
+	return nil
 }
