@@ -131,6 +131,8 @@ func makeClientFactory(log *logp.Logger, manager *licenser.Manager, pipeline bea
 		c := struct {
 			Processors           processors.PluginConfig `config:"processors"`
 			common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
+			Name                 string                  `config:"name"`
+			Type                 string                  `config:"type"`
 		}{}
 
 		if err := cfg.Unpack(&c); err != nil {
@@ -146,6 +148,10 @@ func makeClientFactory(log *logp.Logger, manager *licenser.Manager, pipeline bea
 			PublishMode:   beat.GuaranteedSend,
 			Processor:     processors,
 			EventMetadata: c.EventMetadata,
+			Fields: common.MapStr{
+				"function.name": c.Name,
+				"function.type": c.Type,
+			},
 		})
 
 		if err != nil {
