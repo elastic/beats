@@ -78,6 +78,11 @@
       description: >
         The path accessed by the request.
 
+    - name: aws.api_gateway_proxy.path_parameters
+      type: object
+      description: >
+        The path parameters accessed by the request.
+
     - name: aws.api_gateway_proxy.method
       type: keyword
       description: >

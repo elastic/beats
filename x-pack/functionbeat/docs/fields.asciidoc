@@ -2179,6 +2179,16 @@ The path accessed by the request.
 
 --
 
+*`aws.api_gateway_proxy.path_parameters`*::
++
+--
+type: object
+
+The path parameters accessed by the request.
+
+
+--
+
 *`aws.api_gateway_proxy.method`*::
 +
 --

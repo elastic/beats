@@ -24,6 +24,7 @@ func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
 		events[idx] = beat.Event{
 			Timestamp: ts,
 			Fields: common.MapStr{
+				"read_timestamp":                         time.Now(),
 				"event.id":                               logEvent.ID,
 				"message":                                logEvent.Message,
 				"user.id":                                request.Owner,
@@ -44,6 +45,7 @@ func APIGatewayProxy(request events.APIGatewayProxyRequest) beat.Event {
 		Timestamp: time.Now(),
 		Fields: common.MapStr{
 			"event.id":                                request.RequestContext.RequestID,
+			"read_timestamp":                          time.Now(),
 			"message":                                 request.Body,
 			"aws.api_gateway_proxy.resource":          request.Resource,
 			"aws.api_gateway_proxy.path":              request.Path,
@@ -64,6 +66,7 @@ func Kinesis(request events.KinesisEvent) []beat.Event {
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
 				"event.id":             record.EventID,
+				"read_timestamp":       time.Now(),
 				"cloud.region":         record.AwsRegion,
 				"message":              record.Kinesis.Data,
 				"aws.event_name":       record.EventName,
@@ -86,7 +89,8 @@ func SQS(request events.SQSEvent) []beat.Event {
 				"event.id":               record.MessageId,
 				"aws.event_source":       record.EventSource,
 				"aws.event_source_arn":   record.EventSourceARN,
-				"cloud.egion":            record.AWSRegion,
+				"read_timestamp":         time.Now(),
+				"cloud.region":           record.AWSRegion,
 				"aws.sqs.receipt_handle": record.ReceiptHandle,
 				"aws.sqs.attributes":     record.Attributes,
 				"message":                record.Body,

@@ -58,7 +58,7 @@ func TestCloudwatchLogs(t *testing.T) {
 		},
 	})
 
-	t.Run("when publish is succesful", func(t *testing.T) {
+	t.Run("when publish is successful", func(t *testing.T) {
 		client := &arrayBackedClient{}
 		cwl, err := NewCloudwatchLogs(&provider.DefaultProvider{}, cfg)
 		if !assert.NoError(t, err) {
