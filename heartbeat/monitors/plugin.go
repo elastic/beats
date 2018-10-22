@@ -36,18 +36,14 @@ type pluginBuilder struct {
 }
 
 var pluginKey = "heartbeat.monitor"
-var metricsRegistry = monitoring.Default.NewRegistry("heartbeat")
-var metricsGsr = globalMonitorsRecorder{monitoring.NewInt(metricsRegistry, "monitors")}
 var telemetryRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")
-var telemetryGsr = globalMonitorsRecorder{monitoring.NewInt(telemetryRegistry, "monitors")}
+var telemetryGsr = globalMonitorsRecorder{monitoring.NewInt(telemetryRegistry, "monitorStarts")}
 
 func statsForPlugin(pluginName string) statsRecorder {
 	return multiStatsRecorder{
 		recorders: []statsRecorder{
 			telemetryGsr,
-			metricsGsr,
 			newPluginStatsRecorder(pluginName, telemetryRegistry),
-			newPluginStatsRecorder(pluginName, metricsRegistry),
 		},
 	}
 }
@@ -65,20 +61,20 @@ func init() {
 }
 
 // PluginBuilder is the signature of functions used to build active
-// monitors
+// monitorStarts
 type PluginBuilder func(string, *common.Config) (jobs []Job, endpoints int, err error)
 
 // Type represents whether a plugin is active or passive.
 type Type uint8
 
 const (
-	// ActiveMonitor represents monitors that reach across the network to do things.
+	// ActiveMonitor represents monitorStarts that reach across the network to do things.
 	ActiveMonitor Type = iota + 1
-	// PassiveMonitor represents monitors that receive inbound data.
+	// PassiveMonitor represents monitorStarts that receive inbound data.
 	PassiveMonitor
 )
 
-// globalPluginsReg maintains the canonical list of valid Heartbeat monitors at runtime.
+// globalPluginsReg maintains the canonical list of valid Heartbeat monitorStarts at runtime.
 var globalPluginsReg = newPluginsReg()
 
 type pluginsReg struct {

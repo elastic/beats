@@ -43,7 +43,7 @@ func (msr multiStatsRecorder) stopMonitor(endpoints int64) {
 	}
 }
 
-// globalStats recorder is for recording to the shared global monitors counter.
+// globalStats recorder is for recording to the shared global monitorStarts counter.
 type globalMonitorsRecorder struct {
 	// globalMonitors is a reference to the global count of all monitoring plugins.
 	// A pointer to it is stored here for convenience
@@ -61,26 +61,28 @@ func (gsr globalMonitorsRecorder) stopMonitor(endpoints int64) {
 // singleStats is used to record start/stop events for a single monitor/plugin
 // to a single registry.
 type pluginStatsRecorder struct {
-	// monitors is the count of monitors for this plugin only
-	monitors *monitoring.Int
-	// endpoints is the count of endpoints for this plugin only
-	endpoints *monitoring.Int
+	monitorStarts  *monitoring.Int
+	monitorStops   *monitoring.Int
+	endpointStarts *monitoring.Int
+	endpointStops  *monitoring.Int
 }
 
 func newPluginStatsRecorder(pluginName string, rootRegistry *monitoring.Registry) statsRecorder {
 	pluginRegistry := rootRegistry.NewRegistry(pluginName)
 	return pluginStatsRecorder{
-		monitoring.NewInt(pluginRegistry, "monitors"),
-		monitoring.NewInt(pluginRegistry, "endpoints"),
+		monitoring.NewInt(pluginRegistry, "monitor_starts"),
+		monitoring.NewInt(pluginRegistry, "monitor_stops"),
+		monitoring.NewInt(pluginRegistry, "endpoint_starts"),
+		monitoring.NewInt(pluginRegistry, "endpoint_stops"),
 	}
 }
 
 func (ssr pluginStatsRecorder) startMonitor(endpoints int64) {
-	ssr.monitors.Inc()
-	ssr.endpoints.Add(endpoints)
+	ssr.monitorStarts.Inc()
+	ssr.endpointStarts.Add(endpoints)
 }
 
 func (ssr pluginStatsRecorder) stopMonitor(endpoints int64) {
-	ssr.monitors.Dec()
-	ssr.endpoints.Sub(endpoints)
+	ssr.monitorStops.Inc()
+	ssr.endpointStops.Add(endpoints)
 }
