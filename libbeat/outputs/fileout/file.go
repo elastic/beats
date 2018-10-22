@@ -35,6 +35,7 @@ func init() {
 }
 
 type fileOutput struct {
+	filePath string
 	beat     beat.Info
 	observer outputs.Observer
 	rotator  *file.Rotator
@@ -73,6 +74,8 @@ func (out *fileOutput) init(beat beat.Info, c config) error {
 	} else {
 		path = filepath.Join(c.Path, out.beat.Beat)
 	}
+
+	out.filePath = path
 
 	var err error
 	out.rotator, err = file.NewFileRotator(
@@ -148,4 +151,8 @@ func (out *fileOutput) Publish(
 	st.Acked(len(events) - dropped)
 
 	return nil
+}
+
+func (out *fileOutput) String() string {
+	return "file(" + out.filePath + ")"
 }

@@ -77,3 +77,7 @@ func (b *backoffClient) Test(d testing.Driver) {
 
 	c.Test(d)
 }
+
+func (b *backoffClient) String() string {
+	return "backoff(" + b.client.String() + ")"
+}
