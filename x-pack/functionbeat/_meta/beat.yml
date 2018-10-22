@@ -16,6 +16,7 @@ functionbeat.provider.aws.functions:
   # Define the list of function availables, each function required to have a unique name.
   # Create a function that accepts events coming from cloudwatchlogs.
   - name: fn_cloudwatch_logs
+    enabled: false
     type: cloudwatch_logs
 
     # Description of the method to help identify them when you run multiples functions.
@@ -52,6 +53,7 @@ functionbeat.provider.aws.functions:
 
   # Create a function that accepts events from SQS queues.
   - name: fn_sqs
+    enabled: false
     type: sqs
 
     # Description of the method to help identify them when you run multiples functions.
