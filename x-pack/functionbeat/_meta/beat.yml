@@ -32,7 +32,7 @@ functionbeat.provider.aws.functions:
     #memory_size: 128MiB
 
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
-    # dead_letter_config.target_arn:
+    #dead_letter_config.target_arn:
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -55,7 +55,7 @@ functionbeat.provider.aws.functions:
     type: sqs
 
     # Description of the method to help identify them when you run multiples functions.
-    description: "lambda function for sqs events"
+    description: "lambda function for SQS events"
 
     # Concurrency, is the reserved number of instances for that function.
     # Default is unreserved.
@@ -68,7 +68,7 @@ functionbeat.provider.aws.functions:
     #memory_size: 128MiB
 
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
-    # dead_letter_config.target_arn:
+    #dead_letter_config.target_arn:
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
