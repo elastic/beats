@@ -14,9 +14,6 @@ import (
 )
 
 // Centralize anything related to ECS into a common file.
-// TODO: Look at the fields to align them with ECS.
-// TODO: how to keep the fields in sync with AWS?
-// TODO: api gateway proxy a lot more information is available.
 
 // CloudwatchLogs takes an CloudwatchLogsData and transform it into a beat event.
 func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
@@ -27,13 +24,13 @@ func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
 		events[idx] = beat.Event{
 			Timestamp: ts,
 			Fields: common.MapStr{
-				"functionbeat.aws.id":                             logEvent.ID,
-				"message":                                         logEvent.Message,
-				"functionbeat.cloudwatchlog.owner":                request.Owner,
-				"functionbeat.cloudwatch.log_stream":              request.LogStream,
-				"functionbeat.cloudwatch.log_group":               request.LogGroup,
-				"functionbeat.cloudwatchlog.message_type":         request.MessageType,
-				"functionbeat.cloudwatchlog.subscription_filters": request.SubscriptionFilters,
+				"event.id":                               logEvent.ID,
+				"message":                                logEvent.Message,
+				"user.id":                                request.Owner,
+				"aws.cloudwatch.log_stream":              request.LogStream,
+				"aws.cloudwatch.log_group":               request.LogGroup,
+				"aws.cloudwatchlog.message_type":         request.MessageType,
+				"aws.cloudwatchlog.subscription_filters": request.SubscriptionFilters,
 			},
 		}
 	}
@@ -46,15 +43,15 @@ func APIGatewayProxy(request events.APIGatewayProxyRequest) beat.Event {
 	return beat.Event{
 		Timestamp: time.Now(),
 		Fields: common.MapStr{
-			"functionbeat.aws.id":                            request.RequestContext.RequestID,
-			"functionbeat.api_gateway_proxy.resource":        request.Resource,
-			"functionbeat.api_gateway_proxy.path":            request.Path,
-			"functionbeat.api_gateway_proxy.method":          request.HTTPMethod,
-			"functionbeat.api_gateway_proxy.headers":         request.Headers,
-			"functionbeat.api_gateway_proxy.query_string":    request.QueryStringParameters,
-			"functionbeat.api_gateway_proxy.path_parameters": request.PathParameters,
-			"message":                         request.Body,
-			"function.beat.is_base64_encoded": request.IsBase64Encoded,
+			"event.id":                                request.RequestContext.RequestID,
+			"message":                                 request.Body,
+			"aws.api_gateway_proxy.resource":          request.Resource,
+			"aws.api_gateway_proxy.path":              request.Path,
+			"aws.api_gateway_proxy.method":            request.HTTPMethod,
+			"aws.api_gateway_proxy.headers":           request.Headers,
+			"aws.api_gateway_proxy.query_string":      request.QueryStringParameters,
+			"aws.api_gateway_proxy.path_parameters":   request.PathParameters,
+			"aws.api_gateway_proxy.is_base64_encoded": request.IsBase64Encoded,
 		},
 	}
 }
@@ -66,15 +63,13 @@ func Kinesis(request events.KinesisEvent) []beat.Event {
 		events[idx] = beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
-				"functionbeat.aws": common.MapStr{
-					"id":               record.EventID,
-					"event_name":       record.EventName,
-					"event_source":     record.EventSource,
-					"event_source_arn": record.EventSourceArn,
-					"region":           record.AwsRegion,
-				},
-				"message": record.Kinesis.Data,
-				"functionbeat.kinesis.event_version": record.EventVersion,
+				"event.id":             record.EventID,
+				"cloud.region":         record.AwsRegion,
+				"message":              record.Kinesis.Data,
+				"aws.event_name":       record.EventName,
+				"aws.event_source":     record.EventSource,
+				"aws.event_source_arn": record.EventSourceArn,
+				"aws.kinesis.version":  record.EventVersion,
 			},
 		}
 	}
@@ -88,15 +83,13 @@ func SQS(request events.SQSEvent) []beat.Event {
 		events[idx] = beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
-				"functionbeat.aws": common.MapStr{
-					"id":               record.MessageId,
-					"event_source":     record.EventSource,
-					"event_source_arn": record.EventSourceARN,
-					"region":           record.AWSRegion,
-				},
-				"functionbeat.sqs.receipt_handle": record.ReceiptHandle,
-				"functionbeat.sqs.attributes":     record.Attributes,
-				"message":                         record.Body,
+				"event.id":               record.MessageId,
+				"aws.event_source":       record.EventSource,
+				"aws.event_source_arn":   record.EventSourceARN,
+				"cloud.egion":            record.AWSRegion,
+				"aws.sqs.receipt_handle": record.ReceiptHandle,
+				"aws.sqs.attributes":     record.Attributes,
+				"message":                record.Body,
 			},
 		}
 	}
