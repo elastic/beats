@@ -88,7 +88,7 @@
         - name: geoip
           type: group
           description: >
-            geoip contains information gathered based on the client.ip field.
+            Contains GeoIP information gathered based on the client.ip field.
             Only present if the GeoIP Elasticsearch plugin is available and
             used.
           fields:
@@ -140,4 +140,3 @@
         - name: mode
           type: text
           description: mode that the frontend is operating (TCP or HTTP)
-      
