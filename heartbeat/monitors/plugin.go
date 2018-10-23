@@ -36,18 +36,22 @@ type pluginBuilder struct {
 }
 
 var pluginKey = "heartbeat.monitor"
-var stateRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")
+
 var statsRegistry = monitoring.Default
+var stateRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")
+
+// stateGlobalRecorder records statistics across all plugin types
+var stateGlobalRecorder = newRootGaugeRecorder(stateRegistry)
 
 func statsForPlugin(pluginName string) registryRecorder {
 	return multiRegistryRecorder{
 		recorders: []registryRecorder{
 			// state (telemetry)
-			newRootGaugeRecorder(stateRegistry),
 			newPluginGaugeRecorder(pluginName, stateRegistry),
-			// stats
 			// Record global monitors / endpoints count
 			newPluginCountersRecorder(pluginName, statsRegistry),
+			// When stats for this plugin are updated, update the global stats as well
+			stateGlobalRecorder,
 		},
 	}
 }
