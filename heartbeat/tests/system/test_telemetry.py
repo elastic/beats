@@ -3,6 +3,7 @@ import urllib2
 import json
 import nose.tools
 import os
+from nose.plugins.skip import SkipTest
 
 
 class Test(BaseTest):
