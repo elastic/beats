@@ -1,38 +1,23 @@
 # Suricata module
 
-Shove the content of this repo under `filebeats/module/suricata` for testing,
-until Filebeats supports loading modules from `x-pack/filebeats/module`
-(issue [beats#7524](https://github.com/elastic/beats/issues/7524)).
+## Caveats
 
-## Caveats with this preliminary version
-
-* Dashboards, visualizations and saved searches are trivial at this time.
+* Module is to be considered _beta_.
+* Field names will be changing for 7.0 to comply with Elastic Common Schema (ECS).
 * Original Suricata event shoved as is `suricata.eve.`
-* Due to limitations in Ingest Node field copying, all events have `ecs.user_agent`.
-  Events that actually have user agent information are missing the `ecs.user_agent.raw`,
-  and all of their ua fields have the value "Other". Disregard those.
-* GeoIP is done twice. Once on ECS fields and once on original fields, saving back
-  under original object (in order to have usable geo\_points).
-* ECS
-  * ECS fields nested under `ecs.` instead of being at the top level,
-    to avoid clashes during development.
-  * ECS fields are not set in the index template (and so are simply detected by ElasticSearch),
-    singe beats modules can only configure fields under their own section
-    (in this case `suricata.eve.*`)
 
-## How to try the module
+## How to try the module from source
 
-Copy this full repo at `beats/filebeat/module/suricata`.
-
-Set up the module (you may have to delete your Filebeat index template first).
+Build Filebeat
 
 ```
-cd filebeat
-make update
-./filebeat setup --modules=suricata -e -d "*" -c your/filebeat.yml -E 'setup.dashboards.directory=_meta/kibana'
+cd x-pack/filebeat
+make mage
+mage build update
+./filebeat setup --modules=suricata -e -d "*" -c filebeat.yml -E 'setup.dashboards.directory=build/kibana'
 ```
 
-Install Suricata
+Install Suricata (for MacOS with Brew)
 
 ```
 brew install suricata --with-jansson
@@ -54,7 +39,7 @@ sudo suricata -i en0 # optionally more -i en1 -i en2...
 Start the Suricata Filebeat module
 
 ```
-./filebeat --modules=suricata -e -d "*" -c your/filebeat.yml
+./filebeat --modules=suricata -e -d "*" -c filebeat.yml
 ```
 
 You can look for the Suricata saved searches and dashboards in Kibana.
