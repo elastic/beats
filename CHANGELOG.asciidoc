@@ -136,6 +136,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Release `docker` input as GA. {pull}8328[8328]
 - Keep unparsed user agent information in user_agent.original. {pull}8537[8537]
 - Better tracking of number of open file descriptors. {pull}7986[7986]
+- Added default and TCP parsing formats to HAproxy module {issue}8311[8311] {pull}8637[8637]
 
 *Heartbeat*
 
