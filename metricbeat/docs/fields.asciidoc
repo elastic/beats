@@ -8633,7 +8633,7 @@ HTTP request information
 
 
 
-*`http.request.header`*::
+*`http.request.headers`*::
 +
 --
 type: object
@@ -8660,7 +8660,7 @@ HTTP response information
 
 
 
-*`http.response.header`*::
+*`http.response.headers`*::
 +
 --
 type: object
@@ -8787,6 +8787,24 @@ type: long
 
 Partition id.
 
+
+--
+
+*`kafka.partition.topic_id`*::
++
+--
+type: keyword
+
+Unique id of the partition in the topic.
+
+--
+
+*`kafka.partition.topic_broker_id`*::
++
+--
+type: keyword
+
+Unique id of the partition in the topic and the broker.
 
 --
 

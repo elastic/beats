@@ -119,7 +119,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		haveEnabledInputs = true
 	}
 
-	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil {
+	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && !b.ConfigManager.Enabled() {
 		if !b.InSetupCmd {
 			return nil, errors.New("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
 		}
@@ -191,9 +191,9 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	callback := func(esClient *elasticsearch.Client) error {
 		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
-	elasticsearch.RegisterConnectCallback(callback)
+	_, err := elasticsearch.RegisterConnectCallback(callback)
 
-	return nil
+	return err
 }
 
 func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) error {
