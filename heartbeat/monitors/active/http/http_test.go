@@ -210,6 +210,41 @@ func TestDownStatuses(t *testing.T) {
 	}
 }
 
+func TestLargeResponse(t *testing.T) {
+	server := httptest.NewServer(hbtest.SizedResponseHandler(1024 * 1024))
+	defer server.Close()
+
+	configSrc := map[string]interface{}{
+		"urls":                server.URL,
+		"timeout":             "1s",
+		"check.response.body": "x",
+	}
+
+	config, err := common.NewConfigFrom(configSrc)
+	require.NoError(t, err)
+
+	jobs, err := create("largeresp", config)
+	require.NoError(t, err)
+
+	job := jobs[0]
+
+	event, _, err := job.Run()
+	require.NoError(t, err)
+
+	port, err := hbtest.ServerPort(server)
+	require.NoError(t, err)
+
+	mapvaltest.Test(
+		t,
+		mapval.Strict(mapval.Compose(
+			hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "up"),
+			hbtest.RespondingTCPChecks(port),
+			respondingHTTPChecks(server.URL, 200),
+		)),
+		event.Fields,
+	)
+}
+
 func TestHTTPSServer(t *testing.T) {
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
 	port, err := hbtest.ServerPort(server)
