@@ -52,7 +52,7 @@ functionbeat.provider.aws.functions:
     #      tokenizer: "%{key1} %{key2}"
 
   # Create a function that accepts events from SQS queues.
-  - name: fn_sqs
+  - name: sqs
     enabled: false
     type: sqs
 
