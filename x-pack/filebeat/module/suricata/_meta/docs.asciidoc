@@ -1,9 +1,9 @@
+[role="xpack"]
+
 :modulename: suricata
 :has-dashboards: true
 
 == Suricata module
-
-[role="xpack"]
 
 This is a module to the Suricata IDS/IPS/NSM log. It parses logs that are in the
 https://suricata.readthedocs.io/en/latest/output/eve/eve-json-format.html[

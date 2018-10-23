@@ -3,12 +3,12 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[filebeat-module-suricata]]
+[role="xpack"]
+
 :modulename: suricata
 :has-dashboards: true
 
 == Suricata module
-
-[role="xpack"]
 
 This is a module to the Suricata IDS/IPS/NSM log. It parses logs that are in the
 https://suricata.readthedocs.io/en/latest/output/eve/eve-json-format.html[
@@ -20,7 +20,7 @@ include::../include/what-happens.asciidoc[]
 === Compatibility
 
 This module requires the {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip]
-and {elasticsearch-plugins}/ingest-user-agent.html[[ingest-user-agent]
+and {elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent]
 Elasticsearch plugins.
 
 This module has been developed against Suricata v4.0.4, but is expected to work
