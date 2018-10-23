@@ -264,9 +264,9 @@ func (r *tlsRenegotiationSupport) Unpack(s string) error {
 
 // CertificateConfig define a common set of fields for a certificate.
 type CertificateConfig struct {
-	Certificate string `config:"certificate"`
-	Key         string `config:"key"`
-	Passphrase  string `config:"key_passphrase"`
+	Certificate string `config:"certificate" yaml:"certificate"`
+	Key         string `config:"key" yaml:"key"`
+	Passphrase  string `config:"key_passphrase" yaml:"key_passphrase"`
 }
 
 // Validate validates the CertificateConfig
