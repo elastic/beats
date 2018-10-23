@@ -152,12 +152,10 @@ addons:
   apt:
     update: true
     packages:
-      - libc6-dev-i386
-      - libpcap-dev
-      - libsystemd-journal-dev
-      - libxml2-utils
       - python-virtualenv
+      - libpcap-dev
       - xsltproc
+      - libxml2-utils
 
 before_install:
   - python --version
