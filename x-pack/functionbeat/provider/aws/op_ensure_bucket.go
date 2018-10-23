@@ -5,11 +5,17 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
+
+// This error is not provided by the S3 error package.
+const notFound = "NotFound"
 
 type opEnsureBucket struct {
 	log        *logp.Logger
@@ -22,21 +28,28 @@ func newOpEnsureBucket(log *logp.Logger, cfg aws.Config, bucketName string) *opE
 }
 
 func (o *opEnsureBucket) Execute() error {
-	o.log.Debugf("Creating S3 bucket: %s", o.bucketName)
+	o.log.Debugf("Verifying presence of S3 bucket: %s", o.bucketName)
 
 	check := &s3.HeadBucketInput{Bucket: aws.String(o.bucketName)}
 	reqCheck := o.svc.HeadBucketRequest(check)
 	_, err := reqCheck.Send()
-	// bucket do not exist lets create it.
-	if err != nil {
-		input := &s3.CreateBucketInput{Bucket: aws.String(o.bucketName)}
-		req := o.svc.CreateBucketRequest(input)
-		resp, err := req.Send()
-		if err != nil {
-			o.log.Debugf("Could not create bucket, resp: %v", resp)
-			return err
+	if err == nil {
+		// The bucket exists and we have permission to access it.
+		return nil
+	}
+
+	if aerr, ok := err.(awserr.Error); ok {
+		if aerr.Code() == notFound {
+			// bucket do not exist let's create it.
+			input := &s3.CreateBucketInput{Bucket: aws.String(o.bucketName)}
+			req := o.svc.CreateBucketRequest(input)
+			resp, err := req.Send()
+			if err != nil {
+				o.log.Debugf("Could not create bucket, resp: %v", resp)
+				return err
+			}
 		}
 	}
 
-	return nil
+	return fmt.Errorf("bucket '%s' already exist and you don't have permission to access it", o.bucketName)
 }

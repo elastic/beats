@@ -24,7 +24,6 @@ import (
 const (
 	// AWS lambda currently support go 1.x as a runtime.
 	runtime     = "go1.x"
-	bucket      = "functionbeat-deploy"
 	handlerName = "functionbeat"
 )
 
@@ -47,6 +46,7 @@ type CLIManager struct {
 	provider provider.Provider
 	awsCfg   aws.Config
 	log      *logp.Logger
+	config   *Config
 }
 
 func (c *CLIManager) findFunction(name string) (installer, error) {
@@ -132,7 +132,7 @@ func (c *CLIManager) template(function installer, name, templateLoc string) *clo
 	template.Resources[prefix("")] = &AWSLambdaFunction{
 		AWSLambdaFunction: &cloudformation.AWSLambdaFunction{
 			Code: &cloudformation.AWSLambdaFunction_Code{
-				S3Bucket: bucket,
+				S3Bucket: c.bucket(),
 				S3Key:    templateLoc,
 			},
 			Description: lambdaConfig.Description,
@@ -198,12 +198,12 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 	c.log.Debugf("Using cloudformation template:\n%s", json)
 
 	executer := newExecutor(c.log)
-	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, bucket))
-	executer.Add(newOpUploadToBucket(c.log, c.awsCfg, bucket, codeLoc, content))
+	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, c.bucket()))
+	executer.Add(newOpUploadToBucket(c.log, c.awsCfg, c.bucket(), codeLoc, content))
 	executer.Add(newOpUploadToBucket(
 		c.log,
 		c.awsCfg,
-		bucket,
+		c.bucket(),
 		"functionbeat-deployment/"+name+"/cloudformation-template-create.json",
 		json,
 	))
@@ -211,20 +211,20 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		executer.Add(newOpUpdateCloudFormation(
 			c.log,
 			c.awsCfg,
-			"https://s3.amazonaws.com/"+bucket+"/functionbeat-deployment/"+name+"/cloudformation-template-create.json",
+			"https://s3.amazonaws.com/"+c.bucket()+"/functionbeat-deployment/"+name+"/cloudformation-template-create.json",
 			c.stackName(name),
 		))
 	} else {
 		executer.Add(newOpCreateCloudFormation(
 			c.log,
 			c.awsCfg,
-			"https://s3.amazonaws.com/"+bucket+"/functionbeat-deployment/"+name+"/cloudformation-template-create.json",
+			"https://s3.amazonaws.com/"+c.bucket()+"/functionbeat-deployment/"+name+"/cloudformation-template-create.json",
 			c.stackName(name),
 		))
 	}
 
 	executer.Add(newOpWaitCloudFormation(c.log, c.awsCfg, c.stackName(name)))
-	executer.Add(newOpDeleteFileBucket(c.log, c.awsCfg, bucket, codeLoc))
+	executer.Add(newOpDeleteFileBucket(c.log, c.awsCfg, c.bucket(), codeLoc))
 
 	if err := executer.Execute(); err != nil {
 		if rollbackErr := executer.Rollback(); rollbackErr != nil {
@@ -278,6 +278,10 @@ func (c *CLIManager) Remove(name string) error {
 	return nil
 }
 
+func (c *CLIManager) bucket() string {
+	return string(c.config.DeployBucket)
+}
+
 // NewCLI returns the interface to manage function on Amazon lambda.
 func NewCLI(
 	log *logp.Logger,
@@ -289,7 +293,13 @@ func NewCLI(
 		return nil, err
 	}
 
+	config := &Config{}
+	if err := cfg.Unpack(config); err != nil {
+		return nil, err
+	}
+
 	return &CLIManager{
+		config:   config,
 		provider: provider,
 		awsCfg:   awsCfg,
 		log:      logp.NewLogger("aws lambda cli"),

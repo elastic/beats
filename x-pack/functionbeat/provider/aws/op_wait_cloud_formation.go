@@ -6,7 +6,6 @@ package aws
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -39,21 +38,35 @@ func (o *opCloudWaitCloudFormation) Execute() error {
 	o.log.Debug("Waiting for cloudformation confirmation")
 	status, reason, err := queryStackStatus(o.svc, o.stackName)
 
-	for strings.Index(string(*status), "FAILED") == -1 && *status != cloudformation.StackStatusUpdateComplete && *status != cloudformation.StackStatusCreateComplete && err == nil {
+	// List of States from the cloud formation API.
+	// https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_Stack.html
+	for {
+		o.log.Debugf(
+			"Retrieving information on stack '%s' from cloudformation, current status: %v",
+			o.stackName,
+			*status,
+		)
+
+		if err != nil {
+			return err
+		}
+
+		switch *status {
+		case cloudformation.StackStatusUpdateComplete: // OK
+			return nil
+		case cloudformation.StackStatusCreateComplete: // OK
+			return nil
+		case cloudformation.StackStatusCreateFailed:
+			return fmt.Errorf("failed to create the stack '%s', reason: %v", o.stackName, reason)
+		case cloudformation.StackStatusRollbackFailed:
+			return fmt.Errorf("failed to create and rollback the stack '%s', reason: %v", o.stackName, reason)
+		case cloudformation.StackStatusRollbackComplete:
+			return fmt.Errorf("failed to create the stack '%s', reason: %v", o.stackName, reason)
+		}
+
 		select {
 		case <-time.After(periodicCheck):
 			status, reason, err = queryStackStatus(o.svc, o.stackName)
 		}
 	}
-
-	// Multiple status, setup a catch all for all errors.
-	if strings.Index(string(*status), "FAILED") != -1 {
-		return fmt.Errorf("Could not create the stack, status: %s, reason: %s", *status, reason)
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
