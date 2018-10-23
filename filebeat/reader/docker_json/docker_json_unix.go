@@ -16,10 +16,10 @@
 // under the License.
 // +build linux darwin
 
-package readjson
+package docker_json
 
 import (
-	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/filebeat/reader"
 )
 
 func stripNewLine(msg *reader.Message) {

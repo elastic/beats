@@ -15,12 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package readjson
+package docker_json
 
 import (
 	"bytes"
 
-	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/filebeat/reader"
 )
 
 func stripNewLine(msg *reader.Message) {
