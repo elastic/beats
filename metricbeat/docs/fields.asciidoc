@@ -8633,7 +8633,7 @@ HTTP request information
 
 
 
-*`http.request.header`*::
+*`http.request.headers`*::
 +
 --
 type: object
@@ -8660,7 +8660,7 @@ HTTP response information
 
 
 
-*`http.response.header`*::
+*`http.response.headers`*::
 +
 --
 type: object
