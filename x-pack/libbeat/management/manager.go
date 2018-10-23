@@ -39,8 +39,6 @@ type ConfigManager struct {
 	done     chan struct{}
 	registry *reload.Registry
 	wg       sync.WaitGroup
-	// true if last config update was successful
-	configOK bool
 }
 
 // NewConfigManager returns a X-Pack Beats Central Management manager
@@ -62,7 +60,9 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 		var err error
 
 		// Initialize central management settings cache
-		cache = &Cache{}
+		cache = &Cache{
+			ConfigOK: true,
+		}
 		if err := cache.Load(); err != nil {
 			return nil, errors.Wrap(err, "reading central management internal cache")
 		}
@@ -84,7 +84,6 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 		done:     make(chan struct{}),
 		beatUUID: beatUUID,
 		registry: registry,
-		configOK: true,
 	}, nil
 }
 
@@ -163,7 +162,7 @@ func (cm *ConfigManager) worker() {
 // fetch configurations from kibana, return true if they changed
 func (cm *ConfigManager) fetch() bool {
 	cm.logger.Debug("Retrieving new configurations from Kibana")
-	configs, err := cm.client.Configuration(cm.config.AccessToken, cm.beatUUID, cm.configOK)
+	configs, err := cm.client.Configuration(cm.config.AccessToken, cm.beatUUID, cm.cache.ConfigOK)
 	if err != nil {
 		cm.logger.Errorf("error retriving new configurations, will use cached ones: %s", err)
 		return false
@@ -192,7 +191,7 @@ func (cm *ConfigManager) apply() {
 	}
 
 	// Update configOK flag with the result of this apply
-	cm.configOK = configOK
+	cm.cache.ConfigOK = configOK
 }
 
 func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) error {
