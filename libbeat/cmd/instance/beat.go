@@ -119,6 +119,9 @@ type beatConfig struct {
 	Pipeline   pipeline.Config `config:",inline"`
 	Monitoring *common.Config  `config:"xpack.monitoring"`
 
+	// central managmenet settings
+	Management *common.Config `config:"management"`
+
 	// elastic stack 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`
 	Template   *common.Config `config:"setup.template"`
@@ -605,7 +608,7 @@ func (b *Beat) configure(settings Settings) error {
 	logp.Info("Beat UUID: %v", b.Info.UUID)
 
 	// initialize config manager
-	b.ConfigManager, err = management.Factory()(reload.Register, b.Beat.Info.UUID)
+	b.ConfigManager, err = management.Factory()(b.Config.Management, reload.Register, b.Beat.Info.UUID)
 	if err != nil {
 		return err
 	}

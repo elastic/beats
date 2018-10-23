@@ -62,7 +62,10 @@ func TestEnrollValid(t *testing.T) {
 }
 
 func TestEnrollError(t *testing.T) {
-	beatUUID := uuid.NewV4()
+	beatUUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"message": "Invalid enrollment token"}`, 400)

@@ -14,35 +14,17 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// +build linux darwin
 
-package docker
+package readjson
 
-var defaultConfig = config{
-	Partial: true,
-	Containers: containers{
-		IDs:    []string{},
-		Path:   "/var/lib/docker/containers",
-		Stream: "all",
-	},
-}
+import (
+	"github.com/elastic/beats/libbeat/reader"
+)
 
-type config struct {
-	Containers containers `config:"containers"`
-
-	// Partial configures the prospector to join partial lines
-	Partial bool `config:"combine_partials"`
-
-	// Enable CRI flags parsing (to be switched to default in 7.0)
-	CRIFlags bool `config:"cri.parse_flags"`
-
-	// Fore CRI format (don't perform autodetection)
-	CRIForce bool `config:"cri.force"`
-}
-
-type containers struct {
-	IDs  []string `config:"ids"`
-	Path string   `config:"path"`
-
-	// Stream can be all, stdout or stderr
-	Stream string `config:"stream"`
+func stripNewLine(msg *reader.Message) {
+	l := len(msg.Content)
+	if l > 0 && msg.Content[l-1] == '\n' {
+		msg.Content = msg.Content[:l-1]
+	}
 }
