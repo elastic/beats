@@ -225,7 +225,7 @@ func TestLargeResponse(t *testing.T) {
 	config, err := common.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	jobs, err := create("largeresp", config)
+	jobs, _, err := create("largeresp", config)
 	require.NoError(t, err)
 
 	job := jobs[0]
