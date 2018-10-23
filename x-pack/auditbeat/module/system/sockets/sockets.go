@@ -8,6 +8,7 @@ package sockets
 
 import (
 	"github.com/pkg/errors"
+	"net"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -16,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/logp"
 	mbSocket "github.com/elastic/beats/metricbeat/module/system/socket"
+	"github.com/elastic/gosigar/sys/linux"
 )
 
 const (
@@ -37,6 +39,44 @@ type MetricSet struct {
 	log    *logp.Logger
 
 	netlink *mbSocket.NetlinkSession
+	// TODO: Maybe at some point get this from the processes metricset in Auditbeat
+	// instead of reading /proc again?
+	ptable     *mbSocket.ProcTable
+	rpcPortmap *RpcPortMap
+}
+
+// Socket represents information about a socket.
+type Socket struct {
+	Family      linux.AddressFamily
+	State       linux.TCPState
+	LocalIP     net.IP
+	LocalPort   int
+	RemoteIP    net.IP
+	RemotePort  int
+	Inode       uint32
+	UID         uint32
+	ProcessPID  int
+	ProcessName string
+	ProcessType string // set to "rpc" if socket was held by RPC service, otherwise empty
+}
+
+func (s Socket) toMapStr() common.MapStr {
+	return common.MapStr{
+		"family":      s.Family.String(),
+		"state":       s.State.String(),
+		"local.ip":    s.LocalIP,
+		"local.port":  s.LocalPort,
+		"remote.ip":   s.RemoteIP,
+		"remote.port": s.RemotePort,
+		"inode":       s.Inode,
+		"uid":         s.UID,
+
+		"process": common.MapStr{
+			"pid":  s.ProcessPID,
+			"name": s.ProcessName,
+			"type": s.ProcessType,
+		},
+	}
 }
 
 // New constructs a new MetricSet.
@@ -49,12 +89,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
 	}
 
+	ptable, err := mbSocket.NewProcTable("")
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create process table")
+	}
+
 	ms := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
 		log:           logp.NewLogger(moduleName),
 
 		netlink: mbSocket.NewNetlinkSession(),
+		ptable:  ptable,
 	}
 
 	if config.ReportChanges {
@@ -67,46 +113,89 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch checks which sockets exist on the host and reports them.
 // It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	sockets, err := ms.netlink.GetSocketList()
+	err := ms.ptable.Refresh()
+	if err != nil {
+		ms.log.Error(err)
+		report.Error(err)
+		// purposely not returning - we're only losing some enrichment
+	}
+
+	ms.rpcPortmap, err = GetRpcPortmap()
+	if err != nil {
+		ms.log.Error(err)
+		report.Error(err)
+		// purposely not returning - we're only losing some enrichment
+	}
+	//ms.log.Debugf("found %d ports mapped to RPC services", len(ms.rpcPortmap))
+	ms.log.Errorf("rpcPortmap: %v", ms.rpcPortmap)
+
+	sockets, err := ms.getSockets()
 	if err != nil {
 		ms.log.Error(err)
 		report.Error(err)
 		return
 	}
-	ms.log.Debugf("netlink returned %d sockets", len(sockets))
+	ms.log.Debugf("found %d sockets", len(sockets))
 
-	conns := make([]*mbSocket.Connection, 0, len(sockets))
-	for _, s := range sockets {
-		c := mbSocket.NewConnection(s)
-		conns = append(conns, c)
-	}
+	// Report all currently existing sockets
+	var socketInfos []common.MapStr
 
-	// Report all current network connections
-	var connInfos []common.MapStr
+	for _, socket := range sockets {
+		socketMapStr := socket.toMapStr()
 
-	for _, connInfo := range conns {
-		connInfoMapStr := toMapStr(connInfo)
-
-		connInfos = append(connInfos, connInfoMapStr)
+		socketInfos = append(socketInfos, socketMapStr)
 	}
 
 	report.Event(mb.Event{
 		MetricSetFields: common.MapStr{
-			"connection": connInfos,
+			"socket": socketInfos,
 		},
 	})
 }
 
-func toMapStr(c *mbSocket.Connection) common.MapStr {
-	return common.MapStr{
-		"family":      c.Family.String(),
-		"state":       c.State.String(),
-		"local.ip":    c.LocalIP,
-		"local.port":  c.LocalPort,
-		"remote.ip":   c.RemoteIP,
-		"remote.port": c.RemotePort,
-		"inode":       c.Inode,
-		"uid":         c.UID,
-		"pid":         c.PID,
+func (ms *MetricSet) getSockets() ([]*Socket, error) {
+	diags, err := ms.netlink.GetSocketList()
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting sockets")
 	}
+
+	sockets := make([]*Socket, 0, len(diags))
+	for _, diag := range diags {
+		socket := &Socket{
+			Family:     linux.AddressFamily(diag.Family),
+			State:      linux.TCPState(diag.State),
+			LocalIP:    diag.SrcIP(),
+			LocalPort:  diag.SrcPort(),
+			RemoteIP:   diag.DstIP(),
+			RemotePort: diag.DstPort(),
+			Inode:      diag.Inode,
+			UID:        diag.UID,
+		}
+
+		proc := ms.ptable.ProcessBySocketInode(diag.Inode)
+		if proc != nil {
+			// Add process info by finding the process that holds the socket's inode.
+			socket.ProcessPID = proc.PID
+			socket.ProcessName = proc.Command
+			socket.ProcessType = "process"
+		} else {
+			// If no process holds the inode, try find an RPC service that is using the socket's port
+			rpcServices, found := (*ms.rpcPortmap)[uint32(socket.LocalPort)]
+
+			if !found {
+				rpcServices, found = (*ms.rpcPortmap)[uint32(socket.RemotePort)]
+			}
+
+			if found {
+				// TODO: We assume every RPC service bound to a port is the same, is that true?
+				socket.ProcessPID = -1
+				socket.ProcessName = rpcServices[0].programName
+				socket.ProcessType = "rpc"
+			}
+		}
+
+		sockets = append(sockets, socket)
+	}
+
+	return sockets, nil
 }
