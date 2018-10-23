@@ -46,7 +46,7 @@ func GetUsers() (users []User, err error) {
 
 	for passwd, err := C.getpwent(); passwd != nil; passwd, err = C.getpwent() {
 		if err != nil {
-			return nil, errors.Wrap(err, "Error getting user")
+			return nil, errors.Wrap(err, "error getting user")
 		}
 
 		// passwd is C.struct_passwd
@@ -61,5 +61,5 @@ func GetUsers() (users []User, err error) {
 		})
 	}
 
-	return users, err
+	return users, nil
 }
