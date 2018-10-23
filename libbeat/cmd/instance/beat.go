@@ -309,6 +309,10 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	// Report central management state
+	mgmt := monitoring.GetNamespace("state").GetRegistry().NewRegistry("management")
+	monitoring.NewBool(mgmt, "enabled").Set(b.ConfigManager.Enabled())
+
 	debugf("Initializing output plugins")
 
 	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
