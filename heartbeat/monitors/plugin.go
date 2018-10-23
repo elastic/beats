@@ -37,7 +37,7 @@ type pluginBuilder struct {
 
 var pluginKey = "heartbeat.monitor"
 
-var statsRegistry = monitoring.Default
+var statsRegistry = monitoring.Default.NewRegistry("heartbeat")
 var stateRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")
 
 // stateGlobalRecorder records statistics across all plugin types

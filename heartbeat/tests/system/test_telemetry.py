@@ -82,6 +82,29 @@ class Test(BaseTest):
         stats = json.loads(urllib2.urlopen(
             "http://localhost:5066/state").read())
 
+        total_monitors = 0
+        total_endpoints = 0
+
+        for proto in ("http", "tcp", "icmp"):
+            proto_expected = expected.get(proto, {})
+            monitors = proto_expected.get("monitors", 0)
+            endpoints = proto_expected.get("endpoints", 0)
+            total_monitors += monitors
+            total_endpoints += endpoints
+            nose.tools.assert_dict_equal(stats['heartbeat'][proto], {
+                'monitors': monitors,
+                'endpoints': endpoints,
+            })
+
+        nose.tools.assert_equal(stats['heartbeat']['monitors'], total_monitors)
+        nose.tools.assert_equal(stats['heartbeat']['endpoints'], total_endpoints)
+
+    @staticmethod
+    def assert_stats(expected={}):
+        stats = json.loads(urllib2.urlopen(
+            "http://localhost:5066/stats").read())
+
+
         for proto in ("http", "tcp", "icmp"):
             proto_expected = expected.get(proto, {})
             nose.tools.assert_dict_equal(stats['heartbeat'][proto], {
@@ -89,15 +112,4 @@ class Test(BaseTest):
                 'monitor_stops': proto_expected.get("monitor_stops", 0),
                 'endpoint_starts': proto_expected.get("endpoint_starts", 0),
                 'endpoint_stops': proto_expected.get("endpoint_stops", 0),
-            })
-
-    def assert_stats(expected={}):
-        stats = json.loads(urllib2.urlopen(
-            "http://localhost:5066/stats").read())
-
-        for proto in ("http", "tcp", "icmp"):
-            proto_expected = expected.get(proto, {})
-            nose.tools.assert_dict_equal(stats['heartbeat'][proto], {
-                'monitors': proto_expected.get("monitors", 0),
-                'endpoints': proto_expected.get("endpoints", 0),
             })
