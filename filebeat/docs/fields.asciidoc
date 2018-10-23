@@ -1625,7 +1625,7 @@ The HAProxy source of the log
 [float]
 == geoip fields
 
-geoip contains information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+Contains GeoIP information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
 
 
 
