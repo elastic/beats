@@ -1,0 +1,19 @@
+{beatname_uc} supports templates for modules:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+heartbeat.autodiscover:
+  providers:
+    - type: docker
+      templates:
+        - condition:
+            contains:
+              docker.container.image: redis
+          config:
+            - type: tcp
+              hosts: ["${data.host}:${data.port}"]
+              schedule: "@every 1s"
+              timeout: 1s
+-------------------------------------------------------------------------------------
+
+This configuration launches a `redis` monitor for all containers running an image with `redis` in the name.
