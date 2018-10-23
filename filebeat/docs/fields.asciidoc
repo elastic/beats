@@ -1453,6 +1453,28 @@ haproxy Module
 
 
 
+[float]
+== destination fields
+
+Destination information
+
+
+*`haproxy.destination.port`*::
++
+--
+type: long
+
+Port of the destination host
+
+--
+
+*`haproxy.destination.ip`*::
++
+--
+IP of the destination host
+
+--
+
 *`haproxy.process_name`*::
 +
 --
@@ -1465,53 +1487,77 @@ Name of the process
 --
 type: long
 
-Process ID
+PID of the process
 
 --
 
-*`haproxy.client_ip`*::
+[float]
+== client fields
+
+Information about the client doing the request
+
+
+*`haproxy.client.ip`*::
 +
 --
-client_ip is the IP address of the client which initiated the TCP connection to haproxy.
+IP address of the client which initiated the TCP connection to haproxy.
 
 --
 
-*`haproxy.client_port`*::
+*`haproxy.client.port`*::
 +
 --
 type: long
 
-client_port is the TCP port of the client which initiated the connection.
+TCP port of the client which initiated the connection.
 
 --
 
 *`haproxy.frontend_name`*::
 +
 --
-frontend_name is the name of the frontend (or listener) which received and processed the connection.
+Name of the frontend (or listener) which received and processed the connection.
 
 --
 
 *`haproxy.backend_name`*::
 +
 --
-backend_name is the name of the backend (or listener) which was selected to manage the connection to the server.
+Name of the backend (or listener) which was selected to manage the connection to the server.
 
 --
 
 *`haproxy.server_name`*::
 +
 --
-server_name is the name of the last server to which the connection was sent.
+Name of the last server to which the connection was sent.
 
 --
 
-*`haproxy.time_client_req`*::
+*`haproxy.total_waiting_time_ms`*::
 +
 --
 type: long
 
-time_client_req is the total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+Total time in milliseconds spent waiting in the various queues
+
+--
+
+*`haproxy.connection_wait_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting for the connection to establish to the final server
+
+--
+
+*`haproxy.bytes_read`*::
++
+--
+type: long
+
+Total number of bytes transmitted to the client when the log is emitted.
 
 --
 
@@ -1520,7 +1566,7 @@ time_client_req is the total time in milliseconds spent waiting for a full HTTP 
 --
 type: long
 
-time_queue is the total time in milliseconds spent waiting in the various queues.
+Total time in milliseconds spent waiting in the various queues.
 
 --
 
@@ -1529,25 +1575,7 @@ time_queue is the total time in milliseconds spent waiting in the various queues
 --
 type: long
 
-time_backend_connect is the total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
-
---
-
-*`haproxy.time_server_response`*::
-+
---
-type: long
-
-time_server_response is the total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
-
---
-
-*`haproxy.time_duration`*::
-+
---
-type: long
-
-time_duration is the time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+Total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
 
 --
 
@@ -1556,7 +1584,7 @@ time_duration is the time the request remained active in haproxy, which is the t
 --
 type: long
 
-server_queue is the total number of requests which were processed before this one in the server queue.
+Total number of requests which were processed before this one in the server queue.
 
 --
 
@@ -1565,14 +1593,14 @@ server_queue is the total number of requests which were processed before this on
 --
 type: long
 
-backend_queue is the total number of requests which were processed before this one in the backend's global queue.
+Total number of requests which were processed before this one in the backend's global queue.
 
 --
 
 *`haproxy.bind_name`*::
 +
 --
-bind_name is the name of the listening address which received the connection.
+Name of the listening address which received the connection.
 
 --
 
@@ -1581,14 +1609,23 @@ bind_name is the name of the listening address which received the connection.
 --
 type: text
 
-error_message is the error message logged by HAProxy in case of error.
+Error message logged by HAProxy in case of error.
+
+--
+
+*`haproxy.source`*::
++
+--
+type: text
+
+The HAProxy source of the log
 
 --
 
 [float]
 == geoip fields
 
-Contains GeoIP information gathered based on the client_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+geoip contains information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
 
 
 
@@ -1597,8 +1634,7 @@ Contains GeoIP information gathered based on the client_ip field. Only present i
 --
 type: keyword
 
-The name of the continent.
-
+Name of the continent.
 
 --
 
@@ -1609,7 +1645,6 @@ type: keyword
 
 Country ISO code.
 
-
 --
 
 *`haproxy.geoip.location`*::
@@ -1617,8 +1652,7 @@ Country ISO code.
 --
 type: geo_point
 
-The longitude and latitude.
-
+Represents a geopoint with the longitude and latitude.
 
 --
 
@@ -1627,8 +1661,7 @@ The longitude and latitude.
 --
 type: keyword
 
-The region name.
-
+Name of the region
 
 --
 
@@ -1637,8 +1670,7 @@ The region name.
 --
 type: keyword
 
-The city name.
-
+City name.
 
 --
 
@@ -1647,15 +1679,14 @@ The city name.
 --
 type: keyword
 
-Region ISO code.
-
+ISO code of the region
 
 --
 
 *`haproxy.termination_state`*::
 +
 --
-termination_state is the condition the session was in when the session ended.
+Condition the session was in when the session ended.
 
 --
 
@@ -1670,7 +1701,7 @@ Contains various counts of connections active in the process.
 --
 type: long
 
-active is the total number of concurrent connections on the process when the session was logged.
+Total number of concurrent connections on the process when the session was logged.
 
 --
 
@@ -1679,7 +1710,7 @@ active is the total number of concurrent connections on the process when the ses
 --
 type: long
 
-frontend is the total number of concurrent connections on the frontend when the session was logged.
+Total number of concurrent connections on the frontend when the session was logged.
 
 --
 
@@ -1688,7 +1719,7 @@ frontend is the total number of concurrent connections on the frontend when the 
 --
 type: long
 
-backend is the total number of concurrent connections handled by the backend when the session was logged.
+Total number of concurrent connections handled by the backend when the session was logged.
 
 --
 
@@ -1697,7 +1728,7 @@ backend is the total number of concurrent connections handled by the backend whe
 --
 type: long
 
-server is the total number of concurrent connections still active on the server when the session was logged.
+Total number of concurrent connections still active on the server when the session was logged.
 
 --
 
@@ -1706,7 +1737,16 @@ server is the total number of concurrent connections still active on the server 
 --
 type: long
 
-retries is the number of connection retries experienced by this session when trying to connect to the server.
+Number of connection retries experienced by this session when trying to connect to the server.
+
+--
+
+*`haproxy.mode`*::
++
+--
+type: text
+
+mode that the frontend is operating (TCP or HTTP)
 
 --
 
@@ -1727,23 +1767,14 @@ Fields related to the HTTP response
 --
 type: long
 
-status_code is the HTTP status code returned to the client.
-
---
-
-*`haproxy.http.response.bytes_read`*::
-+
---
-type: long
-
-bytes_read is the total number of bytes transmitted to the client when the log is emitted.
+HTTP status code returned to the client.
 
 --
 
 *`haproxy.http.response.captured_cookie`*::
 +
 --
-captured_cookie is an optional "name=value" entry indicating that the client had this cookie in the response.
+Optional "name=value" entry indicating that the client had this cookie in the response.
 
 
 --
@@ -1753,7 +1784,7 @@ captured_cookie is an optional "name=value" entry indicating that the client had
 --
 type: text
 
-captured_response_headers is a list of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
+List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
 
 
 --
@@ -1767,7 +1798,7 @@ Fields related to the HTTP request
 *`haproxy.http.request.captured_cookie`*::
 +
 --
-captured_cookie is an optional "name=value" entry indicating that the server has returned a cookie with its request.
+Optional "name=value" entry indicating that the server has returned a cookie with its request.
 
 
 --
@@ -1777,7 +1808,7 @@ captured_cookie is an optional "name=value" entry indicating that the server has
 --
 type: text
 
-captured_request_headers is a list of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
+List of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
 
 
 --
@@ -1787,7 +1818,58 @@ captured_request_headers is a list of headers captured in the request due to the
 --
 type: text
 
-raw_request_line is the complete HTTP request line, including the method, request and HTTP version string.
+Complete HTTP request line, including the method, request and HTTP version string.
+
+--
+
+*`haproxy.http.request.time_active_ms`*::
++
+--
+type: long
+
+Time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+
+--
+
+*`haproxy.http.request.time_wait_without_data_ms`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
+
+--
+
+*`haproxy.http.request.time_wait_ms`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+
+--
+
+[float]
+== tcp fields
+
+TCP log format
+
+
+*`haproxy.tcp.processing_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds elapsed between the accept and the last close
+
+--
+
+*`haproxy.tcp.connection_waiting_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds elapsed between the accept and the last close
 
 --
 
