@@ -206,3 +206,71 @@ func testStrInSlice(t *testing.T) {
 		assert.Equal(t, -1, strInSlice(haystack, "robert"))
 	})
 }
+
+func TestFindFunctionByName(t *testing.T) {
+	t.Run("when the function is not enabled", withRegistry(func(
+		t *testing.T,
+		global *feature.Registry,
+		wrapper *Registry,
+	) {
+		configs := []*common.Config{
+			common.MustNewConfigFrom(map[string]interface{}{
+				"name":    "mysqs",
+				"type":    "sqs",
+				"enabled": false,
+			}),
+		}
+
+		myprovider := &mockProvider{}
+
+		_, err := FindFunctionByName(wrapper, myprovider, configs, "mysqs")
+		assert.Error(t, err)
+	}))
+
+	t.Run("when the function is enabled", withRegistry(func(
+		t *testing.T,
+		global *feature.Registry,
+		wrapper *Registry,
+	) {
+		fnName := "sqs"
+		configs := []*common.Config{
+			common.MustNewConfigFrom(map[string]interface{}{
+				"name":    "mysqs",
+				"type":    fnName,
+				"enabled": true,
+			}),
+		}
+
+		name := "myprovider"
+		myprovider := &mockProvider{name: name}
+
+		providerFn := func(log *logp.Logger, registry *Registry, config *common.Config) (Provider, error) {
+			return myprovider, nil
+		}
+		f := Feature(name, providerFn, feature.NewDetails(name, "provider for testing", feature.Experimental))
+
+		myfunction := &mockFunction{name}
+		functionFn := func(provider Provider, config *common.Config) (Function, error) {
+			return myfunction, nil
+		}
+
+		fnFeature := FunctionFeature(name, fnName, functionFn, feature.NewDetails(
+			name,
+			"provider for testing",
+			feature.Experimental,
+		))
+
+		err := global.Register(f)
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		err = global.Register(fnFeature)
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		_, err = FindFunctionByName(wrapper, myprovider, configs, "mysqs")
+		assert.NoError(t, err)
+	}))
+}
