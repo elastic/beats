@@ -2,6 +2,7 @@ from heartbeat import BaseTest
 import urllib2
 import json
 import nose.tools
+import os
 
 
 class Test(BaseTest):
@@ -13,6 +14,11 @@ class Test(BaseTest):
         """
         Test that telemetry metrics are correctly registered and increment / decrement
         """
+        if os.name == "nt":
+            # This test is currently skipped on windows because file permission
+            # configuration isn't implemented on Windows yet
+            raise SkipTest
+
         server = self.start_server("hello world", 200)
         try:
             self.setup_dynamic(["-E", "http.enabled=true"])
