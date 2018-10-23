@@ -14,7 +14,8 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-// +build linux darwin
+
+// +build !windows
 
 package readjson
 
