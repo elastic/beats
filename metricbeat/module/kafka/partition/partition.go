@@ -18,19 +18,17 @@
 package partition
 
 import (
-	"crypto/tls"
 	"errors"
 	"fmt"
 
+	"github.com/Shopify/sarama"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/kafka"
-
-	"github.com/Shopify/sarama"
 )
 
 // init registers the partition MetricSet with the central registry.
@@ -43,13 +41,10 @@ func init() {
 
 // MetricSet type defines all fields of the partition MetricSet
 type MetricSet struct {
-	mb.BaseMetricSet
+	*kafka.MetricSet
 
-	broker *kafka.Broker
 	topics []string
 }
-
-const noID int32 = -1
 
 var errFailQueryOffset = errors.New("operation failed")
 
@@ -59,55 +54,33 @@ var debugf = logp.MakeDebug("kafka")
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The kafka partition metricset is beta")
 
-	config := defaultConfig
+	ms, err := kafka.NewMetricSet(base)
+	if err != nil {
+		return nil, err
+	}
+
+	config := struct {
+		Topics []string `config:"topics"`
+	}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	var tls *tls.Config
-	tlsCfg, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-	if tlsCfg != nil {
-		tls = tlsCfg.BuildModuleConfig("")
-	}
-
-	timeout := base.Module().Config().Timeout
-	cfg := kafka.BrokerSettings{
-		MatchID:     true,
-		DialTimeout: timeout,
-		ReadTimeout: timeout,
-		ClientID:    config.ClientID,
-		Retries:     config.Retries,
-		Backoff:     config.Backoff,
-		TLS:         tls,
-		Username:    config.Username,
-		Password:    config.Password,
-		Version:     kafka.Version("0.8.2.0"),
-	}
-
 	return &MetricSet{
-		BaseMetricSet: base,
-		broker:        kafka.NewBroker(base.Host(), cfg),
-		topics:        config.Topics,
+		MetricSet: ms,
+		topics:    config.Topics,
 	}, nil
-}
-
-func (m *MetricSet) connect() (*kafka.Broker, error) {
-	err := m.broker.Connect()
-	return m.broker, err
 }
 
 // Fetch partition stats list from kafka
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	b, err := m.connect()
+	b, err := m.Connect()
 	if err != nil {
 		r.Error(err)
 		return
 	}
-
 	defer b.Close()
+
 	topics, err := b.GetTopicsMetadata(m.topics...)
 	if err != nil {
 		r.Error(err)
