@@ -97,13 +97,13 @@ class Test(BaseTest):
             })
 
         nose.tools.assert_equal(stats['heartbeat']['monitors'], total_monitors)
-        nose.tools.assert_equal(stats['heartbeat']['endpoints'], total_endpoints)
+        nose.tools.assert_equal(
+            stats['heartbeat']['endpoints'], total_endpoints)
 
     @staticmethod
     def assert_stats(expected={}):
         stats = json.loads(urllib2.urlopen(
             "http://localhost:5066/stats").read())
-
 
         for proto in ("http", "tcp", "icmp"):
             proto_expected = expected.get(proto, {})
