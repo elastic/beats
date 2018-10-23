@@ -19,6 +19,7 @@ type opUploadToBucket struct {
 	bucketName string
 	path       string
 	raw        []byte
+	config     aws.Config
 }
 
 func newOpUploadToBucket(
@@ -33,6 +34,7 @@ func newOpUploadToBucket(
 		bucketName: bucketName,
 		path:       path,
 		raw:        raw,
+		config:     config,
 	}
 }
 
@@ -51,5 +53,15 @@ func (o *opUploadToBucket) Execute() error {
 		return err
 	}
 	o.log.Debug("Upload successful")
+	return nil
+}
+
+func (o *opUploadToBucket) Rollback() error {
+	// The error will be logged but we do not enforce a hard failure because the file could have
+	// been removed before.
+	err := newOpDeleteFileBucket(o.log, o.config, o.bucketName, o.path).Execute()
+	if err != nil {
+		o.log.Debugf("Fail to delete file on bucket, error: %+v", err)
+	}
 	return nil
 }
