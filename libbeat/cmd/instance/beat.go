@@ -21,6 +21,7 @@ import (
 	"context"
 	cryptRand "crypto/rand"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"math"
@@ -117,6 +118,9 @@ type beatConfig struct {
 	// output/publishing related configurations
 	Pipeline   pipeline.Config `config:",inline"`
 	Monitoring *common.Config  `config:"xpack.monitoring"`
+
+	// central managmenet settings
+	Management *common.Config `config:"management"`
 
 	// elastic stack 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`
@@ -308,7 +312,22 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	// Report central management state
+	mgmt := monitoring.GetNamespace("state").GetRegistry().NewRegistry("management")
+	monitoring.NewBool(mgmt, "enabled").Set(b.ConfigManager.Enabled())
+
 	debugf("Initializing output plugins")
+	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
+	if !outputEnabled {
+		if b.ConfigManager.Enabled() {
+			logp.Info("Output is configured through Central Management")
+		} else {
+			msg := "No outputs are defined. Please define one under the output section."
+			logp.Info(msg)
+			return nil, errors.New(msg)
+		}
+	}
+
 	pipeline, err := pipeline.Load(b.Info,
 		pipeline.Monitors{
 			Metrics:   reg,
@@ -317,6 +336,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		},
 		b.Config.Pipeline,
 		b.Config.Output)
+
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %+v", err)
 	}
@@ -588,7 +608,7 @@ func (b *Beat) configure(settings Settings) error {
 	logp.Info("Beat UUID: %v", b.Info.UUID)
 
 	// initialize config manager
-	b.ConfigManager, err = management.Factory()(reload.Register, b.Beat.Info.UUID)
+	b.ConfigManager, err = management.Factory()(b.Config.Management, reload.Register, b.Beat.Info.UUID)
 	if err != nil {
 		return err
 	}
