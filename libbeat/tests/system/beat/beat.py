@@ -61,6 +61,8 @@ class Proc(object):
                 stderr=subprocess.STDOUT,
                 bufsize=0,
             )
+            # If a "No such file or directory" error points you here, run
+            # "make metricbeat.test" on metricbeat folder
         return self.proc
 
     def kill(self):
@@ -501,7 +503,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         global yaml_cache
 
-        # TODO: Make fields_doc path more generic to work with beat-generator
+        # TODO: Make fields_doc path more generic to work with beat-generator. If it can't find file
+        # "fields.yml" you should run "make update" on metricbeat folder
         with open(fields_doc, "r") as f:
             path = os.path.abspath(os.path.dirname(__file__) + "../../../../fields.yml")
             if not os.path.isfile(path):

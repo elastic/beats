@@ -14,7 +14,7 @@
           description: >
               HTTP request information
           fields:
-            - name: header
+            - name: headers
               type: object
               description: >
                 The HTTP headers sent
@@ -31,7 +31,7 @@
           description: >
               HTTP response information
           fields:
-            - name: header
+            - name: headers
               type: object
               description: >
                 The HTTP headers received
