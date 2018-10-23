@@ -4,11 +4,14 @@
 
 package cmd
 
-import "github.com/elastic/beats/auditbeat/cmd"
+import (
+	"github.com/elastic/beats/auditbeat/cmd"
+	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
+)
 
 // RootCmd to handle beats cli
 var RootCmd = cmd.RootCmd
 
 func init() {
-	// TODO inject x-pack features
+	xpackcmd.AddXPack(RootCmd, cmd.Name)
 }

@@ -10,6 +10,7 @@ import sys
 import time
 import yaml
 import hashlib
+import re
 from datetime import datetime, timedelta
 
 from .compose import ComposeMixin
@@ -21,6 +22,8 @@ BEAT_REQUIRED_FIELDS = ["@timestamp",
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 yaml_cache = {}
+
+REGEXP_TYPE = type(re.compile("t"))
 
 
 class TimeoutError(Exception):
@@ -58,6 +61,8 @@ class Proc(object):
                 stderr=subprocess.STDOUT,
                 bufsize=0,
             )
+            # If a "No such file or directory" error points you here, run
+            # "make metricbeat.test" on metricbeat folder
         return self.proc
 
     def kill(self):
@@ -359,6 +364,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         Returns the number of appearances of the given string in the log file
         """
+        is_regexp = type(msg) == REGEXP_TYPE
 
         counter = 0
         if ignore_case:
@@ -371,6 +377,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
         try:
             with open(os.path.join(self.working_dir, logfile), "r") as f:
                 for line in f:
+                    if is_regexp:
+                        if msg.search(line) is not None:
+                            counter = counter + 1
+                        continue
                     if ignore_case:
                         line = line.lower()
                     if line.find(msg) >= 0:
@@ -493,7 +503,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         global yaml_cache
 
-        # TODO: Make fields_doc path more generic to work with beat-generator
+        # TODO: Make fields_doc path more generic to work with beat-generator. If it can't find file
+        # "fields.yml" you should run "make update" on metricbeat folder
         with open(fields_doc, "r") as f:
             path = os.path.abspath(os.path.dirname(__file__) + "../../../../fields.yml")
             if not os.path.isfile(path):

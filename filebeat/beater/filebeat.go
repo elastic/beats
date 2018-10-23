@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/common/reload"
+
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
@@ -32,6 +34,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 
@@ -188,9 +191,9 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	callback := func(esClient *elasticsearch.Client) error {
 		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
-	elasticsearch.RegisterConnectCallback(callback)
+	_, err := elasticsearch.RegisterConnectCallback(callback)
 
-	return nil
+	return err
 }
 
 func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) error {
@@ -391,6 +394,13 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		waitFinished.Add(runOnce)
 	}
 
+	// Register reloadable list of inputs and modules
+	inputs := cfgfile.NewRunnerList(management.DebugK, crawler.InputsFactory, b.Publisher)
+	reload.Register.MustRegisterList("filebeat.inputs", inputs)
+
+	modules := cfgfile.NewRunnerList(management.DebugK, crawler.ModulesFactory, b.Publisher)
+	reload.Register.MustRegisterList("filebeat.modules", modules)
+
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
 		adapter := fbautodiscover.NewAutodiscoverAdapter(crawler.InputsFactory, crawler.ModulesFactory)
@@ -405,10 +415,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
 
-	// Stop autodiscover -> Stop crawler -> stop inputs -> stop harvesters
+	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters
 	// Note: waiting for crawlers to stop here in order to install wgEvents.Wait
 	//       after all events have been enqueued for publishing. Otherwise wgEvents.Wait
 	//       or publisher might panic due to concurrent updates.
+	inputs.Stop()
+	modules.Stop()
 	adiscover.Stop()
 	crawler.Stop()
 

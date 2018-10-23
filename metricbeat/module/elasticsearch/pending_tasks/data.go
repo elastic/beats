@@ -21,10 +21,14 @@ import (
 	"encoding/json"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 var (
@@ -36,29 +40,34 @@ var (
 	}
 )
 
-func eventsMapping(content []byte, applyOpts ...s.ApplyOption) ([]common.MapStr, error) {
+func eventsMapping(r mb.ReporterV2, content []byte) error {
 	tasksStruct := struct {
 		Tasks []map[string]interface{} `json:"tasks"`
 	}{}
 
-	if err := json.Unmarshal(content, &tasksStruct); err != nil {
-		return nil, err
+	err := json.Unmarshal(content, &tasksStruct)
+	if err != nil {
+		err = errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
+		r.Error(err)
+		return err
 	}
+
 	if tasksStruct.Tasks == nil {
-		return nil, s.NewKeyNotFoundError("tasks")
+		return elastic.ReportErrorForMissingField("tasks", elastic.Elasticsearch, r)
 	}
 
-	var events []common.MapStr
-	var errors multierror.Errors
-
-	opts := append(applyOpts, s.AllRequired)
+	var errs multierror.Errors
 	for _, task := range tasksStruct.Tasks {
-		event, err := schema.Apply(task, opts...)
+		event := mb.Event{}
+		event.MetricSetFields, err = schema.Apply(task)
 		if err != nil {
-			errors = append(errors, err)
+			errs = append(errs, errors.Wrap(err, "failure applying task schema"))
 		}
-		events = append(events, event)
+
+		event.RootFields = common.MapStr{}
+		event.RootFields.Put("service.name", elasticsearch.ModuleName)
+		r.Event(event)
 	}
 
-	return events, errors.Err()
+	return errs.Err()
 }

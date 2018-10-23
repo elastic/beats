@@ -678,12 +678,12 @@
 			"versionExact": "v0.0.3"
 		},
 		{
-			"checksumSHA1": "MK8/w0Idj7kRBUiBabARPdm9hOo=",
+			"checksumSHA1": "+FZjRtpNIIvf+ZteS0y6IGw/JA8=",
 			"path": "github.com/elastic/go-ucfg",
-			"revision": "581f7b1fe9d84f4c18ef0694d6e0eb944a925dae",
-			"revisionTime": "2018-07-13T14:04:29Z",
-			"version": "v0.6.1",
-			"versionExact": "v0.6.1"
+			"revision": "e81c02ad8f1ab46b9e8b07f0832245c0c2e1d13c",
+			"revisionTime": "2018-10-05T15:55:04Z",
+			"version": "v0.6.4",
+			"versionExact": "v0.6.4"
 		},
 		{
 			"checksumSHA1": "X+R/CD8SokJrmlxFTx2nSevRDhQ=",
@@ -1095,6 +1095,13 @@
 			"revisionTime": "2017-03-24T09:53:51Z"
 		},
 		{
+			"checksumSHA1": "BfjvAbPn5t/2KrdC5E7418OuzV8=",
+			"path": "github.com/gofrs/uuid",
+			"revision": "47cd1dca1a6e7f807d5a492bd7e7f41d0855b5a1",
+			"revisionTime": "2018-09-14T05:15:27Z",
+			"version": "3.1.1"
+		},
+		{
 			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": "2bba0603135d7d7f5cb73b2125beeda19c09f4ef",
@@ -1374,12 +1381,6 @@
 			"path": "github.com/samuel/go-thrift/parser",
 			"revision": "2187045faa54fce7f5028706ffeb2f2fc342aa7e",
 			"revisionTime": "2014-05-22T04:34:39Z"
-		},
-		{
-			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
-			"path": "github.com/satori/go.uuid",
-			"revision": "5bf94b69c6b68ee1b541973bb8e1144db23a194b",
-			"revisionTime": "2017-03-21T23:07:31Z"
 		},
 		{
 			"checksumSHA1": "wZ7Q/3JyIlVKeYVqRUGh1zuLa9E=",
