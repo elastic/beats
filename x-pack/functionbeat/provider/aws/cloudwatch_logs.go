@@ -8,6 +8,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -22,6 +24,11 @@ import (
 	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/transformer"
 )
 
+var (
+	logGroupNamePattern = "^[\\.\\-_/#A-Za-z0-9]+$"
+	logGroupNameRE      = regexp.MustCompile(logGroupNamePattern)
+)
+
 // CloudwatchLogsConfig is the configuration for the cloudwatchlogs event type.
 type CloudwatchLogsConfig struct {
 	Triggers     []*CloudwatchLogsTriggerConfig `config:"triggers"`
@@ -32,8 +39,8 @@ type CloudwatchLogsConfig struct {
 
 // CloudwatchLogsTriggerConfig is the configuration for the specific triggers for cloudwatch.
 type CloudwatchLogsTriggerConfig struct {
-	LogGroupName  string `config:"log_group_name" validate:"nonzero,required"`
-	FilterPattern string `config:"filter_pattern"`
+	LogGroupName  logGroupName `config:"log_group_name" validate:"nonzero,required"`
+	FilterPattern string       `config:"filter_pattern"`
 }
 
 // Validate validates the configuration.
@@ -41,6 +48,33 @@ func (cfg *CloudwatchLogsConfig) Validate() error {
 	if len(cfg.Triggers) == 0 {
 		return errors.New("you need to specify at least one trigger")
 	}
+	return nil
+}
+
+// DOC: see validations rules at https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_CreateLogGroup.html
+type logGroupName string
+
+// Unpack takes a string and validate the log group format.
+func (l *logGroupName) Unpack(s string) error {
+	const max = 512
+	const min = 1
+
+	if len(s) > max {
+		return fmt.Errorf("log group name '%s' is too long, maximum length is %d", s, max)
+	}
+
+	if len(s) < min {
+		return fmt.Errorf("log group name too short, minimum length is %d", min)
+	}
+
+	if !logGroupNameRE.MatchString(s) {
+		return fmt.Errorf(
+			"invalid characters in log group name '%s', name must match regular expression: '%s'",
+			s,
+			logGroupNamePattern,
+		)
+	}
+	*l = logGroupName(s)
 	return nil
 }
 
@@ -157,7 +191,7 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 					":",
 					cloudformation.Ref("AWS::AccountId"),
 					":log-group:",
-					trigger.LogGroupName,
+					string(trigger.LogGroupName),
 					":*",
 				},
 			),
@@ -168,10 +202,10 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 		}
 
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-subscriptionfilter.html
-		template.Resources[prefix("SubscriptionFilter"+normalize(trigger.LogGroupName))] = &AWSLogsSubscriptionFilter{
+		template.Resources[prefix("SubscriptionFilter"+normalize(string(trigger.LogGroupName)))] = &AWSLogsSubscriptionFilter{
 			DestinationArn: cloudformation.GetAtt(prefix(""), "Arn"),
 			FilterPattern:  trigger.FilterPattern,
-			LogGroupName:   trigger.LogGroupName,
+			LogGroupName:   string(trigger.LogGroupName),
 		}
 	}
 	return template

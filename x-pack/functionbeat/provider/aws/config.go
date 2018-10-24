@@ -14,6 +14,11 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 )
 
+// Config expose the configuration option the AWS provider.
+type Config struct {
+	DeployBucket bucket `config:"deploy_bucket" validate:"nonzero,required"`
+}
+
 // maxMegabytes maximums memory that a lambda can use.
 const maxMegabytes = 3008
 
@@ -83,4 +88,23 @@ func isRawBytes(v string) bool {
 		}
 	}
 	return true
+}
+
+type bucket string
+
+// Do some high level validation on the bucket name, they have strict validations on the name on the API side.
+// DOC: https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html#bucketnamingrules
+func (b *bucket) Unpack(s string) error {
+	const max = 63
+	const min = 3
+	if len(s) > max {
+		return fmt.Errorf("bucket name '%s' is too long, name are restricted to %d chars", s, max)
+	}
+
+	if len(s) < min {
+		return fmt.Errorf("bucket name '%s' is too short, name need to be at least %d chars long", s, min)
+	}
+
+	*b = bucket(s)
+	return nil
 }

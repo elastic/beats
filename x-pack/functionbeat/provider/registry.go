@@ -109,7 +109,7 @@ func CreateFunctions(
 			return nil, err
 		}
 
-		if strInSlice(enabledFunctions, c.Name) == -1 {
+		if strInSlice(enabledFunctions, c.Name.String()) == -1 {
 			continue
 		}
 
@@ -160,7 +160,7 @@ func FindFunctionByName(
 			return nil, err
 		}
 
-		if c.Name != name {
+		if c.Name.String() != name {
 			continue
 		}
 

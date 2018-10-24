@@ -91,3 +91,20 @@ func TestNameMustBeUnique(t *testing.T) {
 		})
 	}
 }
+
+func TestFunctionName(t *testing.T) {
+	t.Run("valid function name", func(t *testing.T) {
+		f := functionName("")
+		err := f.Unpack("hello-world")
+		if !assert.NoError(t, err) {
+			return
+		}
+		assert.Equal(t, functionName("hello-world"), f)
+	})
+
+	t.Run("invalid function name", func(t *testing.T) {
+		f := functionName("")
+		err := f.Unpack("hello world")
+		assert.Error(t, err)
+	})
+}

@@ -12,17 +12,21 @@
 # Configure functions to run on AWS Lambda, currently we assume that the credentials
 # are present in the environment to correctly create the function when using the CLI.
 #
+
+# Configure which S3 bucket we should upload the lambda artifact.
+functionbeat.provider.aws.deploy_bucket: "functionbeat-deploy"
+
 functionbeat.provider.aws.functions:
 # Accepts events from a cloudwatch log group.
-  - name: fn_cloudwatch_logs
+  - name: cloudwatch
     type: cloudwatch_logs
     # The IAM role that the lambda will take when executing your function.
     role: iam
     # List of cloudwatch streams registered to this function.
     triggers:
-      - log_group_name: /aws/lambda/functionbeat-cloudwatch_logs
+      - log_group_name: /aws/lambda/functionbeat-cloudwatch
         filter_name: myfiltername
-        filter_pattern: mylog_
+        #filter_pattern: mylog_
 
 # Accepts events from a SQS queue.
 # - name: fn_sqs
