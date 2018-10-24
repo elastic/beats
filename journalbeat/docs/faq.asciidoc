@@ -1,0 +1,24 @@
+[[faq]]
+== Frequently asked questions
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
+This section contains frequently asked questions about {beatname_uc}. Also check
+out the https://discuss.elastic.co/c/beats/{beatname_lc}[{beatname_uc}
+discussion forum].
+
+[float]
+[id="{beatname_lc}-sometext"]
+=== Question 1?
+
+ADD DESCRIPTION HERE
+
+[float]
+[id="{beatname_lc}-sometext2"]
+=== Question 2?
+
+ADD DESCRIPTION HERE
+
+include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
+
+include::../../libbeat/docs/shared-faq.asciidoc[]
