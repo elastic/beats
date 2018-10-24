@@ -33,12 +33,14 @@ func MakeEndpointPair(tuple BaseTuple, cmdlineTuple *CmdlineTuple) (src Endpoint
 		IP:      tuple.SrcIP.String(),
 		Port:    tuple.SrcPort,
 		Proc:    string(cmdlineTuple.Src),
+		Name:    string(cmdlineTuple.Src),
 		Cmdline: string(cmdlineTuple.SrcCommand),
 	}
 	dst = Endpoint{
 		IP:      tuple.DstIP.String(),
 		Port:    tuple.DstPort,
 		Proc:    string(cmdlineTuple.Dst),
+		Name:    string(cmdlineTuple.Src),
 		Cmdline: string(cmdlineTuple.DstCommand),
 	}
 	return src, dst
