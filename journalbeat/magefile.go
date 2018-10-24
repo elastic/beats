@@ -43,14 +43,14 @@ var (
 		"linux/386":      installLinux386,
 		"linux/amd64":    installLinuxAMD64,
 		"linux/arm64":    installLinuxARM64,
-		"linux/armv5":    installLinuxARMLe,
-		"linux/armv6":    installLinuxARMLe,
-		"linux/armv7":    installLinuxARMHf,
+		"linux/armv5":    installLinuxARMLE,
+		"linux/armv6":    installLinuxARMLE,
+		"linux/armv7":    installLinuxARMHF,
 		"linux/mips":     installLinuxMIPS,
-		"linux/mipsle":   installLinuxMIPSle,
-		"linux/mips64le": installLinuxMIPS64le,
-		"linux/ppc64le":  installLinuxPPC64le,
-		"linux/s390x":    installLinuxs390x,
+		"linux/mipsle":   installLinuxMIPSLE,
+		"linux/mips64le": installLinuxMIPS64LE,
+		"linux/ppc64le":  installLinuxPPC64LE,
+		"linux/s390x":    installLinuxS390X,
 
 		// No deb packages
 		//"linux/ppc64": installLinuxPpc64,
@@ -84,11 +84,11 @@ func installLinuxARM64() error {
 	return installDependencies(libsystemdDevPkgName+":arm64", "arm64")
 }
 
-func installLinuxARMHf() error {
+func installLinuxARMHF() error {
 	return installDependencies(libsystemdDevPkgName+":armhf", "armhf")
 }
 
-func installLinuxARMLe() error {
+func installLinuxARMLE() error {
 	return installDependencies(libsystemdDevPkgName+":armel", "armel")
 }
 
@@ -100,19 +100,19 @@ func installLinuxMIPS() error {
 	return installDependencies(libsystemdDevPkgName+":mips", "mips")
 }
 
-func installLinuxMIPS64le() error {
+func installLinuxMIPS64LE() error {
 	return installDependencies(libsystemdDevPkgName+":mips64el", "mips64el")
 }
 
-func installLinuxMIPSle() error {
+func installLinuxMIPSLE() error {
 	return installDependencies(libsystemdDevPkgName+":mipsel", "mipsel")
 }
 
-func installLinuxPPC64le() error {
+func installLinuxPPC64LE() error {
 	return installDependencies(libsystemdDevPkgName+":ppc64el", "ppc64el")
 }
 
-func installLinuxs390x() error {
+func installLinuxS390X() error {
 	return installDependencies(libsystemdDevPkgName+":s390x", "s390x")
 }
 
