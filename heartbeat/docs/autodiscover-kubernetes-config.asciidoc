@@ -1,8 +1,8 @@
-Metricbeat supports templates for modules:
+{beatname_uc} supports templates for modules:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-metricbeat.autodiscover:
+heartbeat.autodiscover:
   providers:
     - type: kubernetes
       include_annotations: ["prometheus.io.scrape"]
@@ -11,9 +11,10 @@ metricbeat.autodiscover:
             contains:
               kubernetes.annotations.prometheus.io.scrape: "true"
           config:
-            - module: prometheus
-              metricsets: ["collector"]
-              hosts: "${data.host}:{data.port}"
+            - type: http
+              hosts: ["${data.host}:${data.port}"]
+              schedule: "@every 1s"
+              timeout: 1s
 -------------------------------------------------------------------------------------
 
-This configuration launches a `prometheus` module for all containers of pods annotated `prometheus.io.scrape=true`.
+This configuration launches an `http` module for all containers of pods annotated with `prometheus.io.scrape=true`.

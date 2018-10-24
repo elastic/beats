@@ -78,6 +78,8 @@ include::../../libbeat/docs/loggingconfig.asciidoc[]
 :standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
+:autodiscoverJolokia:
+:autodiscoverHints:
 include::../../libbeat/docs/shared-autodiscover.asciidoc[]
 
 :standalone:
