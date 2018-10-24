@@ -78,6 +78,8 @@ func CrossBuildGoDaemon() error {
 	return CrossBuild(defaultCrossBuildGoDaemon...)
 }
 
+// CrossBuildGoDaemonWithSelectableImage cross-builds the go-daemon binary
+// using the selected image.
 func CrossBuildGoDaemonWithSelectableImage(f ImageSelectorFunc) error {
 	opts := append(defaultCrossBuildGoDaemon, ImageSelector(f))
 	return CrossBuild(opts...)
