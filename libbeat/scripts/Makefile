@@ -1,6 +1,7 @@
 ### VARIABLE SETUP ###
 ### Application using libbeat may override the following variables in their Makefile
 BEAT_NAME?=libbeat## @packaging Name of the binary
+LICENSE?=ASL2
 BEAT_TITLE?=${BEAT_NAME}## @packaging Title of the application
 BEAT_PATH?=github.com/elastic/beats/${BEAT_NAME}
 BEAT_PACKAGE_NAME?=${BEAT_NAME}
@@ -122,14 +123,14 @@ check: check-headers python-env prepare-tests ## @build Checks project and sourc
 check-headers:
 ifndef CHECK_HEADERS_DISABLED
 	@go get github.com/elastic/go-licenser
-	@go-licenser -d
+	@go-licenser -d -license ${LICENSE}
 endif
 
 .PHONY: add-headers
 add-headers:
 ifndef CHECK_HEADERS_DISABLED
 	@go get github.com/elastic/go-licenser
-	@go-licenser
+	@go-licenser -license ${LICENSE}
 endif
 
 .PHONY: fmt
@@ -329,7 +330,7 @@ endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME) 
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
 endif
 
 	@# Update docs
