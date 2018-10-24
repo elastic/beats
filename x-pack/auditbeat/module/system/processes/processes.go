@@ -107,7 +107,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 		for _, pInfo := range started {
 			pInfoMapStr := pInfo.(*ProcessInfo).toMapStr()
-			pInfoMapStr.Put("status", "started")
+			pInfoMapStr.Put("status", "STARTED")
 
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
@@ -118,7 +118,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 		for _, pInfo := range stopped {
 			pInfoMapStr := pInfo.(*ProcessInfo).toMapStr()
-			pInfoMapStr.Put("status", "stopped")
+			pInfoMapStr.Put("status", "STOPPED")
 
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
@@ -132,7 +132,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 		for _, pInfo := range processInfos {
 			pInfoMapStr := pInfo.toMapStr()
-			pInfoMapStr.Put("status", "running")
+			pInfoMapStr.Put("status", "RUNNING")
 
 			processEvents = append(processEvents, pInfoMapStr)
 		}

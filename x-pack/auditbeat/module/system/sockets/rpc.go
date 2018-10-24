@@ -11,11 +11,6 @@ package sockets
 // #include <rpc/netdb.h>
 import "C"
 
-/*
-	Build information:
-	- requires libtirpc-dev to build
-*/
-
 import (
 	"github.com/pkg/errors"
 	"strconv"
