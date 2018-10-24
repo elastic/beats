@@ -123,7 +123,6 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Add Beats Central Management {pull}8559[8559]
 - Allow Bus to buffer events in case listeners are not configured. {pull}8527[8527]
 - Enable `host` and `cloud` metadata processors by default. {pull}8596[8596]
-- Set Beats services to automatic-delayed start on Windows. {pull}8720[8711]
 
 *Auditbeat*
 
@@ -302,6 +301,7 @@ The issue will be fixed in the 6.4.1 release.
 - Add module state reporting for Beats Monitoring. {pull}7075[7075]
 - Release the `rename` processor as GA. {pull}7656[7656]
 - Add support for Openstack Nova in `add_cloud_metadata` processor. {pull}7663[7663]
+- Add support to set Beats services to automatic-delayed start on Windows. {pull}8720[8711]
 
 *Auditbeat*
 
