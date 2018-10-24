@@ -109,7 +109,7 @@ func installLinuxPpc64le() error {
 }
 
 func installLinuxs390x() error {
-	return installDependencies("libsystemd-journal-dev:s390x", "s390x")
+	return installDependencies("libsystemd-dev:s390x", "s390x")
 }
 
 func installDependencies(pkg, arch string) error {
