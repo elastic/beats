@@ -3,6 +3,9 @@
 
 [partintro]
 --
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
 Before modifying configuration settings, make sure you've completed the
 <<{beatname_lc}-configuration,configuration steps>> in the Getting Started.
 This section describes some common use cases for changing configuration options.

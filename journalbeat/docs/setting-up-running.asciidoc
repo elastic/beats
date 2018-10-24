@@ -7,6 +7,8 @@
 [[setting-up-and-running]]
 == Setting up and running {beatname_uc}
 
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
 Before reading this section, see the
 <<{beatname_lc}-getting-started,getting started documentation>> for basic
 installation instructions to get you started.

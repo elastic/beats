@@ -1,6 +1,8 @@
 [id="{beatname_lc}-getting-started"]
 == Getting Started With {beatname_uc}
 
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
 include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
 
 * <<{beatname_lc}-installation>>
@@ -13,6 +15,8 @@ include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
 
 [id="{beatname_lc}-installation"]
 === Step 1: Install {beatname_uc}
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
 
 :no-docker:
 include::../../libbeat/docs/shared-download-and-install.asciidoc[]
@@ -110,6 +114,8 @@ endif::[]
 [id="{beatname_lc}-configuration"]
 === Step 2: Configure {beatname_uc}
 
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
 :no-docker:
 include::../../libbeat/docs/shared-configuring.asciidoc[]
 
@@ -174,17 +180,23 @@ include::../../libbeat/docs/step-look-at-config.asciidoc[]
 [id="{beatname_lc}-template"]
 === Step 3: Load the index template in Elasticsearch
 
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
 :allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]
 
 [id="{beatname_lc}-starting"]
 === Step 5: Start {beatname_uc}
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
 
 Start {beatname_uc} by issuing the appropriate command for your platform. If you
 are accessing a secured Elasticsearch cluster, make sure you've configured
@@ -235,6 +247,8 @@ By default, Windows log files are stored in +C:\ProgramData\{beatname_lc}\Logs+.
 
 [[view-kibana-dashboards]]
 === Step 6: View the sample Kibana dashboards
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
 
 To make it easier for you to explore {beatname_uc} data in Kibana, we've created
 example {beatname_uc} dashboards. You loaded the dashboards earlier when you

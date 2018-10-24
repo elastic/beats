@@ -5,6 +5,8 @@
 <titleabbrev>Configure inputs</titleabbrev>
 ++++
 
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
 By default, {beatname_uc} reads log events from the default systemd journals. To
 specify other journal files, set the <<{beatname_lc}-paths,`paths`>> option in
 the +{beatname_lc}.inputs+ section of the +{beatname_lc}.yml+ file. 
