@@ -1,0 +1,826 @@
+
+////
+This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+////
+
+[[exported-fields]]
+= Exported fields
+
+[partintro]
+
+--
+This document describes the fields that are exported by Journalbeat. They are
+grouped in the following categories:
+
+* <<exported-fields-beat>>
+* <<exported-fields-cloud>>
+* <<exported-fields-common>>
+* <<exported-fields-docker-processor>>
+* <<exported-fields-host-processor>>
+* <<exported-fields-kubernetes-processor>>
+
+--
+[[exported-fields-beat]]
+== Beat fields
+
+Contains common beat fields available in all event types.
+
+
+
+*`beat.name`*::
++
+--
+The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
+
+
+--
+
+*`beat.hostname`*::
++
+--
+The hostname as returned by the operating system on which the Beat is running.
+
+
+--
+
+*`beat.timezone`*::
++
+--
+The timezone as returned by the operating system on which the Beat is running.
+
+
+--
+
+*`beat.version`*::
++
+--
+The version of the beat that generated this event.
+
+
+--
+
+*`@timestamp`*::
++
+--
+type: date
+
+example: August 26th 2016, 12:35:53.332
+
+format: date
+
+required: True
+
+The timestamp when the event log record was generated.
+
+
+--
+
+*`tags`*::
++
+--
+Arbitrary tags that can be set per Beat and per transaction type.
+
+
+--
+
+*`fields`*::
++
+--
+type: object
+
+Contains user configurable fields.
+
+
+--
+
+[float]
+== error fields
+
+Error fields containing additional info in case of errors.
+
+
+
+*`error.message`*::
++
+--
+type: text
+
+Error message.
+
+
+--
+
+*`error.code`*::
++
+--
+type: long
+
+Error code.
+
+
+--
+
+*`error.type`*::
++
+--
+type: keyword
+
+Error type.
+
+
+--
+
+[[exported-fields-cloud]]
+== Cloud provider metadata fields
+
+Metadata from cloud providers added by the add_cloud_metadata processor.
+
+
+
+*`meta.cloud.provider`*::
++
+--
+example: ec2
+
+Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
+
+
+--
+
+*`meta.cloud.instance_id`*::
++
+--
+Instance ID of the host machine.
+
+
+--
+
+*`meta.cloud.instance_name`*::
++
+--
+Instance name of the host machine.
+
+
+--
+
+*`meta.cloud.machine_type`*::
++
+--
+example: t2.medium
+
+Machine type of the host machine.
+
+
+--
+
+*`meta.cloud.availability_zone`*::
++
+--
+example: us-east-1c
+
+Availability zone in which this host is running.
+
+
+--
+
+*`meta.cloud.project_id`*::
++
+--
+example: project-x
+
+Name of the project in Google Cloud.
+
+
+--
+
+*`meta.cloud.region`*::
++
+--
+Region in which this host is running.
+
+
+--
+
+[[exported-fields-common]]
+== Common Journalbeat fields
+
+Contains common fields available in all event types.
+
+
+
+*`read_timestamp`*::
++
+--
+The time when Journalbeat read the journal entry.
+
+
+--
+
+[float]
+== coredump fields
+
+Fields used by systemd-coredump kernel helper.
+
+
+
+*`coredump.unit`*::
++
+--
+type: keyword
+
+Annotations of messages containing coredumps from system units.
+
+
+--
+
+*`coredump.user_unit`*::
++
+--
+type: keyword
+
+Annotations of messages containing coredumps from user units.
+
+
+--
+
+[float]
+== journald fields
+
+Fields to log on behalf of a different program.
+
+
+
+[float]
+== audit fields
+
+Audit fields of event.
+
+
+
+*`journald.audit.loginuid`*::
++
+--
+type: long
+
+example: 1000
+
+required: False
+
+The login UID of the source process.
+
+
+--
+
+*`journald.audit.session`*::
++
+--
+type: long
+
+example: 3
+
+required: False
+
+The audit session of the source process.
+
+
+--
+
+*`journald.cmd`*::
++
+--
+type: keyword
+
+example: /lib/systemd/systemd --user
+
+required: False
+
+The command line of the process.
+
+
+--
+
+*`journald.name`*::
++
+--
+type: keyword
+
+example: /lib/systemd/systemd
+
+required: False
+
+Name of the executable.
+
+
+--
+
+*`journald.executable`*::
++
+--
+type: keyword
+
+example: /lib/systemd/systemd
+
+required: False
+
+Path to the the executable.
+
+
+--
+
+*`journald.pid`*::
++
+--
+type: long
+
+example: 1
+
+required: False
+
+The ID of the process which logged the message.
+
+
+--
+
+*`journald.gid`*::
++
+--
+type: long
+
+example: 1
+
+required: False
+
+The ID of the group which runs the process.
+
+
+--
+
+*`journald.uid`*::
++
+--
+type: long
+
+example: 1
+
+required: False
+
+The ID of the user which runs the process.
+
+
+--
+
+*`journald.capabilites`*::
++
+--
+required: False
+
+The effective capabilites of the process.
+
+
+--
+
+[float]
+== systemd fields
+
+Fields of systemd.
+
+
+
+*`systemd.invocation_id`*::
++
+--
+type: keyword
+
+example: 8450f1672de646c88cd133aadd4f2d70
+
+required: False
+
+The invocation ID for the runtime cycle of the unit the message was generated in.
+
+
+--
+
+*`systemd.cgroup`*::
++
+--
+type: keyword
+
+example: /user.slice/user-1234.slice/session-2.scope
+
+required: False
+
+The control group path in the systemd hierarchy.
+
+
+--
+
+*`systemd.owner_uid`*::
++
+--
+type: long
+
+required: False
+
+The owner UID of the systemd user unit or systemd session.
+
+
+--
+
+*`systemd.session`*::
++
+--
+type: keyword
+
+required: False
+
+The ID of the systemd session.
+
+
+--
+
+*`systemd.slice`*::
++
+--
+type: keyword
+
+example: user-1234.slice
+
+required: False
+
+The systemd slice unit.
+
+
+--
+
+*`systemd.user_slice`*::
++
+--
+type: keyword
+
+required: False
+
+The systemd user slice unit.
+
+
+--
+
+*`systemd.unit`*::
++
+--
+type: keyword
+
+example: nginx.service
+
+required: False
+
+The name of the systemd unit.
+
+
+--
+
+*`systemd.user_unit`*::
++
+--
+type: keyword
+
+example: user-1234.slice
+
+required: False
+
+The name of the systemd user unit.
+
+
+--
+
+*`systemd.transport`*::
++
+--
+type: keyword
+
+example: syslog
+
+required: True
+
+How the log message was received by journald.
+
+
+--
+
+[float]
+== host fields
+
+Fields of the host.
+
+
+
+*`host.boot_id`*::
++
+--
+type: text
+
+example: dd8c974asdf01dbe2ef26d7fasdf264c9
+
+required: False
+
+The boot ID for the boot the log was generated in.
+
+
+--
+
+[float]
+== syslog fields
+
+Fields of the code generating the event.
+
+
+
+*`syslog.priority`*::
++
+--
+type: long
+
+example: 1
+
+required: False
+
+The priority of the message. A syslog compatibility field.
+
+
+--
+
+*`syslog.facility`*::
++
+--
+type: long
+
+example: 1
+
+required: False
+
+The facility of the message. A syslog compatibility field.
+
+
+--
+
+*`syslog.identifier`*::
++
+--
+type: text
+
+example: su
+
+required: False
+
+The identifier of the message. A syslog compatibility field.
+
+
+--
+
+*`message`*::
++
+--
+type: text
+
+required: True
+
+The logged message.
+
+
+--
+
+*`custom`*::
++
+--
+type: nested
+
+required: False
+
+Arbitrary fields coming from processes.
+
+
+--
+
+[[exported-fields-docker-processor]]
+== Docker fields
+
+Docker stats collected from Docker.
+
+
+
+
+*`docker.container.id`*::
++
+--
+type: keyword
+
+Unique container id.
+
+
+--
+
+*`docker.container.image`*::
++
+--
+type: keyword
+
+Name of the image the container was built on.
+
+
+--
+
+*`docker.container.name`*::
++
+--
+type: keyword
+
+Container name.
+
+
+--
+
+*`docker.container.labels`*::
++
+--
+type: object
+
+Image labels.
+
+
+--
+
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+*`host.name`*::
++
+--
+type: keyword
+
+Hostname.
+
+
+--
+
+*`host.id`*::
++
+--
+type: keyword
+
+Unique host id.
+
+
+--
+
+*`host.architecture`*::
++
+--
+type: keyword
+
+Host architecture (e.g. x86_64, arm, ppc, mips).
+
+
+--
+
+*`host.os.platform`*::
++
+--
+type: keyword
+
+OS platform (e.g. centos, ubuntu, windows).
+
+
+--
+
+*`host.os.version`*::
++
+--
+type: keyword
+
+OS version.
+
+
+--
+
+*`host.os.family`*::
++
+--
+type: keyword
+
+OS family (e.g. redhat, debian, freebsd, windows).
+
+
+--
+
+*`host.ip`*::
++
+--
+type: ip
+
+List of IP-addresses.
+
+
+--
+
+*`host.mac`*::
++
+--
+type: keyword
+
+List of hardware-addresses, usually MAC-addresses.
+
+
+--
+
+[[exported-fields-kubernetes-processor]]
+== Kubernetes fields
+
+Kubernetes metadata added by the kubernetes processor
+
+
+
+
+*`kubernetes.pod.name`*::
++
+--
+type: keyword
+
+Kubernetes pod name
+
+
+--
+
+*`kubernetes.pod.uid`*::
++
+--
+type: keyword
+
+Kubernetes Pod UID
+
+
+--
+
+*`kubernetes.namespace`*::
++
+--
+type: keyword
+
+Kubernetes namespace
+
+
+--
+
+*`kubernetes.node.name`*::
++
+--
+type: keyword
+
+Kubernetes node name
+
+
+--
+
+*`kubernetes.labels`*::
++
+--
+type: object
+
+Kubernetes labels map
+
+
+--
+
+*`kubernetes.annotations`*::
++
+--
+type: object
+
+Kubernetes annotations map
+
+
+--
+
+*`kubernetes.container.name`*::
++
+--
+type: keyword
+
+Kubernetes container name
+
+
+--
+
+*`kubernetes.container.image`*::
++
+--
+type: keyword
+
+Kubernetes container image
+
+
+--
+

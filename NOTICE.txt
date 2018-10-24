@@ -172,6 +172,37 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/coreos/go-systemd
+Version: v17
+Revision: 39ca1b05acc7ad1220e09f133283b8859a8b71ab
+License type (autodetected): Apache-2.0
+./vendor/github.com/coreos/go-systemd/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+CoreOS Project
+Copyright 2018 CoreOS, Inc
+
+This product includes software developed at CoreOS, Inc.
+(http://www.coreos.com/).
+
+--------------------------------------------------------------------
+Dependency: github.com/coreos/pkg
+Revision: 97fdf19511ea361ae1c100dd393cc47f8dcfa1e1
+License type (autodetected): Apache-2.0
+./vendor/github.com/coreos/pkg/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+CoreOS Project
+Copyright 2014 CoreOS, Inc
+
+This product includes software developed at CoreOS, Inc.
+(http://www.coreos.com/).
+
+--------------------------------------------------------------------
 Dependency: github.com/davecgh/go-spew
 Version: v1.1.0
 Revision: 346938d642f2ec3594ed81d874461961cd0faa76
