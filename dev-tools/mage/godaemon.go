@@ -74,13 +74,7 @@ func BuildGoDaemon() error {
 
 // CrossBuildGoDaemon cross-build the go-daemon binary using the
 // golang-crossbuild environment.
-func CrossBuildGoDaemon() error {
-	return CrossBuild(defaultCrossBuildGoDaemon...)
-}
-
-// CrossBuildGoDaemonWithSelectableImage cross-builds the go-daemon binary
-// using the selected image.
-func CrossBuildGoDaemonWithSelectableImage(f ImageSelectorFunc) error {
-	opts := append(defaultCrossBuildGoDaemon, ImageSelector(f))
+func CrossBuildGoDaemon(options ...CrossBuildOption) error {
+	opts := append(defaultCrossBuildGoDaemon, options...)
 	return CrossBuild(opts...)
 }

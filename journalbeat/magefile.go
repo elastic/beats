@@ -42,14 +42,14 @@ var (
 	deps = map[string]func() error{
 		"linux/386":      installLinux386,
 		"linux/amd64":    installDefaultLinux,
-		"linux/arm64":    installLinuxArm64,
-		"linux/armv5":    installLinuxArmLe,
-		"linux/armv6":    installLinuxArmLe,
-		"linux/armv7":    installLinuxArmHf,
-		"linux/mips":     installLinuxMips,
-		"linux/mipsle":   installLinuxMipsle,
-		"linux/mips64le": installLinuxMips64le,
-		"linux/ppc64le":  installLinuxPpc64le,
+		"linux/arm64":    installLinuxARM64,
+		"linux/armv5":    installLinuxARMLe,
+		"linux/armv6":    installLinuxARMLe,
+		"linux/armv7":    installLinuxARMHf,
+		"linux/mips":     installLinuxMIPS,
+		"linux/mipsle":   installLinuxMIPSle,
+		"linux/mips64le": installLinuxMIPS64le,
+		"linux/ppc64le":  installLinuxPPC64le,
 		"linux/s390x":    installLinuxs390x,
 
 		// No deb packages
@@ -81,15 +81,15 @@ func installDefaultLinux() error {
 	return installDependencies(currentLibsystemdDev, "")
 }
 
-func installLinuxArm64() error {
+func installLinuxARM64() error {
 	return installDependencies(currentLibsystemdDev+":arm64", "arm64")
 }
 
-func installLinuxArmHf() error {
+func installLinuxARMHf() error {
 	return installDependencies(currentLibsystemdDev+":armhf", "armhf")
 }
 
-func installLinuxArmLe() error {
+func installLinuxARMLe() error {
 	return installDependencies(currentLibsystemdDev+":armel", "armel")
 }
 
@@ -97,19 +97,19 @@ func installLinux386() error {
 	return installDependencies(prevLibSystemdDev+":i386", "i386")
 }
 
-func installLinuxMips() error {
+func installLinuxMIPS() error {
 	return installDependencies(currentLibsystemdDev+":mips", "mips")
 }
 
-func installLinuxMips64le() error {
+func installLinuxMIPS64le() error {
 	return installDependencies(currentLibsystemdDev+":mips64el", "mips64el")
 }
 
-func installLinuxMipsle() error {
+func installLinuxMIPSle() error {
 	return installDependencies(currentLibsystemdDev+":mipsel", "mipsel")
 }
 
-func installLinuxPpc64le() error {
+func installLinuxPPC64le() error {
 	return installDependencies(currentLibsystemdDev+":ppc64el", "ppc64el")
 }
 
@@ -175,7 +175,7 @@ func CrossBuildXPack() error {
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
-	return mage.CrossBuildGoDaemonWithSelectableImage(selectImage)
+	return mage.CrossBuildGoDaemon(mage.ImageSelector(selectImage))
 }
 
 // Clean cleans all generated files and build artifacts.
