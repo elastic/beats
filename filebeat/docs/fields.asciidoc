@@ -4806,6 +4806,169 @@ Content length of the HTTP response body.
 
 --
 
+
+*`source_ecs.ip`*::
++
+--
+type: ip
+
+IP address of the source.
+
+
+--
+
+*`source_ecs.port`*::
++
+--
+type: long
+
+Port of the source.
+
+
+--
+
+[float]
+== geo fields
+
+Geolocation for source.
+
+
+*`source_ecs.geo.continent_name`*::
++
+--
+type: keyword
+
+Name of the continent.
+
+
+--
+
+*`source_ecs.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`source_ecs.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`source_ecs.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`source_ecs.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`source_ecs.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+
+[float]
+== geo fields
+
+Geolocation for destination.
+
+
+*`destination.geo.continent_name`*::
++
+--
+type: keyword
+
+Name of the continent.
+
+
+--
+
+*`destination.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`destination.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`destination.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`destination.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`destination.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+
+
+*`user_agent.os.full_name`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-logstash]]
 == logstash fields
 

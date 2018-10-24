@@ -358,7 +358,7 @@ specs:
         <<: *binary_spec
         <<: *elastic_license_for_binaries
         files:
-          /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
+          '{{.BeatName}}{{.BinaryExt}}':
             source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: darwin

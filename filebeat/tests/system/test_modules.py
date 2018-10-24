@@ -3,8 +3,8 @@ from beat.beat import INTEGRATION_TESTS
 import os
 import unittest
 import glob
-import shutil
 import subprocess
+
 from elasticsearch import Elasticsearch
 import json
 import logging
@@ -17,9 +17,10 @@ def load_fileset_test_cases():
     To execute tests for only 1 module, set the env variable TESTING_FILEBEAT_MODULES
     to the specific module name or a , separated lists of modules.
     """
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    modules_dir = os.path.join(current_dir, "..", "..", "module")
-
+    modules_dir = os.getenv("MODULES_PATH")
+    if not modules_dir:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        modules_dir = os.path.join(current_dir, "..", "..", "module")
     modules = os.getenv("TESTING_FILEBEAT_MODULES")
     if modules:
         modules = modules.split(",")
