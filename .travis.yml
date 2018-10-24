@@ -156,6 +156,7 @@ addons:
       - libpcap-dev
       - xsltproc
       - libxml2-utils
+      - libsystemd-journal-dev
 
 before_install:
   - python --version
