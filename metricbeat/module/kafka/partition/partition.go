@@ -74,22 +74,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch partition stats list from kafka
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	b, err := m.Connect()
+	broker, err := m.Connect()
 	if err != nil {
 		r.Error(err)
 		return
 	}
-	defer b.Close()
+	defer broker.Close()
 
-	topics, err := b.GetTopicsMetadata(m.topics...)
+	topics, err := broker.GetTopicsMetadata(m.topics...)
 	if err != nil {
 		r.Error(err)
 		return
 	}
 
 	evtBroker := common.MapStr{
-		"id":      b.ID(),
-		"address": b.AdvertisedAddr(),
+		"id":      broker.ID(),
+		"address": broker.AdvertisedAddr(),
 	}
 
 	for _, topic := range topics {
@@ -106,8 +106,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 		for _, partition := range topic.Partitions {
 			// partition offsets can be queried from leader only
-			if b.ID() != partition.Leader {
-				debugf("broker is not leader (broker=%v, leader=%v)", b.ID(), partition.Leader)
+			if broker.ID() != partition.Leader {
+				debugf("broker is not leader (broker=%v, leader=%v)", broker.ID(), partition.Leader)
 				continue
 			}
 
@@ -115,7 +115,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			for _, id := range partition.Replicas {
 
 				// Get oldest and newest available offsets
-				offOldest, offNewest, offOK, err := queryOffsetRange(b, id, topic.Name, partition.ID)
+				offOldest, offNewest, offOK, err := queryOffsetRange(broker, id, topic.Name, partition.ID)
 
 				if !offOK {
 					if err == nil {

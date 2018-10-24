@@ -76,16 +76,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch consumer group metrics from kafka
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	b, err := m.Connect()
+	broker, err := m.Connect()
 	if err != nil {
 		r.Error(err)
 		return
 	}
-	defer b.Close()
+	defer broker.Close()
 
 	brokerInfo := common.MapStr{
-		"id":      b.ID(),
-		"address": b.AdvertisedAddr(),
+		"id":      broker.ID(),
+		"address": broker.AdvertisedAddr(),
 	}
 
 	emitEvent := func(event common.MapStr) {
@@ -108,7 +108,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			MetricSetFields: event,
 		})
 	}
-	err = fetchGroupInfo(emitEvent, b, m.groups.pred(), m.topics.pred())
+	err = fetchGroupInfo(emitEvent, broker, m.groups.pred(), m.topics.pred())
 	if err != nil {
 		r.Error(err)
 	}
