@@ -105,6 +105,17 @@ jobs:
       go: $GO_VERSION
       stage: test
 
+    # Functionbeat
+    - os: linux
+      env: TARGETS="-C x-pack/functionbeat testsuite"
+      go: $GO_VERSION
+      stage: test
+
+    - os: osx
+      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite"
+      go: $GO_VERSION
+      stage: test
+
     # Generators
     - os: linux
       env: TARGETS="-C generator/metricbeat test"

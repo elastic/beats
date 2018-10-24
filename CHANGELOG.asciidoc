@@ -27,6 +27,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 *Winlogbeat*
 
+*Functionbeat*
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -95,6 +97,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 *Winlogbeat*
 
+*Functionbeat*
 
 ==== Added
 
@@ -167,6 +170,10 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 - Add automatic config file reloading. {pull}8023[8023]
 
+*Functionbeat*
+
+- Initial version of Functionbeat. {pull}8678[8678]
+
 ==== Deprecated
 
 *Affecting all Beats*
@@ -187,6 +194,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 *Packetbeat*
 
 *Winlogbeat*
+
+*Functionbeat*
 
 ==== Known Issue
 
