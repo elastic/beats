@@ -31,6 +31,7 @@ var (
 		"auditbeat",
 		"filebeat",
 		"heartbeat",
+		"journalbeat",
 		"metricbeat",
 		"packetbeat",
 		"winlogbeat",
@@ -68,5 +69,5 @@ func PackageBeatDashboards() error {
 
 // DumpVariables writes the template variables and values to stdout.
 func DumpVariables() error {
-    return mage.DumpVariables()
+	return mage.DumpVariables()
 }
