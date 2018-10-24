@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/magefile/mage/sh"
@@ -40,7 +41,11 @@ func OSSBeatDir(path ...string) string {
 
 	// Check if we need to correct ossDir because it's in x-pack.
 	if parentDir := filepath.Base(filepath.Dir(ossDir)); parentDir == "x-pack" {
-		ossDir = filepath.Join(ossDir, "../..", BeatName)
+		// If the OSS version of the beat exists.
+		tmp := filepath.Join(ossDir, "../..", BeatName)
+		if _, err := os.Stat(tmp); !os.IsNotExist(err) {
+			ossDir = tmp
+		}
 	}
 
 	return filepath.Join(append([]string{ossDir}, path...)...)

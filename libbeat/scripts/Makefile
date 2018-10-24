@@ -82,6 +82,7 @@ VIRTUALENV_PARAMS?=
 INTEGRATION_TESTS?=
 FIND=. ${PYTHON_ENV}/bin/activate; find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
+XPACK_ONLY?=false
 
 ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
@@ -210,7 +211,7 @@ system-tests-environment: prepare-tests build-image
 	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make system-tests
 	#This is a hack to run x-pack/filebeat module tests
 	@XPACKBEAT="${ES_BEATS}/x-pack/${BEAT_NAME}" ; \
-	if [ -e "$$XPACKBEAT/tests/system" ] ; then \
+	if [ -e "$$XPACKBEAT/tests/system" ] && [ $(XPACK_ONLY) = false ]; then \
 	    $(MAKE) -C ../x-pack/${BEAT_NAME} fields; \
 	    ${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e MODULES_PATH="../../x-pack/${BEAT_NAME}/module" -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make -C "$$XPACKBEAT" ${BEAT_NAME}.test system-tests ; \
 	    $(MAKE) -C ../x-pack/${BEAT_NAME} fix-permissions; \
