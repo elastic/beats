@@ -1,0 +1,6 @@
+[id="running-{beatname_lc}-on-kubernetes"]
+=== Running {beatname_uc} on Kubernetes
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
+ADD CONTENT HERE.
