@@ -15,7 +15,6 @@ New-Service -name {{.BeatName}} `
 
 # Attempt to set the service to delayed start using sc config.
 Try {
-  $svcDelayed='config "{0}" start=delayed-auto' -f '{{.BeatName}}'
-  Start-Process -FilePath sc.exe -ArgumentList $svcDelayed
+  Start-Process -FilePath sc.exe -ArgumentList 'config {{.BeatName}} start=delayed-auto'
 }
 Catch { Write-Host "An error occured setting the service to delayed start." -ForegroundColor Red }
