@@ -38,26 +38,6 @@ func init() {
 	mage.Platforms = mage.Platforms.Filter("linux !linux/ppc64 !linux/mips64")
 }
 
-var (
-	deps = map[string]func() error{
-		"linux/386":      installLinux386,
-		"linux/amd64":    installLinuxAMD64,
-		"linux/arm64":    installLinuxARM64,
-		"linux/armv5":    installLinuxARMLE,
-		"linux/armv6":    installLinuxARMLE,
-		"linux/armv7":    installLinuxARMHF,
-		"linux/mips":     installLinuxMIPS,
-		"linux/mipsle":   installLinuxMIPSLE,
-		"linux/mips64le": installLinuxMIPS64LE,
-		"linux/ppc64le":  installLinuxPPC64LE,
-		"linux/s390x":    installLinuxS390X,
-
-		// No deb packages
-		//"linux/ppc64": installLinuxPpc64,
-		//"linux/mips64": installLinuxMips64,
-	}
-)
-
 const (
 	libsystemdDevPkgName = "libsystemd-dev"
 )
@@ -76,61 +56,6 @@ func GolangCrossBuild() error {
 	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
 }
 
-func installLinuxAMD64() error {
-	return installDependencies(libsystemdDevPkgName, "")
-}
-
-func installLinuxARM64() error {
-	return installDependencies(libsystemdDevPkgName+":arm64", "arm64")
-}
-
-func installLinuxARMHF() error {
-	return installDependencies(libsystemdDevPkgName+":armhf", "armhf")
-}
-
-func installLinuxARMLE() error {
-	return installDependencies(libsystemdDevPkgName+":armel", "armel")
-}
-
-func installLinux386() error {
-	return installDependencies(libsystemdDevPkgName+":i386", "i386")
-}
-
-func installLinuxMIPS() error {
-	return installDependencies(libsystemdDevPkgName+":mips", "mips")
-}
-
-func installLinuxMIPS64LE() error {
-	return installDependencies(libsystemdDevPkgName+":mips64el", "mips64el")
-}
-
-func installLinuxMIPSLE() error {
-	return installDependencies(libsystemdDevPkgName+":mipsel", "mipsel")
-}
-
-func installLinuxPPC64LE() error {
-	return installDependencies(libsystemdDevPkgName+":ppc64el", "ppc64el")
-}
-
-func installLinuxS390X() error {
-	return installDependencies(libsystemdDevPkgName+":s390x", "s390x")
-}
-
-func installDependencies(pkg, arch string) error {
-	if arch != "" {
-		err := sh.Run("dpkg", "--add-architecture", arch)
-		if err != nil {
-			return errors.Wrap(err, "error while adding architecture")
-		}
-	}
-
-	if err := sh.Run("apt-get", "update"); err != nil {
-		return err
-	}
-
-	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkg)
-}
-
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
 func BuildGoDaemon() error {
 	return mage.BuildGoDaemon()
@@ -139,30 +64,6 @@ func BuildGoDaemon() error {
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	return mage.CrossBuild(mage.ImageSelector(selectImage))
-}
-
-func selectImage(platform string) (string, error) {
-	tagSuffix := "main"
-
-	switch {
-	case strings.HasPrefix(platform, "linux/arm"):
-		tagSuffix = "arm"
-	case strings.HasPrefix(platform, "linux/mips"):
-		tagSuffix = "mips"
-	case strings.HasPrefix(platform, "linux/ppc"):
-		tagSuffix = "ppc"
-	case platform == "linux/s390x":
-		tagSuffix = "s390x"
-	case strings.HasPrefix(platform, "linux"):
-		tagSuffix = "main-debian8"
-	}
-
-	goVersion, err := mage.GoVersion()
-	if err != nil {
-		return "", err
-	}
-
-	return mage.BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
 }
 
 // CrossBuildXPack cross-builds the beat with XPack for all target platforms.
@@ -221,4 +122,107 @@ func GoTestUnit(ctx context.Context) error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
 	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+}
+
+// -----------------------------------------------------------------------------
+// Customizations specific to Journalbeat.
+// - Install required headers on builders for different architectures.
+
+var (
+	deps = map[string]func() error{
+		"linux/386":      installLinux386,
+		"linux/amd64":    installLinuxAMD64,
+		"linux/arm64":    installLinuxARM64,
+		"linux/armv5":    installLinuxARMLE,
+		"linux/armv6":    installLinuxARMLE,
+		"linux/armv7":    installLinuxARMHF,
+		"linux/mips":     installLinuxMIPS,
+		"linux/mipsle":   installLinuxMIPSLE,
+		"linux/mips64le": installLinuxMIPS64LE,
+		"linux/ppc64le":  installLinuxPPC64LE,
+		"linux/s390x":    installLinuxS390X,
+
+		// No deb packages
+		//"linux/ppc64": installLinuxPpc64,
+		//"linux/mips64": installLinuxMips64,
+	}
+)
+
+func installLinuxAMD64() error {
+	return installDependencies(libsystemdDevPkgName, "")
+}
+
+func installLinuxARM64() error {
+	return installDependencies(libsystemdDevPkgName+":arm64", "arm64")
+}
+
+func installLinuxARMHF() error {
+	return installDependencies(libsystemdDevPkgName+":armhf", "armhf")
+}
+
+func installLinuxARMLE() error {
+	return installDependencies(libsystemdDevPkgName+":armel", "armel")
+}
+
+func installLinux386() error {
+	return installDependencies(libsystemdDevPkgName+":i386", "i386")
+}
+
+func installLinuxMIPS() error {
+	return installDependencies(libsystemdDevPkgName+":mips", "mips")
+}
+
+func installLinuxMIPS64LE() error {
+	return installDependencies(libsystemdDevPkgName+":mips64el", "mips64el")
+}
+
+func installLinuxMIPSLE() error {
+	return installDependencies(libsystemdDevPkgName+":mipsel", "mipsel")
+}
+
+func installLinuxPPC64LE() error {
+	return installDependencies(libsystemdDevPkgName+":ppc64el", "ppc64el")
+}
+
+func installLinuxS390X() error {
+	return installDependencies(libsystemdDevPkgName+":s390x", "s390x")
+}
+
+func installDependencies(pkg, arch string) error {
+	if arch != "" {
+		err := sh.Run("dpkg", "--add-architecture", arch)
+		if err != nil {
+			return errors.Wrap(err, "error while adding architecture")
+		}
+	}
+
+	if err := sh.Run("apt-get", "update"); err != nil {
+		return err
+	}
+
+	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkg)
+}
+
+func selectImage(platform string) (string, error) {
+	tagSuffix := "main"
+
+	switch {
+	case strings.HasPrefix(platform, "linux/arm"):
+		tagSuffix = "arm"
+	case strings.HasPrefix(platform, "linux/mips"):
+		tagSuffix = "mips"
+	case strings.HasPrefix(platform, "linux/ppc"):
+		tagSuffix = "ppc"
+	case platform == "linux/s390x":
+		tagSuffix = "s390x"
+	case strings.HasPrefix(platform, "linux"):
+		tagSuffix = "main-debian8"
+	}
+
+	goVersion, err := mage.GoVersion()
+	if err != nil {
+		return "", err
+	}
+
+	return mage.BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
 }
