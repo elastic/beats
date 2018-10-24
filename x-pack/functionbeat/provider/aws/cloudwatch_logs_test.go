@@ -119,3 +119,34 @@ func generateCloudwatchLogRawEvent() events.CloudwatchLogsEvent {
 		},
 	}
 }
+
+func TestLogGroupName(t *testing.T) {
+	t.Run("valid name", func(t *testing.T) {
+		l := logGroupName("")
+		err := l.Unpack("helloworld")
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		assert.Equal(t, logGroupName("helloworld"), l)
+	})
+
+	t.Run("fail if contains invalid chars", func(t *testing.T) {
+		l := logGroupName("")
+		err := l.Unpack("hello world")
+		assert.Error(t, err)
+	})
+
+	t.Run("fail if too short", func(t *testing.T) {
+		l := logGroupName("")
+		err := l.Unpack("")
+		assert.Error(t, err)
+	})
+
+	t.Run("fail if above 512 chars", func(t *testing.T) {
+		r, _ := common.RandomBytes(513)
+		l := logGroupName("")
+		err := l.Unpack(string(r[:513]))
+		assert.Error(t, err)
+	})
+}
