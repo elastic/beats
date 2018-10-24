@@ -41,7 +41,7 @@ func init() {
 var (
 	deps = map[string]func() error{
 		"linux/386":      installLinux386,
-		"linux/amd64":    installDefaultLinux,
+		"linux/amd64":    installLinuxAMD64,
 		"linux/arm64":    installLinuxARM64,
 		"linux/armv5":    installLinuxARMLe,
 		"linux/armv6":    installLinuxARMLe,
@@ -59,8 +59,8 @@ var (
 )
 
 const (
-	currentLibsystemdDev = "libsystemd-dev"
-	prevLibSystemdDev    = "libsystemd-journal-dev"
+	libsystemdDevPkgNameCurrent = "libsystemd-dev"
+	libsystemdDevPkgNameDebian8 = "libsystemd-journal-dev"
 )
 
 // Build builds the Beat binary.
@@ -77,44 +77,44 @@ func GolangCrossBuild() error {
 	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
 }
 
-func installDefaultLinux() error {
-	return installDependencies(currentLibsystemdDev, "")
+func installLinuxAMD64() error {
+	return installDependencies(libsystemdDevPkgNameDebian8, "")
 }
 
 func installLinuxARM64() error {
-	return installDependencies(currentLibsystemdDev+":arm64", "arm64")
+	return installDependencies(libsystemdDevPkgNameCurrent+":arm64", "arm64")
 }
 
 func installLinuxARMHf() error {
-	return installDependencies(currentLibsystemdDev+":armhf", "armhf")
+	return installDependencies(libsystemdDevPkgNameCurrent+":armhf", "armhf")
 }
 
 func installLinuxARMLe() error {
-	return installDependencies(currentLibsystemdDev+":armel", "armel")
+	return installDependencies(libsystemdDevPkgNameCurrent+":armel", "armel")
 }
 
 func installLinux386() error {
-	return installDependencies(prevLibSystemdDev+":i386", "i386")
+	return installDependencies(libsystemdDevPkgNameDebian8+":i386", "i386")
 }
 
 func installLinuxMIPS() error {
-	return installDependencies(currentLibsystemdDev+":mips", "mips")
+	return installDependencies(libsystemdDevPkgNameCurrent+":mips", "mips")
 }
 
 func installLinuxMIPS64le() error {
-	return installDependencies(currentLibsystemdDev+":mips64el", "mips64el")
+	return installDependencies(libsystemdDevPkgNameCurrent+":mips64el", "mips64el")
 }
 
 func installLinuxMIPSle() error {
-	return installDependencies(currentLibsystemdDev+":mipsel", "mipsel")
+	return installDependencies(libsystemdDevPkgNameCurrent+":mipsel", "mipsel")
 }
 
 func installLinuxPPC64le() error {
-	return installDependencies(currentLibsystemdDev+":ppc64el", "ppc64el")
+	return installDependencies(libsystemdDevPkgNameCurrent+":ppc64el", "ppc64el")
 }
 
 func installLinuxs390x() error {
-	return installDependencies(currentLibsystemdDev+":s390x", "s390x")
+	return installDependencies(libsystemdDevPkgNameCurrent+":s390x", "s390x")
 }
 
 func installDependencies(pkg, arch string) error {
@@ -146,8 +146,6 @@ func selectImage(platform string) (string, error) {
 	tagSuffix := "main"
 
 	switch {
-	case strings.HasPrefix(platform, "darwin"):
-		tagSuffix = "darwin"
 	case strings.HasPrefix(platform, "linux/arm"):
 		tagSuffix = "arm"
 	case strings.HasPrefix(platform, "linux/mips"):
