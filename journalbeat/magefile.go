@@ -35,7 +35,7 @@ import (
 func init() {
 	mage.BeatDescription = "Journalbeat ships systemd journal entries to Elasticsearch or Logstash."
 
-	mage.Platforms = mage.Platforms.Filter("linux")
+	mage.Platforms = mage.Platforms.Filter("linux !linux/ppc64 !linux/mips64")
 }
 
 var (
