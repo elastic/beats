@@ -54,13 +54,15 @@ func testTLSRequest(t *testing.T, testURL string, certPath string) beat.Event {
 	config, err := common.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	jobs, err := create("tls", config)
+	jobs, endpoints, err := create("tls", config)
 	require.NoError(t, err)
 
 	job := jobs[0]
 
 	event, _, err := job.Run()
 	require.NoError(t, err)
+
+	require.Equal(t, 1, endpoints)
 
 	return event
 }

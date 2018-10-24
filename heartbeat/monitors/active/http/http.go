@@ -39,15 +39,15 @@ var debugf = logp.MakeDebug("http")
 func create(
 	name string,
 	cfg *common.Config,
-) ([]monitors.Job, error) {
+) (jobs []monitors.Job, endpoints int, err error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var body []byte
@@ -58,13 +58,13 @@ func create(
 		compression := config.Check.Request.Compression
 		enc, err = getContentEncoder(compression.Type, compression.Level)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		buf := bytes.NewBuffer(nil)
 		err = enc.Encode(buf, bytes.NewBufferString(config.Check.Request.SendBody))
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		body = buf.Bytes()
@@ -72,30 +72,30 @@ func create(
 
 	validator := makeValidateResponse(&config.Check.Response)
 
-	jobs := make([]monitors.Job, len(config.URLs))
+	jobs = make([]monitors.Job, len(config.URLs))
 
 	if config.ProxyURL != "" {
 		transport, err := newRoundTripper(&config, tls)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		for i, url := range config.URLs {
 			jobs[i], err = newHTTPMonitorHostJob(url, &config, transport, enc, body, validator)
 			if err != nil {
-				return nil, err
+				return nil, 0, err
 			}
 		}
 	} else {
 		for i, url := range config.URLs {
 			jobs[i], err = newHTTPMonitorIPsJob(&config, url, tls, enc, body, validator)
 			if err != nil {
-				return nil, err
+				return nil, 0, err
 			}
 		}
 	}
 
-	return jobs, nil
+	return jobs, len(config.URLs), nil
 }
 
 func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport, error) {
