@@ -54,7 +54,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "example.net", 
+        "url.hostname": "example.net", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -118,7 +118,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "example.net", 
+        "url.hostname": "example.net", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -182,7 +182,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "example.net", 
+        "url.hostname": "example.net", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -246,7 +246,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "example.org", 
+        "url.hostname": "example.org", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -310,7 +310,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "example.org", 
+        "url.hostname": "example.org", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -374,7 +374,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "example.org", 
+        "url.hostname": "example.org", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -437,7 +437,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "security.ubuntu.com", 
+        "url.hostname": "security.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -499,7 +499,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "archive.ubuntu.com", 
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -561,7 +561,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "archive.ubuntu.com", 
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -623,7 +623,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "security.ubuntu.com", 
+        "url.hostname": "security.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -685,7 +685,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "security.ubuntu.com", 
+        "url.hostname": "security.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -747,7 +747,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "security.ubuntu.com", 
+        "url.hostname": "security.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -809,7 +809,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "archive.ubuntu.com", 
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -871,7 +871,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "archive.ubuntu.com", 
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -933,7 +933,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "archive.ubuntu.com", 
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -995,7 +995,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "archive.ubuntu.com", 
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -1057,7 +1057,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "archive.ubuntu.com", 
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -1119,7 +1119,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "archive.ubuntu.com", 
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -1179,7 +1179,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "archive.ubuntu.com", 
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -1239,7 +1239,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "archive.ubuntu.com", 
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
