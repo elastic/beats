@@ -19,7 +19,9 @@ import (
 
 // Cache keeps a copy of configs provided by Kibana, it's used when Kibana is down
 type Cache struct {
-	Configs api.ConfigBlocks
+	// ConfigOK is true if last config update was successful
+	ConfigOK bool
+	Configs  api.ConfigBlocks
 }
 
 // Load settings from its source file
