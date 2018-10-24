@@ -105,7 +105,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "192.168.86.28", 
+        "url.hostname": "192.168.86.28", 
         "user_agent.device": "Other", 
         "user_agent.major": "67", 
         "user_agent.minor": "0", 
@@ -162,7 +162,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.host.name": "192.168.86.28", 
+        "url.hostname": "192.168.86.28", 
         "user_agent.device": "Other", 
         "user_agent.major": "67", 
         "user_agent.minor": "0", 

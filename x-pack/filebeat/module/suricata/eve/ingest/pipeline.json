@@ -49,7 +49,7 @@
     }
   , {"convert":
       {"field": "suricata.eve.http.hostname"
-      ,"target_field": "url.host.name"
+      ,"target_field": "url.hostname"
       ,"type": "string"
       ,"ignore_missing": true
       }
