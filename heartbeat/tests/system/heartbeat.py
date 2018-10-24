@@ -27,7 +27,7 @@ class BaseTest(TestCase):
                 self.end_headers()
                 self.wfile.write(content)
 
-        server = BaseHTTPServer.HTTPServer(('localhost', 8185), HTTPHandler)
+        server = BaseHTTPServer.HTTPServer(('localhost', 0), HTTPHandler)
 
         thread = threading.Thread(target=server.serve_forever)
         thread.start()
@@ -39,6 +39,7 @@ class BaseTest(TestCase):
         return """
 - type: http
   schedule: "@every 1s"
+  timeout: 3s
   urls: ["{url}"]
         """[1:-1].format(url=url)
 
@@ -48,6 +49,7 @@ class BaseTest(TestCase):
         return """
 - type: tcp
   schedule: "@every 1s"
+  timeout: 3s
   hosts: [{host_str}]
         """[1:-1].format(host_str=host_str)
 
