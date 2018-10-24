@@ -65,7 +65,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 *Heartbeat*
 
-- Added support for extra TLS/x509 metadata. {pull}7944[7944]
+- Fixed bug where HTTP responses with larger bodies would incorrectly report connection errors. {pull}8660[8660]
 
 *Metricbeat*
 
@@ -125,6 +125,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 *Heartbeat*
 
 - Added autodiscovery support {pull}8415[8415]
+- Added support for extra TLS/x509 metadata. {pull}7944[7944]
+- Added stats and state metrics for number of monitors and endpoints started. {pull}8621[8621]
 
 *Metricbeat*
 
