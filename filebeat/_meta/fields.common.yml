@@ -120,6 +120,11 @@
         @timestamp is the processed timestamp from the log line. If both are identical
         only @timestamp should be used.
 
+    - name: event.type
+      type: keyword
+      description: >
+        A type given to this kind of event which can be used for grouping.
+
     - name: http.response.status_code
       type: long
       description: >
@@ -140,3 +145,214 @@
       type: keyword
       description: >
         Request method.
+
+    - name: source_ecs
+      type: group
+      fields:
+      - name: ip
+        type: ip
+        description: >
+          IP address of the source.
+
+          Can be one or multiple IPv4 or IPv6 addresses.
+
+      - name: port
+        type: long
+        description: >
+          Port of the source.
+
+      - name: geo
+        type: group
+        description:
+          Geolocation for source.
+        fields:
+        - name: continent_name
+          type: keyword
+          description: >
+            Name of the continent.
+
+        - name: country_iso_code
+          type: keyword
+          description: >
+            Country ISO code.
+
+        - name: location
+          type: geo_point
+          description: >
+            Longitude and latitude.
+
+        - name: region_name
+          type: keyword
+          description: >
+            Region name.
+
+        - name: city_name
+          type: keyword
+          description: >
+            City name.
+
+        - name: region_iso_code
+          type: keyword
+          description: >
+            Region ISO code.
+
+    - name: destination
+      type: group
+      fields:
+        - name: ip
+          type: ip
+          description: >
+            IP address of the destination.
+
+            Can be one or multiple IPv4 or IPv6 addresses.
+
+        - name: port
+          type: long
+          description: >
+            Port of the destination.
+
+        - name: geo
+          type: group
+          description:
+            Geolocation for destination.
+          fields:
+          - name: continent_name
+            type: keyword
+            description: >
+              Name of the continent.
+
+          - name: country_iso_code
+            type: keyword
+            description: >
+              Country ISO code.
+
+          - name: location
+            type: geo_point
+            description: >
+              Longitude and latitude.
+
+          - name: region_name
+            type: keyword
+            description: >
+              Region name.
+
+          - name: city_name
+            type: keyword
+            description: >
+              City name.
+
+          - name: region_iso_code
+            type: keyword
+            description: >
+              Region ISO code.
+
+    - name: user_agent
+      title: User agent
+      description: >
+        The user_agent fields normally come from a browser request. They often
+        show up in web service logs coming from the parsed user agent string.
+      type: group
+      fields:
+        - name: original
+          level: extended
+          type: keyword
+          description: >
+            Unparsed version of the user_agent.
+
+        - name: device
+          level: extended
+          type: keyword
+          description: >
+            Name of the physical device.
+
+        - name: version
+          level: extended
+          type: keyword
+          description: >
+            Version of the physical device.
+
+        - name: major
+          level: extended
+          type: long
+          description: >
+            Major version of the user agent.
+
+        - name: minor
+          level: extended
+          type: long
+          description: >
+            Minor version of the user agent.
+
+        - name: patch
+          level: extended
+          type: keyword
+          description: >
+            Patch version of the user agent.
+
+        - name: name
+          level: extended
+          type: keyword
+          example: Chrome
+          description: >
+            Name of the user agent.
+
+        - name: os.name
+          level: extended
+          type: keyword
+          description: >
+            Name of the operating system.
+
+        - name: os.full_name
+          level: extended
+          type: keyword
+          description: >
+            Full name of the operating system (includes version).
+
+        - name: os.version
+          level: extended
+          type: keyword
+          description: >
+            Version of the operating system.
+
+        - name: os.major
+          level: extended
+          type: long
+          description: >
+            Major version of the operating system.
+
+        - name: os.minor
+          level: extended
+          type: long
+          description: >
+            Minor version of the operating system.
+
+    - name: url
+      description: >
+        URL fields provide a complete URL, with scheme, host, and path. The URL
+        object can be reused in other prefixes, such as `host.url.*` for
+        example. Keep the structure consistent whenever you use URL fields.
+
+      type: group
+      fields:
+      - name: hostname
+        type: keyword
+        description: >
+          Hostname of the request, such as "elastic.co".
+          In some cases a URL may refer to an IP and/or port directly, without a
+          domain name. In this case, the IP address would go to the `hostname` field.
+
+    - name: file
+      description: >
+        File fields provide details about each file.
+
+      type: group
+      fields:
+        - name: path
+          level: extended
+          type: keyword
+          description: Path to the file.
+
+        - name: size
+          type: long
+          description: File size in bytes (field is only added when `type` is
+            `file`).

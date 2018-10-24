@@ -210,6 +210,13 @@ system-tests: prepare-tests ${BEAT_NAME}.test python-env
 system-tests-environment:  ## @testing Runs the system tests inside a virtual environment. This can be run on any docker-machine (local, remote)
 system-tests-environment: prepare-tests build-image
 	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make system-tests
+	#This is a hack to run x-pack/filebeat module tests
+	@XPACKBEAT="${ES_BEATS}/x-pack/${BEAT_NAME}" ; \
+	if [ -e "$$XPACKBEAT/tests/system" ] ; then \
+	    $(MAKE) -C ../x-pack/${BEAT_NAME} fields; \
+	    ${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e MODULES_PATH="../../x-pack/${BEAT_NAME}/module" -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make -C "$$XPACKBEAT" ${BEAT_NAME}.test system-tests ; \
+	    $(MAKE) -C ../x-pack/${BEAT_NAME} fix-permissions; \
+	fi
 
 
 .PHONY: fast-system-tests
@@ -348,7 +355,9 @@ endif
 	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/6/dashboard/*.json"
 	@mkdir -p $(PWD)/_meta/kibana.generated/5/index-pattern
 	@mkdir -p $(PWD)/_meta/kibana.generated/6/index-pattern
-	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go -index '${BEAT_INDEX_PREFIX}-*' -beat-name ${BEAT_NAME} -beat-dir $(PWD) -version ${BEAT_VERSION}
+	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go \
+	  -index '${BEAT_INDEX_PREFIX}-*' -beat ${BEAT_NAME} -fields $(PWD)/fields.yml \
+	  -version ${BEAT_VERSION} -out _meta/kibana.generated
 
 .PHONY: docs
 docs:  ## @build Builds the documents for the beat

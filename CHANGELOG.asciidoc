@@ -126,6 +126,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Release `docker` input as GA. {pull}8328[8328]
 - Keep unparsed user agent information in user_agent.original. {pull}7823[7832]
 - Added default and TCP parsing formats to HAproxy module {issue}8311[8311] {pull}8637[8637]
+- Add Suricata IDS/IDP/NSM module. {issue}8153[8153] {pull}8693[8693]
 
 *Heartbeat*
 
