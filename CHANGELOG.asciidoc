@@ -123,7 +123,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Add Beats Central Management {pull}8559[8559]
 - Allow Bus to buffer events in case listeners are not configured. {pull}8527[8527]
 - Enable `host` and `cloud` metadata processors by default. {pull}8596[8596]
-- In Windows, set Beats services to automatic-delayed start. {pull}8720[8711]
+- Set Beats services to automatic-delayed start on Windows. {pull}8720[8711]
 
 *Auditbeat*
 
