@@ -22,10 +22,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage"
 )
@@ -36,6 +38,26 @@ func init() {
 	mage.Platforms = mage.Platforms.Filter("linux")
 }
 
+var (
+	deps = map[string]func() error{
+		"linux/386":      installLinux386,
+		"linux/amd64":    installDefaultLinux,
+		"linux/arm64":    installLinuxArm64,
+		"linux/armv5":    installLinuxArmLe,
+		"linux/armv6":    installLinuxArmLe,
+		"linux/armv7":    installLinuxArmHf,
+		"linux/mips":     installLinuxMips,
+		"linux/mipsle":   installLinuxMipsle,
+		"linux/mips64le": installLinuxMips64le,
+		"linux/ppc64le":  installLinuxPpc64le,
+		"linux/s390x":    installLinuxs390x,
+
+		// No deb packages
+		//"linux/ppc64": installLinuxPpc64,
+		//"linux/mips64": installLinuxMips64,
+	}
+)
+
 // Build builds the Beat binary.
 func Build() error {
 	return mage.Build(mage.DefaultBuildArgs())
@@ -44,16 +66,65 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	mg.Deps(installDependencies)
+	if d, ok := deps[mage.Platform.Name]; ok {
+		mg.Deps(d)
+	}
 	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
 }
 
-func installDependencies() error {
+func installDefaultLinux() error {
+	return installDependencies("libsystemd-dev", "")
+}
+
+func installLinuxArm64() error {
+	return installDependencies("libsystemd-dev:arm64", "arm64")
+}
+
+func installLinuxArmHf() error {
+	return installDependencies("libsystemd-dev:armhf", "armhf")
+}
+
+func installLinuxArmLe() error {
+	return installDependencies("libsystemd-dev:armel", "armel")
+}
+
+func installLinux386() error {
+	return installDependencies("libsystemd-journal-dev:i386", "i386")
+}
+
+func installLinuxMips() error {
+	return installDependencies("libsystemd-journal-dev:mips", "mips")
+}
+
+func installLinuxMips64le() error {
+	return installDependencies("libsystemd-journal-dev:mips64el", "mips64el")
+}
+
+func installLinuxMipsle() error {
+	return installDependencies("libsystemd-journal-dev:mipsel", "mipsel")
+}
+
+func installLinuxPpc64le() error {
+	return installDependencies("libsystemd-journal-dev:ppc64el", "ppc64el")
+}
+
+func installLinuxs390x() error {
+	return installDependencies("libsystemd-journal-dev:s390x", "s390x")
+}
+
+func installDependencies(pkg, arch string) error {
+	if arch != "" {
+		err := sh.Run("dpkg", "--add-architecture", arch)
+		if err != nil {
+			return errors.Wrap(err, "error while adding architecture")
+		}
+	}
+
 	if err := sh.Run("apt-get", "update"); err != nil {
 		return err
 	}
 
-	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", "libsystemd-dev")
+	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkg)
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
