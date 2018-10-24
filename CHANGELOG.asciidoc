@@ -313,6 +313,7 @@ The issue will be fixed in the 6.4.1 release.
 - Add module state reporting for Beats Monitoring. {pull}7075[7075]
 - Release the `rename` processor as GA. {pull}7656[7656]
 - Add support for Openstack Nova in `add_cloud_metadata` processor. {pull}7663[7663]
+- Add support to set Beats services to automatic-delayed start on Windows. {pull}8720[8711]
 
 *Auditbeat*
 
