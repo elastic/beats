@@ -3130,6 +3130,16 @@ event.created contains the date on which the event was created. In case of log e
 
 --
 
+*`event.type`*::
++
+--
+type: keyword
+
+A type given to this kind of event which can be used for grouping.
+
+
+--
+
 *`http.response.status_code`*::
 +
 --
@@ -3179,6 +3189,7 @@ Request method.
 type: ip
 
 IP address of the source.
+Can be one or multiple IPv4 or IPv6 addresses.
 
 
 --
@@ -3260,6 +3271,27 @@ Region ISO code.
 --
 
 
+*`destination.ip`*::
++
+--
+type: ip
+
+IP address of the destination.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`destination.port`*::
++
+--
+type: long
+
+Port of the destination.
+
+
+--
+
 [float]
 == geo fields
 
@@ -3326,12 +3358,132 @@ Region ISO code.
 
 --
 
+[float]
+== user_agent fields
 
+The user_agent fields normally come from a browser request. They often show up in web service logs coming from the parsed user agent string.
+
+
+
+*`user_agent.original`*::
++
+--
+type: keyword
+
+Unparsed version of the user_agent.
+
+
+--
+
+*`user_agent.device`*::
++
+--
+type: keyword
+
+Name of the physical device.
+
+
+--
+
+*`user_agent.version`*::
++
+--
+type: keyword
+
+Version of the physical device.
+
+
+--
+
+*`user_agent.major`*::
++
+--
+type: long
+
+Major version of the user agent.
+
+
+--
+
+*`user_agent.minor`*::
++
+--
+type: long
+
+Minor version of the user agent.
+
+
+--
+
+*`user_agent.patch`*::
++
+--
+type: keyword
+
+Patch version of the user agent.
+
+
+--
+
+*`user_agent.name`*::
++
+--
+type: keyword
+
+example: Chrome
+
+Name of the user agent.
+
+
+--
+
+*`user_agent.os.name`*::
++
+--
+type: keyword
+
+Name of the operating system.
+
+
+--
 
 *`user_agent.os.full_name`*::
 +
 --
 type: keyword
+
+Full name of the operating system (includes version).
+
+
+--
+
+*`user_agent.os.version`*::
++
+--
+type: keyword
+
+Version of the operating system.
+
+
+--
+
+*`user_agent.os.major`*::
++
+--
+type: long
+
+Major version of the operating system.
+
+
+--
+
+*`user_agent.os.minor`*::
++
+--
+type: long
+
+Minor version of the operating system.
+
 
 --
 
@@ -3349,6 +3501,31 @@ type: keyword
 
 Hostname of the request, such as "elastic.co". In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `hostname` field.
 
+
+--
+
+[float]
+== file fields
+
+File fields provide details about each file.
+
+
+
+*`file.path`*::
++
+--
+type: keyword
+
+Path to the file.
+
+--
+
+*`file.size`*::
++
+--
+type: long
+
+File size in bytes (field is only added when `type` is `file`).
 
 --
 
