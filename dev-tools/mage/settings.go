@@ -40,7 +40,7 @@ const (
 
 	// Docker images. See https://github.com/elastic/golang-crossbuild.
 	beatsFPMImage        = "docker.elastic.co/beats-dev/fpm"
-	beatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
+	BeatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
 
 	elasticBeatsImportPath = "github.com/elastic/beats"
 )

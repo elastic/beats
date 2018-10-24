@@ -63,17 +63,43 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return mage.CrossBuild()
+	return mage.CrossBuild(mage.ImageSelector(selectImage))
+}
+
+func selectImage(platform string) (string, error) {
+	tagSuffix := "main"
+
+	switch {
+	case strings.HasPrefix(platform, "darwin"):
+		tagSuffix = "darwin"
+	case strings.HasPrefix(platform, "linux/arm"):
+		tagSuffix = "arm"
+	case strings.HasPrefix(platform, "linux/mips"):
+		tagSuffix = "mips"
+	case strings.HasPrefix(platform, "linux/ppc"):
+		tagSuffix = "ppc"
+	case platform == "linux/s390x":
+		tagSuffix = "s390x"
+	case strings.HasPrefix(platform, "linux"):
+		tagSuffix = "main-debian8"
+	}
+
+	goVersion, err := mage.GoVersion()
+	if err != nil {
+		return "", err
+	}
+
+	return mage.BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
 }
 
 // CrossBuildXPack cross-builds the beat with XPack for all target platforms.
 func CrossBuildXPack() error {
-	return mage.CrossBuildXPack()
+	return mage.CrossBuildXPack(mage.ImageSelector(selectImage))
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
-	return mage.CrossBuildGoDaemon()
+	return mage.CrossBuildGoDaemonWithSelectableImage(selectImage)
 }
 
 // Clean cleans all generated files and build artifacts.
