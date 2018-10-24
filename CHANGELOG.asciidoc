@@ -19,6 +19,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 *Heartbeat*
 
+*Journalbeat*
+
 *Metricbeat*
 
 *Packetbeat*
@@ -66,6 +68,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 *Heartbeat*
 
 - Fixed bug where HTTP responses with larger bodies would incorrectly report connection errors. {pull}8660[8660]
+
+*Journalbeat*
 
 *Metricbeat*
 
@@ -129,6 +133,10 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Added support for extra TLS/x509 metadata. {pull}7944[7944]
 - Added stats and state metrics for number of monitors and endpoints started. {pull}8621[8621]
 
+*Journalbeat*
+
+- Add journalbeat. {pull}8703[8703]
+
 *Metricbeat*
 
 - Add `replstatus` metricset to MongoDB module {pull}7604[7604]
@@ -166,6 +174,8 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 
 *Heartbeat*
 - watch.poll_file is now deprecated and superceded by automatic config file reloading.
+
+*Journalbeat*
 
 *Metricbeat*
 - Redis `info` `replication.master_offset` has been deprecated in favor of `replication.master.offset`.{pull}7695[7695]
