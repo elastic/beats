@@ -16,7 +16,9 @@ functionbeat.provider.aws.deploy_bucket: "functionbeat-deploy"
 
 functionbeat.provider.aws.functions:
   # Define the list of function availables, each function required to have a unique name.
+  # Create a function that accepts events coming from cloudwatchlogs.
   - name: cloudwatch
+    enabled: false
     type: cloudwatch_logs
 
     # Description of the method to help identify them when you run multiples functions.
@@ -33,7 +35,7 @@ functionbeat.provider.aws.functions:
     #memory_size: 128MiB
 
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
-    # dead_letter_config.target_arn:
+    #dead_letter_config.target_arn:
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -50,3 +52,43 @@ functionbeat.provider.aws.functions:
     #processors:
     #  - dissect:
     #      tokenizer: "%{key1} %{key2}"
+
+  # Create a function that accepts events from SQS queues.
+  - name: sqs
+    enabled: false
+    type: sqs
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "lambda function for sqs events"
+
+    # Concurrency, is the reserved number of instances for that function.
+    # Default is unreserved.
+    #
+    # Note: There is a hard limit of 1000 functions of any kind per account.
+    #concurrency: 5
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    #memory_size: 128MiB
+
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    #dead_letter_config.target_arn:
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # List of cloudwatch log group registered to that function.
+    triggers:
+      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+
+    # Define custom processors for this function.
+    #processors:
+    #  - decode_json_fields:
+    #      fields: ["message"]
+    #      process_array: false
+    #      max_depth: 1
+    #      target: ""
+    #      overwrite_keys: false

@@ -25,6 +25,9 @@ const (
 	// AWS lambda currently support go 1.x as a runtime.
 	runtime     = "go1.x"
 	handlerName = "functionbeat"
+
+	// invalidChars for resource name
+	invalidChars = ":-/"
 )
 
 // AWSLambdaFunction add 'dependsOn' as a serializable parameters, for no good reason it's
@@ -98,7 +101,7 @@ func (c *CLIManager) template(function installer, name, templateLoc string) *clo
 			},
 		},
 		Path:     "/",
-		RoleName: "functionbeat-lambda",
+		RoleName: "functionbeat-lambda-" + name,
 		// Allow the lambda to write log to cloudwatch logs.
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html
 		Policies: []cloudformation.AWSIAMRole_Policy{
@@ -344,6 +347,10 @@ func mergeTemplate(to, from *cloudformation.Template) error {
 	}
 
 	return nil
+}
+
+func normalizeResourceName(s string) string {
+	return common.RemoveChars(s, invalidChars)
 }
 
 func codeKey(name string, content []byte) string {

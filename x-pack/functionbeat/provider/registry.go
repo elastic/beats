@@ -164,6 +164,10 @@ func FindFunctionByName(
 			continue
 		}
 
+		if !c.Enabled {
+			return nil, fmt.Errorf("function '%s' not enabled for provider '%s'", name, provider.Name())
+		}
+
 		f, err := registry.LookupFunction(provider.Name(), c.Type)
 		if err != nil {
 			return nil, err
