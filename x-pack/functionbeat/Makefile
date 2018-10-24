@@ -7,6 +7,7 @@ TEST_ENVIRONMENT?=true
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 ES_BEATS?=../../
 FIELDS_FILE_PATH=module
+XPACK_ONLY?=true
 
 # Path to the libbeat Makefile
 include $(ES_BEATS)/libbeat/scripts/Makefile
