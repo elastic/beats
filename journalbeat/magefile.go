@@ -58,6 +58,11 @@ var (
 	}
 )
 
+const (
+	currentLibsystemdDev = "libsystemd-dev"
+	prevLibSystemdDev    = "libsystemd-journal-dev"
+)
+
 // Build builds the Beat binary.
 func Build() error {
 	return mage.Build(mage.DefaultBuildArgs())
@@ -73,43 +78,43 @@ func GolangCrossBuild() error {
 }
 
 func installDefaultLinux() error {
-	return installDependencies("libsystemd-dev", "")
+	return installDependencies(currentLibsystemdDev, "")
 }
 
 func installLinuxArm64() error {
-	return installDependencies("libsystemd-dev:arm64", "arm64")
+	return installDependencies(currentLibsystemdDev+":arm64", "arm64")
 }
 
 func installLinuxArmHf() error {
-	return installDependencies("libsystemd-dev:armhf", "armhf")
+	return installDependencies(currentLibsystemdDev+":armhf", "armhf")
 }
 
 func installLinuxArmLe() error {
-	return installDependencies("libsystemd-dev:armel", "armel")
+	return installDependencies(currentLibsystemdDev+":armel", "armel")
 }
 
 func installLinux386() error {
-	return installDependencies("libsystemd-journal-dev:i386", "i386")
+	return installDependencies(prevLibSystemdDev+":i386", "i386")
 }
 
 func installLinuxMips() error {
-	return installDependencies("libsystemd-journal-dev:mips", "mips")
+	return installDependencies(currentLibsystemdDev+":mips", "mips")
 }
 
 func installLinuxMips64le() error {
-	return installDependencies("libsystemd-journal-dev:mips64el", "mips64el")
+	return installDependencies(currentLibsystemdDev+":mips64el", "mips64el")
 }
 
 func installLinuxMipsle() error {
-	return installDependencies("libsystemd-journal-dev:mipsel", "mipsel")
+	return installDependencies(currentLibsystemdDev+":mipsel", "mipsel")
 }
 
 func installLinuxPpc64le() error {
-	return installDependencies("libsystemd-journal-dev:ppc64el", "ppc64el")
+	return installDependencies(currentLibsystemdDev+":ppc64el", "ppc64el")
 }
 
 func installLinuxs390x() error {
-	return installDependencies("libsystemd-dev:s390x", "s390x")
+	return installDependencies(currentLibsystemdDev+":s390x", "s390x")
 }
 
 func installDependencies(pkg, arch string) error {
@@ -186,9 +191,24 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	mage.UseElasticBeatPackaging()
+	customizePackaging()
+
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
+}
+
+// customizePackaging adds dependencies of journalbeat.
+func customizePackaging() {
+	for _, args := range mage.Packages {
+		switch args.OS {
+		case "linux":
+			if args.Types[0] == mage.Deb {
+				args.Spec.AddDebDependency(currentLibsystemdDev)
+				continue
+			}
+		}
+	}
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
