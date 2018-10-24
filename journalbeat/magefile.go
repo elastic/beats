@@ -59,8 +59,7 @@ var (
 )
 
 const (
-	libsystemdDevPkgNameCurrent = "libsystemd-dev"
-	libsystemdDevPkgNameDebian8 = "libsystemd-journal-dev"
+	libsystemdDevPkgName = "libsystemd-dev"
 )
 
 // Build builds the Beat binary.
@@ -78,43 +77,43 @@ func GolangCrossBuild() error {
 }
 
 func installLinuxAMD64() error {
-	return installDependencies(libsystemdDevPkgNameDebian8, "")
+	return installDependencies(libsystemdDevPkgName, "")
 }
 
 func installLinuxARM64() error {
-	return installDependencies(libsystemdDevPkgNameCurrent+":arm64", "arm64")
+	return installDependencies(libsystemdDevPkgName+":arm64", "arm64")
 }
 
 func installLinuxARMHf() error {
-	return installDependencies(libsystemdDevPkgNameCurrent+":armhf", "armhf")
+	return installDependencies(libsystemdDevPkgName+":armhf", "armhf")
 }
 
 func installLinuxARMLe() error {
-	return installDependencies(libsystemdDevPkgNameCurrent+":armel", "armel")
+	return installDependencies(libsystemdDevPkgName+":armel", "armel")
 }
 
 func installLinux386() error {
-	return installDependencies(libsystemdDevPkgNameDebian8+":i386", "i386")
+	return installDependencies(libsystemdDevPkgName+":i386", "i386")
 }
 
 func installLinuxMIPS() error {
-	return installDependencies(libsystemdDevPkgNameCurrent+":mips", "mips")
+	return installDependencies(libsystemdDevPkgName+":mips", "mips")
 }
 
 func installLinuxMIPS64le() error {
-	return installDependencies(libsystemdDevPkgNameCurrent+":mips64el", "mips64el")
+	return installDependencies(libsystemdDevPkgName+":mips64el", "mips64el")
 }
 
 func installLinuxMIPSle() error {
-	return installDependencies(libsystemdDevPkgNameCurrent+":mipsel", "mipsel")
+	return installDependencies(libsystemdDevPkgName+":mipsel", "mipsel")
 }
 
 func installLinuxPPC64le() error {
-	return installDependencies(libsystemdDevPkgNameCurrent+":ppc64el", "ppc64el")
+	return installDependencies(libsystemdDevPkgName+":ppc64el", "ppc64el")
 }
 
 func installLinuxs390x() error {
-	return installDependencies(libsystemdDevPkgNameCurrent+":s390x", "s390x")
+	return installDependencies(libsystemdDevPkgName+":s390x", "s390x")
 }
 
 func installDependencies(pkg, arch string) error {
