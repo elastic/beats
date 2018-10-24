@@ -38,3 +38,34 @@ func TestCodeKey(t *testing.T) {
 		assert.NotEqual(t, codeKey(name, content), codeKey(name, other))
 	})
 }
+
+func TestNormalize(t *testing.T) {
+	tests := []struct {
+		title     string
+		candidate string
+		chars     string
+		expected  string
+	}{
+		{
+			title:     "when the string contains invalid chars",
+			candidate: "/var/log-alpha/tmp:ok",
+			expected:  "varlogalphatmpok",
+		},
+		{
+			title:     "when we have an empty string",
+			candidate: "",
+			expected:  "",
+		},
+		{
+			title:     "when we don't have any invalid chars",
+			candidate: "hello",
+			expected:  "hello",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.title, func(t *testing.T) {
+			assert.Equal(t, test.expected, normalizeResourceName(test.candidate))
+		})
+	}
+}

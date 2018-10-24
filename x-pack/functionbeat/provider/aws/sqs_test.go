@@ -18,6 +18,11 @@ import (
 func TestSQS(t *testing.T) {
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
 		"name": "foobar",
+		"triggers": []map[string]interface{}{
+			map[string]interface{}{
+				"event_source_arn": "abc1234",
+			},
+		},
 	})
 
 	t.Run("when publish is succesful", func(t *testing.T) {

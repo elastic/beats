@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -197,12 +196,8 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 			),
 		}
 
-		normalize := func(c string) string {
-			return strings.Replace(c, "/", "", -1)
-		}
-
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-subscriptionfilter.html
-		template.Resources[prefix("SubscriptionFilter"+normalize(string(trigger.LogGroupName)))] = &AWSLogsSubscriptionFilter{
+		template.Resources[prefix("SubscriptionFilter"+normalizeResourceName(string(trigger.LogGroupName)))] = &AWSLogsSubscriptionFilter{
 			DestinationArn: cloudformation.GetAtt(prefix(""), "Arn"),
 			FilterPattern:  trigger.FilterPattern,
 			LogGroupName:   string(trigger.LogGroupName),
