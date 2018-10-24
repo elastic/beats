@@ -191,24 +191,10 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	mage.UseElasticBeatPackaging()
-	customizePackaging()
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
-}
-
-// customizePackaging adds dependencies of journalbeat.
-func customizePackaging() {
-	for _, args := range mage.Packages {
-		switch args.OS {
-		case "linux":
-			if args.Types[0] == mage.Deb {
-				args.Spec.AddDebDependency(currentLibsystemdDev)
-				continue
-			}
-		}
-	}
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
