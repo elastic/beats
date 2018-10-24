@@ -31,6 +31,7 @@ var (
 		"auditbeat",
 		"filebeat",
 		"heartbeat",
+		"journalbeat",
 		"metricbeat",
 		"packetbeat",
 		"winlogbeat",

@@ -107,9 +107,11 @@ ${BEAT_NAME}.test: $(GOFILES_ALL)
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
 crosscompile: $(GOFILES)
+ifneq ($(shell [[ $(BEAT_NAME) == journalbeat ]] && echo true ),true)
 	go get github.com/mitchellh/gox
 	mkdir -p ${BUILD_DIR}/bin
 	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
+endif
 
 .PHONY: check
 check: check-headers python-env prepare-tests ## @build Checks project and source code if everything is according to standard
