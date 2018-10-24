@@ -86,8 +86,9 @@ type PackageSpec struct {
 	PreInstallScript  string                 `yaml:"pre_install_script,omitempty"`
 	PostInstallScript string                 `yaml:"post_install_script,omitempty"`
 	Files             map[string]PackageFile `yaml:"files"`
-	OutputFile        string                 `yaml:"output_file,omitempty"` // Optional
-	ExtraVars         map[string]string      `yaml:"extra_vars,omitempty"`  // Optional
+	OutputFile        string                 `yaml:"output_file,omitempty"`  // Optional
+	ExtraVars         map[string]string      `yaml:"extra_vars,omitempty"`   // Optional
+	Depends           []string               `yaml:"dependencies,omitempty"` // Optional
 
 	evalContext            map[string]interface{}
 	packageDir             string
@@ -658,6 +659,12 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		"-p", spec.OutputFile,
 		inputTar,
 	)
+
+	if len(spec.Depends) > 0 {
+		for _, dep := range spec.Depends {
+			args = append(args, "--depends", dep)
+		}
+	}
 
 	if err = dockerRun(args...); err != nil {
 		return errors.Wrap(err, "failed while running FPM in docker")
