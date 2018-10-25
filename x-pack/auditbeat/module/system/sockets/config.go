@@ -4,9 +4,9 @@
 
 package sockets
 
-// Config defines the host metricset's configuration options.
+// Config defines the sockets metricset's configuration options.
 type Config struct {
-	ReportChanges bool `config:"processes.report_changes"`
+	ReportChanges bool `config:"sockets.report_changes"`
 }
 
 // Validate validates the host metricset config.
