@@ -12,9 +12,10 @@ package sockets
 import "C"
 
 import (
-	"github.com/pkg/errors"
 	"strconv"
 	"syscall"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 )

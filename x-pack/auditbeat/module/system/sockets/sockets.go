@@ -7,20 +7,23 @@
 package sockets
 
 import (
-	"github.com/pkg/errors"
 	"net"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
 
+	"strconv"
+
 	"github.com/OneOfOne/xxhash"
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/logp"
 	mbSocket "github.com/elastic/beats/metricbeat/module/system/socket"
 	"github.com/elastic/gosigar/sys/linux"
-	"github.com/joeshaw/multierror"
-	"strconv"
 )
 
 const (
