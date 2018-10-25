@@ -44,7 +44,7 @@ class Test(BaseTest):
     @parameterized.expand([
         (lambda server: "localhost:{}".format(server.server_port), "up"),
         # This IP is reserved in IPv4
-        (lambda server: "207.254.52.220:1233", "down"),
+        (lambda server: "203.0.113.1:1233", "down"),
     ])
     def test_tcp(self, url, status):
         """
@@ -71,7 +71,7 @@ class Test(BaseTest):
                 proc.check_kill_and_wait()
 
             output = self.read_output()
-            nose.tools.assert_equal(status, output[0]["monitor.status"])
+            self.assert_last_status(status)
             if os.name == "nt":
                 # Currently skipped on Windows as fields.yml not generated
                 raise SkipTest
