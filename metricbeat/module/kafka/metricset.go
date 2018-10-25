@@ -19,15 +19,10 @@ package kafka
 
 import (
 	"crypto/tls"
-	"fmt"
 
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/metricbeat/mb"
 )
-
-func main() {
-	fmt.Println("vim-go")
-}
 
 // MetricSet is the base metricset for all Kafka metricsets
 type MetricSet struct {
