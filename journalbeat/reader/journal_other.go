@@ -15,7 +15,4 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
-// +build linux,cgo
-
-package config
+package reader

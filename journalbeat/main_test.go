@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux,cgo
+
 package main
 
 // This file is mandatory as otherwise the journalbeat.test binary is not generated correctly.

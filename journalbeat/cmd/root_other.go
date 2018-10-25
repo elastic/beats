@@ -15,7 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
-// +build linux,cgo
+// +build !linux !cgo
 
-package config
+package cmd
+
+import (
+	"fmt"
+
+	"github.com/elastic/beats/libbeat/beat"
+	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/common"
+)
+
+// Name of this beat
+var Name = "journalbeat"
+
+// RootCmd to handle beats cli
+var RootCmd = cmd.GenRootCmd(Name, "", newBeat)
+
+func newBeat(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	return nil, fmt.Errorf("journalbeat is not supported on your platform")
+}
