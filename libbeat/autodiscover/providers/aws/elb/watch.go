@@ -21,13 +21,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws/external"
+
+	"github.com/aws/aws-sdk-go-v2/service/elbv2"
+
 	"github.com/elastic/beats/libbeat/common/atomic"
 
 	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/elbv2"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -100,15 +100,12 @@ func watch(
 }
 
 func describeEachLBListener(region string, cb func(lbl lbListener)) (stop func(), err error) {
-	sess, err := session.NewSession(
-		&aws.Config{
-			Region: aws.String(region),
-		},
-	)
+	cfg, err := external.LoadDefaultAWSConfig()
+	cfg.Region = region
 	if err != nil {
 		return nil, err
 	}
-	e := elbv2.New(sess)
+	e := elbv2.New(cfg)
 
 	running := atomic.NewBool(true)
 	stop = func() {
@@ -116,24 +113,31 @@ func describeEachLBListener(region string, cb func(lbl lbListener)) (stop func()
 	}
 
 	var pageSize int64 = 100
-	return stop, e.DescribeLoadBalancersPages(
-		&elbv2.DescribeLoadBalancersInput{PageSize: &pageSize},
-		func(output *elbv2.DescribeLoadBalancersOutput, more bool) bool {
-			for _, lb := range output.LoadBalancers {
+	describe := e.DescribeLoadBalancersRequest(&elbv2.DescribeLoadBalancersInput{PageSize: &pageSize}).Paginate()
+
+	go func() {
+		for describe.Next() && running.Load() {
+			for _, lb := range describe.CurrentPage().LoadBalancers {
 				go func() {
-					listenOut, err := e.DescribeListeners(&elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
-					if err != nil {
-						logp.Err(fmt.Sprintf("Could not describe load balancer listeners: %s", err))
-						return
-					}
-					if running.Load() {
-						for _, listener := range listenOut.Listeners {
-							lbl := lbListener{lb, listener}
+					listen := e.DescribeListenersRequest(&elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}).Paginate()
+					for listen.Next() && running.Load() {
+						for _, listener := range listen.CurrentPage().Listeners {
+							lbl := lbListener{&lb, &listener}
 							cb(lbl)
 						}
 					}
+					if err = listen.Err(); err != nil {
+						logp.Err(fmt.Sprintf("Could not describe load balancer listeners: %s", err))
+						return
+					}
 				}()
 			}
-			return running.Load()
-		})
+		}
+	}()
+
+	if err := describe.Err(); err != nil {
+		return stop, err
+	}
+
+	return stop, err
 }

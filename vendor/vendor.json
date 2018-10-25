@@ -371,6 +371,18 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
+			"checksumSHA1": "q+0D/GEmD7mmX2wAavaSUu54fHM=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/ec2",
+			"revision": "a7b51e7962c4227bc0fbe3b7ef635595e7d1a20c",
+			"revisionTime": "2018-10-24T16:15:43Z"
+		},
+		{
+			"checksumSHA1": "HTd+jNlOtsAA01hl1uauiOrZIUA=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/elbv2",
+			"revision": "a7b51e7962c4227bc0fbe3b7ef635595e7d1a20c",
+			"revisionTime": "2018-10-24T16:15:43Z"
+		},
+		{
 			"checksumSHA1": "QX85Yp1ihkxh8ye/FktHZUVsT6A=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/lambda",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
