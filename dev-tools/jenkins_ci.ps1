@@ -23,8 +23,45 @@ if ($env:beat -eq "x-pack/functionbeat") {
   exit 0
 }
 
+# Fix an issue with Windows' MAX_PATH limitation, this can cause compiler issues if the files are
+# nested too deep. To solve this situation we are using 'subst' to map the workspace to a drive.
+# If we have already mapped the workspace to a drive we just use the drive.
+function SetupDrive {
+  foreach($line in subst) {
+    $drive = $line.SubString(0, 2)
+    $path = $line.SubString(8)
+    if ($path -eq $env:WORKSPACE) {
+      echo "Found existing mapping $path to $drive"
+      $env:WORKSPACE = $drive
+      return
+    }
+  }
+  # No existing drive found lets create a new mapping.
+  AssignDrive
+}
+function AssignDrive() {
+  $letters = @('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'X', 'Y', 'Z')
+  Foreach($l in $letters) {
+    $drive = "${l}:"
+    &subst $drive $env:WORKSPACE | Out-Null
+    if ($lastexitcode -eq 0) {
+      echo "Create new mapping for $env:WORKSPACE to $drive"
+      $env:WORKSPACE = $drive
+      return
+    }
+  }
+  throw "cannot use 'subst' to create a drive for the workspace"
+}
+
+echo "Configure virtual drive"
+SetupDrive
+
+# CD into the new drive before running any tests
+echo "Switching to $env:WORKSPACE\src\github.com\elastic\beats"
+Set-Location "$env:WORKSPACE\src\github.com\elastic\beats"
+
 # Setup Go.
-$env:GOPATH = $env:WORKSPACE
+$env:GOPATH = "$env:WORKSPACE\"
 $env:PATH = "$env:GOPATH\bin;C:\tools\mingw64\bin;$env:PATH"
 & gvm --format=powershell $(Get-Content .go-version) | Invoke-Expression
 
@@ -56,6 +93,7 @@ New-Item -ItemType directory -Path build\system-tests\run | Out-Null
 echo "Building fields.yml"
 exec { mage fields } "mage fields FAILURE"
 
+echo Get-Location
 echo "Building $env:beat"
 exec { mage build } "Build FAILURE"
 
