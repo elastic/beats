@@ -22,9 +22,7 @@ mac>> for OS X, and <<win, win>> for Windows).
 
 [NOTE]
 ==================================================
-If you use Apt or Yum, you can {libbeat}/setup-repositories.html[install Topbeat from our repositories] to update to the newest version more easily. 
-
-See our https://www.elastic.co/downloads/beats/topbeat[download page] for other installation options, such as 32-bit images. 
+If you use Apt or Yum, you can {libbeat}/setup-repositories.html[install Topbeat from our repositories] to update to the newest version more easily.
 ==================================================
 
 [[deb]]
@@ -57,8 +55,7 @@ tar xzvf topbeat-{version}-darwin.tgz
 [[win]]
 *win:*
 
-. Download the Topbeat Windows zip file from the
-https://www.elastic.co/downloads/beats/topbeat[downloads page].
+. Download the Topbeat https://download.elastic.co/beats/topbeat/topbeat-{version}-windows.zip[Windows zip file].
 
 . Extract the contents of the zip file into `C:\Program Files`.
 
