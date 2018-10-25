@@ -25,6 +25,7 @@ processors:
     - '%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:
       new user: name=%{DATA:user.name}, UID=%{NUMBER:user.id}, GID=%{NUMBER:group.id},
       home=%{DATA:system.auth.useradd.home}, shell=%{DATA:system.auth.useradd.shell}$'
+    - '%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname}? %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?: pam_%{DATA:system.auth.pam.module}\\(%{DATA:system.auth.pam.service}:%{DATA:system.auth.pam.type}\\): %{DATA:system.auth.pam.result}; logname=%{DATA:system.auth.pam.auth.logname} uid=%{INT:system.auth.pam.auth.uid} euid=%{INT:system.auth.pam.auth.euid} tty=%{DATA:system.auth.pam.auth.tty} ruser=%{DATA:system.auth.pam.auth.ruser} rhost=%{DATA:system.auth.pam.auth.rhost} user=%{DATA:system.auth.pam.user}'
     - '%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname}? %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:
       %{GREEDYMULTILINE:system.auth.message}'
 - remove:

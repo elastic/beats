@@ -28,6 +28,83 @@
       path: user.name
       migration: true
 
+    - name: pam
+      type: group
+      description: >
+        Fields specific to PAM messages.
+      fields:
+      - name: module
+        description: >
+          The name of the PAM module.
+      - name: service
+        description: >
+          The name of the PAM service.
+      - name: type
+        description: >
+          The PAM type.
+      - name: result
+        description: >
+          The PAM result text, e.g. "authentication success".
+      - name: euid
+        type: long
+        description: >
+          The EUID of the PAM process.
+      - name: user
+        description: >
+          The username.
+      - name: auth
+        type: group
+        description: >
+          Fields specific to PAM auth messages.
+        fields:
+        - name: logname
+          description: >
+            The PAM auth logname.
+        - name: uid
+          type: long
+          description: >
+            The UID of the PAM auth process.
+        - name: euid
+          type: long
+          description: >
+            The EUID of the PAM auth process.
+        - name: tty
+          description: >
+            The TTY of the PAM auth process.
+        - name: ruser
+          description: >
+            The remote username.
+        - name: rhost
+          type: ip
+          description: >
+            The remote host IP address.
+      - name: error
+        type: group
+        description: >
+          Fields specific to PAM errors.
+        fields:
+        - name: number
+          type: long
+          description: >
+            The PAM result error number.
+        - name: message
+          description: >
+            The PAM result error message.
+      - name: session
+        type: group
+        description: >
+          Fields specific to PAM session messages.
+        fields:
+        - name: action
+          description: >
+            The PAM session action. Can be one of "opened" or "closed".
+        - name: byuser
+          description: >
+            The PAM session source user.
+        - name: byuid
+          description: >
+            The PAM session source UID.
+
     - name: ssh
       type: group
       fields:

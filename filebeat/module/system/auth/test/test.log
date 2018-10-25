@@ -8,3 +8,13 @@ Feb 23 00:08:48 localhost sudo: vagrant : TTY=pts/1 ; PWD=/home/vagrant ; USER=r
 Feb 24 00:13:02 precise32 sudo:      tsg : user NOT in sudoers ; TTY=pts/1 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/ls
 Feb 22 11:47:05 localhost groupadd[6991]: new group: name=apache, GID=48
 Feb 22 11:47:05 localhost useradd[6995]: new user: name=apache, UID=48, GID=48, home=/usr/share/httpd, shell=/sbin/nologin
+Oct 25 16:01:10 localhost kcheckpass[16540]: pam_sss(kscreensaver:auth): authentication success; logname=test@ad.test.com uid=1111 euid=1111 tty=:0 ruser= rhost= user=test
+Oct 26 09:39:10 localhost auth: pam_sss(dovecot:auth): authentication success; logname= uid=0 euid=0 tty=dovecot ruser=test rhost=10.0.2.2 user=test
+Oct 26 09:39:10 localhost auth: pam_unix(dovecot:session): session opened for user test by (uid=0)
+Oct 26 09:39:10 localhost auth: pam_unix(dovecot:session): session closed for user test
+Oct 26 09:39:35 localhost auth: pam_unix(dovecot:auth): check pass; user unknown
+Oct 26 09:39:35 localhost auth: pam_unix(dovecot:auth): authentication failure; logname= uid=0 euid=0 tty=dovecot ruser=test rhost=10.0.2.2
+Oct 26 10:16:52 localhost gdm-smartcard]: pam_sss(gdm-smartcard:auth): authentication success; logname= uid=0 euid=0 tty=/dev/tty1 ruser= rhost= user=test@ad.test.com
+Oct 26 10:16:53 localhost gdm-smartcard]: pam_unix(gdm-smartcard:session): session opened for user test@ad.test.com by (uid=0)
+Oct 26 10:26:55 localhost su: pam_unix(su:session): session opened for user root by test(uid=1111)
+Oct 26 10:27:25 localhost su: pam_unix(su:session): session closed for user root

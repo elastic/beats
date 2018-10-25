@@ -35137,6 +35137,155 @@ alias to: source.geo.region_iso_code
 --
 
 [float]
+== pam fields
+
+Fields specific to PAM messages.
+
+
+
+*`system.auth.pam.module`*::
++
+--
+The name of the PAM module.
+
+
+--
+
+*`system.auth.pam.service`*::
++
+--
+
+
+--
+
+*`system.auth.pam.type`*::
++
+--
+The PAM type.
+
+
+--
+
+*`system.auth.pam.result`*::
++
+--
+The PAM result text, e.g. "authentication success".
+
+
+--
+
+*`system.auth.pam.logname`*::
++
+--
+The PAM logname.
+
+
+--
+
+*`system.auth.pam.uid`*::
++
+--
+type: long
+
+The UID of the PAM process.
+
+
+--
+
+*`system.auth.pam.euid`*::
++
+--
+type: long
+
+The EUID of the PAM process.
+
+
+--
+
+*`system.auth.pam.tty`*::
++
+--
+The TTY of the PAM process.
+
+
+--
+
+*`system.auth.pam.ruser`*::
++
+--
+The remote username.
+
+
+--
+
+*`system.auth.pam.rhost`*::
++
+--
+type: ip
+
+The remote host IP address.
+
+
+--
+
+*`system.auth.pam.user`*::
++
+--
+The username.
+
+
+--
+
+*`system.auth.pam.errno`*::
++
+--
+type: long
+
+The PAM result error number.
+
+
+--
+
+*`system.auth.pam.errmsg`*::
++
+--
+The PAM result error message.
+
+
+--
+
+[float]
+== session fields
+
+Fields specific to PAM session messages.
+
+
+
+*`system.auth.pam.session.action`*::
++
+--
+The PAM session action. Can be one of "opened" or "closed".
+
+
+--
+
+*`system.auth.pam.session.byuser`*::
++
+--
+The PAM session source user.
+
+
+--
+
+*`system.auth.pam.session.byuid`*::
++
+--
+The PAM session source UID.
+
+
+--
+
+[float]
 === sudo
 
 Fields specific to events created by the `sudo` command.
