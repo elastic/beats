@@ -124,7 +124,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	// Enrich sockets with direction/pid/process/user/hostname and convert to MapStr.
 	rtn := make([]common.MapStr, 0, len(sockets))
 	for _, s := range sockets {
-		c := NewConnection(s)
+		c := newConnection(s)
 		m.enrichConnectionData(c)
 		rtn = append(rtn, c.ToMapStr())
 	}
@@ -179,7 +179,7 @@ func (m *MetricSet) isNewSocket(diag *linux.InetDiagMsg) bool {
 // enrichConnectionData enriches the connection with username, direction,
 // hostname of the remote IP (if enabled), eTLD + 1 of the hostname, and the
 // process owning the socket.
-func (m *MetricSet) enrichConnectionData(c *Connection) {
+func (m *MetricSet) enrichConnectionData(c *connection) {
 	c.Username = m.users.LookupUID(int(c.UID))
 
 	// Determine direction (incoming, outgoing, or listening).
@@ -214,7 +214,7 @@ func (m *MetricSet) enrichConnectionData(c *Connection) {
 	}
 }
 
-type Connection struct {
+type connection struct {
 	Family     linux.AddressFamily
 	LocalIP    net.IP
 	LocalPort  int
@@ -241,8 +241,8 @@ type Connection struct {
 	Username string // Username of the socket.
 }
 
-func NewConnection(diag *linux.InetDiagMsg) *Connection {
-	return &Connection{
+func newConnection(diag *linux.InetDiagMsg) *connection {
+	return &connection{
 		Family:     linux.AddressFamily(diag.Family),
 		State:      linux.TCPState(diag.State),
 		LocalIP:    diag.SrcIP(),
@@ -255,7 +255,7 @@ func NewConnection(diag *linux.InetDiagMsg) *Connection {
 	}
 }
 
-func (c *Connection) ToMapStr() common.MapStr {
+func (c *connection) ToMapStr() common.MapStr {
 	evt := common.MapStr{
 		"family": c.Family.String(),
 		"local": common.MapStr{
