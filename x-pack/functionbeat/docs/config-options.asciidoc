@@ -1,0 +1,35 @@
+[id="configuration-{beatname_lc}-options"]
+== Configure providers
+
+++++
+<titleabbrev>Configure providers</titleabbrev>
+++++
+
+TODO: Replace the following config with a real example. This one was taken from
+the Github issue.
+
+[source,yaml]
+----
+beatless.provider.aws:
+  enabled: true
+  functions:
+    - type: cloudwatch
+
+      stream: messages
+      fields:
+        logs_type: cloudwatch-messages
+      limits:
+        timeout: 5s
+        concurency: 20
+    - type: kinesys
+      name: kinesis-ingress
+      stream: firehos
+      processors:  #....
+    - type: s3
+      bucket: logs.elastic.co
+
+output.elasticsearch:
+  host: abc
+  username: elastic
+  password: abc123
+----

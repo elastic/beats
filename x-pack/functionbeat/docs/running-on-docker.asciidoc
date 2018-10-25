@@ -1,0 +1,1 @@
+include::{libbeat-dir}/docs/shared-docker.asciidoc[]
