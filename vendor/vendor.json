@@ -1958,16 +1958,16 @@
 			"versionExact": "v1.7.1"
 		},
 		{
-			"checksumSHA1": "ppPg0bIlBAVJy0Pn13BfBnkp9V4=",
+			"checksumSHA1": "ejjxT0+wDWWncfh0Rt3lSH4IbXQ=",
 			"path": "golang.org/x/crypto/blake2b",
-			"revision": "5119cf507ed5294cc409c092980c7497ee5d6fd2",
-			"revisionTime": "2018-01-22T10:39:14Z"
+			"revision": "85e1b3f9139abd58575d728a509643924e3b2ebf",
+			"revisionTime": "2018-09-26T22:02:31Z"
 		},
 		{
 			"checksumSHA1": "2LpxYGSf068307b7bhAuVjvzLLc=",
 			"path": "golang.org/x/crypto/ed25519",
-			"revision": "c126467f60eb25f8f27e5a981f32a87e3965053f",
-			"revisionTime": "2018-07-23T15:26:11Z"
+			"revision": "74cb1d3d52f4c01cbfb44c1b50d204462f3124c7",
+			"revisionTime": "2018-10-24T15:56:48Z"
 		},
 		{
 			"checksumSHA1": "0JTAFXPkankmWcZGQJGScLDiaN8=",
@@ -2100,6 +2100,12 @@
 			"revisionTime": "2017-10-22T17:59:00Z",
 			"version": "release-branch.go1.9",
 			"versionExact": "release-branch.go1.9"
+		},
+		{
+			"checksumSHA1": "REkmyB368pIiip76LiqMLspgCRk=",
+			"path": "golang.org/x/sys/cpu",
+			"revision": "d989b31c87461dc8ab2f1cac6792814e27fadea9",
+			"revisionTime": "2018-10-24T19:48:33Z"
 		},
 		{
 			"checksumSHA1": "nc3RG2Qgzn2aup/3/4RusWr+X0g=",
