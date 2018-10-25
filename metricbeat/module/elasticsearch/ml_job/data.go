@@ -60,13 +60,15 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		event := mb.Event{}
 
-		event.MetricSetFields, err = schema.Apply(job)
-		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure applying ml job schema"))
-		}
-
 		event.RootFields = common.MapStr{}
 		event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
+		event.MetricSetFields, err = schema.Apply(job)
+		if err != nil {
+			event.Error = errors.Wrap(err, "failure applying ml job schema")
+			errs = append(errs, event.Error)
+		}
+
 		r.Event(event)
 	}
 	return errs.Err()

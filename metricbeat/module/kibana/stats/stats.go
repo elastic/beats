@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/kibana"
@@ -52,18 +53,17 @@ var (
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
-	mb.BaseMetricSet
+	*kibana.MetricSet
 	statsHTTP    *helper.HTTP
 	settingsHTTP *helper.HTTP
-	xPackEnabled bool
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The " + base.FullyQualifiedName() + " metricset is experimental")
 
-	config := kibana.DefaultConfig()
-	if err := base.Module().UnpackConfig(&config); err != nil {
+	ms, err := kibana.NewMetricSet(base)
+	if err != nil {
 		return nil, err
 	}
 
@@ -87,16 +87,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf(errorMsg, base.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
 	}
 
-	if config.XPackEnabled {
-		cfgwarn.Experimental("The experimental xpack.enabled flag in the " + base.FullyQualifiedName() + " metricset is enabled.")
+	if ms.XPackEnabled {
+		cfgwarn.Experimental("The experimental xpack.enabled flag in the " + ms.FullyQualifiedName() + " metricset is enabled.")
 
 		// Use legacy API response so we can passthru usage as-is
 		statsHTTP.SetURI(statsHTTP.GetURI() + "&legacy=true")
 	}
 
 	var settingsHTTP *helper.HTTP
-	if config.XPackEnabled {
-		cfgwarn.Experimental("The experimental xpack.enabled flag in the " + base.FullyQualifiedName() + " metricset is enabled.")
+	if ms.XPackEnabled {
+		cfgwarn.Experimental("The experimental xpack.enabled flag in the " + ms.FullyQualifiedName() + " metricset is enabled.")
 
 		isSettingsAPIAvailable, err := kibana.IsSettingsAPIAvailable(kibanaVersion)
 		if err != nil {
@@ -105,7 +105,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 		if !isSettingsAPIAvailable {
 			const errorMsg = "The %v metricset with X-Pack enabled is only supported with Kibana >= %v. You are currently running Kibana %v"
-			return nil, fmt.Errorf(errorMsg, base.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
+			return nil, fmt.Errorf(errorMsg, ms.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
 		}
 
 		settingsHTTP, err = helper.NewHTTP(base)
@@ -120,10 +120,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		base,
+		ms,
 		statsHTTP,
 		settingsHTTP,
-		config.XPackEnabled,
 	}, nil
 }
 
@@ -134,7 +133,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	now := time.Now()
 
 	m.fetchStats(r, now)
-	if m.xPackEnabled {
+	if m.XPackEnabled {
 		m.fetchSettings(r, now)
 	}
 }
@@ -142,26 +141,39 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
 	content, err := m.statsHTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
-	if m.xPackEnabled {
+	if m.XPackEnabled {
 		intervalMs := m.calculateIntervalMs()
-		eventMappingStatsXPack(r, intervalMs, now, content)
+		err = eventMappingStatsXPack(r, intervalMs, now, content)
+		if err != nil {
+			m.Log.Error(err)
+			return
+		}
 	} else {
-		eventMapping(r, content)
+		err = eventMapping(r, content)
+		if err != nil {
+			elastic.ReportAndLogError(err, r, m.Log)
+			return
+		}
 	}
 }
 
 func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
 	content, err := m.settingsHTTP.FetchContent()
 	if err != nil {
+		m.Log.Error(err)
 		return
 	}
 
 	intervalMs := m.calculateIntervalMs()
-	eventMappingSettingsXPack(r, intervalMs, now, content)
+	err = eventMappingSettingsXPack(r, intervalMs, now, content)
+	if err != nil {
+		m.Log.Error(err)
+		return
+	}
 }
 
 func (m *MetricSet) calculateIntervalMs() int64 {

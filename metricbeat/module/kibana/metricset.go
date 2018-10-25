@@ -15,64 +15,41 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch
+package kibana
 
 import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
 )
 
-const (
-	defaultScheme = "http"
-	pathConfigKey = "path"
-)
-
-var (
-	// HostParser parses host urls for RabbitMQ management plugin
-	HostParser = parse.URLHostParserBuilder{
-		DefaultScheme: defaultScheme,
-		PathConfigKey: pathConfigKey,
-	}.Build()
-)
-
-// MetricSet can be used to build other metric sets that query RabbitMQ
-// management plugin
+// MetricSet can be used to build other metricsets within the Kibana module.
 type MetricSet struct {
 	mb.BaseMetricSet
-	*helper.HTTP
-	XPack bool
-	Log   *logp.Logger
+	XPackEnabled bool
+	Log          *logp.Logger
 }
 
-// NewMetricSet creates an metric set that can be used to build other metric
-// sets that query RabbitMQ management plugin
-func NewMetricSet(base mb.BaseMetricSet, subPath string) (*MetricSet, error) {
-	http, err := helper.NewHTTP(base)
-	if err != nil {
-		return nil, err
-	}
-	http.SetURI(http.GetURI() + subPath)
-
+// NewMetricSet creates a metricset that can be used to build other metricsets
+// within the Kibana module.
+func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	config := struct {
-		XPack bool `config:"xpack.enabled"`
+		xPackEnabled bool `config:"xpack.enabled"`
 	}{
-		XPack: false,
+		xPackEnabled: false,
 	}
+
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	if config.XPack {
-		cfgwarn.Experimental("The experimental xpack.enabled flag in " + base.FullyQualifiedName() + " metricset is enabled.")
+	if config.xPackEnabled {
+		cfgwarn.Experimental("The experimental xpack.enabled flag in the " + base.FullyQualifiedName() + " metricset is enabled.")
 	}
 
 	return &MetricSet{
 		base,
-		http,
-		config.XPack,
+		config.xPackEnabled,
 		logp.NewLogger(ModuleName),
 	}, nil
 }
