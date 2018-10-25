@@ -9,12 +9,14 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 [partintro]
 
 --
-This document describes the fields that are exported by Beatless. They are
+This document describes the fields that are exported by Functionbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
+* <<exported-fields-ecs>>
+* <<exported-fields-functionbeat>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-kubernetes-processor>>
 
@@ -74,26 +76,6 @@ Contains user configurable fields.
 Error fields containing additional info in case of errors.
 
 
-
-*`error.message`*::
-+
---
-type: text
-
-Error message.
-
-
---
-
-*`error.code`*::
-+
---
-type: long
-
-Error code.
-
-
---
 
 *`error.type`*::
 +
@@ -224,9 +206,12 @@ Image labels.
 
 --
 
-<<<<<<< HEAD
+[[exported-fields-host-processor]]
+== Host fields
+=======
 [[exported-fields-ecs]]
 == ECS fields
+>>>>>>> Run make update
 
 ECS fields.
 
@@ -251,7 +236,7 @@ Version of the agent.
 
 --
 
-*`agent.type`*::
+*`agent.name`*::
 +
 --
 type: keyword
@@ -259,16 +244,6 @@ type: keyword
 example: filebeat
 
 Name of the agent.
-
-
---
-
-*`agent.hostname`*::
-+
---
-type: keyword
-
-Hostname of the agent.
 
 
 --
@@ -415,94 +390,138 @@ Instance ID of the host machine.
 
 
 --
-=======
-[[exported-fields-host-processor]]
-== Host fields
->>>>>>> Initialize docs
 
-Info collected for the host machine.
-
-
-
-
-*`host.name`*::
+*`cloud.instance.name`*::
 +
 --
 type: keyword
 
-Hostname.
+Instance name of the host machine.
 
 
 --
 
-*`host.id`*::
+*`cloud.machine.type`*::
 +
 --
 type: keyword
 
-Unique host id.
+example: t2.medium
+
+Machine type of the host machine.
 
 
 --
 
-*`host.architecture`*::
+*`cloud.account.id`*::
 +
 --
 type: keyword
 
-Host architecture (e.g. x86_64, arm, ppc, mips).
+example: 666777888999
+
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
 
 
 --
 
-*`host.os.platform`*::
+[float]
+== container fields
+
+Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
+
+
+
+*`container.runtime`*::
 +
 --
 type: keyword
 
-OS platform (e.g. centos, ubuntu, windows).
+example: docker
+
+Runtime managing this container.
 
 
 --
 
-*`host.os.version`*::
+*`container.id`*::
 +
 --
 type: keyword
 
-OS version.
+Unique container id.
 
 
 --
 
-*`host.os.family`*::
+*`container.image.name`*::
 +
 --
 type: keyword
 
-OS family (e.g. redhat, debian, freebsd, windows).
+Name of the image the container was built on.
 
 
 --
 
-*`host.os.kernel`*::
+*`container.image.tag`*::
 +
 --
 type: keyword
 
-The operating system's kernel version.
+Container image tag.
 
 
 --
 
-*`host.ip`*::
+*`container.name`*::
++
+--
+type: keyword
+
+Container name.
+
+
+--
+
+*`container.labels`*::
++
+--
+type: object
+
+Image labels.
+
+
+--
+
+[float]
+== destination fields
+
+Destination fields describe details about the destination of a packet/event.
+
+
+
+*`destination.ip`*::
 +
 --
 type: ip
 
-<<<<<<< HEAD
+List of IP-addresses.
+=======
 IP address of the destination.
 Can be one or multiple IPv4 or IPv6 addresses.
+>>>>>>> Run make update
+
+
+--
+
+*`destination.hostname`*::
++
+--
+type: keyword
+
+Hostname of the destination.
 
 
 --
@@ -537,81 +556,28 @@ Destination domain.
 
 --
 
+*`destination.subdomain`*::
++
+--
+type: keyword
+
+Destination subdomain.
+
+
+--
+
 [float]
-== geo fields
+== device fields
 
-Geolocation for destination.
+Device fields are used to provide additional information about the device that is the source of the information. This could be a firewall, network device, etc.
 
 
-*`destination.geo.continent_name`*::
+
+*`device.mac`*::
 +
 --
 type: keyword
 
-Name of the continent.
-
-
---
-
-*`destination.geo.country_iso_code`*::
-+
---
-type: keyword
-
-Country ISO code.
-
-
---
-
-*`destination.geo.location`*::
-+
---
-type: geo_point
-
-Longitude and latitude.
-
-
---
-
-*`destination.geo.region_name`*::
-+
---
-type: keyword
-
-Region name.
-
-
---
-
-*`destination.geo.city_name`*::
-+
---
-type: keyword
-
-City name.
-
-
---
-
-*`destination.geo.region_iso_code`*::
-+
---
-type: keyword
-
-Region ISO code.
-=======
-List of IP-addresses.
->>>>>>> Initialize docs
-
-
---
-
-*`host.mac`*::
-+
---
-type: keyword
-
-<<<<<<< HEAD
 MAC address of the device
 
 
@@ -1738,120 +1704,6 @@ This id normally changes across restarts, but `service.id` does not.
 --
 
 [float]
-== source fields
-
-Source fields describe details about the source of the event.
-
-
-
-*`source.ip`*::
-+
---
-type: ip
-
-IP address of the source.
-Can be one or multiple IPv4 or IPv6 addresses.
-
-
---
-
-*`source.port`*::
-+
---
-type: long
-
-Port of the source.
-
-
---
-
-*`source.mac`*::
-+
---
-type: keyword
-
-MAC address of the source.
-
-
---
-
-*`source.domain`*::
-+
---
-type: keyword
-
-Source domain.
-
-
---
-
-[float]
-== geo fields
-
-Geolocation for source.
-
-
-*`source.geo.continent_name`*::
-+
---
-type: keyword
-
-Name of the continent.
-
-
---
-
-*`source.geo.country_iso_code`*::
-+
---
-type: keyword
-
-Country ISO code.
-
-
---
-
-*`source.geo.location`*::
-+
---
-type: geo_point
-
-Longitude and latitude.
-
-
---
-
-*`source.geo.region_name`*::
-+
---
-type: keyword
-
-Region name.
-
-
---
-
-*`source.geo.city_name`*::
-+
---
-type: keyword
-
-City name.
-
-
---
-
-*`source.geo.region_iso_code`*::
-+
---
-type: keyword
-
-Region ISO code.
-
-
---
-
-[float]
 == url fields
 
 URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
@@ -2179,9 +2031,9 @@ Info collected for the host machine.
 type: keyword
 
 The operating system's kernel version.
-=======
 List of hardware-addresses, usually MAC-addresses.
->>>>>>> Initialize docs
+=======
+>>>>>>> Run make update
 
 
 --
