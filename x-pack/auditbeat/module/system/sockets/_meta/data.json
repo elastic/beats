@@ -6,23 +6,43 @@
     },
     "metricset": {
         "module": "system",
-        "name": "processes",
+        "name": "sockets",
         "rtt": 115
     },
     "system": {
-        "processes": {
-            "process": [
+        "sockets": {
+            "socket": [
                 {
-                    "args": [
-                        "/sbin/init"
-                    ],
-                    "cwd": "/",
-                    "exe": "/lib/systemd/systemd",
-                    "name": "systemd",
-                    "pid": 1,
-                    "ppid": 0,
-                    "starttime": "2018-10-01T14:21:49.06Z",
-                    "status": "running"
+                    "family": "ipv4",
+                    "inode": 36598,
+                    "local.ip": "10.0.2.15",
+                    "local.port": 22,
+                    "process": {
+                        "name": "sshd",
+                        "pid": 9461,
+                        "type": "process"
+                    },
+                    "remote.ip": "10.0.2.2",
+                    "remote.port": 51609,
+                    "state": "ESTAB",
+                    "status": "OPEN",
+                    "uid": 0
+                },
+                {
+                    "family": "ipv4",
+                    "inode": 26938,
+                    "local.ip": "0.0.0.0",
+                    "local.port": 36249,
+                    "process": {
+                        "name": "nlockmgr",
+                        "pid": -1,
+                        "type": "rpc"
+                    },
+                    "remote.ip": "0.0.0.0",
+                    "remote.port": 0,
+                    "state": "LISTEN",
+                    "status": "OPEN",
+                    "uid": 0
                 }
             ]
         }
