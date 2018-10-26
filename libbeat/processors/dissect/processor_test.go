@@ -177,8 +177,8 @@ func TestFieldAlreadyExist(t *testing.T) {
 	}
 }
 
-func TestErrorTagging(t *testing.T) {
-	t.Run("when the parsing fails add a tag", func(t *testing.T) {
+func TestErrorFlagging(t *testing.T) {
+	t.Run("when the parsing fails add a flag", func(t *testing.T) {
 		c, err := common.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "%{ok} - %{notvalid}",
 		})
@@ -199,15 +199,15 @@ func TestErrorTagging(t *testing.T) {
 			return
 		}
 
-		tags, err := event.GetValue(beat.FlagField)
+		flags, err := event.GetValue(beat.FlagField)
 		if !assert.NoError(t, err) {
 			return
 		}
 
-		assert.Contains(t, tags, tagParsingError)
+		assert.Contains(t, flags, flagParsingError)
 	})
 
-	t.Run("when the parsing is succesful do not add a tag", func(t *testing.T) {
+	t.Run("when the parsing is succesful do not add a flag", func(t *testing.T) {
 		c, err := common.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "%{ok} %{valid}",
 		})

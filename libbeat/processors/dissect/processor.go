@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
-const tagParsingError = "dissect_parsing_error"
+const flagParsingError = "dissect_parsing_error"
 
 type processor struct {
 	config config
@@ -65,9 +65,9 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if err := common.AddTagsWithKey(
 			event.Fields,
 			beat.FlagField,
-			[]string{tagParsingError},
+			[]string{flagParsingError},
 		); err != nil {
-			return event, errors.Wrap(err, "cannot add new tag the event")
+			return event, errors.Wrap(err, "cannot add new flag the event")
 		}
 
 		return event, err
