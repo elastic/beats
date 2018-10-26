@@ -10,6 +10,11 @@
 //// This content must be embedded underneath a level 3 heading.
 //////////////////////////////////////////////////////////////////////////
 
+ifndef::only-elasticsearch[]
+NOTE: A connection to Elasticsearch is required to load the index template. If
+the output is not Elasticsearch, you must
+<<load-template-manually,load the template manually>>. 
+endif::only-elasticsearch[]
 
 In Elasticsearch, {elasticsearch}/indices-templates.html[index
 templates] are used to define settings and mappings that determine how fields
@@ -21,35 +26,14 @@ The recommended index template file for {beatname_uc} is installed by the
 after successfully connecting to Elasticsearch. If the template already exists,
 it's not overwritten unless you configure {beatname_uc} to do so.
 
-You can disable automatic template loading, or load your own template, by
-configuring template loading options in the {beatname_uc} configuration file.
-
-You can also set options to change the name of the index and index template.
-
-ifndef::only-elasticsearch[]
-NOTE: A connection to Elasticsearch is required to load the index template. If
-the output is not Elasticsearch, you must
-<<load-template-manually,load the template manually>>. 
-endif::only-elasticsearch[]
-
-For more information, see:
-
-ifdef::only-elasticsearch[]
-* <<load-template-auto>>
-* <<load-template-manually>>
-endif::only-elasticsearch[]
-
-ifndef::only-elasticsearch[]
-* <<load-template-auto>>
-* <<load-template-manually>> - required for non-Elasticsearch output
-endif::only-elasticsearch[]
-
 [[load-template-auto]]
 ==== Configure template loading
 
 By default, {beatname_uc} automatically loads the recommended template file,
-+fields.yml+, if the Elasticsearch output is enabled. You can change the
-defaults in the +{beatname_lc}.yml+ config file to:
++fields.yml+, if the Elasticsearch output is enabled. If you want to use the
+default index template, no additional configuration is required. Otherwise, you
+can change the defaults in the +{beatname_lc}.yml+ config file
+to:
 
 * **Load a different template**
 +
@@ -89,35 +73,26 @@ that you specify should include the root name of the index plus version and
 date information. You also need to configure the `setup.template.name` and
 `setup.template.pattern` options to match the new name. For example:
 +
-ifndef::deprecate_dashboard_loading[]
-
 ["source","sh",subs="attributes,callouts"]
 -----
 output.elasticsearch.index: "customname-%{[beat.version]}-%{+yyyy.MM.dd}"
 setup.template.name: "customname"
 setup.template.pattern: "customname-*"
-setup.dashboards.index: "customname-*" <1>
 -----
-
-<1> If you plan to
-<<load-kibana-dashboards, set up the Kibana dashboards>>, also set
-this option to overwrite the index name defined in the dashboards and index
-pattern.
-
+ifndef::deprecate_dashboard_loading,no_dashboards[]
++
+If you're using pre-built Kibana dashboards, also set the
+`setup.dashboards.index` option. For example: 
++
+[source, yaml]
+----
+setup.dashboards.index: "customname-*"
+----
 endif::[]
 
 ifdef::deprecate_dashboard_loading[]
-
-["source","sh",subs="attributes,callouts"]
------
-output.elasticsearch.index: "customname-%{[beat.version]}-%{+yyyy.MM.dd}"
-setup.template.name: "customname"
-setup.template.pattern: "customname-*"
------
 +
-Also ensure to change the index name accordingly in the Kibana dashboards,
-when loading via the Kibana UI.
-
+Remember to change the index name when you load dashboards via the Kibana UI.
 endif::[]
 
 See <<configuration-template>> for the full list of configuration options.
