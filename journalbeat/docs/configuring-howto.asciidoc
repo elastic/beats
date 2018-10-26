@@ -1,0 +1,90 @@
+[id="configuring-howto-{beatname_lc}"]
+= Configuring {beatname_uc}
+
+[partintro]
+--
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
+Before modifying configuration settings, make sure you've completed the
+<<{beatname_lc}-configuration,configuration steps>> in the Getting Started.
+This section describes some common use cases for changing configuration options.
+
+To configure {beatname_uc}, you edit the configuration file. For rpm and deb,
+you’ll find the configuration file at +/etc/{beatname_lc}/{beatname_lc}.yml+.
+There's also a full example configuration file at
++/etc/{beatname_lc}/{beatname_lc}.reference.yml+ that shows all non-deprecated
+options. For mac and win, look in the archive that you extracted.
+
+The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax.
+See the {libbeat}/config-file-format.html[Config File Format] section of the
+_{libbeat_docs}_ for more about the structure of the config file.
+
+The following topics describe how to configure {beatname_uc}:
+
+* <<configuration-{beatname_lc}-options>>
+* <<configuration-general-options>>
+* <<configuring-internal-queue>>
+* <<configuring-output>>
+* <<configuration-ssl>>
+* <<filtering-and-enhancing-data>>
+* <<configuring-ingest-node>>
+* <<configuration-path>>
+* <<setup-kibana-endpoint>>
+* <<configuration-dashboards>>
+* <<configuration-template>>
+* <<configuration-logging>>
+* <<using-environ-vars>>
+//* <<configuration-autodiscover>>
+* <<yaml-tips>>
+* <<regexp-support>>
+* <<http-endpoint>>
+//* <<{beatname_lc}-reference-yml>>
+
+--
+
+include::./config-options.asciidoc[]
+
+include::./general-options.asciidoc[]
+
+:allplatforms:
+include::../../libbeat/docs/queueconfig.asciidoc[]
+:allplatforms!:
+
+include::../../libbeat/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+
+include::./filtering.asciidoc[]
+
+include::../../libbeat/docs/shared-config-ingest.asciidoc[]
+
+include::../../libbeat/docs/shared-path-config.asciidoc[]
+
+include::../../libbeat/docs/shared-kibana-config.asciidoc[]
+
+include::../../libbeat/docs/setup-config.asciidoc[]
+
+include::../../libbeat/docs/loggingconfig.asciidoc[]
+
+:standalone:
+include::../../libbeat/docs/shared-env-vars.asciidoc[]
+:standalone!:
+
+//OPEN ISSUE: DO WE NEED AUTODISCOVER?
+//include::../../libbeat/docs/shared-autodiscover.asciidoc[]
+
+:standalone:
+:allplatforms:
+include::../../libbeat/docs/yaml.asciidoc[]
+:standalone!:
+:allplatforms!:
+
+include::../../libbeat/docs/regexp.asciidoc[]
+
+include::../../libbeat/docs/http-endpoint.asciidoc[]
+
+// TODO: Uncomment the following include statement when the reference yaml file
+// is available in the repo. Also uncomment the link in the jump list at the top
+// of this file.
+//include::../../libbeat/docs/reference-yml.asciidoc[]

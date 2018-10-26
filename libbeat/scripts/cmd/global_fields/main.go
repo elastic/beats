@@ -65,6 +65,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error getting file info of target Beat: %+v\n", err)
 		os.Exit(1)
 	}
+	beat.Close()
+	esBeats.Close()
 
 	// If a community Beat does not have its own fields.yml file, it still requires
 	// the fields coming from libbeat to generate e.g assets. In case of Elastic Beats,
@@ -78,9 +80,7 @@ func main() {
 
 	var fieldsFiles []*fields.YmlFile
 	for _, fieldsFilePath := range beatFieldsPaths {
-		pathToModules := filepath.Join(beatPath, fieldsFilePath)
-
-		fieldsFile, err := fields.CollectModuleFiles(pathToModules)
+		fieldsFile, err := fields.CollectModuleFiles(fieldsFilePath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
 			os.Exit(2)
@@ -95,7 +95,9 @@ func main() {
 		os.Exit(3)
 	}
 
-	if output != "-" {
-		fmt.Printf("Generated fields.yml for %s\n", name)
+	outputPath, _ := filepath.Abs(output)
+	if err != nil {
+		outputPath = output
 	}
+	fmt.Fprintf(os.Stderr, "Generated fields.yml for %s to %s\n", name, outputPath)
 }

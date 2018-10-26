@@ -29,6 +29,7 @@ The list below covers the major changes between 6.3.0 and master only.
   the building a Beat more cross-platform friendly (e.g. Windows). This requires that your Beat
   has a magefile.go with a fields target. The `FIELDS_FILE_PATH` make variable is no longer
   used because the value is specified in magefile.go. {pull}7670[7670]
+- Renamed `-beat-name` CLI option used in `kibana_index_pattern.go` to `-beat` for consistency with other scripts in `dev-tools/cmd`. {pull}8615[8615]
 
 ==== Bugfixes
 
@@ -52,3 +53,9 @@ The list below covers the major changes between 6.3.0 and master only.
 - Set current year in generator templates. {pull}8396[8396]
 - You can now override default settings of libbeat by using instance.Settings. {pull}8449[8449]
 - Add `-space-id` option to `export_dashboards.go` script to support Kibana Spaces {pull}7942[7942]
+- Add `-name` option to `asset.go` script to explicitly name the asset rather than using its filename. {pull}8693[8693]
+- Add `-out` option to `kibana_index_pattern.go` to control the output dir to make it possible to write the generated output to `build/kibana` instead of `_meta/kibana.generated` (but the output dir remains unchanged at this point). {pull}8615[8615]
+- Add `module_fields.go` for generated `fields.go` files for modules. {pull}8615[8615]
+- Add `mage.GenerateModuleReferenceConfig` for generating reference config files that include configuration sections from the module directory. {pull}8615[8615]
+- Add `mage.GenerateFieldsGo` for generating fields.go files. {pull}8615[8615]
+- Add `mage.KibanaDashboards` for collecting Kibana dashboards and generating index patterns. {pull}8615[8615]

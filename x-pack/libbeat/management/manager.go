@@ -5,6 +5,7 @@
 package management
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -31,6 +32,7 @@ func init() {
 // new configs from Kibana and applying them to the Beat
 type ConfigManager struct {
 	config   *Config
+	cache    *Cache
 	logger   *logp.Logger
 	client   *api.Client
 	beatUUID uuid.UUID
@@ -40,10 +42,12 @@ type ConfigManager struct {
 }
 
 // NewConfigManager returns a X-Pack Beats Central Management manager
-func NewConfigManager(registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
+func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	c := defaultConfig()
-	if err := c.Load(); err != nil {
-		return nil, errors.Wrap(err, "reading central management internal settings")
+	if config != nil {
+		if err := config.Unpack(&c); err != nil {
+			return nil, errors.Wrap(err, "parsing central management settings")
+		}
 	}
 	return NewConfigManagerWithConfig(c, registry, beatUUID)
 }
@@ -51,8 +55,17 @@ func NewConfigManager(registry *reload.Registry, beatUUID uuid.UUID) (management
 // NewConfigManagerWithConfig returns a X-Pack Beats Central Management manager
 func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	var client *api.Client
+	var cache *Cache
 	if c.Enabled {
 		var err error
+
+		// Initialize central management settings cache
+		cache = &Cache{
+			ConfigOK: true,
+		}
+		if err := cache.Load(); err != nil {
+			return nil, errors.Wrap(err, "reading central management internal cache")
+		}
 
 		// Ignore kibana version to avoid permission errors
 		c.Kibana.IgnoreVersion = true
@@ -65,6 +78,7 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 
 	return &ConfigManager{
 		config:   c,
+		cache:    cache,
 		logger:   logp.NewLogger(management.DebugK),
 		client:   client,
 		done:     make(chan struct{}),
@@ -133,7 +147,7 @@ func (cm *ConfigManager) worker() {
 		if changed {
 			// store new configs (already applied)
 			cm.logger.Info("Storing new state")
-			if err := cm.config.Save(); err != nil {
+			if err := cm.cache.Save(); err != nil {
 				cm.logger.Errorf("error storing central management state: %s", err)
 			}
 		}
@@ -148,46 +162,57 @@ func (cm *ConfigManager) worker() {
 // fetch configurations from kibana, return true if they changed
 func (cm *ConfigManager) fetch() bool {
 	cm.logger.Debug("Retrieving new configurations from Kibana")
-	configs, err := cm.client.Configuration(cm.config.AccessToken, cm.beatUUID)
+	configs, err := cm.client.Configuration(cm.config.AccessToken, cm.beatUUID, cm.cache.ConfigOK)
 	if err != nil {
 		cm.logger.Errorf("error retriving new configurations, will use cached ones: %s", err)
 		return false
 	}
 
-	if api.ConfigBlocksEqual(configs, cm.config.Configs) {
+	if api.ConfigBlocksEqual(configs, cm.cache.Configs) {
 		cm.logger.Debug("configuration didn't change, sleeping")
 		return false
 	}
 
 	cm.logger.Info("New configurations retrieved")
-	cm.config.Configs = configs
+	cm.cache.Configs = configs
 
 	return true
 }
 
 func (cm *ConfigManager) apply() {
-	for _, b := range cm.config.Configs {
-		cm.reload(b.Type, b.Blocks)
+	configOK := true
+	for _, b := range cm.cache.Configs {
+		err := cm.reload(b.Type, b.Blocks)
+		configOK = configOK && err == nil
 	}
+
+	if !configOK {
+		logp.Info("Failed to apply settings, reporting error on next fetch")
+	}
+
+	// Update configOK flag with the result of this apply
+	cm.cache.ConfigOK = configOK
 }
 
-func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) {
+func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) error {
 	cm.logger.Infof("Applying settings for %s", t)
 
 	if obj := cm.registry.GetReloadable(t); obj != nil {
 		// Single object
 		if len(blocks) != 1 {
-			cm.logger.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
-			return
+			err := fmt.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
+			cm.logger.Error(err)
+			return err
 		}
 		config, err := blocks[0].ConfigWithMeta()
 		if err != nil {
 			cm.logger.Error(err)
-			return
+			return err
 		}
 
 		if err := obj.Reload(config); err != nil {
 			cm.logger.Error(err)
+			return err
 		}
 	} else if obj := cm.registry.GetReloadableList(t); obj != nil {
 		// List
@@ -203,6 +228,9 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) {
 
 		if err := obj.Reload(configs); err != nil {
 			cm.logger.Error(err)
+			return err
 		}
 	}
+
+	return nil
 }

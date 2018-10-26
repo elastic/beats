@@ -2,6 +2,7 @@ import os
 import sys
 import BaseHTTPServer
 import threading
+import nose.tools
 
 sys.path.append(os.path.join(os.path.dirname(
     __file__), '../../../libbeat/tests/system'))
@@ -32,3 +33,43 @@ class BaseTest(TestCase):
         thread.start()
 
         return server
+
+    @staticmethod
+    def http_cfg(url):
+        return """
+- type: http
+  schedule: "@every 1s"
+  urls: ["{url}"]
+        """[1:-1].format(url=url)
+
+    @staticmethod
+    def tcp_cfg(*hosts):
+        host_str = ", ".join('"' + host + '"' for host in hosts)
+        return """
+- type: tcp
+  schedule: "@every 1s"
+  hosts: [{host_str}]
+        """[1:-1].format(host_str=host_str)
+
+    def last_output_line(self):
+        return self.read_output()[-1]
+
+    def write_dyn_config(self, filename, cfg):
+        with open(self.monitors_dir() + filename, 'w') as f:
+            f.write(cfg)
+
+    def monitors_dir(self):
+        return self.working_dir + "/monitors.d/"
+
+    def assert_last_status(self, status):
+        nose.tools.eq_(self.last_output_line()["monitor.status"], status)
+
+    def setup_dynamic(self, extra_beat_args=[]):
+        os.mkdir(self.monitors_dir())
+        self.render_config_template(
+            reload=True,
+            reload_path=self.monitors_dir() + "*.yml",
+            flush_min_events=1,
+        )
+
+        self.proc = self.start_beat(extra_args=extra_beat_args)

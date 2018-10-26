@@ -35,15 +35,7 @@ var Packages []OSPackageArgs
 // UseCommunityBeatPackaging configures the package target to build packages for
 // a community Beat.
 func UseCommunityBeatPackaging() {
-	beatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		panic(err)
-	}
-
-	err = LoadNamedSpec("community_beat", filepath.Join(beatsDir, packageSpecFile))
-	if err != nil {
-		panic(err)
-	}
+	MustUsePackaging("community_beat", packageSpecFile)
 }
 
 // UseElasticBeatPackaging configures the package target to build packages for
@@ -51,15 +43,7 @@ func UseCommunityBeatPackaging() {
 // that is purely OSS under Apache 2.0 and one that is licensed under the
 // Elastic License and may contain additional X-Pack features.
 func UseElasticBeatPackaging() {
-	beatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		panic(err)
-	}
-
-	err = LoadNamedSpec("elastic_beat", filepath.Join(beatsDir, packageSpecFile))
-	if err != nil {
-		panic(err)
-	}
+	MustUsePackaging("elastic_beat", packageSpecFile)
 }
 
 // UseElasticBeatWithoutXPackPackaging configures the package target to build packages for
@@ -71,12 +55,20 @@ func UseElasticBeatPackaging() {
 // a temporary packaging target for projects that depends on beat but do have concrete x-pack
 // binaries.
 func UseElasticBeatWithoutXPackPackaging() {
+	MustUsePackaging("elastic_beat_without_xpack", packageSpecFile)
+}
+
+// MustUsePackaging will load a named spec from a named file, if any errors occurs when loading
+// the specs it will panic.
+//
+// NOTE: we assume that specFile is relative to the beatsDir.
+func MustUsePackaging(specName, specFile string) {
 	beatsDir, err := ElasticBeatsDir()
 	if err != nil {
 		panic(err)
 	}
 
-	err = LoadNamedSpec("elastic_beat_without_xpack", filepath.Join(beatsDir, packageSpecFile))
+	err = LoadNamedSpec(specName, filepath.Join(beatsDir, specFile))
 	if err != nil {
 		panic(err)
 	}

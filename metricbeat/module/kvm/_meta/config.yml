@@ -2,4 +2,4 @@
   #metricsets:
   #  - dommemstat
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["unix:///var/run/libvirt/libvirt-sock"]
