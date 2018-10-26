@@ -30,8 +30,13 @@ type MetricSet struct {
 	broker *Broker
 }
 
+// MetricSetOptions are the options of a Kafka metricset
+type MetricSetOptions struct {
+	Version string
+}
+
 // NewMetricSet creates a base metricset for Kafka metricsets
-func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
+func NewMetricSet(base mb.BaseMetricSet, options MetricSetOptions) (*MetricSet, error) {
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -57,9 +62,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		TLS:         tls,
 		Username:    config.Username,
 		Password:    config.Password,
-
-		// Consumer groups API requires 0.9.0.0
-		Version: Version("0.9.0.0"),
+		Version:     Version(options.Version),
 	}
 
 	return &MetricSet{

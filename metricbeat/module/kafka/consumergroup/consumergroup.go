@@ -54,7 +54,11 @@ var debugf = logp.MakeDebug("kafka")
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The kafka consumergroup metricset is beta")
 
-	ms, err := kafka.NewMetricSet(base)
+	opts := kafka.MetricSetOptions{
+		Version: "0.9.0.0",
+	}
+
+	ms, err := kafka.NewMetricSet(base, opts)
 	if err != nil {
 		return nil, err
 	}
