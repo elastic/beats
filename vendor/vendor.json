@@ -1097,12 +1097,13 @@
 			"versionExact": "v0.9.0"
 		},
 		{
-			"checksumSHA1": "hTxFrbA619JCHysWjXHa9U6bfto=",
+			"checksumSHA1": "Klc34HULvwvY4cGA/D8HmqtXLqw=",
+			"origin": "github.com/jsoriano/k8s",
 			"path": "github.com/ericchiang/k8s",
-			"revision": "5912993f00cb7c971aaa54529a06bd3eecd6c3d4",
-			"revisionTime": "2018-01-20T20:28:12Z",
-			"version": "v1.0.0",
-			"versionExact": "v1.0.0"
+			"revision": "33b346590d1dd4eaac217471671f736bcdab492d",
+			"revisionTime": "2018-10-25T16:06:03Z",
+			"version": "=v1.0.0/in-cluster-ipv6",
+			"versionExact": "v1.0.0/in-cluster-ipv6"
 		},
 		{
 			"checksumSHA1": "uQuMoUlS7hAWsB+Mwr/1B7+35BU=",
