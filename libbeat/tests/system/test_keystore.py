@@ -70,3 +70,24 @@ class TestKeystore(KeystoreBase):
         self.wait_until(lambda: self.log_contains("Elasticsearch url: http://myeleasticsearchsecrethost:9200"))
         assert self.log_contains(secret)
         proc.check_kill_and_wait()
+
+    def test_export_config_with_keystore(self):
+        """
+        Test export config works and doesn't expose keystore value
+        """
+        key = "asecret"
+        secret = "asecretvalue"
+
+        self.render_config_template(keystore_path=self.keystore_path, elasticsearch={
+            'hosts': "${%s}" % key
+        })
+
+        exit_code = self.run_beat(extra_args=["keystore", "create"])
+        assert exit_code == 0
+
+        self.add_secret(key, value=secret)
+        exit_code = self.run_beat(extra_args=["export", "config"])
+
+        assert exit_code == 0
+        assert self.log_contains(secret) == False
+        assert self.log_contains("${%s}" % key)
