@@ -253,10 +253,12 @@ func (ms *MetricSet) enrichSockets(socketLists ...[]*Socket) error {
 						errs = append(errs, err)
 					}
 
-					ms.log.Debugf("found %d ports mapped to RPC services", len(*ms.rpcPortmap))
+					if ms.rpcPortmap != nil {
+						ms.log.Debugf("found %d ports mapped to RPC services", len(*ms.rpcPortmap))
+					}
 				}
 
-				if len(*ms.rpcPortmap) > 0 {
+				if ms.rpcPortmap != nil && len(*ms.rpcPortmap) > 0 {
 					rpcServices, found := (*ms.rpcPortmap)[uint32(socket.LocalPort)]
 
 					if !found {
