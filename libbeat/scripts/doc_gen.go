@@ -30,12 +30,13 @@ import (
 
 type command struct {
 	Name         string
-	Variables    map[string]*struct{}
+	variables    map[string]*struct{}
+	Variables    []string
 	Dependencies []string
 }
 
 func main() {
-	f, _ := os.Open("test_file")
+	f, _ := os.Open("Makefile")
 
 	reader := bufio.NewReader(f)
 
@@ -50,6 +51,8 @@ func main() {
 	var c *command
 	var isPreviousLinePhony bool
 	var finish bool
+
+	// Iterate lines of the Makefile
 	for {
 		l, _, err := reader.ReadLine()
 		if err != nil {
@@ -60,19 +63,19 @@ func main() {
 
 		if isPhoneReg.Match(l) {
 			if c != nil {
-				// Print current command name
-				commands = append(commands, c)
+				commands = finishCommandAndAdd(commands, c)
 			}
 
 			// New phony
 			c = &command{
 				Name:      strings.Replace(line, phonyString, "", -1),
-				Variables: make(map[string]*struct{}),
+				variables: make(map[string]*struct{}),
 			}
+
 			isPreviousLinePhony = true
 			continue
 		} else if c != nil {
-			variablesFromLine(line, c.Variables)
+			variablesFromLine(line, c.variables)
 		}
 
 		if isPreviousLinePhony {
@@ -84,13 +87,39 @@ func main() {
 		isPreviousLinePhony = false
 
 		if finish {
-			commands = append(commands, c)
+			commands = finishCommandAndAdd(commands, c)
 			break
 		}
 	}
 
+	// Print a nice JSON, still for debugging
 	byt, _ := json.MarshalIndent(commands, "", "  ")
 	fmt.Println(string(byt))
+}
+
+func finishCommandAndAdd(cs []*command, c *command) []*command {
+	c.Variables = mapStructToStringArray(c.variables)
+	cs = append(cs, c)
+	return cs
+}
+
+func ensureCorrectVariableCatching(s string) string {
+	res := strings.Split(s, "$")
+	if len(res) == 1 {
+		return res[0]
+	}
+
+	return res[1]
+}
+
+func mapStructToStringArray(in map[string]*struct{}) []string {
+	res := make([]string, 0)
+
+	for k := range in {
+		res = append(res, k)
+	}
+
+	return res
 }
 
 func cleanStringsArray(ss []string) []string {
@@ -127,7 +156,7 @@ func variablesFromLine(l string, targetMap map[string]*struct{}) {
 			capture = true
 		} else if char == '}' || char == ')' {
 			if curVar != "" {
-				targetMap[curVar] = &struct{}{}
+				targetMap[ensureCorrectVariableCatching(curVar)] = &struct{}{}
 			}
 
 			curVar = ""
