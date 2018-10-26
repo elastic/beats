@@ -27,7 +27,8 @@ class Test(BaseTest):
             cfg_file = "test.yml"
 
             self.write_dyn_config(
-                cfg_file, self.http_cfg("http://localhost:8185")
+                cfg_file, self.http_cfg(
+                    "http://localhost:{}".format(server.server_port))
             )
 
             self.wait_until(lambda: self.output_has(lines=1))
@@ -47,7 +48,7 @@ class Test(BaseTest):
                 }
             })
 
-            tcp_hosts = ["localhost:8185", "localhost:12345"]
+            tcp_hosts = ["localhost:123", "localhost:456"]
 
             self.write_dyn_config(
                 cfg_file, self.tcp_cfg(*tcp_hosts)
