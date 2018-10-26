@@ -18,17 +18,17 @@ class Test(BaseTest):
             cfg_file = "test.yml"
 
             self.write_dyn_config(
-                cfg_file, self.http_cfg("http://localhost:8185"))
+                cfg_file, self.http_cfg("http://localhost:{}".format(server.server_port)))
 
             self.wait_until(lambda: self.output_has(lines=1))
 
             self.assert_last_status("up")
 
             self.write_dyn_config(
-                cfg_file, self.http_cfg("http://localhost:8186"))
+                cfg_file, self.http_cfg("http://203.0.113.1:8186"))
 
             self.wait_until(lambda: self.last_output_line()[
-                            "http.url"] == "http://localhost:8186")
+                            "http.url"] == "http://203.0.113.1:8186")
 
             self.assert_last_status("down")
 
@@ -47,7 +47,7 @@ class Test(BaseTest):
             cfg_file = "test.yml"
 
             self.write_dyn_config(
-                cfg_file, self.http_cfg("http://localhost:8185"))
+                cfg_file, self.http_cfg("http://localhost:{}".format(server.server_port)))
 
             self.wait_until(lambda: self.output_has(lines=2))
 
@@ -57,9 +57,9 @@ class Test(BaseTest):
 
             # Ensure the job was removed from the scheduler
             self.wait_until(lambda: self.log_contains(
-                "Remove scheduler job 'http@http://localhost:8185"))
+                "Remove scheduler job 'http@http://localhost:{}".format(server.server_port)))
             self.wait_until(lambda: self.log_contains(
-                "Job 'http@http://localhost:8185' returned"))
+                "Job 'http@http://localhost:{}' returned".format(server.server_port)))
 
             self.proc.check_kill_and_wait()
         finally:
@@ -77,7 +77,7 @@ class Test(BaseTest):
         server = self.start_server("hello world", 200)
         try:
             self.write_dyn_config(
-                "test.yml", self.http_cfg("http://localhost:8185"))
+                "test.yml", self.http_cfg("http://localhost:{}".format(server.server_port)))
 
             self.wait_until(lambda: self.log_contains(
                 "Starting reload procedure, current runners: 1"))
