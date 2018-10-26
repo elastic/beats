@@ -30,13 +30,13 @@ import (
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 )
 
-// CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available
+// CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
 const CCRStatsAPIAvailableVersion = "6.5.0"
 
-// Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id
+// Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
 
-// ModuleName is the ame of this module
+// ModuleName is the name of this module.
 const ModuleName = "elasticsearch"
 
 // Info construct contains the data from the Elasticsearch / endpoint
@@ -48,7 +48,7 @@ type Info struct {
 	} `json:"version"`
 }
 
-// NodeInfo struct cotains data about the node
+// NodeInfo struct cotains data about the node.
 type NodeInfo struct {
 	Host             string `json:"host"`
 	TransportAddress string `json:"transport_address"`
@@ -57,7 +57,7 @@ type NodeInfo struct {
 	ID               string
 }
 
-// GetClusterID fetches cluster id for given nodeID
+// GetClusterID fetches cluster id for given nodeID.
 func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) {
 	// Check if cluster id already cached. If yes, return it.
 	if clusterID, ok := clusterIDCache[nodeID]; ok {
@@ -73,7 +73,7 @@ func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) 
 	return info.ClusterID, nil
 }
 
-// IsMaster checks if the given node host is a master node
+// IsMaster checks if the given node host is a master node.
 //
 // The detection of the master is done in two steps:
 // * Fetch node name from /_nodes/_local/name
@@ -130,7 +130,7 @@ func getMasterName(http *helper.HTTP, uri string) (string, error) {
 	return clusterStruct.MasterNode, nil
 }
 
-// GetInfo returns the data for the Elasticsearch / endpoint
+// GetInfo returns the data for the Elasticsearch / endpoint.
 func GetInfo(http *helper.HTTP, uri string) (*Info, error) {
 
 	content, err := fetchPath(http, uri, "/")
@@ -157,7 +157,7 @@ func fetchPath(http *helper.HTTP, uri, path string) ([]byte, error) {
 	return http.FetchContent()
 }
 
-// GetNodeInfo returns the node information
+// GetNodeInfo returns the node information.
 func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error) {
 
 	content, err := fetchPath(http, uri, "/_nodes/_local/nodes")
@@ -184,7 +184,7 @@ func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error
 
 // GetLicense returns license information. Since we don't expect license information
 // to change frequently, the information is cached for 1 minute to avoid
-// hitting Elasticsearch frequently
+// hitting Elasticsearch frequently.
 func GetLicense(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	// First, check the cache
 	license := licenseCache.get()
@@ -218,7 +218,7 @@ func GetLicense(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	return licenseCache.get(), nil
 }
 
-// GetClusterState returns cluster state information
+// GetClusterState returns cluster state information.
 func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (common.MapStr, error) {
 	clusterStateURI := "_cluster/state"
 	if metrics != nil && len(metrics) > 0 {
@@ -235,7 +235,7 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (comm
 	return clusterState, err
 }
 
-// GetStackUsage returns stack usage information
+// GetStackUsage returns stack usage information.
 func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	content, err := fetchPath(http, resetURI, "_xpack/usage")
 	if err != nil {
@@ -248,7 +248,7 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 }
 
 // PassThruField copies the field at the given path from the given source data object into
-// the same path in the given target data object
+// the same path in the given target data object.
 func PassThruField(fieldPath string, sourceData, targetData common.MapStr) error {
 	fieldValue, err := sourceData.GetValue(fieldPath)
 	if err != nil {
@@ -260,12 +260,12 @@ func PassThruField(fieldPath string, sourceData, targetData common.MapStr) error
 }
 
 // IsCCRStatsAPIAvailable returns whether the CCR stats API is available in the given version
-// of Elasticsearch
+// of Elasticsearch.
 func IsCCRStatsAPIAvailable(currentElasticsearchVersion string) (bool, error) {
 	return elastic.IsFeatureAvailable(currentElasticsearchVersion, CCRStatsAPIAvailableVersion)
 }
 
-// Global cache for license information. Assumption is that license information changes infrequently
+// Global cache for license information. Assumption is that license information changes infrequently.
 var licenseCache = &_licenseCache{}
 
 type _licenseCache struct {

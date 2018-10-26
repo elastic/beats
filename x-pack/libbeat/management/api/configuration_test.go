@@ -26,11 +26,13 @@ func TestConfiguration(t *testing.T) {
 		// Check enrollment token is correct
 		assert.Equal(t, "thisismyenrollmenttoken", r.Header.Get("kbn-beats-access-token"))
 
+		assert.Equal(t, "false", r.URL.Query().Get("validSetting"))
+
 		fmt.Fprintf(w, `{"configuration_blocks":[{"type":"filebeat.modules","config":{"module":"apache2"}},{"type":"metricbeat.modules","config":{"module":"system","period":"10s"}}]}`)
 	}))
 	defer server.Close()
 
-	configs, err := client.Configuration("thisismyenrollmenttoken", beatUUID)
+	configs, err := client.Configuration("thisismyenrollmenttoken", beatUUID, false)
 	if err != nil {
 		t.Fatal(err)
 	}
