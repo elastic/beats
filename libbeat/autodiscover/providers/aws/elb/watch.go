@@ -18,7 +18,7 @@
 package elb
 
 import (
-	"fmt"
+	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/external"
@@ -51,6 +51,13 @@ func watch(
 		done <- true
 	}
 
+	cfg, err := external.LoadDefaultAWSConfig()
+	cfg.Region = region
+	if err != nil {
+		logp.Err("error querying AWS: %s", err)
+	}
+	client := elbv2.New(cfg)
+
 	go func() {
 		ticker := time.NewTicker(interval)
 
@@ -68,8 +75,15 @@ func watch(
 				oldGen := newGen
 				newGen = oldGen + 1
 
-				var err error
-				stopDescribe, err = describeEachLBListener(region, func(lbl lbListener) {
+				fetchedLbls, err := GetAllLbls(client, region)
+				// If a single request fails we have to skip
+				// We need all the data intact
+				if err != nil {
+					logp.Err("error while querying AWS ELBs: %s", err)
+					continue
+				}
+
+				for _, lbl := range fetchedLbls {
 					uuid := lbl.uuid()
 					if _, exists := lbListeners[uuid]; !exists {
 						if onStart != nil {
@@ -77,11 +91,6 @@ func watch(
 						}
 					}
 					lbListeners[uuid] = newGen
-				})
-
-				if err != nil {
-					logp.Err("error while querying AWS ELBs: %s", err)
-					continue
 				}
 
 				for uuid, entryGen := range lbListeners {
@@ -99,45 +108,123 @@ func watch(
 	return stop
 }
 
-func describeEachLBListener(region string, cb func(lbl lbListener)) (stop func(), err error) {
-	cfg, err := external.LoadDefaultAWSConfig()
-	cfg.Region = region
-	if err != nil {
-		return nil, err
-	}
-	e := elbv2.New(cfg)
+type individualResult struct {
+	lbListener *lbListener
+	err        error
+}
 
-	running := atomic.NewBool(true)
-	stop = func() {
-		running.Store(false)
-	}
+type taskFn func()
 
-	var pageSize int64 = 100
-	describe := e.DescribeLoadBalancersRequest(&elbv2.DescribeLoadBalancersInput{PageSize: &pageSize}).Paginate()
+type inventoryRequest struct {
+	paginator    elbv2.DescribeLoadBalancersPager
+	elbv2Client  *elbv2.ELBV2
+	running      atomic.Bool
+	resultsCh    chan *individualResult
+	tasks        chan taskFn
+	pendingTasks sync.WaitGroup
+}
 
-	go func() {
-		for describe.Next() && running.Load() {
-			for _, lb := range describe.CurrentPage().LoadBalancers {
-				go func() {
-					listen := e.DescribeListenersRequest(&elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}).Paginate()
-					for listen.Next() && running.Load() {
-						for _, listener := range listen.CurrentPage().Listeners {
-							lbl := lbListener{&lb, &listener}
-							cb(lbl)
-						}
-					}
-					if err = listen.Err(); err != nil {
-						logp.Err(fmt.Sprintf("Could not describe load balancer listeners: %s", err))
-						return
-					}
-				}()
-			}
+func (p *inventoryRequest) queueTask(t taskFn) {
+	p.pendingTasks.Add(1)
+	p.tasks <- t
+}
+
+func (p *inventoryRequest) recordResult(lb *elbv2.LoadBalancer, lbl *elbv2.Listener) {
+	p.resultsCh <- &individualResult{&lbListener{lb, lbl}, nil}
+}
+
+func (p *inventoryRequest) recordErr(err error) {
+	p.running.Store(false)
+	p.resultsCh <- &individualResult{nil, err}
+}
+
+func (p *inventoryRequest) fetchListeners(lb elbv2.LoadBalancer) {
+	listen := p.elbv2Client.DescribeListenersRequest(&elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}).Paginate()
+	for listen.Next() && p.running.Load() {
+		for _, listener := range listen.CurrentPage().Listeners {
+			p.recordResult(&lb, &listener)
 		}
+	}
+	if listen.Err() != nil {
+		p.recordErr(listen.Err())
+	}
+}
+
+func (p *inventoryRequest) fetchNextPage() {
+	if !p.running.Load() {
+		return
+	}
+
+	if p.paginator.Next() {
+		for _, lb := range p.paginator.CurrentPage().LoadBalancers {
+			p.queueTask(func() {
+				p.fetchListeners(lb)
+			})
+			p.queueTask(p.fetchNextPage)
+		}
+	}
+
+	if p.paginator.Err() != nil {
+		p.recordErr(p.paginator.Err())
+	}
+}
+
+func (p *inventoryRequest) fetch() ([]*lbListener, error) {
+	done := make(chan struct{})
+
+	p.tasks <- p.fetchNextPage
+	go func() {
+		p.pendingTasks.Wait()
+		close(done)
 	}()
 
-	if err := describe.Err(); err != nil {
-		return stop, err
+	for i := 0; i < 5; i++ {
+		go func() {
+			for {
+				select {
+				case t := <-p.tasks:
+					t()
+					p.pendingTasks.Done()
+				case <-done:
+					return
+				}
+			}
+		}()
 	}
 
-	return stop, err
+	var lbListeners []*lbListener
+	var errs []error
+	for {
+		select {
+		case res := <-p.resultsCh:
+			if res.err != nil {
+				errs = append(errs, res.err)
+			} else {
+				lbListeners = append(lbListeners, res.lbListener)
+			}
+		case <-done:
+			break
+		}
+	}
+
+	if len(errs) > 0 {
+		return nil, errs[0]
+	}
+
+	return lbListeners, nil
+}
+
+func GetAllLbls(client *elbv2.ELBV2, region string) ([]*lbListener, error) {
+	var pageSize int64 = 50
+	paginator := client.DescribeLoadBalancersRequest(&elbv2.DescribeLoadBalancersInput{PageSize: &pageSize}).Paginate()
+	ir := &inventoryRequest{
+		paginator,
+		client,
+		atomic.MakeBool(true),
+		make(chan *individualResult),
+		make(chan taskFn),
+		sync.WaitGroup{},
+	}
+
+	return ir.fetch()
 }
