@@ -612,8 +612,8 @@ subcomponents is subject to the terms and conditions of the
 subcomponent's license, as noted in the LICENSE file.
 --------------------------------------------------------------------
 Dependency: github.com/ericchiang/k8s
-Version: v1.0.0
-Revision: 5912993f00cb7c971aaa54529a06bd3eecd6c3d4
+Version: =v1.0.0/in-cluster-ipv6
+Revision: 33b346590d1dd4eaac217471671f736bcdab492d
 License type (autodetected): Apache-2.0
 ./vendor/github.com/ericchiang/k8s/LICENSE:
 --------------------------------------------------------------------
