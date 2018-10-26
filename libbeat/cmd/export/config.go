@@ -25,7 +25,9 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cli"
+	"github.com/elastic/beats/libbeat/keystore"
 )
 
 // GenExportConfigCmd write to stdout the current configuration in the YAML format.
@@ -49,6 +51,9 @@ func exportConfig(settings instance.Settings, name, idxPrefix, beatVersion strin
 	if err != nil {
 		return fmt.Errorf("error initializing beat: %s", err)
 	}
+
+	// Do not expose sensitive information as when exporting the config.
+	common.OverwriteConfigOpts(keystore.ObfuscatedConfigOpts(b.Keystore()))
 
 	var config map[string]interface{}
 	err = b.RawConfig.Unpack(&config)

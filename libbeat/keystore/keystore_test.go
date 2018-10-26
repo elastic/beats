@@ -48,3 +48,29 @@ func TestResolverWhenTheKeyExist(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, v, "secret")
 }
+
+func TestObfuscatedResolver(t *testing.T) {
+	path := GetTemporaryKeystoreFile()
+	defer os.Remove(path)
+
+	keystore := CreateAnExistingKeystore(path)
+	resolver := ResolverWrap(keystore)
+	v, err := resolver("output.elasticsearch.password")
+	assert.NoError(t, err)
+	assert.Equal(t, v, "secret")
+
+	t.Run("when the key exist", func(t *testing.T) {
+		obfuscated := ObfuscatedResolverWrap(resolver)
+		v, err := obfuscated("output.elasticsearch.password")
+		if !assert.NoError(t, err) {
+			return
+		}
+		assert.Equal(t, v, "${output.elasticsearch.password}")
+	})
+
+	t.Run("when the key doesn't exist", func(t *testing.T) {
+		obfuscated := ObfuscatedResolverWrap(resolver)
+		_, err := obfuscated("donotexist")
+		assert.Error(t, err)
+	})
+}

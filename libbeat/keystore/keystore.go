@@ -97,8 +97,11 @@ func ResolverFromConfig(cfg *common.Config, dataPath string) (func(string) (stri
 	return ResolverWrap(keystore), nil
 }
 
+// ResolverFunc define the resolver signature.
+type ResolverFunc func(string) (string, error)
+
 // ResolverWrap wrap a config resolver around an existing keystore.
-func ResolverWrap(keystore Keystore) func(string) (string, error) {
+func ResolverWrap(keystore Keystore) ResolverFunc {
 	return func(keyName string) (string, error) {
 		key, err := keystore.Retrieve(keyName)
 
@@ -121,12 +124,35 @@ func ResolverWrap(keystore Keystore) func(string) (string, error) {
 	}
 }
 
+// ObfuscatedResolverWrap wrap the keystore resolved into obfuscated mode, will return a fixed string
+// when the values is found in the keystore.
+func ObfuscatedResolverWrap(wrap ResolverFunc) ResolverFunc {
+	const obfuscated = "${%s}"
+	return func(keyName string) (string, error) {
+		_, err := wrap(keyName)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf(obfuscated, keyName), nil
+	}
+}
+
 // ConfigOpts returns ucfg config options with a resolver linked to the current keystore.
 // TODO: Refactor to allow insert into the config option array without having to redefine everything
 func ConfigOpts(keystore Keystore) []ucfg.Option {
 	return []ucfg.Option{
 		ucfg.PathSep("."),
 		ucfg.Resolve(ResolverWrap(keystore)),
+		ucfg.ResolveEnv,
+		ucfg.VarExp,
+	}
+}
+
+// ObfuscatedConfigOpts returns ucfg config options with an obfuscated resolver linked to the current keystore.
+func ObfuscatedConfigOpts(keystore Keystore) []ucfg.Option {
+	return []ucfg.Option{
+		ucfg.PathSep("."),
+		ucfg.Resolve(ObfuscatedResolverWrap(ResolverWrap(keystore))),
 		ucfg.ResolveEnv,
 		ucfg.VarExp,
 	}
