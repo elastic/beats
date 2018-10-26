@@ -20,7 +20,7 @@ package docker_json
 import (
 	"bytes"
 	"encoding/json"
-	"strings"
+	"runtime"
 	"time"
 
 	"github.com/elastic/beats/filebeat/reader"
@@ -38,8 +38,13 @@ type Reader struct {
 	// join partial lines
 	partial bool
 
+	// Force log format: json-file | cri
+	forceCRI bool
+
 	// parse CRI flags
 	criflags bool
+
+	stripNewLine func(msg *reader.Message)
 }
 
 type logLine struct {
@@ -51,13 +56,22 @@ type logLine struct {
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool, CRIFlags bool) *Reader {
-	return &Reader{
+func New(r reader.Reader, stream string, partial bool, forceCRI bool, CRIFlags bool) *Reader {
+	reader := Reader{
 		stream:   stream,
 		partial:  partial,
 		reader:   r,
+		forceCRI: forceCRI,
 		criflags: CRIFlags,
 	}
+
+	if runtime.GOOS == "windows" {
+		reader.stripNewLine = stripNewLineWin
+	} else {
+		reader.stripNewLine = stripNewLine
+	}
+
+	return &reader
 }
 
 // parseCRILog parses logs in CRI log format.
@@ -74,11 +88,11 @@ func (p *Reader) parseCRILog(message *reader.Message, msg *logLine) error {
 	i := 0
 
 	// timestamp
-	log := strings.SplitN(string(message.Content), " ", split)
+	log := bytes.SplitN(message.Content, []byte{' '}, split)
 	if len(log) < split {
 		return errors.New("invalid CRI log format")
 	}
-	ts, err := time.Parse(time.RFC3339, log[i])
+	ts, err := time.Parse(time.RFC3339, string(log[i]))
 	if err != nil {
 		return errors.Wrap(err, "parsing CRI timestamp")
 	}
@@ -86,16 +100,16 @@ func (p *Reader) parseCRILog(message *reader.Message, msg *logLine) error {
 	i++
 
 	// stream
-	msg.Stream = log[i]
+	msg.Stream = string(log[i])
 	i++
 
 	// tags
 	partial := false
 	if p.criflags {
 		// currently only P(artial) or F(ull) are available
-		tags := strings.Split(log[i], ":")
+		tags := bytes.Split(log[i], []byte{':'})
 		for _, tag := range tags {
-			if tag == "P" {
+			if len(tag) == 1 && tag[0] == 'P' {
 				partial = true
 			}
 		}
@@ -106,12 +120,10 @@ func (p *Reader) parseCRILog(message *reader.Message, msg *logLine) error {
 	message.AddFields(common.MapStr{
 		"stream": msg.Stream,
 	})
-	// Remove ending \n for partial messages
-	message.Content = []byte(log[i])
+	// Remove \n ending for partial messages
+	message.Content = log[i]
 	if partial {
-		message.Content = bytes.TrimRightFunc(message.Content, func(r rune) bool {
-			return r == '\n' || r == '\r'
-		})
+		p.stripNewLine(message)
 	}
 
 	return nil
@@ -144,7 +156,12 @@ func (p *Reader) parseDockerJSONLog(message *reader.Message, msg *logLine) error
 }
 
 func (p *Reader) parseLine(message *reader.Message, msg *logLine) error {
-	if strings.HasPrefix(string(message.Content), "{") {
+	if p.forceCRI {
+		return p.parseCRILog(message, msg)
+	}
+
+	// If froceCRI isn't set, autodetect file type
+	if len(message.Content) > 0 && message.Content[0] == '{' {
 		return p.parseDockerJSONLog(message, msg)
 	}
 
@@ -185,4 +202,17 @@ func (p *Reader) Next() (reader.Message, error) {
 
 		return message, err
 	}
+}
+
+func stripNewLine(msg *reader.Message) {
+	l := len(msg.Content)
+	if l > 0 && msg.Content[l-1] == '\n' {
+		msg.Content = msg.Content[:l-1]
+	}
+}
+
+func stripNewLineWin(msg *reader.Message) {
+	msg.Content = bytes.TrimRightFunc(msg.Content, func(r rune) bool {
+		return r == '\n' || r == '\r'
+	})
 }
