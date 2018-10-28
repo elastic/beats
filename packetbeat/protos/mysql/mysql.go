@@ -779,7 +779,6 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 
 			if data[offset+4] == 0xfe {
 				// EOF
-				offset += length + 4
 				break
 			}
 

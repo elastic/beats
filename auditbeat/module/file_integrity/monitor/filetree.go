@@ -116,13 +116,14 @@ func (tree FileTree) add(path string, value FileTree) error {
 }
 
 func (tree FileTree) getByComponents(path string, components []string) (FileTree, error) {
-	dir, exists := tree, false
+	dir := tree
 	for _, item := range components {
 		if len(item) != 0 {
 			if dir == nil {
 				// previous component is a file, not a directory
 				return nil, fmt.Errorf("path component %s is a file: %s", item, path)
 			}
+			var exists bool
 			if dir, exists = dir[item]; !exists {
 				return nil, fmt.Errorf("path component %s not found in %s", item, path)
 			}

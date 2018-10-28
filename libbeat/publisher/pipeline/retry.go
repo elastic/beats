@@ -137,7 +137,7 @@ func (r *retryer) loop() {
 				countFailed  int
 				countDropped int
 				batch        = evt.batch
-				countRetry   = len(batch.events)
+				countRetry   int
 			)
 
 			if evt.tag == retryBatch {
@@ -155,7 +155,6 @@ func (r *retryer) loop() {
 				log.Info("Drop batch")
 				batch.Drop()
 			} else {
-				out = r.out
 				buffer = append(buffer, batch)
 				out = r.out
 				active = buffer[0]

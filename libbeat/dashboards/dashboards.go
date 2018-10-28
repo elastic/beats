@@ -77,9 +77,11 @@ func ImportDashboards(
 		}
 	}
 
-	var esLoader *ElasticsearchLoader
+	var (
+		esLoader  *ElasticsearchLoader
+		importVia importMethod
+	)
 
-	importVia := importNone
 	useKibana := importViaKibana
 	if !kibanaConfig.Enabled() {
 		useKibana = importNone

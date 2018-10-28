@@ -357,12 +357,11 @@ func getErrorsSimulateVerbose(docs []interface{}) ([]common.MapStr, error) {
 			return nil, err
 		}
 		res := rr.([]interface{})
-		hasError := false
+
 		for _, r := range res {
 			rres := r.(map[string]interface{})
 			result := common.MapStr(rres)
-			hasError, _ = result.HasKey("error")
-			if hasError {
+			if hasError, _ := result.HasKey("error"); hasError {
 				errors = append(errors, p)
 			}
 		}

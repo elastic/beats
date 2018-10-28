@@ -55,11 +55,6 @@ func TestIndex(t *testing.T) {
 		t.Fatalf("Index() fails: %s", resp)
 	}
 
-	body = map[string]interface{}{
-		"query": map[string]interface{}{
-			"match_all": map[string]interface{}{},
-		},
-	}
 	_, result, err := client.SearchURIWithBody(index, "", nil, map[string]interface{}{})
 	if err != nil {
 		t.Errorf("SearchUriWithBody() returns an error: %s", err)

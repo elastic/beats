@@ -359,7 +359,7 @@ func makeLexer(in string) lexer {
 
 		varcount := 0
 		for len(content) > 0 {
-			idx := -1
+			var idx int
 			if varcount == 0 {
 				idx = strings.IndexAny(content[off:], `%\`)
 			} else {

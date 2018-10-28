@@ -130,9 +130,6 @@ func (m *metricProcessor) splitMetric(metric string) (string, common.Time, float
 	}
 
 	if len(parts) == 3 {
-		if parts[2] == "N" {
-			timestamp = currentTime
-		}
 		ts, err := strconv.ParseFloat(parts[2], 64)
 		if err != nil {
 			return "", currentTime, 0, errors.New("Unable to parse timestamp")

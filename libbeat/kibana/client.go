@@ -188,9 +188,6 @@ func (conn *Connection) Request(method, extraPath string,
 	defer resp.Body.Close()
 
 	var retError error
-	if resp.StatusCode >= 300 {
-		retError = fmt.Errorf("%v", resp.Status)
-	}
 
 	result, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
