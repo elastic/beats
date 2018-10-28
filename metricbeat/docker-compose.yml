@@ -205,3 +205,5 @@ services:
 
   zookeeper:
     build: ./module/zookeeper/_meta
+    ports:
+      - 2181
