@@ -32,17 +32,21 @@ import (
 func TestStatus(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
 		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("status", r.Host()))
-			event, err := f.Fetch()
-			if !assert.NoError(t, err) {
+			f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("status", r.Host()))
+			events, errs := mbtest.ReportingFetchV2(f)
+
+			assert.Empty(t, errs)
+			if !assert.NotEmpty(t, events) {
 				t.FailNow()
 			}
 
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+				events[0].BeatEvent("kibana", "status").Fields.StringToPrint())
 		},
 		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("status", r.Host()))
-			err := mbtest.WriteEvent(f, t)
+			config := mtest.GetConfig("status", r.Host())
+			f := mbtest.NewReportingMetricSetV2(t, config)
+			err := mbtest.WriteEventsReporterV2(f, t, "")
 			if err != nil {
 				t.Fatal("write", err)
 			}

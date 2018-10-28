@@ -29,9 +29,16 @@ import (
 	"github.com/elastic/beats/heartbeat/look"
 )
 
+// TaskRunner describes a runnable task.
+// Note that these tasks can decompose and produce continuations,
+// along the line of a java fork join pool.
+type TaskRunner interface {
+	Run() (common.MapStr, []TaskRunner, error)
+}
+
 type funcJob struct {
 	settings JobSettings
-	run      JobRunner
+	run      jobRunner
 }
 
 type funcTask struct {
@@ -114,7 +121,7 @@ func MakeJob(settings JobSettings, f func() (common.MapStr, []TaskRunner, error)
 		},
 	})
 
-	return &funcJob{settings, func() (beat.Event, []JobRunner, error) {
+	return &funcJob{settings, func() (beat.Event, []jobRunner, error) {
 		// Create and run new annotated Job whenever the Jobs root is Task is executed.
 		// This will set the jobs active start timestamp to the time.Now().
 		return annotated(settings, time.Now(), f)()
@@ -126,8 +133,8 @@ func annotated(
 	settings JobSettings,
 	start time.Time,
 	fn func() (common.MapStr, []TaskRunner, error),
-) JobRunner {
-	return func() (beat.Event, []JobRunner, error) {
+) jobRunner {
+	return func() (beat.Event, []jobRunner, error) {
 		var event beat.Event
 
 		fields, cont, err := fn()
@@ -156,7 +163,7 @@ func annotated(
 			event.Fields = fields
 		}
 
-		jobCont := make([]JobRunner, len(cont))
+		jobCont := make([]jobRunner, len(cont))
 		for i, c := range cont {
 			jobCont[i] = annotated(settings, start, c.Run)
 		}
@@ -179,7 +186,7 @@ func MakeSimpleCont(f func() (common.MapStr, error)) TaskRunner {
 	})
 }
 
-// MakePingIPFactory creates a factory for building a Task from a new IP address.
+// MakePingIPFactory creates a jobFactory for building a Task from a new IP address.
 func MakePingIPFactory(
 	f func(*net.IPAddr) (common.MapStr, error),
 ) func(*net.IPAddr) TaskRunner {
@@ -428,7 +435,7 @@ func withStart(field string, start time.Time, r TaskRunner) TaskRunner {
 
 func (f *funcJob) Name() string { return f.settings.Name }
 
-func (f *funcJob) Run() (beat.Event, []JobRunner, error) { return f.run() }
+func (f *funcJob) Run() (beat.Event, []jobRunner, error) { return f.run() }
 
 func (f funcTask) Run() (common.MapStr, []TaskRunner, error) { return f.run() }
 

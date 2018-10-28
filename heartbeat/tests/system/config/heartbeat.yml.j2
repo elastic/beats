@@ -1,7 +1,12 @@
+logging.level: debug
+
 heartbeat.monitors:
 {% for monitor in monitors -%}
 - type: {{ monitor.type }}
   schedule: '{{ monitor.schedule|default("@every 1s") }}'
+  {%- if monitor.timeout is defined %}
+  timeout: {{monitor.timeout}}
+  {% endif -%}
 
   {%- if monitor.tags is defined %}
   tags:
@@ -32,6 +37,26 @@ heartbeat.monitors:
     {% endfor %}
   {% endif %}
 {% endfor -%}
+
+{% if reload or reload_path -%}
+heartbeat.config.monitors:
+  path: {{ reload_path|default("${path.config}/monitors.d/*.yml") }}
+  reload.period: 1s
+  reload.enabled: {{ reload|default("false")}}
+{% endif -%}
+
+{% if autodiscover %}
+heartbeat.autodiscover:
+  providers:
+  {%- for provider, settings in autodiscover.items() %}
+  - type: {{provider}}
+    {%- if settings %}
+    {%- for k, v in settings.items() %}
+    {{k}}: {{v | default([])}}
+    {%- endfor %}
+    {%- endif %}
+  {%- endfor %}
+{% endif %}
 
 {%- if shipper_name %}
 name: {{ shipper_name }}

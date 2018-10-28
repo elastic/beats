@@ -5,10 +5,6 @@
     pool.
   release: beta
   fields:
-    - name: name
-      type: keyword
-      description: >
-        The name of the pool.
     - name: process_manager
       type: keyword
       description: >

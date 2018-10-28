@@ -4,7 +4,7 @@
     Stats collected from Prometheus.
   short_config: false
   release: ga
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   fields:
     - name: prometheus
       type: group

@@ -20,14 +20,16 @@ package instance
 import (
 	"github.com/spf13/pflag"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/monitoring/report"
 )
 
 // Settings contains basic settings for any beat to pass into GenRootCmd
 type Settings struct {
-	Name        string
-	IndexPrefix string
-	Version     string
-	Monitoring  report.Settings
-	RunFlags    *pflag.FlagSet
+	Name            string
+	IndexPrefix     string
+	Version         string
+	Monitoring      report.Settings
+	RunFlags        *pflag.FlagSet
+	ConfigOverrides *common.Config
 }

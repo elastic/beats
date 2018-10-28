@@ -20,17 +20,25 @@
 
 package config
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"github.com/elastic/beats/libbeat/autodiscover"
+	"github.com/elastic/beats/libbeat/common"
+)
 
+// Config defines the structure of heartbeat.yml.
 type Config struct {
 	// Modules is a list of module specific configuration data.
-	Monitors  []*common.Config `config:"monitors"         validate:"required"`
-	Scheduler Scheduler        `config:"scheduler"`
+	Monitors       []*common.Config     `config:"monitors"`
+	ConfigMonitors *common.Config       `config:"config.monitors"`
+	Scheduler      Scheduler            `config:"scheduler"`
+	Autodiscover   *autodiscover.Config `config:"autodiscover"`
 }
 
+// Scheduler defines the syntax of a heartbeat.yml scheduler block.
 type Scheduler struct {
 	Limit    uint   `config:"limit"  validate:"min=0"`
 	Location string `config:"location"`
 }
 
+// DefaultConfig is the canonical instantiation of Config.
 var DefaultConfig = Config{}

@@ -30,7 +30,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
-	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
@@ -46,13 +45,15 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 	})
 	require.NoError(t, err)
 
-	jobs, err := create(monitors.Info{}, config)
+	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
 	job := jobs[0]
 
 	event, _, err := job.Run()
 	require.NoError(t, err)
+
+	require.Equal(t, 1, endpoints)
 
 	return &event
 }
@@ -66,13 +67,15 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	})
 	require.NoError(t, err)
 
-	jobs, err := create(monitors.Info{}, config)
+	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
 	job := jobs[0]
 
 	event, _, err := job.Run()
 	require.NoError(t, err)
+
+	require.Equal(t, 1, endpoints)
 
 	return &event
 }

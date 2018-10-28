@@ -39,8 +39,9 @@ const (
 	fpmVersion = "1.10.0"
 
 	// Docker images. See https://github.com/elastic/golang-crossbuild.
-	beatsFPMImage        = "docker.elastic.co/beats-dev/fpm"
-	beatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
+	beatsFPMImage = "docker.elastic.co/beats-dev/fpm"
+	// BeatsCrossBuildImage is the image used for crossbuilding Beats.
+	BeatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
 
 	elasticBeatsImportPath = "github.com/elastic/beats"
 )
@@ -65,9 +66,12 @@ var (
 
 	Snapshot bool
 
+	versionQualified bool
+	versionQualifier string
+
 	FuncMap = map[string]interface{}{
 		"beat_doc_branch":   BeatDocBranch,
-		"beat_version":      BeatVersion,
+		"beat_version":      BeatQualifiedVersion,
 		"commit":            CommitHash,
 		"date":              BuildDate,
 		"elastic_beats_dir": ElasticBeatsDir,
@@ -98,6 +102,8 @@ func init() {
 	if err != nil {
 		panic(errors.Errorf("failed to parse SNAPSHOT env value", err))
 	}
+
+	versionQualifier, versionQualified = os.LookupEnv("BEAT_VERSION_QUALIFIER")
 }
 
 // EnvMap returns map containing the common settings variables and all variables
@@ -130,6 +136,7 @@ func varMap(args ...map[string]interface{}) map[string]interface{} {
 		"BeatLicense":     BeatLicense,
 		"BeatURL":         BeatURL,
 		"Snapshot":        Snapshot,
+		"Qualifier":       versionQualifier,
 	}
 
 	// Add the extra args to the map.
@@ -145,18 +152,19 @@ func varMap(args ...map[string]interface{}) map[string]interface{} {
 func dumpVariables() (string, error) {
 	var dumpTemplate = `## Variables
 
-GOOS            = {{.GOOS}}
-GOARCH          = {{.GOARCH}}
-GOARM           = {{.GOARM}}
-Platform        = {{.Platform}}
-BinaryExt       = {{.BinaryExt}}
-BeatName        = {{.BeatName}}
-BeatServiceName = {{.BeatServiceName}}
-BeatIndexPrefix = {{.BeatIndexPrefix}}
-BeatDescription = {{.BeatDescription}}
-BeatVendor      = {{.BeatVendor}}
-BeatLicense     = {{.BeatLicense}}
-BeatURL         = {{.BeatURL}}
+GOOS             = {{.GOOS}}
+GOARCH           = {{.GOARCH}}
+GOARM            = {{.GOARM}}
+Platform         = {{.Platform}}
+BinaryExt        = {{.BinaryExt}}
+BeatName         = {{.BeatName}}
+BeatServiceName  = {{.BeatServiceName}}
+BeatIndexPrefix  = {{.BeatIndexPrefix}}
+BeatDescription  = {{.BeatDescription}}
+BeatVendor       = {{.BeatVendor}}
+BeatLicense      = {{.BeatLicense}}
+BeatURL          = {{.BeatURL}}
+VersionQualifier = {{.Qualifier}}
 
 ## Functions
 
@@ -310,9 +318,23 @@ var (
 	beatVersionOnce  sync.Once
 )
 
+// BeatQualifiedVersion returns the Beat's qualified version.  The value can be overwritten by
+// setting BEAT_VERSION_QUALIFIER in the environment.
+func BeatQualifiedVersion() (string, error) {
+	version, err := beatVersion()
+	if err != nil {
+		return "", err
+	}
+	// version qualifier can intentionally be set to "" to override build time var
+	if !versionQualified || versionQualifier == "" {
+		return version, nil
+	}
+	return version + "-" + versionQualifier, nil
+}
+
 // BeatVersion returns the Beat's version. The value can be overridden by
 // setting BEAT_VERSION in the environment.
-func BeatVersion() (string, error) {
+func beatVersion() (string, error) {
 	beatVersionOnce.Do(func() {
 		beatVersionValue = os.Getenv("BEAT_VERSION")
 		if beatVersionValue != "" {

@@ -1,7 +1,7 @@
 BEAT_NAME=heartbeat
 BEAT_TITLE=Heartbeat
 SYSTEM_TESTS=true
-TEST_ENVIRONMENT=false
+TEST_ENVIRONMENT?=true
 
 # Path to the libbeat Makefile
 -include ../libbeat/scripts/Makefile

@@ -25,6 +25,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/reload"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
@@ -151,6 +153,7 @@ type queueFactory func(queue.Eventer) (queue.Queue, error)
 // queue and outputs will be closed.
 func New(
 	beat beat.Info,
+	monitors Monitors,
 	metrics *monitoring.Registry,
 	queueFactory queueFactory,
 	out outputs.Group,
@@ -203,7 +206,7 @@ func New(
 	}
 	p.eventSema = newSema(maxEvents)
 
-	p.output = newOutputController(log, p.observer, p.queue)
+	p.output = newOutputController(beat, monitors, log, p.observer, p.queue)
 	p.output.Set(out)
 
 	return p, nil
@@ -433,4 +436,9 @@ func makePipelineProcessors(
 	}
 
 	return p
+}
+
+// OutputReloader returns a reloadable object for the output section of this pipeline
+func (p *Pipeline) OutputReloader() reload.Reloadable {
+	return p.output
 }

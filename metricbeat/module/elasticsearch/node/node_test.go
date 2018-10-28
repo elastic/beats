@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 func TestFetch(t *testing.T) {
@@ -52,7 +53,7 @@ func TestFetch(t *testing.T) {
 			defer server.Close()
 
 			config := map[string]interface{}{
-				"module":     "elasticsearch",
+				"module":     elasticsearch.ModuleName,
 				"metricsets": []string{"node"},
 				"hosts":      []string{server.URL},
 			}

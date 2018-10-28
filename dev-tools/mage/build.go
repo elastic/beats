@@ -53,6 +53,10 @@ func DefaultBuildArgs() BuildArgs {
 		},
 	}
 
+	if versionQualified {
+		args.Vars["github.com/elastic/beats/libbeat/version.qualifier"] = "{{ .Qualifier }}"
+	}
+
 	repo, err := GetProjectRepoInfo()
 	if err != nil {
 		panic(errors.Wrap(err, "failed to determine project repo info"))

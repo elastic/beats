@@ -102,18 +102,20 @@ func (s *event) SetTimeZone(b []byte) {
 	}
 
 	// +00 +00:00 or +0000
+	// Use second value directly and don't use unecessary time.Duration.
+	// Time.FixedZone accepts number of seconds.
 	var h, m int
 	switch len(b[1:]) {
 	case 2:
-		h = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[1:]))))
+		h = 3600 * bytesToInt(skipLeadZero(b[1:]))
 		s.loc = time.FixedZone("", d*h)
 	case 4:
-		h = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[1:3]))))
-		m = int(time.Minute * time.Duration(bytesToInt(skipLeadZero(b[3:5]))))
+		h = 3600 * bytesToInt(skipLeadZero(b[1:3]))
+		m = 60 * bytesToInt(skipLeadZero(b[3:5]))
 		s.loc = time.FixedZone("", d*(h+m))
 	case 5:
-		h = int(time.Hour * time.Duration(bytesToInt(skipLeadZero(b[1:3]))))
-		m = int(time.Minute * time.Duration(bytesToInt(skipLeadZero(b[4:6]))))
+		h = 3600 * bytesToInt(skipLeadZero(b[1:3]))
+		m = 60 * bytesToInt(skipLeadZero(b[4:6]))
 		s.loc = time.FixedZone("", d*(h+m))
 	}
 }
@@ -271,8 +273,8 @@ func (s *event) HasPid() bool {
 func (s *event) SetNanosecond(b []byte) {
 	// We assume that we receive a byte array representing a nanosecond, this might not be
 	// always the case, so we have to pad it.
-	if len(b) < 7 {
-		s.nanosecond = bytesToInt(skipLeadZero(b)) * int(math.Pow10((7 - len(b))))
+	if len(b) < 9 {
+		s.nanosecond = bytesToInt(skipLeadZero(b)) * int(math.Pow10((9 - len(b))))
 	} else {
 		s.nanosecond = bytesToInt(skipLeadZero(b))
 	}

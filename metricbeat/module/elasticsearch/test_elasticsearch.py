@@ -4,7 +4,10 @@ import os
 import unittest
 from elasticsearch import Elasticsearch, TransportError
 from parameterized import parameterized
+from nose.plugins.skip import SkipTest
+import urllib2
 import json
+import semver
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 
@@ -17,6 +20,7 @@ class Test(metricbeat.BaseTest):
     FIELDS = ["elasticsearch"]
 
     @parameterized.expand([
+        "ccr",
         "index",
         "index_summary",
         "ml_job",
@@ -30,6 +34,8 @@ class Test(metricbeat.BaseTest):
         """
         elasticsearch metricset tests
         """
+        self.check_skip(metricset)
+
         if metricset == "ml_job":
             self.create_ml_job()
 
@@ -65,3 +71,22 @@ class Test(metricbeat.BaseTest):
 
         path = "/_xpack/ml/anomaly_detectors/test"
         es.transport.perform_request('PUT', path, body=body)
+
+    def check_skip(self, metricset):
+        if metricset != "ccr":
+            return
+
+        version = self.get_version()
+        if semver.compare(version, "6.5.0") == -1:
+            # Skip CCR metricset system test for Elasticsearch versions < 6.5.0 as CCR Stats
+            # API endpoint is not available
+            raise SkipTest("elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
+
+    def get_version(self):
+        host = self.get_hosts()[0]
+        res = urllib2.urlopen("http://" + host + "/").read()
+
+        body = json.loads(res)
+        version = body["version"]["number"]
+
+        return version

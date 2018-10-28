@@ -33,6 +33,8 @@ type YmlFile struct {
 
 func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]*YmlFile, error) {
 	commonFields := []string{
+		// Fields for custom beats
+		filepath.Join(beatPath, "_meta/fields.yml"),
 		filepath.Join(beatPath, "_meta/fields.common.yml"),
 	}
 
@@ -41,6 +43,7 @@ func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]
 	if !isLibbeat(beatPath) {
 		commonFields = append(commonFields,
 			filepath.Join(esBeatsPath, "libbeat/_meta/fields.common.yml"),
+			filepath.Join(esBeatsPath, "libbeat/_meta/fields.ecs.yml"),
 		)
 
 		libbeatModulesPath := filepath.Join(esBeatsPath, "libbeat/processors")
@@ -73,7 +76,7 @@ func isLibbeat(beatPath string) bool {
 	return filepath.Base(beatPath) == "libbeat"
 }
 
-func writeGeneratedFieldsYml(beatPath string, fieldFiles []*YmlFile, output string) error {
+func writeGeneratedFieldsYml(fieldFiles []*YmlFile, output string) error {
 	data, err := GenerateFieldsYml(fieldFiles)
 	if err != nil {
 		return err
@@ -88,8 +91,7 @@ func writeGeneratedFieldsYml(beatPath string, fieldFiles []*YmlFile, output stri
 		return fw.Flush()
 	}
 
-	outPath := filepath.Join(beatPath, output)
-	f, err := os.Create(outPath)
+	f, err := os.Create(output)
 	if err != nil {
 		return err
 	}
@@ -140,5 +142,5 @@ func Generate(esBeatsPath, beatPath string, files []*YmlFile, output string) err
 		return err
 	}
 
-	return writeGeneratedFieldsYml(beatPath, files, output)
+	return writeGeneratedFieldsYml(files, output)
 }

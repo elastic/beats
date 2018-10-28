@@ -31,7 +31,7 @@ var (
 // GetConfig for Logstash
 func GetConfig(metricset string, host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "logstash",
+		"module":     ModuleName,
 		"metricsets": []string{metricset},
 		"hosts":      []string{host},
 	}

@@ -31,16 +31,18 @@ var (
 		"auditbeat",
 		"filebeat",
 		"heartbeat",
+		"journalbeat",
 		"metricbeat",
 		"packetbeat",
 		"winlogbeat",
+		"x-pack/functionbeat",
 	}
 )
 
 // PackageBeatDashboards packages the dashboards from all Beats into a zip
 // file. The dashboards must be generated first.
 func PackageBeatDashboards() error {
-	version, err := mage.BeatVersion()
+	version, err := mage.BeatQualifiedVersion()
 	if err != nil {
 		return err
 	}
@@ -68,5 +70,5 @@ func PackageBeatDashboards() error {
 
 // DumpVariables writes the template variables and values to stdout.
 func DumpVariables() error {
-    return mage.DumpVariables()
+	return mage.DumpVariables()
 }

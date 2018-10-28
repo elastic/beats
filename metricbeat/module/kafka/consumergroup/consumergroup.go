@@ -19,6 +19,7 @@ package consumergroup
 
 import (
 	"crypto/tls"
+	"fmt"
 
 	"github.com/pkg/errors"
 
@@ -86,7 +87,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Password:    config.Password,
 
 		// consumer groups API requires at least 0.9.0.0
-		Version: kafka.Version{String: "0.9.0.0"},
+		Version: kafka.Version("0.9.0.0"),
 	}
 
 	return &MetricSet{
@@ -111,6 +112,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 
 	emitEvent := func(event common.MapStr) {
+		// Helpful IDs to avoid scripts on queries
+		partitionTopicID := fmt.Sprintf("%d-%s", event["partition"], event["topic"])
+
 		// TODO (deprecation): Remove fields from MetricSetFields moved to ModuleFields
 		event["broker"] = brokerInfo
 		r.Event(mb.Event{
@@ -120,7 +124,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 					"name": event["topic"],
 				},
 				"partition": common.MapStr{
-					"id": event["partition"],
+					"id":       event["partition"],
+					"topic_id": partitionTopicID,
 				},
 			},
 			MetricSetFields: event,
