@@ -24,50 +24,54 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/uwsgi"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFetchTCP(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "uwsgi_tcp")
+func testStatus(t *testing.T, service string) {
+	runner := compose.TestRunner{Service: service}
 
-	f := mbtest.NewEventsFetcher(t, getConfig("tcp"))
-	events, err := f.Fetch()
-	assert.NoError(t, err)
+	runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, getConfig(t, service, r.Host()))
+			events, err := f.Fetch()
+			assert.NoError(t, err)
 
-	assert.True(t, len(events) > 0)
-	totals := findItems(events, "total")
-	assert.Equal(t, 1, len(totals))
+			assert.True(t, len(events) > 0)
+			totals := findItems(events, "total")
+			assert.Equal(t, 1, len(totals))
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, getConfig(t, service, r.Host()))
+			err := mbtest.WriteEvents(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }
 
-func TestFetchHTTP(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "uwsgi_http")
-
-	f := mbtest.NewEventsFetcher(t, getConfig("http"))
-	events, err := f.Fetch()
-	assert.NoError(t, err)
-
-	assert.True(t, len(events) > 0)
-	totals := findItems(events, "total")
-	assert.Equal(t, 1, len(totals))
+func TestStatusTCP(t *testing.T) {
+	testStatus(t, "uwsgi_tcp")
 }
 
-func getConfig(scheme string) map[string]interface{} {
+func TestStatusHTTP(t *testing.T) {
+	testStatus(t, "uwsgi_http")
+}
+
+func getConfig(t *testing.T, service string, host string) map[string]interface{} {
 	conf := map[string]interface{}{
 		"module":     "uwsgi",
 		"metricsets": []string{"status"},
 	}
 
-	switch scheme {
-	case "tcp":
-		conf["hosts"] = []string{uwsgi.GetEnvTCPServer()}
-	case "http", "https":
-		conf["hosts"] = []string{uwsgi.GetEnvHTTPServer()}
+	switch service {
+	case "uwsgi_tcp":
+		conf["hosts"] = []string{"tcp://" + host}
+	case "uwsgi_http":
+		conf["hosts"] = []string{"http://" + host}
 	default:
-		conf["hosts"] = []string{uwsgi.GetEnvTCPServer()}
+		t.Errorf("Unexpected service: %s", service)
 	}
 	return conf
 }
