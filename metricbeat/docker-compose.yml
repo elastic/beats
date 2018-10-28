@@ -145,6 +145,8 @@ services:
 
   memcached:
     build: ./module/memcached/_meta
+    ports:
+      - 11211
 
   mongodb:
     build: ./module/mongodb/_meta
