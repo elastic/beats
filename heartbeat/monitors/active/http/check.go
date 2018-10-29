@@ -157,7 +157,6 @@ func checkJSON(checks []*jsonResponseCheck) (RespCheck, error) {
 
 		var errorDescs []string
 		for _, compiledCheck := range compiledChecks {
-			//compiledCheck.condition, err = conditions.NewEqualsCondition(map[string]interface{}{"foo.baz": "bar"})
 			ok := compiledCheck.condition.Check(decoded)
 			if !ok {
 				errorDescs = append(errorDescs, compiledCheck.description)
