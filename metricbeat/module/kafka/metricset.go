@@ -42,11 +42,12 @@ func NewMetricSet(base mb.BaseMetricSet, options MetricSetOptions) (*MetricSet, 
 		return nil, err
 	}
 
-	var tls *tls.Config
 	tlsCfg, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
+
+	var tls *tls.Config
 	if tlsCfg != nil {
 		tls = tlsCfg.BuildModuleConfig("")
 	}
