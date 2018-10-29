@@ -51,6 +51,25 @@ filebeat.registry_file_permissions: 0600
 -------------------------------------------------------------------------------------
 
 [float]
+==== `registry_flush`
+
+
+The registry flush timeout. The registry is written to disk if the oldest
+unwritten update to the registry exceeds registry_flush. If set to 0s, the
+registry will be flushed after every batch of events that has been successfully
+published. The default value is 0s.
+
+NOTE: The registry is updated if filebeat shuts down normally. But if
+registry_flush is >0s and filebeast or the machine is shutdown unregularily,
+then the registry is not up to date. In this case filebeat will send already
+published events again (depending on values in the last updated registry file).
+
+NOTE: Filtering out a huge amount of logs in filebeat can lead to many registry
+updates, slowing down processing. Setting registry_flush to a value > 0s
+reduces write operations, helping filebeat to process more events.
+
+
+[float]
 ==== `config_dir`
 
 deprecated[6.0.0, Use <<load-input-config>> instead.]
