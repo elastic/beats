@@ -15,12 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//+build !linux
+package reader
 
-package instance
+import "time"
 
-// SetupJournalMetrics initializes and registers monitoring functions.
-func SetupJournalMetrics() {}
+// Config stores the options of a reder.
+type Config struct {
+	// Path is the path to the journal file.
+	Path string
+	// Seek specifies the seeking stategy.
+	// Possible values: head, tail, cursor.
+	Seek string
+	// MaxBackoff is the limit of the backoff time.
+	MaxBackoff time.Duration
+	// Backoff is the current interval to wait before
+	// attemting to read again from the journal.
+	Backoff time.Duration
+	// Matches store the key value pairs to match entries.
+	Matches []string
+}
 
-// StopMonitoringJournal stops monitoring the journal under the path.
-func StopMonitoringJournal(path string) {}
+const (
+	// LocalSystemJournalID is the ID of the local system journal.
+	LocalSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
+)

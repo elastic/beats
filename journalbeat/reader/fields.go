@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//+build linux
+
 package reader
 
 import "github.com/coreos/go-systemd/sdjournal"
