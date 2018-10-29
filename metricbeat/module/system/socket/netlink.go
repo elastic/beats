@@ -23,8 +23,9 @@ import (
 	"os"
 	"sync/atomic"
 
-	"github.com/elastic/gosigar/sys/linux"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/gosigar/sys/linux"
 )
 
 type NetlinkSession struct {
