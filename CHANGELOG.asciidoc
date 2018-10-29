@@ -49,6 +49,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Switch to different UUID lib due to to non-random generated UUIDs. {pull}8485[8485]
 - Fix race condition when publishing monitoring data. {pull}8646[8646]
 - Fix in-cluster kubernetes configuration on IPv6. {pull}8754[8754]
+- Fix bug in loading dashboards from zip file. {issue}8051[8051]
 
 *Auditbeat*
 
