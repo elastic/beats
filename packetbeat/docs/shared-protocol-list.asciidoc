@@ -16,4 +16,5 @@
  - Thrift-RPC
  - MongoDB
  - Memcache
+ - NFS
  - TLS
