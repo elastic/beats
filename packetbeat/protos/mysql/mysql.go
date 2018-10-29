@@ -260,6 +260,14 @@ func (mysql *mysqlPlugin) isServerPort(port uint16) bool {
 	return false
 }
 
+func isRequest(typ uint8) bool {
+	if typ == mysqlCmdQuery || typ == mysqlCmdStmtPrepare ||
+		typ == mysqlCmdStmtExecute || typ == mysqlCmdStmtClose {
+		return true
+	}
+	return false
+}
+
 func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 	logp.Debug("mysqldetailed", "MySQL parser called. parseState = %s", s.parseState)
 
@@ -282,7 +290,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			if s.isClient {
 				// starts Command Phase
 
-				if m.seq == 0 && m.typ == mysqlCmdQuery {
+				if m.seq == 0 && isRequest(m.typ) {
 					// parse request
 					m.isRequest = true
 					m.start = s.parseOffset
