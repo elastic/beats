@@ -77,19 +77,23 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	var errs multierror.Errors
 	for name, node := range nodesStruct.Nodes {
 		event := mb.Event{}
-		event.MetricSetFields, err = schema.Apply(node)
-		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure applying node schema"))
-		}
 
-		// Write name here as full name only available as key
-		event.MetricSetFields["name"] = name
+		event.RootFields = common.MapStr{}
+		event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
 		event.ModuleFields = common.MapStr{}
 		event.ModuleFields.Put("cluster.name", nodesStruct.ClusterName)
 
-		event.RootFields = common.MapStr{}
-		event.RootFields.Put("service.name", elasticsearch.ModuleName)
+		event.MetricSetFields, err = schema.Apply(node)
+		if err != nil {
+			event.Error = errors.Wrap(err, "failure applying node schema")
+			r.Event(event)
+			errs = append(errs, event.Error)
+			continue
+		}
+
+		// Write name here as full name only available as key
+		event.MetricSetFields["name"] = name
 
 		r.Event(event)
 	}

@@ -21,13 +21,15 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 *Heartbeat*
 
-- Added autodiscovery support {pull}8415[8415]
+*Journalbeat*
 
 *Metricbeat*
 
 *Packetbeat*
 
 *Winlogbeat*
+
+*Functionbeat*
 
 ==== Bugfixes
 
@@ -49,6 +51,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Enforce that data used by k8s or docker doesn't use any reference. {pull}8240[8240]
 - Switch to different UUID lib due to to non-random generated UUIDs. {pull}8485[8485]
 - Fix race condition when publishing monitoring data. {pull}8646[8646]
+- Fix in-cluster kubernetes configuration on IPv6. {pull}8754[8754]
 
 *Auditbeat*
 
@@ -71,7 +74,9 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 *Heartbeat*
 
-- Added support for extra TLS/x509 metadata. {pull}7944[7944]
+- Fixed bug where HTTP responses with larger bodies would incorrectly report connection errors. {pull}8660[8660]
+
+*Journalbeat*
 
 *Metricbeat*
 
@@ -88,6 +93,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Avoid mapping issues in kubernetes module. {pull}8487[8487]
 - Fix issue that would prevent kafka module to find a proper broker when port is not set {pull}8613[8613]
 - Fix range colors in multiple visualizations. {issue}8633[8633] {pull}8634[8634]
+- Fix incorrect header parsing on http metricbeat module {issue}8564[8564] {pull}8585[8585]
 
 *Packetbeat*
 
@@ -98,6 +104,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 *Winlogbeat*
 
+*Functionbeat*
 
 ==== Added
 
@@ -136,8 +143,19 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Release `docker` input as GA. {pull}8328[8328]
 - Keep unparsed user agent information in user_agent.original. {pull}8537[8537]
 - Better tracking of number of open file descriptors. {pull}7986[7986]
+- Added default and TCP parsing formats to HAproxy module {issue}8311[8311] {pull}8637[8637]
+- Add Suricata IDS/IDP/NSM module. {issue}8153[8153] {pull}8693[8693]
+- Allow to force CRI format parsing for better performance {pull}8424[8424]
 
 *Heartbeat*
+
+- Added autodiscovery support {pull}8415[8415]
+- Added support for extra TLS/x509 metadata. {pull}7944[7944]
+- Added stats and state metrics for number of monitors and endpoints started. {pull}8621[8621]
+
+*Journalbeat*
+
+- Add journalbeat. {pull}8703[8703]
 
 *Metricbeat*
 
@@ -159,6 +177,8 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Precalculate composed id fields for kafka dashboards. {pull}8504[8504]
 - Add Kafka dashboard. {pull}8457[8457]
 - Added `path_name` and `start_name` to service metricset on windows module {issue}8364[8364]
+- Add untyped metric support to the prometheus module. {pull}8681[8681]
+
 
 *Packetbeat*
 
@@ -172,6 +192,10 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 - Add automatic config file reloading. {pull}8023[8023]
 
+*Functionbeat*
+
+- Initial version of Functionbeat. {pull}8678[8678]
+
 ==== Deprecated
 
 *Affecting all Beats*
@@ -180,6 +204,8 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 *Heartbeat*
 - watch.poll_file is now deprecated and superceded by automatic config file reloading.
+
+*Journalbeat*
 
 *Metricbeat*
 - Redis `info` `replication.master_offset` has been deprecated in favor of `replication.master.offset`.{pull}7695[7695]
@@ -190,6 +216,8 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 *Packetbeat*
 
 *Winlogbeat*
+
+*Functionbeat*
 
 ==== Known Issue
 
@@ -299,6 +327,7 @@ The issue will be fixed in the 6.4.1 release.
 - Add module state reporting for Beats Monitoring. {pull}7075[7075]
 - Release the `rename` processor as GA. {pull}7656[7656]
 - Add support for Openstack Nova in `add_cloud_metadata` processor. {pull}7663[7663]
+- Add support to set Beats services to automatic-delayed start on Windows. {pull}8720[8711]
 
 *Auditbeat*
 

@@ -117,7 +117,7 @@ The Kubernetes autodiscover provider watches for Kubernetes pods to start, updat
 event:
 
   * host
-  * port
+  * port (if exposed)
   * kubernetes.container.id
   * kubernetes.container.image
   * kubernetes.container.name
@@ -173,6 +173,23 @@ The `kubernetes` autodiscover provider has the following configuration settings:
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
 
 [float]
+===== Manually Defining Ports with Kubernetes
+
+Declare exposed ports in your pod spec if possible. Otherwise, you will need to use
+multiple templates with complex filtering rules. The {port} variable will not be
+present, and you will need to hardcode ports. Example: `{data.host}:1234`
+
+When ports are not declared, Autodiscover generates a config using your provided
+template once per pod, and once per container. These generated configs are
+de-duplicated after they are generated. If the generated configs for multiple
+containers are identical, they will be merged into one config.
+
+Pods share an identical host. If only the `{data.host}` variable is interpolated,
+then one config will be generated per host. The configs will be identical.
+After they are de-duplicated, only one will be used.
+
+ifdef::autodiscoverJolokia[]
+[float]
 ===== Jolokia (experimental)
 
 The Jolokia autodiscover provider uses Jolokia Discovery to find agents running
@@ -222,11 +239,14 @@ the ones used for discovery probes, they have these settings:
   (defaults to 1s)
 
 include::../../{beatname_lc}/docs/autodiscover-jolokia-config.asciidoc[]
+endif::autodiscoverJolokia[]
 
+ifdef::autodiscoverHints[]
 [[configuration-autodiscover-hints]]
 === Hints based autodiscover
 
 include::../../{beatname_lc}/docs/autodiscover-hints.asciidoc[]
+endif::autodiscoverHints[]
 
 [[configuration-autodiscover-advanced]]
 === Advanced usage

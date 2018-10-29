@@ -4,6 +4,9 @@ heartbeat.monitors:
 {% for monitor in monitors -%}
 - type: {{ monitor.type }}
   schedule: '{{ monitor.schedule|default("@every 1s") }}'
+  {%- if monitor.timeout is defined %}
+  timeout: {{monitor.timeout}}
+  {% endif -%}
 
   {%- if monitor.tags is defined %}
   tags:
