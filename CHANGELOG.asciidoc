@@ -161,6 +161,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Precalculate composed id fields for kafka dashboards. {pull}8504[8504]
 - Add support for `full` status page output for php-fpm module as a separate metricset called `process`. {pull}8394[8394]
 - Add Kafka dashboard. {pull}8457[8457]
+- Add untyped metric support to the prometheus module. {pull}8681[8681]
 
 *Packetbeat*
 
