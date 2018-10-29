@@ -1,0 +1,270 @@
+[id="{beatname_lc}-getting-started"]
+== Getting Started With {beatname_uc}
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
+include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
+
+* <<{beatname_lc}-installation>>
+* <<{beatname_lc}-configuration>>
+* <<{beatname_lc}-template>>
+* <<load-kibana-dashboards>>
+* <<{beatname_lc}-starting>>
+* <<view-kibana-dashboards>>
+* <<setup-repositories>>
+
+[id="{beatname_lc}-installation"]
+=== Step 1: Install {beatname_uc}
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
+:no-docker:
+include::../../libbeat/docs/shared-download-and-install.asciidoc[]
+
+[[deb]]
+*deb:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-amd64.deb
+sudo dpkg -i {beatname_lc}-{version}-amd64.deb
+------------------------------------------------
+
+endif::[]
+
+[[rpm]]
+*rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-x86_64.rpm
+sudo rpm -vi {beatname_lc}-{version}-x86_64.rpm
+------------------------------------------------
+
+endif::[]
+
+[[mac]]
+*mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
+[[win]]
+*win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+. Download the {beatname_uc} Windows zip file from the
+https://www.elastic.co/downloads/beats/{beatname_lc}[downloads page].
+
+. Extract the contents of the zip file into `C:\Program Files`.
+
+. Rename the +{beatname_lc}-<version>-windows+ directory to +{beatname_uc}+.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
+
+. From the PowerShell prompt, run the following commands to install {beatname_uc} as a
+Windows service:
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+PS > cd 'C:{backslash}Program Files{backslash}{beatname_uc}'
+PS C:{backslash}Program Files{backslash}{beatname_uc}> .{backslash}install-service-{beatname_lc}.ps1
+----------------------------------------------------------------------
+
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: +PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-{beatname_lc}.ps1+.
+
+endif::[]
+
+[id="{beatname_lc}-configuration"]
+=== Step 2: Configure {beatname_uc}
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
+:no-docker:
+include::../../libbeat/docs/shared-configuring.asciidoc[]
+
+Here is a sample of the +{beatname_lc}+ section of the +{beatname_lc}.yml+ file.
+{beatname_uc} uses predefined default values for most configuration options.
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+journalbeat.inputs:
+- paths: ["/path/to/journal/directory"]
+  seek: cursor
+----------------------------------------------------------------------
+
+To configure {beatname_uc}:
+
+. Specify a list of paths to your systemd journal files. Each path can be a
+directory path (to collect events from all journals in a directory), or a file
+path. For example:
++
+["source","sh",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- paths:
+  - "/dev/log"
+  - "/var/log/messages/my-journal-file"
+----
++
+If no paths are specified, {beatname_uc} reads from the default journal.
+
+. Set the `seek` option to control the position where {beatname_uc} starts
+reading the journal. The available options are `head`, `tail`, and `cursor`.
+Typically, you'll set `seek: cursor` so {beatname_uc} can continue reading
+where it left off after a reload or restart.
+
+. Optional: Set the `include_matches` option to filter entries in journald
+before collecting any log events. This reduces the number of fields that the
+Beat needs to process. For example, to fetch only Redis events from a Docker
+container tagged as `redis`, use: 
++
+["source","sh",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- paths: []
+  include_matches:
+    - "CONTAINER_TAG=redis"
+    - "_COMM=redis"
+----
++
+See <<configuration-{beatname_lc}-options>> for more about this setting. 
+
+include::../../libbeat/docs/step-configure-output.asciidoc[]
+
+include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
+include::../../libbeat/docs/step-test-config.asciidoc[]
+
+include::../../libbeat/docs/step-look-at-config.asciidoc[]
+
+
+[id="{beatname_lc}-template"]
+=== Step 3: Load the index template in Elasticsearch
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
+:allplatforms:
+include::../../libbeat/docs/shared-template-load.asciidoc[]
+
+[[load-kibana-dashboards]]
+=== Step 4: Set up the Kibana dashboards
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]
+
+[id="{beatname_lc}-starting"]
+=== Step 5: Start {beatname_uc}
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
+Start {beatname_uc} by issuing the appropriate command for your platform. If you
+are accessing a secured Elasticsearch cluster, make sure you've configured
+credentials as described in <<{beatname_lc}-configuration>>.
+
+NOTE: If you use an init.d script to start {beatname_uc} on deb or rpm, you can't
+specify command line flags (see <<command-line-options>>). To specify flags,
+start {beatname_uc} in the foreground.
+
+*deb:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo service {beatname_lc} start
+----------------------------------------------------------------------
+
+*rpm:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo service {beatname_lc} start
+----------------------------------------------------------------------
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo chown root {beatname_lc}.yml <1>
+sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
+----------------------------------------------------------------------
+<1> You'll be running {beatname_uc} as root, so you need to change ownership
+of the configuration file, or run {beatname_uc} with `--strict.perms=false`
+specified. See
+{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_.
+
+*win:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+PS C:{backslash}Program Files{backslash}{beatname_uc}> Start-Service {beatname_lc}
+----------------------------------------------------------------------
+
+
+By default, Windows log files are stored in +C:\ProgramData\{beatname_lc}\Logs+.
+
+{beatname_uc} is now ready to send log files to your defined output.
+
+[[view-kibana-dashboards]]
+=== Step 6: View the sample Kibana dashboards
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
+To make it easier for you to explore {beatname_uc} data in Kibana, we've created
+example {beatname_uc} dashboards. You loaded the dashboards earlier when you
+ran the `setup` command.
+
+include::../../libbeat/docs/opendashboards.asciidoc[]
+
+You can use these dashboards as examples and
+{kibana-ref}/dashboard.html[customize] them to meet your needs.
+
+To populate the example dashboards with data, you need to either
+<<configuring-ingest-node,define ingest node pipelines>> or use Logstash to
+parse the data into the fields expected by the dashboards. 
+
+Here is an example of the {beatname_uc} ADD DASHBOARD NAME dashboard:
+
+// Add an example of the dashboard
+//[role="screenshot"]
+//image:./images/add-image-name.png[]

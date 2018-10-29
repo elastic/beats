@@ -62,7 +62,7 @@ endif::[]
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-docker run {dockerimage} setup --dashboards
+docker run --net="host" {dockerimage} setup --dashboards
 ----------------------------------------------------------------------
 
 *win:*
@@ -125,7 +125,7 @@ ifdef::allplatforms[]
 
 ["source","sh",subs="attributes"]
 ----
-docker run {dockerimage} setup -e \
+docker run --net="host" {dockerimage} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username={beat_default_index_prefix}_internal \

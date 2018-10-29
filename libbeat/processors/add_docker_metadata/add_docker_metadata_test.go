@@ -24,6 +24,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"runtime"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
@@ -167,9 +169,17 @@ func TestMatchSource(t *testing.T) {
 		}))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	input := common.MapStr{
-		"source": "/var/lib/docker/containers/FABADA/foo.log",
+	var inputSource string
+	switch runtime.GOOS {
+	case "windows":
+		inputSource = "C:\\ProgramData\\docker\\containers\\FABADA\\foo.log"
+	default:
+		inputSource = "/var/lib/docker/containers/FABADA/foo.log"
 	}
+	input := common.MapStr{
+		"source": inputSource,
+	}
+
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 
@@ -185,7 +195,7 @@ func TestMatchSource(t *testing.T) {
 				"name": "name",
 			},
 		},
-		"source": "/var/lib/docker/containers/FABADA/foo.log",
+		"source": inputSource,
 	}, result.Fields)
 }
 

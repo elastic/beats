@@ -75,6 +75,7 @@ func Clean() error {
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
+// Use BEAT_VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
@@ -89,7 +90,7 @@ func Package() {
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return mage.TestPackages()
+	return mage.TestPackages(mage.WithModulesD())
 }
 
 // Update updates the generated files (aka make update).
@@ -126,9 +127,8 @@ func GoTestIntegration(ctx context.Context) error {
 // not supported.
 func customizePackaging() {
 	var (
-		archiveModulesDir   = "modules.d"
-		linuxPkgModulesDir  = "/usr/share/{{.BeatName}}/modules.d"
-		darwinDMGModulesDir = "/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/modules.d"
+		archiveModulesDir = "modules.d"
+		unixModulesDir    = "/etc/{{.BeatName}}/modules.d"
 
 		modulesDir = mage.PackageFile{
 			Mode:   0644,
@@ -176,10 +176,8 @@ func customizePackaging() {
 			switch pkgType {
 			case mage.TarGz, mage.Zip:
 				args.Spec.Files[archiveModulesDir] = modulesDir
-			case mage.Deb, mage.RPM:
-				args.Spec.Files[linuxPkgModulesDir] = modulesDir
-			case mage.DMG:
-				args.Spec.Files[darwinDMGModulesDir] = modulesDir
+			case mage.Deb, mage.RPM, mage.DMG:
+				args.Spec.Files[unixModulesDir] = modulesDir
 			default:
 				panic(errors.Errorf("unhandled package type: %v", pkgType))
 			}

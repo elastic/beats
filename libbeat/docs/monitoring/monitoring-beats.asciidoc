@@ -17,7 +17,7 @@
 [partintro]
 --
 
-NOTE: {monitoring} for {beatname_uc} requires {es} 6.2 or later.
+NOTE: {monitoring} for {beatname_uc} requires {es} {beat_monitoring_version} or later.
 
 {monitoring} enables you to easily monitor {beatname_uc} from {kib}. For more
 information, see
@@ -27,8 +27,8 @@ information, see
 To configure {beatname_uc} to collect and send monitoring metrics:
 
 . Create a user that has appropriate authority to send system-level monitoring
-data to {es}. For example, you can use the built-in `beats_system` user or
-assign the built-in `beats_system` role to another user. For more
+data to {es}. For example, you can use the built-in +{beat_monitoring_user}+ user or
+assign the built-in +{beat_monitoring_user}+ role to another user. For more
 information, see
 {xpack-ref}/setting-up-authentication.html[Setting Up User Authentication] and
 {xpack-ref}/built-in-roles.html[Built-in Roles].
@@ -45,14 +45,14 @@ xpack.monitoring.enabled: true
 If you configured a different output, such as {ls}, you must specify additional
 configuration options. For example:
 
-[source, yml]
+["source","yml",subs="attributes"]
 --------------------
 xpack.monitoring:
   enabled: true
   elasticsearch:
     hosts: ["https://example.com:9200", "https://example2.com:9200"]
-    username: beats_system
-    password: beatspassword
+    username: {beat_monitoring_user}
+    password: somepassword
 --------------------
 
 NOTE: Currently you must send monitoring data to the same cluster as all other events.

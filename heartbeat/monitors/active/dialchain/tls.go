@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/x509util"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -61,8 +60,6 @@ func TLSLayer(cfg *transport.TLSConfig, to time.Duration) Layer {
 			timer.stop()
 			event.Put("tls.rtt.handshake", look.RTT(timer.duration()))
 
-			var certs []string
-
 			// Pointers because we need a nil value
 			var chainNotValidBefore *time.Time
 			var chainNotValidAfter *time.Time
@@ -73,8 +70,6 @@ func TLSLayer(cfg *transport.TLSConfig, to time.Duration) Layer {
 			// compute this correctly.
 			for _, chain := range tlsConn.ConnectionState().VerifiedChains {
 				for _, cert := range chain {
-					certs = append(certs, x509util.CertToPEMString(cert))
-
 					if chainNotValidBefore == nil || chainNotValidBefore.Before(cert.NotBefore) {
 						chainNotValidBefore = &cert.NotBefore
 					}
@@ -87,7 +82,6 @@ func TLSLayer(cfg *transport.TLSConfig, to time.Duration) Layer {
 
 			event.Put("tls.certificate_not_valid_before", *chainNotValidBefore)
 			event.Put("tls.certificate_not_valid_after", *chainNotValidAfter)
-			event.Put("tls.certificates", certs)
 
 			return conn, nil
 		}), nil

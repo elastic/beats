@@ -42,23 +42,10 @@ type config struct {
 	BulkMaxSize      int               `config:"bulk_max_size" validate:"min=0"`
 	BufferSize       int               `config:"buffer_size"`
 	Tags             []string          `config:"tags"`
+	Backoff          backoff           `config:"backoff"`
 }
 
-var defaultConfig = config{
-	Hosts:            nil,
-	Protocol:         "http",
-	Params:           nil,
-	Headers:          nil,
-	Username:         "beats_system",
-	Password:         "",
-	ProxyURL:         "",
-	CompressionLevel: 0,
-	TLS:              nil,
-	MaxRetries:       3,
-	Timeout:          60 * time.Second,
-	MetricsPeriod:    10 * time.Second,
-	StatePeriod:      1 * time.Minute,
-	BulkMaxSize:      50,
-	BufferSize:       50,
-	Tags:             nil,
+type backoff struct {
+	Init time.Duration
+	Max  time.Duration
 }

@@ -37,7 +37,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -49,12 +49,12 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/reader"
-	"github.com/elastic/beats/filebeat/reader/multiline"
-	"github.com/elastic/beats/filebeat/reader/readfile"
-	"github.com/elastic/beats/filebeat/reader/readfile/encoding"
-	"github.com/elastic/beats/filebeat/reader/readjson"
 	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/multiline"
+	"github.com/elastic/beats/libbeat/reader/readfile"
+	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/libbeat/reader/readjson"
 )
 
 var (
@@ -113,6 +113,11 @@ func NewHarvester(
 	outletFactory OutletFactory,
 ) (*Harvester, error) {
 
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
 	h := &Harvester{
 		config:        defaultConfig,
 		state:         state,
@@ -120,7 +125,7 @@ func NewHarvester(
 		publishState:  publishState,
 		done:          make(chan struct{}),
 		stopWg:        &sync.WaitGroup{},
-		id:            uuid.NewV4(),
+		id:            id,
 		outletFactory: outletFactory,
 	}
 
@@ -556,7 +561,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial)
+		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.ForceCRI, h.config.DockerJSON.CRIFlags)
 	}
 
 	if h.config.JSON != nil {

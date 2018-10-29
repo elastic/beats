@@ -31,7 +31,7 @@ https://github.com/elastic/logstash-forwarder[Logstash Forwarder] to {beatname_u
 
 {beatname_uc} requires the {logstash-ref}/plugins-inputs-beats.html[Beats input
 plugin for Logstash]. For information about getting started with this plugin,
-see {stack-ov}/get-started-elastic-stack.html#logstash-setup[Configure Logstash to
+see {stack-gs}/get-started-elastic-stack.html#logstash-setup[Configure Logstash to
 listen for Beats input] in the {stack} getting started tutorial.
 
 In both the 1.5.x and 2.x versions of Logstash, this plugin can be loaded in

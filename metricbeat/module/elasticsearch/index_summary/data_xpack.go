@@ -21,9 +21,12 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -69,45 +72,31 @@ var (
 	}
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) []error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
 	}
 
 	err := json.Unmarshal(content, &all)
 	if err != nil {
-		r.Error(err)
-		return []error{err}
+		return errors.Wrap(err, "failure parsing Elasticsearch Stats API response")
 	}
-
-	var errs []error
 
 	fields, err := schemaXPack.Apply(all.Data)
 	if err != nil {
-		errs = append(errs, err)
+		return errors.Wrap(err, "failure applying stats schema")
 	}
 
-	nodeInfo, err := elasticsearch.GetNodeInfo(m.HTTP, m.HostData().SanitizedURI+statsPath, "")
-	sourceNode := common.MapStr{
-		"uuid":              nodeInfo.ID,
-		"host":              nodeInfo.Host,
-		"transport_address": nodeInfo.TransportAddress,
-		"ip":                nodeInfo.IP,
-		"name":              nodeInfo.Name,
-		"timestamp":         common.Time(time.Now()),
-	}
 	event := mb.Event{}
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("indices_stats._all", fields)
-	event.RootFields.Put("cluser_uuid", info.ClusterID)
+	event.RootFields.Put("cluster_uuid", info.ClusterID)
 	event.RootFields.Put("timestamp", common.Time(time.Now()))
 	event.RootFields.Put("interval_ms", m.Module().Config().Period/time.Millisecond)
 	event.RootFields.Put("type", "indices_stats")
-	event.RootFields.Put("source_node", sourceNode)
 
-	event.Index = ".monitoring-es-6-mb"
+	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 
 	r.Event(event)
-
-	return errs
+	return nil
 }

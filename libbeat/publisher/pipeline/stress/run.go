@@ -57,8 +57,13 @@ func RunTests(
 		return fmt.Errorf("unpacking config failed: %v", err)
 	}
 
-	// reg := monitoring.NewRegistry()
-	pipeline, err := pipeline.Load(info, nil, config.Pipeline, config.Output)
+	pipeline, err := pipeline.Load(info, pipeline.Monitors{
+		Metrics:   nil,
+		Telemetry: nil,
+		Logger:    logp.L(),
+	},
+		config.Pipeline,
+		config.Output)
 	if err != nil {
 		return fmt.Errorf("loading pipeline failed: %+v", err)
 	}

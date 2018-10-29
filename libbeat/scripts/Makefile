@@ -14,7 +14,7 @@ BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 BEAT_REF_YAML?=true
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
 GOPACKAGES?=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/ | grep -v /scripts/cmd/ )
-PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
+PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make release"
 NOTICE_FILE?=../NOTICE.txt
 LICENSE_FILE?=../licenses/APACHE-LICENSE-2.0.txt
 ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
@@ -31,10 +31,10 @@ comma:=,
 ARCH?=$(shell uname -m)
 # Hidden directory to install dependencies for jenkins
 export PATH := ./bin:$(PATH)
-GOFILES = $(shell find . -type f -name '*.go')
-GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*")
-GOFILES_ALL = $(GOFILES) $(shell find $(ES_BEATS) -type f -name '*.go')
-GOPACKAGES_STRESSTESTS=$(shell find . -name '*.go' | xargs awk 'FNR>1 {nextfile} /\+build.*stresstest/ {print FILENAME; nextfile}' | xargs dirname | uniq)
+GOFILES = $(shell find . -type f -name '*.go' 2>/dev/null)
+GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*" 2>/dev/null)
+GOFILES_ALL = $(GOFILES) $(shell find $(ES_BEATS) -type f -name '*.go' 2>/dev/null)
+GOPACKAGES_STRESSTESTS=$(shell find . -name '*.go' 2>/dev/null | xargs awk 'FNR>1 {nextfile} /\+build.*stresstest/ {print FILENAME; nextfile}' | xargs dirname | uniq)
 SHELL=bash
 ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
@@ -48,7 +48,7 @@ TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify/a
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 GOBUILD_FLAGS?=-i -ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 GOIMPORTS=goimports
-GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
+GOIMPORTS_REPO?=github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
 GOLINT=golint
 GOLINT_REPO?=github.com/golang/lint/golint
@@ -57,7 +57,7 @@ REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO?=github.com/haya14busa/reviewdog/cmd/reviewdog
 PROCESSES?= 4
 TIMEOUT?= 90
-PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*")
+PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*" 2>/dev/null)
 NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v --with-xunit --xunit-file=${BUILD_DIR}/TEST-system.xml ## @testing the options to pass when calling nosetests
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
@@ -82,6 +82,7 @@ VIRTUALENV_PARAMS?=
 INTEGRATION_TESTS?=
 FIND=. ${PYTHON_ENV}/bin/activate; find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
+XPACK_ONLY?=false
 
 ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
@@ -106,9 +107,11 @@ ${BEAT_NAME}.test: $(GOFILES_ALL)
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
 crosscompile: $(GOFILES)
+ifneq ($(shell [[ $(BEAT_NAME) == journalbeat ]] && echo true ),true)
 	go get github.com/mitchellh/gox
 	mkdir -p ${BUILD_DIR}/bin
 	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
+endif
 
 .PHONY: check
 check: check-headers python-env prepare-tests ## @build Checks project and source code if everything is according to standard
@@ -122,7 +125,7 @@ check: check-headers python-env prepare-tests ## @build Checks project and sourc
 .PHONY: check-headers
 check-headers:
 ifndef CHECK_HEADERS_DISABLED
-	@go get github.com/elastic/go-licenser
+	@go get -u github.com/elastic/go-licenser
 	@go-licenser -d -license ${LICENSE}
 endif
 
@@ -208,6 +211,13 @@ system-tests: prepare-tests ${BEAT_NAME}.test python-env
 system-tests-environment:  ## @testing Runs the system tests inside a virtual environment. This can be run on any docker-machine (local, remote)
 system-tests-environment: prepare-tests build-image
 	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make system-tests
+	#This is a hack to run x-pack/filebeat module tests
+	@XPACKBEAT="${ES_BEATS}/x-pack/${BEAT_NAME}" ; \
+	if [ -e "$$XPACKBEAT/tests/system" ] && [ $(XPACK_ONLY) = false ]; then \
+	    $(MAKE) -C ../x-pack/${BEAT_NAME} fields; \
+	    ${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e MODULES_PATH="../../x-pack/${BEAT_NAME}/module" -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make -C "$$XPACKBEAT" ${BEAT_NAME}.test system-tests ; \
+	    $(MAKE) -C ../x-pack/${BEAT_NAME} fix-permissions; \
+	fi
 
 
 .PHONY: fast-system-tests
@@ -330,7 +340,7 @@ endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license $(LICENSE) -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
 endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat ]] && echo true ),true)
@@ -348,7 +358,9 @@ endif
 	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/6/dashboard/*.json"
 	@mkdir -p $(PWD)/_meta/kibana.generated/5/index-pattern
 	@mkdir -p $(PWD)/_meta/kibana.generated/6/index-pattern
-	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go -index '${BEAT_INDEX_PREFIX}-*' -beat-name ${BEAT_NAME} -beat-dir $(PWD) -version ${BEAT_VERSION}
+	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go \
+	  -index '${BEAT_INDEX_PREFIX}-*' -beat ${BEAT_NAME} -fields $(PWD)/fields.yml \
+	  -version ${BEAT_VERSION} -out _meta/kibana.generated
 
 .PHONY: docs
 docs:  ## @build Builds the documents for the beat
@@ -377,6 +389,7 @@ build-image: write-environment
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
 .PHONY: start-environment
 start-environment: stop-environment
+	${DOCKER_COMPOSE} pull --include-deps
 	${DOCKER_COMPOSE} up -d
 
 .PHONY: stop-environment

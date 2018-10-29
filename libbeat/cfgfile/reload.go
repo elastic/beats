@@ -18,6 +18,7 @@
 package cfgfile
 
 import (
+	"fmt"
 	"path/filepath"
 	"sync"
 	"time"
@@ -27,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
@@ -67,6 +69,13 @@ type RunnerFactory interface {
 }
 
 type Runner interface {
+	// We include fmt.Stringer here because we do log debug messages that must print
+	// something for the given Runner. We need Runner implementers to consciously implement a
+	// String() method because the default behavior of `%s` is to print everything recursively
+	// in a struct, which could cause a race that would cause the race detector to fail.
+	// This is something that could be anticipated for the Runner interface specifically, because
+	// most runners will use a goroutine that modifies internal state.
+	fmt.Stringer
 	Start()
 	Stop()
 }
@@ -203,9 +212,9 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 	}
 }
 
-func (rl *Reloader) loadConfigs(files []string) ([]*ConfigWithMeta, error) {
+func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error) {
 	// Load all config objects
-	result := []*ConfigWithMeta{}
+	result := []*reload.ConfigWithMeta{}
 	var errs multierror.Errors
 	for _, file := range files {
 		configs, err := LoadList(file)
@@ -216,7 +225,7 @@ func (rl *Reloader) loadConfigs(files []string) ([]*ConfigWithMeta, error) {
 		}
 
 		for _, c := range configs {
-			result = append(result, &ConfigWithMeta{Config: c})
+			result = append(result, &reload.ConfigWithMeta{Config: c})
 		}
 	}
 

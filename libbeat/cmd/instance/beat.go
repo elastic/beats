@@ -21,6 +21,7 @@ import (
 	"context"
 	cryptRand "crypto/rand"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"math"
@@ -32,8 +33,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"go.uber.org/zap"
+
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/asset"
@@ -43,11 +47,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/logp/configure"
+	"github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
@@ -59,8 +65,6 @@ import (
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
-	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
 
 	// Register publisher pipeline modules
 	_ "github.com/elastic/beats/libbeat/publisher/includes"
@@ -72,6 +76,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/add_host_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
+	_ "github.com/elastic/beats/libbeat/processors/add_process_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/dissect"
 	_ "github.com/elastic/beats/libbeat/processors/dns"
 
@@ -114,6 +119,9 @@ type beatConfig struct {
 	Pipeline   pipeline.Config `config:",inline"`
 	Monitoring *common.Config  `config:"xpack.monitoring"`
 
+	// central managmenet settings
+	Management *common.Config `config:"management"`
+
 	// elastic stack 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`
 	Template   *common.Config `config:"setup.template"`
@@ -155,7 +163,11 @@ func initRand() {
 // implementation. bt is the `Creator` callback for creating a new beater
 // instance.
 // XXX Move this as a *Beat method?
-func Run(name, idxPrefix, version string, bt beat.Creator) error {
+func Run(settings Settings, bt beat.Creator) error {
+	name := settings.Name
+	idxPrefix := settings.IndexPrefix
+	version := settings.Version
+
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
@@ -186,7 +198,7 @@ func Run(name, idxPrefix, version string, bt beat.Creator) error {
 		monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
 		monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
 
-		return b.launch(bt)
+		return b.launch(settings, bt)
 	}())
 }
 
@@ -209,6 +221,11 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		return nil, err
 	}
 
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
 	b := beat.Beat{
 		Info: beat.Info{
 			Beat:        name,
@@ -216,7 +233,7 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 			Version:     v,
 			Name:        hostname,
 			Hostname:    hostname,
-			UUID:        uuid.NewV4(),
+			UUID:        id,
 		},
 		Fields: fields,
 	}
@@ -224,8 +241,8 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 	return &Beat{Beat: b}, nil
 }
 
-// init does initialization of things common to all actions (read confs, flags)
-func (b *Beat) Init() error {
+// InitWithSettings does initialization of things common to all actions (read confs, flags)
+func (b *Beat) InitWithSettings(settings Settings) error {
 	err := b.handleFlags()
 	if err != nil {
 		return err
@@ -235,11 +252,18 @@ func (b *Beat) Init() error {
 		return err
 	}
 
-	if err := b.configure(); err != nil {
+	if err := b.configure(settings); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// Init does initialization of things common to all actions (read confs, flags)
+//
+// Deprecated: use InitWithSettings
+func (b *Beat) Init() error {
+	return b.InitWithSettings(Settings{})
 }
 
 // BeatConfig returns config section for this beat
@@ -288,11 +312,36 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	// Report central management state
+	mgmt := monitoring.GetNamespace("state").GetRegistry().NewRegistry("management")
+	monitoring.NewBool(mgmt, "enabled").Set(b.ConfigManager.Enabled())
+
 	debugf("Initializing output plugins")
-	pipeline, err := pipeline.Load(b.Info, reg, b.Config.Pipeline, b.Config.Output)
+	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
+	if !outputEnabled {
+		if b.ConfigManager.Enabled() {
+			logp.Info("Output is configured through Central Management")
+		} else {
+			msg := "No outputs are defined. Please define one under the output section."
+			logp.Info(msg)
+			return nil, errors.New(msg)
+		}
+	}
+
+	pipeline, err := pipeline.Load(b.Info,
+		pipeline.Monitors{
+			Metrics:   reg,
+			Telemetry: monitoring.GetNamespace("state").GetRegistry(),
+			Logger:    logp.L().Named("publisher"),
+		},
+		b.Config.Pipeline,
+		b.Config.Output)
+
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %+v", err)
 	}
+
+	reload.Register.MustRegister("output", pipeline.OutputReloader())
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
@@ -307,11 +356,11 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	return beater, nil
 }
 
-func (b *Beat) launch(bt beat.Creator) error {
+func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer logp.Sync()
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
-	err := b.Init()
+	err := b.InitWithSettings(settings)
 	if err != nil {
 		return err
 	}
@@ -329,7 +378,10 @@ func (b *Beat) launch(bt beat.Creator) error {
 	}
 
 	if b.Config.Monitoring.Enabled() {
-		reporter, err := report.New(b.Info, b.Config.Monitoring, b.Config.Output)
+		settings := report.Settings{
+			DefaultUsername: settings.Monitoring.DefaultUsername,
+		}
+		reporter, err := report.New(b.Info, settings, b.Config.Monitoring, b.Config.Output)
 		if err != nil {
 			return err
 		}
@@ -370,6 +422,10 @@ func (b *Beat) launch(bt beat.Creator) error {
 	if b.Config.HTTP.Enabled() {
 		api.Start(b.Config.HTTP)
 	}
+
+	// Launch config manager
+	b.ConfigManager.Start()
+	defer b.ConfigManager.Stop()
 
 	return beater.Run(&b.Beat)
 }
@@ -489,10 +545,10 @@ func (b *Beat) handleFlags() error {
 // config reads the configuration file from disk, parses the common options
 // defined in BeatConfig, initializes logging, and set GOMAXPROCS if defined
 // in the config. Lastly it invokes the Config method implemented by the beat.
-func (b *Beat) configure() error {
+func (b *Beat) configure(settings Settings) error {
 	var err error
 
-	cfg, err := cfgfile.Load("")
+	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
 	if err != nil {
 		return fmt.Errorf("error loading config file: %v", err)
 	}
@@ -551,6 +607,16 @@ func (b *Beat) configure() error {
 
 	logp.Info("Beat UUID: %v", b.Info.UUID)
 
+	// initialize config manager
+	b.ConfigManager, err = management.Factory()(b.Config.Management, reload.Register, b.Beat.Info.UUID)
+	if err != nil {
+		return err
+	}
+
+	if err := b.ConfigManager.CheckRawConfig(b.RawConfig); err != nil {
+		return err
+	}
+
 	if maxProcs := b.Config.MaxProcs; maxProcs > 0 {
 		runtime.GOMAXPROCS(maxProcs)
 	}
@@ -584,7 +650,7 @@ func (b *Beat) loadMeta() error {
 		}
 
 		f.Close()
-		valid := !uuid.Equal(m.UUID, uuid.Nil)
+		valid := m.UUID != uuid.Nil
 		if valid {
 			b.Info.UUID = m.UUID
 			return nil

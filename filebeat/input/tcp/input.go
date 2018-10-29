@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -57,7 +56,6 @@ func NewInput(
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
-	cfgwarn.Experimental("TCP input type is used")
 
 	out, err := outlet(cfg, context.DynamicFields)
 	if err != nil {

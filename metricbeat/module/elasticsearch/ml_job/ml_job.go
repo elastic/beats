@@ -18,14 +18,16 @@
 package ml_job
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "ml_job", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "ml_job", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 		mb.WithNamespace("elasticsearch.ml.job"),
 	)
@@ -43,7 +45,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch ml_job metricset is beta.")
+	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta.")
 
 	// Get the stats from the local node
 	ms, err := elasticsearch.NewMetricSet(base, jobPath)
@@ -58,25 +60,31 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+jobPath)
 	if err != nil {
-		r.Error(err)
+		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch machine learning job stats from a non-master node.")
+		m.Log.Debug("trying to fetch machine learning job stats from a non-master node")
 		return
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
-	err = eventsMapping(r, content)
+	if m.XPack {
+		err = eventsMappingXPack(r, m, content)
+	} else {
+		err = eventsMapping(r, content)
+	}
+
 	if err != nil {
-		r.Error(err)
+		m.Log.Error(err)
 		return
 	}
 }

@@ -26,6 +26,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -51,6 +52,23 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 	)
 }
 
+// SizedResponseHandler responds with 200 to any request with a body
+// exactly the size of the `bytes` argument, where each byte is the
+// character 'x'
+func SizedResponseHandler(bytes int) http.HandlerFunc {
+	var body strings.Builder
+	for i := 0; i < bytes; i++ {
+		body.WriteString("x")
+	}
+
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+			io.WriteString(w, body.String())
+		},
+	)
+}
+
 // ServerPort takes an httptest.Server and returns its port as a uint16.
 func ServerPort(server *httptest.Server) (uint16, error) {
 	u, err := url.Parse(server.URL)
@@ -66,11 +84,9 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 
 // TLSChecks validates the given x509 cert at the given position.
 func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) mapval.Validator {
-	certPEMString := x509util.CertToPEMString(certificate)
 	return mapval.MustCompile(mapval.Map{
 		"tls": mapval.Map{
 			"rtt.handshake.us":             mapval.IsDuration,
-			"certificates":                 mapval.Slice{certPEMString},
 			"certificate_not_valid_before": certificate.NotBefore,
 			"certificate_not_valid_after":  certificate.NotAfter,
 		},

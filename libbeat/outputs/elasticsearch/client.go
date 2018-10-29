@@ -112,6 +112,7 @@ type bulkResultStats struct {
 	duplicates   int // number of events failed with `create` due to ID already being indexed
 	fails        int // number of failed events (can be retried)
 	nonIndexable int // number of failed events (not indexable -> must be dropped)
+	tooMany      int // number of events receiving HTTP 429 Too Many Requests
 }
 
 var (
@@ -343,6 +344,7 @@ func (client *Client) publishEvents(
 		st.Failed(failed)
 		st.Dropped(dropped)
 		st.Duplicate(duplicates)
+		st.ErrTooMany(stats.tooMany)
 	}
 
 	if failed > 0 {
@@ -515,11 +517,15 @@ func bulkCollectPublishFails(
 			continue // ok
 		}
 
-		if status < 500 && status != 429 {
-			// hard failure, don't collect
-			logp.Warn("Cannot index event %#v (status=%v): %s", data[i], status, msg)
-			stats.nonIndexable++
-			continue
+		if status < 500 {
+			if status == http.StatusTooManyRequests {
+				stats.tooMany++
+			} else {
+				// hard failure, don't collect
+				logp.Warn("Cannot index event %#v (status=%v): %s", data[i], status, msg)
+				stats.nonIndexable++
+				continue
+			}
 		}
 
 		debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)

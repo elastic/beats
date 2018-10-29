@@ -14,7 +14,7 @@
 To send events to {ls}, you also need to create a {ls} configuration pipeline
 that listens for incoming Beats connections and indexes the received events into
 {es}. For more information, see the section about
-{stack-ov}/get-started-elastic-stack.html#logstash-setup[configuring {ls}] in
+{stack-gs}/get-started-elastic-stack.html#logstash-setup[configuring {ls}] in
 the {stack} getting started tutorial. Also see the documentation for the
 {logstash-ref}/plugins-inputs-beats.html[{beats} input] and
 {logstash-ref}/plugins-outputs-elasticsearch.html[{es} output] plugins.

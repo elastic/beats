@@ -33,6 +33,7 @@ type Stats struct {
 	active     *monitoring.Uint // events sent and waiting for ACK/fail from output
 	duplicates *monitoring.Uint // events sent and waiting for ACK/fail from output
 	dropped    *monitoring.Uint // total number of invalid events dropped by the output
+	tooMany    *monitoring.Uint // total number of too many requests replies from output
 
 	//
 	// Output network connection stats
@@ -56,6 +57,7 @@ func NewStats(reg *monitoring.Registry) *Stats {
 		dropped:    monitoring.NewUint(reg, "events.dropped"),
 		duplicates: monitoring.NewUint(reg, "events.duplicates"),
 		active:     monitoring.NewUint(reg, "events.active"),
+		tooMany:    monitoring.NewUint(reg, "events.toomany"),
 
 		writeBytes:  monitoring.NewUint(reg, "write.bytes"),
 		writeErrors: monitoring.NewUint(reg, "write.errors"),
@@ -114,6 +116,13 @@ func (s *Stats) Dropped(n int) {
 func (s *Stats) Cancelled(n int) {
 	if s != nil {
 		s.active.Sub(uint64(n))
+	}
+}
+
+// ErrTooMany updates the number of Too Many Requests responses reported by the output.
+func (s *Stats) ErrTooMany(n int) {
+	if s != nil {
+		s.tooMany.Add(uint64(n))
 	}
 }
 

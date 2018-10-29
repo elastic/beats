@@ -22,31 +22,34 @@ package node
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/logstash"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "logstash")
 
-	f := mbtest.NewEventFetcher(t, logstash.GetConfig("node"))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
+	f := mbtest.NewReportingMetricSetV2(t, logstash.GetConfig("node"))
+	events, errs := mbtest.ReportingFetchV2(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
 		t.FailNow()
 	}
 
-	assert.NotNil(t, event)
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("logstash", "node").Fields.StringToPrint())
 }
 
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "logstash")
 
-	f := mbtest.NewEventFetcher(t, logstash.GetConfig("node"))
-	err := mbtest.WriteEvent(f, t)
+	config := logstash.GetConfig("node")
+	f := mbtest.NewReportingMetricSetV2(t, config)
+	err := mbtest.WriteEventsReporterV2(f, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}

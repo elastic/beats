@@ -96,9 +96,36 @@ func (b packageBuilder) Build() error {
 		b.Spec.Name, b.Type, b.Platform.Name)
 }
 
+type testPackagesParams struct {
+	HasModules  bool
+	HasModulesD bool
+}
+
+// TestPackagesOption defines a option to the TestPackages target.
+type TestPackagesOption func(params *testPackagesParams)
+
+// WithModules enables modules folder contents testing
+func WithModules() func(params *testPackagesParams) {
+	return func(params *testPackagesParams) {
+		params.HasModules = true
+	}
+}
+
+// WithModulesD enables modules.d folder contents testing
+func WithModulesD() func(params *testPackagesParams) {
+	return func(params *testPackagesParams) {
+		params.HasModulesD = true
+	}
+}
+
 // TestPackages executes the package tests on the produced binaries. These tests
 // inspect things like file ownership and mode.
-func TestPackages() error {
+func TestPackages(options ...TestPackagesOption) error {
+	params := testPackagesParams{}
+	for _, opt := range options {
+		opt(&params)
+	}
+
 	fmt.Println(">> Testing package contents")
 	goTest := sh.OutCmd("go", "test")
 
@@ -106,11 +133,18 @@ func TestPackages() error {
 	if mg.Verbose() {
 		args = append(args, "-v")
 	}
-	args = append(args,
-		MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/package_test.go"),
-		"-files",
-		MustExpand("{{.PWD}}/build/distributions/*"),
-	)
+
+	args = append(args, MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/package_test.go"))
+
+	if params.HasModules {
+		args = append(args, "--modules")
+	}
+
+	if params.HasModulesD {
+		args = append(args, "--modules.d")
+	}
+
+	args = append(args, "-files", MustExpand("{{.PWD}}/build/distributions/*"))
 
 	if out, err := goTest(args...); err != nil {
 		if !mg.Verbose() {

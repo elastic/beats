@@ -1,5 +1,5 @@
 [[configuring-howto-heartbeat]]
-= Configuring Heartbeat
+= Configuring {beatname_uc}
 
 [partintro]
 --
@@ -34,6 +34,7 @@ The following topics describe how to configure Heartbeat:
 * <<configuration-template>>
 * <<configuration-logging>>
 * <<using-environ-vars>>
+* <<configuration-autodiscover>>
 * <<yaml-tips>>
 * <<regexp-support>>
 * <<http-endpoint>>
@@ -66,6 +67,8 @@ include::../../libbeat/docs/loggingconfig.asciidoc[]
 
 :standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
+
+include::../../libbeat/docs/shared-autodiscover.asciidoc[]
 
 :standalone:
 :allplatforms:

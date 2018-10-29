@@ -7,8 +7,6 @@
 <titleabbrev>Docker</titleabbrev>
 ++++
 
-experimental[]
-
 Use the `docker` input to read logs from Docker containers.
 
 This input searches for container logs under its path, and parse them into
@@ -55,6 +53,12 @@ Enable partial messages joining. Docker `json-file` driver splits log lines larg
 end of line (`\n`) is present for common lines in the resulting file, while it's not the for the lines
 that have been split. `combine_partial` joins them back together when enabled. It is enabled by default.
 
+===== `cri.parse_flags`
+
+Enable CRI flags parsing from the log file. CRI uses flags to signal a partial line, enabling this will
+ensure partial lines are rejoined. It is disabled by default.
+
+
 The following input configures {beatname_uc} to read the `stdout` stream from
 all containers under the default Docker containers path:
 
@@ -68,6 +72,11 @@ all containers under the default Docker containers path:
     ids:
       - "*"
 ----
+
+===== `cri.force`
+
+Force CRI format parsing. This disables automatic format detection, use it when you know format is CRI
+to gain some performance. This is false by default.
 
 include::../inputs/input-common-harvester-options.asciidoc[]
 

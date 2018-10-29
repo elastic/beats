@@ -21,8 +21,8 @@ PS > .{backslash}{beatname_lc}.exe setup -e
 ----
 
 The <<setup-command,`setup`>> command loads the recommended index template for
-writing to {es} and deploys the sample dashboards for visualizing the
-data in {kib}. This is a one-time setup step. 
+writing to {es} and deploys the sample dashboards (if available) for visualizing
+the data in {kib}. This is a one-time setup step. 
 
 The `-e` flag is optional and sends output to standard error instead of syslog.
 --

@@ -85,7 +85,7 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 	if config.MatchSource {
 		var procConf, _ = common.NewConfigFrom(map[string]interface{}{
 			"field":     "source",
-			"separator": "/",
+			"separator": string(os.PathSeparator),
 			"index":     config.SourceIndex,
 			"target":    "docker.container.id",
 		})
@@ -181,7 +181,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		meta.Put("container.id", container.ID)
 		meta.Put("container.image", container.Image)
 		meta.Put("container.name", container.Name)
-		event.Fields["docker"] = meta
+		event.Fields["docker"] = meta.Clone()
 	} else {
 		d.log.Debugf("Container not found: cid=%s", cid)
 	}
