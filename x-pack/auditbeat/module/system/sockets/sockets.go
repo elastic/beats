@@ -9,6 +9,8 @@ package sockets
 import (
 	"net"
 
+	"fmt"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -17,6 +19,7 @@ import (
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
 
 	"strconv"
+	"syscall"
 
 	"github.com/OneOfOne/xxhash"
 	"github.com/joeshaw/multierror"
@@ -48,59 +51,81 @@ type MetricSet struct {
 	log    *logp.Logger
 
 	netlink *mbSocket.NetlinkSession
-	// TODO: Maybe at some point get this from the processes metricset in Auditbeat
-	// instead of reading /proc again?
+	// TODO: Replace with process data collected in processes metricset
 	ptable     *mbSocket.ProcTable
-	rpcPortmap *RpcPortMap
+	listeners  *mbSocket.ListenerTable
+	rpcPortmap *RpcPortmap
+	// TODO: Replace with user data collected in host metricset
+	users mbSocket.UserCache
 }
 
 // Socket represents information about a socket.
 type Socket struct {
-	Family      linux.AddressFamily
-	State       linux.TCPState
-	LocalIP     net.IP
-	LocalPort   int
-	RemoteIP    net.IP
-	RemotePort  int
-	Inode       uint32
-	UID         uint32
-	ProcessPID  int
-	ProcessName string
-	ProcessType string // set to "rpc" if socket was held by RPC service, otherwise empty
+	Family       linux.AddressFamily
+	State        linux.TCPState
+	LocalIP      net.IP
+	LocalPort    int
+	RemoteIP     net.IP
+	RemotePort   int
+	Inode        uint32
+	UID          uint32
+	Username     string
+	ProcessPID   int
+	ProcessName  string
+	ProcessType  string // set to "rpc" if socket was held by RPC service, otherwise empty
+	Direction    mbSocket.Direction
+	ProcessError error
 }
 
 // Hash creates a hash for Socket.
 func (s Socket) Hash() uint64 {
 	h := xxhash.New64()
-
-	// Local ports of RPC sockets change all the time so cannot be used for hashing
-	//h.WriteString(strconv.Itoa(s.LocalPort))
-
 	h.WriteString(s.LocalIP.String())
 	h.WriteString(s.RemoteIP.String())
+	h.WriteString(strconv.Itoa(s.LocalPort))
 	h.WriteString(strconv.Itoa(s.RemotePort))
 	h.WriteString(strconv.FormatUint(uint64(s.Inode), 10))
-	h.WriteString(strconv.Itoa(s.ProcessPID))
 	return h.Sum64()
 }
 
 func (s Socket) toMapStr() common.MapStr {
-	return common.MapStr{
-		"family":      s.Family.String(),
-		"state":       s.State.String(),
-		"local.ip":    s.LocalIP,
-		"local.port":  s.LocalPort,
-		"remote.ip":   s.RemoteIP,
-		"remote.port": s.RemotePort,
-		"inode":       s.Inode,
-		"uid":         s.UID,
-
-		"process": common.MapStr{
-			"pid":  s.ProcessPID,
-			"name": s.ProcessName,
-			"type": s.ProcessType,
+	evt := common.MapStr{
+		"family":    s.Family.String(),
+		"state":     s.State.String(),
+		"direction": s.Direction.String(),
+		"local": common.MapStr{
+			"ip":   s.LocalIP,
+			"port": s.LocalPort,
+		},
+		"remote": common.MapStr{
+			"ip":   s.RemoteIP,
+			"port": s.RemotePort,
+		},
+		"user": common.MapStr{
+			"id": s.UID,
 		},
 	}
+
+	if s.Username != "" {
+		evt.Put("user.name", s.Username)
+	}
+
+	if s.ProcessName != "" {
+		evt["process"] = common.MapStr{
+			"name": s.ProcessName,
+			"type": s.ProcessType,
+		}
+	}
+
+	if s.ProcessPID != -1 {
+		evt.Put("process.pid", s.ProcessPID)
+	}
+
+	if s.ProcessError != nil {
+		evt.Put("process.error", s.ProcessError.Error())
+	}
+
+	return evt
 }
 
 // New constructs a new MetricSet.
@@ -118,13 +143,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to create process table")
 	}
 
+	logger := logp.NewLogger(moduleName)
+
+	rpcPortmap, err := NewRpcPortmap()
+	if err != nil {
+		logger.Error(err)
+		// Continue
+	}
+
 	ms := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		log:           logp.NewLogger(moduleName),
+		log:           logger,
 
-		netlink: mbSocket.NewNetlinkSession(),
-		ptable:  ptable,
+		netlink:    mbSocket.NewNetlinkSession(),
+		ptable:     ptable,
+		listeners:  mbSocket.NewListenerTable(),
+		rpcPortmap: rpcPortmap,
+		users:      mbSocket.NewUserCache(),
 	}
 
 	if config.ReportChanges {
@@ -145,20 +181,26 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 	ms.log.Debugf("found %d sockets", len(sockets))
 
-	if ms.cache != nil && !ms.cache.IsEmpty() {
-		openedFromCache, closedfromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(sockets))
-		opened := convertToSocket(openedFromCache)
-		closed := convertToSocket(closedfromCache)
+	err = ms.refreshEnrichmentData(sockets)
+	if err != nil {
+		ms.log.Error(err)
+		report.Error(err)
+		// purposely not returning - we only missed some enrichment
+	}
 
-		err = ms.enrichSockets(opened, closed)
-		if err != nil {
-			ms.log.Error(err)
-			report.Error(err)
-			// purposely not returning - we only missed some enrichment
+	if ms.cache != nil && !ms.cache.IsEmpty() {
+		opened, closed := ms.cache.DiffAndUpdateCache(convertToCacheable(sockets))
+
+		for _, socket := range opened {
+			ms.enrichSocket(socket.(*Socket))
+		}
+
+		for _, socket := range closed {
+			ms.enrichSocket(socket.(*Socket))
 		}
 
 		for _, s := range opened {
-			socketMapStr := s.toMapStr()
+			socketMapStr := s.(*Socket).toMapStr()
 			socketMapStr.Put("status", "OPENED")
 
 			report.Event(mb.Event{
@@ -169,7 +211,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 
 		for _, s := range closed {
-			socketMapStr := s.toMapStr()
+			socketMapStr := s.(*Socket).toMapStr()
 			socketMapStr.Put("status", "CLOSED")
 
 			report.Event(mb.Event{
@@ -179,14 +221,11 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 			})
 		}
 	} else {
-		err = ms.enrichSockets(sockets)
-		if err != nil {
-			ms.log.Error(err)
-			report.Error(err)
-			// purposely not returning - we only missed some enrichment
+		// Report all currently existing sockets
+		for _, socket := range sockets {
+			ms.enrichSocket(socket)
 		}
 
-		// Report all currently existing sockets
 		var socketMapStrAll []common.MapStr
 
 		for _, socket := range sockets {
@@ -207,16 +246,9 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 			ms.cache.DiffAndUpdateCache(convertToCacheable(sockets))
 		}
 	}
-}
 
-func convertToSocket(objects []interface{}) []*Socket {
-	sockets := make([]*Socket, 0, len(objects))
-
-	for _, o := range objects {
-		sockets = append(sockets, o.(*Socket))
-	}
-
-	return sockets
+	// Reset the listeners for the next iteration.
+	ms.listeners.Reset()
 }
 
 func convertToCacheable(sockets []*Socket) []cache.Cacheable {
@@ -229,55 +261,60 @@ func convertToCacheable(sockets []*Socket) []cache.Cacheable {
 	return c
 }
 
-func (ms *MetricSet) enrichSockets(socketLists ...[]*Socket) error {
+func (ms *MetricSet) refreshEnrichmentData(allSockets []*Socket) error {
 	var errs multierror.Errors
 
-	err := ms.ptable.Refresh()
+	// Register all listening sockets.
+	for _, socket := range allSockets {
+		if socket.RemotePort == 0 {
+			ms.listeners.Put(uint8(syscall.IPPROTO_TCP), socket.LocalIP, socket.LocalPort)
+		}
+	}
+
+	err := ms.rpcPortmap.Refresh()
 	if err != nil {
 		errs = append(errs, err)
 	}
 
-	for _, socketList := range socketLists {
-		for _, socket := range socketList {
-			proc := ms.ptable.ProcessBySocketInode(socket.Inode)
-			if proc != nil {
-				// Add process info by finding the process that holds the socket's inode.
-				socket.ProcessPID = proc.PID
-				socket.ProcessName = proc.Command
-				socket.ProcessType = ProcessType_PROCESS
-			} else {
-				// If no process holds the inode, try find an RPC service that is using the socket's port
-				if ms.rpcPortmap == nil {
-					ms.rpcPortmap, err = GetRpcPortmap()
-					if err != nil {
-						errs = append(errs, err)
-					}
-
-					if ms.rpcPortmap != nil {
-						ms.log.Debugf("found %d ports mapped to RPC services", len(*ms.rpcPortmap))
-					}
-				}
-
-				if ms.rpcPortmap != nil && len(*ms.rpcPortmap) > 0 {
-					rpcServices, found := (*ms.rpcPortmap)[uint32(socket.LocalPort)]
-
-					if !found {
-						rpcServices, found = (*ms.rpcPortmap)[uint32(socket.RemotePort)]
-					}
-
-					if found {
-						// TODO: We assume every RPC service bound to a port is the same, is that true?
-						socket.ProcessPID = -1
-						socket.ProcessName = rpcServices[0].programName
-						socket.ProcessType = ProcessType_RPC
-					}
-				}
-			}
-		}
+	err = ms.ptable.Refresh()
+	if err != nil {
+		errs = append(errs, err)
 	}
 
-	ms.rpcPortmap = nil
 	return errs.Err()
+}
+
+func (ms *MetricSet) enrichSocket(socket *Socket) {
+	socket.Username = ms.users.LookupUID(int(socket.UID))
+
+	socket.Direction = ms.listeners.Direction(uint8(syscall.IPPROTO_TCP),
+		socket.LocalIP, socket.LocalPort, socket.RemoteIP, socket.RemotePort)
+
+	if ms.ptable != nil {
+		proc := ms.ptable.ProcessBySocketInode(socket.Inode)
+		if proc != nil {
+			// Add process info by finding the process that holds the socket's inode.
+			socket.ProcessPID = proc.PID
+			socket.ProcessName = proc.Command
+			socket.ProcessType = ProcessType_PROCESS
+		} else if ms.rpcPortmap != nil {
+			// If no process holds the inode, try find an RPC service that is using the socket's port
+			rpcService := ms.rpcPortmap.Lookup(uint32(socket.LocalPort))
+
+			if rpcService == nil {
+				rpcService = ms.rpcPortmap.Lookup(uint32(socket.RemotePort))
+			}
+
+			if rpcService != nil {
+				socket.ProcessName = rpcService.programName
+				socket.ProcessType = ProcessType_RPC
+			}
+		}
+
+		if socket.ProcessName == "" {
+			socket.ProcessError = fmt.Errorf("process not found. inode=%v", socket.Inode)
+		}
+	}
 }
 
 func (ms *MetricSet) getSockets() ([]*Socket, error) {
@@ -297,6 +334,7 @@ func (ms *MetricSet) getSockets() ([]*Socket, error) {
 			RemotePort: diag.DstPort(),
 			Inode:      diag.Inode,
 			UID:        diag.UID,
+			ProcessPID: -1,
 		}
 
 		sockets = append(sockets, socket)

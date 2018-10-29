@@ -12,9 +12,11 @@ package sockets
 import "C"
 
 import (
+	"fmt"
 	"strconv"
 	"syscall"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -29,7 +31,12 @@ type RpcService struct {
 	programName   string
 }
 
-type RpcPortMap map[uint32]([]RpcService)
+type portToServiceMap map[uint32]RpcService
+
+type RpcPortmap struct {
+	portmap     portToServiceMap
+	rpcBindAddr C.struct_sockaddr_in
+}
 
 func (service RpcService) toMapStr() common.MapStr {
 	return common.MapStr{
@@ -41,8 +48,7 @@ func (service RpcService) toMapStr() common.MapStr {
 	}
 }
 
-// GetRpcPortmap retrieves a map of ports to RPC services using pmap_getmaps(3).
-func GetRpcPortmap() (*RpcPortMap, error) {
+func NewRpcPortmap() (*RpcPortmap, error) {
 	addr := C.struct_sockaddr_in{}
 
 	// By default, get_myaddress will set the loopback address (INADDR_LOOPBACK)
@@ -52,18 +58,44 @@ func GetRpcPortmap() (*RpcPortMap, error) {
 		return nil, errors.Wrap(err, "error getting address for RPC")
 	}
 
+	return &RpcPortmap{
+		rpcBindAddr: addr,
+	}, nil
+}
+
+func (portmap *RpcPortmap) Lookup(port uint32) *RpcService {
+	service, found := portmap.portmap[port]
+	if found {
+		return &service
+	} else {
+		return nil
+	}
+}
+
+func (portmap *RpcPortmap) Refresh() error {
+	portmap.portmap = make(portToServiceMap, len(portmap.portmap))
+	err := portmap.loadRpcPortmap()
+	return err
+}
+
+func (portmap *RpcPortmap) RpcPort() uint32 {
+	return uint32(portmap.rpcBindAddr.sin_port)
+}
+
+// loadRpcPortmap retrieves a map of ports to RPC services using pmap_getmaps(3).
+func (portmap *RpcPortmap) loadRpcPortmap() error {
 	/*
 		struct pmaplist {
 			struct pmap pml_map;
 			struct pmaplist *pml_next;
 		}
 	*/
-	pmaplist, err := C.pmap_getmaps(&addr)
+	pmaplist, err := C.pmap_getmaps(&portmap.rpcBindAddr)
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting RPC port maps")
+		return errors.Wrap(err, "error getting RPC port maps")
 	}
 
-	portmap := make(RpcPortMap)
+	var errs multierror.Errors
 	for ; pmaplist != nil; pmaplist = pmaplist.pml_next {
 		/*
 			struct pmap {
@@ -88,7 +120,7 @@ func GetRpcPortmap() (*RpcPortMap, error) {
 		*/
 		rpcent, err := C.getrpcbynumber(C.int(pmaplist.pml_map.pm_prog))
 		if err != nil {
-			return nil, errors.Wrap(err, "error getting RPC program name")
+			return errors.Wrap(err, "error getting RPC program name")
 		}
 		service.programName = C.GoString(rpcent.r_name)
 
@@ -101,8 +133,14 @@ func GetRpcPortmap() (*RpcPortMap, error) {
 			service.protocol = strconv.FormatUint(protocol, 10)
 		}
 
-		portmap[service.port] = append(portmap[service.port], service)
+		existingService, found := portmap.portmap[service.port]
+		if !found {
+			portmap.portmap[service.port] = service
+		} else if found && existingService.programName != service.programName {
+			errs = append(errs, fmt.Errorf("conflicting RPC program names for port '%d': '%v' and '%v'", service.port,
+				existingService.programName, service.programName))
+		}
 	}
 
-	return &portmap, nil
+	return errs.Err()
 }
