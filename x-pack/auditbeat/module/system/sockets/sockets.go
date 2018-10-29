@@ -22,7 +22,6 @@ import (
 	"syscall"
 
 	"github.com/OneOfOne/xxhash"
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/libbeat/logp"
 	mbSocket "github.com/elastic/beats/metricbeat/module/system/socket"
@@ -32,9 +31,6 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "sockets"
-
-	ProcessType_PROCESS = "process"
-	ProcessType_RPC     = "rpc"
 )
 
 func init() {
@@ -52,9 +48,8 @@ type MetricSet struct {
 
 	netlink *mbSocket.NetlinkSession
 	// TODO: Replace with process data collected in processes metricset
-	ptable     *mbSocket.ProcTable
-	listeners  *mbSocket.ListenerTable
-	rpcPortmap *RpcPortmap
+	ptable    *mbSocket.ProcTable
+	listeners *mbSocket.ListenerTable
 	// TODO: Replace with user data collected in host metricset
 	users mbSocket.UserCache
 }
@@ -68,12 +63,11 @@ type Socket struct {
 	RemoteIP     net.IP
 	RemotePort   int
 	Inode        uint32
+	Direction    mbSocket.Direction
 	UID          uint32
 	Username     string
 	ProcessPID   int
 	ProcessName  string
-	ProcessType  string // set to "rpc" if socket was held by RPC service, otherwise empty
-	Direction    mbSocket.Direction
 	ProcessError error
 }
 
@@ -112,13 +106,9 @@ func (s Socket) toMapStr() common.MapStr {
 
 	if s.ProcessName != "" {
 		evt["process"] = common.MapStr{
+			"pid":  s.ProcessPID,
 			"name": s.ProcessName,
-			"type": s.ProcessType,
 		}
-	}
-
-	if s.ProcessPID != -1 {
-		evt.Put("process.pid", s.ProcessPID)
 	}
 
 	if s.ProcessError != nil {
@@ -143,24 +133,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to create process table")
 	}
 
-	logger := logp.NewLogger(moduleName)
-
-	rpcPortmap, err := NewRpcPortmap()
-	if err != nil {
-		logger.Error(err)
-		// Continue
-	}
-
 	ms := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		log:           logger,
+		log:           logp.NewLogger(moduleName),
 
-		netlink:    mbSocket.NewNetlinkSession(),
-		ptable:     ptable,
-		listeners:  mbSocket.NewListenerTable(),
-		rpcPortmap: rpcPortmap,
-		users:      mbSocket.NewUserCache(),
+		netlink:   mbSocket.NewNetlinkSession(),
+		ptable:    ptable,
+		listeners: mbSocket.NewListenerTable(),
+		users:     mbSocket.NewUserCache(),
 	}
 
 	if config.ReportChanges {
@@ -185,7 +166,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	if err != nil {
 		ms.log.Error(err)
 		report.Error(err)
-		// purposely not returning - we only missed some enrichment
+		return
 	}
 
 	if ms.cache != nil && !ms.cache.IsEmpty() {
@@ -262,8 +243,6 @@ func convertToCacheable(sockets []*Socket) []cache.Cacheable {
 }
 
 func (ms *MetricSet) refreshEnrichmentData(allSockets []*Socket) error {
-	var errs multierror.Errors
-
 	// Register all listening sockets.
 	for _, socket := range allSockets {
 		if socket.RemotePort == 0 {
@@ -271,17 +250,8 @@ func (ms *MetricSet) refreshEnrichmentData(allSockets []*Socket) error {
 		}
 	}
 
-	err := ms.rpcPortmap.Refresh()
-	if err != nil {
-		errs = append(errs, err)
-	}
-
-	err = ms.ptable.Refresh()
-	if err != nil {
-		errs = append(errs, err)
-	}
-
-	return errs.Err()
+	err := ms.ptable.Refresh()
+	return err
 }
 
 func (ms *MetricSet) enrichSocket(socket *Socket) {
@@ -296,23 +266,10 @@ func (ms *MetricSet) enrichSocket(socket *Socket) {
 			// Add process info by finding the process that holds the socket's inode.
 			socket.ProcessPID = proc.PID
 			socket.ProcessName = proc.Command
-			socket.ProcessType = ProcessType_PROCESS
-		} else if ms.rpcPortmap != nil {
-			// If no process holds the inode, try find an RPC service that is using the socket's port
-			rpcService := ms.rpcPortmap.Lookup(uint32(socket.LocalPort))
-
-			if rpcService == nil {
-				rpcService = ms.rpcPortmap.Lookup(uint32(socket.RemotePort))
-			}
-
-			if rpcService != nil {
-				socket.ProcessName = rpcService.programName
-				socket.ProcessType = ProcessType_RPC
-			}
-		}
-
-		if socket.ProcessName == "" {
-			socket.ProcessError = fmt.Errorf("process not found. inode=%v", socket.Inode)
+		} else if socket.Inode == 0 {
+			socket.ProcessError = errors.New("process has exited")
+		} else {
+			socket.ProcessError = fmt.Errorf("process not found (inode=%v)", socket.Inode)
 		}
 	}
 }
