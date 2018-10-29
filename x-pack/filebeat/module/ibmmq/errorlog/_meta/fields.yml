@@ -1,0 +1,80 @@
+- name: errorlog
+  description: IBM MQ error logs
+  example: Please add example
+  type: group
+  fields:
+  - name: process
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: user
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: program
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: hostname
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: installation
+    description: Please add description
+    example: Please add example
+    type: keyword
+  - name: vrmf
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: qmgr
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: iso8601_timestamp
+    description: Please add description
+    example: Please add example
+  - name: remotehost
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: arithinsert1
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: arithinsert2
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: commentinsert1
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: commentinsert2
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: commentinsert3
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: errorcode
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: errordescription
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: explanation
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: action
+    description: Please add description
+    example: Please add example
+    type: text
+- name: severity
+  description: Please add description
+  example: Please add example
+  type: text

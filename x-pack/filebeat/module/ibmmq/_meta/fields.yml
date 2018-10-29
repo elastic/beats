@@ -1,0 +1,9 @@
+- key: ibmmq
+  title: "ibmmq"
+  description: >
+    ibmmq Module
+  fields:
+    - name: ibmmq
+      type: group
+      description: >
+      fields:

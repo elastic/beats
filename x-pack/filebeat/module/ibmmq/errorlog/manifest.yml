@@ -1,0 +1,10 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/mqm/AMQERR01.LOG*
+      - /var/mqm/qmgrs/*/AMQERR01.LOG*
+
+ingest_pipeline: ingest/pipeline.json
+input: config/errorlog.yml
