@@ -18,11 +18,6 @@ function Exec {
     }
 }
 
-# TMP working to fix this in https://github.com/elastic/beats/pull/8753
-if ($env:beat -eq "x-pack/functionbeat") {
-  exit 0
-}
-
 # Fix an issue with Windows' MAX_PATH limitation, this can cause compiler issues if the files are
 # nested too deep. To solve this situation we are using 'subst' to map the workspace to a drive.
 # If we have already mapped the workspace to a drive we just use the drive.
