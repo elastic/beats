@@ -182,7 +182,6 @@ include::../../libbeat/docs/step-look-at-config.asciidoc[]
 
 IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
 
-:allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
@@ -190,7 +189,6 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 
 IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
 
-:allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]
 
 [id="{beatname_lc}-starting"]

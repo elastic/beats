@@ -54,7 +54,6 @@ include::./filebeat-general-options.asciidoc[]
 
 include::./reload-configuration.asciidoc[]
 
-:allplatforms:
 include::../../libbeat/docs/queueconfig.asciidoc[]
 
 include::../../libbeat/docs/outputconfig.asciidoc[]
@@ -77,14 +76,15 @@ include::../../libbeat/docs/loggingconfig.asciidoc[]
 
 :standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
+:standalone!:
 
 :autodiscoverJolokia:
 :autodiscoverHints:
 include::../../libbeat/docs/shared-autodiscover.asciidoc[]
 
 :standalone:
-:allplatforms:
 include::../../libbeat/docs/yaml.asciidoc[]
+:standalone!:
 
 include::../../libbeat/docs/regexp.asciidoc[]
 
