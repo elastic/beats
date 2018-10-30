@@ -644,16 +644,24 @@ func (b *Beat) loadMeta() error {
 
 	if err == nil {
 		m := meta{}
-		if err := json.NewDecoder(f).Decode(&m); err != nil {
-			f.Close()
-			return fmt.Errorf("Beat meta file reading error: %v", err)
+		
+		fi, err := f.Stat()
+		if err != nil {
+			return fmt.Errorf("Beat meta file stat error: %v", err)
 		}
+		
+		if fi.Size() != 0 {
+			if err := json.NewDecoder(f).Decode(&m); err != nil {
+				f.Close()
+				return fmt.Errorf("Beat meta file reading error: %v", err)
+			}
 
-		f.Close()
-		valid := m.UUID != uuid.Nil
-		if valid {
-			b.Info.UUID = m.UUID
-			return nil
+			f.Close()
+			valid := m.UUID != uuid.Nil
+			if valid {
+				b.Info.UUID = m.UUID
+				return nil
+			}
 		}
 	}
 
