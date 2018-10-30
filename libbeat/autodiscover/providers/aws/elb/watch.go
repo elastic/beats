@@ -18,7 +18,6 @@
 package elb
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -79,7 +78,6 @@ func watch(
 				newGen = oldGen + 1
 
 				fetchedLbls, err := GetAllLbls(client)
-				fmt.Printf("FETCHED LBLS %v\n", fetchedLbls)
 				// If a single request fails we have to skip
 				// We need all the data intact
 				if err != nil {
@@ -200,7 +198,6 @@ func (p *inventoryRequest) fetch() ([]*lbListener, error) {
 		return nil, multierr.Combine(p.errs...)
 	}
 
-	fmt.Printf("FRETURN %v\n", p.lbListeners)
 	return p.lbListeners, nil
 }
 
