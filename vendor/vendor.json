@@ -1375,11 +1375,11 @@
 			"versionExact": "v1.5.0"
 		},
 		{
-			"checksumSHA1": "TmMTaJIWueXrKneUOKMOgq75fKE=",
+			"checksumSHA1": "4ZEyxKIsoeECu8pA7mK4mjiUvpw=",
 			"origin": "github.com/elastic/fsevents",
 			"path": "github.com/fsnotify/fsevents",
-			"revision": "4d5197691b054c220286f7c6ea167de9753d902d",
-			"revisionTime": "2018-05-02T14:11:16Z",
+			"revision": "e1d381a4d27063baac2e9d3c5887ceb4ab059287",
+			"revisionTime": "2018-10-29T22:35:31Z",
 			"tree": true
 		},
 		{
@@ -1537,10 +1537,10 @@
 			"revisionTime": "2017-02-10T14:05:23Z"
 		},
 		{
-			"checksumSHA1": "k3e1TD8wrhxfUUG3pQBb10ppNGA=",
+			"checksumSHA1": "Kq6KC9PlUP58qiX0WzApE85SsLg=",
 			"path": "github.com/magefile/mage",
-			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
-			"revisionTime": "2018-04-12T15:54:34Z"
+			"revision": "11d15918ff3aa6f75cd6d3340a9507bb5309c679",
+			"revisionTime": "2018-10-17T17:03:14Z"
 		},
 		{
 			"checksumSHA1": "KODorM0Am1g55qObNz3jVOdRVFs=",
