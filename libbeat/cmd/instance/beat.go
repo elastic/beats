@@ -154,7 +154,11 @@ func initRand() {
 // implementation. bt is the `Creator` callback for creating a new beater
 // instance.
 // XXX Move this as a *Beat method?
-func Run(name, idxPrefix, version string, bt beat.Creator) error {
+func Run(settings Settings, bt beat.Creator) error {
+	name := settings.Name
+	idxPrefix := settings.IndexPrefix
+	version := settings.Version
+
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
@@ -185,7 +189,7 @@ func Run(name, idxPrefix, version string, bt beat.Creator) error {
 		monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
 		monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
 
-		return b.launch(bt)
+		return b.launch(settings, bt)
 	}())
 }
 
@@ -306,7 +310,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	return beater, nil
 }
 
-func (b *Beat) launch(bt beat.Creator) error {
+func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer logp.Sync()
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
@@ -328,7 +332,10 @@ func (b *Beat) launch(bt beat.Creator) error {
 	}
 
 	if b.Config.Monitoring.Enabled() {
-		reporter, err := report.New(b.Info, b.Config.Monitoring, b.Config.Output)
+		settings := report.Settings{
+			DefaultUsername: settings.Monitoring.DefaultUsername,
+		}
+		reporter, err := report.New(b.Info, settings, b.Config.Monitoring, b.Config.Output)
 		if err != nil {
 			return err
 		}
