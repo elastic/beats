@@ -95,3 +95,36 @@
         type: ip
         description: >
           IP addresses.
+  - name: users
+    type: array
+    description: >
+        `users` contains information about the users on this system. See the man page for passwd(5) for more detailed information.
+    fields:
+    - name: name
+      type: keyword
+      description: >
+          User name.
+    - name: uid
+      type: integer
+      description: >
+          User ID.
+    - name: gid
+      type: integer
+      description: >
+          Group ID.
+    - name: passwd
+      type: keyword
+      description: >
+          Information about a user's password.
+    - name: dir
+      type: text
+      description: >
+          User's home directory.
+    - name: shell
+      type: text
+      description: >
+          Program to run at login.
+    - name: gecos
+      type: text
+      description: >
+          Comment field.
