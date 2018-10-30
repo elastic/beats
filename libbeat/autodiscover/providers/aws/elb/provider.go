@@ -29,7 +29,7 @@ type Provider struct {
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
-	cfgwarn.Beta("AWS autodiscover is beta")
+	cfgwarn.Beta("aws_elb autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {

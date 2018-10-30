@@ -18,8 +18,11 @@
 package elb
 
 import (
+	"fmt"
 	"sync"
 	"time"
+
+	"go.uber.org/multierr"
 
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 
@@ -76,6 +79,7 @@ func watch(
 				newGen = oldGen + 1
 
 				fetchedLbls, err := GetAllLbls(client)
+				fmt.Printf("FETCHED LBLS %v\n", fetchedLbls)
 				// If a single request fails we have to skip
 				// We need all the data intact
 				if err != nil {
@@ -117,26 +121,38 @@ type inventoryRequest struct {
 	paginator    elbv2.DescribeLoadBalancersPager
 	elbv2Client  *elbv2.ELBV2
 	running      atomic.Bool
-	resultsCh    chan *individualResult
+	lbListeners  []*lbListener
+	errs         []error
+	resultsLock  sync.Mutex
 	taskPool     sync.Pool
 	pendingTasks sync.WaitGroup
 }
 
-func (p *inventoryRequest) recordResult(lb *elbv2.LoadBalancer, lbl *elbv2.Listener) {
-	p.resultsCh <- &individualResult{&lbListener{lb, lbl}, nil}
+func (p *inventoryRequest) recordGoodResult(lb *elbv2.LoadBalancer, lbl *elbv2.Listener) {
+	p.resultsLock.Lock()
+	defer p.resultsLock.Unlock()
+
+	p.lbListeners = append(p.lbListeners, &lbListener{lb, lbl})
 }
 
-func (p *inventoryRequest) recordErr(err error) {
+func (p *inventoryRequest) recordErrResult(err error) {
+	p.resultsLock.Lock()
+	defer p.resultsLock.Unlock()
+
+	p.errs = append(p.errs, err)
+
+	// Try to stop execution early
 	p.running.Store(false)
-	p.resultsCh <- &individualResult{nil, err}
 }
 
 func (p *inventoryRequest) dispatch(fn func()) {
 	p.pendingTasks.Add(1)
-	defer p.pendingTasks.Done()
+
 	go func() {
 		slot := p.taskPool.Get()
 		defer p.taskPool.Put(slot)
+		defer p.pendingTasks.Done()
+
 		fn()
 	}()
 }
@@ -146,11 +162,11 @@ func (p *inventoryRequest) fetchListeners(lb elbv2.LoadBalancer) {
 	listen := listenReq.Paginate()
 	for listen.Next() && p.running.Load() {
 		for _, listener := range listen.CurrentPage().Listeners {
-			p.recordResult(&lb, &listener)
+			p.recordGoodResult(&lb, &listener)
 		}
 	}
 	if listen.Err() != nil {
-		p.recordErr(listen.Err())
+		p.recordErrResult(listen.Err())
 	}
 }
 
@@ -166,58 +182,46 @@ func (p *inventoryRequest) fetchNextPage() {
 	}
 
 	if p.paginator.Err() != nil {
-		p.recordErr(p.paginator.Err())
+		p.recordErrResult(p.paginator.Err())
 	}
-
-	p.pendingTasks.Done()
 }
 
 func (p *inventoryRequest) fetch() ([]*lbListener, error) {
-	done := make(chan struct{})
-
-	p.pendingTasks.Add(1)
 	p.dispatch(p.fetchNextPage)
 
-	go func() {
-		p.pendingTasks.Wait()
-		close(done)
-	}()
+	p.pendingTasks.Wait()
 
-	for i := 0; i < 5; i++ {
-		p.taskPool.Put(nil)
+	// Acquire the results lock to ensure memory
+	// consistency between the last write and this read
+	p.resultsLock.Lock()
+	defer p.resultsLock.Unlock()
+
+	if len(p.errs) > 0 {
+		return nil, multierr.Combine(p.errs...)
 	}
 
-	var lbListeners []*lbListener
-	var errs []error
-	for {
-		select {
-		case res := <-p.resultsCh:
-			if res.err != nil {
-				errs = append(errs, res.err)
-			} else {
-				lbListeners = append(lbListeners, res.lbListener)
-			}
-		case <-done:
-			break
-		}
-	}
-
-	if len(errs) > 0 {
-		return nil, errs[0]
-	}
-
-	return lbListeners, nil
+	fmt.Printf("FRETURN %v\n", p.lbListeners)
+	return p.lbListeners, nil
 }
 
 func GetAllLbls(client *elbv2.ELBV2) ([]*lbListener, error) {
 	var pageSize int64 = 50
 	req := client.DescribeLoadBalancersRequest(&elbv2.DescribeLoadBalancersInput{PageSize: &pageSize})
+
+	// Limit concurrency against the AWS API to 5
+	taskPool := sync.Pool{}
+	for i := 0; i < 5; i++ {
+		taskPool.Put(nil)
+	}
+
 	ir := &inventoryRequest{
 		req.Paginate(),
 		client,
 		atomic.MakeBool(true),
-		make(chan *individualResult),
-		sync.Pool{},
+		[]*lbListener{},
+		[]error{},
+		sync.Mutex{},
+		taskPool,
 		sync.WaitGroup{},
 	}
 
