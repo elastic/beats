@@ -54,19 +54,6 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		return
 	}
 
-	users, err := GetUsers()
-	if err != nil {
-		errW := errors.Wrap(err, "Failed to get users")
-		ms.log.Error(errW)
-		report.Error(errW)
-		return
-	}
-
-	var usersMapStr []common.MapStr
-	for _, u := range users {
-		usersMapStr = append(usersMapStr, u.toMapStr())
-	}
-
 	networkInterfaces, err := getNetworkInterfaces()
 	if err != nil {
 		errW := errors.Wrap(err, "Failed to load network interface information")
@@ -101,8 +88,6 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 				"version":  host.Info().OS.Version,
 				"kernel":   host.Info().KernelVersion,
 			},
-
-			"users": usersMapStr,
 
 			"network": common.MapStr{
 				"interfaces": networkInterfaceMapStr,
