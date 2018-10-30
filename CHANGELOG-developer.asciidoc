@@ -59,3 +59,4 @@ The list below covers the major changes between 6.3.0 and master only.
 - Add `mage.GenerateModuleReferenceConfig` for generating reference config files that include configuration sections from the module directory. {pull}8615[8615]
 - Add `mage.GenerateFieldsGo` for generating fields.go files. {pull}8615[8615]
 - Add `mage.KibanaDashboards` for collecting Kibana dashboards and generating index patterns. {pull}8615[8615]
+- Allow to disable config resolver using the `Settings.DisableConfigResolver` field when initializing libbeat. {pull}8769[8769]
