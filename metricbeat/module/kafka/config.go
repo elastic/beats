@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package partition
+package kafka
 
 import (
 	"fmt"
@@ -24,17 +24,16 @@ import (
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 )
 
-type connConfig struct {
+type metricsetConfig struct {
 	Retries  int               `config:"retries" validate:"min=0"`
 	Backoff  time.Duration     `config:"backoff" validate:"min=0"`
 	TLS      *tlscommon.Config `config:"ssl"`
 	Username string            `config:"username"`
 	Password string            `config:"password"`
 	ClientID string            `config:"client_id"`
-	Topics   []string          `config:"topics"`
 }
 
-var defaultConfig = connConfig{
+var defaultConfig = metricsetConfig{
 	Retries:  3,
 	Backoff:  250 * time.Millisecond,
 	TLS:      nil,
@@ -43,7 +42,7 @@ var defaultConfig = connConfig{
 	ClientID: "metricbeat",
 }
 
-func (c *connConfig) Validate() error {
+func (c *metricsetConfig) Validate() error {
 	if c.Username != "" && c.Password == "" {
 		return fmt.Errorf("password must be set when username is configured")
 	}
