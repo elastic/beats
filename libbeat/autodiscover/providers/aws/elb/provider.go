@@ -76,8 +76,8 @@ func (p *Provider) Start() {
 					"elb": lb,
 				},
 			}
-			if config := p.templates.GetConfig(e); config != nil {
-				e["config"] = config
+			if configs := p.templates.GetConfig(e); configs != nil {
+				e["config"] = configs
 			}
 			p.appenders.Append(e)
 			p.bus.Publish(e)

@@ -17,6 +17,7 @@ func (l *lbListener) toMap() common.MapStr {
 	m := common.MapStr{}
 
 	m["host"] = *l.lb.DNSName
+	m["port"] = l.listener.Port
 	m["type"] = string(l.lb.Type)
 	m["scheme"] = l.lb.Scheme
 	m["availability_zones"] = l.azStrings()
@@ -26,7 +27,6 @@ func (l *lbListener) toMap() common.MapStr {
 	m["ip_address_type"] = string(l.lb.IpAddressType)
 	m["security_groups"] = l.lb.SecurityGroups
 	m["vpc_id"] = *l.lb.VpcId
-	m["port"] = l.listener.Port
 	m["protocol"] = l.listener.Protocol
 	m["ssl_policy"] = l.listener.SslPolicy
 

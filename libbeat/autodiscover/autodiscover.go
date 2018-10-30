@@ -165,8 +165,8 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 	logp.Debug(debugK, "Got a start event: %v, generated configs: %+v", event, configs)
 
 	meta := getMeta(event)
-	for _, config := range configs {
-		hash, err := hashKeyOrConfig(event, config)
+	for configIdx, config := range configs {
+		hash, err := hashKeyOrConfig(event, configIdx, config)
 		if err != nil {
 			logp.Error(err)
 		}
@@ -205,8 +205,8 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 	}
 	logp.Debug(debugK, "Got a stop event: %v, generated configs: %+v", event, configs)
 
-	for _, config := range configs {
-		hash, err := hashKeyOrConfig(event, config)
+	for configIdx, config := range configs {
+		hash, err := hashKeyOrConfig(event, configIdx, config)
 		if err != nil {
 			logp.Error(err)
 		}
@@ -232,16 +232,14 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 	return updated
 }
 
-// Hash using the special "hashKey" key if available, otherwise hash the given config
-func hashKeyOrConfig(event bus.Event, config *common.Config) (hash uint64, err error) {
+// Hash using the special "hashKey" key plus the index of the key if available, otherwise hash the given config
+func hashKeyOrConfig(event bus.Event, configIdx int, config *common.Config) (hash uint64, err error) {
 	if hk, ok := event["hashKey"]; ok {
-		hash, err = hashstructure.Hash(hk, nil)
-		fmt.Printf("HASHOF %v\n", hk)
+		hash, err = hashstructure.Hash(fmt.Sprintf("%s,%d", hk, configIdx), nil)
 		if err != nil {
 			errors.Wrapf(err, "Could not hash key %s:", hk)
 		}
 	} else {
-		fmt.Printf("LEGACY HASH\n")
 		hash, err = cfgfile.HashConfig(config)
 		if err != nil {
 			errors.Wrapf(err, "Could not hash config %v", config)

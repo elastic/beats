@@ -16,27 +16,3 @@
 // under the License.
 
 package elb
-
-import (
-	"fmt"
-	"testing"
-	"time"
-
-	"github.com/aws/aws-sdk-go/service/elbv2"
-)
-
-func TestBasicELB(t *testing.T) {
-	stop := watch(
-		10*time.Second,
-		func(arn string, lb *elbv2.LoadBalancer) {
-			fmt.Printf("GOT A NEW LB %s | %v\n", arn, lb)
-		},
-		func(arn string) {
-			fmt.Printf("STOPPED A LB %s\n", arn)
-		},
-	)
-	for {
-		time.Sleep(time.Second)
-	}
-	stop()
-}
