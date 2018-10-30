@@ -28,17 +28,20 @@ import (
 	"github.com/elastic/gosigar/sys/linux"
 )
 
+// NetlinkSession communicates with the kernel's netlink subsystem.
 type NetlinkSession struct {
 	readBuffer []byte
 	seq        uint32
 }
 
+// NewNetlinkSession creates a new netlink session.
 func NewNetlinkSession() *NetlinkSession {
 	return &NetlinkSession{
 		readBuffer: make([]byte, os.Getpagesize()),
 	}
 }
 
+// GetSocketList retrieves the current list of sockets from the kernel.
 func (session *NetlinkSession) GetSocketList() ([]*linux.InetDiagMsg, error) {
 	// Send request over netlink and parse responses.
 	req := linux.NewInetDiagReq()
