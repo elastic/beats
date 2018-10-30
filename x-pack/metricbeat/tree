@@ -1,0 +1,52 @@
+.
+├── cmd
+│   └── root.go
+├── docs
+│   ├── fields.asciidoc
+│   ├── modules
+│   │   ├── foo
+│   │   │   └── bar.asciidoc
+│   │   └── foo.asciidoc
+│   └── modules_list.asciidoc
+├── fields.yml
+├── include
+│   ├── fields
+│   │   └── fields.go
+│   ├── fields.go
+│   └── list.go
+├── magefile.go
+├── main.go
+├── main_test.go
+├── make.bat
+├── Makefile
+├── _meta
+│   ├── beat.reference.yml
+│   ├── beat.yml
+│   └── kibana.generated
+│       ├── 5
+│       │   └── index-pattern
+│       │       └── metricbeat.json
+│       └── 6
+│           └── index-pattern
+│               └── metricbeat.json
+├── metricbeat.reference.yml
+├── metricbeat.yml
+├── module
+│   └── foo
+│       ├── bar
+│       │   ├── bar.go
+│       │   └── _meta
+│       │       ├── data.json
+│       │       ├── docs.asciidoc
+│       │       └── fields.yml
+│       ├── doc.go
+│       ├── fields.go
+│       └── _meta
+│           ├── config.yml
+│           ├── docs.asciidoc
+│           └── fields.yml
+├── modules.d
+│   └── foo.yml.disabled
+└── tree
+
+18 directories, 31 files

@@ -4,7 +4,7 @@ from os.path import abspath, isdir, join, dirname, basename
 from argparse import ArgumentParser
 
 sys.path.append(abspath("scripts"))
-from generate_imports_helper import comment, get_importable_lines
+# from generate_imports_helper import comment, get_importable_lines
 
 
 import_line_format = "\t_ \"{beat_path}/{module}/{name}\""
@@ -39,6 +39,8 @@ import (
 
 
 def generate_and_write_to_file(outfile, go_beat_path):
+    from generate_imports_helper import comment, get_importable_lines
+
     imported_beat_lines = get_importable_lines(go_beat_path, import_line_format)
     imported_lines = "\n".join(imported_beat_lines)
     package = basename(dirname(outfile))
@@ -52,7 +54,11 @@ def generate_and_write_to_file(outfile, go_beat_path):
 if __name__ == "__main__":
     parser = ArgumentParser(description="Generate imports for Beats packages")
     parser.add_argument("--out", default="include/list.go")
+    parser.add_argument("--scripts_path")
     parser.add_argument("beats_path")
     args = parser.parse_args()
+
+    if args.scripts_path is not None:
+        sys.path.append(args.scripts_path)
 
     generate_and_write_to_file(args.out, args.beats_path)

@@ -9,7 +9,7 @@ ES_BEATS?=../..
 GOX_OS=netbsd linux windows
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 
-DOCS_BRANCH=$(shell grep doc-branch ../libbeat/docs/version.asciidoc | cut -c 14-)
+DOCS_BRANCH=$(shell grep doc-branch ../../libbeat/docs/version.asciidoc | cut -c 14-)
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 
@@ -25,18 +25,18 @@ kibana:
 collect-docs: python-env
 	@rm -rf docs/modules
 	@mkdir -p docs/modules
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/x-pack/metricbeat/scripts/docs_collector.py --beat ${BEAT_NAME}
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/docs_collector.py --beat ${BEAT_NAME}
 
 # Collects all module configs
 .PHONY: configs
 configs: python-env
 	@mkdir -p _meta
-	@cp ${ES_BEATS}/x-pack/metricbeat/_meta/common.yml _meta/beat.yml
-	@cat ${ES_BEATS}/x-pack/metricbeat/_meta/setup.yml >> _meta/beat.yml
-	@cat ${ES_BEATS}/x-pack/metricbeat/_meta/common.reference.yml > _meta/beat.reference.yml
+	@cp ${ES_BEATS}/metricbeat/_meta/common.yml _meta/beat.yml
+	@cat ${ES_BEATS}/metricbeat/_meta/setup.yml >> _meta/beat.yml
+	@cat ${ES_BEATS}/metricbeat/_meta/common.reference.yml > _meta/beat.reference.yml
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
 	@rm -rf modules.d
-	${PYTHON_ENV}/bin/python ${ES_BEATS}/x-pack/metricbeat/scripts/modules_collector.py --docs_branch=$(DOCS_BRANCH)
+	${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/modules_collector.py --docs_branch=$(DOCS_BRANCH)
 	@chmod go-w modules.d/*
 	@# Enable system by default:
 	@if [ -f modules.d/system.yml.disabled ]; then mv modules.d/system.yml.disabled modules.d/system.yml; fi
@@ -45,7 +45,7 @@ configs: python-env
 .PHONY: imports
 imports: python-env
 	@mkdir -p include
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py --scripts_path ${ES_BEATS}/metricbeat/scripts ${BEAT_PATH}
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
@@ -75,7 +75,7 @@ test-module: python-env update metricbeat.test
 
 .PHONY: assets
 assets:
-	go run ${ES_BEATS}/x-pack/metricbeat/scripts/assets/assets.go ${ES_BEATS}/x-pack/metricbeat/module
+	go run ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/x-pack/metricbeat/module
 	mkdir -p include/fields
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -pkg include -in ${ES_BEATS}/x-pack/metricbeat/_meta/fields.common.yml -out include/fields.go $(BEAT_NAME)
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -pkg include -in ${ES_BEATS}/metricbeat/_meta/fields.common.yml -out include/fields.go $(BEAT_NAME)
 	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -out ./include/fields/fields.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
