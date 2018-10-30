@@ -52,8 +52,6 @@ func (l *lbListener) stateMap() (stateMap common.MapStr) {
 	if state.Reason != nil {
 		stateMap["reason"] = *state.Reason
 	}
-	if state.Code != nil {
-		stateMap["code"] = *state.Code
-	}
+	stateMap["code"] = state.Code
 	return stateMap
 }

@@ -75,7 +75,7 @@ func watch(
 				oldGen := newGen
 				newGen = oldGen + 1
 
-				fetchedLbls, err := GetAllLbls(client, region)
+				fetchedLbls, err := GetAllLbls(client)
 				// If a single request fails we have to skip
 				// We need all the data intact
 				if err != nil {
@@ -142,7 +142,8 @@ func (p *inventoryRequest) dispatch(fn func()) {
 }
 
 func (p *inventoryRequest) fetchListeners(lb elbv2.LoadBalancer) {
-	listen := p.elbv2Client.DescribeListenersRequest(&elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}).Paginate()
+	listenReq := p.elbv2Client.DescribeListenersRequest(&elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
+	listen := listenReq.Paginate()
 	for listen.Next() && p.running.Load() {
 		for _, listener := range listen.CurrentPage().Listeners {
 			p.recordResult(&lb, &listener)
@@ -208,11 +209,11 @@ func (p *inventoryRequest) fetch() ([]*lbListener, error) {
 	return lbListeners, nil
 }
 
-func GetAllLbls(client *elbv2.ELBV2, region string) ([]*lbListener, error) {
+func GetAllLbls(client *elbv2.ELBV2) ([]*lbListener, error) {
 	var pageSize int64 = 50
-	paginator := client.DescribeLoadBalancersRequest(&elbv2.DescribeLoadBalancersInput{PageSize: &pageSize}).Paginate()
+	req := client.DescribeLoadBalancersRequest(&elbv2.DescribeLoadBalancersInput{PageSize: &pageSize})
 	ir := &inventoryRequest{
-		paginator,
+		req.Paginate(),
 		client,
 		atomic.MakeBool(true),
 		make(chan *individualResult),
