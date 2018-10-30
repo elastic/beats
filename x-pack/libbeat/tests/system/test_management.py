@@ -13,4 +13,6 @@ INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 
 class TestManagement(BaseTest):
-    pass
+
+    def test_broken(self):
+        assert False
