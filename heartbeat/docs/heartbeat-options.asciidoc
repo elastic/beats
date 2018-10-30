@@ -52,6 +52,8 @@ happening to you. To do so you would instead have your +heartbeat.yml+ file cont
 heartbeat.config.monitors:
   # Directory + glob pattern to search for configuration files
   path: /path/to/my/monitors.d/*.yml
+  # If enabled, heartbeat will periodically check the config.monitors path for changes
+  reload.enabled: true
   # How often to check for changes
   reload.period: 1s
 ----------------------------------------------------------------------
