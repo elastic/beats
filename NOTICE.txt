@@ -447,8 +447,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
-Version: v0.6.1
-Revision: 581f7b1fe9d84f4c18ef0694d6e0eb944a925dae
+Version: v0.6.5
+Revision: 92d43887f91851c9936621665af7f796f4d03412
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-ucfg/LICENSE:
 --------------------------------------------------------------------
@@ -2209,6 +2209,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/stretchr/objx
+Revision: b8b73a35e9830ae509858c10dec5866b4d5c8bff
 License type (autodetected): MIT
 ./vendor/github.com/stretchr/objx/LICENSE.md:
 --------------------------------------------------------------------
@@ -2238,8 +2239,8 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/stretchr/testify
-Version: v1.2.0
-Revision: b91bfb9ebec76498946beb6af7c0230c7cc7ba6c
+Version: v1.2.2
+Revision: f35b8ab0b5a2cef36673838d662e249dd9c94686
 License type (autodetected): MIT
 ./vendor/github.com/stretchr/testify/LICENSE:
 --------------------------------------------------------------------
