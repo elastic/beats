@@ -1,43 +1,66 @@
-- name: processes
+- name: sockets
   type: group
   description: >
-    `processes` contains process information.
+    `sockets` contains socket information.
   release: experimental
   fields:
-  - name: process
+  - name: socket
     type: array
     description: >
-        One or more processes.
+        Information about one or more sockets.
     fields:
-    - name: status
+    - name: family
+      type: keyword
+      example: ipv4
+      description: >
+        Address family.
+    - name: state
       type: keyword
       description: >
-        Process status - `started`, `running`, or `stopped`.
+        TCP state.
+    - name: direction
+      type: keyword
+      example: incoming
+      description: >
+        How the socket was initiated. Possible values are incoming, outgoing,
+        or listening.
+    - name: local.ip
+      type: ip
+      example: 192.0.2.1 or 2001:0DB8:ABED:8536::1
+      description: >
+        Local IP address. This can be an IPv4 or IPv6 address.
+    - name: local.port
+      type: long
+      example: 22
+      description: >
+        Local port.
+    - name: remote.ip
+      type: ip
+      example: 192.0.2.1 or 2001:0DB8:ABED:8536::1
+      description: >
+        Remote IP address. This can be an IPv4 or IPv6 address.
+    - name: remote.port
+      type: long
+      example: 22
+      description: >
+        Remote port.
+    - name: user.id
+      type: long
+      description: >
+        UID of the user running the process.
+    - name: user.name
+      type: keyword
+      description: >
+        Name of the user running the process.
+    - name: process.pid
+      type: long
+      description: >
+        ID of the process that opened the socket.
     - name: process.name
       type: keyword
       description: >
-        Process name.
-    - name: process.args
+        Name of the command (limited to 20 chars by the OS).
+    - name: process.error
       type: text
       description: >
-        List of process arguments.
-    - name: process.pid
-      type: keyword
-      description: >
-        Process PID.
-    - name: process.ppid
-      type: keyword
-      description: >
-        Process Parent PID.
-    - name: process.cwd
-      type: text
-      description: >
-        Directory from which the process was started.
-    - name: process.exe
-      type: text
-      description: >
-        Full path of the process executable.
-    - name: process.starttime
-      type: date
-      description: >
-        Start time of the process.
+        Any error that occurred during process enrichment.

@@ -44,7 +44,7 @@ class Test(AuditbeatXPackTest):
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "processes", COMMON_FIELDS + fields, warnings_allowed=True)
 
-    @unittest.skipUnless(sys.platform == "linux", "Only implemented for Linux")
+    @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
     def test_metricset_sockets(self):
         """
         sockets metricset collects information about open sockets on a system.

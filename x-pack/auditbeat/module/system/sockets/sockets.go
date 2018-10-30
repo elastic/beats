@@ -251,7 +251,7 @@ func (ms *MetricSet) refreshEnrichmentData(allSockets []*Socket) error {
 	}
 
 	err := ms.ptable.Refresh()
-	return err
+	return errors.Wrap(err, "error refreshing process data")
 }
 
 func (ms *MetricSet) enrichSocket(socket *Socket) {
