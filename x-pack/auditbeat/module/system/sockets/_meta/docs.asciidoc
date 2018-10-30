@@ -1,6 +1,6 @@
 The System `sockets` metricset provides ... TODO.
 
-The module is implemented for Linux, macOS (Darwin), and Windows.
+The module is implemented for Linux only.
 
 [float]
 === Configuration options

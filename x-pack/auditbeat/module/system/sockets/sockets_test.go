@@ -51,6 +51,7 @@ func TestFetch(t *testing.T) {
 		t.Fatal("failed to get port from addr", addr)
 	}
 
+	// Consume second event: Socket we just opened
 	events, errs = mbtest.ReportingFetchV2(ms)
 	if errs != nil {
 		t.Fatal("fetch", errs)

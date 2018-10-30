@@ -267,7 +267,7 @@ func (ms *MetricSet) enrichSocket(socket *Socket) {
 			socket.ProcessPID = proc.PID
 			socket.ProcessName = proc.Command
 		} else if socket.Inode == 0 {
-			socket.ProcessError = errors.New("process has exited")
+			socket.ProcessError = fmt.Errorf("process has exited (inode=%v)", socket.Inode)
 		} else {
 			socket.ProcessError = fmt.Errorf("process not found (inode=%v)", socket.Inode)
 		}
