@@ -113,20 +113,13 @@ type individualResult struct {
 	err        error
 }
 
-type taskFn func()
-
 type inventoryRequest struct {
 	paginator    elbv2.DescribeLoadBalancersPager
 	elbv2Client  *elbv2.ELBV2
 	running      atomic.Bool
 	resultsCh    chan *individualResult
-	tasks        chan taskFn
+	taskPool     sync.Pool
 	pendingTasks sync.WaitGroup
-}
-
-func (p *inventoryRequest) queueTask(t taskFn) {
-	p.pendingTasks.Add(1)
-	p.tasks <- t
 }
 
 func (p *inventoryRequest) recordResult(lb *elbv2.LoadBalancer, lbl *elbv2.Listener) {
@@ -136,6 +129,16 @@ func (p *inventoryRequest) recordResult(lb *elbv2.LoadBalancer, lbl *elbv2.Liste
 func (p *inventoryRequest) recordErr(err error) {
 	p.running.Store(false)
 	p.resultsCh <- &individualResult{nil, err}
+}
+
+func (p *inventoryRequest) dispatch(fn func()) {
+	p.pendingTasks.Add(1)
+	defer p.pendingTasks.Done()
+	go func() {
+		slot := p.taskPool.Get()
+		defer p.taskPool.Put(slot)
+		fn()
+	}()
 }
 
 func (p *inventoryRequest) fetchListeners(lb elbv2.LoadBalancer) {
@@ -157,39 +160,30 @@ func (p *inventoryRequest) fetchNextPage() {
 
 	if p.paginator.Next() {
 		for _, lb := range p.paginator.CurrentPage().LoadBalancers {
-			p.queueTask(func() {
-				p.fetchListeners(lb)
-			})
-			p.queueTask(p.fetchNextPage)
+			p.dispatch(func() { p.fetchListeners(lb) })
 		}
 	}
 
 	if p.paginator.Err() != nil {
 		p.recordErr(p.paginator.Err())
 	}
+
+	p.pendingTasks.Done()
 }
 
 func (p *inventoryRequest) fetch() ([]*lbListener, error) {
 	done := make(chan struct{})
 
-	p.tasks <- p.fetchNextPage
+	p.pendingTasks.Add(1)
+	p.dispatch(p.fetchNextPage)
+
 	go func() {
 		p.pendingTasks.Wait()
 		close(done)
 	}()
 
 	for i := 0; i < 5; i++ {
-		go func() {
-			for {
-				select {
-				case t := <-p.tasks:
-					t()
-					p.pendingTasks.Done()
-				case <-done:
-					return
-				}
-			}
-		}()
+		p.taskPool.Put(nil)
 	}
 
 	var lbListeners []*lbListener
@@ -222,7 +216,7 @@ func GetAllLbls(client *elbv2.ELBV2, region string) ([]*lbListener, error) {
 		client,
 		atomic.MakeBool(true),
 		make(chan *individualResult),
-		make(chan taskFn),
+		sync.Pool{},
 		sync.WaitGroup{},
 	}
 
