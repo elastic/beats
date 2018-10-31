@@ -25,6 +25,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -314,34 +315,52 @@ func newCloudMetadata(c *common.Config) (processors.Processor, error) {
 		return nil, err
 	}
 
-	result := fetchMetadata(fetchers, config.Timeout)
-	if result == nil {
-		logp.Info("add_cloud_metadata: hosting provider type not detected.")
-		return &addCloudMetadata{}, nil
+	acm := new(addCloudMetadata)
+
+	acm.initFn = func() {
+		result := fetchMetadata(fetchers, config.Timeout)
+		if result == nil {
+			logp.Info("add_cloud_metadata: hosting provider type not detected.")
+			return
+		}
+		acm.metadata = result.metadata
+		acm.initFn = nil
+		logp.Info("add_cloud_metadata: hosting provider type detected as %v, metadata=%v",
+			result.provider, result.metadata.String())
 	}
 
-	logp.Info("add_cloud_metadata: hosting provider type detected as %v, metadata=%v",
-		result.provider, result.metadata.String())
-
-	return &addCloudMetadata{metadata: result.metadata}, nil
+	go acm.init()
+	return acm, nil
 }
 
 type addCloudMetadata struct {
+	initFn   func()
+	initOnce sync.Once
 	metadata common.MapStr
 }
 
-func (p addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
-	if len(p.metadata) == 0 {
+func (p *addCloudMetadata) init() {
+	p.initOnce.Do(p.initFn)
+}
+
+func (p *addCloudMetadata) getMeta() common.MapStr {
+	p.init()
+	return p.metadata
+}
+
+func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
+	meta := p.getMeta()
+	if len(meta) == 0 {
 		return event, nil
 	}
 
 	// This overwrites the meta.cloud if it exists. But the cloud key should be
 	// reserved for this processor so this should happen.
-	_, err := event.PutValue("meta.cloud", p.metadata)
+	_, err := event.PutValue("meta.cloud", meta)
 
 	return event, err
 }
 
-func (p addCloudMetadata) String() string {
-	return "add_cloud_metadata=" + p.metadata.String()
+func (p *addCloudMetadata) String() string {
+	return "add_cloud_metadata=" + p.getMeta().String()
 }
