@@ -3,7 +3,7 @@ package cloudformation
 import (
 	"encoding/json"
 
-	"github.com/awslabs/goformation/intrinsics"
+	"github.com/ph/goformation/intrinsics"
 	"github.com/sanathkr/yaml"
 )
 

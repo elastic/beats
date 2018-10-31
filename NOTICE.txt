@@ -164,8 +164,7 @@ Copyright 2014-2015 Stripe, Inc.
 
 --------------------------------------------------------------------
 Dependency: github.com/awslabs/goformation
-Version: 1.2.2
-Revision: d42502ef32a8892bf380256e2f57c6f69190d802
+Revision: 203f76b396c00260641745841e465d1a618cfde1
 License type (autodetected): Apache-2.0
 ./vendor/github.com/awslabs/goformation/LICENSE:
 --------------------------------------------------------------------
