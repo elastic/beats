@@ -75,10 +75,10 @@ test-module: python-env update metricbeat.test
 
 .PHONY: assets
 assets:
-	go run ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/x-pack/metricbeat/module
+	go run ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/x-pack/metricbeat/module Elastic
 	mkdir -p include/fields
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -pkg include -in ${ES_BEATS}/metricbeat/_meta/fields.common.yml -out include/fields.go $(BEAT_NAME)
-	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -out ./include/fields/fields.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license Elastic -pkg include -in ${ES_BEATS}/metricbeat/_meta/fields.common.yml -out include/fields.go $(BEAT_NAME)
+	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license Elastic -out ./include/fields/fields.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
 
 # Overwrite check-headers - check for Apache license in
 # auditbeat/ and Elastic license in xpack/auditbeat/

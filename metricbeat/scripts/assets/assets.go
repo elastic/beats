@@ -36,8 +36,8 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if len(args) != 1 {
-		fmt.Fprintln(os.Stderr, "Module path must be set")
+	if len(args) == 0 {
+		fmt.Fprintln(os.Stderr, "At least a Module path must be set")
 		os.Exit(1)
 	}
 
@@ -68,9 +68,18 @@ func main() {
 			os.Exit(1)
 		}
 
+		var license string = licenses.ASL2
+		if len(args) == 2 {
+			if overridenLicense, err := licenses.Find(args[1]); err != nil {
+				fmt.Fprintln(os.Stderr, "Provided license '%s' wasn't found. Using ASL2", args[1])
+			} else {
+				license = overridenLicense
+			}
+		}
+
 		var buf bytes.Buffer
 		asset.Template.Execute(&buf, asset.Data{
-			License: licenses.ASL2,
+			License: license,
 			Beat:    "metricbeat",
 			Name:    module,
 			Data:    encData,
