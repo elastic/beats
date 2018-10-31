@@ -79,3 +79,23 @@ assets:
 	mkdir -p include/fields
 	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -pkg include -in ${ES_BEATS}/metricbeat/_meta/fields.common.yml -out include/fields.go $(BEAT_NAME)
 	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -out ./include/fields/fields.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
+
+# Overwrite check-headers - check for Apache license in
+# auditbeat/ and Elastic license in xpack/auditbeat/
+.PHONY: check-headers
+check-headers:
+ifndef CHECK_HEADERS_DISABLED
+	@go get -u github.com/elastic/go-licenser
+	@go-licenser -d -license ${LICENSE} ${ES_BEATS}/${BEAT_NAME}
+	@go-licenser -d -license Elastic .
+endif
+
+# Overwrite check-headers - insert Apache license in
+# auditbeat/ and Elastic license in xpack/{beat}/
+.PHONY: add-headers
+add-headers:
+ifndef CHECK_HEADERS_DISABLED
+	@go get github.com/elastic/go-licenser
+	@go-licenser -license ${LICENSE} ${ES_BEATS}/${BEAT_NAME}
+	@go-licenser -license Elastic .
+endif
