@@ -45,12 +45,11 @@ class Proc(object):
         self.env = env
 
     def start(self):
+        # ensure that the environment is inherited to the subprocess.
+        variables = os.environ.copy()
+        variables = variables.update(self.env)
 
         if sys.platform.startswith("win"):
-            # ensure that the environment is inherited to the subprocess.
-            variables = os.environ.copy()
-            variables = variables.update(self.env)
-
             self.proc = subprocess.Popen(
                 self.args,
                 stdin=self.stdin_read,
@@ -66,7 +65,7 @@ class Proc(object):
                 stdout=self.output,
                 stderr=subprocess.STDOUT,
                 bufsize=0,
-                env=self.env)
+                env=variables)
             # If a "No such file or directory" error points you here, run
             # "make metricbeat.test" on metricbeat folder
         return self.proc
