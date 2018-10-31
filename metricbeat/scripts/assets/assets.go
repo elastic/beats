@@ -71,7 +71,7 @@ func main() {
 		var license string = licenses.ASL2
 		if len(args) == 2 {
 			if overridenLicense, err := licenses.Find(args[1]); err != nil {
-				fmt.Fprintln(os.Stderr, "Provided license '%s' wasn't found. Using ASL2", args[1])
+				fmt.Fprintf(os.Stderr, "Provided license '%s' wasn't found. Using ASL2/n", args[1])
 			} else {
 				license = overridenLicense
 			}
