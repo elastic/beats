@@ -130,11 +130,10 @@
 	},
 	{
 		"name": "indirect field",
-		"tok": "%{key} %{\u0026key}",
+		"tok": "%{?key} %{\u0026key}",
 		"msg": "hello world",
 		"expected": {
 			"hello": "world",
-			"key": "hello"
 		},
 		"skip": false,
 		"fail": false
