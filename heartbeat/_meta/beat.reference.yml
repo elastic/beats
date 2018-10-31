@@ -63,6 +63,16 @@ heartbeat.monitors:
     # Interval between file file changed checks.
     #interval: 5s
 
+# Define a directory to load monitor definitions from. Definitions take the form
+# of individual yaml files.
+# heartbeat.config.monitors:
+  # Directory + glob pattern to search for configuration files
+  #path: /path/to/my/monitors.d/*.yml
+  # If enabled, heartbeat will periodically check the config.monitors path for changes
+  #reload.enabled: true
+  # How often to check for changes
+  #reload.period: 1s
+
 - type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
             # by sending/receiving a custom payload
 
