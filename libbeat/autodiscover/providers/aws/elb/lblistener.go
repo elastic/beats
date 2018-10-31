@@ -8,6 +8,10 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+func lblToMap(l *elbv2.LoadBalancer, listener *elbv2.Listener) {
+
+}
+
 type lbListener struct {
 	lb       *elbv2.LoadBalancer
 	listener *elbv2.Listener
@@ -17,7 +21,7 @@ func (l *lbListener) toMap() common.MapStr {
 	m := common.MapStr{}
 
 	m["host"] = *l.lb.DNSName
-	m["port"] = l.listener.Port
+	m["port"] = *l.listener.Port
 	m["type"] = string(l.lb.Type)
 	m["scheme"] = l.lb.Scheme
 	m["availability_zones"] = l.azStrings()

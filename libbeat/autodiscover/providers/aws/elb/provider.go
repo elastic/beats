@@ -3,6 +3,12 @@ package elb
 import (
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/elbv2"
+
+	"github.com/aws/aws-sdk-go-v2/aws/external"
+
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
@@ -16,25 +22,35 @@ func init() {
 
 // Provider implements autodiscover provider for aws ELBs
 type Provider struct {
+	fetcher       Fetcher
 	config        *Config
 	bus           bus.Bus
 	builders      autodiscover.Builders
 	appenders     autodiscover.Appenders
 	templates     *template.Mapper
-	stop          chan interface{}
 	startListener bus.Listener
 	stopListener  bus.Listener
-	onStop        func()
+	watcher       *watcher
 }
 
-// AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
-	cfgwarn.Beta("aws_elb autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, err
 	}
+
+	cfg, err := external.LoadDefaultAWSConfig()
+	cfg.Region = config.Region
+	if err != nil {
+		logp.Err("error querying AWS: %s", err)
+	}
+
+	return internalBuilder(bus, config, NewAPIFetcher(elbv2.New(cfg)))
+}
+
+func internalBuilder(bus bus.Bus, config *Config, fetcher Fetcher) (*Provider, error) {
+	cfgwarn.Beta("aws_elb autodiscover is beta")
 
 	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
@@ -52,49 +68,55 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	}
 
 	return &Provider{
+		fetcher:   fetcher,
 		config:    config,
 		bus:       bus,
 		builders:  builders,
 		appenders: appenders,
 		templates: mapper,
-		stop:      make(chan interface{}),
 	}, nil
 }
 
 // Start the autodiscover process
 func (p *Provider) Start() {
-	p.onStop = watch(
-		p.config.Region,
+	p.watcher = newWatcher(
+		p.fetcher,
 		10*time.Second,
-		func(uuid string, lb common.MapStr) {
-			e := bus.Event{
-				"start":   true,
-				"hashKey": uuid,
-				"host":    lb["host"],
-				"port":    lb["port"],
-				"meta": common.MapStr{
-					"elb": lb,
-				},
-			}
-			if configs := p.templates.GetConfig(e); configs != nil {
-				e["config"] = configs
-			}
-			p.appenders.Append(e)
-			p.bus.Publish(e)
-		},
-		func(arn string) {
-			e := bus.Event{
-				"stop":    true,
-				"hashKey": arn,
-			}
-			p.bus.Publish(e)
-		},
+		p.onWatcherStart,
+		p.onWatcherStop,
 	)
+	p.watcher.start()
 }
 
 // Stop the autodiscover process
 func (p *Provider) Stop() {
-	close(p.stop)
+	p.watcher.stop()
+}
+
+func (p *Provider) onWatcherStart(uuid string, lbl *lbListener) {
+	lblMap := lbl.toMap()
+	e := bus.Event{
+		"start":   true,
+		"hashKey": uuid,
+		"host":    lblMap["host"],
+		"port":    lblMap["port"],
+		"meta": common.MapStr{
+			"elb": lbl.toMap(),
+		},
+	}
+	if configs := p.templates.GetConfig(e); configs != nil {
+		e["config"] = configs
+	}
+	p.appenders.Append(e)
+	p.bus.Publish(e)
+}
+
+func (p *Provider) onWatcherStop(uuid string) {
+	e := bus.Event{
+		"stop":    true,
+		"hashKey": uuid,
+	}
+	p.bus.Publish(e)
 }
 
 func (p *Provider) String() string {

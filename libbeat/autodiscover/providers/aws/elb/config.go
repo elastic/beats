@@ -24,7 +24,7 @@ import (
 
 // Config for docker autodiscover provider
 type Config struct {
-	Region       string                  `config:"region"`
+	Region       string                  `config:"region" validate:"required"`
 	Type         string                  `config:"type"`
 	HintsEnabled bool                    `config:"hints.enabled"`
 	Builders     []*common.Config        `config:"builders"`
