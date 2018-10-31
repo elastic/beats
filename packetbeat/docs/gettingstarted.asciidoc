@@ -258,14 +258,7 @@ NOTE: If you use an init.d script to start Packetbeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
 start Packetbeat in the foreground.
 
-*deb:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo service {beatname_lc} start
-----------------------------------------------------------------------
-
-*rpm:*
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------

@@ -40,23 +40,14 @@ include::../../libbeat/docs/shared-note-sudo.asciidoc[]
 
 endif::[]
 
-ifdef::deb_os[]
-*deb:*
+ifdef::deb_os,rpm_os[]
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 {beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
-endif::deb_os[]
-
-ifdef::rpm_os[]
-*rpm:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-{beatname_lc} setup --dashboards
-----------------------------------------------------------------------
-endif::rpm_os[]
+endif::deb_os,rpm_os[]
 
 ifdef::mac_os[]
 *mac:*
@@ -106,8 +97,8 @@ credentials.
 TIP: The example shows a hard-coded password, but you should store sensitive
 values in the <<keystore,secrets keystore>>.
 
-ifdef::deb_os[]
-*deb:*
+ifdef::deb_os,rpm_os[]
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----
@@ -118,21 +109,7 @@ ifdef::deb_os[]
   -E output.elasticsearch.password={pwd} \
   -E setup.kibana.host=localhost:5601
 ----
-endif::deb_os[]
-
-ifdef::rpm_os[]
-*rpm:*
-
-["source","sh",subs="attributes"]
-----
-{beatname_lc} setup -e \
-  -E output.logstash.enabled=false \
-  -E output.elasticsearch.hosts=['localhost:9200'] \
-  -E output.elasticsearch.username={beat_default_index_prefix}_internal \
-  -E output.elasticsearch.password={pwd} \
-  -E setup.kibana.host=localhost:5601
-----
-endif::rpm_os[]
+endif::deb_os,rpm_os[]
 
 ifdef::mac_os[]
 *mac:*

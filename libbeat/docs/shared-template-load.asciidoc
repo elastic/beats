@@ -163,21 +163,13 @@ include::./shared-note-sudo.asciidoc[]
 
 endif::[]
 
-ifdef::deb_os[]
-*deb:*
+ifdef::deb_os,rpm_os[]
+*deb and rpm:*
 ["source","sh",subs="attributes"]
 ----
 {beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
-endif::deb_os[]
-
-ifdef::rpm_os[]
-*rpm:*
-["source","sh",subs="attributes"]
-----
-{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
-----
-endif::rpm_os[]
+endif::deb_os,rpm_os[]
 
 ifdef::mac_os[]
 *mac:*
@@ -222,23 +214,14 @@ the index may contain old documents. After you load the index template,
 you can delete the old documents from +{beatname_lc}-*+ to force Kibana to look
 at the newest documents. Use this command:
 
-ifdef::deb_os[]
-*deb:*
+ifdef::deb_os,rpm_os[]
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
 ----------------------------------------------------------------------
-endif::deb_os[]
-
-ifdef::rpm_os[]
-*rpm:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
-----------------------------------------------------------------------
-endif::rpm_os[]
+endif::deb_os,rpm_os[]
 
 ifdef::mac_os[]
 *mac:*
@@ -272,26 +255,17 @@ Elasticsearch, you can export the index template to a file, move it to a
 machine that does have connectivity, and then install the template manually.
 
 To export the index template, run:
-ifdef::deb_os[]
 
-*deb:*
-
-["source","sh",subs="attributes"]
-----
-{beatname_lc} export template > {beatname_lc}.template.json
-----
-endif::deb_os[]
-ifdef::rpm_os[]
-
-*rpm:*
+ifdef::deb_os,rpm_os[]
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----
 {beatname_lc} export template > {beatname_lc}.template.json
 ----
-endif::rpm_os[]
+endif::deb_os,rpm_os[]
+
 ifdef::mac_os[]
-
 *mac:*
 
 ["source","sh",subs="attributes"]
@@ -312,26 +286,17 @@ PS > .{backslash}{beatname_lc}.exe export template --es.version {stack-version} 
 endif::win_os[]
 
 To install the template, run:
-ifdef::deb_os[]
 
-*deb:*
-
-["source","sh",subs="attributes"]
-----
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
-----
-endif::deb_os[]
-ifdef::rpm_os[]
-
-*rpm:*
+ifdef::deb_os,rpm_os[]
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----
 curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
 ----
-endif::rpm_os[]
+endif::deb_os,rpm_os[]
+
 ifdef::mac_os[]
-
 *mac:*
 
 ["source","sh",subs="attributes"]
