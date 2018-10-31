@@ -277,6 +277,9 @@ func (d *Discovery) update(config InterfaceConfig, message common.MapStr) {
 		return
 	}
 
+	// set instance id
+	message["id"] = agentID
+
 	d.Lock()
 	defer d.Unlock()
 	i, found := d.instances[agentID]

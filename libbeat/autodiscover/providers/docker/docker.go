@@ -142,6 +142,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
+			"id":     container.ID,
 			flag:     true,
 			"host":   host,
 			"docker": meta,
@@ -156,6 +157,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	// Emit container container and port information
 	for _, port := range container.Ports {
 		event := bus.Event{
+			"id":     container.ID,
 			flag:     true,
 			"host":   host,
 			"port":   port.PrivatePort,

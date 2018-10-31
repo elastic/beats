@@ -185,6 +185,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 		// Without this check there would be overlapping configurations with and without ports.
 		if len(c.Ports) == 0 {
 			event := bus.Event{
+				"id":         cid,
 				flag:         true,
 				"host":       host,
 				"kubernetes": kubemeta,
@@ -197,6 +198,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 
 		for _, port := range c.Ports {
 			event := bus.Event{
+				"id":         cid,
 				flag:         true,
 				"host":       host,
 				"port":       port.GetContainerPort(),
