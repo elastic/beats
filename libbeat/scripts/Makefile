@@ -211,7 +211,6 @@ system-tests: prepare-tests ${BEAT_NAME}.test python-env
 system-tests-environment:  ## @testing Runs the system tests inside a virtual environment. This can be run on any docker-machine (local, remote)
 system-tests-environment: prepare-tests build-image
 	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make system-tests
-	${DOCKER_COMPOSE} logs kibana
 	#This is a hack to run x-pack/filebeat module tests
 	@XPACKBEAT="${ES_BEATS}/x-pack/${BEAT_NAME}" ; \
 	if [ -e "$$XPACKBEAT/tests/system" ] && [ "$(BEAT_NAME)" != "libbeat" ] && [ $(XPACK_ONLY) = false ]; then \
