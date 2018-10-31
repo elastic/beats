@@ -38,10 +38,10 @@ import (
 """
 
 
-def generate_and_write_to_file(outfile, go_beat_path):
-    from generate_imports_helper import comment, get_importable_lines
+def generate_and_write_to_file(outfile, go_beat_path, imported_beat_lines):
+    from generate_imports_helper import comment
 
-    imported_beat_lines = get_importable_lines(go_beat_path, import_line_format)
+    # imported_beat_lines = get_importable_lines(go_beat_path, import_line_format)
     imported_lines = "\n".join(imported_beat_lines)
     package = basename(dirname(outfile))
     list_go = import_template.format(package=package,
@@ -54,6 +54,7 @@ def generate_and_write_to_file(outfile, go_beat_path):
 if __name__ == "__main__":
     parser = ArgumentParser(description="Generate imports for Beats packages")
     parser.add_argument("--out", default="include/list.go")
+    parser.add_argument("--x_pack_path")
     parser.add_argument("--scripts_path")
     parser.add_argument("beats_path")
     args = parser.parse_args()
@@ -61,4 +62,12 @@ if __name__ == "__main__":
     if args.scripts_path is not None:
         sys.path.append(args.scripts_path)
 
-    generate_and_write_to_file(args.out, args.beats_path)
+    from generate_imports_helper import get_importable_lines, get_importable_lines_with_module_path
+
+    if args.x_pack_path is not None:
+        imported_beat_lines = get_importable_lines_with_module_path(args.x_pack_path, import_line_format, abspath("../../../../../" + args.x_pack_path + "/module"))
+        imported_beat_lines += get_importable_lines_with_module_path(args.beats_path, import_line_format, abspath("../../../../../" + args.beats_path + "/module"))
+    else:
+        imported_beat_lines = get_importable_lines(args.beats_path, import_line_format)
+
+    generate_and_write_to_file(args.out, args.beats_path, imported_beat_lines)

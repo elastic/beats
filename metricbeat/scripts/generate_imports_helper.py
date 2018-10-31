@@ -9,14 +9,16 @@ modules."""
 
 def get_importable_lines(go_beat_path, import_line):
     path = abspath("module")
+    return get_importable_lines_with_module_path(go_beat_path, import_line, path)
 
+def get_importable_lines_with_module_path(go_beat_path, import_line, beat_root_module_path):
     imported_lines = []
-    modules = [m for m in listdir(path) if isdir(join(path, m)) and m != "_meta"]
+    modules = [m for m in listdir(beat_root_module_path) if isdir(join(beat_root_module_path, m)) and m != "_meta"]
     for module in modules:
         module_import = import_line.format(beat_path=go_beat_path, module="module", name=module)
         imported_lines.append(module_import)
 
-        module_path = join(path, module)
+        module_path = join(beat_root_module_path, module)
         ignore = ["_meta", "vendor", "mtest"]
         metricsets = [m for m in listdir(module_path) if isdir(join(module_path, m)) and m not in ignore]
         for metricset in metricsets:

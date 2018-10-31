@@ -45,7 +45,7 @@ configs: python-env
 .PHONY: imports
 imports: python-env
 	@mkdir -p include
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py --scripts_path ${ES_BEATS}/metricbeat/scripts ${BEAT_PATH}
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py --x_pack_path github.com/elastic/beats/x-pack/metricbeat --scripts_path ${ES_BEATS}/metricbeat/scripts ${BEAT_PATH}
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
