@@ -388,10 +388,8 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				m.numberOfParams = int(binary.LittleEndian.Uint16(s.data[m.start+11:]))
 				if m.numberOfFields > 0 {
 					s.parseState = mysqlStateEatFields
-				} else {
-					if m.numberOfParams > 0 {
-						s.parseState = mysqlStateEatRows
-					}
+				} else if m.numberOfParams > 0 {
+					s.parseState = mysqlStateEatRows
 				}
 			} else {
 				return true, true
@@ -712,7 +710,7 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 		} else if msg.typ == mysqlCmdStmtClose {
 			delete(stmts, trans.statementID)
 			trans.query = "CmdStmtClose"
-			//mysql.transactions.Delete(tuple.Hashable())
+			mysql.transactions.Delete(tuple.Hashable())
 		}
 	} else {
 		trans.query = msg.query
@@ -808,7 +806,6 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 	mysql.transactions.Delete(trans.tuple.Hashable())
 
 	logp.Debug("mysql", "Mysql transaction completed: %s %s %s", trans.query, trans.params, trans.mysql)
-	//	logp.Debug("mysql", "%s", trans.responseRaw)
 }
 
 func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysqlStmtData) []string {
@@ -1213,6 +1210,7 @@ func readLstring(data []byte, offset int) ([]byte, int, bool, error) {
 
 	return data[off : off+int(length)], off + int(length), true, nil
 }
+
 func readLinteger(data []byte, offset int) (uint64, int, bool, error) {
 	if len(data) < offset+1 {
 		return 0, 0, false, nil
