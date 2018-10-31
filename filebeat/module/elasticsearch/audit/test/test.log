@@ -6,3 +6,15 @@
 [2018-06-19T05:55:26,898] [transport] [access_denied]	origin_type=[rest], origin_address=[147.107.128.77], principal=[_anonymous], action=[cluster:monitor/main], request=[MainRequest]
 [2018-06-19T05:24:15,190] [v_VJhjV] [rest] [authentication_failed]	origin_address=[172.18.0.3], principal=[elastic], uri=[/_nodes?filter_path=nodes.*.version%2Cnodes.*.http.publish_address%2Cnodes.*.ip], request_body=[body]
 [2019-01-08T14:15:02,011] [NodeName-0] [transport] [access_granted]     origin_type=[transport], origin_address=[192.168.2.1], principal=[username], realm=[active_directory], roles=[kibana_user,my_custom_role_1,foo_reader], action=[indices:data/read/search[free_context]], indices=[foo-2019.01.04,foo-2019.01.03,foo-2019.01.06,foo-2019.01.05,foo-2019.01.08,servicelog-2019.01.07], request=[SearchFreeContextRequest]
+{"@timestamp":"2018-10-31T09:34:25,109", "node.id":"DSiWcTyeThWtUXLB9J0BMw", "event.type":"rest", "event.action":"authentication_failed", "user.name":"elastic", "origin.type":"rest", "origin.address":"[::1]:61598", "url.path":"/_xpack
+/security/user/beats_system/_password"}
+{"@timestamp":"2018-10-31T09:34:25,207", "node.id":"DSiWcTyeThWtUXLB9J0BMw", "event.type":"rest", "event.action":"authentication_failed", "user.name":"elastic", "origin.type":"rest", "origin.address":"[::1]:61599", "url.path":"/_xpack
+/security/user/remote_monitoring_user/_password"}
+{"@timestamp":"2018-10-31T09:35:11,428", "node.id":"DSiWcTyeThWtUXLB9J0BMw", "event.type":"transport", "event.action":"access_granted", "user.name":"_xpack_security", "user.realm":"__attach", "user.roles":["superuser"], "origin.type":
+"local_node", "origin.address":"127.0.0.1:9300", "action":"cluster:admin/xpack/security/realm/cache/clear", "request.name":"ClearRealmCacheRequest"}
+{"@timestamp":"2018-10-31T09:35:11,430", "node.id":"DSiWcTyeThWtUXLB9J0BMw", "event.type":"transport", "event.action":"access_granted", "user.name":"_xpack_security", "user.realm":"__attach", "user.roles":["superuser"], "origin.type":
+"local_node", "origin.address":"127.0.0.1:9300", "action":"cluster:admin/xpack/security/realm/cache/clear[n]", "request.name":"Node"}
+{"@timestamp":"2018-10-31T09:35:12,303", "node.id":"DSiWcTyeThWtUXLB9J0BMw", "event.type":"transport", "event.action":"access_granted", "user.name":"elastic", "user.realm":"reserved", "user.roles":["superuser"], "origin.type":"rest",
+"origin.address":"[::1]:61711", "action":"cluster:admin/xpack/security/user/change_password", "request.name":"ChangePasswordRequest"}
+{"@timestamp":"2018-10-31T09:35:12,314", "node.id":"DSiWcTyeThWtUXLB9J0BMw", "event.type":"transport", "event.action":"access_granted", "user.name":"_xpack_security", "user.realm":"__attach", "user.roles":["superuser"], "origin.type":
+"local_node", "origin.address":"127.0.0.1:9300", "action":"indices:admin/create", "request.name":"CreateIndexRequest", "indices":[".security-6"]}

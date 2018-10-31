@@ -10,6 +10,18 @@
         {
             "grok": {
                 "field": "message",
+                "patterns": [
+                    "^%{CHAR:first_char}"
+                ],
+                "pattern_definitions": {
+                    "CHAR": "."
+                }
+            }
+        },
+        {
+            "grok": {
+                "if": "ctx.first_char != '{'",
+                "field": "message",
                 "pattern_definitions": {
                     "ES_TIMESTAMP": "\\[%{TIMESTAMP_ISO8601:elasticsearch.audit.timestamp}\\]",
                     "ES_NODE_NAME": "(\\[%{DATA:elasticsearch.node.name}\\])?",
@@ -52,11 +64,59 @@
             }
         },
         {
+            "json": {
+                "if": "ctx.first_char == '{'",
+                "field": "message",
+                "target_field": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "if": "ctx.first_char == '{'",
+                "field": "elasticsearch.audit.event.action",
+                "target_field": "elasticsearch.audit.event_type"
+            }
+        },
+        {
+            "rename": {
+                "if": "ctx.first_char == '{'",
+                "field": "elasticsearch.audit.event.type",
+                "target_field": "elasticsearch.audit.layer"
+            }
+        },
+        {
+            "rename": {
+                "if": "ctx.first_char == '{'",
+                "field": "elasticsearch.audit.origin.address",
+                "target_field": "elasticsearch.audit.origin_address"
+            }
+        },
+        {
+            "rename": {
+                "if": "ctx.first_char == '{'",
+                "field": "elasticsearch.audit.user.name",
+                "target_field": "elasticsearch.audit.principal"
+            }
+        },
+        {
+            "set": {
+                "if": "ctx.first_char == '{'",
+                "field": "elasticsearch.audit.uri",
+                "value": "{{elasticsearch.audit.url.path}}?{{elasticsearch.audit.url.query}}"
+            }
+        },
+        {
             "remove": {
                 "field": "elasticsearch.audit.sub_action",
                 "ignore_missing": true
             }
         },
+        {
+            "remove": {
+                "field": "elasticsearch.audit.url",
+                "ignore_missing": true
+            }
+        }
         {
             "date": {
                 "field": "elasticsearch.audit.timestamp",
@@ -71,6 +131,13 @@
         {
             "remove": {
                 "field": "elasticsearch.audit.timestamp"
+            }
+        },
+        {
+            "remove": {
+                "field": [
+                    "first_char"
+                ]
             }
         }
     ],
