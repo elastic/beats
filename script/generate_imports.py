@@ -41,7 +41,6 @@ import (
 def generate_and_write_to_file(outfile, go_beat_path, imported_beat_lines):
     from generate_imports_helper import comment
 
-    # imported_beat_lines = get_importable_lines(go_beat_path, import_line_format)
     imported_lines = "\n".join(imported_beat_lines)
     package = basename(dirname(outfile))
     list_go = import_template.format(package=package,
