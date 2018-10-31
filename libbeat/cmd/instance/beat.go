@@ -38,6 +38,7 @@ import (
 
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
+	ucfg "github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/asset"
@@ -149,12 +150,13 @@ func init() {
 // CryptGenRandom is used.
 func initRand() {
 	n, err := cryptRand.Int(cryptRand.Reader, big.NewInt(math.MaxInt64))
-	seed := n.Int64()
+	var seed int64
 	if err != nil {
 		// fallback to current timestamp
 		seed = time.Now().UnixNano()
+	} else {
+		seed = n.Int64()
 	}
-
 	rand.Seed(seed)
 }
 
@@ -563,8 +565,13 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("could not initialize the keystore: %v", err)
 	}
 
-	// TODO: Allow the options to be more flexible for dynamic changes
-	common.OverwriteConfigOpts(keystore.ConfigOpts(store))
+	if settings.DisableConfigResolver {
+		common.OverwriteConfigOpts(obfuscateConfigOpts())
+	} else {
+		// TODO: Allow the options to be more flexible for dynamic changes
+		common.OverwriteConfigOpts(configOpts(store))
+	}
+
 	b.keystore = store
 	err = cloudid.OverwriteSettings(cfg)
 	if err != nil {
@@ -878,5 +885,25 @@ func logSystemInfo(info beat.Info) {
 		if len(process) > 0 {
 			log.Infow("Process info", "process", process)
 		}
+	}
+}
+
+// configOpts returns ucfg config options with a resolver linked to the current keystore.
+// TODO: Refactor to allow insert into the config option array without having to redefine everything
+func configOpts(store keystore.Keystore) []ucfg.Option {
+	return []ucfg.Option{
+		ucfg.PathSep("."),
+		ucfg.Resolve(keystore.ResolverWrap(store)),
+		ucfg.ResolveEnv,
+		ucfg.VarExp,
+	}
+}
+
+// obfuscateConfigOpts disables any resolvers in the configuration, instead we return the field
+// reference string directly.
+func obfuscateConfigOpts() []ucfg.Option {
+	return []ucfg.Option{
+		ucfg.PathSep("."),
+		ucfg.ResolveNOOP,
 	}
 }
