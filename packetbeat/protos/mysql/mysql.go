@@ -281,7 +281,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				return false, false
 			}
 			hdr := s.data[s.parseOffset : s.parseOffset+5]
-			m.packetLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
+			m.packetLength = leUint24(hdr[0:3])
 			m.seq = hdr[3]
 			m.typ = hdr[4]
 
@@ -372,7 +372,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				// string[1] sql state marker
 				// string[5] sql state
 				// string<EOF> error message
-				m.errorCode = uint16(s.data[m.start+6])<<8 | uint16(s.data[m.start+5])
+				m.errorCode = binary.LittleEndian.Uint16(s.data[m.start+5 : m.start+7])
 
 				m.errorInfo = string(s.data[m.start+8:m.start+13]) + ": " + string(s.data[m.start+13:])
 			}
@@ -401,7 +401,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			}
 
 			hdr := s.data[s.parseOffset : s.parseOffset+4]
-			m.packetLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
+			m.packetLength = leUint24(hdr[:3])
 			m.seq = hdr[3]
 
 			if len(s.data[s.parseOffset:]) >= int(m.packetLength)+4 {
@@ -461,7 +461,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				return true, false
 			}
 			hdr := s.data[s.parseOffset : s.parseOffset+4]
-			m.packetLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
+			m.packetLength = leUint24(hdr[:3])
 			m.seq = hdr[3]
 
 			logp.Debug("mysqldetailed", "Rows: packet length %d, packet number %d", m.packetLength, m.seq)
@@ -918,10 +918,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				logp.Debug("mysql", "Data too small")
 				return nil
 			}
-			valueString := strconv.FormatInt(int64(data[paramOffset])|int64(data[paramOffset+1])<<8|
-				int64(data[paramOffset+2])<<16|int64(data[paramOffset+3])<<24|
-				int64(data[paramOffset+4])<<32|int64(data[paramOffset+5])<<40|
-				int64(data[paramOffset+6])<<48|int64(data[paramOffset+7])<<56, 10)
+			valueString := strconv.FormatInt(int64(binary.LittleEndian.Uint64(data[paramOffset:paramOffset+8])), 10)
 			paramString = append(paramString, valueString)
 			paramOffset += 8
 		// FIELD_TYPE_TIMESTAMP
@@ -972,7 +969,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			paramOffset++
 			switch paramLen {
 			case 0xfc: /* 252 - 64k chars */
-				paramLen16 := int(data[paramOffset]) | int(data[paramOffset+1])<<8
+				paramLen16 := int(binary.LittleEndian.Uint16(data[paramOffset : paramOffset+2]))
 				if dataLen < paramOffset+paramLen16+2 {
 					logp.Debug("mysql", "Data too small")
 					return nil
@@ -981,7 +978,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				paramString = append(paramString, string(data[paramOffset:paramOffset+paramLen16]))
 				paramOffset += paramLen16
 			case 0xfd: /* 64k - 16M chars */
-				paramLen24 := int(data[paramOffset]) | int(data[paramOffset+1])<<8 | int(data[paramOffset+2])<<16
+				paramLen24 := int(leUint24(data[paramOffset : paramOffset+3]))
 				if dataLen < paramOffset+paramLen24+3 {
 					logp.Debug("mysql", "Data too small")
 					return nil
@@ -1211,6 +1208,10 @@ func readLstring(data []byte, offset int) ([]byte, int, bool, error) {
 	return data[off : off+int(length)], off + int(length), true, nil
 }
 
+func leUint24(data []byte) uint32 {
+	return uint32(data[0]) | uint32(data[1])<<8 | uint32(data[2])<<16
+}
+
 func readLinteger(data []byte, offset int) (uint64, int, bool, error) {
 	if len(data) < offset+1 {
 		return 0, 0, false, nil
@@ -1226,17 +1227,16 @@ func readLinteger(data []byte, offset int) (uint64, int, bool, error) {
 		if len(data[offset+1:]) < 3 {
 			return 0, 0, false, nil
 		}
-		return uint64(data[offset+1]) | uint64(data[offset+2])<<8 |
-			uint64(data[offset+3])<<16, offset + 4, true, nil
+		return uint64(leUint24(data[offset+1 : offset+4])), offset + 4, true, nil
 	case 0xfc:
 		if len(data[offset+1:]) < 2 {
 			return 0, 0, false, nil
 		}
-		return uint64(data[offset+1]) | uint64(data[offset+2])<<8, offset + 3, true, nil
+		return uint64(binary.LittleEndian.Uint16(data[offset+1:])), offset + 3, true, nil
 	}
 
 	if uint64(data[offset]) >= 0xfb {
-		return 0, 0, false, fmt.Errorf("Unexpected value in read_linteger")
+		return 0, 0, false, fmt.Errorf("unexpected value in read_linteger")
 	}
 
 	return uint64(data[offset]), offset + 1, true, nil
@@ -1245,10 +1245,7 @@ func readLinteger(data []byte, offset int) (uint64, int, bool, error) {
 // Read a mysql length field (3 bytes LE)
 func readLength(data []byte, offset int) (int, error) {
 	if len(data[offset:]) < 3 {
-		return 0, errors.New("Data too small to contain a valid length")
+		return 0, errors.New("data too small to contain a valid length")
 	}
-	length := uint32(data[offset]) |
-		uint32(data[offset+1])<<8 |
-		uint32(data[offset+2])<<16
-	return int(length), nil
+	return int(leUint24(data[offset : offset+3])), nil
 }
