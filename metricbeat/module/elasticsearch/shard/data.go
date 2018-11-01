@@ -40,6 +40,7 @@ var (
 )
 
 type stateStruct struct {
+	ClusterID   string `json:"cluster_uuid"`
 	ClusterName string `json:"cluster_name"`
 	StateID     string `json:"state_uuid"`
 	MasterNode  string `json:"master_node"`
@@ -73,6 +74,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 				event.ModuleFields = common.MapStr{}
 				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
+				event.ModuleFields.Put("cluster.id", stateData.ClusterID)
 				event.ModuleFields.Put("cluster.name", stateData.ClusterName)
 
 				fields, err := schema.Apply(shard)
