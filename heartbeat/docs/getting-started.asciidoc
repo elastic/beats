@@ -205,13 +205,11 @@ include::../../libbeat/docs/step-look-at-config.asciidoc[]
 [[heartbeat-template]]
 === Step 3: Load the index template in Elasticsearch
 
-:allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-:allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]
 
 [[heartbeat-starting]]
@@ -225,14 +223,7 @@ NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
 start Heartbeat in the foreground.
 
-*deb:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo service {beatname_lc}-elastic start
-----------------------------------------------------------------------
-
-*rpm:*
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
