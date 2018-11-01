@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2018-07-30T09:03:52.726Z", 
-        "fileset.module": "haproxy", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "haproxy", 
         "haproxy.backend_name": "docs_microservice", 
         "haproxy.backend_queue": 0, 
         "haproxy.bytes_read": 168, 

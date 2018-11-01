@@ -41,14 +41,6 @@
         the original `@timestamp` (representing the time when the log line was read) in this
         field.
 
-    - name: fileset.module
-      description: >
-        The Filebeat module that generated this event.
-
-    - name: fileset.name
-      description: >
-        The Filebeat fileset that generated this event.
-
     - name: syslog.facility
       type: long
       required: false

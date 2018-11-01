@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2018-05-09T10:57:55.000Z", 
-        "fileset.module": "kibana", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "kibana", 
         "http.request.method": "get", 
         "http.response.content_length": 9, 
         "http.response.elapsed_time": 26, 
@@ -35,8 +35,8 @@
     }, 
     {
         "@timestamp": "2018-05-09T10:59:12.000Z", 
-        "fileset.module": "kibana", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "kibana", 
         "input.type": "log", 
         "kibana.log.meta.type": "log", 
         "kibana.log.tags": [
@@ -53,8 +53,8 @@
     }, 
     {
         "@timestamp": "2018-05-09T10:59:12.000Z", 
-        "fileset.module": "kibana", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "kibana", 
         "input.type": "log", 
         "kibana.log.meta.type": "log", 
         "kibana.log.tags": [

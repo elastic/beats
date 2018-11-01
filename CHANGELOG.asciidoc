@@ -20,6 +20,8 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Use `initial_scan` action for new paths. {pull}7954[7954]
 
 *Filebeat*
+- Rename `fileset.name` to `event.name`.
+- Rename `fileset.module` to `event.module`.
 
 - Remove the deprecated `prospector(s)` option in the configuration use `input(s)` instead. {pull}8909[8909]
 - Rename `offset` to `log.offset`.

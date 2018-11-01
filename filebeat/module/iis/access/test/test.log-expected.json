@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2018-01-01T08:09:10.000Z", 
-        "fileset.module": "iis", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "iis", 
         "iis.access.geoip.city_name": "Berlin", 
         "iis.access.geoip.continent_name": "Europe", 
         "iis.access.geoip.country_iso_code": "DE", 
@@ -34,8 +34,8 @@
     }, 
     {
         "@timestamp": "2018-01-01T09:10:11.000Z", 
-        "fileset.module": "iis", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "iis", 
         "iis.access.body_received.bytes": "456", 
         "iis.access.body_sent.bytes": "123", 
         "iis.access.cookie": "-", 
@@ -64,8 +64,8 @@
     }, 
     {
         "@timestamp": "2018-01-01T10:11:12.000Z", 
-        "fileset.module": "iis", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "iis", 
         "iis.access.body_received.bytes": "456", 
         "iis.access.body_sent.bytes": "123", 
         "iis.access.cookie": "-", 
