@@ -21,7 +21,7 @@ type apiFetcher struct {
 	client *elbv2.ELBV2
 }
 
-func newApiFetcher(client *elbv2.ELBV2) fetcher {
+func newAPIFetcher(client *elbv2.ELBV2) fetcher {
 	return &apiFetcher{client}
 }
 

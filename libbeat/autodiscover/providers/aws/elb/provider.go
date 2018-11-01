@@ -47,7 +47,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)
 	}
 
-	return internalBuilder(bus, config, newApiFetcher(elbv2.New(cfg)))
+	return internalBuilder(bus, config, newAPIFetcher(elbv2.New(cfg)))
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
