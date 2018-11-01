@@ -238,7 +238,6 @@ func hashKeyOrConfig(event bus.Event, configIdx int, config *common.Config) (has
 		hasher := fnv.New64a()
 		hasher.Write([]byte(hashStr))
 		hash = hasher.Sum64()
-		fmt.Printf("HASHED %s to %d", hashStr, err)
 	} else {
 		hash, err = cfgfile.HashConfig(config)
 		if err != nil {

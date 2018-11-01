@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elbv2"
 )
 
+// mockFetcher is a fetcher that returns a customizable list of results, useful for testing.
 type mockFetcher struct {
 	lblListeners []*lbListener
 	err          error
@@ -23,6 +24,7 @@ func (f *mockFetcher) fetch() ([]*lbListener, error) {
 
 	result := make([]*lbListener, len(f.lblListeners))
 	copy(result, f.lblListeners)
+
 	return result, f.err
 }
 
@@ -31,6 +33,14 @@ func (f *mockFetcher) setLbls(newLbls []*lbListener) {
 	defer f.lock.Unlock()
 
 	f.lblListeners = newLbls
+}
+
+func (f *mockFetcher) setError(err error) {
+	f.lock.Lock()
+	defer f.lock.Unlock()
+
+	f.lblListeners = []*lbListener{}
+	f.err = err
 }
 
 func fakeLbl() *lbListener {

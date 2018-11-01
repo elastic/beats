@@ -18,7 +18,6 @@
 package elb
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -27,7 +26,7 @@ import (
 type watcher struct {
 	// gen tracks changes we increment the 'generation' of each entry in the map.
 	gen         uint64
-	fetcher     Fetcher
+	fetcher     fetcher
 	onStart     func(uuid string, lblMap *lbListener)
 	onStop      func(uuid string)
 	done        chan struct{}
@@ -36,7 +35,7 @@ type watcher struct {
 }
 
 func newWatcher(
-	fetcher Fetcher,
+	fetcher fetcher,
 	interval time.Duration,
 	onStart func(uuid string, lblMap *lbListener),
 	onStop func(uuid string)) *watcher {
@@ -77,7 +76,6 @@ func (w *watcher) forever() {
 // This is mostly useful for testing.
 func (w *watcher) once() error {
 	fetchedLbls, err := w.fetcher.fetch()
-	fmt.Printf("RUNONCE %v ++ %v\n", fetchedLbls, err)
 	if err != nil {
 		return err
 	}
@@ -90,7 +88,6 @@ func (w *watcher) once() error {
 		uuid := lbl.uuid()
 		if _, exists := w.lbListeners[uuid]; !exists {
 			if w.onStart != nil {
-				fmt.Printf("TRIGGER ON START\n")
 				w.onStart(uuid, lbl)
 			}
 		}
@@ -101,7 +98,6 @@ func (w *watcher) once() error {
 	for uuid, entryGen := range w.lbListeners {
 		if entryGen == oldGen {
 			if w.onStop != nil {
-				fmt.Printf("TRIGGER ON STOP\n")
 				w.onStop(uuid)
 			}
 		}

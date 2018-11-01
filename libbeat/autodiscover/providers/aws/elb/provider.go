@@ -1,7 +1,6 @@
 package elb
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/external"
@@ -19,9 +18,9 @@ func init() {
 	autodiscover.Registry.AddProvider("aws_elb", AutodiscoverBuilder)
 }
 
-// Provider implements autodiscover provider for aws ELBs
+// Provider implements autodiscover provider for aws ELBs.
 type Provider struct {
-	fetcher       Fetcher
+	fetcher       fetcher
 	config        *Config
 	bus           bus.Bus
 	builders      autodiscover.Builders
@@ -32,7 +31,10 @@ type Provider struct {
 	watcher       *watcher
 }
 
+// AutodiscoverBuilder is the main builder for this provider.
 func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+	cfgwarn.Beta("aws_elb autodiscover is beta")
+
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {
@@ -42,15 +44,15 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	cfg, err := external.LoadDefaultAWSConfig()
 	cfg.Region = config.Region
 	if err != nil {
-		logp.Err("error querying AWS: %s", err)
+		logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)
 	}
 
-	return internalBuilder(bus, config, NewAPIFetcher(elbv2.New(cfg)))
+	return internalBuilder(bus, config, newApiFetcher(elbv2.New(cfg)))
 }
 
-func internalBuilder(bus bus.Bus, config *Config, fetcher Fetcher) (*Provider, error) {
-	cfgwarn.Beta("aws_elb autodiscover is beta")
-
+// internalBuilder is mainly intended for testing via mocks and stubs.
+// it can be configured to use a fetcher that doesn't actually hit the AWS API.
+func internalBuilder(bus bus.Bus, config *Config, fetcher fetcher) (*Provider, error) {
 	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
 		return nil, err
@@ -76,7 +78,7 @@ func internalBuilder(bus bus.Bus, config *Config, fetcher Fetcher) (*Provider, e
 	}, nil
 }
 
-// Start the autodiscover process
+// Start the autodiscover process.
 func (p *Provider) Start() {
 	p.watcher = newWatcher(
 		p.fetcher,
@@ -87,7 +89,7 @@ func (p *Provider) Start() {
 	p.watcher.start()
 }
 
-// Stop the autodiscover process
+// Stop the autodiscover process.
 func (p *Provider) Stop() {
 	p.watcher.stop()
 }
@@ -107,7 +109,6 @@ func (p *Provider) onWatcherStart(uuid string, lbl *lbListener) {
 		e["config"] = configs
 	}
 	p.appenders.Append(e)
-	fmt.Printf("PUBLISH %v\n", e)
 	p.bus.Publish(e)
 }
 
@@ -116,7 +117,6 @@ func (p *Provider) onWatcherStop(uuid string) {
 		"stop":    true,
 		"hashKey": uuid,
 	}
-	fmt.Printf("PUBLISH %v\n", e)
 	p.bus.Publish(e)
 }
 

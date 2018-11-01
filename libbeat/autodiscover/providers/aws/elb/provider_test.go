@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/stretchr/testify/assert"
@@ -122,4 +124,13 @@ func Test_internalBuilder(t *testing.T) {
 
 	require.Equal(t, expectedStopEvent, events.get()[1])
 
+	// Test that in an error situation nothing changes.
+	preErrorEventCount := events.len()
+	fetcher.setError(errors.New("oops"))
+
+	// Give it two chances to make a mistake
+	provider.watcher.once()
+	provider.watcher.once()
+
+	assert.Equal(t, preErrorEventCount, events.len())
 }

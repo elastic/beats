@@ -8,15 +8,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-func lblToMap(l *elbv2.LoadBalancer, listener *elbv2.Listener) {
-
-}
-
+// lbListener is a tuple type representing an elbv2.Listener and its associated elbv2.LoadBalancer.
 type lbListener struct {
 	lb       *elbv2.LoadBalancer
 	listener *elbv2.Listener
 }
 
+// toMap converts this lbListener into the form consumed as metadata in the autodiscovery process.
 func (l *lbListener) toMap() common.MapStr {
 	m := common.MapStr{}
 
@@ -37,6 +35,7 @@ func (l *lbListener) toMap() common.MapStr {
 	return m
 }
 
+// uuid returns a globally unique ID based on concatenated ARNs for the listener and lb.
 func (l *lbListener) uuid() string {
 	return fmt.Sprintf("%s|%s", *l.lb.LoadBalancerArn, *l.listener.ListenerArn)
 }

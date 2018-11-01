@@ -22,7 +22,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// Config for docker autodiscover provider
+// Config for the aws_elb autodiscover provider.
 type Config struct {
 	Region       string                  `config:"region" validate:"required"`
 	Type         string                  `config:"type"`
