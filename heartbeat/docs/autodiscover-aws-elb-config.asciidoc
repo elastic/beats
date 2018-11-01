@@ -1,0 +1,19 @@
+{beatname_uc} supports templates for modules:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+heartbeat.autodiscover:
+  providers:
+  - type: aws_elb
+    region: us-east-1
+    templates:
+    - condition:
+        has_fields: ["port"]
+      config:
+      - type: tcp
+        hosts: ["${data.host}:${data.port}"]
+        schedule: "@every 5s"
+        timeout: 1s
+-------------------------------------------------------------------------------------
+
+This configuration launches a `redis` monitor for all containers running an image with `redis` in the name.

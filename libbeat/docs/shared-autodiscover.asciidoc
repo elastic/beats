@@ -188,6 +188,25 @@ Pods share an identical host. If only the `{data.host}` variable is interpolated
 then one config will be generated per host. The configs will be identical.
 After they are de-duplicated, only one will be used.
 
+
+
+ifdef::autodiscoverAWSELB[]
+[float]
+===== AWS ELB
+
+Use the `aws_elb` autodiscover provider to automatically configure beats against ELB endpoints.
+
+The aws_elb autodiscover provider actually renders once per load balancer listener. Since ELBs
+may expose multiple ports one generally wants to have a unique config per port.
+
+The `aws_elb` autodiscover provider requires AWS credentials to speak with the AWS API.
+If you are running heartbeat on an AWS instance, and IAM credentials are already associated with
+that instance these credentials will be automatically picked up. To set credentials via environment
+variables or credentials file read the https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html[AWS configuration docs].
+
+include::../../{beatname_lc}/docs/autodiscover-aws-elb-config.asciidoc[]
+endif::autodiscoverAWSELB[]
+
 ifdef::autodiscoverJolokia[]
 [float]
 ===== Jolokia (experimental)
