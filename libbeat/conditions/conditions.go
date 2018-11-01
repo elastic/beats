@@ -36,6 +36,7 @@ type Config struct {
 	OR        []Config `config:"or"`
 	AND       []Config `config:"and"`
 	NOT       *Config  `config:"not"`
+	Bool      *bool    `config:"bool"`
 }
 
 // Condition is the interface for all defined conditions
@@ -85,6 +86,8 @@ func NewCondition(config *Config) (Condition, error) {
 		if err == nil {
 			condition, err = NewNotCondition(inner)
 		}
+	case config.Bool != nil:
+		condition = Bool(*config.Bool)
 	default:
 		err = errors.New("missing condition")
 	}

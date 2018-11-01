@@ -205,6 +205,7 @@ The supported conditions are:
 * <<condition-or, `or`>>
 * <<condition-and, `and`>>
 * <<condition-not, `not`>>
+* <<condition-bool, `bool`>>
 
 
 [float]
@@ -398,6 +399,26 @@ For example, to configure the condition `NOT status = OK`:
 not:
   equals:
     status: OK
+------
+
+
+[float]
+[[condition-bool]]
+===== `bool`
+
+The `bool` operator returns a constant boolean value. Use it for debugging purposes where
+it is more convenient to always have a given value than simply remove the config.
+
+[source,yaml]
+-------
+bool: <true|false>
+-------
+
+For example, to configure the condition to always be true:
+
+[source,yaml]
+------
+bool: true
 ------
 
 [[add-cloud-metadata]]

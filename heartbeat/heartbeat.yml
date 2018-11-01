@@ -9,18 +9,15 @@
 
 ############################# Heartbeat ######################################
 
-# Configure monitors
-heartbeat.monitors:
-- type: http
-
-  # List or urls to query
-  urls: ["http://localhost:9200"]
-
-  # Configure task schedule
-  schedule: '@every 10s'
-
-  # Total test connection and data exchange timeout
-  #timeout: 16s
+heartbeat.autodiscover:
+  providers:
+  - type: docker
+    templates:
+    - config:
+      - type: tcp
+        hosts: ["${data.host}:${data.port}"]
+        schedule: "@every 1s"
+        timeout: 1s
 
 #==================== Elasticsearch template setting ==========================
 

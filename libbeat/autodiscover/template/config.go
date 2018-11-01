@@ -45,14 +45,19 @@ type MapperSettings []*struct {
 func NewConfigMapper(configs MapperSettings) (*Mapper, error) {
 	var mapper Mapper
 	for _, c := range configs {
-		condition, err := conditions.NewCondition(c.ConditionConfig)
-		if err != nil {
-			return nil, err
+		condMap := &ConditionMap{Configs: c.Configs}
+
+		if c.ConditionConfig == nil {
+			condMap.Condition = conditions.Bool(true)
+		} else {
+			var err error
+			condMap.Condition, err = conditions.NewCondition(c.ConditionConfig)
+			if err != nil {
+				return nil, err
+			}
 		}
-		mapper = append(mapper, &ConditionMap{
-			Condition: condition,
-			Configs:   c.Configs,
-		})
+
+		mapper = append(mapper, condMap)
 	}
 
 	return &mapper, nil
