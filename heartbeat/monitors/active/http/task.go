@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -260,12 +261,30 @@ func execRequest(client *http.Client, req *http.Request, validator func(*http.Re
 	}
 
 	err = validator(resp)
-	end = time.Now()
 	if err != nil {
-		return start, end, resp, reason.ValidateFailed(err)
+		return start, time.Now(), resp, reason.ValidateFailed(err)
 	}
 
-	return start, end, resp, nil
+	// Read the entirety of the body. Otherwise, the stats for the check
+	// don't include download time.
+	buf := make([]byte, 1024)
+	for {
+		read, err := resp.Body.Read(buf)
+		if read < 0 {
+			panic("negative read encountered in http response!")
+		}
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return start, time.Now(), resp, reason.IOFailed(err)
+		}
+		if read == 0 {
+			break
+		}
+	}
+
+	return start, time.Now(), resp, nil
 }
 
 func makeEvent(rtt time.Duration, resp *http.Response) common.MapStr {
