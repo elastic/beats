@@ -16,4 +16,4 @@ heartbeat.autodiscover:
         timeout: 1s
 -------------------------------------------------------------------------------------
 
-This configuration launches a `redis` monitor for all containers running an image with `redis` in the name.
+This configuration launches a `tcp` monitor for all elbs that have a declared port (TODO: come up with a better condition).
