@@ -19,6 +19,7 @@ kibana:
 	@rm -rf _meta/kibana.generated
 	@mkdir -p _meta/kibana.generated
 	@-cp -pr module/*/_meta/kibana/* _meta/kibana.generated
+	@-cp -pr ../../metricbeat/module/*/_meta/kibana/* _meta/kibana.generated
 
 # Collects all module docs
 .PHONY: collect-docs
@@ -34,9 +35,9 @@ configs: python-env
 	@cp ${ES_BEATS}/metricbeat/_meta/common.yml _meta/beat.yml
 	@cat ${ES_BEATS}/metricbeat/_meta/setup.yml >> _meta/beat.yml
 	@cat ${ES_BEATS}/metricbeat/_meta/common.reference.yml > _meta/beat.reference.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --x_pack_path $(PWD) --full $(PWD)/../../metricbeat >> _meta/beat.reference.yml
 	@rm -rf modules.d
-	${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/modules_collector.py --docs_branch=$(DOCS_BRANCH)
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/modules_collector.py --docs_branch=$(DOCS_BRANCH) --is_x_pack
 	@chmod go-w modules.d/*
 	@# Enable system by default:
 	@if [ -f modules.d/system.yml.disabled ]; then mv modules.d/system.yml.disabled modules.d/system.yml; fi
@@ -49,7 +50,7 @@ imports: python-env
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: assets collect-docs configs kibana imports
+collect: imports assets collect-docs configs kibana fmt
 
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset
@@ -96,6 +97,6 @@ endif
 add-headers:
 ifndef CHECK_HEADERS_DISABLED
 	@go get github.com/elastic/go-licenser
-	@go-licenser -license ${LICENSE} ${ES_BEATS}/${BEAT_NAME}
+	@go-licenser -license ${LICENSE} ${ES_BEATS}/x-pack/${BEAT_NAME}
 	@go-licenser -license Elastic .
 endif

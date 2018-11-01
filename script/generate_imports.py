@@ -38,7 +38,7 @@ import (
 """
 
 
-def generate_and_write_to_file(outfile, go_beat_path, imported_beat_lines):
+def generate_and_write_to_file(outfile, imported_beat_lines):
     from generate_imports_helper import comment
 
     imported_lines = "\n".join(imported_beat_lines)
@@ -69,4 +69,4 @@ if __name__ == "__main__":
     else:
         imported_beat_lines = get_importable_lines(args.beats_path, import_line_format)
 
-    generate_and_write_to_file(args.out, args.beats_path, imported_beat_lines)
+    generate_and_write_to_file(args.out, imported_beat_lines)

@@ -1,32 +1,50 @@
-import os
 import argparse
+import os
 import yaml
+
 
 # Collects config for all modules
 
+# yml file
+config_yml = "\n#==========================  Modules configuration ============================\n"
 
-def collect(beat_name, beat_path, full=False):
+
+def collect(oss_beat_path, x_pack_path, full=False):
+
+    # Read the modules list but put "system" first
+    modules = [("system", os.path.abspath(oss_beat_path) + "/module/system/_meta")]
+    modules_temp = get_modules_from_beat(oss_beat_path)
+
+    # When called form a x-pack beat, a flag with the path is provided
+    if x_pack_path is not None:
+        modules_temp += get_modules_from_beat(x_pack_path)
+
+    for (module, path) in sorted(modules_temp, key=lambda tup: tup[0]):
+        if module != "system":
+            modules.append((module, path))
+
+    write_modules(modules, full)
+
+
+def get_modules_from_beat(beat_path):
+    modules = []
 
     base_dir = beat_path + "/module"
     path = os.path.abspath(base_dir)
 
-    # yml file
-
-    config_yml = "\n#==========================  Modules configuration ============================\n"
-    config_yml += beat_name + """.modules:
-
-"""
-
-    # Read the modules list but put "system" first
-    modules = ["system"]
-    for module in sorted(os.listdir(base_dir)):
+    for module in os.listdir(base_dir):
         if module != "system":
-            modules.append(module)
+            modules.append((module, path + "/" + module + "/_meta"))
 
-    # Iterate over all modules
-    for module in modules:
+    return modules
 
-        beat_path = path + "/" + module + "/_meta"
+
+def write_modules(modules, full):    # Iterate over all modules
+    global config_yml
+
+    for (module, beat_path) in modules:
+
+        # beat_path = path + "/" + module + "/_meta"
 
         module_configs = beat_path + "/config.yml"
 
@@ -80,11 +98,11 @@ def get_title_line(title):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(
         description="Collects modules config")
     parser.add_argument("path", help="Path to the beat folder")
     parser.add_argument("--beat", help="Beat name")
+    parser.add_argument("--x_pack_path", help="Path to x-pack folder with the beat")
     parser.add_argument("--full", action="store_true",
                         help="Collect the full versions")
 
@@ -92,4 +110,8 @@ if __name__ == "__main__":
     beat_name = args.beat
     beat_path = args.path
 
-    collect(beat_name, beat_path, args.full)
+    config_yml += beat_name + """.modules:
+
+"""
+
+    collect(beat_path, args.x_pack_path, args.full)
