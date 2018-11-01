@@ -447,7 +447,9 @@ func (list BuildPlatformList) Filter(expr string) BuildPlatformList {
 
 // Merge creates a new list with the two list merged.
 func (list BuildPlatformList) Merge(with BuildPlatformList) BuildPlatformList {
-	out := append(list, with...)
+	out := make(BuildPlatformList, 0, len(list)+len(with))
+	out = append(list, with...)
+	out = append(out, with...)
 	return out.deduplicate()
 }
 

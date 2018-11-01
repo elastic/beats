@@ -88,8 +88,8 @@ func ImageSelector(f ImageSelectorFunc) func(params *crossBuildParams) {
 	}
 }
 
-// WithPlatforms sets dependencies on others platforms.
-func WithPlatforms(expressions ...string) func(params *crossBuildParams) {
+// AddPlatforms sets dependencies on others platforms.
+func AddPlatforms(expressions ...string) func(params *crossBuildParams) {
 	return func(params *crossBuildParams) {
 		var list BuildPlatformList
 		for _, expr := range expressions {
