@@ -24,7 +24,6 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -52,8 +51,6 @@ var debugf = logp.MakeDebug("kafka")
 
 // New creates a new instance of the partition MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The kafka partition metricset is beta")
-
 	opts := kafka.MetricSetOptions{
 		Version: "0.8.2.0",
 	}
