@@ -71,10 +71,24 @@
             }
         },
         {
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "event.action",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
             "rename": {
                 "if": "ctx.first_char == '{'",
                 "field": "elasticsearch.audit.event.action",
                 "target_field": "elasticsearch.audit.event_type"
+            }
+        },
+        {
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "event.type",
+                "path": "elasticsearch.audit"
             }
         },
         {
@@ -85,10 +99,53 @@
             }
         },
         {
+            "remove": {
+                "if": "ctx.first_char == '{'",
+                "field": "elasticsearch.audit.event"
+            }
+        },
+        {
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "origin.type",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
             "rename": {
                 "if": "ctx.first_char == '{'",
+                "field": "elasticsearch.audit.origin.type",
+                "target_field": "elasticsearch.audit.origin_type"
+            }
+        },
+        {
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "origin.address",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "grok": {
+                "if": "ctx.first_char == '{'",
                 "field": "elasticsearch.audit.origin.address",
-                "target_field": "elasticsearch.audit.origin_address"
+                "patterns": [
+                    "\\[%{IPORHOST:elasticsearch.audit.origin_address}\\]:%{INT:elasticsearch.audit.origin_port:int}",
+                    "%{IPORHOST:elasticsearch.audit.origin_address}:%{INT:elasticsearch.audit.origin_port:int}"
+                ]
+            }
+        },
+        {
+            "remove": {
+                "if": "ctx.first_char == '{'",
+                "field": "elasticsearch.audit.origin"
+            }
+        },
+        {
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "user.name",
+                "path": "elasticsearch.audit"
             }
         },
         {
@@ -99,8 +156,55 @@
             }
         },
         {
+            "remove": {
+                "if": "ctx.first_char == '{'",
+                "field": "elasticsearch.audit.user"
+            }
+        },
+        {
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "request.name",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
             "set": {
                 "if": "ctx.first_char == '{'",
+                "value": "{{elasticsearch.audit.request.name}}",
+                "field": "elasticsearch.audit.request"
+            }
+        },
+        {
+            "remove": {
+                "if": "ctx.elasticsearch.audit.request == ''",
+                "field": "elasticsearch.audit.request"
+            }
+        },
+        {
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "url.path",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "url.query",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "set": {
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.url.query == null",
+                "field": "elasticsearch.audit.uri",
+                "value": "{{elasticsearch.audit.url.path}}"
+            }
+        },
+        {
+            "set": {
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.url.query != null",
                 "field": "elasticsearch.audit.uri",
                 "value": "{{elasticsearch.audit.url.path}}?{{elasticsearch.audit.url.query}}"
             }
@@ -112,11 +216,60 @@
             }
         },
         {
-            "remove": {
-                "field": "elasticsearch.audit.url",
-                "ignore_missing": true
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "node.id",
+                "path": "elasticsearch.audit"
             }
-        }
+        },
+        {
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "node.name",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "if": "ctx.first_char == '{'",
+                "field": "elasticsearch.audit.node",
+                "target_field": "elasticsearch.node"
+            }
+        },
+        {
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "user.realm",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.user.realm != null",
+                "field": "elasticsearch.audit.user.realm",
+                "target_field": "elasticsearch.audit.user_realm"
+            }
+        },
+        {
+            "dot_expander": {
+                "if": "ctx.first_char == '{'",
+                "field": "user.roles",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.user.roles != null",
+                "field": "elasticsearch.audit.user.roles",
+                "target_field": "elasticsearch.audit.user_roles"
+            }
+        },
+        {
+            "remove": {
+                "if": "ctx.first_char == '{'",
+                "field": "elasticsearch.audit.user"
+            }
+        },
         {
             "date": {
                 "field": "elasticsearch.audit.timestamp",
@@ -131,6 +284,12 @@
         {
             "remove": {
                 "field": "elasticsearch.audit.timestamp"
+            }
+        },
+        {
+            "remove": {
+                "field": "elasticsearch.audit.url",
+                "ignore_missing": true
             }
         },
         {
