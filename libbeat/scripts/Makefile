@@ -363,7 +363,7 @@ endif
 	  -version ${BEAT_VERSION} -out _meta/kibana.generated
 
 .PHONY: docs
-docs:  ## @build Builds the documents for the beat
+docs: update ## @build Builds the documents for the beat
 	sh ${ES_BEATS}/script/build_docs.sh ${BEAT_NAME} ${BEAT_PATH}/docs ${BUILD_DIR}
 
 .PHONY: docs-preview
