@@ -8,4 +8,4 @@ var:
     os.windows: []
 
 ingest_pipeline: ingest/pipeline.json
-prospector: config/log.yml
+input: config/log.yml

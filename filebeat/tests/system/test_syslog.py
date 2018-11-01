@@ -90,7 +90,6 @@ class Test(BaseTest):
         self.assert_syslog(output[0])
 
     def assert_syslog(self, syslog):
-        assert syslog["prospector.type"] == "syslog"
         assert syslog["event.severity"] == 5
         assert syslog["hostname"] == "wopr.mymachine.co"
         assert syslog["input.type"] == "syslog"
