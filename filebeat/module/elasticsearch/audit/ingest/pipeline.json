@@ -197,14 +197,14 @@
         },
         {
             "set": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.url.query == null",
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.url.path != null && ctx.elasticsearch.audit.url.query == null",
                 "field": "elasticsearch.audit.uri",
                 "value": "{{elasticsearch.audit.url.path}}"
             }
         },
         {
             "set": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.url.query != null",
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.url.path != null && ctx.elasticsearch.audit.url.query != null",
                 "field": "elasticsearch.audit.uri",
                 "value": "{{elasticsearch.audit.url.path}}?{{elasticsearch.audit.url.query}}"
             }
