@@ -96,7 +96,7 @@ setup.kibana:
 
 #-------------------------- Elasticsearch output ------------------------------
 output.console:
-  pretty: true
+  pretty: false
 #output.elasticsearch:
   # Array of hosts to connect to.
 #  hosts: ["localhost:9200"]

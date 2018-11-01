@@ -1,19 +1,18 @@
 package elb
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/elbv2"
-
 	"github.com/aws/aws-sdk-go-v2/aws/external"
-
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/aws/aws-sdk-go-v2/service/elbv2"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func init() {
@@ -108,6 +107,7 @@ func (p *Provider) onWatcherStart(uuid string, lbl *lbListener) {
 		e["config"] = configs
 	}
 	p.appenders.Append(e)
+	fmt.Printf("PUBLISH %v\n", e)
 	p.bus.Publish(e)
 }
 
@@ -116,6 +116,7 @@ func (p *Provider) onWatcherStop(uuid string) {
 		"stop":    true,
 		"hashKey": uuid,
 	}
+	fmt.Printf("PUBLISH %v\n", e)
 	p.bus.Publish(e)
 }
 

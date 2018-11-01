@@ -18,6 +18,7 @@
 package elb
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -76,6 +77,7 @@ func (w *watcher) forever() {
 // This is mostly useful for testing.
 func (w *watcher) once() error {
 	fetchedLbls, err := w.fetcher.fetch()
+	fmt.Printf("RUNONCE %v ++ %v\n", fetchedLbls, err)
 	if err != nil {
 		return err
 	}
@@ -88,6 +90,7 @@ func (w *watcher) once() error {
 		uuid := lbl.uuid()
 		if _, exists := w.lbListeners[uuid]; !exists {
 			if w.onStart != nil {
+				fmt.Printf("TRIGGER ON START\n")
 				w.onStart(uuid, lbl)
 			}
 		}
@@ -98,6 +101,7 @@ func (w *watcher) once() error {
 	for uuid, entryGen := range w.lbListeners {
 		if entryGen == oldGen {
 			if w.onStop != nil {
+				fmt.Printf("TRIGGER ON STOP\n")
 				w.onStop(uuid)
 			}
 		}

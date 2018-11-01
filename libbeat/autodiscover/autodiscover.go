@@ -19,9 +19,8 @@ package autodiscover
 
 import (
 	"fmt"
+	"hash/fnv"
 	"time"
-
-	"github.com/mitchellh/hashstructure"
 
 	"github.com/pkg/errors"
 
@@ -235,10 +234,11 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 // Hash using the special "hashKey" key plus the index of the key if available, otherwise hash the given config
 func hashKeyOrConfig(event bus.Event, configIdx int, config *common.Config) (hash uint64, err error) {
 	if hk, ok := event["hashKey"]; ok {
-		hash, err = hashstructure.Hash(fmt.Sprintf("%s,%d", hk, configIdx), nil)
-		if err != nil {
-			errors.Wrapf(err, "Could not hash key %s:", hk)
-		}
+		hashStr := fmt.Sprintf("%s,%d", hk, configIdx)
+		hasher := fnv.New64a()
+		hasher.Write([]byte(hashStr))
+		hash = hasher.Sum64()
+		fmt.Printf("HASHED %s to %d", hashStr, err)
 	} else {
 		hash, err = cfgfile.HashConfig(config)
 		if err != nil {
