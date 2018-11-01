@@ -28,9 +28,6 @@ include::../../libbeat/docs/repositories.asciidoc[]
 
 include::./setting-up-running.asciidoc[]
 
-//TODO: Decide whether this requires a separate topic
-//include::./how-it-works.asciidoc[]
-
 include::./configuring-howto.asciidoc[]
 
 include::./fields.asciidoc[]
