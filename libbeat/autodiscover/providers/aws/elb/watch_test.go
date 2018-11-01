@@ -18,7 +18,6 @@
 package elb
 
 import (
-	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -61,7 +60,8 @@ func TestWatchTicks(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	uuids := []string{fmt.Sprintf("%s|%s", *lbls[0].lb.LoadBalancerArn, *lbls[0].listener.ListenerArn)}
+	// The listener ARN is the unique identifier used.
+	uuids := []string{*lbls[0].listener.ListenerArn}
 
 	// Test that we've seen one lbl start, but none stop
 	assert.Equal(t, uuids, startUUIDs)

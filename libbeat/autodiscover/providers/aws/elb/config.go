@@ -35,6 +35,3 @@ type Config struct {
 func defaultConfig() *Config {
 	return &Config{}
 }
-
-func (c *Config) Validate() {
-}
