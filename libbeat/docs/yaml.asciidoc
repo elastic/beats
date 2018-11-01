@@ -46,23 +46,23 @@ Simply change to the directory where the binary is installed, and run
 the Beat in the foreground with the `test config` command specified. For
 example:
 
-ifdef::allplatforms[]
+ifndef::win-only[]
 
 ["source","shell",subs="attributes"]
 ----------------------------------------------------------------------
 {beatname_lc} test config -c {beatname_lc}.yml
 ----------------------------------------------------------------------
 
-endif::allplatforms[]
+endif::win-only[]
 
-ifdef::win[]
+ifdef::win-only[]
 
 ["source","shell",subs="attributes"]
 ----------------------------------------------------------------------
 .\winlogbeat.exe test config -c .\winlogbeat.yml -e
 ----------------------------------------------------------------------
 
-endif::win[]
+endif::win-only[]
 
 You'll see a message if the Beat finds an error in the file.
 
