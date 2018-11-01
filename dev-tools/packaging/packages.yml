@@ -255,7 +255,7 @@ specs:
         name: '{{.BeatName}}-oss'
 
     - os: linux
-      types: [tgz]
+      types: [tgz, docker]
       spec:
         <<: *binary_spec
         <<: *apache_license_for_binaries
@@ -369,7 +369,7 @@ specs:
         <<: *elastic_license_for_macos_pkg
 
     - os: linux
-      types: [tgz]
+      types: [tgz, docker]
       spec:
         <<: *binary_spec
         <<: *elastic_license_for_binaries

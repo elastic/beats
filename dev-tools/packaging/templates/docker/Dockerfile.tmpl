@@ -1,0 +1,40 @@
+{{- $beatHome := printf "%s/%s" "/usr/share" .BeatName }}
+{{- $beatBinary := printf "%s/%s" $beatHome .BeatName }}
+
+FROM {{ .From }}
+
+LABEL \
+  org.label-schema.schema-version="1.0" \
+  org.label-schema.vendor="Elastic" \
+  org.label-schema.name="{{ .BeatName }}" \
+  org.label-schema.version="{{ .Version }}" \
+  org.label-schema.url="https://www.elastic.co/products/beats/{{ .BeatName }}" \
+  org.label-schema.vcs-url="https://github.com/elastic/beats-docker" \
+  license="{{ .License }}"
+
+ENV ELASTIC_CONTAINER "true"
+ENV PATH={{ $beatHome }}:$PATH
+{{- range $key, $value := .Env }}
+ENV {{ $key }} {{ $value }}
+{{- end }}
+
+COPY beat {{ $beatHome }}
+COPY docker-entrypoint /usr/local/bin/docker-entrypoint
+RUN chmod a+x /usr/local/bin/docker-entrypoint
+
+{{- if .LinuxCapabilities }}
+RUN setcap {{ .LinuxCapabilities }} {{ $beatBinary }}
+{{- end }}
+
+RUN groupadd --gid 1000 {{ .BeatName }}
+{{- if .User }}
+RUN useradd -M --uid 1000 --gid 1000 --home {{ $beatHome }} {{ .User }}
+USER {{ .User }}
+{{- end }}
+
+WORKDIR /usr/share/{{ .BeatName }}
+
+# TODO: Fix permissions in files
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
+CMD ["-e"]
