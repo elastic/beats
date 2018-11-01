@@ -35,11 +35,6 @@ include::../include/var-paths.asciidoc[]
 include::../include/var-paths.asciidoc[]
 
 [float]
-==== `gc` log fileset settings
-
-include::../include/var-paths.asciidoc[]
-
-[float]
 ==== `audit` log fileset settings
 
 include::../include/var-paths.asciidoc[]
