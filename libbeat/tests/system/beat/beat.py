@@ -321,7 +321,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             # running tests in parallel
             pass
 
-    def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond"):
+    def wait_until(self, cond, max_timeout=15, poll_interval=0.1, name="cond"):
         """
         Waits until the cond function returns true,
         or until the max_timeout is reached. Calls the cond
