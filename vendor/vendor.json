@@ -395,28 +395,34 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
-			"checksumSHA1": "bYNIHZ2HowxKRrXRFVzNh2A12i4=",
+			"checksumSHA1": "WphR6i6yAU9KwJ1FaGsSP+UcCrA=",
+			"origin": "github.com/ph/goformation",
 			"path": "github.com/awslabs/goformation",
-			"revision": "d42502ef32a8892bf380256e2f57c6f69190d802",
-			"revisionTime": "2018-09-16T20:29:49Z",
-			"version": "1.2.2",
-			"versionExact": "1.2.2"
+			"revision": "c5f655c41370a0bec733fa251fd2ecd4e3f0dfe3",
+			"revisionTime": "2018-10-29T15:41:58Z"
 		},
 		{
-			"checksumSHA1": "fF1BZ9eAf5RxXXos9/30RKhbSr8=",
+			"checksumSHA1": "9UUSrXIJWHfYH9kQH1fYFnpOMPo=",
+			"origin": "github.com/ph/goformation/cloudformation",
 			"path": "github.com/awslabs/goformation/cloudformation",
-			"revision": "d42502ef32a8892bf380256e2f57c6f69190d802",
-			"revisionTime": "2018-09-16T20:29:49Z",
-			"version": "1.2.2",
-			"versionExact": "1.2.2"
+			"revision": "c5f655c41370a0bec733fa251fd2ecd4e3f0dfe3",
+			"revisionTime": "2018-10-29T15:41:58Z"
 		},
 		{
 			"checksumSHA1": "iAlvZoyOROLal7D0Zh8K32bQJwE=",
+			"origin": "github.com/ph/goformation/intrinsics",
 			"path": "github.com/awslabs/goformation/intrinsics",
 			"revision": "d42502ef32a8892bf380256e2f57c6f69190d802",
 			"revisionTime": "2018-09-16T20:29:49Z",
 			"version": "1.2.2",
 			"versionExact": "1.2.2"
+		},
+		{
+			"checksumSHA1": "bHeG9a9KF3MjiU6ZAdz91geL1DA=",
+			"origin": "github.com/ph/goformation/intrinsics",
+			"path": "github.com/awslabs/goformation/intrinsics/",
+			"revision": "c5f655c41370a0bec733fa251fd2ecd4e3f0dfe3",
+			"revisionTime": "2018-10-29T15:41:58Z"
 		},
 		{
 			"checksumSHA1": "al43W4TWRdznwfxOWp4egKcL39c=",
