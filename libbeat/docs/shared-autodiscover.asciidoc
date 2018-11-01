@@ -194,15 +194,33 @@ ifdef::autodiscoverAWSELB[]
 [float]
 ===== AWS ELB
 
-Use the `aws_elb` autodiscover provider to automatically configure beats against ELB endpoints.
+Use the `aws_elb` autodiscover provider to automatically configure beats against ELB endpoints. It should be noted that classic ELBs are currently not supported.
 
-The aws_elb autodiscover provider actually renders once per load balancer listener. Since ELBs
+The aws_elb autodiscover provider actually renders once per load balancer listener, not once per load balancer. Since ELBs
 may expose multiple ports one generally wants to have a unique config per port.
 
 The `aws_elb` autodiscover provider requires AWS credentials to speak with the AWS API.
 If you are running heartbeat on an AWS instance, and IAM credentials are already associated with
 that instance these credentials will be automatically picked up. To set credentials via environment
 variables or credentials file read the https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html[AWS configuration docs].
+
+The available fields are:
+
+  * `arn`, A string uniquely identifying this load balancer listener.
+  * `host`, the DNS name of the given ELB
+  * `port`, the port of the ELB listener
+  * `protocol`, One of `HTTP`, `HTTPS`, or `TCP`.
+  * `type`, the type of load balancer, either `application` or `network`.
+  * `scheme`, the scheme used by this ELB. Either `internet-facing` or `internal`
+  * `availability_zones`, a list of strings names of AZs this ELB is present in.
+  * `created`, the time this load balancer was created.
+  * `state.code`, One of `active`, `provisioning`, `active_impaired`, or `failed`
+  * `state.reason`, A string giving more detail about the current state.
+  * `load_balancer_arn`, A string uniquely identifying the load balancer. Note that this may be shared by multiple configs. If you need a unique value use the `listener_arn`.
+  * `ip_address_type`, One of `ipv4` or `dualstack`.
+  * `security_groups`, A string list of security group names.
+  * `vpc_id`, The name of the VPC this ELB is configured within.
+  * `ssl_policy`, A string representing the security policy for this listener.
 
 include::../../{beatname_lc}/docs/autodiscover-aws-elb-config.asciidoc[]
 endif::autodiscoverAWSELB[]

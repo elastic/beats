@@ -1,8 +1,6 @@
 package elb
 
 import (
-	"fmt"
-
 	"github.com/aws/aws-sdk-go-v2/service/elbv2"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -18,8 +16,10 @@ type lbListener struct {
 func (l *lbListener) toMap() common.MapStr {
 	m := common.MapStr{}
 
+	m["arn"] = l.listener.ListenerArn
 	m["host"] = *l.lb.DNSName
 	m["port"] = *l.listener.Port
+	m["protocol"] = l.listener.Protocol
 	m["type"] = string(l.lb.Type)
 	m["scheme"] = l.lb.Scheme
 	m["availability_zones"] = l.azStrings()
@@ -29,15 +29,14 @@ func (l *lbListener) toMap() common.MapStr {
 	m["ip_address_type"] = string(l.lb.IpAddressType)
 	m["security_groups"] = l.lb.SecurityGroups
 	m["vpc_id"] = *l.lb.VpcId
-	m["protocol"] = l.listener.Protocol
 	m["ssl_policy"] = l.listener.SslPolicy
 
 	return m
 }
 
-// uuid returns a globally unique ID based on concatenated ARNs for the listener and lb.
+// uuid returns a globally unique ID. In the case of an lbListener, that would be its listenerArn.
 func (l *lbListener) uuid() string {
-	return fmt.Sprintf("%s|%s", *l.lb.LoadBalancerArn, *l.listener.ListenerArn)
+	return *l.listener.ListenerArn
 }
 
 func (l *lbListener) azStrings() []string {
