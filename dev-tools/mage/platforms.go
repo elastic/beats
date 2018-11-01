@@ -445,6 +445,12 @@ func (list BuildPlatformList) Filter(expr string) BuildPlatformList {
 	return out.deduplicate()
 }
 
+// Merge creates a new list with the two list merged.
+func (list BuildPlatformList) Merge(with BuildPlatformList) BuildPlatformList {
+	out := append(list, with...)
+	return out.deduplicate()
+}
+
 // deduplicate removes duplicate platforms and sorts the list.
 func (list BuildPlatformList) deduplicate() BuildPlatformList {
 	set := map[string]BuildPlatform{}
