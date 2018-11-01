@@ -73,8 +73,10 @@ if __name__ == "__main__":
 
     if args.x_pack_path is not None:
         import_template = elastic_license + import_template
-        imported_beat_lines = get_importable_lines_with_module_path(args.x_pack_path, import_line_format, abspath("../../../../../" + args.x_pack_path + "/module"))
-        imported_beat_lines += get_importable_lines_with_module_path(args.beats_path, import_line_format, abspath("../../../../../" + args.beats_path + "/module"))
+        imported_beat_lines = get_importable_lines_with_module_path(
+            args.x_pack_path, import_line_format, abspath("../../../../../" + args.x_pack_path + "/module"))
+        imported_beat_lines += get_importable_lines_with_module_path(
+            args.beats_path, import_line_format, abspath("../../../../../" + args.beats_path + "/module"))
     else:
         import_template = asl2 + import_template
         imported_beat_lines = get_importable_lines(args.beats_path, import_line_format)
