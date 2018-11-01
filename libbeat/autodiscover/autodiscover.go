@@ -19,7 +19,6 @@ package autodiscover
 
 import (
 	"fmt"
-	"hash/fnv"
 	"time"
 
 	"github.com/pkg/errors"
@@ -164,10 +163,11 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 	logp.Debug(debugK, "Got a start event: %v, generated configs: %+v", event, configs)
 
 	meta := getMeta(event)
-	for configIdx, config := range configs {
-		hash, err := hashKeyOrConfig(event, configIdx, config)
+	for _, config := range configs {
+		hash, err := cfgfile.HashConfig(config)
 		if err != nil {
-			logp.Error(err)
+			logp.Debug(debugK, "Could not hash config %v: %v", config, err)
+			continue
 		}
 
 		err = a.adapter.CheckConfig(config)
@@ -204,12 +204,8 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 	}
 	logp.Debug(debugK, "Got a stop event: %v, generated configs: %+v", event, configs)
 
-	for configIdx, config := range configs {
-		hash, err := hashKeyOrConfig(event, configIdx, config)
-		if err != nil {
-			logp.Error(err)
-		}
-
+	for _, config := range configs {
+		hash, err := cfgfile.HashConfig(config)
 		if err != nil {
 			logp.Debug(debugK, "Could not hash config %v: %v", config, err)
 			continue
@@ -229,22 +225,6 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 	}
 
 	return updated
-}
-
-// Hash using the special "hashKey" key plus the index of the key if available, otherwise hash the given config
-func hashKeyOrConfig(event bus.Event, configIdx int, config *common.Config) (hash uint64, err error) {
-	if hk, ok := event["hashKey"]; ok {
-		hashStr := fmt.Sprintf("%s,%d", hk, configIdx)
-		hasher := fnv.New64a()
-		hasher.Write([]byte(hashStr))
-		hash = hasher.Sum64()
-	} else {
-		hash, err = cfgfile.HashConfig(config)
-		if err != nil {
-			errors.Wrapf(err, "Could not hash config %v", config)
-		}
-	}
-	return hash, err
 }
 
 func getMeta(event bus.Event) common.MapStr {
