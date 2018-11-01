@@ -416,7 +416,7 @@ func createEventBulkMeta(
 		ID:       id,
 	}
 
-	if id != "" {
+	if id == "" {
 		return bulkCreateAction{meta}, nil
 	}
 	return bulkIndexAction{meta}, nil
