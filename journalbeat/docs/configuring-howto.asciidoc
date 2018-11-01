@@ -47,9 +47,7 @@ include::./config-options.asciidoc[]
 
 include::./general-options.asciidoc[]
 
-:allplatforms:
 include::../../libbeat/docs/queueconfig.asciidoc[]
-:allplatforms!:
 
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
@@ -75,10 +73,8 @@ include::../../libbeat/docs/shared-env-vars.asciidoc[]
 //include::../../libbeat/docs/shared-autodiscover.asciidoc[]
 
 :standalone:
-:allplatforms:
 include::../../libbeat/docs/yaml.asciidoc[]
 :standalone!:
-:allplatforms!:
 
 include::../../libbeat/docs/regexp.asciidoc[]
 
