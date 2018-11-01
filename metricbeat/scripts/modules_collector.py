@@ -32,6 +32,7 @@ def collect(docs_branch, is_x_pack):
         with open(os.getcwd() + '/modules.d/' + '/' + module + '.yml.disabled', 'w') as f:
             f.write(module_file)
 
+
 def get_modules_list(is_x_pack):
     modules = []
 
@@ -54,6 +55,7 @@ def get_modules_list(is_x_pack):
         modules.append((module, beat_path))
 
     return sorted(modules, key=lambda t: t[0])
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

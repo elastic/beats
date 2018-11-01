@@ -11,6 +11,7 @@ def get_importable_lines(go_beat_path, import_line):
     path = abspath("module")
     return get_importable_lines_with_module_path(go_beat_path, import_line, path)
 
+
 def get_importable_lines_with_module_path(go_beat_path, import_line, beat_root_module_path):
     imported_lines = []
     modules = [m for m in listdir(beat_root_module_path) if isdir(join(beat_root_module_path, m)) and m != "_meta"]
