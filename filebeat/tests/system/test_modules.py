@@ -190,11 +190,11 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "beat.hostname", "beat.name"]
+    host_keys = ["host.name", "agent.hostname", "agent.type"]
     # The create timestamps area always new
     time_keys = ["read_timestamp", "event.created"]
     # source path and beat.version can be different for each run
-    other_keys = ["source", "beat.version"]
+    other_keys = ["source", "agent.version"]
 
     for key in host_keys + time_keys + other_keys:
         delete_key(obj, key)
