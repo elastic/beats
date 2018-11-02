@@ -21,7 +21,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -57,19 +57,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+clusterStatsPath)
 	if err != nil {
-		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
+		err := errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug(elasticsearch.ModuleName, "trying to fetch cluster stats from a non master node.")
+		m.Log.Debug("trying to fetch cluster stats from a non-master node")
 		return
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
@@ -80,8 +81,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 
 	if m.MetricSet.XPack {
-		eventMappingXPack(r, m, *info, content)
+		err = eventMappingXPack(r, m, *info, content)
 	} else {
-		eventMapping(r, *info, content)
+		err = eventMapping(r, *info, content)
+	}
+
+	if err != nil {
+		m.Log.Error(err)
 	}
 }

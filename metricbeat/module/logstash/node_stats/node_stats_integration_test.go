@@ -22,11 +22,11 @@ package node_stats
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/logstash"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestFetch(t *testing.T) {

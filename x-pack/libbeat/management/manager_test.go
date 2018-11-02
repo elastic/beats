@@ -53,7 +53,7 @@ func TestConfigManager(t *testing.T) {
 		`{"configuration_blocks":[{"type":"test.block","config":{"module":"system"}}]}`,
 	}
 	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, fmt.Sprintf("/api/beats/agent/%s/configuration", id), r.RequestURI)
+		assert.Equal(t, fmt.Sprintf("/api/beats/agent/%s/configuration?validSetting=true", id), r.RequestURI)
 		fmt.Fprintf(w, responses[i])
 		i++
 	}))

@@ -104,6 +104,11 @@ func GetPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 			value["bucket"] = bucketMap
 		}
 
+		untyped := metric.GetUntyped()
+		if untyped != nil {
+			value["value"] = untyped.GetValue()
+		}
+
 		event.value = value
 
 		events = append(events, event)

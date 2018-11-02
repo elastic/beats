@@ -111,7 +111,6 @@ PS C:\Program Files\Winlogbeat> .\winlogbeat.exe test config -c .\winlogbeat.yml
 [[config-winlogbeat-logstash]]
 === Step 3: Configure Winlogbeat to use Logstash
 
-:win:
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[winlogbeat-template]]
@@ -122,7 +121,6 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 [[load-kibana-dashboards]]
 === Step 5: Set up the Kibana dashboards
 
-:win:
 include::../../libbeat/docs/dashboards.asciidoc[]
 
 [[winlogbeat-starting]]

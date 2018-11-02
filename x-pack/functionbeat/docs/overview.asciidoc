@@ -1,0 +1,10 @@
+[id="{beatname_lc}-overview"]
+== {beatname_uc} overview
+
+++++
+<titleabbrev>Overview</titleabbrev>
+++++
+
+{beatname_uc} is a lightweight shipper that you can install as a function on
+a serverless provider.For example, you can use {beatname_uc} to collect and
+centralize log events from the Cloudwatchlogs to your Elasticsearch cluster.

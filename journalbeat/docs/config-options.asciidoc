@@ -1,0 +1,102 @@
+[id="configuration-{beatname_lc}-options"]
+== Configure inputs
+
+++++
+<titleabbrev>Configure inputs</titleabbrev>
+++++
+
+IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
+
+By default, {beatname_uc} reads log events from the default systemd journals. To
+specify other journal files, set the <<{beatname_lc}-paths,`paths`>> option in
+the +{beatname_lc}.inputs+ section of the +{beatname_lc}.yml+ file. 
+
+The list of paths is a YAML array, so each path begins with a dash (-). Each
+path can be a directory path (to collect events from all journals in a
+directory), or a file path. For example:
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- paths:
+  - "/dev/log"
+  - "/var/log/messages/my-journal-file"
+----
+
+Within the +{beatname_lc}.inputs+ section, you can also specify options that
+control the position where {beatname_uc} starts reading the journal file, and
+set filters to reduce the fields that {beatname_uc} needs to process. See
+<<{beatname_lc}-options>> for a list of available options.
+
+[float]
+=== Configuration examples
+
+The following example shows how to monitor multiple journals under the
+same directory. {beatname_uc} merges all journals under the directory into a
+single journal and reads them. With `seek` set to `cursor`, {beatname_uc}
+starts reading at the beginning of the journal, but will continue reading where
+it left off after a reload or restart. 
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- paths: ["/path/to/journal/directory"]
+  seek: cursor
+----
+
+The following examples show how to get Redis events from a Docker container that
+is tagged as `redis`.
+
+//TODO: Add a better explanation of the options.
+
+This example uses the translated fields by Journald:
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- paths: []
+  include_matches:
+    - "container.image.tag=redis"
+    - "process.name=redis"
+----
+
+This example uses the field names from the systemd journal:
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- paths: []
+  include_matches:
+    - "CONTAINER_TAG=redis"
+    - "_COMM=redis"
+----
+
+[id="{beatname_lc}-options"]
+[float]
+=== Configuration options
+You can specify the following options to configure how {beatname_uc} reads the
+journal files.
+
+[float]
+[id="{beatname_lc}-paths"]
+==== `paths`
+
+A list of paths that will be crawled and fetched. Each path can be a directory
+path (to collect events from all journals in a directory), or a file path. If
+you specify a directory, {beatname_uc} merges all journals under the directory
+into a single journal and reads them.
+
+//QUESTION: Are globs supported? If so, I need to add more detail here. 
+
+[float]
+[id="{beatname_lc}-seek"]
+==== `seek`
+
+The position to start reading the journal from. Valid settings are:
+
+* `head`: Starts reading at the beginning of the file.
+* `tail`: Starts reading at the end of the file.
+* `cursor`: Initially starts reading at the beginning of the file, but continues
+reading where it left off after a reload or restart. 
+
+//TODO: ADD OTHER OPTIONS HERE.     
