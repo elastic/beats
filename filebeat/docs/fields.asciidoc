@@ -5563,6 +5563,61 @@ String representation of the collection time, as formatted by osquery.
 
 --
 
+[float]
+== snapshot fields
+
+Common fields exported by the snapshot metricset.
+
+
+
+*`osquery.snapshot.name`*::
++
+--
+type: keyword
+
+The name of the query that generated this event.
+
+
+--
+
+*`osquery.snapshot.action`*::
++
+--
+type: keyword
+
+For incremental data, marks whether the entry was added or removed. It can be one of "added", "removed", or "snapshot".
+
+
+--
+
+*`osquery.snapshot.host_identifier`*::
++
+--
+type: keyword
+
+The identifier for the host on which the osquery agent is running. Normally the hostname.
+
+
+--
+
+*`osquery.snapshot.unix_time`*::
++
+--
+type: long
+
+Unix timestamp of the event, in seconds since the epoch. Used for computing the `@timestamp` column.
+
+
+--
+
+*`osquery.snapshot.calendar_time`*::
++
+--
+String representation of the collection time, as formatted by osquery.
+
+
+--
+
 [[exported-fields-postgresql]]
 == PostgreSQL fields
 
