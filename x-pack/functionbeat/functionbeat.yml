@@ -12,10 +12,13 @@
 # Configure functions to run on AWS Lambda, currently we assume that the credentials
 # are present in the environment to correctly create the function when using the CLI.
 #
+# Configure which S3 bucket we should upload the lambda artifact.
+functionbeat.provider.aws.deploy_bucket: "functionbeat-deploy"
+
 functionbeat.provider.aws.functions:
   # Define the list of function availables, each function required to have a unique name.
   # Create a function that accepts events coming from cloudwatchlogs.
-  - name: fn_cloudwatch_logs
+  - name: cloudwatch
     enabled: false
     type: cloudwatch_logs
 
