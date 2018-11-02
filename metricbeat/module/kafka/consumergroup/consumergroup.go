@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/kafka"
@@ -52,8 +51,6 @@ var debugf = logp.MakeDebug("kafka")
 
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The kafka consumergroup metricset is beta")
-
 	opts := kafka.MetricSetOptions{
 		Version: "0.9.0.0",
 	}
