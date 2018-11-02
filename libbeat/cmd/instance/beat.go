@@ -61,6 +61,7 @@ import (
 	"github.com/elastic/beats/libbeat/version"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
+	ucfg "github.com/elastic/go-ucfg"
 
 	// Register publisher pipeline modules
 	_ "github.com/elastic/beats/libbeat/publisher/includes"
@@ -140,12 +141,13 @@ func init() {
 // CryptGenRandom is used.
 func initRand() {
 	n, err := cryptRand.Int(cryptRand.Reader, big.NewInt(math.MaxInt64))
-	seed := n.Int64()
+	var seed int64
 	if err != nil {
 		// fallback to current timestamp
 		seed = time.Now().UnixNano()
+	} else {
+		seed = n.Int64()
 	}
-
 	rand.Seed(seed)
 }
 
@@ -154,7 +156,11 @@ func initRand() {
 // implementation. bt is the `Creator` callback for creating a new beater
 // instance.
 // XXX Move this as a *Beat method?
-func Run(name, idxPrefix, version string, bt beat.Creator) error {
+func Run(settings Settings, bt beat.Creator) error {
+	name := settings.Name
+	idxPrefix := settings.IndexPrefix
+	version := settings.Version
+
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
@@ -185,7 +191,7 @@ func Run(name, idxPrefix, version string, bt beat.Creator) error {
 		monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
 		monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
 
-		return b.launch(bt)
+		return b.launch(settings, bt)
 	}())
 }
 
@@ -223,8 +229,8 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 	return &Beat{Beat: b}, nil
 }
 
-// init does initialization of things common to all actions (read confs, flags)
-func (b *Beat) Init() error {
+// InitWithSettings does initialization of things common to all actions (read confs, flags)
+func (b *Beat) InitWithSettings(settings Settings) error {
 	err := b.handleFlags()
 	if err != nil {
 		return err
@@ -234,11 +240,18 @@ func (b *Beat) Init() error {
 		return err
 	}
 
-	if err := b.configure(); err != nil {
+	if err := b.configure(settings); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// Init does initialization of things common to all actions (read confs, flags)
+//
+// Deprecated: use InitWithSettings
+func (b *Beat) Init() error {
+	return b.InitWithSettings(Settings{})
 }
 
 // BeatConfig returns config section for this beat
@@ -306,11 +319,11 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	return beater, nil
 }
 
-func (b *Beat) launch(bt beat.Creator) error {
+func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer logp.Sync()
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
-	err := b.Init()
+	err := b.InitWithSettings(settings)
 	if err != nil {
 		return err
 	}
@@ -328,7 +341,10 @@ func (b *Beat) launch(bt beat.Creator) error {
 	}
 
 	if b.Config.Monitoring.Enabled() {
-		reporter, err := report.New(b.Info, b.Config.Monitoring, b.Config.Output)
+		settings := report.Settings{
+			DefaultUsername: settings.Monitoring.DefaultUsername,
+		}
+		reporter, err := report.New(b.Info, settings, b.Config.Monitoring, b.Config.Output)
 		if err != nil {
 			return err
 		}
@@ -488,10 +504,10 @@ func (b *Beat) handleFlags() error {
 // config reads the configuration file from disk, parses the common options
 // defined in BeatConfig, initializes logging, and set GOMAXPROCS if defined
 // in the config. Lastly it invokes the Config method implemented by the beat.
-func (b *Beat) configure() error {
+func (b *Beat) configure(settings Settings) error {
 	var err error
 
-	cfg, err := cfgfile.Load("")
+	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
 	if err != nil {
 		return fmt.Errorf("error loading config file: %v", err)
 	}
@@ -506,8 +522,13 @@ func (b *Beat) configure() error {
 		return fmt.Errorf("could not initialize the keystore: %v", err)
 	}
 
-	// TODO: Allow the options to be more flexible for dynamic changes
-	common.OverwriteConfigOpts(keystore.ConfigOpts(store))
+	if settings.DisableConfigResolver {
+		common.OverwriteConfigOpts(obfuscateConfigOpts())
+	} else {
+		// TODO: Allow the options to be more flexible for dynamic changes
+		common.OverwriteConfigOpts(configOpts(store))
+	}
+
 	b.keystore = store
 	err = cloudid.OverwriteSettings(cfg)
 	if err != nil {
@@ -812,5 +833,25 @@ func logSystemInfo(info beat.Info) {
 		if len(process) > 0 {
 			log.Infow("Process info", "process", process)
 		}
+	}
+}
+
+// configOpts returns ucfg config options with a resolver linked to the current keystore.
+// TODO: Refactor to allow insert into the config option array without having to redefine everything
+func configOpts(store keystore.Keystore) []ucfg.Option {
+	return []ucfg.Option{
+		ucfg.PathSep("."),
+		ucfg.Resolve(keystore.ResolverWrap(store)),
+		ucfg.ResolveEnv,
+		ucfg.VarExp,
+	}
+}
+
+// obfuscateConfigOpts disables any resolvers in the configuration, instead we return the field
+// reference string directly.
+func obfuscateConfigOpts() []ucfg.Option {
+	return []ucfg.Option{
+		ucfg.PathSep("."),
+		ucfg.ResolveNOOP,
 	}
 }
