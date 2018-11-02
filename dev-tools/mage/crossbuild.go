@@ -88,6 +88,17 @@ func ImageSelector(f ImageSelectorFunc) func(params *crossBuildParams) {
 	}
 }
 
+// AddPlatforms sets dependencies on others platforms.
+func AddPlatforms(expressions ...string) func(params *crossBuildParams) {
+	return func(params *crossBuildParams) {
+		var list BuildPlatformList
+		for _, expr := range expressions {
+			list = NewPlatformList(expr)
+			params.Platforms = params.Platforms.Merge(list)
+		}
+	}
+}
+
 type crossBuildParams struct {
 	Platforms     BuildPlatformList
 	Target        string
