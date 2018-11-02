@@ -31,8 +31,7 @@ You can change these settings by using CLI flags or setting
 
 {beatname_uc} uses the following default paths unless you explicitly change them.
 
-ifndef::win_only[]
-
+ifdef::deb_os,rpm_os[]
 [float]
 ===== deb and rpm
 [cols="<h,<,<m",options="header",]
@@ -50,7 +49,7 @@ the systemd unit file.  Make sure that you start the {beatname_uc} service by us
 the preferred operating system method (init scripts or `systemctl`).
 Otherwise the paths might be set incorrectly.
 
-endif::win_only[]
+endif::deb_os,rpm_os[]
 
 ifdef::docker_platform[]
 [float]
@@ -67,6 +66,7 @@ ifdef::docker_platform[]
 
 endif::docker_platform[]
 
+ifdef::mac_os,win_os[]
 [float]
 ===== zip, tar.gz, or tgz
 [cols="<h,<,<m",options="header",]
@@ -77,11 +77,16 @@ endif::docker_platform[]
 | config | The location for configuration files. | {extract.path}
 | data   | The location for persistent data files. | {extract.path}/data
 | logs   | The location for the logs created by {beatname_uc}. | {extract.path}/logs
+ifdef::serverless[]
+| pkg    | The location for the binary uploaded to your serverless provider. | {extract.path}/pkg
+endif::serverless[]
 |=======================================================================
 
 For the zip, tar.gz, or tgz distributions, these paths are based on the location
 of the extracted binary file. This means that if you start {beatname_uc} with
 the following simple command, all paths are set correctly:
+
+endif::mac_os,win_os[]
 
 ifndef::win_only[]
 

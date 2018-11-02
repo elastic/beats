@@ -6,7 +6,6 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
 * <<{beatname_lc}-template>>
-* <<load-kibana-dashboards>>
 * <<{beatname_lc}-starting>>
 * <<view-kibana-dashboards>>
 * <<setup-repositories>>
@@ -17,9 +16,11 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 The {beatname_uc} package contains the command line tools, configuration file,
 and binary code required to run {beatname_uc} in your serverless environment. 
 
-To download and extract the package, use the commands that work with your system.
+To download and extract the package, use the commands that work with your
+system.
 
-TODO: Confirm and update paths.
+// REVIEWERS: will the download path include x-path? In BC2, it's 
+// https://staging.elastic.co/6.5.0-92a7b7db/downloads/beats/x-pack/functionbeat/functionbeat-6.5.0-windows-x86_64.zip
 
 [[linux]]
 *linux:*
@@ -34,8 +35,8 @@ ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
-tar xzvf {beatname_lc}-{version}-ADDPATHHERE.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
 ------------------------------------------------
 
 endif::[]
@@ -75,8 +76,6 @@ https://www.elastic.co/downloads/beats/{beatname_lc}[downloads page].
 
 . Extract the contents of the zip file. 
 
-QUESTION: Is powershell required to run the deploy command?
-
 endif::[]
 
 [id="{beatname_lc}-configuration"]
@@ -84,8 +83,8 @@ endif::[]
 
 Before deploying {beatname_uc} to your serverless environment, you need to
 specify details about the functions that you want to deploy, including the
-function name, type, and triggers that will invoke the function. You also need
-to specify connection details for your {es} cluster. 
+function name, type, and triggers that will cause the function to execute.
+You also need to specify connection details for your {es} cluster. 
 
 You specify settings in the  +{beatname_lc}.yml+ configuration file. This file
 is located in the archive that you extracted earlier.
@@ -94,25 +93,63 @@ TIP: See the
 {libbeat}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
-The following example configures a function called `myfunction` that collects
+The following example configures a function called `cloudwatch` that collects
 events from Cloudwatch Logs and forwards the events to {es}.
 
 ["source","sh",subs="attributes"]
 -------------------------------------------------------------------------------------
-ADD EXAMPLE HERE.
+{beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
+{beatname_lc}.provider.aws.functions:
+  - name: cloudwatch
+    enabled: true
+    type: cloudwatch_logs
+    description: "lambda function for cloudwatch logs"
+    triggers:
+      - log_group_name: /aws/lambda/myfunction-cloudwatch_logs
+output.elasticsearch:
+  cloud.id: "MyESDeployment:SomeLongString=="
+  cloud.auth: "elastic:SomeLongString"
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
 -------------------------------------------------------------------------------------
 
 To configure {beatname_uc}:
 
-. Define the functions that will execute in your serverless environment.
-+
-TODO: Explain what is required (name, type?, one or more triggers, etc. Will
-need to desribe triggers somewhere else maybe and refer to those?
+. Specify a unique name for the S3 bucket that the functions will be uploaded
+to. For example:
 +
 ["source","sh",subs="attributes"]
--------------------------------------------------------------------------------------
-ADD AN EXAMPLE IF NEEDED
--------------------------------------------------------------------------------------
+----
+{beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
+----
+
+. Define the functions that want to deploy. For each function, you must specify:
++
+[horizontal]
+`name`:: A unique name for the Lambda function.  
+`type`:: The type of service to monitor. For this release, the supported types
+are:
+* `cloudwatch_logs` to collect data from CloudWatch logs.
+* `sqs` to collect data from Amazon Simple Queue Service (SQS)
+`triggers`:: The trigger that will cause the function to execute. If `type` is
+`cloudwatch_logs` logs, specify a list of log groups. If `type` is `sqs`,
+specify a list of Amazon Resource Names (ARNs). 
++
+When a message is sent to the specified log group or queue, the Lambda function
+executes and sends message events to the output configured for {beatname_uc}.
++
+The following example configures a function called `sqs` that collects data
+from Amazon SQS:
++
+["source","sh",subs="attributes"]
+----
+- name: sqs
+  enabled: true
+  type: sqs
+  triggers:
+    - event_source_arn: arn:aws:sqs:us-east-1:123456789012:myevents
+----
 
 include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
 
@@ -130,72 +167,57 @@ include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 :allplatforms:
 include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
-[[load-kibana-dashboards]]
-=== Step 4: Set up the Kibana dashboards
-
-:allplatforms:
-include::{libbeat-dir}/docs/dashboards.asciidoc[]
-
 [id="{beatname_lc}-starting"]
-=== Step 5: Deploy {beatname_uc} code to your serverless environment
+=== Step 4: Deploy {beatname_uc} code to your serverless environment
 
-Before deploying functions to your serverless environment, make sure you're
-logged in with the credentials required by your cloud service provider. 
+Before deploying functions to your serverless environment, make sure your user
+has the credentials required by your cloud service provider. For example, if you
+are deploying an AWS Lambda function, you can set environment variables that
+contain your credentials:
 
-QUESTION: Does the user need specific privileges to run functionbeat?
+*linux and mac*:
 
-The following command deploys the function named `myfunction`. See xxx for more
-information about the `deploy` command.
+[source, shell]
+----
+export AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMNOPUSER
+export AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
+export AWS_DEFAULT_REGION=us-east-1
+----
 
-TODO: Add link that points to the command reference for more information.
+*win*:
 
-QUESTION: Which flags do we want to show in the example here? debug selectors?
+[source, shell]
+----
+set AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMNOPUSER
+set AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
+set AWS_DEFAULT_REGION=us-east-1
+----
 
-QUESTION: What happens to the Lambda function running on Amazon if you change
-the configuration after deploying the function? 
+After setting credentials, run the `deploy` command to deploy the function.
+The following command deploys a function called `cloudwatch`: 
 
-*linux:*
+*linux and mac:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-{beatname_lc} function deploy myfunction
-----------------------------------------------------------------------
-
-*mac:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-./{beatname_lc} function deploy myfunction
+./{beatname_lc} deploy cloudwatch -d "*"
 ----------------------------------------------------------------------
 
 *win:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-PS > .\{beatname_lc}.exe function deploy myfunction
+.{backslash}{beatname_lc}.exe deploy cloudwatch
 ----------------------------------------------------------------------
 
 {beatname_uc} is now deployed in your serverless environment and ready to send
-log files to the output.
+log events to the configured output.
 
 [[view-kibana-dashboards]]
-=== Step 6: View the sample Kibana dashboards
+=== Step 5: View your data in Kibana
 
-To make it easier for you to explore {beatname_uc} data in Kibana, we've created
-example {beatname_uc} dashboards. You loaded the dashboards earlier when you
-ran the `setup` command.
+There are currently no example dashboards available for {beatname_uc}.
 
-include::{libbeat-dir}/docs/opendashboards.asciidoc[]
+To learn how to view and explore your data, see the
+_{kibana-ref}/index.html[{kib} User Guide]_.
 
-You can use these dashboards as examples and
-{kibana-ref}/dashboard.html[customize] them to meet your needs.
-
-To populate the example dashboards with data, you need to either
-<<configuring-ingest-node,define ingest node pipelines>> or use Logstash to
-parse the data into the fields expected by the dashboards. 
-
-Here is an example of the {beatname_uc} ADD DASHBOARD NAME dashboard:
-
-// Add an example of the dashboard
-//[role="screenshot"]
-//image:./images/add-image-name.png[]

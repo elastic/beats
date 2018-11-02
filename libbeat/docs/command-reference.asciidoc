@@ -20,7 +20,7 @@
 :keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
 :modules-command-short-desc: Manages configured modules
 :package-command-short-desc: Packages the configuration and executable in a zip file
-:remove-command-short-desc: Removes the specified function
+:remove-command-short-desc: Removes the specified function from your serverless environment
 :run-command-short-desc: Runs {beatname_uc}. This command is used by default if you start {beatname_uc} without specifying a command
 
 ifndef::deprecate_dashboard_loading[]

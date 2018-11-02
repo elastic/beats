@@ -7,16 +7,7 @@ Before modifying configuration settings, make sure you've completed the
 <<{beatname_lc}-configuration,configuration steps>> in the Getting Started.
 This section describes some common use cases for changing configuration options.
 
-To configure {beatname_uc}, you edit the configuration file before deploying
-functions to your serverless environment. For rpm and deb,
-you’ll find the configuration file at +/etc/{beatname_lc}/{beatname_lc}.yml+.
-There's also a full example configuration file at
-+/etc/{beatname_lc}/{beatname_lc}.reference.yml+ that shows all non-deprecated
-options. For mac and win, look in the archive that you extracted.
-
-The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax.
-See the {libbeat}/config-file-format.html[Config File Format] section of the
-_{libbeat_docs}_ for more about the structure of the config file.
+include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
 
 The following topics describe how to configure {beatname_uc}:
 
@@ -33,11 +24,10 @@ The following topics describe how to configure {beatname_uc}:
 * <<configuration-template>>
 * <<configuration-logging>>
 * <<using-environ-vars>>
-//* <<configuration-autodiscover>>
 * <<yaml-tips>>
 * <<regexp-support>>
 * <<http-endpoint>>
-//* <<{beatname_lc}-reference-yml>>
+* <<{beatname_lc}-reference-yml>>
 
 --
 
@@ -69,9 +59,6 @@ include::{libbeat-dir}/docs/loggingconfig.asciidoc[]
 include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
 :standalone!:
 
-//OPEN ISSUE: DO WE NEED AUTODISCOVER?
-//include::{libbeat-dir}/docs/shared-autodiscover.asciidoc[]
-
 :standalone:
 :allplatforms:
 include::{libbeat-dir}/docs/yaml.asciidoc[]
@@ -82,7 +69,4 @@ include::{libbeat-dir}/docs/regexp.asciidoc[]
 
 include::{libbeat-dir}/docs/http-endpoint.asciidoc[]
 
-// TODO: Uncomment the following include statement when the reference yaml file
-// is available in the repo. Also uncomment the link in the jump list at the top
-// of this file.
-//include::{libbeat-dir}/docs/reference-yml.asciidoc[]
+include::{libbeat-dir}/docs/reference-yml.asciidoc[]
