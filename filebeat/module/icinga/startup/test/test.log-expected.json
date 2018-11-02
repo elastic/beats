@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2018-11-06T15:26:20.085Z", 
+        "@timestamp": "2018-11-06T18:29:13.579Z", 
         "event.dataset": "startup", 
         "event.module": "icinga", 
         "icinga.startup.facility": "cli", 
@@ -10,7 +10,7 @@
         "log.offset": 0
     }, 
     {
-        "@timestamp": "2018-11-06T15:26:20.085Z", 
+        "@timestamp": "2018-11-06T18:29:13.579Z", 
         "event.dataset": "startup", 
         "event.module": "icinga", 
         "icinga.startup.facility": "cli", 
