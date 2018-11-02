@@ -91,7 +91,14 @@ annotations:
 -------------------------------------------------------------------------------------
 
 The above annotations are used to spin up a Prometheus collector metricset and it polls the
-parent container on port `9090` at a 1 minute interval.
+parent container on port `9090` at a 1 minute interval. If you need more than one entry for
+values, use comma separated strings. That is:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.metrics/metricsets: 'metricset_1,metricset_2'
+co.elastic.metrics/hosts: 'host_1,host_2'
+-------------------------------------------------------------------------------------
 
 [float]
 ===== Multiple containers
