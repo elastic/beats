@@ -45,6 +45,38 @@ Apache2 Module
 
 
 
+*`http.response.body_sent.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+--
+
+*`source.hostname`*::
++
+--
+type: keyword
+
+test
+
+
+--
+
+*`http.request.referer`*::
++
+--
+type: keyword
+
+Http request referer.
+
+
+--
+
 [float]
 == apache2 fields
 
@@ -59,65 +91,45 @@ Contains fields for the Apache2 HTTPD access logs.
 
 
 
-*`apache2.access.remote_ip`*::
+*`source.ip`*::
 +
 --
-type: keyword
-
-Client IP address.
-
+type: alias
 
 --
 
-*`apache2.access.user_name`*::
+*`user.name`*::
 +
 --
-type: keyword
-
-The user name used when basic authentication is used.
-
+type: alias
 
 --
 
-*`apache2.access.method`*::
+*`http.request.method`*::
 +
 --
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
+type: alias
 
 --
 
-*`apache2.access.url`*::
+*`url.original`*::
 +
 --
-type: keyword
-
-The request HTTP URL.
-
+type: alias
 
 --
 
-*`apache2.access.http_version`*::
+*`http.version`*::
 +
 --
-type: keyword
-
-The HTTP version.
-
+type: alias
 
 --
 
-*`apache2.access.response_code`*::
+*`http.response.status_code`*::
 +
 --
-type: long
-
-The HTTP response code.
-
+type: alias
 
 --
 
@@ -2444,10 +2456,10 @@ URL fields provide a complete URL, with scheme, host, and path. The URL object c
 
 
 
-*`url.href`*::
+*`url.original`*::
 +
 --
-type: text
+type: keyword
 
 example: https://elastic.co:443/search?q=elasticsearch#top
 
@@ -2455,16 +2467,6 @@ Full url. The field is stored as keyword.
 `url.href` is a [multi field](https://www.elastic.co/guide/en/ elasticsearch/reference/6.2/ multi-fields.html#_multi_fields_with_multiple_analyzers). The data is stored as keyword `url.href` and test `url.href.analyzed`. These fields enable you to run a query against part of the url still works splitting up the URL at ingest time.
 `href` is an analyzed field so the parsed information can be accessed through `href.analyzed` in queries.
 
-
-*`url.href.raw`*::
-+
---
-type: keyword
-
-The full URL. This is a non-analyzed field that is useful for aggregations.
-
-
---
 
 --
 

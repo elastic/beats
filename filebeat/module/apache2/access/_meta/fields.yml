@@ -4,30 +4,31 @@
     Contains fields for the Apache2 HTTPD access logs.
   fields:
     - name: remote_ip
-      type: keyword
-      description: >
-        Client IP address.
+      type: alias
+      path: source.ip
+
     - name: user_name
-      type: keyword
-      description: >
-        The user name used when basic authentication is used.
+      type: alias
+      path: user.name
+
     - name: method
-      type: keyword
-      example: GET
-      description: >
-        The request HTTP method.
+      type: alias
+      path: http.request.method
+
     - name: url
-      type: keyword
-      description: >
-        The request HTTP URL.
+      type: alias
+      path: url.original
+
     - name: http_version
-      type: keyword
-      description: >
-        The HTTP version.
+      type: alias
+      path: http.version
+
     - name: response_code
-      type: long
-      description: >
-        The HTTP response code.
+      type: alias
+      path: http.response.status_code
+
+
+
     - name: body_sent.bytes
       type: long
       format: bytes
@@ -37,6 +38,7 @@
       type: keyword
       description: >
         The HTTP referrer.
+
     - name: agent
       type: text
       description: >
@@ -121,3 +123,4 @@
           type: keyword
           description: >
             Region ISO code.
+
