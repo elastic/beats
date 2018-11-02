@@ -42,13 +42,18 @@ import (
 
 // Fileset struct is the representation of a fileset.
 type Fileset struct {
-	name       string
-	mcfg       *ModuleConfig
-	fcfg       *FilesetConfig
-	modulePath string
-	manifest   *manifest
-	vars       map[string]interface{}
-	pipelineID string
+	name        string
+	mcfg        *ModuleConfig
+	fcfg        *FilesetConfig
+	modulePath  string
+	manifest    *manifest
+	vars        map[string]interface{}
+	pipelineIDs []string
+}
+
+type pipeline struct {
+	id       string
+	contents map[string]interface{}
 }
 
 // New allocates a new Fileset object with the given configuration.
@@ -89,7 +94,7 @@ func (fs *Fileset) Read(beatVersion string) error {
 		return err
 	}
 
-	fs.pipelineID, err = fs.getPipelineID(beatVersion)
+	fs.pipelineIDs, err = fs.getPipelineIDs(beatVersion)
 	if err != nil {
 		return err
 	}
@@ -102,7 +107,7 @@ func (fs *Fileset) Read(beatVersion string) error {
 type manifest struct {
 	ModuleVersion   string                   `config:"module_version"`
 	Vars            []map[string]interface{} `config:"var"`
-	IngestPipeline  string                   `config:"ingest_pipeline"`
+	IngestPipeline  []string                 `config:"ingest_pipeline"`
 	Input           string                   `config:"input"`
 	MachineLearning []struct {
 		Name       string `config:"name"`
@@ -329,7 +334,11 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 	}
 
 	// force our pipeline ID
-	err = cfg.SetString("pipeline", -1, fs.pipelineID)
+	rootPipelineID := ""
+	if len(fs.pipelineIDs) > 0 {
+		rootPipelineID = fs.pipelineIDs[0]
+	}
+	err = cfg.SetString("pipeline", -1, rootPipelineID)
 	if err != nil {
 		return nil, fmt.Errorf("Error setting the pipeline ID in the input config: %v", err)
 	}
@@ -349,43 +358,60 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 	return cfg, nil
 }
 
-// getPipelineID returns the Ingest Node pipeline ID
-func (fs *Fileset) getPipelineID(beatVersion string) (string, error) {
-	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline, false)
-	if err != nil {
-		return "", fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
+// getPipelineIDs returns the Ingest Node pipeline IDs
+func (fs *Fileset) getPipelineIDs(beatVersion string) ([]string, error) {
+	var pipelineIDs []string
+	for _, ingestPipeline := range fs.manifest.IngestPipeline {
+		path, err := applyTemplate(fs.vars, ingestPipeline, false)
+		if err != nil {
+			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
+		}
+
+		pipelineIDs = append(pipelineIDs, formatPipelineID(fs.mcfg.Module, fs.name, path, beatVersion))
 	}
 
-	return formatPipelineID(fs.mcfg.Module, fs.name, path, beatVersion), nil
+	return pipelineIDs, nil
 }
 
-// GetPipeline returns the JSON content of the Ingest Node pipeline that parses the logs.
-func (fs *Fileset) GetPipeline(esVersion common.Version) (pipelineID string, content map[string]interface{}, err error) {
-	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline, false)
-	if err != nil {
-		return "", nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
-	}
-
-	strContents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
-	if err != nil {
-		return "", nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
-	}
-
+// GetPipelines returns the JSON content of the Ingest Node pipeline that parses the logs.
+func (fs *Fileset) GetPipelines(esVersion common.Version) (pipelines []pipeline, err error) {
 	vars, err := fs.turnOffElasticsearchVars(fs.vars, esVersion)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
-	jsonString, err := applyTemplate(vars, string(strContents), true)
-	if err != nil {
-		return "", nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %v", err)
+	for idx, ingestPipeline := range fs.manifest.IngestPipeline {
+		path, err := applyTemplate(fs.vars, ingestPipeline, false)
+		if err != nil {
+			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
+		}
+
+		strContents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
+		if err != nil {
+			return nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
+		}
+
+		jsonString, err := applyTemplate(vars, string(strContents), true)
+		if err != nil {
+			return nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %v", err)
+		}
+
+		var content map[string]interface{}
+		err = json.Unmarshal([]byte(jsonString), &content)
+		if err != nil {
+			return nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %v", path, err)
+		}
+
+		pipelineID := fs.pipelineIDs[idx]
+
+		p := pipeline{
+			pipelineID,
+			content,
+		}
+		pipelines = append(pipelines, p)
 	}
 
-	err = json.Unmarshal([]byte(jsonString), &content)
-	if err != nil {
-		return "", nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %v", path, err)
-	}
-	return fs.pipelineID, content, nil
+	return pipelines, nil
 }
 
 // formatPipelineID generates the ID to be used for the pipeline ID in Elasticsearch

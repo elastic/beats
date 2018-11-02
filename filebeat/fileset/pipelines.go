@@ -51,13 +51,15 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 				}
 			}
 
-			pipelineID, content, err := fileset.GetPipeline(esClient.GetVersion())
+			pipelines, err := fileset.GetPipelines(esClient.GetVersion())
 			if err != nil {
 				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
 			}
-			err = loadPipeline(esClient, pipelineID, content, overwrite)
-			if err != nil {
-				return fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
+			for _, pipeline := range pipelines {
+				err = loadPipeline(esClient, pipeline.id, pipeline.contents, overwrite)
+				if err != nil {
+					return fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
+				}
 			}
 		}
 	}
