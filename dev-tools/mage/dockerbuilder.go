@@ -28,15 +28,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type dockerTemplateData struct {
-	BeatName          string
-	Version           string
-	License           string
-	Env               map[string]string
-	LinuxCapabilities string
-	User              string
-}
-
 type dockerBuilder struct {
 	PackageSpec
 }
@@ -48,52 +39,76 @@ func newDockerBuilder(spec PackageSpec) (*dockerBuilder, error) {
 }
 
 func (b *dockerBuilder) Build() error {
-	buildDir := filepath.Join(b.packageDir, "docker-build")
-	beatDir := filepath.Join(buildDir, "beat")
-	// TODO: defer removal of buildDir
+	buildDir := b.buildDir()
+	if err := os.RemoveAll(buildDir); err != nil {
+		return errors.Wrapf(err, "failed to clean existing build directory %s", buildDir)
+	}
 
-	elasticBeatsDir, err := ElasticBeatsDir()
-	if err != nil {
+	if err := b.copyFiles(); err != nil {
 		return err
 	}
-	templatesDir := filepath.Join(elasticBeatsDir, "dev-tools/packaging/templates/docker")
 
+	if err := b.prepareBuild(); err != nil {
+		return errors.Wrap(err, "failed to prepare build")
+	}
+
+	tag, err := b.dockerBuild()
+	if err != nil {
+		return errors.Wrap(err, "failed to build docker")
+	}
+
+	if err := b.dockerSave(tag); err != nil {
+		return errors.Wrap(err, "failed to save docker as artifact")
+	}
+
+	return nil
+}
+
+func (b *dockerBuilder) buildDir() string {
+	return filepath.Join(b.packageDir, "docker-build")
+}
+
+func (b *dockerBuilder) beatDir() string {
+	return filepath.Join(b.buildDir(), "beat")
+}
+
+func (b *dockerBuilder) copyFiles() error {
+	beatDir := b.beatDir()
 	for _, f := range b.Files {
 		target := filepath.Join(beatDir, f.Target)
 		if err := Copy(f.Source, target); err != nil {
 			return errors.Wrapf(err, "failed to copy from %s to %s", f.Source, target)
 		}
 	}
+	return nil
+}
 
-	/* TODO:
-	data := dockerTemplateData{
-		BeatName: b.Name,
-		Version:  b.Version,
-		License:  b.License,
+func (b *dockerBuilder) prepareBuild() error {
+	elasticBeatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		return err
 	}
-	*/
+	templatesDir := filepath.Join(elasticBeatsDir, "dev-tools/packaging/templates/docker")
+
 	data := map[string]interface{}{
 		"From":              "centos:7", // TODO: Parametrize this
 		"BeatName":          b.Name,
 		"Version":           b.Version,
+		"Vendor":            b.Vendor,
 		"License":           b.License,
 		"Env":               map[string]string{},
 		"LinuxCapabilities": "",
 		"User":              b.Name,
 	}
 
-	// TODO: Expand templates from packages.yml?
-	err = filepath.Walk(templatesDir, func(path string, info os.FileInfo, err error) error {
-		/* TODO: Why there is an error here?
-		if err != nil {
-			return err
-		}
-		*/
+	buildDir := b.buildDir()
+	return filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
 		if !info.IsDir() {
 			target := strings.TrimSuffix(
 				filepath.Join(buildDir, filepath.Base(path)),
 				".tmpl",
 			)
+
 			err = expandFile(path, target, data)
 			if err != nil {
 				return errors.Wrapf(err, "expanding template '%s' to '%s'", path, target)
@@ -101,12 +116,26 @@ func (b *dockerBuilder) Build() error {
 		}
 		return nil
 	})
-	if err != nil {
+}
+
+func (b *dockerBuilder) dockerBuild() (string, error) {
+	repository := "docker.elastic.co/beats"                                   // TODO: Parametrize this
+	tag := fmt.Sprintf("%s:%s", filepath.Join(repository, b.Name), b.Version) // TODO: What about OSS?
+	return tag, sh.Run("docker", "build", "-t", tag, b.buildDir())
+}
+
+func (b *dockerBuilder) dockerSave(tag string) error {
+	// Save the container as artifact
+	outputFile := b.OutputFile
+	if outputFile == "" {
+		outputTar, err := b.Expand(defaultBinaryName + ".docker.tar")
+		if err != nil {
+			return err
+		}
+		outputFile = filepath.Join(distributionsDir, outputTar)
+	}
+	if err := sh.Run("docker", "save", "-o", outputFile, tag); err != nil {
 		return err
 	}
-
-	// TODO: Tag container on build
-	repository := "docker.elastic.co/beats" // TODO: Parametrize this
-	tag := fmt.Sprintf("%s/%s:%s", repository, b.Name, b.Version)
-	return sh.RunCmd("docker", "build", "-t", tag, buildDir)()
+	return errors.Wrap(CreateSHA512File(outputFile), "failed to create .sha512 file")
 }
