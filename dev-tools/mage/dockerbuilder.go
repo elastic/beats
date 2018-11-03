@@ -72,6 +72,16 @@ func (b *dockerBuilder) beatDir() string {
 	return filepath.Join(b.buildDir(), "beat")
 }
 
+func (b *dockerBuilder) modulesDirs() []string {
+	var modulesd []string
+	for _, f := range b.Files {
+		if f.Modules {
+			modulesd = append(modulesd, f.Target)
+		}
+	}
+	return modulesd
+}
+
 func (b *dockerBuilder) copyFiles() error {
 	beatDir := b.beatDir()
 	for _, f := range b.Files {
@@ -96,6 +106,7 @@ func (b *dockerBuilder) prepareBuild() error {
 		"Env":               map[string]string{},
 		"LinuxCapabilities": "",
 		"User":              b.ServiceName,
+		"ModulesDirs":       b.modulesDirs(),
 	}
 
 	buildDir := b.buildDir()

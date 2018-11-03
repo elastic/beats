@@ -174,14 +174,16 @@ func customizePackaging() {
 
 		modulesDTarget = "modules.d"
 		modulesD       = mage.PackageFile{
-			Mode:   0644,
-			Source: "modules.d",
-			Config: true,
+			Mode:    0644,
+			Source:  "modules.d",
+			Config:  true,
+			Modules: true,
 		}
 		modulesDXPack = mage.PackageFile{
-			Mode:   0644,
-			Source: dirModulesDGeneratedXPack,
-			Config: true,
+			Mode:    0644,
+			Source:  dirModulesDGeneratedXPack,
+			Config:  true,
+			Modules: true,
 		}
 	)
 

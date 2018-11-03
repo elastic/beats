@@ -10,7 +10,8 @@ LABEL \
   org.label-schema.version="{{ .Version }}" \
   org.label-schema.url="https://www.elastic.co/products/beats/{{ .BeatName }}" \
   org.label-schema.vcs-url="{{ .BeatURL }}" \
-  license="{{ .BeatLicense }}"
+  license="{{ .BeatLicense }}" \
+  description="{{ .BeatDescription }}"
 
 ENV ELASTIC_CONTAINER "true"
 ENV PATH={{ $beatHome }}:$PATH
@@ -27,14 +28,22 @@ RUN setcap {{ .LinuxCapabilities }} {{ $beatBinary }}
 {{- end }}
 
 RUN groupadd --gid 1000 {{ .BeatName }}
+
+WORKDIR {{ $beatHome }}
+RUN mkdir data logs && \
+    chown -R root:{{ .BeatName }} . && \
+    find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
+    find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
+    chmod 0750 {{ $beatBinary }} && \
+    chmod 0770 data logs
+{{- range $i, $modulesd := .ModulesDirs }}
+RUN chmod 0770 {{ $modulesd }}
+{{- end }}
+
 {{- if .User }}
 RUN useradd -M --uid 1000 --gid 1000 --home {{ $beatHome }} {{ .User }}
 USER {{ .User }}
 {{- end }}
-
-WORKDIR /usr/share/{{ .BeatName }}
-
-# TODO: Fix permissions in files
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 CMD ["-e"]

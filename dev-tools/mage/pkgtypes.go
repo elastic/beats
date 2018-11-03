@@ -104,6 +104,7 @@ type PackageFile struct {
 	Target   string                  `yaml:"target,omitempty"`    // Target location in package. Relative paths are added to a package specific directory (e.g. metricbeat-7.0.0-linux-x86_64).
 	Mode     os.FileMode             `yaml:"mode,omitempty"`      // Target mode for file. Does not apply when source is a directory.
 	Config   bool                    `yaml:"config"`              // Mark file as config in the package (deb and rpm only).
+	Modules  bool                    `yaml:"modules"`             // Mark directory as directory with modules.
 	Dep      func(PackageSpec) error `yaml:"-" hash:"-" json:"-"` // Dependency to invoke during Evaluate.
 }
 
