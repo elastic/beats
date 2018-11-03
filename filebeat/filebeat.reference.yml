@@ -757,10 +757,10 @@ filebeat.inputs:
 # This option is not supported on Windows.
 #filebeat.registry_file_permissions: 0600
 
-# The registry flush timeout. The registry is written to disk if the oldest
-# unwritten update to the registry exceeds registry_flush. If set to 0s, the
-# registry will be flushed after every batch of events that has been successfully
-# published.
+# The timeout value that controls when registry entries are written to disk
+# (flushed). When an unwritten update exceeds this value, it triggers a write to
+# disk. When registry_flush is set to 0s, the registry is written to disk after
+# each batch of events has been published successfully. The default value is 0s.
 #filebeat.registry_flush: 0s
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
