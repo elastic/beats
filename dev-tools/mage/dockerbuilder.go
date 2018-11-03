@@ -92,13 +92,10 @@ func (b *dockerBuilder) prepareBuild() error {
 
 	data := map[string]interface{}{
 		"From":              "centos:7", // TODO: Parametrize this
-		"BeatName":          b.Name,
 		"Version":           b.Version,
-		"Vendor":            b.Vendor,
-		"License":           b.License,
 		"Env":               map[string]string{},
 		"LinuxCapabilities": "",
-		"User":              b.Name,
+		"User":              b.ServiceName,
 	}
 
 	buildDir := b.buildDir()
@@ -109,7 +106,7 @@ func (b *dockerBuilder) prepareBuild() error {
 				".tmpl",
 			)
 
-			err = expandFile(path, target, data)
+			err = ExpandFile(path, target, data)
 			if err != nil {
 				return errors.Wrapf(err, "expanding template '%s' to '%s'", path, target)
 			}

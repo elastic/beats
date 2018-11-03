@@ -5,12 +5,12 @@ FROM {{ .From }}
 
 LABEL \
   org.label-schema.schema-version="1.0" \
-  org.label-schema.vendor="{{ .Vendor }}" \
+  org.label-schema.vendor="{{ .BeatVendor }}" \
   org.label-schema.name="{{ .BeatName }}" \
   org.label-schema.version="{{ .Version }}" \
   org.label-schema.url="https://www.elastic.co/products/beats/{{ .BeatName }}" \
-  org.label-schema.vcs-url="https://github.com/elastic/beats-docker" \
-  license="{{ .License }}"
+  org.label-schema.vcs-url="{{ .BeatURL }}" \
+  license="{{ .BeatLicense }}"
 
 ENV ELASTIC_CONTAINER "true"
 ENV PATH={{ $beatHome }}:$PATH
