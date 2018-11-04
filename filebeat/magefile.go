@@ -203,7 +203,7 @@ func customizePackaging() {
 
 		pkgType := args.Types[0]
 		switch pkgType {
-		case mage.TarGz, mage.Zip:
+		case mage.TarGz, mage.Zip, mage.Docker:
 			args.Spec.Files[moduleTarget] = mods
 			args.Spec.Files[modulesDTarget] = modsD
 		case mage.Deb, mage.RPM:
