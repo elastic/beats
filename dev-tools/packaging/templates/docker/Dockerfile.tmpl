@@ -1,5 +1,6 @@
 {{- $beatHome := printf "%s/%s" "/usr/share" .BeatName }}
 {{- $beatBinary := printf "%s/%s" $beatHome .BeatName }}
+{{- $repoInfo := repo }}
 
 FROM {{ .From }}
 
@@ -8,8 +9,8 @@ LABEL \
   org.label-schema.vendor="{{ .BeatVendor }}" \
   org.label-schema.name="{{ .BeatName }}" \
   org.label-schema.version="{{ .Version }}" \
-  org.label-schema.url="https://www.elastic.co/products/beats/{{ .BeatName }}" \
-  org.label-schema.vcs-url="{{ .BeatURL }}" \
+  org.label-schema.url="{{ .BeatURL }}" \
+  org.label-schema.vcs-url="{{ $repoInfo.RootImportPath }}" \
   license="{{ .BeatLicense }}" \
   description="{{ .BeatDescription }}"
 
