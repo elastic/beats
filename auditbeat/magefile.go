@@ -202,9 +202,10 @@ func customizePackaging() {
 	for _, args := range mage.Packages {
 		pkgType := args.Types[0]
 		switch pkgType {
-		case mage.TarGz, mage.Zip:
+		case mage.TarGz, mage.Zip, mage.Docker:
 			args.Spec.ReplaceFile("{{.BeatName}}.yml", shortConfig)
 			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfig)
+			args.Spec.ExtraVar("user", "root")
 		case mage.Deb, mage.RPM, mage.DMG:
 			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", shortConfig)
 			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)

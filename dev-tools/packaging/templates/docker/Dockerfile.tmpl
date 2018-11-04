@@ -2,7 +2,7 @@
 {{- $beatBinary := printf "%s/%s" $beatHome .BeatName }}
 {{- $repoInfo := repo }}
 
-FROM {{ .From }}
+FROM {{ .from }}
 
 LABEL \
   org.label-schema.schema-version="1.0" \
@@ -24,8 +24,8 @@ COPY beat {{ $beatHome }}
 COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod a+x /usr/local/bin/docker-entrypoint
 
-{{- if .LinuxCapabilities }}
-RUN setcap {{ .LinuxCapabilities }} {{ $beatBinary }}
+{{- if .linux_capabilities }}
+RUN setcap {{ .linux_capabilities }} {{ $beatBinary }}
 {{- end }}
 
 RUN groupadd --gid 1000 {{ .BeatName }}
@@ -41,10 +41,10 @@ RUN mkdir data logs && \
 RUN chmod 0770 {{ $modulesd }}
 {{- end }}
 
-{{- if .User }}
-RUN useradd -M --uid 1000 --gid 1000 --home {{ $beatHome }} {{ .User }}
-USER {{ .User }}
+{{- if ne .user "root" }}
+RUN useradd -M --uid 1000 --gid 1000 --home {{ $beatHome }} {{ .user }}
 {{- end }}
+USER {{ .user }}
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 CMD ["-e"]

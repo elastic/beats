@@ -293,6 +293,13 @@ func (s PackageSpec) ReplaceFile(target string, file PackageFile) {
 	s.Files[target] = file
 }
 
+func (s *PackageSpec) ExtraVar(key, value string) {
+	if s.ExtraVars == nil {
+		s.ExtraVars = make(map[string]string)
+	}
+	s.ExtraVars[key] = value
+}
+
 // Expand expands a templated string using data from the spec.
 func (s PackageSpec) Expand(in string, args ...map[string]interface{}) (string, error) {
 	return expandTemplate("inline", in, FuncMap,

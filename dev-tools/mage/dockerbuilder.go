@@ -101,11 +101,8 @@ func (b *dockerBuilder) prepareBuild() error {
 	templatesDir := filepath.Join(elasticBeatsDir, "dev-tools/packaging/templates/docker")
 
 	data := map[string]interface{}{
-		"From":              "centos:7", // TODO: Parametrize this
-		"Env":               map[string]string{},
-		"LinuxCapabilities": "",
-		"User":              b.ServiceName,
-		"ModulesDirs":       b.modulesDirs(),
+		"Env":         map[string]string{},
+		"ModulesDirs": b.modulesDirs(),
 	}
 
 	buildDir := b.buildDir()
@@ -116,7 +113,7 @@ func (b *dockerBuilder) prepareBuild() error {
 				".tmpl",
 			)
 
-			err = ExpandFile(path, target, data)
+			err = b.ExpandFile(path, target, data)
 			if err != nil {
 				return errors.Wrapf(err, "expanding template '%s' to '%s'", path, target)
 			}
