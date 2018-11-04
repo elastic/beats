@@ -102,7 +102,6 @@ func (b *dockerBuilder) prepareBuild() error {
 
 	data := map[string]interface{}{
 		"From":              "centos:7", // TODO: Parametrize this
-		"Version":           b.Version,
 		"Env":               map[string]string{},
 		"LinuxCapabilities": "",
 		"User":              b.ServiceName,
@@ -127,8 +126,8 @@ func (b *dockerBuilder) prepareBuild() error {
 }
 
 func (b *dockerBuilder) dockerBuild() (string, error) {
-	repository := "docker.elastic.co/beats"                                   // TODO: Parametrize this
-	tag := fmt.Sprintf("%s:%s", filepath.Join(repository, b.Name), b.Version) // TODO: What about OSS?
+	repository := "docker.elastic.co/beats" // TODO: Parametrize this
+	tag := fmt.Sprintf("%s:%s", filepath.Join(repository, b.Name), b.Version)
 	return tag, sh.Run("docker", "build", "-t", tag, b.buildDir())
 }
 
