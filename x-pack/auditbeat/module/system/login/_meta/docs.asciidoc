@@ -1,0 +1,8 @@
+The System `logins` metricset provides ... TODO.
+
+The module is implemented for Linux.
+
+[float]
+=== Configuration options
+
+TODO

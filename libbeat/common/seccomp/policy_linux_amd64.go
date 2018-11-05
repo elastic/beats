@@ -72,6 +72,7 @@ func init() {
 					"gettid",
 					"gettimeofday",
 					"getuid",
+					"getutent",
 					"inotify_add_watch",
 					"inotify_init1",
 					"inotify_rm_watch",
