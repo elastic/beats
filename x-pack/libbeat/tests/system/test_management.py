@@ -122,6 +122,50 @@ class TestManagement(BaseTest):
 
         proc.check_kill_and_wait()
 
+    def test_configs_cache(self):
+        """
+        Config cache is used if Kibana is not available
+        """
+        # Enroll the beat
+        config_path = os.path.join(self.working_dir, "mockbeat.yml")
+        self.render_config_template("mockbeat", config_path)
+        exit_code = self.enroll(KIBANA_PASSWORD)
+        assert exit_code == 0
+
+        # Update output configuration
+        self.create_and_assing_tag([
+            {
+                "type": "output",
+                "configs": [
+                    {
+                        "output": "file",
+                        "file": {
+                            "path": os.path.join(self.working_dir, "output"),
+                            "filename": "mockbeat_managed",
+                        }
+                    }
+                ]
+            }
+        ])
+
+        output_file = os.path.join("output", "mockbeat_managed")
+
+        # Start beat
+        proc = self.start_beat()
+        self.wait_until(cond=lambda: self.output_has(1, output_file=output_file))
+        proc.check_kill_and_wait()
+
+        # Remove output file
+        os.remove(os.path.join(self.working_dir, output_file))
+
+        # Cache should exists already, start with wrong kibana settings:
+        proc = self.start_beat(extra_args=[
+            "-E", "management.kibana.host=wronghost",
+            "-E", "management.kibana.timeout=0.5s",
+        ])
+        self.wait_until(cond=lambda: self.output_has(1, output_file=output_file))
+        proc.check_kill_and_wait()
+
     def enroll(self, password):
         return self.run_beat(
             extra_args=["enroll", self.get_kibana_url(),
