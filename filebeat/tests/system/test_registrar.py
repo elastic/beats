@@ -845,6 +845,7 @@ class Test(BaseTest):
         if os.name == "nt":
             assert data[0]["offset"] == 3
         else:
+            print data[0]
             assert data[0]["offset"] == 2
 
     def test_clean_removed(self):

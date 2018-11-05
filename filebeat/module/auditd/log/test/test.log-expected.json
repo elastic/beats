@@ -14,7 +14,12 @@
         "fileset.module": "auditd", 
         "fileset.name": "log", 
         "input.type": "log", 
+<<<<<<< HEAD
         "offset": 0
+=======
+        "log.offset": 0, 
+        "prospector.type": "log"
+>>>>>>> Rename field `offset` to `log.offset`
     }, 
     {
         "@timestamp": "2017-01-31T20:17:14.891Z", 
@@ -47,6 +52,11 @@
         "fileset.module": "auditd", 
         "fileset.name": "log", 
         "input.type": "log", 
+<<<<<<< HEAD
         "offset": 174
+=======
+        "log.offset": 174, 
+        "prospector.type": "log"
+>>>>>>> Rename field `offset` to `log.offset`
     }
 ]

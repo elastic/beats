@@ -26,8 +26,8 @@
         "kibana.log.meta.statusCode": 304, 
         "kibana.log.meta.type": "response", 
         "kibana.log.tags": [], 
+        "log.offset": 0, 
         "message": "GET /ui/fonts/open_sans/open_sans_v15_latin_600.woff2 304 26ms - 9.0B", 
-        "offset": 0, 
         "process.pid": 69410, 
         "service.name": [
             "kibana"
@@ -44,8 +44,8 @@
             "monitoring-ui", 
             "kibana-monitoring"
         ], 
+        "log.offset": 920, 
         "message": "Fetching data from kibana_stats collector", 
-        "offset": 920, 
         "process.pid": 69776, 
         "service.name": [
             "kibana"
@@ -62,8 +62,8 @@
             "debug", 
             "exportTypes"
         ], 
+        "log.offset": 1090, 
         "message": "Found exportType at /Users/ruflin/Downloads/6.3/kibana-6.3.0-darwin-x86_64/node_modules/x-pack/plugins/reporting/export_types/csv/server/index.js", 
-        "offset": 1090, 
         "process.pid": 69776, 
         "service.name": [
             "kibana"

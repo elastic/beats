@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 *Filebeat*
 
 - Remove the deprecated `prospector(s)` option in the configuration use `input(s)` instead. {pull}8909[8909]
+- Rename `offset` to `log.offset`.
 
 *Heartbeat*
 

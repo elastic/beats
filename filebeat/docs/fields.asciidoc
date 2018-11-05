@@ -4635,7 +4635,7 @@ The file from which the line was read. This field contains the absolute path to 
 
 --
 
-*`offset`*::
+*`log.offset`*::
 +
 --
 type: long
