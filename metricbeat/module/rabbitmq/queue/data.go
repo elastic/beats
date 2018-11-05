@@ -87,7 +87,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	var queues []map[string]interface{}
 	err := json.Unmarshal(content, &queues)
 	if err != nil {
-		logp.Err("Error: %v", err)
+		logp.Err("Error: %+v", err)
 		return nil, err
 	}
 

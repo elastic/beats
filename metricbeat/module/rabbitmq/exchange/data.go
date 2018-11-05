@@ -59,7 +59,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	var exchanges []map[string]interface{}
 	err := json.Unmarshal(content, &exchanges)
 	if err != nil {
-		logp.Err("Error: %v", err)
+		logp.Err("Error: %+v", err)
 		return nil, err
 	}
 

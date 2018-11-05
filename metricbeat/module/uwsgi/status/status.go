@@ -57,7 +57,7 @@ func fetchStatData(URL string) ([]byte, error) {
 
 	u, err := url.Parse(URL)
 	if err != nil {
-		logp.Err("parsing uwsgi stats url failed: %v", err)
+		logp.Err("parsing uwsgi stats url failed: %+v", err)
 		return nil, err
 	}
 
@@ -95,7 +95,7 @@ func fetchStatData(URL string) ([]byte, error) {
 
 	data, err := ioutil.ReadAll(reader)
 	if err != nil {
-		logp.Err("uwsgi data read failed: %v	", err)
+		logp.Err("uwsgi data read failed: %+v", err)
 		return nil, err
 	}
 
