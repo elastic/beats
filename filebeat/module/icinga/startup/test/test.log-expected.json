@@ -1,22 +1,22 @@
 [
     {
-        "@timestamp": "2018-07-23T11:50:38.896Z",
-        "fileset.module": "icinga",
-        "fileset.name": "startup",
-        "icinga.startup.facility": "cli",
-        "icinga.startup.message": "Icinga application loader (version: r2.6.3-1)",
-        "icinga.startup.severity": "information",
-        "input.type": "log",
+        "@timestamp": "2018-11-05T14:11:43.219Z", 
+        "fileset.module": "icinga", 
+        "fileset.name": "startup", 
+        "icinga.startup.facility": "cli", 
+        "icinga.startup.message": "Icinga application loader (version: r2.6.3-1)", 
+        "icinga.startup.severity": "information", 
+        "input.type": "log", 
         "offset": 0
-    },
+    }, 
     {
-        "@timestamp": "2018-07-23T11:50:38.896Z",
-        "fileset.module": "icinga",
-        "fileset.name": "startup",
-        "icinga.startup.facility": "cli",
-        "icinga.startup.message": "Loading configuration file(s).",
-        "icinga.startup.severity": "information",
-        "input.type": "log",
+        "@timestamp": "2018-11-05T14:11:43.219Z", 
+        "fileset.module": "icinga", 
+        "fileset.name": "startup", 
+        "icinga.startup.facility": "cli", 
+        "icinga.startup.message": "Loading configuration file(s).", 
+        "icinga.startup.severity": "information", 
+        "input.type": "log", 
         "offset": 63
     }
 ]
