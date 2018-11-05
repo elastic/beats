@@ -143,7 +143,8 @@ func apmIndicesExist(clusterState common.MapStr) (bool, error) {
 }
 
 func getClusterMetadataSettings(m *MetricSet) (common.MapStr, error) {
-	filterPaths := []string{"*.cluster.metadata"}
+	// For security reasons we only get the display_name setting
+	filterPaths := []string{"*.cluster.metadata.display_name"}
 	clusterSettings, err := elasticsearch.GetClusterSettingsWithDefaults(m.HTTP, m.HTTP.GetURI(), filterPaths)
 	if err != nil {
 		return nil, errors.Wrap(err, "failure to get cluster settings")
