@@ -20,6 +20,7 @@ package shard
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -61,32 +62,45 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 		return err
 	}
 
+	var errs multierror.Errors
 	for _, index := range stateData.RoutingTable.Indices {
 		for _, shards := range index.Shards {
 			for _, shard := range shards {
 				event := mb.Event{}
 
+				event.RootFields = common.MapStr{}
+				event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
+				event.ModuleFields = common.MapStr{}
+				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
+				event.ModuleFields.Put("cluster.name", stateData.ClusterName)
+
 				fields, err := schema.Apply(shard)
 				if err != nil {
-					r.Error(errors.Wrap(err, "failure applying shard schema"))
+					event.Error = errors.Wrap(err, "failure applying shard schema")
+					r.Event(event)
+					errs = append(errs, event.Error)
 					continue
 				}
 
 				// Handle node field: could be string or null
 				err = elasticsearch.PassThruField("node", shard, fields)
 				if err != nil {
-					r.Error(errors.Wrap(err, "failure passing through node field"))
+					event.Error = errors.Wrap(err, "failure passing through node field")
+					r.Event(event)
+					errs = append(errs, event.Error)
 					continue
 				}
 
 				// Handle relocating_node field: could be string or null
 				err = elasticsearch.PassThruField("relocating_node", shard, fields)
 				if err != nil {
-					r.Error(errors.Wrap(err, "failure passing through relocating_node field"))
+					event.Error = errors.Wrap(err, "failure passing through relocating_node field")
+					r.Event(event)
+					errs = append(errs, event.Error)
 					continue
 				}
 
-				event.ModuleFields = common.MapStr{}
 				event.ModuleFields.Put("node.name", fields["node"])
 				delete(fields, "node")
 
@@ -100,15 +114,9 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 				delete(event.MetricSetFields, "relocating_node")
 				event.MetricSetFields.Put("relocating_node.name", fields["relocating_node"])
 
-				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
-				event.ModuleFields.Put("cluster.name", stateData.ClusterName)
-
-				event.RootFields = common.MapStr{}
-				event.RootFields.Put("service.name", elasticsearch.ModuleName)
-
 				r.Event(event)
 			}
 		}
 	}
-	return nil
+	return errs.Err()
 }
