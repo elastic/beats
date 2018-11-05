@@ -29,6 +29,26 @@ include::../include/config-option-intro.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+[float]
+==== `gc` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `audit` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `slowlog` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `deprecation` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
 :has-dashboards!:
 
 :fileset_ex!:
