@@ -24,13 +24,8 @@ COPY beat {{ $beatHome }}
 COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod a+x /usr/local/bin/docker-entrypoint
 
-{{- if .linux_capabilities }}
-RUN setcap {{ .linux_capabilities }} {{ $beatBinary }}
-{{- end }}
-
 RUN groupadd --gid 1000 {{ .BeatName }}
 
-WORKDIR {{ $beatHome }}
 RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
     chown -R root:{{ .BeatName }} {{ $beatHome }} && \
     find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
@@ -38,7 +33,11 @@ RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
     chmod 0750 {{ $beatBinary }} && \
     chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
 {{- range $i, $modulesd := .ModulesDirs }}
-RUN chmod 0770 {{ $modulesd }}
+RUN chmod 0770 {{ $beatHome}}/{{ $modulesd }}
+{{- end }}
+
+{{- if .linux_capabilities }}
+RUN setcap {{ .linux_capabilities }} {{ $beatBinary }}
 {{- end }}
 
 {{- if ne .user "root" }}
@@ -46,5 +45,6 @@ RUN useradd -M --uid 1000 --gid 1000 --home {{ $beatHome }} {{ .user }}
 {{- end }}
 USER {{ .user }}
 
+WORKDIR {{ $beatHome }}
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 CMD ["-e"]
