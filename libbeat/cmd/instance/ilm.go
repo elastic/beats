@@ -41,7 +41,7 @@ var ILMPolicy = common.MapStr{
 			"hot": common.MapStr{
 				"actions": common.MapStr{
 					"rollover": common.MapStr{
-						"max_size": "25gb",
+						"max_size": "50gb",
 						"max_age":  "30d",
 					},
 				},
