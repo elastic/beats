@@ -152,7 +152,8 @@ class TestManagement(BaseTest):
 
         # Start beat
         proc = self.start_beat()
-        self.wait_until(cond=lambda: self.output_has(1, output_file=output_file))
+        self.wait_until(cond=lambda: self.output_has(
+            1, output_file=output_file))
         proc.check_kill_and_wait()
 
         # Remove output file
@@ -163,7 +164,8 @@ class TestManagement(BaseTest):
             "-E", "management.kibana.host=wronghost",
             "-E", "management.kibana.timeout=0.5s",
         ])
-        self.wait_until(cond=lambda: self.output_has(1, output_file=output_file))
+        self.wait_until(cond=lambda: self.output_has(
+            1, output_file=output_file))
         proc.check_kill_and_wait()
 
     def enroll(self, password):
