@@ -13,6 +13,7 @@
         "haproxy.geoip.country_iso_code": "US", 
         "haproxy.geoip.location.lat": 47.913, 
         "haproxy.geoip.location.lon": -122.3042, 
+        "haproxy.geoip.region_iso_code": "US-WA", 
         "haproxy.geoip.region_name": "Washington", 
         "haproxy.mode": "HTTP", 
         "haproxy.pid": "24551", 
