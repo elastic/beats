@@ -134,7 +134,12 @@ func loadOutput(
 		outStats outputs.Observer
 	)
 	if monitors.Metrics != nil {
-		metrics = monitors.Metrics.NewRegistry("output")
+		metrics = monitors.Metrics.GetRegistry("output")
+		if metrics != nil {
+			metrics.Clear()
+		} else {
+			metrics = monitors.Metrics.NewRegistry("output")
+		}
 		outStats = outputs.NewStats(metrics)
 	}
 
@@ -147,7 +152,12 @@ func loadOutput(
 		monitoring.NewString(metrics, "type").Set(outcfg.Name())
 	}
 	if monitors.Telemetry != nil {
-		telemetry := monitors.Telemetry.NewRegistry("output")
+		telemetry := monitors.Telemetry.GetRegistry("output")
+		if telemetry != nil {
+			telemetry.Clear()
+		} else {
+			telemetry = monitors.Telemetry.NewRegistry("output")
+		}
 		monitoring.NewString(telemetry, "name").Set(outcfg.Name())
 	}
 
