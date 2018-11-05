@@ -48,8 +48,11 @@ func (o *opEnsureBucket) Execute() error {
 				o.log.Debugf("Could not create bucket, resp: %v", resp)
 				return err
 			}
+			// bucket created successfully
+			return nil
 		}
 	}
 
+	// Catchall for unauthorized access.
 	return fmt.Errorf("bucket '%s' already exist and you don't have permission to access it", o.bucketName)
 }
