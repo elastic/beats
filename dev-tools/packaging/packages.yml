@@ -161,7 +161,7 @@ shared:
     <<: *binary_spec
     extra_vars:
       from: 'centos:7'
-      user: '{{ .BeatServiceName }}'
+      user: '{{ .BeatName }}'
       linux_capabilities: ''
 
   #
