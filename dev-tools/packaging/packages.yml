@@ -163,6 +163,11 @@ shared:
       from: 'centos:7'
       user: '{{ .BeatName }}'
       linux_capabilities: ''
+    files:
+      '{{.BeatName}}.yml':
+        source: '{{.BeatName}}.docker.yml'
+        mode: 0600
+        config: true
 
   #
   # License modifiers for Apache 2.0

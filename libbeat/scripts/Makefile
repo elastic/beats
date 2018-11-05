@@ -325,8 +325,10 @@ update: python-env fields collect
 	@mkdir -p _meta
 	@# Update config files.
 	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.yml
-	@chmod 0640 ${BEAT_NAME}.yml
-
+ifneq (,$(wildcard _meta/beat.docker.yml))
+	@cat _meta/beat.docker.yml ${ES_BEATS}/libbeat/_meta/config.docker.yml > ${BEAT_NAME}.docker.yml
+	@chmod 0640 ${BEAT_NAME}.yml ${BEAT_NAME}.docker.yml
+endif
 
 	@# Update reference config files.
 ifeq ($(BEAT_REF_YAML),true)
