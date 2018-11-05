@@ -9,7 +9,6 @@
 /*/*.template*.json
 **/html_docs
 /*/_meta/kibana.generated
-/x-pack/*/_meta/kibana.generated
 
 # Files
 .DS_Store
