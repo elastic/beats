@@ -309,8 +309,25 @@ func MergeClusterSettings(clusterSettings common.MapStr) (common.MapStr, error) 
 	}
 
 	// Transient settings override persistent settings which override default settings
-	settings.DeepUpdate(persistentSettings)
-	settings.DeepUpdate(transientSettings)
+	if settings == nil {
+		settings = persistentSettings
+	}
+
+	if settings == nil {
+		settings = transientSettings
+	}
+
+	if settings == nil {
+		return nil, nil
+	}
+
+	if persistentSettings != nil {
+		settings.DeepUpdate(persistentSettings)
+	}
+
+	if transientSettings != nil {
+		settings.DeepUpdate(transientSettings)
+	}
 
 	return settings, nil
 }
@@ -359,7 +376,7 @@ func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr,
 	}
 
 	if !hasSettingGroup {
-		return common.MapStr{}, nil
+		return nil, nil
 	}
 
 	settings, err := allSettings.GetValue(groupKey)

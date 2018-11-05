@@ -221,24 +221,26 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		},
 	}
 
+	event := mb.Event{}
+	event.RootFields = common.MapStr{
+		"cluster_uuid":  info.ClusterID,
+		"cluster_name":  clusterName,
+		"timestamp":     common.Time(time.Now()),
+		"interval_ms":   m.Module().Config().Period / time.Millisecond,
+		"type":          "cluster_stats",
+		"license":       license,
+		"version":       info.Version.Number,
+		"cluster_stats": clusterStats,
+		"cluster_state": clusterState,
+		"stack_stats":   stackStats,
+	}
+
 	clusterSettings, err := getClusterMetadataSettings(m)
 	if err != nil {
 		return err
 	}
-
-	event := mb.Event{}
-	event.RootFields = common.MapStr{
-		"cluster_uuid":     info.ClusterID,
-		"cluster_name":     clusterName,
-		"timestamp":        common.Time(time.Now()),
-		"interval_ms":      m.Module().Config().Period / time.Millisecond,
-		"type":             "cluster_stats",
-		"license":          license,
-		"version":          info.Version.Number,
-		"cluster_stats":    clusterStats,
-		"cluster_state":    clusterState,
-		"stack_stats":      stackStats,
-		"cluster_settings": clusterSettings,
+	if clusterSettings != nil {
+		event.RootFields.Put("cluster_settings", clusterSettings)
 	}
 
 	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
