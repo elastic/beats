@@ -31,12 +31,12 @@ RUN setcap {{ .linux_capabilities }} {{ $beatBinary }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 
 WORKDIR {{ $beatHome }}
-RUN mkdir data logs && \
-    chown -R root:{{ .BeatName }} . && \
+RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
+    chown -R root:{{ .BeatName }} {{ $beatHome }} && \
     find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
     find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
     chmod 0750 {{ $beatBinary }} && \
-    chmod 0770 data logs
+    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
 {{- range $i, $modulesd := .ModulesDirs }}
 RUN chmod 0770 {{ $modulesd }}
 {{- end }}
