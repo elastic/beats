@@ -190,18 +190,22 @@ func customizePackaging() {
 	for _, args := range mage.Packages {
 		mods := module
 		modsD := modulesD
+		pkgType := args.Types[0]
 		if args.Spec.License == "Elastic License" {
 			mods = moduleXPack
 			modsD = modulesDXPack
 			replacePackageFileSource(args, map[string]string{
 				"fields.yml":                  "../x-pack/{{.BeatName}}/fields.yml",
-				"{{.BeatName}}.yml":           "../x-pack/{{.BeatName}}/{{.BeatName}}.yml",
 				"{{.BeatName}}.reference.yml": "../x-pack/{{.BeatName}}/{{.BeatName}}.reference.yml",
 				"_meta/kibana.generated":      "../x-pack/{{.BeatName}}/build/kibana",
 			})
+			if pkgType != mage.Docker {
+				replacePackageFileSource(args, map[string]string{
+					"{{.BeatName}}.yml": "../x-pack/{{.BeatName}}/{{.BeatName}}.yml",
+				})
+			}
 		}
 
-		pkgType := args.Types[0]
 		switch pkgType {
 		case mage.TarGz, mage.Zip, mage.Docker:
 			args.Spec.Files[moduleTarget] = mods

@@ -162,6 +162,7 @@ shared:
     extra_vars:
       from: 'centos:7'
       user: '{{ .BeatName }}'
+      repository: 'docker.elastic.co/beats'
       linux_capabilities: ''
     files:
       '{{.BeatName}}.yml':

@@ -123,8 +123,10 @@ func (b *dockerBuilder) prepareBuild() error {
 }
 
 func (b *dockerBuilder) dockerBuild() (string, error) {
-	repository := "docker.elastic.co/beats" // TODO: Parametrize this
-	tag := fmt.Sprintf("%s:%s", filepath.Join(repository, b.Name), b.Version)
+	tag := fmt.Sprintf("%s:%s", b.Name, b.Version)
+	if repository, _ := b.ExtraVars["repository"]; repository != "" {
+		tag = fmt.Sprintf("%s/%s", repository, tag)
+	}
 	return tag, sh.Run("docker", "build", "-t", tag, b.buildDir())
 }
 
