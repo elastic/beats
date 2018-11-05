@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2018-11-05T19:58:39.971Z", 
+        "@timestamp": "2018-11-05T20:45:13.262Z", 
         "fileset.module": "icinga", 
         "fileset.name": "startup", 
         "icinga.startup.facility": "cli", 
@@ -10,7 +10,7 @@
         "offset": 0
     }, 
     {
-        "@timestamp": "2018-11-05T19:58:39.971Z", 
+        "@timestamp": "2018-11-05T20:45:13.262Z", 
         "fileset.module": "icinga", 
         "fileset.name": "startup", 
         "icinga.startup.facility": "cli", 

@@ -15,13 +15,10 @@
         "haproxy.connections.retries": 0, 
         "haproxy.connections.server": 0, 
         "haproxy.frontend_name": "incoming~", 
-        "haproxy.geoip.city_name": "Mukilteo", 
         "haproxy.geoip.continent_name": "North America", 
         "haproxy.geoip.country_iso_code": "US", 
-        "haproxy.geoip.location.lat": 47.913, 
-        "haproxy.geoip.location.lon": -122.3042, 
-        "haproxy.geoip.region_iso_code": "US-WA", 
-        "haproxy.geoip.region_name": "Washington", 
+        "haproxy.geoip.location.lat": 37.751, 
+        "haproxy.geoip.location.lon": -97.822, 
         "haproxy.http.request.captured_cookie": "-", 
         "haproxy.http.request.captured_headers": [
             "docs.example.internal"
