@@ -30,12 +30,7 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 257
-=======
-        "log.offset": 257, 
-        "prospector.type": "log"
->>>>>>> Rename field `offset` to `log.offset`
+        "log.offset": 257
     }, 
     {
         "@timestamp": "2018-01-01T09:10:11.000Z", 
@@ -65,12 +60,7 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 709
-=======
-        "log.offset": 709, 
-        "prospector.type": "log"
->>>>>>> Rename field `offset` to `log.offset`
+        "log.offset": 709
     }, 
     {
         "@timestamp": "2018-01-01T10:11:12.000Z", 
@@ -110,11 +100,6 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 1204
-=======
-        "log.offset": 1204, 
-        "prospector.type": "log"
->>>>>>> Rename field `offset` to `log.offset`
+        "log.offset": 1204
     }
 ]
