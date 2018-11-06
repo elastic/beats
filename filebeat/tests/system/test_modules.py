@@ -129,7 +129,7 @@ class Test(BaseTest):
         self.es.indices.refresh(index=self.index_name)
         # Loads the first 100 events to be checked
         res = self.es.search(index=self.index_name,
-                             body={"query": {"match_all": {}}, "size": 100, "sort": {"offset": {"order": "asc"}}})
+                             body={"query": {"match_all": {}}, "size": 100, "sort": {"log.offset": {"order": "asc"}}})
         objects = [o["_source"] for o in res["hits"]["hits"]]
         assert len(objects) > 0
         for obj in objects:

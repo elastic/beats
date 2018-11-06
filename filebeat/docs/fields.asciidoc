@@ -4635,7 +4635,7 @@ The file from which the line was read. This field contains the absolute path to 
 
 --
 
-*`offset`*::
+*`log.offset`*::
 +
 --
 type: long
@@ -4667,19 +4667,6 @@ type: keyword
 required: False
 
 Log stream when reading container logs, can be 'stdout' or 'stderr'
-
-
---
-
-*`prospector.type`*::
-+
---
-
-deprecated[6.3]
-
-required: True
-
-The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `input.type`)
 
 
 --

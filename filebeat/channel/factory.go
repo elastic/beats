@@ -110,9 +110,6 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 		}
 	}
 	if config.Type != "" {
-		fields["prospector"] = common.MapStr{
-			"type": config.Type,
-		}
 		fields["input"] = common.MapStr{
 			"type": config.Type,
 		}
