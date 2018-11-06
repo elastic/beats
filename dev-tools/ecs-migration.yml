@@ -25,3 +25,18 @@
   to: event.module
   alias: true
   copy_to: false
+
+- from: beat.name
+  to: agent.type
+  alias: true
+  copy_to: false
+
+- from: beat.hostname
+  to: agent.hostname
+  alias: true
+  copy_to: false
+
+- from: beat.version
+  to: agent.version
+  alias: true
+  copy_to: false
