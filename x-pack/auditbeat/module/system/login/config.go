@@ -6,7 +6,7 @@ package login
 
 // Config defines the metricset's configuration options.
 type Config struct {
-	WtmpFile string `config:"login.wtmp_file"`
+	WtmpFilePattern string `config:"login.wtmp_file_pattern"`
 }
 
 // Validate validates the host metricset config.
@@ -15,5 +15,5 @@ func (c *Config) Validate() error {
 }
 
 var defaultConfig = Config{
-	WtmpFile: "/var/log/wtmp",
+	WtmpFilePattern: "/var/log/wtmp*",
 }

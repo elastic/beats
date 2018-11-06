@@ -6,6 +6,7 @@ package login
 
 import (
 	"github.com/pkg/errors"
+	"path/filepath"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -55,19 +56,28 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch collects any new login records from /var/log/wtmp. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	loginRecords, err := ReadUtmpFile(ms.config.WtmpFile)
+	paths, err := filepath.Glob(ms.config.WtmpFilePattern)
 	if err != nil {
 		ms.log.Error(err)
 		report.Error(err)
 		return
 	}
 
-	for _, loginRecord := range loginRecords {
-		report.Event(mb.Event{
-			MetricSetFields: common.MapStr{
-				"login": loginRecord.toMapStr(),
-			},
-		})
+	for _, path := range paths {
+		loginRecords, err := ReadUtmpFile(path)
+		if err != nil {
+			ms.log.Error(err)
+			report.Error(err)
+			return
+		}
+
+		for _, loginRecord := range loginRecords {
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"login": loginRecord.toMapStr(),
+				},
+			})
+		}
 	}
 }
 

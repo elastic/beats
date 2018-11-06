@@ -26,14 +26,14 @@ import (
 // See utmp(5).
 var utTypes = map[int]string{
 	0: "EMPTY",
-	1: "RUN_LVL",
-	2: "BOOT_TIME",
-	3: "NEW_TIME",
-	4: "OLD_TIME",
+	1: "RUN_LVL",   // keep - shutdown
+	2: "BOOT_TIME", // keep - reboot
+	3: "NEW_TIME",  // investigate
+	4: "OLD_TIME",  // investigate
 	5: "INIT_PROCESS",
 	6: "LOGIN_PROCESS",
-	7: "USER_PROCESS",
-	8: "DEAD_PROCESS",
+	7: "USER_PROCESS", // keep - user login
+	8: "DEAD_PROCESS", // keep - user logout
 	9: "ACCOUNTING",
 }
 
