@@ -7,8 +7,7 @@
         "fileset.module": "apache2", 
         "fileset.name": "error", 
         "input.type": "log", 
-        "offset": 0, 
-        "prospector.type": "log"
+        "offset": 0
     }, 
     {
         "@timestamp": "2016-12-26T16:15:55.103Z", 
@@ -19,8 +18,7 @@
         "fileset.module": "apache2", 
         "fileset.name": "error", 
         "input.type": "log", 
-        "offset": 99, 
-        "prospector.type": "log"
+        "offset": 99
     }, 
     {
         "@timestamp": "2011-09-09T10:42:29.902Z", 
@@ -33,7 +31,6 @@
         "fileset.module": "apache2", 
         "fileset.name": "error", 
         "input.type": "log", 
-        "offset": 229, 
-        "prospector.type": "log"
+        "offset": 229
     }
 ]

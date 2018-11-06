@@ -29,7 +29,6 @@
         "message": "GET /ui/fonts/open_sans/open_sans_v15_latin_600.woff2 304 26ms - 9.0B", 
         "offset": 0, 
         "process.pid": 69410, 
-        "prospector.type": "log", 
         "service.name": [
             "kibana"
         ]
@@ -48,7 +47,6 @@
         "message": "Fetching data from kibana_stats collector", 
         "offset": 920, 
         "process.pid": 69776, 
-        "prospector.type": "log", 
         "service.name": [
             "kibana"
         ]
@@ -67,7 +65,6 @@
         "message": "Found exportType at /Users/ruflin/Downloads/6.3/kibana-6.3.0-darwin-x86_64/node_modules/x-pack/plugins/reporting/export_types/csv/server/index.js", 
         "offset": 1090, 
         "process.pid": 69776, 
-        "prospector.type": "log", 
         "service.name": [
             "kibana"
         ]

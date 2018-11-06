@@ -10,8 +10,7 @@
         "postgresql.log.message": "database system was shut down at 2017-06-17 16:58:04 CEST", 
         "postgresql.log.thread_id": "4974", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.585", 
-        "postgresql.log.timezone": "CEST", 
-        "prospector.type": "log"
+        "postgresql.log.timezone": "CEST"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.605Z", 
@@ -24,8 +23,7 @@
         "postgresql.log.message": "MultiXact member wraparound protections are now enabled", 
         "postgresql.log.thread_id": "4974", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.605", 
-        "postgresql.log.timezone": "CEST", 
-        "prospector.type": "log"
+        "postgresql.log.timezone": "CEST"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.615Z", 
@@ -38,8 +36,7 @@
         "postgresql.log.message": "autovacuum launcher started", 
         "postgresql.log.thread_id": "4978", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.615", 
-        "postgresql.log.timezone": "CEST", 
-        "prospector.type": "log"
+        "postgresql.log.timezone": "CEST"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.616Z", 
@@ -52,8 +49,7 @@
         "postgresql.log.message": "database system is ready to accept connections", 
         "postgresql.log.thread_id": "4973", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.616", 
-        "postgresql.log.timezone": "CEST", 
-        "prospector.type": "log"
+        "postgresql.log.timezone": "CEST"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.956Z", 
@@ -68,8 +64,7 @@
         "postgresql.log.thread_id": "4980", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.956", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "unknown", 
-        "prospector.type": "log"
+        "postgresql.log.user": "unknown"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:43.557Z", 
@@ -88,8 +83,7 @@
         "postgresql.log.thread_id": "4983", 
         "postgresql.log.timestamp": "2017-07-31 13:36:43.557", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:44.104Z", 
@@ -108,8 +102,7 @@
         "postgresql.log.thread_id": "4986", 
         "postgresql.log.timestamp": "2017-07-31 13:36:44.104", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:44.642Z", 
@@ -128,8 +121,7 @@
         "postgresql.log.thread_id": "4989", 
         "postgresql.log.timestamp": "2017-07-31 13:36:44.642", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:39:16.249Z", 
@@ -144,8 +136,7 @@
         "postgresql.log.thread_id": "5407", 
         "postgresql.log.timestamp": "2017-07-31 13:39:16.249", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:39:17.945Z", 
@@ -160,8 +151,7 @@
         "postgresql.log.thread_id": "5500", 
         "postgresql.log.timestamp": "2017-07-31 13:39:17.945", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:39:21.025Z", 
@@ -180,8 +170,7 @@
         "postgresql.log.thread_id": "5404", 
         "postgresql.log.timestamp": "2017-07-31 13:39:21.025", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:39:31.619Z", 
@@ -197,8 +186,7 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:39:31.619", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:39:40.147Z", 
@@ -214,8 +202,7 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:39:40.147", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:40:54.310Z", 
@@ -234,8 +221,7 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:40:54.310", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:43:22.645Z", 
@@ -251,8 +237,7 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:43:22.645", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:46:02.670Z", 
@@ -268,8 +253,7 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:46:02.670", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:46:23.016Z", 
@@ -285,8 +269,7 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:46:23.016", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:46:55.637Z", 
@@ -302,7 +285,6 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:46:55.637", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }
 ]

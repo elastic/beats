@@ -11,8 +11,7 @@
         "fileset.module": "apache2", 
         "fileset.name": "access", 
         "input.type": "log", 
-        "offset": 0, 
-        "prospector.type": "log"
+        "offset": 0
     }, 
     {
         "@timestamp": "2016-12-26T16:22:13.000Z", 
@@ -36,8 +35,7 @@
         "fileset.module": "apache2", 
         "fileset.name": "access", 
         "input.type": "log", 
-        "offset": 73, 
-        "prospector.type": "log"
+        "offset": 73
     }, 
     {
         "@timestamp": "2016-12-26T14:16:48.000Z", 
@@ -47,8 +45,7 @@
         "fileset.module": "apache2", 
         "fileset.name": "access", 
         "input.type": "log", 
-        "offset": 238, 
-        "prospector.type": "log"
+        "offset": 238
     }, 
     {
         "@timestamp": "2017-05-29T19:02:48.000Z", 
@@ -71,7 +68,6 @@
         "fileset.module": "apache2", 
         "fileset.name": "access", 
         "input.type": "log", 
-        "offset": 285, 
-        "prospector.type": "log"
+        "offset": 285
     }
 ]
