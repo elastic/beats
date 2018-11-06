@@ -7,12 +7,7 @@
         "log.offset": 0, 
         "logstash.log.level": "INFO", 
         "logstash.log.message": "Initializing module {:module_name=>\"fb_apache\", :directory=>\"/usr/share/logstash/modules/fb_apache/configuration\"}", 
-        "logstash.log.module": "logstash.modules.scaffold", 
-<<<<<<< HEAD
-        "offset": 0
-=======
-        "prospector.type": "log"
->>>>>>> Rename field `offset` to `log.offset`
+        "logstash.log.module": "logstash.modules.scaffold"
     }, 
     {
         "@timestamp": "2017-11-20T03:55:00,318", 
@@ -25,11 +20,6 @@
         "log.offset": 175, 
         "logstash.log.level": "INFO", 
         "logstash.log.message": "(0.058950s) Select Name as [person.name]\n, Address as [person.address]\nfrom people\n", 
-        "logstash.log.module": "logstash.inputs.jdbc     ", 
-<<<<<<< HEAD
-        "offset": 175
-=======
-        "prospector.type": "log"
->>>>>>> Rename field `offset` to `log.offset`
+        "logstash.log.module": "logstash.inputs.jdbc     "
     }
 ]

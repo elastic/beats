@@ -78,7 +78,6 @@ class Test(BaseTest):
 
         data = self.get_registry()
         assert len(data) == 1
-        print data[0]
         assert data[0]["offset"] == 20
 
         # check only second line has been written

@@ -16,12 +16,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 0, 
-=======
         "log.offset": 0, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 32858, 
         "suricata.eve.alert.action": "allowed", 
@@ -84,12 +79,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 723, 
-=======
         "log.offset": 723, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 32864, 
         "suricata.eve.alert.action": "allowed", 
@@ -152,12 +142,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 1445, 
-=======
         "log.offset": 1445, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 32870, 
         "suricata.eve.alert.action": "allowed", 
@@ -220,12 +205,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 2168, 
-=======
         "log.offset": 2168, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 32872, 
         "suricata.eve.alert.action": "allowed", 
@@ -288,12 +268,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 2889, 
-=======
         "log.offset": 2889, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 32876, 
         "suricata.eve.alert.action": "allowed", 
@@ -356,12 +331,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 3611, 
-=======
         "log.offset": 3611, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 32892, 
         "suricata.eve.alert.action": "allowed", 
@@ -424,12 +394,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 4334, 
-=======
         "log.offset": 4334, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 37742, 
         "suricata.eve.alert.action": "allowed", 
@@ -490,12 +455,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "304", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 5140, 
-=======
         "log.offset": 5140, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 52340, 
         "suricata.eve.alert.action": "allowed", 
@@ -556,12 +516,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 5931, 
-=======
         "log.offset": 5931, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 52340, 
         "suricata.eve.alert.action": "allowed", 
@@ -622,12 +577,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 6734, 
-=======
         "log.offset": 6734, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 37742, 
         "suricata.eve.alert.action": "allowed", 
@@ -688,12 +638,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 7630, 
-=======
         "log.offset": 7630, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 37742, 
         "suricata.eve.alert.action": "allowed", 
@@ -754,12 +699,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 8533, 
-=======
         "log.offset": 8533, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 37742, 
         "suricata.eve.alert.action": "allowed", 
@@ -820,12 +760,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 9443, 
-=======
         "log.offset": 9443, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 52340, 
         "suricata.eve.alert.action": "allowed", 
@@ -886,12 +821,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 10252, 
-=======
         "log.offset": 10252, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 52340, 
         "suricata.eve.alert.action": "allowed", 
@@ -952,12 +882,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 11147, 
-=======
         "log.offset": 11147, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 52340, 
         "suricata.eve.alert.action": "allowed", 
@@ -1018,12 +943,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 12048, 
-=======
         "log.offset": 12048, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 52340, 
         "suricata.eve.alert.action": "allowed", 
@@ -1084,12 +1004,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 12951, 
-=======
         "log.offset": 12951, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 52340, 
         "suricata.eve.alert.action": "allowed", 
@@ -1150,12 +1065,7 @@
         "http.request.method": "GET", 
         "http.response.status_code": "200", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 13860, 
-=======
         "log.offset": 13860, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 52340, 
         "suricata.eve.alert.action": "allowed", 
@@ -1215,12 +1125,7 @@
         "fileset.name": "eve", 
         "http.request.method": "GET", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 14767, 
-=======
         "log.offset": 14767, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 52340, 
         "suricata.eve.alert.action": "allowed", 
@@ -1279,12 +1184,7 @@
         "fileset.name": "eve", 
         "http.request.method": "GET", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 15651, 
-=======
         "log.offset": 15651, 
-        "prospector.type": "log", 
->>>>>>> update files from suricata
         "source_ecs.ip": "192.168.1.146", 
         "source_ecs.port": 52340, 
         "suricata.eve.alert.action": "allowed", 

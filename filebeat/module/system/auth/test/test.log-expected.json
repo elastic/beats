@@ -4,12 +4,7 @@
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 0, 
-=======
         "log.offset": 0, 
-        "prospector.type": "log", 
->>>>>>> Rename field `offset` to `log.offset`
         "system.auth.hostname": "localhost", 
         "system.auth.pid": "3402", 
         "system.auth.ssh.event": "Accepted", 
@@ -25,12 +20,7 @@
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 152, 
-=======
         "log.offset": 152, 
-        "prospector.type": "log", 
->>>>>>> Rename field `offset` to `log.offset`
         "system.auth.hostname": "localhost", 
         "system.auth.pid": "7483", 
         "system.auth.ssh.event": "Accepted", 
@@ -45,12 +35,7 @@
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 254, 
-=======
         "log.offset": 254, 
-        "prospector.type": "log", 
->>>>>>> Rename field `offset` to `log.offset`
         "system.auth.hostname": "localhost", 
         "system.auth.pid": "3430", 
         "system.auth.ssh.event": "Invalid", 
@@ -63,12 +48,7 @@
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 324, 
-=======
         "log.offset": 324, 
-        "prospector.type": "log", 
->>>>>>> Rename field `offset` to `log.offset`
         "system.auth.hostname": "slave22", 
         "system.auth.pid": "5774", 
         "system.auth.ssh.event": "Failed", 
@@ -89,12 +69,7 @@
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 420, 
-=======
         "log.offset": 420, 
-        "prospector.type": "log", 
->>>>>>> Rename field `offset` to `log.offset`
         "system.auth.hostname": "localhost", 
         "system.auth.sudo.command": "/bin/ls", 
         "system.auth.sudo.pwd": "/home/vagrant", 
@@ -108,12 +83,7 @@
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 522, 
-=======
         "log.offset": 522, 
-        "prospector.type": "log", 
->>>>>>> Rename field `offset` to `log.offset`
         "system.auth.hostname": "slave22", 
         "system.auth.pid": "18406", 
         "system.auth.ssh.dropped_ip": "123.57.245.163", 
@@ -124,12 +94,7 @@
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 617, 
-=======
         "log.offset": 617, 
-        "prospector.type": "log", 
->>>>>>> Rename field `offset` to `log.offset`
         "system.auth.hostname": "localhost", 
         "system.auth.sudo.command": "/bin/cat /var/log/secure", 
         "system.auth.sudo.pwd": "/home/vagrant", 
@@ -143,12 +108,7 @@
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 736, 
-=======
         "log.offset": 736, 
-        "prospector.type": "log", 
->>>>>>> Rename field `offset` to `log.offset`
         "system.auth.hostname": "precise32", 
         "system.auth.sudo.command": "/bin/ls", 
         "system.auth.sudo.error": "user NOT in sudoers", 
@@ -163,12 +123,7 @@
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 861, 
-=======
         "log.offset": 861, 
-        "prospector.type": "log", 
->>>>>>> Rename field `offset` to `log.offset`
         "system.auth.groupadd.gid": "48", 
         "system.auth.groupadd.name": "apache", 
         "system.auth.hostname": "localhost", 
@@ -180,12 +135,7 @@
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
-<<<<<<< HEAD
-        "offset": 934, 
-=======
         "log.offset": 934, 
-        "prospector.type": "log", 
->>>>>>> Rename field `offset` to `log.offset`
         "system.auth.hostname": "localhost", 
         "system.auth.pid": "6995", 
         "system.auth.timestamp": "Feb 22 11:47:05", 
