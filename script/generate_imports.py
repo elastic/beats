@@ -4,7 +4,7 @@ from os.path import abspath, isdir, join, dirname, basename
 from argparse import ArgumentParser
 
 sys.path.append(abspath("scripts"))
-# from generate_imports_helper import comment, get_importable_lines
+from generate_imports_helper import comment, get_importable_lines
 
 
 import_line_format = "\t_ \"{beat_path}/{module}/{name}\""
@@ -47,8 +47,6 @@ import (
 
 
 def generate_and_write_to_file(outfile, imported_beat_lines):
-    from generate_imports_helper import comment
-
     imported_lines = "\n".join(imported_beat_lines)
     package = basename(dirname(outfile))
     list_go = import_template.format(package=package,
@@ -69,9 +67,9 @@ if __name__ == "__main__":
     if args.scripts_path is not None:
         sys.path.append(args.scripts_path)
 
-    from generate_imports_helper import get_importable_lines, get_importable_lines_with_module_path
-
     if args.x_pack_path is not None:
+        from generate_imports_helper import get_importable_lines_with_module_path
+
         import_template = elastic_license + import_template
         imported_beat_lines = get_importable_lines_with_module_path(
             args.x_pack_path, import_line_format, abspath("../../../../../" + args.x_pack_path + "/module"))
