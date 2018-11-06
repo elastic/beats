@@ -28,14 +28,13 @@ RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
     find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
     find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
     chmod 0750 {{ $beatBinary }} && \
-    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
-{{- range $i, $modulesd := .ModulesDirs }}
-RUN chmod 0770 {{ $beatHome}}/{{ $modulesd }}
-{{- end }}
-
 {{- if .linux_capabilities }}
-RUN setcap {{ .linux_capabilities }} {{ $beatBinary }}
+    setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
 {{- end }}
+{{- range $i, $modulesd := .ModulesDirs }}
+    chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
+{{- end }}
+    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
 
 {{- if ne .user "root" }}
 RUN useradd -M --uid 1000 --gid 1000 --home {{ $beatHome }} {{ .user }}
