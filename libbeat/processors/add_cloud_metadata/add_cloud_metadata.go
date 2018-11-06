@@ -315,36 +315,39 @@ func newCloudMetadata(c *common.Config) (processors.Processor, error) {
 		return nil, err
 	}
 
-	acm := new(addCloudMetadata)
-
-	acm.initFn = func() {
-		result := fetchMetadata(fetchers, config.Timeout)
-		if result == nil {
-			logp.Info("add_cloud_metadata: hosting provider type not detected.")
-			return
-		}
-		acm.metadata = result.metadata
-		acm.initFn = nil
-		logp.Info("add_cloud_metadata: hosting provider type detected as %v, metadata=%v",
-			result.provider, result.metadata.String())
+	p := &addCloudMetadata{
+		initData: &initData{fetchers, config.Timeout},
 	}
 
-	go acm.init()
-	return acm, nil
+	go p.initOnce.Do(p.init)
+	return p, nil
+}
+
+type initData struct {
+	fetchers []*metadataFetcher
+	timeout  time.Duration
 }
 
 type addCloudMetadata struct {
-	initFn   func()
 	initOnce sync.Once
+	initData *initData
 	metadata common.MapStr
 }
 
 func (p *addCloudMetadata) init() {
-	p.initOnce.Do(p.initFn)
+	result := fetchMetadata(p.initData.fetchers, p.initData.timeout)
+	if result == nil {
+		logp.Info("add_cloud_metadata: hosting provider type not detected.")
+		return
+	}
+	p.metadata = result.metadata
+	p.initData = nil
+	logp.Info("add_cloud_metadata: hosting provider type detected as %v, metadata=%v",
+		result.provider, result.metadata.String())
 }
 
 func (p *addCloudMetadata) getMeta() common.MapStr {
-	p.init()
+	p.initOnce.Do(p.init)
 	return p.metadata
 }
 
