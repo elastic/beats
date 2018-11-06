@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2017-10-02T20:22:07.000Z", 
-        "fileset.module": "traefik", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "traefik", 
         "input.type": "log", 
         "log.offset": 0, 
         "traefik.access.body_sent.bytes": "0", 
@@ -24,8 +24,8 @@
     }, 
     {
         "@timestamp": "2017-10-02T20:22:08.000Z", 
-        "fileset.module": "traefik", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "traefik", 
         "input.type": "log", 
         "log.offset": 280, 
         "traefik.access.body_sent.bytes": "0", 

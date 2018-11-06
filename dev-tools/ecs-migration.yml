@@ -11,7 +11,17 @@
 #   # Copy to is useful for fields where multiple fields map to the same ECS field
 #   copy_to: true-if-field-should-be-copied-to-target-in-6x
 
- - from: offset
-   to: log.offset
-   alias: true
-   copy_to: false
+- from: offset
+  to: log.offset
+  alias: true
+  copy_to: false
+
+- from: fileset.name
+  to: event.dataset
+  alias: true
+  copy_to: false
+
+- from: fileset.module
+  to: event.module
+  alias: true
+  copy_to: false

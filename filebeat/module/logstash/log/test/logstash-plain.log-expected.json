@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2017-10-23T14:20:12,046", 
-        "fileset.module": "logstash", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "logstash", 
         "input.type": "log", 
         "log.offset": 0, 
         "logstash.log.level": "INFO", 
@@ -11,8 +11,8 @@
     }, 
     {
         "@timestamp": "2017-11-20T03:55:00,318", 
-        "fileset.module": "logstash", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "logstash", 
         "input.type": "log", 
         "log.flags": [
             "multiline"

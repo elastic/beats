@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2018-12-13T11:35:28.000Z", 
-        "fileset.module": "system", 
-        "fileset.name": "syslog", 
+        "event.dataset": "syslog", 
+        "event.module": "system", 
         "input.type": "log", 
         "log.flags": [
             "multiline"
@@ -16,8 +16,8 @@
     }, 
     {
         "@timestamp": "2018-12-13T11:35:28.000Z", 
-        "fileset.module": "system", 
-        "fileset.name": "syslog", 
+        "event.dataset": "syslog", 
+        "event.module": "system", 
         "input.type": "log", 
         "log.offset": 907, 
         "system.syslog.hostname": "a-mac-with-esc-key", 
@@ -28,8 +28,8 @@
     }, 
     {
         "@timestamp": "2018-04-04T03:39:57.000Z", 
-        "fileset.module": "system", 
-        "fileset.name": "syslog", 
+        "event.dataset": "syslog", 
+        "event.module": "system", 
         "input.type": "log", 
         "log.offset": 1176, 
         "system.syslog.message": "--- last message repeated 1 time ---", 
