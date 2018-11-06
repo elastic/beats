@@ -3,12 +3,36 @@
 
 - module: ibmmq
   metricsets:
-    - qmgr
-  #  - queue
+  #  - qmgr
+    - queue
   #  - channel
   #  - custom
   period: 10s
 
+
+  ##Remote connection not yet implemented -- MQ module needs be installed locally to build / run the beat
   hosts: ["localhost"]
   #username: guest
   #password: guest
+
+  #Defines the queuemanger you want to monitor.
+  queueManager: "QM1"
+
+  #Defines the local queues to gets stats from. Defauls to * which indicates that everything
+  #available queue from given queuemanger should be monitored
+  #Set it to "" to not monitor anything in this module
+  queue: "*"
+
+  #Defines the channel to monitor. Defauls to * which indicates that everything
+  #available channel from given queuemanger should be monitored
+  #Set it to "" to not monitor anything in this module
+  channel: "*"
+
+  #Defines whether the queue and queuemanger statistics should be collected via
+  #the pub/sub methods of IBM MQ since v.9.0
+  #pubSub: true
+
+  #The advanced JSON config enables you to send any PCF command to MQ and get the response back
+  #Hava a look at: https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_9.1.0/com.ibm.mq.ref.adm.doc/q086870_.htm
+  #advanced: '{"commands":[{"cmd":"MQCMD_INQUIRE_PROCESS","params":{"MQCA_PROCESS_NAME":"*"}},{"cmd":"MQCMD_INQUIRE_CHANNEL_NAMES","params":{"MQCACH_CHANNEL_NAME":"*"}}]}'
+
