@@ -30,18 +30,25 @@ import (
 
 type dockerBuilder struct {
 	PackageSpec
+
+	buildDir string
+	beatDir  string
 }
 
 func newDockerBuilder(spec PackageSpec) (*dockerBuilder, error) {
+	buildDir := filepath.Join(spec.packageDir, "docker-build")
+	beatDir := filepath.Join(buildDir, "beat")
+
 	return &dockerBuilder{
 		PackageSpec: spec,
+		buildDir:    buildDir,
+		beatDir:     beatDir,
 	}, nil
 }
 
 func (b *dockerBuilder) Build() error {
-	buildDir := b.buildDir()
-	if err := os.RemoveAll(buildDir); err != nil {
-		return errors.Wrapf(err, "failed to clean existing build directory %s", buildDir)
+	if err := os.RemoveAll(b.buildDir); err != nil {
+		return errors.Wrapf(err, "failed to clean existing build directory %s", b.buildDir)
 	}
 
 	if err := b.copyFiles(); err != nil {
@@ -64,14 +71,6 @@ func (b *dockerBuilder) Build() error {
 	return nil
 }
 
-func (b *dockerBuilder) buildDir() string {
-	return filepath.Join(b.packageDir, "docker-build")
-}
-
-func (b *dockerBuilder) beatDir() string {
-	return filepath.Join(b.buildDir(), "beat")
-}
-
 func (b *dockerBuilder) modulesDirs() []string {
 	var modulesd []string
 	for _, f := range b.Files {
@@ -83,9 +82,8 @@ func (b *dockerBuilder) modulesDirs() []string {
 }
 
 func (b *dockerBuilder) copyFiles() error {
-	beatDir := b.beatDir()
 	for _, f := range b.Files {
-		target := filepath.Join(beatDir, f.Target)
+		target := filepath.Join(b.beatDir, f.Target)
 		if err := Copy(f.Source, target); err != nil {
 			return errors.Wrapf(err, "failed to copy from %s to %s", f.Source, target)
 		}
@@ -104,11 +102,10 @@ func (b *dockerBuilder) prepareBuild() error {
 		"ModulesDirs": b.modulesDirs(),
 	}
 
-	buildDir := b.buildDir()
 	return filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
 		if !info.IsDir() {
 			target := strings.TrimSuffix(
-				filepath.Join(buildDir, filepath.Base(path)),
+				filepath.Join(b.buildDir, filepath.Base(path)),
 				".tmpl",
 			)
 
@@ -126,7 +123,7 @@ func (b *dockerBuilder) dockerBuild() (string, error) {
 	if repository, _ := b.ExtraVars["repository"]; repository != "" {
 		tag = fmt.Sprintf("%s/%s", repository, tag)
 	}
-	return tag, sh.Run("docker", "build", "-t", tag, b.buildDir())
+	return tag, sh.Run("docker", "build", "-t", tag, b.buildDir)
 }
 
 func (b *dockerBuilder) dockerSave(tag string) error {
