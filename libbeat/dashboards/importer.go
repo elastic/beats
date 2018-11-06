@@ -131,6 +131,7 @@ func (imp Importer) unzip(archive, target string) error {
 	if err != nil {
 		return err
 	}
+	defer reader.Close()
 
 	// Closure to close the files on each iteration
 	unzipFile := func(file *zip.File) error {
@@ -149,6 +150,11 @@ func (imp Importer) unzip(archive, target string) error {
 		if file.FileInfo().IsDir() {
 			return os.MkdirAll(filePath, file.Mode())
 		}
+
+		if err = os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+			return fmt.Errorf("failed making directory for file %v: %v", filePath, err)
+		}
+
 		fileReader, err := file.Open()
 		if err != nil {
 			return err

@@ -208,7 +208,7 @@
                         }
                     }
                 }, 
-                "title": "Broswers breakdown [Filebeat IIS]", 
+                "title": "Browsers breakdown [Filebeat IIS]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -258,7 +258,7 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Broswers breakdown [Filebeat IIS]", 
+                    "title": "Browsers breakdown [Filebeat IIS]", 
                     "type": "pie"
                 }
             }, 
