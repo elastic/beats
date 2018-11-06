@@ -9,12 +9,19 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"regexp"
+	"strings"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/thehivecorporation/log"
+
+	"github.com/elastic/beats/libbeat/generator/fields"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage"
 )
@@ -85,11 +92,6 @@ func Update() error {
 	return sh.Run("make", "update")
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
-	return mage.GenerateFieldsYAML("module")
-}
-
 // GoTestUnit executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
@@ -102,6 +104,34 @@ func GoTestUnit(ctx context.Context) error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
 	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+}
+
+// Fields generates a fields.yml for the Beat.
+// $OUTPUT_FILE_PATH: Specify `fields.yml` output file path. Default: fields.yml
+// $EXTRA_FIELDS_FOLDERS: Comma separated list of `/module` paths that must be included. Default: ../../metricbeat/module,module
+func Fields() (err error) {
+	conf := fieldsConf{}
+
+	if conf.beatPath, err = os.Getwd(); err != nil {
+		return errors.Wrap(err, "Error trying to get current working directory. Aborting")
+	}
+
+	if conf.beatsRootPath, err = mage.ElasticBeatsDir(); err != nil {
+		return err
+	}
+
+	if conf.outputFilePath = os.Getenv("OUTPUT_FILE_PATH"); conf.outputFilePath == "" {
+		conf.outputFilePath = "fields.yml"
+	}
+
+	if foldersEnv := os.Getenv("EXTRA_FIELDS_FOLDERS"); foldersEnv != "" {
+		folders := strings.Split(foldersEnv, ",")
+		conf.extraBeatsModulesPaths = folders
+	} else {
+		conf.extraBeatsModulesPaths = []string{"module", conf.beatsRootPath + "/metricbeat/module"}
+	}
+
+	return generateFields(conf)
 }
 
 // -----------------------------------------------------------------------------
@@ -170,4 +200,98 @@ func customizePackaging() {
 			}
 		}
 	}
+}
+
+type fieldsConf struct {
+	// beatsRootPath is the root of the beats folder, usually in github.com/elastic/beats
+	beatsRootPath string
+
+	// beatPath is the path of the beat. In case of metricbeat it is in github.com/elastic/beats/metricbeat
+	beatPath string
+
+	// extraBeatsModulesPaths a list of beats paths that must be included
+	extraBeatsModulesPaths []string
+
+	outputFilePath string
+}
+
+func generateFields(c fieldsConf) error {
+	name := filepath.Base(c.beatPath)
+
+	err := validFieldFilesFound(c)
+	if err != nil {
+		return err
+	}
+
+	var fieldsFiles []*fields.YmlFile
+
+	for _, fieldsFilePath := range c.extraBeatsModulesPaths {
+		fieldsFile, err := fields.CollectModuleFiles(fieldsFilePath)
+		if err != nil {
+			return errors.Wrap(err, "Cannot collect fields.yml files")
+		}
+
+		fieldsFiles = append(fieldsFiles, fieldsFile...)
+	}
+
+	err = fields.Generate(c.beatsRootPath, c.beatPath, fieldsFiles, c.outputFilePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Cannot generate global fields.yml file for %s: %+v\n", name, err)
+		os.Exit(3)
+	}
+
+	outputPath, _ := filepath.Abs(c.outputFilePath)
+	if err != nil {
+		outputPath = c.outputFilePath
+	}
+	fmt.Fprintf(os.Stderr, "Generated fields.yml for %s to %s\n", name, outputPath)
+
+	return nil
+}
+
+func validFieldFilesFound(c fieldsConf) error {
+	if c.beatPath == "" {
+		return errors.New("Beat path cannot be empty")
+	}
+
+	beatsRootPathInfo, err := getFileInfo(c.beatsRootPath)
+	if err != nil {
+		return errors.Wrap(err, "Error getting file info of elastic/beats")
+	}
+
+	beatPathInfo, err := getFileInfo(c.beatPath)
+	if err != nil {
+		return errors.Wrap(err, "Error getting file info of target Beat")
+	}
+
+	// If a community Beat does not have its own fields.yml file, it still requires
+	// the fields coming from libbeat to generate e.g assets. In case of Elastic Beats,
+	// it's not a problem because all of them has unique fields.yml files somewhere.
+	if len(c.extraBeatsModulesPaths) == 0 && os.SameFile(beatsRootPathInfo, beatPathInfo) {
+		if c.outputFilePath != "-" {
+			return errors.New("No field files to collect")
+		}
+	}
+
+	return nil
+}
+
+func closeFile(f *os.File) {
+	if err := f.Close(); err != nil {
+		log.WithError(err).Fatalf("Error trying to close file '%s'", f.Name())
+	}
+}
+
+func getFileInfo(p string) (i os.FileInfo, err error) {
+	var f *os.File
+	if f, err = os.Open(p); err != nil {
+		return nil, errors.Wrap(err, "Error opening path")
+	}
+	defer closeFile(f)
+
+	if i, err = f.Stat(); err != nil {
+		return nil, errors.Wrap(err, "Error getting file info")
+	}
+
+	return
 }

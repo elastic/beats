@@ -50,7 +50,7 @@ imports: python-env
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: imports assets collect-docs configs kibana fmt
+collect: imports assets fields add-headers collect-docs configs kibana fmt
 
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset
@@ -79,7 +79,7 @@ assets:
 	go run ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/x-pack/metricbeat/module Elastic
 	mkdir -p include/fields
 	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license Elastic -pkg include -in ${ES_BEATS}/metricbeat/_meta/fields.common.yml -out include/fields.go $(BEAT_NAME)
-	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license Elastic -out ./include/fields/fields.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
+	# go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license Elastic -out ./include/fields/fields.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
 
 # Overwrite check-headers - check for Apache license in
 # auditbeat/ and Elastic license in xpack/auditbeat/
@@ -100,3 +100,16 @@ ifndef CHECK_HEADERS_DISABLED
 	@go-licenser -license ${LICENSE} ${ES_BEATS}/x-pack/${BEAT_NAME}
 	@go-licenser -license Elastic .
 endif
+
+.PHONY: fields
+fields:
+	@mage fields
+
+#.PHONY: update
+#update: python-env fields collect
+#	@echo "Updating generated files for ${BEAT_NAME}"
+#
+#	@mkdir -p _meta
+#	@# Update config files.
+#	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.yml
+#	@chmod 0640 ${BEAT_NAME}.yml
