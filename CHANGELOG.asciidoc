@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Fix bug in loading dashboards from zip file. {issue}8051[8051]
 - The export config subcommand should not display real value for field reference. {pull}xxx[xxx]
 - The export config subcommand should not display real value for field reference. {pull}8769[8769]
+- Do not panic when no tokenizer string is configured for a dissect processor. {issue}8895[8895]
 
 *Auditbeat*
 
