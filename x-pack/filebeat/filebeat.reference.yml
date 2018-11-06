@@ -43,7 +43,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#-------------------------------- Apache2 Module --------------------------------
+#------------------------------- Apache2 Module -------------------------------
 #- module: apache2
   # Access logs
   #access:
@@ -82,7 +82,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#----------------------------- Elasticsearch Module -----------------------------
+#---------------------------- Elasticsearch Module ----------------------------
 - module: elasticsearch
   # Server log
   server:
@@ -116,7 +116,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#-------------------------------- Haproxy Module --------------------------------
+#------------------------------- Haproxy Module -------------------------------
 - module: haproxy
   # All logs
   log:
@@ -167,7 +167,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#---------------------------------- IIS Module ----------------------------------
+#--------------------------------- IIS Module ---------------------------------
 #- module: iis
   # Access logs
   #access:
@@ -193,7 +193,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------------- Kafka Module ---------------------------------
+#-------------------------------- Kafka Module --------------------------------
 - module: kafka
   # All logs
   log:
@@ -237,7 +237,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#-------------------------------- Mongodb Module --------------------------------
+#------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
   # Logs
   #log:
@@ -251,7 +251,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------------- MySQL Module ---------------------------------
+#-------------------------------- MySQL Module --------------------------------
 #- module: mysql
   # Error logs
   #error:
@@ -277,7 +277,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------------- Nginx Module ---------------------------------
+#-------------------------------- Nginx Module --------------------------------
 #- module: nginx
   # Access logs
   #access:
@@ -303,7 +303,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#-------------------------------- Osquery Module --------------------------------
+#------------------------------- Osquery Module -------------------------------
 - module: osquery
   result:
     enabled: true
@@ -331,7 +331,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------------- Redis Module ---------------------------------
+#-------------------------------- Redis Module --------------------------------
 #- module: redis
   # Main logs
   #log:
@@ -361,7 +361,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#-------------------------------- Traefik Module --------------------------------
+#------------------------------- Traefik Module -------------------------------
 #- module: traefik
   # Access logs
   #access:

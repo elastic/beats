@@ -39,7 +39,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// GoTestArgs are the arguments used for the "goTest*" targets and they define
+// GoTestArgs are the arguments used for the "go*Test" targets and they define
 // how "go test" is invoked. "go test" is always invoked with -v for verbose.
 type GoTestArgs struct {
 	TestName            string            // Test name used in logging.
@@ -81,13 +81,16 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 }
 
 // GoTest invokes "go test" and reports the results to stdout. It returns an
-// error if there was any failuring executing the tests or if there were any
+// error if there was any failure executing the tests or if there were any
 // test failures.
 func GoTest(ctx context.Context, params GoTestArgs) error {
 	fmt.Println(">> go test:", params.TestName, "Testing")
 
 	// Build args list to Go.
 	args := []string{"test", "-v"}
+	if params.Race {
+		args = append(args, "-race")
+	}
 	if len(params.Tags) > 0 {
 		args = append(args, "-tags", strings.Join(params.Tags, " "))
 	}
@@ -324,4 +327,17 @@ func (s *GoTestSummary) String() string {
 	}
 
 	return strings.TrimRight(b.String(), "\n")
+}
+
+// BuildSystemTestBinary build a binary for testing that is instrumented for
+// testing and measuring code coverage. The binary is only instrumented for
+// coverage when TEST_COVERAGE=true (default is false).
+func BuildSystemTestBinary() error {
+	args := []string{
+		"test", "-c",
+	}
+	if TestCoverage {
+		args = append(args, "-coverpkg", "./...")
+	}
+	return sh.RunV("go", args...)
 }

@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"bytes"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -74,10 +75,24 @@ func MustUsePackaging(specName, specFile string) {
 	}
 }
 
+// LoadLocalNamedSpec loads the named package spec from the packages.yml in the
+// current directory.
+func LoadLocalNamedSpec(name string) {
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		panic(err)
+	}
+
+	err = LoadNamedSpec(name, filepath.Join(beatsDir, packageSpecFile), "packages.yml")
+	if err != nil {
+		panic(err)
+	}
+}
+
 // LoadNamedSpec loads a packaging specification with the given name from the
 // specified YAML file. name should be a sub-key of 'specs'.
-func LoadNamedSpec(name, file string) error {
-	specs, err := LoadSpecs(file)
+func LoadNamedSpec(name string, files ...string) error {
+	specs, err := LoadSpecs(files...)
 	if err != nil {
 		return errors.Wrap(err, "failed to load spec file")
 	}
@@ -87,16 +102,20 @@ func LoadNamedSpec(name, file string) error {
 		return errors.Errorf("%v not found in package specs", name)
 	}
 
-	log.Printf("%v package spec loaded from %v", name, file)
+	log.Printf("%v package spec loaded from %v", name, files)
 	Packages = packages
 	return nil
 }
 
 // LoadSpecs loads the packaging specifications from the specified YAML file.
-func LoadSpecs(file string) (map[string][]OSPackageArgs, error) {
-	data, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to read from spec file")
+func LoadSpecs(files ...string) (map[string][]OSPackageArgs, error) {
+	var data [][]byte
+	for _, file := range files {
+		d, err := ioutil.ReadFile(file)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to read from spec file")
+		}
+		data = append(data, d)
 	}
 
 	type PackageYAML struct {
@@ -104,7 +123,7 @@ func LoadSpecs(file string) (map[string][]OSPackageArgs, error) {
 	}
 
 	var packages PackageYAML
-	if err = yaml.Unmarshal(data, &packages); err != nil {
+	if err := yaml.Unmarshal(bytes.Join(data, []byte{'\n'}), &packages); err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal spec data")
 	}
 
