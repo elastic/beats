@@ -16,9 +16,6 @@ LABEL \
 
 ENV ELASTIC_CONTAINER "true"
 ENV PATH={{ $beatHome }}:$PATH
-{{- range $key, $value := .Env }}
-ENV {{ $key }} {{ $value }}
-{{- end }}
 
 COPY beat {{ $beatHome }}
 COPY docker-entrypoint /usr/local/bin/docker-entrypoint

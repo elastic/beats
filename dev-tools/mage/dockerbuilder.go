@@ -101,7 +101,6 @@ func (b *dockerBuilder) prepareBuild() error {
 	templatesDir := filepath.Join(elasticBeatsDir, "dev-tools/packaging/templates/docker")
 
 	data := map[string]interface{}{
-		"Env":         map[string]string{},
 		"ModulesDirs": b.modulesDirs(),
 	}
 
