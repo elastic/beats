@@ -6,8 +6,8 @@ var:
       - /var/log/elasticsearch/*_index_search_slowlog.log
       - /var/log/elasticsearch/*_index_indexing_slowlog.log
     os.darwin:
-      - /usr/local/elasticsearch/*_index_search_slowlog.log
-      - /usr/local/elasticsearch/*_index_indexing_slowlog.log
+      - /usr/local/var/lib/elasticsearch/*_index_search_slowlog.log
+      - /usr/local/var/lib/elasticsearch/*_index_indexing_slowlog.log
     os.windows:
       - c:/ProgramData/Elastic/Elasticsearch/logs/*_index_search_slowlog.log
       - c:/ProgramData/Elastic/Elasticsearch/logs/*_index_indexing_slowlog.log
