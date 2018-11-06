@@ -12,5 +12,5 @@ import (
 
 // GetUsers is not implemented on all systems.
 func GetUsers() (users []*User, err error) {
-	return nil, errors.New("Not implemented.")
+	return nil, errors.New("not implemented")
 }
