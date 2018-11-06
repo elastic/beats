@@ -8,8 +8,8 @@
         "kafka.log.component": "controller-event-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Starting", 
-        "message": "[2017-08-04 10:48:21,048] INFO [controller-event-thread]: Starting (kafka.controller.ControllerEventManager$ControllerEventThread)", 
-        "offset": 0
+        "log.offset": 0, 
+        "message": "[2017-08-04 10:48:21,048] INFO [controller-event-thread]: Starting (kafka.controller.ControllerEventManager$ControllerEventThread)"
     }, 
     {
         "@timestamp": "2017-08-04T10:48:21.063Z", 
@@ -20,8 +20,8 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "0 successfully elected as the controller", 
-        "message": "[2017-08-04 10:48:21,063] INFO [Controller 0]: 0 successfully elected as the controller (kafka.controller.KafkaController)", 
-        "offset": 131
+        "log.offset": 131, 
+        "message": "[2017-08-04 10:48:21,063] INFO [Controller 0]: 0 successfully elected as the controller (kafka.controller.KafkaController)"
     }, 
     {
         "@timestamp": "2017-08-04T10:48:21.064Z", 
@@ -32,8 +32,8 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Broker 0 starting become controller state transition", 
-        "message": "[2017-08-04 10:48:21,064] INFO [Controller 0]: Broker 0 starting become controller state transition (kafka.controller.KafkaController)", 
-        "offset": 254
+        "log.offset": 254, 
+        "message": "[2017-08-04 10:48:21,064] INFO [Controller 0]: Broker 0 starting become controller state transition (kafka.controller.KafkaController)"
     }, 
     {
         "@timestamp": "2017-08-04T10:48:21.082Z", 
@@ -44,8 +44,8 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Controller 0 incremented epoch to 1", 
-        "message": "[2017-08-04 10:48:21,082] INFO [Controller 0]: Controller 0 incremented epoch to 1 (kafka.controller.KafkaController)", 
-        "offset": 389
+        "log.offset": 389, 
+        "message": "[2017-08-04 10:48:21,082] INFO [Controller 0]: Controller 0 incremented epoch to 1 (kafka.controller.KafkaController)"
     }, 
     {
         "@timestamp": "2017-08-04T10:48:21.085Z", 
@@ -56,8 +56,8 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "DEBUG", 
         "kafka.log.message": "Registering IsrChangeNotificationListener", 
-        "message": "[2017-08-04 10:48:21,085] DEBUG [Controller 0]: Registering IsrChangeNotificationListener (kafka.controller.KafkaController)", 
-        "offset": 507
+        "log.offset": 507, 
+        "message": "[2017-08-04 10:48:21,085] DEBUG [Controller 0]: Registering IsrChangeNotificationListener (kafka.controller.KafkaController)"
     }, 
     {
         "@timestamp": "2017-08-04T10:48:21.154Z", 
@@ -68,8 +68,8 @@
         "kafka.log.component": "Replica state machine on controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Started replica state machine with initial state -> Map()", 
-        "message": "[2017-08-04 10:48:21,154] INFO [Replica state machine on controller 0]: Started replica state machine with initial state -> Map() (kafka.controller.ReplicaStateMachine)", 
-        "offset": 632
+        "log.offset": 632, 
+        "message": "[2017-08-04 10:48:21,154] INFO [Replica state machine on controller 0]: Started replica state machine with initial state -> Map() (kafka.controller.ReplicaStateMachine)"
     }, 
     {
         "@timestamp": "2017-08-04T10:48:21.156Z", 
@@ -80,8 +80,8 @@
         "kafka.log.component": "Partition state machine on Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Started partition state machine with initial state -> Map()", 
-        "message": "[2017-08-04 10:48:21,156] INFO [Partition state machine on Controller 0]: Started partition state machine with initial state -> Map() (kafka.controller.PartitionStateMachine)", 
-        "offset": 801
+        "log.offset": 801, 
+        "message": "[2017-08-04 10:48:21,156] INFO [Partition state machine on Controller 0]: Started partition state machine with initial state -> Map() (kafka.controller.PartitionStateMachine)"
     }, 
     {
         "@timestamp": "2017-08-04T10:48:21.157Z", 
@@ -92,8 +92,8 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Broker 0 is ready to serve as the new controller with epoch 1", 
-        "message": "[2017-08-04 10:48:21,157] INFO [Controller 0]: Broker 0 is ready to serve as the new controller with epoch 1 (kafka.controller.KafkaController)", 
-        "offset": 976
+        "log.offset": 976, 
+        "message": "[2017-08-04 10:48:21,157] INFO [Controller 0]: Broker 0 is ready to serve as the new controller with epoch 1 (kafka.controller.KafkaController)"
     }, 
     {
         "@timestamp": "2017-08-04T10:48:21.165Z", 
@@ -104,8 +104,8 @@
         "kafka.log.component": "Partition state machine on Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Invoking state change to OnlinePartition for partitions ", 
-        "message": "[2017-08-04 10:48:21,165] INFO [Partition state machine on Controller 0]: Invoking state change to OnlinePartition for partitions  (kafka.controller.PartitionStateMachine)", 
-        "offset": 1120
+        "log.offset": 1120, 
+        "message": "[2017-08-04 10:48:21,165] INFO [Partition state machine on Controller 0]: Invoking state change to OnlinePartition for partitions  (kafka.controller.PartitionStateMachine)"
     }, 
     {
         "@timestamp": "2017-08-04T11:44:22.588Z", 
@@ -116,8 +116,8 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "DEBUG", 
         "kafka.log.message": "Live brokers: ", 
-        "message": "[2017-08-04 11:44:22,588] DEBUG [Controller 0]: Live brokers:  (kafka.controller.KafkaController)", 
-        "offset": 1292
+        "log.offset": 1292, 
+        "message": "[2017-08-04 11:44:22,588] DEBUG [Controller 0]: Live brokers:  (kafka.controller.KafkaController)"
     }, 
     {
         "@timestamp": "2017-08-04T11:44:25.094Z", 
@@ -128,8 +128,8 @@
         "kafka.log.component": "controller-event-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Shutting down", 
-        "message": "[2017-08-04 11:44:25,094] INFO [controller-event-thread]: Shutting down (kafka.controller.ControllerEventManager$ControllerEventThread)", 
-        "offset": 1390
+        "log.offset": 1390, 
+        "message": "[2017-08-04 11:44:25,094] INFO [controller-event-thread]: Shutting down (kafka.controller.ControllerEventManager$ControllerEventThread)"
     }, 
     {
         "@timestamp": "2017-08-04T11:44:25.095Z", 
@@ -140,8 +140,8 @@
         "kafka.log.component": "controller-event-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Stopped", 
-        "message": "[2017-08-04 11:44:25,095] INFO [controller-event-thread]: Stopped (kafka.controller.ControllerEventManager$ControllerEventThread)", 
-        "offset": 1526
+        "log.offset": 1526, 
+        "message": "[2017-08-04 11:44:25,095] INFO [controller-event-thread]: Stopped (kafka.controller.ControllerEventManager$ControllerEventThread)"
     }, 
     {
         "@timestamp": "2017-08-04T11:44:25.097Z", 
@@ -152,8 +152,8 @@
         "kafka.log.component": "controller-event-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Shutdown completed", 
-        "message": "[2017-08-04 11:44:25,097] INFO [controller-event-thread]: Shutdown completed (kafka.controller.ControllerEventManager$ControllerEventThread)", 
-        "offset": 1656
+        "log.offset": 1656, 
+        "message": "[2017-08-04 11:44:25,097] INFO [controller-event-thread]: Shutdown completed (kafka.controller.ControllerEventManager$ControllerEventThread)"
     }, 
     {
         "@timestamp": "2017-08-04T11:44:25.099Z", 
@@ -164,8 +164,8 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "DEBUG", 
         "kafka.log.message": "Controller resigning, broker id 0", 
-        "message": "[2017-08-04 11:44:25,099] DEBUG [Controller 0]: Controller resigning, broker id 0 (kafka.controller.KafkaController)", 
-        "offset": 1797
+        "log.offset": 1797, 
+        "message": "[2017-08-04 11:44:25,099] DEBUG [Controller 0]: Controller resigning, broker id 0 (kafka.controller.KafkaController)"
     }, 
     {
         "@timestamp": "2017-08-04T11:44:25.100Z", 
@@ -176,8 +176,8 @@
         "kafka.log.component": "Controller 0", 
         "kafka.log.level": "DEBUG", 
         "kafka.log.message": "De-registering IsrChangeNotificationListener", 
-        "message": "[2017-08-04 11:44:25,100] DEBUG [Controller 0]: De-registering IsrChangeNotificationListener (kafka.controller.KafkaController)", 
-        "offset": 1914
+        "log.offset": 1914, 
+        "message": "[2017-08-04 11:44:25,100] DEBUG [Controller 0]: De-registering IsrChangeNotificationListener (kafka.controller.KafkaController)"
     }, 
     {
         "@timestamp": "2017-08-04T11:44:25.105Z", 
@@ -188,8 +188,8 @@
         "kafka.log.component": "Partition state machine on Controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Stopped partition state machine", 
-        "message": "[2017-08-04 11:44:25,105] INFO [Partition state machine on Controller 0]: Stopped partition state machine (kafka.controller.PartitionStateMachine)", 
-        "offset": 2042
+        "log.offset": 2042, 
+        "message": "[2017-08-04 11:44:25,105] INFO [Partition state machine on Controller 0]: Stopped partition state machine (kafka.controller.PartitionStateMachine)"
     }, 
     {
         "@timestamp": "2017-08-04T11:44:25.111Z", 
@@ -200,8 +200,8 @@
         "kafka.log.component": "Replica state machine on controller 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Stopped replica state machine", 
-        "message": "[2017-08-04 11:44:25,111] INFO [Replica state machine on controller 0]: Stopped replica state machine (kafka.controller.ReplicaStateMachine)", 
-        "offset": 2189
+        "log.offset": 2189, 
+        "message": "[2017-08-04 11:44:25,111] INFO [Replica state machine on controller 0]: Stopped replica state machine (kafka.controller.ReplicaStateMachine)"
     }, 
     {
         "@timestamp": "2017-08-04T11:44:25.112Z", 
@@ -212,8 +212,8 @@
         "kafka.log.component": "Controller-0-to-broker-0-send-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Shutting down", 
-        "message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Shutting down (kafka.controller.RequestSendThread)", 
-        "offset": 2330
+        "log.offset": 2330, 
+        "message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Shutting down (kafka.controller.RequestSendThread)"
     }, 
     {
         "@timestamp": "2017-08-04T11:44:25.112Z", 
@@ -224,8 +224,8 @@
         "kafka.log.component": "Controller-0-to-broker-0-send-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Stopped", 
-        "message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Stopped (kafka.controller.RequestSendThread)", 
-        "offset": 2452
+        "log.offset": 2452, 
+        "message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Stopped (kafka.controller.RequestSendThread)"
     }, 
     {
         "@timestamp": "2017-08-04T11:44:25.113Z", 
@@ -236,7 +236,7 @@
         "kafka.log.component": "Controller-0-to-broker-0-send-thread", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Shutdown completed", 
-        "message": "[2017-08-04 11:44:25,113] INFO [Controller-0-to-broker-0-send-thread]: Shutdown completed (kafka.controller.RequestSendThread)", 
-        "offset": 2568
+        "log.offset": 2568, 
+        "message": "[2017-08-04 11:44:25,113] INFO [Controller-0-to-broker-0-send-thread]: Shutdown completed (kafka.controller.RequestSendThread)"
     }
 ]

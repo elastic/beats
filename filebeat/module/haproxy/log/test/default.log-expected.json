@@ -17,6 +17,6 @@
         "haproxy.process_name": "haproxy", 
         "haproxy.source": "1.2.3.4", 
         "input.type": "log", 
-        "offset": 0
+        "log.offset": 0
     }
 ]
