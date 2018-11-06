@@ -20,7 +20,7 @@ ENV PATH={{ $beatHome }}:$PATH
 
 COPY beat {{ $beatHome }}
 COPY docker-entrypoint /usr/local/bin/docker-entrypoint
-RUN chmod a+x /usr/local/bin/docker-entrypoint
+RUN chmod 755 /usr/local/bin/docker-entrypoint
 
 RUN groupadd --gid 1000 {{ .BeatName }}
 
