@@ -2,4 +2,5 @@
 *beat/build
 *beat/logs
 *beat/data
+*beat/_meta/kibana.generated
 *beat/fields.yml
