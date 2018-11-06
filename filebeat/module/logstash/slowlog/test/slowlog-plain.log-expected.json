@@ -13,7 +13,6 @@
         "logstash.slowlog.plugin_type": "filters", 
         "logstash.slowlog.took_in_millis": 3027, 
         "logstash.slowlog.took_in_nanos": 3027675106, 
-        "offset": 0, 
-        "prospector.type": "log"
+        "offset": 0
     }
 ]

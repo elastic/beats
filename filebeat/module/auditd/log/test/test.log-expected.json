@@ -14,8 +14,7 @@
         "fileset.module": "auditd", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "offset": 0, 
-        "prospector.type": "log"
+        "offset": 0
     }, 
     {
         "@timestamp": "2017-01-31T20:17:14.891Z", 
@@ -48,7 +47,6 @@
         "fileset.module": "auditd", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "offset": 174, 
-        "prospector.type": "log"
+        "offset": 174
     }
 ]
