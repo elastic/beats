@@ -1,10 +1,10 @@
 ---
 name: Flaky Test
-about: Report a flakey test (one that doesn't pass consistently)
+about: Report a flaky test (one that doesn't pass consistently)
 
 ---
 
-## Flakey Test
+## Flaky Test
 
 * **Test Name:** Name of the failing test.
 * **Link:** Link to file/line number in github.
