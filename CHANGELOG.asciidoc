@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.4.1...6.4[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.4.3...6.4[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -29,11 +29,6 @@ https://github.com/elastic/beats/compare/v6.4.1...6.4[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix a race condition with the `add_host_metadata` and the event serialization. {pull}8223[8223] {pull}8653[8653]
-- Fix race condition when publishing monitoring data. {pull}8646[8646]
-- Fix bug in loading dashboards from zip file. {issue}8051[8051]
-- The export config subcommand should not display real value for field reference. {pull}8769[8769]
-
 *Auditbeat*
 
 *Filebeat*
@@ -41,10 +36,6 @@ https://github.com/elastic/beats/compare/v6.4.1...6.4[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
-
-- Recover metrics for old apache versions removed by mistake on #6450. {pull}7871[7871]
-- Avoid mapping issues in kubernetes module. {pull}8487[8487]
-- Fixed a panic when the kvm module cannot establish a connection to libvirtd. {issue}7792[7792].
 
 *Packetbeat*
 
@@ -84,6 +75,30 @@ https://github.com/elastic/beats/compare/v6.4.1...6.4[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.4.3]]
+=== Beats version 6.4.3
+https://github.com/elastic/beats/compare/v6.4.2...v6.4.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix a race condition with the `add_host_metadata` and the event serialization. {pull}8223[8223] {pull}8653[8653]
+- Fix race condition when publishing monitoring data. {pull}8646[8646]
+- Fix bug in loading dashboards from zip file. {issue}8051[8051]
+- The export config subcommand should not display real value for field reference. {pull}8769[8769]
+
+*Filebeat*
+
+- Fix typo in Filebeat IIS Kibana visualization. {pull}8604[8604]
+
+*Metricbeat*
+
+- Recover metrics for old Apache versions removed by mistake on #6450. {pull}7871[7871]
+- Avoid mapping issues in Kubernetes module. {pull}8487[8487]
+- Fixed a panic when the KVM module cannot establish a connection to libvirtd. {issue}7792[7792]
+
 
 [[release-notes-6.4.2]]
 === Beats version 6.4.2
