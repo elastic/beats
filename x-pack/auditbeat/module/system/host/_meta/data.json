@@ -40,18 +40,7 @@
             },
             "timezone.name": "UTC",
             "timezone.offset.sec": 0,
-            "uptime": 222611977726,
-            "users": [
-                {
-                    "dir": "/root",
-                    "gecos": "root",
-                    "gid": 0,
-                    "name": "root",
-                    "passwd": "x",
-                    "shell": "/bin/bash",
-                    "uid": 0
-                }
-            ]
+            "uptime": 222611977726
         }
     }
 }
