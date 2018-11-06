@@ -293,6 +293,7 @@ func (s PackageSpec) ReplaceFile(target string, file PackageFile) {
 	s.Files[target] = file
 }
 
+// ExtraVar adds or replaces a variable to `extra_vars` in package specs.
 func (s *PackageSpec) ExtraVar(key, value string) {
 	if s.ExtraVars == nil {
 		s.ExtraVars = make(map[string]string)
