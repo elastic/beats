@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "NkpNQgmrdzGr9HUDL8Bp5YAxt0k=",
+			"path": "cloud.google.com/go/civil",
+			"revision": "632e11ec7c242a85e1931e4a8fdda2002316569f",
+			"revisionTime": "2018-10-26T23:03:58Z"
+		},
+		{
 			"checksumSHA1": "AzjRkOQtVBTwIw4RJLTygFhJs3s=",
 			"path": "github.com/Microsoft/go-winio",
 			"revision": "f533f7a102197536779ea3a8cb881d639e21ec5a",
@@ -463,6 +469,18 @@
 			"revisionTime": "2016-10-29T20:57:26Z",
 			"version": "v1.1.0",
 			"versionExact": "v1.1.0"
+		},
+		{
+			"checksumSHA1": "0rXUgJC/GgF8XbLxmJiMgC4peQQ=",
+			"path": "github.com/denisenkom/go-mssqldb",
+			"revision": "4e0d7dc8888fbb59764060e99b7b68e77a6f9698",
+			"revisionTime": "2018-10-14T14:49:52Z"
+		},
+		{
+			"checksumSHA1": "wu8t19t2rmyrrfDfdu9v7f/+iag=",
+			"path": "github.com/denisenkom/go-mssqldb/internal/cp",
+			"revision": "4e0d7dc8888fbb59764060e99b7b68e77a6f9698",
+			"revisionTime": "2018-10-14T14:49:52Z"
 		},
 		{
 			"checksumSHA1": "Gj+xR1VgFKKmFXYOJMnAczC3Znk=",
@@ -1974,6 +1992,12 @@
 			"path": "golang.org/x/crypto/ed25519/internal/edwards25519",
 			"revision": "c126467f60eb25f8f27e5a981f32a87e3965053f",
 			"revisionTime": "2018-07-23T15:26:11Z"
+		},
+		{
+			"checksumSHA1": "MCeXr2RNeiG1XG6V+er1OR0qyeo=",
+			"path": "golang.org/x/crypto/md4",
+			"revision": "4d3f4d9ffa16a13f451c3b2999e9c49e9750bf06",
+			"revisionTime": "2018-10-23T16:52:47Z"
 		},
 		{
 			"checksumSHA1": "1MGpGDQqnUoRpv7VEcQrXOBydXE=",
