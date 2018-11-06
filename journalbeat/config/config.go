@@ -41,5 +41,5 @@ var DefaultConfig = Config{
 	RegistryFile: "registry",
 	Backoff:      1 * time.Second,
 	MaxBackoff:   60 * time.Second,
-	Seek:         "tail",
+	Seek:         "cursor",
 }
