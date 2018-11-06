@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2018-01-01T08:09:10.000Z", 
-        "fileset.module": "iis", 
-        "fileset.name": "error", 
+        "event.dataset": "error", 
+        "event.module": "iis", 
         "iis.error.http_version": "1.1", 
         "iis.error.method": "GET", 
         "iis.error.queue_name": "-", 
@@ -18,8 +18,8 @@
     }, 
     {
         "@timestamp": "2018-01-01T09:10:11.000Z", 
-        "fileset.module": "iis", 
-        "fileset.name": "error", 
+        "event.dataset": "error", 
+        "event.module": "iis", 
         "iis.error.geoip.city_name": "Berlin", 
         "iis.error.geoip.continent_name": "Europe", 
         "iis.error.geoip.country_iso_code": "DE", 
@@ -42,8 +42,8 @@
     }, 
     {
         "@timestamp": "2018-01-01T10:11:12.000Z", 
-        "fileset.module": "iis", 
-        "fileset.name": "error", 
+        "event.dataset": "error", 
+        "event.module": "iis", 
         "iis.error.geoip.city_name": "Berlin", 
         "iis.error.geoip.continent_name": "Europe", 
         "iis.error.geoip.country_iso_code": "DE", 
@@ -66,8 +66,8 @@
     }, 
     {
         "@timestamp": "2018-01-01T11:12:13.000Z", 
-        "fileset.module": "iis", 
-        "fileset.name": "error", 
+        "event.dataset": "error", 
+        "event.module": "iis", 
         "iis.error.geoip.city_name": "Berlin", 
         "iis.error.geoip.continent_name": "Europe", 
         "iis.error.geoip.country_iso_code": "DE", 

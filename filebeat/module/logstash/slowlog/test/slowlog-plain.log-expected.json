@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2017-10-30T09:57:58,243", 
-        "fileset.module": "logstash", 
-        "fileset.name": "slowlog", 
+        "event.dataset": "slowlog", 
+        "event.module": "logstash", 
         "input.type": "log", 
         "log.offset": 0, 
         "logstash.slowlog.event": "\"{\\\"@version\\\":\\\"1\\\",\\\"@timestamp\\\":\\\"2017-10-30T13:57:55.130Z\\\",\\\"host\\\":\\\"sashimi\\\",\\\"sequence\\\":0,\\\"message\\\":\\\"Hello world!\\\"}\"", 

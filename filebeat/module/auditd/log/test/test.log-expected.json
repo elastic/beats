@@ -11,8 +11,8 @@
         "auditd.log.ses": "4294967295", 
         "auditd.log.src": "192.168.2.0", 
         "auditd.log.src_prefixlen": "24", 
-        "fileset.module": "auditd", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "auditd", 
         "input.type": "log", 
         "log.offset": 0
     }, 
@@ -44,8 +44,8 @@
         "auditd.log.syscall": "44", 
         "auditd.log.tty": "(none)", 
         "auditd.log.uid": "0", 
-        "fileset.module": "auditd", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "auditd", 
         "input.type": "log", 
         "log.offset": 174
     }

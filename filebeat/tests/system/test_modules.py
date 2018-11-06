@@ -133,8 +133,8 @@ class Test(BaseTest):
         objects = [o["_source"] for o in res["hits"]["hits"]]
         assert len(objects) > 0
         for obj in objects:
-            assert obj["fileset"]["module"] == module, "expected fileset.module={} but got {}".format(
-                module, obj["fileset"]["module"])
+            assert obj["event"]["module"] == module, "expected event.module={} but got {}".format(
+                module, obj["event"]["module"])
 
             assert "error" not in obj, "not error expected but got: {}".format(
                 obj)
@@ -176,7 +176,7 @@ class Test(BaseTest):
                 clean_keys(obj)
 
                 # Remove timestamp for comparison where timestamp is not part of the log line
-                if obj["fileset.module"] == "icinga" and obj["fileset.name"] == "startup":
+                if obj["event.module"] == "icinga" and obj["event.dataset"] == "startup":
                     delete_key(obj, "@timestamp")
                     delete_key(ev, "@timestamp")
 

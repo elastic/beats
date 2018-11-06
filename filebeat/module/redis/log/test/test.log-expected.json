@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2018-05-30T12:23:52.442Z", 
-        "fileset.module": "redis", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "redis", 
         "input.type": "log", 
         "log.offset": 0, 
         "redis.log.level": "notice", 
@@ -12,8 +12,8 @@
     }, 
     {
         "@timestamp": "2018-05-30T10:05:20.000Z", 
-        "fileset.module": "redis", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "redis", 
         "input.type": "log", 
         "log.offset": 76, 
         "redis.log.level": "debug", 
@@ -21,8 +21,8 @@
     }, 
     {
         "@timestamp": "2018-05-31T04:32:08.000Z", 
-        "fileset.module": "redis", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "redis", 
         "input.type": "log", 
         "log.offset": 165, 
         "redis.log.level": "notice", 
@@ -30,8 +30,8 @@
     }, 
     {
         "@timestamp": "2017-05-30T10:57:24.000Z", 
-        "fileset.module": "redis", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "redis", 
         "input.type": "log", 
         "log.offset": 250, 
         "redis.log.message": "Received SIGINT scheduling shutdown...", 

@@ -4689,22 +4689,6 @@ In case the ingest pipeline parses the timestamp from the log contents, it store
 
 --
 
-*`fileset.module`*::
-+
---
-The Filebeat module that generated this event.
-
-
---
-
-*`fileset.name`*::
-+
---
-The Filebeat fileset that generated this event.
-
-
---
-
 *`syslog.facility`*::
 +
 --
