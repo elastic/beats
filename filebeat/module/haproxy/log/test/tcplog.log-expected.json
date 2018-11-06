@@ -24,6 +24,6 @@
         "haproxy.termination_state": "SC", 
         "haproxy.total_waiting_time_ms": -1, 
         "input.type": "log", 
-        "offset": 0
+        "log.offset": 0
     }
 ]
