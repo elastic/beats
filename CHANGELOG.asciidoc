@@ -14,7 +14,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 *Affecting all Beats*
 
 - Dissect syntax change, use * instead of ? when working with field reference. {issue}8054[8054]
-- Add `-e` flag by default to systemd unit so logs are collected by journald, behaviour can be reverted by overriding BEAT_LOG_OPTS environment variable with an empty value {pull}[]
+- On systems with systemd the Beats log is now written to journald by default rather than file, this behaviour can be reverted by overriding BEAT_LOG_OPTS with an empty value. {pull}8942[8942].
 
 *Auditbeat*
 
