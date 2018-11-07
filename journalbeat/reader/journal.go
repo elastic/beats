@@ -158,6 +158,7 @@ func (r *Reader) seek(cursor string) {
 		r.logger.Debug("Seeked to position defined in cursor")
 	case config.SeekTail:
 		r.journal.SeekTail()
+		r.journal.Next()
 		r.logger.Debug("Tailing the journal file")
 	case config.SeekHead:
 		r.journal.SeekHead()
