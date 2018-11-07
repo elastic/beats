@@ -21,11 +21,12 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Rename beat.name to agent.type, beat.hostname to agent.hostname, beat.version to agent.version.
 
 *Filebeat*
-- Rename `fileset.name` to `event.name`.
-- Rename `fileset.module` to `event.module`.
 
+- Rename `fileset.name` to `event.name`. {pull}8879[8879]
+- Rename `fileset.module` to `event.module`. {pull}8879[8879]
+- Rename source to log.file.path and log.source.ip {pull}8902[8902]
 - Remove the deprecated `prospector(s)` option in the configuration use `input(s)` instead. {pull}8909[8909]
-- Rename `offset` to `log.offset`.
+- Rename `offset` to `log.offset`. {pull}8923[8923]
 
 *Heartbeat*
 
