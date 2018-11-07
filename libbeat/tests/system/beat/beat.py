@@ -48,8 +48,7 @@ class Proc(object):
 
         if sys.platform.startswith("win"):
             # ensure that the environment is inherited to the subprocess.
-            variables = os.environ.copy()
-            variables = variables.update(self.env)
+            variables = os.environ.copy().update(self.env)
 
             self.proc = subprocess.Popen(
                 self.args,
