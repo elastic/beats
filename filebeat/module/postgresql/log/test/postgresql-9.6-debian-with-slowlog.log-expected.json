@@ -1,86 +1,81 @@
 [
     {
         "@timestamp": "2017-07-31T13:36:42.585Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 0, 
         "message": "2017-07-31 13:36:42.585 CEST [4974] LOG:  database system was shut down at 2017-06-17 16:58:04 CEST", 
-        "offset": 0, 
         "postgresql.log.level": "LOG", 
         "postgresql.log.message": "database system was shut down at 2017-06-17 16:58:04 CEST", 
         "postgresql.log.thread_id": "4974", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.585", 
-        "postgresql.log.timezone": "CEST", 
-        "prospector.type": "log"
+        "postgresql.log.timezone": "CEST"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.605Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 100, 
         "message": "2017-07-31 13:36:42.605 CEST [4974] LOG:  MultiXact member wraparound protections are now enabled", 
-        "offset": 100, 
         "postgresql.log.level": "LOG", 
         "postgresql.log.message": "MultiXact member wraparound protections are now enabled", 
         "postgresql.log.thread_id": "4974", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.605", 
-        "postgresql.log.timezone": "CEST", 
-        "prospector.type": "log"
+        "postgresql.log.timezone": "CEST"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.615Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 198, 
         "message": "2017-07-31 13:36:42.615 CEST [4978] LOG:  autovacuum launcher started", 
-        "offset": 198, 
         "postgresql.log.level": "LOG", 
         "postgresql.log.message": "autovacuum launcher started", 
         "postgresql.log.thread_id": "4978", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.615", 
-        "postgresql.log.timezone": "CEST", 
-        "prospector.type": "log"
+        "postgresql.log.timezone": "CEST"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.616Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 268, 
         "message": "2017-07-31 13:36:42.616 CEST [4973] LOG:  database system is ready to accept connections", 
-        "offset": 268, 
         "postgresql.log.level": "LOG", 
         "postgresql.log.message": "database system is ready to accept connections", 
         "postgresql.log.thread_id": "4973", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.616", 
-        "postgresql.log.timezone": "CEST", 
-        "prospector.type": "log"
+        "postgresql.log.timezone": "CEST"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.956Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 357, 
         "message": "2017-07-31 13:36:42.956 CEST [4980] [unknown]@[unknown] LOG:  incomplete startup packet", 
-        "offset": 357, 
         "postgresql.log.database": "unknown", 
         "postgresql.log.level": "LOG", 
         "postgresql.log.message": "incomplete startup packet", 
         "postgresql.log.thread_id": "4980", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.956", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "unknown", 
-        "prospector.type": "log"
+        "postgresql.log.user": "unknown"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:43.557Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.flags": [
             "multiline"
         ], 
+        "log.offset": 445, 
         "message": "2017-07-31 13:36:43.557 CEST [4983] postgres@postgres LOG:  duration: 37.118 ms  statement: SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;", 
-        "offset": 445, 
         "postgresql.log.database": "postgres", 
         "postgresql.log.duration": "37.118", 
         "postgresql.log.level": "LOG", 
@@ -88,19 +83,18 @@
         "postgresql.log.thread_id": "4983", 
         "postgresql.log.timestamp": "2017-07-31 13:36:43.557", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:44.104Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.flags": [
             "multiline"
         ], 
+        "log.offset": 873, 
         "message": "2017-07-31 13:36:44.104 CEST [4986] postgres@postgres LOG:  duration: 2.895 ms  statement: SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;", 
-        "offset": 873, 
         "postgresql.log.database": "postgres", 
         "postgresql.log.duration": "2.895", 
         "postgresql.log.level": "LOG", 
@@ -108,19 +102,18 @@
         "postgresql.log.thread_id": "4986", 
         "postgresql.log.timestamp": "2017-07-31 13:36:44.104", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:44.642Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.flags": [
             "multiline"
         ], 
+        "log.offset": 1300, 
         "message": "2017-07-31 13:36:44.642 CEST [4989] postgres@postgres LOG:  duration: 2.809 ms  statement: SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;", 
-        "offset": 1300, 
         "postgresql.log.database": "postgres", 
         "postgresql.log.duration": "2.809", 
         "postgresql.log.level": "LOG", 
@@ -128,51 +121,48 @@
         "postgresql.log.thread_id": "4989", 
         "postgresql.log.timestamp": "2017-07-31 13:36:44.642", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:39:16.249Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 1727, 
         "message": "2017-07-31 13:39:16.249 CEST [5407] postgres@users FATAL:  database \"users\" does not exist", 
-        "offset": 1727, 
         "postgresql.log.database": "users", 
         "postgresql.log.level": "FATAL", 
         "postgresql.log.message": "database \"users\" does not exist", 
         "postgresql.log.thread_id": "5407", 
         "postgresql.log.timestamp": "2017-07-31 13:39:16.249", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:39:17.945Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 1818, 
         "message": "2017-07-31 13:39:17.945 CEST [5500] postgres@user FATAL:  database \"user\" does not exist", 
-        "offset": 1818, 
         "postgresql.log.database": "user", 
         "postgresql.log.level": "FATAL", 
         "postgresql.log.message": "database \"user\" does not exist", 
         "postgresql.log.thread_id": "5500", 
         "postgresql.log.timestamp": "2017-07-31 13:39:17.945", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:39:21.025Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.flags": [
             "multiline"
         ], 
+        "log.offset": 1907, 
         "message": "2017-07-31 13:39:21.025 CEST [5404] postgres@postgres LOG:  duration: 37.598 ms  statement: SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;", 
-        "offset": 1907, 
         "postgresql.log.database": "postgres", 
         "postgresql.log.duration": "37.598", 
         "postgresql.log.level": "LOG", 
@@ -180,16 +170,15 @@
         "postgresql.log.thread_id": "5404", 
         "postgresql.log.timestamp": "2017-07-31 13:39:21.025", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:39:31.619Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 2620, 
         "message": "2017-07-31 13:39:31.619 CEST [5502] postgres@clients LOG:  duration: 9.482 ms  statement: select * from clients;", 
-        "offset": 2620, 
         "postgresql.log.database": "clients", 
         "postgresql.log.duration": "9.482", 
         "postgresql.log.level": "LOG", 
@@ -197,16 +186,15 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:39:31.619", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:39:40.147Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 2733, 
         "message": "2017-07-31 13:39:40.147 CEST [5502] postgres@clients LOG:  duration: 0.765 ms  statement: select id from clients;", 
-        "offset": 2733, 
         "postgresql.log.database": "clients", 
         "postgresql.log.duration": "0.765", 
         "postgresql.log.level": "LOG", 
@@ -214,19 +202,18 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:39:40.147", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:40:54.310Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.flags": [
             "multiline"
         ], 
+        "log.offset": 2847, 
         "message": "2017-07-31 13:40:54.310 CEST [5502] postgres@clients LOG:  duration: 26.082 ms  statement: SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;", 
-        "offset": 2847, 
         "postgresql.log.database": "clients", 
         "postgresql.log.duration": "26.082", 
         "postgresql.log.level": "LOG", 
@@ -234,16 +221,15 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:40:54.310", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:43:22.645Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 3559, 
         "message": "2017-07-31 13:43:22.645 CEST [5502] postgres@clients LOG:  duration: 36.162 ms  statement: create table cats(name varchar(50) primary key, toy varchar (50) not null, born timestamp not null);", 
-        "offset": 3559, 
         "postgresql.log.database": "clients", 
         "postgresql.log.duration": "36.162", 
         "postgresql.log.level": "LOG", 
@@ -251,16 +237,15 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:43:22.645", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:46:02.670Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 3751, 
         "message": "2017-07-31 13:46:02.670 CEST [5502] postgres@c$lients LOG:  duration: 10.540 ms  statement: insert into cats(name, toy, born) values('kate', 'ball', now());", 
-        "offset": 3751, 
         "postgresql.log.database": "c$lients", 
         "postgresql.log.duration": "10.540", 
         "postgresql.log.level": "LOG", 
@@ -268,16 +253,15 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:46:02.670", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:46:23.016Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 3908, 
         "message": "2017-07-31 13:46:23.016 CEST [5502] postgres@_clients$db LOG:  duration: 5.156 ms  statement: insert into cats(name, toy, born) values('frida', 'horse', now());", 
-        "offset": 3908, 
         "postgresql.log.database": "_clients$db", 
         "postgresql.log.duration": "5.156", 
         "postgresql.log.level": "LOG", 
@@ -285,16 +269,15 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:46:23.016", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }, 
     {
         "@timestamp": "2017-07-31T13:46:55.637Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
+        "log.offset": 4069, 
         "message": "2017-07-31 13:46:55.637 CEST [5502] postgres@clients_db LOG:  duration: 25.871 ms  statement: create table dogs(name varchar(50) primary key, owner varchar (50) not null, born timestamp not null);", 
-        "offset": 4069, 
         "postgresql.log.database": "clients_db", 
         "postgresql.log.duration": "25.871", 
         "postgresql.log.level": "LOG", 
@@ -302,7 +285,6 @@
         "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:46:55.637", 
         "postgresql.log.timezone": "CEST", 
-        "postgresql.log.user": "postgres", 
-        "prospector.type": "log"
+        "postgresql.log.user": "postgres"
     }
 ]

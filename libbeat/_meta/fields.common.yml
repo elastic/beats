@@ -4,24 +4,10 @@
   description: >
     Contains common beat fields available in all event types.
   fields:
-
-    - name: beat.name
-      description: >
-        The name of the Beat sending the log messages. If the Beat name is
-        set in the configuration file, then that value is used. If it is not
-        set, the hostname is used. To set the Beat name, use the `name`
-        option in the configuration file.
-    - name: beat.hostname
-      description: >
-        The hostname as returned by the operating system on which the Beat is
-        running.
     - name: beat.timezone
       description: >
         The timezone as returned by the operating system on which the Beat is
         running.
-    - name: beat.version
-      description: >
-        The version of the beat that generated this event.
 
     - name: "@timestamp"
       type: date

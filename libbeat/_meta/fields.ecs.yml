@@ -23,12 +23,17 @@
             Version of the agent.
     
           example: 6.0.0-rc2
-        - name: name
+        - name: type
           type: keyword
           description: >
             Name of the agent.
     
           example: filebeat
+        - name: hostname
+          type: keyword
+          description: >
+            Hostname of the agent.
+
         - name: id
           type: keyword
           description: >

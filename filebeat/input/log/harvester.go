@@ -307,7 +307,9 @@ func (h *Harvester) Run() error {
 		if !message.IsEmpty() && h.shouldExportLine(text) {
 			fields := common.MapStr{
 				"source": state.Source,
-				"offset": startingOffset, // Offset here is the offset before the starting char.
+				"log": common.MapStr{
+					"offset": startingOffset, // Offset here is the offset before the starting char.
+				},
 			}
 			fields.DeepUpdate(message.Fields)
 

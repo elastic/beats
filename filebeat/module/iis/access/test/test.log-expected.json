@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2018-01-01T08:09:10.000Z", 
-        "fileset.module": "iis", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "iis", 
         "iis.access.geoip.city_name": "Berlin", 
         "iis.access.geoip.continent_name": "Europe", 
         "iis.access.geoip.country_iso_code": "DE", 
@@ -30,13 +30,12 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
-        "offset": 257, 
-        "prospector.type": "log"
+        "log.offset": 257
     }, 
     {
         "@timestamp": "2018-01-01T09:10:11.000Z", 
-        "fileset.module": "iis", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "iis", 
         "iis.access.body_received.bytes": "456", 
         "iis.access.body_sent.bytes": "123", 
         "iis.access.cookie": "-", 
@@ -61,13 +60,12 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
-        "offset": 709, 
-        "prospector.type": "log"
+        "log.offset": 709
     }, 
     {
         "@timestamp": "2018-01-01T10:11:12.000Z", 
-        "fileset.module": "iis", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "iis", 
         "iis.access.body_received.bytes": "456", 
         "iis.access.body_sent.bytes": "123", 
         "iis.access.cookie": "-", 
@@ -102,7 +100,6 @@
         "iis.access.user_name": "-", 
         "iis.access.win32_status": "0", 
         "input.type": "log", 
-        "offset": 1204, 
-        "prospector.type": "log"
+        "log.offset": 1204
     }
 ]

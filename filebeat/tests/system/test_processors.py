@@ -16,7 +16,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/test.log",
             processors=[{
                 "drop_fields": {
-                    "fields": ["beat"],
+                    "fields": ["agent"],
                 },
             }]
         )
@@ -30,7 +30,7 @@ class Test(BaseTest):
         output = self.read_output(
             required_fields=["@timestamp"],
         )[0]
-        assert "beat.name" not in output
+        assert "agent.type" not in output
         assert "message" in output
 
     def test_include_fields(self):
@@ -55,7 +55,7 @@ class Test(BaseTest):
         output = self.read_output(
             required_fields=["@timestamp"],
         )[0]
-        assert "beat.name" not in output
+        assert "agent.type" not in output
         assert "message" in output
 
     def test_drop_event(self):
@@ -83,7 +83,7 @@ class Test(BaseTest):
         output = self.read_output(
             required_fields=["@timestamp"],
         )[0]
-        assert "beat.name" in output
+        assert "agent.type" in output
         assert "message" in output
         assert "test" in output["message"]
 
@@ -112,7 +112,7 @@ class Test(BaseTest):
         output = self.read_output(
             required_fields=["@timestamp"],
         )[0]
-        assert "beat.name" in output
+        assert "agent.type" in output
         assert "message" in output
         assert "test" in output["message"]
 
