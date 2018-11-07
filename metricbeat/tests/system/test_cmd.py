@@ -136,7 +136,11 @@ class TestCommands(metricbeat.BaseTest):
             extra_args=["test", "modules"])
 
         assert exit_code == 0
-        assert self.log_contains("ERROR error making http request")
+        try:
+            assert self.log_contains("ERROR error making http request")
+        finally:
+            print "Flaky test - https://github.com/elastic/beats/issues/8412"
+            print self.get_log()
         assert self.log_contains("cpu...OK")
         assert self.log_contains("memory...OK")
 
