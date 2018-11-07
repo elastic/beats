@@ -31,7 +31,7 @@ const (
 	eventTypeState = "state"
 	eventTypeEvent = "event"
 
-	eventActionUserExists  = "user_exists"
+	eventActionUserExists  = "existing_user"
 	eventActionUserAdded   = "user_added"
 	eventActionUserRemoved = "user_removed"
 	eventActionUserChanged = "user_changed"
