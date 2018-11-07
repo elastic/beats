@@ -7,11 +7,6 @@
 //// resolve Beat names: beatname_uc and beatname_lc
 //// Use the following include to pull this content into a doc file:
 //// include::../../libbeat/docs/shared-template-load.asciidoc[]
-//// If you want to include conditional content, you also need to
-//// add the following doc attribute definition  before the
-//// include statement so that you have:
-//// :allplatforms:
-//// include::../../libbeat/docs/shared-template-load.asciidoc[]
 //// This content must be embedded underneath a level 3 heading.
 //////////////////////////////////////////////////////////////////////////
 
@@ -35,19 +30,19 @@ ifndef::only-elasticsearch[]
 NOTE: A connection to Elasticsearch is required to load the index template. If
 the output is not Elasticsearch, you must
 <<load-template-manually,load the template manually>>. 
-endif::[]
+endif::only-elasticsearch[]
 
 For more information, see:
 
 ifdef::only-elasticsearch[]
 * <<load-template-auto>>
 * <<load-template-manually>>
-endif::[]
+endif::only-elasticsearch[]
 
 ifndef::only-elasticsearch[]
 * <<load-template-auto>>
 * <<load-template-manually>> - required for non-Elasticsearch output
-endif::[]
+endif::only-elasticsearch[]
 
 [[load-template-auto]]
 ==== Configure template loading
@@ -138,7 +133,7 @@ If another output is enabled, you need
 to temporarily disable that output and enable Elasticsearch by using the
 `-E` option. The examples here assume that Logstash output is enabled. You can
 omit the `-E` flags if Elasticsearch output is already enabled.
-endif::[]
+endif::only-elasticsearch[]
 
 If you are connecting to a secured Elasticsearch cluster, make sure you've
 configured credentials as described in <<{beatname_lc}-configuration>>.
@@ -146,17 +141,21 @@ configured credentials as described in <<{beatname_lc}-configuration>>.
 If the host running {beatname_uc} does not have direct connectivity to
 Elasticsearch, see <<load-template-manually-alternate>>.
 
+ifndef::win_only[]
 To load the template, use the appropriate command for your system.
+endif::win_only[]
+
+ifdef::win_only[]
+To load the template:
+endif::win_only[]
 
 ifndef::only-elasticsearch[]
 :disable_logstash: {sp}-E output.logstash.enabled=false
-endif::[]
+endif::only-elasticsearch[]
 
 ifdef::only-elasticsearch[]
 :disable_logstash:
-endif::[]
-
-ifdef::allplatforms[]
+endif::only-elasticsearch[]
 
 ifeval::["{requires-sudo}"=="yes"]
 
@@ -164,31 +163,36 @@ include::./shared-note-sudo.asciidoc[]
 
 endif::[]
 
+ifdef::deb_os,rpm_os[]
 *deb and rpm:*
 ["source","sh",subs="attributes"]
 ----
 {beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
+endif::deb_os,rpm_os[]
 
+ifdef::mac_os[]
 *mac:*
 
 ["source","sh",subs="attributes"]
 ----
 ./{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
+endif::mac_os[]
 
-
+ifdef::mac_os[]
 *docker:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 docker run {dockerimage} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
+endif::mac_os[]
 
-
+ifdef::win_os[]
+ifndef::win_only[]
 *win:*
-
-endif::allplatforms[]
+endif::win_only[]
 
 Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
 and select *Run As Administrator*).
@@ -200,7 +204,7 @@ and run:
 ----------------------------------------------------------------------
 PS > .{backslash}{beatname_lc}.exe setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
-
+endif::win_os[]
 
 [[force-kibana-new]]
 ===== Force Kibana to look at newest documents
@@ -210,20 +214,34 @@ the index may contain old documents. After you load the index template,
 you can delete the old documents from +{beatname_lc}-*+ to force Kibana to look
 at the newest documents. Use this command:
 
-*deb, rpm, and mac:*
+ifdef::deb_os,rpm_os[]
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
 ----------------------------------------------------------------------
+endif::deb_os,rpm_os[]
 
+ifdef::mac_os[]
+*mac:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
+----------------------------------------------------------------------
+endif::mac_os[]
+
+ifdef::win_os[]
+ifndef::win_only[]
 *win:*
+endif::win_only[]
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 PS > Invoke-RestMethod -Method Delete "http://localhost:9200/{beatname_lc}-*"
 ----------------------------------------------------------------------
-
+endif::win_os[]
 
 This command deletes all indices that match the pattern +{beat_default_index_prefix}-*+.
 Before running this command, make sure you want to delete all indices that match
@@ -236,43 +254,64 @@ If the host running {beatname_uc} does not have direct connectivity to
 Elasticsearch, you can export the index template to a file, move it to a
 machine that does have connectivity, and then install the template manually.
 
-. Export the index template:
-+
-ifdef::allplatforms[]
+To export the index template, run:
+
+ifdef::deb_os,rpm_os[]
 *deb and rpm:*
-+
+
 ["source","sh",subs="attributes"]
 ----
 {beatname_lc} export template > {beatname_lc}.template.json
 ----
-+
+endif::deb_os,rpm_os[]
+
+ifdef::mac_os[]
 *mac:*
-+
+
 ["source","sh",subs="attributes"]
 ----
 ./{beatname_lc} export template > {beatname_lc}.template.json
 ----
-+
+endif::mac_os[]
+
+ifdef::win_os[]
+ifndef::win_only[]
 *win:*
-+
-endif::allplatforms[]
+endif::win_only[]
+
 ["source","sh",subs="attributes"]
 ----
 PS > .{backslash}{beatname_lc}.exe export template --es.version {stack-version} | Out-File -Encoding UTF8 {beatname_lc}.template.json
 ----
+endif::win_os[]
 
-. Install the template:
-+
-*deb, rpm, and mac:*
-+
+To install the template, run:
+
+ifdef::deb_os,rpm_os[]
+*deb and rpm:*
+
 ["source","sh",subs="attributes"]
 ----
 curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
 ----
-+
+endif::deb_os,rpm_os[]
+
+ifdef::mac_os[]
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
+----
+endif::mac_os[]
+
+ifdef::win_os[]
+ifndef::win_only[]
 *win:*
-+
+endif::win_only[]
+
 ["source","sh",subs="attributes"]
 ----
 PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_template/{beatname_lc}-{stack-version}
 ----
+endif::win_os[]

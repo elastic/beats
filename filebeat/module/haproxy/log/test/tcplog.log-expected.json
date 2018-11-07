@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2018-09-20T15:44:23.285Z", 
-        "fileset.module": "haproxy", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "haproxy", 
         "haproxy.backend_name": "app", 
         "haproxy.backend_queue": 0, 
         "haproxy.bytes_read": 212, 
@@ -24,7 +24,6 @@
         "haproxy.termination_state": "SC", 
         "haproxy.total_waiting_time_ms": -1, 
         "input.type": "log", 
-        "offset": 0, 
-        "prospector.type": "log"
+        "log.offset": 0
     }
 ]

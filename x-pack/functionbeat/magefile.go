@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -38,7 +39,7 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return mage.CrossBuild()
+	return mage.CrossBuild(mage.AddPlatforms("linux/amd64"))
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
@@ -78,4 +79,18 @@ func Update() error {
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
 	return mage.GenerateFieldsYAML()
+}
+
+// GoTestUnit executes the Go unit tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoTestUnit(ctx context.Context) error {
+	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
+}
+
+// GoTestIntegration executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoTestIntegration(ctx context.Context) error {
+	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
 }
