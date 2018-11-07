@@ -45,9 +45,9 @@ const (
 	SeekInvalid SeekMode = iota
 	// SeekHead option seeks to the head of a journal
 	SeekHead
-	// SeekHead option seeks to the tail of a journal
+	// SeekTail option seeks to the tail of a journal
 	SeekTail
-	// SeekHead option seeks to the position specified in the cursor
+	// SeekCursor option seeks to the position specified in the cursor
 	SeekCursor
 
 	seekHeadStr   = "head"
