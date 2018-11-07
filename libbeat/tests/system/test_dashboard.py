@@ -63,7 +63,6 @@ class Test(BaseTest):
 
         assert self.log_contains("Kibana dashboards successfully loaded") is True
 
-
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_load_dashboard_into_space(self, create_space=True):
