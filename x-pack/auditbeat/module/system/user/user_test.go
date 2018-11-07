@@ -12,7 +12,7 @@ import (
 
 func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(f, t, "")
+	err := mbtest.WriteDataSetEventsReporterV2(f, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}

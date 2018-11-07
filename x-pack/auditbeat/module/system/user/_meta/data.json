@@ -4,11 +4,12 @@
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
-    "metricset": {
-        "module": "system",
-        "name": "user",
-        "rtt": 115
+    "event": {
+        "dataset": "user",
+        "module": "system"
     },
+    "event.action": "existing_user",
+    "event.type": "state",
     "system": {
         "user": {
             "dir": "/root",

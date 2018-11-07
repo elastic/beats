@@ -97,9 +97,42 @@ func WriteEventsCond(f mb.EventsFetcher, t testing.TB, cond func(e common.MapStr
 	return nil
 }
 
+// WriteDataSetEventsReporterV2 fetches events and writes the first event to a ./_meta/data.json
+// file. Instead of information about a MetricSet it adds DataSet information (Auditbeat uses this).
+func WriteDataSetEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB, path string) error {
+	return writeEventsReporterV2(f, t, path, AddDataSetInfo)
+}
+
+// AddDataSetInfo is an EventModifier that adds information about the
+// DataSet that generated the event. It will add the dataset and
+// module names.
+//
+//     "event": {
+//       "module": "system",
+//       "dataset": "host"
+//     }
+func AddDataSetInfo(module, dataset string, event *mb.Event) {
+	eventInfo := common.MapStr{
+		"event": common.MapStr{
+			"module":  module,
+			"dataset": dataset,
+		},
+	}
+
+	if event.RootFields == nil {
+		event.RootFields = eventInfo
+	} else {
+		event.RootFields.DeepUpdate(eventInfo)
+	}
+}
+
 // WriteEventsReporterV2 fetches events and writes the first event to a ./_meta/data.json
 // file.
 func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB, path string) error {
+	return writeEventsReporterV2(f, t, path, mb.AddMetricSetInfo)
+}
+
+func writeEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB, path string, modifier mb.EventModifier) error {
 	if !*dataFlag {
 		t.Skip("skip data generation tests")
 	}
@@ -113,7 +146,7 @@ func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB, path string)
 		return fmt.Errorf("no events were generated")
 	}
 
-	e := StandardizeEvent(f, events[0], mb.AddMetricSetInfo)
+	e := StandardizeEvent(f, events[0], modifier)
 
 	WriteEventToDataJSON(t, e, path)
 	return nil
