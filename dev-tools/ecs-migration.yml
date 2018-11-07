@@ -24,6 +24,10 @@
 - from: fileset.module
   to: event.module
   alias: true
+
+- from: source
+  to: ["log.file.path", "log.source.ip"]
+  alias: false
   copy_to: false
 
 - from: beat.name
