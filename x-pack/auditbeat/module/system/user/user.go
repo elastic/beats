@@ -28,13 +28,13 @@ const (
 	metricsetName = "user"
 	bucketName    = "user.v1"
 
-	eventTypeSnapshot = "snapshot"
-	eventTypeChange   = "change"
+	eventTypeState = "state"
+	eventTypeEvent = "event"
 
-	eventTypeDetailUserExists  = "user_exists"
-	eventTypeDetailUserAdded   = "user_added"
-	eventTypeDetailUserRemoved = "user_removed"
-	eventTypeDetailUserChanged = "user_changed"
+	eventActionUserExists  = "user_exists"
+	eventActionUserAdded   = "user_added"
+	eventActionUserRemoved = "user_removed"
+	eventActionUserChanged = "user_changed"
 )
 
 func init() {
@@ -193,8 +193,8 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		for _, user := range added {
 			report.Event(mb.Event{
 				RootFields: common.MapStr{
-					"event.type":        eventTypeChange,
-					"event.type_detail": eventTypeDetailUserAdded,
+					"event.type":   eventTypeEvent,
+					"event.action": eventActionUserAdded,
 				},
 				MetricSetFields: user.toMapStr(),
 			})
@@ -203,8 +203,8 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		for _, user := range removed {
 			report.Event(mb.Event{
 				RootFields: common.MapStr{
-					"event.type":        eventTypeChange,
-					"event.type_detail": eventTypeDetailUserRemoved,
+					"event.type":   eventTypeEvent,
+					"event.action": eventActionUserRemoved,
 				},
 				MetricSetFields: user.toMapStr(),
 			})
@@ -213,8 +213,8 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		for _, user := range changed {
 			report.Event(mb.Event{
 				RootFields: common.MapStr{
-					"event.type":        eventTypeChange,
-					"event.type_detail": eventTypeDetailUserChanged,
+					"event.type":   eventTypeEvent,
+					"event.action": eventActionUserChanged,
 				},
 				MetricSetFields: user.toMapStr(),
 			})
@@ -232,8 +232,8 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		for _, user := range users {
 			report.Event(mb.Event{
 				RootFields: common.MapStr{
-					"event.type":        eventTypeSnapshot,
-					"event.type_detail": eventTypeDetailUserExists,
+					"event.type":   eventTypeState,
+					"event.action": eventActionUserExists,
 				},
 				MetricSetFields: user.toMapStr(),
 			})
