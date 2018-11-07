@@ -2278,6 +2278,64 @@ This id normally changes across restarts, but `service.id` does not.
 --
 
 [float]
+== source fields
+
+Source fields describe details about the source of the event.
+
+
+
+*`source.ip`*::
++
+--
+type: ip
+
+IP address of the source.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`source.hostname`*::
++
+--
+type: keyword
+
+Hostname of the source.
+
+
+--
+
+*`source.port`*::
++
+--
+type: long
+
+Port of the source.
+
+
+--
+
+*`source.mac`*::
++
+--
+type: keyword
+
+MAC address of the source.
+
+
+--
+
+*`source.domain`*::
++
+--
+type: keyword
+
+Source domain.
+
+
+--
+
+[float]
 == url fields
 
 URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
@@ -4776,33 +4834,13 @@ Content length of the HTTP response body.
 --
 
 
-*`source_ecs.ip`*::
-+
---
-type: ip
-
-IP address of the source.
-
-
---
-
-*`source_ecs.port`*::
-+
---
-type: long
-
-Port of the source.
-
-
---
-
 [float]
 == geo fields
 
 Geolocation for source.
 
 
-*`source_ecs.geo.continent_name`*::
+*`source.geo.continent_name`*::
 +
 --
 type: keyword
@@ -4812,7 +4850,7 @@ Name of the continent.
 
 --
 
-*`source_ecs.geo.country_iso_code`*::
+*`source.geo.country_iso_code`*::
 +
 --
 type: keyword
@@ -4822,7 +4860,7 @@ Country ISO code.
 
 --
 
-*`source_ecs.geo.location`*::
+*`source.geo.location`*::
 +
 --
 type: geo_point
@@ -4832,7 +4870,7 @@ Longitude and latitude.
 
 --
 
-*`source_ecs.geo.region_name`*::
+*`source.geo.region_name`*::
 +
 --
 type: keyword
@@ -4842,7 +4880,7 @@ Region name.
 
 --
 
-*`source_ecs.geo.city_name`*::
+*`source.geo.city_name`*::
 +
 --
 type: keyword
@@ -4852,7 +4890,7 @@ City name.
 
 --
 
-*`source_ecs.geo.region_iso_code`*::
+*`source.geo.region_iso_code`*::
 +
 --
 type: keyword

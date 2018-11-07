@@ -940,7 +940,46 @@
     
             This id normally changes across restarts, but `service.id` does not.
           example: 8a4f500f
-    
+
+    - name: source
+      title: Source
+      description: >
+        Source fields describe details about the source of the event.
+
+      type: group
+      fields:
+      - name: ip
+        level: core
+        type: ip
+        description: >
+          IP address of the source.
+
+          Can be one or multiple IPv4 or IPv6 addresses.
+
+      - name: hostname
+        level: core
+        type: keyword
+        description: >
+          Hostname of the source.
+
+      - name: port
+        level: core
+        type: long
+        description: >
+          Port of the source.
+
+      - name: mac
+        level: core
+        type: keyword
+        description: >
+          MAC address of the source.
+
+      - name: domain
+        level: core
+        type: keyword
+        description: >
+          Source domain.
+
     - name: url
       title: URL
       description: >

@@ -92,19 +92,9 @@
       description: >
         Content length of the HTTP response body.
 
-    - name: source_ecs
+    - name: source
       type: group
       fields:
-      - name: ip
-        type: ip
-        description: >
-          IP address of the source.
-
-      - name: port
-        type: long
-        description: >
-          Port of the source.
-
       - name: geo
         type: group
         description:

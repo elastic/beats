@@ -3749,6 +3749,64 @@ This id normally changes across restarts, but `service.id` does not.
 --
 
 [float]
+== source fields
+
+Source fields describe details about the source of the event.
+
+
+
+*`source.ip`*::
++
+--
+type: ip
+
+IP address of the source.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`source.hostname`*::
++
+--
+type: keyword
+
+Hostname of the source.
+
+
+--
+
+*`source.port`*::
++
+--
+type: long
+
+Port of the source.
+
+
+--
+
+*`source.mac`*::
++
+--
+type: keyword
+
+MAC address of the source.
+
+
+--
+
+*`source.domain`*::
++
+--
+type: keyword
+
+Source domain.
+
+
+--
+
+[float]
 == url fields
 
 URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
@@ -4135,22 +4193,6 @@ Properties of the source host
 
 
 
-*`source.mac`*::
-+
---
-Source MAC address as indicated by first packet seen for the current flow.
-
-
---
-
-*`source.ip`*::
-+
---
-Innermost IPv4 source address as indicated by first packet seen for the current flow.
-
-
---
-
 *`source.ip_location`*::
 +
 --
@@ -4219,14 +4261,6 @@ type: geo_point
 example: 60.715, -76.011
 
 The GeoIP location of the `outer_ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
---
-
-*`source.port`*::
-+
---
-Source port number as indicated by first packet seen for the current flow.
 
 
 --
