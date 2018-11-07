@@ -26,13 +26,13 @@ func GetUsers() (users []*User, err error) {
 
 		// passwd is C.struct_passwd
 		users = append(users, &User{
-			name:     C.GoString(passwd.pw_name),
-			passwd:   C.GoString(passwd.pw_passwd),
-			uid:      uint32(passwd.pw_uid),
-			gid:      uint32(passwd.pw_gid),
-			userInfo: C.GoString(passwd.pw_gecos),
-			dir:      C.GoString(passwd.pw_dir),
-			shell:    C.GoString(passwd.pw_shell),
+			Name:     C.GoString(passwd.pw_name),
+			Passwd:   C.GoString(passwd.pw_passwd),
+			UID:      uint32(passwd.pw_uid),
+			GID:      uint32(passwd.pw_gid),
+			UserInfo: C.GoString(passwd.pw_gecos),
+			Dir:      C.GoString(passwd.pw_dir),
+			Shell:    C.GoString(passwd.pw_shell),
 		})
 	}
 

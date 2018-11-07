@@ -5,6 +5,9 @@
 package user
 
 import (
+	"bytes"
+	"encoding/gob"
+	"io"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -50,40 +53,40 @@ type MetricSet struct {
 
 // User represents a user. Fields according to getpwent(3).
 type User struct {
-	name     string
-	passwd   string
-	uid      uint32
-	gid      uint32
-	userInfo string
-	dir      string
-	shell    string
+	Name     string
+	Passwd   string
+	UID      uint32
+	GID      uint32
+	UserInfo string
+	Dir      string
+	Shell    string
 }
 
 // Hash creates a hash for User.
 func (user User) Hash() uint64 {
 	h := xxhash.New64()
 	// Use everything except userInfo
-	h.WriteString(user.name)
-	h.WriteString(user.passwd)
-	h.WriteString(strconv.Itoa(int(user.uid)))
-	h.WriteString(strconv.Itoa(int(user.gid)))
-	h.WriteString(user.dir)
-	h.WriteString(user.shell)
+	h.WriteString(user.Name)
+	h.WriteString(user.Passwd)
+	h.WriteString(strconv.Itoa(int(user.UID)))
+	h.WriteString(strconv.Itoa(int(user.GID)))
+	h.WriteString(user.Dir)
+	h.WriteString(user.Shell)
 	return h.Sum64()
 }
 
 func (user User) toMapStr() common.MapStr {
 	evt := common.MapStr{
-		"name":   user.name,
-		"passwd": user.passwd,
-		"uid":    user.uid,
-		"gid":    user.gid,
-		"dir":    user.dir,
-		"shell":  user.shell,
+		"name":   user.Name,
+		"passwd": user.Passwd,
+		"uid":    user.UID,
+		"gid":    user.GID,
+		"dir":    user.Dir,
+		"shell":  user.Shell,
 	}
 
-	if user.userInfo != "" {
-		evt.Put("user_information", user.userInfo)
+	if user.UserInfo != "" {
+		evt.Put("user_information", user.UserInfo)
 	}
 
 	return evt
@@ -98,12 +101,72 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to open persistent datastore")
 	}
 
-	return &MetricSet{
+	ms := &MetricSet{
 		BaseMetricSet: base,
-		log:           logp.NewLogger(moduleName),
+		log:           logp.NewLogger(metricsetName),
 		cache:         cache.New(),
 		bucket:        bucket,
-	}, nil
+	}
+
+	users, err := ms.restoreUsersFromDisk()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to restore users from disk")
+	}
+	ms.log.Debugf("Restored %d users from disk", len(users))
+
+	ms.log.Debugf("%v", users)
+	ms.cache.DiffAndUpdateCache(convertToCacheable(users))
+
+	return ms, nil
+}
+
+// Load user cache from disk.
+func (ms *MetricSet) restoreUsersFromDisk() (users []*User, err error) {
+	var decoder *gob.Decoder
+	err = ms.bucket.Load("users", func(blob []byte) error {
+		if len(blob) > 0 {
+			buf := bytes.NewBuffer(blob)
+			decoder = gob.NewDecoder(buf)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if decoder != nil {
+		for {
+			user := new(User)
+			err = decoder.Decode(user)
+			if err == nil {
+				users = append(users, user)
+			} else if err == io.EOF {
+				// Read all users
+				break
+			} else {
+				return nil, errors.Wrap(err, "decode error")
+			}
+
+		}
+	}
+
+	return users, nil
+}
+
+// Save user cache to disk.
+func (ms *MetricSet) saveUsersToDisk(users []*User) error {
+	var buf bytes.Buffer
+	encoder := gob.NewEncoder(&buf)
+
+	for _, user := range users {
+		err := encoder.Encode(*user)
+		if err != nil {
+			return errors.Wrap(err, "encode error")
+		}
+	}
+
+	ms.bucket.Store("users", buf.Bytes())
+	return nil
 }
 
 // Close cleans up the MetricSet when it finishes.
@@ -156,6 +219,14 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 				MetricSetFields: user.toMapStr(),
 			})
 		}
+
+		if len(added) > 0 || len(removed) > 0 || len(changed) > 0 {
+			err := ms.saveUsersToDisk(users)
+			if err != nil {
+				ms.log.Error(err)
+				report.Error(err)
+			}
+		}
 	} else {
 		// Report all existing users
 		for _, user := range users {
@@ -172,6 +243,12 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 			// This will initialize the cache with the current processes
 			ms.cache.DiffAndUpdateCache(convertToCacheable(users))
 		}
+
+		err := ms.saveUsersToDisk(users)
+		if err != nil {
+			ms.log.Error(err)
+			report.Error(err)
+		}
 	}
 }
 
@@ -184,15 +261,15 @@ func (ms *MetricSet) compareUsers(users []*User) (added, removed, changed []*Use
 		// Check for changes to users
 		missingUserMap := make(map[uint32](*User))
 		for _, missingUser := range missingFromCache {
-			missingUserMap[missingUser.(*User).uid] = missingUser.(*User)
+			missingUserMap[missingUser.(*User).UID] = missingUser.(*User)
 		}
 
 		for _, newUser := range newInCache {
-			matchingMissingUser, found := missingUserMap[newUser.(*User).uid]
+			matchingMissingUser, found := missingUserMap[newUser.(*User).UID]
 
 			if found {
 				changed = append(changed, newUser.(*User))
-				delete(missingUserMap, matchingMissingUser.uid)
+				delete(missingUserMap, matchingMissingUser.UID)
 			} else {
 				added = append(added, newUser.(*User))
 			}
