@@ -34,16 +34,14 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"go.uber.org/zap"
-
 	errw "github.com/pkg/errors"
-
-	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
-	ucfg "github.com/elastic/go-ucfg"
+	"go.uber.org/zap"
 
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/asset"
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cloudid"
@@ -60,19 +58,11 @@ import (
 	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
+	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
 	"github.com/elastic/beats/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
-	"github.com/elastic/beats/libbeat/publisher/pipeline"
-	svc "github.com/elastic/beats/libbeat/service"
-	"github.com/elastic/beats/libbeat/template"
-	"github.com/elastic/beats/libbeat/version"
-
-	// Register publisher pipeline modules
-	_ "github.com/elastic/beats/libbeat/publisher/includes"
-
-	// Register default processors.
 	_ "github.com/elastic/beats/libbeat/processors/actions"
 	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_docker_metadata"
@@ -82,14 +72,14 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/add_process_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/dissect"
 	_ "github.com/elastic/beats/libbeat/processors/dns"
-
-	// Register autodiscover providers
-	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
-	_ "github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
-	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
-
-	// Register default monitoring reporting
-	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
+	_ "github.com/elastic/beats/libbeat/publisher/includes"
+	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	svc "github.com/elastic/beats/libbeat/service"
+	"github.com/elastic/beats/libbeat/template"
+	"github.com/elastic/beats/libbeat/version"
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
+	ucfg "github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.

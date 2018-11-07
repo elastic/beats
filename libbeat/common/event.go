@@ -26,9 +26,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 const eventDebugSelector = "event"

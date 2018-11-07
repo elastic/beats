@@ -21,12 +21,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/docker/docker/api"
 	"github.com/docker/docker/api/types/versions"
 	"github.com/docker/docker/client"
 	"golang.org/x/net/context"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // NewClient builds and returns a new Docker client
