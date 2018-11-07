@@ -161,7 +161,7 @@ func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader) error {
 	}
 
 	if err := importer.Import(); err != nil {
-		return errw.Wrap(err, "fail to import the dashboards in Kibana: %v")
+		return errw.Wrap(err, "fail to import the dashboards in Kibana")
 	}
 
 	return nil
