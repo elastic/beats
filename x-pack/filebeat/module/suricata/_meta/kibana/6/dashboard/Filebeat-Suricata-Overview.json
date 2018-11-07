@@ -777,7 +777,134 @@
           "hidePanelTitles": false,
           "useMargins": true
         },
-        "panelsJSON": null,
+        "panelsJSON": [
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 10,
+                    "i": "1",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "id": "c7d46c60-86da-11e8-b59d-21efb914e65c",
+                "panelIndex": "1",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 14,
+                    "i": "2",
+                    "w": 9,
+                    "x": 0,
+                    "y": 20
+                },
+                "id": "0a0aa630-86db-11e8-b59d-21efb914e65c",
+                "panelIndex": "2",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 14,
+                    "i": "3",
+                    "w": 11,
+                    "x": 19,
+                    "y": 20
+                },
+                "id": "728f64c0-86db-11e8-b59d-21efb914e65c",
+                "panelIndex": "3",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 10,
+                    "i": "4",
+                    "w": 48,
+                    "x": 0,
+                    "y": 10
+                },
+                "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c",
+                "panelIndex": "4",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 19,
+                    "i": "5",
+                    "w": 48,
+                    "x": 0,
+                    "y": 34
+                },
+                "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
+                "panelIndex": "5",
+                "type": "search",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 14,
+                    "i": "6",
+                    "w": 9,
+                    "x": 30,
+                    "y": 20
+                },
+                "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c",
+                "panelIndex": "6",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 14,
+                    "i": "7",
+                    "w": 9,
+                    "x": 39,
+                    "y": 20
+                },
+                "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c",
+                "panelIndex": "7",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 14,
+                    "i": "8",
+                    "w": 10,
+                    "x": 9,
+                    "y": 20
+                },
+                "id": "0a363820-86dd-11e8-b59d-21efb914e65c",
+                "panelIndex": "8",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 16,
+                    "i": "9",
+                    "w": 48,
+                    "x": 0,
+                    "y": 53
+                },
+                "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c",
+                "panelIndex": "9",
+                "type": "search",
+                "version": "6.3.0"
+            }
+        ],
         "timeRestore": false,
         "title": "[Suricata] Events Overview",
         "version": 1
