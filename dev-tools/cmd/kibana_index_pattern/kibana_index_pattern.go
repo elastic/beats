@@ -69,7 +69,6 @@ func main() {
 
 	versions := []string{
 		"6.0.0",
-		"7.0.0",
 	}
 	for _, version := range versions {
 		version, _ := common.NewVersion(version)

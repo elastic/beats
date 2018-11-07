@@ -23,7 +23,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -177,5 +176,9 @@ func createTargetDir(baseDir string, version common.Version) string {
 }
 
 func getVersionPath(version common.Version) string {
-	return strconv.Itoa(version.Major)
+	versionPath := "6"
+	if version.Major == 5 {
+		versionPath = "5"
+	}
+	return versionPath
 }
