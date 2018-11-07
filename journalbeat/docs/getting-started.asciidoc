@@ -74,8 +74,9 @@ endif::[]
 [id="{beatname_lc}-configuration"]
 === Step 2: Configure {beatname_uc}
 
-Before running {beatname_uc}, you need to specify the location of the systemd
-journal files and configure how you want the files to be read.
+Before running {beatname_uc}, you can specify the location of the systemd
+journal files and configure how you want the files to be read. If you accept the
+default configuration, {beatname_uc} reads from the local journal.
 
 include::../../libbeat/docs/shared-configuring.asciidoc[]
 
@@ -107,12 +108,15 @@ If no paths are specified, {beatname_uc} reads from the default journal.
 
 . Set the <<{beatname_lc}-seek,`seek`>> option to control the position where
 {beatname_uc} starts reading the journal. The available options are `head`,
-`tail`, and `cursor`. The default is `cursor`, which means that
-{beatname_uc} will continue reading where it left off after a reload or restart.
+`tail`, and `cursor`. The default is `cursor`, which means that on first read,
+{beatname_uc} starts reading at the beginning of the file, but continues reading
+at the last known position after a reload or restart. For more detail about
+the settings, see the reference docs for the
+<<{beatname_lc}-seek,`seek` option>>. 
 
 . (Optional) Set the <<{beatname_lc}-include-matches,`include_matches`>> option
 to filter entries in journald before collecting any log events. This reduces the
-number of fields that {beatname_uc} needs to process. For example, to fetch only
+number of events that {beatname_uc} needs to process. For example, to fetch only
 Redis events from a Docker container tagged as `redis`, use: 
 +
 ["source","sh",subs="attributes"]
@@ -163,16 +167,13 @@ sudo service {beatname_lc} start
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo chown root {beatname_lc}.yml <1>
-sudo ./{beatname_lc} -e -d "publish"
+sudo ./{beatname_lc} -e
 ----------------------------------------------------------------------
 <1> You'll be running {beatname_uc} as root, so you need to change ownership
 of the configuration file, or run {beatname_uc} with `--strict.perms=false`
 specified. See
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
-
-// REVIEWERS: Do you think it's better to show the run command with or without
-// -c journalbeat.yml included? I'm inclined to show it without. WDYT?
 
 {beatname_uc} is now ready to send journal events to the defined output.
 

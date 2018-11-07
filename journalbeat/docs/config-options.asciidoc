@@ -29,11 +29,11 @@ cases.
 
 [[monitor-multiple-journals]]
 .Example 1: Monitor multiple journals under the same directory
-This example configures {beatname_uc} to read from multiple journals that
-are stored under the same directory. {beatname_uc} merges all journals under the
-directory into a single journal and reads them. With `seek` set to `cursor`,
-{beatname_uc} starts reading at the beginning of the journal, but will continue
-reading where it left off after a reload or restart.
+This example configures {beatname_uc} to read from multiple journals that are
+stored under the same directory. {beatname_uc} merges all journals under the
+directory into a single event stream and reads the events. With `seek` set to
+`cursor`, {beatname_uc} starts reading at the beginning of the journal, but will
+continue reading at the last known position after a reload or restart.
 ["source","sh",subs="attributes"]
 ----
 {beatname_lc}.inputs:
@@ -82,7 +82,9 @@ journal files.
 A list of paths that will be crawled and fetched. Each path can be a directory
 path (to collect events from all journals in a directory), or a file path. If
 you specify a directory, {beatname_uc} merges all journals under the directory
-into a single journal and reads them. 
+into a single journal and reads them.
+
+If no paths are specified, {beatname_uc} reads from the default journal.
 
 [float]
 [id="{beatname_lc}-seek"]
@@ -90,14 +92,19 @@ into a single journal and reads them.
 
 The position to start reading the journal from. Valid settings are:
 
-* `head`: Starts reading at the beginning of the file.
-* `tail`: Starts reading at the end of the file.
+* `head`: Starts reading at the beginning of the file, even after a reload or
+restart.
+* `tail`: Starts reading at the end of the file, even after a reload or restart.
 * `cursor`: On first read, starts reading at the beginning of the file. After a
-reload or restart, continues reading where it left off.
+reload or restart, continues reading at the last known position.
 
 When specified under `paths`, the `seek` setting applies to all journals under
 the configured paths. When specified directly under the +{beatname_lc}+
 namespace, the setting applies to all journals read by {beatname_uc}.
+
+If you have old log files and want to skip lines, start {beatname_uc} with
+`seek: tail` specified. Then stop {beatname_uc}, set `seek: cursor`, and restart
+{beatname_uc}.
 
 [float]
 [id="{beatname_lc}-include-matches"]
