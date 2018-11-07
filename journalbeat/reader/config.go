@@ -17,7 +17,11 @@
 
 package reader
 
-import "time"
+import (
+	"time"
+
+	"github.com/elastic/beats/journalbeat/config"
+)
 
 // Config stores the options of a reder.
 type Config struct {
@@ -25,7 +29,7 @@ type Config struct {
 	Path string
 	// Seek specifies the seeking stategy.
 	// Possible values: head, tail, cursor.
-	Seek string
+	Seek config.SeekMode
 	// MaxBackoff is the limit of the backoff time.
 	MaxBackoff time.Duration
 	// Backoff is the current interval to wait before
