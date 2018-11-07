@@ -135,7 +135,11 @@ func (i *Input) Run() {
 	}
 	defer client.Close()
 
-	i.publishAll(client)
+	go i.publishAll(client)
+
+	select {
+	case <-i.done:
+	}
 }
 
 // publishAll reads events from all readers and publishes them.
