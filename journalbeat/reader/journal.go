@@ -224,7 +224,7 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	}
 
 	if len(custom) != 0 {
-		fields["custom"] = custom
+		fields.Put("journald.custom", custom)
 	}
 
 	state := checkpoint.JournalState{
