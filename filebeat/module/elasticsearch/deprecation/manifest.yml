@@ -5,7 +5,7 @@ var:
     default:
       - /var/log/elasticsearch/*_deprecation.log
     os.darwin:
-      - /usr/local/elasticsearch/*_deprecation.log
+      - /usr/local/var/lib/elasticsearch/*_deprecation.log
     os.windows:
       - c:/ProgramData/Elastic/Elasticsearch/logs/*_deprecation.log
 
