@@ -170,6 +170,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 - Add Kafka dashboard. {pull}8457[8457]
 - Add untyped metric support to the prometheus module. {pull}8681[8681]
 - Release Kafka module as GA. {pull}8854[8854]
+- Collect custom cluster `display_name` in `elasticsearch/cluster_stats` metricset. {pull}8445[8445]
 
 *Packetbeat*
 
