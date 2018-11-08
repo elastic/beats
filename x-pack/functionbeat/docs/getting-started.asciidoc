@@ -6,7 +6,7 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
 * <<{beatname_lc}-template>>
-* <<{beatname_lc}-starting>>
+* <<{beatname_lc}-deploying>>
 * <<view-kibana-dashboards>>
 * <<setup-repositories>>
 
@@ -94,7 +94,7 @@ TIP: See the
 _Beats Platform Reference_ for more about the structure of the config file.
 
 The following example configures a function called `cloudwatch` that collects
-events from Cloudwatch Logs and forwards the events to {es}.
+events from CloudWatch Logs and forwards the events to {es}.
 
 ["source","sh",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ events from Cloudwatch Logs and forwards the events to {es}.
     type: cloudwatch_logs
     description: "lambda function for cloudwatch logs"
     triggers:
-      - log_group_name: /aws/lambda/myfunction-cloudwatch_logs
+      - log_group_name: /aws/lambda/my-lambda-function
 output.elasticsearch:
   cloud.id: "MyESDeployment:SomeLongString=="
   cloud.auth: "elastic:SomeLongString"
@@ -116,8 +116,8 @@ processors:
 
 To configure {beatname_uc}:
 
-. Specify a unique name for the S3 bucket that the functions will be uploaded
-to. For example:
+. Specify a unique name for the S3 bucket to which the functions will be
+uploaded. For example:
 +
 ["source","sh",subs="attributes"]
 ----
@@ -130,10 +130,10 @@ to. For example:
 `name`:: A unique name for the Lambda function.  
 `type`:: The type of service to monitor. For this release, the supported types
 are:
-* `cloudwatch_logs` to collect data from CloudWatch logs.
-* `sqs` to collect data from Amazon Simple Queue Service (SQS)
-`triggers`:: The trigger that will cause the function to execute. If `type` is
-`cloudwatch_logs` logs, specify a list of log groups. If `type` is `sqs`,
+* `cloudwatch_logs` to collect data from CloudWatch logs
+* `sqs` to collect messages from Amazon Simple Queue Service (SQS)
+`triggers`:: The triggers that will cause the function to execute. If `type`
+is `cloudwatch_logs` logs, specify a list of log groups. If `type` is `sqs`,
 specify a list of Amazon Resource Names (ARNs). 
 +
 When a message is sent to the specified log group or queue, the Lambda function
@@ -153,8 +153,6 @@ from Amazon SQS:
 
 include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
-
 include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
 
 include::{libbeat-dir}/docs/step-test-config.asciidoc[]
@@ -167,7 +165,7 @@ include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 :allplatforms:
 include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
-[id="{beatname_lc}-starting"]
+[id="{beatname_lc}-deploying"]
 === Step 4: Deploy {beatname_uc} code to your serverless environment
 
 Before deploying functions to your serverless environment, make sure your user
@@ -200,18 +198,21 @@ The following command deploys a function called `cloudwatch`:
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-./{beatname_lc} deploy cloudwatch -d "*"
+./{beatname_lc} -v -e -d "*" deploy cloudwatch
 ----------------------------------------------------------------------
 
 *win:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-.{backslash}{beatname_lc}.exe deploy cloudwatch
+.{backslash}{beatname_lc}.exe -v -e -d "*" deploy cloudwatch
 ----------------------------------------------------------------------
 
 {beatname_uc} is now deployed in your serverless environment and ready to send
 log events to the configured output.
+
+TIP: If you change the configuration after deploying the function, use
+the <<update-command,`update` command>> to update your deployment.
 
 [[view-kibana-dashboards]]
 === Step 5: View your data in Kibana
