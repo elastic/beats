@@ -1,0 +1,33 @@
+[[configuration-central-management]]
+== Central Management
+
+beta[]
+
+Beats Central Management provides with a way to manage all beats from
+Kibana, allowing you to quickly deploy configuration changes to all
+running Beats.
+
+[float]
+=== Prerequisites
+
+In order to use Beats Central Management, https://www.elastic.co/guide/en/kibana/current/using-kibana-with-security.html[security must be enabled]
+in Kibana. This will ensure that only the users with enough access rights
+can access Beats configurations.
+
+
+[float]
+=== Enroll in Central Management
+
+the
+
+
+[float]
+=== Configuration tags
+
+things
+
+
+[float]
+=== Beat status
+
+things

@@ -37,6 +37,7 @@ The following topics describe how to configure Filebeat:
 * <<configuration-logging>>
 * <<using-environ-vars>>
 * <<configuration-autodiscover>>
+* <<configuration-central-management>>
 * <<yaml-tips>>
 * <<regexp-support>>
 * <<http-endpoint>>
@@ -81,6 +82,8 @@ include::../../libbeat/docs/shared-env-vars.asciidoc[]
 :autodiscoverJolokia:
 :autodiscoverHints:
 include::../../libbeat/docs/shared-autodiscover.asciidoc[]
+
+include::../../libbeat/docs/shared-central-management.asciidoc[]
 
 :standalone:
 include::../../libbeat/docs/yaml.asciidoc[]
