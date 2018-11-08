@@ -31,9 +31,9 @@ import (
 )
 
 const (
-	// BEATS_DOCKER_INTEG_TEST_ENV is used to indicate that we are inside of the
-	// Docker integration test environment (e.g. in a container).
-	beatsDockerIntegTestEnvVar = "BEATS_DOCKER_INTEG_TEST_ENV"
+	// BEATS_DOCKER_INTEGRATION_TEST_ENV is used to indicate that we are inside
+	// of the Docker integration test environment (e.g. in a container).
+	beatsDockerIntegrationTestEnvVar = "BEATS_DOCKER_INTEGRATION_TEST_ENV"
 )
 
 var (
@@ -168,7 +168,7 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		args = append(args, "-e", "MAGEFILE_VERBOSE=1")
 	}
 	args = append(args,
-		"-e", beatsDockerIntegTestEnvVar+"=true",
+		"-e", beatsDockerIntegrationTestEnvVar+"=true",
 		"beat", // Docker compose container name.
 		magePath,
 		mageTarget,
@@ -196,7 +196,7 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 // IsInIntegTestEnv return true if executing inside the integration test
 // environment.
 func IsInIntegTestEnv() bool {
-	_, found := os.LookupEnv(beatsDockerIntegTestEnvVar)
+	_, found := os.LookupEnv(beatsDockerIntegrationTestEnvVar)
 	return found
 }
 
