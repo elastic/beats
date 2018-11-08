@@ -4,7 +4,7 @@ from os.path import abspath, isdir, join, dirname, basename
 from argparse import ArgumentParser
 
 sys.path.append(abspath("scripts"))
-from generate_imports_helper import comment, get_importable_lines
+# from generate_imports_helper import comment, get_importable_lines
 
 
 import_line_format = "\t_ \"{beat_path}/{module}/{name}\""
@@ -47,6 +47,7 @@ import (
 
 
 def generate_and_write_to_file(outfile, imported_beat_lines):
+    from generate_imports_helper import comment
     imported_lines = "\n".join(imported_beat_lines)
     package = basename(dirname(outfile))
     list_go = import_template.format(package=package,
@@ -76,6 +77,7 @@ if __name__ == "__main__":
         imported_beat_lines += get_importable_lines_with_module_path(
             args.beats_path, import_line_format, abspath("../../../../../" + args.beats_path + "/module"))
     else:
+        from generate_imports_helper import get_importable_lines
         import_template = asl2 + import_template
         imported_beat_lines = get_importable_lines(args.beats_path, import_line_format)
 
