@@ -3,6 +3,14 @@
 
 beta[]
 
+[WARNING]
+=======================================
+It's important to understand that when using Central Management, Beats
+configurations are stored centrally in Elasticsearch. If Elasticsearch
+or Kibana are compromised, the attacker can leverage that to define
+configurations to attack the infrastructure where they are running.
+=======================================
+
 Beats Central Management provides with a way to manage all beats from
 Kibana, allowing you to quickly deploy configuration changes to all
 running Beats.
