@@ -184,7 +184,7 @@ func normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
 			}
 		}
 		if !mask {
-			return arr, nil
+			return value, nil
 		}
 
 		tmp := make([]uint64, len(arr))
