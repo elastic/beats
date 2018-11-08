@@ -5,20 +5,21 @@
         "name": "host.example.com"
     },
     "event": {
+        "action": "existing_user",
         "dataset": "user",
-        "module": "system"
+        "id": "57ee8bb6-a3da-4c43-b0d9-0688ccdc88d0",
+        "module": "system",
+        "type": "state"
     },
-    "event.action": "existing_user",
-    "event.type": "state",
     "system": {
         "user": {
-            "dir": "/root",
-            "gid": 0,
-            "name": "root",
+            "dir": "/home/ubuntu",
+            "gid": 1001,
+            "name": "ubuntu",
             "passwd": "x",
             "shell": "/bin/bash",
-            "uid": 0,
-            "user_information": "root"
+            "uid": 1001,
+            "user_information": "Ubuntu"
         }
     }
 }

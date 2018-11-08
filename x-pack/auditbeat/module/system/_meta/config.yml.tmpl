@@ -1,14 +1,17 @@
 {{ if .Reference -}}
 {{ end -}}
 - module: system
-  
+
   metricsets:
     - host
     - packages
     - processes
+    - user
+
+  state.period: 12h
 
   report_changes: true
-  
+
   {{ if eq .GOOS "darwin" -}}
   {{ else if eq .GOOS "windows" -}}
   {{ else -}}

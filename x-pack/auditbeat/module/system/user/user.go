@@ -11,6 +11,7 @@ import (
 	"io"
 	"runtime"
 	"strconv"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -29,7 +30,10 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "user"
-	bucketName    = "user.v1"
+
+	bucketName              = "user.v1"
+	bucketKeyUsers          = "users"
+	bucketKeyStateTimestamp = "state_timestamp"
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
@@ -49,9 +53,11 @@ func init() {
 // MetricSet collects data about a system's users.
 type MetricSet struct {
 	mb.BaseMetricSet
-	log    *logp.Logger
-	cache  *cache.Cache
-	bucket datastore.Bucket
+	config    Config
+	log       *logp.Logger
+	cache     *cache.Cache
+	bucket    datastore.Bucket
+	lastState time.Time
 }
 
 // User represents a user. Fields according to getpwent(3).
@@ -102,6 +108,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("the %v/%v dataset is not supported on Windows", moduleName, metricsetName)
 	}
 
+	config := defaultConfig
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
+	}
+
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open persistent datastore")
@@ -109,11 +120,29 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	ms := &MetricSet{
 		BaseMetricSet: base,
+		config:        config,
 		log:           logp.NewLogger(metricsetName),
 		cache:         cache.New(),
 		bucket:        bucket,
 	}
 
+	// Load from disk: Time when state was last sent
+	err = bucket.Load(bucketKeyStateTimestamp, func(blob []byte) error {
+		if len(blob) > 0 {
+			return ms.lastState.UnmarshalBinary(blob)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !ms.lastState.IsZero() {
+		ms.log.Debugf("Last state was sent at %v. Next state update by %v.", ms.lastState, ms.lastState.Add(ms.config.effectiveStatePeriod()))
+	} else {
+		ms.log.Debug("No state timestamp found")
+	}
+
+	// Load from disk: Users
 	users, err := ms.restoreUsersFromDisk()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to restore users from disk")
@@ -128,7 +157,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // restoreUsersFromDisk loads the user cache from disk.
 func (ms *MetricSet) restoreUsersFromDisk() (users []*User, err error) {
 	var decoder *gob.Decoder
-	err = ms.bucket.Load("users", func(blob []byte) error {
+	err = ms.bucket.Load(bucketKeyUsers, func(blob []byte) error {
 		if len(blob) > 0 {
 			buf := bytes.NewBuffer(blob)
 			decoder = gob.NewDecoder(buf)
@@ -169,7 +198,7 @@ func (ms *MetricSet) saveUsersToDisk(users []*User) error {
 		}
 	}
 
-	err := ms.bucket.Store("users", buf.Bytes())
+	err := ms.bucket.Store(bucketKeyUsers, buf.Bytes())
 	if err != nil {
 		return errors.Wrap(err, "error writing users to disk")
 	}
@@ -193,49 +222,76 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		report.Error(errW)
 		return
 	}
+	ms.log.Debugf("Found %v users", len(users))
 
-	if ms.cache != nil && !ms.cache.IsEmpty() {
-		added, removed, changed := ms.compareUsers(users)
-
-		for _, user := range added {
-			report.Event(userEvent(user, eventTypeEvent, eventActionUserAdded))
-		}
-
-		for _, user := range removed {
-			report.Event(userEvent(user, eventTypeEvent, eventActionUserRemoved))
-		}
-
-		for _, user := range changed {
-			report.Event(userEvent(user, eventTypeEvent, eventActionUserChanged))
-		}
-
-		if len(added) > 0 || len(removed) > 0 || len(changed) > 0 {
-			err := ms.saveUsersToDisk(users)
-			if err != nil {
-				ms.log.Error(err)
-				report.Error(err)
-			}
-		}
-	} else {
-		// Report all existing users
-		stateID := uuid.NewV4().String()
-		for _, user := range users {
-			event := userEvent(user, eventTypeState, eventActionUserExists)
-			event.RootFields.Put("event.state_id", stateID)
-			report.Event(event)
-		}
-
-		if ms.cache != nil {
-			// This will initialize the cache with the current processes
-			ms.cache.DiffAndUpdateCache(convertToCacheable(users))
-		}
-
-		err := ms.saveUsersToDisk(users)
+	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
+	if needsStateUpdate || ms.cache.IsEmpty() {
+		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
+		err = ms.reportState(report, users)
 		if err != nil {
 			ms.log.Error(err)
 			report.Error(err)
 		}
+		ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
 	}
+
+	err = ms.reportChanges(report, users)
+	if err != nil {
+		ms.log.Error(err)
+		report.Error(err)
+	}
+}
+
+// reportState reports all existing users on the system.
+func (ms *MetricSet) reportState(report mb.ReporterV2, users []*User) error {
+	ms.lastState = time.Now()
+
+	stateID := uuid.NewV4().String()
+	for _, user := range users {
+		event := userEvent(user, eventTypeState, eventActionUserExists)
+		event.RootFields.Put("event.id", stateID)
+		report.Event(event)
+	}
+
+	if ms.cache != nil {
+		// This will initialize the cache with the current processes
+		ms.cache.DiffAndUpdateCache(convertToCacheable(users))
+	}
+
+	// Save time so we know when to send the state again (config.StatePeriod)
+	timeBytes, err := ms.lastState.MarshalBinary()
+	if err != nil {
+		return err
+	}
+	err = ms.bucket.Store(bucketKeyStateTimestamp, timeBytes)
+	if err != nil {
+		return errors.Wrap(err, "error writing state timestamp to disk")
+	}
+
+	return ms.saveUsersToDisk(users)
+}
+
+// reportChanges reports any changes to users on this system since the last call.
+func (ms *MetricSet) reportChanges(report mb.ReporterV2, users []*User) error {
+	added, removed, changed := ms.compareUsers(users)
+
+	for _, user := range added {
+		report.Event(userEvent(user, eventTypeEvent, eventActionUserAdded))
+	}
+
+	for _, user := range removed {
+		report.Event(userEvent(user, eventTypeEvent, eventActionUserRemoved))
+	}
+
+	for _, user := range changed {
+		report.Event(userEvent(user, eventTypeEvent, eventActionUserChanged))
+	}
+
+	if len(added) > 0 || len(removed) > 0 || len(changed) > 0 {
+		return ms.saveUsersToDisk(users)
+	}
+
+	return nil
 }
 
 func userEvent(user *User, eventType string, eventAction string) mb.Event {
