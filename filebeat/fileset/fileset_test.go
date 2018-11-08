@@ -25,6 +25,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
+	"text/template"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -272,4 +273,15 @@ func TestGetPipelineConvertTS(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetTemplateFunctions(t *testing.T) {
+	vars := map[string]interface{}{
+		"builtin": map[string]interface{}{},
+	}
+	templateFunctions, err := getTemplateFunctions(vars)
+	assert.NoError(t, err)
+	assert.IsType(t, template.FuncMap{}, templateFunctions)
+	assert.Len(t, templateFunctions, 1)
+	assert.Contains(t, templateFunctions, "IngestPipeline")
 }
