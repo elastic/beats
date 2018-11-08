@@ -29,26 +29,6 @@ data path. See the <<directory-layout>> section for details. The default is `${p
 ----
 
 [float]
-[id="{beatname_lc}-backoff"]
-==== `backoff`
-
-The number of seconds to wait before trying to read again from journals. The
-default is 1s.
-
-[float]
-[id="{beatname_lc}-backoff-factor"]
-==== `backoff_factor`
-
-Multiplier of the backoff value. The default is 1s.
-
-[float]
-[id="{beatname_lc}-max-backoff"]
-==== `max_backoff`
-
-The maximum number of seconds to wait before attempting to read again from
-journals. The default is 60s.
-
-[float]
 ==== `seek`
 
 This option is valid as a global setting under the +{beatname_lc}+ namespace
