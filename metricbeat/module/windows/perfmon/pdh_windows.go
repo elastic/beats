@@ -406,7 +406,7 @@ func (r *PerfmonReader) Read() ([]mb.Event, error) {
 				eventKey = val.Instance
 			} else {
 				// Send every measurement as an individual event
-				eventKey = counterPath + str(ind)
+				eventKey = counterPath + strconv.Itoa(ind)
 			}
 
 			// Create a new event if the key doesn't exist in the map
