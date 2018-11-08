@@ -35,7 +35,7 @@ import (
 var usageText = `
 Usage: module_include_list [flags] [module-dir]
   module_include_list generates a list.go file containing import statements for
-  the module and its metricset packages. The file is usually written to the 
+  the module and its dataset packages. The file is usually written to the 
   include/list.go in the Beat's root directory.
 Options:
 `[1:]
@@ -68,13 +68,13 @@ func main() {
 	}
 	dir := args[0]
 
-	// Find modules and metricsets.
+	// Find modules and datasets.
 	metaDirs, err := mage.FindFiles(
 		filepath.Join(dir, "*/_meta"),
 		filepath.Join(dir, "*/*/_meta"),
 	)
 	if err != nil {
-		log.Fatalf("Failed finding modules and metricsets: %v", err)
+		log.Fatalf("Failed finding modules and datasets: %v", err)
 	}
 
 	// Get the current directories Go import path.
