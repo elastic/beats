@@ -199,33 +199,15 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		added, removed, changed := ms.compareUsers(users)
 
 		for _, user := range added {
-			report.Event(mb.Event{
-				RootFields: common.MapStr{
-					"event.type":   eventTypeEvent,
-					"event.action": eventActionUserAdded,
-				},
-				MetricSetFields: user.toMapStr(),
-			})
+			reportUser(report, user, eventTypeEvent, eventActionUserAdded)
 		}
 
 		for _, user := range removed {
-			report.Event(mb.Event{
-				RootFields: common.MapStr{
-					"event.type":   eventTypeEvent,
-					"event.action": eventActionUserRemoved,
-				},
-				MetricSetFields: user.toMapStr(),
-			})
+			reportUser(report, user, eventTypeEvent, eventActionUserRemoved)
 		}
 
 		for _, user := range changed {
-			report.Event(mb.Event{
-				RootFields: common.MapStr{
-					"event.type":   eventTypeEvent,
-					"event.action": eventActionUserChanged,
-				},
-				MetricSetFields: user.toMapStr(),
-			})
+			reportUser(report, user, eventTypeEvent, eventActionUserChanged)
 		}
 
 		if len(added) > 0 || len(removed) > 0 || len(changed) > 0 {
@@ -238,13 +220,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	} else {
 		// Report all existing users
 		for _, user := range users {
-			report.Event(mb.Event{
-				RootFields: common.MapStr{
-					"event.type":   eventTypeState,
-					"event.action": eventActionUserExists,
-				},
-				MetricSetFields: user.toMapStr(),
-			})
+			reportUser(report, user, eventTypeState, eventActionUserExists)
 		}
 
 		if ms.cache != nil {
@@ -258,6 +234,16 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 			report.Error(err)
 		}
 	}
+}
+
+func reportUser(report mb.ReporterV2, user *User, eventType string, eventAction string) {
+	report.Event(mb.Event{
+		RootFields: common.MapStr{
+			"event.type":   eventType,
+			"event.action": eventAction,
+		},
+		MetricSetFields: user.toMapStr(),
+	})
 }
 
 // compareUsers compares a new list of users with what is in the cache. It returns
