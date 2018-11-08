@@ -51,7 +51,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 				}
 			}
 
-			pipelines, err := fileset.GetPipelines(esClient.GetVersion())
+			pipelines, err := fileset.getPipelines(esClient.GetVersion())
 			if err != nil {
 				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
 			}
