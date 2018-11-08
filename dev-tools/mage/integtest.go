@@ -88,7 +88,7 @@ func StopIntegTestEnv() error {
 	}
 
 	if err := haveIntegTestEnvRequirements(); err != nil {
-		// Do nothing.
+		// Ignore error because it will be logged by RunIntegTest.
 		return nil
 	}
 
