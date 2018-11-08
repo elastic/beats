@@ -162,13 +162,16 @@ shared:
     extra_vars:
       from: 'centos:7'
       user: '{{ .BeatName }}'
-      repository: 'docker.elastic.co/beats'
       linux_capabilities: ''
     files:
       '{{.BeatName}}.yml':
         source: '{{.BeatName}}.docker.yml'
         mode: 0600
         config: true
+
+  - &elastic_docker_spec
+    extra_vars:
+      repository: 'docker.elastic.co/beats'
 
   #
   # License modifiers for Apache 2.0
@@ -290,6 +293,7 @@ specs:
       types: [docker]
       spec:
         <<: *docker_spec
+        <<: *elastic_docker_spec
         <<: *apache_license_for_binaries
         name: '{{.BeatName}}-oss'
 
@@ -330,6 +334,7 @@ specs:
       types: [docker]
       spec:
         <<: *docker_spec
+        <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
 
   # Official Beats
@@ -376,6 +381,7 @@ specs:
       types: [docker]
       spec:
         <<: *docker_spec
+        <<: *elastic_docker_spec
         <<: *apache_license_for_binaries
         name: '{{.BeatName}}-oss'
 
@@ -428,6 +434,7 @@ specs:
       types: [docker]
       spec:
         <<: *docker_spec
+        <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
