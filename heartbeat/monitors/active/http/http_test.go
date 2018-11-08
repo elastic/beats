@@ -55,7 +55,6 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	if extraConfig != nil {
 		for k, v := range extraConfig {
 			configSrc[k] = v
-			//configSrc["ssl.certificate_authorities"] = certPath
 		}
 	}
 
