@@ -34,7 +34,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/pkg/errors"
+	errw "github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -274,7 +274,7 @@ func applyTemplate(vars map[string]interface{}, templateString string, specialDe
 
 	tplFunctions, err := getTemplateFunctions(vars)
 	if err != nil {
-		return "", errors.Wrap(err, "error fetching template functions")
+		return "", errw.Wrap(err, "error fetching template functions")
 	}
 	tpl = tpl.Funcs(tplFunctions)
 

@@ -60,7 +60,7 @@ func TestLoadManifestNginx(t *testing.T) {
 func TestGetBuiltinVars(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
 
-	vars, err := fs.getBuiltinVars()
+	vars, err := fs.getBuiltinVars("6.6.0")
 	assert.NoError(t, err)
 
 	assert.IsType(t, vars["hostname"], "a-mac-with-esc-key")
@@ -74,7 +74,7 @@ func TestEvaluateVarsNginx(t *testing.T) {
 	fs.manifest, err = fs.readManifest()
 	assert.NoError(t, err)
 
-	vars, err := fs.evaluateVars()
+	vars, err := fs.evaluateVars("6.6.0")
 	assert.NoError(t, err)
 
 	builtin := vars["builtin"].(map[string]interface{})
@@ -97,7 +97,7 @@ func TestEvaluateVarsNginxOverride(t *testing.T) {
 	fs.manifest, err = fs.readManifest()
 	assert.NoError(t, err)
 
-	vars, err := fs.evaluateVars()
+	vars, err := fs.evaluateVars("6.6.0")
 	assert.NoError(t, err)
 
 	assert.Equal(t, "no_plugins", vars["pipeline"])
@@ -110,7 +110,7 @@ func TestEvaluateVarsMySQL(t *testing.T) {
 	fs.manifest, err = fs.readManifest()
 	assert.NoError(t, err)
 
-	vars, err := fs.evaluateVars()
+	vars, err := fs.evaluateVars("6.6.0")
 	assert.NoError(t, err)
 
 	builtin := vars["builtin"].(map[string]interface{})
@@ -216,11 +216,14 @@ func TestGetPipelineNginx(t *testing.T) {
 	assert.NoError(t, fs.Read("5.2.0"))
 
 	version := common.MustNewVersion("5.2.0")
-	pipelineID, content, err := fs.GetPipeline(*version)
+	pipelines, err := fs.GetPipelines(*version)
 	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
-	assert.Contains(t, content, "description")
-	assert.Contains(t, content, "processors")
+	assert.Len(t, pipelines, 1)
+
+	pipeline := pipelines[0]
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipeline.id)
+	assert.Contains(t, pipeline.contents, "description")
+	assert.Contains(t, pipeline.contents, "processors")
 }
 
 func TestGetPipelineConvertTS(t *testing.T) {
@@ -251,11 +254,13 @@ func TestGetPipelineConvertTS(t *testing.T) {
 
 		t.Run(fmt.Sprintf("es=%v", esVersion), func(t *testing.T) {
 			ver := common.MustNewVersion(esVersion)
-			pipelineID, content, err := fs.GetPipeline(*ver)
+			pipelines, err := fs.GetPipelines(*ver)
 			require.NoError(t, err)
-			assert.Equal(t, pipelineName, pipelineID)
 
-			marshaled, err := json.Marshal(content)
+			pipeline := pipelines[0]
+			assert.Equal(t, pipelineName, pipeline.id)
+
+			marshaled, err := json.Marshal(pipeline.contents)
 			require.NoError(t, err)
 			if cfg.Timezone {
 				assert.Contains(t, string(marshaled), "beat.timezone")
