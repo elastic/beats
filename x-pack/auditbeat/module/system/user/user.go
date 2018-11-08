@@ -7,6 +7,7 @@ package user
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"io"
 	"runtime"
 	"strconv"
@@ -97,7 +98,7 @@ func (user User) toMapStr() common.MapStr {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
 	if runtime.GOOS == "windows" {
-		return nil, errors.New("the %v/%v dataset is not supported on Windows", moduleName, metricsetName)
+		return nil, fmt.Errorf("the %v/%v dataset is not supported on Windows", moduleName, metricsetName)
 	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
