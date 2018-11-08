@@ -21,7 +21,7 @@ journalbeat.inputs:
   # The number of seconds to wait before trying to read again from journals.
   #backoff: 1s
   # The maximum number of seconds to wait before attempting to read again from journals.
-  #max_backoff: 60s
+  #max_backoff: 20s
 
   # Position to start reading from journal. Valid values: head, tail, cursor
   seek: cursor
