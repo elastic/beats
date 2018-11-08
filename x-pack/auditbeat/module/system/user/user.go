@@ -8,15 +8,16 @@ import (
 	"bytes"
 	"encoding/gob"
 	"io"
+	"runtime"
 	"strconv"
 
 	"github.com/pkg/errors"
 
+	"github.com/OneOfOne/xxhash"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/OneOfOne/xxhash"
 
 	"github.com/elastic/beats/auditbeat/datastore"
 	"github.com/elastic/beats/libbeat/logp"
@@ -95,6 +96,9 @@ func (user User) toMapStr() common.MapStr {
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
+	if runtime.GOOS == "windows" {
+		return nil, errors.New("the %v/%v dataset is not supported on Windows", moduleName, metricsetName)
+	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
@@ -120,7 +124,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return ms, nil
 }
 
-// Load user cache from disk.
+// restoreUsersFromDisk loads the user cache from disk.
 func (ms *MetricSet) restoreUsersFromDisk() (users []*User, err error) {
 	var decoder *gob.Decoder
 	err = ms.bucket.Load("users", func(blob []byte) error {
@@ -161,11 +165,14 @@ func (ms *MetricSet) saveUsersToDisk(users []*User) error {
 	for _, user := range users {
 		err := encoder.Encode(*user)
 		if err != nil {
-			return errors.Wrap(err, "encode error")
+			return errors.Wrap(err, "error encoding users")
 		}
 	}
 
-	ms.bucket.Store("users", buf.Bytes())
+	err := ms.bucket.Store("users", buf.Bytes())
+	if err != nil {
+		return errors.Wrap(err, "error writing users to disk")
+	}
 	return nil
 }
 
