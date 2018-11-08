@@ -767,6 +767,12 @@ filebeat.inputs:
 # This option is not supported on Windows.
 #filebeat.registry_file_permissions: 0600
 
+# The timeout value that controls when registry entries are written to disk
+# (flushed). When an unwritten update exceeds this value, it triggers a write to
+# disk. When registry_flush is set to 0s, the registry is written to disk after
+# each batch of events has been published successfully. The default value is 0s.
+#filebeat.registry_flush: 0s
+
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
 # everytime a new Elasticsearch connection is established.

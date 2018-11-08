@@ -160,7 +160,11 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 
 	// Build docker-compose args.
 	args := []string{"-p", dockerComposeProjectName(), "run",
-		"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + dockerComposeProjectName()}
+		"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + dockerComposeProjectName(),
+		// Disable strict.perms because we moust host dirs inside containers
+		// and the UID/GID won't meet the strict requirements.
+		"-e", "BEAT_STRICT_PERMS=false",
+	}
 	for _, envVar := range passThroughEnvVars {
 		args = append(args, "-e", envVar+"="+os.Getenv(envVar))
 	}
