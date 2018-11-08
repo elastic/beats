@@ -65,6 +65,9 @@ func TestGetBuiltinVars(t *testing.T) {
 
 	assert.IsType(t, vars["hostname"], "a-mac-with-esc-key")
 	assert.IsType(t, vars["domain"], "local")
+	assert.Equal(t, "nginx", vars["module"])
+	assert.Equal(t, "access", vars["metricset"])
+	assert.Equal(t, "6.6.0", vars["beatVersion"])
 }
 
 func TestEvaluateVarsNginx(t *testing.T) {

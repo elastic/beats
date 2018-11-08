@@ -297,11 +297,11 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 	}
 
 	return template.FuncMap{
-		"IngestPipeline": func(shortName string) string {
+		"IngestPipeline": func(shortID string) string {
 			return formatPipelineID(
 				builtinVars["module"].(string),
 				builtinVars["fileset"].(string),
-				shortName,
+				shortID,
 				builtinVars["beatVersion"].(string),
 			)
 		},
