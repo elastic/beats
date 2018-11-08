@@ -42,6 +42,10 @@ RUN useradd -M --uid 1000 --gid 1000 --home {{ $beatHome }} {{ .user }}
 {{- end }}
 USER {{ .user }}
 
+{{- range $i, $port := .ExposePorts }}
+EXPOSE {{ $port }}
+{{- end }}
+
 WORKDIR {{ $beatHome }}
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 CMD ["-e"]

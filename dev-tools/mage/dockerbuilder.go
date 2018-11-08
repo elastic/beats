@@ -24,7 +24,6 @@ import (
 	"strings"
 
 	"github.com/magefile/mage/sh"
-
 	"github.com/pkg/errors"
 )
 
@@ -81,6 +80,13 @@ func (b *dockerBuilder) modulesDirs() []string {
 	return modulesd
 }
 
+func (b *dockerBuilder) exposePorts() []string {
+	if ports, _ := b.ExtraVars["expose_ports"]; ports != "" {
+		return strings.Split(ports, ",")
+	}
+	return nil
+}
+
 func (b *dockerBuilder) copyFiles() error {
 	for _, f := range b.Files {
 		target := filepath.Join(b.beatDir, f.Target)
@@ -99,6 +105,7 @@ func (b *dockerBuilder) prepareBuild() error {
 	templatesDir := filepath.Join(elasticBeatsDir, "dev-tools/packaging/templates/docker")
 
 	data := map[string]interface{}{
+		"ExposePorts": b.exposePorts(),
 		"ModulesDirs": b.modulesDirs(),
 	}
 
