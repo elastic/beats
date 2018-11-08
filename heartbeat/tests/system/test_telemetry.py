@@ -15,6 +15,9 @@ class Test(BaseTest):
         """
         Test that telemetry metrics are correctly registered and increment / decrement
         """
+        # This test is flaky https://github.com/elastic/beats/issues/8966
+        raise SkipTest
+
         if os.name == "nt":
             # This test is currently skipped on windows because file permission
             # configuration isn't implemented on Windows yet
