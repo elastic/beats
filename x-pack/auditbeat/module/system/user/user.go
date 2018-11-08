@@ -15,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/OneOfOne/xxhash"
+	"github.com/satori/go.uuid"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -119,7 +120,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	ms.log.Debugf("Restored %d users from disk", len(users))
 
-	ms.log.Debugf("%v", users)
 	ms.cache.DiffAndUpdateCache(convertToCacheable(users))
 
 	return ms, nil
@@ -149,9 +149,8 @@ func (ms *MetricSet) restoreUsersFromDisk() (users []*User, err error) {
 				// Read all users
 				break
 			} else {
-				return nil, errors.Wrap(err, "decode error")
+				return nil, errors.Wrap(err, "error decoding users")
 			}
-
 		}
 	}
 
@@ -199,15 +198,15 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		added, removed, changed := ms.compareUsers(users)
 
 		for _, user := range added {
-			reportUser(report, user, eventTypeEvent, eventActionUserAdded)
+			report.Event(userEvent(user, eventTypeEvent, eventActionUserAdded))
 		}
 
 		for _, user := range removed {
-			reportUser(report, user, eventTypeEvent, eventActionUserRemoved)
+			report.Event(userEvent(user, eventTypeEvent, eventActionUserRemoved))
 		}
 
 		for _, user := range changed {
-			reportUser(report, user, eventTypeEvent, eventActionUserChanged)
+			report.Event(userEvent(user, eventTypeEvent, eventActionUserChanged))
 		}
 
 		if len(added) > 0 || len(removed) > 0 || len(changed) > 0 {
@@ -219,8 +218,11 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 	} else {
 		// Report all existing users
+		stateID := uuid.NewV4().String()
 		for _, user := range users {
-			reportUser(report, user, eventTypeState, eventActionUserExists)
+			event := userEvent(user, eventTypeState, eventActionUserExists)
+			event.RootFields.Put("event.state_id", stateID)
+			report.Event(event)
 		}
 
 		if ms.cache != nil {
@@ -236,14 +238,16 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 }
 
-func reportUser(report mb.ReporterV2, user *User, eventType string, eventAction string) {
-	report.Event(mb.Event{
+func userEvent(user *User, eventType string, eventAction string) mb.Event {
+	return mb.Event{
 		RootFields: common.MapStr{
-			"event.type":   eventType,
-			"event.action": eventAction,
+			"event": common.MapStr{
+				"type":   eventType,
+				"action": eventAction,
+			},
 		},
 		MetricSetFields: user.toMapStr(),
-	})
+	}
 }
 
 // compareUsers compares a new list of users with what is in the cache. It returns
