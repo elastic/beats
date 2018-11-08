@@ -142,6 +142,22 @@ func apmIndicesExist(clusterState common.MapStr) (bool, error) {
 	return false, nil
 }
 
+func getClusterMetadataSettings(m *MetricSet) (common.MapStr, error) {
+	// For security reasons we only get the display_name setting
+	filterPaths := []string{"*.cluster.metadata.display_name"}
+	clusterSettings, err := elasticsearch.GetClusterSettingsWithDefaults(m.HTTP, m.HTTP.GetURI(), filterPaths)
+	if err != nil {
+		return nil, errors.Wrap(err, "failure to get cluster settings")
+	}
+
+	clusterSettings, err = elasticsearch.MergeClusterSettings(clusterSettings)
+	if err != nil {
+		return nil, errors.Wrap(err, "failure to merge cluster settings")
+	}
+
+	return clusterSettings, nil
+}
+
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
@@ -217,6 +233,14 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		"cluster_stats": clusterStats,
 		"cluster_state": clusterState,
 		"stack_stats":   stackStats,
+	}
+
+	clusterSettings, err := getClusterMetadataSettings(m)
+	if err != nil {
+		return err
+	}
+	if clusterSettings != nil {
+		event.RootFields.Put("cluster_settings", clusterSettings)
 	}
 
 	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)

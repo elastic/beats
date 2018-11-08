@@ -3,12 +3,19 @@
   description: >
     Contains log file lines.
   fields:
-    - name: source
+
+    - name: log.file.path
       type: keyword
-      required: true
+      required: false
       description: >
         The file from which the line was read. This field contains the absolute path to the file.
         For example: `/var/log/system.log`.
+
+    - name: log.source.ip
+      type: ip
+      required: false
+      description: >
+        Source IP from which the log event was read / sent from.
 
     - name: log.offset
       type: long

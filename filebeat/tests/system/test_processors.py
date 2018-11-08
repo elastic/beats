@@ -66,7 +66,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/test*.log",
             processors=[{
                 "drop_event": {
-                    "when": "contains.source: test1",
+                    "when": "contains.log.file.path: test1",
                 },
             }]
         )

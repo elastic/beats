@@ -5,7 +5,7 @@ var:
     default:
       - /var/log/elasticsearch/*.log
     os.darwin:
-      - /usr/local/elasticsearch/*.log
+      - /usr/local/var/lib/elasticsearch/*.log
     os.windows:
       - c:/ProgramData/Elastic/Elasticsearch/logs/*.log
 

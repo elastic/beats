@@ -194,7 +194,7 @@ def clean_keys(obj):
     # The create timestamps area always new
     time_keys = ["read_timestamp", "event.created"]
     # source path and beat.version can be different for each run
-    other_keys = ["source", "agent.version"]
+    other_keys = ["log.file.path", "agent.version"]
 
     for key in host_keys + time_keys + other_keys:
         delete_key(obj, key)
