@@ -80,8 +80,8 @@ func Load(
 		Annotations: Annotations{
 			Event: config.EventMetadata,
 			Builtin: common.MapStr{
-				"beat": common.MapStr{
-					"name":     name,
+				"agent": common.MapStr{
+					"type":     beatInfo.Beat,
 					"hostname": beatInfo.Hostname,
 					"version":  beatInfo.Version,
 				},
@@ -90,6 +90,10 @@ func Load(
 				},
 			},
 		},
+	}
+
+	if name != beatInfo.Hostname {
+		settings.Annotations.Builtin.Put("agent.name", name)
 	}
 
 	queueBuilder, err := createQueueBuilder(config.Queue, monitors)

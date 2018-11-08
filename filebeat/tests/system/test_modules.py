@@ -3,8 +3,8 @@ from beat.beat import INTEGRATION_TESTS
 import os
 import unittest
 import glob
-import shutil
 import subprocess
+
 from elasticsearch import Elasticsearch
 import json
 import logging
@@ -17,9 +17,10 @@ def load_fileset_test_cases():
     To execute tests for only 1 module, set the env variable TESTING_FILEBEAT_MODULES
     to the specific module name or a , separated lists of modules.
     """
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    modules_dir = os.path.join(current_dir, "..", "..", "module")
-
+    modules_dir = os.getenv("MODULES_PATH")
+    if not modules_dir:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        modules_dir = os.path.join(current_dir, "..", "..", "module")
     modules = os.getenv("TESTING_FILEBEAT_MODULES")
     if modules:
         modules = modules.split(",")
@@ -128,12 +129,12 @@ class Test(BaseTest):
         self.es.indices.refresh(index=self.index_name)
         # Loads the first 100 events to be checked
         res = self.es.search(index=self.index_name,
-                             body={"query": {"match_all": {}}, "size": 100, "sort": {"offset": {"order": "asc"}}})
+                             body={"query": {"match_all": {}}, "size": 100, "sort": {"log.offset": {"order": "asc"}}})
         objects = [o["_source"] for o in res["hits"]["hits"]]
         assert len(objects) > 0
         for obj in objects:
-            assert obj["fileset"]["module"] == module, "expected fileset.module={} but got {}".format(
-                module, obj["fileset"]["module"])
+            assert obj["event"]["module"] == module, "expected event.module={} but got {}".format(
+                module, obj["event"]["module"])
 
             assert "error" not in obj, "not error expected but got: {}".format(
                 obj)
@@ -175,7 +176,7 @@ class Test(BaseTest):
                 clean_keys(obj)
 
                 # Remove timestamp for comparison where timestamp is not part of the log line
-                if obj["fileset.module"] == "icinga" and obj["fileset.name"] == "startup":
+                if obj["event.module"] == "icinga" and obj["event.dataset"] == "startup":
                     delete_key(obj, "@timestamp")
                     delete_key(ev, "@timestamp")
 
@@ -189,11 +190,11 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "beat.hostname", "beat.name"]
+    host_keys = ["host.name", "agent.hostname", "agent.type"]
     # The create timestamps area always new
     time_keys = ["read_timestamp", "event.created"]
     # source path and beat.version can be different for each run
-    other_keys = ["source", "beat.version"]
+    other_keys = ["log.file.path", "agent.version"]
 
     for key in host_keys + time_keys + other_keys:
         delete_key(obj, key)

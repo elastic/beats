@@ -378,5 +378,4 @@ output.console:
 [[config-file-format-tips]]
 === YAML tips and gotchas
 
-:allplatforms:
 include::yaml.asciidoc[]

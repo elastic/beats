@@ -26,10 +26,10 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-func CheckRemoved5xSettings(cfg *common.Config, settings ...string) error {
+func checkRemovedSettings(cfg *common.Config, settings ...string) error {
 	var errs multierror.Errors
 	for _, setting := range settings {
-		if err := CheckRemoved5xSetting(cfg, setting); err != nil {
+		if err := checkRemovedSetting(cfg, setting); err != nil {
 			errs = append(errs, err)
 		}
 	}
@@ -37,8 +37,7 @@ func CheckRemoved5xSettings(cfg *common.Config, settings ...string) error {
 	return errs.Err()
 }
 
-// CheckRemoved5xSetting prints a warning if the obsolete setting is used.
-func CheckRemoved5xSetting(cfg *common.Config, setting string) error {
+func checkRemovedSetting(cfg *common.Config, setting string) error {
 	segments := strings.Split(setting, ".")
 
 	L := len(segments)
@@ -63,4 +62,24 @@ func CheckRemoved5xSetting(cfg *common.Config, setting string) error {
 	}
 
 	return fmt.Errorf("setting '%v' has been removed", current.PathOf(name))
+}
+
+// CheckRemoved5xSettings prints a warning if the obsolete setting is used.
+func CheckRemoved5xSettings(cfg *common.Config, settings ...string) error {
+	return checkRemovedSettings(cfg, settings...)
+}
+
+// CheckRemoved5xSetting prints a warning if the obsolete setting is used.
+func CheckRemoved5xSetting(cfg *common.Config, setting string) error {
+	return checkRemovedSetting(cfg, setting)
+}
+
+// CheckRemoved6xSettings prints a warning if the obsolete setting is used.
+func CheckRemoved6xSettings(cfg *common.Config, settings ...string) error {
+	return checkRemovedSettings(cfg, settings...)
+}
+
+// CheckRemoved6xSetting prints a warning if the obsolete setting is used.
+func CheckRemoved6xSetting(cfg *common.Config, setting string) error {
+	return checkRemovedSetting(cfg, setting)
 }

@@ -1,0 +1,6 @@
+update_time: 2018-09-11T10:06:50.895829905Z
+journal_entries:
+- path: /home/n/go/src/github.com/elastic/beats/journalbeat/tests/system/input/test.journal
+  cursor: s=7d22fd7aa0c7482d88c303f47d5f32dc;i=2fcb;b=902dc834f07d4f41ade064f6b2ef8b4f;m=1bf0ff5c6d;t=55913a25fe765;x=c7e6480eec30822b
+  realtime_timestamp: 1505315746998117
+  monotonic_timestamp: 120007384173

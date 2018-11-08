@@ -1,0 +1,161 @@
+{ "description": "Pipeline for parsing Suricata EVE logs"
+, "processors":
+  [ { "script":
+      { "lang": "painless"
+      , "source": "ctx['suricata'] = new HashMap(); ctx['suricata']['eve'] = ctx['json']; ctx.remove('json');"
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.src_ip"
+      ,"target_field": "source_ecs.ip"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.src_port"
+      ,"target_field": "source_ecs.port"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.dest_ip"
+      ,"target_field": "destination.ip"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.dest_port"
+      ,"target_field": "destination.port"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.http.http_method"
+      ,"target_field": "http.request.method"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.http.status"
+      ,"target_field": "http.response.status_code"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.http.hostname"
+      ,"target_field": "url.hostname"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.fileinfo.filename"
+      ,"target_field": "file.path"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.fileinfo.size"
+      ,"target_field": "file.size"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.http.http_user_agent"
+      ,"target_field": "user_agent.original"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+
+  , { "date":
+      { "field": "suricata.eve.timestamp"
+      , "target_field": "@timestamp"
+      , "formats": ["ISO8601"]
+      }
+    }
+
+  , { "lowercase":
+      { "field": "suricata.eve.event_type"
+      , "ignore_missing": true
+      }
+    }
+  , { "set":
+      { "field": "event.type"
+      , "value": "{{suricata.eve.event_type}}"
+      }
+    }
+
+  , { "user_agent":
+      { "field": "user_agent.original"
+      , "target_field": "user_agent"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "user_agent.os"
+      , "target_field": "user_agent.temp_os"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "user_agent.temp_os"
+      , "target_field": "user_agent.os.full_name"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "user_agent.os_name"
+      , "target_field": "user_agent.os.name"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "user_agent.os_version"
+      , "target_field": "user_agent.os.version"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "user_agent.os_major"
+      , "target_field": "user_agent.os.major"
+      , "ignore_missing": true
+      }
+    }
+  , { "rename":
+      { "field": "user_agent.os_minor"
+      , "target_field": "user_agent.os.minor"
+      , "ignore_missing": true
+      }
+    }
+
+  , { "geoip":
+      { "field": "source_ecs.ip"
+      , "target_field": "source_ecs.geo"
+      , "ignore_missing": true
+      }
+    }
+  , { "geoip":
+      { "field": "destination.ip"
+      , "target_field": "destination.geo"
+      , "ignore_missing": true
+      }
+    }
+
+  ]
+, "on_failure":
+  [ { "set" :
+      { "field" : "error.message"
+      , "value" : "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ]
+}

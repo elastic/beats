@@ -816,34 +816,10 @@ Contains common beat fields available in all event types.
 
 
 
-*`beat.name`*::
-+
---
-The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
-
-
---
-
-*`beat.hostname`*::
-+
---
-The hostname as returned by the operating system on which the Beat is running.
-
-
---
-
 *`beat.timezone`*::
 +
 --
 The timezone as returned by the operating system on which the Beat is running.
-
-
---
-
-*`beat.version`*::
-+
---
-The version of the beat that generated this event.
 
 
 --
@@ -3415,7 +3391,7 @@ Version of the agent.
 
 --
 
-*`agent.name`*::
+*`agent.type`*::
 +
 --
 type: keyword
@@ -3423,6 +3399,16 @@ type: keyword
 example: filebeat
 
 Name of the agent.
+
+
+--
+
+*`agent.hostname`*::
++
+--
+type: keyword
+
+Hostname of the agent.
 
 
 --
@@ -4923,15 +4909,15 @@ Note: The `:` is not part of the scheme.
 
 --
 
-*`url.host.name`*::
+*`url.hostname`*::
 +
 --
 type: keyword
 
 example: elastic.co
 
-Hostname of the request, such as "example.com".
-For correlation the this field can be copied into the `host.name` field.
+Hostname of the request, such as "elastic.co".
+In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `hostname` field.
 
 
 --
@@ -8633,7 +8619,7 @@ HTTP request information
 
 
 
-*`http.request.header`*::
+*`http.request.headers`*::
 +
 --
 type: object
@@ -8660,7 +8646,7 @@ HTTP response information
 
 
 
-*`http.response.header`*::
+*`http.response.headers`*::
 +
 --
 type: object

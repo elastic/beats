@@ -4,11 +4,10 @@
         "apache2.error.client": "192.168.33.1", 
         "apache2.error.level": "error", 
         "apache2.error.message": "File does not exist: /var/www/favicon.ico", 
-        "fileset.module": "apache2", 
-        "fileset.name": "error", 
+        "event.dataset": "error", 
+        "event.module": "apache2", 
         "input.type": "log", 
-        "offset": 0, 
-        "prospector.type": "log"
+        "log.offset": 0
     }, 
     {
         "@timestamp": "2016-12-26T16:15:55.103Z", 
@@ -16,11 +15,10 @@
         "apache2.error.message": "AH00094: Command line: '/usr/local/Cellar/httpd24/2.4.23_2/bin/httpd'", 
         "apache2.error.module": "core", 
         "apache2.error.pid": "11379", 
-        "fileset.module": "apache2", 
-        "fileset.name": "error", 
+        "event.dataset": "error", 
+        "event.module": "apache2", 
         "input.type": "log", 
-        "offset": 99, 
-        "prospector.type": "log"
+        "log.offset": 99
     }, 
     {
         "@timestamp": "2011-09-09T10:42:29.902Z", 
@@ -30,10 +28,9 @@
         "apache2.error.module": "core", 
         "apache2.error.pid": "35708", 
         "apache2.error.tid": "4328636416", 
-        "fileset.module": "apache2", 
-        "fileset.name": "error", 
+        "event.dataset": "error", 
+        "event.module": "apache2", 
         "input.type": "log", 
-        "offset": 229, 
-        "prospector.type": "log"
+        "log.offset": 229
     }
 ]

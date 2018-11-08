@@ -23,12 +23,17 @@
             Version of the agent.
     
           example: 6.0.0-rc2
-        - name: name
+        - name: type
           type: keyword
           description: >
             Name of the agent.
     
           example: filebeat
+        - name: hostname
+          type: keyword
+          description: >
+            Hostname of the agent.
+
         - name: id
           type: keyword
           description: >
@@ -974,13 +979,13 @@
     
             Note: The `:` is not part of the scheme.
           example: https
-        - name: host.name
+        - name: hostname
           type: keyword
           description: >
-            Hostname of the request, such as "example.com".
-    
-            For correlation the this field can be copied into the `host.name`
-            field.
+            Hostname of the request, such as "elastic.co".
+
+            In some cases a URL may refer to an IP and/or port directly, without a
+            domain name. In this case, the IP address would go to the `hostname` field.
           example: elastic.co
         - name: port
           type: integer

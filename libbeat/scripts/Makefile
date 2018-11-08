@@ -82,6 +82,7 @@ VIRTUALENV_PARAMS?=
 INTEGRATION_TESTS?=
 FIND=. ${PYTHON_ENV}/bin/activate; find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
+XPACK_ONLY?=false
 
 ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
@@ -106,9 +107,11 @@ ${BEAT_NAME}.test: $(GOFILES_ALL)
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
 crosscompile: $(GOFILES)
+ifneq ($(shell [[ $(BEAT_NAME) == journalbeat ]] && echo true ),true)
 	go get github.com/mitchellh/gox
 	mkdir -p ${BUILD_DIR}/bin
 	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
+endif
 
 .PHONY: check
 check: check-headers python-env prepare-tests ## @build Checks project and source code if everything is according to standard
@@ -208,6 +211,13 @@ system-tests: prepare-tests ${BEAT_NAME}.test python-env
 system-tests-environment:  ## @testing Runs the system tests inside a virtual environment. This can be run on any docker-machine (local, remote)
 system-tests-environment: prepare-tests build-image
 	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make system-tests
+	#This is a hack to run x-pack/filebeat module tests
+	@XPACKBEAT="${ES_BEATS}/x-pack/${BEAT_NAME}" ; \
+	if [ -e "$$XPACKBEAT/tests/system" ] && [ $(XPACK_ONLY) = false ]; then \
+	    $(MAKE) -C ../x-pack/${BEAT_NAME} fields; \
+	    ${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e MODULES_PATH="../../x-pack/${BEAT_NAME}/module" -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make -C "$$XPACKBEAT" ${BEAT_NAME}.test system-tests ; \
+	    $(MAKE) -C ../x-pack/${BEAT_NAME} fix-permissions; \
+	fi
 
 
 .PHONY: fast-system-tests
@@ -330,7 +340,7 @@ endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license $(LICENSE) -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
 endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat ]] && echo true ),true)
@@ -348,7 +358,9 @@ endif
 	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/6/dashboard/*.json"
 	@mkdir -p $(PWD)/_meta/kibana.generated/5/index-pattern
 	@mkdir -p $(PWD)/_meta/kibana.generated/6/index-pattern
-	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go -index '${BEAT_INDEX_PREFIX}-*' -beat-name ${BEAT_NAME} -beat-dir $(PWD) -version ${BEAT_VERSION}
+	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go \
+	  -index '${BEAT_INDEX_PREFIX}-*' -beat ${BEAT_NAME} -fields $(PWD)/fields.yml \
+	  -version ${BEAT_VERSION} -out _meta/kibana.generated
 
 .PHONY: docs
 docs:  ## @build Builds the documents for the beat

@@ -306,8 +306,12 @@ func (h *Harvester) Run() error {
 		// Check if data should be added to event. Only export non empty events.
 		if !message.IsEmpty() && h.shouldExportLine(text) {
 			fields := common.MapStr{
-				"source": state.Source,
-				"offset": startingOffset, // Offset here is the offset before the starting char.
+				"log": common.MapStr{
+					"offset": startingOffset, // Offset here is the offset before the starting char.
+					"file": common.MapStr{
+						"path": state.Source,
+					},
+				},
 			}
 			fields.DeepUpdate(message.Fields)
 
@@ -561,7 +565,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.CRIFlags)
+		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.ForceCRI, h.config.DockerJSON.CRIFlags)
 	}
 
 	if h.config.JSON != nil {

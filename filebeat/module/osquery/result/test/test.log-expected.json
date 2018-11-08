@@ -1,10 +1,10 @@
 [
     {
         "@timestamp": "2017-12-28T14:40:08.000Z", 
-        "fileset.module": "osquery", 
-        "fileset.name": "result", 
+        "event.dataset": "result", 
+        "event.module": "osquery", 
         "input.type": "log", 
-        "offset": 0, 
+        "log.offset": 0, 
         "osquery.result.action": "removed", 
         "osquery.result.calendar_time": "Thu Dec 28 14:40:08 2017 UTC", 
         "osquery.result.columns.blocks": "122061322", 
@@ -24,7 +24,6 @@
         "osquery.result.epoch": "0", 
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro", 
         "osquery.result.name": "pack_it-compliance_mounts", 
-        "osquery.result.unix_time": "1514472008", 
-        "prospector.type": "log"
+        "osquery.result.unix_time": "1514472008"
     }
 ]

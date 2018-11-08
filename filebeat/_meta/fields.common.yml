@@ -3,14 +3,21 @@
   description: >
     Contains log file lines.
   fields:
-    - name: source
+
+    - name: log.file.path
       type: keyword
-      required: true
+      required: false
       description: >
         The file from which the line was read. This field contains the absolute path to the file.
         For example: `/var/log/system.log`.
 
-    - name: offset
+    - name: log.source.ip
+      type: ip
+      required: false
+      description: >
+        Source IP from which the log event was read / sent from.
+
+    - name: log.offset
       type: long
       required: false
       description: >
@@ -29,13 +36,6 @@
       description: >
         Log stream when reading container logs, can be 'stdout' or 'stderr'
 
-    - name: prospector.type
-      required: true
-      deprecated: 6.3
-      description: >
-        The input type from which the event was generated. This field is set to the value specified
-        for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `input.type`)
-
     - name: input.type
       required: true
       description: >
@@ -47,14 +47,6 @@
         In case the ingest pipeline parses the timestamp from the log contents, it stores
         the original `@timestamp` (representing the time when the log line was read) in this
         field.
-
-    - name: fileset.module
-      description: >
-        The Filebeat module that generated this event.
-
-    - name: fileset.name
-      description: >
-        The Filebeat fileset that generated this event.
 
     - name: syslog.facility
       type: long
@@ -100,3 +92,97 @@
       description: >
         Content length of the HTTP response body.
 
+    - name: source_ecs
+      type: group
+      fields:
+      - name: ip
+        type: ip
+        description: >
+          IP address of the source.
+
+      - name: port
+        type: long
+        description: >
+          Port of the source.
+
+      - name: geo
+        type: group
+        description:
+          Geolocation for source.
+        fields:
+        - name: continent_name
+          type: keyword
+          description: >
+            Name of the continent.
+
+        - name: country_iso_code
+          type: keyword
+          description: >
+            Country ISO code.
+
+        - name: location
+          type: geo_point
+          description: >
+            Longitude and latitude.
+
+        - name: region_name
+          type: keyword
+          description: >
+            Region name.
+
+        - name: city_name
+          type: keyword
+          description: >
+            City name.
+
+        - name: region_iso_code
+          type: keyword
+          description: >
+            Region ISO code.
+
+    - name: destination
+      type: group
+      fields:
+        - name: geo
+          type: group
+          description:
+            Geolocation for destination.
+          fields:
+          - name: continent_name
+            type: keyword
+            description: >
+              Name of the continent.
+
+          - name: country_iso_code
+            type: keyword
+            description: >
+              Country ISO code.
+
+          - name: location
+            type: geo_point
+            description: >
+              Longitude and latitude.
+
+          - name: region_name
+            type: keyword
+            description: >
+              Region name.
+
+          - name: city_name
+            type: keyword
+            description: >
+              City name.
+
+          - name: region_iso_code
+            type: keyword
+            description: >
+              Region ISO code.
+
+    - name: user_agent
+      type: group
+      fields:
+      - name: os
+        type: group
+        fields:
+        - name: full_name
+          type: keyword
