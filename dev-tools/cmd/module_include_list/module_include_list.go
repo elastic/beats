@@ -47,7 +47,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&license, "license", "ASL2", "License header for generated file.")
+	flag.StringVar(&license, "license", "ASL2", "License header for generated file (ASL2 or Elastic).")
 	flag.StringVar(&pkg, "pkg", "include", "Package name.")
 	flag.StringVar(&outFile, "out", "include/list.go", "Output file.")
 	flag.Usage = usageFlag
