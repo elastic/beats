@@ -106,8 +106,6 @@ journals. The default is 60s.
 
 The position to start reading the journal from. Valid settings are:
 
-// REVIEWERS: Not sure if I've gotten this quite right. 
-
 * `head`: Starts reading at the beginning of the file. After a restart,
 {beatname_uc} resends all log messages in the journal.
 * `tail`: Starts reading at the end of the file. After a restart, 
