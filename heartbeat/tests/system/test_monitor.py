@@ -17,7 +17,8 @@ class Test(BaseTest):
         status_code = int(status_code)
         server = self.start_server("hello world", status_code)
 
-        self.render_http_config(["http://localhost:{}".format(server.server_port)])
+        self.render_http_config(
+            ["http://localhost:{}".format(server.server_port)])
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("heartbeat is running"))
@@ -46,12 +47,14 @@ class Test(BaseTest):
             delay = 1.0
             server = self.start_server("sloooow body", 200, write_delay=delay)
 
-            self.render_http_config(["http://localhost:{}".format(server.server_port)])
+            self.render_http_config(
+                ["http://localhost:{}".format(server.server_port)])
 
             try:
                 proc = self.start_beat()
                 self.wait_until(lambda: self.output_has(lines=1))
-                nose.tools.assert_greater_equal(self.last_output_line()['http.rtt.total.us'], delay)
+                nose.tools.assert_greater_equal(
+                    self.last_output_line()['http.rtt.total.us'], delay)
             finally:
                 proc.check_kill_and_wait()
         finally:
@@ -97,8 +100,8 @@ class Test(BaseTest):
 
     def render_http_config(self, urls):
         self.render_config_template(
-                monitors=[{
-                    "type": "http",
-                    "urls": urls,
-                }]
-            )
+            monitors=[{
+                "type": "http",
+                "urls": urls,
+            }]
+        )
