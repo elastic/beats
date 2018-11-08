@@ -22,7 +22,6 @@ package config
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -34,10 +33,6 @@ type SeekMode uint8
 type Config struct {
 	Inputs       []*common.Config `config:"inputs"`
 	RegistryFile string           `config:"registry_file"`
-	Backoff      time.Duration    `config:"backoff" validate:"min=0,nonzero"`
-	MaxBackoff   time.Duration    `config:"max_backoff" validate:"min=0,nonzero"`
-	Seek         SeekMode         `config:"seek"`
-	Matches      []string         `config:"include_matches"`
 }
 
 const (
@@ -59,9 +54,6 @@ var (
 	// DefaultConfig are the defaults of a Journalbeat instance
 	DefaultConfig = Config{
 		RegistryFile: "registry",
-		Backoff:      1 * time.Second,
-		MaxBackoff:   60 * time.Second,
-		Seek:         SeekCursor,
 	}
 
 	seekModes = map[string]SeekMode{
