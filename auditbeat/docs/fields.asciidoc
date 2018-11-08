@@ -282,6 +282,15 @@ The current working directory.
 Source that triggered the event.
 
 
+*`source.hostname`*::
++
+--
+type: keyword
+
+Hostname of the source.
+
+--
+
 *`source.path`*::
 +
 --
@@ -3033,16 +3042,6 @@ Can be one or multiple IPv4 or IPv6 addresses.
 
 --
 
-*`destination.hostname`*::
-+
---
-type: keyword
-
-Hostname of the destination.
-
-
---
-
 *`destination.port`*::
 +
 --
@@ -3073,12 +3072,68 @@ Destination domain.
 
 --
 
-*`destination.subdomain`*::
+[float]
+== geo fields
+
+Geolocation for destination.
+
+
+*`destination.geo.continent_name`*::
 +
 --
 type: keyword
 
-Destination subdomain.
+Name of the continent.
+
+
+--
+
+*`destination.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`destination.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`destination.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`destination.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`destination.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
 
 
 --
@@ -4238,16 +4293,6 @@ Can be one or multiple IPv4 or IPv6 addresses.
 
 --
 
-*`source.hostname`*::
-+
---
-type: keyword
-
-Hostname of the source.
-
-
---
-
 *`source.port`*::
 +
 --
@@ -4274,6 +4319,72 @@ MAC address of the source.
 type: keyword
 
 Source domain.
+
+
+--
+
+[float]
+== geo fields
+
+Geolocation for source.
+
+
+*`source.geo.continent_name`*::
++
+--
+type: keyword
+
+Name of the continent.
+
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`source.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
 
 
 --
