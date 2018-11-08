@@ -34,6 +34,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -89,7 +91,7 @@ func (fs *Fileset) Read(beatVersion string) error {
 		return err
 	}
 
-	fs.vars, err = fs.evaluateVars()
+	fs.vars, err = fs.evaluateVars(beatVersion)
 	if err != nil {
 		return err
 	}
@@ -155,10 +157,10 @@ func (fs *Fileset) readManifest() (*manifest, error) {
 }
 
 // evaluateVars resolves the fileset variables.
-func (fs *Fileset) evaluateVars() (map[string]interface{}, error) {
+func (fs *Fileset) evaluateVars(beatVersion string) (map[string]interface{}, error) {
 	var err error
 	vars := map[string]interface{}{}
-	vars["builtin"], err = fs.getBuiltinVars()
+	vars["builtin"], err = fs.getBuiltinVars(beatVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +271,14 @@ func applyTemplate(vars map[string]interface{}, templateString string, specialDe
 	if specialDelims {
 		tpl = tpl.Delims("{<", ">}")
 	}
-	tpl, err := tpl.Parse(templateString)
+
+	tplFunctions, err := getTemplateFunctions(vars)
+	if err != nil {
+		return "", errors.Wrap(err, "error fetching template functions")
+	}
+	tpl = tpl.Funcs(tplFunctions)
+
+	tpl, err = tpl.Parse(templateString)
 	if err != nil {
 		return "", fmt.Errorf("Error parsing template %s: %v", templateString, err)
 	}
@@ -281,9 +290,27 @@ func applyTemplate(vars map[string]interface{}, templateString string, specialDe
 	return buf.String(), nil
 }
 
+func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error) {
+	builtinVars, ok := vars["builtin"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("error fetching built-in vars as a dictionary")
+	}
+
+	return template.FuncMap{
+		"IngestPipeline": func(shortName string) string {
+			return formatPipelineID(
+				builtinVars["module"].(string),
+				builtinVars["fileset"].(string),
+				shortName,
+				builtinVars["beatVersion"].(string),
+			)
+		},
+	}, nil
+}
+
 // getBuiltinVars computes the supported built in variables and groups them
 // in a dictionary
-func (fs *Fileset) getBuiltinVars() (map[string]interface{}, error) {
+func (fs *Fileset) getBuiltinVars(beatVersion string) (map[string]interface{}, error) {
 	host, err := os.Hostname()
 	if err != nil || len(host) == 0 {
 		return nil, fmt.Errorf("Error getting the hostname: %v", err)
@@ -296,8 +323,11 @@ func (fs *Fileset) getBuiltinVars() (map[string]interface{}, error) {
 	}
 
 	return map[string]interface{}{
-		"hostname": hostname,
-		"domain":   domain,
+		"hostname":    hostname,
+		"domain":      domain,
+		"module":      fs.mcfg.Module,
+		"fileset":     fs.name,
+		"beatVersion": beatVersion,
 	}, nil
 }
 
