@@ -9,6 +9,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -16,7 +17,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/thehivecorporation/log"
 
 	"github.com/elastic/beats/libbeat/generator/fields"
 
@@ -278,7 +278,7 @@ func validFieldFilesFound(c fieldsConf) error {
 
 func closeFile(f *os.File) {
 	if err := f.Close(); err != nil {
-		log.WithError(err).Fatalf("Error trying to close file '%s'", f.Name())
+		log.Fatalf("Error trying to close file '%s'. %v", f.Name(), err)
 	}
 }
 
