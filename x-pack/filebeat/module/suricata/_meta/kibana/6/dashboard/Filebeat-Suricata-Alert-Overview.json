@@ -660,7 +660,118 @@
           "hidePanelTitles": false,
           "useMargins": true
         },
-        "panelsJSON": null,
+        "panelsJSON": [
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 10,
+                    "i": "1",
+                    "w": 23,
+                    "x": 0,
+                    "y": 0
+                },
+                "id": "494fa290-86d2-11e8-b59d-21efb914e65c",
+                "panelIndex": "1",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 22,
+                    "i": "2",
+                    "w": 25,
+                    "x": 23,
+                    "y": 0
+                },
+                "id": "16033310-86d3-11e8-b59d-21efb914e65c",
+                "panelIndex": "2",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 16,
+                    "i": "3",
+                    "w": 48,
+                    "x": 0,
+                    "y": 37
+                },
+                "id": "1c2bcec0-86d1-11e8-b59d-21efb914e65c",
+                "panelIndex": "3",
+                "type": "search",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "mapCenter": [
+                        38.548165423046584,
+                        -6.328125000000001
+                    ],
+                    "mapZoom": 2
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4",
+                    "w": 23,
+                    "x": 0,
+                    "y": 22
+                },
+                "id": "85fed080-86d7-11e8-b59d-21efb914e65c",
+                "panelIndex": "4",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "mapCenter": [
+                        41.77131167976407,
+                        1.9335937500000002
+                    ],
+                    "mapZoom": 2
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5",
+                    "w": 25,
+                    "x": 23,
+                    "y": 22
+                },
+                "id": "a09ca070-86d7-11e8-b59d-21efb914e65c",
+                "panelIndex": "5",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 12,
+                    "i": "7",
+                    "w": 12,
+                    "x": 11,
+                    "y": 10
+                },
+                "id": "2ccdc1a0-86d8-11e8-b59d-21efb914e65c",
+                "panelIndex": "7",
+                "type": "visualization",
+                "version": "6.3.0"
+            },
+            {
+                "embeddableConfig": {},
+                "gridData": {
+                    "h": 12,
+                    "i": "8",
+                    "w": 11,
+                    "x": 0,
+                    "y": 10
+                },
+                "id": "c7b8b8f0-86d8-11e8-b59d-21efb914e65c",
+                "panelIndex": "8",
+                "type": "visualization",
+                "version": "6.3.0"
+            }
+        ],
         "timeRestore": false,
         "title": "[Suricata] Alert Overview",
         "version": 1

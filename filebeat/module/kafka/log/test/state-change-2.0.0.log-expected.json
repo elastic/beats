@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2018-10-31T15:09:30.451Z", 
-        "fileset.module": "kafka", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "kafka", 
         "input.type": "log", 
         "kafka.log.class": "state.change.logger", 
         "kafka.log.component": "Broker id=20", 

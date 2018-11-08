@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2016-12-07T10:05:07.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
         "log.offset": 0, 
         "nginx.access.body_sent.bytes": "571", 
@@ -30,8 +30,8 @@
     }, 
     {
         "@timestamp": "2017-05-29T19:02:48.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
         "log.offset": 183, 
         "nginx.access.body_sent.bytes": "612", 
@@ -56,8 +56,8 @@
     }, 
     {
         "@timestamp": "2016-12-07T10:05:07.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
         "log.offset": 341, 
         "nginx.access.body_sent.bytes": "571", 
@@ -92,8 +92,8 @@
     }, 
     {
         "@timestamp": "2016-12-07T10:05:07.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
         "log.offset": 527, 
         "nginx.access.body_sent.bytes": "571", 
@@ -126,8 +126,8 @@
     }, 
     {
         "@timestamp": "2016-01-22T13:18:29.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
         "log.offset": 693, 
         "nginx.access.body_sent.bytes": "25507", 
@@ -159,8 +159,8 @@
     }, 
     {
         "@timestamp": "2016-12-30T06:47:09.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
         "log.offset": 845, 
         "nginx.access.body_sent.bytes": "8571", 
@@ -190,8 +190,8 @@
     }, 
     {
         "@timestamp": "2018-04-12T07:48:40.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
         "log.offset": 1085, 
         "nginx.access.body_sent.bytes": "0", 

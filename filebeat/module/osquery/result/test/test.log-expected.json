@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2017-12-28T14:40:08.000Z", 
-        "fileset.module": "osquery", 
-        "fileset.name": "result", 
+        "event.dataset": "result", 
+        "event.module": "osquery", 
         "input.type": "log", 
         "log.offset": 0, 
         "osquery.result.action": "removed", 

@@ -36,6 +36,8 @@ import (
 	"github.com/gofrs/uuid"
 	"go.uber.org/zap"
 
+	errw "github.com/pkg/errors"
+
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 	ucfg "github.com/elastic/go-ucfg"
@@ -452,7 +454,7 @@ func (b *Beat) TestConfig(bt beat.Creator) error {
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
-func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pipelines bool) error {
+func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning, pipelines bool) error {
 	return handleError(func() error {
 		err := b.Init()
 		if err != nil {
@@ -497,14 +499,20 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pip
 			fmt.Println("Loaded index template")
 		}
 
-		if dashboards {
+		if setupDashboards {
 			fmt.Println("Loading dashboards (Kibana must be running and reachable)")
 			err = b.loadDashboards(context.Background(), true)
-			if err != nil {
-				return err
-			}
 
-			fmt.Println("Loaded dashboards")
+			if err != nil {
+				switch err := errw.Cause(err).(type) {
+				case *dashboards.ErrNotFound:
+					fmt.Printf("Skipping loading dashboards, %+v\n", err)
+				default:
+					return err
+				}
+			} else {
+				fmt.Println("Loaded dashboards")
+			}
 		}
 
 		if machineLearning && b.SetupMLCallback != nil {
@@ -728,7 +736,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		err := dashboards.ImportDashboards(ctx, b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
 			b.Config.Kibana, esConfig, b.Config.Dashboards, nil)
 		if err != nil {
-			return fmt.Errorf("Error importing Kibana dashboards: %v", err)
+			return errw.Wrap(err, "Error importing Kibana dashboards")
 		}
 		logp.Info("Kibana dashboards successfully loaded.")
 	}

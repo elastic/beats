@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2016-10-25T14:49:34.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "error", 
+        "event.dataset": "error", 
+        "event.module": "nginx", 
         "input.type": "log", 
         "log.offset": 0, 
         "nginx.error.connection_id": "1", 
@@ -13,8 +13,8 @@
     }, 
     {
         "@timestamp": "2016-10-25T14:50:44.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "error", 
+        "event.dataset": "error", 
+        "event.module": "nginx", 
         "input.type": "log", 
         "log.offset": 273, 
         "nginx.error.connection_id": "3", 

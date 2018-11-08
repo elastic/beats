@@ -136,7 +136,15 @@ class TestCommands(metricbeat.BaseTest):
             extra_args=["test", "modules"])
 
         assert exit_code == 0
-        assert self.log_contains("ERROR error making http request")
+        try:
+            assert any((
+                self.log_contains("ERROR error making http request"),
+                self.log_contains("ERROR timeout waiting for an event"),
+            ))
+        except:
+            # Print log to help debugging this if error message changes
+            print self.get_log()
+            raise
         assert self.log_contains("cpu...OK")
         assert self.log_contains("memory...OK")
 

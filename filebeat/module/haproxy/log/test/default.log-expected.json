@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2018-09-20T15:42:59.000Z", 
-        "fileset.module": "haproxy", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "haproxy", 
         "haproxy.client.ip": "1.2.3.4", 
         "haproxy.client.port": "40780", 
         "haproxy.destination.ip": "1.2.3.4", 
