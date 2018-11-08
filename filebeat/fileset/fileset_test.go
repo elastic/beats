@@ -49,7 +49,7 @@ func TestLoadManifestNginx(t *testing.T) {
 	manifest, err := fs.readManifest()
 	assert.NoError(t, err)
 	assert.Equal(t, manifest.ModuleVersion, "1.0")
-	assert.Equal(t, manifest.IngestPipeline, "ingest/default.json")
+	assert.Equal(t, manifest.IngestPipeline, []string{"ingest/default.json"})
 	assert.Equal(t, manifest.Input, "config/nginx-access.yml")
 
 	vars := manifest.Vars
@@ -67,7 +67,7 @@ func TestGetBuiltinVars(t *testing.T) {
 	assert.IsType(t, vars["hostname"], "a-mac-with-esc-key")
 	assert.IsType(t, vars["domain"], "local")
 	assert.Equal(t, "nginx", vars["module"])
-	assert.Equal(t, "access", vars["metricset"])
+	assert.Equal(t, "access", vars["fileset"])
 	assert.Equal(t, "6.6.0", vars["beatVersion"])
 }
 
@@ -148,14 +148,16 @@ func TestResolveVariable(t *testing.T) {
 		{
 			Value: "test-{{.value}}",
 			Vars: map[string]interface{}{
-				"value": 2,
+				"value":   2,
+				"builtin": map[string]interface{}{},
 			},
 			Expected: "test-2",
 		},
 		{
 			Value: []interface{}{"test-{{.value}}", "test1-{{.value}}"},
 			Vars: map[string]interface{}{
-				"value": 2,
+				"value":   2,
+				"builtin": map[string]interface{}{},
 			},
 			Expected: []interface{}{"test-2", "test1-2"},
 		},
