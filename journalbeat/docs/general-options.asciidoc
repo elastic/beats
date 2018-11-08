@@ -28,19 +28,5 @@ data path. See the <<directory-layout>> section for details. The default is `${p
 {beatname_lc}.registry_file: registry
 ----
 
-[float]
-==== `seek`
-
-This option is valid as a global setting under the +{beatname_lc}+ namespace
-or under `paths`. For a description of this option, see
-<<{beatname_lc}-seek,`seek`>>. 
-
-[float]
-==== `include_matches`
-
-This option is valid as a global setting under the +{beatname_lc}+ namespace
-or under `paths`. For a description of this option, see
-<<{beatname_lc}-include-matches,`include_matches`>>. 
-
 include::../../libbeat/docs/generalconfig.asciidoc[]
 

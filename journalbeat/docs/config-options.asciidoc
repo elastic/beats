@@ -117,10 +117,6 @@ only the last log message is sent on restart.
 * `cursor`: On first read, starts reading at the beginning of the file. After a
 reload or restart, continues reading at the last known position.
 
-When specified under `paths`, the `seek` setting applies to all journals under
-the configured paths. When specified directly under the +{beatname_lc}+
-namespace, the setting applies to all journals read by {beatname_uc}.
-
 If you have old log files and want to skip lines, start {beatname_uc} with
 `seek: tail` specified. Then stop {beatname_uc}, set `seek: cursor`, and restart
 {beatname_uc}.
@@ -142,11 +138,6 @@ To reference fields, use one of the following:
 (<<filter-using-translated-names,see a full example>>). {beatname_uc}
 does not translate all fields from the journal. For custom fields, use the name
 specified in the systemd journal.
-
-When specified under `paths`, the `include_matches` filter is applied to all
-journals under the configured paths. When specified directly under the
-+{beatname_lc}+ namespace, the setting applies to all journals read by
-{beatname_uc}.
 
 [float]
 [[translated-fields]]
