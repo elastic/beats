@@ -34,6 +34,22 @@ Contains common beat fields available in all event types.
 
 
 
+*`agent.hostname`*::
++
+--
+Hostname of the agent.
+
+
+--
+
+*`host.name`*::
++
+--
+Customizable name for the host.
+
+
+--
+
 *`beat.timezone`*::
 +
 --

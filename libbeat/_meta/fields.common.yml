@@ -4,6 +4,14 @@
   description: >
     Contains common beat fields available in all event types.
   fields:
+    - name: agent.hostname
+      description: >
+        Hostname of the agent.
+
+    - name: host.name
+      description: >
+        Customizable name for the host.
+
     - name: beat.timezone
       description: >
         The timezone as returned by the operating system on which the Beat is
