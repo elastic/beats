@@ -13,17 +13,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/OneOfOne/xxhash"
+	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
 
+	"github.com/elastic/beats/auditbeat/datastore"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/elastic/beats/auditbeat/datastore"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
 )
 
