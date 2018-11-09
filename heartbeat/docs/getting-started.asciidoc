@@ -235,7 +235,7 @@ sudo service {beatname_lc}-elastic start
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo chown root heartbeat.yml <1>
-sudo ./heartbeat -e -c heartbeat.yml -d "publish"
+sudo ./heartbeat -e -c heartbeat.yml
 ----------------------------------------------------------------------
 <1> You'll be running Heartbeat as root, so you need to change ownership of the
 configuration file, or run Heartbeat with `--strict.perms=false` specified. See
