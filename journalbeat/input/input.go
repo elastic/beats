@@ -37,7 +37,6 @@ type Input struct {
 	done       chan struct{}
 	config     Config
 	pipeline   beat.Pipeline
-	client     beat.Client
 	states     map[string]checkpoint.JournalState
 	id         uuid.UUID
 	logger     *logp.Logger
@@ -121,8 +120,7 @@ func New(
 // Run connects to the output, collects entries from the readers
 // and then publishes the events.
 func (i *Input) Run() {
-	var err error
-	i.client, err = i.pipeline.ConnectWith(beat.ClientConfig{
+	client, err := i.pipeline.ConnectWith(beat.ClientConfig{
 		PublishMode:   beat.GuaranteedSend,
 		EventMetadata: i.eventMeta,
 		Meta:          nil,
@@ -135,12 +133,13 @@ func (i *Input) Run() {
 		i.logger.Error("Error connecting to output: %v", err)
 		return
 	}
+	defer client.Close()
 
-	i.publishAll()
+	i.publishAll(client)
 }
 
 // publishAll reads events from all readers and publishes them.
-func (i *Input) publishAll() {
+func (i *Input) publishAll(client beat.Client) {
 	out := make(chan *beat.Event)
 	defer close(out)
 
@@ -180,14 +179,13 @@ func (i *Input) publishAll() {
 		case <-i.done:
 			return
 		case e := <-out:
-			i.client.Publish(*e)
+			client.Publish(*e)
 		}
 	}
 }
 
 // Stop stops all readers of the input.
 func (i *Input) Stop() {
-	i.client.Close()
 	for _, r := range i.readers {
 		r.Close()
 	}

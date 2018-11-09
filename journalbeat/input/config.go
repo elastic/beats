@@ -18,9 +18,9 @@
 package input
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/elastic/beats/journalbeat/config"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -29,13 +29,15 @@ import (
 type Config struct {
 	// Paths stores the paths to the journal files to be read.
 	Paths []string `config:"paths"`
+	// MaxBackoff is the limit of the backoff time.
+	Backoff time.Duration `config:"backoff" validate:"min=0,nonzero"`
 	// Backoff is the current interval to wait before
 	// attemting to read again from the journal.
-	Backoff time.Duration `config:"backoff" validate:"min=0,nonzero"`
-	// MaxBackoff is the limit of the backoff time.
+	BackoffFactor int `config:"backoff_factor" validate:"min=1"`
+	// BackoffFactor is the multiplier of Backoff.
 	MaxBackoff time.Duration `config:"max_backoff" validate:"min=0,nonzero"`
 	// Seek is the method to read from journals.
-	Seek config.SeekMode `config:"seek"`
+	Seek string `config:"seek"`
 	// Matches store the key value pairs to match entries.
 	Matches []string `config:"include_matches"`
 
@@ -48,8 +50,25 @@ type Config struct {
 var (
 	// DefaultConfig is the defaults for an inputs
 	DefaultConfig = Config{
-		Backoff:    1 * time.Second,
-		MaxBackoff: 20 * time.Second,
-		Seek:       config.SeekCursor,
+		Backoff:       1 * time.Second,
+		BackoffFactor: 2,
+		MaxBackoff:    60 * time.Second,
+		Seek:          "cursor",
 	}
 )
+
+// Validate check the configuration of the input.
+func (c *Config) Validate() error {
+	correctSeek := false
+	for _, s := range []string{"cursor", "head", "tail"} {
+		if c.Seek == s {
+			correctSeek = true
+		}
+	}
+
+	if !correctSeek {
+		return fmt.Errorf("incorrect value for seek: %s. possible values: cursor, head, tail", c.Seek)
+	}
+
+	return nil
+}
