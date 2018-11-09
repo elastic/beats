@@ -22,20 +22,70 @@ In order to use Beats Central Management, https://www.elastic.co/guide/en/kibana
 in Kibana. This will ensure that only the users with enough access rights
 can access Beats configurations.
 
+Users with the role `beats_admin` will be able to use Central Management
+to enroll new Beats and manage their settings.
 
 [float]
-=== Enroll in Central Management
+=== Beats enrollment
 
-the
+Enrolling {beatname_uc} in Kibana will register it in Central Management and
+establish trust. Once done, {beatname_uc} will have the credentials to
+retrieve configurations from Kibana.
 
+During the enroll invokation this will happen:
+
+ . {beatname_uc} will contact Kibana and try to register with the given method
+ . Kibana will register this {beatname_uc} instance and return an access token for configurations polling
+ . The enroll command will **overwrite your current settings**, as now they will be centrally managed (confirmation will be requested, also a backup copy is created)
+
+There are two ways to perform enrollment:
+
+[float]
+==== Token based enrollment
+
+This is the recommended way when manually enrolling {beatname_uc}. Go to Kibana
+-> Management -> Beats and click on `Enroll Beat`. That will show the command
+to run in order to enroll {beatname_uc}. The command has this format:
+
+["source","shell",subs="attributes"]
+----------------------------------------------------------------------
+{beatname_lc} enroll <kibana_url> <enrollment_token>
+----------------------------------------------------------------------
+
+The enrollment token will expire as soon as it is used, next enroll will
+require to follow the same process to obtain a new token.
+
+[float]
+==== Username and password based enrollment
+
+Enroll is also possible using username and password. This is the recommended way
+for scripted deploys:
+
+["source","shell",subs="attributes"]
+----------------------------------------------------------------------
+{beatname_lc} enroll <kibana_url>
+----------------------------------------------------------------------
+
+[float]
+==== Parameters
+
+This is the full list of paramaters for the `enroll` command:
+
+*`--username <user>`*::
+Use the given username when doing password based enrollment. Default username
+is `elastic`.
+
+*`--password <method>`*::
+Use the given method to introduce the password for enrollment, available options
+are (default is `stdin`):
+
+ * `env:<VAR_NAME>` - Get the password from the environment variable `VAR_NAME`
+ * `stdin` - Prompt the user for a password
+
+*`--force`*::
+Do not ask for confirmation to overwrite current settings.
 
 [float]
 === Configuration tags
-
-things
-
-
-[float]
-=== Beat status
 
 things
