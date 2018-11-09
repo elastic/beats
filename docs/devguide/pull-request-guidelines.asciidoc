@@ -3,7 +3,6 @@
 
 Every change made to Beats must be held to a high standard, and while the responsibility for quality in a pull request ultimately lies with the author, Beats team members have the responsibility as reviewers to verify during their review process. Where this document is unclear or inappropriate let common sense and consensus override it.
 
-
 [float]
 === Code Style
 
