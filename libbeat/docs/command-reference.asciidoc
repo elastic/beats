@@ -14,7 +14,7 @@
 
 :global-flags: Also see <<global-flags,Global flags>>.
 
-:export-command-short-desc: Exports the configuration, index template or a dashboard to stdout
+:export-command-short-desc: Exports the configuration, index template, or a dashboard to stdout
 :help-command-short-desc: Shows help for any command
 :keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
 :modules-command-short-desc: Manages configured modules
@@ -97,7 +97,7 @@ Also see <<global-flags,Global flags>>.
 
 {export-command-short-desc}. You can use this
 command to quickly view your configuration, see the contents of the index
-template or export a dashboard from Kibana.
+template, or export a dashboard from Kibana.
 
 *SYNOPSIS*
 
@@ -439,10 +439,10 @@ endif::[]
 +
 ifdef::has_ml_jobs[]
 Loads the initial setup, including Elasticsearch template, Kibana index pattern,
-Kibana dashboards and Machine learning jobs.
+Kibana dashboards (when available), and Machine learning jobs.
 endif::[]
 ifndef::has_ml_jobs[]
-Loads the initial setup, including Elasticsearch template, Kibana index pattern and Kibana dashboards.
+Loads the initial setup, including Elasticsearch template, Kibana index pattern, and Kibana dashboards (when available).
 endif::[]
 If you want to use the command without running {beatname_uc}, use the <<setup-command,`setup`>> command instead.
 
@@ -511,10 +511,10 @@ environment without actually running {beatname_uc} and ingesting data.
 
 ifndef::deprecate_dashboard_loading[]
 *`--dashboards`*::
-Sets up the Kibana dashboards only. This option loads the dashboards from the
-{beatname_uc} package. For more options, such as loading customized dashboards,
-see {beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards]
-in the _Beats Developer Guide_.
+Sets up the Kibana dashboards (when available). This option loads the dashboards
+from the {beatname_uc} package. For more options, such as loading customized
+dashboards, see {beatsdevguide}/import-dashboards.html[Importing Existing Beat
+Dashboards] in the _Beats Developer Guide_.
 endif::[]
 
 ifdef::deprecate_dashboard_loading[]
