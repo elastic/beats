@@ -267,22 +267,7 @@ func execRequest(client *http.Client, req *http.Request, validator func(*http.Re
 
 	// Read the entirety of the body. Otherwise, the stats for the check
 	// don't include download time.
-	buf := make([]byte, 1024)
-	for {
-		read, err := resp.Body.Read(buf)
-		if read < 0 {
-			panic("negative read encountered in http response!")
-		}
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return start, time.Now(), resp, reason.IOFailed(err)
-		}
-		if read == 0 {
-			break
-		}
-	}
+	io.Copy(ioutil.Discard, resp.Body)
 
 	return start, time.Now(), resp, nil
 }
