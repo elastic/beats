@@ -16,10 +16,6 @@
       type: integer
       description: >
           Group ID.
-    - name: passwd
-      type: keyword
-      description: >
-          Information about a user's password.
     - name: dir
       type: keyword
       description: >
@@ -32,3 +28,16 @@
       type: text
       description: >
           General user information. On Linux, this is the gecos field.
+    - name: password
+      type: group
+      description: >
+        `password` contains information about a user's password (not the password itself).
+      fields:
+        - name: type
+          type: keyword
+          description: >
+              A user's password type, e.g. whether it's a shadow password.
+        - name: last_changed
+          type: date
+          description: >
+              The day the user's password was last changed.

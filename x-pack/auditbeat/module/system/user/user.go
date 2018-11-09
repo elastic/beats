@@ -36,10 +36,11 @@ const (
 	eventTypeState = "state"
 	eventTypeEvent = "event"
 
-	eventActionUserExists  = "existing_user"
-	eventActionUserAdded   = "user_added"
-	eventActionUserRemoved = "user_removed"
-	eventActionUserChanged = "user_changed"
+	eventActionExistingUser    = "existing_user"
+	eventActionUserAdded       = "user_added"
+	eventActionUserRemoved     = "user_removed"
+	eventActionUserChanged     = "user_changed"
+	eventActionPasswordChanged = "password_changed"
 )
 
 func init() {
@@ -60,13 +61,16 @@ type MetricSet struct {
 
 // User represents a user. Fields according to getpwent(3).
 type User struct {
-	Name     string
-	Passwd   string
-	UID      uint32
-	GID      uint32
-	UserInfo string
-	Dir      string
-	Shell    string
+	Name                string
+	PasswordType        string
+	PasswordChanged     time.Time
+	PasswordHashExcerpt string
+	UID                 uint32
+	GID                 uint32
+	UserInfo            string
+	Dir                 string
+	Shell               string
+	Action              string
 }
 
 // Hash creates a hash for User.
@@ -74,7 +78,9 @@ func (user User) Hash() uint64 {
 	h := xxhash.New64()
 	// Use everything except userInfo
 	h.WriteString(user.Name)
-	h.WriteString(user.Passwd)
+	h.WriteString(user.PasswordType)
+	h.WriteString(user.PasswordChanged.String())
+	h.WriteString(user.PasswordHashExcerpt)
 	h.WriteString(strconv.Itoa(int(user.UID)))
 	h.WriteString(strconv.Itoa(int(user.GID)))
 	h.WriteString(user.Dir)
@@ -84,16 +90,22 @@ func (user User) Hash() uint64 {
 
 func (user User) toMapStr() common.MapStr {
 	evt := common.MapStr{
-		"name":   user.Name,
-		"passwd": user.Passwd,
-		"uid":    user.UID,
-		"gid":    user.GID,
-		"dir":    user.Dir,
-		"shell":  user.Shell,
+		"name": user.Name,
+		"password": common.MapStr{
+			"type": user.PasswordType,
+		},
+		"uid":   user.UID,
+		"gid":   user.GID,
+		"dir":   user.Dir,
+		"shell": user.Shell,
 	}
 
 	if user.UserInfo != "" {
 		evt.Put("user_information", user.UserInfo)
+	}
+
+	if !user.PasswordChanged.IsZero() {
+		evt.Put("password.last_changed", user.PasswordChanged)
 	}
 
 	return evt
@@ -102,8 +114,8 @@ func (user User) toMapStr() common.MapStr {
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
-	if runtime.GOOS == "windows" {
-		return nil, fmt.Errorf("the %v/%v dataset is not supported on Windows", moduleName, metricsetName)
+	if runtime.GOOS != "linux" {
+		return nil, fmt.Errorf("the %v/%v dataset is only supported on Linux", moduleName, metricsetName)
 	}
 
 	config := defaultConfig
@@ -246,7 +258,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2, users []*User) error {
 
 	stateID := uuid.NewV4().String()
 	for _, user := range users {
-		event := userEvent(user, eventTypeState, eventActionUserExists)
+		event := userEvent(user, eventTypeState, eventActionExistingUser)
 		event.RootFields.Put("event.id", stateID)
 		report.Event(event)
 	}
@@ -269,23 +281,55 @@ func (ms *MetricSet) reportState(report mb.ReporterV2, users []*User) error {
 	return ms.saveUsersToDisk(users)
 }
 
-// reportChanges reports any changes to users on this system since the last call.
+// reportChanges detects and reports any changes to users on this system since the last call.
 func (ms *MetricSet) reportChanges(report mb.ReporterV2, users []*User) error {
-	added, removed, changed := ms.compareUsers(users)
+	newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(users))
 
-	for _, user := range added {
-		report.Event(userEvent(user, eventTypeEvent, eventActionUserAdded))
+	if len(newInCache) > 0 && len(missingFromCache) > 0 {
+		// Check for changes to users
+		missingUserMap := make(map[uint32](*User))
+		for _, missingUser := range missingFromCache {
+			missingUserMap[missingUser.(*User).UID] = missingUser.(*User)
+		}
+
+		for _, userFromCache := range newInCache {
+			newUser := userFromCache.(*User)
+			matchingMissingUser, found := missingUserMap[newUser.UID]
+
+			if found {
+				// Report password change separately
+				if newUser.PasswordChanged.Before(matchingMissingUser.PasswordChanged) ||
+					newUser.PasswordHashExcerpt != matchingMissingUser.PasswordHashExcerpt {
+					report.Event(userEvent(newUser, eventTypeEvent, eventActionPasswordChanged))
+				}
+
+				// Hack to check if only the password change time changed
+				matchingMissingUser.PasswordChanged = newUser.PasswordChanged
+				if newUser.Hash() != matchingMissingUser.Hash() {
+					report.Event(userEvent(newUser, eventTypeEvent, eventActionUserChanged))
+				}
+
+				delete(missingUserMap, matchingMissingUser.UID)
+			} else {
+				report.Event(userEvent(newUser, eventTypeEvent, eventActionUserAdded))
+			}
+		}
+
+		for _, missingUser := range missingUserMap {
+			report.Event(userEvent(missingUser, eventTypeEvent, eventActionUserRemoved))
+		}
+	} else {
+		// No changes to users
+		for _, user := range newInCache {
+			report.Event(userEvent(user.(*User), eventTypeEvent, eventActionUserAdded))
+		}
+
+		for _, user := range missingFromCache {
+			report.Event(userEvent(user.(*User), eventTypeEvent, eventActionUserRemoved))
+		}
 	}
 
-	for _, user := range removed {
-		report.Event(userEvent(user, eventTypeEvent, eventActionUserRemoved))
-	}
-
-	for _, user := range changed {
-		report.Event(userEvent(user, eventTypeEvent, eventActionUserChanged))
-	}
-
-	if len(added) > 0 || len(removed) > 0 || len(changed) > 0 {
+	if len(newInCache) > 0 || len(missingFromCache) > 0 {
 		return ms.saveUsersToDisk(users)
 	}
 
@@ -302,46 +346,6 @@ func userEvent(user *User, eventType string, eventAction string) mb.Event {
 		},
 		MetricSetFields: user.toMapStr(),
 	}
-}
-
-// compareUsers compares a new list of users with what is in the cache. It returns
-// any users that were added, removed, or changed.
-func (ms *MetricSet) compareUsers(users []*User) (added, removed, changed []*User) {
-	newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(users))
-
-	if len(newInCache) > 0 && len(missingFromCache) > 0 {
-		// Check for changes to users
-		missingUserMap := make(map[uint32](*User))
-		for _, missingUser := range missingFromCache {
-			missingUserMap[missingUser.(*User).UID] = missingUser.(*User)
-		}
-
-		for _, newUser := range newInCache {
-			matchingMissingUser, found := missingUserMap[newUser.(*User).UID]
-
-			if found {
-				changed = append(changed, newUser.(*User))
-				delete(missingUserMap, matchingMissingUser.UID)
-			} else {
-				added = append(added, newUser.(*User))
-			}
-		}
-
-		for _, missingUser := range missingUserMap {
-			removed = append(removed, missingUser)
-		}
-	} else {
-		// No changes to users
-		for _, user := range newInCache {
-			added = append(added, user.(*User))
-		}
-
-		for _, user := range missingFromCache {
-			removed = append(removed, user.(*User))
-		}
-	}
-
-	return
 }
 
 func convertToCacheable(users []*User) []cache.Cacheable {
