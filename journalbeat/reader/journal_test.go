@@ -65,10 +65,8 @@ func TestToEvent(t *testing.T) {
 				},
 			},
 			expectedFields: common.MapStr{
-				"journald": common.MapStr{
-					"custom": common.MapStr{
-						"my_custom_field": "value",
-					},
+				"custom": common.MapStr{
+					"my_custom_field": "value",
 				},
 			},
 		},
