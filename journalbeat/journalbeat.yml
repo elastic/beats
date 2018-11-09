@@ -21,7 +21,7 @@ journalbeat.inputs:
   # The number of seconds to wait before trying to read again from journals.
   #backoff: 1s
   # The maximum number of seconds to wait before attempting to read again from journals.
-  #max_backoff: 20s
+  #max_backoff: 60s
 
   # Position to start reading from journal. Valid values: head, tail, cursor
   seek: cursor
@@ -42,6 +42,18 @@ journalbeat.inputs:
   # Name of the registry file. If a relative path is used, it is considered relative to the
   # data path.
   #registry_file: registry
+
+  # The number of seconds to wait before trying to read again from journals.
+  #backoff: 1s
+  # The maximum number of seconds to wait before attempting to read again from journals.
+  #max_backoff: 60s
+
+  # Position to start reading from all journal. Possible values: head, tail, cursor
+  #seek: head
+
+  # Exact matching for field values of events.
+  # Matching for nginx entries: "systemd.unit=nginx"
+  #matches: []
 
 #================================ General =====================================
 
