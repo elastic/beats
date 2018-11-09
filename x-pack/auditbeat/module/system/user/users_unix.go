@@ -25,7 +25,7 @@ func GetUsers() (users []*User, err error) {
 		}
 
 		// passwd is C.struct_passwd
-		users = append(users, &User{
+		user := &User{
 			Name:     C.GoString(passwd.pw_name),
 			Passwd:   C.GoString(passwd.pw_passwd),
 			UID:      uint32(passwd.pw_uid),
@@ -33,7 +33,20 @@ func GetUsers() (users []*User, err error) {
 			UserInfo: C.GoString(passwd.pw_gecos),
 			Dir:      C.GoString(passwd.pw_dir),
 			Shell:    C.GoString(passwd.pw_shell),
-		})
+		}
+
+		switch C.GoString(passwd.pw_passwd) {
+		case "x":
+			user.Passwd = "shadow_password"
+		case "*":
+			user.Passwd = "login_disabled"
+		case "":
+			user.Passwd = "no_password"
+		default:
+			user.Passwd = "<redacted>"
+		}
+
+		users = append(users, user)
 	}
 
 	return users, nil
