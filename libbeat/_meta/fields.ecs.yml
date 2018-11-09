@@ -405,6 +405,49 @@
                 City name.
               example: Montreal
 
+        - name: os
+          title: Operating System
+          group: 2
+          description: >
+            The OS fields contain information about the operating system.
+          type: group
+          fields:
+
+            - name: platform
+              level: extended
+              type: keyword
+              description: >
+                Operating system platform (such centos, ubuntu, windows).
+              example: darwin
+
+            - name: name
+              level: extended
+              type: keyword
+              example: "Mac OS X"
+              description: >
+                Operating system name.
+
+            - name: family
+              level: extended
+              type: keyword
+              example: "debian"
+              description: >
+                OS family (such as redhat, debian, freebsd, windows).
+
+            - name: version
+              level: extended
+              type: keyword
+              example: "10.12.6-rc2"
+              description: >
+                Operating system version as a raw string.
+
+            - name: kernel
+              level: extended
+              type: keyword
+              example: "4.4.0-112-generic"
+              description: >
+                Operating system kernel version as a raw string.
+
     - name: ecs
       title: ECS
       group: 2
@@ -835,6 +878,49 @@
                 City name.
               example: Montreal
 
+        - name: os
+          title: Operating System
+          group: 2
+          description: >
+            The OS fields contain information about the operating system.
+          type: group
+          fields:
+
+            - name: platform
+              level: extended
+              type: keyword
+              description: >
+                Operating system platform (such centos, ubuntu, windows).
+              example: darwin
+
+            - name: name
+              level: extended
+              type: keyword
+              example: "Mac OS X"
+              description: >
+                Operating system name.
+
+            - name: family
+              level: extended
+              type: keyword
+              example: "debian"
+              description: >
+                OS family (such as redhat, debian, freebsd, windows).
+
+            - name: version
+              level: extended
+              type: keyword
+              example: "10.12.6-rc2"
+              description: >
+                Operating system version as a raw string.
+
+            - name: kernel
+              level: extended
+              type: keyword
+              example: "4.4.0-112-generic"
+              description: >
+                Operating system kernel version as a raw string.
+
     - name: log
       title: Log
       description: >
@@ -1010,6 +1096,7 @@
           type: keyword
           description: >
             Unique identifier for the organization.
+
     - name: os
       title: Operating System
       group: 2
