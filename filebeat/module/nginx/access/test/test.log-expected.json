@@ -1,9 +1,10 @@
 [
     {
         "@timestamp": "2016-12-07T10:05:07.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
+        "log.offset": 0, 
         "nginx.access.body_sent.bytes": "571", 
         "nginx.access.http_version": "1.1", 
         "nginx.access.method": "GET", 
@@ -25,15 +26,14 @@
         "nginx.access.user_agent.os_major": "10", 
         "nginx.access.user_agent.os_minor": "12", 
         "nginx.access.user_agent.os_name": "Mac OS X", 
-        "nginx.access.user_name": "-", 
-        "offset": 0, 
-        "prospector.type": "log"
+        "nginx.access.user_name": "-"
     }, 
     {
         "@timestamp": "2017-05-29T19:02:48.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
+        "log.offset": 183, 
         "nginx.access.body_sent.bytes": "612", 
         "nginx.access.http_version": "1.1", 
         "nginx.access.method": "GET", 
@@ -52,15 +52,14 @@
         "nginx.access.user_agent.os": "Windows 7", 
         "nginx.access.user_agent.os_name": "Windows 7", 
         "nginx.access.user_agent.patch": "a2", 
-        "nginx.access.user_name": "-", 
-        "offset": 183, 
-        "prospector.type": "log"
+        "nginx.access.user_name": "-"
     }, 
     {
         "@timestamp": "2016-12-07T10:05:07.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
+        "log.offset": 341, 
         "nginx.access.body_sent.bytes": "571", 
         "nginx.access.geoip.city_name": "Berlin", 
         "nginx.access.geoip.continent_name": "Europe", 
@@ -89,15 +88,14 @@
         "nginx.access.user_agent.os_major": "10", 
         "nginx.access.user_agent.os_minor": "12", 
         "nginx.access.user_agent.os_name": "Mac OS X", 
-        "nginx.access.user_name": "-", 
-        "offset": 341, 
-        "prospector.type": "log"
+        "nginx.access.user_name": "-"
     }, 
     {
         "@timestamp": "2016-12-07T10:05:07.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
+        "log.offset": 527, 
         "nginx.access.body_sent.bytes": "571", 
         "nginx.access.geoip.city_name": "Berlin", 
         "nginx.access.geoip.continent_name": "Europe", 
@@ -124,15 +122,14 @@
         "nginx.access.user_agent.os_major": "10", 
         "nginx.access.user_agent.os_minor": "12", 
         "nginx.access.user_agent.os_name": "Mac OS X", 
-        "nginx.access.user_name": "-", 
-        "offset": 527, 
-        "prospector.type": "log"
+        "nginx.access.user_name": "-"
     }, 
     {
         "@timestamp": "2016-01-22T13:18:29.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
+        "log.offset": 693, 
         "nginx.access.body_sent.bytes": "25507", 
         "nginx.access.geoip.city_name": "Springfield", 
         "nginx.access.geoip.continent_name": "North America", 
@@ -158,15 +155,14 @@
         "nginx.access.user_agent.original": "Amazon CloudFront", 
         "nginx.access.user_agent.os": "Other", 
         "nginx.access.user_agent.os_name": "Other", 
-        "nginx.access.user_name": "-", 
-        "offset": 693, 
-        "prospector.type": "log"
+        "nginx.access.user_name": "-"
     }, 
     {
         "@timestamp": "2016-12-30T06:47:09.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
+        "log.offset": 845, 
         "nginx.access.body_sent.bytes": "8571", 
         "nginx.access.geoip.continent_name": "Europe", 
         "nginx.access.geoip.country_iso_code": "PT", 
@@ -190,15 +186,14 @@
         "nginx.access.user_agent.original": "Mozilla/5.0 (compatible; Facebot 1.0; https://developers.facebook.com/docs/sharing/webmasters/crawler)", 
         "nginx.access.user_agent.os": "Other", 
         "nginx.access.user_agent.os_name": "Other", 
-        "nginx.access.user_name": "-", 
-        "offset": 845, 
-        "prospector.type": "log"
+        "nginx.access.user_name": "-"
     }, 
     {
         "@timestamp": "2018-04-12T07:48:40.000Z", 
-        "fileset.module": "nginx", 
-        "fileset.name": "access", 
+        "event.dataset": "access", 
+        "event.module": "nginx", 
         "input.type": "log", 
+        "log.offset": 1085, 
         "nginx.access.body_sent.bytes": "0", 
         "nginx.access.referrer": "-", 
         "nginx.access.remote_ip": "127.0.0.1", 
@@ -211,8 +206,6 @@
         "nginx.access.user_agent.original": "-", 
         "nginx.access.user_agent.os": "Other", 
         "nginx.access.user_agent.os_name": "Other", 
-        "nginx.access.user_name": "-", 
-        "offset": 1085, 
-        "prospector.type": "log"
+        "nginx.access.user_name": "-"
     }
 ]

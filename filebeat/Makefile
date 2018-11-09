@@ -34,7 +34,7 @@ collect-docs: python-env
 	@mkdir -p docs/modules
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/filebeat/scripts/docs_collector.py --beat ${BEAT_NAME}
 
-# Generate imports for prospectors
+# Generate imports for inputs
 .PHONY: imports
 imports: python-env
 	@mkdir -p include

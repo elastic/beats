@@ -53,7 +53,7 @@ var (
 		Backoff:       1 * time.Second,
 		BackoffFactor: 2,
 		MaxBackoff:    60 * time.Second,
-		Seek:          "tail",
+		Seek:          "cursor",
 	}
 )
 

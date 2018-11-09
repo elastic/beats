@@ -25,6 +25,8 @@ import (
 	"strconv"
 	"strings"
 
+	errw "github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -159,7 +161,7 @@ func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader) error {
 	}
 
 	if err := importer.Import(); err != nil {
-		return fmt.Errorf("fail to import the dashboards in Kibana: %v", err)
+		return errw.Wrap(err, "fail to import the dashboards in Kibana")
 	}
 
 	return nil
