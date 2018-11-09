@@ -184,3 +184,19 @@ There are currently no example dashboards available for {beatname_uc}.
 
 To learn how to view and explore your data, see the
 _{kibana-ref}/index.html[{kib} User Guide]_.
+
+[NOTE]
+=====
+By default, the Logs UI in {kib} only shows logs from `filebeat-*`
+indexes. To show {beatname_uc} indexes, add the following settings to the {kib}
+configuration: 
+
+[source,yaml]
+----
+xpack.infra:
+ sources:
+   default:
+     logAlias: "filebeat-*,journalbeat-*"
+----
+
+=====

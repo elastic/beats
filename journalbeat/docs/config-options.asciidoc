@@ -98,7 +98,7 @@ default is 1s.
 ==== `max_backoff`
 
 The maximum number of seconds to wait before attempting to read again from
-journals. The default is 20s.
+journals. The default is 60s.
 
 [float]
 [id="{beatname_lc}-seek"]
