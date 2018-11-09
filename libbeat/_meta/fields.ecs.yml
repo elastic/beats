@@ -269,6 +269,50 @@
           description: >
             Destination domain.
 
+        - name: geo
+          title: Geo
+          group: 2
+          description: >
+            Geo fields can carry data about a specific location related to an event
+            or geo information derived from an IP field.
+          type: group
+          fields:
+
+            - name: continent_name
+              level: core
+              type: keyword
+              description: >
+                Name of the continent.
+              example: North America
+
+            - name: country_iso_code
+              level: core
+              type: keyword
+              description: >
+                Country ISO code.
+              example: CA
+
+            - name: location
+              level: core
+              type: geo_point
+              description: >
+                Longitude and latitude.
+              example: '{ "lon": -73.614830, "lat": 45.505918 }'
+
+            - name: region_name
+              level: core
+              type: keyword
+              description: >
+                Region name.
+              example: Quebec
+
+            - name: city_name
+              level: core
+              type: keyword
+              description: >
+                City name.
+              example: Montreal
+
     - name: device
       title: Device
       group: 2
@@ -316,6 +360,50 @@
             There is no predefined list of device types. Some examples are
             `endpoint`, `firewall`, `ids`, `ips`, `proxy`.
           example: firewall
+
+        - name: geo
+          title: Geo
+          group: 2
+          description: >
+            Geo fields can carry data about a specific location related to an event
+            or geo information derived from an IP field.
+          type: group
+          fields:
+
+            - name: continent_name
+              level: core
+              type: keyword
+              description: >
+                Name of the continent.
+              example: North America
+
+            - name: country_iso_code
+              level: core
+              type: keyword
+              description: >
+                Country ISO code.
+              example: CA
+
+            - name: location
+              level: core
+              type: geo_point
+              description: >
+                Longitude and latitude.
+              example: '{ "lon": -73.614830, "lat": 45.505918 }'
+
+            - name: region_name
+              level: core
+              type: keyword
+              description: >
+                Region name.
+              example: Quebec
+
+            - name: city_name
+              level: core
+              type: keyword
+              description: >
+                City name.
+              example: Montreal
 
     - name: ecs
       title: ECS
@@ -702,6 +790,50 @@
           example: "x86_64"
           description: >
             Operating system architecture.
+
+        - name: geo
+          title: Geo
+          group: 2
+          description: >
+            Geo fields can carry data about a specific location related to an event
+            or geo information derived from an IP field.
+          type: group
+          fields:
+
+            - name: continent_name
+              level: core
+              type: keyword
+              description: >
+                Name of the continent.
+              example: North America
+
+            - name: country_iso_code
+              level: core
+              type: keyword
+              description: >
+                Country ISO code.
+              example: CA
+
+            - name: location
+              level: core
+              type: geo_point
+              description: >
+                Longitude and latitude.
+              example: '{ "lon": -73.614830, "lat": 45.505918 }'
+
+            - name: region_name
+              level: core
+              type: keyword
+              description: >
+                Region name.
+              example: Quebec
+
+            - name: city_name
+              level: core
+              type: keyword
+              description: >
+                City name.
+              example: Montreal
 
     - name: log
       title: Log
@@ -1092,6 +1224,50 @@
           type: keyword
           description: >
             Source domain.
+
+        - name: geo
+          title: Geo
+          group: 2
+          description: >
+            Geo fields can carry data about a specific location related to an event
+            or geo information derived from an IP field.
+          type: group
+          fields:
+
+            - name: continent_name
+              level: core
+              type: keyword
+              description: >
+                Name of the continent.
+              example: North America
+
+            - name: country_iso_code
+              level: core
+              type: keyword
+              description: >
+                Country ISO code.
+              example: CA
+
+            - name: location
+              level: core
+              type: geo_point
+              description: >
+                Longitude and latitude.
+              example: '{ "lon": -73.614830, "lat": 45.505918 }'
+
+            - name: region_name
+              level: core
+              type: keyword
+              description: >
+                Region name.
+              example: Quebec
+
+            - name: city_name
+              level: core
+              type: keyword
+              description: >
+                City name.
+              example: Montreal
 
     - name: url
       title: URL
