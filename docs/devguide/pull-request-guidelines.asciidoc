@@ -1,129 +1,19 @@
 [[pr-review]]
 == Pull request review guidelines
 
-Every change made to Beats must be held to a high standard, and while the responsibility for quality in a pull request ultimately lies with the author, Beats team members have the responsibility as reviewers to verify during their review process.
-
-Frankly, it's impossible to build a concrete list of requirements that encompass all of the possible situations we'll encounter when reviewing pull requests, so instead this document tries to lay out a common set of the few obvious requirements while also outlining a general philosophy that we should have when approaching any PR review.
-
-It is not expected nor intended for a PR review to take the shape of this document, where the topmost guidelines are always applied first and the bottommost guidelines are always applied last. This entire document should be considered as a whole rather than as a series of consecutive todos that must be completed in order.
-
-While the review process is always done by Elastic staff members, these guidelines apply to all pull requests regardless of whether they are authored by community members or Elastic staff.
+Every change made to Beats must be held to a high standard, and while the responsibility for quality in a pull request ultimately lies with the author, Beats team members have the responsibility as reviewers to verify during their review process. Where this document is unclear or inappropriate let common sense and consensus override it.
 
 
 [float]
-=== Target audience
+=== Code Style
 
-The target audience for this document are pull request reviewers. For Beats maintainers, the PR review is the only part of the contributing process in which we have complete control. The author of any given pull request may not be up to speed on the latest expectations we have for pull requests, and they may have never read our guidelines at all. It's our responsibility as reviewers to guide folks through this process, but it's hard to do that consistently without a common set of documented principles.
-
-Pull request authors can benefit from reading this document as well because it'll help establish a common set of expectations between authors and reviewers early.
-
-
-[float]
-=== Reject fast
-
-Every pull request is different, and before reviewing any given PR, reviewers should consider the optimal way to approach the PR review so that if the change is ultimately rejected, it is done so as early in the process as possible.
-
-For example, a reviewer may want to do a product level review as early as possible for a PR that includes a new UI feature. On the other hand, perhaps the author is submitting a new feature that has been rejected in the past due to key architectural decisions, in which case it may be appropriate for the reviewer to focus on the soundness of the architecture before diving into anything else.
-
-
-[float]
-=== The big three
-
-There are a lot of discrete requirements and guidelines we want to follow in all of our pull requests, but three things in particular stand out as important above all the rest.
-
-. *Do we want this change in the product?*
-+
---
-Just because a person spent time building something doesn't mean we want that change to exist in the product, which is why we encourage everyone to open issues describing what they want to do before going off and doing it.
-
-Every feature we add permanently takes a portion of our attention away from building and supporting other features. We literally have a finite capacity of the number of features we can maintain since they all require a little bit of our time and focus, so it's important that enhancements to the project are scrutinized not just for their quality but also for the value they add, the maintenance burden they add, and how closely they align to our long term goals for the project.
-
-The landscape can change over time as well, so it's important that continuously reevaluate decisions we've made around whether or not we want certain changes in the project. Some changes take a significant amount of time to build, and it's possible that by the time we're wrapping them up, the situation has changed enough that we no longer want the change in the project.
---
-. *Is this change architecturally sound?*
-+
---
-Making poor decisions around how a change is technically architected means we immediately have taken on technical debt, which is going to unnecessarily distract us from our future efforts to improve the project as we need to maintain that existing change, chase down bugs, and ultimately re-architect that area in the future.
-
-There is no one-size-fits-all way to evaluate whether a given change is technically sound, so instead we must rely on our concrete knowledge and experience building software. This is an especially hard thing to do when two experienced developers have differing opinions about what is and is not architecturally sound, so it requires both the author and reviewer to show empathy, to go out of their way to understand each other, and to come to a consensus about a path forward.
-
-The goal here isn't finding the one best architecture as it's unlikely this could ever be qualified. There are usually many architecturally sound solutions to any problem, so reviewers should be focused on that goal objectively rather than whether or not their own vision for how the change should be architected is "better".
---
-. *Are there sufficient tests to ensure this change doesn't break in the future?*
-+
---
-We cannot scale our development efforts and continue to be effective at improving and maintaining the product if we're relying on manual testing to catch bugs. Manual testing is our last line of defense, and it's the least effective and most expensive way to ensure a stable product. This means that every change we make to the product needs to have sufficient test coverage.
-
-This isn't simply a question of enough test files. The code in the tests themselves is just as important as the code in the product.
-
-All of our code should have unit tests that verify its behaviors, including not only the "happy path", but also edge cases, error handling, etc.  When you change an existing API of a module, then there should always be at least one failing unit test, which in turn means we need to verify that all code consuming that API properly handles the change if necessary. For modules at a high enough level, this will mean we have breaking change in the product, which we'll need to handle accordingly.
-
-In addition to extensive unit test coverage, PRs should include relevant functional and integration tests. In some cases, we may simply be testing a programmatic interface (e.g. a service) that is integrating with the file system, the network, Elasticsearch, etc. In other cases, we'll be testing REST APIs over HTTP or comparing screenshots/snapshots with prior known acceptable state. In the worst case, we are doing browser-based functional testing on a running instance of Beats using selenium.
-
-Enhancements are pretty much always going to have extensive unit tests as a base as well as functional and integration testing. Bug fixes should always include regression tests to ensure that same bug does not manifest again in the future.
---
-
-
-[float]
-=== Product level review
-
-Reviewers are not simply evaluating the code itself, they are also evaluating the quality of the user-facing change in the product. This generally means they need to check out the branch locally and "play around" with it. In addition to the "do we want this change in the product" details from above, the reviewer should be looking for bugs and evaluating how approachable and useful the feature is as implemented. Special attention should be given to error scenarios and edge cases to ensure they are all handled well within the product.
-
-
-[float]
-=== Consistency, style, readability
-
-Having a relatively consistent codebase is an important part of us building a sustainable project. With dozens of active contributors at any given time, we rely on automation to help ensure consistency - we enforce a comprehensive set of linting rules through gofmt and other services such as Hound. We use an EditorConfig file in the beats repository to standardise how different editors handle whitespace, line endings, and other coding styles in our files. Most popular editors have a plugin for EditorConfig and we strongly recommend that you install it.
+Everyone's got an opinion on style. To avoid spending time on this issue we rely almost exclusively on `go fmt` and https://houndci.com/[hound] to police style. If neither of these tools complain the code is almost certainly fine. There may be exceptions to this, but they should be extremely rare. Only override the judgement of these tools in the most unusual of situations.
 
 [float]
 === Flaky Tests
 
-As software projects grow so does the complexity of their test cases and with that the probability of some tests becoming 'flaky'. It is everyone's responsibility to handle flaky tests. If you notice a pull request build failing for a reason that is unrelated to the pushed code, and not related to a transient error (say, an external
-service being available), please mute this test, then open an issue using our "Flaky test" pull request template.
+As software projects grow so does the complexity of their test cases and with that the probability of some tests becoming 'flaky'. It is everyone's responsibility to handle flaky tests. If you notice a pull request build failing for a reason that is unrelated to the pushed code follow the procedure below:
 
-Once the issue is created open a PR to skip the failing tests. Once this PR is merged you can rebase your PR on top of it.
-
-
-[float]
-=== Nitpicking
-
-Nitpicking is when a reviewer identifies trivial and unimportant details in a pull request and asks the author to change them. This is a completely subjective category that is impossible to define universally, and it's equally impractical to define a blanket policy on nitpicking that everyone will be happy with.
-
-Reviewers should feel comfortable giving any feedback they have on a pull request regardless of how trivial it is. Authors should feel equally comfortable passing on feedback that they think is trivial and inconsequential.
-
-Often, reviewers have an opinion about whether the feedback they are about to give is a nitpick or not. While not required, it can be really helpful to identify that feedback as such, for example "nit: a newline after this would be helpful". This helps the author understand your intention.
-
-
-[float]
-=== Handling disagreements
-
-Conflicting opinions between reviewers and authors happen, and sometimes it is hard to reconcile those opinions. Ideally folks can work together in the spirit of these guidelines toward a consensus, but if that doesn't work out it may be best to bring a third person into the discussion. Our pull requests generally have two reviewers, so an appropriate third person may already be obvious. Otherwise, reach out to the functional area that is most appropriate or to technical leadership if an area isn't obvious.
-
-
-[float]
-=== Inappropriate review feedback
-
-Whether or not a bit of feedback is appropriate for a pull request is often dependent on the motivation for giving the feedback in the first place.
-
-_Demanding_ an author make changes based primarily on the mindset of "how would I write this code?" isn't appropriate. The reviewer didn't write the code, and their critical purpose in the review process is not to craft the contribution into a form that is simply whatever they would have written if they had. If a reviewer wants to provide this type of feedback, they should qualify it as a "nit" as mentioned in the nitpicking section above to make it clear that the author can take it or leave it.
-
-Inflammatory feedback such as "this is crap" isn't feedback at all. It's both mean and unhelpful, and it is never appropriate.
-
-
-[float]
-=== A checklist
-
-Establishing a comprehensive checklist for all of the things that should happen in all possible pull requests is impractical, but that doesn't mean we lack a concrete set of minimum requirements that we can enumerate. The following items should be double checked for any pull request:
-
-* CLA check passes
-* Jenkins job runs and passes. If unrelated tests are failing, see the above section on flaky tests. It is everyone's job to keep the build green.
-* Adheres to the spirit of our various styleguides
-* Has thorough unit test coverage
-* Automated tests provide high confidence the change continues to work without manual verification
-* Appropriate product documentation is included (asciidocs)
-* Sufficient security protections are in place where appropriate, particularly when rendering API responses, parsing expressions, compiling URLs, loading external content, or redirecting
-* PR title summarizes the change (no "fixes bug number 123")
-* PR description includes:
-** A detailed summary of what changed
-** The motivation for the change
-** A link to each issue that is closed by the PR (e.g. Closes #123)
+1. Create an issue using the "Flaky Test" github issue template with the "Flaky Test" label attached.
+2. Create a PR to mute or fix the flaky test.
+3. Merge that PR and rebase off of it before continuing with the normal PR process for your original PR.
