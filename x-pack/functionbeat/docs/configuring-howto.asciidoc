@@ -20,7 +20,6 @@ The following topics describe how to configure {beatname_uc}:
 * <<configuring-ingest-node>>
 * <<configuration-path>>
 * <<setup-kibana-endpoint>>
-* <<configuration-dashboards>>
 * <<configuration-template>>
 * <<configuration-logging>>
 * <<using-environ-vars>>
