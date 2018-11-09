@@ -215,9 +215,12 @@ The index name to write events to. The default is
 +"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
-(see <<configuration-template>>). If you are using the pre-built Kibana
+(see <<configuration-template>>).
+ifndef::no_dashboards[]
+If you are using the pre-built Kibana
 dashboards, you also need to set the `setup.dashboards.index` option (see
 <<configuration-dashboards>>).
+endif::no_dashboards[]
 
 You can set the index dynamically by using a format string to access any event
 field. For example, this configuration uses a custom field, `fields.log_type`,
