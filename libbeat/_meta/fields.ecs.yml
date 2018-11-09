@@ -207,29 +207,58 @@
             IP address of the destination.
     
             Can be one or multiple IPv4 or IPv6 addresses.
-        - name: hostname
-          type: keyword
-          description: >
-            Hostname of the destination.
+
         - name: port
           type: long
           description: >
             Port of the destination.
+
         - name: mac
           type: keyword
           description: >
             MAC address of the destination.
+
         - name: domain
           type: keyword
           phase: 1
           description: >
             Destination domain.
-        - name: subdomain
-          type: keyword
-          phase: 1
-          description: >
-            Destination subdomain.
-    
+
+        - name: geo
+          type: group
+          description:
+            Geolocation for destination.
+          fields:
+          - name: continent_name
+            type: keyword
+            description: >
+              Name of the continent.
+
+          - name: country_iso_code
+            type: keyword
+            description: >
+              Country ISO code.
+
+          - name: location
+            type: geo_point
+            description: >
+              Longitude and latitude.
+
+          - name: region_name
+            type: keyword
+            description: >
+              Region name.
+
+          - name: city_name
+            type: keyword
+            description: >
+              City name.
+
+          - name: region_iso_code
+            type: keyword
+            description: >
+              Region ISO code.
+
     - name: device
       title: Device
       group: 2
@@ -940,7 +969,75 @@
     
             This id normally changes across restarts, but `service.id` does not.
           example: 8a4f500f
-    
+
+    - name: source
+      title: Source
+      description: >
+        Source fields describe details about the source of the event.
+
+      type: group
+      fields:
+      - name: ip
+        level: core
+        type: ip
+        description: >
+          IP address of the source.
+
+          Can be one or multiple IPv4 or IPv6 addresses.
+
+      - name: port
+        level: core
+        type: long
+        description: >
+          Port of the source.
+
+      - name: mac
+        level: core
+        type: keyword
+        description: >
+          MAC address of the source.
+
+      - name: domain
+        level: core
+        type: keyword
+        description: >
+          Source domain.
+
+      - name: geo
+        type: group
+        description:
+          Geolocation for source.
+        fields:
+        - name: continent_name
+          type: keyword
+          description: >
+            Name of the continent.
+
+        - name: country_iso_code
+          type: keyword
+          description: >
+            Country ISO code.
+
+        - name: location
+          type: geo_point
+          description: >
+            Longitude and latitude.
+
+        - name: region_name
+          type: keyword
+          description: >
+            Region name.
+
+        - name: city_name
+          type: keyword
+          description: >
+            City name.
+
+        - name: region_iso_code
+          type: keyword
+          description: >
+            Region ISO code.
+
     - name: url
       title: URL
       description: >

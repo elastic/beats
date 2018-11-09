@@ -103,12 +103,6 @@
     type: group
     description: Source that triggered the event.
     fields:
-    - name: ip
-      type: ip
-      description: The remote address.
-    - name: port
-      type: keyword
-      description: The port number.
     - name: hostname
       type: keyword
       description: Hostname of the source.
