@@ -192,6 +192,8 @@ services:
 
   traefik:
     build: ./module/traefik/_meta
+    ports:
+     - 8080
 
   uwsgi_tcp:
     build: ./module/uwsgi/_meta

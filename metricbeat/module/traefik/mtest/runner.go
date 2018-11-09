@@ -17,11 +17,13 @@
 
 package mtest
 
-// GetConfig for Traefik
-func GetConfig(metricset string, host string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "traefik",
-		"metricsets": []string{metricset},
-		"hosts":      []string{host},
+import (
+	"github.com/elastic/beats/libbeat/tests/compose"
+)
+
+var (
+	Runner = compose.TestRunner{
+		Service:  "traefik",
+		Parallel: true,
 	}
-}
+)
