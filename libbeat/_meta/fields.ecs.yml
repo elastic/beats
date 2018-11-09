@@ -313,6 +313,46 @@
                 City name.
               example: Montreal
 
+        - name: user
+          title: User
+          group: 2
+          description: >
+            The user fields describe information about the user that is relevant
+            to  the event. Fields can have one entry or multiple entries. If a
+            user has more than one id, provide an array that includes all of
+            them.
+          type: group
+          fields:
+
+            - name: id
+              level: core
+              type: keyword
+              description: >
+                One or multiple unique identifiers of the user.
+
+            - name: name
+              level: core
+              type: keyword
+              description: >
+                Name of the user.
+
+                The field is a keyword, and will not be tokenized.
+
+            - name: email
+              level: extended
+              type: keyword
+              description: >
+                User email address.
+
+            - name: hash
+              level: extended
+              type: keyword
+              description: >
+                Unique user hash to correlate information for a user in anonymized form.
+
+                Useful if `user.id` or `user.name` contain confidential information and
+                cannot be used.
+
     - name: device
       title: Device
       group: 2
@@ -921,6 +961,46 @@
               description: >
                 Operating system kernel version as a raw string.
 
+        - name: user
+          title: User
+          group: 2
+          description: >
+            The user fields describe information about the user that is relevant
+            to  the event. Fields can have one entry or multiple entries. If a
+            user has more than one id, provide an array that includes all of
+            them.
+          type: group
+          fields:
+
+            - name: id
+              level: core
+              type: keyword
+              description: >
+                One or multiple unique identifiers of the user.
+
+            - name: name
+              level: core
+              type: keyword
+              description: >
+                Name of the user.
+
+                The field is a keyword, and will not be tokenized.
+
+            - name: email
+              level: extended
+              type: keyword
+              description: >
+                User email address.
+
+            - name: hash
+              level: extended
+              type: keyword
+              description: >
+                Unique user hash to correlate information for a user in anonymized form.
+
+                Useful if `user.id` or `user.name` contain confidential information and
+                cannot be used.
+
     - name: log
       title: Log
       description: >
@@ -1355,6 +1435,46 @@
               description: >
                 City name.
               example: Montreal
+
+        - name: user
+          title: User
+          group: 2
+          description: >
+            The user fields describe information about the user that is relevant
+            to  the event. Fields can have one entry or multiple entries. If a
+            user has more than one id, provide an array that includes all of
+            them.
+          type: group
+          fields:
+
+            - name: id
+              level: core
+              type: keyword
+              description: >
+                One or multiple unique identifiers of the user.
+
+            - name: name
+              level: core
+              type: keyword
+              description: >
+                Name of the user.
+
+                The field is a keyword, and will not be tokenized.
+
+            - name: email
+              level: extended
+              type: keyword
+              description: >
+                User email address.
+
+            - name: hash
+              level: extended
+              type: keyword
+              description: >
+                Unique user hash to correlate information for a user in anonymized form.
+
+                Useful if `user.id` or `user.name` contain confidential information and
+                cannot be used.
 
     - name: url
       title: URL
