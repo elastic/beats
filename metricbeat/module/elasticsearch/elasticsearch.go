@@ -391,3 +391,24 @@ func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr,
 
 	return common.MapStr(v), nil
 }
+
+// IsCCRAvailable returns whether CCR is available or not, depending on the current license
+func IsCCRAvailable(http *helper.HTTP, resetURI string) (isAvailable bool, currentLicense string, err error) {
+	license, err := GetLicense(http, resetURI)
+	if err != nil {
+		return false, "", errors.Wrap(err, "error determining Elasticsearch license")
+	}
+
+	licenseType, err := license.GetValue("type")
+	if err != nil {
+		return false, "", errors.Wrap(err, "error determining Elasticsearch license type")
+	}
+
+	currentLicense, ok := licenseType.(string)
+	if !ok {
+		return false, "", fmt.Errorf("error determining Elasticsearch license type")
+	}
+
+	isAvailable = currentLicense == "trial" || currentLicense == "platinum"
+	return
+}

@@ -19,6 +19,7 @@ package ccr
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -41,6 +42,7 @@ const (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*elasticsearch.MetricSet
+	lastCCRLicenseMessageTimestamp time.Time
 }
 
 // New create a new instance of the MetricSet
@@ -56,7 +58,30 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch gathers stats for each follower shard from the _ccr/stats API
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+ccrStatsPath)
+	// CCR is only available in Trial or Platinum license of Elasticsearch. So we check
+	// the license first.
+	resetURI := m.HostData().SanitizedURI + ccrStatsPath
+	isCCRAvailable, currentLicense, err := elasticsearch.IsCCRAvailable(m.HTTP, resetURI)
+	if err != nil {
+		err = errors.Wrap(err, "error determining if CCR is available")
+		elastic.ReportAndLogError(err, r, m.Log)
+		return
+	}
+
+	if !isCCRAvailable {
+		// Just log
+		const errorMsg = "the CCR feature is available with a %v Elasticsearch license. " +
+			"You currently have a %v license. " +
+			"Either upgrade your license or remove the ccr metricset from your Elasticsearch module configuration."
+		err = fmt.Errorf(errorMsg, "platinum", currentLicense)
+		if time.Since(m.lastCCRLicenseMessageTimestamp) > 1*time.Minute {
+			elastic.ReportAndLogError(err, r, m.Log)
+			m.lastCCRLicenseMessageTimestamp = time.Now()
+		}
+		return
+	}
+
+	isMaster, err := elasticsearch.IsMaster(m.HTTP, resetURI)
 	if err != nil {
 		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 		elastic.ReportAndLogError(err, r, m.Log)
@@ -69,7 +94,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+ccrStatsPath)
+	info, err := elasticsearch.GetInfo(m.HTTP, resetURI)
 	if err != nil {
 		elastic.ReportAndLogError(err, r, m.Log)
 		return
