@@ -95,8 +95,47 @@
     - name: user_agent
       type: group
       fields:
+
       - name: os
         type: group
         fields:
         - name: full_name
           type: keyword
+
+# User agent field definitions below are temporary, until they make their way into ECS again.
+# See https://github.com/elastic/ecs/pull/172
+      - name: original
+        type: keyword
+        description: >
+          Unparsed version of the user_agent.
+
+      - name: device
+        type: keyword
+        description: >
+          Name of the physical device.
+
+      - name: version
+        type: keyword
+        description: >
+          Version of the physical device.
+
+      - name: major
+        type: long
+        description: >
+          Major version of the user agent.
+
+      - name: minor
+        type: long
+        description: >
+          Minor version of the user agent.
+
+      - name: patch
+        type: keyword
+        description: >
+          Patch version of the user agent.
+
+      - name: name
+        type: keyword
+        example: Chrome
+        description: >
+          Name of the user agent.
