@@ -98,5 +98,28 @@ list of log groups. If `type` is `sqs`, specify a list of Amazon Resource Names
 ==== `filter_pattern`
 
 A regular expression that matches the events you want to collect. Setting this
-option may reduce execution costs because the function running the Beat
-only executes if there is data that matches the pattern.
+option may reduce execution costs because the function only executes if there is
+data that matches the pattern.
+
+[float]
+[id="{beatname_lc}-concurrency"]
+==== `concurrency`
+
+The reserved number of instances for the function.  Setting this option may
+reduce execution costs by limiting the number of functions that can execute in
+your serverless environment. The default is unreserved.
+
+[float]
+[id="{beatname_lc}-memory-size"]
+==== `memory_size`
+
+The maximum amount of memory to allocate for this function. Specify a value that
+is a factor of 64. There is a hard limit of 3008 MiB for each function. The
+default is 128 MiB.
+
+[float]
+[id="{beatname_lc}-dead-letter-config"]
+==== `dead_letter_config.target_arn`
+
+The dead letter queue to use for messages that can't be processed successfully.
+Set this option to an ARN that points to an SQS queue. 
