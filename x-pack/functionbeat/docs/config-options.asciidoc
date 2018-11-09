@@ -29,7 +29,7 @@ the events to {es}.
     description: "lambda function for cloudwatch logs"
     triggers:
       - log_group_name: /aws/lambda/my-lambda-function
-        filter_pattern: mylog_
+        #filter_pattern: mylog_
   - name: sqs
     enabled: true
     type: sqs
@@ -93,10 +93,10 @@ triggers depends on the `type`. If `type` is `cloudwatch_logs` logs, specify a
 list of log groups. If `type` is `sqs`, specify a list of Amazon Resource Names
 (ARNs). 
 
-You can also set up triggers for Kinesis and API Gateway, but they are not
-currently supported as {beatname_uc} configuration options. You must create them
-manually by using the Lambda console in AWS after deploying the function of
-AWS.
+[float]
+[id="{beatname_lc}-filter_pattern"]
+==== `filter_pattern`
 
-// REVIEWERS: I have not verified this and I don't know if it's true. Is it
-// correct?
+A regular expression that matches the events you want to collect. Setting this
+option may reduce execution costs because the function running the Beat
+only executes if there is data that matches the pattern.

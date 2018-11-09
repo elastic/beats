@@ -109,9 +109,6 @@ events from CloudWatch Logs and forwards the events to {es}.
 output.elasticsearch:
   cloud.id: "MyESDeployment:SomeLongString=="
   cloud.auth: "elastic:SomeLongString"
-processors:
-  - add_host_metadata: ~
-  - add_cloud_metadata: ~
 -------------------------------------------------------------------------------------
 
 To configure {beatname_uc}:
