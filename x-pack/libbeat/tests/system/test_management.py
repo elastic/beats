@@ -44,7 +44,7 @@ class TestManagement(BaseTest):
 
     def test_enroll_bad_pw(self):
         """
-        Enroll the beat in Kibana Central Management
+        Try to enroll the beat in Kibana Central Management with a bad password
         """
         # We don't care about this as it will be replaced by enrollment
         # process:
