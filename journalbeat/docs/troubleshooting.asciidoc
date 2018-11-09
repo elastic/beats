@@ -4,8 +4,6 @@
 [partintro]
 --
 
-IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
-
 If you have issues installing or running {beatname_uc}, read the
 following tips:
 
