@@ -19,9 +19,6 @@ and binary code required to run {beatname_uc} in your serverless environment.
 To download and extract the package, use the commands that work with your
 system.
 
-// REVIEWERS: will the download path include x-path? In BC2, it's 
-// https://staging.elastic.co/6.5.0-92a7b7db/downloads/beats/x-pack/functionbeat/functionbeat-6.5.0-windows-x86_64.zip
-
 [[linux]]
 *linux:*
 
@@ -35,7 +32,7 @@ ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/x-pack/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
 tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
 ------------------------------------------------
 
@@ -54,7 +51,7 @@ ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/x-pack/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
 tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
