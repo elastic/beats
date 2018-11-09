@@ -230,7 +230,7 @@
           "suricata.eve.src_port",
           "suricata.eve.dest_ip",
           "suricata.eve.dest_port",
-          "source_ecs.geo.country_iso_code",
+          "source.geo.country_iso_code",
           "destination.geo.country_iso_code"
         ],
         "description": "",
