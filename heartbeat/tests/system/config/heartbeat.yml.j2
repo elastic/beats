@@ -29,6 +29,14 @@ heartbeat.monitors:
     {% endfor %}
   {% endif -%}
 
+
+  {%- if monitor.check_response_json is defined %}
+  check.response.json:
+    {%- for check in monitor.check_response_json %}
+    - {{check}}
+    {% endfor %}
+  {% endif -%}
+
   {%- if monitor.fields is defined %}
   {% if monitor.fields_under_root %}fields_under_root: true{% endif %}
   fields:
