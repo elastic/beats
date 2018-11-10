@@ -172,6 +172,8 @@ services:
 
   rabbitmq:
     build: ./module/rabbitmq/_meta
+    ports:
+      - 15672
 
   redis:
     extends:

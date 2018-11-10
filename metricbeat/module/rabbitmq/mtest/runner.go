@@ -15,32 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
-
-package connection
+package mtest
 
 import (
-	"testing"
-
 	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
 )
 
-func TestConnection(t *testing.T) {
-	mtest.Runner.Run(t, compose.Suite{
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
-			err := mbtest.WriteEvents(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
-	})
-}
-
-func getConfig(host string) map[string]interface{} {
-	config := mtest.GetIntegrationConfig(host)
-	config["metricsets"] = []string{"connection"}
-	return config
-}
+var (
+	Runner = compose.TestRunner{
+		Service:  "rabbitmq",
+		Parallel: true,
+	}
+)

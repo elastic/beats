@@ -27,19 +27,20 @@ import (
 	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
 )
 
-func TestData(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "rabbitmq")
-
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
+func TestNode(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Data": func(t *testing.T, r compose.R) {
+			ms := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+			err := mbtest.WriteEventsReporterV2(ms, t, "")
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }
 
-func getConfig() map[string]interface{} {
-	config := mtest.GetIntegrationConfig()
+func getConfig(host string) map[string]interface{} {
+	config := mtest.GetIntegrationConfig(host)
 	config["metricsets"] = []string{"node"}
 	return config
 }

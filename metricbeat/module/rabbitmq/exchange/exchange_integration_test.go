@@ -28,23 +28,24 @@ import (
 	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
 )
 
-func TestData(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "rabbitmq")
-
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEventsCond(f, t, func(e common.MapStr) bool {
-		hasIn, _ := e.HasKey("messages.publish_in")
-		hasOut, _ := e.HasKey("messages.publish_out")
-		return hasIn && hasOut
+func TestExchange(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
+			err := mbtest.WriteEventsCond(f, t, func(e common.MapStr) bool {
+				hasIn, _ := e.HasKey("messages.publish_in")
+				hasOut, _ := e.HasKey("messages.publish_out")
+				return hasIn && hasOut
+			})
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
 	})
-	if err != nil {
-		t.Fatal("write", err)
-	}
 }
 
-func getConfig() map[string]interface{} {
-	config := mtest.GetIntegrationConfig()
+func getConfig(host string) map[string]interface{} {
+	config := mtest.GetIntegrationConfig(host)
 	config["metricsets"] = []string{"exchange"}
 	return config
 }
