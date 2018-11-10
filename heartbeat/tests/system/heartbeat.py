@@ -8,6 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(
     __file__), '../../../libbeat/tests/system'))
 
 from beat.beat import TestCase
+from time import sleep
 
 
 class BaseTest(TestCase):
@@ -19,12 +20,15 @@ class BaseTest(TestCase):
             os.path.join(os.path.dirname(__file__), "../../"))
         super(BaseTest, self).setUpClass()
 
-    def start_server(self, content, status_code):
+    def start_server(self, content, status_code, **kwargs):
         class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             def do_GET(self):
                 self.send_response(status_code)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
+                if "write_delay" in kwargs:
+                    sleep(float(kwargs["write_delay"]))
+
                 self.wfile.write(content)
 
         server = BaseHTTPServer.HTTPServer(('localhost', 0), HTTPHandler)
