@@ -103,9 +103,6 @@
     type: group
     description: Source that triggered the event.
     fields:
-    - name: hostname
-      type: keyword
-      description: Hostname of the source.
     - name: path
       type: keyword
       description: This is the path associated with a unix socket.
