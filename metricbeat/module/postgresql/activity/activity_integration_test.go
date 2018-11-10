@@ -25,56 +25,44 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/postgresql"
+	"github.com/elastic/beats/metricbeat/module/postgresql/mtest"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFetch(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "postgresql")
+func TestActivity(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, mtest.GetConfig("activity", r.Host()))
+			events, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	events, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+			assert.True(t, len(events) > 0)
+			event := events[0]
 
-	assert.True(t, len(events) > 0)
-	event := events[0]
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+			// Check event fields
+			assert.Contains(t, event, "database")
+			db_oid := event["database"].(common.MapStr)["oid"].(int64)
+			assert.True(t, db_oid > 0)
 
-	// Check event fields
-	assert.Contains(t, event, "database")
-	db_oid := event["database"].(common.MapStr)["oid"].(int64)
-	assert.True(t, db_oid > 0)
+			assert.Contains(t, event, "pid")
+			assert.True(t, event["pid"].(int64) > 0)
 
-	assert.Contains(t, event, "pid")
-	assert.True(t, event["pid"].(int64) > 0)
+			assert.Contains(t, event, "user")
+			assert.Contains(t, event["user"].(common.MapStr), "name")
+			assert.Contains(t, event["user"].(common.MapStr), "id")
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, mtest.GetConfig("activity", r.Host()))
 
-	assert.Contains(t, event, "user")
-	assert.Contains(t, event["user"].(common.MapStr), "name")
-	assert.Contains(t, event["user"].(common.MapStr), "id")
-}
-
-func TestData(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "postgresql")
-	f := mbtest.NewEventsFetcher(t, getConfig())
-
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "postgresql",
-		"metricsets": []string{"activity"},
-		"hosts":      []string{postgresql.GetEnvDSN()},
-		"username":   postgresql.GetEnvUsername(),
-		"password":   postgresql.GetEnvPassword(),
-	}
+			err := mbtest.WriteEvents(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }

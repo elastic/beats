@@ -15,18 +15,35 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package postgresql
+package mtest
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
-func GetEnvDSN() string {
-	return os.Getenv("POSTGRESQL_DSN")
+const (
+	defaultUsername = "postgres"
+)
+
+func GetConfig(metricset, host string) map[string]interface{} {
+	dsn := fmt.Sprintf("postgres://%s?sslmode=disable", host)
+	return map[string]interface{}{
+		"module":     "postgresql",
+		"metricsets": []string{metricset},
+		"hosts":      []string{dsn},
+		"username":   getEnvUsername(),
+		"password":   getEnvPassword(),
+	}
 }
 
-func GetEnvUsername() string {
-	return os.Getenv("POSTGRESQL_USERNAME")
+func getEnvUsername() string {
+	if username := os.Getenv("POSTGRESQL_USERNAME"); len(username) > 0 {
+		return username
+	}
+	return defaultUsername
 }
 
-func GetEnvPassword() string {
+func getEnvPassword() string {
 	return os.Getenv("POSTGRESQL_PASSWORD")
 }

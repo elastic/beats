@@ -166,6 +166,8 @@ services:
 
   postgresql:
     build: ./module/postgresql/_meta
+    ports:
+      - 5432
 
   prometheus:
     build: ./module/prometheus/_meta
