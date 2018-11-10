@@ -1,91 +1,184 @@
 [[configuration-central-management]]
-== Central Management
+[role="xpack"]
+= {beats} central management
+
+++++
+<titleabbrev>Central management</titleabbrev>
+++++
+
+[partintro]
+--
 
 beta[]
 
 [WARNING]
 =======================================
-It's important to understand that when using Central Management, Beats
-configurations are stored centrally in Elasticsearch. If Elasticsearch
-or Kibana are compromised, the attacker can leverage that to define
-configurations to attack the infrastructure where they are running.
+When you use central management, configurations are stored centrally in {es}. To
+prevent an attacker from leveraging the configurations to attack your
+infrastructure, you must {stack-ov}/elasticsearch-security.html[secure {es} and
+{kib}] before using central management.
 =======================================
 
-Beats Central Management provides with a way to manage all beats from
-Kibana, allowing you to quickly deploy configuration changes to all
-running Beats.
+{beats} central management provides a way to define and manage configurations in
+a central location in {kib} and quickly deploy configuration changes to all
+{beats} running across your enterprise. 
+
+To learn more, see <<how-central-managment-works>>.
+
+To use central management, <<enroll-beats,enroll your {beats}>>, then use
+the {cm-ui} UI in {kib} to create and apply the configurations.
+
+--
+
+[[how-central-managment-works]]
+[role="xpack"]
+== How central management works
+
+{beats} central management uses a mechanism called configuration tags to group
+related configurations. You define configuration tags in the {cm-ui} UI in {kib}
+after <<enroll-beats,enrolling your first beat.>>
+
+A _configuration tag_ is a group of configuration blocks that you can apply to
+one or more {beats}. A tag can have configuration blocks for different types of
+{beats}. For example, you might have a tag called `development` that you use to
+group all configurations that are valid for running {beats} in your development
+environment. The `development` tag might have:
+
+* Two Metricbeat module configuration blocks: one that reads system metrics and
+another that reads metrics from Apache HTTP servers
+* Two Filebeat module configuration blocks: one that reads Apache HTTP server
+logs and another that reads system logs
+* One Elasticsearch output configuration block that sends the output to your
+{es} development cluster
+
+[role="screenshot"]
+image::./images/configuration-blocks.png[Screen showing configuration blocks in a tag]
+
+You apply the tag to any {beats} that will use the configurations defined in the
+tag.
+
+[role="screenshot"]
+image::./images/enrolled-beats.png[Screen showing {beats} with tags applied]
+
+When the enrolled {beats} run, each Beat uses the configuration blocks that are
+valid for its type.
+
+You can add, modify, or remove configuration blocks from a tag. Any changes that
+you make to the configuration blocks in a tag are automatically applied to all
+{beats} that have that tag.
+
+You can add or remove tags to change the set of configuration blocks applied to
+your {beats}. For example, after you've tested configurations in your
+`development` environment, you can remove the `development` tag and add a
+`production` tag that has an {es} output configuration block for sending the
+data to your production cluster.
+
+[role="screenshot"]
+image::./images/enrolled-beats-dev-prod.png[Screen showing {beats} with development and production tags applied]
+
+You can apply multiple tags to a Beat. For example, instead of defining the
+apache modules under the `development` tag as described earlier, you could
+create a separate tag called `apache` that contains the Apache module
+configurations, then apply the tag to all {beats} running on Apache servers.
+This would enable you to maintain your Apache module configurations under a
+single tag, while also using a `development` tag to send output for some
+instances to your development cluster. 
+
+[role="screenshot"]
+image::./images/enrolled-beats-apache.png[Screen showing {beats} with multiple tags]
+
+You can apply as many tags as you need. Just keep in mind that the
+configurations for all assigned tags are merged, which means that you should not
+specify conflicting configurations. If there are errors in the configuration,
+you'll see an Error status in the {cm-ui} UI and need to look at the logs for
+the Beat to troubleshoot the problem. 
+
+[[enroll-beats]]
+== Enroll {beats} in central management
+
+You need to enroll {beats} to register them in
+<<configuration-central-management,central management>> and establish
+trust. Enrolled {beats} will have the credentials needed to retrieve
+configurations from {kib}.
+
+During the enrollment process:
+
+ . The Beat contacts {kib} and tries to register
+ . {kib} registers the Beat instance and returns an access token
+ for configuration polling
+ . The enroll command creates a backup of your configuration and then
+ **overwrites the current settings** so they can be managed centrally
+ 
+To enroll {beats}, use either <<token-based-enrollment,token-based>>
+or <<username-password-enrollment,username and password-based>> enrollment.
+
 
 [float]
 === Prerequisites
 
-In order to use Beats Central Management, https://www.elastic.co/guide/en/kibana/current/using-kibana-with-security.html[security must be enabled]
-in Kibana. This will ensure that only the users with enough access rights
-can access Beats configurations.
-
-Users with the role `beats_admin` will be able to use Central Management
-to enroll new Beats and manage their settings.
-
-[float]
-=== Beats enrollment
-
-Enrolling {beatname_uc} in Kibana will register it in Central Management and
-establish trust. Once done, {beatname_uc} will have the credentials to
-retrieve configurations from Kibana.
-
-During the enroll invokation this will happen:
-
- . {beatname_uc} will contact Kibana and try to register with the given method
- . Kibana will register this {beatname_uc} instance and return an access token for configurations polling
- . The enroll command will **overwrite your current settings**, as now they will be centrally managed (confirmation will be requested, also a backup copy is created)
-
-There are two ways to perform enrollment:
+* {kibana-ref}/using-kibana-with-security.html[Enable security] in {kib} to
+ensure that only users with sufficient privileges are able to access {beats}
+configurations. 
+* Assign the `beats_admin` role to any users who need to enroll {beats} or
+manage configuration settings in central management.
 
 [float]
-==== Token based enrollment
+[[token-based-enrollment]]
+=== Token-based enrollment
 
-This is the recommended way when manually enrolling {beatname_uc}. Go to Kibana
--> Management -> Beats and click on `Enroll Beat`. That will show the command
-to run in order to enroll {beatname_uc}. The command has this format:
+Token-based enrollment is recommended if you are enrolling {beats} manually.
+
+To use token-based enrollment, go to {kib} -> Management -> {beats} and click
+`Enroll Beat`. Select the Beat type and operating system, then copy and run the
+command for enrolling the Beat.
+
+The command has this format:
 
 ["source","shell",subs="attributes"]
 ----------------------------------------------------------------------
-{beatname_lc} enroll <kibana_url> <enrollment_token>
+{beatname_lc} enroll KIBANA_URL TOKEN
 ----------------------------------------------------------------------
 
-The enrollment token will expire as soon as it is used, next enroll will
-require to follow the same process to obtain a new token.
+*`KIBANA_URL`*::
+The URL of the {kib} instance you will use for central management.
+
+*`TOKEN`*::
+The enrollment token generated by the {cm-ui} UI. The enrollment token will
+expire as soon as it's used.
+
+Repeat this process to enroll additional {beats}.
 
 [float]
-==== Username and password based enrollment
+[[username-password-enrollment]]
+=== Username and password-based enrollment
 
-Enroll is also possible using username and password. This is the recommended way
-for scripted deploys:
+You can also enroll by specifying a username and password. This is the
+recommended way for scripted deploys:
 
 ["source","shell",subs="attributes"]
 ----------------------------------------------------------------------
-{beatname_lc} enroll <kibana_url>
+{beatname_lc} enroll KIBANA_URL --username USER --password METHOD [--force]
 ----------------------------------------------------------------------
 
-[float]
-==== Parameters
+*`--username USER`*::
+The username to use for password-based enrollment. The default
+username is `elastic`.
 
-This is the full list of paramaters for the `enroll` command:
+*`--password METHOD`*::
+The method to use for getting the password. Available options are:
 
-*`--username <user>`*::
-Use the given username when doing password based enrollment. Default username
-is `elastic`.
-
-*`--password <method>`*::
-Use the given method to introduce the password for enrollment, available options
-are (default is `stdin`):
-
- * `env:<VAR_NAME>` - Get the password from the environment variable `VAR_NAME`
- * `stdin` - Prompt the user for a password
+ * `env:VAR_NAME` gets the password from the environment variable `VAR_NAME`
+ * `stdin` prompts the user for a password. This is the default.
 
 *`--force`*::
-Do not ask for confirmation to overwrite current settings.
+Overwrites the current settings without asking for confirmation.
 
-[float]
-=== Configuration tags
+[[central-management-API]]
+== Enrollment API (not documented for beta)
 
-things
+Documentation about the enrollment API for {beats} central management is not yet
+available.
+
+// REVIEWERS: Thought it might be worth adding a container so users know that the
+// there is an API, but that it's not documented. I can comment this out if you
+// think it's a bad idea to show it here.
