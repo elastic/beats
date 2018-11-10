@@ -60,6 +60,16 @@ func TestConfigsMapping(t *testing.T) {
 			},
 			expected: []*common.Config{config},
 		},
+		// No condition
+		{
+			mapping: `
+- config:
+    - correct: config`,
+			event: bus.Event{
+				"foo": 3,
+			},
+			expected: []*common.Config{config},
+		},
 	}
 
 	for _, test := range tests {
