@@ -18,14 +18,12 @@ The following topics describe how to configure {beatname_uc}:
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
-* <<configuration-path>>
 * <<setup-kibana-endpoint>>
 * <<configuration-template>>
 * <<configuration-logging>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
 * <<regexp-support>>
-* <<http-endpoint>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -46,8 +44,6 @@ include::./filtering.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
 
-include::{libbeat-dir}/docs/shared-path-config.asciidoc[]
-
 include::{libbeat-dir}/docs/shared-kibana-config.asciidoc[]
 
 include::{libbeat-dir}/docs/setup-config.asciidoc[]
@@ -65,7 +61,5 @@ include::{libbeat-dir}/docs/yaml.asciidoc[]
 :allplatforms!:
 
 include::{libbeat-dir}/docs/regexp.asciidoc[]
-
-include::{libbeat-dir}/docs/http-endpoint.asciidoc[]
 
 include::{libbeat-dir}/docs/reference-yml.asciidoc[]

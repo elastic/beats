@@ -24,8 +24,10 @@ The directory layout of an installation is as follows:
 | logs   | The location for the logs created by {beatname_uc}. | {path.home}/logs | path.logs
 |=======================================================================
 
+ifndef::serverless[]
 You can change these settings by using CLI flags or setting
 <<configuration-path,path options>> in the configuration file.
+endif::serverless[]
 
 ==== Default paths
 
