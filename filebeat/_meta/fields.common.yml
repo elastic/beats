@@ -100,3 +100,12 @@
         fields:
         - name: full_name
           type: keyword
+
+  # Temporary fix to get 7.0 dashboards working
+    - name: fileset.name
+      type: alias
+      path: event.dataset
+
+    - name: fileset.module
+      type: alias
+      path: event.module
