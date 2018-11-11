@@ -20,11 +20,11 @@
 package collector
 
 import (
-	"os"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/prometheus/mtest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -32,54 +32,30 @@ import (
 // These tests are running with prometheus metrics as an example as this container is already available
 // Every prometheus exporter should work here.
 
-func TestFetch(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "prometheus")
+func TestCollector(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
+			event, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+			err := mbtest.WriteEvents(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }
 
-func TestData(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "prometheus")
-
-	f := mbtest.NewEventsFetcher(t, getConfig())
-
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "prometheus",
-		"metricsets": []string{"collector"},
-		"hosts":      []string{getPrometheusEnvHost() + ":" + getPrometheusEnvPort()},
-		"namespace":  "collector",
-	}
-}
-
-func getPrometheusEnvHost() string {
-	host := os.Getenv("PROMETHEUS_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func getPrometheusEnvPort() string {
-	port := os.Getenv("PROMETHEUS_PORT")
-
-	if len(port) == 0 {
-		port = "9090"
-	}
-	return port
+func getConfig(host string) map[string]interface{} {
+	config := mtest.GetConfig("collector", host)
+	config["namespace"] = "collector"
+	return config
 }

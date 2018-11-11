@@ -171,6 +171,8 @@ services:
 
   prometheus:
     build: ./module/prometheus/_meta
+    ports:
+      - 9090
 
   rabbitmq:
     build: ./module/rabbitmq/_meta
