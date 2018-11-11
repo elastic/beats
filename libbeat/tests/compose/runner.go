@@ -121,6 +121,9 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 		}
 		sort.Strings(vars)
 		desc := strings.Join(vars, ",")
+		if desc == "" {
+			desc = "WithoutVars"
+		}
 
 		seq := make([]byte, 16)
 		rand.Read(seq)
