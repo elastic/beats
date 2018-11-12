@@ -214,7 +214,7 @@ func (l *icmpLoop) ping(
 	count int,
 ) ([]PingResult, error) {
 	var err error
-	results := []PingResult
+	results := make([]PingResult, count)
 	doneSignal := make(chan struct{})
 	// results accepts first response received only
 	for c := 0; c < count; c++ {
