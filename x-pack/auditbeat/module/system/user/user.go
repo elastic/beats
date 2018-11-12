@@ -67,10 +67,17 @@ type User struct {
 	PasswordHashExcerpt string
 	UID                 uint32
 	GID                 uint32
+	Groups              []Group
 	UserInfo            string
 	Dir                 string
 	Shell               string
 	Action              string
+}
+
+// Group contains information about a group.
+type Group struct {
+	Name string
+	GID  uint32
 }
 
 // Hash creates a hash for User.
@@ -85,6 +92,12 @@ func (user User) Hash() uint64 {
 	h.WriteString(strconv.Itoa(int(user.GID)))
 	h.WriteString(user.Dir)
 	h.WriteString(user.Shell)
+
+	for _, group := range user.Groups {
+		h.WriteString(group.Name)
+		h.WriteString(strconv.Itoa(int(group.GID)))
+	}
+
 	return h.Sum64()
 }
 
@@ -106,6 +119,17 @@ func (user User) toMapStr() common.MapStr {
 
 	if !user.PasswordChanged.IsZero() {
 		evt.Put("password.last_changed", user.PasswordChanged)
+	}
+
+	if len(user.Groups) > 0 {
+		var groupMapStr []common.MapStr
+		for _, group := range user.Groups {
+			groupMapStr = append(groupMapStr, common.MapStr{
+				"name": group.Name,
+				"gid":  group.GID,
+			})
+		}
+		evt.Put("group", groupMapStr)
 	}
 
 	return evt

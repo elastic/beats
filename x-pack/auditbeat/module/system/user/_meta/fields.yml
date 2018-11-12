@@ -28,6 +28,19 @@
       type: text
       description: >
           General user information. On Linux, this is the gecos field.
+    - name: group
+      type: group
+      description: >
+        `group` contains information about any groups the user is part of (beyond the user's primary group).
+      fields:
+        - name: name
+          type: keyword
+          description: >
+              Group name.
+        - name: gid
+          type: integer
+          description: >
+              Group ID.
     - name: password
       type: group
       description: >

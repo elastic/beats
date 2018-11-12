@@ -8,12 +8,14 @@ package user
 
 // #include <sys/types.h>
 // #include <pwd.h>
+// #include <grp.h>
 // #include <shadow.h>
 import "C"
 
 import (
 	"github.com/pkg/errors"
 	"time"
+	"unsafe"
 )
 
 var (
@@ -22,9 +24,14 @@ var (
 
 // GetUsers retrieves a list of users using getpwent(3).
 func GetUsers() (users []*User, err error) {
+	gidToGroup, userToGroup, err := readGroupFile()
+	if err != nil {
+		return nil, err
+	}
+
 	shadowEntries, err := readShadowFile()
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting password change times")
+		return nil, err
 	}
 
 	C.setpwent()
@@ -56,6 +63,16 @@ func GetUsers() (users []*User, err error) {
 			user.PasswordType = "<redacted>"
 		}
 
+		primaryGroup, found := gidToGroup[user.GID]
+		if found {
+			user.Groups = append(user.Groups, primaryGroup)
+		}
+
+		secondaryGroups, found := userToGroup[user.Name]
+		if found {
+			user.Groups = append(user.Groups, secondaryGroups...)
+		}
+
 		shadow, found := shadowEntries[user.Name]
 		if found {
 			user.PasswordChanged = shadow.LastChanged
@@ -66,6 +83,51 @@ func GetUsers() (users []*User, err error) {
 	}
 
 	return users, nil
+}
+
+// readGroupFile reads /etc/group and returns two maps:
+// The first maps group IDs to groups.
+// The second maps group members (user names) to groups.
+// See getgrent(3) for details of the structs.
+func readGroupFile() (map[uint32]Group, map[string][]Group, error) {
+	C.setgrent()
+	defer C.endgrent()
+
+	groupIdMap := make(map[uint32]Group)
+	groupMemberMap := make(map[string][]Group)
+	for cgroup, err := C.getgrent(); cgroup != nil; cgroup, err = C.getgrent() {
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "error while reading group file")
+		}
+
+		groupName := C.GoString(cgroup.gr_name)
+		gid := uint32(cgroup.gr_gid)
+
+		group := Group{
+			Name: groupName,
+			GID:  gid,
+		}
+
+		groupIdMap[gid] = group
+
+		/*
+			group.gr_mem is a NULL-terminated array of pointers to user names (char **)
+			which makes some pointer arithmetic necessary to read it.
+		*/
+		for i := 0; ; i++ {
+			offset := (unsafe.Sizeof(unsafe.Pointer(*cgroup.gr_mem)) * uintptr(i))
+			member := *(**C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(cgroup.gr_mem)) + offset))
+
+			if member == nil {
+				break
+			}
+
+			groupMember := C.GoString(member)
+			groupMemberMap[groupMember] = append(groupMemberMap[groupMember], group)
+		}
+	}
+
+	return groupIdMap, groupMemberMap, nil
 }
 
 // shadowFileEntry represents an entry in /etc/shadow. See getspnam(3) for details.
