@@ -1,4 +1,4 @@
-- key: http
+- key: http-monitor
   title: "HTTP monitor"
   description:
   fields:

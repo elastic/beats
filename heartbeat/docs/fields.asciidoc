@@ -18,7 +18,7 @@ grouped in the following categories:
 * <<exported-fields-docker-processor>>
 * <<exported-fields-ecs>>
 * <<exported-fields-http>>
-* <<exported-fields-http>>
+* <<exported-fields-http-monitor>>
 * <<exported-fields-icmp>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-resolve>>
@@ -2535,7 +2535,7 @@ http version.
 
 --
 
-[[exported-fields-http]]
+[[exported-fields-http-monitor]]
 == HTTP monitor fields
 
 None
