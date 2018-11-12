@@ -34,6 +34,7 @@ paths in single quotation marks (see <<wrap-paths-in-quotes>>).
 
 Also see the general advice under <<yaml-tips>>.
 
+ifndef::only-elasticsearch[]
 [float]
 [[connection-problem]]
 === Logstash connection doesn't work?
@@ -54,7 +55,9 @@ telnet <hostname or IP> 5044
 input plugin for Logstash] is installed and configured. Note that Beats will not
 connect to the Lumberjack input plugin. To learn how to install and update
 plugins, see {logstash-ref}/working-with-plugins.html[Working with plugins].
+endif::only-elasticsearch[]
 
+ifndef::only-elasticsearch[]
 [float]
 [[metadata-missing]]
 === @metadata is missing in Logstash?
@@ -64,7 +67,9 @@ queue (for example, Redis or Kafka), the `@metadata` field will not be available
 
 TIP: To preserve `@metadata` fields, use the Logstash mutate filter with the rename setting to rename the fields to
 non-internal fields.
+endif::only-elasticsearch[]
 
+ifndef::only-elasticsearch[]
 [float]
 [[diff-logstash-beats]]
 === Difference between Logstash and Beats?
@@ -77,7 +82,9 @@ and transforming data from a variety of sources.
 
 For more information, see the https://www.elastic.co/guide/en/logstash/current/introduction.html[Logstash Introduction] and
 the https://www.elastic.co/guide/en/beats/libbeat/current/beats-reference.html[Beats Overview].
+endif::only-elasticsearch[]
 
+ifndef::only-elasticsearch[]
 [float]
 [[ssl-client-fails]]
 === SSL client fails to connect to Logstash?
@@ -142,6 +149,7 @@ This is not a SSL problem. Make sure that Logstash is running and that there is 
 
 A firewall is refusing the connection. Check if a firewall is blocking the traffic on the client, the network, or the
 destination host.
+endif::only-elasticsearch[]
 
 [float]
 [[monitoring-shows-fewer-than-expected-beats]]
