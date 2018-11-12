@@ -44,23 +44,6 @@ const (
 	eventActionPasswordChanged = "password_changed"
 )
 
-func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
-		mb.DefaultMetricSet(),
-	)
-}
-
-// MetricSet collects data about a system's users.
-type MetricSet struct {
-	mb.BaseMetricSet
-	config     Config
-	log        *logp.Logger
-	cache      *cache.Cache
-	bucket     datastore.Bucket
-	lastState  time.Time
-	lastChange time.Time
-}
-
 // User represents a user. Fields according to getpwent(3).
 type User struct {
 	Name                string
@@ -137,6 +120,23 @@ func (user User) toMapStr() common.MapStr {
 	return evt
 }
 
+func init() {
+	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+		mb.DefaultMetricSet(),
+	)
+}
+
+// MetricSet collects data about a system's users.
+type MetricSet struct {
+	mb.BaseMetricSet
+	config     Config
+	log        *logp.Logger
+	cache      *cache.Cache
+	bucket     datastore.Bucket
+	lastState  time.Time
+	lastChange time.Time
+}
+
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
@@ -188,57 +188,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms.cache.DiffAndUpdateCache(convertToCacheable(users))
 
 	return ms, nil
-}
-
-// restoreUsersFromDisk loads the user cache from disk.
-func (ms *MetricSet) restoreUsersFromDisk() (users []*User, err error) {
-	var decoder *gob.Decoder
-	err = ms.bucket.Load(bucketKeyUsers, func(blob []byte) error {
-		if len(blob) > 0 {
-			buf := bytes.NewBuffer(blob)
-			decoder = gob.NewDecoder(buf)
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if decoder != nil {
-		for {
-			user := new(User)
-			err = decoder.Decode(user)
-			if err == nil {
-				users = append(users, user)
-			} else if err == io.EOF {
-				// Read all users
-				break
-			} else {
-				return nil, errors.Wrap(err, "error decoding users")
-			}
-		}
-	}
-
-	return users, nil
-}
-
-// Save user cache to disk.
-func (ms *MetricSet) saveUsersToDisk(users []*User) error {
-	var buf bytes.Buffer
-	encoder := gob.NewEncoder(&buf)
-
-	for _, user := range users {
-		err := encoder.Encode(*user)
-		if err != nil {
-			return errors.Wrap(err, "error encoding users")
-		}
-	}
-
-	err := ms.bucket.Store(bucketKeyUsers, buf.Bytes())
-	if err != nil {
-		return errors.Wrap(err, "error writing users to disk")
-	}
-	return nil
 }
 
 // Close cleans up the MetricSet when it finishes.
@@ -302,38 +251,6 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	}
 
 	return ms.saveUsersToDisk(users)
-}
-
-// haveFilesChanged checks if any of the relevant files (/etc/passwd, /etc/shadow, /etc/group)
-// have changed.
-func haveFilesChanged(since time.Time) (bool, error) {
-	const passwdFile = "/etc/passwd"
-	const shadowFile = "/etc/shadow"
-	const groupFile = "/etc/group"
-
-	var stats syscall.Stat_t
-	if err := syscall.Stat(passwdFile, &stats); err != nil {
-		return true, errors.Wrapf(err, "failed to stat %v", passwdFile)
-	}
-	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
-		return true, nil
-	}
-
-	if err := syscall.Stat(shadowFile, &stats); err != nil {
-		return true, errors.Wrapf(err, "failed to stat %v", shadowFile)
-	}
-	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
-		return true, nil
-	}
-
-	if err := syscall.Stat(groupFile, &stats); err != nil {
-		return true, errors.Wrapf(err, "failed to stat %v", groupFile)
-	}
-	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
-		return true, nil
-	}
-
-	return false, nil
 }
 
 // reportChanges detects and reports any changes to users on this system since the last call.
@@ -428,4 +345,87 @@ func convertToCacheable(users []*User) []cache.Cacheable {
 	}
 
 	return c
+}
+
+// restoreUsersFromDisk loads the user cache from disk.
+func (ms *MetricSet) restoreUsersFromDisk() (users []*User, err error) {
+	var decoder *gob.Decoder
+	err = ms.bucket.Load(bucketKeyUsers, func(blob []byte) error {
+		if len(blob) > 0 {
+			buf := bytes.NewBuffer(blob)
+			decoder = gob.NewDecoder(buf)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if decoder != nil {
+		for {
+			user := new(User)
+			err = decoder.Decode(user)
+			if err == nil {
+				users = append(users, user)
+			} else if err == io.EOF {
+				// Read all users
+				break
+			} else {
+				return nil, errors.Wrap(err, "error decoding users")
+			}
+		}
+	}
+
+	return users, nil
+}
+
+// Save user cache to disk.
+func (ms *MetricSet) saveUsersToDisk(users []*User) error {
+	var buf bytes.Buffer
+	encoder := gob.NewEncoder(&buf)
+
+	for _, user := range users {
+		err := encoder.Encode(*user)
+		if err != nil {
+			return errors.Wrap(err, "error encoding users")
+		}
+	}
+
+	err := ms.bucket.Store(bucketKeyUsers, buf.Bytes())
+	if err != nil {
+		return errors.Wrap(err, "error writing users to disk")
+	}
+	return nil
+}
+
+// haveFilesChanged checks if any of the relevant files (/etc/passwd, /etc/shadow, /etc/group)
+// have changed.
+func haveFilesChanged(since time.Time) (bool, error) {
+	const passwdFile = "/etc/passwd"
+	const shadowFile = "/etc/shadow"
+	const groupFile = "/etc/group"
+
+	var stats syscall.Stat_t
+	if err := syscall.Stat(passwdFile, &stats); err != nil {
+		return true, errors.Wrapf(err, "failed to stat %v", passwdFile)
+	}
+	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
+		return true, nil
+	}
+
+	if err := syscall.Stat(shadowFile, &stats); err != nil {
+		return true, errors.Wrapf(err, "failed to stat %v", shadowFile)
+	}
+	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
+		return true, nil
+	}
+
+	if err := syscall.Stat(groupFile, &stats); err != nil {
+		return true, errors.Wrapf(err, "failed to stat %v", groupFile)
+	}
+	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
+		return true, nil
+	}
+
+	return false, nil
 }
