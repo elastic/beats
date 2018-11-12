@@ -151,6 +151,7 @@ https://github.com/elastic/beats/compare/v6.4.0...6.x[Check the HEAD diff]
 *Journalbeat*
 
 - Add journalbeat. {pull}8703[8703]
+- Add the ability to check against JSON HTTP bodies with conditions. {pull}8667[8667]
 
 *Metricbeat*
 

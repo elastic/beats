@@ -61,6 +61,43 @@ class Test(BaseTest):
             server.shutdown()
 
     @parameterized.expand([
+        ("up", '{"foo": {"baz": "bar"}}'),
+        ("down", '{"foo": "unexpected"}'),
+        ("down", 'notjson'),
+    ])
+    def test_http_json(self, expected_status, body):
+        """
+        Test JSON response checks
+        """
+        server = self.start_server(body, 200)
+        try:
+            self.render_config_template(
+                monitors=[{
+                    "type": "http",
+                    "urls": ["http://localhost:{}".format(server.server_port)],
+                    "check_response_json": [{
+                        "description": "foo equals bar",
+                        "condition": {
+                            "equals": {"foo": {"baz": "bar"}}
+                        }
+                    }]
+                }]
+            )
+
+            try:
+                proc = self.start_beat()
+                self.wait_until(lambda: self.log_contains("heartbeat is running"))
+
+                self.wait_until(
+                    lambda: self.output_has(lines=1))
+            finally:
+                proc.check_kill_and_wait()
+
+            self.assert_last_status(expected_status)
+        finally:
+            server.shutdown()
+
+    @parameterized.expand([
         (lambda server: "localhost:{}".format(server.server_port), "up"),
         # This IP is reserved in IPv4
         (lambda server: "203.0.113.1:1233", "down"),
