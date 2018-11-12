@@ -197,12 +197,12 @@ func (l *icmpLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 	}
 }
 
-struct ResultSet {
+type ResultSet struct {
 	Rtt time.Duration
 
 }
 
-struct PingResult {
+type PingResult struct {
 	Rtt time.Duration,
 	Success bool,
 }
