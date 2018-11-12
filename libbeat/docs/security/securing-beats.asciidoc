@@ -67,12 +67,16 @@ ifeval::["{beatname_lc}"=="filebeat"]
 |Run Filebeat modules | ++{beat_default_index_prefix}_writer++
 endif::[]
 |Load index templates | ++{beat_default_index_prefix}_writer++ and `kibana_user`
+ifndef::no_dashboards[]
 |Load {beatname_uc} dashboards into {kib} | ++{beat_default_index_prefix}_writer++ and `kibana_user`
+endif::[]
 ifdef::has_ml_jobs[]
 |Load machine learning jobs | `machine_learning_admin`
 endif::[]
 |Read indices created by {beatname_uc} | ++{beat_default_index_prefix}_reader++ 
+ifndef::no_dashboards[]
 |View {beatname_uc} dashboards in {kib} | `kibana_user`
+endif::[]
 |=======
 
 include::basic-auth.asciidoc[]
