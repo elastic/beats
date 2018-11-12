@@ -203,8 +203,8 @@ type ResultSet struct {
 }
 
 type PingResult struct {
-	Rtt time.Duration,
-	Success bool,
+	Rtt time.Duration
+	Success bool
 }
 
 func (l *icmpLoop) ping(
