@@ -11,6 +11,8 @@ and if we confirm that there is a bug, then you can open a new issue.
 For security vulnerabilities please only send reports to security@elastic.co.
 See https://www.elastic.co/community/security for more information.
 
+Please include configurations and logs if available.
+
 For confirmed bugs, please report:
 - Version: 
 - Operating System: 
