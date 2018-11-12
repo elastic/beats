@@ -17,12 +17,8 @@ class Test(BaseTest):
         status_code = int(status_code)
         server = self.start_server("hello world", status_code)
 
-        self.render_config_template(
-            monitors=[{
-                "type": "http",
-                "urls": ["http://localhost:{}".format(server.server_port)],
-            }],
-        )
+        self.render_http_config(
+            ["http://localhost:{}".format(server.server_port)])
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("heartbeat is running"))
@@ -40,6 +36,29 @@ class Test(BaseTest):
             # Currently skipped on Windows as fields.yml not generated
             raise SkipTest
         self.assert_fields_are_documented(output[0])
+
+    def test_http_delayed(self):
+        """
+        Ensure that the HTTP monitor consumes the whole body.
+        We do this by ensuring that a slow HTTP body write's time is reflected
+        in the beats metrics.
+        """
+        try:
+            delay = 1.0
+            server = self.start_server("sloooow body", 200, write_delay=delay)
+
+            self.render_http_config(
+                ["http://localhost:{}".format(server.server_port)])
+
+            try:
+                proc = self.start_beat()
+                self.wait_until(lambda: self.output_has(lines=1))
+                nose.tools.assert_greater_equal(
+                    self.last_output_line()['http.rtt.total.us'], delay)
+            finally:
+                proc.check_kill_and_wait()
+        finally:
+            server.shutdown()
 
     @parameterized.expand([
         (lambda server: "localhost:{}".format(server.server_port), "up"),
@@ -78,3 +97,11 @@ class Test(BaseTest):
             self.assert_fields_are_documented(output[0])
         finally:
             server.shutdown()
+
+    def render_http_config(self, urls):
+        self.render_config_template(
+            monitors=[{
+                "type": "http",
+                "urls": urls,
+            }]
+        )
