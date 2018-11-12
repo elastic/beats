@@ -40,7 +40,6 @@ include::./winlogbeat-options.asciidoc[]
 
 include::./winlogbeat-general-options.asciidoc[]
 
-:win:
 include::../../libbeat/docs/queueconfig.asciidoc[]
 
 include::../../libbeat/docs/outputconfig.asciidoc[]
@@ -61,10 +60,11 @@ include::../../libbeat/docs/loggingconfig.asciidoc[]
 
 :standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
+:standalone!:
 
 :standalone:
-:win:
 include::../../libbeat/docs/yaml.asciidoc[]
+:standalone!:
 
 include::../../libbeat/docs/http-endpoint.asciidoc[]
 
