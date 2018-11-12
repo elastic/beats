@@ -93,7 +93,7 @@ func readGroupFile() (map[uint32]Group, map[string][]Group, error) {
 	C.setgrent()
 	defer C.endgrent()
 
-	groupIdMap := make(map[uint32]Group)
+	groupIDMap := make(map[uint32]Group)
 	groupMemberMap := make(map[string][]Group)
 	for cgroup, err := C.getgrent(); cgroup != nil; cgroup, err = C.getgrent() {
 		if err != nil {
@@ -108,7 +108,7 @@ func readGroupFile() (map[uint32]Group, map[string][]Group, error) {
 			GID:  gid,
 		}
 
-		groupIdMap[gid] = group
+		groupIDMap[gid] = group
 
 		/*
 			group.gr_mem is a NULL-terminated array of pointers to user names (char **)
@@ -127,7 +127,7 @@ func readGroupFile() (map[uint32]Group, map[string][]Group, error) {
 		}
 	}
 
-	return groupIdMap, groupMemberMap, nil
+	return groupIDMap, groupMemberMap, nil
 }
 
 // shadowFileEntry represents an entry in /etc/shadow. See getspnam(3) for details.
