@@ -11,6 +11,7 @@ import (
 	"io"
 	"runtime"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/OneOfOne/xxhash"
@@ -52,11 +53,12 @@ func init() {
 // MetricSet collects data about a system's users.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config    Config
-	log       *logp.Logger
-	cache     *cache.Cache
-	bucket    datastore.Bucket
-	lastState time.Time
+	config     Config
+	log        *logp.Logger
+	cache      *cache.Cache
+	bucket     datastore.Bucket
+	lastState  time.Time
+	lastChange time.Time
 }
 
 // User represents a user. Fields according to getpwent(3).
@@ -249,19 +251,10 @@ func (ms *MetricSet) Close() error {
 
 // Fetch collects the user information. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	users, err := GetUsers()
-	if err != nil {
-		errW := errors.Wrap(err, "Failed to get users")
-		ms.log.Error(errW)
-		report.Error(errW)
-		return
-	}
-	ms.log.Debugf("Found %v users", len(users))
-
 	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
 	if needsStateUpdate || ms.cache.IsEmpty() {
 		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
-		err = ms.reportState(report, users)
+		err := ms.reportState(report)
 		if err != nil {
 			ms.log.Error(err)
 			report.Error(err)
@@ -269,7 +262,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
 	}
 
-	err = ms.reportChanges(report, users)
+	err := ms.reportChanges(report)
 	if err != nil {
 		ms.log.Error(err)
 		report.Error(err)
@@ -277,8 +270,14 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 }
 
 // reportState reports all existing users on the system.
-func (ms *MetricSet) reportState(report mb.ReporterV2, users []*User) error {
+func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	ms.lastState = time.Now()
+
+	users, err := GetUsers()
+	if err != nil {
+		return errors.Wrap(err, "failed to get users")
+	}
+	ms.log.Debugf("Found %v users", len(users))
 
 	stateID := uuid.NewV4().String()
 	for _, user := range users {
@@ -305,8 +304,56 @@ func (ms *MetricSet) reportState(report mb.ReporterV2, users []*User) error {
 	return ms.saveUsersToDisk(users)
 }
 
+// haveFilesChanged checks if any of the relevant files (/etc/passwd, /etc/shadow, /etc/group)
+// have changed.
+func haveFilesChanged(since time.Time) (bool, error) {
+	const passwdFile = "/etc/passwd"
+	const shadowFile = "/etc/shadow"
+	const groupFile = "/etc/group"
+
+	var stats syscall.Stat_t
+	if err := syscall.Stat(passwdFile, &stats); err != nil {
+		return true, errors.Wrapf(err, "failed to stat %v", passwdFile)
+	}
+	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
+		return true, nil
+	}
+
+	if err := syscall.Stat(shadowFile, &stats); err != nil {
+		return true, errors.Wrapf(err, "failed to stat %v", shadowFile)
+	}
+	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
+		return true, nil
+	}
+
+	if err := syscall.Stat(groupFile, &stats); err != nil {
+		return true, errors.Wrapf(err, "failed to stat %v", groupFile)
+	}
+	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 // reportChanges detects and reports any changes to users on this system since the last call.
-func (ms *MetricSet) reportChanges(report mb.ReporterV2, users []*User) error {
+func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
+	currentTime := time.Now()
+	changed, err := haveFilesChanged(ms.lastChange)
+	if err != nil {
+		return err
+	}
+	if !changed {
+		return nil
+	}
+	ms.lastChange = currentTime
+
+	users, err := GetUsers()
+	if err != nil {
+		return errors.Wrap(err, "failed to get users")
+	}
+	ms.log.Debugf("Found %v users", len(users))
+
 	newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(users))
 
 	if len(newInCache) > 0 && len(missingFromCache) > 0 {
@@ -327,8 +374,9 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2, users []*User) error {
 					report.Event(userEvent(newUser, eventTypeEvent, eventActionPasswordChanged))
 				}
 
-				// Hack to check if only the password change time changed
+				// Hack to check if only the password changed
 				matchingMissingUser.PasswordChanged = newUser.PasswordChanged
+				matchingMissingUser.PasswordHashExcerpt = newUser.PasswordHashExcerpt
 				if newUser.Hash() != matchingMissingUser.Hash() {
 					report.Event(userEvent(newUser, eventTypeEvent, eventActionUserChanged))
 				}
