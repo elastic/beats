@@ -15,29 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mysql
+package mtest
 
 import (
-	"os"
-
 	"github.com/go-sql-driver/mysql"
+
+	"github.com/elastic/beats/libbeat/tests/compose"
 )
 
-// Helper functions for testing used in the mysql MetricSets.
+var Runner = compose.TestRunner{
+	Service:  "mysql",
+	Parallel: true,
+}
 
-// GetMySQLEnvDSN returns the MySQL server DSN to use for testing. It
-// reads the value from the MYSQL_DSN environment variable and returns
-// root@tcp(127.0.0.1:3306)/ if it is not set.
-func GetMySQLEnvDSN() string {
-	dsn := os.Getenv("MYSQL_DSN")
-
-	if len(dsn) == 0 {
-		c := &mysql.Config{
-			Net:  "tcp",
-			Addr: "127.0.0.1:3306",
-			User: "root",
-		}
-		dsn = c.FormatDSN()
+// GetDSN returns the MySQL server DSN to use for testing.
+func GetDSN(host string) string {
+	c := &mysql.Config{
+		Net:    "tcp",
+		Addr:   host,
+		User:   "root",
+		Passwd: "test",
 	}
-	return dsn
+	return c.FormatDSN()
+}
+
+// GetConfig returns the configuration for a mysql module
+func GetConfig(metricset, host string, raw bool) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "mysql",
+		"metricsets": []string{metricset},
+		"hosts":      []string{GetDSN(host)},
+		"raw":        raw,
+	}
 }

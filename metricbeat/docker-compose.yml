@@ -157,6 +157,8 @@ services:
 
   mysql:
     build: ./module/mysql/_meta
+    ports:
+      - 3306
 
   nginx:
     build: ./module/nginx/_meta

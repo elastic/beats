@@ -25,16 +25,17 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
-	_ "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/mysql/mtest"
 )
 
 func TestNewDB(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "mysql")
+	mtest.Runner.Run(t, compose.Suite{
+		"NewDB": func(t *testing.T, r compose.R) {
+			db, err := NewDB(mtest.GetDSN(r.Host()))
+			assert.NoError(t, err)
 
-	db, err := NewDB(GetMySQLEnvDSN())
-	assert.NoError(t, err)
-
-	err = db.Ping()
-	assert.NoError(t, err)
+			err = db.Ping()
+			assert.NoError(t, err)
+		},
+	})
 }
