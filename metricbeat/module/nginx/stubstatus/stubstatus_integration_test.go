@@ -24,40 +24,44 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/nginx"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFetch(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "nginx")
-
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+func TestStubstatus(t *testing.T) {
+	runner := compose.TestRunner{
+		Service:  "nginx",
+		Parallel: true,
 	}
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
+			event, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	// Check number of fields.
-	assert.Equal(t, 10, len(event))
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+			// Check number of fields.
+			assert.Equal(t, 10, len(event))
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
+
+			err := mbtest.WriteEvent(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }
 
-func TestData(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
-
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "nginx",
 		"metricsets": []string{"stubstatus"},
-		"hosts":      []string{nginx.GetNginxEnvHost()},
+		"hosts":      []string{host},
 	}
 }
