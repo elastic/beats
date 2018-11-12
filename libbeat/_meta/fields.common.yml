@@ -51,26 +51,34 @@
 - key: http
   title: HTTP
   fields:
-    - name: http.request.method
-      type: keyword
+    - name: http
+      title: HTTP
+      group: 2
       description: >
-        http request method.
-      example: get, post, put
+        Fields related to HTTP requests and responses.
+      type: group
+      fields:
 
-    - name: http.response.status_code
-      type: long
-      description: >
-        http response status code.
-      example: 404
+        - name: request.method
+          type: keyword
+          description: >
+            http request method.
+          example: get, post, put
 
-    - name: http.response.body
-      type: text
-      description: >
-        the full http response body.
-      example: hello world
+        - name: response.status_code
+          type: long
+          description: >
+            http response status code.
+          example: 404
 
-    - name: http.version
-      type: keyword
-      description: >
-        http version.
-      example: 1.1
+        - name: response.body
+          type: text
+          description: >
+            the full http response body.
+          example: hello world
+
+        - name: version
+          type: keyword
+          description: >
+            http version.
+          example: 1.1

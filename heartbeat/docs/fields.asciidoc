@@ -2480,6 +2480,13 @@ Useful if `user.id` or `user.name` contain confidential information and cannot b
 
 [[exported-fields-http]]
 
+[float]
+== http fields
+
+Fields related to HTTP requests and responses.
+
+
+
 *`http.request.method`*::
 +
 --

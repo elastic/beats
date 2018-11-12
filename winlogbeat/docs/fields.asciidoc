@@ -2681,6 +2681,13 @@ The XML representation of the event is useful for troubleshooting purposes. The 
 
 [[exported-fields-http]]
 
+[float]
+== http fields
+
+Fields related to HTTP requests and responses.
+
+
+
 *`http.request.method`*::
 +
 --

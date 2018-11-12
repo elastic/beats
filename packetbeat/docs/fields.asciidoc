@@ -23,7 +23,7 @@ grouped in the following categories:
 * <<exported-fields-ecs>>
 * <<exported-fields-flows_event>>
 * <<exported-fields-http>>
-* <<exported-fields-http>>
+* <<exported-fields-http-packetbeat>>
 * <<exported-fields-icmp>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-memcache>>
@@ -4739,6 +4739,13 @@ optional TCP connection id
 
 [[exported-fields-http]]
 
+[float]
+== http fields
+
+Fields related to HTTP requests and responses.
+
+
+
 *`http.request.method`*::
 +
 --
@@ -4787,22 +4794,10 @@ http version.
 
 --
 
-[[exported-fields-http]]
+[[exported-fields-http-packetbeat]]
 == HTTP fields
 
 HTTP-specific event fields.
-
-
-[float]
-== http fields
-
-Information about the HTTP request and response.
-
-
-[float]
-== request fields
-
-HTTP request
 
 
 *`http.request.params`*::
@@ -4831,12 +4826,6 @@ type: text
 The body of the HTTP request.
 
 --
-
-[float]
-== response fields
-
-HTTP response
-
 
 *`http.response.code`*::
 +

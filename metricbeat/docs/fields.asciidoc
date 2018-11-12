@@ -8940,6 +8940,13 @@ The average queue time in ms over the last 1024 requests.
 
 [[exported-fields-http]]
 
+[float]
+== http fields
+
+Fields related to HTTP requests and responses.
+
+
+
 *`http.request.method`*::
 +
 --

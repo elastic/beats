@@ -2379,6 +2379,13 @@ None
 
 [[exported-fields-http]]
 
+[float]
+== http fields
+
+Fields related to HTTP requests and responses.
+
+
+
 *`http.request.method`*::
 +
 --
