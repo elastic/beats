@@ -181,9 +181,24 @@ func (cm *ConfigManager) fetch() bool {
 
 func (cm *ConfigManager) apply() {
 	configOK := true
+
+	missing := map[string]bool{}
+	for _, name := range cm.registry.GetRegisteredNames() {
+		missing[name] = true
+	}
+
+	// Reload configs
 	for _, b := range cm.cache.Configs {
 		err := cm.reload(b.Type, b.Blocks)
 		configOK = configOK && err == nil
+		missing[b.Type] = false
+	}
+
+	// Unset missing configs
+	for name := range missing {
+		if missing[name] {
+			cm.reload(name, []*api.ConfigBlock{})
+		}
 	}
 
 	if !configOK {
@@ -199,15 +214,20 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) error {
 
 	if obj := cm.registry.GetReloadable(t); obj != nil {
 		// Single object
-		if len(blocks) != 1 {
+		if len(blocks) > 1 {
 			err := fmt.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
 			cm.logger.Error(err)
 			return err
 		}
-		config, err := blocks[0].ConfigWithMeta()
-		if err != nil {
-			cm.logger.Error(err)
-			return err
+
+		var config *reload.ConfigWithMeta
+		var err error
+		if len(blocks) == 1 {
+			config, err = blocks[0].ConfigWithMeta()
+			if err != nil {
+				cm.logger.Error(err)
+				return err
+			}
 		}
 
 		if err := obj.Reload(config); err != nil {

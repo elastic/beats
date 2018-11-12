@@ -94,3 +94,68 @@ func TestConfigManager(t *testing.T) {
 		}),
 	}, config2)
 }
+
+func TestRemoveItems(t *testing.T) {
+	registry := reload.NewRegistry()
+	id, err := uuid.NewV4()
+	if err != nil {
+		t.Fatalf("error while generating id: %v", err)
+	}
+	accessToken := "footoken"
+	reloadable := reloadable{
+		reloaded: make(chan *reload.ConfigWithMeta, 1),
+	}
+	registry.MustRegister("test.blocks", &reloadable)
+
+	mux := http.NewServeMux()
+	i := 0
+	responses := []string{
+		// Initial load
+		`{"configuration_blocks":[{"type":"test.blocks","config":{"module":"apache2"}}]}`,
+
+		// Return no blocks
+		`{"configuration_blocks":[]}`,
+	}
+	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, responses[i])
+		i++
+	}))
+
+	server := httptest.NewServer(mux)
+
+	c, err := api.ConfigFromURL(server.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	config := &Config{
+		Enabled:     true,
+		Period:      100 * time.Millisecond,
+		Kibana:      c,
+		AccessToken: accessToken,
+	}
+
+	manager, err := NewConfigManagerWithConfig(config, registry, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	manager.Start()
+
+	// On first reload we will get apache2 module
+	config1 := <-reloadable.reloaded
+	assert.Equal(t, &reload.ConfigWithMeta{
+		Config: common.MustNewConfigFrom(map[string]interface{}{
+			"module": "apache2",
+		}),
+	}, config1)
+
+	// Get a nil config, even if the block is not part of the payload
+	config2 := <-reloadable.reloaded
+	var nilConfig *reload.ConfigWithMeta
+	assert.Equal(t, nilConfig, config2)
+
+	// Cleanup
+	manager.Stop()
+	os.Remove(paths.Resolve(paths.Data, "management.yml"))
+}
