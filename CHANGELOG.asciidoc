@@ -19,6 +19,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 
 - Use `initial_scan` action for new paths. {pull}7954[7954]
 - Rename beat.name to agent.type, beat.hostname to agent.hostname, beat.version to agent.version.
+- Rename `source.hostname` to `source.domain` in the auditd module. {pull}9027[9027]
 
 *Filebeat*
 

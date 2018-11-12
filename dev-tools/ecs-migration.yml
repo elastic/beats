@@ -84,3 +84,9 @@
   to: source.geo.region_iso_code
   alias: true
   copy_to: false
+
+# From Auditbeat's auditd module.
+- from: source.hostname
+  to: source.domain
+  alias: true
+  copy_to: false

@@ -282,15 +282,6 @@ The current working directory.
 Source that triggered the event.
 
 
-*`source.hostname`*::
-+
---
-type: keyword
-
-Hostname of the source.
-
---
-
 *`source.path`*::
 +
 --
