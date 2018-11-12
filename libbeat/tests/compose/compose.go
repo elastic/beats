@@ -21,50 +21,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"strconv"
-	"testing"
 )
-
-// EnsureUp starts all the requested services (must be defined in docker-compose.yml)
-// with a default timeout of 300 seconds
-func EnsureUp(t *testing.T, services ...string) {
-	EnsureUpWithTimeout(t, 300, services...)
-}
-
-// EnsureUpWithTimeout starts all the requested services (must be defined in docker-compose.yml)
-// Wait for `timeout` seconds for health
-func EnsureUpWithTimeout(t *testing.T, timeout int, services ...string) {
-	// The NO_COMPOSE env variables makes it possible to skip the starting of the environment.
-	// This is useful if the service is already running locally.
-	if noCompose, err := strconv.ParseBool(os.Getenv("NO_COMPOSE")); err == nil && noCompose {
-		return
-	}
-
-	name := os.Getenv("DOCKER_COMPOSE_PROJECT_NAME")
-	compose, err := getComposeProject(name)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Kill no longer used containers
-	err = compose.KillOld(services)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for _, service := range services {
-		err = compose.Start(service)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	// Wait for health
-	err = compose.Wait(timeout, services...)
-	if err != nil {
-		t.Fatal(err)
-	}
-}
 
 func findComposePath() (string, error) {
 	// find docker-compose
