@@ -30,7 +30,7 @@ grouped in the following categories:
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-http>>
-* <<exported-fields-http>>
+* <<exported-fields-http-metrics>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
@@ -8995,7 +8995,7 @@ http version.
 
 --
 
-[[exported-fields-http]]
+[[exported-fields-http-metrics]]
 == HTTP fields
 
 HTTP module
@@ -9003,13 +9003,7 @@ HTTP module
 
 
 [float]
-== http fields
-
-
-
-
-[float]
-== request fields
+== http.request fields
 
 HTTP request information
 
@@ -9036,7 +9030,7 @@ The HTTP payload sent
 --
 
 [float]
-== response fields
+== http.response fields
 
 HTTP response information
 
