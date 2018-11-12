@@ -2541,13 +2541,6 @@ http version.
 None
 
 
-[float]
-== http fields
-
-HTTP related fields.
-
-
-
 *`http.url`*::
 +
 --
@@ -2569,7 +2562,7 @@ The service url used by monitor. This is a non-analyzed field that is useful for
 --
 
 [float]
-== rtt fields
+== http.rtt fields
 
 HTTP layer round trip times.
 
