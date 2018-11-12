@@ -205,7 +205,6 @@ struct ResultSet {
 struct PingResult {
 	Rtt time.Duration,
 	Success bool,
-	Error: error,
 }
 
 func (l *icmpLoop) ping(
@@ -215,68 +214,38 @@ func (l *icmpLoop) ping(
 	count int,
 ) ([]PingResult, error) {
 	var err error
+	results := []PingResult
 	doneSignal := make(chan struct{})
 	// results accepts first response received only
-	results := make(chan PingResult, count)
 	for c := 0; c < count; c++ {
 		toTimer := time.NewTimer(timeout)
 		var ctx *requestContext
 		ctx, err = l.sendEchoRequest(addr)
 		if err != nil {
-			break
+			close(doneSignal)
+			return results, err
 		}
-
 		// Spawn a listener for the ICMP request that was just sent
 		go func(ctx *requestContext) {
 			select {
 			case <-doneSignal:
-				ctx.Stop()
+				results = append(results, PingResult{
+					Rtt: 0 * time.Second,
+					Success: false,
+				})
 			case r := <-ctx.result:
 				// ctx is removed from request tables automatically a response is
 				// received. No need to stop it.
 				// try to push RTT. The first result available will be reported
-				select {
-				case results <- r.packet.ts.Sub(ctx.ts):
-				default:
-				}
+				results = append(results, PingResult{
+					Rtt: r.packet.ts.Sub(ctx.ts)
+					Success: true,
+				})
 			}
 		}(ctx)
 		toTimer.Stop()
 	}
-
-	for !done {
-		var ctx *requestContext
-		ctx, err = l.sendEchoRequest(addr)
-		if err != nil {
-			close(doneSignal)
-			break
-		}
-		go awaitResponse(ctx)
-		requests++
-
-		select {
-		case <-toTimer.C:
-			// no response for any active request received. Finish loop
-			// and remove all requests from request table.
-			done = true
-			close(doneSignal)
-
-		case rtt = <-results:
-			success = true
-
-			done = true
-			close(doneSignal)
-		}
-	}
-
-	if err != nil {
-		return 0, 0, err
-	}
-
-	if !success {
-		return 0, requests, timeoutError{}
-	}
-	return rtt, requests, nil
+	return results, nil
 }
 
 func (l *icmpLoop) sendEchoRequest(addr *net.IPAddr) (*requestContext, error) {
