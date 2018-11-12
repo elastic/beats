@@ -26,44 +26,33 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/mongodb"
+	"github.com/elastic/beats/metricbeat/module/mongodb/mtest"
 )
 
-func TestFetch(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "mongodb")
+func TestMetrics(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, mtest.GetConfig("metrics", r.Host()))
+			event, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+			// Check a few event Fields
+			findCount, err := event.GetValue("commands.find.total")
+			assert.NoError(t, err)
+			assert.True(t, findCount.(int64) >= 0)
 
-	// Check a few event Fields
-	findCount, err := event.GetValue("commands.find.total")
-	assert.NoError(t, err)
-	assert.True(t, findCount.(int64) >= 0)
-
-	deletedDocuments, err := event.GetValue("document.deleted")
-	assert.NoError(t, err)
-	assert.True(t, deletedDocuments.(int64) >= 0)
-}
-
-func TestData(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "mongodb")
-
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "mongodb",
-		"metricsets": []string{"metrics"},
-		"hosts":      []string{mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()},
-	}
+			deletedDocuments, err := event.GetValue("document.deleted")
+			assert.NoError(t, err)
+			assert.True(t, deletedDocuments.(int64) >= 0)
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, mtest.GetConfig("metrics", r.Host()))
+			err := mbtest.WriteEvent(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }

@@ -15,32 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mongodb
+package mtest
 
-import "os"
+import (
+	"github.com/elastic/beats/libbeat/tests/compose"
+)
 
-// Helper functions for testing mongodb metricsets.
-
-// GetEnvHost returns the hostname of the Mongodb server to use for testing.
-// It reads the value from the MONGODB_HOST environment variable and returns
-// 127.0.0.1 if it is not set.
-func GetEnvHost() string {
-	host := os.Getenv("MONGODB_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
+var Runner = compose.TestRunner{
+	Service:  "mongodb",
+	Parallel: true,
 }
 
-// GetEnvPort returns the port of the Mongodb server to use for testing.
-// It reads the value from the MONGODB_PORT environment variable and returns
-// 27017 if it is not set.
-func GetEnvPort() string {
-	port := os.Getenv("MONGODB_PORT")
-
-	if len(port) == 0 {
-		port = "27017"
+func GetConfig(metricset, host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "mongodb",
+		"metricsets": []string{metricset},
+		"hosts":      []string{host},
 	}
-	return port
 }

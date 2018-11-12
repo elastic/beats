@@ -31,70 +31,58 @@ import (
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
+	"github.com/elastic/beats/metricbeat/module/mongodb/mtest"
 )
 
-func TestFetch(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "mongodb")
+func TestReplStatus(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			err := initiateReplicaSet(t, r.Host())
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	err := initiateReplicaSet(t)
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+			f := mbtest.NewEventFetcher(t, mtest.GetConfig("replstatus", r.Host()))
+			event, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+			// Check event fields
+			oplog := event["oplog"].(common.MapStr)
+			allocated := oplog["size"].(common.MapStr)["allocated"].(int64)
+			assert.True(t, allocated >= 0)
 
-	// Check event fields
-	oplog := event["oplog"].(common.MapStr)
-	allocated := oplog["size"].(common.MapStr)["allocated"].(int64)
-	assert.True(t, allocated >= 0)
+			used := oplog["size"].(common.MapStr)["used"].(float64)
+			assert.True(t, used > 0)
 
-	used := oplog["size"].(common.MapStr)["used"].(float64)
-	assert.True(t, used > 0)
+			firstTs := oplog["first"].(common.MapStr)["timestamp"].(int64)
+			assert.True(t, firstTs >= 0)
 
-	firstTs := oplog["first"].(common.MapStr)["timestamp"].(int64)
-	assert.True(t, firstTs >= 0)
+			window := oplog["window"].(int64)
+			assert.True(t, window >= 0)
 
-	window := oplog["window"].(int64)
-	assert.True(t, window >= 0)
+			members := event["members"].(common.MapStr)
+			primary := members["primary"].(common.MapStr)
+			assert.NotEmpty(t, primary["host"].(string))
+			assert.True(t, primary["optime"].(int64) > 0)
 
-	members := event["members"].(common.MapStr)
-	primary := members["primary"].(common.MapStr)
-	assert.NotEmpty(t, primary["host"].(string))
-	assert.True(t, primary["optime"].(int64) > 0)
-
-	set := event["set_name"].(string)
-	assert.Equal(t, set, "beats")
+			set := event["set_name"].(string)
+			assert.Equal(t, set, "beats")
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, mtest.GetConfig("replstatus", r.Host()))
+			err := mbtest.WriteEvent(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }
 
-func TestData(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "mongodb")
-
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "mongodb",
-		"metricsets": []string{"replstatus"},
-		"hosts":      []string{mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()},
-	}
-}
-
-func initiateReplicaSet(t *testing.T) error {
-	url := getConfig()["hosts"].([]string)[0]
-
+func initiateReplicaSet(t *testing.T, url string) error {
 	dialInfo, err := mgo.ParseURL(url)
 	if err != nil {
 		return err

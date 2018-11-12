@@ -151,6 +151,8 @@ services:
   mongodb:
     build: ./module/mongodb/_meta
     command: mongod --replSet beats
+    ports:
+      - 27017
 
   munin:
     build: ./module/munin/_meta

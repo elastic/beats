@@ -26,46 +26,35 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/mongodb"
+	"github.com/elastic/beats/metricbeat/module/mongodb/mtest"
 )
 
-func TestFetch(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "mongodb")
+func TestCollstats(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, mtest.GetConfig("collstats", r.Host()))
+			events, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	events, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+			for _, event := range events {
+				t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	for _, event := range events {
-		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+				// Check a few event Fields
+				db := event["db"].(string)
+				assert.NotEqual(t, db, "")
 
-		// Check a few event Fields
-		db := event["db"].(string)
-		assert.NotEqual(t, db, "")
-
-		collection := event["collection"].(string)
-		assert.NotEqual(t, collection, "")
-	}
-}
-
-func TestData(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "mongodb")
-
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "mongodb",
-		"metricsets": []string{"collstats"},
-		"hosts":      []string{mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()},
-	}
+				collection := event["collection"].(string)
+				assert.NotEqual(t, collection, "")
+			}
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventsFetcher(t, mtest.GetConfig("collstats", r.Host()))
+			err := mbtest.WriteEvents(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }

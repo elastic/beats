@@ -27,47 +27,36 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/mongodb"
+	"github.com/elastic/beats/metricbeat/module/mongodb/mtest"
 )
 
-func TestFetch(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "mongodb")
+func TestStatus(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Fetch": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, mtest.GetConfig("status", r.Host()))
+			event, err := f.Fetch()
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+			// Check event fields
+			current := event["connections"].(common.MapStr)["current"].(int64)
+			assert.True(t, current >= 0)
 
-	// Check event fields
-	current := event["connections"].(common.MapStr)["current"].(int64)
-	assert.True(t, current >= 0)
+			available := event["connections"].(common.MapStr)["available"].(int64)
+			assert.True(t, available > 0)
 
-	available := event["connections"].(common.MapStr)["available"].(int64)
-	assert.True(t, available > 0)
-
-	pageFaults := event["extra_info"].(common.MapStr)["page_faults"].(int64)
-	assert.True(t, pageFaults >= 0)
-}
-
-func TestData(t *testing.T) {
-	t.Skip("ignoring tests with EnsureUp by now")
-	compose.EnsureUp(t, "mongodb")
-
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "mongodb",
-		"metricsets": []string{"status"},
-		"hosts":      []string{mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()},
-	}
+			pageFaults := event["extra_info"].(common.MapStr)["page_faults"].(int64)
+			assert.True(t, pageFaults >= 0)
+		},
+		"Data": func(t *testing.T, r compose.R) {
+			f := mbtest.NewEventFetcher(t, mtest.GetConfig("status", r.Host()))
+			err := mbtest.WriteEvent(f, t)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		},
+	})
 }
