@@ -76,5 +76,4 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_host(self):
-        host = self.compose_hosts()[0]
-        return "http://" + os.getenv('HTTP_HOST', host) + ':' + os.getenv('HTTP_PORT', '8080')
+        return "http://" + self.compose_host()

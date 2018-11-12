@@ -77,16 +77,8 @@ class Test(metricbeat.BaseTest):
 
     @classmethod
     def get_kubelet_hosts(cls):
-        return [
-            "http://" +
-            os.getenv('KUBELET_HOST', self.compose_hosts()[0]) + ':' +
-            os.getenv('KUBELET_PORT', '10255')
-        ]
+        return [self.compose_host("kubernetes")]
 
     @classmethod
     def get_kube_state_hosts(cls):
-        return [
-            "http://" +
-            os.getenv('KUBE_STATE_METRICS_HOST', self.compose_hosts()[1]) + ':' +
-            os.getenv('KUBE_STATE_METRICS_PORT', '18080')
-        ]
+        return [self.compose_host("kubestate")]

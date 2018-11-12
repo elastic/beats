@@ -34,9 +34,13 @@ services:
 
   ceph:
     build: ./module/ceph/_meta
+    ports:
+      - 5000
 
   couchbase:
     build: ./module/couchbase/_meta
+    ports:
+      - 8091
 
   dropwizard:
     build: ./module/dropwizard/_meta
@@ -60,16 +64,28 @@ services:
 
   haproxy:
     build: ./module/haproxy/_meta
+    ports:
+      - 14567
+      - 14568
+      - 14569
 
   haproxy_1_6:
     build:
       context: ./module/haproxy/_meta
       dockerfile: Dockerfile.1.6
+    ports:
+      - 14567
+      - 14568
+      - 14569
 
   haproxy_1_7:
     build:
       context: ./module/haproxy/_meta
       dockerfile: Dockerfile.1.7
+    ports:
+      - 14567
+      - 14568
+      - 14569
 
   http:
     build: ./module/http/_meta
@@ -156,6 +172,8 @@ services:
 
   munin:
     build: ./module/munin/_meta
+    ports:
+      - 4949
 
   mysql:
     build: ./module/mysql/_meta

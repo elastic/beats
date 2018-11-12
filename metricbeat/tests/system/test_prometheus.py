@@ -34,5 +34,4 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return ["http://" + os.getenv('PROMETHEUS_HOST', self.compose_hosts()[0]) + ':' +
-                os.getenv('PROMETHEUS_PORT', '9090')]
+        return [self.compose_host()]

@@ -20,12 +20,11 @@ class Test(metricbeat.BaseTest):
 
     def get_hosts(self):
         username = "postgres"
-        host = self.compose_hosts()[0]
-        port = 5432
-        dsn = "postgres://{}:{}?sslmode=disable".format(host, port)
+        host = self.compose_host()
+        dsn = "postgres://{}?sslmode=disable".format(host)
         return (
-            [os.getenv("POSTGRESQL_DSN", dsn)],
-            os.getenv("POSTGRESQL_USERNAME", username),
+            [dsn],
+            username,
             os.getenv("POSTGRESQL_PASSWORD"),
         )
 

@@ -27,4 +27,4 @@ class ConfigTest(metricbeat.BaseTest):
                                  " has been removed")
 
     def get_host(self):
-        return 'http://' + os.getenv('ES_HOST', self.compose_hosts()[0]) + ':' + os.getenv('ES_PORT', '9200')
+        return 'http://' + self.compose_host()

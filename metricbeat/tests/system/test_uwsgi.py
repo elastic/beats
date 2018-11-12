@@ -68,13 +68,11 @@ class Test(metricbeat.BaseTest):
         self.common_checks(output)
 
     def get_host(self):
-        return os.getenv("UWSGI_STAT_TCP_SERVER",
-                         "tcp://{}:9191".format(self.compose_hosts()[0]))
+        return "tcp://" + self.compose_host()
 
 
 class TestHTTP(Test):
     COMPOSE_SERVICES = ['uwsgi_http']
 
     def get_host(self):
-        return os.getenv("UWSGI_STAT_HTTP_SERVER",
-                         "http://{}:9191".format(self.compose_hosts()[0]))
+        return "http://" + self.compose_host()
