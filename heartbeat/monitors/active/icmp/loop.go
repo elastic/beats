@@ -197,44 +197,51 @@ func (l *icmpLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 	}
 }
 
+struct ResultSet {
+	Rtt time.Duration
+
+}
+
+struct PingResult {
+	Rtt time.Duration,
+	Success bool,
+	Error: error,
+}
+
 func (l *icmpLoop) ping(
 	addr *net.IPAddr,
 	timeout time.Duration,
 	interval time.Duration,
-) (time.Duration, int, error) {
-
+	count int,
+) ([]PingResult, error) {
 	var err error
-	toTimer := time.NewTimer(timeout)
-	defer toTimer.Stop()
-
-	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
-
-	done := false
 	doneSignal := make(chan struct{})
-
-	success := false
-	var rtt time.Duration
-
 	// results accepts first response received only
-	results := make(chan time.Duration, 1)
-	requests := 0
-
-	awaitResponse := func(ctx *requestContext) {
-		select {
-		case <-doneSignal:
-			ctx.Stop()
-
-		case r := <-ctx.result:
-			// ctx is removed from request tables automatically a response is
-			// received. No need to stop it.
-
-			// try to push RTT. The first result available will be reported
-			select {
-			case results <- r.packet.ts.Sub(ctx.ts):
-			default:
-			}
+	results := make(chan PingResult, count)
+	for c := 0; c < count; c++ {
+		toTimer := time.NewTimer(timeout)
+		var ctx *requestContext
+		ctx, err = l.sendEchoRequest(addr)
+		if err != nil {
+			break
 		}
+
+		// Spawn a listener for the ICMP request that was just sent
+		go func(ctx *requestContext) {
+			select {
+			case <-doneSignal:
+				ctx.Stop()
+			case r := <-ctx.result:
+				// ctx is removed from request tables automatically a response is
+				// received. No need to stop it.
+				// try to push RTT. The first result available will be reported
+				select {
+				case results <- r.packet.ts.Sub(ctx.ts):
+				default:
+				}
+			}
+		}(ctx)
+		toTimer.Stop()
 	}
 
 	for !done {
@@ -253,9 +260,6 @@ func (l *icmpLoop) ping(
 			// and remove all requests from request table.
 			done = true
 			close(doneSignal)
-
-		case <-ticker.C:
-			// No response yet. Send another request with every tick
 
 		case rtt = <-results:
 			success = true

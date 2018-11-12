@@ -98,7 +98,7 @@ func create(
 
 func createPingIPFactory(config *Config) func(*net.IPAddr) (common.MapStr, error) {
 	return func(ip *net.IPAddr) (common.MapStr, error) {
-		rtt, n, err := loop.ping(ip, config.Timeout, config.Wait)
+		rtt, n, err := loop.ping(ip, config.Timeout, config.Wait, config.Count)
 
 		fields := common.MapStr{"requests": n}
 		if err == nil {

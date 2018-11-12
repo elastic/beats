@@ -31,6 +31,7 @@ type Config struct {
 
 	Timeout time.Duration `config:"timeout"`
 	Wait    time.Duration `config:"wait"`
+	Count   int           `config:"count"`
 }
 
 var DefaultConfig = Config{
@@ -39,4 +40,5 @@ var DefaultConfig = Config{
 
 	Timeout: 16 * time.Second,
 	Wait:    1 * time.Second,
+	Count:   1,
 }
