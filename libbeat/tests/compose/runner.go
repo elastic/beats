@@ -41,7 +41,7 @@ type TestRunner struct {
 	Timeout  int
 }
 
-type Suite map[string]func(t *testing.T, r R)
+type Suite map[string]interface{}
 
 type RunnerOptions map[string][]string
 
@@ -76,7 +76,16 @@ func (r *TestRunner) scenarios() []map[string]string {
 
 func (r *TestRunner) runSuite(t *testing.T, tests Suite, ctl R) {
 	for name, test := range tests {
-		t.Run(name, func(t *testing.T) { test(t, ctl) })
+		var testFunc func(t *testing.T)
+		switch f := test.(type) {
+		case func(R):
+			testFunc = func(t *testing.T) { f(ctl) }
+		case func(*testing.T, R):
+			testFunc = func(t *testing.T) { f(t, ctl) }
+		default:
+			t.Fatalf("incorrect test suite function '%s'", name)
+		}
+		t.Run(name, testFunc)
 	}
 }
 
@@ -90,8 +99,8 @@ func (r *TestRunner) runHostOverride(t *testing.T, tests Suite) bool {
 	t.Logf("Test host overriden by %s=%s", env, host)
 
 	ctl := &runnerControl{
+		T:    t,
 		host: host,
-		t:    t,
 	}
 	r.runSuite(t, tests, ctl)
 	return true
@@ -159,8 +168,8 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 			}
 
 			ctl := &runnerControl{
+				T:        t,
 				host:     host,
-				t:        t,
 				scenario: s,
 			}
 			r.runSuite(t, tests, ctl)
@@ -169,7 +178,10 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 	}
 }
 
+// R extends the testing.T interface with methods that expose information about current scenario
 type R interface {
+	testing.TB
+
 	Host() string
 	Hostname() string
 	Port() string
@@ -178,7 +190,8 @@ type R interface {
 }
 
 type runnerControl struct {
-	t        *testing.T
+	*testing.T
+
 	host     string
 	scenario map[string]string
 }
