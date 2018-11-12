@@ -17,24 +17,21 @@
 
 // +build integration
 
-package pool
+package mtest
 
 import (
-	"testing"
-
 	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/php_fpm/mtest"
 )
 
-func TestPool(t *testing.T) {
-	mtest.Runner.Run(t, compose.Suite{
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("pool", r.Host()))
-			err := mbtest.WriteEventsReporterV2(f, t, "")
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
-	})
+var Runner = compose.TestRunner{
+	Service:  "phpfpm",
+	Parallel: true,
+}
+
+func GetConfig(metricset, host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "php_fpm",
+		"metricsets": []string{metricset},
+		"hosts":      []string{host},
+	}
 }

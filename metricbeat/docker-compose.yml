@@ -165,6 +165,8 @@ services:
 
   phpfpm:
     build: ./module/php_fpm/_meta
+    ports:
+      - 81
 
   postgresql:
     build: ./module/postgresql/_meta
