@@ -127,6 +127,10 @@ func (b *dockerBuilder) prepareBuild() error {
 
 func (b *dockerBuilder) dockerBuild() (string, error) {
 	tag := fmt.Sprintf("%s:%s", b.Name, b.Version)
+	if b.Snapshot {
+		tag = tag + "-SNAPSHOT"
+	}
+
 	if repository, _ := b.ExtraVars["repository"]; repository != "" {
 		tag = fmt.Sprintf("%s/%s", repository, tag)
 	}
