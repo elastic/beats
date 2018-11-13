@@ -22,20 +22,20 @@ class TestKeystore(KeystoreBase):
         Test that we correctly to string replacement with values from the keystore
         """
 
-        key = "elasticsearch_host"
-        secret = "myeleasticsearchsecrethost"
+        key = "mysecretpath"
+        secret = "thisisultrasecretpath"
 
-        self.render_config_template(keystore_path=self.keystore_path, elasticsearch={
-            'hosts': "${%s}:9200" % key
-        })
+        self.render_config_template("mockbeat",
+                                    keystore_path=self.keystore_path,
+                                    output_file_path="${%s}" % key)
 
-        exit_code = self.run_beat(extra_args=["keystore", "create"])
+        exit_code = self.run_beat(extra_args=["keystore", "create"],
+                                  config="mockbeat.yml")
         assert exit_code == 0
 
         self.add_secret(key, secret)
-        proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("Elasticsearch url: http://myeleasticsearchsecrethost:9200"))
-        assert self.log_contains(secret)
+        proc = self.start_beat(config="mockbeat.yml")
+        self.wait_until(lambda: self.log_contains("accessing key '%s' from the keystore" % key))
         proc.check_kill_and_wait()
 
     def test_keystore_with_key_not_present(self):
@@ -58,17 +58,17 @@ class TestKeystore(KeystoreBase):
         key = "output.elasticsearch.hosts.0"
         secret = "myeleasticsearchsecrethost"
 
-        self.render_config_template(keystore_path=self.keystore_path, elasticsearch={
-            'hosts': "${%s}" % key
-        })
+        self.render_config_template("mockbeat",
+                                    keystore_path=self.keystore_path,
+                                    output_file_path="${%s}" % key)
 
-        exit_code = self.run_beat(extra_args=["keystore", "create"])
+        exit_code = self.run_beat(extra_args=["keystore", "create"],
+                                  config="mockbeat.yml")
         assert exit_code == 0
 
         self.add_secret(key, secret)
-        proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("Elasticsearch url: http://myeleasticsearchsecrethost:9200"))
-        assert self.log_contains(secret)
+        proc = self.start_beat(config="mockbeat.yml")
+        self.wait_until(lambda: self.log_contains("accessing key '%s' from the keystore" % key))
         proc.check_kill_and_wait()
 
     def test_export_config_with_keystore(self):
