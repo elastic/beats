@@ -23,7 +23,7 @@ class TestKeystore(KeystoreBase):
         """
 
         key = "mysecretpath"
-        secret = self.working_dir + "thisisultrasecretpath"
+        secret = path.join(self.working_dir, "thisisultrasecretpath")
 
         self.render_config_template("mockbeat",
                                     keystore_path=self.keystore_path,
@@ -57,7 +57,7 @@ class TestKeystore(KeystoreBase):
         """
 
         key = "output.elasticsearch.hosts.0"
-        secret = self.working_dir + "myeleasticsearchsecrethost"
+        secret = path.join(self.working_dir,"myeleasticsearchsecrethost")
 
         self.render_config_template("mockbeat",
                                     keystore_path=self.keystore_path,
