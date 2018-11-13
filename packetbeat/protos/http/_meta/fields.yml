@@ -1,4 +1,4 @@
-# Additional HTTP fields used by Packetbeats
+# Additional HTTP fields used by Packetbeat
 - key: http-packetbeat
   title: "HTTP"
   description: HTTP-specific event fields.
