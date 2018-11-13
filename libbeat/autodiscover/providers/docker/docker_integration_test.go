@@ -23,11 +23,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	dk "github.com/elastic/beats/libbeat/tests/docker"
-
-	"github.com/stretchr/testify/assert"
 )
 
 // Test docker start emits an autodiscover event
