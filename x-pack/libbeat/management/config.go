@@ -77,11 +77,16 @@ type Config struct {
 	AccessToken string `config:"access_token" yaml:"access_token"`
 
 	Kibana *kibana.ClientConfig `config:"kibana" yaml:"kibana"`
+
+	Blacklist ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
 }
 
 func defaultConfig() *Config {
 	return &Config{
 		Period: 60 * time.Second,
+		Blacklist: ConfigBlacklistSettings{
+			"output": "console|file",
+		},
 	}
 }
 
