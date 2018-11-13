@@ -18,12 +18,11 @@
 package add_host_metadata
 
 import (
+	"runtime"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-
-	"runtime"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"

@@ -20,10 +20,10 @@ package template
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestConfigsMapping(t *testing.T) {
