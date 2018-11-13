@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/elastic/beats/libbeat/generator/fields"
 )
@@ -66,6 +65,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error getting file info of target Beat: %+v\n", err)
 		os.Exit(1)
 	}
+	beat.Close()
+	esBeats.Close()
 
 	// If a community Beat does not have its own fields.yml file, it still requires
 	// the fields coming from libbeat to generate e.g assets. In case of Elastic Beats,
@@ -79,29 +80,13 @@ func main() {
 
 	var fieldsFiles []*fields.YmlFile
 	for _, fieldsFilePath := range beatFieldsPaths {
-		fullPath := filepath.Join(beatPath, fieldsFilePath)
-
-		isFile := strings.HasSuffix(fullPath, ".yml")
-		if isFile {
-			file, err := fields.NewYmlFile(fullPath, 0)
-
-			if err != nil || file == nil {
-				fmt.Fprintf(os.Stderr, "Cannot collect fields.yml file: %+v\n", err)
-				os.Exit(2)
-			}
-
-			fieldsFiles = append(fieldsFiles, file)
-		} else {
-			// fullPath is a directory
-			files, err := fields.CollectModuleFiles(fullPath)
-
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
-				os.Exit(2)
-			}
-
-			fieldsFiles = append(fieldsFiles, files...)
+		fieldsFile, err := fields.CollectModuleFiles(fieldsFilePath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
+			os.Exit(2)
 		}
+
+		fieldsFiles = append(fieldsFiles, fieldsFile...)
 	}
 
 	err = fields.Generate(esBeatsPath, beatPath, fieldsFiles, output)
@@ -110,5 +95,9 @@ func main() {
 		os.Exit(3)
 	}
 
-	fmt.Fprintf(os.Stderr, "Generated fields.yml for %s to %s\n", name, filepath.Join(beatPath, output))
+	outputPath, _ := filepath.Abs(output)
+	if err != nil {
+		outputPath = output
+	}
+	fmt.Fprintf(os.Stderr, "Generated fields.yml for %s to %s\n", name, outputPath)
 }

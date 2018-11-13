@@ -20,14 +20,16 @@ package ccr
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "ccr", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "ccr", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 	)
 }
@@ -43,7 +45,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch ccr metricset is beta")
+	cfgwarn.Beta("the " + base.FullyQualifiedName() + " metricset is beta")
 
 	ms, err := elasticsearch.NewMetricSet(base, ccrStatsPath)
 	if err != nil {
@@ -56,49 +58,52 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+ccrStatsPath)
 	if err != nil {
-		r.Error(err)
+		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch ccr stats from a non master node.")
+		m.Log.Debug("trying to fetch ccr stats from a non-master node")
 		return
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+ccrStatsPath)
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	elasticsearchVersion := info.Version.Number
 	isCCRStatsAPIAvailable, err := elasticsearch.IsCCRStatsAPIAvailable(elasticsearchVersion)
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	if !isCCRStatsAPIAvailable {
-		const errorMsg = "the elasticsearch ccr metricset is only supported with Elasticsearch >= %v. " +
+		const errorMsg = "the %v metricset is only supported with Elasticsearch >= %v. " +
 			"You are currently running Elasticsearch %v"
-		r.Error(fmt.Errorf(errorMsg, elasticsearch.CCRStatsAPIAvailableVersion, elasticsearchVersion))
+		err = fmt.Errorf(errorMsg, m.FullyQualifiedName(), elasticsearch.CCRStatsAPIAvailableVersion, elasticsearchVersion)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	if m.XPack {
-		eventsMappingXPack(r, m, *info, content)
+		err = eventsMappingXPack(r, m, *info, content)
 	} else {
 		err = eventsMapping(r, *info, content)
-		if err != nil {
-			r.Error(err)
-			return
-		}
+	}
+
+	if err != nil {
+		m.Log.Error(err)
+		return
 	}
 }

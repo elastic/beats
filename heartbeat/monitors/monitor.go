@@ -42,6 +42,8 @@ type Monitor struct {
 	scheduler  *scheduler.Scheduler
 	jobTasks   []*task
 	enabled    bool
+	// endpoints is a count of endpoints this monitor measures.
+	endpoints int
 	// internalsMtx is used to synchronize access to critical
 	// internal datastructures
 	internalsMtx sync.Mutex
@@ -50,7 +52,11 @@ type Monitor struct {
 	watchPollTasks []*task
 	watch          watcher.Watch
 
-	pipeline beat.Pipeline
+	pipelineConnector beat.PipelineConnector
+
+	// stats is the countersRecorder used to record lifecycle events
+	// for global metrics + telemetry
+	stats registryRecorder
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -70,7 +76,7 @@ var ErrWatchesDisabled = errors.New("watch poll files are only allowed in heartb
 func newMonitor(
 	config *common.Config,
 	registrar *pluginsReg,
-	pipeline beat.Pipeline,
+	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
 ) (*Monitor, error) {
@@ -84,20 +90,22 @@ func newMonitor(
 
 	monitorPlugin, found := registrar.get(mpi.Type)
 	if !found {
-		return nil, fmt.Errorf("monitor type %v does not exist", mpi.Type)
+		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", mpi.Type, registrar.monitorNames())
 	}
 
 	m := &Monitor{
-		name:           monitorPlugin.name,
-		scheduler:      scheduler,
-		jobTasks:       []*task{},
-		pipeline:       pipeline,
-		watchPollTasks: []*task{},
-		internalsMtx:   sync.Mutex{},
-		config:         config,
+		name:              monitorPlugin.name,
+		scheduler:         scheduler,
+		jobTasks:          []*task{},
+		pipelineConnector: pipelineConnector,
+		watchPollTasks:    []*task{},
+		internalsMtx:      sync.Mutex{},
+		config:            config,
+		stats:             monitorPlugin.stats,
 	}
 
-	jobs, err := monitorPlugin.create(config)
+	jobs, endpoints, err := monitorPlugin.create(config)
+	m.endpoints = endpoints
 	if err != nil {
 		return nil, fmt.Errorf("job err %v", err)
 	}
@@ -181,7 +189,8 @@ func (m *Monitor) makeWatchTasks(monitorPlugin pluginBuilder) error {
 					return
 				}
 
-				watchJobs, err := monitorPlugin.create(merged)
+				watchJobs, endpoints, err := monitorPlugin.create(merged)
+				m.endpoints = endpoints
 				if err != nil {
 					logp.Err("Could not create job from watch file: %v", err)
 				}
@@ -227,6 +236,8 @@ func (m *Monitor) Start() {
 	for _, t := range m.watchPollTasks {
 		t.Start()
 	}
+
+	m.stats.startMonitor(int64(m.endpoints))
 }
 
 // Stop stops the Monitor's execution in its configured scheduler.
@@ -242,4 +253,6 @@ func (m *Monitor) Stop() {
 	for _, t := range m.watchPollTasks {
 		t.Stop()
 	}
+
+	m.stats.stopMonitor(int64(m.endpoints))
 }

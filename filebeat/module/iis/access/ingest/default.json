@@ -37,7 +37,7 @@
   }, {
     "rename": {
       "field": "iis.access.agent",
-      "target_field": "iis.access.user_agent.raw"
+      "target_field": "iis.access.user_agent.original"
     }
   }, {
     "geoip": {

@@ -1,0 +1,68 @@
+[id="configuring-howto-{beatname_lc}"]
+= Configuring {beatname_uc}
+
+[partintro]
+--
+
+Before modifying configuration settings, make sure you've completed the
+<<{beatname_lc}-configuration,configuration steps>> in the Getting Started.
+This section describes some common use cases for changing configuration options.
+
+include::../../libbeat/docs/shared-configuring.asciidoc[]
+
+The following topics describe how to configure {beatname_uc}:
+
+* <<configuration-{beatname_lc}-options>>
+* <<configuration-general-options>>
+* <<configuring-internal-queue>>
+* <<configuring-output>>
+* <<configuration-ssl>>
+* <<filtering-and-enhancing-data>>
+* <<configuring-ingest-node>>
+* <<configuration-path>>
+* <<setup-kibana-endpoint>>
+* <<configuration-template>>
+* <<configuration-logging>>
+* <<using-environ-vars>>
+* <<yaml-tips>>
+* <<regexp-support>>
+* <<http-endpoint>>
+* <<{beatname_lc}-reference-yml>>
+
+--
+
+include::./config-options.asciidoc[]
+
+include::./general-options.asciidoc[]
+
+include::../../libbeat/docs/queueconfig.asciidoc[]
+
+include::../../libbeat/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+
+include::./filtering.asciidoc[]
+
+include::../../libbeat/docs/shared-config-ingest.asciidoc[]
+
+include::../../libbeat/docs/shared-path-config.asciidoc[]
+
+include::../../libbeat/docs/shared-kibana-config.asciidoc[]
+
+include::../../libbeat/docs/setup-config.asciidoc[]
+
+include::../../libbeat/docs/loggingconfig.asciidoc[]
+
+:standalone:
+include::../../libbeat/docs/shared-env-vars.asciidoc[]
+:standalone!:
+
+:standalone:
+include::../../libbeat/docs/yaml.asciidoc[]
+:standalone!:
+
+include::../../libbeat/docs/regexp.asciidoc[]
+
+include::../../libbeat/docs/http-endpoint.asciidoc[]
+
+include::../../libbeat/docs/reference-yml.asciidoc[]

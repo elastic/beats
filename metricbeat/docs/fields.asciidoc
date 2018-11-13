@@ -816,34 +816,10 @@ Contains common beat fields available in all event types.
 
 
 
-*`beat.name`*::
-+
---
-The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
-
-
---
-
-*`beat.hostname`*::
-+
---
-The hostname as returned by the operating system on which the Beat is running.
-
-
---
-
 *`beat.timezone`*::
 +
 --
 The timezone as returned by the operating system on which the Beat is running.
-
-
---
-
-*`beat.version`*::
-+
---
-The version of the beat that generated this event.
 
 
 --
@@ -3415,7 +3391,7 @@ Version of the agent.
 
 --
 
-*`agent.name`*::
+*`agent.type`*::
 +
 --
 type: keyword
@@ -3423,6 +3399,16 @@ type: keyword
 example: filebeat
 
 Name of the agent.
+
+
+--
+
+*`agent.hostname`*::
++
+--
+type: keyword
+
+Hostname of the agent.
 
 
 --
@@ -3692,16 +3678,6 @@ Can be one or multiple IPv4 or IPv6 addresses.
 
 --
 
-*`destination.hostname`*::
-+
---
-type: keyword
-
-Hostname of the destination.
-
-
---
-
 *`destination.port`*::
 +
 --
@@ -3732,12 +3708,68 @@ Destination domain.
 
 --
 
-*`destination.subdomain`*::
+[float]
+== geo fields
+
+Geolocation for destination.
+
+
+*`destination.geo.continent_name`*::
 +
 --
 type: keyword
 
-Destination subdomain.
+Name of the continent.
+
+
+--
+
+*`destination.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`destination.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`destination.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`destination.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`destination.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
 
 
 --
@@ -4880,6 +4912,120 @@ This id normally changes across restarts, but `service.id` does not.
 --
 
 [float]
+== source fields
+
+Source fields describe details about the source of the event.
+
+
+
+*`source.ip`*::
++
+--
+type: ip
+
+IP address of the source.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`source.port`*::
++
+--
+type: long
+
+Port of the source.
+
+
+--
+
+*`source.mac`*::
++
+--
+type: keyword
+
+MAC address of the source.
+
+
+--
+
+*`source.domain`*::
++
+--
+type: keyword
+
+Source domain.
+
+
+--
+
+[float]
+== geo fields
+
+Geolocation for source.
+
+
+*`source.geo.continent_name`*::
++
+--
+type: keyword
+
+Name of the continent.
+
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`source.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+[float]
 == url fields
 
 URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
@@ -4923,15 +5069,15 @@ Note: The `:` is not part of the scheme.
 
 --
 
-*`url.host.name`*::
+*`url.hostname`*::
 +
 --
 type: keyword
 
 example: elastic.co
 
-Hostname of the request, such as "example.com".
-For correlation the this field can be copied into the `host.name` field.
+Hostname of the request, such as "elastic.co".
+In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `hostname` field.
 
 
 --
@@ -5185,6 +5331,20 @@ type: long
 
 Minor version of the operating system.
 
+
+--
+
+*`agent.type`*::
++
+--
+type: alias
+
+--
+
+*`agent.hostname`*::
++
+--
+type: alias
 
 --
 
@@ -8633,7 +8793,7 @@ HTTP request information
 
 
 
-*`http.request.header`*::
+*`http.request.headers`*::
 +
 --
 type: object
@@ -8660,7 +8820,7 @@ HTTP response information
 
 
 
-*`http.response.header`*::
+*`http.response.headers`*::
 +
 --
 type: object
@@ -8787,6 +8947,24 @@ type: long
 
 Partition id.
 
+
+--
+
+*`kafka.partition.topic_id`*::
++
+--
+type: keyword
+
+Unique id of the partition in the topic.
+
+--
+
+*`kafka.partition.topic_broker_id`*::
++
+--
+type: keyword
+
+Unique id of the partition in the topic and the broker.
 
 --
 
@@ -19920,6 +20098,16 @@ The number of Bytes read from the device per second.
 
 --
 
+*`system.diskio.iostat.read.await`*::
++
+--
+type: float
+
+The average time spent for read requests issued to the device to be served.
+
+
+--
+
 *`system.diskio.iostat.write.per_sec.bytes`*::
 +
 --
@@ -19928,6 +20116,16 @@ type: float
 format: bytes
 
 The number of Bytes write from the device per second.
+
+
+--
+
+*`system.diskio.iostat.write.await`*::
++
+--
+type: float
+
+The average time spent for write requests issued to the device to be served.
 
 
 --

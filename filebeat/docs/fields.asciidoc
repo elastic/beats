@@ -252,13 +252,15 @@ The name of the operating system.
 
 --
 
-*`apache2.access.user_agent.raw`*::
+*`apache2.access.user_agent.original`*::
 +
 --
 type: text
 
-Raw user agent value before parsing by ingest-user-agent plugin.
+Original user agent value before parsing by ingest-user-agent plugin.
 
+
+Field is not indexed.
 
 --
 
@@ -597,34 +599,10 @@ Contains common beat fields available in all event types.
 
 
 
-*`beat.name`*::
-+
---
-The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
-
-
---
-
-*`beat.hostname`*::
-+
---
-The hostname as returned by the operating system on which the Beat is running.
-
-
---
-
 *`beat.timezone`*::
 +
 --
 The timezone as returned by the operating system on which the Beat is running.
-
-
---
-
-*`beat.version`*::
-+
---
-The version of the beat that generated this event.
 
 
 --
@@ -825,7 +803,7 @@ Version of the agent.
 
 --
 
-*`agent.name`*::
+*`agent.type`*::
 +
 --
 type: keyword
@@ -833,6 +811,16 @@ type: keyword
 example: filebeat
 
 Name of the agent.
+
+
+--
+
+*`agent.hostname`*::
++
+--
+type: keyword
+
+Hostname of the agent.
 
 
 --
@@ -1102,16 +1090,6 @@ Can be one or multiple IPv4 or IPv6 addresses.
 
 --
 
-*`destination.hostname`*::
-+
---
-type: keyword
-
-Hostname of the destination.
-
-
---
-
 *`destination.port`*::
 +
 --
@@ -1142,12 +1120,68 @@ Destination domain.
 
 --
 
-*`destination.subdomain`*::
+[float]
+== geo fields
+
+Geolocation for destination.
+
+
+*`destination.geo.continent_name`*::
 +
 --
 type: keyword
 
-Destination subdomain.
+Name of the continent.
+
+
+--
+
+*`destination.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`destination.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`destination.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`destination.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`destination.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
 
 
 --
@@ -2290,6 +2324,120 @@ This id normally changes across restarts, but `service.id` does not.
 --
 
 [float]
+== source fields
+
+Source fields describe details about the source of the event.
+
+
+
+*`source.ip`*::
++
+--
+type: ip
+
+IP address of the source.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`source.port`*::
++
+--
+type: long
+
+Port of the source.
+
+
+--
+
+*`source.mac`*::
++
+--
+type: keyword
+
+MAC address of the source.
+
+
+--
+
+*`source.domain`*::
++
+--
+type: keyword
+
+Source domain.
+
+
+--
+
+[float]
+== geo fields
+
+Geolocation for source.
+
+
+*`source.geo.continent_name`*::
++
+--
+type: keyword
+
+Name of the continent.
+
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`source.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+[float]
 == url fields
 
 URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
@@ -2333,15 +2481,15 @@ Note: The `:` is not part of the scheme.
 
 --
 
-*`url.host.name`*::
+*`url.hostname`*::
 +
 --
 type: keyword
 
 example: elastic.co
 
-Hostname of the request, such as "example.com".
-For correlation the this field can be copied into the `host.name` field.
+Hostname of the request, such as "elastic.co".
+In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `hostname` field.
 
 
 --
@@ -2595,6 +2743,20 @@ type: long
 
 Minor version of the operating system.
 
+
+--
+
+*`agent.type`*::
++
+--
+type: alias
+
+--
+
+*`agent.hostname`*::
++
+--
+type: alias
 
 --
 
@@ -3231,6 +3393,28 @@ haproxy Module
 
 
 
+[float]
+== destination fields
+
+Destination information
+
+
+*`haproxy.destination.port`*::
++
+--
+type: long
+
+Port of the destination host
+
+--
+
+*`haproxy.destination.ip`*::
++
+--
+IP of the destination host
+
+--
+
 *`haproxy.process_name`*::
 +
 --
@@ -3243,53 +3427,77 @@ Name of the process
 --
 type: long
 
-Process ID
+PID of the process
 
 --
 
-*`haproxy.client_ip`*::
+[float]
+== client fields
+
+Information about the client doing the request
+
+
+*`haproxy.client.ip`*::
 +
 --
-client_ip is the IP address of the client which initiated the TCP connection to haproxy.
+IP address of the client which initiated the TCP connection to haproxy.
 
 --
 
-*`haproxy.client_port`*::
+*`haproxy.client.port`*::
 +
 --
 type: long
 
-client_port is the TCP port of the client which initiated the connection.
+TCP port of the client which initiated the connection.
 
 --
 
 *`haproxy.frontend_name`*::
 +
 --
-frontend_name is the name of the frontend (or listener) which received and processed the connection.
+Name of the frontend (or listener) which received and processed the connection.
 
 --
 
 *`haproxy.backend_name`*::
 +
 --
-backend_name is the name of the backend (or listener) which was selected to manage the connection to the server.
+Name of the backend (or listener) which was selected to manage the connection to the server.
 
 --
 
 *`haproxy.server_name`*::
 +
 --
-server_name is the name of the last server to which the connection was sent.
+Name of the last server to which the connection was sent.
 
 --
 
-*`haproxy.time_client_req`*::
+*`haproxy.total_waiting_time_ms`*::
 +
 --
 type: long
 
-time_client_req is the total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+Total time in milliseconds spent waiting in the various queues
+
+--
+
+*`haproxy.connection_wait_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting for the connection to establish to the final server
+
+--
+
+*`haproxy.bytes_read`*::
++
+--
+type: long
+
+Total number of bytes transmitted to the client when the log is emitted.
 
 --
 
@@ -3298,7 +3506,7 @@ time_client_req is the total time in milliseconds spent waiting for a full HTTP 
 --
 type: long
 
-time_queue is the total time in milliseconds spent waiting in the various queues.
+Total time in milliseconds spent waiting in the various queues.
 
 --
 
@@ -3307,25 +3515,7 @@ time_queue is the total time in milliseconds spent waiting in the various queues
 --
 type: long
 
-time_backend_connect is the total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
-
---
-
-*`haproxy.time_server_response`*::
-+
---
-type: long
-
-time_server_response is the total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
-
---
-
-*`haproxy.time_duration`*::
-+
---
-type: long
-
-time_duration is the time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+Total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
 
 --
 
@@ -3334,7 +3524,7 @@ time_duration is the time the request remained active in haproxy, which is the t
 --
 type: long
 
-server_queue is the total number of requests which were processed before this one in the server queue.
+Total number of requests which were processed before this one in the server queue.
 
 --
 
@@ -3343,14 +3533,14 @@ server_queue is the total number of requests which were processed before this on
 --
 type: long
 
-backend_queue is the total number of requests which were processed before this one in the backend's global queue.
+Total number of requests which were processed before this one in the backend's global queue.
 
 --
 
 *`haproxy.bind_name`*::
 +
 --
-bind_name is the name of the listening address which received the connection.
+Name of the listening address which received the connection.
 
 --
 
@@ -3359,14 +3549,23 @@ bind_name is the name of the listening address which received the connection.
 --
 type: text
 
-error_message is the error message logged by HAProxy in case of error.
+Error message logged by HAProxy in case of error.
+
+--
+
+*`haproxy.source`*::
++
+--
+type: text
+
+The HAProxy source of the log
 
 --
 
 [float]
 == geoip fields
 
-Contains GeoIP information gathered based on the client_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+Contains GeoIP information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
 
 
 
@@ -3375,8 +3574,7 @@ Contains GeoIP information gathered based on the client_ip field. Only present i
 --
 type: keyword
 
-The name of the continent.
-
+Name of the continent.
 
 --
 
@@ -3387,7 +3585,6 @@ type: keyword
 
 Country ISO code.
 
-
 --
 
 *`haproxy.geoip.location`*::
@@ -3395,8 +3592,7 @@ Country ISO code.
 --
 type: geo_point
 
-The longitude and latitude.
-
+Represents a geopoint with the longitude and latitude.
 
 --
 
@@ -3405,8 +3601,7 @@ The longitude and latitude.
 --
 type: keyword
 
-The region name.
-
+Name of the region
 
 --
 
@@ -3415,8 +3610,7 @@ The region name.
 --
 type: keyword
 
-The city name.
-
+City name.
 
 --
 
@@ -3425,15 +3619,14 @@ The city name.
 --
 type: keyword
 
-Region ISO code.
-
+ISO code of the region
 
 --
 
 *`haproxy.termination_state`*::
 +
 --
-termination_state is the condition the session was in when the session ended.
+Condition the session was in when the session ended.
 
 --
 
@@ -3448,7 +3641,7 @@ Contains various counts of connections active in the process.
 --
 type: long
 
-active is the total number of concurrent connections on the process when the session was logged.
+Total number of concurrent connections on the process when the session was logged.
 
 --
 
@@ -3457,7 +3650,7 @@ active is the total number of concurrent connections on the process when the ses
 --
 type: long
 
-frontend is the total number of concurrent connections on the frontend when the session was logged.
+Total number of concurrent connections on the frontend when the session was logged.
 
 --
 
@@ -3466,7 +3659,7 @@ frontend is the total number of concurrent connections on the frontend when the 
 --
 type: long
 
-backend is the total number of concurrent connections handled by the backend when the session was logged.
+Total number of concurrent connections handled by the backend when the session was logged.
 
 --
 
@@ -3475,7 +3668,7 @@ backend is the total number of concurrent connections handled by the backend whe
 --
 type: long
 
-server is the total number of concurrent connections still active on the server when the session was logged.
+Total number of concurrent connections still active on the server when the session was logged.
 
 --
 
@@ -3484,7 +3677,16 @@ server is the total number of concurrent connections still active on the server 
 --
 type: long
 
-retries is the number of connection retries experienced by this session when trying to connect to the server.
+Number of connection retries experienced by this session when trying to connect to the server.
+
+--
+
+*`haproxy.mode`*::
++
+--
+type: text
+
+mode that the frontend is operating (TCP or HTTP)
 
 --
 
@@ -3505,23 +3707,14 @@ Fields related to the HTTP response
 --
 type: long
 
-status_code is the HTTP status code returned to the client.
-
---
-
-*`haproxy.http.response.bytes_read`*::
-+
---
-type: long
-
-bytes_read is the total number of bytes transmitted to the client when the log is emitted.
+HTTP status code returned to the client.
 
 --
 
 *`haproxy.http.response.captured_cookie`*::
 +
 --
-captured_cookie is an optional "name=value" entry indicating that the client had this cookie in the response.
+Optional "name=value" entry indicating that the client had this cookie in the response.
 
 
 --
@@ -3531,7 +3724,7 @@ captured_cookie is an optional "name=value" entry indicating that the client had
 --
 type: text
 
-captured_response_headers is a list of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
+List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
 
 
 --
@@ -3545,7 +3738,7 @@ Fields related to the HTTP request
 *`haproxy.http.request.captured_cookie`*::
 +
 --
-captured_cookie is an optional "name=value" entry indicating that the server has returned a cookie with its request.
+Optional "name=value" entry indicating that the server has returned a cookie with its request.
 
 
 --
@@ -3555,7 +3748,7 @@ captured_cookie is an optional "name=value" entry indicating that the server has
 --
 type: text
 
-captured_request_headers is a list of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
+List of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
 
 
 --
@@ -3565,7 +3758,58 @@ captured_request_headers is a list of headers captured in the request due to the
 --
 type: text
 
-raw_request_line is the complete HTTP request line, including the method, request and HTTP version string.
+Complete HTTP request line, including the method, request and HTTP version string.
+
+--
+
+*`haproxy.http.request.time_active_ms`*::
++
+--
+type: long
+
+Time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+
+--
+
+*`haproxy.http.request.time_wait_without_data_ms`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
+
+--
+
+*`haproxy.http.request.time_wait_ms`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+
+--
+
+[float]
+== tcp fields
+
+TCP log format
+
+
+*`haproxy.tcp.processing_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds elapsed between the accept and the last close
+
+--
+
+*`haproxy.tcp.connection_waiting_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds elapsed between the accept and the last close
 
 --
 
@@ -4037,13 +4281,15 @@ The name of the operating system.
 
 --
 
-*`iis.access.user_agent.raw`*::
+*`iis.access.user_agent.original`*::
 +
 --
 type: text
 
-Raw user agent value before parsing by ingest-user-agent plugin.
+Original user agent value before parsing by ingest-user-agent plugin.
 
+
+Field is not indexed.
 
 --
 
@@ -4537,19 +4783,31 @@ Contains log file lines.
 
 
 
-*`source`*::
+*`log.file.path`*::
 +
 --
 type: keyword
 
-required: True
+required: False
 
 The file from which the line was read. This field contains the absolute path to the file. For example: `/var/log/system.log`.
 
 
 --
 
-*`offset`*::
+*`log.source.ip`*::
++
+--
+type: ip
+
+required: False
+
+Source IP from which the log event was read / sent from.
+
+
+--
+
+*`log.offset`*::
 +
 --
 type: long
@@ -4585,19 +4843,6 @@ Log stream when reading container logs, can be 'stdout' or 'stderr'
 
 --
 
-*`prospector.type`*::
-+
---
-
-deprecated[6.3]
-
-required: True
-
-The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `input.type`)
-
-
---
-
 *`input.type`*::
 +
 --
@@ -4612,22 +4857,6 @@ The input type from which the event was generated. This field is set to the valu
 +
 --
 In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
-
-
---
-
-*`fileset.module`*::
-+
---
-The Filebeat module that generated this event.
-
-
---
-
-*`fileset.name`*::
-+
---
-The Filebeat fileset that generated this event.
 
 
 --
@@ -4717,6 +4946,29 @@ type: long
 
 Content length of the HTTP response body.
 
+
+--
+
+
+
+*`user_agent.os.full_name`*::
++
+--
+type: keyword
+
+--
+
+*`event.dataset`*::
++
+--
+type: alias
+
+--
+
+*`event.module`*::
++
+--
+type: alias
 
 --
 
@@ -5355,13 +5607,15 @@ The name of the operating system.
 
 --
 
-*`nginx.access.user_agent.raw`*::
+*`nginx.access.user_agent.original`*::
 +
 --
 type: text
 
-Raw user agent value before parsing by ingest-user-agent plugin.
+Original user agent value before parsing by ingest-user-agent plugin.
 
+
+Field is not indexed.
 
 --
 
@@ -6365,13 +6619,15 @@ The name of the operating system.
 
 --
 
-*`traefik.access.user_agent.raw`*::
+*`traefik.access.user_agent.original`*::
 +
 --
 type: text
 
-Raw user agent value before parsing by ingest-user-agent plugin.
+Original user agent value before parsing by ingest-user-agent plugin.
 
+
+Field is not indexed.
 
 --
 

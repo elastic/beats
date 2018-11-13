@@ -215,9 +215,12 @@ The index name to write events to. The default is
 +"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
-(see <<configuration-template>>). If you are using the pre-built Kibana
+(see <<configuration-template>>).
+ifndef::no_dashboards[]
+If you are using the pre-built Kibana
 dashboards, you also need to set the `setup.dashboards.index` option (see
 <<configuration-dashboards>>).
+endif::no_dashboards[]
 
 You can set the index dynamically by using a format string to access any event
 field. For example, this configuration uses a custom field, `fields.log_type`,
@@ -485,6 +488,7 @@ Elasticsearch.
 
 See <<configuration-ssl>> for more information.
 
+//begin outer exclude for ls, kafka, redis, file, and console
 ifndef::only-elasticsearch[]
 
 [[logstash-output]]
@@ -994,6 +998,7 @@ Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silentl
 Configuration options for SSL parameters like the root CA for Kafka connections. See
 <<configuration-ssl>> for more information.
 
+//begin inner exclude for redis
 ifndef::no-redis-output[]
 [[redis-output]]
 === Configure the Redis output
@@ -1250,6 +1255,7 @@ client. You can change this behavior by setting the
 This option determines whether Redis hostnames are resolved locally when using a proxy.
 The default value is false, which means that name resolution occurs on the proxy server.
 
+//end inner exclude for redis
 endif::[]
 
 [[file-output]]
@@ -1364,6 +1370,9 @@ Setting `bulk_max_size` to values less than or equal to 0 disables the
 splitting of batches. When splitting is disabled, the queue decides on the
 number of events to be contained in a batch.
 
+//end outer exclude for ls, kafka, redis, file, and console
+endif::[]
+
 [[configure-cloud-id]]
 === Configure the output for the Elastic Cloud
 
@@ -1405,6 +1414,9 @@ When specified, the `cloud.auth` overwrites the `output.elasticsearch.username` 
 the username and password from the Elasticsearch output, this can also be used
 to set the `setup.kibana.username` and `setup.kibana.password` options.
 
+//begin exclude for output codec
+ifndef::only-elasticsearch[]
+
 [[configuration-output-codec]]
 === Change the output codec
 
@@ -1437,4 +1449,5 @@ output.console:
     string: '%{[@timestamp]} %{[message]}'
 ------------------------------------------------------------------------------
 
+//end exclude for output codec
 endif::[]

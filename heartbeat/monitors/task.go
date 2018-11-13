@@ -123,7 +123,7 @@ func (t *task) makeSchedulerTaskFunc() scheduler.TaskFunc {
 // Start schedules this task for execution.
 func (t *task) Start() {
 	var err error
-	t.client, err = t.monitor.pipeline.ConnectWith(beat.ClientConfig{
+	t.client, err = t.monitor.pipelineConnector.ConnectWith(beat.ClientConfig{
 		EventMetadata: t.config.EventMetadata,
 		Processor:     t.processors,
 	})
@@ -135,7 +135,7 @@ func (t *task) Start() {
 	tf := t.makeSchedulerTaskFunc()
 	t.cancelFn, err = t.monitor.scheduler.Add(t.config.Schedule, t.job.Name(), tf)
 	if err != nil {
-		logp.Err("could not start monitor: %v, err")
+		logp.Err("could not start monitor: %v", err)
 	}
 }
 

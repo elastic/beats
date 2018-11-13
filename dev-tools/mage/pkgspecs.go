@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"bytes"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -35,15 +36,7 @@ var Packages []OSPackageArgs
 // UseCommunityBeatPackaging configures the package target to build packages for
 // a community Beat.
 func UseCommunityBeatPackaging() {
-	beatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		panic(err)
-	}
-
-	err = LoadNamedSpec("community_beat", filepath.Join(beatsDir, packageSpecFile))
-	if err != nil {
-		panic(err)
-	}
+	MustUsePackaging("community_beat", packageSpecFile)
 }
 
 // UseElasticBeatPackaging configures the package target to build packages for
@@ -51,15 +44,7 @@ func UseCommunityBeatPackaging() {
 // that is purely OSS under Apache 2.0 and one that is licensed under the
 // Elastic License and may contain additional X-Pack features.
 func UseElasticBeatPackaging() {
-	beatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		panic(err)
-	}
-
-	err = LoadNamedSpec("elastic_beat", filepath.Join(beatsDir, packageSpecFile))
-	if err != nil {
-		panic(err)
-	}
+	MustUsePackaging("elastic_beat", packageSpecFile)
 }
 
 // UseElasticBeatWithoutXPackPackaging configures the package target to build packages for
@@ -71,12 +56,34 @@ func UseElasticBeatPackaging() {
 // a temporary packaging target for projects that depends on beat but do have concrete x-pack
 // binaries.
 func UseElasticBeatWithoutXPackPackaging() {
+	MustUsePackaging("elastic_beat_without_xpack", packageSpecFile)
+}
+
+// MustUsePackaging will load a named spec from a named file, if any errors occurs when loading
+// the specs it will panic.
+//
+// NOTE: we assume that specFile is relative to the beatsDir.
+func MustUsePackaging(specName, specFile string) {
 	beatsDir, err := ElasticBeatsDir()
 	if err != nil {
 		panic(err)
 	}
 
-	err = LoadNamedSpec("elastic_beat_without_xpack", filepath.Join(beatsDir, packageSpecFile))
+	err = LoadNamedSpec(specName, filepath.Join(beatsDir, specFile))
+	if err != nil {
+		panic(err)
+	}
+}
+
+// LoadLocalNamedSpec loads the named package spec from the packages.yml in the
+// current directory.
+func LoadLocalNamedSpec(name string) {
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		panic(err)
+	}
+
+	err = LoadNamedSpec(name, filepath.Join(beatsDir, packageSpecFile), "packages.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -84,8 +91,8 @@ func UseElasticBeatWithoutXPackPackaging() {
 
 // LoadNamedSpec loads a packaging specification with the given name from the
 // specified YAML file. name should be a sub-key of 'specs'.
-func LoadNamedSpec(name, file string) error {
-	specs, err := LoadSpecs(file)
+func LoadNamedSpec(name string, files ...string) error {
+	specs, err := LoadSpecs(files...)
 	if err != nil {
 		return errors.Wrap(err, "failed to load spec file")
 	}
@@ -95,16 +102,20 @@ func LoadNamedSpec(name, file string) error {
 		return errors.Errorf("%v not found in package specs", name)
 	}
 
-	log.Printf("%v package spec loaded from %v", name, file)
+	log.Printf("%v package spec loaded from %v", name, files)
 	Packages = packages
 	return nil
 }
 
 // LoadSpecs loads the packaging specifications from the specified YAML file.
-func LoadSpecs(file string) (map[string][]OSPackageArgs, error) {
-	data, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to read from spec file")
+func LoadSpecs(files ...string) (map[string][]OSPackageArgs, error) {
+	var data [][]byte
+	for _, file := range files {
+		d, err := ioutil.ReadFile(file)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to read from spec file")
+		}
+		data = append(data, d)
 	}
 
 	type PackageYAML struct {
@@ -112,7 +123,7 @@ func LoadSpecs(file string) (map[string][]OSPackageArgs, error) {
 	}
 
 	var packages PackageYAML
-	if err = yaml.Unmarshal(data, &packages); err != nil {
+	if err := yaml.Unmarshal(bytes.Join(data, []byte{'\n'}), &packages); err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal spec data")
 	}
 

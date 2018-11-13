@@ -1,0 +1,92 @@
+# The ECS migration file contains the information about all the Beats fields which are migrated to ECS in 7.0.
+# The goal of the file is to potentially have scripts on top of this information to convert visualisations and templates
+# based on this information in an automated way and to keep track of all changes which were applied.
+#
+# The format of the file is as following:
+#
+# - from: source-field-in-6.x
+#   to: target-filed-in-ECS
+#   # Alias field is useful for fields where there is a 1-1 mapping from old to new
+#   alias: true-if-alias-is-required-in-6x
+#   # Copy to is useful for fields where multiple fields map to the same ECS field
+#   copy_to: true-if-field-should-be-copied-to-target-in-6x
+
+- from: offset
+  to: log.offset
+  alias: true
+  copy_to: false
+
+- from: fileset.name
+  to: event.dataset
+  alias: true
+  copy_to: false
+
+- from: fileset.module
+  to: event.module
+  alias: true
+
+- from: source
+  to: ["log.file.path", "log.source.ip"]
+  alias: false
+  copy_to: false
+
+- from: beat.name
+  to: agent.type
+  alias: true
+  copy_to: false
+
+- from: beat.hostname
+  to: agent.hostname
+  alias: true
+  copy_to: false
+
+- from: beat.version
+  to: agent.version
+  alias: true
+  copy_to: false
+
+- from: source_ecs.ip
+  to: source.ip
+  alias: true
+  copy_to: false
+
+- from: source_ecs.port
+  to: source.port
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.continent_name
+  to: source.geo.continent_name
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.location
+  to: source.geo.location
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.region_name
+  to: source.geo.region_name
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.city_name
+  to: source.geo.city_name
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  copy_to: false
+
+# From Auditbeat's auditd module.
+- from: source.hostname
+  to: source.domain
+  alias: true
+  copy_to: false

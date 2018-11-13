@@ -11,12 +11,11 @@
         "elasticsearch.gc.phase.cpu_time.user_sec": "0.01", 
         "elasticsearch.gc.phase.duration_sec": "0.0021716", 
         "elasticsearch.gc.phase.name": "CMS Initial Mark", 
-        "fileset.module": "elasticsearch", 
-        "fileset.name": "gc", 
+        "event.dataset": "gc", 
+        "event.module": "elasticsearch", 
         "input.type": "log", 
+        "log.offset": 0, 
         "message": "2018-03-03T19:37:06.157+0500: 14597.826: [GC (CMS Initial Mark) [1 CMS-initial-mark: 131804K(174784K)] 142444K(253440K), 0.0021716 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]", 
-        "offset": 0, 
-        "prospector.type": "log", 
         "service.name": "elasticsearch"
     }, 
     {
@@ -24,12 +23,11 @@
         "elasticsearch.gc.jvm_runtime_sec": "1396138.752", 
         "elasticsearch.gc.stopping_threads_time_sec": "0.0000702", 
         "elasticsearch.gc.threads_total_stop_time_sec": "0.0083760", 
-        "fileset.module": "elasticsearch", 
-        "fileset.name": "gc", 
+        "event.dataset": "gc", 
+        "event.module": "elasticsearch", 
         "input.type": "log", 
+        "log.offset": 181, 
         "message": "2018-06-11T01:53:11.382+0000: 1396138.752: Total time for which application threads were stopped: 0.0083760 seconds, Stopping threads took: 0.0000702 seconds", 
-        "offset": 181, 
-        "prospector.type": "log", 
         "service.name": "elasticsearch"
     }, 
     {
@@ -51,12 +49,11 @@
         "elasticsearch.gc.phase.weak_refs_processing_time_sec": "0.0003647", 
         "elasticsearch.gc.young_gen.size_kb": "157248", 
         "elasticsearch.gc.young_gen.used_kb": "113198", 
-        "fileset.module": "elasticsearch", 
-        "fileset.name": "gc", 
+        "event.dataset": "gc", 
+        "event.module": "elasticsearch", 
         "input.type": "log", 
+        "log.offset": 339, 
         "message": "2018-06-30T16:35:26.632+0500: 224.671: [GC (CMS Final Remark) [YG occupancy: 113198 K (157248 K)]224.671: [Rescan (parallel) , 0.0148273 secs]224.686: [weak refs processing, 0.0003647 secs]224.687: [class unloading, 0.0188407 secs]224.705: [scrub symbol table, 0.0100207 secs]224.715: [scrub string table, 0.0005253 secs][1 CMS-remark: 277821K(349568K)] 391020K(506816K), 0.0457689 secs] [Times: user=0.12 sys=0.00, real=0.04 secs]", 
-        "offset": 339, 
-        "prospector.type": "log", 
         "service.name": "elasticsearch"
     }
 ]

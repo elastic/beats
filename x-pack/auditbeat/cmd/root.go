@@ -6,6 +6,8 @@ package cmd
 
 import (
 	"github.com/elastic/beats/auditbeat/cmd"
+	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
+)
 
 	// Register Auditbeat x-pack modules.
 	_ "github.com/elastic/beats/x-pack/auditbeat/include"
@@ -15,5 +17,5 @@ import (
 var RootCmd = cmd.RootCmd
 
 func init() {
-	// TODO: Inject x-pack features.
+	xpackcmd.AddXPack(RootCmd, cmd.Name)
 }

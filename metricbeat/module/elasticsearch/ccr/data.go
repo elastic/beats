@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
@@ -54,44 +55,50 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
+		err = errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
 		r.Error(err)
 		return err
 	}
 
-	var errors multierror.Errors
+	var errs multierror.Errors
 	for _, followerShards := range data {
 
 		shards, ok := followerShards.([]interface{})
 		if !ok {
 			err := fmt.Errorf("shards is not an array")
-			errors = append(errors, err)
+			errs = append(errs, err)
+			r.Error(err)
 			continue
 		}
 
 		for _, s := range shards {
-			shard, ok := s.(map[string]interface{})
-			if !ok {
-				err := fmt.Errorf("shard is not an object")
-				errors = append(errors, err)
-				continue
-			}
 			event := mb.Event{}
-			event.MetricSetFields, err = schema.Apply(shard)
-			if err != nil {
-				errors = append(errors, err)
-				continue
-			}
-
 			event.RootFields = common.MapStr{}
-			event.RootFields.Put("service.name", "elasticsearch")
+			event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
 			event.ModuleFields = common.MapStr{}
 			event.ModuleFields.Put("cluster.name", info.ClusterName)
 			event.ModuleFields.Put("cluster.id", info.ClusterID)
 
+			shard, ok := s.(map[string]interface{})
+			if !ok {
+				event.Error = fmt.Errorf("shard is not an object")
+				r.Event(event)
+				errs = append(errs, event.Error)
+				continue
+			}
+
+			event.MetricSetFields, err = schema.Apply(shard)
+			if err != nil {
+				event.Error = errors.Wrap(err, "failure applying shard schema")
+				r.Event(event)
+				errs = append(errs, event.Error)
+				continue
+			}
+
 			r.Event(event)
 		}
 	}
 
-	return errors.Err()
+	return errs.Err()
 }
