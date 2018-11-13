@@ -207,6 +207,8 @@ func customizePackaging() {
 		case mage.Deb, mage.RPM, mage.DMG:
 			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", shortConfig)
 			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
+		case mage.Docker:
+			args.Spec.ExtraVar("user", "root")
 		default:
 			panic(errors.Errorf("unhandled package type: %v", pkgType))
 		}

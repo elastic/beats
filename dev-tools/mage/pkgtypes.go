@@ -61,6 +61,7 @@ const (
 	Zip
 	TarGz
 	DMG
+	Docker
 )
 
 // OSPackageArgs define a set of package types to build for an operating
@@ -103,6 +104,7 @@ type PackageFile struct {
 	Target   string                  `yaml:"target,omitempty"`    // Target location in package. Relative paths are added to a package specific directory (e.g. metricbeat-7.0.0-linux-x86_64).
 	Mode     os.FileMode             `yaml:"mode,omitempty"`      // Target mode for file. Does not apply when source is a directory.
 	Config   bool                    `yaml:"config"`              // Mark file as config in the package (deb and rpm only).
+	Modules  bool                    `yaml:"modules"`             // Mark directory as directory with modules.
 	Dep      func(PackageSpec) error `yaml:"-" hash:"-" json:"-"` // Dependency to invoke during Evaluate.
 }
 
@@ -165,6 +167,9 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 			"ppc64le":  "ppc64le",
 			"s390x":    "s390x",
 		},
+		Docker: map[string]string{
+			"amd64": "amd64",
+		},
 	},
 }
 
@@ -204,6 +209,8 @@ func (typ PackageType) String() string {
 		return "tar.gz"
 	case DMG:
 		return "dmg"
+	case Docker:
+		return "docker"
 	default:
 		return "invalid"
 	}
@@ -227,6 +234,8 @@ func (typ *PackageType) UnmarshalText(text []byte) error {
 		*typ = Zip
 	case "dmg":
 		*typ = DMG
+	case "docker":
+		*typ = Docker
 	default:
 		return errors.Errorf("unknown package type: %v", string(text))
 	}
@@ -256,6 +265,8 @@ func (typ PackageType) Build(spec PackageSpec) error {
 		return PackageTarGz(spec)
 	case DMG:
 		return PackageDMG(spec)
+	case Docker:
+		return PackageDocker(spec)
 	default:
 		return errors.Errorf("unknown package type: %v", typ)
 	}
@@ -280,6 +291,14 @@ func (s PackageSpec) ReplaceFile(target string, file PackageFile) {
 	}
 
 	s.Files[target] = file
+}
+
+// ExtraVar adds or replaces a variable to `extra_vars` in package specs.
+func (s *PackageSpec) ExtraVar(key, value string) {
+	if s.ExtraVars == nil {
+		s.ExtraVars = make(map[string]string)
+	}
+	s.ExtraVars[key] = value
 }
 
 // Expand expands a templated string using data from the spec.
@@ -821,5 +840,18 @@ func PackageDMG(spec PackageSpec) error {
 		return err
 	}
 
+	return b.Build()
+}
+
+// PackageDocker packages the Beat into a docker image.
+func PackageDocker(spec PackageSpec) error {
+	if err := HaveDocker(); err != nil {
+		return errors.Errorf("docker daemon required to build images: %s", err)
+	}
+
+	b, err := newDockerBuilder(spec)
+	if err != nil {
+		return err
+	}
 	return b.Build()
 }
