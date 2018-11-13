@@ -36,6 +36,8 @@ include::./how-filebeat-works.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
+include::../../libbeat/docs/shared-central-management.asciidoc[]
+
 include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]
