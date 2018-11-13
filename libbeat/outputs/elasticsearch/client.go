@@ -26,6 +26,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -42,10 +43,11 @@ type Client struct {
 	Connection
 	tlsConfig *transport.TLSConfig
 
-	index    outil.Selector
-	pipeline *outil.Selector
-	params   map[string]string
-	timeout  time.Duration
+	index     outil.Selector
+	pipeline  *outil.Selector
+	params    map[string]string
+	timeout   time.Duration
+	eventType string
 
 	// buffered bulk requests
 	bulkRequ *bulkRequest
@@ -130,7 +132,9 @@ var (
 )
 
 const (
-	eventType = "doc"
+	defaultEventTypeES6 = "doc"
+	defaultEventTypeES7 = "_doc"
+	defaultEventType    = defaultEventTypeES7
 )
 
 // NewClient instantiates a new client.
@@ -215,6 +219,7 @@ func NewClient(
 		pipeline:  pipeline,
 		params:    params,
 		timeout:   s.Timeout,
+		eventType: defaultEventType,
 
 		bulkRequ: bulkRequ,
 
@@ -302,7 +307,7 @@ func (client *Client) publishEvents(
 	// events slice
 
 	origCount := len(data)
-	data = bulkEncodePublishRequest(body, client.index, client.pipeline, data)
+	data = bulkEncodePublishRequest(body, client.index, client.pipeline, client.eventType, data)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
@@ -362,12 +367,13 @@ func bulkEncodePublishRequest(
 	body bulkWriter,
 	index outil.Selector,
 	pipeline *outil.Selector,
+	eventType string,
 	data []publisher.Event,
 ) []publisher.Event {
 	okEvents := data[:0]
 	for i := range data {
 		event := &data[i].Content
-		meta, err := createEventBulkMeta(index, pipeline, event)
+		meta, err := createEventBulkMeta(index, pipeline, eventType, event)
 		if err != nil {
 			logp.Err("Failed to encode event meta data: %s", err)
 			continue
@@ -384,6 +390,7 @@ func bulkEncodePublishRequest(
 func createEventBulkMeta(
 	indexSel outil.Selector,
 	pipelineSel *outil.Selector,
+	eventType string,
 	event *beat.Event,
 ) (interface{}, error) {
 	pipeline, err := getPipeline(event, pipelineSel)
@@ -672,6 +679,20 @@ func (client *Client) Test(d testing.Driver) {
 
 func (client *Client) String() string {
 	return "elasticsearch(" + client.Connection.URL + ")"
+}
+
+func (client *Client) Connect() error {
+	err := client.Connection.Connect()
+	if err != nil {
+		return err
+	}
+
+	if strings.HasPrefix(client.GetVersion(), "7.") {
+		client.eventType = defaultEventTypeES7
+	} else {
+		client.eventType = defaultEventTypeES6
+	}
+	return nil
 }
 
 // Connect connects the client.

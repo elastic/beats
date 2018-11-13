@@ -210,19 +210,20 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 
-	if t.esVersion.IsMajor(7) {
-		defaultFields = append(defaultFields, "fields.*")
-		indexSettings.Put("query.default_field", defaultFields)
-	}
-
-	indexSettings.DeepUpdate(t.config.Settings.Index)
-
 	var mappingName string
 	if t.esVersion.Major >= 6 {
 		mappingName = "doc"
 	} else {
 		mappingName = "_default_"
 	}
+
+	if t.esVersion.IsMajor(7) {
+		mappingName = "_doc"
+		defaultFields = append(defaultFields, "fields.*")
+		indexSettings.Put("query.default_field", defaultFields)
+	}
+
+	indexSettings.DeepUpdate(t.config.Settings.Index)
 
 	// Load basic structure
 	basicStructure := common.MapStr{
