@@ -21,10 +21,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/filebeat/reader"
 	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestDockerJSON(t *testing.T) {

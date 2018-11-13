@@ -24,15 +24,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/go-lumber/server/v2"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/go-lumber/server/v2"
 )
 
 const (
