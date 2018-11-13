@@ -332,6 +332,10 @@ func userEvent(user *User, eventType string, eventAction string) mb.Event {
 				"type":   eventType,
 				"action": eventAction,
 			},
+			"user": common.MapStr{
+				"id":   user.UID,
+				"name": user.Name,
+			},
 		},
 		MetricSetFields: user.toMapStr(),
 	}

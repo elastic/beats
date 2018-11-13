@@ -11,6 +11,10 @@
         "action": "existing_user",
         "id": "57ee8bb6-a3da-4c43-b0d9-0688ccdc88d0"
     },
+    "user": {
+        "id": 1001,
+        "name": "ubuntu"
+    },
     "system": {
         "user": {
             "uid": 1001,
