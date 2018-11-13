@@ -23,7 +23,7 @@ class TestKeystore(KeystoreBase):
         """
 
         key = "mysecretpath"
-        secret = "thisisultrasecretpath"
+        secret = self.working_dir + "thisisultrasecretpath"
 
         self.render_config_template("mockbeat",
                                     keystore_path=self.keystore_path,
@@ -35,8 +35,9 @@ class TestKeystore(KeystoreBase):
 
         self.add_secret(key, secret)
         proc = self.start_beat(config="mockbeat.yml")
-        self.wait_until(lambda: self.log_contains("accessing key '%s' from the keystore" % key))
+        self.wait_until(lambda: self.log_contains("ackloop:  done send ack"))
         proc.check_kill_and_wait()
+        assert path.exists(secret)
 
     def test_keystore_with_key_not_present(self):
         key = "elasticsearch_host"
@@ -56,7 +57,7 @@ class TestKeystore(KeystoreBase):
         """
 
         key = "output.elasticsearch.hosts.0"
-        secret = "myeleasticsearchsecrethost"
+        secret = self.working_dir + "myeleasticsearchsecrethost"
 
         self.render_config_template("mockbeat",
                                     keystore_path=self.keystore_path,
@@ -68,8 +69,9 @@ class TestKeystore(KeystoreBase):
 
         self.add_secret(key, secret)
         proc = self.start_beat(config="mockbeat.yml")
-        self.wait_until(lambda: self.log_contains("accessing key '%s' from the keystore" % key))
+        self.wait_until(lambda: self.log_contains("ackloop:  done send ack"))
         proc.check_kill_and_wait()
+        assert path.exists(secret)
 
     def test_export_config_with_keystore(self):
         """
