@@ -137,7 +137,7 @@ func (a *Autodiscover) worker() {
 				logp.Debug(debugK, "Reloading existing autodiscover configs after error")
 			}
 
-			configs := make([]*reload.ConfigWithMeta, 0, len(a.configs))
+			configs := []*reload.ConfigWithMeta{}
 			for _, list := range a.configs {
 				for _, c := range list {
 					configs = append(configs, c)
@@ -161,7 +161,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 
 	eventID := getID(event)
 	if eventID == "" {
-		logp.Err("Event didn't provide instance id, ignoring it")
+		logp.Err("Event didn't provide instance id: %+v, ignoring it", event)
 		return false
 	}
 
@@ -215,7 +215,7 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 	logp.Debug(debugK, "Got a stop event: %v", event)
 	eventID := getID(event)
 	if eventID == "" {
-		logp.Err("Event didn't provide instance id, ignoring it")
+		logp.Err("Event didn't provide instance id: %+v, ignoring it", event)
 		return false
 	}
 
