@@ -11,6 +11,7 @@ import time
 import yaml
 import hashlib
 import re
+from jinja_filters import to_yaml
 from datetime import datetime, timedelta
 
 from .compose import ComposeMixin
@@ -297,6 +298,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
             ])
         )
+
+        self.template_env.filters['to_yaml'] = to_yaml
 
         # create working dir
         self.working_dir = os.path.abspath(os.path.join(

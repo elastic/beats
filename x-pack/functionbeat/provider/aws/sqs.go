@@ -98,6 +98,7 @@ func (s *SQS) Template() *cloudformation.Template {
 			FunctionName:   cloudformation.GetAtt(prefix(""), "Arn"),
 		}
 	}
+
 	return template
 }
 

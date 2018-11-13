@@ -1,53 +1,7 @@
 ################### Beat Configuration #########################
-functionbeat.provider.local:
-    functions:
-      - type: stdin
-        enabled: true
-
-############################# Output ##########################################
-
-# Configure what outputs to use when sending the data collected by the beat.
-# You can enable one or multiple outputs by setting enabled option to true.
-output:
-
-  ### File as output
-  file:
-    # Enabling file output
-    enabled: true
-
-    # Path to the directory where to save the generated files. The option is mandatory.
-    path: {{ output_file_path|default(beat.working_dir + "/output") }}
-
-
-    # Name of the generated files. The default is `functionbeat` and it generates
-    # files: `functionbeat`, `functionbeat.1`, `functionbeat.2`, etc.
-    filename: {{ output_file_filename|default("functionbeat") }}
-
-    # Maximum size in kilobytes of each file. When this size is reached, the files are
-    # rotated. The default value is 10 MB.
-    #rotate_every_kb: 10000
-
-    # Maximum number of files under path. When this number of files is reached, the
-    # oldest file is deleted and the rest are shifted from last to first. The default
-    # is 7 files.
-    #number_of_files: 7
-
-
-
-############################# Beat #########################################
-
-# The name of the shipper that publishes the network data. It can be used to group
-# all the transactions sent by a single shipper in the web interface.
-# If this options is not defined, the hostname is used.
-#name:
-
-# The tags of the shipper are included in their own field with each
-# transaction published. Tags make it easy to group servers by different
-# logical properties.
-#tags: ["service-X", "web-tier"]
-
-
-
+functionbeat.provider.aws.deploy_bucket: {{deploy_bucket}}
+functionbeat.provider.aws.functions:
+    - {{function | to_yaml | indent(6, false)}}
 ############################# Logging #########################################
 
 #logging:
@@ -78,3 +32,21 @@ output:
 
     # Number of rotated log files to keep. Oldest files will be deleted first.
     #keepfiles: 7
+
+#============================= Elastic Cloud ==================================
+
+# These settings simplify using filebeat with the Elastic Cloud (https://cloud.elastic.co/).
+
+# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+# `setup.kibana.host` options.
+# You can find the `cloud.id` in the Elastic Cloud web UI.
+cloud.id: {{cloud_id}}
+
+# The cloud.auth setting overwrites the `output.elasticsearch.username` and
+# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+cloud.auth: {{cloud_auth}}
+
+#================================ General ======================================
+{% if options %}
+{{options| to_yaml}}
+{% endif %}
