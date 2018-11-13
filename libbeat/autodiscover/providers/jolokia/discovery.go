@@ -73,6 +73,7 @@ var messageSchema = s.Schema{
 // Event is a Jolokia Discovery event
 type Event struct {
 	Type    string
+	AgentID string
 	Message common.MapStr
 }
 
@@ -80,6 +81,7 @@ type Event struct {
 func (e *Event) BusEvent() bus.Event {
 	event := bus.Event{
 		e.Type:    true,
+		"id":      e.AgentID,
 		"jolokia": e.Message,
 		"meta": common.MapStr{
 			"jolokia": e.Message,
@@ -93,6 +95,7 @@ func (e *Event) BusEvent() bus.Event {
 type Instance struct {
 	LastSeen      time.Time
 	LastInterface *InterfaceConfig
+	AgentID       string
 	Message       common.MapStr
 }
 
@@ -277,16 +280,13 @@ func (d *Discovery) update(config InterfaceConfig, message common.MapStr) {
 		return
 	}
 
-	// set instance id
-	message["id"] = agentID
-
 	d.Lock()
 	defer d.Unlock()
 	i, found := d.instances[agentID]
 	if !found {
-		i = &Instance{Message: message}
+		i = &Instance{Message: message, AgentID: agentID}
 		d.instances[agentID] = i
-		d.events <- Event{"start", message}
+		d.events <- Event{"start", agentID, message}
 	}
 	i.LastSeen = time.Now()
 	i.LastInterface = &config
@@ -298,7 +298,7 @@ func (d *Discovery) checkStopped() {
 
 	for id, i := range d.instances {
 		if time.Since(i.LastSeen) > i.LastInterface.GracePeriod {
-			d.events <- Event{"stop", i.Message}
+			d.events <- Event{"stop", i.AgentID, i.Message}
 			delete(d.instances, id)
 		}
 	}
