@@ -94,6 +94,7 @@ you'll see an Error status in the {cm-ui} UI and need to look at the logs for
 the Beat to troubleshoot the problem. 
 
 [[enroll-beats]]
+[role="xpack"]
 == Enroll {beats} in central management
 
 You need to enroll {beats} to register them in
@@ -173,12 +174,9 @@ The method to use for getting the password. Available options are:
 *`--force`*::
 Overwrites the current settings without asking for confirmation.
 
-[[central-management-API]]
-== Enrollment API (not documented for beta)
 
-Documentation about the enrollment API for {beats} central management is not yet
-available.
+//[[central-management-API]]
+//== Enrollment API (not documented for beta)
+//
+//available.
 
-// REVIEWERS: Thought it might be worth adding a container so users know that the
-// there is an API, but that it's not documented. I can comment this out if you
-// think it's a bad idea to show it here.
