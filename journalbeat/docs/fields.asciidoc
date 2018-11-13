@@ -2574,6 +2574,20 @@ Minor version of the operating system.
 
 --
 
+*`agent.type`*::
++
+--
+type: alias
+
+--
+
+*`agent.hostname`*::
++
+--
+type: alias
+
+--
+
 [[exported-fields-host-processor]]
 == Host fields
 

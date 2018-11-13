@@ -1217,3 +1217,14 @@
           type: long
           description: >
             Minor version of the operating system.
+
+  # Temporary fix to get 7.0 dashboards working.
+  # This must go in the ecs.yml as otherwise tests don't work.
+    - name: beat.name
+      type: alias
+      path: agent.type
+
+    - name: beat.hostname
+      type: alias
+      path: agent.hostname
+
