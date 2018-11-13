@@ -23,10 +23,10 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/reader"
-
-	"github.com/pkg/errors"
 )
 
 // DockerJSONReader processor renames a given field

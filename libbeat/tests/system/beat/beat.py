@@ -17,7 +17,7 @@ from .compose import ComposeMixin
 
 
 BEAT_REQUIRED_FIELDS = ["@timestamp",
-                        "beat.name", "beat.hostname", "beat.version"]
+                        "agent.type", "agent.hostname", "agent.version"]
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -47,7 +47,7 @@ class Proc(object):
     def start(self):
         # ensure that the environment is inherited to the subprocess.
         variables = os.environ.copy()
-        variables = variables.update(self.env)
+        variables.update(self.env)
 
         if sys.platform.startswith("win"):
             self.proc = subprocess.Popen(

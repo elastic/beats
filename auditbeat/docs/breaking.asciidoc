@@ -1,4 +1,15 @@
 [[auditbeat-breaking-changes]]
+== Breaking changes in 7.0
+
+In version 7.0 the following fields were renamed.
+
+.Renamed Fields in 7.0
+[frame="topbot",options="header"]
+|======================
+|Old Field|New Field
+|`source.hostname`        |`source.domain`
+|======================
+
 == Breaking changes in 6.2
 
 As a general rule, we strive to keep backwards compatibility between minor
@@ -97,7 +108,7 @@ In Kibana you need to <<load-kibana-dashboards,import>> the latest dashboards
 that work with the new event format. The new dashboards will not work with data
 produced by older versions of Auditbeat.
 
-.Renamed Fields
+.Renamed Fields in 6.2
 [frame="topbot",options="header"]
 |======================
 |Old Field|New Field

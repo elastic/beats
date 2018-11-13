@@ -133,8 +133,8 @@ class Test(BaseTest):
         objects = [o["_source"] for o in res["hits"]["hits"]]
         assert len(objects) > 0
         for obj in objects:
-            assert obj["fileset"]["module"] == module, "expected fileset.module={} but got {}".format(
-                module, obj["fileset"]["module"])
+            assert obj["event"]["module"] == module, "expected event.module={} but got {}".format(
+                module, obj["event"]["module"])
 
             assert "error" not in obj, "not error expected but got: {}".format(
                 obj)
@@ -176,7 +176,7 @@ class Test(BaseTest):
                 clean_keys(obj)
 
                 # Remove timestamp for comparison where timestamp is not part of the log line
-                if obj["fileset.module"] == "icinga" and obj["fileset.name"] == "startup":
+                if obj["event.module"] == "icinga" and obj["event.dataset"] == "startup":
                     delete_key(obj, "@timestamp")
                     delete_key(ev, "@timestamp")
 
@@ -190,11 +190,11 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "beat.hostname", "beat.name"]
+    host_keys = ["host.name", "agent.hostname", "agent.type"]
     # The create timestamps area always new
     time_keys = ["read_timestamp", "event.created"]
     # source path and beat.version can be different for each run
-    other_keys = ["source", "beat.version"]
+    other_keys = ["log.file.path", "agent.version"]
 
     for key in host_keys + time_keys + other_keys:
         delete_key(obj, key)

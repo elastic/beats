@@ -18,7 +18,6 @@
 package mage
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/magefile/mage/sh"
@@ -32,23 +31,6 @@ import (
 // contents of each fields.yml will be included in the generated file.
 func GenerateFieldsYAML(moduleDirs ...string) error {
 	return generateFieldsYAML(OSSBeatDir(), moduleDirs...)
-}
-
-// OSSBeatDir returns the OSS beat directory. You can pass paths and they will
-// be joined and appended to the OSS beat dir.
-func OSSBeatDir(path ...string) string {
-	ossDir := CWD()
-
-	// Check if we need to correct ossDir because it's in x-pack.
-	if parentDir := filepath.Base(filepath.Dir(ossDir)); parentDir == "x-pack" {
-		// If the OSS version of the beat exists.
-		tmp := filepath.Join(ossDir, "../..", BeatName)
-		if _, err := os.Stat(tmp); !os.IsNotExist(err) {
-			ossDir = tmp
-		}
-	}
-
-	return filepath.Join(append([]string{ossDir}, path...)...)
 }
 
 func generateFieldsYAML(baseDir string, moduleDirs ...string) error {
@@ -104,7 +86,7 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 // each module's field.yml data in a format that can be embedded in Beat's
 // binary.
 func GenerateModuleFieldsGo() error {
-	const moduleFieldsCmdPath = "dev-tools/cmd/module_fields/main.go"
+	const moduleFieldsCmdPath = "dev-tools/cmd/module_fields/module_fields.go"
 
 	beatsDir, err := ElasticBeatsDir()
 	if err != nil {
@@ -119,6 +101,30 @@ func GenerateModuleFieldsGo() error {
 	moduleFieldsCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, moduleFieldsCmdPath),
 		"-beat", BeatName,
+		"-license", licenseType,
+		filepath.Join(CWD(), "module"),
+	)
+
+	return moduleFieldsCmd()
+}
+
+// GenerateModuleIncludeListGo generates an include/list.go file containing
+// a import statement for each module and metricset.
+func GenerateModuleIncludeListGo() error {
+	const moduleIncludeListCmdPath = "dev-tools/cmd/module_include_list/module_include_list.go"
+
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+
+	licenseType := BeatLicense
+	if licenseType == "ASL 2.0" {
+		licenseType = "ASL2"
+	}
+
+	moduleFieldsCmd := sh.RunCmd("go", "run",
+		filepath.Join(beatsDir, moduleIncludeListCmdPath),
 		"-license", licenseType,
 		filepath.Join(CWD(), "module"),
 	)

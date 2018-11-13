@@ -24,12 +24,12 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
 	"github.com/elastic/beats/libbeat/version"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCheckTemplate(t *testing.T) {

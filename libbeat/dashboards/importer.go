@@ -30,8 +30,22 @@ import (
 	"strconv"
 	"strings"
 
+	errw "github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 )
+
+// ErrNotFound returned when we cannot find any dashboard to import.
+type ErrNotFound struct {
+	ErrorString string
+}
+
+// Error returns the human readable error.
+func (e *ErrNotFound) Error() string { return e.ErrorString }
+
+func newErrNotFound(s string, a ...interface{}) *ErrNotFound {
+	return &ErrNotFound{fmt.Sprintf(s, a...)}
+}
 
 // MessageOutputter is a function type for injecting status logging
 // into this module.
@@ -70,12 +84,12 @@ func (imp Importer) Import() error {
 	if imp.cfg.URL != "" || imp.cfg.File != "" {
 		err := imp.ImportArchive()
 		if err != nil {
-			return fmt.Errorf("Error importing URL/file: %v", err)
+			return errw.Wrap(err, "Error importing URL/file")
 		}
 	} else {
 		err := imp.ImportKibanaDir(imp.cfg.Dir)
 		if err != nil {
-			return fmt.Errorf("Error importing directory %s: %v", imp.cfg.Dir, err)
+			return errw.Wrapf(err, "Error importing directory %s", imp.cfg.Dir)
 		}
 	}
 	return nil
@@ -294,7 +308,7 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 	imp.loader.statusMsg("Importing directory %v", dir)
 
 	if _, err := os.Stat(dir); err != nil {
-		return fmt.Errorf("No directory %s", dir)
+		return newErrNotFound("No directory %s", dir)
 	}
 
 	check := []string{}
@@ -315,7 +329,7 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 	}
 
 	if len(types) == 0 {
-		return fmt.Errorf("The directory %s does not contain the %s subdirectory."+
+		return newErrNotFound("The directory %s does not contain the %s subdirectory."+
 			" There is nothing to import into Kibana.", dir, strings.Join(check, " or "))
 	}
 
@@ -332,8 +346,8 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 	}
 
 	if wantDashboards && !importDashboards {
-		return fmt.Errorf("No dashboards to import. Please make sure the %s directory contains a dashboard directory.",
-			dir)
+		return newErrNotFound("No dashboards to import. Please make sure the %s directory "+
+			"contains a dashboard directory.", dir)
 	}
 	return nil
 }

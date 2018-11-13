@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2017-07-31T13:36:42.585Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 0, 
         "message": "2017-07-31 13:36:42.585 CEST [4974] LOG:  database system was shut down at 2017-06-17 16:58:04 CEST", 
@@ -14,8 +14,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.605Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 100, 
         "message": "2017-07-31 13:36:42.605 CEST [4974] LOG:  MultiXact member wraparound protections are now enabled", 
@@ -27,8 +27,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.615Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 198, 
         "message": "2017-07-31 13:36:42.615 CEST [4978] LOG:  autovacuum launcher started", 
@@ -40,8 +40,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.616Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 268, 
         "message": "2017-07-31 13:36:42.616 CEST [4973] LOG:  database system is ready to accept connections", 
@@ -53,8 +53,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.956Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 357, 
         "message": "2017-07-31 13:36:42.956 CEST [4980] [unknown]@[unknown] LOG:  incomplete startup packet", 
@@ -68,8 +68,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:36:43.557Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.flags": [
             "multiline"
@@ -87,8 +87,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:36:44.104Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.flags": [
             "multiline"
@@ -106,8 +106,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:36:44.642Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.flags": [
             "multiline"
@@ -125,8 +125,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:39:16.249Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 1727, 
         "message": "2017-07-31 13:39:16.249 CEST [5407] postgres@users FATAL:  database \"users\" does not exist", 
@@ -140,8 +140,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:39:17.945Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 1818, 
         "message": "2017-07-31 13:39:17.945 CEST [5500] postgres@user FATAL:  database \"user\" does not exist", 
@@ -155,8 +155,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:39:21.025Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.flags": [
             "multiline"
@@ -174,8 +174,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:39:31.619Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 2620, 
         "message": "2017-07-31 13:39:31.619 CEST [5502] postgres@clients LOG:  duration: 9.482 ms  statement: select * from clients;", 
@@ -190,8 +190,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:39:40.147Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 2733, 
         "message": "2017-07-31 13:39:40.147 CEST [5502] postgres@clients LOG:  duration: 0.765 ms  statement: select id from clients;", 
@@ -206,8 +206,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:40:54.310Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.flags": [
             "multiline"
@@ -225,8 +225,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:43:22.645Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 3559, 
         "message": "2017-07-31 13:43:22.645 CEST [5502] postgres@clients LOG:  duration: 36.162 ms  statement: create table cats(name varchar(50) primary key, toy varchar (50) not null, born timestamp not null);", 
@@ -241,8 +241,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:46:02.670Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 3751, 
         "message": "2017-07-31 13:46:02.670 CEST [5502] postgres@c$lients LOG:  duration: 10.540 ms  statement: insert into cats(name, toy, born) values('kate', 'ball', now());", 
@@ -257,8 +257,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:46:23.016Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 3908, 
         "message": "2017-07-31 13:46:23.016 CEST [5502] postgres@_clients$db LOG:  duration: 5.156 ms  statement: insert into cats(name, toy, born) values('frida', 'horse', now());", 
@@ -273,8 +273,8 @@
     }, 
     {
         "@timestamp": "2017-07-31T13:46:55.637Z", 
-        "fileset.module": "postgresql", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
         "input.type": "log", 
         "log.offset": 4069, 
         "message": "2017-07-31 13:46:55.637 CEST [5502] postgres@clients_db LOG:  duration: 25.871 ms  statement: create table dogs(name varchar(50) primary key, owner varchar (50) not null, born timestamp not null);", 
