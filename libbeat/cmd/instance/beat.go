@@ -644,12 +644,12 @@ func (b *Beat) loadMeta() error {
 
 	if err == nil {
 		m := meta{}
-		
+
 		fi, err := f.Stat()
 		if err != nil {
 			return fmt.Errorf("Beat meta file stat error: %v", err)
 		}
-		
+
 		if fi.Size() != 0 {
 			if err := json.NewDecoder(f).Decode(&m); err != nil {
 				f.Close()
