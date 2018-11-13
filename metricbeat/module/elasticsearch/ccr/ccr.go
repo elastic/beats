@@ -88,10 +88,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	if (ccrUnavailableMessage != "") && (time.Since(m.lastCCRLicenseMessageTimestamp) > 1*time.Minute) {
-		err := fmt.Errorf(ccrUnavailableMessage)
-		elastic.ReportAndLogError(err, r, m.Log)
-		m.lastCCRLicenseMessageTimestamp = time.Now()
+	if ccrUnavailableMessage != "" {
+		if time.Since(m.lastCCRLicenseMessageTimestamp) > 1*time.Minute {
+			err := fmt.Errorf(ccrUnavailableMessage)
+			elastic.ReportAndLogError(err, r, m.Log)
+			m.lastCCRLicenseMessageTimestamp = time.Now()
+		}
 		return
 	}
 
@@ -130,7 +132,7 @@ func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion string) (me
 	}
 
 	isAvailable := currentLicense == "trial" || currentLicense == "platinum"
-	if isAvailable {
+	if !isAvailable {
 		message = "the CCR feature is available with a platinum Elasticsearch license. " +
 			"You currently have a " + currentLicense + " license. " +
 			"Either upgrade your license or remove the ccr metricset from your Elasticsearch module configuration."
