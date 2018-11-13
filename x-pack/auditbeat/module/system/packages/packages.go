@@ -204,7 +204,7 @@ func convertToCacheable(packages []*Package) []cache.Cacheable {
 func getPackages(osFamily string) (packages []*Package, err error) {
 	switch osFamily {
 	case redhat:
-		// TODO: Implement RPM
+		packages, err = listRPMPackages()
 		err = errors.New("RPM not yet supported")
 	case debian:
 		packages, err = listDebPackages()
