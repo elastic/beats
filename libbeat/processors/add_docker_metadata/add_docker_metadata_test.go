@@ -20,7 +20,6 @@ package add_docker_metadata
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
