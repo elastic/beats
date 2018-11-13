@@ -228,7 +228,7 @@ docker run {dockerimage}
 [source,shell]
 ----------------------------------------------------------------------
 sudo chown root filebeat.yml <1>
-sudo ./filebeat -e -c filebeat.yml -d "publish"
+sudo ./filebeat -e -c filebeat.yml
 ----------------------------------------------------------------------
 <1> You'll be running Filebeat as root, so you need to change ownership
 of the configuration file, or run Filebeat with `--strict.perms=false`

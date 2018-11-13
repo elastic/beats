@@ -277,7 +277,7 @@ docker run {dockerimage}
 [source,shell]
 ----------------------------------------------------------------------
 sudo chown root packetbeat.yml <1>
-sudo ./packetbeat -e -c packetbeat.yml -d "publish"
+sudo ./packetbeat -e -c packetbeat.yml
 ----------------------------------------------------------------------
 <1> You'll be running Packetbeat as root, so you need to change ownership of the
 configuration file, or run Packetbeat with `--strict.perms=false` specified. See

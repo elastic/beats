@@ -249,7 +249,7 @@ See <<running-on-docker>>.
 ----------------------------------------------------------------------
 sudo chown root {beatname_lc}.yml <1>
 sudo chown root modules.d/system.yml <1>
-sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
+sudo ./{beatname_lc} -e -c {beatname_lc}.yml
 ----------------------------------------------------------------------
 <1> You'll be running {beatname_uc} as root, so you need to change ownership of the
 configuration file and any configurations enabled in the `modules.d` directory,
