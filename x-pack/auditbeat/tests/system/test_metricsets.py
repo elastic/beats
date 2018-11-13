@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../auditbeat/t
 
 from auditbeat_xpack import *
 
-COMMON_FIELDS = ["@timestamp", "beat.version", "host.name", "event.module", "event.dataset"]
+COMMON_FIELDS = ["@timestamp", "host.name", "event.module", "event.dataset"]
 
 
 class Test(AuditbeatXPackTest):

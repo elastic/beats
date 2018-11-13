@@ -84,9 +84,14 @@ func Update() error {
 	return sh.Run("make", "update")
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
-	return mage.GenerateFieldsYAML("module", "../../auditbeat/module", "../../auditbeat/_meta/fields.common.yml")
+// Fields generates a fields.yml and fields.go for each module.
+func Fields() {
+	mg.Deps(fieldsYML, mage.GenerateModuleFieldsGo)
+}
+
+// fieldsYML generates a fields.yml based on auditbeat + x-pack/auditbeat/modules.
+func fieldsYML() error {
+	return mage.GenerateFieldsYAML(mage.OSSBeatDir("module"), "module")
 }
 
 // GoTestUnit executes the Go unit tests.
