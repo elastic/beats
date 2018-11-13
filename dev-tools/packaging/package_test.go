@@ -351,7 +351,7 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 				t.Fatalf("%s entrypoint mode is %s, expected: %s", entrypoint, mode, expectedMode)
 			}
 		} else {
-			t.Skip("TODO: check if binary is in $PATH")
+			t.Fatal("TODO: check if binary is in $PATH")
 		}
 	})
 }
