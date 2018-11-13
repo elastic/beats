@@ -46,6 +46,28 @@
           description: >
             Error type.
 
+    # Add a GeoIP field missing from ECS
+    # Should be added via https://github.com/elastic/ecs/issues/177
+    - name: geo.region_iso_code
+      type: keyword
+      description: Region ISO code.
+
+    - name: source.geo.region_iso_code
+      type: keyword
+      description: Region ISO code.
+
+    - name: destination.geo.region_iso_code
+      type: keyword
+      description: Region ISO code.
+
+    - name: host.geo.region_iso_code
+      type: keyword
+      description: Region ISO code.
+
+    - name: device.geo.region_iso_code
+      type: keyword
+      description: Region ISO code.
+
 # HTTP field definitions below are temporary, until http makes its way into ECS again.
 # See https://github.com/elastic/ecs/pull/171
 - key: http

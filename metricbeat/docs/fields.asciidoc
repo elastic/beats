@@ -891,6 +891,51 @@ Error type.
 
 --
 
+*`geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+--
+
+*`destination.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+--
+
+*`host.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+--
+
+*`device.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+--
+
 [[exported-fields-ceph]]
 == Ceph fields
 
