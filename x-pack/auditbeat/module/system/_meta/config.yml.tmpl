@@ -6,7 +6,9 @@
     - host
     - packages
     - processes
+    {{ if eq .GOOS "linux" -}}
     - user
+    {{- end }}
 
   state.period: 12h
 
