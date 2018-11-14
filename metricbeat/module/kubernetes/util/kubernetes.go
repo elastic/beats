@@ -294,6 +294,8 @@ func (m *enricher) Stop() {
 }
 
 func (m *enricher) Enrich(events []common.MapStr) {
+	m.RLock()
+	defer m.RUnlock()
 	for _, event := range events {
 		if meta := m.metadata[m.index(event)]; meta != nil {
 			event.DeepUpdate(common.MapStr{
