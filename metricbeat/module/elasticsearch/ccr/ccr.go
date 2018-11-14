@@ -131,7 +131,11 @@ func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion string) (me
 		return "", fmt.Errorf("error determining Elasticsearch license type")
 	}
 
-	isAvailable := currentLicense == "trial" || currentLicense == "platinum"
+	isAvailable, err := elasticsearch.IsLicenseOneOf(m.HTTP, m.getResetURI(), []string{"trial", "platinum"})
+	if err != nil {
+		return "", errors.Wrap(err, "error determining if current Elasticsearch license supports CCR")
+	}
+
 	if !isAvailable {
 		message = "the CCR feature is available with a platinum Elasticsearch license. " +
 			"You currently have a " + currentLicense + " license. " +

@@ -385,3 +385,29 @@ func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr,
 
 	return common.MapStr(v), nil
 }
+
+// IsLicenseOneOf returns whether the current Elasticsearch license is one of a given set of candidate licenses
+func IsLicenseOneOf(http *helper.HTTP, resetURI string, candidateLicenses []string) (bool, error) {
+	license, err := GetLicense(http, resetURI)
+	if err != nil {
+		return false, errors.Wrap(err, "error determining Elasticsearch license")
+	}
+
+	licenseType, err := license.GetValue("type")
+	if err != nil {
+		return false, errors.Wrap(err, "error determining Elasticsearch license type")
+	}
+
+	currentLicense, ok := licenseType.(string)
+	if !ok {
+		return false, fmt.Errorf("error determining Elasticsearch license type")
+	}
+
+	for _, candidateLicense := range candidateLicenses {
+		if candidateLicense == currentLicense {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
