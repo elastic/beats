@@ -44,3 +44,49 @@
   to: agent.version
   alias: true
   copy_to: false
+
+- from: source_ecs.ip
+  to: source.ip
+  alias: true
+  copy_to: false
+
+- from: source_ecs.port
+  to: source.port
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.continent_name
+  to: source.geo.continent_name
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.location
+  to: source.geo.location
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.region_name
+  to: source.geo.region_name
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.city_name
+  to: source.geo.city_name
+  alias: true
+  copy_to: false
+
+- from: source_ecs.geo.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  copy_to: false
+
+# From Auditbeat's auditd module.
+- from: source.hostname
+  to: source.domain
+  alias: true
+  copy_to: false

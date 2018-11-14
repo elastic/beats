@@ -72,6 +72,10 @@ jobs:
       env: STRESS_TEST_OPTIONS="-timeout=20m -race -v -parallel 1" TARGETS="-C libbeat stress-tests"
       go: $GO_VERSION
       stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/libbeat testsuite"
+      go: $GO_VERSION
+      stage: test
 
     # Metricbeat
     - os: linux

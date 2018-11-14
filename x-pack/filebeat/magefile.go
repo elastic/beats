@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -27,7 +28,7 @@ func Build() error {
 	return mage.Build(mage.DefaultBuildArgs())
 }
 
-// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// GolangCrossBuild builds the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
@@ -36,6 +37,11 @@ func GolangCrossBuild() error {
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	return mage.CrossBuild()
+}
+
+// Clean cleans all generated files and build artifacts.
+func Clean() error {
+	return mage.Clean()
 }
 
 // Fields generates a fields.yml and fields.go for each module.
@@ -58,9 +64,56 @@ func Config() {
 	mg.Deps(shortConfig, referenceConfig, createDirModulesD)
 }
 
-// Update is an alias for running fields, dashboards, config.
+// Update is an alias for executing fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config)
+	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
+}
+
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	mage.AddIntegTestUsage()
+	defer mage.StopIntegTestEnv()
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
+// UnitTest executes the unit tests.
+func UnitTest() {
+	mg.SerialDeps(GoUnitTest, PythonUnitTest)
+}
+
+// GoUnitTest executes the Go unit tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoUnitTest(ctx context.Context) error {
+	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return mage.RunIntegTest("goIntegTest", func() error {
+		return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+	})
+}
+
+// PythonUnitTest executes the python system tests.
+func PythonUnitTest() error {
+	mg.Deps(mage.BuildSystemTestBinary)
+	return mage.PythonNoseTest(mage.DefaultPythonTestUnitArgs())
+}
+
+// PythonIntegTest executes the python system tests in the integration environment (Docker).
+func PythonIntegTest(ctx context.Context) error {
+	if !mage.IsInIntegTestEnv() {
+		mg.Deps(Fields)
+	}
+	return mage.RunIntegTest("pythonIntegTest", func() error {
+		mg.Deps(mage.BuildSystemTestBinary)
+		args := mage.DefaultPythonTestIntegrationArgs()
+		args.Env["MODULES_PATH"] = mage.CWD("module")
+		return mage.PythonNoseTest(args)
+	})
 }
 
 // -----------------------------------------------------------------------------

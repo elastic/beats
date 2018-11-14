@@ -1,5 +1,9 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
     "auditd": {
         "data": {
             "acct": "(invalid user)",
@@ -21,10 +25,6 @@
                 "type": "user-session"
             }
         }
-    },
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
     },
     "event": {
         "action": "logged-in",

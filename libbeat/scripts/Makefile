@@ -213,7 +213,7 @@ system-tests-environment: prepare-tests build-image
 	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make system-tests
 	#This is a hack to run x-pack/filebeat module tests
 	@XPACKBEAT="${ES_BEATS}/x-pack/${BEAT_NAME}" ; \
-	if [ -e "$$XPACKBEAT/tests/system" ] && [ $(XPACK_ONLY) = false ]; then \
+	if [ -e "$$XPACKBEAT/tests/system" ] && [ "$(BEAT_NAME)" != "libbeat" ] && [ $(XPACK_ONLY) = false ]; then \
 	    $(MAKE) -C ../x-pack/${BEAT_NAME} fields; \
 	    ${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e MODULES_PATH="../../x-pack/${BEAT_NAME}/module" -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make -C "$$XPACKBEAT" ${BEAT_NAME}.test system-tests ; \
 	    $(MAKE) -C ../x-pack/${BEAT_NAME} fix-permissions; \
@@ -325,8 +325,10 @@ update: python-env fields collect
 	@mkdir -p _meta
 	@# Update config files.
 	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.yml
-	@chmod 0640 ${BEAT_NAME}.yml
-
+ifneq (,$(wildcard _meta/beat.docker.yml))
+	@cat _meta/beat.docker.yml ${ES_BEATS}/libbeat/_meta/config.docker.yml > ${BEAT_NAME}.docker.yml
+	@chmod 0640 ${BEAT_NAME}.yml ${BEAT_NAME}.docker.yml
+endif
 
 	@# Update reference config files.
 ifeq ($(BEAT_REF_YAML),true)

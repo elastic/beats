@@ -47,7 +47,7 @@ It is required to set a namespace in the general module config section.
 
 [float]
 ==== json.is_array
-With this configuration enabled the `json` metriset expects the JSON structure returned by the HTTP endpoint to be an array. Further,
+With this configuration enabled the `json` metricset expects the JSON structure returned by the HTTP endpoint to be an array. Further,
 it creates separate events for each element in the array.
 
 [float]
