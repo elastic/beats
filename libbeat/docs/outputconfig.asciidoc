@@ -819,7 +819,7 @@ Event timestamps will be added, if version 0.10.0.0+ is enabled.
 
 Valid values are all kafka releases in between `0.8.2.0` and `2.0.0`.
 
-See <<kafka-compatibility,`Compatibility`>> for information on supported versions.
+See <<kafka-compatibility>> for information on supported versions.
 
 ===== `username`
 
