@@ -15,8 +15,8 @@ import (
 	"time"
 
 	"github.com/OneOfOne/xxhash"
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-	"github.com/satori/go.uuid"
 
 	"github.com/elastic/beats/auditbeat/datastore"
 	"github.com/elastic/beats/libbeat/common"
@@ -228,10 +228,13 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	}
 	ms.log.Debugf("Found %v users", len(users))
 
-	stateID := uuid.NewV4().String()
+	stateID, err := uuid.NewV4()
+	if err != nil {
+		return errors.Wrap(err, "error generating state ID")
+	}
 	for _, user := range users {
 		event := userEvent(user, eventTypeState, eventActionExistingUser)
-		event.RootFields.Put("event.id", stateID)
+		event.RootFields.Put("event.id", stateID.String())
 		report.Event(event)
 	}
 
