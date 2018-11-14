@@ -371,6 +371,7 @@ func (c *_licenseCache) set(license *License, ttl time.Duration) {
 	c.cachedOn = time.Now()
 }
 
+// IsOneOf returns whether the license is one of the specified candidate licenses
 func (l *License) IsOneOf(candidateLicenses ...string) bool {
 	t := l.Type
 
