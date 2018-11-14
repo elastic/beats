@@ -40,13 +40,13 @@ import (
 	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
-func testRequest(t *testing.T, testURL string) beat.Event {
+func testRequest(t *testing.T, testURL string) *beat.Event {
 	return testTLSRequest(t, testURL, nil)
 }
 
 // testTLSRequest tests the given request. certPath is optional, if given
 // an empty string no cert will be set.
-func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interface{}) beat.Event {
+func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interface{}) *beat.Event {
 	configSrc := map[string]interface{}{
 		"urls":    testURL,
 		"timeout": "1s",
@@ -61,7 +61,7 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	config, err := common.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	jobs, endpoints, err := create("tls", config)
+	jobs, endpoints, err := Create("tls", config)
 	require.NoError(t, err)
 
 	job := jobs[0]
@@ -74,7 +74,7 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	return event
 }
 
-func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, beat.Event) {
+func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, *beat.Event) {
 	server := httptest.NewServer(handlerFunc)
 	defer server.Close()
 	event := testRequest(t, server.URL)
@@ -232,7 +232,7 @@ func TestLargeResponse(t *testing.T) {
 	config, err := common.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	jobs, _, err := create("largeresp", config)
+	jobs, _, err := Create("largeresp", config)
 	require.NoError(t, err)
 
 	job := jobs[0]

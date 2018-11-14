@@ -32,16 +32,16 @@ import (
 
 type taskCanceller func() error
 
-type task struct {
+type configuredJob struct {
 	job        Job
-	config     taskConfig
+	config     jobConfig
 	monitor    *Monitor
 	processors *processors.Processors
 	cancelFn   taskCanceller
 	client     beat.Client
 }
 
-type taskConfig struct {
+type jobConfig struct {
 	Name     string             `config:"name"`
 	Type     string             `config:"type"`
 	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
@@ -59,8 +59,8 @@ func (e InvalidMonitorProcessorsError) Error() string {
 	return fmt.Sprintf("could not load monitor processors: %s", e.root)
 }
 
-func newTask(job Job, config taskConfig, monitor *Monitor) (*task, error) {
-	t := &task{
+func newConfiguredJob(job Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
+	t := &configuredJob{
 		job:     job,
 		config:  config,
 		monitor: monitor,
@@ -73,23 +73,23 @@ func newTask(job Job, config taskConfig, monitor *Monitor) (*task, error) {
 	t.processors = processors
 
 	if err != nil {
-		logp.Critical("Could not create client for monitor task %+v", t.monitor)
-		return nil, errors.Wrap(err, "could not create client for monitor task")
+		logp.Critical("Could not create client for monitor configuredJob %+v", t.monitor)
+		return nil, errors.Wrap(err, "could not create client for monitor configuredJob")
 	}
 
 	return t, nil
 }
 
-func (t *task) prepareSchedulerJob(meta common.MapStr, run jobRunner) scheduler.TaskFunc {
+func (t *configuredJob) prepareSchedulerJob(meta common.MapStr, job Job) scheduler.TaskFunc {
 	return func() []scheduler.TaskFunc {
-		event, next, err := run()
+		event, next, err := job.Run()
 		if err != nil {
 			logp.Err("Job %v failed with: ", err)
 		}
 
-		if event.Fields != nil {
-			event.Fields.DeepUpdate(meta)
-			t.client.Publish(event)
+		if event != nil && event.Fields != nil {
+			MergeEventFields(event, meta)
+			t.client.Publish(*event)
 		}
 
 		if len(next) == 0 {
@@ -104,7 +104,7 @@ func (t *task) prepareSchedulerJob(meta common.MapStr, run jobRunner) scheduler.
 	}
 }
 
-func (t *task) makeSchedulerTaskFunc() scheduler.TaskFunc {
+func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
 	name := t.config.Name
 	if name == "" {
 		name = t.config.Type
@@ -117,11 +117,11 @@ func (t *task) makeSchedulerTaskFunc() scheduler.TaskFunc {
 		},
 	}
 
-	return t.prepareSchedulerJob(meta, t.job.Run)
+	return t.prepareSchedulerJob(meta, t.job)
 }
 
-// Start schedules this task for execution.
-func (t *task) Start() {
+// Start schedules this configuredJob for execution.
+func (t *configuredJob) Start() {
 	var err error
 
 	t.client, err = t.monitor.pipelineConnector.ConnectWith(beat.ClientConfig{
@@ -141,8 +141,8 @@ func (t *task) Start() {
 	}
 }
 
-// Stop unschedules this task from execution.
-func (t *task) Stop() {
+// Stop unschedules this configuredJob from execution.
+func (t *configuredJob) Stop() {
 	if t.cancelFn != nil {
 		t.cancelFn()
 	}

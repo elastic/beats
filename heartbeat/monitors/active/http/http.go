@@ -31,12 +31,12 @@ import (
 )
 
 func init() {
-	monitors.RegisterActive("http", create)
+	monitors.RegisterActive("http", Create)
 }
 
 var debugf = logp.MakeDebug("http")
 
-func create(
+func Create(
 	name string,
 	cfg *common.Config,
 ) (jobs []monitors.Job, endpoints int, err error) {
@@ -91,14 +91,15 @@ func create(
 		}
 	} else {
 		for i, url := range config.URLs {
-			jobs[i], err = newHTTPMonitorIPsJob(&config, url, tls, enc, body, validator)
+			jobs[i], err = NewHTTPMonitorIPsJob(&config, url, tls, enc, body, validator)
 			if err != nil {
 				return nil, 0, err
 			}
 		}
 	}
 
-	return jobs, len(config.URLs), nil
+	wrapped := monitors.WrapAll(jobs, monitors.WithErrAsField)
+	return wrapped, len(config.URLs), nil
 }
 
 func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport, error) {

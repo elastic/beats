@@ -90,9 +90,11 @@ func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, er
 }
 
 func createMockJob(name string, cfg *common.Config) ([]Job, error) {
-	j := MakeSimpleJob(JobSettings{}, func() (common.MapStr, error) {
-		return common.MapStr{
-			"foo": "bar",
+	j := MakeSimpleJob(func() (*beat.Event, error) {
+		return &beat.Event{
+			Fields: common.MapStr{
+				"foo": "bar",
+			},
 		}, nil
 	})
 
