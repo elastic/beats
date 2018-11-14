@@ -1,4 +1,5 @@
 [id="configuration-{beatname_lc}-options"]
+[role="xpack"]
 == Configure functions
 
 ++++
