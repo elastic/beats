@@ -32,7 +32,7 @@ func generateFileset(module, fileset, modulesPath, beatsPath string) error {
 		return fmt.Errorf("fileset already exists: %s", fileset)
 	}
 
-	err := generator.CreateDirectories(filesetPath, []string{"", "_meta", "test", "config", "ingest"})
+	err := generator.CreateDirectories(filesetPath, "_meta", "test", "config", "ingest")
 	if err != nil {
 		return err
 	}
