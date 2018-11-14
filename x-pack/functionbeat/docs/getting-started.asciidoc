@@ -8,7 +8,6 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 * <<{beatname_lc}-template>>
 * <<{beatname_lc}-deploying>>
 * <<view-kibana-dashboards>>
-* <<setup-repositories>>
 
 [id="{beatname_lc}-installation"]
 === Step 1: Download the {beatname_uc} package
