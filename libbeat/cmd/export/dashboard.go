@@ -23,6 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/filebeat/scripts/generator"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/kibana"
@@ -35,6 +36,8 @@ func GenDashboardCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 		Short: "Export defined dashboard to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
 			dashboard, _ := cmd.Flags().GetString("id")
+			module, _ := cmd.Flags().GetString("module")
+			suffix, _ := cmd.Flags().GetString("suffix")
 
 			b, err := instance.NewBeat(name, idxPrefix, beatVersion)
 			if err != nil {
@@ -63,11 +66,23 @@ func GenDashboardCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 				fmt.Fprintf(os.Stderr, "Error getting dashboard: %+v\n", err)
 				os.Exit(1)
 			}
+
+			if module != "" {
+				err := generator.AddModuleDashboard(name, module, client.GetVersion(), dashboard, result, suffix)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error adding dashboard to module '%s': %+v\n", module, err)
+					os.Exit(2)
+				}
+				return
+			}
+
 			fmt.Println(result.StringToPrint())
 		},
 	}
 
 	genTemplateConfigCmd.Flags().String("id", "", "Dashboard id")
+	genTemplateConfigCmd.Flags().String("module", "", "Name of the module to save for")
+	genTemplateConfigCmd.Flags().String("suffix", "overview", "Suffix of the dashboard name")
 
 	return genTemplateConfigCmd
 }

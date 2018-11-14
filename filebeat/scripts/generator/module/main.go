@@ -32,11 +32,6 @@ func generateModule(module, modulesPath, beatsPath string) error {
 		return fmt.Errorf("module already exists: %s", module)
 	}
 
-	err := generator.CreateDirectories(modulePath, []string{path.Join("_meta", "kibana", "6")})
-	if err != nil {
-		return err
-	}
-
 	replace := map[string]string{"module": module}
 	templatesPath := path.Join(beatsPath, "scripts", "module")
 	filesToCopy := []string{
@@ -45,7 +40,7 @@ func generateModule(module, modulesPath, beatsPath string) error {
 		path.Join("_meta", "config.yml"),
 		"module.yml",
 	}
-	generator.CopyTemplates(templatesPath, modulePath, filesToCopy, replace)
+	err := generator.CopyTemplates(templatesPath, modulePath, filesToCopy, replace)
 	if err != nil {
 		return err
 	}
