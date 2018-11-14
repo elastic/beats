@@ -211,7 +211,7 @@ sudo service {beatname_lc} start
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo chown root {beatname_lc}.yml <1>
-sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
+sudo ./{beatname_lc} -e -c {beatname_lc}.yml
 ----------------------------------------------------------------------
 <1> To monitor system files, you'll be running {beatname_uc} as root, so you
 need to change ownership of the configuration file, or run {beatname_uc} with

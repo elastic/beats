@@ -147,12 +147,12 @@ func expandFile(src, dst string, args ...map[string]interface{}) error {
 }
 
 // CWD return the current working directory.
-func CWD() string {
+func CWD(elem ...string) string {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(errors.Wrap(err, "failed to get the CWD"))
 	}
-	return wd
+	return filepath.Join(append([]string{wd}, elem...)...)
 }
 
 // EnvOr returns the value of the specified environment variable if it is
@@ -213,6 +213,13 @@ func dockerInfo() (*DockerInfo, error) {
 	}
 
 	return &info, nil
+}
+
+// HaveDockerCompose returns an error if docker-compose is not found on the
+// PATH.
+func HaveDockerCompose() error {
+	_, err := exec.LookPath("docker-compose")
+	return errors.Wrap(err, "docker-compose was not found on the PATH")
 }
 
 // FindReplace reads a file, performs a find/replace operation, then writes the
@@ -644,6 +651,23 @@ func IsUpToDate(dst string, sources ...string) bool {
 
 	execute, err := target.Path(dst, files...)
 	return err == nil && !execute
+}
+
+// OSSBeatDir returns the OSS beat directory. You can pass paths and they will
+// be joined and appended to the OSS beat dir.
+func OSSBeatDir(path ...string) string {
+	ossDir := CWD()
+
+	// Check if we need to correct ossDir because it's in x-pack.
+	if parentDir := filepath.Base(filepath.Dir(ossDir)); parentDir == "x-pack" {
+		// If the OSS version of the beat exists.
+		tmp := filepath.Join(ossDir, "../..", BeatName)
+		if _, err := os.Stat(tmp); !os.IsNotExist(err) {
+			ossDir = tmp
+		}
+	}
+
+	return filepath.Join(append([]string{ossDir}, path...)...)
 }
 
 // createDir creates the parent directory for the given file.

@@ -136,15 +136,6 @@
       description: >
         Properties of the source host
       fields:
-        - name: mac
-          description: >
-              Source MAC address as indicated by first packet seen for the current flow.
-
-        - name: ip
-          description: >
-              Innermost IPv4 source address as indicated by first packet seen for the
-              current flow.
-
         - name: ip_location
           type: geo_point
           example: "40.715, -74.011"
@@ -188,10 +179,6 @@
             The GeoIP location of the `outer_ipv6_source` IP address. The field is a
             string containing the latitude and longitude separated by a comma.
 
-        - name: port
-          description: >
-            Source port number as indicated by first packet seen for the current flow.
-
         - name: stats
           type: group
           description: >
@@ -206,8 +193,6 @@
               type: long
               description: >
                 Total number of bytes
-
-
 
     - name: dest
       type: group

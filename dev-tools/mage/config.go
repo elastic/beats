@@ -78,7 +78,7 @@ func moduleDashes(name string) string {
 		titleSuffixLen = len(" Module ")
 	)
 
-	numDashes := lineLen - headerLen - titleSuffixLen - len(name)
+	numDashes := lineLen - headerLen - titleSuffixLen - len(name) - 1
 	numDashes /= 2
 	return strings.Repeat("-", numDashes)
 }
@@ -151,5 +151,5 @@ func GenerateModuleReferenceConfig(out string, moduleDirs ...string) error {
 		"Modules": moduleConfigs,
 	})
 
-	return ioutil.WriteFile(out, []byte(config), 0644)
+	return ioutil.WriteFile(createDir(out), []byte(config), 0644)
 }
