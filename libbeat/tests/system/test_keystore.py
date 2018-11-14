@@ -57,7 +57,7 @@ class TestKeystore(KeystoreBase):
         """
 
         key = "output.elasticsearch.hosts.0"
-        secret = path.join(self.working_dir,"myeleasticsearchsecrethost")
+        secret = path.join(self.working_dir, "myeleasticsearchsecrethost")
 
         self.render_config_template("mockbeat",
                                     keystore_path=self.keystore_path,
