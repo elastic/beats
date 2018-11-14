@@ -64,9 +64,17 @@
       "target_field": "user_agent.original"
     }
   }, {
-    "geoip": {
+    "grok": {
       "field": "nginx.access.remote_ip",
-      "target_field": "nginx.access.geoip"
+      "patterns": [
+        "^(%{IP:source.ip}|%{HOSTNAME:source.domain})$"
+      ]
+    }
+  },{
+    "geoip": {
+      "field": "source.ip",
+      "target_field": "source.geo",
+      "ignore_missing": true
     }
   }],
   "on_failure" : [{
