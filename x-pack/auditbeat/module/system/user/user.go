@@ -46,17 +46,17 @@ const (
 
 // User represents a user. Fields according to getpwent(3).
 type User struct {
-	Name                string
-	PasswordType        string
-	PasswordChanged     time.Time
-	PasswordHashExcerpt string
-	UID                 uint32
-	GID                 uint32
-	Groups              []Group
-	UserInfo            string
-	Dir                 string
-	Shell               string
-	Action              string
+	Name             string
+	PasswordType     string
+	PasswordChanged  time.Time
+	PasswordHashHash []byte
+	UID              uint32
+	GID              uint32
+	Groups           []Group
+	UserInfo         string
+	Dir              string
+	Shell            string
+	Action           string
 }
 
 // Group contains information about a group.
@@ -72,7 +72,7 @@ func (user User) Hash() uint64 {
 	h.WriteString(user.Name)
 	h.WriteString(user.PasswordType)
 	h.WriteString(user.PasswordChanged.String())
-	h.WriteString(user.PasswordHashExcerpt)
+	h.Write(user.PasswordHashHash)
 	h.WriteString(strconv.Itoa(int(user.UID)))
 	h.WriteString(strconv.Itoa(int(user.GID)))
 	h.WriteString(user.Dir)
@@ -290,13 +290,15 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 			if found {
 				// Report password change separately
 				if newUser.PasswordChanged.Before(matchingMissingUser.PasswordChanged) ||
-					newUser.PasswordHashExcerpt != matchingMissingUser.PasswordHashExcerpt {
+					!bytes.Equal(newUser.PasswordHashHash, matchingMissingUser.PasswordHashHash) ||
+					newUser.PasswordType != matchingMissingUser.PasswordType {
 					report.Event(userEvent(newUser, eventTypeEvent, eventActionPasswordChanged))
 				}
 
 				// Hack to check if only the password changed
 				matchingMissingUser.PasswordChanged = newUser.PasswordChanged
-				matchingMissingUser.PasswordHashExcerpt = newUser.PasswordHashExcerpt
+				matchingMissingUser.PasswordHashHash = newUser.PasswordHashHash
+				matchingMissingUser.PasswordType = newUser.PasswordType
 				if newUser.Hash() != matchingMissingUser.Hash() {
 					report.Event(userEvent(newUser, eventTypeEvent, eventActionUserChanged))
 				}

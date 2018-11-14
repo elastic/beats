@@ -13,9 +13,12 @@ package user
 import "C"
 
 import (
-	"github.com/pkg/errors"
+	"crypto/sha512"
+	"strings"
 	"time"
 	"unsafe"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -52,17 +55,6 @@ func GetUsers() (users []*User, err error) {
 			Shell:    C.GoString(passwd.pw_shell),
 		}
 
-		switch C.GoString(passwd.pw_passwd) {
-		case "x":
-			user.PasswordType = "shadow_password"
-		case "*":
-			user.PasswordType = "login_disabled"
-		case "":
-			user.PasswordType = "no_password"
-		default:
-			user.PasswordType = "<redacted>"
-		}
-
 		primaryGroup, found := gidToGroup[user.GID]
 		if found {
 			user.Groups = append(user.Groups, primaryGroup)
@@ -73,10 +65,35 @@ func GetUsers() (users []*User, err error) {
 			user.Groups = append(user.Groups, secondaryGroups...)
 		}
 
-		shadow, found := shadowEntries[user.Name]
-		if found {
-			user.PasswordChanged = shadow.LastChanged
-			user.PasswordHashExcerpt = shadow.PasswordHashExcerpt
+		const shadowPassword = "shadow_password"
+		const passwordDisabled = "password_disabled"
+		const noPassword = "no_password"
+		const cryptPassword = "crypt_password"
+		switch C.GoString(passwd.pw_passwd) {
+		case "x":
+			user.PasswordType = shadowPassword
+		case "*":
+			user.PasswordType = passwordDisabled
+		case "":
+			user.PasswordType = noPassword
+		default:
+			user.PasswordType = cryptPassword
+			user.PasswordHashHash = noSaltHash(C.GoString(passwd.pw_passwd))
+		}
+
+		if user.PasswordType == shadowPassword {
+			shadow, found := shadowEntries[user.Name]
+			if found {
+				user.PasswordChanged = shadow.LastChanged
+
+				if shadow.Password == "" {
+					user.PasswordType = noPassword
+				} else if strings.HasPrefix(shadow.Password, "!") || strings.HasPrefix(shadow.Password, "*") {
+					user.PasswordType = passwordDisabled
+				} else {
+					user.PasswordHashHash = noSaltHash(shadow.Password)
+				}
+			}
 		}
 
 		users = append(users, user)
@@ -132,8 +149,8 @@ func readGroupFile() (map[uint32]Group, map[string][]Group, error) {
 
 // shadowFileEntry represents an entry in /etc/shadow. See getspnam(3) for details.
 type shadowFileEntry struct {
-	LastChanged         time.Time
-	PasswordHashExcerpt string
+	LastChanged time.Time
+	Password    string
 }
 
 // readShadowFile reads /etc/shadow and returns a map of the entries keyed to user's names.
@@ -150,24 +167,33 @@ func readShadowFile() (map[string]shadowFileEntry, error) {
 		shadow := shadowFileEntry{
 			// sp_lstchg is in days since Jan 1, 1970.
 			LastChanged: epoch.AddDate(0, 0, int(spwd.sp_lstchg)),
-		}
 
-		/*
-			Make sure the full password hash is long (it should be) and then collect only 10 characters.
-			This should be long enough to make collisions (where a new password hash shares these
-			10 characters with an old password hash) extremely unlikely. In addition, we also check
-			the day the password was last changed to detect a password change.
-
-			The hash excerpt is not included in any event output, but it is persisted to the
-			beat.db file on disk.
-		*/
-		passwordHash := C.GoString(spwd.sp_pwdp)
-		if len(passwordHash) > 24 {
-			shadow.PasswordHashExcerpt = passwordHash[len(passwordHash)-10:]
+			// The password hash is never output to Elasticsearch or any other output,
+			// but a hash of the hash is persisted to disk in the beat.db file.
+			Password: C.GoString(spwd.sp_pwdp),
 		}
 
 		shadowEntries[C.GoString(spwd.sp_namp)] = shadow
 	}
 
 	return shadowEntries, nil
+}
+
+// noSaltHash takes a password string from /etc/passwd or /etc/shadow, tries to skip the salt,
+// and returns a SHA-512 hash of the rest.
+func noSaltHash(password string) []byte {
+	// On modern UNIX systems, the format of the password field is $id$salt$encrypted (see crypt(3)).
+	// We only want to use the `encrypted` part.
+	if lastSeparator := strings.LastIndex(password, "$"); lastSeparator != -1 {
+		password = password[lastSeparator+1:]
+	} else if len(password) == 13 {
+		// In older (now unsafe) versions, the encrypted password was 13 characters, the first two
+		// of which were the salt.
+		password = password[2:]
+	} else {
+		// In other cases, we don't know where the salt is (or if there is one).
+	}
+
+	hash := sha512.Sum512([]byte(password))
+	return hash[:]
 }

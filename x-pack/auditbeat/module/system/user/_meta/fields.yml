@@ -50,9 +50,10 @@
           type: keyword
           description: >
               A user's password type. Possible values are `shadow_password`
-              (the password hash is in the shadow file), `login_disabled`,
+              (the password hash is in the shadow file), `password_disabled`,
               `no_password` (this is dangerous as anyone can log in), and
-              `<redacted>` (for any other values).
+              `crypt_password` (when the password field in /etc/passwd seems
+              to contain an encrypted password).
         - name: last_changed
           type: date
           description: >
