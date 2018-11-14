@@ -4,7 +4,7 @@
 
 // +build linux
 
-package sockets
+package socket
 
 import (
 	"net"
@@ -30,7 +30,7 @@ import (
 
 const (
 	moduleName    = "system"
-	metricsetName = "sockets"
+	metricsetName = "socket"
 )
 
 func init() {

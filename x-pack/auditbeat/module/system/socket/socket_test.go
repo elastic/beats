@@ -4,7 +4,7 @@
 
 // +build linux
 
-package sockets
+package socket
 
 import (
 	"net"
@@ -112,6 +112,6 @@ func getRequiredValue(key string, mbEvent mb.Event, t testing.TB) interface{} {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "system",
-		"metricsets": []string{"sockets"},
+		"metricsets": []string{"socket"},
 	}
 }

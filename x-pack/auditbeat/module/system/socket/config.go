@@ -2,11 +2,11 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package sockets
+package socket
 
-// Config defines the sockets metricset's configuration options.
+// Config defines the socket metricset's configuration options.
 type Config struct {
-	ReportChanges bool `config:"sockets.report_changes"`
+	ReportChanges bool `config:"socket.report_changes"`
 }
 
 // Validate validates the host metricset config.

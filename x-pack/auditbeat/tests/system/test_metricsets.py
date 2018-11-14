@@ -45,15 +45,15 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "processes", COMMON_FIELDS + fields, warnings_allowed=True)
 
     @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
-    def test_metricset_sockets(self):
+    def test_metricset_socket(self):
         """
-        sockets metricset collects information about open sockets on a system.
+        socket metricset collects information about open sockets on a system.
         """
 
-        fields = ["system.sockets.socket"]
+        fields = ["system.socket.local.ip"]
 
         # Metricset is experimental and that generates a warning, TODO: remove later
-        self.check_metricset("system", "sockets", COMMON_FIELDS + fields, warnings_allowed=True)
+        self.check_metricset("system", "socket", COMMON_FIELDS + fields, warnings_allowed=True)
 
     def test_metricset_user(self):
         """

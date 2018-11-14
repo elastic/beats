@@ -1,4 +1,4 @@
-The System `sockets` metricset provides ... TODO.
+The System `socket` metricset provides ... TODO.
 
 The module is implemented for Linux only.
 

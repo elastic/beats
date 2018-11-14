@@ -1,7 +1,7 @@
-- name: sockets
+- name: socket
   type: group
   description: >
-    `sockets` contains socket information.
+    `socket` contains socket information.
   release: experimental
   fields:
   - name: socket
