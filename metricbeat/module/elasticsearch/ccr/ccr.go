@@ -58,7 +58,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch gathers stats for each follower shard from the _ccr/stats API
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.getResetURI())
+	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.getServiceURI())
 	if err != nil {
 		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 		elastic.ReportAndLogError(err, r, m.Log)
@@ -71,7 +71,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	info, err := elasticsearch.GetInfo(m.HTTP, m.getResetURI())
+	info, err := elasticsearch.GetInfo(m.HTTP, m.getServiceURI())
 	if err != nil {
 		elastic.ReportAndLogError(err, r, m.Log)
 		return
@@ -116,7 +116,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 }
 
 func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion string) (message string, err error) {
-	license, err := elasticsearch.GetLicense(m.HTTP, m.getResetURI())
+	license, err := elasticsearch.GetLicense(m.HTTP, m.getServiceURI())
 	if err != nil {
 		return "", errors.Wrap(err, "error determining Elasticsearch license")
 	}
@@ -131,7 +131,7 @@ func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion string) (me
 		return "", fmt.Errorf("error determining Elasticsearch license type")
 	}
 
-	isAvailable, err := elasticsearch.IsLicenseOneOf(m.HTTP, m.getResetURI(), []string{"trial", "platinum"})
+	isAvailable, err := elasticsearch.IsLicenseOneOf(m.HTTP, m.getServiceURI(), []string{"trial", "platinum"})
 	if err != nil {
 		return "", errors.Wrap(err, "error determining if current Elasticsearch license supports CCR")
 	}
@@ -159,7 +159,7 @@ func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion string) (me
 	return "", nil
 }
 
-func (m *MetricSet) getResetURI() string {
+func (m *MetricSet) getServiceURI() string {
 	return m.HostData().SanitizedURI + ccrStatsPath
 
 }
