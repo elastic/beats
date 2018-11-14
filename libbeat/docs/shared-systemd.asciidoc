@@ -38,7 +38,7 @@ Service status can be also obtained with `systemctl`.
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-systemctl start {beatname_lc}
+systemctl status {beatname_lc}
 ------------------------------------------------
 
 Logs are stored by default in journald, they can be viewed with `journalctl`.
