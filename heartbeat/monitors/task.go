@@ -80,7 +80,7 @@ func newTask(job Job, config taskConfig, monitor *Monitor) (*task, error) {
 	return t, nil
 }
 
-func (t *task) prepareSchedulerJob(meta common.MapStr, run jobRunner) scheduler.TaskFunc {
+func (t *task) prepareSchedulerJob(meta common.MapStr, run JobRunner) scheduler.TaskFunc {
 	return func() []scheduler.TaskFunc {
 		event, next, err := run()
 		if err != nil {
@@ -88,8 +88,8 @@ func (t *task) prepareSchedulerJob(meta common.MapStr, run jobRunner) scheduler.
 		}
 
 		if event.Fields != nil {
-			event.Fields.DeepUpdate(meta)
-			t.client.Publish(event)
+			MergeEventFields(event, meta)
+			t.client.Publish(*event)
 		}
 
 		if len(next) == 0 {

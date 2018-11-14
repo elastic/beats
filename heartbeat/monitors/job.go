@@ -24,7 +24,7 @@ import (
 // Job represents the work done by a single check by a given Monitor.
 type Job interface {
 	Name() string
-	Run() (beat.Event, []jobRunner, error)
+	Run() (*beat.Event, []JobRunner, error)
 }
 
-type jobRunner func() (beat.Event, []jobRunner, error)
+type JobRunner func() (*beat.Event, []JobRunner, error)

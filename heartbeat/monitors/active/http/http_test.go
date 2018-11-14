@@ -40,13 +40,13 @@ import (
 	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
-func testRequest(t *testing.T, testURL string) beat.Event {
+func testRequest(t *testing.T, testURL string) *beat.Event {
 	return testTLSRequest(t, testURL, nil)
 }
 
 // testTLSRequest tests the given request. certPath is optional, if given
 // an empty string no cert will be set.
-func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interface{}) beat.Event {
+func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interface{}) *beat.Event {
 	configSrc := map[string]interface{}{
 		"urls":    testURL,
 		"timeout": "1s",
@@ -74,7 +74,7 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	return event
 }
 
-func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, beat.Event) {
+func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, *beat.Event) {
 	server := httptest.NewServer(handlerFunc)
 	defer server.Close()
 	event := testRequest(t, server.URL)

@@ -55,7 +55,7 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 
 	require.Equal(t, 1, endpoints)
 
-	return &event
+	return event
 }
 
 func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string) *beat.Event {
@@ -77,7 +77,7 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 
 	require.Equal(t, 1, endpoints)
 
-	return &event
+	return event
 }
 
 func setupServer(t *testing.T, serverCreator func(http.Handler) *httptest.Server) (*httptest.Server, uint16) {

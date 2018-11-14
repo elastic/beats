@@ -77,3 +77,13 @@ func (e *Event) PutValue(key string, v interface{}) (interface{}, error) {
 func (e *Event) Delete(key string) error {
 	return e.Fields.Delete(key)
 }
+
+// Copies the event. NOTE: Private data is not copied
+func (e *Event) Clone() *Event {
+	return &Event{
+		e.Timestamp,
+		e.Meta.Clone(),
+		e.Fields.Clone(),
+		nil,
+	}
+}

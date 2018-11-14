@@ -23,13 +23,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-
-	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
 )
 
 func init() {
@@ -88,7 +88,7 @@ func create(
 		}
 
 		epJobs, err := dialchain.MakeDialerJobs(db, typ, scheme, eps, config.Mode,
-			func(dialer transport.Dialer, addr string) (common.MapStr, error) {
+			func(dialer transport.Dialer, addr string) (*beat.Event, error) {
 				return pingHost(dialer, addr, timeout, validator)
 			})
 		if err != nil {

@@ -20,11 +20,11 @@ package tcp
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/transport"
-
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/reason"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 func pingHost(
@@ -32,7 +32,7 @@ func pingHost(
 	host string,
 	timeout time.Duration,
 	validator ConnCheck,
-) (common.MapStr, error) {
+) (*beat.Event, error) {
 	start := time.Now()
 	deadline := start.Add(timeout)
 
@@ -44,7 +44,7 @@ func pingHost(
 	defer conn.Close()
 	if validator == nil {
 		// no additional validation step => ping success
-		return common.MapStr{}, nil
+		return &beat.Event{}, nil
 	}
 
 	if err := conn.SetDeadline(deadline); err != nil {
@@ -60,15 +60,17 @@ func pingHost(
 	}
 
 	end := time.Now()
-	event := common.MapStr{
-		"tcp": common.MapStr{
-			"rtt": common.MapStr{
-				"validate": look.RTT(end.Sub(validateStart)),
+	event := &beat.Event{
+		Fields: common.MapStr{
+			"tcp": common.MapStr{
+				"rtt": common.MapStr{
+					"validate": look.RTT(end.Sub(validateStart)),
+				},
 			},
 		},
 	}
 	if err != nil {
-		event["error"] = reason.FailValidate(err)
+		event.Fields["error"] = reason.FailValidate(err)
 	}
 	return event, nil
 }
