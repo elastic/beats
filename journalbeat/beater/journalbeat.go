@@ -47,6 +47,10 @@ type Journalbeat struct {
 // New returns a new Journalbeat instance
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	cfgwarn.Experimental("Journalbeat is experimental.")
+	cfgwarn.Deprecate("7.0.0", "global seek is deprecated, Use seek on input level instead.")
+	cfgwarn.Deprecate("7.0.0", "global backoff is deprecated, Use backoff on input level instead.")
+	cfgwarn.Deprecate("7.0.0", "global max_backoff is deprecated, Use max_backoff on input level instead.")
+	cfgwarn.Deprecate("7.0.0", "global include_matches is deprecated, Use include_matches on input level instead.")
 
 	config := config.DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
