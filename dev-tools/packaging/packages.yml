@@ -349,8 +349,9 @@ specs:
       spec:
         <<: *windows_binary_spec
         <<: *elastic_license_for_binaries
-        '{{.BeatName}}{{.BinaryExt}}':
-          source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: darwin
       types: [tgz]

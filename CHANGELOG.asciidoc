@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.5[Check the HEAD diff]
 *Auditbeat*
 
 *Filebeat*
+- Make sure the Filebeat Elastic licensed packages uses the Elastic binary instead of the OSS. {pull}8836[8836]
 
 *Heartbeat*
 
