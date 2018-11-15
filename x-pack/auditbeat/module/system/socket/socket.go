@@ -36,6 +36,7 @@ const (
 	eventTypeState            = "state"
 	eventTypeEvent            = "event"
 	eventActionExistingSocket = "existing_socket"
+	eventActionNewSocket      = "new_socket"
 )
 
 func init() {
@@ -77,6 +78,21 @@ type Socket struct {
 	ProcessPID   int
 	ProcessName  string
 	ProcessError error
+}
+
+// newSocket creates a new socket out of a netlink diag message.
+func newSocket(diag *linux.InetDiagMsg) *Socket {
+	return &Socket{
+		Family:     linux.AddressFamily(diag.Family),
+		State:      linux.TCPState(diag.State),
+		LocalIP:    diag.SrcIP(),
+		LocalPort:  diag.SrcPort(),
+		RemoteIP:   diag.DstIP(),
+		RemotePort: diag.DstPort(),
+		Inode:      diag.Inode,
+		UID:        diag.UID,
+		ProcessPID: -1,
+	}
 }
 
 // Hash creates a hash for Socket.
@@ -181,9 +197,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It also sends a state update right away, and regular state updates
 // thereafter.
 func (ms *MetricSet) Run(report mb.PushReporterV2) {
+	// Start receiving socket events
+	socketC, err := NetlinkSocketSubscription()
+	if err != nil {
+		ms.log.Error(err)
+		report.Error(err)
+		return
+	}
+
 	// Report state on start but do not update lastState
 	// so regular state update proceeds as scheduled.
-	err := ms.reportState(report)
+	err = ms.reportState(report)
 	if err != nil {
 		ms.log.Error(err)
 		report.Error(err)
@@ -210,32 +234,27 @@ func (ms *MetricSet) Run(report mb.PushReporterV2) {
 				}
 				ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
 			}
+		case diag := <-socketC:
+			socket := newSocket(diag)
+
+			if socket.RemotePort == 0 {
+				ms.listeners.Put(uint8(syscall.IPPROTO_TCP), socket.LocalIP, socket.LocalPort)
+			}
+
+			// Refresh inode to process mapping
+			err := ms.ptable.Refresh()
+			if err != nil {
+				ms.log.Error(err)
+				report.Error(err)
+			}
+
+			ms.enrichSocket(socket)
+
+			event := socketEvent(socket, eventTypeEvent, eventActionNewSocket)
+			report.Event(event)
 		}
 	}
-
-	// 1. always report state at beginning of Run()
-	// 2. Start go subroutine that checks if state update needed, if not
-	//    goes back to sleep for 10s/1m
-	//   2.1 Use separate ptable so we don't need to sync it
-	// 3. Create netlink_sub.go file with Subscribe(channel) method that
-	//    opens a socket to kernel and subscribes to socket updates
-	//   3.1 Go routine to consume events and handle enrichment
-	//       independently (might require syncing ptable, or just
-	//       going through /proc every time)
-	// 4. Select between reporter.Done() and subscribe channel and output
-	//    events.
 }
-
-/*
-// Fetch collects socket information. It is invoked periodically.
-func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-		err := ms.reportChanges(report)
-		if err != nil {
-			ms.log.Error(err)
-			report.Error(err)
-		}
-}
-*/
 
 // reportState reports all existing sockets on the system.
 func (ms *MetricSet) reportState(report mb.ReporterV2) error {
@@ -250,9 +269,17 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error generating state ID")
 	}
 
-	err = ms.refreshEnrichmentData(sockets)
+	// Register all listening sockets
+	for _, socket := range sockets {
+		if socket.RemotePort == 0 {
+			ms.listeners.Put(uint8(syscall.IPPROTO_TCP), socket.LocalIP, socket.LocalPort)
+		}
+	}
+
+	// Refresh inode to process mapping
+	err = ms.ptable.Refresh()
 	if err != nil {
-		return errors.Wrap(err, "error refreshing enrichment data")
+		return errors.Wrap(err, "error refreshing process data")
 	}
 
 	for _, socket := range sockets {
@@ -282,41 +309,6 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	ms.listeners.Reset()
 
 	return nil
-
-	/*if ms.cache != nil && !ms.cache.IsEmpty() {
-		opened, closed := ms.cache.DiffAndUpdateCache(convertToCacheable(sockets))
-
-		for _, socket := range opened {
-			ms.enrichSocket(socket.(*Socket))
-		}
-
-		for _, socket := range closed {
-			ms.enrichSocket(socket.(*Socket))
-		}
-
-		for _, s := range opened {
-			socketMapStr := s.(*Socket).toMapStr()
-			socketMapStr.Put("status", "OPENED")
-
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"socket": socketMapStr,
-				},
-			})
-		}
-
-		for _, s := range closed {
-			socketMapStr := s.(*Socket).toMapStr()
-			socketMapStr.Put("status", "CLOSED")
-
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"socket": socketMapStr,
-				},
-			})
-		}
-	} else {
-		// Report all currently existing sockets*/
 }
 
 func socketEvent(socket *Socket, eventType string, eventAction string) mb.Event {
@@ -357,18 +349,6 @@ func convertToCacheable(sockets []*Socket) []cache.Cacheable {
 	return c
 }
 
-func (ms *MetricSet) refreshEnrichmentData(allSockets []*Socket) error {
-	// Register all listening sockets.
-	for _, socket := range allSockets {
-		if socket.RemotePort == 0 {
-			ms.listeners.Put(uint8(syscall.IPPROTO_TCP), socket.LocalIP, socket.LocalPort)
-		}
-	}
-
-	err := ms.ptable.Refresh()
-	return errors.Wrap(err, "error refreshing process data")
-}
-
 func (ms *MetricSet) enrichSocket(socket *Socket) {
 	socket.Username = ms.users.LookupUID(int(socket.UID))
 
@@ -397,19 +377,7 @@ func (ms *MetricSet) getSockets() ([]*Socket, error) {
 
 	sockets := make([]*Socket, 0, len(diags))
 	for _, diag := range diags {
-		socket := &Socket{
-			Family:     linux.AddressFamily(diag.Family),
-			State:      linux.TCPState(diag.State),
-			LocalIP:    diag.SrcIP(),
-			LocalPort:  diag.SrcPort(),
-			RemoteIP:   diag.DstIP(),
-			RemotePort: diag.DstPort(),
-			Inode:      diag.Inode,
-			UID:        diag.UID,
-			ProcessPID: -1,
-		}
-
-		sockets = append(sockets, socket)
+		sockets = append(sockets, newSocket(diag))
 	}
 
 	return sockets, nil
