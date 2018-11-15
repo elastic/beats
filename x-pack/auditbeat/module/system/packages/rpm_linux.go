@@ -111,82 +111,110 @@ const (
 	RPMTAG_INSTALLTIME = 1008
 )
 
-var librpmNames = []string{
-	"/usr/lib64/librpm.so",
+type cFunctions struct {
+	rpmtsCreate        unsafe.Pointer
+	rpmReadConfigFiles unsafe.Pointer
+	rpmtsInitIterator  unsafe.Pointer
+	rpmdbNextIterator  unsafe.Pointer
+	headerLink         unsafe.Pointer
+	headerGetEntry     unsafe.Pointer
+	headerFree         unsafe.Pointer
+	rpmdbFreeIterator  unsafe.Pointer
+	rpmtsFree          unsafe.Pointer
 }
 
-func listRPMPackages() ([]*Package, error) {
-	// TODO; cache these handles
+var cFun *cFunctions
+
+func dlopenCFunctions() (*cFunctions, error) {
+	var librpmNames = []string{
+		"/usr/lib64/librpm.so",
+	}
+	var cFun cFunctions
+
 	librpm, err := dlopen.GetHandle(librpmNames)
 	if err != nil {
 		return nil, err
 	}
 
-	rpmtsCreate, err := librpm.GetSymbolPointer("rpmtsCreate")
+	cFun.rpmtsCreate, err = librpm.GetSymbolPointer("rpmtsCreate")
 	if err != nil {
 		return nil, err
 	}
 
-	rpmReadConfigFiles, err := librpm.GetSymbolPointer("rpmReadConfigFiles")
+	cFun.rpmReadConfigFiles, err = librpm.GetSymbolPointer("rpmReadConfigFiles")
 	if err != nil {
 		return nil, err
 	}
 
-	rpmtsInitIterator, err := librpm.GetSymbolPointer("rpmtsInitIterator")
+	cFun.rpmtsInitIterator, err = librpm.GetSymbolPointer("rpmtsInitIterator")
 	if err != nil {
 		return nil, err
 	}
 
-	rpmdbNextIterator, err := librpm.GetSymbolPointer("rpmdbNextIterator")
+	cFun.rpmdbNextIterator, err = librpm.GetSymbolPointer("rpmdbNextIterator")
 	if err != nil {
 		return nil, err
 	}
 
-	headerLink, err := librpm.GetSymbolPointer("headerLink")
+	cFun.headerLink, err = librpm.GetSymbolPointer("headerLink")
 	if err != nil {
 		return nil, err
 	}
 
-	headerGetEntry, err := librpm.GetSymbolPointer("headerGetEntry")
+	cFun.headerGetEntry, err = librpm.GetSymbolPointer("headerGetEntry")
 	if err != nil {
 		return nil, err
 	}
 
-	headerFree, err := librpm.GetSymbolPointer("headerFree")
+	cFun.headerFree, err = librpm.GetSymbolPointer("headerFree")
 	if err != nil {
 		return nil, err
 	}
 
-	rpmdbFreeIterator, err := librpm.GetSymbolPointer("rpmdbFreeIterator")
+	cFun.rpmdbFreeIterator, err = librpm.GetSymbolPointer("rpmdbFreeIterator")
 	if err != nil {
 		return nil, err
 	}
 
-	rpmtsFree, err := librpm.GetSymbolPointer("rpmtsFree")
+	cFun.rpmtsFree, err = librpm.GetSymbolPointer("rpmtsFree")
 	if err != nil {
 		return nil, err
 	}
 
-	rpmts := C.my_rpmtsCreate(rpmtsCreate)
+	return &cFun, nil
+}
+
+func listRPMPackages() ([]*Package, error) {
+	// TODO; cache these handles
+
+	if cFun == nil {
+		var err error
+		cFun, err = dlopenCFunctions()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	rpmts := C.my_rpmtsCreate(cFun.rpmtsCreate)
 	if rpmts == nil {
 		return nil, fmt.Errorf("Failed to get rpmts")
 	}
-	defer C.my_rpmtsFree(rpmtsFree, rpmts)
-	res := C.my_rpmReadConfigFiles(rpmReadConfigFiles)
+	defer C.my_rpmtsFree(cFun.rpmtsFree, rpmts)
+	res := C.my_rpmReadConfigFiles(cFun.rpmReadConfigFiles)
 	if int(res) != 0 {
 		return nil, fmt.Errorf("Error: %d", int(res))
 	}
 
-	mi := C.my_rpmtsInitIterator(rpmtsInitIterator, rpmts)
+	mi := C.my_rpmtsInitIterator(cFun.rpmtsInitIterator, rpmts)
 	if mi == nil {
 		return nil, fmt.Errorf("Failed to get match iterator")
 	}
-	defer C.my_rpmdbFreeIterator(rpmdbFreeIterator, mi)
+	defer C.my_rpmdbFreeIterator(cFun.rpmdbFreeIterator, mi)
 
 	packages := []*Package{}
-	for header := C.my_rpmdbNextIterator(rpmdbNextIterator, mi); header != nil; header = C.my_rpmdbNextIterator(rpmdbNextIterator, mi) {
+	for header := C.my_rpmdbNextIterator(cFun.rpmdbNextIterator, mi); header != nil; header = C.my_rpmdbNextIterator(cFun.rpmdbNextIterator, mi) {
 
-		pkg, err := packageFromHeader(header, headerGetEntry, headerLink, headerFree)
+		pkg, err := packageFromHeader(header, cFun)
 		if err != nil {
 			return nil, err
 		}
@@ -197,74 +225,71 @@ func listRPMPackages() ([]*Package, error) {
 	return packages, nil
 }
 
-func packageFromHeader(header C.Header,
-	headerGetEntry unsafe.Pointer,
-	headerLink unsafe.Pointer,
-	headerFree unsafe.Pointer) (*Package, error) {
+func packageFromHeader(header C.Header, cFun *cFunctions) (*Package, error) {
 
-	header = C.my_headerLink(headerLink, header)
+	header = C.my_headerLink(cFun.headerLink, header)
 	if header == nil {
 		return nil, fmt.Errorf("Error calling headerLink")
 	}
-	defer C.my_headerFree(headerFree, header)
+	defer C.my_headerFree(cFun.headerFree, header)
 
 	pkg := Package{}
 
 	var name *C.char
-	res := C.my_headerGetEntry(headerGetEntry, header, RPMTAG_NAME, &name)
+	res := C.my_headerGetEntry(cFun.headerGetEntry, header, RPMTAG_NAME, &name)
 	if res != 1 {
 		return nil, fmt.Errorf("Failed to call headerGetEntry(name): %d", res)
 	}
 	pkg.Name = C.GoString(name)
 
 	var version *C.char
-	res = C.my_headerGetEntry(headerGetEntry, header, RPMTAG_VERSION, &version)
+	res = C.my_headerGetEntry(cFun.headerGetEntry, header, RPMTAG_VERSION, &version)
 	if res != 1 {
 		return nil, fmt.Errorf("Failed to call headerGetEntry(version): %d", res)
 	}
 	pkg.Version = C.GoString(version)
 
 	var release *C.char
-	res = C.my_headerGetEntry(headerGetEntry, header, RPMTAG_RELEASE, &release)
+	res = C.my_headerGetEntry(cFun.headerGetEntry, header, RPMTAG_RELEASE, &release)
 	if res != 1 {
 		return nil, fmt.Errorf("Failed to call headerGetEntry(release): %d", res)
 	}
 	pkg.Release = C.GoString(release)
 
 	var license *C.char
-	res = C.my_headerGetEntry(headerGetEntry, header, RPMTAG_LICENSE, &license)
+	res = C.my_headerGetEntry(cFun.headerGetEntry, header, RPMTAG_LICENSE, &license)
 	if res != 1 {
 		return nil, fmt.Errorf("Failed to call headerGetEntry(license): %d", res)
 	}
 	pkg.License = C.GoString(license)
 
 	var arch *C.char
-	res = C.my_headerGetEntry(headerGetEntry, header, RPMTAG_ARCH, &arch)
+	res = C.my_headerGetEntry(cFun.headerGetEntry, header, RPMTAG_ARCH, &arch)
 	if res == 1 { // not always successful
 		pkg.Arch = C.GoString(arch)
 	}
 
 	var url *C.char
-	res = C.my_headerGetEntry(headerGetEntry, header, RPMTAG_URL, &url)
+	res = C.my_headerGetEntry(cFun.headerGetEntry, header, RPMTAG_URL, &url)
 	if res == 1 { // not always successful
 		pkg.URL = C.GoString(url)
 	}
 
 	var summary *C.char
-	res = C.my_headerGetEntry(headerGetEntry, header, RPMTAG_SUMMARY, &summary)
+	res = C.my_headerGetEntry(cFun.headerGetEntry, header, RPMTAG_SUMMARY, &summary)
 	if res == 1 { // not always successful
 		pkg.Summary = C.GoString(summary)
 	}
 
 	var size *C.int
-	res = C.my_headerGetEntryInt(headerGetEntry, header, RPMTAG_SIZE, &size)
+	res = C.my_headerGetEntryInt(cFun.headerGetEntry, header, RPMTAG_SIZE, &size)
 	if res != 1 {
 		return nil, fmt.Errorf("Failed to call headerGetEntry(size): %d", res)
 	}
 	pkg.Size = uint64(*size)
 
 	var installTime *C.int
-	res = C.my_headerGetEntryInt(headerGetEntry, header, RPMTAG_INSTALLTIME, &installTime)
+	res = C.my_headerGetEntryInt(cFun.headerGetEntry, header, RPMTAG_INSTALLTIME, &installTime)
 	if res != 1 {
 		return nil, fmt.Errorf("Failed to call headerGetEntry(installTime): %d", res)
 	}
