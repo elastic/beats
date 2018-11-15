@@ -182,3 +182,8 @@ func (g *GlobManager) Disable(name string) error {
 
 	return errors.Errorf("module %s not found", name)
 }
+
+// DisplayName returns the config file's display name
+func (f *CfgFile) DisplayName() string {
+	return strings.Replace(f.Name, ".", ":", -1)
+}
