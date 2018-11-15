@@ -1,4 +1,5 @@
 [id="configuring-howto-{beatname_lc}"]
+[role="xpack"]
 = Configuring {beatname_uc}
 
 [partintro]
@@ -33,33 +34,44 @@ include::./config-options.asciidoc[]
 include::./general-options.asciidoc[]
 
 :allplatforms:
+[role="xpack"]
 include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 :allplatforms!:
 
+[role="xpack"]
 include::{libbeat-dir}/docs/outputconfig.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
 
 include::./filtering.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/shared-kibana-config.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/setup-config.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/loggingconfig.asciidoc[]
 
 :standalone:
+[role="xpack"]
 include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
 :standalone!:
 
 :standalone:
 :allplatforms:
+[role="xpack"]
 include::{libbeat-dir}/docs/yaml.asciidoc[]
 :standalone!:
 :allplatforms!:
 
+[role="xpack"]
 include::{libbeat-dir}/docs/regexp.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/reference-yml.asciidoc[]

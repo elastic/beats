@@ -36,10 +36,13 @@ include::./setting-up-running.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
+[role="xpack"]
 include::./fields.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/monitoring/monitoring-beats.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/shared-securing-beat.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
