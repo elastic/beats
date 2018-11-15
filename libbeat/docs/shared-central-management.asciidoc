@@ -33,10 +33,7 @@ the {cm-ui} UI in {kib} to create and apply the configurations.
 This feature requires an Elastic license that includes {beats} central
 management.  
 
-Don't have a license? You can start a 30-day trial. At the end of the trial
-period, you can purchase a subscription to keep using central management. For
-more information, see https://www.elastic.co/subscriptions and
-{xpack-ref}/license-management.html[License Management].
+include::shared-license-statement.asciidoc[]
 =====
 
 --
@@ -131,10 +128,7 @@ or <<username-password-enrollment,username and password-based>> enrollment.
 * Verify that your Elastic license includes the {beats} central management
 feature.
 +
-Don't have a license? You can start a 30-day trial. At the end of the trial
-period, you can purchase a subscription to keep using central management. For
-more information, see https://www.elastic.co/subscriptions and
-{xpack-ref}/license-management.html[License Management].
+include::shared-license-statement.asciidoc[]
 
 * {kibana-ref}/using-kibana-with-security.html[Enable security] in {kib} to
 ensure that only users with sufficient privileges are able to access {beats}
