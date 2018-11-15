@@ -95,6 +95,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Allow Bus to buffer events in case listeners are not configured. {pull}8527[8527]
 - Dissect will now flag event on parsing error. {pull}8751[8751]
 - add_cloud_metadata initialization is performed asynchronously to avoid delays on startup. {pull}8845[8845]
+- Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]
 
 *Auditbeat*
 
