@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Use `initial_scan` action for new paths. {pull}7954[7954]
 - Rename beat.name to agent.type, beat.hostname to agent.hostname, beat.version to agent.version.
 - Rename `source.hostname` to `source.domain` in the auditd module. {pull}9027[9027]
+- Remove warning for deprecated option: "filters". {pull}9002[9002]
 
 *Filebeat*
 
@@ -29,12 +30,14 @@ https://github.com/elastic/beats/compare/v6.4.0...master[Check the HEAD diff]
 - Remove the deprecated `prospector(s)` option in the configuration use `input(s)` instead. {pull}8909[8909]
 - Rename `offset` to `log.offset`. {pull}8923[8923]
 - Rename `source_ecs` to `source` in the Filebeat Suricata module. {pull}8983[8983]
+- Remove warnings for deprecated options: "spool_size", "publish_async", "idle_timeout". {pull}9002[9002]
 
 *Heartbeat*
 
 *Journalbeat*
 
 *Metricbeat*
+- Remove warning for deprecated option: "filters". {pull}9002[9002]
 
 *Packetbeat*
 
