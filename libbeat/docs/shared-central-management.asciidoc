@@ -28,6 +28,10 @@ To learn more, see <<how-central-managment-works>>.
 To use central management, <<enroll-beats,enroll your {beats}>>, then use
 the {cm-ui} UI in {kib} to create and apply the configurations.
 
+NOTE: {beats} central management requires a
+https://www.elastic.co/subscriptions[paid subscription]. To see the {cm-ui} UI
+in {kib}, you must activate your license.
+
 --
 
 [[how-central-managment-works]]
