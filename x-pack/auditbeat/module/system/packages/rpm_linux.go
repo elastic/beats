@@ -4,6 +4,7 @@ package packages
 
 import (
 	"fmt"
+	"time"
 	"unsafe"
 
 	"github.com/coreos/pkg/dlopen"
@@ -64,6 +65,14 @@ import (
 //  return headerGetEntry(h, tag, NULL, (void**)p, NULL);
 //}
 //
+//int
+//my_headerGetEntryInt(void *f, Header h, rpm_tag_t tag, int **p) {
+//  int (*headerGetEntry)(Header, rpm_tag_t, rpm_tagtype_t*, rpm_data_t*, rpm_count_t*);
+//  headerGetEntry = (int (*)(Header, rpm_tag_t, rpm_tagtype_t*, rpm_data_t*, rpm_count_t*))f;
+//
+//  return headerGetEntry(h, tag, NULL, (void**)p, NULL);
+//}
+//
 //void
 //my_headerFree(void *f, Header h) {
 //	Header (*headerFree)(Header);
@@ -91,14 +100,15 @@ import "C"
 
 // Constants in sync with /usr/include/rpm/rpmtag.h
 const (
-	RPMTAG_NAME    = 1000
-	RPMTAG_VERSION = 1001
-	RPMTAG_RELEASE = 1002
-	RPMTAG_SUMMARY = 1004
-	RPMTAG_SIZE    = 1009
-	RPMTAG_LICENSE = 1014
-	RPMTAG_URL     = 1020
-	RPMTAG_ARCH    = 1022
+	RPMTAG_NAME        = 1000
+	RPMTAG_VERSION     = 1001
+	RPMTAG_RELEASE     = 1002
+	RPMTAG_SUMMARY     = 1004
+	RPMTAG_LICENSE     = 1014
+	RPMTAG_URL         = 1020
+	RPMTAG_ARCH        = 1022
+	RPMTAG_SIZE        = 1009
+	RPMTAG_INSTALLTIME = 1008
 )
 
 var librpmNames = []string{
@@ -173,7 +183,7 @@ func listRPMPackages() ([]*Package, error) {
 	}
 	defer C.my_rpmdbFreeIterator(rpmdbFreeIterator, mi)
 
-	packages := []Package{}
+	packages := []*Package{}
 	for header := C.my_rpmdbNextIterator(rpmdbNextIterator, mi); header != nil; header = C.my_rpmdbNextIterator(rpmdbNextIterator, mi) {
 
 		pkg, err := packageFromHeader(header, headerGetEntry, headerLink, headerFree)
@@ -203,28 +213,28 @@ func packageFromHeader(header C.Header,
 	var name *C.char
 	res := C.my_headerGetEntry(headerGetEntry, header, RPMTAG_NAME, &name)
 	if res != 1 {
-		return nil, fmt.Errorf("Failed to call headerGetEntry(name): %s", res)
+		return nil, fmt.Errorf("Failed to call headerGetEntry(name): %d", res)
 	}
 	pkg.Name = C.GoString(name)
 
 	var version *C.char
 	res = C.my_headerGetEntry(headerGetEntry, header, RPMTAG_VERSION, &version)
 	if res != 1 {
-		return nil, fmt.Errorf("Failed to call headerGetEntry(version): %s", res)
+		return nil, fmt.Errorf("Failed to call headerGetEntry(version): %d", res)
 	}
 	pkg.Version = C.GoString(version)
 
 	var release *C.char
 	res = C.my_headerGetEntry(headerGetEntry, header, RPMTAG_RELEASE, &release)
 	if res != 1 {
-		return nil, fmt.Errorf("Failed to call headerGetEntry(release): %s", res)
+		return nil, fmt.Errorf("Failed to call headerGetEntry(release): %d", res)
 	}
 	pkg.Release = C.GoString(release)
 
 	var license *C.char
 	res = C.my_headerGetEntry(headerGetEntry, header, RPMTAG_LICENSE, &license)
 	if res != 1 {
-		return nil, fmt.Errorf("Failed to call headerGetEntry(license): %s", res)
+		return nil, fmt.Errorf("Failed to call headerGetEntry(license): %d", res)
 	}
 	pkg.License = C.GoString(license)
 
@@ -245,6 +255,20 @@ func packageFromHeader(header C.Header,
 	if res == 1 { // not always successful
 		pkg.Summary = C.GoString(summary)
 	}
+
+	var size *C.int
+	res = C.my_headerGetEntryInt(headerGetEntry, header, RPMTAG_SIZE, &size)
+	if res != 1 {
+		return nil, fmt.Errorf("Failed to call headerGetEntry(size): %d", res)
+	}
+	pkg.Size = uint64(*size)
+
+	var installTime *C.int
+	res = C.my_headerGetEntryInt(headerGetEntry, header, RPMTAG_INSTALLTIME, &installTime)
+	if res != 1 {
+		return nil, fmt.Errorf("Failed to call headerGetEntry(installTime): %d", res)
+	}
+	pkg.InstallTime = time.Unix(int64(*installTime), 0)
 
 	return &pkg, nil
 }

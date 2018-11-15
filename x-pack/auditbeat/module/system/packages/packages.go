@@ -205,7 +205,9 @@ func getPackages(osFamily string) (packages []*Package, err error) {
 	switch osFamily {
 	case redhat:
 		packages, err = listRPMPackages()
-		err = errors.New("RPM not yet supported")
+		if err != nil {
+			err = errors.Wrap(err, "error getting DEB packages")
+		}
 	case debian:
 		packages, err = listDebPackages()
 		if err != nil {
