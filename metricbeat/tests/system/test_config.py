@@ -8,4 +8,4 @@ import time
 
 class ConfigTest(metricbeat.BaseTest):
     def get_host(self):
-        return 'http://' + os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
+        return 'http://' + self.compose_host()

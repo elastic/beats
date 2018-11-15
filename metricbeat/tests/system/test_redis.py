@@ -59,9 +59,10 @@ class Test(metricbeat.BaseTest):
         """
 
         # At least one event must be inserted so db stats exist
+        host, port = self.compose_host().split(":")
         r = redis.StrictRedis(
-            host=self.compose_hosts()[0],
-            port=os.getenv('REDIS_PORT', '6379'),
+            host=host,
+            port=port,
             db=0)
         r.set('foo', 'bar')
 
@@ -120,8 +121,7 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
 
     def get_hosts(self):
-        return [self.compose_hosts()[0] + ':' +
-                os.getenv('REDIS_PORT', '6379')]
+        return [self.compose_host()]
 
 
 class TestRedis4(Test):

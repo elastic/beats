@@ -31,5 +31,4 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [os.getenv('ENVOYPROXY_HOST', 'localhost') + ':' +
-                os.getenv('ENVOYPROXY_PORT', '9901')]
+        return [self.compose_host()]

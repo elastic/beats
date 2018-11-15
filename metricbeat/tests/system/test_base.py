@@ -75,3 +75,12 @@ class Test(BaseTest):
 
         assert exit_code == 0
         assert self.log_contains("Kibana dashboards successfully loaded.")
+
+    def get_elasticsearch_url(self):
+        return "http://" + self.compose_host("elasticsearch")
+
+    def get_kibana_url(self):
+        """
+        Returns kibana host URL
+        """
+        return "http://" + self.compose_host("kibana")

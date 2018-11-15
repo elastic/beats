@@ -11,7 +11,7 @@ class Test(metricbeat.BaseTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
         """
-        prometheus stats test
+        golang heap test
         """
         self.render_config_template(modules=[{
             "name": "golang",
