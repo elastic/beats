@@ -18,9 +18,9 @@
 package input
 
 import (
-	"fmt"
 	"time"
 
+	"github.com/elastic/beats/journalbeat/config"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -37,7 +37,7 @@ type Config struct {
 	// BackoffFactor is the multiplier of Backoff.
 	MaxBackoff time.Duration `config:"max_backoff" validate:"min=0,nonzero"`
 	// Seek is the method to read from journals.
-	Seek string `config:"seek"`
+	Seek config.SeekMode `config:"seek"`
 	// Matches store the key value pairs to match entries.
 	Matches []string `config:"include_matches"`
 
@@ -53,22 +53,6 @@ var (
 		Backoff:       1 * time.Second,
 		BackoffFactor: 2,
 		MaxBackoff:    60 * time.Second,
-		Seek:          "cursor",
+		Seek:          config.SeekCursor,
 	}
 )
-
-// Validate check the configuration of the input.
-func (c *Config) Validate() error {
-	correctSeek := false
-	for _, s := range []string{"cursor", "head", "tail"} {
-		if c.Seek == s {
-			correctSeek = true
-		}
-	}
-
-	if !correctSeek {
-		return fmt.Errorf("incorrect value for seek: %s. possible values: cursor, head, tail", c.Seek)
-	}
-
-	return nil
-}
