@@ -48,6 +48,22 @@ type Journalbeat struct {
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	cfgwarn.Experimental("Journalbeat is experimental.")
 
+	if cfg.HasField("seek") {
+		cfgwarn.Deprecate("7.0.0", "global seek is deprecated, Use seek on input level instead.")
+	}
+
+	if cfg.HasField("backoff") {
+		cfgwarn.Deprecate("7.0.0", "global backoff is deprecated, Use backoff on input level instead.")
+	}
+
+	if cfg.HasField("max_backoff") {
+		cfgwarn.Deprecate("7.0.0", "global max_backoff is deprecated, Use max_backoff on input level instead.")
+	}
+
+	if cfg.HasField("include_matches") {
+		cfgwarn.Deprecate("7.0.0", "global include_matches is deprecated, Use include_matches on input level instead.")
+	}
+
 	config := conf.DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("error reading config file: %v", err)
@@ -68,22 +84,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 			return nil, err
 		}
 		inputs = append(inputs, i)
-	}
-
-	if config.Seek > conf.SeekInvalid {
-		cfgwarn.Deprecate("7.0.0", "global seek is deprecated, Use seek on input level instead.")
-	}
-
-	if config.Backoff > 0*time.Second {
-		cfgwarn.Deprecate("7.0.0", "global backoff is deprecated, Use backoff on input level instead.")
-	}
-
-	if config.MaxBackoff > 0*time.Second {
-		cfgwarn.Deprecate("7.0.0", "global max_backoff is deprecated, Use max_backoff on input level instead.")
-	}
-
-	if len(config.Matches) > 0 {
-		cfgwarn.Deprecate("7.0.0", "global include_matches is deprecated, Use include_matches on input level instead.")
 	}
 
 	bt := &Journalbeat{
