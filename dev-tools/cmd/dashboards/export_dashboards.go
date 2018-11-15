@@ -82,16 +82,16 @@ func main() {
 	if len(*dashboard) > 0 {
 		result, err := dashboards.Export(client, *dashboard)
 		if err != nil {
-			log.Fatalf("failed to export the dashboard: %s", err)
+			log.Fatalf("Failed to export the dashboard: %s", err)
 		}
 		bytes, err := json.Marshal(result)
 		if err != nil {
-			log.Fatalf("failed to save the dashboard: %s", err)
+			log.Fatalf("Failed to save the dashboard: %s", err)
 		}
 
 		err = ioutil.WriteFile(*fileOutput, bytes, 0644)
 		if err != nil {
-			log.Fatalf("failed to save the dashboard: %s", err)
+			log.Fatalf("Failed to save the dashboard: %s", err)
 
 		}
 		if !*quiet {

@@ -31,36 +31,41 @@ import (
 	"github.com/elastic/beats/libbeat/kibana"
 )
 
-// DashboardsListYml is the yaml file which contains list of available dashboards.
-type ListYml struct {
-	Dashboards []YmlElement `yaml:"dashboards"`
+// ListYML is the yaml file which contains list of available dashboards.
+type ListYML struct {
+	Dashboards []YMLElement `yaml:"dashboards"`
 }
 
-type YmlElement struct {
+// YmlElement contains the data of a dashboard:
+// * its uuid in Kibana
+// * filename to be saved as
+type YMLElement struct {
 	ID   string `yaml:"id"`
 	File string `yaml:"file"`
 }
 
+// Export wraps GetDashboard call to provide a more descriptive API
 func Export(client *kibana.Client, id string) (common.MapStr, error) {
 	return client.GetDashboard(id)
 }
 
-func ExportAllFromYml(client *kibana.Client, yml string) ([]common.MapStr, ListYml, error) {
+// ExportAllFromYml exports all dashboards found in the YML file
+func ExportAllFromYml(client *kibana.Client, yml string) ([]common.MapStr, ListYML, error) {
 	b, err := ioutil.ReadFile(yml)
 	if err != nil {
-		return nil, ListYml{}, fmt.Errorf("error opening the list of dashboards: %+v", err)
+		return nil, ListYML{}, fmt.Errorf("error opening the list of dashboards: %+v", err)
 	}
-	var list ListYml
+	var list ListYML
 	err = yaml.Unmarshal(b, &list)
 	if err != nil {
-		return nil, ListYml{}, fmt.Errorf("error reading the list of dashboards: %+v", err)
+		return nil, ListYML{}, fmt.Errorf("error reading the list of dashboards: %+v", err)
 	}
 
 	var results []common.MapStr
 	for _, e := range list.Dashboards {
 		result, err := Export(client, e.ID)
 		if err != nil {
-			return nil, ListYml{}, err
+			return nil, ListYML{}, err
 		}
 		results = append(results, result)
 	}
