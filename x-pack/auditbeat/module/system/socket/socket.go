@@ -176,43 +176,69 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return ms, nil
 }
 
-// Fetch collects socket information. It is invoked periodically.
-func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
-	if needsStateUpdate || ms.cache.IsEmpty() {
-		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
-		err := ms.reportState(report)
-		if err != nil {
-			ms.log.Error(err)
-			report.Error(err)
-		}
-		ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
+// Run registers a netlink subscription to the kernel and receives
+// socket events until the reporter's done channel is closed.
+// It also sends a state update right away, and regular state updates
+// thereafter.
+func (ms *MetricSet) Run(report mb.PushReporterV2) {
+	// Report state on start but do not update lastState
+	// so regular state update proceeds as scheduled.
+	err := ms.reportState(report)
+	if err != nil {
+		ms.log.Error(err)
+		report.Error(err)
 	}
 
-	/*
+	// Check if state update is needed every 10 seconds
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-report.Done():
+			// Stop
+			return
+		case t := <-ticker.C:
+			// Check if state update needed
+			if time.Since(ms.lastState) > ms.config.effectiveStatePeriod() {
+				ms.log.Debug("Sending regular state update")
+				ms.lastState = t
+				err := ms.reportState(report)
+				if err != nil {
+					ms.log.Error(err)
+					report.Error(err)
+				}
+				ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
+			}
+		}
+	}
+
+	// 1. always report state at beginning of Run()
+	// 2. Start go subroutine that checks if state update needed, if not
+	//    goes back to sleep for 10s/1m
+	//   2.1 Use separate ptable so we don't need to sync it
+	// 3. Create netlink_sub.go file with Subscribe(channel) method that
+	//    opens a socket to kernel and subscribes to socket updates
+	//   3.1 Go routine to consume events and handle enrichment
+	//       independently (might require syncing ptable, or just
+	//       going through /proc every time)
+	// 4. Select between reporter.Done() and subscribe channel and output
+	//    events.
+}
+
+/*
+// Fetch collects socket information. It is invoked periodically.
+func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		err := ms.reportChanges(report)
 		if err != nil {
 			ms.log.Error(err)
 			report.Error(err)
 		}
-	*/
 }
+*/
 
 // reportState reports all existing sockets on the system.
 func (ms *MetricSet) reportState(report mb.ReporterV2) error {
-	currentTime := time.Now()
-
-	/*
-		Since we are not persisting socket information to disk, a
-		new state is sent when Auditbeat is restarted.
-		To still make sure that state is sent at the specified regular
-		intervals, we only update the lastState time when this state
-		update was not triggered by a restart (when the cache is empty).
-	*/
-	if !ms.cache.IsEmpty() {
-		ms.lastState = currentTime
-	}
-
 	sockets, err := ms.getSockets()
 	if err != nil {
 		return errors.Wrap(err, "failed to get sockets")
@@ -243,7 +269,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	}
 
 	// Save time so we know when to send the state again (config.StatePeriod)
-	timeBytes, err := currentTime.MarshalBinary()
+	timeBytes, err := ms.lastState.MarshalBinary()
 	if err != nil {
 		return err
 	}
