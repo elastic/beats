@@ -82,7 +82,7 @@ func (c *ConfigBlacklist) Filter(configBlocks api.ConfigBlocks) api.ConfigBlocks
 		newConfigs := api.ConfigBlocksWithType{Type: configs.Type}
 
 		for _, block := range configs.Blocks {
-			if c.blacklisted(configs.Type, block) {
+			if c.isBlacklisted(configs.Type, block) {
 				logp.Err("Got a blacklisted configuration, ignoring it")
 				continue
 			}
@@ -98,7 +98,7 @@ func (c *ConfigBlacklist) Filter(configBlocks api.ConfigBlocks) api.ConfigBlocks
 	return result
 }
 
-func (c *ConfigBlacklist) blacklisted(blockType string, block *api.ConfigBlock) bool {
+func (c *ConfigBlacklist) isBlacklisted(blockType string, block *api.ConfigBlock) bool {
 	cfg, err := block.ConfigWithMeta()
 	if err != nil {
 		return false
@@ -117,7 +117,7 @@ func (c *ConfigBlacklist) blacklisted(blockType string, block *api.ConfigBlock) 
 			if len(field) > 0 {
 				segments = strings.Split(field, ".")
 			}
-			if c.blockMatches(pattern, segments, cfg.Config) {
+			if c.isBlacklistedBlock(pattern, segments, cfg.Config) {
 				return true
 			}
 		}
@@ -126,7 +126,7 @@ func (c *ConfigBlacklist) blacklisted(blockType string, block *api.ConfigBlock) 
 	return false
 }
 
-func (c *ConfigBlacklist) blockMatches(pattern *regexp.Regexp, segments []string, current *common.Config) bool {
+func (c *ConfigBlacklist) isBlacklistedBlock(pattern *regexp.Regexp, segments []string, current *common.Config) bool {
 	if current.IsDict() {
 		switch len(segments) {
 		case 0:
@@ -144,12 +144,12 @@ func (c *ConfigBlacklist) blockMatches(pattern *regexp.Regexp, segments []string
 			}
 			// not a string, traverse
 			child, _ := current.Child(segments[0], -1)
-			return child != nil && c.blockMatches(pattern, segments[1:], child)
+			return child != nil && c.isBlacklistedBlock(pattern, segments[1:], child)
 
 		default:
 			// traverse the tree
 			child, _ := current.Child(segments[0], -1)
-			return child != nil && c.blockMatches(pattern, segments[1:], child)
+			return child != nil && c.isBlacklistedBlock(pattern, segments[1:], child)
 
 		}
 	}
@@ -167,7 +167,7 @@ func (c *ConfigBlacklist) blockMatches(pattern *regexp.Regexp, segments []string
 				// not a string, traverse
 				child, _ := current.Child("", count-1)
 				if child != nil {
-					if c.blockMatches(pattern, segments, child) {
+					if c.isBlacklistedBlock(pattern, segments, child) {
 						return true
 					}
 				}
@@ -177,7 +177,7 @@ func (c *ConfigBlacklist) blockMatches(pattern *regexp.Regexp, segments []string
 			// List of elements, explode traversal to all of them
 			for count, _ := current.CountField(""); count > 0; count-- {
 				child, _ := current.Child("", count-1)
-				if child != nil && c.blockMatches(pattern, segments, child) {
+				if child != nil && c.isBlacklistedBlock(pattern, segments, child) {
 					return true
 				}
 			}
