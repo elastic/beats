@@ -34,7 +34,7 @@ import (
 type ESClient interface {
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() string
+	GetVersion() common.Version
 }
 
 type Loader struct {

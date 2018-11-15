@@ -69,6 +69,10 @@ func NewVersion(version string) (*Version, error) {
 	return &v, nil
 }
 
+func (v *Version) IsValid() bool {
+	return v.version != ""
+}
+
 func (v *Version) IsMajor(major int) bool {
 	return major == v.Major
 }

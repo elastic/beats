@@ -35,7 +35,7 @@ var importAPI = "/api/kibana/dashboards/import"
 type KibanaLoader struct {
 	client       *kibana.Client
 	config       *Config
-	version      string
+	version      common.Version
 	hostname     string
 	msgOutputter MessageOutputter
 }

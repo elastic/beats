@@ -26,10 +26,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
@@ -91,7 +91,7 @@ type Connection struct {
 	onConnectCallback func() error
 
 	encoder bodyEncoder
-	version string
+	version common.Version
 }
 
 type bulkIndexAction struct {
@@ -641,7 +641,7 @@ func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte
 }
 
 // GetVersion returns the elasticsearch version the client is connected to
-func (client *Client) GetVersion() string {
+func (client *Client) GetVersion() common.Version {
 	return client.Connection.version
 }
 
@@ -673,7 +673,7 @@ func (client *Client) Test(d testing.Driver) {
 
 		err = client.Connect()
 		d.Fatal("talk to server", err)
-		d.Info("version", client.version)
+		d.Info("version", client.version.String())
 	})
 }
 
@@ -687,20 +687,27 @@ func (client *Client) Connect() error {
 		return err
 	}
 
-	if strings.HasPrefix(client.GetVersion(), "7.") {
-		client.eventType = defaultEventTypeES7
-	} else {
+	if client.GetVersion().Major <= 7 {
 		client.eventType = defaultEventTypeES6
+	} else {
+		client.eventType = defaultEventType
 	}
+
 	return nil
 }
 
 // Connect connects the client.
 func (conn *Connection) Connect() error {
-	var err error
-	conn.version, err = conn.Ping()
+	versionInfo, err := conn.Ping()
 	if err != nil {
 		return err
+	}
+
+	if version, err := common.NewVersion(versionInfo); err != nil {
+		logp.Err("Invalid version from Elasticsearch: %v", versionInfo)
+		conn.version = common.Version{}
+	} else {
+		conn.version = *version
 	}
 
 	err = conn.onConnectCallback()
@@ -829,7 +836,7 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	return status, obj, err
 }
 
-func (conn *Connection) GetVersion() string {
+func (conn *Connection) GetVersion() common.Version {
 	return conn.version
 }
 
