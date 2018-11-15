@@ -26,14 +26,15 @@ import (
 	"path/filepath"
 	"syscall"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	sock "github.com/elastic/beats/metricbeat/helper/socket"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
 	"github.com/elastic/gosigar/sys/linux"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -49,14 +50,14 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	netlink       *NetlinkSession
-	ptable        *ProcTable
+	netlink       *sock.NetlinkSession
+	ptable        *sock.ProcTable
 	euid          int
 	previousConns hashSet
 	currentConns  hashSet
 	reverseLookup *ReverseLookupCache
-	listeners     *ListenerTable
-	users         UserCache
+	listeners     *sock.ListenerTable
+	users         sock.UserCache
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -70,7 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.New("unexpected module type")
 	}
 
-	ptable, err := NewProcTable(filepath.Join(systemModule.HostFS, "/proc"))
+	ptable, err := sock.NewProcTable(filepath.Join(systemModule.HostFS, "/proc"))
 	if err != nil {
 		return nil, err
 	}
@@ -81,13 +82,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	m := &MetricSet{
 		BaseMetricSet: base,
-		netlink:       NewNetlinkSession(),
+		netlink:       sock.NewNetlinkSession(),
 		ptable:        ptable,
 		euid:          os.Geteuid(),
 		previousConns: hashSet{},
 		currentConns:  hashSet{},
-		listeners:     NewListenerTable(),
-		users:         NewUserCache(),
+		listeners:     sock.NewListenerTable(),
+		users:         sock.NewUserCache(),
 	}
 
 	if c.ReverseLookup.IsEnabled() {
@@ -187,7 +188,7 @@ func (m *MetricSet) enrichConnectionData(c *connection) {
 		c.LocalIP, c.LocalPort, c.RemoteIP, c.RemotePort)
 
 	// Reverse DNS lookup on the remote IP.
-	if m.reverseLookup != nil && c.Direction != Listening {
+	if m.reverseLookup != nil && c.Direction != sock.Listening {
 		hostname, err := m.reverseLookup.Lookup(c.RemoteIP)
 		if err != nil {
 			c.DestHostError = err
@@ -222,7 +223,7 @@ type connection struct {
 	RemotePort int
 
 	State     linux.TCPState
-	Direction Direction
+	Direction sock.Direction
 
 	DestHost            string // Reverse lookup of dest IP.
 	DestHostETLDPlusOne string

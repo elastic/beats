@@ -7,24 +7,20 @@
 package socket
 
 import (
-	"net"
-
 	"fmt"
-
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/auditbeat/cache"
-
+	"net"
 	"strconv"
 	"syscall"
 
 	"github.com/OneOfOne/xxhash"
+	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
-	mbSocket "github.com/elastic/beats/metricbeat/module/system/socket"
+	sock "github.com/elastic/beats/metricbeat/helper/socket"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/auditbeat/cache"
 	"github.com/elastic/gosigar/sys/linux"
 )
 
@@ -46,12 +42,12 @@ type MetricSet struct {
 	cache  *cache.Cache
 	log    *logp.Logger
 
-	netlink *mbSocket.NetlinkSession
+	netlink *sock.NetlinkSession
 	// TODO: Replace with process data collected in processes metricset
-	ptable    *mbSocket.ProcTable
-	listeners *mbSocket.ListenerTable
+	ptable    *sock.ProcTable
+	listeners *sock.ListenerTable
 	// TODO: Replace with user data collected in host metricset
-	users mbSocket.UserCache
+	users sock.UserCache
 }
 
 // Socket represents information about a socket.
@@ -63,7 +59,7 @@ type Socket struct {
 	RemoteIP     net.IP
 	RemotePort   int
 	Inode        uint32
-	Direction    mbSocket.Direction
+	Direction    sock.Direction
 	UID          uint32
 	Username     string
 	ProcessPID   int
@@ -128,7 +124,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
 	}
 
-	ptable, err := mbSocket.NewProcTable("")
+	ptable, err := sock.NewProcTable("")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create process table")
 	}
@@ -138,10 +134,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config:        config,
 		log:           logp.NewLogger(moduleName),
 
-		netlink:   mbSocket.NewNetlinkSession(),
+		netlink:   sock.NewNetlinkSession(),
 		ptable:    ptable,
-		listeners: mbSocket.NewListenerTable(),
-		users:     mbSocket.NewUserCache(),
+		listeners: sock.NewListenerTable(),
+		users:     sock.NewUserCache(),
 	}
 
 	if config.ReportChanges {
