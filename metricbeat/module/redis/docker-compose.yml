@@ -1,0 +1,13 @@
+version: "2.1"
+
+services:
+  redis:
+    image: redis:${REDIS_VERSION:-4.0.11}-${IMAGE_OS:-alpine}
+    ports:
+      - 6379
+    healthcheck:
+      test:
+      - "CMD-SHELL"
+      - "redis-cli ping"
+      interval: 1s
+      retries: 90

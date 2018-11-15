@@ -1,0 +1,16 @@
+version: '2.1'
+
+services:
+  aerospike:
+    build:
+      context: ./_meta
+      args:
+        AEROSPIKE_VERSION: ${AEROSPIKE_VERSION:-3.9.0}
+    ports:
+      - "3000"
+    healthcheck:
+      test:
+      - "CMD-SHELL"
+      - "nc -z localhost 3000"
+      interval: 1s
+      retries: 90
