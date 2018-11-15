@@ -30,14 +30,14 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 
-	"github.com/elastic/beats/journalbeat/config"
+	conf "github.com/elastic/beats/journalbeat/config"
 )
 
 // Journalbeat instance
 type Journalbeat struct {
 	inputs []*input.Input
 	done   chan struct{}
-	config config.Config
+	config conf.Config
 
 	pipeline   beat.Pipeline
 	checkpoint *checkpoint.Checkpoint
@@ -47,12 +47,8 @@ type Journalbeat struct {
 // New returns a new Journalbeat instance
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	cfgwarn.Experimental("Journalbeat is experimental.")
-	cfgwarn.Deprecate("7.0.0", "global seek is deprecated, Use seek on input level instead.")
-	cfgwarn.Deprecate("7.0.0", "global backoff is deprecated, Use backoff on input level instead.")
-	cfgwarn.Deprecate("7.0.0", "global max_backoff is deprecated, Use max_backoff on input level instead.")
-	cfgwarn.Deprecate("7.0.0", "global include_matches is deprecated, Use include_matches on input level instead.")
 
-	config := config.DefaultConfig
+	config := conf.DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("error reading config file: %v", err)
 	}
@@ -72,6 +68,22 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 			return nil, err
 		}
 		inputs = append(inputs, i)
+	}
+
+	if config.Seek != conf.SeekInvalid {
+		cfgwarn.Deprecate("7.0.0", "global seek is deprecated, Use seek on input level instead.")
+	}
+
+	if config.Backoff > 0*time.Second {
+		cfgwarn.Deprecate("7.0.0", "global backoff is deprecated, Use backoff on input level instead.")
+	}
+
+	if config.MaxBackoff > 0*time.Second {
+		cfgwarn.Deprecate("7.0.0", "global max_backoff is deprecated, Use max_backoff on input level instead.")
+	}
+
+	if len(config.Matches) > 0 {
+		cfgwarn.Deprecate("7.0.0", "global include_matches is deprecated, Use include_matches on input level instead.")
 	}
 
 	bt := &Journalbeat{
