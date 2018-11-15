@@ -3,9 +3,8 @@ package elbv2
 import (
 	"fmt"
 	"net/url"
-	"strconv"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/libbeat/beat"
 
 	"github.com/elastic/beats/heartbeat/monitors/active/http"
 
@@ -21,9 +20,16 @@ import (
 // See the source for elbv2.DescribeLoadBalancersInput for more info.
 const pageSize = 20
 
+func init() {
+	monitors.RegisterActive("aws_elbv2", create)
+}
+
 func create(name string, commonCfg *common.Config) (jobs []monitors.Job, endpoints int, err error) {
-	config := Config{}
-	commonCfg.Unpack(config)
+	config := &Config{}
+	err = commonCfg.Unpack(config)
+	if err != nil {
+		return nil, 0, err
+	}
 
 	cfg, err := external.LoadDefaultAWSConfig()
 	cfg.Region = config.Region
@@ -53,93 +59,139 @@ func create(name string, commonCfg *common.Config) (jobs []monitors.Job, endpoin
 }
 
 func newELBv2Job(client *elbv2.ELBV2, arns []string) (monitors.Job, error) {
-	psValue := int64(pageSize)
-	describeInput := &elbv2.DescribeLoadBalancersInput{
-		PageSize:         &psValue,
-		LoadBalancerArns: arns,
+	jobSettings := monitors.JobSettings{
+		Name: fmt.Sprintf("aws_elbv2/%v", arns),
 	}
 
-	return monitors.MakeJob(monitors.JobSettings{}, func() (common.MapStr, []monitors.TaskRunner, error) {
+	return monitors.MakeJob(jobSettings, func() (*beat.Event, []monitors.JobRunner, error) {
+		describeInput := &elbv2.DescribeLoadBalancersInput{
+			LoadBalancerArns: arns,
+		}
+
 		lbResp, err := client.DescribeLoadBalancersRequest(describeInput).Send()
 
 		if err != nil {
 			return nil, nil, err
 		}
 
-		var listenersCont []monitors.TaskRunner
+		var jobs []monitors.JobRunner
 		for _, lb := range lbResp.LoadBalancers {
-			listenersCont = append(listenersCont, newListenerTask(client, lb))
+			jobs = append(jobs, newLbJob(lb))
+			jobs = append(jobs, newListenerJob(client, lb))
 		}
+
+		fmt.Printf("JOBS ARE %v\n", jobs)
+		return nil, jobs, nil
 	}), nil
 }
 
-func newListenerTask(client *elbv2.ELBV2, lb elbv2.LoadBalancer) monitors.TaskRunner {
-	return monitors.MakeCont(func() (common.MapStr, []monitors.TaskRunner, error) {
-		describeInput := &elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}
-		req := client.DescribeListenersRequest(describeInput).Paginate()
-
-		var tasks []monitors.TaskRunner
-		for req.Next() {
-			for _, listener := range req.CurrentPage().Listeners {
-				hostPort := fmt.Sprintf("%s:%s", *lb.DNSName, listener.Port)
-
-				var task monitors.TaskRunner
-				var err error
-
-				switch listener.Protocol {
-				case elbv2.ProtocolEnumHttps:
-					url := &url.URL{Scheme: "https", Host: hostPort}
-					task, err = newHttpCheck(url)
-				case elbv2.ProtocolEnumHttp:
-					url := &url.URL{Scheme: "http", Host: hostPort}
-					task, err = newHttpCheck(url)
-				case elbv2.ProtocolEnumTcp:
-					panic("IMPLEMENT ME")
-				}
-
-				if err != nil {
-					return nil, nil, err
-				}
-
-				tasks = append(tasks, task)
-			}
+func newLbJob(lb elbv2.LoadBalancer) monitors.JobRunner {
+	return func() (*beat.Event, []monitors.JobRunner, error) {
+		var status string
+		if lb.State.Code == elbv2.LoadBalancerStateEnumActive {
+			status = "up"
+		} else {
+			status = "down"
 		}
 
-	})
+		event := &beat.Event{
+			Fields: common.MapStr{
+				"monitor": common.MapStr{
+					"status":    status,
+					"task_type": "elbv2_state",
+					"task_id":   "ELBv2 State",
+				},
+				"aws": common.MapStr{
+					"arn": lb.LoadBalancerArn,
+					"elbv2": common.MapStr{
+						"status": lb.State,
+						"arn":    lb.LoadBalancerArn,
+					},
+				},
+			},
+		}
+
+		return event, []monitors.JobRunner{}, nil
+	}
 }
 
-func newHttpCheck(url *url.URL) (monitors.TaskRunner, error) {
+func newListenerJob(client *elbv2.ELBV2, lb elbv2.LoadBalancer) monitors.JobRunner {
+	return func() (*beat.Event, []monitors.JobRunner, error) {
+		describeInput := &elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}
+		// Pagination not supported when LB is specified
+		resp, err := client.DescribeListenersRequest(describeInput).Send()
+		if err != nil {
+			return nil, nil, err
+		}
+
+		var jobs []monitors.JobRunner
+		for _, listener := range resp.Listeners {
+			hostPort := fmt.Sprintf("%s:%d", *lb.DNSName, *listener.Port)
+
+			var job monitors.JobRunner
+			var err error
+
+			var listenerURL url.URL
+			switch listener.Protocol {
+			case elbv2.ProtocolEnumHttps:
+				listenerURL = url.URL{Scheme: "https", Host: hostPort}
+				job, err = newHttpCheck(listener, &listenerURL)
+			case elbv2.ProtocolEnumHttp:
+				listenerURL = url.URL{Scheme: "http", Host: hostPort}
+				job, err = newHttpCheck(listener, &listenerURL)
+			case elbv2.ProtocolEnumTcp:
+				panic("IMPLEMENT ME")
+			}
+
+			if err != nil {
+				fmt.Printf("LISTEN JOB ERR %v\n", err)
+				return nil, nil, err
+			}
+
+			jobs = append(jobs, job)
+		}
+
+		fmt.Printf("LISTEN JOBS ARE %v\n", jobs)
+		return nil, jobs, nil
+	}
+}
+
+func newHttpCheck(listener elbv2.Listener, url *url.URL) (monitors.JobRunner, error) {
+	fmt.Printf("START LISTENER JOB\n")
 	httpConfig := &http.Config{
 		URLs: []string{url.String()},
+		Mode: monitors.DefaultIPSettings,
 	}
 
-	for _, url := range httpConfig.URLs {
-		job, err := http.NewHTTPMonitorIPsJob(httpConfig, url, nil, nil, nil, nil)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not initialize HTTP job for ELB")
+	job, err := http.NewHTTPMonitorIPsJob(httpConfig, url.String(), nil, nil, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	overlay := common.MapStr{
+		"monitor": common.MapStr{
+			"task_type": "elbv2_check_port_http",
+			"task_id":   url.String(),
+		},
+		"aws": common.MapStr{
+			"arn": listener.ListenerArn,
+			"elbv2": common.MapStr{
+				"arn": listener.LoadBalancerArn,
+				"listener": common.MapStr{
+					"arn": listener.ListenerArn,
+				},
+			},
+		},
+	}
+
+	runner := func() (*beat.Event, []monitors.JobRunner, error) {
+		event, jobs, err := job.Run()
+
+		if event != nil {
+			monitors.MergeEventFields(event, overlay)
 		}
-		job.
-		return job, nil
-	}
 
-	req, err := http.BuildRequest(url.String(), httpConfig, nil)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not build request for ELB listener port @ '%s'", url)
+		return event, jobs, err
 	}
-	port, err := strconv.Atoi(url.Port())
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not convert ELB listener port '%s' to int", url.Port())
-	}
-
-	task := http.CreatePingFactory(
-		httpConfig,
-		url.Hostname(),
-		uint16(port),
-		nil,
-		req,
-		nil,
-		nil,
-	)
-
-	return task(), nil
+	return runner, nil
 }

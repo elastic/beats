@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Monitor represents a configured recurring monitoring task loaded from a config file. Starting it
+// Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
 type Monitor struct {
 	name       string
@@ -40,7 +40,7 @@ type Monitor struct {
 	registrar  *pluginsReg
 	uniqueName string
 	scheduler  *scheduler.Scheduler
-	jobTasks   []*task
+	jobTasks   []*configuredJob
 	enabled    bool
 	// endpoints is a count of endpoints this monitor measures.
 	endpoints int
@@ -49,7 +49,7 @@ type Monitor struct {
 	internalsMtx sync.Mutex
 
 	// Watch related fields
-	watchPollTasks []*task
+	watchPollTasks []*configuredJob
 	watch          watcher.Watch
 
 	pipelineConnector beat.PipelineConnector
@@ -96,9 +96,9 @@ func newMonitor(
 	m := &Monitor{
 		name:              monitorPlugin.name,
 		scheduler:         scheduler,
-		jobTasks:          []*task{},
+		jobTasks:          []*configuredJob{},
 		pipelineConnector: pipelineConnector,
-		watchPollTasks:    []*task{},
+		watchPollTasks:    []*configuredJob{},
 		internalsMtx:      sync.Mutex{},
 		config:            config,
 		stats:             monitorPlugin.stats,
@@ -132,15 +132,15 @@ See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartb
 	return m, nil
 }
 
-func (m *Monitor) makeTasks(config *common.Config, jobs []Job) ([]*task, error) {
-	mtConf := taskConfig{}
+func (m *Monitor) makeTasks(config *common.Config, jobs []Job) ([]*configuredJob, error) {
+	mtConf := jobConfig{}
 	if err := config.Unpack(&mtConf); err != nil {
 		return nil, errors.Wrap(err, "invalid config, could not unpack monitor config")
 	}
 
-	var mTasks []*task
+	var mTasks []*configuredJob
 	for _, job := range jobs {
-		t, err := newTask(job, mtConf, m)
+		t, err := newConfiguredJob(job, mtConf, m)
 		if err != nil {
 			// Failure to compile monitor processors should not crash hb or prevent progress
 			if _, ok := err.(InvalidMonitorProcessorsError); ok {
@@ -166,7 +166,7 @@ func (m *Monitor) makeWatchTasks(monitorPlugin pluginBuilder) error {
 
 	if len(watchCfg.Path) > 0 {
 		m.watch, err = watcher.NewFilePoller(watchCfg.Path, watchCfg.Poll, func(content []byte) {
-			var newTasks []*task
+			var newTasks []*configuredJob
 
 			dec := json.NewDecoder(bytes.NewBuffer(content))
 			for dec.More() {
@@ -197,7 +197,7 @@ func (m *Monitor) makeWatchTasks(monitorPlugin pluginBuilder) error {
 
 				watchTasks, err := m.makeTasks(merged, watchJobs)
 				if err != nil {
-					logp.Err("Could not make task for config: %v", err)
+					logp.Err("Could not make configuredJob for config: %v", err)
 					return
 				}
 

@@ -11,19 +11,23 @@
 
 # Configure monitors
 heartbeat.monitors:
+  - type: aws_elbv2
+    arns: ["arn:aws:elasticloadbalancing:us-east-1:114575138929:loadbalancer/app/test-lb/e35147785f6cc9a4"]
+    region: "us-east-1"
+    schedule: "@every 10s"
 
-heartbeat.autodiscover:
-  providers:
-  - type: aws_elb
-    region: us-east-1
-    templates:
-    - condition:
-        has_fields: ["port"]
-      config:
-      - type: tcp
-        hosts: ["${data.host}:${data.port}"]
-        schedule: "@every 5s"
-        timeout: 1s
+#heartbeat.autodiscover:
+#  providers:
+#  - type: aws_elb
+#    region: us-east-1
+#    templates:
+#    - condition:
+#        has_fields: ["port"]
+#      config:
+#      - type: tcp
+#        hosts: ["${data.host}:${data.port}"]
+#        schedule: "@every 5s"
+#        timeout: 1s
 
 #==================== Elasticsearch template setting ==========================
 
@@ -99,7 +103,7 @@ output.console:
   pretty: false
 #output.elasticsearch:
   # Array of hosts to connect to.
-#  hosts: ["localhost:9200"]
+  #hosts: ["localhost:9200"]
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"

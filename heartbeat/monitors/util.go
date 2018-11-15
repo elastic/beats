@@ -113,7 +113,8 @@ func MakeJob(settings JobSettings, f func() (*beat.Event, []JobRunner, error)) J
 	return &funcJob{settings, func() (*beat.Event, []JobRunner, error) {
 		// Create and run new annotated Job whenever the Jobs root is Task is executed.
 		// This will set the jobs active start timestamp to the time.Now().
-		return annotated(settings, time.Now(), f)()
+		event, jobs, err := annotated(settings, time.Now(), f)()
+		return event, jobs, err
 	}}
 }
 
@@ -127,11 +128,19 @@ func annotated(
 		event, cont, err := fn()
 
 		if err != nil {
-			event.Fields.Put("error", look.Reason(err))
+			// Handle the case where we have a parent configuredJob that only spawns subtasks
+			// that has itself encountered an error
+			if event == nil {
+				event = &beat.Event{}
+			}
+			MergeEventFields(event, common.MapStr{
+				"error": look.Reason(err),
+			})
 		}
 
 		if event != nil {
 			status := look.Status(err)
+			fmt.Printf("SET STATUS %v\n", status)
 			MergeEventFields(event, common.MapStr{
 				"monitor": common.MapStr{
 					"duration": look.RTT(time.Since(start)),
@@ -375,6 +384,7 @@ func resolveErr(host string, err error) (*beat.Event, []JobRunner, error) {
 func WithFields(fields common.MapStr, r JobRunner) JobRunner {
 	return func() (*beat.Event, []JobRunner, error) {
 		event, cont, err := r()
+		fmt.Printf("WITH FIELDS %v\n", err)
 		if event == nil {
 			event = &beat.Event{}
 		} else {
@@ -391,7 +401,7 @@ func WithFields(fields common.MapStr, r JobRunner) JobRunner {
 }
 
 // WithDuration wraps a TaskRunner, measuring the duration between creation and
-// finish of the actual task and sub-tasks.
+// finish of the actual configuredJob and sub-tasks.
 func WithDuration(field string, r JobRunner) JobRunner {
 	return func() (*beat.Event, []JobRunner, error) {
 		return withStart(field, time.Now(), r)()

@@ -139,6 +139,7 @@ func CreatePingFactory(
 	checkRedirect := makeCheckRedirect(config.MaxRedirects)
 
 	return monitors.MakePingIPFactory(func(ip *net.IPAddr) (*beat.Event, error) {
+		fmt.Printf("EXEC HTTP PING FACTORY")
 		event := &beat.Event{}
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
 		d := &dialchain.DialerChain{

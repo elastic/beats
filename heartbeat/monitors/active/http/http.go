@@ -31,12 +31,12 @@ import (
 )
 
 func init() {
-	monitors.RegisterActive("http", create)
+	monitors.RegisterActive("http", Create)
 }
 
 var debugf = logp.MakeDebug("http")
 
-func create(
+func Create(
 	name string,
 	cfg *common.Config,
 ) (jobs []monitors.Job, endpoints int, err error) {
