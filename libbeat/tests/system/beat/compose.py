@@ -96,6 +96,20 @@ class ComposeMixin(object):
             cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
 
     @classmethod
+    def _private_host(cls, info, port):
+        networks = info['NetworkSettings']['Networks'].values()
+        port = port.split("/")[0]
+        for network in networks:
+            ip = network['IPAddress']
+            if ip:
+                return "%s:%s" % (ip, port)
+
+    @classmethod
+    def _public_host(cls, info, port):
+        hostPort = info['NetworkSettings']['Ports'][port][0]['HostPort']
+        return "localhost:%s" % hostPort
+
+    @classmethod
     def compose_host(cls, service=None, port=None):
         if not INTEGRATION_TESTS or not cls.COMPOSE_SERVICES:
             return []
@@ -109,13 +123,12 @@ class ComposeMixin(object):
 
         container = cls.compose_project().containers(service_names=[service])[0]
         info = container.inspect()
-
         if port is None:
             portsConfig = info['HostConfig']['PortBindings']
             port = portsConfig.keys()[0]
 
-        hostPort = info['NetworkSettings']['Ports'][port][0]['HostPort']
-        return "localhost:%s" % hostPort
+        # TODO: Change _private_host to _public_host when go tests have been also migrated
+        return cls._private_host(info, port)
 
     @classmethod
     def compose_project(cls):
