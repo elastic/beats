@@ -698,13 +698,13 @@ func (client *Client) Connect() error {
 
 // Connect connects the client.
 func (conn *Connection) Connect() error {
-	versionInfo, err := conn.Ping()
+	versionString, err := conn.Ping()
 	if err != nil {
 		return err
 	}
 
-	if version, err := common.NewVersion(versionInfo); err != nil {
-		logp.Err("Invalid version from Elasticsearch: %v", versionInfo)
+	if version, err := common.NewVersion(versionString); err != nil {
+		logp.Err("Invalid version from Elasticsearch: %v", versionString)
 		conn.version = common.Version{}
 	} else {
 		conn.version = *version

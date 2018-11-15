@@ -179,30 +179,6 @@ func ImportDashboardsViaElasticsearch(esLoader *ElasticsearchLoader) error {
 	return nil
 }
 
-// TODO: remove me
-/*
-func getMajorAndMinorVersion(version string) (int, int, error) {
-	fields := strings.Split(version, ".")
-	if len(fields) != 3 {
-		return 0, 0, fmt.Errorf("wrong version %s", version)
-	}
-	majorVersion := fields[0]
-	minorVersion := fields[1]
-
-	majorVersionInt, err := strconv.Atoi(majorVersion)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	minorVersionInt, err := strconv.Atoi(minorVersion)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return majorVersionInt, minorVersionInt, nil
-}
-*/
-
 func isKibanaAPIavailable(version common.Version) bool {
 	return (version.Major == 5 && version.Minor >= 6) || version.Major >= 6
 }
