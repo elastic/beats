@@ -130,6 +130,7 @@ func (g *GlobManager) ListDisabled() []*CfgFile {
 
 // Enabled returns true if given conf file is enabled
 func (g *GlobManager) Enabled(name string) bool {
+	name = convertDisplayNameToFileName(name)
 	for _, file := range g.files {
 		if name == file.Name {
 			return file.Enabled
@@ -140,6 +141,7 @@ func (g *GlobManager) Enabled(name string) bool {
 
 // Exists return true if the given conf exists (enabled or disabled)
 func (g *GlobManager) Exists(name string) bool {
+	name = convertDisplayNameToFileName(name)
 	for _, file := range g.files {
 		if name == file.Name {
 			return true
@@ -150,6 +152,7 @@ func (g *GlobManager) Exists(name string) bool {
 
 // Enable given conf file, does nothing if it's enabled already
 func (g *GlobManager) Enable(name string) error {
+	name = convertDisplayNameToFileName(name)
 	for _, file := range g.files {
 		if name == file.Name {
 			if !file.Enabled {
@@ -169,6 +172,7 @@ func (g *GlobManager) Enable(name string) error {
 
 // Disable given conf file, does nothing if it's disabled already
 func (g *GlobManager) Disable(name string) error {
+	name = convertDisplayNameToFileName(name)
 	for _, file := range g.files {
 		if name == file.Name {
 			if file.Enabled {
@@ -189,6 +193,10 @@ func (g *GlobManager) Disable(name string) error {
 // DisplayName returns the config file's display name
 func (f *CfgFile) DisplayName() string {
 	return strings.Replace(f.Name, ".", ":", -1)
+}
+
+func convertDisplayNameToFileName(displayName string) string {
+	return strings.Replace(displayName, ":", ".", -1)
 }
 
 // For sorting config files in the desired order, so variants will
