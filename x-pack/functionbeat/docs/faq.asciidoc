@@ -1,4 +1,5 @@
 [[faq]]
+[role="xpack"]
 == Frequently asked questions
 
 This section contains frequently asked questions about {beatname_uc}. Also check
