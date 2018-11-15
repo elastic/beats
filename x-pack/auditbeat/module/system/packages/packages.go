@@ -148,7 +148,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 		for _, pkgInfo := range installed {
 			pkgInfoMapStr := pkgInfo.(*Package).toMapStr()
-			pkgInfoMapStr.Put("status", "NEW")
+			pkgInfoMapStr.Put("status", "new")
 
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
@@ -159,7 +159,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 		for _, pkgInfo := range removed {
 			pkgInfoMapStr := pkgInfo.(*Package).toMapStr()
-			pkgInfoMapStr.Put("status", "REMOVED")
+			pkgInfoMapStr.Put("status", "removed")
 
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
@@ -173,7 +173,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 		for _, pkgInfo := range packages {
 			pkgInfoMapStr := pkgInfo.toMapStr()
-			pkgInfoMapStr.Put("status", "INSTALLED")
+			pkgInfoMapStr.Put("status", "installed")
 
 			pkgInfos = append(pkgInfos, pkgInfoMapStr)
 		}
