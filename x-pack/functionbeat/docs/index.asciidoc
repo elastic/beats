@@ -26,8 +26,6 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
 
-:release-state: released
-
 include::./overview.asciidoc[]
 
 include::./getting-started.asciidoc[]
