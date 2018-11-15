@@ -28,9 +28,16 @@ To learn more, see <<how-central-managment-works>>.
 To use central management, <<enroll-beats,enroll your {beats}>>, then use
 the {cm-ui} UI in {kib} to create and apply the configurations.
 
-NOTE: {beats} central management requires a
-https://www.elastic.co/subscriptions[paid subscription]. To see the {cm-ui} UI
-in {kib}, you must activate your license.
+[NOTE]
+=====
+This feature requires an Elastic license that includes {beats} central
+management.  
+
+Don't have a license? You can start a 30-day trial. At the end of the trial
+period, you can purchase a subscription to keep using central management. For
+more information, see https://www.elastic.co/subscriptions and
+{xpack-ref}/license-management.html[License Management].
+=====
 
 --
 
@@ -120,6 +127,14 @@ or <<username-password-enrollment,username and password-based>> enrollment.
 
 [float]
 === Prerequisites
+
+* Verify that your Elastic license includes the {beats} central management
+feature.
++
+Don't have a license? You can start a 30-day trial. At the end of the trial
+period, you can purchase a subscription to keep using central management. For
+more information, see https://www.elastic.co/subscriptions and
+{xpack-ref}/license-management.html[License Management].
 
 * {kibana-ref}/using-kibana-with-security.html[Enable security] in {kib} to
 ensure that only users with sufficient privileges are able to access {beats}
