@@ -294,19 +294,31 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 }
 
 func socketEvent(socket *Socket, eventType string, eventAction string) mb.Event {
-	return mb.Event{
+	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"type":   eventType,
 				"action": eventAction,
 			},
 			"user": common.MapStr{
-				"id":   socket.UID,
-				"name": socket.Username,
+				"id": socket.UID,
 			},
 		},
 		MetricSetFields: socket.toMapStr(),
 	}
+
+	if socket.Username != "" {
+		event.RootFields.Put("user.name", socket.Username)
+	}
+
+	if socket.ProcessName != "" {
+		event.RootFields.Put("process", common.MapStr{
+			"pid":  socket.ProcessPID,
+			"name": socket.ProcessName,
+		})
+	}
+
+	return event
 }
 
 func convertToCacheable(sockets []*Socket) []cache.Cacheable {

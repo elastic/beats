@@ -7,9 +7,13 @@
     "event": {
         "action": "existing_socket",
         "dataset": "socket",
-        "id": "6bac91ea-b41f-4436-8cee-e0c0ba4eb749",
+        "id": "73fe1375-fc81-4238-a6a4-b1b0de968677",
         "module": "system",
         "type": "state"
+    },
+    "process": {
+        "name": "systemd-resolve",
+        "pid": 29834
     },
     "system": {
         "socket": {
