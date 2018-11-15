@@ -156,7 +156,6 @@ func (r *Reader) seek(cursor string) {
 			r.logger.Error("Error while seeking to cursor")
 		}
 		r.logger.Debug("Seeked to position defined in cursor")
-
 	case config.SeekTail:
 		r.journal.SeekTail()
 		r.logger.Debug("Tailing the journal file")
