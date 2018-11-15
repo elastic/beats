@@ -36,7 +36,7 @@ type ListYML struct {
 	Dashboards []YMLElement `yaml:"dashboards"`
 }
 
-// YmlElement contains the data of a dashboard:
+// YMLElement contains the data of a dashboard:
 // * its uuid in Kibana
 // * filename to be saved as
 type YMLElement struct {
