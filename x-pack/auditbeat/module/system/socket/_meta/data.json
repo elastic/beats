@@ -1,40 +1,41 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
-    "metricset": {
+    "event": {
+        "action": "existing_socket",
+        "dataset": "socket",
+        "id": "6bac91ea-b41f-4436-8cee-e0c0ba4eb749",
         "module": "system",
-        "name": "sockets",
-        "rtt": 115
+        "type": "state"
     },
     "system": {
-        "sockets": {
-            "socket": [
-                {
-                    "direction": "incoming",
-                    "family": "ipv4",
-                    "local": {
-                        "ip": "10.0.2.15",
-                        "port": 22
-                    },
-                    "process": {
-                        "name": "sshd",
-                        "pid": 2777
-                    },
-                    "remote": {
-                        "ip": "10.0.2.2",
-                        "port": 52306
-                    },
-                    "state": "ESTAB",
-                    "status": "OPEN",
-                    "user": {
-                        "id": 0,
-                        "name": "root"
-                    }
-                }
-            ]
+        "socket": {
+            "direction": "listening",
+            "family": "ipv4",
+            "local": {
+                "ip": "127.0.0.53",
+                "port": 53
+            },
+            "process": {
+                "name": "systemd-resolve",
+                "pid": 29834
+            },
+            "remote": {
+                "ip": "0.0.0.0",
+                "port": 0
+            },
+            "state": "LISTEN",
+            "user": {
+                "name": "systemd Resolver",
+                "uid": 101
+            }
         }
+    },
+    "user": {
+        "id": 101,
+        "name": "systemd Resolver"
     }
 }

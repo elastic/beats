@@ -4,11 +4,6 @@
     `socket` contains socket information.
   release: experimental
   fields:
-  - name: socket
-    type: array
-    description: >
-        Information about one or more sockets.
-    fields:
     - name: family
       type: keyword
       example: ipv4
@@ -44,8 +39,8 @@
       example: 22
       description: >
         Remote port.
-    - name: user.id
-      type: long
+    - name: user.uid
+      type: integer
       description: >
         UID of the user running the process.
     - name: user.name

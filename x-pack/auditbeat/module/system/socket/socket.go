@@ -11,10 +11,13 @@ import (
 	"net"
 	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/OneOfOne/xxhash"
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/auditbeat/datastore"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -27,6 +30,12 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "socket"
+
+	bucketName                = "auditbeat.socket.v1"
+	bucketKeyStateTimestamp   = "state_timestamp"
+	eventTypeState            = "state"
+	eventTypeEvent            = "event"
+	eventActionExistingSocket = "existing_socket"
 )
 
 func init() {
@@ -48,6 +57,9 @@ type MetricSet struct {
 	listeners *sock.ListenerTable
 	// TODO: Replace with user data collected in host metricset
 	users sock.UserCache
+
+	bucket    datastore.Bucket
+	lastState time.Time
 }
 
 // Socket represents information about a socket.
@@ -92,7 +104,7 @@ func (s Socket) toMapStr() common.MapStr {
 			"port": s.RemotePort,
 		},
 		"user": common.MapStr{
-			"id": s.UID,
+			"uid": s.UID,
 		},
 	}
 
@@ -115,13 +127,17 @@ func (s Socket) toMapStr() common.MapStr {
 }
 
 // New constructs a new MetricSet.
-// TODO: Extend beyond Linux.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
+	}
+
+	bucket, err := datastore.OpenBucket(bucketName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open persistent datastore")
 	}
 
 	ptable, err := sock.NewProcTable("")
@@ -132,40 +148,116 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		log:           logp.NewLogger(moduleName),
-
-		netlink:   sock.NewNetlinkSession(),
-		ptable:    ptable,
-		listeners: sock.NewListenerTable(),
-		users:     sock.NewUserCache(),
+		log:           logp.NewLogger(metricsetName),
+		cache:         cache.New(),
+		netlink:       sock.NewNetlinkSession(),
+		ptable:        ptable,
+		listeners:     sock.NewListenerTable(),
+		users:         sock.NewUserCache(),
+		bucket:        bucket,
 	}
 
-	if config.ReportChanges {
-		ms.cache = cache.New()
+	// Load from disk: Time when state was last sent
+	err = bucket.Load(bucketKeyStateTimestamp, func(blob []byte) error {
+		if len(blob) > 0 {
+			return ms.lastState.UnmarshalBinary(blob)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !ms.lastState.IsZero() {
+		ms.log.Debugf("Last state was sent at %v. Next state update by %v.", ms.lastState, ms.lastState.Add(ms.config.effectiveStatePeriod()))
+	} else {
+		ms.log.Debug("No state timestamp found")
 	}
 
 	return ms, nil
 }
 
-// Fetch checks which sockets exist on the host and reports them.
-// It is invoked periodically.
+// Fetch collects socket information. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
+	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
+	if needsStateUpdate || ms.cache.IsEmpty() {
+		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
+		err := ms.reportState(report)
+		if err != nil {
+			ms.log.Error(err)
+			report.Error(err)
+		}
+		ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
+	}
+
+	/*
+		err := ms.reportChanges(report)
+		if err != nil {
+			ms.log.Error(err)
+			report.Error(err)
+		}
+	*/
+}
+
+// reportState reports all existing sockets on the system.
+func (ms *MetricSet) reportState(report mb.ReporterV2) error {
+	currentTime := time.Now()
+
+	/*
+		Since we are not persisting socket information to disk, a
+		new state is sent when Auditbeat is restarted.
+		To still make sure that state is sent at the specified regular
+		intervals, we only update the lastState time when this state
+		update was not triggered by a restart (when the cache is empty).
+	*/
+	if !ms.cache.IsEmpty() {
+		ms.lastState = currentTime
+	}
+
 	sockets, err := ms.getSockets()
 	if err != nil {
-		ms.log.Error(err)
-		report.Error(err)
-		return
+		return errors.Wrap(err, "failed to get sockets")
 	}
-	ms.log.Debugf("found %d sockets", len(sockets))
+	ms.log.Debugf("Found %d sockets", len(sockets))
+
+	stateID, err := uuid.NewV4()
+	if err != nil {
+		return errors.Wrap(err, "error generating state ID")
+	}
 
 	err = ms.refreshEnrichmentData(sockets)
 	if err != nil {
-		ms.log.Error(err)
-		report.Error(err)
-		return
+		return errors.Wrap(err, "error refreshing enrichment data")
 	}
 
-	if ms.cache != nil && !ms.cache.IsEmpty() {
+	for _, socket := range sockets {
+		ms.enrichSocket(socket)
+
+		event := socketEvent(socket, eventTypeState, eventActionExistingSocket)
+		event.RootFields.Put("event.id", stateID.String())
+		report.Event(event)
+	}
+
+	if ms.cache != nil {
+		// This will initialize the cache with the current sockets
+		ms.cache.DiffAndUpdateCache(convertToCacheable(sockets))
+	}
+
+	// Save time so we know when to send the state again (config.StatePeriod)
+	timeBytes, err := currentTime.MarshalBinary()
+	if err != nil {
+		return err
+	}
+	err = ms.bucket.Store(bucketKeyStateTimestamp, timeBytes)
+	if err != nil {
+		return errors.Wrap(err, "error writing state timestamp to disk")
+	}
+
+	// Reset the listeners for the next iteration.
+	ms.listeners.Reset()
+
+	return nil
+
+	/*if ms.cache != nil && !ms.cache.IsEmpty() {
 		opened, closed := ms.cache.DiffAndUpdateCache(convertToCacheable(sockets))
 
 		for _, socket := range opened {
@@ -198,34 +290,23 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 			})
 		}
 	} else {
-		// Report all currently existing sockets
-		for _, socket := range sockets {
-			ms.enrichSocket(socket)
-		}
+		// Report all currently existing sockets*/
+}
 
-		var socketMapStrAll []common.MapStr
-
-		for _, socket := range sockets {
-			socketMapStr := socket.toMapStr()
-			socketMapStr.Put("status", "OPEN")
-
-			socketMapStrAll = append(socketMapStrAll, socketMapStr)
-		}
-
-		report.Event(mb.Event{
-			MetricSetFields: common.MapStr{
-				"socket": socketMapStrAll,
+func socketEvent(socket *Socket, eventType string, eventAction string) mb.Event {
+	return mb.Event{
+		RootFields: common.MapStr{
+			"event": common.MapStr{
+				"type":   eventType,
+				"action": eventAction,
 			},
-		})
-
-		if ms.cache != nil {
-			// This will initialize the cache with the current sockets
-			ms.cache.DiffAndUpdateCache(convertToCacheable(sockets))
-		}
+			"user": common.MapStr{
+				"id":   socket.UID,
+				"name": socket.Username,
+			},
+		},
+		MetricSetFields: socket.toMapStr(),
 	}
-
-	// Reset the listeners for the next iteration.
-	ms.listeners.Reset()
 }
 
 func convertToCacheable(sockets []*Socket) []cache.Cacheable {

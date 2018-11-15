@@ -8,6 +8,7 @@ package socket
 
 import (
 	"fmt"
+
 	"github.com/elastic/beats/metricbeat/mb"
 )
 

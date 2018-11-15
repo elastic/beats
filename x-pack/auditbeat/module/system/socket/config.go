@@ -4,9 +4,14 @@
 
 package socket
 
+import (
+	"time"
+)
+
 // Config defines the socket metricset's configuration options.
 type Config struct {
-	ReportChanges bool `config:"socket.report_changes"`
+	StatePeriod       time.Duration `config:"state.period"`
+	SocketStatePeriod time.Duration `config:"socket.state.period"`
 }
 
 // Validate validates the host metricset config.
@@ -14,6 +19,13 @@ func (c *Config) Validate() error {
 	return nil
 }
 
+func (c *Config) effectiveStatePeriod() time.Duration {
+	if c.SocketStatePeriod != 0 {
+		return c.SocketStatePeriod
+	}
+	return c.StatePeriod
+}
+
 var defaultConfig = Config{
-	ReportChanges: true,
+	StatePeriod: 12 * time.Hour,
 }

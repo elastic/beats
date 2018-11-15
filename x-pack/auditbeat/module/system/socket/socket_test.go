@@ -13,19 +13,24 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/auditbeat/core"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(f, t, "")
-	if err != nil {
-		t.Fatal("write", err)
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("received error: %+v", errs[0])
 	}
+	if len(events) == 0 {
+		t.Fatal("no events were generated")
+	}
+	fullEvent := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
+	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
 func TestFetch(t *testing.T) {
@@ -35,7 +40,7 @@ func TestFetch(t *testing.T) {
 	if errs != nil {
 		t.Fatal("fetch", errs)
 	}
-	_, err := events[0].MetricSetFields["socket"].([]common.MapStr)[0].HasKey("local.port")
+	_, err := events[0].MetricSetFields.HasKey("local.port")
 	assert.NoError(t, err)
 
 	ln, err := net.Listen("tcp", ":0")
