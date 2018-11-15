@@ -70,7 +70,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		inputs = append(inputs, i)
 	}
 
-	if config.Seek != conf.SeekInvalid {
+	if config.Seek > conf.SeekInvalid {
 		cfgwarn.Deprecate("7.0.0", "global seek is deprecated, Use seek on input level instead.")
 	}
 
