@@ -80,6 +80,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 *Metricbeat*
 
 - Collect custom cluster `display_name` in `elasticsearch/cluster_stats` metricset. {pull}8445[8445]
+- Test etcd module with etcd 3.3. {pull}9068[9068]
 
 *Packetbeat*
 
