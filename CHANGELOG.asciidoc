@@ -102,6 +102,8 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 *Packetbeat*
 
+- Support new TLS version negotiation introduced in TLS 1.3. {issue}8647[8647].
+
 *Winlogbeat*
 
 *Functionbeat*
