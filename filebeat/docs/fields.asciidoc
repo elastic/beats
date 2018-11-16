@@ -6039,6 +6039,13 @@ Module for parsing system log files.
 
 
 
+*`host.hostname`*::
++
+--
+type: keyword
+
+--
+
 [float]
 == system fields
 
