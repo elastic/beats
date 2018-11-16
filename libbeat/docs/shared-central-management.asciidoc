@@ -28,6 +28,14 @@ To learn more, see <<how-central-managment-works>>.
 To use central management, <<enroll-beats,enroll your {beats}>>, then use
 the {cm-ui} UI in {kib} to create and apply the configurations.
 
+[NOTE]
+=====
+This feature requires an Elastic license that includes {beats} central
+management.  
+
+include::shared-license-statement.asciidoc[]
+=====
+
 --
 
 [[how-central-managment-works]]
@@ -116,6 +124,11 @@ or <<username-password-enrollment,username and password-based>> enrollment.
 
 [float]
 === Prerequisites
+
+* Verify that your Elastic license includes the {beats} central management
+feature.
++
+include::shared-license-statement.asciidoc[]
 
 * {kibana-ref}/using-kibana-with-security.html[Enable security] in {kib} to
 ensure that only users with sufficient privileges are able to access {beats}
