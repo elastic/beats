@@ -133,7 +133,7 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 	}
 
 	var r reader.Reader
-	r, err = readfile.NewEncodeReader(f, enc, 4096)
+	r, err = readfile.NewEncodeReader(f, enc, 4096, false)
 	if err != nil {
 		return nil, err
 	}

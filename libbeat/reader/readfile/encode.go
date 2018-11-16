@@ -37,8 +37,9 @@ func NewEncodeReader(
 	r io.Reader,
 	codec encoding.Encoding,
 	bufferSize int,
+	alignBuffer bool,
 ) (EncoderReader, error) {
-	eReader, err := NewLineReader(r, codec, bufferSize)
+	eReader, err := NewLineReader(r, codec, bufferSize, alignBuffer)
 	return EncoderReader{eReader}, err
 }
 

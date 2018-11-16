@@ -31,19 +31,20 @@ import (
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
 type LineReader struct {
-	reader     io.Reader
-	codec      encoding.Encoding
-	bufferSize int
-	nl         []byte
-	inBuffer   *streambuf.Buffer
-	outBuffer  *streambuf.Buffer
-	inOffset   int // input buffer read offset
-	byteCount  int // number of bytes decoded from input buffer into output buffer
-	decoder    transform.Transformer
+	reader      io.Reader
+	codec       encoding.Encoding
+	bufferSize  int
+	alignBuffer bool
+	nl          []byte
+	inBuffer    *streambuf.Buffer
+	outBuffer   *streambuf.Buffer
+	inOffset    int // input buffer read offset
+	byteCount   int // number of bytes decoded from input buffer into output buffer
+	decoder     transform.Transformer
 }
 
 // New creates a new reader object
-func NewLineReader(input io.Reader, codec encoding.Encoding, bufferSize int) (*LineReader, error) {
+func NewLineReader(input io.Reader, codec encoding.Encoding, bufferSize int, alignBuffer bool) (*LineReader, error) {
 	encoder := codec.NewEncoder()
 
 	// Create newline char based on encoding
@@ -53,13 +54,14 @@ func NewLineReader(input io.Reader, codec encoding.Encoding, bufferSize int) (*L
 	}
 
 	return &LineReader{
-		reader:     input,
-		codec:      codec,
-		bufferSize: bufferSize,
-		nl:         nl,
-		decoder:    codec.NewDecoder(),
-		inBuffer:   streambuf.New(nil),
-		outBuffer:  streambuf.New(nil),
+		reader:      input,
+		codec:       codec,
+		bufferSize:  bufferSize,
+		alignBuffer: alignBuffer,
+		nl:          nl,
+		decoder:     codec.NewDecoder(),
+		inBuffer:    streambuf.New(nil),
+		outBuffer:   streambuf.New(nil),
 	}, nil
 }
 
@@ -120,7 +122,10 @@ func (r *LineReader) advance() error {
 			r.inOffset = newOffset
 		}
 
-		buf := make([]byte, r.bufferSize)
+		buf, err := MakeBuffer(r.bufferSize, r.alignBuffer)
+		if err != nil {
+			return err
+		}
 
 		// try to read more bytes into buffer
 		n, err := r.reader.Read(buf)

@@ -15,43 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !windows
-
 package file
 
 import (
+	"fmt"
 	"os"
-	"strconv"
 	"syscall"
 )
 
-type StateOS struct {
-	Inode  uint64 `json:"inode,"`
-	Device uint64 `json:"device,"`
-}
-
-// GetOSState returns the FileStateOS for non windows systems
-func GetOSState(info os.FileInfo) StateOS {
-	stat := info.Sys().(*syscall.Stat_t)
-
-	// Convert inode and dev to uint64 to be cross platform compatible
-	fileState := StateOS{
-		Inode:  uint64(stat.Ino),
-		Device: uint64(stat.Dev),
+// ReadOpen opens a file for reading only
+func ReadOpen(path string, diskCacheOff bool) (*os.File, error) {
+	flag := os.O_RDONLY
+	perm := os.FileMode(0)
+	file, err := os.OpenFile(path, flag, perm)
+	if err != nil {
+		return nil, err
 	}
 
-	return fileState
-}
+	if !diskCacheOff {
+		return file, nil
+	}
 
-// IsSame file checks if the files are identical
-func (fs StateOS) IsSame(state StateOS) bool {
-	return fs.Inode == state.Inode && fs.Device == state.Device
-}
+	// Set F_NOCACHE to avoid caching
+	// F_NOCACHE    Turns data caching off/on. A non-zero value in arg turns data caching off.  A value
+	//              of zero in arg turns data caching on.
+	_, _, e1 := syscall.Syscall(syscall.SYS_FCNTL, uintptr(file.Fd()), syscall.F_NOCACHE, 1)
+	if e1 != 0 {
+		err = fmt.Errorf("Failed to set F_NOCACHE: %s", e1)
+		file.Close()
+		file = nil
+	}
 
-func (fs StateOS) String() string {
-	var buf [64]byte
-	current := strconv.AppendUint(buf[:0], fs.Inode, 10)
-	current = append(current, '-')
-	current = strconv.AppendUint(current, fs.Device, 10)
-	return string(current)
+	return file, nil
 }

@@ -402,7 +402,7 @@ func hashFile(name string, hashType ...HashType) (map[HashType]Digest, error) {
 		}
 	}
 
-	f, err := file.ReadOpen(name)
+	f, err := file.ReadOpen(name, false)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open file for hashing")
 	}

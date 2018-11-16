@@ -424,7 +424,7 @@ func (h *Harvester) shouldExportLine(line string) bool {
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned
 func (h *Harvester) openFile() error {
-	f, err := file_helper.ReadOpen(h.state.Source)
+	f, err := file_helper.ReadOpen(h.state.Source, h.config.DiskCacheOff)
 	if err != nil {
 		return fmt.Errorf("Failed opening %s: %s", h.state.Source, err)
 	}
@@ -558,7 +558,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = readfile.NewEncodeReader(h.log, h.encoding, h.config.BufferSize)
+	r, err = readfile.NewEncodeReader(h.log, h.encoding, h.config.BufferSize, h.config.DiskCacheOff)
 	if err != nil {
 		return nil, err
 	}

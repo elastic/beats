@@ -95,6 +95,12 @@ The size in bytes of the buffer that each harvester uses when fetching a file.
 The default is 16384.
 
 [float]
+===== `disk_cache_off`
+
+If true turns harvester will read log files without disk cache.
+Works on all systems except OpenBSD and Plan9.
+
+[float]
 ===== `max_bytes`
 
 The maximum number of bytes that a single log message can have. All bytes after

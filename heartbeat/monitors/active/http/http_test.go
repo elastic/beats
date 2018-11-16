@@ -301,7 +301,7 @@ func TestHTTPSx509Auth(t *testing.T) {
 	clientKeyPath := path.Join(wd, "testdata", "client_key.pem")
 	clientCertPath := path.Join(wd, "testdata", "client_cert.pem")
 
-	certReader, err := file.ReadOpen(clientCertPath)
+	certReader, err := file.ReadOpen(clientCertPath, false)
 	require.NoError(t, err)
 
 	clientCertBytes, err := ioutil.ReadAll(certReader)

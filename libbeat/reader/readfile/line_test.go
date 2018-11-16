@@ -68,7 +68,7 @@ func TestReaderEncodings(t *testing.T) {
 		}
 
 		// create line reader
-		reader, err := NewLineReader(buffer, codec, 1024)
+		reader, err := NewLineReader(buffer, codec, 1024, false)
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
 			continue
@@ -159,7 +159,7 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
 	codec, _ := encoding.Plain(buffer)
-	reader, err := NewLineReader(buffer, codec, buffer.Len())
+	reader, err := NewLineReader(buffer, codec, buffer.Len(), false)
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}

@@ -73,7 +73,7 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 
 // fileOwner returns the SID and name (domain\user) of the file's owner.
 func fileOwner(path string) (sid, owner string, err error) {
-	f, err := file.ReadOpen(path)
+	f, err := file.ReadOpen(path, false)
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to open file to get owner")
 	}
