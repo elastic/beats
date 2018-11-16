@@ -21,10 +21,29 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 )
 
-// Job represents the work done by a single check by a given Monitor.
 type Job interface {
 	Name() string
-	Run() (*beat.Event, []JobRunner, error)
+	Run() (*beat.Event, []Job, error)
 }
 
-type JobRunner func() (*beat.Event, []JobRunner, error)
+type AnonJob func() (*beat.Event, []Job, error)
+
+func (aj AnonJob) Name() string {
+	return ""
+}
+
+func (aj AnonJob) Run() (*beat.Event, []Job, error) {
+	return aj()
+}
+
+func AfterSuccess(j Job, after func(*beat.Event, []Job, error) (*beat.Event, []Job, error)) Job {
+
+	return AnonJob(func() (*beat.Event, []Job, error) {
+		event, next, err := j.Run()
+		if err != nil {
+			return event, next, err
+		}
+
+		return after(event, next, err)
+	})
+}

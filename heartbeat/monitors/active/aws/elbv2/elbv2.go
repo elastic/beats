@@ -63,7 +63,7 @@ func newELBv2Job(client *elbv2.ELBV2, arns []string) (monitors.Job, error) {
 		Name: fmt.Sprintf("aws_elbv2/%v", arns),
 	}
 
-	return monitors.MakeJob(jobSettings, func() (*beat.Event, []monitors.JobRunner, error) {
+	return monitors.MakeJob(jobSettings, func() (*beat.Event, []monitors.Job, error) {
 		describeInput := &elbv2.DescribeLoadBalancersInput{
 			LoadBalancerArns: arns,
 		}
@@ -74,7 +74,7 @@ func newELBv2Job(client *elbv2.ELBV2, arns []string) (monitors.Job, error) {
 			return nil, nil, err
 		}
 
-		var jobs []monitors.JobRunner
+		var jobs []monitors.Job
 		for _, lb := range lbResp.LoadBalancers {
 			jobs = append(jobs, newLbJob(lb))
 			jobs = append(jobs, newListenerJob(client, lb))
@@ -85,8 +85,8 @@ func newELBv2Job(client *elbv2.ELBV2, arns []string) (monitors.Job, error) {
 	}), nil
 }
 
-func newLbJob(lb elbv2.LoadBalancer) monitors.JobRunner {
-	return func() (*beat.Event, []monitors.JobRunner, error) {
+func newLbJob(lb elbv2.LoadBalancer) monitors.Job {
+	return monitors.AnonJob(func() (*beat.Event, []monitors.Job, error) {
 		var status string
 		if lb.State.Code == elbv2.LoadBalancerStateEnumActive {
 			status = "up"
@@ -111,12 +111,12 @@ func newLbJob(lb elbv2.LoadBalancer) monitors.JobRunner {
 			},
 		}
 
-		return event, []monitors.JobRunner{}, nil
-	}
+		return event, []monitors.Job{}, nil
+	})
 }
 
-func newListenerJob(client *elbv2.ELBV2, lb elbv2.LoadBalancer) monitors.JobRunner {
-	return func() (*beat.Event, []monitors.JobRunner, error) {
+func newListenerJob(client *elbv2.ELBV2, lb elbv2.LoadBalancer) monitors.Job {
+	return monitors.AnonJob(func() (*beat.Event, []monitors.Job, error) {
 		describeInput := &elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}
 		// Pagination not supported when LB is specified
 		resp, err := client.DescribeListenersRequest(describeInput).Send()
@@ -124,11 +124,11 @@ func newListenerJob(client *elbv2.ELBV2, lb elbv2.LoadBalancer) monitors.JobRunn
 			return nil, nil, err
 		}
 
-		var jobs []monitors.JobRunner
+		var jobs []monitors.Job
 		for _, listener := range resp.Listeners {
 			hostPort := fmt.Sprintf("%s:%d", *lb.DNSName, *listener.Port)
 
-			var job monitors.JobRunner
+			var job monitors.Job
 			var err error
 
 			var listenerURL url.URL
@@ -153,10 +153,10 @@ func newListenerJob(client *elbv2.ELBV2, lb elbv2.LoadBalancer) monitors.JobRunn
 
 		fmt.Printf("LISTEN JOBS ARE %v\n", jobs)
 		return nil, jobs, nil
-	}
+	})
 }
 
-func newHttpCheck(listener elbv2.Listener, url *url.URL) (monitors.JobRunner, error) {
+func newHttpCheck(listener elbv2.Listener, url *url.URL) (monitors.Job, error) {
 	fmt.Printf("START LISTENER JOB\n")
 	httpConfig := &http.Config{
 		URLs: []string{url.String()},
@@ -184,7 +184,7 @@ func newHttpCheck(listener elbv2.Listener, url *url.URL) (monitors.JobRunner, er
 		},
 	}
 
-	runner := func() (*beat.Event, []monitors.JobRunner, error) {
+	runner := monitors.AnonJob(func() (*beat.Event, []monitors.Job, error) {
 		event, jobs, err := job.Run()
 
 		if event != nil {
@@ -192,6 +192,6 @@ func newHttpCheck(listener elbv2.Listener, url *url.URL) (monitors.JobRunner, er
 		}
 
 		return event, jobs, err
-	}
+	})
 	return runner, nil
 }

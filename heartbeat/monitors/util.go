@@ -31,7 +31,7 @@ import (
 
 type funcJob struct {
 	settings JobSettings
-	run      JobRunner
+	run      func() (*beat.Event, []Job, error)
 }
 
 // IPSettings provides common configuration settings for IP resolution and ping
@@ -93,7 +93,7 @@ func (s IPSettings) Network() string {
 // return an valid event and can not create any sub-tasks to be executed after
 // completion.
 func MakeSimpleJob(settings JobSettings, f func() (*beat.Event, error)) Job {
-	return MakeJob(settings, func() (*beat.Event, []JobRunner, error) {
+	return MakeJob(settings, func() (*beat.Event, []Job, error) {
 		event, err := f()
 		return event, nil, err
 	})
@@ -103,29 +103,28 @@ func MakeSimpleJob(settings JobSettings, f func() (*beat.Event, error)) Job {
 // optionally return an event to be published and a set of derived sub-tasks to be
 // scheduled. The sub-tasks will be run only once and removed from the scheduler
 // after completion.
-func MakeJob(settings JobSettings, f func() (*beat.Event, []JobRunner, error)) Job {
+func MakeJob(settings JobSettings, f func() (*beat.Event, []Job, error)) Job {
 	settings.AddFields(common.MapStr{
 		"monitor": common.MapStr{
 			"id": settings.Name,
 		},
 	})
 
-	return &funcJob{settings, func() (*beat.Event, []JobRunner, error) {
+	return &funcJob{settings, func() (*beat.Event, []Job, error) {
 		// Create and run new annotated Job whenever the Jobs root is Task is executed.
 		// This will set the jobs active start timestamp to the time.Now().
-		event, jobs, err := annotated(settings, time.Now(), f)()
-		return event, jobs, err
+		return annotated(settings, time.Now(), AnonJob(f)).Run()
 	}}
 }
 
-// annotated lifts a TaskRunner into a job, annotating events with common fields and start timestamp.
+// Annotes events with common fields and start timestamp.
 func annotated(
 	settings JobSettings,
 	start time.Time,
-	fn func() (*beat.Event, []JobRunner, error),
-) JobRunner {
-	return func() (*beat.Event, []JobRunner, error) {
-		event, cont, err := fn()
+	job Job,
+) Job {
+	return AnonJob(func() (*beat.Event, []Job, error) {
+		event, cont, err := job.Run()
 
 		if err != nil {
 			// Handle the case where we have a parent configuredJob that only spawns subtasks
@@ -154,28 +153,28 @@ func annotated(
 			event.Timestamp = start
 		}
 
-		jobCont := make([]JobRunner, len(cont))
+		jobCont := make([]Job, len(cont))
 		for i, c := range cont {
 			jobCont[i] = annotated(settings, start, c)
 		}
 		return event, jobCont, nil
-	}
+	})
 }
 
 // MakeSimpleCont wraps a function that produces an event and error
-// into an executable JobRunner.
-func MakeSimpleCont(f func() (*beat.Event, error)) JobRunner {
-	return func() (*beat.Event, []JobRunner, error) {
+// into an executable Job.
+func MakeSimpleCont(f func() (*beat.Event, error)) Job {
+	return AnonJob(func() (*beat.Event, []Job, error) {
 		event, err := f()
 		return event, nil, err
-	}
+	})
 }
 
 // MakePingIPFactory creates a jobFactory for building a Task from a new IP address.
 func MakePingIPFactory(
 	f func(*net.IPAddr) (*beat.Event, error),
-) func(*net.IPAddr) JobRunner {
-	return func(ip *net.IPAddr) JobRunner {
+) func(*net.IPAddr) Job {
+	return func(ip *net.IPAddr) Job {
 		return MakeSimpleCont(func() (*beat.Event, error) { return f(ip) })
 	}
 }
@@ -185,8 +184,8 @@ var emptyTask = MakeSimpleCont(func() (*beat.Event, error) { return nil, nil })
 // MakePingAllIPFactory wraps a function for building a recursive Task Runner from function callbacks.
 func MakePingAllIPFactory(
 	f func(*net.IPAddr) []func() (*beat.Event, error),
-) func(*net.IPAddr) JobRunner {
-	return func(ip *net.IPAddr) JobRunner {
+) func(*net.IPAddr) Job {
+	return func(ip *net.IPAddr) Job {
 		cont := f(ip)
 		switch len(cont) {
 		case 0:
@@ -195,13 +194,13 @@ func MakePingAllIPFactory(
 			return MakeSimpleCont(cont[0])
 		}
 
-		tasks := make([]JobRunner, len(cont))
+		tasks := make([]Job, len(cont))
 		for i, c := range cont {
 			tasks[i] = MakeSimpleCont(c)
 		}
-		return func() (*beat.Event, []JobRunner, error) {
+		return AnonJob(func() (*beat.Event, []Job, error) {
 			return nil, tasks, nil
-		}
+		})
 	}
 }
 
@@ -210,7 +209,7 @@ func MakePingAllIPFactory(
 func MakePingAllIPPortFactory(
 	ports []uint16,
 	f func(*net.IPAddr, uint16) (*beat.Event, error),
-) func(*net.IPAddr) JobRunner {
+) func(*net.IPAddr) Job {
 	if len(ports) == 1 {
 		port := ports[0]
 		return MakePingIPFactory(func(ip *net.IPAddr) (*beat.Event, error) {
@@ -238,7 +237,7 @@ func MakePingAllIPPortFactory(
 func MakeByIPJob(
 	settings JobSettings,
 	ip net.IP,
-	pingFactory func(ip *net.IPAddr) JobRunner,
+	pingFactory func(ip *net.IPAddr) Job,
 ) (Job, error) {
 	// use ResolveIPAddr to parse the ip into net.IPAddr adding a zone info
 	// if ipv6 is used.
@@ -250,7 +249,8 @@ func MakeByIPJob(
 	fields := common.MapStr{
 		"monitor": common.MapStr{"ip": addr.String()},
 	}
-	return MakeJob(settings, WithFields(fields, pingFactory(addr))), nil
+
+	return MakeJob(settings, WithFields(fields, pingFactory(addr)).Run), nil
 }
 
 // MakeByHostJob creates a new Job including host lookup. The pingFactory will be used to
@@ -260,7 +260,7 @@ func MakeByIPJob(
 // MakePingAllIPFactory or MakePingAllIPPortFactory.
 func MakeByHostJob(
 	settings HostJobSettings,
-	pingFactory func(ip *net.IPAddr) JobRunner,
+	pingFactory func(ip *net.IPAddr) Job,
 ) (Job, error) {
 	host := settings.Host
 
@@ -290,11 +290,11 @@ func MakeByHostJob(
 func makeByHostAnyIPJob(
 	settings HostJobSettings,
 	host string,
-	pingFactory func(ip *net.IPAddr) JobRunner,
+	pingFactory func(ip *net.IPAddr) Job,
 ) Job {
 	network := settings.IP.Network()
 
-	return MakeJob(settings.jobSettings(), func() (*beat.Event, []JobRunner, error) {
+	return MakeJob(settings.jobSettings(), func() (*beat.Event, []Job, error) {
 		resolveStart := time.Now()
 		ip, err := net.ResolveIPAddr(network, host)
 		if err != nil {
@@ -305,19 +305,19 @@ func makeByHostAnyIPJob(
 		resolveRTT := resolveEnd.Sub(resolveStart)
 
 		event := resolveIPEvent(host, ip.String(), resolveRTT)
-		return WithFields(event, pingFactory(ip))()
+		return WithFields(event, pingFactory(ip)).Run()
 	})
 }
 
 func makeByHostAllIPJob(
 	settings HostJobSettings,
 	host string,
-	pingFactory func(ip *net.IPAddr) JobRunner,
+	pingFactory func(ip *net.IPAddr) Job,
 ) Job {
 	network := settings.IP.Network()
 	filter := makeIPFilter(network)
 
-	return MakeJob(settings.jobSettings(), func() (*beat.Event, []JobRunner, error) {
+	return MakeJob(settings.jobSettings(), func() (*beat.Event, []Job, error) {
 		// TODO: check for better DNS IP lookup support:
 		//         - The net.LookupIP drops ipv6 zone index
 		//
@@ -340,7 +340,7 @@ func makeByHostAllIPJob(
 		}
 
 		// create ip ping tasks
-		cont := make([]JobRunner, len(ips))
+		cont := make([]Job, len(ips))
 		for i, ip := range ips {
 			addr := &net.IPAddr{IP: ip}
 			event := resolveIPEvent(host, ip.String(), resolveRTT)
@@ -364,7 +364,7 @@ func resolveIPEvent(host, ip string, rtt time.Duration) common.MapStr {
 	}
 }
 
-func resolveErr(host string, err error) (*beat.Event, []JobRunner, error) {
+func resolveErr(host string, err error) (*beat.Event, []Job, error) {
 	event := &beat.Event{
 		Fields: common.MapStr{
 			"monitor": common.MapStr{
@@ -381,10 +381,10 @@ func resolveErr(host string, err error) (*beat.Event, []JobRunner, error) {
 
 // WithFields wraps a TaskRunner, updating all events returned with the set of
 // fields configured.
-func WithFields(fields common.MapStr, r JobRunner) JobRunner {
-	return func() (*beat.Event, []JobRunner, error) {
-		event, cont, err := r()
-		fmt.Printf("WITH FIELDS %v\n", err)
+func WithFields(fields common.MapStr, r Job) Job {
+	return AnonJob(func() (*beat.Event, []Job, error) {
+		event, cont, err := r.Run()
+
 		if event == nil {
 			event = &beat.Event{}
 		} else {
@@ -397,20 +397,12 @@ func WithFields(fields common.MapStr, r JobRunner) JobRunner {
 			cont[i] = WithFields(fields, cont[i])
 		}
 		return event, cont, err
-	}
+	})
 }
 
-// WithDuration wraps a TaskRunner, measuring the duration between creation and
-// finish of the actual configuredJob and sub-tasks.
-func WithDuration(field string, r JobRunner) JobRunner {
-	return func() (*beat.Event, []JobRunner, error) {
-		return withStart(field, time.Now(), r)()
-	}
-}
+func withStart(field string, start time.Time, r Job) Job {
+	return AfterSuccess(r, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
 
-func withStart(field string, start time.Time, r JobRunner) JobRunner {
-	return func() (*beat.Event, []JobRunner, error) {
-		event, cont, err := r()
 		if event != nil {
 			event.Fields.Put(field, look.RTT(time.Since(start)))
 		}
@@ -418,13 +410,14 @@ func withStart(field string, start time.Time, r JobRunner) JobRunner {
 		for i := range cont {
 			cont[i] = withStart(field, start, cont[i])
 		}
+
 		return event, cont, err
-	}
+	})
 }
 
 func (f *funcJob) Name() string { return f.settings.Name }
 
-func (f *funcJob) Run() (*beat.Event, []JobRunner, error) { return f.run() }
+func (f *funcJob) Run() (*beat.Event, []Job, error) { return f.run() }
 
 // Unpack sets PingMode from a constant string. Unpack will be called by common.Unpack when
 // unpacking into an IPSettings type.

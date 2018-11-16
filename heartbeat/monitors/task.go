@@ -80,9 +80,9 @@ func newConfiguredJob(job Job, config jobConfig, monitor *Monitor) (*configuredJ
 	return t, nil
 }
 
-func (t *configuredJob) prepareSchedulerJob(meta common.MapStr, run JobRunner) scheduler.TaskFunc {
+func (t *configuredJob) prepareSchedulerJob(meta common.MapStr, job Job) scheduler.TaskFunc {
 	return func() []scheduler.TaskFunc {
-		event, next, err := run()
+		event, next, err := job.Run()
 		if err != nil {
 			logp.Err("Job %v failed with: ", err)
 		}
@@ -117,7 +117,7 @@ func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
 		},
 	}
 
-	return t.prepareSchedulerJob(meta, t.job.Run)
+	return t.prepareSchedulerJob(meta, t.job)
 }
 
 // Start schedules this configuredJob for execution.
