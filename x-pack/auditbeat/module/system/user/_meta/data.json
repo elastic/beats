@@ -1,0 +1,38 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "module": "system",
+        "dataset": "user",
+        "type": "state",
+        "action": "existing_user",
+        "id": "57ee8bb6-a3da-4c43-b0d9-0688ccdc88d0"
+    },
+    "user": {
+        "id": 1001,
+        "name": "ubuntu"
+    },
+    "system": {
+        "user": {
+            "uid": 1001,
+            "gid": 1001,
+            "name": "ubuntu",
+            "dir": "/home/ubuntu",
+            "shell": "/bin/bash",
+            "user_information": "Ubuntu",
+            "group": [
+                {
+                    "name": "sudo",
+                    "gid": 27
+                }
+            ],
+            "password": {
+                "type": "shadow_password",
+                "last_changed": "2018-09-21T00:00:00.000Z"
+            }
+        }
+    }
+}
