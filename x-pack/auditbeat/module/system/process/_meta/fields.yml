@@ -1,7 +1,7 @@
-- name: processes
+- name: process
   type: group
   description: >
-    `processes` contains process information.
+    `process` contains process information.
   release: experimental
   fields:
   - name: process

@@ -34,15 +34,15 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "packages", COMMON_FIELDS + fields, warnings_allowed=True)
 
     @unittest.skipIf(sys.platform == "darwin" and os.geteuid != 0, "Requires root on macOS")
-    def test_metricset_processes(self):
+    def test_metricset_process(self):
         """
-        processes metricset collects information about processes running on a system.
+        process metricset collects information about processes running on a system.
         """
 
-        fields = ["system.processes.process"]
+        fields = ["system.process.process"]
 
         # Metricset is experimental and that generates a warning, TODO: remove later
-        self.check_metricset("system", "processes", COMMON_FIELDS + fields, warnings_allowed=True)
+        self.check_metricset("system", "process", COMMON_FIELDS + fields, warnings_allowed=True)
 
     @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
     def test_metricset_socket(self):

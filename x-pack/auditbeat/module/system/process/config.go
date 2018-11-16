@@ -2,11 +2,11 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package processes
+package process
 
 // Config defines the host metricset's configuration options.
 type Config struct {
-	ReportChanges bool `config:"processes.report_changes"`
+	ReportChanges bool `config:"process.report_changes"`
 }
 
 // Validate validates the host metricset config.

@@ -1,4 +1,4 @@
-The System `processes` metricset provides ... TODO.
+The System `process` metricset provides ... TODO.
 
 The module is implemented for Linux, macOS (Darwin), and Windows.
 
