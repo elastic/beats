@@ -78,7 +78,8 @@ func GetUsers() (users []*User, err error) {
 			user.PasswordType = noPassword
 		default:
 			user.PasswordType = cryptPassword
-			user.PasswordHashHash = noSaltHash(C.GoString(passwd.pw_passwd))
+			hash := sha512.Sum512([]byte(C.GoString(passwd.pw_passwd)))
+			user.PasswordHashHash = hash[:]
 		}
 
 		if user.PasswordType == shadowPassword {
@@ -91,7 +92,8 @@ func GetUsers() (users []*User, err error) {
 				} else if strings.HasPrefix(shadow.Password, "!") || strings.HasPrefix(shadow.Password, "*") {
 					user.PasswordType = passwordDisabled
 				} else {
-					user.PasswordHashHash = noSaltHash(shadow.Password)
+					hash := sha512.Sum512([]byte(shadow.Password))
+					user.PasswordHashHash = hash[:]
 				}
 			}
 		}
@@ -177,23 +179,4 @@ func readShadowFile() (map[string]shadowFileEntry, error) {
 	}
 
 	return shadowEntries, nil
-}
-
-// noSaltHash takes a password string from /etc/passwd or /etc/shadow, tries to skip the salt,
-// and returns a SHA-512 hash of the rest.
-func noSaltHash(password string) []byte {
-	// On modern UNIX systems, the format of the password field is $id$salt$encrypted (see crypt(3)).
-	// We only want to use the `encrypted` part.
-	if lastSeparator := strings.LastIndex(password, "$"); lastSeparator != -1 {
-		password = password[lastSeparator+1:]
-	} else if len(password) == 13 {
-		// In older (now unsafe) versions, the encrypted password was 13 characters, the first two
-		// of which were the salt.
-		password = password[2:]
-	} else {
-		// In other cases, we don't know where the salt is (or if there is one).
-	}
-
-	hash := sha512.Sum512([]byte(password))
-	return hash[:]
 }
