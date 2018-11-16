@@ -18,15 +18,14 @@
 package main
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"flag"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/kibana"
@@ -47,20 +46,20 @@ func main() {
 	flag.Parse()
 	log.SetFlags(0)
 
-	transCfg := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
-	}
-
-	elements := strings.Split(kibanaURL, "://")
+	elements := strings.Split(*kibanaURL, "://")
 	if len(elements) != 2 {
 		log.Fatalf("Invalid Kibana URL format")
 	}
 
-	client, err := kibana.NewKibanaClient(kibana.ClientConfig{
+	client, err := kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Protocol: elements[0],
 		Host:     elements[1],
-		SpaceID:  spaceID,
+		SpaceID:  *spaceID,
+		Timeout:  90 * time.Second,
 	})
+	if err != nil {
+		log.Fatalf("Error while connecting to Kibana: %+v", err)
+	}
 
 	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
 		flag.Usage()
@@ -68,7 +67,7 @@ func main() {
 	}
 
 	if len(*ymlFile) > 0 {
-		results, infos, err := dashboards.ExportAllFromYml(client, *ymlFile)
+		results, info, err := dashboards.ExportAllFromYml(client, *ymlFile)
 		for i, r := range results {
 			log.Printf("id=%s, name=%s\n", info.Dashboards[i].ID, info.Dashboards[i].File)
 			err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(*ymlFile), client.GetVersion())
@@ -94,8 +93,8 @@ func main() {
 			log.Fatalf("Failed to save the dashboard: %s", err)
 
 		}
-		if !*quiet {
-			log.Printf("The dashboard %s was exported under the %s file\n", dashboard, out)
+		if !quiet {
+			log.Printf("The dashboard %s was exported under the %s file\n", *dashboard, *fileOutput)
 		}
 	}
 }

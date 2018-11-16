@@ -307,10 +307,11 @@ func (client *Client) GetDashboard(id string) (common.MapStr, error) {
 	return result, nil
 }
 
+// error is not propagated, because it can fail if the key is missing
 func decodeValue(data common.MapStr, key string) error {
 	v, err := data.GetValue(key)
 	if err != nil {
-		return err
+		return
 	}
 	s := v.(string)
 	var d interface{}
