@@ -29,24 +29,12 @@ import (
 	"github.com/elastic/beats/heartbeat/look"
 )
 
-type funcJob struct {
-	settings JobSettings
-	run      func() (*beat.Event, []Job, error)
-}
-
 // IPSettings provides common configuration settings for IP resolution and ping
 // mode.
 type IPSettings struct {
 	IPv4 bool     `config:"ipv4"`
 	IPv6 bool     `config:"ipv6"`
 	Mode PingMode `config:"mode"`
-}
-
-// JobSettings configures a Job name and global fields to be added to every
-// event.
-type JobSettings struct {
-	Name   string
-	Fields common.MapStr
 }
 
 // HostJobSettings configures a Job including Host lookups and global fields to be added
@@ -89,37 +77,10 @@ func (s IPSettings) Network() string {
 	return ""
 }
 
-// MakeSimpleJob creates a new Job from a callback function. The callback should
-// return an valid event and can not create any sub-tasks to be executed after
-// completion.
-func MakeSimpleJob(settings JobSettings, f func() (*beat.Event, error)) Job {
-	return MakeJob(settings, func() (*beat.Event, []Job, error) {
-		event, err := f()
-		return event, nil, err
-	})
-}
-
-// MakeJob create a new Job from a callback function. The callback can
-// optionally return an event to be published and a set of derived sub-tasks to be
-// scheduled. The sub-tasks will be run only once and removed from the scheduler
-// after completion.
-func MakeJob(settings JobSettings, f func() (*beat.Event, []Job, error)) Job {
-	settings.AddFields(common.MapStr{
-		"monitor": common.MapStr{
-			"id": settings.Name,
-		},
-	})
-
-	return &funcJob{settings, func() (*beat.Event, []Job, error) {
-		// Create and run new annotated Job whenever the Jobs root is Task is executed.
-		// This will set the jobs active start timestamp to the time.Now().
-		return annotated(settings, time.Now(), AnonJob(f)).Run()
-	}}
-}
-
 // Annotes events with common fields and start timestamp.
 func annotated(
-	settings JobSettings,
+	id string,
+	fields common.MapStr,
 	start time.Time,
 	job Job,
 ) Job {
@@ -139,15 +100,15 @@ func annotated(
 
 		if event != nil {
 			status := look.Status(err)
-			fmt.Printf("SET STATUS %v\n", status)
 			MergeEventFields(event, common.MapStr{
 				"monitor": common.MapStr{
 					"duration": look.RTT(time.Since(start)),
 					"status":   status,
+					"id":       id,
 				},
 			})
-			if user := settings.Fields; user != nil {
-				MergeEventFields(event, user.Clone())
+			if fields != nil {
+				MergeEventFields(event, fields.Clone())
 			}
 
 			event.Timestamp = start
@@ -155,7 +116,7 @@ func annotated(
 
 		jobCont := make([]Job, len(cont))
 		for i, c := range cont {
-			jobCont[i] = annotated(settings, start, c)
+			jobCont[i] = annotated(id, fields, start, c)
 		}
 		return event, jobCont, nil
 	})
@@ -235,7 +196,6 @@ func MakePingAllIPPortFactory(
 // A pingFactory instance is normally build with MakePingIPFactory,
 // MakePingAllIPFactory or MakePingAllIPPortFactory.
 func MakeByIPJob(
-	settings JobSettings,
 	ip net.IP,
 	pingFactory func(ip *net.IPAddr) Job,
 ) (Job, error) {
@@ -250,7 +210,7 @@ func MakeByIPJob(
 		"monitor": common.MapStr{"ip": addr.String()},
 	}
 
-	return MakeJob(settings, WithFields(fields, pingFactory(addr)).Run), nil
+	return WithFields(fields, pingFactory(addr)), nil
 }
 
 // MakeByHostJob creates a new Job including host lookup. The pingFactory will be used to
@@ -265,7 +225,7 @@ func MakeByHostJob(
 	host := settings.Host
 
 	if ip := net.ParseIP(host); ip != nil {
-		return MakeByIPJob(settings.jobSettings(), ip, pingFactory)
+		return MakeByIPJob(ip, pingFactory)
 	}
 
 	network := settings.IP.Network()
@@ -294,7 +254,7 @@ func makeByHostAnyIPJob(
 ) Job {
 	network := settings.IP.Network()
 
-	return MakeJob(settings.jobSettings(), func() (*beat.Event, []Job, error) {
+	return AnonJob(func() (*beat.Event, []Job, error) {
 		resolveStart := time.Now()
 		ip, err := net.ResolveIPAddr(network, host)
 		if err != nil {
@@ -317,7 +277,7 @@ func makeByHostAllIPJob(
 	network := settings.IP.Network()
 	filter := makeIPFilter(network)
 
-	return MakeJob(settings.jobSettings(), func() (*beat.Event, []Job, error) {
+	return AnonJob(func() (*beat.Event, []Job, error) {
 		// TODO: check for better DNS IP lookup support:
 		//         - The net.LookupIP drops ipv6 zone index
 		//
@@ -382,9 +342,7 @@ func resolveErr(host string, err error) (*beat.Event, []Job, error) {
 // WithFields wraps a TaskRunner, updating all events returned with the set of
 // fields configured.
 func WithFields(fields common.MapStr, r Job) Job {
-	return AnonJob(func() (*beat.Event, []Job, error) {
-		event, cont, err := r.Run()
-
+	return AfterJob(r, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
 		if event == nil {
 			event = &beat.Event{}
 		} else {
@@ -401,7 +359,7 @@ func WithFields(fields common.MapStr, r Job) Job {
 }
 
 func withStart(field string, start time.Time, r Job) Job {
-	return AfterSuccess(r, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
+	return AfterJobSuccess(r, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
 
 		if event != nil {
 			event.Fields.Put(field, look.RTT(time.Since(start)))
@@ -414,10 +372,6 @@ func withStart(field string, start time.Time, r Job) Job {
 		return event, cont, err
 	})
 }
-
-func (f *funcJob) Name() string { return f.settings.Name }
-
-func (f *funcJob) Run() (*beat.Event, []Job, error) { return f.run() }
 
 // Unpack sets PingMode from a constant string. Unpack will be called by common.Unpack when
 // unpacking into an IPSettings type.
@@ -453,23 +407,6 @@ func filterIPs(ips []net.IP, filt func(net.IP) bool) []net.IP {
 	return out
 }
 
-// MakeJobSetting creates a new JobSettings structure without any global event fields.
-func MakeJobSetting(name string) JobSettings {
-	return JobSettings{Name: name}
-}
-
-// WithFields adds new event fields to a Job. Existing fields will be
-// overwritten.
-// The fields map will be updated (no copy).
-func (s JobSettings) WithFields(m common.MapStr) JobSettings {
-	s.AddFields(m)
-	return s
-}
-
-// AddFields adds new event fields to a Job. Existing fields will be
-// overwritten.
-func (s *JobSettings) AddFields(m common.MapStr) { addFields(&s.Fields, m) }
-
 // MakeHostJobSettings creates a new HostJobSettings structure without any global
 // event fields.
 func MakeHostJobSettings(name, host string, ip IPSettings) HostJobSettings {
@@ -499,10 +436,6 @@ func addFields(to *common.MapStr, m common.MapStr) {
 		*to = fields
 	}
 	fields.DeepUpdate(m)
-}
-
-func (s *HostJobSettings) jobSettings() JobSettings {
-	return JobSettings{Name: s.Name, Fields: s.Fields}
 }
 
 func MergeEventFields(e *beat.Event, merge common.MapStr) {

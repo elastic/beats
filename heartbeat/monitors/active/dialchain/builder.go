@@ -172,10 +172,8 @@ func makeEndpointJobs(
 	if b.resolveViaSocks5 {
 		jobs := make([]monitors.Job, len(endpoint.Ports))
 		for i, port := range endpoint.Ports {
-			jobName := jobName(typ, scheme, endpoint.Host, []uint16{port})
 			address := net.JoinHostPort(endpoint.Host, strconv.Itoa(int(port)))
-			settings := monitors.MakeJobSetting(jobName).WithFields(fields)
-			jobs[i] = monitors.MakeSimpleJob(settings, func() (*beat.Event, error) {
+			jobs[i] = monitors.MakeSimpleJob(func() (*beat.Event, error) {
 				return b.Run(address, func(dialer transport.Dialer) (*beat.Event, error) {
 					return fn(dialer, address)
 				})

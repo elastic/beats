@@ -59,30 +59,30 @@ func create(name string, commonCfg *common.Config) (jobs []monitors.Job, endpoin
 }
 
 func newELBv2Job(client *elbv2.ELBV2, arns []string) (monitors.Job, error) {
-	jobSettings := monitors.JobSettings{
-		Name: fmt.Sprintf("aws_elbv2/%v", arns),
-	}
+	job := monitors.CreateNamedJob(
+		fmt.Sprintf("aws_elbv2/%v", arns),
+		func() (*beat.Event, []monitors.Job, error) {
+			describeInput := &elbv2.DescribeLoadBalancersInput{
+				LoadBalancerArns: arns,
+			}
 
-	return monitors.MakeJob(jobSettings, func() (*beat.Event, []monitors.Job, error) {
-		describeInput := &elbv2.DescribeLoadBalancersInput{
-			LoadBalancerArns: arns,
-		}
+			lbResp, err := client.DescribeLoadBalancersRequest(describeInput).Send()
 
-		lbResp, err := client.DescribeLoadBalancersRequest(describeInput).Send()
+			if err != nil {
+				return nil, nil, err
+			}
 
-		if err != nil {
-			return nil, nil, err
-		}
+			var jobs []monitors.Job
+			for _, lb := range lbResp.LoadBalancers {
+				jobs = append(jobs, newLbJob(lb))
+				jobs = append(jobs, newListenerJob(client, lb))
+			}
 
-		var jobs []monitors.Job
-		for _, lb := range lbResp.LoadBalancers {
-			jobs = append(jobs, newLbJob(lb))
-			jobs = append(jobs, newListenerJob(client, lb))
-		}
+			fmt.Printf("JOBS ARE %v\n", jobs)
+			return nil, jobs, nil
+		})
 
-		fmt.Printf("JOBS ARE %v\n", jobs)
-		return nil, jobs, nil
-	}), nil
+	return job, nil
 }
 
 func newLbJob(lb elbv2.LoadBalancer) monitors.Job {

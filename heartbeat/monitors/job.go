@@ -26,6 +26,23 @@ type Job interface {
 	Run() (*beat.Event, []Job, error)
 }
 
+type NamedJob struct {
+	name string
+	run  func() (*beat.Event, []Job, error)
+}
+
+func CreateNamedJob(name string, run func() (*beat.Event, []Job, error)) *NamedJob {
+	return &NamedJob{name, run}
+}
+
+func (f *NamedJob) Name() string {
+	return f.name
+}
+
+func (f *NamedJob) Run() (*beat.Event, []Job, error) {
+	return f.run()
+}
+
 type AnonJob func() (*beat.Event, []Job, error)
 
 func (aj AnonJob) Name() string {
@@ -36,14 +53,34 @@ func (aj AnonJob) Run() (*beat.Event, []Job, error) {
 	return aj()
 }
 
-func AfterSuccess(j Job, after func(*beat.Event, []Job, error) (*beat.Event, []Job, error)) Job {
+func AfterJob(j Job, after func(*beat.Event, []Job, error) (*beat.Event, []Job, error)) Job {
 
-	return AnonJob(func() (*beat.Event, []Job, error) {
-		event, next, err := j.Run()
+	return CreateNamedJob(
+		j.Name(),
+		func() (*beat.Event, []Job, error) {
+			event, next, err := j.Run()
+
+			return after(event, next, err)
+		},
+	)
+}
+
+func AfterJobSuccess(j Job, after func(*beat.Event, []Job, error) (*beat.Event, []Job, error)) Job {
+	return AfterJob(j, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
 		if err != nil {
-			return event, next, err
+			return event, cont, err
 		}
 
-		return after(event, next, err)
+		return after(event, cont, err)
+	})
+}
+
+// MakeSimpleJob creates a new Job from a callback function. The callback should
+// return an valid event and can not create any sub-tasks to be executed after
+// completion.
+func MakeSimpleJob(f func() (*beat.Event, error)) Job {
+	return AnonJob(func() (*beat.Event, []Job, error) {
+		event, err := f()
+		return event, nil, err
 	})
 }

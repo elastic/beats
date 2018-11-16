@@ -48,9 +48,6 @@ func newHTTPMonitorHostJob(
 	body []byte,
 	validator RespCheck,
 ) (monitors.Job, error) {
-	typ := config.Name
-	jobName := fmt.Sprintf("%v@%v", typ, addr)
-
 	client := &http.Client{
 		CheckRedirect: makeCheckRedirect(config.MaxRedirects),
 		Transport:     transport,
@@ -68,7 +65,12 @@ func newHTTPMonitorHostJob(
 
 	timeout := config.Timeout
 
-	settings := monitors.MakeJobSetting(jobName).WithFields(common.MapStr{
+	job := monitors.MakeSimpleJob(func() (*beat.Event, error) {
+		_, _, event, err := execPing(client, request, body, timeout, validator)
+		return event, err
+	})
+
+	fields := common.MapStr{
 		"monitor": common.MapStr{
 			"scheme": request.URL.Scheme,
 			"host":   hostname,
@@ -79,12 +81,9 @@ func newHTTPMonitorHostJob(
 		"tcp": common.MapStr{
 			"port": port,
 		},
-	})
+	}
 
-	return monitors.MakeSimpleJob(settings, func() (*beat.Event, error) {
-		_, _, event, err := execPing(client, request, body, timeout, validator)
-		return event, err
-	}), nil
+	return monitors.WithFields(fields, job), nil
 }
 
 func NewHTTPMonitorIPsJob(
