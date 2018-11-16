@@ -43,3 +43,13 @@ class Test(AuditbeatXPackTest):
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "processes", COMMON_FIELDS + fields, warnings_allowed=True)
+
+    def test_metricset_user(self):
+        """
+        user metricset collects information about users on a server.
+        """
+
+        fields = ["system.user.name"]
+
+        # Metricset is experimental and that generates a warning, TODO: remove later
+        self.check_metricset("system", "user", COMMON_FIELDS + fields, warnings_allowed=True)
