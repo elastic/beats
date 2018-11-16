@@ -6,24 +6,36 @@ package process
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/OneOfOne/xxhash"
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/auditbeat/datastore"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/auditbeat/cache"
-	"github.com/elastic/go-sysinfo/types"
-
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/process"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/auditbeat/cache"
 	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 )
 
 const (
 	moduleName    = "system"
 	metricsetName = "process"
+
+	bucketName              = "auditbeat.process.v1"
+	bucketKeyStateTimestamp = "state_timestamp"
+
+	eventTypeState = "state"
+	eventTypeEvent = "event"
+
+	eventActionExistingProcess = "existing_process"
+	eventActionProcessStarted  = "process_started"
+	eventActionProcessStopped  = "process_stopped"
 )
 
 func init() {
@@ -35,9 +47,11 @@ func init() {
 // MetricSet collects data about the host.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config Config
-	cache  *cache.Cache
-	log    *logp.Logger
+	config    Config
+	cache     *cache.Cache
+	log       *logp.Logger
+	bucket    datastore.Bucket
+	lastState time.Time
 }
 
 // ProcessInfo wraps the process information and implements cache.Cacheable.
@@ -75,78 +89,142 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
 	}
 
+	bucket, err := datastore.OpenBucket(bucketName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open persistent datastore")
+	}
+
 	ms := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		log:           logp.NewLogger(moduleName),
+		log:           logp.NewLogger(metricsetName),
+		cache:         cache.New(),
+		bucket:        bucket,
 	}
 
-	if config.ReportChanges {
-		ms.cache = cache.New()
+	// Load from disk: Time when state was last sent
+	err = bucket.Load(bucketKeyStateTimestamp, func(blob []byte) error {
+		if len(blob) > 0 {
+			return ms.lastState.UnmarshalBinary(blob)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !ms.lastState.IsZero() {
+		ms.log.Debugf("Last state was sent at %v. Next state update by %v.", ms.lastState, ms.lastState.Add(ms.config.effectiveStatePeriod()))
+	} else {
+		ms.log.Debug("No state timestamp found")
 	}
 
 	return ms, nil
 }
 
-// Fetch checks which processes are running on the host and reports them.
-// It is invoked periodically.
+// Close cleans up the MetricSet when it finishes.
+func (ms *MetricSet) Close() error {
+	if ms.bucket != nil {
+		return ms.bucket.Close()
+	}
+	return nil
+}
+
+// Fetch collects process information. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	processInfos, errorList := ms.getProcessInfos()
-	if len(errorList) != 0 {
-		for _, err := range errorList {
+	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
+	if needsStateUpdate || ms.cache.IsEmpty() {
+		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
+		err := ms.reportState(report)
+		if err != nil {
 			ms.log.Error(err)
 			report.Error(err)
 		}
-	}
-	if processInfos == nil {
-		return
+		ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
 	}
 
-	if ms.cache != nil && !ms.cache.IsEmpty() {
-		started, stopped := ms.cache.DiffAndUpdateCache(convertToCacheable(processInfos))
+	err := ms.reportChanges(report)
+	if err != nil {
+		ms.log.Error(err)
+		report.Error(err)
+	}
+}
 
-		for _, pInfo := range started {
-			pInfoMapStr := pInfo.(*ProcessInfo).toMapStr()
-			pInfoMapStr.Put("status", "started")
+// reportState reports all running processes on the system.
+func (ms *MetricSet) reportState(report mb.ReporterV2) error {
+	// Only update lastState if this state update was regularly scheduled,
+	// i.e. not caused by an Auditbeat restart (when the cache would be empty).
+	if !ms.cache.IsEmpty() {
+		ms.lastState = time.Now()
+	}
 
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"process": pInfoMapStr,
-				},
-			})
-		}
+	processInfos, err := ms.getProcessInfos()
+	if err != nil {
+		return errors.Wrap(err, "failed to get process infos")
+	}
+	ms.log.Debugf("Found %v processes", len(processInfos))
 
-		for _, pInfo := range stopped {
-			pInfoMapStr := pInfo.(*ProcessInfo).toMapStr()
-			pInfoMapStr.Put("status", "stopped")
+	stateID, err := uuid.NewV4()
+	if err != nil {
+		return errors.Wrap(err, "error generating state ID")
+	}
+	for _, pInfo := range processInfos {
+		event := processEvent(pInfo, eventTypeState, eventActionExistingProcess)
+		event.RootFields.Put("event.id", stateID.String())
+		report.Event(event)
+	}
 
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"process": pInfoMapStr,
-				},
-			})
-		}
-	} else {
-		// Report all running processes
-		var processEvents []common.MapStr
+	if ms.cache != nil {
+		// This will initialize the cache with the current processes
+		ms.cache.DiffAndUpdateCache(convertToCacheable(processInfos))
+	}
 
-		for _, pInfo := range processInfos {
-			pInfoMapStr := pInfo.toMapStr()
-			pInfoMapStr.Put("status", "running")
+	// Save time so we know when to send the state again (config.StatePeriod)
+	timeBytes, err := ms.lastState.MarshalBinary()
+	if err != nil {
+		return err
+	}
+	err = ms.bucket.Store(bucketKeyStateTimestamp, timeBytes)
+	if err != nil {
+		return errors.Wrap(err, "error writing state timestamp to disk")
+	}
 
-			processEvents = append(processEvents, pInfoMapStr)
-		}
+	return nil
+}
 
-		report.Event(mb.Event{
-			MetricSetFields: common.MapStr{
-				"process": processEvents,
+// reportChanges detects and reports any changes to processes on this system since the last call.
+func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
+	processInfos, err := ms.getProcessInfos()
+	if err != nil {
+		return errors.Wrap(err, "failed to get process infos")
+	}
+	ms.log.Debugf("Found %v processes", len(processInfos))
+
+	started, stopped := ms.cache.DiffAndUpdateCache(convertToCacheable(processInfos))
+
+	for _, pInfo := range started {
+		report.Event(processEvent(pInfo.(*ProcessInfo), eventTypeEvent, eventActionProcessStarted))
+	}
+
+	for _, pInfo := range stopped {
+		report.Event(processEvent(pInfo.(*ProcessInfo), eventTypeEvent, eventActionProcessStopped))
+	}
+
+	return nil
+}
+
+func processEvent(pInfo *ProcessInfo, eventType string, eventAction string) mb.Event {
+	return mb.Event{
+		RootFields: common.MapStr{
+			"event": common.MapStr{
+				"type":   eventType,
+				"action": eventAction,
 			},
-		})
-
-		if ms.cache != nil {
-			// This will initialize the cache with the current processes
-			ms.cache.DiffAndUpdateCache(convertToCacheable(processInfos))
-		}
+			"process": common.MapStr{
+				"pid":  pInfo.PID,
+				"name": pInfo.Name,
+			},
+		},
+		MetricSetFields: pInfo.toMapStr(),
 	}
 }
 
@@ -160,28 +238,29 @@ func convertToCacheable(processInfos []*ProcessInfo) []cache.Cacheable {
 	return c
 }
 
-func (ms *MetricSet) getProcessInfos() ([]*ProcessInfo, []error) {
+func (ms *MetricSet) getProcessInfos() ([]*ProcessInfo, error) {
 	// TODO: Implement Processes() in go-sysinfo
 	// e.g. https://github.com/elastic/go-sysinfo/blob/master/providers/darwin/process_darwin_amd64.go#L41
 	pids, err := process.Pids()
 	if err != nil {
-		return nil, []error{errors.Wrap(err, "Failed to fetch the list of PIDs")}
+		return nil, errors.Wrap(err, "Failed to fetch the list of PIDs")
 	}
 
 	var processInfos []*ProcessInfo
-	var errorList []error
 
 	for _, pid := range pids {
-		if p, err := sysinfo.Process(pid); err == nil {
-			if pInfo, err := p.Info(); err == nil {
-				processInfos = append(processInfos, &ProcessInfo{pInfo})
-			} else {
-				errorList = append(errorList, errors.Wrap(err, "Failed to load process information"))
-			}
-		} else {
-			errorList = append(errorList, errors.Wrap(err, "Failed to load process"))
+		process, err := sysinfo.Process(pid)
+		if err != nil {
+			return nil, errors.Wrap(err, "Failed to load process")
 		}
+
+		pInfo, err := process.Info()
+		if err != nil {
+			return nil, errors.Wrap(err, "Failed to load process information")
+		}
+
+		processInfos = append(processInfos, &ProcessInfo{pInfo})
 	}
 
-	return processInfos, errorList
+	return processInfos, nil
 }

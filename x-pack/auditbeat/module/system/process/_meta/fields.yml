@@ -4,40 +4,31 @@
     `process` contains process information.
   release: experimental
   fields:
-  - name: process
-    type: array
-    description: >
-        One or more processes.
-    fields:
-    - name: status
-      type: keyword
-      description: >
-        Process status - `started`, `running`, or `stopped`.
-    - name: process.name
+    - name: name
       type: keyword
       description: >
         Process name.
-    - name: process.args
+    - name: args
       type: text
       description: >
         List of process arguments.
-    - name: process.pid
+    - name: pid
       type: keyword
       description: >
         Process PID.
-    - name: process.ppid
+    - name: ppid
       type: keyword
       description: >
         Process Parent PID.
-    - name: process.cwd
+    - name: cwd
       type: text
       description: >
         Directory from which the process was started.
-    - name: process.exe
+    - name: exe
       type: text
       description: >
         Full path of the process executable.
-    - name: process.starttime
+    - name: starttime
       type: date
       description: >
         Start time of the process.

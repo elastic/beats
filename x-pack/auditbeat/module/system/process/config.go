@@ -4,9 +4,14 @@
 
 package process
 
+import (
+	"time"
+)
+
 // Config defines the host metricset's configuration options.
 type Config struct {
-	ReportChanges bool `config:"process.report_changes"`
+	StatePeriod        time.Duration `config:"state.period"`
+	ProcessStatePeriod time.Duration `config:"process.state.period"`
 }
 
 // Validate validates the host metricset config.
@@ -14,6 +19,13 @@ func (c *Config) Validate() error {
 	return nil
 }
 
+func (c *Config) effectiveStatePeriod() time.Duration {
+	if c.ProcessStatePeriod != 0 {
+		return c.ProcessStatePeriod
+	}
+	return c.StatePeriod
+}
+
 var defaultConfig = Config{
-	ReportChanges: true,
+	StatePeriod: 12 * time.Hour,
 }

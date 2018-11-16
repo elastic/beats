@@ -39,7 +39,7 @@ class Test(AuditbeatXPackTest):
         process metricset collects information about processes running on a system.
         """
 
-        fields = ["system.process.process"]
+        fields = ["system.process.pid"]
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "process", COMMON_FIELDS + fields, warnings_allowed=True)
