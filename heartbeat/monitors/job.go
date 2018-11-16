@@ -84,3 +84,11 @@ func MakeSimpleJob(f func() (*beat.Event, error)) Job {
 		return event, nil, err
 	})
 }
+
+func WrapAll(jobs []Job, fn func(Job) Job) []Job {
+	var wrapped []Job
+	for _, j := range jobs {
+		wrapped = append(wrapped, fn(j))
+	}
+	return wrapped
+}

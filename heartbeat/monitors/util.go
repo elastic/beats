@@ -77,15 +77,8 @@ func (s IPSettings) Network() string {
 	return ""
 }
 
-// Annotes events with common fields and start timestamp.
-func annotated(
-	id string,
-	fields common.MapStr,
-	start time.Time,
-	job Job,
-) Job {
-	return AnonJob(func() (*beat.Event, []Job, error) {
-		event, cont, err := job.Run()
+func WithErrAsField(job Job) Job {
+	return AfterJob(job, func(event *beat.Event, jobs []Job, err error) (*beat.Event, []Job, error) {
 
 		if err != nil {
 			// Handle the case where we have a parent configuredJob that only spawns subtasks
@@ -98,6 +91,18 @@ func annotated(
 			})
 		}
 
+		return event, jobs, nil
+	})
+}
+
+// Annotes events with common fields and start timestamp.
+func Annotated(
+	id string,
+	fields common.MapStr,
+	start time.Time,
+	job Job,
+) Job {
+	return AfterJob(job, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
 		if event != nil {
 			status := look.Status(err)
 			MergeEventFields(event, common.MapStr{
@@ -116,7 +121,7 @@ func annotated(
 
 		jobCont := make([]Job, len(cont))
 		for i, c := range cont {
-			jobCont[i] = annotated(id, fields, start, c)
+			jobCont[i] = Annotated(id, fields, start, c)
 		}
 		return event, jobCont, nil
 	})
