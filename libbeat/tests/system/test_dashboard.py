@@ -125,9 +125,59 @@ class Test(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_export_dashboard(self):
+    def test_export_dashboard_cmd_export_dashboard_by_id(self):
         """
-        Test export dashboards and remove unsupported characters
+        Test testbeat export dashboard can export dashboards
+        and removes unsupported characters
+        """
+        self.render_config_template()
+        self.test_load_dashboard()
+        beat = self.start_beat(
+            logging_args=["-e", "-d", "*"],
+            extra_args=["export",
+                        "dashboard",
+                        "-id", "Metricbeat-system-overview"]
+        )
+
+        beat.check_wait(exit_code=0)
+
+        assert self.log_contains("\"id\": \"Metricbeat-system-overview\",") is True
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_export_dashboard_cmd_export_dashboard_from_yml(self):
+        """
+        Test testbeat export dashboard can export dashboards from dashboards YAML file
+        and removes unsupported characters
+        """
+
+        self.render_config_template()
+        self.test_load_dashboard()
+        beat = self.start_beat(
+            logging_args=["-e", "-d", "*"],
+            extra_args=["export",
+                        "dashboard",
+                        "-yml", os.path.join(self.beat_path, "tests", "files", "dashboards.yml")]
+        )
+
+        beat.check_wait(exit_code=0)
+
+        version = self.get_version()
+        kibana_semver = semver.VersionInfo.parse(version)
+        exported_dashboard_path = os.path.join(self.beat_path, "tests", "files", "_meta",
+                "kibana", str(kibana_semver.major), "dashboard", "Metricbeat-system-test-overview.json")
+
+        with open(exported_dashboard_path) as f:
+            content = f.read()
+            assert "Metricbeat-system-overview" in content
+
+        os.remove(exported_dashboard_path)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_dev_tool_export_dashboard_by_id(self):
+        """
+        Test dev-tools/cmd/dashboards exports dashboard and removes unsupported characters
         """
 
         self.test_load_dashboard()
@@ -151,9 +201,10 @@ class Test(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_export_dashboard_from_space(self):
+    def test_dev_tool_export_dashboard_by_id_from_space(self):
         """
-        Test export dashboards from Kibana space and remove unsupported characters
+        Test dev-tools/cmd/dashboards exports dashboard from Kibana space
+        and removes unsupported characters
         """
         version = self.get_version()
         if semver.compare(version, "6.5.0") == -1:
@@ -178,6 +229,36 @@ class Test(BaseTest):
             assert "Metricbeat-system-overview" in content
 
         os.remove("output.json")
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_dev_tool_export_dashboard_from_yml(self):
+        """
+        Test dev-tools/cmd/dashboards exports dashboard from dashboards YAML file
+        and removes unsupported characters
+        """
+
+        self.test_load_dashboard()
+
+        path = os.path.normpath(self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards.go")
+        command = path + " -kibana http://" + self.get_kibana_host() + ":" + self.get_kibana_port()
+        command = "go run " + command + " -yml " + os.path.join(self.beat_path, "tests", "files", "dashboards.yml")
+
+        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        content, err = p.communicate()
+
+        assert p.returncode == 0
+
+        version = self.get_version()
+        kibana_semver = semver.VersionInfo.parse(version)
+        exported_dashboard_path = os.path.join(self.beat_path, "tests", "files", "_meta",
+                "kibana", str(kibana_semver.major), "dashboard", "Metricbeat-system-test-overview.json")
+
+        with open(exported_dashboard_path) as f:
+            content = f.read()
+            assert "Metricbeat-system-overview" in content
+
+        os.remove(exported_dashboard_path)
 
     def get_host(self):
         return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
