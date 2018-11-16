@@ -67,7 +67,7 @@ func (b *Beat) writeAliasLoadingCallback() (func(esClient *elasticsearch.Client)
 			return err
 		}
 
-		firstIndex := fmt.Sprintf("<%s-{now/d}-%s>", config.RolloverAlias, config.Pattern)
+		firstIndex := fmt.Sprintf("%s-%s", config.RolloverAlias, config.Pattern)
 		// Create write alias
 		status, b, err := esClient.Request("HEAD", "/_alias/"+config.RolloverAlias, "", nil, nil)
 		if err != nil && status != 404 {

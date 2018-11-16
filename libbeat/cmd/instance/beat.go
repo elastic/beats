@@ -768,6 +768,11 @@ func (b *Beat) registerTemplateLoading() error {
 
 			// Template name and pattern can't be configure when using ILM
 			logp.Info("Overwriting template name and pattern as ILM is enabled.")
+
+			// In case no template settings are set, config must be created
+			if b.Config.Template == nil {
+				b.Config.Template = common.NewConfig()
+			}
 			b.Config.Template.SetString("name", -1, ilmCfg.RolloverAlias)
 			b.Config.Template.SetString("pattern", -1, fmt.Sprintf("%s-*", ilmCfg.RolloverAlias))
 
