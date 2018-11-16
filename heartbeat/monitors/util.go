@@ -95,13 +95,9 @@ func WithErrAsField(job Job) Job {
 	})
 }
 
-// Annotes events with common fields and start timestamp.
-func Annotated(
-	id string,
-	fields common.MapStr,
-	start time.Time,
-	job Job,
-) Job {
+func TimeAndCheckJob(job Job) Job {
+	start := time.Now()
+
 	return AfterJob(job, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
 		if event != nil {
 			status := look.Status(err)
@@ -109,22 +105,26 @@ func Annotated(
 				"monitor": common.MapStr{
 					"duration": look.RTT(time.Since(start)),
 					"status":   status,
-					"id":       id,
 				},
 			})
-			if fields != nil {
-				MergeEventFields(event, fields.Clone())
-			}
-
 			event.Timestamp = start
 		}
 
-		jobCont := make([]Job, len(cont))
-		for i, c := range cont {
-			jobCont[i] = Annotated(id, fields, start, c)
-		}
-		return event, jobCont, nil
+		wrappedCont := WrapAll(cont, TimeAndCheckJob)
+		return event, wrappedCont, err
 	})
+}
+
+func WithJobId(id string, job Job) Job {
+	return CreateNamedJob(
+		id,
+		WithFields(
+			common.MapStr{
+				"monitor": common.MapStr{"id": id},
+			},
+			job,
+		).Run,
+	)
 }
 
 // MakeSimpleCont wraps a function that produces an event and error
@@ -215,7 +215,8 @@ func MakeByIPJob(
 		"monitor": common.MapStr{"ip": addr.String()},
 	}
 
-	return WithFields(fields, pingFactory(addr)), nil
+	job := TimeAndCheckJob(WithFields(fields, pingFactory(addr)))
+	return job, nil
 }
 
 // MakeByHostJob creates a new Job including host lookup. The pingFactory will be used to
@@ -240,15 +241,10 @@ func MakeByHostJob(
 
 	mode := settings.IP.Mode
 
-	settings.AddFields(common.MapStr{
-		"monitor": common.MapStr{
-			"host": host,
-		},
-	})
-
 	if mode == PingAny {
 		return makeByHostAnyIPJob(settings, host, pingFactory), nil
 	}
+
 	return makeByHostAllIPJob(settings, host, pingFactory), nil
 }
 
@@ -259,7 +255,7 @@ func makeByHostAnyIPJob(
 ) Job {
 	network := settings.IP.Network()
 
-	return AnonJob(func() (*beat.Event, []Job, error) {
+	aj := AnonJob(func() (*beat.Event, []Job, error) {
 		resolveStart := time.Now()
 		ip, err := net.ResolveIPAddr(network, host)
 		if err != nil {
@@ -269,9 +265,12 @@ func makeByHostAnyIPJob(
 		resolveEnd := time.Now()
 		resolveRTT := resolveEnd.Sub(resolveStart)
 
-		event := resolveIPEvent(host, ip.String(), resolveRTT)
-		return WithFields(event, pingFactory(ip)).Run()
+		ipFields := resolveIPEvent(host, ip.String(), resolveRTT)
+		return WithFields(ipFields, pingFactory(ip)).Run()
 	})
+
+	fmt.Printf("ANNOTATE ME\n")
+	return TimeAndCheckJob(aj)
 }
 
 func makeByHostAllIPJob(
@@ -282,7 +281,7 @@ func makeByHostAllIPJob(
 	network := settings.IP.Network()
 	filter := makeIPFilter(network)
 
-	return AnonJob(func() (*beat.Event, []Job, error) {
+	return CreateNamedJob(settings.Name, func() (*beat.Event, []Job, error) {
 		// TODO: check for better DNS IP lookup support:
 		//         - The net.LookupIP drops ipv6 zone index
 		//
@@ -308,8 +307,8 @@ func makeByHostAllIPJob(
 		cont := make([]Job, len(ips))
 		for i, ip := range ips {
 			addr := &net.IPAddr{IP: ip}
-			event := resolveIPEvent(host, ip.String(), resolveRTT)
-			cont[i] = WithFields(event, pingFactory(addr))
+			ipFields := resolveIPEvent(host, ip.String(), resolveRTT)
+			cont[i] = TimeAndCheckJob(WithFields(ipFields, pingFactory(addr)))
 		}
 		return nil, cont, nil
 	})
@@ -346,8 +345,8 @@ func resolveErr(host string, err error) (*beat.Event, []Job, error) {
 
 // WithFields wraps a TaskRunner, updating all events returned with the set of
 // fields configured.
-func WithFields(fields common.MapStr, r Job) Job {
-	return AfterJob(r, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
+func WithFields(fields common.MapStr, job Job) Job {
+	return AfterJob(job, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
 		if event == nil {
 			event = &beat.Event{}
 		} else {

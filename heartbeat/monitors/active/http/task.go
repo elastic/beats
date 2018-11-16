@@ -48,6 +48,9 @@ func newHTTPMonitorHostJob(
 	body []byte,
 	validator RespCheck,
 ) (monitors.Job, error) {
+	typ := config.Name
+	id := fmt.Sprintf("%v@%v", typ, addr)
+
 	client := &http.Client{
 		CheckRedirect: makeCheckRedirect(config.MaxRedirects),
 		Transport:     transport,
@@ -65,25 +68,25 @@ func newHTTPMonitorHostJob(
 
 	timeout := config.Timeout
 
-	job := monitors.MakeSimpleJob(func() (*beat.Event, error) {
-		_, _, event, err := execPing(client, request, body, timeout, validator)
-		return event, err
-	})
-
-	fields := common.MapStr{
-		"monitor": common.MapStr{
-			"scheme": request.URL.Scheme,
-			"host":   hostname,
-		},
-		"http": common.MapStr{
-			"url": request.URL.String(),
-		},
-		"tcp": common.MapStr{
-			"port": port,
-		},
-	}
-
-	return monitors.WithFields(fields, job), nil
+	return monitors.WithJobId(id,
+		monitors.WithFields(
+			common.MapStr{
+				"monitor": common.MapStr{
+					"scheme": request.URL.Scheme,
+					"host":   hostname,
+				},
+				"http": common.MapStr{
+					"url": request.URL.String(),
+				},
+				"tcp": common.MapStr{
+					"port": port,
+				},
+			},
+			monitors.MakeSimpleJob(func() (*beat.Event, error) {
+				_, _, event, err := execPing(client, request, body, timeout, validator)
+				return event, err
+			}),
+		)), nil
 }
 
 func NewHTTPMonitorIPsJob(
@@ -95,7 +98,7 @@ func NewHTTPMonitorIPsJob(
 	validator RespCheck,
 ) (monitors.Job, error) {
 	typ := config.Name
-	jobName := fmt.Sprintf("%v@%v", typ, addr)
+	id := fmt.Sprintf("%v@%v", typ, addr)
 
 	req, err := BuildRequest(addr, config, enc)
 	if err != nil {
@@ -107,8 +110,12 @@ func NewHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	settings := monitors.MakeHostJobSettings(jobName, hostname, config.Mode)
-	settings = settings.WithFields(common.MapStr{
+	settings := monitors.MakeHostJobSettings(id, hostname, config.Mode)
+
+	pingFactory := CreatePingFactory(config, hostname, port, tls, req, body, validator)
+	job, err := monitors.MakeByHostJob(settings, pingFactory)
+
+	fields := common.MapStr{
 		"monitor": common.MapStr{
 			"scheme": req.URL.Scheme,
 		},
@@ -118,10 +125,9 @@ func NewHTTPMonitorIPsJob(
 		"tcp": common.MapStr{
 			"port": port,
 		},
-	})
+	}
 
-	pingFactory := CreatePingFactory(config, hostname, port, tls, req, body, validator)
-	return monitors.MakeByHostJob(settings, pingFactory)
+	return monitors.WithJobId(id, monitors.WithFields(fields, job)), err
 }
 
 func CreatePingFactory(
