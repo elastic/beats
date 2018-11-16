@@ -79,7 +79,8 @@ func (l *Loader) Load() error {
 	exists := l.CheckTemplate(templateName)
 	if !exists || l.config.Overwrite {
 
-		logp.Info("Loading template for Elasticsearch version: %s", l.client.GetVersion())
+		version := l.client.GetVersion()
+		logp.Info("Loading template for Elasticsearch version: %s", version.String())
 		if l.config.Overwrite {
 			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
 		}

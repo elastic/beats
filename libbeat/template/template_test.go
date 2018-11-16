@@ -34,7 +34,7 @@ func TestNumberOfRoutingShards(t *testing.T) {
 	config := TemplateConfig{}
 
 	// Test it exists in 6.1
-	template, err := New(beatVersion, beatName, "6.1.0", config)
+	template, err := New(beatVersion, beatName, mustParseVersion("6.1.0"), config)
 	assert.NoError(t, err)
 
 	data := template.Generate(nil, nil)
@@ -44,7 +44,7 @@ func TestNumberOfRoutingShards(t *testing.T) {
 	assert.Equal(t, 30, shards.(int))
 
 	// Test it does not exist in 6.0
-	template, err = New(beatVersion, beatName, "6.0.0", config)
+	template, err = New(beatVersion, beatName, mustParseVersion("6.0.0"), config)
 	assert.NoError(t, err)
 
 	data = template.Generate(nil, nil)
@@ -64,7 +64,7 @@ func TestNumberOfRoutingShardsOverwrite(t *testing.T) {
 	}
 
 	// Test it exists in 6.1
-	template, err := New(beatVersion, beatName, "6.1.0", config)
+	template, err := New(beatVersion, beatName, mustParseVersion("6.1.0"), config)
 	assert.NoError(t, err)
 
 	data := template.Generate(nil, nil)
@@ -175,4 +175,12 @@ func TestAppendFields(t *testing.T) {
 			assert.NoError(t, err)
 		}
 	}
+}
+
+func mustParseVersion(s string) common.Version {
+	v, err := common.NewVersion(s)
+	if err != nil {
+		panic(err)
+	}
+	return *v
 }
