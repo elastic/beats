@@ -23,6 +23,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Metricbeat*
 
+- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
+
 *Packetbeat*
 
 *Winlogbeat*
