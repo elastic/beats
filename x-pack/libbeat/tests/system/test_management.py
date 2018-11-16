@@ -93,7 +93,11 @@ class TestManagement(BaseTest):
         ])
 
         # Start beat
-        proc = self.start_beat(extra_args=["-E", "management.period=1s"])
+        proc = self.start_beat(extra_args=[
+            "-E", "management.period=1s",
+            # do not blacklist file output
+            "-E", "management.blacklist.output='.*'",
+        ])
 
         # Wait for beat to apply new conf
         self.wait_log_contains("Applying settings for output")
@@ -163,6 +167,8 @@ class TestManagement(BaseTest):
         proc = self.start_beat(extra_args=[
             "-E", "management.kibana.host=wronghost",
             "-E", "management.kibana.timeout=0.5s",
+            # do not blacklist file output
+            "-E", "management.blacklist.output='.*'",
         ])
         self.wait_until(cond=lambda: self.output_has(
             1, output_file=output_file))
