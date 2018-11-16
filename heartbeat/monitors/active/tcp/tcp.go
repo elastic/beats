@@ -95,7 +95,7 @@ func create(
 			return nil, 0, err
 		}
 
-		jobs = append(jobs, epJobs...)
+		jobs = append(jobs, monitors.WrapAll(epJobs, monitors.WithErrAsField)...)
 	}
 
 	numHosts := 0

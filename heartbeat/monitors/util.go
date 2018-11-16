@@ -269,7 +269,6 @@ func makeByHostAnyIPJob(
 		return WithFields(ipFields, pingFactory(ip)).Run()
 	})
 
-	fmt.Printf("ANNOTATE ME\n")
 	return TimeAndCheckJob(aj)
 }
 
@@ -349,8 +348,6 @@ func WithFields(fields common.MapStr, job Job) Job {
 	return AfterJob(job, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
 		if event == nil {
 			event = &beat.Event{}
-		} else {
-			event = event.Clone()
 		}
 
 		MergeEventFields(event, fields)

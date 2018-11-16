@@ -184,8 +184,9 @@ func makeEndpointJobs(
 
 	// Create job that first resolves one or multiple IP (depending on
 	// config.Mode) in order to create one continuation Task per IP.
-	jobName := jobName(typ, scheme, endpoint.Host, endpoint.Ports)
-	settings := monitors.MakeHostJobSettings(jobName, endpoint.Host, mode).WithFields(fields)
+	jobId := jobId(typ, scheme, endpoint.Host, endpoint.Ports)
+	settings := monitors.MakeHostJobSettings(jobId, endpoint.Host, mode)
+
 	job, err := monitors.MakeByHostJob(settings,
 		monitors.MakePingAllIPPortFactory(endpoint.Ports,
 			func(ip *net.IPAddr, port uint16) (*beat.Event, error) {
@@ -200,10 +201,10 @@ func makeEndpointJobs(
 	if err != nil {
 		return nil, err
 	}
-	return []monitors.Job{job}, nil
+	return []monitors.Job{monitors.WithJobId(jobId, monitors.WithFields(fields, job))}, nil
 }
 
-func jobName(typ, jobType, host string, ports []uint16) string {
+func jobId(typ, jobType, host string, ports []uint16) string {
 	var h string
 	if len(ports) == 1 {
 		h = fmt.Sprintf("%v:%v", host, ports[0])
