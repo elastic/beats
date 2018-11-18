@@ -72,7 +72,7 @@ clean-vendor:
 
 .PHONY: check
 check: python-env
-	@$(foreach var,$(PROJECTS) dev-tools,$(MAKE) -C $(var) check || exit 1;)
+	@$(foreach var,$(PROJECTS) dev-tools x-pack/filebeat,$(MAKE) -C $(var) check || exit 1;)
 	@# Checks also python files which are not part of the beats
 	@$(FIND) -name *.py -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@# Validate that all updates were committed
@@ -107,7 +107,7 @@ misspell:
 
 .PHONY: fmt
 fmt: add-headers python-env
-	@$(foreach var,$(PROJECTS) dev-tools,$(MAKE) -C $(var) fmt || exit 1;)
+	@$(foreach var,$(PROJECTS) dev-tools x-pack/filebeat,$(MAKE) -C $(var) fmt || exit 1;)
 	@# Cleans also python files which are not part of the beats
 	@$(FIND) -name "*.py" -exec $(PYTHON_ENV)/bin/autopep8 --in-place --max-line-length 120 {} \;
 

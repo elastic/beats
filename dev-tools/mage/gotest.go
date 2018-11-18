@@ -206,7 +206,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 }
 
 func makeCommand(ctx context.Context, env map[string]string, cmd string, args ...string) *exec.Cmd {
-	c := exec.CommandContext(ctx, "go", args...)
+	c := exec.CommandContext(ctx, cmd, args...)
 	c.Env = os.Environ()
 	for k, v := range env {
 		c.Env = append(c.Env, k+"="+v)
