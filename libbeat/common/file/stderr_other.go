@@ -21,25 +21,11 @@ package file
 
 import (
 	"os"
-	"path/filepath"
+	"syscall"
 )
 
-// SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
-func SafeFileRotate(path, tempfile string) error {
-	parent := filepath.Dir(path)
-
-	if e := os.Rename(tempfile, path); e != nil {
-		return e
-	}
-
-	// best-effort fsync on parent directory. The fsync is required by some
-	// filesystems, so to update the parents directory metadata to actually
-	// contain the new file being rotated in.
-	f, err := os.Open(parent)
-	if err != nil {
-		return nil // ignore error
-	}
-	defer f.Close()
-
-	return f.Sync()
+// RedirectStandardError causes all standard error output to be directed to the
+// given file.
+func RedirectStandardError(toFile *os.File) error {
+	return syscall.Dup2(int(toFile.Fd()), 2)
 }

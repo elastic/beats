@@ -62,6 +62,12 @@ services:
     ports:
       - 2379
 
+  etcd_3_2:
+    build:
+      context: ./module/etcd/_meta
+      args:
+        ETCD_VERSION: v3.2.25
+
   haproxy:
     build: ./module/haproxy/_meta
     ports:

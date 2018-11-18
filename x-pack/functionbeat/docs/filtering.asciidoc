@@ -1,4 +1,5 @@
 [[filtering-and-enhancing-data]]
+[role="xpack"]
 == Filter and enhance the exported data
 
 Your use case might require only a subset of the data exported by {beatname_uc},
