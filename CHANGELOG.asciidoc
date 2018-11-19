@@ -163,6 +163,7 @@ https://github.com/elastic/beats/compare/v6.4.0...v6.5.0[View commits]
 - Fix range colors in multiple visualizations. {issue}8633[8633] {pull}8634[8634]
 - Fix incorrect header parsing on http metricbeat module {issue}8564[8564] {pull}8585[8585]
 - Fixed a panic when the kvm module cannot establish a connection to libvirtd. {issue}7792[7792].
+- Add missing namespace field in http server metricset {pull}7890[7890]
 
 *Packetbeat*
 
