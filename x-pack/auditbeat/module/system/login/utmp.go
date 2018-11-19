@@ -57,15 +57,25 @@ func (login LoginRecord) Hash() uint64 {
 }
 
 func (login LoginRecord) toMapStr() common.MapStr {
-	return common.MapStr{
+	mapstr := common.MapStr{
 		"record_type": login.RecordType,
 		"pid":         login.PID,
 		"tty":         login.TTY,
-		"username":    login.Username,
-		"hostname":    login.Hostname,
 		"ip":          login.IP,
 		"timestamp":   login.Timestamp,
 	}
+
+	if login.Username != "" {
+		mapstr.Put("user", common.MapStr{
+			"name": login.Username,
+		})
+	}
+
+	if login.Hostname != "" {
+		mapstr.Put("hostname", login.Hostname)
+	}
+
+	return mapstr
 }
 
 // ReadUtmpFile reads a UTMP formatted file (usually /var/log/wtmp).

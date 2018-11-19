@@ -252,18 +252,23 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 				"type":   eventTypeEvent,
 				"action": eventActionLogin,
 			},
-			"user": common.MapStr{
-				"name": loginRecord.Username,
-			},
 		},
 		MetricSetFields: loginRecord.toMapStr(),
 	}
 
-	user, err := user.Lookup(loginRecord.Username)
-	if err == nil {
-		uid := strconv.ParseUint(user.Uid, 10, 32)
-		event.MetricSetFields.Put("uid", uid)
-		event.RootFields.Put("user.id", uid)
+	if loginRecord.Username != "" {
+		event.RootFields.Put("user", common.MapStr{
+			"name": loginRecord.Username,
+		})
+
+		user, err := user.Lookup(loginRecord.Username)
+		if err == nil {
+			uid, err := strconv.ParseUint(user.Uid, 10, 32)
+			if err == nil {
+				event.MetricSetFields.Put("user.uid", uid)
+				event.RootFields.Put("user.id", uid)
+			}
+		}
 	}
 
 	return event
