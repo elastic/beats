@@ -31,6 +31,7 @@ The list below covers the major changes between 6.3.0 and master only.
   used because the value is specified in magefile.go. {pull}7670[7670]
 - Outputs must implement String. {pull}6404[6404]
 - Renamed `-beat-name` CLI option used in `kibana_index_pattern.go` to `-beat` for consistency with other scripts in `dev-tools/cmd`. {pull}8615[8615]
+- Removed dashboards and index patterns generation for Kibana 5. {pull}8927[8927]
 
 ==== Bugfixes
 

@@ -358,8 +358,6 @@ endif
 	fi
 	@# Convert all dashboards to string
 	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/6/dashboard/*.json"
-	@mkdir -p $(PWD)/_meta/kibana.generated/5/index-pattern
-	@mkdir -p $(PWD)/_meta/kibana.generated/6/index-pattern
 	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go \
 	  -index '${BEAT_INDEX_PREFIX}-*' -beat ${BEAT_NAME} -fields $(PWD)/fields.yml \
 	  -version ${BEAT_VERSION} -out _meta/kibana.generated
