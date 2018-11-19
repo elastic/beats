@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.5.0...6.5[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.5.1...6.5[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -36,17 +36,12 @@ https://github.com/elastic/beats/compare/v6.5.0...6.5[Check the HEAD diff]
 *Auditbeat*
 
 *Filebeat*
-- Make sure the Filebeat Elastic licensed packages uses the Elastic binary instead of the OSS. {pull}8836[8836]
 
 *Heartbeat*
 
 *Journalbeat*
 
-- Add missing journalbeat non breaking fixes. {pull}9106[9106]
-
 *Metricbeat*
-
-- Fix race condition when enriching events with kubernetes metadata. {issue}9055[9055] {issue}9067[9067]
 
 *Packetbeat*
 
@@ -96,6 +91,26 @@ https://github.com/elastic/beats/compare/v6.5.0...6.5[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.5.1]]
+=== Beats version 6.5.1
+https://github.com/elastic/beats/compare/v6.5.0...v6.5.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Fix windows binaries not having an enroll command. {issue}9096[9096] {pull}8836[8836]
+
+*Journalbeat*
+- Fix journalbeat sometimes hanging if output is unavailable. {pull}9106[9106]
+
+*Metricbeat*
+- Fix race condition when enriching events with kubernetes metadata. {issue}9055[9055] {issue}9067[9067]
+
+==== Added
+
+*Journalbeat*
+- Add minimal kibana dashboard. {pull}9106[9106]
 
 [[release-notes-6.5.0]]
 === Beats version 6.5.0
