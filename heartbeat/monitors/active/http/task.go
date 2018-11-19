@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -260,12 +261,15 @@ func execRequest(client *http.Client, req *http.Request, validator func(*http.Re
 	}
 
 	err = validator(resp)
-	end = time.Now()
 	if err != nil {
-		return start, end, resp, reason.ValidateFailed(err)
+		return start, time.Now(), resp, reason.ValidateFailed(err)
 	}
 
-	return start, end, resp, nil
+	// Read the entirety of the body. Otherwise, the stats for the check
+	// don't include download time.
+	io.Copy(ioutil.Discard, resp.Body)
+
+	return start, time.Now(), resp, nil
 }
 
 func makeEvent(rtt time.Duration, resp *http.Response) common.MapStr {

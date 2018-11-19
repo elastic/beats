@@ -33,6 +33,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/ccr"
@@ -242,7 +243,7 @@ func checkSkip(t *testing.T, metricset string, host string) {
 		t.Fatal("getting elasticsearch version", err)
 	}
 
-	isCCRStatsAPIAvailable, err := elasticsearch.IsCCRStatsAPIAvailable(version)
+	isCCRStatsAPIAvailable, err := elastic.IsFeatureAvailable(version, elasticsearch.CCRStatsAPIAvailableVersion)
 	if err != nil {
 		t.Fatal("checking if elasticsearch CCR stats API is available", err)
 	}

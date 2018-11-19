@@ -33,24 +33,19 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
+type clusterStatsLicense struct {
+	*elasticsearch.License
+	ClusterNeedsTLS bool `json:"cluster_needs_tls"`
+}
+
+func clusterNeedsTLSEnabled(license *elasticsearch.License, stackStats common.MapStr) (bool, error) {
 	// TLS does not need to be enabled if license type is something other than trial
-	value, err := license.GetValue("type")
-	if err != nil {
-		return false, elastic.MakeErrorForMissingField("type", elastic.Elasticsearch)
-	}
-
-	licenseType, ok := value.(string)
-	if !ok {
-		return false, fmt.Errorf("license type is not a string")
-	}
-
-	if licenseType != "trial" {
+	if !license.IsOneOf("trial") {
 		return false, nil
 	}
 
 	// TLS does not need to be enabled if security is not enabled
-	value, err = stackStats.GetValue("security.enabled")
+	value, err := stackStats.GetValue("security.enabled")
 	if err != nil {
 		return false, elastic.MakeErrorForMissingField("security.enabled", elastic.Elasticsearch)
 	}
@@ -206,7 +201,8 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	if err != nil {
 		return errors.Wrap(err, "failed to determine if cluster needs TLS enabled")
 	}
-	license.Put("cluster_needs_tls", clusterNeedsTLS) // This powers a cluster alert for enabling TLS on the ES transport protocol
+
+	l := clusterStatsLicense{license, clusterNeedsTLS}
 
 	isAPMFound, err := apmIndicesExist(clusterState)
 	if err != nil {
@@ -228,7 +224,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		"timestamp":     common.Time(time.Now()),
 		"interval_ms":   m.Module().Config().Period / time.Millisecond,
 		"type":          "cluster_stats",
-		"license":       license,
+		"license":       l,
 		"version":       info.Version.Number,
 		"cluster_stats": clusterStats,
 		"cluster_state": clusterState,

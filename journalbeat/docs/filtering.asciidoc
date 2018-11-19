@@ -1,20 +1,15 @@
 [[filtering-and-enhancing-data]]
 == Filter and enhance the exported data
 
-IMPORTANT: This documentation is placeholder content. It has not yet been reviewed.
-
 Your use case might require only a subset of the data exported by {beatname_uc},
 or you might need to enhance the exported data (for example, by adding
 metadata). {beatname_uc} provides a couple of options for filtering and
 enhancing exported data.
 
-You can configure each input to include or exclude specific lines or files. This
-allows you to specify different filtering criteria for each input. To do this,
-you use the `include_lines`, `exclude_lines`, and `exclude_files` options under
-the +{beatname_lc}.inputs+ section of the config file (see
-<<configuration-{beatname_lc}-options>>). The disadvantage of this approach is
-that you need to implement a configuration option for each filtering criteria
-that you need.
+You can configure {beatname_uc} to include events that match specific filtering
+criteria. To do this, use the <<{beatname_lc}-include-matches,`include_matches`>>
+option. The advantage of this approach is that you can reduce the number of
+fields that {beatname_uc} needs to process.
 
 Another approach (the one described here) is to define processors to configure
 global processing across all data exported by {beatname_uc}.
@@ -25,12 +20,6 @@ global processing across all data exported by {beatname_uc}.
 === Processors
 
 include::../../libbeat/docs/processors.asciidoc[]
-
-[float]
-[[specific-example]]
-==== XYZ example
-
-ADD EXAMPLES SPECIFIC TO THE BEAT, OR DELETE THIS SECTION
 
 // You must set the processor-scope attribute to resolve the attribute reference
 // defined in processors-using.asciidoc. The attribute is used to indicate where

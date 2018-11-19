@@ -347,6 +347,24 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	if len(fingerprints) > 0 {
 		tls["fingerprints"] = fingerprints
 	}
+
+	// TLS version in use
+	if conn.handshakeCompleted > 1 {
+		var version string
+		if serverHello != nil {
+			var ok bool
+			if value, exists := serverHello.extensions.Parsed["supported_versions"]; exists {
+				version, ok = value.(string)
+			}
+			if !ok {
+				version = serverHello.version.String()
+			}
+		} else if clientHello != nil {
+			version = clientHello.version.String()
+		}
+		tls["version"] = version
+	}
+
 	fields := common.MapStr{
 		"type":   "tls",
 		"status": status,
