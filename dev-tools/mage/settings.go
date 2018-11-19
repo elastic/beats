@@ -103,7 +103,7 @@ func init() {
 		panic(errors.Errorf("failed to parse SNAPSHOT env value", err))
 	}
 
-	versionQualifier, versionQualified = os.LookupEnv("BEAT_VERSION_QUALIFIER")
+	versionQualifier, versionQualified = os.LookupEnv("VERSION_QUALIFIER")
 }
 
 // EnvMap returns map containing the common settings variables and all variables
@@ -319,7 +319,7 @@ var (
 )
 
 // BeatQualifiedVersion returns the Beat's qualified version.  The value can be overwritten by
-// setting BEAT_VERSION_QUALIFIER in the environment.
+// setting VERSION_QUALIFIER in the environment.
 func BeatQualifiedVersion() (string, error) {
 	version, err := beatVersion()
 	if err != nil {

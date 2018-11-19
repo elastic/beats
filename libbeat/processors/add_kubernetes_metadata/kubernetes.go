@@ -103,7 +103,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
 
-	logp.Debug("kubernetes", "Using host ", config.Host)
+	logp.Debug("kubernetes", "Using host: %s", config.Host)
 	logp.Debug("kubernetes", "Initializing watcher")
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
@@ -112,7 +112,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		Namespace:   config.Namespace,
 	})
 	if err != nil {
-		logp.Err("kubernetes: Couldn't create watcher for %t", &kubernetes.Pod{})
+		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
 		return nil, err
 	}
 

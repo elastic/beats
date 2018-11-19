@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -67,11 +67,6 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 
 	indexRecovery := common.MapStr{}
 	indexRecovery["shards"] = results
-
-	info, err := elasticsearch.GetInfo(m.HTTP, m.HTTP.GetURI())
-	if err != nil {
-		return errors.Wrap(err, "failed to retrieve info from Elasticsearch")
-	}
 
 	event := mb.Event{}
 	event.RootFields = common.MapStr{

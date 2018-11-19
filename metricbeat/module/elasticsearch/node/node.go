@@ -18,6 +18,8 @@
 package node
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -72,7 +74,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	err = eventsMapping(r, content)
+	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+nodeStatsPath)
+	if err != nil {
+		err = errors.Wrap(err, "failed to get info from Elasticsearch")
+		elastic.ReportAndLogError(err, r, m.Log)
+		return
+	}
+
+	err = eventsMapping(r, *info, content)
 	if err != nil {
 		elastic.ReportAndLogError(err, r, m.Log)
 		return

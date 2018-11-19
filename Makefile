@@ -13,12 +13,18 @@ REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 XPACK_SUFFIX=x-pack/
 
+# PROJECTS_XPACK_MAGE is a list of Beats whose primary build logic is based in
+# Mage. For compatibility with CI testing these projects support a subset of the
+# makefile targets. After all Beats converge to primarily using Mage we can
+# remove this and treat all sub-projects the same.
+PROJECTS_XPACK_MAGE=x-pack/filebeat x-pack/metricbeat
+
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
 
 .PHONY: testsuite
 testsuite:
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
+	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) testsuite || exit 1;)
 
 .PHONY: setup-commit-hook
 setup-commit-hook:
@@ -54,13 +60,13 @@ coverage-report:
 
 .PHONY: update
 update: notice
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) update || exit 1;)
+	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) update || exit 1;)
 	@$(MAKE) -C deploy/kubernetes all
 
 .PHONY: clean
 clean:
 	@rm -rf build
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) clean || exit 1;)
+	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) clean || exit 1;)
 	@$(MAKE) -C generator clean
 	@-mage -clean 2> /dev/null
 
@@ -72,7 +78,7 @@ clean-vendor:
 
 .PHONY: check
 check: python-env
-	@$(foreach var,$(PROJECTS) dev-tools,$(MAKE) -C $(var) check || exit 1;)
+	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
 	@# Checks also python files which are not part of the beats
 	@$(FIND) -name *.py -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@# Validate that all updates were committed
@@ -107,7 +113,7 @@ misspell:
 
 .PHONY: fmt
 fmt: add-headers python-env
-	@$(foreach var,$(PROJECTS) dev-tools,$(MAKE) -C $(var) fmt || exit 1;)
+	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) fmt || exit 1;)
 	@# Cleans also python files which are not part of the beats
 	@$(FIND) -name "*.py" -exec $(PYTHON_ENV)/bin/autopep8 --in-place --max-line-length 120 {} \;
 

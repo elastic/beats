@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -41,6 +42,8 @@ var (
 	integTestUseCountLock sync.Mutex // Lock to guard integTestUseCount.
 
 	integTestLock sync.Mutex // Only allow one integration test at a time.
+
+	integTestBuildImagesOnce sync.Once // Build images one time for all integ testing.
 )
 
 // Integration Test Configuration
@@ -142,6 +145,12 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		return test()
 	}
 
+	var err error
+	integTestBuildImagesOnce.Do(func() { err = dockerComposeBuildImages() })
+	if err != nil {
+		return err
+	}
+
 	// Test that we actually have Docker and docker-compose.
 	if err := haveIntegTestEnvRequirements(); err != nil {
 		return errors.Wrapf(err, "failed to run %v target in integration environment", mageTarget)
@@ -231,10 +240,55 @@ func integTestDockerComposeEnvVars() (map[string]string, error) {
 	}, nil
 }
 
+// dockerComposeProjectName returns the project name to use with docker-compose.
+// It is passed to docker-compose using the `-p` flag. And is passed to our
+// Go and Python testing libraries through the DOCKER_COMPOSE_PROJECT_NAME
+// environment variable.
 func dockerComposeProjectName() string {
-	projectName := "{{.BeatName}}{{.StackEnvironment}}{{ beat_version }}{{ commit }}"
+	commit, err := CommitHash()
+	if err != nil {
+		panic(errors.Wrap(err, "failed to construct docker compose project name"))
+	}
+
+	version, err := BeatQualifiedVersion()
+	if err != nil {
+		panic(errors.Wrap(err, "failed to construct docker compose project name"))
+	}
+	version = strings.NewReplacer(".", "_").Replace(version)
+
+	projectName := "{{.BeatName}}_{{.Version}}_{{.ShortCommit}}-{{.StackEnvironment}}"
 	projectName = MustExpand(projectName, map[string]interface{}{
 		"StackEnvironment": StackEnvironment,
+		"ShortCommit":      commit[:10],
+		"Version":          version,
 	})
 	return projectName
+}
+
+// dockerComposeBuildImages builds all images in the docker-compose.yml file.
+func dockerComposeBuildImages() error {
+	fmt.Println(">> Building docker images")
+
+	composeEnv, err := integTestDockerComposeEnvVars()
+	if err != nil {
+		return err
+	}
+
+	args := []string{"-p", dockerComposeProjectName(), "build", "--pull", "--force-rm"}
+	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
+		args = append(args, "--no-cache")
+	}
+
+	out := ioutil.Discard
+	if mg.Verbose() {
+		out = os.Stderr
+	}
+
+	_, err = sh.Exec(
+		composeEnv,
+		out,
+		os.Stderr,
+		"docker-compose", args...,
+	)
+	return err
 }
