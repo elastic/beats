@@ -247,7 +247,7 @@ func (b GolangCrossBuilder) Build() error {
 		)
 	}
 	if versionQualified {
-		args = append(args, "--env", "BEAT_VERSION_QUALIFIER="+versionQualifier)
+		args = append(args, "--env", "VERSION_QUALIFIER="+versionQualifier)
 	}
 	args = append(args,
 		"--rm",
