@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -260,8 +261,9 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 
 	user, err := user.Lookup(loginRecord.Username)
 	if err == nil {
-		event.MetricSetFields.Put("uid", user.Uid)
-		event.RootFields.Put("user.id", user.Uid)
+		uid := strconv.ParseUint(user.Uid, 10, 32)
+		event.MetricSetFields.Put("uid", uid)
+		event.RootFields.Put("user.id", uid)
 	}
 
 	return event

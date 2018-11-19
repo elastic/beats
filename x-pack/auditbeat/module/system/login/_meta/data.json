@@ -1,30 +1,29 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
-    "metricset": {
+    "event": {
+        "action": "login",
+        "dataset": "login",
         "module": "system",
-        "name": "packages",
-        "rtt": 115
+        "type": "event"
     },
     "system": {
-        "packages": {
-            "package": [
-                {
-                    "arch": "amd64",
-                    "installtime": "0001-01-01T00:00:00Z",
-                    "license": "",
-                    "name": "vim-tiny",
-                    "release": "",
-                    "size": 1271,
-                    "status": "installed",
-                    "summary": "Vi IMproved - enhanced vi editor - compact version",
-                    "url": "",
-                    "version": "2:8.0.1453-1ubuntu1"
-                }
-            ]
+        "login": {
+            "hostname": "10.0.2.2",
+            "ip": "10.0.2.2",
+            "pid": 14728,
+            "record_type": "USER_PROCESS",
+            "timestamp": "2018-11-19T13:48:39.038Z",
+            "uid": 1000,
+            "tty": "pts/2",
+            "username": "vagrant"
         }
+    },
+    "user": {
+        "id": 1000,
+        "name": "vagrant"
     }
 }
