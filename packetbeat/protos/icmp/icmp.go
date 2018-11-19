@@ -94,7 +94,7 @@ func (icmp *icmpPlugin) init(results protos.Reporter, config *icmpConfig) error 
 	var err error
 	icmp.localIps, err = common.LocalIPAddrs()
 	if err != nil {
-		logp.Err("icmp", "Error getting local IP addresses: %s", err)
+		logp.Err("Error getting local IP addresses: %+v", err)
 		icmp.localIps = []net.IP{}
 	}
 	logp.Debug("icmp", "Local IP addresses: %s", icmp.localIps)

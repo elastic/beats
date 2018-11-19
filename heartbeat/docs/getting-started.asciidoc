@@ -81,6 +81,23 @@ tar xzvf heartbeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+[[linux]]
+*linux:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O {downloads}/heartbeat/heartbeat-{version}-linux-x86_64.tar.gz
+tar xzvf heartbeat-{version}-linux-x86_64.tar.gz
+------------------------------------------------
+endif::[]
 
 [[docker]]
 *docker:*
@@ -230,12 +247,12 @@ start Heartbeat in the foreground.
 sudo service {beatname_lc}-elastic start
 ----------------------------------------------------------------------
 
-*mac:*
+*mac and linux:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo chown root heartbeat.yml <1>
-sudo ./heartbeat -e -c heartbeat.yml
+sudo ./heartbeat -e
 ----------------------------------------------------------------------
 <1> You'll be running Heartbeat as root, so you need to change ownership of the
 configuration file, or run Heartbeat with `--strict.perms=false` specified. See

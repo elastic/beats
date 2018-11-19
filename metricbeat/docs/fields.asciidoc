@@ -5391,6 +5391,26 @@ Elasticsearch state id.
 
 --
 
+*`elasticsearch.node.id`*::
++
+--
+type: keyword
+
+Node ID
+
+
+--
+
+*`elasticsearch.node.name`*::
++
+--
+type: keyword
+
+Node name.
+
+
+--
+
 [float]
 == ccr fields
 
@@ -5440,7 +5460,7 @@ Number of the shard within the index
 
 --
 
-*`elasticsearch.ccr.follower.operations_indexed`*::
+*`elasticsearch.ccr.follower.operations_written`*::
 +
 --
 type: long
@@ -5450,7 +5470,7 @@ Number of operations indexed (replicated) into the follower shard from the leade
 
 --
 
-*`elasticsearch.ccr.follower.time_since_last_fetch.ms`*::
+*`elasticsearch.ccr.follower.time_since_last_read.ms`*::
 +
 --
 type: long
@@ -5927,16 +5947,6 @@ The number of records with either a missing date field or a date that could not 
 node
 
 
-
-*`elasticsearch.node.name`*::
-+
---
-type: keyword
-
-Node name.
-
-
---
 
 *`elasticsearch.node.version`*::
 +

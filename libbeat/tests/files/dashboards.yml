@@ -1,0 +1,3 @@
+dashboards:
+- id: Metricbeat-system-overview
+  file: Metricbeat-system-test-overview.json

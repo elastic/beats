@@ -185,7 +185,7 @@ func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*f
 
 	moduleFilesets, err := l.Registry.ModuleFilesets(module)
 	if err != nil {
-		logp.Err("Error retrieving module filesets", err)
+		logp.Err("Error retrieving module filesets: %+v", err)
 		return nil
 	}
 

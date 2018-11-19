@@ -283,6 +283,7 @@ func (client *Client) GetDashboard(id string) (common.MapStr, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error removing index pattern: %+v", err)
 	}
+
 	return result, nil
 }
 

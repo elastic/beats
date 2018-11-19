@@ -761,7 +761,7 @@ func (conn *Connection) execRequest(
 ) (int, []byte, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		logp.Warn("Failed to create request", err)
+		logp.Warn("Failed to create request %+v", err)
 		return 0, nil, err
 	}
 	if body != nil {

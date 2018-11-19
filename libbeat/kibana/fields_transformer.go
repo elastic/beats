@@ -41,7 +41,7 @@ func newFieldsTransformer(version *common.Version, fields common.Fields) (*field
 		version:                   version,
 		transformedFields:         []common.MapStr{},
 		transformedFieldFormatMap: common.MapStr{},
-		keys: common.MapStr{},
+		keys:                      common.MapStr{},
 	}, nil
 }
 
