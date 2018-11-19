@@ -31,6 +31,7 @@ grouped in the following categories:
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
+* <<exported-fields-iis>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
@@ -8865,6 +8866,37 @@ json metricset
 
 server
 
+
+[[exported-fields-iis]]
+== iis fields
+
+experimental[]
+iis module
+
+
+
+[float]
+== iis fields
+
+
+
+
+[float]
+== system fields
+
+system
+
+
+
+*`iis.system.example`*::
++
+--
+type: keyword
+
+Example field
+
+
+--
 
 [[exported-fields-jolokia]]
 == Jolokia fields

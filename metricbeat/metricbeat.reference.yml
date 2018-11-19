@@ -296,6 +296,14 @@ metricbeat.modules:
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
 
+#--------------------------------- iis Module --------------------------------
+- module: iis
+  metricsets: ["system"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost"]
+
+
 #------------------------------- Jolokia Module ------------------------------
 - module: jolokia
   #metricsets: ["jmx"]
