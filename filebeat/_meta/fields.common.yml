@@ -108,6 +108,13 @@
         Referrer for this HTTP request.
       example: https://blog.example.com/
 
+  # Temporary fixes until ECS is reimported
+    - name: url.original
+      type: keyword
+      description: >
+        Full original url. The field is stored as keyword.
+      example: https://blog.example.com/
+
   # Temporary fix to get 7.0 dashboards working
     - name: fileset.name
       type: alias

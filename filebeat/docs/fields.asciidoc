@@ -4845,6 +4845,18 @@ Referrer for this HTTP request.
 
 --
 
+*`url.original`*::
++
+--
+type: keyword
+
+example: https://blog.example.com/
+
+Full original url. The field is stored as keyword.
+
+
+--
+
 *`event.dataset`*::
 +
 --
