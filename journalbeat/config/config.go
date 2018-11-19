@@ -69,6 +69,8 @@ func (m *SeekMode) Unpack(value string) error {
 	if !ok {
 		return fmt.Errorf("invalid seek mode '%s'", value)
 	}
+
 	*m = mode
+
 	return nil
 }
