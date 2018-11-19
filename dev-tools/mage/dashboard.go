@@ -42,7 +42,7 @@ func ExportDashboard() error {
 	}
 
 	// TODO: This is currently hardcoded for KB 6, we need to figure out what we do for KB 7
-	file := filepath.Join(beatsDir, BeatName, "module", module, "_meta/kibana/6/dashboard", id+".json")
+	file := CWD("module", module, "_meta/kibana/6/dashboard", id+".json")
 
 	dashboardCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, "dev-tools/cmd/dashboards/export_dashboards.go"),
