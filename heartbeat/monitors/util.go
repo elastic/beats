@@ -91,28 +91,35 @@ func WithErrAsField(job Job) Job {
 			})
 		}
 
-		return event, jobs, nil
+		wrapped := WrapAll(jobs, WithErrAsField)
+		return event, wrapped, nil
 	})
 }
 
 func TimeAndCheckJob(job Job) Job {
-	start := time.Now()
+	// This should probably execute before job.Run
+	return CreateNamedJob(
+		job.Name(),
+		func() (*beat.Event, []Job, error) {
+			start := time.Now()
 
-	return AfterJob(job, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
-		if event != nil {
-			status := look.Status(err)
-			MergeEventFields(event, common.MapStr{
-				"monitor": common.MapStr{
-					"duration": look.RTT(time.Since(start)),
-					"status":   status,
-				},
-			})
-			event.Timestamp = start
-		}
+			event, cont, err := job.Run()
 
-		wrappedCont := WrapAll(cont, TimeAndCheckJob)
-		return event, wrappedCont, err
-	})
+			if event != nil {
+				status := look.Status(err)
+				MergeEventFields(event, common.MapStr{
+					"monitor": common.MapStr{
+						"duration": look.RTT(time.Since(start)),
+						"status":   status,
+					},
+				})
+				event.Timestamp = start
+			}
+
+			wrappedCont := WrapAll(cont, TimeAndCheckJob)
+			return event, wrappedCont, err
+		},
+	)
 }
 
 func WithJobId(id string, job Job) Job {

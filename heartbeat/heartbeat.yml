@@ -11,6 +11,9 @@
 
 # Configure monitors
 heartbeat.monitors:
+  - type: icmp
+    hosts: "toeueouhnouehnoeuhnt.com"
+    schedule: "@every 3s"
   - type: aws_elbv2
     arns: ["arn:aws:elasticloadbalancing:us-east-1:114575138929:loadbalancer/app/test-lb/e35147785f6cc9a4"]
     region: "us-east-1"
@@ -99,11 +102,11 @@ setup.kibana:
 # Configure what output to use when sending the data collected by the beat.
 
 #-------------------------- Elasticsearch output ------------------------------
-output.console:
-  pretty: false
-#output.elasticsearch:
+#output.console:
+#  pretty: false
+output.elasticsearch:
   # Array of hosts to connect to.
-  #hosts: ["localhost:9200"]
+  hosts: ["localhost:9200"]
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"

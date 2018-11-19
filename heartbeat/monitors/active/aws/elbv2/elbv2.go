@@ -55,7 +55,7 @@ func create(name string, commonCfg *common.Config) (jobs []monitors.Job, endpoin
 		}
 	}
 
-	return jobs, len(pageARNs), nil
+	return monitors.WrapAll(jobs, monitors.WithErrAsField), len(pageARNs), nil
 }
 
 func newELBv2Job(client *elbv2.ELBV2, arns []string) (monitors.Job, error) {
@@ -74,11 +74,10 @@ func newELBv2Job(client *elbv2.ELBV2, arns []string) (monitors.Job, error) {
 
 			var jobs []monitors.Job
 			for _, lb := range lbResp.LoadBalancers {
-				jobs = append(jobs, newLbJob(lb))
-				jobs = append(jobs, newListenerJob(client, lb))
+				jobs = append(jobs, monitors.WithJobId(*lb.LoadBalancerArn, newLbJob(lb)))
+				jobs = append(jobs, monitors.WithJobId(*lb.LoadBalancerArn, newListenerJob(client, lb)))
 			}
 
-			fmt.Printf("JOBS ARE %v\n", jobs)
 			return nil, jobs, nil
 		})
 
@@ -86,7 +85,7 @@ func newELBv2Job(client *elbv2.ELBV2, arns []string) (monitors.Job, error) {
 }
 
 func newLbJob(lb elbv2.LoadBalancer) monitors.Job {
-	return monitors.AnonJob(func() (*beat.Event, []monitors.Job, error) {
+	return monitors.TimeAndCheckJob(monitors.AnonJob(func() (*beat.Event, []monitors.Job, error) {
 		var status string
 		if lb.State.Code == elbv2.LoadBalancerStateEnumActive {
 			status = "up"
@@ -99,7 +98,7 @@ func newLbJob(lb elbv2.LoadBalancer) monitors.Job {
 				"monitor": common.MapStr{
 					"status":    status,
 					"task_type": "elbv2_state",
-					"task_id":   "ELBv2 State",
+					"task_id":   lb.DNSName,
 				},
 				"aws": common.MapStr{
 					"arn": lb.LoadBalancerArn,
@@ -112,11 +111,11 @@ func newLbJob(lb elbv2.LoadBalancer) monitors.Job {
 		}
 
 		return event, []monitors.Job{}, nil
-	})
+	}))
 }
 
 func newListenerJob(client *elbv2.ELBV2, lb elbv2.LoadBalancer) monitors.Job {
-	return monitors.AnonJob(func() (*beat.Event, []monitors.Job, error) {
+	return monitors.TimeAndCheckJob(monitors.AnonJob(func() (*beat.Event, []monitors.Job, error) {
 		describeInput := &elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}
 		// Pagination not supported when LB is specified
 		resp, err := client.DescribeListenersRequest(describeInput).Send()
@@ -144,20 +143,17 @@ func newListenerJob(client *elbv2.ELBV2, lb elbv2.LoadBalancer) monitors.Job {
 			}
 
 			if err != nil {
-				fmt.Printf("LISTEN JOB ERR %v\n", err)
 				return nil, nil, err
 			}
 
 			jobs = append(jobs, job)
 		}
 
-		fmt.Printf("LISTEN JOBS ARE %v\n", jobs)
 		return nil, jobs, nil
-	})
+	}))
 }
 
 func newHttpCheck(listener elbv2.Listener, url *url.URL) (monitors.Job, error) {
-	fmt.Printf("START LISTENER JOB\n")
 	httpConfig := &http.Config{
 		URLs: []string{url.String()},
 		Mode: monitors.DefaultIPSettings,

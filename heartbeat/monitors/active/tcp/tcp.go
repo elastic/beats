@@ -95,14 +95,16 @@ func create(
 			return nil, 0, err
 		}
 
-		jobs = append(jobs, monitors.WrapAll(epJobs, monitors.WithErrAsField)...)
+		jobs = append(jobs, epJobs...)
 	}
 
 	numHosts := 0
 	for _, hosts := range schemeHosts {
 		numHosts += len(hosts)
 	}
-	return jobs, numHosts, nil
+
+	errWrapped := monitors.WrapAll(jobs, monitors.WithErrAsField)
+	return errWrapped, numHosts, nil
 }
 
 func collectHosts(config *Config, defaultScheme string) (map[string][]dialchain.Endpoint, error) {

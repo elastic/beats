@@ -94,7 +94,8 @@ func create(
 		}
 	}
 
-	return jobs, len(config.Hosts), nil
+	errWrapped := monitors.WrapAll(jobs, monitors.WithErrAsField)
+	return errWrapped, len(config.Hosts), nil
 }
 
 func createPingIPFactory(config *Config) func(*net.IPAddr) (*beat.Event, error) {
