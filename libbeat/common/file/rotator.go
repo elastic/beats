@@ -68,6 +68,7 @@ type Rotator struct {
 	log             Logger // Optional Logger (may be nil).
 	interval        time.Duration
 	intervalRotator *intervalRotator // Optional, may be nil
+	redirectStderr  bool
 
 	file  *os.File
 	size  uint
@@ -120,6 +121,14 @@ func WithLogger(l Logger) RotatorOption {
 func Interval(d time.Duration) RotatorOption {
 	return func(r *Rotator) {
 		r.interval = d
+	}
+}
+
+// RedirectStderr causes all writes to standard error to be redirected
+// to this rotator.
+func RedirectStderr(redirect bool) RotatorOption {
+	return func(r *Rotator) {
+		r.redirectStderr = redirect
 	}
 }
 
@@ -277,7 +286,9 @@ func (r *Rotator) openFile() error {
 	if err != nil {
 		return errors.Wrap(err, "failed to open new file")
 	}
-
+	if r.redirectStderr {
+		RedirectStandardError(r.file)
+	}
 	return nil
 }
 

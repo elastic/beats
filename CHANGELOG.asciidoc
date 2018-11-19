@@ -25,6 +25,8 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
+
 *Packetbeat*
 
 *Winlogbeat*
@@ -42,6 +44,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Fix improperly set config for CRI Flag in Docker Input {pull}8899[8899]
 - Just enabling the `elasticsearch` fileset and starting Filebeat no longer causes an error. {pull}8891[8891]
 - Fix macOS default log path for elasticsearch module based on homebrew paths. {pul}8939[8939]
+- Make sure the Filebeat Elastic licensed packages uses the Elastic binary instead of the OSS. {pull}8836[8836]
 
 *Heartbeat*
 
@@ -52,6 +55,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 *Metricbeat*
 
 - Add missing namespace field in http server metricset {pull}7890[7890]
+- Fix race condition when enriching events with kubernetes metadata. {issue}9055[9055] {issue}9067[9067]
 
 *Packetbeat*
 
@@ -64,6 +68,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 *Affecting all Beats*
 
 - Dissect will now flag event on parsing error. {pull}8751[8751]
+- Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]
 
 *Auditbeat*
 
@@ -80,6 +85,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 *Metricbeat*
 
 - Collect custom cluster `display_name` in `elasticsearch/cluster_stats` metricset. {pull}8445[8445]
+- Test etcd module with etcd 3.3. {pull}9068[9068]
 
 *Packetbeat*
 
@@ -100,6 +106,8 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 *Metricbeat*
 
 *Packetbeat*
+
+- Support new TLS version negotiation introduced in TLS 1.3. {issue}8647[8647].
 
 *Winlogbeat*
 

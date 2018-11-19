@@ -5,6 +5,7 @@
 /////
 
 [[setting-up-and-running]]
+[role="xpack"]
 == Setting up and running {beatname_uc}
 
 Before reading this section, see the
@@ -23,8 +24,11 @@ This section includes additional information on how to set up and run
 
 //MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
 
+[role="xpack"]
 include::{libbeat-dir}/docs/shared-directory-layout.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/keystore.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/command-reference.asciidoc[]

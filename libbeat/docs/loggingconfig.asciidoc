@@ -170,6 +170,16 @@ unix epoch. Defaults to disabled.
 When true, logs messages in JSON format. The default is false.
 
 [float]
+==== `logging.files.redirect_stderr` experimental[]
+
+When true, diagnostic messages printed to {beatname_uc}'s standard error output
+will also be logged to the log file. This can be helpful in situations were
+{beatname_uc} terminates unexpectedly because an error has been detected by
+Go's runtime but diagnostic information is not present in the log file.
+This feature is only available when logging to files (`logging.to_files` is true).
+Disabled by default.
+
+[float]
 === Logging format
 
 The logging format is generally the same for each logging output. The one

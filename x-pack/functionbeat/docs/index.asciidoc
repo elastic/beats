@@ -22,25 +22,25 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :win_os:
 :linux_os:
 :no_dashboards:
+:no_repos:
 
 include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
-
-:release-state: released
 
 include::./overview.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
-include::{libbeat-dir}/docs/repositories.asciidoc[]
-
 include::./setting-up-running.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
+[role="xpack"]
 include::./fields.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/monitoring/monitoring-beats.asciidoc[]
 
+[role="xpack"]
 include::{libbeat-dir}/docs/shared-securing-beat.asciidoc[]
 
 include::./troubleshooting.asciidoc[]

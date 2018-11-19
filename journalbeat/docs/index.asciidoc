@@ -18,8 +18,6 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
-:release-state: released
-
 include::./overview.asciidoc[]
 
 include::./getting-started.asciidoc[]
