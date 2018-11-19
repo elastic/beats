@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/beats/journalbeat/checkpoint"
 	"github.com/elastic/beats/journalbeat/cmd/instance"
+	"github.com/elastic/beats/journalbeat/config"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -142,7 +143,8 @@ func setupMatches(j *sdjournal.Journal, matches []string) error {
 
 // seek seeks to the position determined by the coniguration and cursor state.
 func (r *Reader) seek(cursor string) {
-	if r.config.Seek == "cursor" {
+	switch r.config.Seek {
+	case config.SeekCursor:
 		if cursor == "" {
 			r.journal.SeekHead()
 			r.logger.Debug("Seeking method set to cursor, but no state is saved for reader. Starting to read from the beginning")
@@ -154,12 +156,14 @@ func (r *Reader) seek(cursor string) {
 			r.logger.Error("Error while seeking to cursor")
 		}
 		r.logger.Debug("Seeked to position defined in cursor")
-	} else if r.config.Seek == "tail" {
+	case config.SeekTail:
 		r.journal.SeekTail()
 		r.logger.Debug("Tailing the journal file")
-	} else if r.config.Seek == "head" {
+	case config.SeekHead:
 		r.journal.SeekHead()
 		r.logger.Debug("Reading from the beginning of the journal file")
+	default:
+		r.logger.Error("Invalid seeking mode")
 	}
 }
 
