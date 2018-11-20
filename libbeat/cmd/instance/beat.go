@@ -517,7 +517,7 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 			if err != nil {
 				return err
 			}
-			fmt.Println("ILM policy loaded for Beat")
+			fmt.Println("Loaded Index Lifecycle Management (ILM) policies")
 		}
 
 		return nil
@@ -799,9 +799,6 @@ func (b *Beat) registerTemplateLoading() error {
 
 			// Load write alias already on
 			esConfig := b.Config.Output.Config()
-			if err != nil {
-				return err
-			}
 
 			// Check that ILM is enabled and the right elasticsearch version exists
 			esClient, err := elasticsearch.NewConnectedClient(esConfig)

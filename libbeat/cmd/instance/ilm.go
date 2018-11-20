@@ -52,7 +52,7 @@ var ILMPolicy = common.MapStr{
 
 const (
 	ILMPolicyName     = "beats-default-policy"
-	ILMDefaultPattern = "0001"
+	ILMDefaultPattern = "00001"
 )
 
 // Build and return a callback to load ILM write alias
@@ -68,7 +68,8 @@ func (b *Beat) writeAliasLoadingCallback() (func(esClient *elasticsearch.Client)
 		}
 
 		firstIndex := fmt.Sprintf("%s-%s", config.RolloverAlias, config.Pattern)
-		// Create write alias
+
+		// Check if alias already exists
 		status, b, err := esClient.Request("HEAD", "/_alias/"+config.RolloverAlias, "", nil, nil)
 		if err != nil && status != 404 {
 			logp.Err("Failed create write alias: %s: %+v", err, string(b))
