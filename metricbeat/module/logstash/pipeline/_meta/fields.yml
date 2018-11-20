@@ -1,0 +1,26 @@
+- name: pipeline
+  type: group
+  description: >
+    logstash pipeline
+  release: beta
+  fields:
+    - name: id
+      type: keyword
+      description: >
+        Pipeline ID
+    - name: ephemeral_id
+      type: keyword
+      description: >
+        Pipeline Ephemeral ID
+    - name: hash
+      type: keyword
+      description: >
+        Pipeline Configuration Hash
+    - name: workers
+      type: integer
+      description: >
+        Number of processor (filter+output) workers
+    - name: batch_size
+      type: integer
+      description: >
+        Max. number of events consumed by each processor worker

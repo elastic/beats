@@ -11597,6 +11597,63 @@ Filtered events counter.
 
 --
 
+[float]
+== pipeline fields
+
+logstash pipeline
+
+
+
+*`logstash.pipeline.id`*::
++
+--
+type: keyword
+
+Pipeline ID
+
+
+--
+
+*`logstash.pipeline.ephemeral_id`*::
++
+--
+type: keyword
+
+Pipeline Ephemeral ID
+
+
+--
+
+*`logstash.pipeline.hash`*::
++
+--
+type: keyword
+
+Pipeline Configuration Hash
+
+
+--
+
+*`logstash.pipeline.workers`*::
++
+--
+type: integer
+
+Number of processor (filter+output) workers
+
+
+--
+
+*`logstash.pipeline.batch_size`*::
++
+--
+type: integer
+
+Max. number of events consumed by each processor worker
+
+
+--
+
 [[exported-fields-memcached]]
 == Memcached fields
 

@@ -45,7 +45,11 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-logstash-node_stats,node_stats>>
 
+* <<metricbeat-metricset-logstash-pipeline,pipeline>>
+
 include::logstash/node.asciidoc[]
 
 include::logstash/node_stats.asciidoc[]
+
+include::logstash/pipeline.asciidoc[]
 

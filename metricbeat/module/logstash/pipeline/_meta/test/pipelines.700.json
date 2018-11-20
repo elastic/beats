@@ -1,0 +1,25 @@
+{
+    "host": "Shaunaks-MBP-2",
+    "version": "7.0.0-alpha1",
+    "http_address": "127.0.0.1:9600",
+    "id": "7565df20-c3aa-4261-81d5-3b0ab8d15c16",
+    "name": "Shaunaks-MBP-2",
+    "pipelines": {
+        "test": {
+            "workers": 1,
+            "batch_size": 1,
+            "batch_delay": 50,
+            "config_reload_automatic": false,
+            "config_reload_interval": 3000000000,
+            "dead_letter_queue_enabled": false
+        },
+        "another_test": {
+            "workers": 8,
+            "batch_size": 125,
+            "batch_delay": 50,
+            "config_reload_automatic": false,
+            "config_reload_interval": 3000000000,
+            "dead_letter_queue_enabled": false
+        }
+    }
+}
