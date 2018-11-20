@@ -49,6 +49,7 @@ type Reader struct {
 	last         []byte
 	numLines     int
 	truncated    int
+	keepOriginal bool
 	err          error // last seen error
 	state        func(*Reader) (reader.Message, error)
 	message      reader.Message
@@ -76,6 +77,7 @@ func New(
 	r reader.Reader,
 	separator string,
 	maxBytes int,
+	keepOriginal bool,
 	config *Config,
 ) (*Reader, error) {
 	types := map[string]func(match.Matcher) (matcher, error){
@@ -124,6 +126,7 @@ func New(
 		maxBytes:     maxBytes,
 		maxLines:     maxLines,
 		separator:    []byte(separator),
+		keepOriginal: keepOriginal,
 		message:      reader.Message{},
 	}
 	return mlr, nil
@@ -279,6 +282,9 @@ func (mlr *Reader) finalize() reader.Message {
 
 	// Copy message from existing content
 	msg := mlr.message
+	if mlr.keepOriginal {
+		msg.Original = mlr.message.Original
+	}
 
 	mlr.clear()
 	return msg
@@ -324,6 +330,13 @@ func (mlr *Reader) addLine(m reader.Message) {
 		// increase the number of skipped bytes, if cannot add
 		mlr.truncated += len(m.Content)
 
+	}
+
+	if len(m.Original) > 0 {
+		if len(mlr.message.Original) > 0 {
+			mlr.message.Original = append(mlr.message.Original, mlr.separator...)
+		}
+		mlr.message.Original = append(mlr.message.Original, m.Original...)
 	}
 
 	mlr.last = m.Content

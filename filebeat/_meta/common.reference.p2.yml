@@ -107,6 +107,9 @@ filebeat.inputs:
   # be used.
   #json.add_error_key: false
 
+  # Keep the original unparsed line under log.original field.
+  #json.keep_original_message: false
+
   ### Multiline options
 
   # Multiline can be used for log messages spanning multiple lines. This is common
@@ -354,6 +357,9 @@ filebeat.inputs:
 
   # Combine partial lines flagged by `json-file` format
   #combine_partials: true
+
+  # Keep the original unparsed line under log.original field.
+  #keep_original_message: false
 
   # Use this to read from all containers, replace * with a container id to read from one:
   #containers:

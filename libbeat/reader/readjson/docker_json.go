@@ -44,6 +44,9 @@ type DockerJSONReader struct {
 	// parse CRI flags
 	criflags bool
 
+	// keep original messages
+	keepOriginal bool
+
 	stripNewLine func(msg *reader.Message)
 }
 
@@ -56,13 +59,14 @@ type logLine struct {
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool, forceCRI bool, CRIFlags bool) *DockerJSONReader {
+func New(r reader.Reader, stream string, partial, forceCRI, CRIFlags, keepOriginal bool) *DockerJSONReader {
 	reader := DockerJSONReader{
-		stream:   stream,
-		partial:  partial,
-		reader:   r,
-		forceCRI: forceCRI,
-		criflags: CRIFlags,
+		stream:       stream,
+		partial:      partial,
+		reader:       r,
+		forceCRI:     forceCRI,
+		criflags:     CRIFlags,
+		keepOriginal: keepOriginal,
 	}
 
 	if runtime.GOOS == "windows" {
@@ -176,6 +180,8 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			return message, err
 		}
 
+		original := message.Content
+
 		var logLine logLine
 		err = p.parseLine(&message, &logLine)
 		if err != nil {
@@ -188,12 +194,19 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			if err != nil {
 				return message, err
 			}
+
+			original = append(original, message.Content...)
+
 			err = p.parseLine(&next, &logLine)
 			if err != nil {
 				return message, err
 			}
 			message.Content = append(message.Content, next.Content...)
 			message.Bytes += next.Bytes
+		}
+
+		if p.keepOriginal {
+			message.Original = original
 		}
 
 		if p.stream != "all" && p.stream != logLine.Stream {

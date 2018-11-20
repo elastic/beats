@@ -100,6 +100,10 @@ func (r *JSONReader) Next() (reader.Message, error) {
 		return message, err
 	}
 
+	if r.cfg.KeepOriginal {
+		message.Original = message.Content
+	}
+
 	var fields common.MapStr
 	message.Content, fields = r.decode(message.Content)
 	message.AddFields(common.MapStr{"json": fields})

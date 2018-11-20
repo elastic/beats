@@ -26,10 +26,11 @@ import (
 // Message represents a reader event with timestamp, content and actual number
 // of bytes read from input before decoding.
 type Message struct {
-	Ts      time.Time     // timestamp the content was read
-	Content []byte        // actual content read
-	Bytes   int           // total number of bytes read to generate the message
-	Fields  common.MapStr // optional fields that can be added by reader
+	Ts       time.Time     // timestamp the content was read
+	Content  []byte        // actual content read
+	Original []byte        // unparsed content
+	Bytes    int           // total number of bytes read to generate the message
+	Fields   common.MapStr // optional fields that can be added by reader
 }
 
 // IsEmpty returns true in case the message is empty

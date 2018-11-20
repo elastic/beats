@@ -18,7 +18,8 @@
 package docker
 
 var defaultConfig = config{
-	Partial: true,
+	Partial:      true,
+	KeepOriginal: false,
 	Containers: containers{
 		IDs:    []string{},
 		Path:   "/var/lib/docker/containers",
@@ -37,6 +38,9 @@ type config struct {
 
 	// Fore CRI format (don't perform autodetection)
 	CRIForce bool `config:"cri.force"`
+
+	// Keep original raw message
+	KeepOriginal bool `config:"keep_original_message"`
 }
 
 type containers struct {

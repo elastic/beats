@@ -314,6 +314,9 @@ func (h *Harvester) Run() error {
 					},
 				},
 			}
+			if len(message.Original) > 0 {
+				fields.Put("log.original", string(message.Original))
+			}
 			fields.DeepUpdate(message.Fields)
 
 			// Check if json fields exist
@@ -550,6 +553,7 @@ func (h *Harvester) cleanup() {
 func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	var r reader.Reader
 	var err error
+	keepOriginalDocker, keepOriginalJSON := false, false
 
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
@@ -571,17 +575,25 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.ForceCRI, h.config.DockerJSON.CRIFlags)
+		keepOriginalDocker = h.config.DockerJSON.KeepOriginal
+		r = readjson.New(r,
+			h.config.DockerJSON.Stream,
+			h.config.DockerJSON.Partial,
+			h.config.DockerJSON.ForceCRI,
+			h.config.DockerJSON.CRIFlags,
+			h.config.DockerJSON.KeepOriginal)
 	}
 
 	if h.config.JSON != nil {
+		keepOriginalJSON = h.config.JSON.KeepOriginal
 		r = readjson.NewJSONReader(r, h.config.JSON)
 	}
 
 	r = readfile.NewStripNewline(r)
 
 	if h.config.Multiline != nil {
-		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)
+		keepOriginalEnabled := keepOriginalDocker || keepOriginalJSON
+		r, err = multiline.New(r, "\n", h.config.MaxBytes, keepOriginalEnabled, h.config.Multiline)
 		if err != nil {
 			return nil, err
 		}

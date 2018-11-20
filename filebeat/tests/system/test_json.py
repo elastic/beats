@@ -410,3 +410,61 @@ class Test(BaseTest):
         output = self.read_output()
         assert len(output) == 1
         assert output[0]["status"] == 404
+
+    def test_keep_original(self):
+        """
+        JSON events contain raw version if json.keep_original_message is set
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            json=dict(
+                keys_under_root=True,
+                keep_original_message=True,
+            )
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        self.copy_files(["logs/json_int.log"],
+                        target_dir="log")
+
+        proc = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=2),
+            max_timeout=10)
+        proc.check_kill_and_wait()
+
+        output = self.read_output()
+        assert len(output) == 2
+        assert all("log.original" in o for o in output)
+
+    def test_keep_original_multiline(self):
+        """
+        Multiline JSON events contain raw version if json.keep_original_message is set
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            json=dict(
+                keys_under_root=True,
+                keep_original_message=True,
+                message_key="log_line",
+            ),
+            multiline=True,
+            pattern="^\[",
+            negate="true",
+            match="after",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        self.copy_files(["logs/json_multiline.log"],
+                        target_dir="log")
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=1))
+        proc.check_kill_and_wait()
+
+        output = self.read_output()
+        assert len(output) == 1
+        assert "log.original" in output[0]
+        assert output[0]["log.original"].count("\n") == 2

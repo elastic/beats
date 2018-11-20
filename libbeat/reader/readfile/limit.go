@@ -40,5 +40,10 @@ func (r *LimitReader) Next() (reader.Message, error) {
 		message.Content = message.Content[:r.maxBytes]
 		message.AddFlagsWithKey("log.flags", "truncated")
 	}
+
+	if len(message.Original) > r.maxBytes {
+		message.Original = message.Original[:r.maxBytes]
+	}
+
 	return message, err
 }
