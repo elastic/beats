@@ -681,6 +681,9 @@ func (client *Client) String() string {
 	return "elasticsearch(" + client.Connection.URL + ")"
 }
 
+// Connect connects the client. It runs a GET request against the root URL of
+// the configured host, updates the known Elasticsearch version and calls
+// globally configured handlers.
 func (client *Client) Connect() error {
 	err := client.Connection.Connect()
 	if err != nil {
@@ -696,7 +699,9 @@ func (client *Client) Connect() error {
 	return nil
 }
 
-// Connect connects the client.
+// Connect connects the client. It runs a GET request against the root URL of
+// the configured host, updates the known Elasticsearch version and calls
+// globally configured handlers.
 func (conn *Connection) Connect() error {
 	versionString, err := conn.Ping()
 	if err != nil {
