@@ -43,8 +43,9 @@ class Test(BaseTest):
 
         # Check if template is loaded with settings
         template = es.transport.perform_request('GET', '/_template/mockbeat-9.9.9')
-        # TODO: check content
-        print template
+
+        assert template["mockbeat-9.9.9"]["settings"]["index"]["lifecycle"]["name"] == "beats-default-policy"
+        assert template["mockbeat-9.9.9"]["settings"]["index"]["lifecycle"]["rollover_alias"] == "mockbeat-9.9.9"
 
         # Make sure the correct index + alias was created
         alias = es.transport.perform_request('GET', '/_alias/mockbeat-9.9.9')
