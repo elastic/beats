@@ -123,8 +123,10 @@ class ComposeMixin(object):
 
         container = cls.compose_project().containers(service_names=[service])[0]
         info = container.inspect()
+        portsConfig = info['HostConfig']['PortBindings']
+        if len(portsConfig) == 0:
+            raise Exception("No exposed ports for service %s" % service)
         if port is None:
-            portsConfig = info['HostConfig']['PortBindings']
             port = portsConfig.keys()[0]
 
         return cls._public_host(info, port)
