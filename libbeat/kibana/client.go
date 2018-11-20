@@ -311,7 +311,7 @@ func (client *Client) GetDashboard(id string) (common.MapStr, error) {
 func decodeValue(data common.MapStr, key string) error {
 	v, err := data.GetValue(key)
 	if err != nil {
-		return
+		return err
 	}
 	s := v.(string)
 	var d interface{}
