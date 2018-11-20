@@ -18,3 +18,40 @@
 // +build integration
 
 package pipeline
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/logstash"
+	_ "github.com/elastic/beats/metricbeat/module/logstash/pipeline"
+)
+
+func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "logstash")
+
+	f := mbtest.NewReportingMetricSetV2(t, logstash.GetConfig("pipeline"))
+	events, errs := mbtest.ReportingFetchV2(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("logstash", "pipeline").Fields.StringToPrint())
+}
+
+func TestData(t *testing.T) {
+	compose.EnsureUp(t, "logstash")
+
+	config := logstash.GetConfig("pipeline")
+	f := mbtest.NewReportingMetricSetV2(t, config)
+	err := mbtest.WriteEventsReporterV2(f, t, "")
+	if err != nil {
+		t.Fatal("write", err)
+	}
+}
