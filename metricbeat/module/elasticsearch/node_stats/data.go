@@ -32,6 +32,7 @@ import (
 
 var (
 	schema = s.Schema{
+		"name": c.Str("name"),
 		"jvm": c.Dict("jvm", s.Schema{
 			"mem": c.Dict("mem", s.Schema{
 				"pools": c.Dict("pools", s.Schema{
@@ -103,11 +104,10 @@ var (
 )
 
 type nodesStruct struct {
-	ClusterName string                            `json:"cluster_name"`
-	Nodes       map[string]map[string]interface{} `json:"nodes"`
+	Nodes map[string]map[string]interface{} `json:"nodes"`
 }
 
-func eventsMapping(r mb.ReporterV2, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 
 	nodeData := &nodesStruct{}
 	err := json.Unmarshal(content, nodeData)
@@ -118,7 +118,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	}
 
 	var errs multierror.Errors
-	for name, node := range nodeData.Nodes {
+	for id, node := range nodeData.Nodes {
 		event := mb.Event{}
 
 		event.RootFields = common.MapStr{}
@@ -126,10 +126,11 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		event.ModuleFields = common.MapStr{
 			"node": common.MapStr{
-				"name": name,
+				"id": id,
 			},
 			"cluster": common.MapStr{
-				"name": nodeData.ClusterName,
+				"name": info.ClusterName,
+				"id":   info.ClusterID,
 			},
 		}
 
@@ -139,6 +140,10 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 			r.Event(event)
 			errs = append(errs, event.Error)
 		}
+
+		name, _ := event.MetricSetFields.GetValue("name")
+		event.ModuleFields.Put("node.name", name.(string))
+		event.MetricSetFields.Delete("name")
 
 		r.Event(event)
 	}
