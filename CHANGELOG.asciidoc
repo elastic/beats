@@ -123,6 +123,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Rename `offset` to `log.offset`. {pull}8923[8923]
 - Rename `source_ecs` to `source` in the Filebeat Suricata module. {pull}8983[8983]
 - Remove warnings for deprecated options: "spool_size", "publish_async", "idle_timeout". {pull}9002[9002]
+- Rename many `system.syslog.*` fields to map to ECS. {pull}9135[9135]
 
 *Metricbeat*
 
