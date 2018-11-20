@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 *Metricbeat*
 
 - Fix race condition when enriching events with kubernetes metadata. {issue}9055[9055] {issue}9067[9067]
+- Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
 
 *Packetbeat*
 
