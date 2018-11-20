@@ -34,6 +34,7 @@ import (
 var metricSets = []string{
 	"node",
 	"node_stats",
+	"pipeline",
 }
 
 func TestFetch(t *testing.T) {
