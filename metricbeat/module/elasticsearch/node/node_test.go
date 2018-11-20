@@ -48,7 +48,6 @@ func TestFetch(t *testing.T) {
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json;")
 				w.Write([]byte(response))
-				assert.Equal(t, "/_nodes/_local", r.RequestURI)
 			}))
 			defer server.Close()
 
