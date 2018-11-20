@@ -16,5 +16,5 @@ responds to the triggers defined for the following event sources:
 * https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html[CloudWatch Logs]
 * https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html[Amazon Simple Queue Service (SQS)]
 
-{beatname_uc} is based on the `libbeat` framework. For more information, see the
-{libbeat}/index.html[{libbeat-docs}]. 
+include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]
+
