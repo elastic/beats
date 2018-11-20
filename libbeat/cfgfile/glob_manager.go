@@ -190,8 +190,8 @@ func (g *GlobManager) Disable(name string) error {
 	return errors.Errorf("module %s not found", name)
 }
 
-// DisplayName returns the config file's display name
-func (f *CfgFile) DisplayName() string {
+// String returns the config file's display name
+func (f *CfgFile) String() string {
 	return strings.Replace(f.Name, ".", ":", -1)
 }
 
@@ -213,8 +213,8 @@ func (s byCfgFileDisplayNames) Swap(i, j int) {
 }
 
 func (s byCfgFileDisplayNames) Less(i, j int) bool {
-	namei := s[i].DisplayName()
-	namej := s[j].DisplayName()
+	namei := s[i].String()
+	namej := s[j].String()
 
 	if strings.HasPrefix(namei, namej) {
 		// namei starts with namej, so namei is longer and we want it to come after namej

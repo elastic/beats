@@ -97,7 +97,7 @@ func TestGlobManager(t *testing.T) {
 	assert.Equal(t, disabled[0].Name, "config2")
 	assert.Equal(t, disabled[0].Enabled, false)
 	assert.Equal(t, disabled[1].Name, "config2.alt")
-	assert.Equal(t, disabled[1].DisplayName(), "config2:alt")
+	assert.Equal(t, disabled[1].String(), "config2:alt")
 	assert.Equal(t, disabled[1].Enabled, false)
 
 	// Check correct files layout:

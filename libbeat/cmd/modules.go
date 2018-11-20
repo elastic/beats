@@ -88,12 +88,12 @@ func genListModulesCmd(name, version string, modulesFactory modulesManagerFactor
 
 			fmt.Println("Enabled:")
 			for _, module := range modules.ListEnabled() {
-				fmt.Println(module.DisplayName())
+				fmt.Println(module.String())
 			}
 
 			fmt.Println("\nDisabled:")
 			for _, module := range modules.ListDisabled() {
-				fmt.Println(module.DisplayName())
+				fmt.Println(module.String())
 			}
 		},
 	}
