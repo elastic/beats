@@ -28,14 +28,25 @@ const ModuleName = "logstash"
 // MetricSet can be used to build other metricsets within the Logstash module.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Log *logp.Logger
+	XPack bool
+	Log   *logp.Logger
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
 // within the Logstash module.
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
+	config := struct {
+		XPack bool `config:"xpack.enabled"`
+	}{
+		XPack: false,
+	}
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		base,
+		config.XPack,
 		logp.NewLogger(ModuleName),
 	}, nil
 }

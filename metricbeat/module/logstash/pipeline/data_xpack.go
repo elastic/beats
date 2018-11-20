@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -26,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/logstash"
 )
@@ -36,18 +38,12 @@ var (
 		"hash":         c.Str("hash", s.Optional),         // TODO: Remove optional once [1] is resolved
 		"batch_size":   c.Int("batch_size"),
 		"workers":      c.Int("workers"),
-		// "representation": c.Dict("representation", s.Schema{ // xpack only?
-		// "type": c.Str("type"),
-		// "hash": c.Str("hash"),
-		// "version": c.Str("version"),
-		// "graph":
-		//}),
 	}
 )
 
 // [1] https://github.com/elastic/logstash/issues/10119
 
-func eventMappingXPack(r mb.ReporterV2, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	event := mb.Event{}
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", logstash.ModuleName)
@@ -71,7 +67,16 @@ func eventMappingXPack(r mb.ReporterV2, content []byte) error {
 
 		fields.Put("id", pipelineID)
 
-		event.MetricSetFields = fields
+		// TODO: call individual pipeline API? and add representation field once [1] is resolved
+
+		event.RootFields = common.MapStr{
+			"timestamp":      common.Time(time.Now()),
+			"interval_ms":    m.Module().Config().Period / time.Millisecond,
+			"type":           "logstash_state",
+			"logstash_state": fields,
+		}
+
+		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Logstash)
 		r.Event(event)
 	}
 	return errs.Err()
