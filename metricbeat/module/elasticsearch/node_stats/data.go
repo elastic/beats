@@ -19,6 +19,9 @@ package node_stats
 
 import (
 	"encoding/json"
+	"fmt"
+
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -139,10 +142,25 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 			event.Error = errors.Wrap(err, "failure to apply node schema")
 			r.Event(event)
 			errs = append(errs, event.Error)
+			continue
 		}
 
-		name, _ := event.MetricSetFields.GetValue("name")
-		event.ModuleFields.Put("node.name", name.(string))
+		name, err := event.MetricSetFields.GetValue("name")
+		if err != nil {
+			event.Error = elastic.MakeErrorForMissingField("name", elastic.Elasticsearch)
+			r.Event(event)
+			errs = append(errs, event.Error)
+			continue
+		}
+
+		nameStr, ok := name.(string)
+		if !ok {
+			event.Error = fmt.Errorf("name is not a string")
+			r.Event(event)
+			errs = append(errs, event.Error)
+			continue
+		}
+		event.ModuleFields.Put("node.name", nameStr)
 		event.MetricSetFields.Delete("name")
 
 		r.Event(event)
