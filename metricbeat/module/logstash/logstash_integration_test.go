@@ -17,7 +17,7 @@
 
 // +build integration
 
-package node
+package logstash_test
 
 import (
 	"testing"
@@ -27,30 +27,41 @@ import (
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/logstash"
+	_ "github.com/elastic/beats/metricbeat/module/logstash/node"
+	_ "github.com/elastic/beats/metricbeat/module/logstash/node_stats"
 )
+
+var metricSets = []string{
+	"node",
+	"node_stats",
+}
 
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "logstash")
 
-	f := mbtest.NewReportingMetricSetV2(t, logstash.GetConfig("node"))
-	events, errs := mbtest.ReportingFetchV2(f)
+	for _, metricSet := range metricSets {
+		f := mbtest.NewReportingMetricSetV2(t, logstash.GetConfig(metricSet))
+		events, errs := mbtest.ReportingFetchV2(f)
 
-	assert.Empty(t, errs)
-	if !assert.NotEmpty(t, events) {
-		t.FailNow()
+		assert.Empty(t, errs)
+		if !assert.NotEmpty(t, events) {
+			t.FailNow()
+		}
+
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+			events[0].BeatEvent("logstash", metricSet).Fields.StringToPrint())
 	}
-
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-		events[0].BeatEvent("logstash", "node").Fields.StringToPrint())
 }
 
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "logstash")
 
-	config := logstash.GetConfig("node")
-	f := mbtest.NewReportingMetricSetV2(t, config)
-	err := mbtest.WriteEventsReporterV2(f, t, "")
-	if err != nil {
-		t.Fatal("write", err)
+	for _, metricSet := range metricSets {
+		config := logstash.GetConfig(metricSet)
+		f := mbtest.NewReportingMetricSetV2(t, config)
+		err := mbtest.WriteEventsReporterV2(f, t, metricSet)
+		if err != nil {
+			t.Fatal("write", err)
+		}
 	}
 }
