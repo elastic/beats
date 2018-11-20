@@ -6024,9 +6024,26 @@ If process locked in memory.
 --
 
 [float]
-== node.stats fields
+== node fields
 
-node_stats
+Node
+
+
+
+*`elasticsearch.node.id`*::
++
+--
+type: keyword
+
+Node ID
+
+
+--
+
+[float]
+== stats fields
+
+Node stats
 
 
 
