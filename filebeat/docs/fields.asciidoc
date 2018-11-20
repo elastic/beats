@@ -4958,6 +4958,18 @@ type: keyword
 
 --
 
+*`http.request.referrer`*::
++
+--
+type: keyword
+
+example: https://blog.example.com/
+
+Referrer for this HTTP request.
+
+
+--
+
 *`event.dataset`*::
 +
 --
