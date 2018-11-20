@@ -67,3 +67,4 @@ The list below covers the major changes between 6.3.0 and master only.
 - Add `mage.AddPlatforms` to allow to specify dependent platforms when building a beat. {pull}8889[8889]
 - Add `cfgwarn.CheckRemoved6xSetting(s)` to display a warning for options removed in 7.0. {pull}8909[8909]
 - Add docker image building to `mage.Package`. {pull}8898[8898]
+- Simplified exporting of dashboards. {pull}7730[7730]
