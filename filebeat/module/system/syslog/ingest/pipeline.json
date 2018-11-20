@@ -37,6 +37,11 @@
                 {< if .convert_timezone >}"timezone": "{{ beat.timezone }}",{< end >}
                 "ignore_failure": true
             }
+        },
+        {
+            "remove": {
+                "field": "system.syslog.timestamp"
+            }
         }
     ],
     "on_failure" : [{
