@@ -215,25 +215,6 @@ https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for mor
 
 Alternatively, if the scripts above are not available, you can use your Beat binary to export Kibana 6.0 dashboards or later.
 
-/////////////////////
-NOT YET IMPLEMENTED
-NOTE: You can make use of the Makefile from the Beat GitHub repository to export all the Kibana dashboards for a Beat
-from your Elasticsearch. If Elasticsearch is running on localhost, then you just need to run the following command from the Beat repository:
-
-[source,shell]
------------------------------
-make export-dashboards
------------------------------
-
-If Elasticsearch is running on a different host, then you can use the `ES_URL` variable:
-
-[source,shell]
-----------------------------
-ES_URL="http://192.168.3.206:9200" make export-dashboards
-----------------------------
-
-/////////////////////
-
 ==== Exporting Kibana 6.0 dashboards and newer
 
 The `dev-tools/cmd/export_dashboards.go` script helps you export your customized Kibana 6.0 dashboards and newer. You might need to export a single dashboard or all the dashboards available for a module or Beat.
