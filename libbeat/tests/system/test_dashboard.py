@@ -136,6 +136,9 @@ class Test(BaseTest):
             logging_args=["-e", "-d", "*"],
             extra_args=["export",
                         "dashboard",
+                        "-E", "setup.kibana.protocol=http",
+                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
+                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
                         "-id", "Metricbeat-system-overview"]
         )
 
@@ -157,6 +160,9 @@ class Test(BaseTest):
             logging_args=["-e", "-d", "*"],
             extra_args=["export",
                         "dashboard",
+                        "-E", "setup.kibana.protocol=http",
+                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
+                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
                         "-yml", os.path.join(self.beat_path, "tests", "files", "dashboards.yml")]
         )
 
