@@ -19,7 +19,7 @@
             }
         }
     },
-    "agent": {
+    "beat": {
         "name": "host.example.com",
         "hostname": "host.example.com"
     }
