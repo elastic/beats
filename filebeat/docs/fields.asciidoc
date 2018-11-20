@@ -4857,30 +4857,6 @@ Full original url. The field is stored as keyword.
 
 --
 
-*`group.id`*::
-+
---
-type: keyword
-
-required: False
-
-ID of the group.
-
-
---
-
-*`group.name`*::
-+
---
-type: keyword
-
-required: False
-
-Name of the group.
-
-
---
-
 *`event.dataset`*::
 +
 --
@@ -5873,6 +5849,30 @@ Module for parsing system log files.
 +
 --
 type: keyword
+
+--
+
+*`group.id`*::
++
+--
+type: keyword
+
+required: False
+
+ID of the group.
+
+
+--
+
+*`group.name`*::
++
+--
+type: keyword
+
+required: False
+
+Name of the group.
+
 
 --
 
