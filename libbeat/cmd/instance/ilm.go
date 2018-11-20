@@ -36,7 +36,6 @@ type ilmConfig struct {
 
 var ILMPolicy = common.MapStr{
 	"policy": common.MapStr{
-		"type": "timeseries",
 		"phases": common.MapStr{
 			"hot": common.MapStr{
 				"actions": common.MapStr{
@@ -110,7 +109,7 @@ func (b *Beat) loadILMPolicy() error {
 		return err
 	}
 
-	_, _, err = esClient.Request("PUT", "/_ilm/"+ILMPolicyName, "", nil, ILMPolicy)
+	_, _, err = esClient.Request("PUT", "/_ilm/policy/"+ILMPolicyName, "", nil, ILMPolicy)
 	return err
 }
 

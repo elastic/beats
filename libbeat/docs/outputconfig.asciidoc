@@ -93,14 +93,12 @@ For more information about securing {beatname_uc}, see
 <<securing-{beatname_lc}>>.
 
 
-To configure the Elasticsearch with index lifecycle management feature configure it as following:
-
-// TODO: Add link to ILM in Elasticsearch
+To configure the Elasticsearch output with https://www.elastic.co/guide/en/elasticsearch/reference/6.x/getting-started-index-lifecycle-management.html[index lifecycle management] feature configure it as following:
 
 [source,yaml]
 ------------------------------------------------------------------------------
 output.elasticsearch:
-  hosts: ["localhost"]
+  hosts: ["localhost:9200"]
   ilm.enabled: true
 ------------------------------------------------------------------------------
 
@@ -129,7 +127,7 @@ Note: If you modify the rollover_alias or the pattern you have to overwrite the 
 To load the default policy you can run `{beatname_lc} setup --ilm-policy`. It will load the default policy
 directly into Elasticsearch. If you want to modify the default policy and load it manually in Elasticsearch, you
 can run `{beatname_lc} export ilm-policy` which will print the policy to stdout. You can modify it and then upload
-it to Elasticsearch. Alternative you can load the default policy and modify it in Kibana.
+it to Elasticsearch. Alternative you can load the default policy and modify it in the Kibana ILM policy editor.
 
 // TOOD: Add links to Kibana ILM docs
 
