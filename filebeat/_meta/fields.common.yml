@@ -114,6 +114,17 @@
       description: >
         Full original url. The field is stored as keyword.
       example: https://blog.example.com/
+    - name: group.id
+      type: keyword
+      required: false
+      description: >
+        ID of the group.
+
+    - name: group.name
+      type: keyword
+      required: false
+      description: >
+        Name of the group.
 
   # Temporary fix to get 7.0 dashboards working
     - name: fileset.name
