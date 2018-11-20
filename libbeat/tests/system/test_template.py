@@ -21,7 +21,7 @@ class Test(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified.") is True
+            "setup.template.name and setup.template.pattern have to be set if index name is modified") is True
 
     def test_index_not_modified(self):
         """
@@ -48,7 +48,7 @@ class Test(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified.") is True
+            "setup.template.name and setup.template.pattern have to be set if index name is modified") is True
 
     def test_index_modified_no_name(self):
         """
@@ -63,7 +63,7 @@ class Test(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified.") is True
+            "setup.template.name and setup.template.pattern have to be set if index name is modified") is True
 
     def test_index_with_pattern_name(self):
         """
