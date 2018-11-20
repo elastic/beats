@@ -35,6 +35,7 @@ func TestDockerJSON(t *testing.T) {
 		partial         bool
 		forceCRI        bool
 		criflags        bool
+		keepOriginal    bool
 		expectedError   bool
 		expectedMessage reader.Message
 	}{
@@ -78,12 +79,14 @@ func TestDockerJSON(t *testing.T) {
 			input:  [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
 			stream: "all",
 			expectedMessage: reader.Message{
-				Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
-				Fields:  common.MapStr{"stream": "stdout"},
-				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
-				Bytes:   115,
+				Content:  []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
+				Original: []byte("2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
+				Fields:   common.MapStr{"stream": "stdout"},
+				Ts:       time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
+				Bytes:    115,
 			},
-			criflags: false,
+			criflags:     false,
+			keepOriginal: true,
 		},
 		{
 			name:   "CRI log",
@@ -152,12 +155,14 @@ func TestDockerJSON(t *testing.T) {
 			stream:  "stdout",
 			partial: true,
 			expectedMessage: reader.Message{
-				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
-				Fields:  common.MapStr{"stream": "stdout"},
-				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
-				Bytes:   163,
+				Content:  []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
+				Original: []byte("2017-10-12T13:32:21.232861448Z stdout P 2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache\n2017-11-12T23:32:21.212771448Z stdout F  error"),
+				Fields:   common.MapStr{"stream": "stdout"},
+				Ts:       time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
+				Bytes:    163,
 			},
-			criflags: true,
+			criflags:     true,
+			keepOriginal: true,
 		},
 		{
 			name: "Split lines and remove \\n",
@@ -262,7 +267,7 @@ func TestDockerJSON(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			r := &mockReader{messages: test.input}
-			json := New(r, test.stream, test.partial, test.forceCRI, test.criflags)
+			json := New(r, test.stream, test.partial, test.forceCRI, test.criflags, test.keepOriginal)
 			message, err := json.Next()
 
 			if test.expectedError {

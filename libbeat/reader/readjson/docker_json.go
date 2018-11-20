@@ -195,7 +195,8 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 				return message, err
 			}
 
-			original = append(original, message.Content...)
+			original = append(original, []byte("\n")...)
+			original = append(original, next.Content...)
 
 			err = p.parseLine(&next, &logLine)
 			if err != nil {
