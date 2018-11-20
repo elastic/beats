@@ -51,7 +51,7 @@ var ILMPolicy = common.MapStr{
 
 const (
 	ILMPolicyName     = "beats-default-policy"
-	ILMDefaultPattern = "00001"
+	ILMDefaultPattern = "000001"
 )
 
 // Build and return a callback to load ILM write alias

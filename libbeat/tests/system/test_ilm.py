@@ -48,7 +48,7 @@ class Test(BaseTest):
 
         # Make sure the correct index + alias was created
         alias = es.transport.perform_request('GET', '/_alias/mockbeat-9.9.9')
-        assert "mockbeat-9.9.9-0001" in alias
+        assert "mockbeat-9.9.9-000001" in alias
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')

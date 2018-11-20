@@ -33,6 +33,7 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("metricbeat start running."))
         self.wait_until(lambda: self.log_contains("Overwriting setup.template for ILM"))
+        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
         es = Elasticsearch([self.get_elasticsearch_url()])
@@ -41,11 +42,12 @@ class Test(BaseTest):
 
         # Check if template is loaded with settings
         template = es.transport.perform_request('GET', '/_template/metricbeat-7.0.0-alpha1')
+        # TODO: check content of template if alias inside
 
         # Make sure the correct index + alias was created
         alias = es.transport.perform_request('GET', '/_alias/metricbeat-7.0.0-alpha1')
-        assert "metricbeat-7.0.0-alpha1-0001" in alias
+        assert "metricbeat-7.0.0-alpha1-000001" in alias
 
         # Asserts that data is actually written to the ILM indices
-        data = es.transport.perform_request('GET', '/metricbeat-7.0.0-alpha1-0001/_search')
+        data = es.transport.perform_request('GET', '/metricbeat-7.0.0-alpha1-000001/_search')
         assert data["hits"]["total"] > 0

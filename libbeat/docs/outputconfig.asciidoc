@@ -109,7 +109,7 @@ Note: This feature only works with X-Pack Basic.
 
 The default `rollover_alias` used is `{beatname_lc}-{beat.version}`. It's not possible to remove the `{beat.version}`
 from the rollover_alias name but the prefix part can be adjusted. This will also directly affect the name of the
-rollover indices. The default pattern used for the rollover index is `00001`. It can be adjusted with the
+rollover indices. The default pattern used for the rollover index is `000001`. It can be adjusted with the
 `ilm.pattern` config. See config below for an example:
 
 [source,yaml]
@@ -118,7 +118,7 @@ output.elasticsearch:
   hosts: ["localhost"]
   ilm.enabled: true
   ilm.rollover_alias: "metricbeat"
-  ilm.pattern: "00001"
+  ilm.pattern: "000001"
 ------------------------------------------------------------------------------
 
 Note: If you modify the rollover_alias or the pattern you have to overwrite the index template again as the settings

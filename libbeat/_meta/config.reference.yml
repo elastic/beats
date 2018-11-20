@@ -248,7 +248,7 @@ output.elasticsearch:
   # Enabled ilm to use index lifecycle management instead daily indices.
   #ilm.enabled: false
   #ilm.rollover_alias: "beat-index-prefix"
-  #ilm.pattern: "00001"
+  #ilm.pattern: "000001"
 
   # Set gzip compression level.
   #compression_level: 0
