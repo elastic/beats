@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"syscall"
 	"time"
@@ -24,7 +25,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/auditbeat/cache"
 )
 
 const (
@@ -32,11 +32,10 @@ const (
 	metricsetName = "login"
 
 	bucketName           = "auditbeat.login.v1"
-	bucketKeyFileRecords = "login_records"
+	bucketKeyFileRecords = "file_records"
+	bucketKeyTTYLookup   = "tty_lookup"
 
 	eventTypeEvent = "event"
-
-	eventActionLogin = "login"
 )
 
 type FileRecord struct {
@@ -55,12 +54,11 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	config      Config
-	osFamily    string
-	cache       *cache.Cache
 	bucket      datastore.Bucket
 	log         *logp.Logger
 	paths       []string
 	fileRecords map[uint64]FileRecord
+	ttyLookup   map[string]*LoginRecord
 }
 
 // New constructs a new MetricSet.
@@ -72,11 +70,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
 	}
 
-	paths, err := filepath.Glob(config.WtmpFilePattern)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to expand file pattern")
-	}
-
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open persistent datastore")
@@ -86,17 +79,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		config:        config,
 		log:           logp.NewLogger(metricsetName),
-		paths:         paths,
 		bucket:        bucket,
 		fileRecords:   make(map[uint64]FileRecord),
+		ttyLookup:     make(map[string]*LoginRecord),
 	}
 
-	// Load file records from disk
-	err = ms.restoreFileRecordsFromDisk()
+	ms.paths, err = filepath.Glob(config.WtmpFilePattern)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to restore file records from disk")
+		return nil, errors.Wrap(err, "failed to expand file pattern")
 	}
-	ms.log.Debugf("Restored %d file records from disk", len(ms.fileRecords))
+	// Sort paths in reverse order (oldest/most-rotated file first)
+	sort.Sort(sort.Reverse(sort.StringSlice(ms.paths)))
+	ms.log.Debugf("Reading files: %v", ms.paths)
+
+	// Load state (file records, tty mapping) from disk
+	err = ms.restoreStateFromDisk()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to restore state from disk")
+	}
 
 	return ms, nil
 }
@@ -141,7 +141,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 		fileRecord, isKnownFile := ms.fileRecords[stats.Ino]
 		if !isKnownFile || fileRecord.LastCtime.Before(ctime) {
-			loginRecords, err := ReadUtmpFile(path)
+			loginRecords, err := ReadUtmpFile(ms.log, path)
 			if err != nil {
 				ms.log.Error(err)
 				report.Error(err)
@@ -154,6 +154,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 			reachedNewRecords := !isKnownFile
 			for _, loginRecord := range loginRecords {
 				if reachedNewRecords {
+					ms.processLoginRecord(&loginRecord)
 					newRecords = append(newRecords, loginRecord)
 				}
 
@@ -185,13 +186,43 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 	// Save latest read records to disk
 	if len(newRecords) > 0 {
-		err := ms.saveFileRecordsToDisk()
+		err := ms.saveStateToDisk()
 		if err != nil {
 			ms.log.Error(err)
 			report.Error(err)
 			return
 		}
 	}
+}
+
+func (ms *MetricSet) processLoginRecord(record *LoginRecord) {
+	switch record.Type {
+	case UserLogin:
+		// Store TTY from user login record for enrichment when user logout
+		// record comes along (which, alas, does not contain the username).
+		ms.ttyLookup[record.TTY] = record
+	case UserLogout:
+		savedRecord, found := ms.ttyLookup[record.TTY]
+		if found {
+			record.Username = savedRecord.Username
+		} else {
+			ms.log.Debugf("No matching login record found for logout on %v", record.TTY)
+		}
+	}
+}
+
+func (ms *MetricSet) saveStateToDisk() error {
+	err := ms.saveFileRecordsToDisk()
+	if err != nil {
+		return err
+	}
+
+	err = ms.saveTTYLookupToDisk()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (ms *MetricSet) saveFileRecordsToDisk() error {
@@ -211,6 +242,40 @@ func (ms *MetricSet) saveFileRecordsToDisk() error {
 	}
 
 	ms.log.Debugf("Wrote %d file records to disk", len(ms.fileRecords))
+	return nil
+}
+
+func (ms *MetricSet) saveTTYLookupToDisk() error {
+	var buf bytes.Buffer
+	encoder := gob.NewEncoder(&buf)
+
+	for _, loginRecord := range ms.ttyLookup {
+		err := encoder.Encode(*loginRecord)
+		if err != nil {
+			return errors.Wrap(err, "error encoding login record")
+		}
+	}
+
+	err := ms.bucket.Store(bucketKeyTTYLookup, buf.Bytes())
+	if err != nil {
+		return errors.Wrap(err, "error writing login records to disk")
+	}
+
+	ms.log.Debugf("Wrote %d open login records to disk", len(ms.ttyLookup))
+	return nil
+}
+
+func (ms *MetricSet) restoreStateFromDisk() error {
+	err := ms.restoreFileRecordsFromDisk()
+	if err != nil {
+		return err
+	}
+
+	err = ms.restoreTTYLookupFromDisk()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -241,6 +306,39 @@ func (ms *MetricSet) restoreFileRecordsFromDisk() error {
 			}
 		}
 	}
+	ms.log.Debugf("Restored %d file records from disk", len(ms.fileRecords))
+
+	return nil
+}
+
+func (ms *MetricSet) restoreTTYLookupFromDisk() error {
+	var decoder *gob.Decoder
+	err := ms.bucket.Load(bucketKeyTTYLookup, func(blob []byte) error {
+		if len(blob) > 0 {
+			buf := bytes.NewBuffer(blob)
+			decoder = gob.NewDecoder(buf)
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	if decoder != nil {
+		for {
+			loginRecord := new(LoginRecord)
+			err = decoder.Decode(loginRecord)
+			if err == nil {
+				ms.ttyLookup[loginRecord.TTY] = loginRecord
+			} else if err == io.EOF {
+				// Read all
+				break
+			} else {
+				return errors.Wrap(err, "error decoding login record")
+			}
+		}
+	}
+	ms.log.Debugf("Restored %d open login records from disk", len(ms.ttyLookup))
 
 	return nil
 }
@@ -250,7 +348,7 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"type":   eventTypeEvent,
-				"action": eventActionLogin,
+				"action": loginRecord.Type.String(),
 			},
 		},
 		MetricSetFields: loginRecord.toMapStr(),
