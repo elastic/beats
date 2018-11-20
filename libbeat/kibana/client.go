@@ -254,6 +254,8 @@ func (client *Client) readVersion() error {
 	return nil
 }
 
+// GetVersion returns the version read from kibana. The version is not set if
+// IgnoreVersion was set when creating the client.
 func (client *Client) GetVersion() common.Version { return client.version }
 
 func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[string]interface{}) error {

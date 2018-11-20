@@ -69,6 +69,7 @@ func NewVersion(version string) (*Version, error) {
 	return &v, nil
 }
 
+// IsValid returns true if the version object stores a successfully parsed version number.
 func (v *Version) IsValid() bool {
 	return v.version != ""
 }

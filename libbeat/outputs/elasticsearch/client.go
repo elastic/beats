@@ -640,7 +640,7 @@ func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte
 	return body, nil
 }
 
-// GetVersion returns the elasticsearch version the client is connected to
+// GetVersion returns the elasticsearch version the client is connected to.
 func (client *Client) GetVersion() common.Version {
 	return client.Connection.version
 }
@@ -836,6 +836,8 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	return status, obj, err
 }
 
+// GetVersion returns the elasticsearch version the client is connected to.
+// The version is read and updated on 'Connect'.
 func (conn *Connection) GetVersion() common.Version {
 	return conn.version
 }
