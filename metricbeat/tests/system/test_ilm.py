@@ -3,14 +3,14 @@ import os
 from elasticsearch import Elasticsearch, TransportError
 from nose.plugins.attrib import attr
 import unittest
-import time
+import re
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 
 class Test(BaseTest):
 
-    COMPOSE_SERVICES = ['elasticsearch']
+    #COMPOSE_SERVICES = ['elasticsearch']
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -39,12 +39,13 @@ class Test(BaseTest):
 
         es = Elasticsearch([self.get_elasticsearch_url()])
 
-        # TODO: Get Version of metricbeat to fetch right indices / aliases
-        beat_name = "metricbeat-7.0.0-alpha1"
+        # Extracts metricbeat version from log to make it cross version compatible
+        log = self.get_log()
+        r = re.findall('"version": "(.*)"', log)
+        beat_name = "metricbeat-" + r[0]
 
         # Check if template is loaded with settings
         template = es.transport.perform_request('GET', '/_template/' + beat_name)
-        # TODO: check content of template if alias inside
         assert template[beat_name]["settings"]["index"]["lifecycle"]["name"] == "beats-default-policy"
         assert template[beat_name]["settings"]["index"]["lifecycle"]["rollover_alias"] == beat_name
 
