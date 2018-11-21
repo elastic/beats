@@ -38,6 +38,7 @@ type CPUStats struct {
 	SystemUsagePercentage       float64
 }
 
+// CPUService is a helper to collect docker CPU metrics
 type CPUService struct {
 	Cores bool
 }
