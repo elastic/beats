@@ -40,7 +40,7 @@ func TestFetch(t *testing.T) {
 	if errs != nil {
 		t.Fatal("fetch", errs)
 	}
-	_, err := events[0].MetricSetFields.HasKey("local.port")
+	_, err := events[0].MetricSetFields.HasKey("destination.port")
 	assert.NoError(t, err)
 
 	ln, err := net.Listen("tcp", ":0")
@@ -64,35 +64,35 @@ func TestFetch(t *testing.T) {
 
 	var found bool
 	for _, evt := range events {
-		port, ok := getRequiredValue("socket.local.port", evt, t).(int)
+		port, ok := getRequiredValue("destination.port", evt, t).(int)
 		if !ok {
-			t.Fatal("local.port is not an int")
+			t.Fatal("destination.port is not an int")
 		}
 		if port != listenerPort {
 			continue
 		}
 
-		pid, ok := getRequiredValue("socket.process.pid", evt, t).(int)
+		pid, ok := getRequiredValue("process.pid", evt, t).(int)
 		if !ok {
-			t.Fatal("process.pid is not a int")
+			t.Fatal("process.pid is not an int")
 		}
 		assert.Equal(t, os.Getpid(), pid)
 
-		processName, ok := getRequiredValue("socket.process.name", evt, t).(string)
+		processName, ok := getRequiredValue("process.name", evt, t).(string)
 		if !ok {
 			t.Fatal("process.name is not a string")
 		}
-		assert.Equal(t, "sockets.test", processName)
+		assert.Equal(t, "socket.test", processName)
 
-		uid, ok := getRequiredValue("socket.user.id", evt, t).(uint32)
+		uid, ok := getRequiredValue("user.uid", evt, t).(uint32)
 		if !ok {
-			t.Fatal("user.id is not an uint32")
+			t.Fatal("user.uid is not a uint32")
 		}
 		assert.EqualValues(t, os.Geteuid(), uid)
 
-		dir, ok := getRequiredValue("socket.direction", evt, t).(string)
+		dir, ok := getRequiredValue("network.direction", evt, t).(string)
 		if !ok {
-			t.Fatal("direction is not a string")
+			t.Fatal("network.direction is not a string")
 		}
 		assert.Equal(t, "listening", dir)
 

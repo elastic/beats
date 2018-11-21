@@ -5,41 +5,42 @@
         "name": "host.example.com"
     },
     "event": {
-        "action": "existing_socket",
+        "action": "socket_opened",
         "dataset": "socket",
-        "id": "73fe1375-fc81-4238-a6a4-b1b0de968677",
         "module": "system",
-        "type": "state"
+        "type": "event"
     },
     "process": {
-        "name": "systemd-resolve",
-        "pid": 29834
+        "name": "lynx",
+        "pid": 12016
     },
     "system": {
         "socket": {
-            "direction": "listening",
-            "family": "ipv4",
-            "local": {
-                "ip": "127.0.0.53",
-                "port": 53
+            "network": {
+                "type": "ipv4",
+                "direction": "outgoing"
+            },
+            "state": "CLOSE-WAIT",
+            "user": {
+                "uid": 1000,
+                "name": "vagrant"
+            },
+            "source": {
+                "ip": "10.0.2.15",
+                "port": 56148
+            },
+            "destination": {
+                "ip": "216.58.213.68",
+                "port": 80
             },
             "process": {
-                "name": "systemd-resolve",
-                "pid": 29834
-            },
-            "remote": {
-                "ip": "0.0.0.0",
-                "port": 0
-            },
-            "state": "LISTEN",
-            "user": {
-                "name": "systemd Resolver",
-                "uid": 101
+                "pid": 12016,
+                "name": "lynx"
             }
         }
     },
     "user": {
-        "id": 101,
-        "name": "systemd Resolver"
+        "id": 1000,
+        "name": "vagrant"
     }
 }

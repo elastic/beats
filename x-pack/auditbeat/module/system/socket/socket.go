@@ -110,20 +110,40 @@ func (s Socket) Hash() uint64 {
 
 func (s Socket) toMapStr() common.MapStr {
 	evt := common.MapStr{
-		"family":    s.Family.String(),
-		"state":     s.State.String(),
-		"direction": s.Direction.String(),
-		"local": common.MapStr{
-			"ip":   s.LocalIP,
-			"port": s.LocalPort,
+		"network": common.MapStr{
+			"type":      s.Family.String(),
+			"direction": s.Direction.String(),
 		},
-		"remote": common.MapStr{
-			"ip":   s.RemoteIP,
-			"port": s.RemotePort,
-		},
+		"state": s.State.String(),
 		"user": common.MapStr{
 			"uid": s.UID,
 		},
+	}
+
+	switch s.Direction {
+	case sock.Outgoing:
+		evt.Put("source", common.MapStr{
+			"ip":   s.LocalIP,
+			"port": s.LocalPort,
+		})
+		evt.Put("destination", common.MapStr{
+			"ip":   s.RemoteIP,
+			"port": s.RemotePort,
+		})
+	case sock.Incoming:
+		evt.Put("source", common.MapStr{
+			"ip":   s.RemoteIP,
+			"port": s.RemotePort,
+		})
+		evt.Put("destination", common.MapStr{
+			"ip":   s.LocalIP,
+			"port": s.LocalPort,
+		})
+	case sock.Listening:
+		evt.Put("destination", common.MapStr{
+			"ip":   s.LocalIP,
+			"port": s.LocalPort,
+		})
 	}
 
 	if s.Username != "" {
