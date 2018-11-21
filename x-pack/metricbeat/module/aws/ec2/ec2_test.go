@@ -18,15 +18,27 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-type mockEC2Client struct {
+type MockEC2Client struct {
 	ec2iface.EC2API
 }
 
-type mockCloudWatchClient struct {
+type MockCloudWatchClient struct {
 	cloudwatchiface.CloudWatchAPI
 }
 
-func (m *mockEC2Client) DescribeInstances(input *ec2.DescribeInstancesInput) (output *ec2.DescribeInstancesOutput, err error) {
+func (m *MockEC2Client) DescribeRegions(input *ec2.DescribeRegionsInput) (output *ec2.DescribeRegionsOutput, err error) {
+	region1 := "us-west-1"
+	output = &ec2.DescribeRegionsOutput{
+		Regions: []*ec2.Region{
+			&ec2.Region{
+				RegionName: &region1,
+			},
+		},
+	}
+	return
+}
+
+func (m *MockEC2Client) DescribeInstances(input *ec2.DescribeInstancesInput) (output *ec2.DescribeInstancesOutput, err error) {
 	instance1 := &ec2.Instance{InstanceId: aws.String("i-123")}
 	instance2 := &ec2.Instance{InstanceId: aws.String("i-456")}
 	output = &ec2.DescribeInstancesOutput{
@@ -42,7 +54,7 @@ func (m *mockEC2Client) DescribeInstances(input *ec2.DescribeInstancesInput) (ou
 	return
 }
 
-func (m *mockCloudWatchClient) GetMetricData(input *cloudwatch.GetMetricDataInput) (output *cloudwatch.GetMetricDataOutput, err error) {
+func (m *MockCloudWatchClient) GetMetricData(input *cloudwatch.GetMetricDataInput) (output *cloudwatch.GetMetricDataOutput, err error) {
 	id := "m1"
 	label := "CPUUtilization"
 	value := 0.25
@@ -58,8 +70,19 @@ func (m *mockCloudWatchClient) GetMetricData(input *cloudwatch.GetMetricDataInpu
 	return
 }
 
+func TestGetRegions(t *testing.T) {
+	mockSvc := &MockEC2Client{}
+	regionsList, err := getRegions(mockSvc)
+	if err != nil {
+		fmt.Println("failed getRegions: ", err)
+		t.FailNow()
+	}
+	assert.Equal(t, 1, len(regionsList))
+	assert.Equal(t, "us-west-1", regionsList[0])
+}
+
 func TestGetInstanceIDs(t *testing.T) {
-	mockSvc := &mockEC2Client{}
+	mockSvc := &MockEC2Client{}
 	instanceIDs, err := getInstancesPerRegion(mockSvc)
 	if err != nil {
 		fmt.Println("failed getInstancesPerRegion: ", err)
@@ -71,7 +94,7 @@ func TestGetInstanceIDs(t *testing.T) {
 }
 
 func TestGetMetricDataPerRegion(t *testing.T) {
-	mockSvc := &mockCloudWatchClient{}
+	mockSvc := &MockCloudWatchClient{}
 	getMetricDataOutput, err := getMetricDataPerRegion("i-123", nil, mockSvc)
 	if err != nil {
 		fmt.Println("failed getMetricDataPerRegion: ", err)
@@ -84,11 +107,10 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	os.Setenv("MFA_TOKEN", "mfa_token")
-	os.Setenv("SERIAL_NUMBER", "serial_number")
-	tempCredentials, err := getTemporaryTokenUsingMFA()
+	mock := true
+	tempCredentials, err := getCredentials(mock)
 	if err != nil {
-		fmt.Println("failed getTemporaryTokenUsingMFA: ", err)
+		fmt.Println("failed getCredentials: ", err)
 		t.FailNow()
 	}
 
@@ -99,10 +121,13 @@ func TestFetch(t *testing.T) {
 		t.FailNow()
 	}
 	t.Logf("Module: %s Metricset: %s", awsMetricSet.Module().Name(), awsMetricSet.Name())
+
+	if mock {
+		assert.Equal(t, 2, len(events))
+	}
+
 	for _, event := range events {
 		checkSpecificMetric("cpu_utilization", event, t)
-		checkSpecificMetric("cpu_credit_usage", event, t)
-		checkSpecificMetric("cpu_credit_balance", event, t)
 	}
 }
 
@@ -121,7 +146,16 @@ func checkSpecificMetric(metricName string, event mb.Event, t *testing.T) {
 	}
 }
 
-func getTemporaryTokenUsingMFA() (map[string]interface{}, error) {
+func getCredentials(mock bool) (map[string]interface{}, error) {
+	if mock {
+		creds := map[string]interface{}{
+			"module":     "aws",
+			"metricsets": []string{"ec2"},
+			"mock":       "true",
+		}
+		return creds, nil
+	}
+
 	sess, err := session.NewSession()
 	if err != nil {
 		fmt.Println("NewSession failed: ", err)
@@ -149,6 +183,7 @@ func getTemporaryTokenUsingMFA() (map[string]interface{}, error) {
 	creds := map[string]interface{}{
 		"module":            "aws",
 		"metricsets":        []string{"ec2"},
+		"mock":              "false",
 		"access_key_id":     accessKeyId,
 		"secret_access_key": secretAccessKey,
 		"session_token":     sessionToken,

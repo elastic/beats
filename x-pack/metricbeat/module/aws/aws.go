@@ -2,10 +2,12 @@ package aws
 
 import "github.com/elastic/beats/metricbeat/mb"
 
+// Config defines all required and optional parameters for aws metricsets
 type Config struct {
-	AccessKeyID     string `config:"access_key_id" validate:"nonzero,required"`
-	SecretAccessKey string `config:"secret_access_key" validate:"nonzero,required"`
-	SessionToken    string `config:"session_token" validate:"nonzero,required"`
+	Mock            string `config:"mock" validate:"nonzero,required"`
+	AccessKeyID     string `config:"access_key_id" validate:"nonzero"`
+	SecretAccessKey string `config:"secret_access_key" validate:"nonzero"`
+	SessionToken    string `config:"session_token" validate:"nonzero"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
