@@ -63,6 +63,9 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 					"ms": 1000,
 				},
 			},
+			"service": common.MapStr{
+				"type": "docker",
+			},
 		}, e.Fields)
 	})
 
@@ -95,6 +98,9 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 					"ms": 1000,
 				},
 			},
+			"service": common.MapStr{
+				"type": "docker",
+			},
 		}, e.Fields)
 	})
 
@@ -108,6 +114,9 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 		assert.Equal(t, common.MapStr{
 			"module":    module,
 			"metricset": metricSet,
+			"service": common.MapStr{
+				"type": "docker",
+			},
 		}, e.Fields)
 	})
 
@@ -141,6 +150,9 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 				"uptime": common.MapStr{
 					"ms": 1000,
 				},
+			},
+			"service": common.MapStr{
+				"type": "docker",
 			},
 		}, e.Fields)
 	})
