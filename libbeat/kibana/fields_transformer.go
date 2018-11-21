@@ -109,7 +109,7 @@ func (t *fieldsTransformer) update(target *common.MapStr, override common.Field)
 
 func (t *fieldsTransformer) add(f common.Field) {
 	if idx := t.keys[f.Path]; idx > 0 {
-		target := &t.transformedFields[t.keys[f.Path]-1] // 1-indexed
+		target := &t.transformedFields[idx-1] // 1-indexed
 		if err := t.update(target, f); err != nil {
 			panic(err)
 		}
