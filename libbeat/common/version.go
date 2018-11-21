@@ -31,6 +31,16 @@ type Version struct {
 	Meta    string
 }
 
+// MustNewVersion creates a version from the given version string.
+// If the version string is invalid, MustNewVersion panics.
+func MustNewVersion(version string) *Version {
+	v, err := NewVersion(version)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
 // NewVersion expects a string in the format:
 // major.minor.bugfix(-meta)
 func NewVersion(version string) (*Version, error) {
