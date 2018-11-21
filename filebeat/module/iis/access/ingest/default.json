@@ -30,6 +30,10 @@
       "field": "iis.access.time"
     }
   }, {
+    "urldecode": {
+      "field": "iis.access.agent"
+    }
+  }, {
     "user_agent": {
       "field": "iis.access.agent"
     }
