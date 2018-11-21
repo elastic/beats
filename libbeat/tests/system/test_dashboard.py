@@ -148,6 +148,27 @@ class Test(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
+    def test_export_dashboard_cmd_export_dashboard_by_id_unknown_id(self):
+        """
+        Test testbeat export dashboard fails gracefully when dashboard with unknown ID is requested
+        """
+        self.render_config_template()
+        beat = self.start_beat(
+            logging_args=["-e", "-d", "*"],
+            extra_args=["export",
+                        "dashboard",
+                        "-E", "setup.kibana.protocol=http",
+                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
+                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-id", "No-such-dashboard"]
+        )
+
+        beat.check_wait(exit_code=1)
+
+        assert self.log_contains("Error getting dashboard: error exporting dashboard: Not found") is True
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
     def test_export_dashboard_cmd_export_dashboard_from_yml(self):
         """
         Test testbeat export dashboard can export dashboards from dashboards YAML file
@@ -181,6 +202,27 @@ class Test(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
+    def test_export_dashboard_cmd_export_dashboard_from_not_existent_yml(self):
+        """
+        Test testbeat export dashboard fails gracefully when cannot find YAML file
+        """
+
+        self.render_config_template()
+        beat = self.start_beat(
+            logging_args=["-e", "-d", "*"],
+            extra_args=["export",
+                        "dashboard",
+                        "-E", "setup.kibana.protocol=http",
+                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
+                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-yml", os.path.join(self.beat_path, "tests", "files", "no-such-file.yml")]
+        )
+
+        beat.check_wait(exit_code=1)
+        assert self.log_contains("Error getting dashboards from yml: error opening the list of dashboards:") is True
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
     def test_dev_tool_export_dashboard_by_id(self):
         """
         Test dev-tools/cmd/dashboards exports dashboard and removes unsupported characters
@@ -204,6 +246,22 @@ class Test(BaseTest):
             assert "Metricbeat-system-overview" in content
 
         os.remove("output.json")
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_dev_tool_export_dashboard_by_id_unknown_id(self):
+        """
+        Test dev-tools/cmd/dashboards fails gracefully when dashboard with unknown ID is requested
+        """
+
+        path = os.path.normpath(self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards.go")
+        command = path + " -kibana http://" + self.get_kibana_host() + ":" + self.get_kibana_port()
+        command = "go run " + command + " -dashboard No-such-dashboard"
+
+        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        content, err = p.communicate()
+
+        assert p.returncode != 0
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')

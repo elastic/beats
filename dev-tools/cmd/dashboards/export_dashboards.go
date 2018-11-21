@@ -22,17 +22,23 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/kibana"
 )
 
-var indexPattern = false
-var quiet = false
+var (
+	indexPattern = false
+	quiet        = false
+)
+
+const (
+	kibanaTimeout = 90 * time.Second
+)
 
 func main() {
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
@@ -46,16 +52,16 @@ func main() {
 	flag.Parse()
 	log.SetFlags(0)
 
-	elements := strings.Split(*kibanaURL, "://")
-	if len(elements) != 2 {
-		log.Fatalf("Invalid Kibana URL format")
+	u, err := url.Parse(*kibanaURL)
+	if err != nil {
+		log.Fatalf("Error parsing Kibana URL: %v", err)
 	}
 
 	client, err := kibana.NewClientWithConfig(&kibana.ClientConfig{
-		Protocol: elements[0],
-		Host:     elements[1],
+		Protocol: u.Scheme,
+		Host:     u.Host,
 		SpaceID:  *spaceID,
-		Timeout:  90 * time.Second,
+		Timeout:  kibanaTimeout,
 	})
 	if err != nil {
 		log.Fatalf("Error while connecting to Kibana: %+v", err)

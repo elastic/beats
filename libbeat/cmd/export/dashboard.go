@@ -66,14 +66,14 @@ func GenDashboardCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 				results, info, err := dashboards.ExportAllFromYml(client, yml)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Error getting dashboards from yml: %+v\n", err)
-					os.Exit(2)
+					os.Exit(1)
 				}
 				for i, r := range results {
 					err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(yml), client.GetVersion())
 					if err != nil {
 						fmt.Fprintf(os.Stderr, "Error saving dashboard '%s' to file '%s' : %+v\n",
 							info.Dashboards[i].ID, info.Dashboards[i].File, err)
-						os.Exit(2)
+						os.Exit(1)
 					}
 				}
 				return

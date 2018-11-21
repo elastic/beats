@@ -227,7 +227,7 @@ func (client *Client) SetVersion() error {
 
 	code, result, err := client.Connection.Request("GET", "/api/status", nil, nil, nil)
 	if err != nil || code >= 400 {
-		return fmt.Errorf("HTTP GET request to /api/status fails: %v. Response: %s.",
+		err = fmt.Errorf("HTTP GET request to /api/status fails: %v. Response: %s.",
 			err, truncateString(result))
 	}
 
@@ -300,7 +300,10 @@ func (client *Client) GetDashboard(id string) (common.MapStr, error) {
 		o := obj.(common.MapStr)
 		for _, key := range responseToDecode {
 			// All fields are optional, so errors are not caught
-			decodeValue(o, key)
+			err = decodeValue(o, key)
+			if err != nil {
+				logp.Debug("kibana", "Error while decoding dashboard objects: %+v", err)
+			}
 		}
 	}
 	result["objects"] = objects
