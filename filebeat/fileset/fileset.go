@@ -201,7 +201,7 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 		retVars[key] = val
 	}
 
-	if esVersion.IsValid() {
+	if !esVersion.IsValid() {
 		return vars, errors.New("Unknown Elasticsearch version")
 	}
 
