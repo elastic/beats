@@ -98,20 +98,37 @@ func TestMissingVersion(t *testing.T) {
 }
 
 func TestDuplicateField(t *testing.T) {
-	commonFields := common.Fields{
-		common.Field{Name: "context", Path: "something"},
-		common.Field{Name: "context", Path: "something", Type: "date"},
+	testCases := []struct {
+		commonFields []common.Field
+	}{
+		// type change
+		{commonFields: []common.Field{
+			{Name: "context", Path: "something"},
+			{Name: "context", Path: "something", Type: "date"},
+		}},
+		// missing overwrite
+		{commonFields: []common.Field{
+			{Name: "context", Path: "something"},
+			{Name: "context", Path: "something"},
+		}},
+		// missing overwrite in source
+		{commonFields: []common.Field{
+			{Name: "context", Path: "something", Overwrite: true},
+			{Name: "context", Path: "something"},
+		}},
 	}
-	trans, err := newFieldsTransformer(version, commonFields)
-	require.NoError(t, err)
-	_, err = trans.transform()
-	assert.Error(t, err)
+	for _, testCase := range testCases {
+		trans, err := newFieldsTransformer(version, testCase.commonFields)
+		require.NoError(t, err)
+		_, err = trans.transform()
+		assert.Error(t, err)
+	}
 }
 
 func TestValidDuplicateField(t *testing.T) {
 	commonFields := common.Fields{
 		common.Field{Name: "context", Path: "something", Type: "keyword", Description: "original description"},
-		common.Field{Name: "context", Path: "something", Description: "updated description",
+		common.Field{Name: "context", Path: "something", Overwrite: true, Description: "updated description",
 			Aggregatable: &falsy,
 			Analyzed:     &truthy,
 			Count:        2,
@@ -130,14 +147,13 @@ func TestValidDuplicateField(t *testing.T) {
 			Name: "context",
 			Type: "group",
 			Fields: common.Fields{
-				common.Field{Name: "another"},
+				common.Field{Name: "another", Overwrite: true},
 			},
 		},
 	}
 	trans, err := newFieldsTransformer(version, commonFields)
 	require.NoError(t, err)
 	transformed, err := trans.transform()
-	t.Log(transformed)
 	require.NoError(t, err)
 	out := transformed["fields"].([]common.MapStr)[0]
 	assert.Equal(t, out, common.MapStr{

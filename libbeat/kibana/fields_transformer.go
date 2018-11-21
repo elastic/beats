@@ -102,9 +102,14 @@ func (t *fieldsTransformer) update(target *common.MapStr, override common.Field)
 	field, _ := transformField(t.version, override)
 	if override.Type == "" || (*target)["type"] == field["type"] {
 		target.Update(field)
+		if ! override.Overwrite {
+			// compatible duplication
+			return fmt.Errorf("field <%s> is duplicated, remove it or set 'overwrite: true'", override.Path)
+		}
 		return nil
 	}
-	return fmt.Errorf("ERROR: Field <%s> is duplicated. Please update and try again.\n", override.Path)
+	// incompatible duplication
+	return fmt.Errorf("field <%s> is duplicated", override.Path)
 }
 
 func (t *fieldsTransformer) add(f common.Field) {
