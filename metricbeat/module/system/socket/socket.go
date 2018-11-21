@@ -57,7 +57,7 @@ type MetricSet struct {
 	currentConns  hashSet
 	reverseLookup *ReverseLookupCache
 	listeners     *sock.ListenerTable
-	users         sock.UserCache
+	users         UserCache
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -88,7 +88,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		previousConns: hashSet{},
 		currentConns:  hashSet{},
 		listeners:     sock.NewListenerTable(),
-		users:         sock.NewUserCache(),
+		users:         NewUserCache(),
 	}
 
 	if c.ReverseLookup.IsEnabled() {

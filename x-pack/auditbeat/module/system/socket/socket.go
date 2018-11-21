@@ -9,6 +9,7 @@ package socket
 import (
 	"fmt"
 	"net"
+	"os/user"
 	"strconv"
 	"syscall"
 	"time"
@@ -31,12 +32,15 @@ const (
 	moduleName    = "system"
 	metricsetName = "socket"
 
-	bucketName                = "auditbeat.socket.v1"
-	bucketKeyStateTimestamp   = "state_timestamp"
-	eventTypeState            = "state"
-	eventTypeEvent            = "event"
+	bucketName              = "auditbeat.socket.v1"
+	bucketKeyStateTimestamp = "state_timestamp"
+
+	eventTypeState = "state"
+	eventTypeEvent = "event"
+
 	eventActionExistingSocket = "existing_socket"
-	eventActionNewSocket      = "new_socket"
+	eventActionSocketOpened   = "socket_opened"
+	eventActionSocketClosed   = "socket_closed"
 )
 
 func init() {
@@ -56,8 +60,6 @@ type MetricSet struct {
 	// TODO: Replace with process data collected in processes metricset
 	ptable    *sock.ProcTable
 	listeners *sock.ListenerTable
-	// TODO: Replace with user data collected in host metricset
-	users sock.UserCache
 
 	bucket    datastore.Bucket
 	lastState time.Time
@@ -169,7 +171,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		netlink:       sock.NewNetlinkSession(),
 		ptable:        ptable,
 		listeners:     sock.NewListenerTable(),
-		users:         sock.NewUserCache(),
 		bucket:        bucket,
 	}
 
@@ -192,72 +193,42 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return ms, nil
 }
 
-// Run registers a netlink subscription to the kernel and receives
-// socket events until the reporter's done channel is closed.
-// It also sends a state update right away, and regular state updates
-// thereafter.
-func (ms *MetricSet) Run(report mb.PushReporterV2) {
-	// Start receiving socket events
-	socketC, err := NetlinkSocketSubscription()
-	if err != nil {
-		ms.log.Error(err)
-		report.Error(err)
-		return
+// Close cleans up the MetricSet when it finishes.
+func (ms *MetricSet) Close() error {
+	if ms.bucket != nil {
+		return ms.bucket.Close()
 	}
+	return nil
+}
 
-	// Report state on start but do not update lastState
-	// so regular state update proceeds as scheduled.
-	err = ms.reportState(report)
-	if err != nil {
-		ms.log.Error(err)
-		report.Error(err)
-	}
-
-	// Check if state update is needed every 10 seconds
-	ticker := time.NewTicker(10 * time.Second)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-report.Done():
-			// Stop
-			return
-		case t := <-ticker.C:
-			// Check if state update needed
-			if time.Since(ms.lastState) > ms.config.effectiveStatePeriod() {
-				ms.log.Debug("Sending regular state update")
-				ms.lastState = t
-				err := ms.reportState(report)
-				if err != nil {
-					ms.log.Error(err)
-					report.Error(err)
-				}
-				ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
-			}
-		case diag := <-socketC:
-			socket := newSocket(diag)
-
-			if socket.RemotePort == 0 {
-				ms.listeners.Put(uint8(syscall.IPPROTO_TCP), socket.LocalIP, socket.LocalPort)
-			}
-
-			// Refresh inode to process mapping
-			err := ms.ptable.Refresh()
-			if err != nil {
-				ms.log.Error(err)
-				report.Error(err)
-			}
-
-			ms.enrichSocket(socket)
-
-			event := socketEvent(socket, eventTypeEvent, eventActionNewSocket)
-			report.Event(event)
+// Fetch collects the user information. It is invoked periodically.
+func (ms *MetricSet) Fetch(report mb.ReporterV2) {
+	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
+	if needsStateUpdate || ms.cache.IsEmpty() {
+		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
+		err := ms.reportState(report)
+		if err != nil {
+			ms.log.Error(err)
+			report.Error(err)
 		}
+		ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
+	}
+
+	err := ms.reportChanges(report)
+	if err != nil {
+		ms.log.Error(err)
+		report.Error(err)
 	}
 }
 
 // reportState reports all existing sockets on the system.
 func (ms *MetricSet) reportState(report mb.ReporterV2) error {
+	// Only update lastState if this state update was regularly scheduled,
+	// i.e. not caused by an Auditbeat restart (when the cache would be empty).
+	if !ms.cache.IsEmpty() {
+		ms.lastState = time.Now()
+	}
+
 	sockets, err := ms.getSockets()
 	if err != nil {
 		return errors.Wrap(err, "failed to get sockets")
@@ -269,31 +240,25 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error generating state ID")
 	}
 
-	// Register all listening sockets
-	for _, socket := range sockets {
-		if socket.RemotePort == 0 {
-			ms.listeners.Put(uint8(syscall.IPPROTO_TCP), socket.LocalIP, socket.LocalPort)
-		}
-	}
-
-	// Refresh inode to process mapping
-	err = ms.ptable.Refresh()
+	// Refresh data for direction and process enrichment
+	err = ms.refreshEnrichments(sockets)
 	if err != nil {
-		return errors.Wrap(err, "error refreshing process data")
+		return err
 	}
 
 	for _, socket := range sockets {
-		ms.enrichSocket(socket)
+		err = ms.enrichSocket(socket)
+		if err != nil {
+			return err
+		}
 
 		event := socketEvent(socket, eventTypeState, eventActionExistingSocket)
 		event.RootFields.Put("event.id", stateID.String())
 		report.Event(event)
 	}
 
-	if ms.cache != nil {
-		// This will initialize the cache with the current sockets
-		ms.cache.DiffAndUpdateCache(convertToCacheable(sockets))
-	}
+	// This will initialize the cache with the current sockets
+	ms.cache.DiffAndUpdateCache(convertToCacheable(sockets))
 
 	// Save time so we know when to send the state again (config.StatePeriod)
 	timeBytes, err := ms.lastState.MarshalBinary()
@@ -305,8 +270,40 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error writing state timestamp to disk")
 	}
 
-	// Reset the listeners for the next iteration.
-	ms.listeners.Reset()
+	return nil
+}
+
+// reportChanges detects and reports any changes to sockets on this system since the last call.
+func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
+	sockets, err := ms.getSockets()
+	if err != nil {
+		return errors.Wrap(err, "failed to get sockets")
+	}
+
+	opened, closed := ms.cache.DiffAndUpdateCache(convertToCacheable(sockets))
+	ms.log.Debugf("Found %d sockets (%d opened, %d closed)", len(sockets), len(opened), len(closed))
+
+	if len(opened) > 0 {
+		// Refresh data for direction and process enrichment - only new sockets
+		// need enrichment
+		err = ms.refreshEnrichments(sockets)
+		if err != nil {
+			return err
+		}
+
+		for _, s := range opened {
+			err = ms.enrichSocket(s.(*Socket))
+			if err != nil {
+				return err
+			}
+
+			report.Event(socketEvent(s.(*Socket), eventTypeEvent, eventActionSocketOpened))
+		}
+	}
+
+	for _, s := range closed {
+		report.Event(socketEvent(s.(*Socket), eventTypeEvent, eventActionSocketClosed))
+	}
 
 	return nil
 }
@@ -349,8 +346,13 @@ func convertToCacheable(sockets []*Socket) []cache.Cacheable {
 	return c
 }
 
-func (ms *MetricSet) enrichSocket(socket *Socket) {
-	socket.Username = ms.users.LookupUID(int(socket.UID))
+func (ms *MetricSet) enrichSocket(socket *Socket) error {
+	userAccount, err := user.LookupId(strconv.FormatUint(uint64(socket.UID), 10))
+	if err != nil {
+		return errors.Wrapf(err, "error looking up socket UID")
+	}
+
+	socket.Username = userAccount.Username
 
 	socket.Direction = ms.listeners.Direction(uint8(syscall.IPPROTO_TCP),
 		socket.LocalIP, socket.LocalPort, socket.RemoteIP, socket.RemotePort)
@@ -367,6 +369,8 @@ func (ms *MetricSet) enrichSocket(socket *Socket) {
 			socket.ProcessError = fmt.Errorf("process not found (inode=%v)", socket.Inode)
 		}
 	}
+
+	return nil
 }
 
 func (ms *MetricSet) getSockets() ([]*Socket, error) {
@@ -381,4 +385,22 @@ func (ms *MetricSet) getSockets() ([]*Socket, error) {
 	}
 
 	return sockets, nil
+}
+
+func (ms *MetricSet) refreshEnrichments(sockets []*Socket) error {
+	// Refresh inode to process mapping for process enrichment
+	err := ms.ptable.Refresh()
+	if err != nil {
+		return errors.Wrap(err, "error refreshing process data")
+	}
+
+	// Register all listening sockets
+	ms.listeners.Reset()
+	for _, socket := range sockets {
+		if socket.RemotePort == 0 {
+			ms.listeners.Put(uint8(syscall.IPPROTO_TCP), socket.LocalIP, socket.LocalPort)
+		}
+	}
+
+	return nil
 }
