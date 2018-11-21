@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 - Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 - Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
+- Fix issue with not collecting Elasticsearch cross-cluster replication stats correctly. {pull}9179[9179]
 
 *Packetbeat*
 
