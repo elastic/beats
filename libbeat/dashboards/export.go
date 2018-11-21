@@ -70,6 +70,7 @@ func ExportAllFromYml(client *kibana.Client, ymlPath string) ([]common.MapStr, L
 	return results, list, err
 }
 
+// ExportAll exports all dashboards from an opened and parsed dashboards YML.
 func ExportAll(client *kibana.Client, list ListYML) ([]common.MapStr, error) {
 	var results []common.MapStr
 	for _, e := range list.Dashboards {

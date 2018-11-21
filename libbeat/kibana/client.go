@@ -227,7 +227,7 @@ func (client *Client) SetVersion() error {
 
 	code, result, err := client.Connection.Request("GET", "/api/status", nil, nil, nil)
 	if err != nil || code >= 400 {
-		err = fmt.Errorf("HTTP GET request to /api/status fails: %v. Response: %s.",
+		return fmt.Errorf("HTTP GET request to /api/status fails: %v. Response: %s.",
 			err, truncateString(result))
 	}
 
