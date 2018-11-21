@@ -1,0 +1,26 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"aws",
+        "name":"ec2",
+        "rtt":44269
+    },
+    "aws":{
+        "ec2":{
+            "instance": {
+                "instance_id": "1"
+            },
+            "cpu": {
+                "cpu_utilization": 0.25,
+                "cpu_credit_usage": 0.01,
+                "cpu_credit_balance": 70
+            }
+        }
+    },
+    "type":"metricsets"
+}
