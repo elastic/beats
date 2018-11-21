@@ -50,7 +50,7 @@ class Test(AuditbeatXPackTest):
         socket metricset collects information about open sockets on a system.
         """
 
-        fields = ["system.socket.local.ip"]
+        fields = ["system.socket.destination.port"]
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "socket", COMMON_FIELDS + fields, warnings_allowed=True)
