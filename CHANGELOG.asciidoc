@@ -66,6 +66,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add setting to disable docker cpu metrics per core. {pull}9194[9194]
+
 *Packetbeat*
 
 *Functionbeat*
