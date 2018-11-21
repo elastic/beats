@@ -15,6 +15,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :deb_os:
 :rpm_os:
 :mac_os:
+:linux_os:
 :docker_platform:
 :win_os:
 
