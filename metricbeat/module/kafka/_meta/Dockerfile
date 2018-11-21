@@ -10,7 +10,7 @@ ENV TERM=linux
 RUN apk add -u bash
 
 RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && \
-    wget -q -O $INSTALL_DIR/kafka.tgz "http://ftp.wayne.edu/apache/kafka/${KAFKA_VERSION}/kafka_2.11-${KAFKA_VERSION}.tgz" && \
+    wget -q -O $INSTALL_DIR/kafka.tgz "https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.11-${KAFKA_VERSION}.tgz" && \
     tar xzf ${INSTALL_DIR}/kafka.tgz -C ${KAFKA_HOME} --strip-components 1 && \
     rm -f ${INSTALL_DIR}/kafka.tgz
 

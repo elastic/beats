@@ -23,8 +23,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Metricbeat*
 
-- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
-
 *Packetbeat*
 
 *Winlogbeat*
@@ -44,6 +42,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 *Journalbeat*
 
 *Metricbeat*
+
+- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
+- Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
 
 *Packetbeat*
 
@@ -101,6 +102,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 *Affecting all Beats*
 
 - Dissect syntax change, use * instead of ? when working with field reference. {issue}8054[8054]
+- Removed dashboards and index patterns generation for Kibana 5. {pull}8927[8927]
 
 *Auditbeat*
 

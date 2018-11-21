@@ -789,6 +789,7 @@ output.kafka:
 
 NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be dropped. To avoid this problem, make sure {beatname_uc} does not generate events bigger than <<kafka-max_message_bytes,`max_message_bytes`>>.
 
+[[kafka-compatibility]]
 ==== Compatibility
 
 This output works with all Kafka versions in between 0.11 and 2.0.0. Older versions
@@ -812,11 +813,13 @@ The cluster metadata contain the actual Kafka brokers events are published to.
 
 ===== `version`
 
-Kafka version ${beatname_lc} is assumed to run against. Defaults to 1.0.0.
+Kafka version {beatname_lc} is assumed to run against. Defaults to 1.0.0.
 
 Event timestamps will be added, if version 0.10.0.0+ is enabled.
 
-Valid values are all kafka releases in between `0.8.2.0` and `1.1.1`.
+Valid values are all kafka releases in between `0.8.2.0` and `2.0.0`.
+
+See <<kafka-compatibility>> for information on supported versions.
 
 ===== `username`
 

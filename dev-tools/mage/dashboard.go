@@ -15,36 +15,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package version
+package mage
 
-import "time"
+import (
+	"fmt"
+	"path/filepath"
 
-// GetDefaultVersion returns the current libbeat version.
-// This method is in a separate file as the version.go file is auto generated
-func GetDefaultVersion() string {
-	if qualifier == "" {
-		return defaultBeatVersion
-	}
-	return defaultBeatVersion + "-" + qualifier
-}
-
-var (
-	buildTime = "unknown"
-	commit    = "unknown"
-	qualifier = ""
+	"github.com/magefile/mage/sh"
 )
 
-// BuildTime exposes the compile-time build time information.
-// It will represent the zero time instant if parsing fails.
-func BuildTime() time.Time {
-	t, err := time.Parse(time.RFC3339, buildTime)
-	if err != nil {
-		return time.Time{}
+// ExportDashboard exports a dashboard from Kibana and writes it into the given module.
+func ExportDashboard() error {
+	module := EnvOr("MODULE", "")
+	if module == "" {
+		return fmt.Errorf("MODULE must be specified")
 	}
-	return t
-}
 
-// Commit exposes the compile-time commit hash.
-func Commit() string {
-	return commit
+	id := EnvOr("ID", "")
+	if id == "" {
+		return fmt.Errorf("Dashboad ID must be specified")
+	}
+
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+
+	// TODO: This is currently hardcoded for KB 6, we need to figure out what we do for KB 7
+	file := CWD("module", module, "_meta/kibana/6/dashboard", id+".json")
+
+	dashboardCmd := sh.RunCmd("go", "run",
+		filepath.Join(beatsDir, "dev-tools/cmd/dashboards/export_dashboards.go"),
+		"-output", file, "-dashboard", id,
+	)
+
+	return dashboardCmd()
 }

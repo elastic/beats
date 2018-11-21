@@ -89,6 +89,7 @@ func Export(client *http.Client, conn string, spaceID string, dashboard string, 
 	for _, obj := range objects {
 		o := obj.(common.MapStr)
 
+		// All fields are optional, so errors are not catched
 		decodeValue(o, "attributes.uiStateJSON")
 		decodeValue(o, "attributes.visState")
 		decodeValue(o, "attributes.optionsJSON")
@@ -104,23 +105,27 @@ func Export(client *http.Client, conn string, spaceID string, dashboard string, 
 		return err
 	}
 
-	err = ioutil.WriteFile(out, []byte(data.StringToPrint()), 0666)
+	err = ioutil.WriteFile(out, []byte(data.StringToPrint()), 0644)
 	if !quiet {
 		log.Printf("The dashboard %s was exported under the %s file\n", dashboard, out)
 	}
 	return err
 }
 
-func decodeValue(data common.MapStr, key string) {
+func decodeValue(data common.MapStr, key string) error {
 	v, err := data.GetValue(key)
 	if err != nil {
-		return
+		return err
 	}
 	s := v.(string)
 	var d interface{}
-	json.Unmarshal([]byte(s), &d)
+	err = json.Unmarshal([]byte(s), &d)
+	if err != nil {
+		return fmt.Errorf("error decoding %s: %v", key, err)
+	}
 
 	data.Put(key, d)
+	return nil
 }
 
 func ReadManifest(file string) ([]map[string]string, error) {

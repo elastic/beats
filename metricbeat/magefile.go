@@ -75,7 +75,7 @@ func Clean() error {
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
-// Use BEAT_VERSION_QUALIFIER to control the version qualifier.
+// Use VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
@@ -115,6 +115,15 @@ func GoTestUnit(ctx context.Context) error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
 	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+}
+
+// ExportDashboard exports a dashboard and writes it into the correct directory
+//
+// Required ENV variables:
+// * MODULE: Name of the module
+// * ID: Dashboard id
+func ExportDashboard() error {
+	return mage.ExportDashboard()
 }
 
 // -----------------------------------------------------------------------------
