@@ -106,6 +106,8 @@ grouped in the following categories:
 
     # deduplicate fields, last one wins
     for section in docs:
+        if not section.get("fields"):
+            continue
         fields = OrderedDict()
         for field in section["fields"]:
             name = field["name"]
