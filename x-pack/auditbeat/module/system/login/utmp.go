@@ -21,7 +21,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type RecordType int
@@ -40,6 +39,7 @@ var recordTypeToString = map[RecordType]string{
 
 // LoginRecord represents a login record.
 type LoginRecord struct {
+	utmp      Utmp
 	Type      RecordType
 	PID       int
 	TTY       string
@@ -47,7 +47,17 @@ type LoginRecord struct {
 	Hostname  string
 	IP        net.IP
 	Timestamp time.Time
-	utmp      *C.struct_utmp // Raw C structure
+}
+
+// Utmp contains data from the C utmp struct.
+type Utmp struct {
+	utType   int
+	utPid    int
+	utLine   string
+	utUser   string
+	utHost   string
+	utTv     time.Time
+	utAddrV6 [4]uint32
 }
 
 // String returns the string representation for a RecordType.
@@ -59,23 +69,6 @@ func (recordType RecordType) String() string {
 		return ""
 	}
 }
-
-// UtmpDebugString returns a string containing
-/*func (loginRecord *LoginRecord) UtmpDebugString() string {
-	utmp := loginRecord.utmp
-
-	utType := int(utmp.ut_type)
-	utPid := int(utmp.ut_pid)
-	utLine := C.GoString(&utmp.ut_line[0])
-	utUser := C.GoString(&utmp.ut_user[0])
-	utHost := C.GoString(&utmp.ut_host[0])
-	utTvSec := int64(utmp.ut_tv.tv_sec)
-	utTvUsec := int64(utmp.ut_tv.tv_usec)
-	utAddrV6 := []uint32{uint32(utmp.ut_addr_v6[0]), uint32(utmp.ut_addr_v6[1]), uint32(utmp.ut_addr_v6[2]), uint32(utmp.ut_addr_v6[3])}
-
-	return fmt.Sprintf("utmp: (ut_type=%d, ut_pid=%d, ut_line=%v, ut_user=%v, ut_host=%v, ut_tv.tv_sec=%d, ut_tv.tv_usec=%d, ut_addr_v6=%v)",
-		utType, utPid, utLine, utUser, utHost, utTvSec, utTvUsec, utAddrV6)
-}*/
 
 // Hash creates a hash for LoginRecord.
 func (login LoginRecord) Hash() uint64 {
@@ -90,7 +83,6 @@ func (login LoginRecord) toMapStr() common.MapStr {
 		"type":      login.Type.String(),
 		"pid":       login.PID,
 		"tty":       login.TTY,
-		"ip":        login.IP,
 		"timestamp": login.Timestamp,
 	}
 
@@ -104,11 +96,15 @@ func (login LoginRecord) toMapStr() common.MapStr {
 		mapstr.Put("hostname", login.Hostname)
 	}
 
+	if !login.IP.IsUnspecified() {
+		mapstr.Put("ip", login.IP)
+	}
+
 	return mapstr
 }
 
 // ReadUtmpFile reads a UTMP formatted file (usually /var/log/wtmp).
-func ReadUtmpFile(log *logp.Logger, utmpFile string) ([]LoginRecord, error) {
+func ReadUtmpFile(utmpFile string) ([]LoginRecord, error) {
 	cs := C.CString(utmpFile)
 	defer C.free(unsafe.Pointer(cs))
 
@@ -131,7 +127,7 @@ func ReadUtmpFile(log *logp.Logger, utmpFile string) ([]LoginRecord, error) {
 		}
 
 		if utmp != nil {
-			loginRecords = append(loginRecords, createLoginRecord(log, utmp))
+			loginRecords = append(loginRecords, createLoginRecord(utmp))
 		} else {
 			break
 		}
@@ -140,46 +136,32 @@ func ReadUtmpFile(log *logp.Logger, utmpFile string) ([]LoginRecord, error) {
 	return loginRecords, nil
 }
 
-func createLoginRecord(log *logp.Logger, utmp *C.struct_utmp) LoginRecord {
-	utType := int(utmp.ut_type)
-	utPid := int(utmp.ut_pid)
-	utLine := C.GoString(&utmp.ut_line[0])
-	utUser := C.GoString(&utmp.ut_user[0])
-	utHost := C.GoString(&utmp.ut_host[0])
-	utTvSec := int64(utmp.ut_tv.tv_sec)
-	utTvUsec := int64(utmp.ut_tv.tv_usec)
-	utAddrV6 := []uint32{uint32(utmp.ut_addr_v6[0]), uint32(utmp.ut_addr_v6[1]), uint32(utmp.ut_addr_v6[2]), uint32(utmp.ut_addr_v6[3])}
-	log.Debugf("utmp: (ut_type=%d, ut_pid=%d, ut_line=%v, ut_user=%v, ut_host=%v, ut_tv.tv_sec=%d, ut_tv.tv_usec=%d, ut_addr_v6=%v)",
-		utType, utPid, utLine, utUser, utHost, utTvSec, utTvUsec, utAddrV6)
+func createLoginRecord(utmpC *C.struct_utmp) LoginRecord {
+	// See utmp(5) for the utmp struct fields.
+	utmp := Utmp{
+		utType:   int(utmpC.ut_type),
+		utPid:    int(utmpC.ut_pid),
+		utLine:   C.GoString(&utmpC.ut_line[0]),
+		utUser:   C.GoString(&utmpC.ut_user[0]),
+		utHost:   C.GoString(&utmpC.ut_host[0]),
+		utTv:     time.Unix(int64(utmpC.ut_tv.tv_sec), int64(utmpC.ut_tv.tv_usec)*1000),
+		utAddrV6: [4]uint32{uint32(utmpC.ut_addr_v6[0]), uint32(utmpC.ut_addr_v6[1]), uint32(utmpC.ut_addr_v6[2]), uint32(utmpC.ut_addr_v6[3])},
+	}
 
 	record := LoginRecord{
-		PID:       utPid,
-		TTY:       utLine,
-		Hostname:  utHost,
-		Timestamp: time.Unix(utTvSec, utTvUsec*1000),
+		utmp:      utmp,
+		Timestamp: utmp.utTv,
+		PID:       utmp.utPid,
+		TTY:       utmp.utLine,
 	}
 
-	// See utmp(5) for the utmp struct fields.
-	if uint32(utmp.ut_addr_v6[1]) != 0 || uint32(utmp.ut_addr_v6[2]) != 0 || uint32(utmp.ut_addr_v6[3]) != 0 {
-		// IPv6
-		b := make([]byte, 16)
-		binary.LittleEndian.PutUint32(b[:4], uint32(utmp.ut_addr_v6[0]))
-		binary.LittleEndian.PutUint32(b[4:8], uint32(utmp.ut_addr_v6[1]))
-		binary.LittleEndian.PutUint32(b[8:12], uint32(utmp.ut_addr_v6[2]))
-		binary.LittleEndian.PutUint32(b[12:], uint32(utmp.ut_addr_v6[3]))
-		record.IP = net.IP(b)
-	} else {
-		// IPv4
-		b := make([]byte, 4)
-		binary.LittleEndian.PutUint32(b, uint32(utmp.ut_addr_v6[0]))
-		record.IP = net.IP(b)
-	}
-
-	switch utType {
+	switch utmp.utType {
 	// See utmp(5) for C constants.
 	case C.USER_PROCESS:
 		record.Type = UserLogin
-		record.Username = utUser
+		record.Username = utmp.utUser
+		record.IP = createIP(utmp.utAddrV6)
+		record.Hostname = utmp.utHost
 	case C.DEAD_PROCESS:
 		record.Type = UserLogout
 	default:
@@ -187,4 +169,22 @@ func createLoginRecord(log *logp.Logger, utmp *C.struct_utmp) LoginRecord {
 	}
 
 	return record
+}
+
+func createIP(utAddrV6 [4]uint32) net.IP {
+	// See utmp(5) for the utmp struct fields.
+	if utAddrV6[1] != 0 || utAddrV6[2] != 0 || utAddrV6[3] != 0 {
+		// IPv6
+		b := make([]byte, 16)
+		binary.LittleEndian.PutUint32(b[:4], utAddrV6[0])
+		binary.LittleEndian.PutUint32(b[4:8], utAddrV6[1])
+		binary.LittleEndian.PutUint32(b[8:12], utAddrV6[2])
+		binary.LittleEndian.PutUint32(b[12:], utAddrV6[3])
+		return net.IP(b)
+	} else {
+		// IPv4
+		b := make([]byte, 4)
+		binary.LittleEndian.PutUint32(b, utAddrV6[0])
+		return net.IP(b)
+	}
 }

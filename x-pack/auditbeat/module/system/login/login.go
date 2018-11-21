@@ -141,7 +141,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 		fileRecord, isKnownFile := ms.fileRecords[stats.Ino]
 		if !isKnownFile || fileRecord.LastCtime.Before(ctime) {
-			loginRecords, err := ReadUtmpFile(ms.log, path)
+			loginRecords, err := ReadUtmpFile(path)
 			if err != nil {
 				ms.log.Error(err)
 				report.Error(err)
@@ -154,6 +154,10 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 			reachedNewRecords := !isKnownFile
 			for _, loginRecord := range loginRecords {
 				if reachedNewRecords {
+					ms.log.Debugf("utmp: (ut_type=%d, ut_pid=%d, ut_line=%v, ut_user=%v, ut_host=%v, ut_tv.tv_sec=%v, ut_addr_v6=%v)",
+						loginRecord.utmp.utType, loginRecord.utmp.utPid, loginRecord.utmp.utLine, loginRecord.utmp.utUser,
+						loginRecord.utmp.utHost, loginRecord.utmp.utTv, loginRecord.utmp.utAddrV6)
+
 					ms.processLoginRecord(&loginRecord)
 					newRecords = append(newRecords, loginRecord)
 				}
@@ -205,6 +209,8 @@ func (ms *MetricSet) processLoginRecord(record *LoginRecord) {
 		savedRecord, found := ms.ttyLookup[record.TTY]
 		if found {
 			record.Username = savedRecord.Username
+			record.IP = savedRecord.IP
+			record.Hostname = savedRecord.Hostname
 		} else {
 			ms.log.Debugf("No matching login record found for logout on %v", record.TTY)
 		}
