@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -99,12 +100,57 @@ func TestMissingVersion(t *testing.T) {
 func TestDuplicateField(t *testing.T) {
 	commonFields := common.Fields{
 		common.Field{Name: "context", Path: "something"},
-		common.Field{Name: "context", Path: "something", Type: "keyword"},
+		common.Field{Name: "context", Path: "something", Type: "date"},
 	}
 	trans, err := newFieldsTransformer(version, commonFields)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = trans.transform()
 	assert.Error(t, err)
+}
+
+func TestValidDuplicateField(t *testing.T) {
+	commonFields := common.Fields{
+		common.Field{Name: "context", Path: "something", Type: "keyword", Description: "original description"},
+		common.Field{Name: "context", Path: "something", Description: "updated description",
+			Aggregatable: &falsy,
+			Analyzed:     &truthy,
+			Count:        2,
+			DocValues:    &falsy,
+			Index:        &falsy,
+			Searchable:   &falsy,
+		},
+		common.Field{
+			Name: "context",
+			Type: "group",
+			Fields: common.Fields{
+				common.Field{Name: "another", Type: "date"},
+			},
+		},
+		common.Field{
+			Name: "context",
+			Type: "group",
+			Fields: common.Fields{
+				common.Field{Name: "another"},
+			},
+		},
+	}
+	trans, err := newFieldsTransformer(version, commonFields)
+	require.NoError(t, err)
+	transformed, err := trans.transform()
+	t.Log(transformed)
+	require.NoError(t, err)
+	out := transformed["fields"].([]common.MapStr)[0]
+	assert.Equal(t, out, common.MapStr{
+		"aggregatable": false,
+		"analyzed":     true,
+		"count":        2,
+		"doc_values":   false,
+		"indexed":      false,
+		"name":         "context",
+		"scripted":     false,
+		"searchable":   false,
+		"type":         "string",
+	})
 }
 
 func TestInvalidVersion(t *testing.T) {
