@@ -10,12 +10,6 @@
         "http.response.status_code": 200, 
         "iis.access.request_time_ms": 123, 
         "iis.access.sub_status": 0, 
-        "iis.access.user_agent.device": "Other", 
-        "iis.access.user_agent.major": "57", 
-        "iis.access.user_agent.minor": "0", 
-        "iis.access.user_agent.name": "Firefox", 
-        "iis.access.user_agent.os": "Windows", 
-        "iis.access.user_agent.os_name": "Windows", 
         "iis.access.win32_status": 0, 
         "input.type": "log", 
         "log.offset": 257, 
@@ -30,7 +24,13 @@
         "url.path": "/", 
         "url.query": "q=100", 
         "user.name": "-", 
-        "user_agent.original": "Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0"
+        "user_agent.device": "Other", 
+        "user_agent.major": "57", 
+        "user_agent.minor": "0", 
+        "user_agent.name": "Firefox", 
+        "user_agent.original": "Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0", 
+        "user_agent.os.full_name": "Windows", 
+        "user_agent.os.name": "Windows"
     }, 
     {
         "@timestamp": "2018-01-01T09:10:11.000Z", 
@@ -47,12 +47,6 @@
         "iis.access.request_time_ms": 789, 
         "iis.access.site_name": "W3SVC1", 
         "iis.access.sub_status": 0, 
-        "iis.access.user_agent.device": "Other", 
-        "iis.access.user_agent.major": "57", 
-        "iis.access.user_agent.minor": "0", 
-        "iis.access.user_agent.name": "Firefox", 
-        "iis.access.user_agent.os": "Windows", 
-        "iis.access.user_agent.os_name": "Windows", 
         "iis.access.win32_status": 0, 
         "input.type": "log", 
         "log.offset": 709, 
@@ -60,7 +54,13 @@
         "url.path": "/", 
         "url.query": "-", 
         "user.name": "-", 
-        "user_agent.original": "Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0"
+        "user_agent.device": "Other", 
+        "user_agent.major": "57", 
+        "user_agent.minor": "0", 
+        "user_agent.name": "Firefox", 
+        "user_agent.original": "Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0", 
+        "user_agent.os.full_name": "Windows", 
+        "user_agent.os.name": "Windows"
     }, 
     {
         "@timestamp": "2018-01-01T10:11:12.000Z", 
@@ -80,12 +80,6 @@
         "iis.access.server_name": "MACHINE-NAME", 
         "iis.access.site_name": "W3SVC1", 
         "iis.access.sub_status": 0, 
-        "iis.access.user_agent.device": "Other", 
-        "iis.access.user_agent.major": "57", 
-        "iis.access.user_agent.minor": "0", 
-        "iis.access.user_agent.name": "Firefox", 
-        "iis.access.user_agent.os": "Windows", 
-        "iis.access.user_agent.os_name": "Windows", 
         "iis.access.win32_status": 0, 
         "input.type": "log", 
         "log.offset": 1204, 
@@ -100,6 +94,12 @@
         "url.path": "/", 
         "url.query": "-", 
         "user.name": "-", 
-        "user_agent.original": "Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0"
+        "user_agent.device": "Other", 
+        "user_agent.major": "57", 
+        "user_agent.minor": "0", 
+        "user_agent.name": "Firefox", 
+        "user_agent.original": "Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0", 
+        "user_agent.os.full_name": "Windows", 
+        "user_agent.os.name": "Windows"
     }
 ]

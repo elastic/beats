@@ -31,8 +31,17 @@
     }
   }, {
     "user_agent": {
-      "field": "iis.access.agent",
-      "target_field": "iis.access.user_agent"
+      "field": "iis.access.agent"
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os",
+      "target_field": "user_agent.os.full_name"
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_name",
+      "target_field": "user_agent.os.name"
     }
   }, {
     "rename": {
