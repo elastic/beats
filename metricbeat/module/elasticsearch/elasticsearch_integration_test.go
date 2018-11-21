@@ -196,7 +196,7 @@ func createMLJob(host string) error {
 		return nil
 	}
 
-	body, resp, err := httpPutJson(host, jobURL, mlJob)
+	body, resp, err := httpPutJSON(host, jobURL, mlJob)
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("HTTP error loading ml job %d: %s, %s", resp.StatusCode, resp.Status, body)
@@ -231,7 +231,7 @@ func setupCCRRemote(host string) error {
 	}
 
 	settingsURL := "/_cluster/settings"
-	_, _, err = httpPutJson(host, settingsURL, remoteSettings)
+	_, _, err = httpPutJSON(host, settingsURL, remoteSettings)
 	return err
 }
 
@@ -242,7 +242,7 @@ func createCCRLeaderIndex(host string) error {
 	}
 
 	indexURL := "/pied_piper"
-	_, _, err = httpPutJson(host, indexURL, leaderIndex)
+	_, _, err = httpPutJSON(host, indexURL, leaderIndex)
 	return err
 }
 
@@ -253,7 +253,7 @@ func createCCRFollowerIndex(host string) error {
 	}
 
 	followURL := "/rats/_ccr/follow"
-	_, _, err = httpPutJson(host, followURL, followerIndex)
+	_, _, err = httpPutJSON(host, followURL, followerIndex)
 	return err
 }
 
@@ -316,7 +316,7 @@ func getElasticsearchVersion(elasticsearchHostPort string) (string, error) {
 	return version.(string), nil
 }
 
-func httpPutJson(host, path string, body []byte) ([]byte, *http.Response, error) {
+func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {
 	req, err := http.NewRequest("PUT", "http://"+host+path, bytes.NewReader(body))
 	if err != nil {
 		return nil, nil, err
