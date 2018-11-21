@@ -111,8 +111,7 @@ func (s Socket) Hash() uint64 {
 func (s Socket) toMapStr() common.MapStr {
 	evt := common.MapStr{
 		"network": common.MapStr{
-			"type":      s.Family.String(),
-			"direction": s.Direction.String(),
+			"type": s.Family.String(),
 		},
 		"state": s.State.String(),
 		"user": common.MapStr{
@@ -122,6 +121,7 @@ func (s Socket) toMapStr() common.MapStr {
 
 	switch s.Direction {
 	case sock.Outgoing:
+		evt.Put("network.direction", "outbound")
 		evt.Put("source", common.MapStr{
 			"ip":   s.LocalIP,
 			"port": s.LocalPort,
@@ -131,6 +131,7 @@ func (s Socket) toMapStr() common.MapStr {
 			"port": s.RemotePort,
 		})
 	case sock.Incoming:
+		evt.Put("network.direction", "inbound")
 		evt.Put("source", common.MapStr{
 			"ip":   s.RemoteIP,
 			"port": s.RemotePort,
@@ -140,6 +141,7 @@ func (s Socket) toMapStr() common.MapStr {
 			"port": s.LocalPort,
 		})
 	case sock.Listening:
+		evt.Put("network.direction", "listening")
 		evt.Put("destination", common.MapStr{
 			"ip":   s.LocalIP,
 			"port": s.LocalPort,
