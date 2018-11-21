@@ -520,6 +520,29 @@ func FindFiles(globs ...string) ([]string, error) {
 	return configFiles, nil
 }
 
+// FindFilesRecursive recursively traverses from the CWD and invokes the given
+// match function on each regular file to determine if the given path should be
+// returned as a match.
+func FindFilesRecursive(match func(path string, info os.FileInfo) bool) ([]string, error) {
+	var matches []string
+	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.Mode().IsRegular() {
+			// continue
+			return nil
+		}
+
+		if match(filepath.ToSlash(path), info) {
+			matches = append(matches, path)
+		}
+		return nil
+	})
+	return matches, err
+}
+
 // FileConcat concatenates files and writes the output to out.
 func FileConcat(out string, perm os.FileMode, files ...string) error {
 	f, err := os.OpenFile(createDir(out), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perm)
