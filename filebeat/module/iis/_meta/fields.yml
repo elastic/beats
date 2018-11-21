@@ -3,8 +3,17 @@
   description: >
     Module for parsing IIS log files.
   fields:
+    - name: user_agent.os_major
+      type: keyword
+      description: Temporary fix
+
+    - name: user_agent.os_minor
+      type: keyword
+      description: Temporary fix
+
     - name: iis
       type: group
       description: >
         Fields from IIS log files.
       fields:
+

@@ -95,11 +95,14 @@
         "url.query": "-", 
         "user.name": "-", 
         "user_agent.device": "Other", 
-        "user_agent.major": "57", 
+        "user_agent.major": "70", 
         "user_agent.minor": "0", 
-        "user_agent.name": "Firefox", 
-        "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0", 
-        "user_agent.os.full_name": "Windows 7", 
-        "user_agent.os.name": "Windows 7"
+        "user_agent.name": "Chrome", 
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36", 
+        "user_agent.os.full_name": "Mac OS X 10.14.0", 
+        "user_agent.os.name": "Mac OS X", 
+        "user_agent.os_major": "10", 
+        "user_agent.os_minor": "14", 
+        "user_agent.patch": "3538"
     }
 ]
