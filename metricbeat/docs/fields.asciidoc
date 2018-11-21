@@ -5440,7 +5440,7 @@ Number of the shard within the index
 
 --
 
-*`elasticsearch.ccr.follower.operations_indexed`*::
+*`elasticsearch.ccr.follower.operations_written`*::
 +
 --
 type: long
@@ -5450,7 +5450,7 @@ Number of operations indexed (replicated) into the follower shard from the leade
 
 --
 
-*`elasticsearch.ccr.follower.time_since_last_fetch.ms`*::
+*`elasticsearch.ccr.follower.time_since_last_read.ms`*::
 +
 --
 type: long
