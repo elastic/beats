@@ -5,12 +5,17 @@
         "name": "host.example.com"
     },
     "elasticsearch": {
+        "cluster": {
+            "id": "3LbUkLkURz--FR-YO0wLNA",
+            "name": "es1"
+        },
         "ml": {
             "job": {
                 "data_counts": {
+                    "invalid_date_count": 0,
                     "processed_record_count": 0
                 },
-                "id": "filebeat-apache2-access-low_request_rate",
+                "id": "total-requests",
                 "state": "closed"
             }
         }
