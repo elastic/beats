@@ -32,12 +32,7 @@ type YmlFile struct {
 }
 
 func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]*YmlFile, error) {
-	commonFields := []string{
-		// Fields for custom beats
-		filepath.Join(beatPath, "_meta/fields.yml"),
-		filepath.Join(beatPath, "_meta/fields.common.yml"),
-	}
-
+	var commonFields []string
 	var libbeatFieldFiles []*YmlFile
 	var err error
 	if !isLibbeat(beatPath) {
@@ -52,6 +47,12 @@ func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]
 			return nil, err
 		}
 	}
+
+	// Fields for custom beats last, to enable overriding more generically defined fields
+	commonFields = append(commonFields,
+		filepath.Join(beatPath, "_meta/fields.common.yml"),
+		filepath.Join(beatPath, "_meta/fields.yml"),
+	)
 
 	var files []*YmlFile
 	for _, cf := range commonFields {
