@@ -40,12 +40,32 @@
   }, {
     "rename": {
       "field": "user_agent.os",
-      "target_field": "user_agent.os.full_name"
+      "target_field": "user_agent.os.full_name",
+      "ignore_missing": true
     }
   }, {
     "rename": {
       "field": "user_agent.os_name",
-      "target_field": "user_agent.os.name"
+      "target_field": "user_agent.os.name",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_major",
+      "target_field": "user_agent.os.major",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_minor",
+      "target_field": "user_agent.os.minor",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_patch",
+      "target_field": "user_agent.os.patch",
+      "ignore_missing": true
     }
   }, {
     "rename": {

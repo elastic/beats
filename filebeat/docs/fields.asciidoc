@@ -3962,24 +3962,6 @@ Module for parsing IIS log files.
 
 
 
-*`user_agent.os_major`*::
-+
---
-type: keyword
-
-Temporary fix
-
---
-
-*`user_agent.os_minor`*::
-+
---
-type: keyword
-
-Temporary fix
-
---
-
 [float]
 == iis fields
 
