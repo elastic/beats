@@ -36,6 +36,7 @@ class Test(metricbeat.BaseTest):
         """
         self.check_skip(metricset)
 
+        self.start_trial()
         if metricset == "ml_job":
             self.create_ml_job()
 
@@ -51,13 +52,6 @@ class Test(metricbeat.BaseTest):
     def create_ml_job(self):
         es = Elasticsearch(self.get_hosts())
 
-        # Enable xpack trial
-        try:
-            es.transport.perform_request('POST', "/_xpack/license/start_trial?acknowledge=true")
-        except:
-            e = sys.exc_info()[0]
-            print "Trial already enabled. Error: {}".format(e)
-
         # Check if an ml job already exists
         response = es.transport.perform_request('GET', "/_xpack/ml/anomaly_detectors/_all/")
         if response["count"] > 0:
@@ -71,6 +65,16 @@ class Test(metricbeat.BaseTest):
 
         path = "/_xpack/ml/anomaly_detectors/test"
         es.transport.perform_request('PUT', path, body=body)
+
+    def start_trial(self):
+        es = Elasticsearch(self.get_hosts())
+
+        # Enable xpack trial
+        try:
+            es.transport.perform_request('POST', "/_xpack/license/start_trial?acknowledge=true")
+        except:
+            e = sys.exc_info()[0]
+            print "Trial already enabled. Error: {}".format(e)
 
     def check_skip(self, metricset):
         if metricset != "ccr":
