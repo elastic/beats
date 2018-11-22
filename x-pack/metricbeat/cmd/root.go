@@ -5,7 +5,7 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/filebeat/cmd"
+	"github.com/elastic/beats/metricbeat/cmd"
 	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
 
 	// Register the includes.
