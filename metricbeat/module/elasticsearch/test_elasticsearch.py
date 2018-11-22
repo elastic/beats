@@ -39,6 +39,8 @@ class Test(metricbeat.BaseTest):
         self.start_trial()
         if metricset == "ml_job":
             self.create_ml_job()
+        if metricset == "ccr":
+            self.create_ccr_stats()
 
         es = Elasticsearch(self.get_hosts())
         es.indices.create(index='test-index', ignore=400)
@@ -66,8 +68,54 @@ class Test(metricbeat.BaseTest):
         path = "/_xpack/ml/anomaly_detectors/test"
         es.transport.perform_request('PUT', path, body=body)
 
+    def create_ccr_stats(self):
+        self.setup_ccr_remote()
+        self.create_ccr_leader_index()
+        self.create_ccr_follower_index()
+
+    def setup_ccr_remote(self):
+        es = Elasticsearch(self.get_hosts())
+
+        file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr", "_meta", "test", "test_remote_settings.json")
+
+        body = {}
+        with open(file, 'r') as f:
+            body = json.load(f)
+
+        path = "/_cluster/settings"
+        es.transport.perform_request('PUT', path, body=body)
+
+    def create_ccr_leader_index(self):
+        es = Elasticsearch(self.get_hosts())
+
+        file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr", "_meta", "test", "test_leader_index.json")
+
+        body = {}
+        with open(file, 'r') as f:
+            body = json.load(f)
+
+        path = "/pied_piper"
+        es.transport.perform_request('PUT', path, body=body)
+
+    def create_ccr_follower_index(self):
+        es = Elasticsearch(self.get_hosts())
+
+        file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr", "_meta", "test", "test_follower_index.json")
+
+        body = {}
+        with open(file, 'r') as f:
+            body = json.load(f)
+
+        path = "/rats/_ccr/follow"
+        es.transport.perform_request('PUT', path, body=body)
+
     def start_trial(self):
         es = Elasticsearch(self.get_hosts())
+
+        # Check if trial is already enabled
+        response = es.transport.perform_request('GET', "/_xpack/license")
+        if response["license"]["type"] == "trial":
+            return
 
         # Enable xpack trial
         try:
