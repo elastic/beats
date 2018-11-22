@@ -192,7 +192,7 @@ var queryMessage = []byte(`{"type":"query"}`)
 func (d *Discovery) sendProbe(config InterfaceConfig) {
 	interfaces, err := d.interfaces(config.Name)
 	if err != nil {
-		logp.Err("failed to get interfaces: ", err)
+		logp.Err("failed to get interfaces: %+v", err)
 		return
 	}
 
