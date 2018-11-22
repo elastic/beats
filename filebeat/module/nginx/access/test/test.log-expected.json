@@ -119,14 +119,15 @@
         "url.original": "/ocelot", 
         "user.name": "-", 
         "user_agent.device": "Other", 
-        "user_agent.major": "49", 
+        "user_agent.major": "70", 
         "user_agent.minor": "0", 
-        "user_agent.name": "Firefox", 
-        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0", 
-        "user_agent.os.full_name": "Mac OS X 10.12", 
+        "user_agent.name": "Chrome", 
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36", 
+        "user_agent.os.full_name": "Mac OS X 10.14.0", 
         "user_agent.os.major": "10", 
-        "user_agent.os.minor": "12", 
-        "user_agent.os.name": "Mac OS X"
+        "user_agent.os.minor": "14", 
+        "user_agent.os.name": "Mac OS X", 
+        "user_agent.patch": "3538"
     }, 
     {
         "@timestamp": "2016-01-22T13:18:29.000Z", 
@@ -137,7 +138,7 @@
         "http.response.status_code": 200, 
         "http.version": "1.1", 
         "input.type": "log", 
-        "log.offset": 693, 
+        "log.offset": 732, 
         "network.forwarded_ip": [
             "10.5.102.222", 
             "199.96.1.1", 
@@ -171,7 +172,7 @@
         "http.response.status_code": 404, 
         "http.version": "1.1", 
         "input.type": "log", 
-        "log.offset": 845, 
+        "log.offset": 884, 
         "network.forwarded_ip": [
             "2a03:0000:10ff:f00f:0000:0000:0:8000", 
             "10.225.192.17", 
@@ -201,7 +202,7 @@
         "http.request.referrer": "-", 
         "http.response.status_code": 400, 
         "input.type": "log", 
-        "log.offset": 1085, 
+        "log.offset": 1124, 
         "network.forwarded_ip": [
             "127.0.0.1"
         ], 
