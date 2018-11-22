@@ -67,6 +67,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Metricbeat*
 
+- The `elasticsearch/node` metricset now reports the Elasticsearch cluster UUID. {pull}8771[8771]
+
 *Packetbeat*
 
 *Functionbeat*
