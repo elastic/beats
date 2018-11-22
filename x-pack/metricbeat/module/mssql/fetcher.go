@@ -63,7 +63,7 @@ type Fetcher struct {
 	wg      sync.WaitGroup // WaitGroup to wait for all queries to complete.
 }
 
-// Reports receives a mb.ReporterV2 to send the data to the outputs. Because the operations are common between metricsets
+// Report receives a mb.ReporterV2 to send the data to the outputs. Because the operations are common between metricsets
 // it can be extracted to a common function
 func (f *Fetcher) Report(reporter mb.ReporterV2) {
 	// Run queries concurrently.
