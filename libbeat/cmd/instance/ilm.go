@@ -51,7 +51,7 @@ var ILMPolicy = common.MapStr{
 
 const (
 	ILMPolicyName     = "beats-default-policy"
-	ILMDefaultPattern = "000001"
+	ILMDefaultPattern = "%7Bnow%2Fd%7D-000001" // {now/d} escaped
 )
 
 // Build and return a callback to load ILM write alias
@@ -66,7 +66,8 @@ func (b *Beat) writeAliasLoadingCallback() (func(esClient *elasticsearch.Client)
 			return err
 		}
 
-		firstIndex := fmt.Sprintf("%s-%s", config.RolloverAlias, config.Pattern)
+		// This always assume it's a date pattern by sourrounding it by <...>
+		firstIndex := fmt.Sprintf("%%3C%s-%s%%3E", config.RolloverAlias, config.Pattern)
 
 		// Check if alias already exists
 		status, b, err := esClient.Request("HEAD", "/_alias/"+config.RolloverAlias, "", nil, nil)

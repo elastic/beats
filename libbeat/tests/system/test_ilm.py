@@ -5,6 +5,7 @@ from nose.plugins.attrib import attr
 import unittest
 import shutil
 import logging
+import datetime
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -17,12 +18,14 @@ class Test(BaseTest):
         self.elasticsearch_url = self.get_elasticsearch_url()
         print("Using elasticsearch: {}".format(self.elasticsearch_url))
         self.es = Elasticsearch([self.elasticsearch_url])
+        self.alias_name = "mockbeat-9.9.9"
+        self.policy_name = "beats-default-policy"
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_ilm_enabled(self):
+    def test_enabled(self):
         """
         Test ilm enabled
         """
@@ -34,20 +37,81 @@ class Test(BaseTest):
             },
         )
 
+        self.clean()
+
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains("Overwriting setup.template for ILM"))
         proc.check_kill_and_wait()
 
         # Check if template is loaded with settings
-        template = self.es.transport.perform_request('GET', '/_template/mockbeat-9.9.9')
+        template = self.es.transport.perform_request('GET', '/_template/' + self.alias_name)
 
-        assert template["mockbeat-9.9.9"]["settings"]["index"]["lifecycle"]["name"] == "beats-default-policy"
-        assert template["mockbeat-9.9.9"]["settings"]["index"]["lifecycle"]["rollover_alias"] == "mockbeat-9.9.9"
+        assert template[self.alias_name]["settings"]["index"]["lifecycle"]["name"] == "beats-default-policy"
+        assert template[self.alias_name]["settings"]["index"]["lifecycle"]["rollover_alias"] == self.alias_name
 
         # Make sure the correct index + alias was created
-        alias = self.es.transport.perform_request('GET', '/_alias/mockbeat-9.9.9')
-        assert "mockbeat-9.9.9-000001" in alias
+        alias = self.es.transport.perform_request('GET', '/_alias/' + self.alias_name)
+        d = datetime.datetime.now()
+        now = d.strftime("%Y.%m.%d")
+        index_name = self.alias_name + "-" + now + "-000001"
+        assert index_name in alias
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_rollover_alias(self):
+        """
+        Test ilm rollover alias setting
+        """
+
+        alias_name = "foo"
+        self.render_config_template(
+            elasticsearch={
+                "hosts": self.get_host(),
+                "ilm.enabled": True,
+                "ilm.pattern": "1",
+                "ilm.rollover_alias": alias_name
+            },
+        )
+
+        self.clean(alias_name=alias_name)
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains("Overwriting setup.template for ILM"))
+        proc.check_kill_and_wait()
+
+        # Make sure the correct index + alias was created
+        alias = self.es.transport.perform_request('GET', '/_alias/' + alias_name)
+        index_name = alias_name + "-1"
+        assert index_name in alias
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_pattern(self):
+        """
+        Test ilm pattern setting
+        """
+
+        self.render_config_template(
+            elasticsearch={
+                "hosts": self.get_host(),
+                "ilm.enabled": True,
+                "ilm.pattern": "1"
+            },
+        )
+
+        self.clean()
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains("Overwriting setup.template for ILM"))
+        proc.check_kill_and_wait()
+
+        # Make sure the correct index + alias was created
+        alias = self.es.transport.perform_request('GET', '/_alias/' + self.alias_name)
+        index_name = self.alias_name + "-1"
+        assert index_name in alias
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -56,13 +120,7 @@ class Test(BaseTest):
         Test ilm policy setup
         """
 
-        policy_name = "beats-default-policy"
-
-        # Delete any existing policy
-        try:
-            self.es.transport.perform_request('DELETE', "/_ilm/policy/" + policy_name)
-        except:
-            pass
+        self.clean()
 
         shutil.copy(self.beat_path + "/_meta/config.yml",
                     os.path.join(self.working_dir, "libbeat.yml"))
@@ -79,8 +137,25 @@ class Test(BaseTest):
 
         assert exit_code == 0
 
-        policy = self.es.transport.perform_request('GET', "/_ilm/policy/" + policy_name)
-        assert policy_name in policy
+        policy = self.es.transport.perform_request('GET', "/_ilm/policy/" + self.policy_name)
+        assert self.policy_name in policy
 
     def get_host(self):
         return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
+
+    def clean(self, alias_name=""):
+
+        if alias_name == "":
+            alias_name = self.alias_name
+
+        # Delete existing indices and aliases with it policy
+        try:
+            self.es.transport.perform_request('DELETE', "/" + alias_name + "*")
+        except:
+            pass
+
+        # Delete any existing policy
+        try:
+            self.es.transport.perform_request('DELETE', "/_ilm/policy/" + self.policy_name)
+        except:
+            pass

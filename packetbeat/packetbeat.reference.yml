@@ -737,7 +737,8 @@ output.elasticsearch:
   # Enabled ilm to use index lifecycle management instead daily indices.
   #ilm.enabled: false
   #ilm.rollover_alias: "packetbeat"
-  #ilm.pattern: "000001"
+  # This default pattern is {now/d}-000001 escaped as it contains date math
+  #ilm.pattern: "%7Bnow%2Fd%7D-000001"
 
   # Set gzip compression level.
   #compression_level: 0

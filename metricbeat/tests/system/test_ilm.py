@@ -4,6 +4,7 @@ from elasticsearch import Elasticsearch, TransportError
 from nose.plugins.attrib import attr
 import unittest
 import re
+import datetime
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -51,11 +52,15 @@ class Test(BaseTest):
 
         # Make sure the correct index + alias was created
         alias = es.transport.perform_request('GET', '/_alias/' + beat_name)
-        assert beat_name + "-000001" in alias
+        d = datetime.datetime.now()
+        now = d.strftime("%Y.%m.%d")
+        index_name = beat_name + "-" + now + "-000001"
+        assert index_name in alias
+        assert alias[index_name]["aliases"][beat_name]["is_write_index"] == True
 
         # Asserts that data is actually written to the ILM indices
         self.wait_until(lambda: es.transport.perform_request(
-            'GET', '/' + beat_name + '-000001/_search')["hits"]["total"] > 0)
+            'GET', '/' + index_name + '/_search')["hits"]["total"] > 0)
 
-        data = es.transport.perform_request('GET', '/' + beat_name + '-000001/_search')
+        data = es.transport.perform_request('GET', '/' + index_name + '/_search')
         assert data["hits"]["total"] > 0
