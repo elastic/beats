@@ -6039,6 +6039,13 @@ Module for parsing system log files.
 
 
 
+*`host.hostname`*::
++
+--
+type: keyword
+
+--
+
 [float]
 == system fields
 
@@ -6363,45 +6370,38 @@ Contains fields from the syslog system logs.
 
 
 
-*`system.syslog.timestamp`*::
+*`@timestamp`*::
 +
 --
-The timestamp as read from the syslog message.
-
+type: alias
 
 --
 
-*`system.syslog.hostname`*::
+*`host.hostname`*::
 +
 --
-The hostname as read from the syslog message.
-
+type: alias
 
 --
 
-*`system.syslog.program`*::
+*`process.name`*::
 +
 --
-The process name as read from the syslog message.
-
+type: alias
 
 --
 
-*`system.syslog.pid`*::
+*`process.pid`*::
 +
 --
-The PID of the process that sent the syslog message.
-
+type: alias
 
 --
 
-*`system.syslog.message`*::
+*`message`*::
 +
 --
-type: text
-
-The message in the log line.
-
+type: alias
 
 --
 

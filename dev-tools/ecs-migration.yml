@@ -85,6 +85,26 @@
   alias: true
   copy_to: false
 
+- from: system.syslog.hostname
+  to: host.hostname
+  alias: true
+  copy_to: false
+
+- from: system.syslog.program
+  to: process.name
+  alias: true
+  copy_to: false
+
+- from: system.syslog.pid
+  to: process.pid
+  alias: true
+  copy_to: false
+
+- from: system.syslog.message
+  to: message
+  alias: true
+  copy_to: false
+
 # From Auditbeat's auditd module.
 - from: source.hostname
   to: source.domain
