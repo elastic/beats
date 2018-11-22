@@ -9,11 +9,11 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 
 	// Register driver.
 	_ "github.com/denisenkom/go-mssqldb"
@@ -41,12 +41,6 @@ func NewFetcher(uri string, qs []string, schema *s.Schema, log *logp.Logger) (*F
 		log:     log,
 	}
 
-	// Run queries concurrently.
-	f.doQueries()
-
-	if len(f.errs) > 0 {
-		f.Error = multierr.Combine(f.errs...)
-	}
 	return f, nil
 }
 
@@ -67,6 +61,24 @@ type Fetcher struct {
 
 	queries []string       // List of queries to execute concurrently.
 	wg      sync.WaitGroup // WaitGroup to wait for all queries to complete.
+}
+
+// Reports receives a mb.ReporterV2 to send the data to the outputs. Because the operations are common between metricsets
+// it can be extracted to a common function
+func (f *Fetcher) Report(reporter mb.ReporterV2) {
+	// Run queries concurrently.
+	f.doQueries()
+
+	if f.Error != nil {
+		reporter.Error(f.Error)
+		return
+	}
+
+	for _, e := range f.Results {
+		reporter.Event(mb.Event{
+			MetricSetFields: e,
+		})
+	}
 }
 
 // doQueries is executed on object creation from the metricsets via NewFetcher.
