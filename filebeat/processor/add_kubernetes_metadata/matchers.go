@@ -19,6 +19,7 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -59,8 +60,8 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 	}
 
 	logPath := config.LogsPath
-	if logPath[len(logPath)-1:] != "/" {
-		logPath = logPath + "/"
+	if logPath[len(logPath)-1:] != string(os.PathSeparator) {
+		logPath = logPath + string(os.PathSeparator)
 	}
 	resourceType := config.ResourceType
 
