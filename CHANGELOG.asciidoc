@@ -126,6 +126,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Rename many `system.syslog.*` fields to map to ECS. {pull}9135[9135]
 - Rename many `iis.access.*` fields to map to ECS. {pull}9084[9084]
 - IIS module's user agent string is no longer encoded (`+` replaced with spaces). {pull}9084[9084]
+- Rename many `haproxy.*` fields to map to ECS. {pull}9117[9117]
 
 *Metricbeat*
 

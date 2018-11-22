@@ -197,3 +197,58 @@
   to: http.request.referrer
   alias: true
   copy_to: false
+
+- from: haproxy.client.port
+  to: source.port
+  alias: true
+  copy_to: false
+
+- from: haproxy.process_name
+  to: process.name
+  alias: true
+  copy_to: false
+
+- from: haproxy.pid
+  to: process.pid
+  alias: true
+  copy_to: false
+
+- from: haproxy.destination.ip
+  to: destination.ip
+  alias: true
+  copy_to: false
+
+- from: haproxy.destination.port
+  to: destination.port
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.location
+  to: source.geo.location
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  copy_to: false
