@@ -76,7 +76,8 @@ class Test(metricbeat.BaseTest):
     def setup_ccr_remote(self):
         es = Elasticsearch(self.get_hosts())
 
-        file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr", "_meta", "test", "test_remote_settings.json")
+        file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr",
+                            "_meta", "test", "test_remote_settings.json")
 
         body = {}
         with open(file, 'r') as f:
@@ -100,7 +101,8 @@ class Test(metricbeat.BaseTest):
     def create_ccr_follower_index(self):
         es = Elasticsearch(self.get_hosts())
 
-        file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr", "_meta", "test", "test_follower_index.json")
+        file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr",
+                            "_meta", "test", "test_follower_index.json")
 
         body = {}
         with open(file, 'r') as f:
