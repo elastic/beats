@@ -3393,66 +3393,6 @@ haproxy Module
 
 
 
-[float]
-== destination fields
-
-Destination information
-
-
-*`haproxy.destination.port`*::
-+
---
-type: long
-
-Port of the destination host
-
---
-
-*`haproxy.destination.ip`*::
-+
---
-IP of the destination host
-
---
-
-*`haproxy.process_name`*::
-+
---
-Name of the process
-
---
-
-*`haproxy.pid`*::
-+
---
-type: long
-
-PID of the process
-
---
-
-[float]
-== client fields
-
-Information about the client doing the request
-
-
-*`haproxy.client.ip`*::
-+
---
-IP address of the client which initiated the TCP connection to haproxy.
-
---
-
-*`haproxy.client.port`*::
-+
---
-type: long
-
-TCP port of the client which initiated the connection.
-
---
-
 *`haproxy.frontend_name`*::
 +
 --
@@ -3562,71 +3502,19 @@ The HAProxy source of the log
 
 --
 
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-*`haproxy.geoip.continent_name`*::
-+
---
-type: keyword
-
-Name of the continent.
-
---
-
-*`haproxy.geoip.country_iso_code`*::
-+
---
-type: keyword
-
-Country ISO code.
-
---
-
-*`haproxy.geoip.location`*::
-+
---
-type: geo_point
-
-Represents a geopoint with the longitude and latitude.
-
---
-
-*`haproxy.geoip.region_name`*::
-+
---
-type: keyword
-
-Name of the region
-
---
-
-*`haproxy.geoip.city_name`*::
-+
---
-type: keyword
-
-City name.
-
---
-
-*`haproxy.geoip.region_iso_code`*::
-+
---
-type: keyword
-
-ISO code of the region
-
---
-
 *`haproxy.termination_state`*::
 +
 --
 Condition the session was in when the session ended.
+
+--
+
+*`haproxy.mode`*::
++
+--
+type: text
+
+mode that the frontend is operating (TCP or HTTP)
 
 --
 
@@ -3681,12 +3569,108 @@ Number of connection retries experienced by this session when trying to connect 
 
 --
 
-*`haproxy.mode`*::
+[float]
+== client fields
+
+Information about the client doing the request
+
+
+*`haproxy.client.ip`*::
 +
 --
-type: text
+IP address of the client which initiated the TCP connection to haproxy.
+If connection is via unix socket, socket path is in this field.
 
-mode that the frontend is operating (TCP or HTTP)
+
+--
+
+*`source.port`*::
++
+--
+type: alias
+
+--
+
+*`process.name`*::
++
+--
+type: alias
+
+--
+
+*`process.pid`*::
++
+--
+type: alias
+
+--
+
+[float]
+== destination fields
+
+Destination information
+
+
+*`destination.port`*::
++
+--
+type: alias
+
+--
+
+*`destination.ip`*::
++
+--
+type: alias
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`source.geo.continent_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.location`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: alias
 
 --
 

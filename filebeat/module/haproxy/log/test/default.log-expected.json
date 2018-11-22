@@ -1,22 +1,23 @@
 [
     {
         "@timestamp": "2018-09-20T15:42:59.000Z", 
+        "destination.ip": "1.2.3.4", 
+        "destination.port": 5000, 
         "event.dataset": "log", 
         "event.module": "haproxy", 
         "haproxy.client.ip": "1.2.3.4", 
-        "haproxy.client.port": "40780", 
-        "haproxy.destination.ip": "1.2.3.4", 
-        "haproxy.destination.port": "5000", 
         "haproxy.frontend_name": "main", 
-        "haproxy.geoip.continent_name": "North America", 
-        "haproxy.geoip.country_iso_code": "US", 
-        "haproxy.geoip.location.lat": 37.751, 
-        "haproxy.geoip.location.lon": -97.822, 
         "haproxy.mode": "HTTP", 
-        "haproxy.pid": "24551", 
-        "haproxy.process_name": "haproxy", 
         "haproxy.source": "1.2.3.4", 
         "input.type": "log", 
-        "log.offset": 0
+        "log.offset": 0, 
+        "process.name": "haproxy", 
+        "process.pid": 24551, 
+        "source.geo.continent_name": "North America", 
+        "source.geo.country_iso_code": "US", 
+        "source.geo.location.lat": 37.751, 
+        "source.geo.location.lon": -97.822, 
+        "source.ip": "1.2.3.4", 
+        "source.port": 40780
     }
 ]
