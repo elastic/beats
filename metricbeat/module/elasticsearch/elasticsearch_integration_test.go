@@ -120,9 +120,9 @@ func TestElasticsearch(t *testing.T) {
 // GetConfig returns config for elasticsearch module
 func getConfig(metricset string, host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":     elasticsearch.ModuleName,
-		"metricsets": []string{metricset},
-		"hosts":      []string{host},
+		"module":                     elasticsearch.ModuleName,
+		"metricsets":                 []string{metricset},
+		"hosts":                      []string{host},
 		"index_recovery.active_only": false,
 	}
 }
