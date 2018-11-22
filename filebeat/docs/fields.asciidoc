@@ -3976,6 +3976,90 @@ Contains fields for IIS access logs.
 
 
 
+*`iis.access.sub_status`*::
++
+--
+type: long
+
+The HTTP substatus code.
+
+
+--
+
+*`iis.access.win32_status`*::
++
+--
+type: long
+
+The Windows status code.
+
+
+--
+
+*`iis.access.request_time_ms`*::
++
+--
+type: long
+
+The request time in milliseconds.
+
+
+--
+
+*`iis.access.site_name`*::
++
+--
+type: keyword
+
+The site name and instance number.
+
+
+--
+
+*`iis.access.server_name`*::
++
+--
+type: keyword
+
+The name of the server on which the log file entry was generated.
+
+
+--
+
+*`iis.access.cookie`*::
++
+--
+type: keyword
+
+The content of the cookie sent or received, if any.
+
+
+--
+
+*`iis.access.body_sent.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+--
+
+*`iis.access.body_received.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes of the server request body.
+
+
+--
+
 *`destination.ip`*::
 +
 --
@@ -4039,56 +4123,6 @@ type: alias
 
 --
 
-*`iis.access.sub_status`*::
-+
---
-type: long
-
-The HTTP substatus code.
-
-
---
-
-*`iis.access.win32_status`*::
-+
---
-type: long
-
-The Windows status code.
-
-
---
-
-*`iis.access.request_time_ms`*::
-+
---
-type: long
-
-The request time in milliseconds.
-
-
---
-
-*`iis.access.site_name`*::
-+
---
-type: keyword
-
-The site name and instance number.
-
-
---
-
-*`iis.access.server_name`*::
-+
---
-type: keyword
-
-The name of the server on which the log file entry was generated.
-
-
---
-
 *`http.version`*::
 +
 --
@@ -4096,44 +4130,10 @@ type: alias
 
 --
 
-*`iis.access.cookie`*::
-+
---
-type: keyword
-
-The content of the cookie sent or received, if any.
-
-
---
-
 *`host.hostname`*::
 +
 --
 type: alias
-
---
-
-*`iis.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
-
-
---
-
-*`iis.access.body_received.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server request body.
-
 
 --
 

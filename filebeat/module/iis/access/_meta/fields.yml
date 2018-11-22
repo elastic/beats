@@ -3,6 +3,41 @@
   description: >
     Contains fields for IIS access logs.
   fields:
+    - name: sub_status
+      type: long
+      description: >
+        The HTTP substatus code.
+    - name: win32_status
+      type: long
+      description: >
+        The Windows status code.
+    - name: request_time_ms
+      type: long
+      description: >
+        The request time in milliseconds.
+    - name: site_name
+      type: keyword
+      description: >
+        The site name and instance number.
+    - name: server_name
+      type: keyword
+      description: >
+        The name of the server on which the log file entry was generated.
+    - name: cookie
+      type: keyword
+      description: >
+        The content of the cookie sent or received, if any.
+    - name: body_sent.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes of the server response body.
+    - name: body_received.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes of the server request body.
+
     - name: server_ip
       type: alias
       path: destination.ip
@@ -30,46 +65,12 @@
     - name: response_code
       type: alias
       path: http.response.status_code
-    - name: sub_status
-      type: long
-      description: >
-        The HTTP substatus code.
-    - name: win32_status
-      type: long
-      description: >
-        The Windows status code.
-    - name: request_time_ms
-      type: long
-      description: >
-        The request time in milliseconds.
-    - name: site_name
-      type: keyword
-      description: >
-        The site name and instance number.
-    - name: server_name
-      type: keyword
-      description: >
-        The name of the server on which the log file entry was generated.
     - name: http_version
       type: alias
       path: http.version
-    - name: cookie
-      type: keyword
-      description: >
-        The content of the cookie sent or received, if any.
     - name: hostname
       type: alias
       path: host.hostname
-    - name: body_sent.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes of the server response body.
-    - name: body_received.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes of the server request body.
     - name: user_agent
       type: group
       fields:
