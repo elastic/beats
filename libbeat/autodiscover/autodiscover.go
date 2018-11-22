@@ -225,7 +225,7 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 			delete(a.configs, hash)
 			updated = true
 		} else {
-			logp.Debug(debugK, "Runner not found for stopping: %s", hash)
+			logp.Debug(debugK, "Runner not found for stopping: %d", hash)
 		}
 	}
 
