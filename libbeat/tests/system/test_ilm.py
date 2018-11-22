@@ -39,16 +39,14 @@ class Test(BaseTest):
         self.wait_until(lambda: self.log_contains("Overwriting setup.template for ILM"))
         proc.check_kill_and_wait()
 
-        es = Elasticsearch([self.get_elasticsearch_url()])
-
         # Check if template is loaded with settings
-        template = es.transport.perform_request('GET', '/_template/mockbeat-9.9.9')
+        template = self.es.transport.perform_request('GET', '/_template/mockbeat-9.9.9')
 
         assert template["mockbeat-9.9.9"]["settings"]["index"]["lifecycle"]["name"] == "beats-default-policy"
         assert template["mockbeat-9.9.9"]["settings"]["index"]["lifecycle"]["rollover_alias"] == "mockbeat-9.9.9"
 
         # Make sure the correct index + alias was created
-        alias = es.transport.perform_request('GET', '/_alias/mockbeat-9.9.9')
+        alias = self.es.transport.perform_request('GET', '/_alias/mockbeat-9.9.9')
         assert "mockbeat-9.9.9-000001" in alias
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
