@@ -37,6 +37,8 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Propagate Sync error when running SafeFileRotate. {pull}9069[9069]
+
 *Auditbeat*
 
 *Filebeat*
