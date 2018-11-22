@@ -19,6 +19,8 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 )
 
+// NewFetcher is called from all metricsets to initialize their fetching routines. It opens a different connection to
+// the database for each fetch operation
 func NewFetcher(uri string, qs []string, schema *s.Schema, log *logp.Logger) (*Fetcher, error) {
 	db, err := sql.Open("sqlserver", uri)
 	if err != nil {

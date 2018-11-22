@@ -18,11 +18,13 @@ func init() {
 		mb.WithHostParser(mssql.HostParser))
 }
 
+// MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	log *logp.Logger
 }
 
+// New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The mssql performance metricset is experimental.")
 	return &MetricSet{
@@ -31,6 +33,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
+// Fetch methods implements the data gathering and data conversion to the right format
+// It returns the event which is then forward to the output. In case of an error, a
+// descriptive error must be returned.
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	fetcher, err := mssql.NewFetcher(m.HostData().URI, []string{
 		`SELECT [cntr_value] as page_life_expectancy FROM sys.dm_os_performance_counters WHERE [object_name] = 'SQLServer:Buffer Manager' AND [counter_name] = 'Page life expectancy'`,

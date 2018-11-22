@@ -146,7 +146,7 @@ func PythonUnitTest() error {
 	return mage.PythonNoseTest(mage.DefaultPythonTestUnitArgs())
 }
 
-// PythonUnitTest executes the python system tests in the integration environment (Docker).
+// PythonIntegTest executes the python system tests in the integration environment (Docker).
 func PythonIntegTest(ctx context.Context) error {
 	if !mage.IsInIntegTestEnv() {
 		mg.Deps(Fields)
