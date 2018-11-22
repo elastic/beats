@@ -79,9 +79,11 @@ func (r *TestRunner) runSuite(t *testing.T, tests Suite, ctl R) {
 		var testFunc func(t *testing.T)
 		switch f := test.(type) {
 		case func(R):
-			testFunc = func(t *testing.T) { f(ctl) }
+			testFunc = func(t *testing.T) { f(ctl.WithT(t)) }
 		case func(*testing.T, R):
-			testFunc = func(t *testing.T) { f(t, ctl) }
+			testFunc = func(t *testing.T) { f(t, ctl.WithT(t)) }
+		case func(*testing.T):
+			testFunc = func(t *testing.T) { f(t) }
 		default:
 			t.Fatalf("incorrect test suite function '%s'", name)
 		}
@@ -99,7 +101,6 @@ func (r *TestRunner) runHostOverride(t *testing.T, tests Suite) bool {
 	t.Logf("Test host overriden by %s=%s", env, host)
 
 	ctl := &runnerControl{
-		T:    t,
 		host: host,
 	}
 	r.runSuite(t, tests, ctl)
@@ -168,7 +169,6 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 			}
 
 			ctl := &runnerControl{
-				T:        t,
 				host:     host,
 				scenario: s,
 			}
@@ -182,6 +182,8 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 type R interface {
 	testing.TB
 
+	WithT(t *testing.T) R
+
 	Host() string
 	Hostname() string
 	Port() string
@@ -194,6 +196,12 @@ type runnerControl struct {
 
 	host     string
 	scenario map[string]string
+}
+
+func (r *runnerControl) WithT(t *testing.T) R {
+	ctl := *r
+	ctl.T = t
+	return &ctl
 }
 
 func (r *runnerControl) Host() string {
