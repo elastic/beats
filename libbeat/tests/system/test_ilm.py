@@ -32,7 +32,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             elasticsearch={
-                "hosts": self.get_host(),
+                "hosts": self.get_elasticsearch_url(),
                 "ilm.enabled": True,
             },
         )
@@ -67,7 +67,7 @@ class Test(BaseTest):
         alias_name = "foo"
         self.render_config_template(
             elasticsearch={
-                "hosts": self.get_host(),
+                "hosts": self.get_elasticsearch_url(),
                 "ilm.enabled": True,
                 "ilm.pattern": "1",
                 "ilm.rollover_alias": alias_name
@@ -95,7 +95,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             elasticsearch={
-                "hosts": self.get_host(),
+                "hosts": self.get_elasticsearch_url(),
                 "ilm.enabled": True,
                 "ilm.pattern": "1"
             },
@@ -132,16 +132,13 @@ class Test(BaseTest):
             extra_args=["setup",
                         "--ilm-policy",
                         "-path.config", self.working_dir,
-                        "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']"],
+                        "-E", "output.elasticsearch.hosts=['" + self.get_elasticsearch_url() + "']"],
             config="libbeat.yml")
 
         assert exit_code == 0
 
         policy = self.es.transport.perform_request('GET', "/_ilm/policy/" + self.policy_name)
         assert self.policy_name in policy
-
-    def get_host(self):
-        return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
 
     def clean(self, alias_name=""):
 
