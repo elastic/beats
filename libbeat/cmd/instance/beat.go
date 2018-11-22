@@ -49,6 +49,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cloudid"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/common/seccomp"
@@ -103,8 +104,9 @@ type beatConfig struct {
 	Keystore      *common.Config `config:"keystore"`
 
 	// output/publishing related configurations
-	Pipeline   pipeline.Config `config:",inline"`
-	Monitoring *common.Config  `config:"xpack.monitoring"`
+	Pipeline      pipeline.Config `config:",inline"`
+	Monitoring    *common.Config  `config:"xpack.monitoring"`
+	MonitoringNew *common.Config  `config:"monitoring"`
 
 	// central management settings
 	Management *common.Config `config:"management"`
@@ -362,11 +364,13 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	if b.Config.Monitoring.Enabled() {
+	if b.Config.MonitoringNew.Enabled() || b.Config.Monitoring.Enabled() {
+		monitoringCfg := chooseMonitoringConfig(b.Config)
+
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 		}
-		reporter, err := report.New(b.Info, settings, b.Config.Monitoring, b.Config.Output)
+		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
 		if err != nil {
 			return err
 		}
@@ -945,4 +949,20 @@ func initPaths(cfg *common.Config) error {
 		return fmt.Errorf("error setting default paths: %+v", err)
 	}
 	return nil
+}
+
+func chooseMonitoringConfig(beatCfg beatConfig) (monitoringCfg *common.Config) {
+	if beatCfg.MonitoringNew.Enabled() && beatCfg.Monitoring.Enabled() {
+		cfgwarn.Deprecate("6.6.0", "both xpack.monitoring.* and monitoring.* cannot be set. Using monitoring.* which is preferred.")
+		monitoringCfg = beatCfg.MonitoringNew
+		monitoringCfg.SetString("dest", -1, "monitoring")
+	} else if beatCfg.Monitoring.Enabled() {
+		cfgwarn.Deprecate("6.6.0", "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.hosts to monitoring cluster hosts.")
+		monitoringCfg = beatCfg.Monitoring
+		monitoringCfg.SetString("dest", -1, "production")
+	} else {
+		monitoringCfg = beatCfg.MonitoringNew
+		monitoringCfg.SetString("dest", -1, "monitoring")
+	}
+	return
 }
