@@ -10,7 +10,7 @@ INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 class Test(BaseTest):
 
-    #COMPOSE_SERVICES = ['elasticsearch']
+    COMPOSE_SERVICES = ['elasticsearch']
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
