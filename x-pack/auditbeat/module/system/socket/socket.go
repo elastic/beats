@@ -263,10 +263,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	}
 
 	// Refresh data for direction and process enrichment
-	err = ms.refreshEnrichments(sockets)
-	if err != nil {
-		return err
-	}
+	ms.refreshEnrichments(sockets)
 
 	for _, socket := range sockets {
 		err = ms.enrichSocket(socket)
@@ -308,10 +305,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	if len(opened) > 0 {
 		// Refresh data for direction and process enrichment - only new sockets
 		// need enrichment
-		err = ms.refreshEnrichments(sockets)
-		if err != nil {
-			return err
-		}
+		ms.refreshEnrichments(sockets)
 
 		for _, s := range opened {
 			err = ms.enrichSocket(s.(*Socket))
@@ -409,11 +403,12 @@ func (ms *MetricSet) getSockets() ([]*Socket, error) {
 	return sockets, nil
 }
 
-func (ms *MetricSet) refreshEnrichments(sockets []*Socket) error {
+func (ms *MetricSet) refreshEnrichments(sockets []*Socket) {
 	// Refresh inode to process mapping for process enrichment
 	err := ms.ptable.Refresh()
 	if err != nil {
-		return errors.Wrap(err, "error refreshing process data")
+		// Errors here can happen, e.g. if a process exits while its /proc is being read.
+		ms.log.Warn(errors.Wrap(err, "error refreshing process data"))
 	}
 
 	// Register all listening sockets
@@ -423,6 +418,4 @@ func (ms *MetricSet) refreshEnrichments(sockets []*Socket) error {
 			ms.listeners.Put(uint8(syscall.IPPROTO_TCP), socket.LocalIP, socket.LocalPort)
 		}
 	}
-
-	return nil
 }
