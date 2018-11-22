@@ -73,10 +73,10 @@ func New(
 }
 
 func getReporterConfig(
-	cfg *common.Config,
+	monitoringConfig *common.Config,
 	outputs common.ConfigNamespace,
 ) (string, *common.Config, error) {
-	cfg = collectSubObject(cfg)
+	cfg := collectSubObject(monitoringConfig)
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return "", nil, err
@@ -109,6 +109,12 @@ func getReporterConfig(
 			}
 			rc = merged
 		}
+
+		format, err := monitoringConfig.String("format", -1)
+		if err != nil {
+			return "", nil, err
+		}
+		rc.SetString("parameters.format", -1, format)
 
 		return name, rc, nil
 	}

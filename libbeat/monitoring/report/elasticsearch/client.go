@@ -84,6 +84,8 @@ func (c *publishClient) Connect() error {
 	}
 
 	debugf("XPack monitoring is enabled")
+	debugf("Publishing to %v cluster", c.params["format"])
+
 	return nil
 }
 

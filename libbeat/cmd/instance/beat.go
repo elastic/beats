@@ -365,7 +365,10 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	if b.Config.MonitoringNew.Enabled() || b.Config.Monitoring.Enabled() {
-		monitoringCfg := chooseMonitoringConfig(b.Config)
+		monitoringCfg, err := chooseMonitoringConfig(b.Config)
+		if err != nil {
+			return err
+		}
 
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
@@ -951,18 +954,16 @@ func initPaths(cfg *common.Config) error {
 	return nil
 }
 
-func chooseMonitoringConfig(beatCfg beatConfig) (monitoringCfg *common.Config) {
+func chooseMonitoringConfig(beatCfg beatConfig) (monitoringCfg *common.Config, err error) {
 	if beatCfg.MonitoringNew.Enabled() && beatCfg.Monitoring.Enabled() {
-		cfgwarn.Deprecate("6.6.0", "both xpack.monitoring.* and monitoring.* cannot be set. Using monitoring.* which is preferred.")
-		monitoringCfg = beatCfg.MonitoringNew
-		monitoringCfg.SetString("dest", -1, "monitoring")
+		err = fmt.Errorf("both xpack.monitoring.* and monitoring.* cannot be set. Prefer to set monitoring.* and set monitoring.hosts to monitoring cluster hosts")
 	} else if beatCfg.Monitoring.Enabled() {
-		cfgwarn.Deprecate("6.6.0", "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.hosts to monitoring cluster hosts.")
+		cfgwarn.Deprecate("7.0", "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.hosts to monitoring cluster hosts")
 		monitoringCfg = beatCfg.Monitoring
-		monitoringCfg.SetString("dest", -1, "production")
+		monitoringCfg.SetString("format", -1, "production")
 	} else {
 		monitoringCfg = beatCfg.MonitoringNew
-		monitoringCfg.SetString("dest", -1, "monitoring")
+		monitoringCfg.SetString("format", -1, "monitoring")
 	}
 	return
 }
