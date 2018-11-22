@@ -6,6 +6,7 @@
     },
     "elasticsearch": {
         "cluster": {
+            "id": "91RpCx2xSQ21pVPTZfDK0Q",
             "name": "elasticsearch"
         },
         "node": {
@@ -16,25 +17,25 @@
                             "bytes": 1073741824
                         },
                         "max": {
-                            "bytes": 1038876672
+                            "bytes": 1037959168
                         }
                     },
                     "nonheap": {
                         "init": {
-                            "bytes": 2555904
+                            "bytes": 7667712
                         },
                         "max": {
                             "bytes": 0
                         }
                     }
                 },
-                "version": "1.8.0_144"
+                "version": "11.0.1"
             },
-            "name": "523zXyT6TRWiqXcQItnkyQ",
+            "name": "DSiWcTyeThWtUXLB9J0BMw",
             "process": {
                 "mlockall": false
             },
-            "version": "6.3.0"
+            "version": "7.0.0-alpha1"
         }
     },
     "metricset": {
