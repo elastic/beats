@@ -59,7 +59,8 @@ func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *
 		msgOutputter: msgOutputter,
 	}
 
-	loader.statusMsg("Initialize the Kibana %s loader", client.GetVersion())
+	version := client.GetVersion()
+	loader.statusMsg("Initialize the Kibana %s loader", version.String())
 
 	return &loader, nil
 }
