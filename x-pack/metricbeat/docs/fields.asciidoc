@@ -7029,10 +7029,10 @@ bar
 
 
 
-*`foo.bar.example`*::
+*`foo.bar.counter`*::
 +
 --
-type: keyword
+type: long
 
 Example field
 

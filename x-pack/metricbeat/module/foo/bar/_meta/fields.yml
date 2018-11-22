@@ -3,7 +3,7 @@
   description: >
     bar
   fields:
-    - name: example
-      type: keyword
+    - name: counter
+      type: long
       description: >
         Example field

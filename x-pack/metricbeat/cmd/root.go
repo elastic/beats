@@ -5,16 +5,30 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/metricbeat/cmd"
-	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
+	"flag"
 
-	// Register the includes.
+	"github.com/spf13/pflag"
+
+	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/x-pack/metricbeat/beater"
+	"github.com/elastic/beats/x-pack/metricbeat/cmd/test"
+
+	// import modules
 	_ "github.com/elastic/beats/x-pack/metricbeat/include"
+	_ "github.com/elastic/beats/x-pack/metricbeat/include/fields"
 )
 
+// Name of this beat
+var Name = "metricbeat"
+
 // RootCmd to handle beats cli
-var RootCmd = cmd.RootCmd
+var RootCmd *cmd.BeatsRootCmd
 
 func init() {
-	xpackcmd.AddXPack(RootCmd, cmd.Name)
+	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
+
+	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.DefaultCreator(), runFlags)
+	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
+	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, ""))
 }

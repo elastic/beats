@@ -1,0 +1,18 @@
+version: '2'
+services:
+  beat:
+    build: ${PWD}/.
+    environment:
+    - TEST_ENVIRONMENT=false
+    working_dir: /go/src/github.com/elastic/beats/x-pack/metricbeat
+    volumes:
+    - ${PWD}/..:/go/src/github.com/elastic/beats/
+    # This is required to on-demand launching the rest on containers for tests & also docker module tests:
+    - /var/run/docker.sock:/var/run/docker.sock
+    command: make
+    env_file:
+    - ./module/foo/_meta/env
+
+  # Modules
+  aerospike:
+    build: ./module/foo/_meta
