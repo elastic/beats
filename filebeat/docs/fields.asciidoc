@@ -3569,6 +3569,28 @@ Number of connection retries experienced by this session when trying to connect 
 
 --
 
+[float]
+== client fields
+
+Information about the client doing the request
+
+
+*`haproxy.client.ip`*::
++
+--
+IP address of the client which initiated the TCP connection to haproxy.
+If connection is via unix socket, socket path is in this field.
+
+
+--
+
+*`source.port`*::
++
+--
+type: alias
+
+--
+
 *`process.name`*::
 +
 --
@@ -3577,26 +3599,6 @@ type: alias
 --
 
 *`process.pid`*::
-+
---
-type: alias
-
---
-
-[float]
-== client fields
-
-Information about the client doing the request
-
-
-*`source.ip`*::
-+
---
-type: alias
-
---
-
-*`source.port`*::
 +
 --
 type: alias

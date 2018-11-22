@@ -87,6 +87,20 @@
               description: Number of connection retries experienced by this session when trying to connect to the server.
               type: long
 
+        - name: client
+          description: Information about the client doing the request
+          type: group
+          fields:
+          - name: ip
+            description: >
+              IP address of the client which initiated the TCP connection to haproxy.
+
+              If connection is via unix socket, socket path is in this field.
+          - name: port
+            type: alias
+            path: source.port
+
+
 
         - name: process_name
           type: alias
@@ -95,17 +109,6 @@
         - name: pid
           type: alias
           path: process.pid
-
-        - name: client
-          description: Information about the client doing the request
-          type: group
-          fields:
-          - name: ip
-            type: alias
-            path: source.ip
-          - name: port
-            type: alias
-            path: source.port
 
         - name: destination
           description: Destination information
