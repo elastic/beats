@@ -21,10 +21,12 @@ package template
 
 import (
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -217,8 +219,13 @@ func TestTemplateSettings(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, val.(string), "1")
 
-	val, err = templateJSON.GetValue("mappings.doc._source.enabled")
-	assert.NoError(t, err)
+	docType := "_doc"
+	if client.GetVersion().Major < 7 {
+		docType = "doc"
+	}
+
+	val, err = templateJSON.GetValue(fmt.Sprintf("mappings.%v._source.enabled", docType))
+	require.NoError(t, err)
 	assert.Equal(t, val.(bool), false)
 
 	// Delete template again to clean up
