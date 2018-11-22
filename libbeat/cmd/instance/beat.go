@@ -39,6 +39,10 @@ import (
 	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
 
+	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
+	ucfg "github.com/elastic/go-ucfg"
+
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
@@ -66,9 +70,6 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/processing"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/version"
-	sysinfo "github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
-	ucfg "github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
