@@ -130,11 +130,6 @@
   alias: true
   copy_to: false
 
-- from: system.auth.ssh.signature
-  to: event.hash
-  alias: true
-  copy_to: false
-
 - from: system.auth.ssh.event
   to: event.action
   alias: true
