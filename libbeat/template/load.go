@@ -23,6 +23,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/elastic/beats/libbeat/asset"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -36,37 +38,31 @@ type ESClient interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() common.Version
 }
-
 type Loader struct {
-	config   TemplateConfig
-	client   ESClient
-	beatInfo beat.Info
-	fields   []byte
+	config    TemplateConfig
+	client    ESClient
+	beatInfo  beat.Info
+	esVersion common.Version
 }
 
 // NewLoader creates a new template loader
-func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields []byte) (*Loader, error) {
-	config := DefaultConfig
-
-	err := cfg.Unpack(&config)
-	if err != nil {
-		return nil, err
+func NewLoader(cfg TemplateConfig, client ESClient, beatInfo beat.Info) (*Loader, error) {
+	l := Loader{config: cfg, client: client, beatInfo: beatInfo}
+	if client != nil {
+		l.esVersion = client.GetVersion()
 	}
-
-	return &Loader{
-		config:   config,
-		client:   client,
-		beatInfo: beatInfo,
-		fields:   fields,
-	}, nil
+	return &l, nil
 }
 
 // Load checks if the index mapping template should be loaded
 // In case the template is not already loaded or overwriting is enabled, the
-// template is written to index
+// template is written to the configured output.
 func (l *Loader) Load() error {
+	if !l.config.Enabled {
+		return nil
+	}
 
-	tmpl, err := New(l.beatInfo.Version, l.beatInfo.IndexPrefix, l.client.GetVersion(), l.config)
+	tmpl, err := New(l.beatInfo.Version, l.beatInfo.IndexPrefix, l.esVersion, l.config)
 	if err != nil {
 		return fmt.Errorf("error creating template instance: %v", err)
 	}
@@ -75,12 +71,11 @@ func (l *Loader) Load() error {
 	if l.config.JSON.Enabled {
 		templateName = l.config.JSON.Name
 	}
-	// Check if template already exist or should be overwritten
-	exists := l.CheckTemplate(templateName)
-	if !exists || l.config.Overwrite {
 
-		version := l.client.GetVersion()
-		logp.Info("Loading template for Elasticsearch version: %s", version.String())
+	// Check if template already exist or should be overwritten
+	if !l.templateLoaded(templateName) || l.config.Overwrite {
+
+		logp.Info("Loading template %s for Elasticsearch version: %s", templateName, l.esVersion.String())
 		if l.config.Overwrite {
 			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
 		}
@@ -103,6 +98,7 @@ func (l *Loader) Load() error {
 			if err != nil {
 				return fmt.Errorf("could not unmarshal json template: %s", err)
 			}
+
 			// Load fields from path
 		} else if l.config.Fields != "" {
 			logp.Debug("template", "Load fields.yml from file: %s", l.config.Fields)
@@ -113,9 +109,28 @@ func (l *Loader) Load() error {
 			if err != nil {
 				return fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
 			}
+
+			// Load fields for modules
+		} else if l.config.Module != "" {
+			logp.Debug("template", "Load fields for %s", l.config.Module)
+
+			fields, err := asset.GetFieldsFor(l.beatInfo.Beat, l.config.Module)
+			if err != nil {
+				return err
+			}
+			template, err = tmpl.LoadBytes(fields)
+			if err != nil {
+				return fmt.Errorf("error creating template: %v", err)
+			}
+
+			// Load default fields
 		} else {
 			logp.Debug("template", "Load default fields.yml")
-			template, err = tmpl.LoadBytes(l.fields)
+			fields, err := asset.GetFields(l.beatInfo.Beat)
+			if err != nil {
+				return err
+			}
+			template, err = tmpl.LoadBytes(fields)
 			if err != nil {
 				return fmt.Errorf("error creating template: %v", err)
 			}
@@ -126,6 +141,8 @@ func (l *Loader) Load() error {
 			return fmt.Errorf("could not load template. Elasticsearch returned: %v. Template is: %s", err, template)
 		}
 
+		logp.Info("Template successfully loaded.")
+
 	} else {
 		logp.Info("Template already exists and will not be overwritten.")
 	}
@@ -135,21 +152,31 @@ func (l *Loader) Load() error {
 
 // LoadTemplate loads a template into Elasticsearch overwriting the existing
 // template if it exists. If you wish to not overwrite an existing template
-// then use CheckTemplate prior to calling this method.
-func (l *Loader) LoadTemplate(templateName string, template map[string]interface{}) error {
+// then use templateLoaded prior to calling this method.
+func (l *Loader) LoadTemplate(templateName string, template common.MapStr) error {
 	logp.Debug("template", "Try loading template with name: %s", templateName)
+	if l.client == nil {
+		if _, err := os.Stdout.WriteString(template.StringToPrint() + "\n"); err != nil {
+			return fmt.Errorf("Error writing template: %v", err)
+		}
+		return nil
+	}
+
 	path := "/_template/" + templateName
 	body, err := l.client.LoadJSON(path, template)
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
 	}
-	logp.Info("Elasticsearch template with name '%s' loaded", templateName)
 	return nil
 }
 
-// CheckTemplate checks if a given template already exist. It returns true if
+// templateLoaded checks if a given template already exist. It returns true if
 // and only if Elasticsearch returns with HTTP status code 200.
-func (l *Loader) CheckTemplate(templateName string) bool {
+// If no ES client is configured it returns false.
+func (l *Loader) templateLoaded(templateName string) bool {
+	if l.client == nil {
+		return false
+	}
 	status, _, _ := l.client.Request("HEAD", "/_template/"+templateName, "", nil, nil)
 
 	if status != 200 {

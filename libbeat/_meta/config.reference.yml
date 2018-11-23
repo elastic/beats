@@ -218,6 +218,80 @@
 #    target: ""
 #    overwrite_keys: false
 
+#============================== Indices =====================================
+
+# Index settings can define an index name, conditions which events should be sent to which index,
+# whether or not to use index lifecycle management for a specific index,
+# and several options to configure the Elasticsearch template for a specific index.
+#indices:
+
+  #- name: "beat-index-prefix-%{[beat.version]}-%{+yyyy.MM.dd}"
+
+    # Enable ilm to use index lifecycle management instead daily indices.
+    # ilm.enabled.true: The index `name` is ignored, instead the `ilm.rollover_alias` and `ilm.pattern` will be used.
+    # ilm.enabled.false: The index `name` configuration is used.
+    # ilm.enabled.auto: If the configured output is Elasticsearch and ILM is availbe in the Elasticsearch cluster, ilm will be enabled.
+    #ilm:
+
+      #enabled: auto
+      #rollover_alias: "beat-index-prefix-%{[beat.version]}"
+      #pattern: "{now/d}-000001"
+
+    # A template is used to set the mapping in Elasticsearch
+    # By default template loading is enabled and the template is loaded.
+    # These settings can be adjusted to load your own template or overwrite existing ones per index.
+    #template:
+
+      # Set to false to disable template loading.
+      #enabled: true
+
+      # Template name. By default the template name is "beat-index-prefix-%{[beat.version]}"
+      # The template name and pattern has to be set in case the Elasticsearch index name is modified.
+      #name: "beat-index-prefix-%{[beat.version]}"
+
+      # Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+      # The first part is the version of the beat and then -* is used to match all indices for this beat in this version.
+      # The template name and pattern has to be set in case the Elasticsearch index name is modified.
+      #pattern: "beat-index-prefix-%{[beat.version]}-*"
+
+      # Path to fields.yml file to generate the template
+      #fields: "${path.config}/fields.yml"
+
+      # A list of fields to be added to the template and Kibana index pattern. Also
+      # specify index.template.overwrite: true to overwrite the existing template.
+      # This setting is experimental.
+      #append_fields:
+      #- name: field_name
+      #  type: field_type
+
+      # Enable JSON template loading. If this is enabled, the fields.yml is ignored.
+      #json.enabled: false
+
+      # Path to the JSON template file
+      #json.path: "${path.config}/template.json"
+
+      # Name under which the template is stored in Elasticsearch
+      #json.name: ""
+
+      # Overwrite existing template
+      #overwrite: false
+
+      # Elasticsearch template settings
+      #settings:
+
+      # A dictionary of settings to place into the settings.index dictionary
+      # of the Elasticsearch template. For more details, please check
+      # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
+      #index:
+      #number_of_shards: 1
+      #codec: best_compression
+      #number_of_routing_shards: 30
+
+      # A dictionary of settings for the _source field. For more details, please check
+      # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
+      #_source:
+      #enabled: false
+
 #============================= Elastic Cloud ==================================
 
 # These settings simplify using beatname with the Elastic Cloud (https://cloud.elastic.co/).
@@ -246,11 +320,6 @@ output.elasticsearch:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
 
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
-  #ilm.rollover_alias: "beat-index-prefix"
-  #ilm.pattern: "{now/d}-000001"
-
   # Set gzip compression level.
   #compression_level: 0
 
@@ -270,6 +339,7 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
+  # The `output.elasticsearch.index` and `output.elasticsearch.indices` config options are deprecated from 6.7 on, use `indices` instead.
   # Optional index name. The default is "beat-index-prefix" plus date
   # and generates [beat-index-prefix-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
@@ -841,7 +911,10 @@ output.elasticsearch:
 #setup.dashboards.retry.maximum: 0
 
 
-#============================== Template =====================================
+#============================ Deprecated: Template =================================
+
+# The `template` config option is deprecated from 6.7 on,
+# use config options nested below `indices` instead.
 
 # A template is used to set the mapping in Elasticsearch
 # By default template loading is enabled and the template is loaded.

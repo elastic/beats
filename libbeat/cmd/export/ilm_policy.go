@@ -19,21 +19,52 @@ package export
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/spf13/cobra"
+	"github.com/elastic/beats/libbeat/index"
+	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
+
+	"github.com/spf13/cobra"
 )
 
 // GenGetILMPolicyCmd is the command used to export the ilm policy.
-func GenGetILMPolicyCmd() *cobra.Command {
-	genTemplateConfigCmd := &cobra.Command{
+func GenGetILMPolicyCmd(settings instance.Settings, name, idxPrefix, beatVersion string) *cobra.Command {
+	genILMConfigCmd := &cobra.Command{
 		Use:   "ilm-policy",
-		Short: "Export ILM policy",
+		Short: "Export ILM policies to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(instance.ILMPolicy.StringToPrint())
+			version, _ := cmd.Flags().GetString("es.version")
+			idx, _ := cmd.Flags().GetString("index")
+
+			b, err := instance.NewBeat(name, idx, version)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error initializing beat: %s\n", err)
+				os.Exit(1)
+			}
+			err = b.InitWithSettings(settings)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error initializing beat: %s\n", err)
+				os.Exit(1)
+			}
+
+			var indexCfgs index.IndexConfigs
+			if err := b.Config.Indices.Unpack(&indexCfgs); err != nil {
+				fmt.Fprintf(os.Stderr, "unpacking indices config fails: %v", err)
+				os.Exit(1)
+			}
+
+			if err := indexCfgs.LoadILMPolicies(nil, b.Info); err != nil {
+				fmt.Fprintf(os.Stderr, "error loading ILM policies: %v", err)
+				os.Exit(1)
+			}
+			logp.Info("loaded ILM policies")
 		},
 	}
 
-	return genTemplateConfigCmd
+	genILMConfigCmd.Flags().String("version", beatVersion, "Beat version")
+	genILMConfigCmd.Flags().String("index", idxPrefix, "Base index name")
+
+	return genILMConfigCmd
 }

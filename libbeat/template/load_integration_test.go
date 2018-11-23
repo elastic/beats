@@ -70,7 +70,7 @@ func TestLoadTemplate(t *testing.T) {
 	fieldsPath := absPath + "/fields.yml"
 	index := "testbeat"
 
-	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
+	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfigs{})
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
@@ -140,7 +140,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		fieldsPath := absPath + "/fields.yml"
 		index := beat
 
-		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
+		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfigs{})
 		assert.NoError(t, err)
 		content, err := tmpl.LoadFile(fieldsPath)
 		assert.NoError(t, err)
@@ -186,7 +186,7 @@ func TestTemplateSettings(t *testing.T) {
 			"enabled": false,
 		},
 	}
-	config := TemplateConfig{
+	config := TemplateConfigs{
 		Settings: settings,
 	}
 	tmpl, err := New(version.GetDefaultVersion(), "testbeat", client.GetVersion(), config)
@@ -236,7 +236,7 @@ func TestOverwrite(t *testing.T) {
 	client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
 
 	// Load template
-	config := newConfigFrom(t, TemplateConfig{
+	config := newConfigFrom(t, TemplateConfigs{
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
 	})
@@ -246,7 +246,7 @@ func TestOverwrite(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Load template again, this time with custom settings
-	config = newConfigFrom(t, TemplateConfig{
+	config = newConfigFrom(t, TemplateConfigs{
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
 		Settings: TemplateSettings{
@@ -265,7 +265,7 @@ func TestOverwrite(t *testing.T) {
 	assert.Equal(t, true, templateJSON.SourceEnabled())
 
 	// Load template again, this time with custom settings AND overwrite: true
-	config = newConfigFrom(t, TemplateConfig{
+	config = newConfigFrom(t, TemplateConfigs{
 		Enabled:   true,
 		Overwrite: true,
 		Fields:    absPath + "/fields.yml",
@@ -339,7 +339,7 @@ func TestTemplateWithData(t *testing.T) {
 	// Setup ES
 	client := estest.GetTestingElasticsearch(t)
 
-	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{})
+	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfigs{})
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)

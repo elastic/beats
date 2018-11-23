@@ -30,11 +30,6 @@ import (
 )
 
 var (
-	// Defaults used in the template
-	defaultDateDetection         = false
-	defaultTotalFieldsLimit      = 10000
-	defaultNumberOfRoutingShards = 30
-
 	// Array to store dynamicTemplate parts in
 	dynamicTemplates []common.MapStr
 
@@ -87,22 +82,30 @@ func New(beatVersion string, beatName string, esVersion common.Version, config T
 		Timestamp: time.Now(),
 	}
 
-	nameFormatter, err := fmtstr.CompileEvent(name)
+	name, err = runFormatter(name, event)
 	if err != nil {
 		return nil, err
 	}
-	name, err = nameFormatter.Run(event)
+	pattern, err = runFormatter(pattern, event)
 	if err != nil {
 		return nil, err
 	}
-
-	patternFormatter, err := fmtstr.CompileEvent(pattern)
-	if err != nil {
-		return nil, err
-	}
-	pattern, err = patternFormatter.Run(event)
-	if err != nil {
-		return nil, err
+	// update lifecycle entries
+	if lifecycle, ok := config.Settings.Index["lifecycle"].(map[string]interface{}); ok {
+		if alias, ok := lifecycle["rollover_alias"].(string); ok {
+			alias, err = runFormatter(alias, event)
+			if err != nil {
+				return nil, err
+			}
+			config.Settings.Index["lifecycle"].(map[string]interface{})["rollover_alias"] = alias
+		}
+		if name, ok := lifecycle["name"].(string); ok {
+			name, err = runFormatter(name, event)
+			if err != nil {
+				return nil, err
+			}
+			config.Settings.Index["lifecycle"].(map[string]interface{})["name"] = name
+		}
 	}
 
 	// In case no esVersion is set, it is assumed the same as beat version
@@ -160,10 +163,14 @@ func (t *Template) LoadFile(file string) (common.MapStr, error) {
 }
 
 // LoadBytes loads the the template from the given byte array
-func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
-	fields, err := loadYamlByte(data)
-	if err != nil {
-		return nil, err
+func (t *Template) LoadBytes(data ...[]byte) (common.MapStr, error) {
+	var fields common.Fields
+	for _, d := range data {
+		f, err := loadYamlByte(d)
+		if err != nil {
+			return nil, err
+		}
+		fields = append(fields, f...)
 	}
 
 	return t.load(fields)
@@ -296,4 +303,12 @@ func loadYamlByte(data []byte) (common.Fields, error) {
 		fields = append(fields, key.Fields...)
 	}
 	return fields, nil
+}
+
+func runFormatter(s string, event *beat.Event) (string, error) {
+	formatter, err := fmtstr.CompileEvent(s)
+	if err != nil {
+		return s, err
+	}
+	return formatter.Run(event)
 }

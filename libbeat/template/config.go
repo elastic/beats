@@ -17,21 +17,32 @@
 
 package template
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"fmt"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/ilm"
+)
+
+//TODO: rework Template(s)
+type TemplateConfigs []TemplateConfig
 
 type TemplateConfig struct {
-	Enabled bool   `config:"enabled"`
-	Name    string `config:"name"`
+	AppendFields common.Fields `config:"append_fields"`
+	Enabled      bool          `config:"enabled"`
+	Overwrite    bool          `config:"overwrite"`
+
+	Name    string `config:"name"` //TODO: check if the name needs to be set for the new handling
 	Pattern string `config:"pattern"`
 	Fields  string `config:"fields"`
+	Module  string `config:"module"` //TODO: check if module usage makes sense for beats, or if we can use the name for this
 	JSON    struct {
 		Enabled bool   `config:"enabled"`
 		Path    string `config:"path"`
 		Name    string `config:"name"`
 	} `config:"json"`
-	AppendFields common.Fields    `config:"append_fields"`
-	Overwrite    bool             `config:"overwrite"`
-	Settings     TemplateSettings `config:"settings"`
+
+	Settings TemplateSettings `config:"settings"`
 }
 
 type TemplateSettings struct {
@@ -39,10 +50,40 @@ type TemplateSettings struct {
 	Source map[string]interface{} `config:"_source"`
 }
 
-var (
-	// DefaultConfig for index template
-	DefaultConfig = TemplateConfig{
-		Enabled: true,
-		Fields:  "",
+//UpdateILM fetches relevant information from ILM config and
+//adapts the template config accordingly.
+func (cfg *TemplateConfig) UpdateILM(config ilm.ILMConfig) {
+	cfg.Pattern = fmt.Sprintf("%s*", config.RolloverAlias)
+	cfg.Settings.Index["lifecycle"] = map[string]interface{}{
+		"rollover_alias": config.RolloverAlias,
+		"name":           config.Policy.Name,
 	}
+}
+
+var (
+	// Defaults used in the template
+	defaultDateDetection         = false
+	defaultTotalFieldsLimit      = 10000
+	defaultNumberOfRoutingShards = 30
 )
+
+func defaultTemplateCfg() TemplateConfig {
+	return TemplateConfig{
+		Enabled:   true,
+		Overwrite: false,
+		Fields:    "",
+	}
+}
+
+//Unpack sets the TemplateConfig instance to the given values
+func (tc *TemplateConfig) Unpack(c *common.Config) error {
+	type tmpConfig TemplateConfig
+	var cfg tmpConfig
+	cfg = tmpConfig(defaultTemplateCfg())
+	if err := c.Unpack(&cfg); err != nil {
+		return err
+	}
+
+	*tc = TemplateConfig(cfg)
+	return nil
+}

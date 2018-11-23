@@ -38,7 +38,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/libbeat/api"
-	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cloudid"
@@ -48,6 +47,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
+	"github.com/elastic/beats/libbeat/index"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/logp/configure"
@@ -65,7 +65,7 @@ import (
 	"github.com/elastic/beats/libbeat/version"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
-	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
@@ -103,11 +103,13 @@ type beatConfig struct {
 
 	// elastic stack 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`
-	Template   *common.Config `config:"setup.template"`
 	Kibana     *common.Config `config:"setup.kibana"`
 
-	// ILM Config options
-	ILM *common.Config `config:"output.elasticsearch.ilm"`
+	//new config opt, holding information about index, ilm and template
+	Indices *common.Config `config:"indices"`
+
+	//deprecated
+	Template *common.Config `config:"setup.template"`
 }
 
 var (
@@ -199,11 +201,6 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		return nil, err
 	}
 
-	fields, err := asset.GetFields(name)
-	if err != nil {
-		return nil, err
-	}
-
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, err
@@ -219,7 +216,6 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 			ID:          id,
 			EphemeralID: ephemeralID,
 		},
-		Fields: fields,
 	}
 
 	return &Beat{Beat: b}, nil
@@ -281,7 +277,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
 
-	err = b.registerTemplateLoading()
+	err = b.registerIndexSetup()
 	if err != nil {
 		return nil, err
 	}
@@ -451,45 +447,22 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 		}
 
 		if template {
-			outCfg := b.Config.Output
-
-			if outCfg.Name() != "elasticsearch" {
-				return fmt.Errorf("Template loading requested but the Elasticsearch output is not configured/enabled")
+			callback, shouldLoad, err := b.templateLoadingCallback()
+			if err != nil {
+				return err
 			}
 
-			if b.Config.ILM.Enabled() {
-				cfgwarn.Beta("Index lifecycle management is enabled which is in beta.")
-
-				ilmCfg, err := getILMConfig(b)
+			if shouldLoad {
+				esClient, err := b.esClient()
 				if err != nil {
 					return err
 				}
 
-				err = b.prepareILMTemplate(ilmCfg)
+				err = callback(esClient)
 				if err != nil {
 					return err
 				}
 			}
-
-			esConfig := outCfg.Config()
-			if tmplCfg := b.Config.Template; tmplCfg == nil || tmplCfg.Enabled() {
-				loadCallback, err := b.templateLoadingCallback()
-				if err != nil {
-					return err
-				}
-
-				esClient, err := elasticsearch.NewConnectedClient(esConfig)
-				if err != nil {
-					return err
-				}
-
-				// Load template
-				err = loadCallback(esClient)
-				if err != nil {
-					return err
-				}
-			}
-
 			fmt.Println("Loaded index template")
 		}
 
@@ -528,14 +501,35 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 		}
 
 		if policy {
-			if err := b.loadILMPolicy(); err != nil {
+			callback, shouldLoad, err := b.ilmPoliciesLoadingCallback()
+			if err != nil {
 				return err
 			}
-			fmt.Println("Loaded Index Lifecycle Management (ILM) policy")
+
+			if shouldLoad {
+				esClient, err := b.esClient()
+				if err != nil {
+					return err
+				}
+
+				err = callback(esClient)
+				if err != nil {
+					return err
+				}
+			}
+			fmt.Println("Loaded ILM policies")
 		}
 
 		return nil
 	}())
+}
+
+func (b *Beat) esClient() (*elasticsearch.Client, error) {
+	if b.Config.Output.Name() != "elasticsearch" {
+		return nil, fmt.Errorf("elasticsearch output is not configured/enabled")
+	}
+
+	return elasticsearch.NewConnectedClient(b.Config.Output.Config())
 }
 
 // handleFlags parses the command line flags. It handles the '-version' flag
@@ -740,159 +734,135 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	return nil
 }
 
-// registerTemplateLoading registers the loading of the template as a callback with
-// the elasticsearch output. It is important the the registration happens before
-// the publisher is created.
-func (b *Beat) registerTemplateLoading() error {
-	var templateCfg template.TemplateConfig
-
-	// Check if outputting to file is enabled, and output to file if it is
-	if b.Config.Template.Enabled() {
-		err := b.Config.Template.Unpack(&templateCfg)
-		if err != nil {
-			return fmt.Errorf("unpacking template config fails: %v", err)
-		}
+func (b *Beat) registerIndexSetup() error {
+	if b.Config.Indices == nil {
+		b.Config.Indices = common.NewConfig()
 	}
 
-	// Loads template by default if esOutput is enabled
-	if b.Config.Output.Name() == "elasticsearch" {
-
-		// Get ES Index name for comparison
-		esCfg := struct {
-			Index string `config:"index"`
-		}{}
-		err := b.Config.Output.Config().Unpack(&esCfg)
-		if err != nil {
-			return err
-		}
-
-		if esCfg.Index != "" &&
-			(templateCfg.Name == "" || templateCfg.Pattern == "") &&
-			(b.Config.Template == nil || b.Config.Template.Enabled()) {
-			return errors.New("setup.template.name and setup.template.pattern have to be set if index name is modified")
-		}
-
-		if b.Config.Template == nil || (b.Config.Template != nil && b.Config.Template.Enabled()) {
-
-			// load template through callback to make sure it is also loaded
-			// on reconnecting
-			callback, err := b.templateLoadingCallback()
-			if err != nil {
-				return err
-			}
-			elasticsearch.RegisterConnectCallback(callback)
-		} else if b.Config.ILM.Enabled() {
-			return errors.New("templates cannot be disable when using ILM")
-		}
-
-		if b.Config.ILM.Enabled() {
-			cfgwarn.Beta("Index lifecycle management is enabled which is in beta.")
-
-			ilmCfg, err := getILMConfig(b)
-			if err != nil {
-				return err
-			}
-
-			err = b.prepareILMTemplate(ilmCfg)
-			if err != nil {
-				return err
-			}
-
-			// Set the ingestion index to the rollover alias
-			logp.Info("Set output.elasticsearch.index to '%s' as ILM is enabled.", ilmCfg.RolloverAlias)
-			esCfg.Index = ilmCfg.RolloverAlias
-			err = b.Config.Output.Config().SetString("index", -1, ilmCfg.RolloverAlias)
-			if err != nil {
-				return errw.Wrap(err, "error setting output.elasticsearch.index")
-			}
-
-			writeAliasCallback, err := b.writeAliasLoadingCallback()
-			if err != nil {
-				return err
-			}
-
-			// Load write alias already on
-			esConfig := b.Config.Output.Config()
-
-			// Check that ILM is enabled and the right elasticsearch version exists
-			esClient, err := elasticsearch.NewConnectedClient(esConfig)
-			if err != nil {
-				return err
-			}
-
-			err = checkElasticsearchVersionIlm(esClient)
-			if err != nil {
-				return err
-			}
-
-			err = checkILMFeatureEnabled(esClient)
-			if err != nil {
-				return err
-			}
-
-			elasticsearch.RegisterConnectCallback(writeAliasCallback)
-		}
+	//register ILM loading
+	callback, shouldRegister, err := b.ilmWriteAliasesLoadingCallback()
+	if err != nil {
+		return err
 	}
+	if shouldRegister {
+		elasticsearch.RegisterConnectCallback(callback)
+	}
+
+	//registerTemplateLoading registers the loading of the templates as a callback with
+	//the elasticsearch output. It is important the registration happens before
+	//the publisher is created.
+	callback, shouldRegister, err = b.templateLoadingCallback()
+	if err != nil {
+		return err
+	}
+	if shouldRegister {
+		elasticsearch.RegisterConnectCallback(callback)
+	}
+
+	//TODO: set output.elasticsearch.index and output.elasticsearch.indices to new index configuration
 
 	return nil
 }
 
-func (b *Beat) prepareILMTemplate(ilmCfg *ilmConfig) error {
-	// In case no template settings are set, config must be created
-	if b.Config.Template == nil {
-		b.Config.Template = common.NewConfig()
-	}
-	// Template name and pattern can't be configure when using ILM
-	logp.Info("Set setup.template.name to '%s' as ILM is enabled.", ilmCfg.RolloverAlias)
-	err := b.Config.Template.SetString("name", -1, ilmCfg.RolloverAlias)
-	if err != nil {
-		return errw.Wrap(err, "error setting setup.template.name")
-	}
-	pattern := fmt.Sprintf("%s-*", ilmCfg.RolloverAlias)
-	logp.Info("Set setup.template.pattern to '%s' as ILM is enabled.", pattern)
-	err = b.Config.Template.SetString("pattern", -1, pattern)
-	if err != nil {
-		return errw.Wrap(err, "error setting setup.template.pattern")
+//Build and return a callback to load ILM policies and write alias
+func (b *Beat) ilmPoliciesLoadingCallback() (func(esClient *elasticsearch.Client) error, bool, error) {
+	indexCfgs, valid, err := b.idxCfgsEnabled()
+	if err != nil || !valid || indexCfgs == nil {
+		return nil, false, err
 	}
 
-	// rollover_alias and lifecycle.name can't be configured and will be overwritten
-	logp.Info("Set settings.index.lifecycle.rollover_alias in template to %s as ILM is enabled.", ilmCfg.RolloverAlias)
-	err = b.Config.Template.SetString("settings.index.lifecycle.rollover_alias", -1, ilmCfg.RolloverAlias)
-	if err != nil {
-		return errw.Wrap(err, "error setting settings.index.lifecycle.rollover_alias")
-	}
-	logp.Info("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", ILMPolicyName)
-	err = b.Config.Template.SetString("settings.index.lifecycle.name", -1, ILMPolicyName)
-	if err != nil {
-		return errw.Wrap(err, "error setting settings.index.lifecycle.name")
-	}
-
-	return nil
-}
-
-// Build and return a callback to load index template into ES
-func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) error, error) {
 	callback := func(esClient *elasticsearch.Client) error {
-		if b.Config.Template == nil {
-			b.Config.Template = common.NewConfig()
+		if err := indexCfgs.LoadILMPolicies(esClient, b.Info); err != nil {
+			return fmt.Errorf("error loading ILM policies: %v", err)
 		}
-
-		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info, b.Fields)
-		if err != nil {
-			return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
-		}
-
-		err = loader.Load()
-		if err != nil {
-			return fmt.Errorf("Error loading Elasticsearch template: %v", err)
-		}
-
-		logp.Info("Template successfully loaded.")
+		logp.Info("ILM policies successfully loaded.")
 
 		return nil
 	}
 
-	return callback, nil
+	return callback, true, nil
+}
+
+//Build and return a callback to load ILM policies and write alias
+func (b *Beat) ilmWriteAliasesLoadingCallback() (func(esClient *elasticsearch.Client) error, bool, error) {
+	indexCfgs, valid, err := b.idxCfgsEnabled()
+	if err != nil || !valid || indexCfgs == nil {
+		return nil, false, err
+	}
+
+	callback := func(esClient *elasticsearch.Client) error {
+		if err := indexCfgs.LoadILMWriteAliases(esClient, b.Info); err != nil {
+			return fmt.Errorf("error loading ILM Elasticsearch write alias: %v", err)
+		}
+
+		return nil
+	}
+
+	return callback, true, nil
+}
+
+//Build and return a callback to load index templates into ES when prerequisites are fulfilled
+func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) error, bool, error) {
+	indexCfgs, valid, err := b.idxCfgsEnabled()
+	if err != nil || !valid {
+		return nil, false, err
+	}
+
+	var templateCfg template.TemplateConfig
+	if len(indexCfgs) == 0 && b.Config.Template != nil {
+		//use deprecated config options
+
+		if err := b.Config.Template.Unpack(&templateCfg); err != nil {
+			return nil, false, fmt.Errorf("unpacking template config fails: %v", err)
+		}
+
+		//Get ES Index name for comparison
+		esCfg := struct {
+			Index string `config:"index"`
+		}{}
+		if err := b.Config.Output.Config().Unpack(&esCfg); err != nil {
+			return nil, false, err
+		}
+
+		//Return error when index is using custom values, but template is not properly configured.
+		if esCfg.Index != "" && templateCfg.Enabled && (templateCfg.Name == "" || templateCfg.Pattern == "") {
+			return nil, false, fmt.Errorf("setup.template.name and setup.template.pattern have to be set if index name is modified.")
+		}
+
+		//return if loading template is disabled.
+		if !templateCfg.Enabled {
+			return nil, false, nil
+		}
+
+		var err error
+		if indexCfgs, err = index.DeprecatedConfigs(b.Config.Template); err != nil {
+			return nil, false, err
+		}
+
+	} else if b.Config.Template != nil {
+		//issue warning if deprecated and new config options are mixed
+		//new and deprecated config handling is mixed
+		logp.Warn("New and deprecated way of template configuration is mixed, deprecated config options will be ignored.")
+	}
+
+	//create callback
+	callback := func(esClient *elasticsearch.Client) error {
+		return indexCfgs.LoadTemplates(esClient, b.Info)
+	}
+	return callback, true, nil
+}
+
+func (b *Beat) idxCfgsEnabled() (index.IndexConfigs, bool, error) {
+	if b.Config.Output.Name() != "elasticsearch" {
+		logp.Info("ILM is disabled as no elasticsearch output is configured")
+		return nil, false, nil
+	}
+
+	var indexCfgs index.IndexConfigs
+	if err := b.Config.Indices.Unpack(&indexCfgs); err != nil {
+		return nil, false, fmt.Errorf("unpacking indices config fails: %v", err)
+	}
+	return indexCfgs, true, nil
 }
 
 // handleError handles the given error by logging it and then returning the

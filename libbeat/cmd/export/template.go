@@ -21,73 +21,51 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spf13/cobra"
-
 	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/libbeat/template"
+	"github.com/elastic/beats/libbeat/index"
+	"github.com/spf13/cobra"
 )
 
 func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersion string) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "template",
-		Short: "Export index template to stdout",
+		Short: "Export index templates to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _ := cmd.Flags().GetString("es.version")
-			index, _ := cmd.Flags().GetString("index")
+			idx, _ := cmd.Flags().GetString("index")
 
-			b, err := instance.NewBeat(name, idxPrefix, beatVersion)
+			b, err := instance.NewBeat(name, idx, version)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
+				fmt.Fprintf(os.Stderr, "error initializing beat: %s\n", err)
 				os.Exit(1)
 			}
 			err = b.InitWithSettings(settings)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
+				fmt.Fprintf(os.Stderr, "error initializing beat: %s\n", err)
 				os.Exit(1)
 			}
 
-			cfg := template.DefaultConfig
-			if b.Config.Template.Enabled() {
-				err = b.Config.Template.Unpack(&cfg)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error getting template settings: %+v", err)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error fetching version: %s\n", err)
+				os.Exit(1)
+			}
+
+			var indexCfgs index.IndexConfigs
+			if b.Config.Indices != nil {
+				if err := b.Config.Indices.Unpack(&indexCfgs); err != nil {
+					fmt.Fprintf(os.Stderr, "unpacking indices config fails: %v", err)
 					os.Exit(1)
 				}
 			}
-
-			if version == "" {
-				version = b.Info.Version
+			if len(indexCfgs) == 0 {
+				indexCfgs, err = index.DeprecatedConfigs(b.Config.Template)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "unpacking template config fails: %v", err)
+					os.Exit(1)
+				}
 			}
-
-			esVersion, err := common.NewVersion(version)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Invalid Elasticsearch version: %s\n", err)
-			}
-
-			tmpl, err := template.New(b.Info.Version, index, *esVersion, cfg)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
-				os.Exit(1)
-			}
-
-			var templateString common.MapStr
-			if cfg.Fields != "" {
-				fieldsPath := paths.Resolve(paths.Config, cfg.Fields)
-				templateString, err = tmpl.LoadFile(fieldsPath)
-			} else {
-				templateString, err = tmpl.LoadBytes(b.Fields)
-			}
-
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
-				os.Exit(1)
-			}
-
-			_, err = os.Stdout.WriteString(templateString.StringToPrint() + "\n")
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error writing template: %+v", err)
+			if err = indexCfgs.LoadTemplates(nil, b.Info); err != nil {
+				fmt.Fprintf(os.Stderr, err.Error())
 				os.Exit(1)
 			}
 		},
