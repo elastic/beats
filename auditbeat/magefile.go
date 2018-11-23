@@ -44,6 +44,9 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
+	if d, ok := deps[mage.Platform.Name]; ok {
+		mg.Deps(d)
+	}
 	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
 }
 
@@ -120,6 +123,83 @@ func GoTestIntegration(ctx context.Context) error {
 // -----------------------------------------------------------------------------
 // Customizations specific to Auditbeat.
 // - Config files are Go templates.
+var (
+	deps = map[string]func() error{
+		"linux/386":      installLinux386,
+		"linux/amd64":    installLinuxAMD64,
+		"linux/arm64":    installLinuxARM64,
+		"linux/armv5":    installLinuxARMLE,
+		"linux/armv6":    installLinuxARMLE,
+		"linux/armv7":    installLinuxARMHF,
+		"linux/mips":     installLinuxMIPS,
+		"linux/mipsle":   installLinuxMIPSLE,
+		"linux/mips64le": installLinuxMIPS64LE,
+		"linux/ppc64le":  installLinuxPPC64LE,
+		"linux/s390x":    installLinuxS390X,
+
+		//"linux/ppc64":  installLinuxPpc64,
+		//"linux/mips64": installLinuxMips64,
+	}
+)
+
+const (
+	librpmDevPkgName = "librpm-dev"
+)
+
+func installLinuxAMD64() error {
+	return installDependencies(librpmDevPkgName, "")
+}
+
+func installLinuxARM64() error {
+	return installDependencies(librpmDevPkgName+":arm64", "arm64")
+}
+
+func installLinuxARMHF() error {
+	return installDependencies(librpmDevPkgName+":armhf", "armhf")
+}
+
+func installLinuxARMLE() error {
+	return installDependencies(librpmDevPkgName+":armel", "armel")
+}
+
+func installLinux386() error {
+	return installDependencies(librpmDevPkgName+":i386", "i386")
+}
+
+func installLinuxMIPS() error {
+	return installDependencies(librpmDevPkgName+":mips", "mips")
+}
+
+func installLinuxMIPS64LE() error {
+	return installDependencies(librpmDevPkgName+":mips64el", "mips64el")
+}
+
+func installLinuxMIPSLE() error {
+	return installDependencies(librpmDevPkgName+":mipsel", "mipsel")
+}
+
+func installLinuxPPC64LE() error {
+	return installDependencies(librpmDevPkgName+":ppc64el", "ppc64el")
+}
+
+func installLinuxS390X() error {
+	return installDependencies(librpmDevPkgName+":s390x", "s390x")
+}
+
+func installDependencies(pkg, arch string) error {
+	if arch != "" {
+		err := sh.Run("dpkg", "--add-architecture", arch)
+		if err != nil {
+			return errors.Wrap(err, "error while adding architecture")
+		}
+	}
+
+	if err := sh.Run("apt-get", "update"); err != nil {
+		return err
+	}
+
+	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkg)
+}
 
 const (
 	configTemplateGlob      = "module/*/_meta/config*.yml.tmpl"
