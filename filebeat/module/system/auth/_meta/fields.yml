@@ -25,26 +25,27 @@
     - name: ssh
       type: group
       fields:
-      - name: event
-        type: alias
-        path: event.action
       - name: method
         description: >
           The SSH authentication method. Can be one of "password" or "publickey".
-      - name: ip
-        type: alias
-        path: source.ip
+      - name: signature
+        description: >
+          The signature of the client public key.
       - name: dropped_ip
         type: ip
         description: >
           The client IP from SSH connections that are open and immediately dropped.
         copy_to: source.ip
+
+      - name: event
+        type: alias
+        path: event.action
+      - name: ip
+        type: alias
+        path: source.ip
       - name: port
         type: alias
         path: source.port
-      - name: signature
-        description: >
-          The signature of the client public key.
 
       - name: geoip
         type: group
@@ -96,6 +97,13 @@
       description: >
         Fields specific to events created by the `useradd` command.
       fields:
+      - name: home
+        description:
+          The home folder for the new user.
+      - name: shell
+        description:
+          The default shell for the new user.
+
       - name: name
         type: alias
         path: user.name
@@ -105,12 +113,6 @@
       - name: gid
         type: alias
         path: group.id
-      - name: home
-        description:
-          The home folder for the new user.
-      - name: shell
-        description:
-          The default shell for the new user.
 
     - name: groupadd
       type: group

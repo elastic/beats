@@ -5933,13 +5933,6 @@ type: alias
 --
 
 
-*`event.action`*::
-+
---
-type: alias
-
---
-
 *`system.auth.ssh.method`*::
 +
 --
@@ -5948,10 +5941,11 @@ The SSH authentication method. Can be one of "password" or "publickey".
 
 --
 
-*`source.ip`*::
+*`system.auth.ssh.signature`*::
 +
 --
-type: alias
+The signature of the client public key.
+
 
 --
 
@@ -5965,18 +5959,24 @@ The client IP from SSH connections that are open and immediately dropped.
 
 --
 
-*`source.port`*::
+*`event.action`*::
 +
 --
 type: alias
 
 --
 
-*`system.auth.ssh.signature`*::
+*`source.ip`*::
 +
 --
-The signature of the client public key.
+type: alias
 
+--
+
+*`source.port`*::
++
+--
+type: alias
 
 --
 
@@ -6081,6 +6081,20 @@ Fields specific to events created by the `useradd` command.
 
 
 
+*`system.auth.useradd.home`*::
++
+--
+The home folder for the new user.
+
+--
+
+*`system.auth.useradd.shell`*::
++
+--
+The default shell for the new user.
+
+--
+
 *`user.name`*::
 +
 --
@@ -6099,20 +6113,6 @@ type: alias
 +
 --
 type: alias
-
---
-
-*`system.auth.useradd.home`*::
-+
---
-The home folder for the new user.
-
---
-
-*`system.auth.useradd.shell`*::
-+
---
-The default shell for the new user.
 
 --
 
