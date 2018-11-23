@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 - Collect custom cluster `display_name` in `elasticsearch/cluster_stats` metricset. {pull}8445[8445]
 - Test etcd module with etcd 3.3. {pull}9068[9068]
+- Add setting to disable docker cpu metrics per core. {pull}9194[9194]
 
 *Packetbeat*
 
