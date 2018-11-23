@@ -719,7 +719,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // the elasticsearch output. It is important the the registration happens before
 // the publisher is created.
 func (b *Beat) registerTemplateLoading() error {
-	var cfg template.TemplateConfig
+	var cfg template.TemplatesConfig
 
 	// Check if outputting to file is enabled, and output to file if it is
 	if b.Config.Template.Enabled() {
@@ -741,13 +741,14 @@ func (b *Beat) registerTemplateLoading() error {
 			return err
 		}
 
-		if esCfg.Index != "" && (cfg.Name == "" || cfg.Pattern == "") && (b.Config.Template == nil || b.Config.Template.Enabled()) {
+		//TODO: what to do with this check with Indices?
+		if esCfg.Index != "" && (len(cfg.Templates) == 0 || cfg.Templates[0].Name == "" || cfg.Templates[0].Pattern == "") && (b.Config.Template == nil || b.Config.Template.Enabled()) {
 			return fmt.Errorf("setup.template.name and setup.template.pattern have to be set if index name is modified.")
 		}
 
 		if b.Config.Template == nil || (b.Config.Template != nil && b.Config.Template.Enabled()) {
 
-			// load template through callback to make sure it is also loaded
+			// load templates through callback to make sure it is also loaded
 			// on reconnecting
 			callback, err := b.templateLoadingCallback()
 			if err != nil {
@@ -760,7 +761,7 @@ func (b *Beat) registerTemplateLoading() error {
 	return nil
 }
 
-// Build and return a callback to load index template into ES
+// Build and return a callback to load index templates into ES
 func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) error, error) {
 	callback := func(esClient *elasticsearch.Client) error {
 		if b.Config.Template == nil {

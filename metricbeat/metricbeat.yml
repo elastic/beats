@@ -21,6 +21,10 @@ metricbeat.config.modules:
 
 #==================== Elasticsearch template setting ==========================
 
+setup.template.name: "metricbeat-simi"
+setup.template.pattern: "metricbeat-simi*"
+#setup.template.fields: "${path.config}/simi-fields.yml"
+
 setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
@@ -97,6 +101,8 @@ output.elasticsearch:
   #protocol: "https"
   #username: "elastic"
   #password: "changeme"
+  
+  index: "metricbeat-simi-%{+yyyy.MM.dd}"
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:

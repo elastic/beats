@@ -31,7 +31,7 @@ func TestNumberOfRoutingShards(t *testing.T) {
 
 	beatVersion := "6.1.0"
 	beatName := "testbeat"
-	config := TemplateConfig{}
+	config := TemplatesConfig{}
 
 	// Test it exists in 6.1
 	template, err := New(beatVersion, beatName, "6.1.0", config)
@@ -57,7 +57,7 @@ func TestNumberOfRoutingShardsOverwrite(t *testing.T) {
 
 	beatVersion := "6.1.0"
 	beatName := "testbeat"
-	config := TemplateConfig{
+	config := TemplatesConfig{
 		Settings: TemplateSettings{
 			Index: map[string]interface{}{"number_of_routing_shards": 5},
 		},

@@ -30,9 +30,11 @@ import (
 )
 
 func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersion string) *cobra.Command {
+	fmt.Println(name)
+	fmt.Println(idxPrefix)
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "template",
-		Short: "Export index template to stdout",
+		Short: "Export index template(s) to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _ := cmd.Flags().GetString("es.version")
 			index, _ := cmd.Flags().GetString("index")
@@ -48,38 +50,40 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 				os.Exit(1)
 			}
 
-			cfg := template.DefaultConfig
+			templatesCfg := template.DefaultConfig
 			if b.Config.Template.Enabled() {
-				err = b.Config.Template.Unpack(&cfg)
+				err = b.Config.Template.Unpack(&templatesCfg)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Error getting template settings: %+v", err)
 					os.Exit(1)
 				}
 			}
 
-			tmpl, err := template.New(b.Info.Version, index, version, cfg)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
-				os.Exit(1)
-			}
+			for _, cfg := range templatesCfg.Templates {
+				tmpl, err := template.NewTemplate(b.Info.Version, index, version, cfg)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
+					os.Exit(1)
+				}
 
-			var templateString common.MapStr
-			if cfg.Fields != "" {
-				fieldsPath := paths.Resolve(paths.Config, cfg.Fields)
-				templateString, err = tmpl.LoadFile(fieldsPath)
-			} else {
-				templateString, err = tmpl.LoadBytes(b.Fields)
-			}
+				var templateString common.MapStr
+				if cfg.Fields != "" {
+					fieldsPath := paths.Resolve(paths.Config, cfg.Fields)
+					templateString, err = tmpl.LoadFile(fieldsPath)
+				} else {
+					templateString, err = tmpl.LoadBytes(b.Fields)
+				}
 
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
-				os.Exit(1)
-			}
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
+					os.Exit(1)
+				}
 
-			_, err = os.Stdout.WriteString(templateString.StringToPrint() + "\n")
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error writing template: %+v", err)
-				os.Exit(1)
+				_, err = os.Stdout.WriteString(templateString.StringToPrint() + "\n")
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error writing template: %+v", err)
+					os.Exit(1)
+				}
 			}
 		},
 	}

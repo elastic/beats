@@ -30,16 +30,13 @@ import (
 )
 
 var (
-	// Defaults used in the template
-	defaultDateDetection         = false
-	defaultTotalFieldsLimit      = 10000
-	defaultNumberOfRoutingShards = 30
-
 	// Array to store dynamicTemplate parts in
 	dynamicTemplates []common.MapStr
 
 	defaultFields []string
 )
+
+type Templates []Template
 
 type Template struct {
 	sync.Mutex
@@ -51,7 +48,7 @@ type Template struct {
 }
 
 // New creates a new template instance
-func New(beatVersion string, beatName string, esVersion string, config TemplateConfig) (*Template, error) {
+func NewTemplate(beatVersion string, beatName string, esVersion string, config TemplateConfig) (*Template, error) {
 	bV, err := common.NewVersion(beatVersion)
 	if err != nil {
 		return nil, err

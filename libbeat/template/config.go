@@ -20,7 +20,8 @@ package template
 import "github.com/elastic/beats/libbeat/common"
 
 type TemplateConfig struct {
-	Enabled bool   `config:"enabled"`
+	AppendFields common.Fields `config:"append_fields"`
+
 	Name    string `config:"name"`
 	Pattern string `config:"pattern"`
 	Fields  string `config:"fields"`
@@ -29,9 +30,19 @@ type TemplateConfig struct {
 		Path    string `config:"path"`
 		Name    string `config:"name"`
 	} `config:"json"`
-	AppendFields common.Fields    `config:"append_fields"`
-	Overwrite    bool             `config:"overwrite"`
-	Settings     TemplateSettings `config:"settings"`
+
+	Settings  TemplateSettings
+	Enabled   bool
+	Overwrite bool
+}
+
+type TemplatesConfig struct {
+	Enabled   bool `config:"enabled"`
+	Overwrite bool `config:"overwrite"`
+
+	Templates []TemplateConfig `config:"templates"`
+
+	Settings TemplateSettings `config:"settings"`
 }
 
 type TemplateSettings struct {
@@ -41,8 +52,15 @@ type TemplateSettings struct {
 
 var (
 	// DefaultConfig for index template
-	DefaultConfig = TemplateConfig{
+	DefaultConfig = TemplatesConfig{
 		Enabled: true,
-		Fields:  "",
+		Templates: []TemplateConfig{
+			TemplateConfig{Fields: ""},
+		},
 	}
+
+	// Defaults used in the template
+	defaultDateDetection         = false
+	defaultTotalFieldsLimit      = 10000
+	defaultNumberOfRoutingShards = 30
 )
