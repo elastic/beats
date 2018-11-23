@@ -19,7 +19,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Filebeat*
 
-- Keep raw JSON messages. {pull}9172[9172]
+- Add configuration option to keep raw JSON messages. {pull}9172[9172]
 
 *Heartbeat*
 
