@@ -76,6 +76,7 @@ func main() {
 		results, info, err := dashboards.ExportAllFromYml(client, *ymlFile)
 		for i, r := range results {
 			log.Printf("id=%s, name=%s\n", info.Dashboards[i].ID, info.Dashboards[i].File)
+			r = dashboards.DecodeExported(r)
 			err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(*ymlFile), client.GetVersion())
 			if err != nil {
 				log.Fatalf("failed to export the dashboards: %s", err)
@@ -89,6 +90,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to export the dashboard: %s", err)
 		}
+		result = dashboards.DecodeExported(result)
 		bytes, err := json.Marshal(result)
 		if err != nil {
 			log.Fatalf("Failed to save the dashboard: %s", err)

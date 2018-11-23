@@ -125,10 +125,33 @@ class Test(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_export_dashboard_cmd_export_dashboard_by_id(self):
+    def test_export_dashboard_cmd_export_dashboard_by_id_and_decoding(self):
         """
         Test testbeat export dashboard can export dashboards
         and removes unsupported characters
+        """
+        self.render_config_template()
+        self.test_load_dashboard()
+        beat = self.start_beat(
+            logging_args=["-e", "-d", "*"],
+            extra_args=["export",
+                        "dashboard",
+                        "-E", "setup.kibana.protocol=http",
+                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
+                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-decode",
+                        "-id", "Metricbeat-system-overview"]
+        )
+
+        beat.check_wait(exit_code=0)
+
+        assert self.log_contains("\"id\": \"Metricbeat-system-overview\",") is True
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_export_dashboard_cmd_export_dashboard_by_id(self):
+        """
+        Test testbeat export dashboard can export dashboards
         """
         self.render_config_template()
         self.test_load_dashboard()

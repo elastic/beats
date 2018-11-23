@@ -50,16 +50,6 @@ type Client struct {
 	Connection
 }
 
-var (
-	responseToDecode = []string{
-		"attributes.uiStateJSON",
-		"attributes.visState",
-		"attributes.optionsJSON",
-		"attributes.panelsJSON",
-		"attributes.kibanaSavedObjectMeta.searchSourceJSON",
-	}
-)
-
 func addToURL(_url, _path string, params url.Values) string {
 	if len(params) == 0 {
 		return _url + _path
@@ -294,37 +284,7 @@ func (client *Client) GetDashboard(id string) (common.MapStr, error) {
 		return nil, fmt.Errorf("error removing index pattern: %+v", err)
 	}
 
-	// remove unsupported chars
-	objects := result["objects"].([]interface{})
-	for _, obj := range objects {
-		o := obj.(common.MapStr)
-		for _, key := range responseToDecode {
-			// All fields are optional, so errors are not caught
-			err = decodeValue(o, key)
-			if err != nil {
-				logp.Debug("kibana", "Error while decoding dashboard objects: %+v", err)
-			}
-		}
-	}
-	result["objects"] = objects
 	return result, nil
-}
-
-// error is not propagated, because it can fail if the key is missing
-func decodeValue(data common.MapStr, key string) error {
-	v, err := data.GetValue(key)
-	if err != nil {
-		return err
-	}
-	s := v.(string)
-	var d interface{}
-	err = json.Unmarshal([]byte(s), &d)
-	if err != nil {
-		return fmt.Errorf("error decoding %s: %v", key, err)
-	}
-
-	data.Put(key, d)
-	return nil
 }
 
 // truncateString returns a truncated string if the length is greater than 250
