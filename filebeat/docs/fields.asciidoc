@@ -5303,6 +5303,18 @@ Contains fields for the Nginx access logs.
 
 
 
+*`nginx.access.body_sent.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+--
+
 *`network.forwarded_ip`*::
 +
 --
@@ -5349,18 +5361,6 @@ type: alias
 +
 --
 type: alias
-
---
-
-*`nginx.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
-
 
 --
 
