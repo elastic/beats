@@ -85,8 +85,170 @@
   alias: true
   copy_to: false
 
+- from: system.syslog.hostname
+  to: host.hostname
+  alias: true
+  copy_to: false
+
+- from: system.syslog.program
+  to: process.name
+  alias: true
+  copy_to: false
+
+- from: system.syslog.pid
+  to: process.pid
+  alias: true
+  copy_to: false
+
+- from: system.syslog.message
+  to: message
+  alias: true
+  copy_to: false
+
 # From Auditbeat's auditd module.
 - from: source.hostname
   to: source.domain
+  alias: true
+  copy_to: false
+
+- from: iis.access.server_ip
+  to: destination.ip
+  alias: true
+  copy_to: false
+
+- from: iis.access.remote_ip
+  to: source.ip
+  alias: true
+  copy_to: false
+
+- from: iis.access.url
+  to: url.path
+  alias: true
+  copy_to: false
+
+- from: iis.access.query_string
+  to: url.query
+  alias: true
+  copy_to: false
+
+- from: iis.access.port
+  to: destination.port
+  alias: true
+  copy_to: false
+
+- from: iis.access.user_name
+  to: user.name
+  alias: true
+  copy_to: false
+
+- from: iis.access.hostname
+  to: destination.domain
+  alias: true
+  copy_to: false
+
+- from: iis.access.user_agent.original
+  to: user_agent.original
+  alias: true
+  copy_to: false
+
+- from: iis.access.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  copy_to: false
+
+- from: iis.access.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  copy_to: false
+
+- from: iis.access.geoip.location
+  to: source.geo.location
+  alias: true
+  copy_to: false
+
+- from: iis.access.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  copy_to: false
+
+- from: iis.access.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  copy_to: false
+
+- from: iis.access.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  copy_to: false
+
+# Note: `http` is not officially in ECS yet
+
+- from: iis.access.method
+  to: http.request.method
+  alias: true
+  copy_to: false
+
+- from: iis.access.response_code
+  to: http.response.status_code
+  alias: true
+  copy_to: false
+
+- from: iis.access.referrer
+  to: http.request.referrer
+  alias: true
+  copy_to: false
+
+- from: haproxy.client.port
+  to: source.port
+  alias: true
+  copy_to: false
+
+- from: haproxy.process_name
+  to: process.name
+  alias: true
+  copy_to: false
+
+- from: haproxy.pid
+  to: process.pid
+  alias: true
+  copy_to: false
+
+- from: haproxy.destination.ip
+  to: destination.ip
+  alias: true
+  copy_to: false
+
+- from: haproxy.destination.port
+  to: destination.port
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.location
+  to: source.geo.location
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  copy_to: false
+
+- from: haproxy.geoip.region_iso_code
+  to: source.geo.region_iso_code
   alias: true
   copy_to: false

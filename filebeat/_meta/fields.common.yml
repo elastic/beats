@@ -101,6 +101,13 @@
         - name: full_name
           type: keyword
 
+  # Temporary fix until ECS includes the HTTP object again
+    - name: http.request.referrer
+      type: keyword
+      description: >
+        Referrer for this HTTP request.
+      example: https://blog.example.com/
+
   # Temporary fix to get 7.0 dashboards working
     - name: fileset.name
       type: alias
