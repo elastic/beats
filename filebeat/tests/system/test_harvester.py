@@ -837,11 +837,11 @@ class Test(BaseTest):
         file = open(logfile, 'w', 0)
         file.write("hello world1")
         file.write("\n")
-        file.write("\x00")
+        file.write("\x00\x00\x00\x00")
         file.write("\n")
         file.write("hello world2")
         file.write("\n")
-        file.write("\x00")
+        file.write("\x00\x00\x00\x00")
         file.write("Hello World\n")
         # Write some more data to hit the 16k min buffer size.
         # Make it web safe.

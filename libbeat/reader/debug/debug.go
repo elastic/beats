@@ -84,8 +84,8 @@ func (r *Reader) Read(p []byte) (int, error) {
 		// cleanup any remaining bytes in the buffer.
 		if r.buffer.Len() > 0 {
 			r.predicate(r.offset, r.buffer.Bytes())
-			r.buffer = bytes.Buffer{}
 		}
+		r.buffer = bytes.Buffer{}
 		r.log.Info("Stopping debug reader, max execution reached")
 		r.state = stopped
 		return r.reader.Read(p)
@@ -108,7 +108,7 @@ func (r *Reader) Read(p []byte) (int, error) {
 			if r.failures < r.maxFailures && r.predicate(r.offset, r.buffer.Bytes()) {
 				r.failures++
 			}
-			r.buffer = bytes.Buffer{}
+			r.buffer.Reset()
 		}
 		r.offset += int64(n)
 	}
@@ -169,7 +169,7 @@ func AppendReaders(reader io.Reader) (io.Reader, error) {
 			reader,
 			defaultMinBuffer,
 			defaultMaxFailures,
-			makeNullCheck(log, 1),
+			makeNullCheck(log, 4),
 		); err != nil {
 			return nil, err
 		}
