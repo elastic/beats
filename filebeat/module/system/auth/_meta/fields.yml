@@ -35,7 +35,6 @@
         type: ip
         description: >
           The client IP from SSH connections that are open and immediately dropped.
-        copy_to: source.ip
 
       - name: event
         type: alias

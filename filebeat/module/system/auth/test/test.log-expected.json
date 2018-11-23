@@ -91,6 +91,7 @@
         "source.geo.location.lat": 34.7725, 
         "source.geo.location.lon": 113.7266, 
         "source.ip": "123.57.245.163", 
+        "system.auth.ssh.dropped_ip": "123.57.245.163", 
         "system.auth.timestamp": "Feb 19 15:30:04"
     }, 
     {
