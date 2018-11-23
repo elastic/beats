@@ -20,9 +20,11 @@ package export
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/paths"
@@ -35,6 +37,7 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "template",
 		Short: "Export index template(s) to stdout",
+		//TODO: generally use Loader here
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _ := cmd.Flags().GetString("es.version")
 			index, _ := cmd.Flags().GetString("index")
@@ -70,8 +73,22 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 				if cfg.Fields != "" {
 					fieldsPath := paths.Resolve(paths.Config, cfg.Fields)
 					templateString, err = tmpl.LoadFile(fieldsPath)
+				} else if cfg.Modules != "" {
+
+					fields, err := asset.GetFieldsFor(name, strings.Split(cfg.Modules, ","))
+					if err != nil {
+						fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
+						os.Exit(1)
+					}
+					templateString, err = tmpl.LoadBytes(fields)
 				} else {
-					templateString, err = tmpl.LoadBytes(b.Fields)
+
+					fields, err := asset.GetFields(name)
+					if err != nil {
+						fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
+						os.Exit(1)
+					}
+					templateString, err = tmpl.LoadBytes(fields)
 				}
 
 				if err != nil {

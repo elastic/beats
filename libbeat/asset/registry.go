@@ -21,6 +21,8 @@ import (
 	"bytes"
 	"compress/zlib"
 	"encoding/base64"
+	"errors"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -42,10 +44,29 @@ func SetFields(beat, name string, asset func() string) error {
 	return nil
 }
 
-// GetFields returns a byte array contains all fields for the given beat
+// GetFields returns a byte array containing all fields for the given beat
 func GetFields(beat string) ([]byte, error) {
 	var fields []byte
 	for _, data := range FieldsRegistry[beat] {
+		output, err := DecodeData(data)
+		if err != nil {
+			return nil, err
+		}
+
+		fields = append(fields, output...)
+	}
+	return fields, nil
+}
+
+// GetFieldsFor returns a byte array containing all fields for the given beat
+// and given names
+func GetFieldsFor(beat string, names []string) ([]byte, error) {
+	var fields []byte
+	for _, name := range names {
+		data, ok := FieldsRegistry[beat][name]
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("No fields available for %s", name))
+		}
 		output, err := DecodeData(data)
 		if err != nil {
 			return nil, err

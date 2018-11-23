@@ -22,7 +22,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -41,11 +43,10 @@ type Loader struct {
 	config   TemplatesConfig
 	client   ESClient
 	beatInfo beat.Info
-	fields   []byte
 }
 
 // NewLoader creates a new template loader
-func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields []byte) (*Loader, error) {
+func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info) (*Loader, error) {
 	//TODO: change init
 	config := DefaultConfig
 
@@ -58,7 +59,6 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields [
 		config:   config,
 		client:   client,
 		beatInfo: beatInfo,
-		fields:   fields,
 	}, nil
 }
 
@@ -68,6 +68,10 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields [
 func (l *Loader) Load() error {
 
 	for _, cfg := range l.config.Templates {
+		fmt.Println("------------- SIMI TEMPLATE")
+		fmt.Println(cfg)
+		fmt.Println(cfg.Enabled)
+		fmt.Println(cfg.Overwrite)
 		tmpl, err := NewTemplate(l.beatInfo.Version, l.beatInfo.IndexPrefix, l.client.GetVersion(), cfg)
 		if err != nil {
 			return fmt.Errorf("error creating template instance: %v", err)
@@ -114,9 +118,28 @@ func (l *Loader) Load() error {
 				if err != nil {
 					return fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
 				}
+
+				// Load fields for modules
+			} else if cfg.Modules != "" {
+				logp.Debug("template", "Load fields for %s", cfg.Modules)
+
+				fields, err := asset.GetFieldsFor(l.beatInfo.Name, strings.Split(cfg.Modules, ","))
+				if err != nil {
+					return err
+				}
+				template, err = tmpl.LoadBytes(fields)
+				if err != nil {
+					return fmt.Errorf("error creating template: %v", err)
+				}
+
+				// Load default fields
 			} else {
 				logp.Debug("template", "Load default fields")
-				template, err = tmpl.LoadBytes(l.fields)
+				fields, err := asset.GetFields(l.beatInfo.Name)
+				if err != nil {
+					return err
+				}
+				template, err = tmpl.LoadBytes(fields)
 				if err != nil {
 					return fmt.Errorf("error creating template: %v", err)
 				}

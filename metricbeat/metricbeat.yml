@@ -102,7 +102,7 @@ output.elasticsearch:
   #username: "elastic"
   #password: "changeme"
   
-  index: "metricbeat-simi-%{+yyyy.MM.dd}"
+  #index: "metricbeat-simi-%{+yyyy.MM.dd}"
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:

@@ -25,18 +25,21 @@ type TemplateConfig struct {
 	Name    string `config:"name"`
 	Pattern string `config:"pattern"`
 	Fields  string `config:"fields"`
+	Modules string `config:"modules"`
 	JSON    struct {
 		Enabled bool   `config:"enabled"`
 		Path    string `config:"path"`
 		Name    string `config:"name"`
 	} `config:"json"`
 
-	Settings  TemplateSettings
-	Enabled   bool
-	Overwrite bool
+	//TODO: check for overwrites
+	Settings  TemplateSettings `config:"settings"`
+	Enabled   bool             `config:"enabled"`
+	Overwrite bool             `config:"overwrite"`
 }
 
 type TemplatesConfig struct {
+	//TODO: check for this attribute
 	Enabled   bool `config:"enabled"`
 	Overwrite bool `config:"overwrite"`
 
