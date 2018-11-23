@@ -1,0 +1,25 @@
+# Module: windows
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-windows.html
+
+- module: windows
+  #metricsets:
+  #  - service
+  period: 1m
+
+#- module: windows
+#  metricsets:
+#    - perfmon
+#  period: 10s
+#  perfmon.counters:
+#    - instance_label: processor.name
+#      instance_name: total
+#      measurement_label: processor.time.total.pct
+#      query: '\Processor Information(_Total)\% Processor Time'
+#
+#    - instance_label: physical_disk.name
+#      measurement_label: physical_disk.write.per_sec
+#      query: '\PhysicalDisk(*)\Disk Writes/sec'
+#
+#    - instance_label: physical_disk.name
+#      measurement_label: physical_disk.write.time.pct
+#      query: '\PhysicalDisk(*)\% Disk Write Time'

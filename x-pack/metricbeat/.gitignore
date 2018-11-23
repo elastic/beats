@@ -5,3 +5,4 @@ _meta/beat.reference.yml
 /metricbeat
 /metricbeat.test
 /docs/html_docs
+_meta/kibana.generated

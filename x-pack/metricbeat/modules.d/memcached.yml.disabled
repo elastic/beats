@@ -1,0 +1,7 @@
+# Module: memcached
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-memcached.html
+
+- module: memcached
+#  metricsets: ["stats"]
+  period: 10s
+  hosts: ["localhost:11211"]
