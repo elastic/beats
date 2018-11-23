@@ -690,7 +690,7 @@ func (client *Client) Connect() error {
 		return err
 	}
 
-	if client.GetVersion().Major <= 7 {
+	if client.GetVersion().Major < 7 {
 		client.eventType = defaultEventTypeES6
 	} else {
 		client.eventType = defaultEventType
