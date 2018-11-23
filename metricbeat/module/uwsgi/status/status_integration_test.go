@@ -29,24 +29,31 @@ import (
 )
 
 func TestStatusTCP(t *testing.T) {
+	t.Parallel()
 	testStatus(t, "uwsgi_tcp")
 }
 
 func TestStatusHTTP(t *testing.T) {
+	t.Parallel()
 	testStatus(t, "uwsgi_http")
 }
 
 func testStatus(t *testing.T, service string) {
 	runner := compose.TestRunner{Service: service}
 
+	test := uwsgiTest{Service: service}
 	runner.Run(t, compose.Suite{
-		"Fetch": testFetch,
-		"Data":  testData,
+		"Fetch": test.Fetch,
+		"Data":  test.Data,
 	})
 }
 
-func testFetch(t *testing.T, r compose.R) {
-	f := mbtest.NewEventsFetcher(t, getConfig(t, service, r.Host()))
+type uwsgiTest struct {
+	Service string
+}
+
+func (u *uwsgiTest) Fetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig(t, u.Service, r.Host()))
 	events, err := f.Fetch()
 	assert.NoError(t, err)
 
@@ -55,8 +62,8 @@ func testFetch(t *testing.T, r compose.R) {
 	assert.Equal(t, 1, len(totals))
 }
 
-func testData(t *testing.T, r compose.R) {
-	f := mbtest.NewEventsFetcher(t, getConfig(t, service, r.Host()))
+func (u *uwsgiTest) Data(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig(t, u.Service, r.Host()))
 	err := mbtest.WriteEvents(f, t)
 	if err != nil {
 		t.Fatal("write", err)

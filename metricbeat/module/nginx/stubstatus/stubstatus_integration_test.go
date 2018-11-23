@@ -35,7 +35,7 @@ func TestStubstatus(t *testing.T) {
 	}
 
 	runner.Run(t, compose.Suite{
-		"Fetch": tesFetch,
+		"Fetch": testFetch,
 		"Data":  testData,
 	})
 }
