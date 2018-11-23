@@ -4,6 +4,8 @@ import json
 import os
 import shutil
 import subprocess
+import sys
+import unittest
 
 
 class Test(BaseTest):
@@ -177,6 +179,7 @@ class Test(BaseTest):
             lambda: self.log_contains("Total non-zero metrics"),
             max_timeout=2)
 
+    @unittest.skipIf(sys.platform == 'darwin', 'flaky test https://github.com/elastic/beats/issues/9216')
     def test_persistent_uuid(self):
         self.render_config_template()
 
