@@ -31,28 +31,32 @@ import (
 
 func TestMetrics(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("metrics", r.Host()))
-			event, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			// Check a few event Fields
-			findCount, err := event.GetValue("commands.find.total")
-			assert.NoError(t, err)
-			assert.True(t, findCount.(int64) >= 0)
-
-			deletedDocuments, err := event.GetValue("document.deleted")
-			assert.NoError(t, err)
-			assert.True(t, deletedDocuments.(int64) >= 0)
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("metrics", r.Host()))
-			err := mbtest.WriteEvent(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, mtest.GetConfig("metrics", r.Host()))
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	// Check a few event Fields
+	findCount, err := event.GetValue("commands.find.total")
+	assert.NoError(t, err)
+	assert.True(t, findCount.(int64) >= 0)
+
+	deletedDocuments, err := event.GetValue("document.deleted")
+	assert.NoError(t, err)
+	assert.True(t, deletedDocuments.(int64) >= 0)
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, mtest.GetConfig("metrics", r.Host()))
+	err := mbtest.WriteEvent(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }

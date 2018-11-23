@@ -31,30 +31,33 @@ import (
 
 func TestStatus(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
-
-			err := mbtest.WriteEvent(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
-
-		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
-			event, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
-			// Check number of fields.
-			if len(event) < 11 {
-				t.Fatal("Too few top-level elements in the event")
-			}
-		},
+		"Data":  testData,
+		"Fetch": testFetch,
 	})
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
+
+	err := mbtest.WriteEvent(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+	// Check number of fields.
+	if len(event) < 11 {
+		t.Fatal("Too few top-level elements in the event")
+	}
 }
 
 func getConfig(host string) map[string]interface{} {

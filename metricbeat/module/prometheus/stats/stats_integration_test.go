@@ -32,27 +32,31 @@ import (
 
 func TestStats(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("stats", r.Host()))
-			event, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
-			// Check number of fields.
-			assert.Equal(t, 3, len(event))
-			assert.True(t, event["processes"].(common.MapStr)["open_fds"].(int64) > 0)
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("stats", r.Host()))
-
-			err := mbtest.WriteEvent(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
 
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, mtest.GetConfig("stats", r.Host()))
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+	// Check number of fields.
+	assert.Equal(t, 3, len(event))
+	assert.True(t, event["processes"].(common.MapStr)["open_fds"].(int64) > 0)
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, mtest.GetConfig("stats", r.Host()))
+
+	err := mbtest.WriteEvent(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }

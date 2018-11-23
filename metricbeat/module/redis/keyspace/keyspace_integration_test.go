@@ -32,42 +32,44 @@ import (
 )
 
 func TestKeyspace(t *testing.T) {
-	t.Parallel()
-
 	mtest.Runner.Run(t, compose.Suite{
-		"Data": func(t *testing.T, r compose.R) {
-			addEntry(t, r.Host())
-
-			f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
-
-			err := mbtest.WriteEvents(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
-		"Fetch": func(t *testing.T, r compose.R) {
-			addEntry(t, r.Host())
-
-			// Fetch data
-			f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
-			events, err := f.Fetch()
-			if err != nil {
-				t.Fatal("fetch", err)
-			}
-
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
-
-			// Make sure at least 1 db keyspace exists
-			assert.True(t, len(events) > 0)
-
-			keyspace := events[0]
-
-			assert.True(t, keyspace["avg_ttl"].(int64) >= 0)
-			assert.True(t, keyspace["expires"].(int64) >= 0)
-			assert.True(t, keyspace["keys"].(int64) >= 0)
-			assert.True(t, strings.Contains(keyspace["id"].(string), "db"))
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	addEntry(t, r.Host())
+
+	// Fetch data
+	f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
+	events, err := f.Fetch()
+	if err != nil {
+		t.Fatal("fetch", err)
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
+
+	// Make sure at least 1 db keyspace exists
+	assert.True(t, len(events) > 0)
+
+	keyspace := events[0]
+
+	assert.True(t, keyspace["avg_ttl"].(int64) >= 0)
+	assert.True(t, keyspace["expires"].(int64) >= 0)
+	assert.True(t, keyspace["keys"].(int64) >= 0)
+	assert.True(t, strings.Contains(keyspace["id"].(string), "db"))
+}
+
+func testData(t *testing.T, r compose.R) {
+	addEntry(t, r.Host())
+
+	f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
+
+	err := mbtest.WriteEvents(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 // addEntry adds an entry to redis

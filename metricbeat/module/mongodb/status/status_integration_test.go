@@ -32,31 +32,35 @@ import (
 
 func TestStatus(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("status", r.Host()))
-			event, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
-			// Check event fields
-			current := event["connections"].(common.MapStr)["current"].(int64)
-			assert.True(t, current >= 0)
-
-			available := event["connections"].(common.MapStr)["available"].(int64)
-			assert.True(t, available > 0)
-
-			pageFaults := event["extra_info"].(common.MapStr)["page_faults"].(int64)
-			assert.True(t, pageFaults >= 0)
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("status", r.Host()))
-			err := mbtest.WriteEvent(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, mtest.GetConfig("status", r.Host()))
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+	// Check event fields
+	current := event["connections"].(common.MapStr)["current"].(int64)
+	assert.True(t, current >= 0)
+
+	available := event["connections"].(common.MapStr)["available"].(int64)
+	assert.True(t, available > 0)
+
+	pageFaults := event["extra_info"].(common.MapStr)["page_faults"].(int64)
+	assert.True(t, pageFaults >= 0)
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, mtest.GetConfig("status", r.Host()))
+	err := mbtest.WriteEvent(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }

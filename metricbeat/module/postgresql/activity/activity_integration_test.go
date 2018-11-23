@@ -32,37 +32,41 @@ import (
 
 func TestActivity(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, mtest.GetConfig("activity", r.Host()))
-			events, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			assert.True(t, len(events) > 0)
-			event := events[0]
-
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
-			// Check event fields
-			assert.Contains(t, event, "database")
-			db_oid := event["database"].(common.MapStr)["oid"].(int64)
-			assert.True(t, db_oid > 0)
-
-			assert.Contains(t, event, "pid")
-			assert.True(t, event["pid"].(int64) > 0)
-
-			assert.Contains(t, event, "user")
-			assert.Contains(t, event["user"].(common.MapStr), "name")
-			assert.Contains(t, event["user"].(common.MapStr), "id")
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, mtest.GetConfig("activity", r.Host()))
-
-			err := mbtest.WriteEvents(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, mtest.GetConfig("activity", r.Host()))
+	events, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	assert.True(t, len(events) > 0)
+	event := events[0]
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+	// Check event fields
+	assert.Contains(t, event, "database")
+	db_oid := event["database"].(common.MapStr)["oid"].(int64)
+	assert.True(t, db_oid > 0)
+
+	assert.Contains(t, event, "pid")
+	assert.True(t, event["pid"].(int64) > 0)
+
+	assert.Contains(t, event, "user")
+	assert.Contains(t, event["user"].(common.MapStr), "name")
+	assert.Contains(t, event["user"].(common.MapStr), "id")
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, mtest.GetConfig("activity", r.Host()))
+
+	err := mbtest.WriteEvents(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }

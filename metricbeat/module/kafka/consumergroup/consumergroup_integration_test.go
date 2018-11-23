@@ -31,25 +31,29 @@ import (
 )
 
 func TestConsumerGroup(t *testing.T) {
-	mtest.Runner.Run(t, compose.Suite{"Data": func(t *testing.T, r compose.R) {
-		topic := "metricbeat-test"
-		mtest.GenerateKafkaData(t, topic, r.Host())
-		c, err := mtest.StartConsumer(t, topic, r.Host())
-		if err != nil {
-			t.Fatal(errors.Wrap(err, "starting kafka consumer"))
-		}
-		defer c.Close()
+	mtest.Runner.Run(t, compose.Suite{
+		"Data": testData,
+	})
+}
 
-		ms := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
-		for retries := 0; retries < 3; retries++ {
-			err = mbtest.WriteEventsReporterV2(ms, t, "")
-			if err == nil {
-				return
-			}
-			time.Sleep(500 * time.Millisecond)
+func testData(t *testing.T, r compose.R) {
+	topic := "metricbeat-test"
+	mtest.GenerateKafkaData(t, topic, r.Host())
+	c, err := mtest.StartConsumer(t, topic, r.Host())
+	if err != nil {
+		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
+	}
+	defer c.Close()
+
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	for retries := 0; retries < 3; retries++ {
+		err = mbtest.WriteEventsReporterV2(ms, t, "")
+		if err == nil {
+			return
 		}
-		t.Fatal("write", err)
-	}})
+		time.Sleep(500 * time.Millisecond)
+	}
+	t.Fatal("write", err)
 }
 
 func getConfig(host string) map[string]interface{} {

@@ -30,14 +30,16 @@ func TestStats(t *testing.T) {
 	runner := compose.TestRunner{Service: "memcached"}
 
 	runner.Run(t, compose.Suite{
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
-			err := mbtest.WriteEvent(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Data": testData,
 	})
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
+	err := mbtest.WriteEvent(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func getConfig(host string) map[string]interface{} {

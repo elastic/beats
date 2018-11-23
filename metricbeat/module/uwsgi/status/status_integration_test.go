@@ -28,35 +28,39 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func testStatus(t *testing.T, service string) {
-	runner := compose.TestRunner{Service: service}
-
-	runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, getConfig(t, service, r.Host()))
-			events, err := f.Fetch()
-			assert.NoError(t, err)
-
-			assert.True(t, len(events) > 0)
-			totals := findItems(events, "total")
-			assert.Equal(t, 1, len(totals))
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, getConfig(t, service, r.Host()))
-			err := mbtest.WriteEvents(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
-	})
-}
-
 func TestStatusTCP(t *testing.T) {
 	testStatus(t, "uwsgi_tcp")
 }
 
 func TestStatusHTTP(t *testing.T) {
 	testStatus(t, "uwsgi_http")
+}
+
+func testStatus(t *testing.T, service string) {
+	runner := compose.TestRunner{Service: service}
+
+	runner.Run(t, compose.Suite{
+		"Fetch": testFetch,
+		"Data":  testData,
+	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig(t, service, r.Host()))
+	events, err := f.Fetch()
+	assert.NoError(t, err)
+
+	assert.True(t, len(events) > 0)
+	totals := findItems(events, "total")
+	assert.Equal(t, 1, len(totals))
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig(t, service, r.Host()))
+	err := mbtest.WriteEvents(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func getConfig(t *testing.T, service string, host string) map[string]interface{} {

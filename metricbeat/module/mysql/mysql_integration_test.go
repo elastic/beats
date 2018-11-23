@@ -30,12 +30,14 @@ import (
 
 func TestNewDB(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"NewDB": func(t *testing.T, r compose.R) {
-			db, err := NewDB(mtest.GetDSN(r.Host()))
-			assert.NoError(t, err)
-
-			err = db.Ping()
-			assert.NoError(t, err)
-		},
+		"NewDB": testNewDB,
 	})
+}
+
+func testNewDB(t *testing.T, r compose.R) {
+	db, err := NewDB(mtest.GetDSN(r.Host()))
+	assert.NoError(t, err)
+
+	err = db.Ping()
+	assert.NoError(t, err)
 }

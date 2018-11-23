@@ -31,30 +31,34 @@ import (
 
 func TestCollstats(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, mtest.GetConfig("collstats", r.Host()))
-			events, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			for _, event := range events {
-				t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
-				// Check a few event Fields
-				db := event["db"].(string)
-				assert.NotEqual(t, db, "")
-
-				collection := event["collection"].(string)
-				assert.NotEqual(t, collection, "")
-			}
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, mtest.GetConfig("collstats", r.Host()))
-			err := mbtest.WriteEvents(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, mtest.GetConfig("collstats", r.Host()))
+	events, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	for _, event := range events {
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+		// Check a few event Fields
+		db := event["db"].(string)
+		assert.NotEqual(t, db, "")
+
+		collection := event["collection"].(string)
+		assert.NotEqual(t, collection, "")
+	}
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, mtest.GetConfig("collstats", r.Host()))
+	err := mbtest.WriteEvents(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }

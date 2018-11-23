@@ -35,55 +35,59 @@ func TestCollector(t *testing.T) {
 	runner := compose.TestRunner{Service: "dropwizard"}
 
 	runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
-			events, err := f.Fetch()
+		"Fetch": testFetch,
+		"Data":  testData,
+	})
+}
 
-			hasTag := false
-			doesntHaveTag := false
-			for _, event := range events {
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
+	events, err := f.Fetch()
 
-				ok, _ := event.HasKey("my_histogram")
-				if ok {
-					_, err := event.GetValue("tags")
-					if err == nil {
-						t.Fatal("write", "my_counter not supposed to have tags")
-					}
-					doesntHaveTag = true
-				}
+	hasTag := false
+	doesntHaveTag := false
+	for _, event := range events {
 
-				ok, _ = event.HasKey("my_counter")
-				if ok {
-					tagsRaw, err := event.GetValue("tags")
-					if err != nil {
-						t.Fatal("write", err)
-					} else {
-						tags, ok := tagsRaw.(common.MapStr)
-						if !ok {
-							t.Fatal("write", "unable to cast tags to common.MapStr")
-						} else {
-							assert.Equal(t, len(tags), 1)
-							hasTag = true
-						}
-					}
-				}
+		ok, _ := event.HasKey("my_histogram")
+		if ok {
+			_, err := event.GetValue("tags")
+			if err == nil {
+				t.Fatal("write", "my_counter not supposed to have tags")
 			}
-			assert.Equal(t, hasTag, true)
-			assert.Equal(t, doesntHaveTag, true)
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
+			doesntHaveTag = true
+		}
 
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
-			err := mbtest.WriteEvents(f, t)
+		ok, _ = event.HasKey("my_counter")
+		if ok {
+			tagsRaw, err := event.GetValue("tags")
 			if err != nil {
 				t.Fatal("write", err)
+			} else {
+				tags, ok := tagsRaw.(common.MapStr)
+				if !ok {
+					t.Fatal("write", "unable to cast tags to common.MapStr")
+				} else {
+					assert.Equal(t, len(tags), 1)
+					hasTag = true
+				}
 			}
-		},
-	})
+		}
+	}
+	assert.Equal(t, hasTag, true)
+	assert.Equal(t, doesntHaveTag, true)
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
+	err := mbtest.WriteEvents(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func getConfig(host string) map[string]interface{} {

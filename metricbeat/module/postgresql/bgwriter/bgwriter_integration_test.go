@@ -32,39 +32,43 @@ import (
 
 func TestBgwriter(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("bgwriter", r.Host()))
-			event, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
-			assert.Contains(t, event, "checkpoints")
-			assert.Contains(t, event, "buffers")
-			assert.Contains(t, event, "stats_reset")
-
-			checkpoints := event["checkpoints"].(common.MapStr)
-			assert.Contains(t, checkpoints, "scheduled")
-			assert.Contains(t, checkpoints, "requested")
-			assert.Contains(t, checkpoints, "times")
-
-			buffers := event["buffers"].(common.MapStr)
-			assert.Contains(t, buffers, "checkpoints")
-			assert.Contains(t, buffers, "clean")
-			assert.Contains(t, buffers, "clean_full")
-			assert.Contains(t, buffers, "backend")
-			assert.Contains(t, buffers, "backend_fsync")
-			assert.Contains(t, buffers, "allocated")
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("bgwriter", r.Host()))
-
-			err := mbtest.WriteEvent(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, mtest.GetConfig("bgwriter", r.Host()))
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+	assert.Contains(t, event, "checkpoints")
+	assert.Contains(t, event, "buffers")
+	assert.Contains(t, event, "stats_reset")
+
+	checkpoints := event["checkpoints"].(common.MapStr)
+	assert.Contains(t, checkpoints, "scheduled")
+	assert.Contains(t, checkpoints, "requested")
+	assert.Contains(t, checkpoints, "times")
+
+	buffers := event["buffers"].(common.MapStr)
+	assert.Contains(t, buffers, "checkpoints")
+	assert.Contains(t, buffers, "clean")
+	assert.Contains(t, buffers, "clean_full")
+	assert.Contains(t, buffers, "backend")
+	assert.Contains(t, buffers, "backend_fsync")
+	assert.Contains(t, buffers, "allocated")
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, mtest.GetConfig("bgwriter", r.Host()))
+
+	err := mbtest.WriteEvent(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }

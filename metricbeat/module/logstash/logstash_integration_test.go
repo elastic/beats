@@ -38,29 +38,33 @@ var metricSets = []string{
 
 func TestLogstash(t *testing.T) {
 	logstash.Runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			for _, metricSet := range metricSets {
-				f := mbtest.NewReportingMetricSetV2(t, logstash.GetConfig(metricSet, r.Host()))
-				events, errs := mbtest.ReportingFetchV2(f)
-
-				assert.Empty(t, errs)
-				if !assert.NotEmpty(t, events) {
-					t.FailNow()
-				}
-
-				t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-					events[0].BeatEvent("logstash", metricSet).Fields.StringToPrint())
-			}
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			for _, metricSet := range metricSets {
-				config := logstash.GetConfig(metricSet, r.Host())
-				f := mbtest.NewReportingMetricSetV2(t, config)
-				err := mbtest.WriteEventsReporterV2(f, t, "")
-				if err != nil {
-					t.Fatal("write", err)
-				}
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	for _, metricSet := range metricSets {
+		f := mbtest.NewReportingMetricSetV2(t, logstash.GetConfig(metricSet, r.Host()))
+		events, errs := mbtest.ReportingFetchV2(f)
+
+		assert.Empty(t, errs)
+		if !assert.NotEmpty(t, events) {
+			t.FailNow()
+		}
+
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+			events[0].BeatEvent("logstash", metricSet).Fields.StringToPrint())
+	}
+}
+
+func testData(t *testing.T, r compose.R) {
+	for _, metricSet := range metricSets {
+		config := logstash.GetConfig(metricSet, r.Host())
+		f := mbtest.NewReportingMetricSetV2(t, config)
+		err := mbtest.WriteEventsReporterV2(f, t, "")
+		if err != nil {
+			t.Fatal("write", err)
+		}
+	}
 }

@@ -32,29 +32,33 @@ func TestJMX(t *testing.T) {
 	runner := compose.TestRunner{Service: "jolokia"}
 
 	runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			for _, config := range getConfigs(r.Host()) {
-				f := mbtest.NewEventsFetcher(t, config)
-				events, err := f.Fetch()
-				if !assert.NoError(t, err) {
-					t.FailNow()
-				}
-				t.Logf("%s/%s events: %+v", f.Module().Name(), f.Name(), events)
-				if len(events) == 0 || len(events[0]) <= 1 {
-					t.Fatal("Empty events")
-				}
-			}
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			for _, config := range getConfigs(r.Host()) {
-				f := mbtest.NewEventsFetcher(t, config)
-				err := mbtest.WriteEvents(f, t)
-				if err != nil {
-					t.Fatal("write", err)
-				}
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	for _, config := range getConfigs(r.Host()) {
+		f := mbtest.NewEventsFetcher(t, config)
+		events, err := f.Fetch()
+		if !assert.NoError(t, err) {
+			t.FailNow()
+		}
+		t.Logf("%s/%s events: %+v", f.Module().Name(), f.Name(), events)
+		if len(events) == 0 || len(events[0]) <= 1 {
+			t.Fatal("Empty events")
+		}
+	}
+}
+
+func testData(t *testing.T, r compose.R) {
+	for _, config := range getConfigs(r.Host()) {
+		f := mbtest.NewEventsFetcher(t, config)
+		err := mbtest.WriteEvents(f, t)
+		if err != nil {
+			t.Fatal("write", err)
+		}
+	}
 }
 
 func getConfigs(host string) []map[string]interface{} {

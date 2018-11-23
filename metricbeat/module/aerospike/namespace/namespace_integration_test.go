@@ -28,15 +28,17 @@ import (
 )
 
 func TestNamespace(t *testing.T) {
-	t.Parallel()
+	mtest.Runner.Run(t, compose.Suite{
+		"Data": testData,
+	})
+}
 
-	mtest.Runner.Run(t, compose.Suite{"Data": func(t *testing.T, r compose.R) {
-		f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
-		err := mbtest.WriteEvents(f, t)
-		if err != nil {
-			t.Fatal("write", err)
-		}
-	}})
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
+	err := mbtest.WriteEvents(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func getConfig(host string) map[string]interface{} {

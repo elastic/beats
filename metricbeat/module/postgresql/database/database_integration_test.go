@@ -32,38 +32,42 @@ import (
 
 func TestDatabase(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, mtest.GetConfig("database", r.Host()))
-			events, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			assert.True(t, len(events) > 0)
-			event := events[0]
-
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
-			// Check event fields
-			db_oid := event["oid"].(int64)
-			assert.True(t, db_oid > 0)
-			assert.Contains(t, event, "name")
-			_, ok := event["name"].(string)
-			assert.True(t, ok)
-
-			rows := event["rows"].(common.MapStr)
-			assert.Contains(t, rows, "returned")
-			assert.Contains(t, rows, "fetched")
-			assert.Contains(t, rows, "inserted")
-			assert.Contains(t, rows, "updated")
-			assert.Contains(t, rows, "deleted")
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, mtest.GetConfig("database", r.Host()))
-			err := mbtest.WriteEvents(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, mtest.GetConfig("database", r.Host()))
+	events, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	assert.True(t, len(events) > 0)
+	event := events[0]
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+	// Check event fields
+	db_oid := event["oid"].(int64)
+	assert.True(t, db_oid > 0)
+	assert.Contains(t, event, "name")
+	_, ok := event["name"].(string)
+	assert.True(t, ok)
+
+	rows := event["rows"].(common.MapStr)
+	assert.Contains(t, rows, "returned")
+	assert.Contains(t, rows, "fetched")
+	assert.Contains(t, rows, "inserted")
+	assert.Contains(t, rows, "updated")
+	assert.Contains(t, rows, "deleted")
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, mtest.GetConfig("database", r.Host()))
+	err := mbtest.WriteEvents(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }

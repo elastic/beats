@@ -36,52 +36,55 @@ import (
 
 func TestReplStatus(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			err := initiateReplicaSet(t, r.Host())
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("replstatus", r.Host()))
-			event, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
-			// Check event fields
-			oplog := event["oplog"].(common.MapStr)
-			allocated := oplog["size"].(common.MapStr)["allocated"].(int64)
-			assert.True(t, allocated >= 0)
-
-			used := oplog["size"].(common.MapStr)["used"].(float64)
-			assert.True(t, used > 0)
-
-			firstTs := oplog["first"].(common.MapStr)["timestamp"].(int64)
-			assert.True(t, firstTs >= 0)
-
-			window := oplog["window"].(int64)
-			assert.True(t, window >= 0)
-
-			members := event["members"].(common.MapStr)
-			primary := members["primary"].(common.MapStr)
-			assert.NotEmpty(t, primary["host"].(string))
-			assert.True(t, primary["optime"].(int64) > 0)
-
-			set := event["set_name"].(string)
-			assert.Equal(t, set, "beats")
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, mtest.GetConfig("replstatus", r.Host()))
-			err := mbtest.WriteEvent(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
 }
 
+func testFetch(t *testing.T, r compose.R) {
+	err := initiateReplicaSet(t, r.Host())
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	f := mbtest.NewEventFetcher(t, mtest.GetConfig("replstatus", r.Host()))
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+	// Check event fields
+	oplog := event["oplog"].(common.MapStr)
+	allocated := oplog["size"].(common.MapStr)["allocated"].(int64)
+	assert.True(t, allocated >= 0)
+
+	used := oplog["size"].(common.MapStr)["used"].(float64)
+	assert.True(t, used > 0)
+
+	firstTs := oplog["first"].(common.MapStr)["timestamp"].(int64)
+	assert.True(t, firstTs >= 0)
+
+	window := oplog["window"].(int64)
+	assert.True(t, window >= 0)
+
+	members := event["members"].(common.MapStr)
+	primary := members["primary"].(common.MapStr)
+	assert.NotEmpty(t, primary["host"].(string))
+	assert.True(t, primary["optime"].(int64) > 0)
+
+	set := event["set_name"].(string)
+	assert.Equal(t, set, "beats")
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, mtest.GetConfig("replstatus", r.Host()))
+	err := mbtest.WriteEvent(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
+}
 func initiateReplicaSet(t *testing.T, url string) error {
 	dialInfo, err := mgo.ParseURL(url)
 	if err != nil {

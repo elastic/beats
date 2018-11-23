@@ -43,33 +43,37 @@ func makeBadRequest(config map[string]interface{}) error {
 
 func TestHealth(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			config := mtest.GetConfig("health", r.Host())
-
-			makeBadRequest(config)
-
-			ms := mbtest.NewReportingMetricSetV2(t, config)
-			reporter := &mbtest.CapturingReporterV2{}
-
-			ms.Fetch(reporter)
-			assert.Nil(t, reporter.GetErrors(), "Errors while fetching metrics")
-
-			event := reporter.GetEvents()[0]
-			assert.NotNil(t, event)
-			t.Logf("%s/%s event: %+v", ms.Module().Name(), ms.Name(), event)
-
-			responseCount, _ := event.MetricSetFields.GetValue("response.count")
-			assert.True(t, responseCount.(int64) >= 1)
-
-			badResponseCount, _ := event.MetricSetFields.GetValue("response.status_codes.404")
-			assert.True(t, badResponseCount.(float64) >= 1)
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			ms := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("health", r.Host()))
-			err := mbtest.WriteEventsReporterV2(ms, t, "")
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	config := mtest.GetConfig("health", r.Host())
+
+	makeBadRequest(config)
+
+	ms := mbtest.NewReportingMetricSetV2(t, config)
+	reporter := &mbtest.CapturingReporterV2{}
+
+	ms.Fetch(reporter)
+	assert.Nil(t, reporter.GetErrors(), "Errors while fetching metrics")
+
+	event := reporter.GetEvents()[0]
+	assert.NotNil(t, event)
+	t.Logf("%s/%s event: %+v", ms.Module().Name(), ms.Name(), event)
+
+	responseCount, _ := event.MetricSetFields.GetValue("response.count")
+	assert.True(t, responseCount.(int64) >= 1)
+
+	badResponseCount, _ := event.MetricSetFields.GetValue("response.status_codes.404")
+	assert.True(t, badResponseCount.(float64) >= 1)
+}
+
+func testData(t *testing.T, r compose.R) {
+	ms := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("health", r.Host()))
+	err := mbtest.WriteEventsReporterV2(ms, t, "")
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }

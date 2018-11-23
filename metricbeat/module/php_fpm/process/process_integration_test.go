@@ -29,12 +29,14 @@ import (
 
 func TestProcess(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("process", r.Host()))
-			err := mbtest.WriteEventsReporterV2(f, t, "")
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Data": testData,
 	})
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("process", r.Host()))
+	err := mbtest.WriteEventsReporterV2(f, t, "")
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }

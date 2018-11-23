@@ -30,17 +30,19 @@ import (
 
 func TestQueue(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
-			err := mbtest.WriteEventsCond(f, t, func(e common.MapStr) bool {
-				hasTotal, _ := e.HasKey("messages.total")
-				return hasTotal
-			})
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Data": testData,
 	})
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
+	err := mbtest.WriteEventsCond(f, t, func(e common.MapStr) bool {
+		hasTotal, _ := e.HasKey("messages.total")
+		return hasTotal
+	})
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func getConfig(host string) map[string]interface{} {

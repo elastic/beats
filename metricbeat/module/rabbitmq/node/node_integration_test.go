@@ -29,14 +29,16 @@ import (
 
 func TestNode(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Data": func(t *testing.T, r compose.R) {
-			ms := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
-			err := mbtest.WriteEventsReporterV2(ms, t, "")
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Data": testData,
 	})
+}
+
+func testData(t *testing.T, r compose.R) {
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	err := mbtest.WriteEventsReporterV2(ms, t, "")
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func getConfig(host string) map[string]interface{} {

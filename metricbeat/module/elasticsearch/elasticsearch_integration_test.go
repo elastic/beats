@@ -72,49 +72,53 @@ func TestElasticsearch(t *testing.T) {
 	}
 
 	runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			if r.Option("ELASTICSEARCH_VERSION") == "6.2.4" {
-				t.Skip("This test fails on this version")
-			}
-
-			host := r.Host()
-			err := createIndex(host)
-			assert.NoError(t, err)
-
-			err = enableTrialLicense(host)
-			assert.NoError(t, err)
-
-			err = createMLJob(host)
-			assert.NoError(t, err)
-
-			for _, metricSet := range metricSets {
-				t.Run(metricSet, func(t *testing.T) {
-					checkSkip(t, metricSet, host)
-					f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet, host))
-					events, errs := mbtest.ReportingFetchV2(f)
-
-					assert.Empty(t, errs)
-					if !assert.NotEmpty(t, events) {
-						t.FailNow()
-					}
-					t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-						events[0].BeatEvent("elasticsearch", metricSet).Fields.StringToPrint())
-				})
-			}
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			for _, metricSet := range metricSets {
-				t.Run(metricSet, func(t *testing.T) {
-					checkSkip(t, metricSet, r.Host())
-					f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet, r.Host()))
-					err := mbtest.WriteEventsReporterV2(f, t, metricSet)
-					if err != nil {
-						t.Fatal("write", err)
-					}
-				})
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	if r.Option("ELASTICSEARCH_VERSION") == "6.2.4" {
+		t.Skip("This test fails on this version")
+	}
+
+	host := r.Host()
+	err := createIndex(host)
+	assert.NoError(t, err)
+
+	err = enableTrialLicense(host)
+	assert.NoError(t, err)
+
+	err = createMLJob(host)
+	assert.NoError(t, err)
+
+	for _, metricSet := range metricSets {
+		t.Run(metricSet, func(t *testing.T) {
+			checkSkip(t, metricSet, host)
+			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet, host))
+			events, errs := mbtest.ReportingFetchV2(f)
+
+			assert.Empty(t, errs)
+			if !assert.NotEmpty(t, events) {
+				t.FailNow()
+			}
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+				events[0].BeatEvent("elasticsearch", metricSet).Fields.StringToPrint())
+		})
+	}
+}
+
+func testData(t *testing.T, r compose.R) {
+	for _, metricSet := range metricSets {
+		t.Run(metricSet, func(t *testing.T) {
+			checkSkip(t, metricSet, r.Host())
+			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet, r.Host()))
+			err := mbtest.WriteEventsReporterV2(f, t, metricSet)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		})
+	}
 }
 
 // GetConfig returns config for elasticsearch module

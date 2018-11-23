@@ -33,39 +33,42 @@ func TestMntr(t *testing.T) {
 	runner := compose.TestRunner{Service: "zookeeper", Parallel: true}
 
 	runner.Run(t, compose.Suite{
-		"Fetch": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
-			event, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
-			// Check values
-			version := event["version"].(string)
-			avgLatency := event["latency"].(common.MapStr)["avg"].(int64)
-			maxLatency := event["latency"].(common.MapStr)["max"].(int64)
-			numAliveConnections := event["num_alive_connections"].(int64)
-
-			assert.Equal(t, version, "3.4.8--1, built on 02/06/2016 03:18 GMT")
-			assert.True(t, avgLatency >= 0)
-			assert.True(t, maxLatency >= 0)
-			assert.True(t, numAliveConnections > 0)
-
-			// Check number of fields. At least 10, depending on environment
-			assert.True(t, len(event) >= 10)
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
-
-			err := mbtest.WriteEvent(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
 
+}
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+	// Check values
+	version := event["version"].(string)
+	avgLatency := event["latency"].(common.MapStr)["avg"].(int64)
+	maxLatency := event["latency"].(common.MapStr)["max"].(int64)
+	numAliveConnections := event["num_alive_connections"].(int64)
+
+	assert.Equal(t, version, "3.4.8--1, built on 02/06/2016 03:18 GMT")
+	assert.True(t, avgLatency >= 0)
+	assert.True(t, maxLatency >= 0)
+	assert.True(t, numAliveConnections > 0)
+
+	// Check number of fields. At least 10, depending on environment
+	assert.True(t, len(event) >= 10)
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
+
+	err := mbtest.WriteEvent(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func getConfig(host string) map[string]interface{} {

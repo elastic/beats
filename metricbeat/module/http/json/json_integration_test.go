@@ -32,32 +32,38 @@ func TestJSON(t *testing.T) {
 	runner := compose.TestRunner{Service: "http"}
 
 	runner.Run(t, compose.Suite{
-		"FetchObject": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, getConfig("object", r.Host()))
-			event, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-		},
-		"FetchArray": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, getConfig("array", r.Host()))
-			event, err := f.Fetch()
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-		},
-		"Data": func(t *testing.T, r compose.R) {
-			f := mbtest.NewEventsFetcher(t, getConfig("object", r.Host()))
-			err := mbtest.WriteEvents(f, t)
-			if err != nil {
-				t.Fatal("write", err)
-			}
-		},
+		"FetchObject": testFetchObject,
+		"FetchArray":  testFetchArray,
+		"Data":        testData,
 	})
+}
+
+func testFetchObject(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig("object", r.Host()))
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+}
+
+func testFetchArray(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig("array", r.Host()))
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig("object", r.Host()))
+	err := mbtest.WriteEvents(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func getConfig(jsonType string, host string) map[string]interface{} {
