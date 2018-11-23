@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -38,14 +39,23 @@ type ESClient interface {
 }
 
 type Loader struct {
-	config   TemplateConfig
-	client   ESClient
-	beatInfo beat.Info
-	fields   []byte
+	config    TemplateConfig
+	client    ESClient
+	beatInfo  beat.Info
+	esVersion common.Version
 }
 
-// NewLoader creates a new template loader
-func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields []byte) (*Loader, error) {
+// NewESLoader creates a new Elasticsearch template loader
+func NewESLoader(cfg *common.Config, client ESClient, beatInfo beat.Info) (*Loader, error) {
+	return newLoader(cfg, client, beatInfo, client.GetVersion())
+}
+
+// NewConsoleLoader creates a new Console template loader
+func NewConsoleLoader(cfg *common.Config, beatInfo beat.Info, esVersion common.Version) (*Loader, error) {
+	return newLoader(cfg, nil, beatInfo, esVersion)
+}
+
+func newLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, esVersion common.Version) (*Loader, error) {
 	config := DefaultConfig
 
 	err := cfg.Unpack(&config)
@@ -54,10 +64,10 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields [
 	}
 
 	return &Loader{
-		config:   config,
-		client:   client,
-		beatInfo: beatInfo,
-		fields:   fields,
+		config:    config,
+		client:    client,
+		beatInfo:  beatInfo,
+		esVersion: esVersion,
 	}, nil
 }
 
@@ -66,7 +76,11 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields [
 // template is written to index
 func (l *Loader) Load() error {
 
-	tmpl, err := New(l.beatInfo.Version, l.beatInfo.IndexPrefix, l.client.GetVersion(), l.config)
+	if !l.config.Enabled {
+		return nil
+	}
+
+	tmpl, err := New(l.beatInfo.Version, l.beatInfo.IndexPrefix, l.esVersion, l.config)
 	if err != nil {
 		return fmt.Errorf("error creating template instance: %v", err)
 	}
@@ -76,16 +90,15 @@ func (l *Loader) Load() error {
 		templateName = l.config.JSON.Name
 	}
 	// Check if template already exist or should be overwritten
-	exists := l.CheckTemplate(templateName)
-	if !exists || l.config.Overwrite {
+	loaded := l.templateLoaded(templateName)
+	if !loaded || l.config.Overwrite {
 
-		version := l.client.GetVersion()
-		logp.Info("Loading template for Elasticsearch version: %s", version.String())
+		logp.Info("Loading template for Elasticsearch version: %s", l.esVersion.String())
 		if l.config.Overwrite {
 			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
 		}
 
-		var template map[string]interface{}
+		var template common.MapStr
 		if l.config.JSON.Enabled {
 			jsonPath := paths.Resolve(paths.Config, l.config.JSON.Path)
 			if _, err := os.Stat(jsonPath); err != nil {
@@ -113,9 +126,15 @@ func (l *Loader) Load() error {
 			if err != nil {
 				return fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
 			}
+
+			// Load default fields
 		} else {
-			logp.Debug("template", "Load default fields.yml")
-			template, err = tmpl.LoadBytes(l.fields)
+			logp.Debug("template", "Load default fields")
+			fields, err := asset.GetFields(l.beatInfo.Beat)
+			if err != nil {
+				return err
+			}
+			template, err = tmpl.LoadBytes(fields)
 			if err != nil {
 				return fmt.Errorf("error creating template: %v", err)
 			}
@@ -136,8 +155,15 @@ func (l *Loader) Load() error {
 // LoadTemplate loads a template into Elasticsearch overwriting the existing
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
-func (l *Loader) LoadTemplate(templateName string, template map[string]interface{}) error {
+func (l *Loader) LoadTemplate(templateName string, template common.MapStr) error {
 	logp.Debug("template", "Try loading template with name: %s", templateName)
+	if l.client == nil {
+		if _, err := os.Stdout.WriteString(template.StringToPrint() + "\n"); err != nil {
+			return fmt.Errorf("Error writing template: %v", err)
+		}
+		return nil
+	}
+
 	path := "/_template/" + templateName
 	body, err := l.client.LoadJSON(path, template)
 	if err != nil {
@@ -149,7 +175,11 @@ func (l *Loader) LoadTemplate(templateName string, template map[string]interface
 
 // CheckTemplate checks if a given template already exist. It returns true if
 // and only if Elasticsearch returns with HTTP status code 200.
-func (l *Loader) CheckTemplate(templateName string) bool {
+// If no ES client is configured it returns false.
+func (l *Loader) templateLoaded(templateName string) bool {
+	if l.client == nil {
+		return false
+	}
 	status, _, _ := l.client.Request("HEAD", "/_template/"+templateName, "", nil, nil)
 
 	if status != 200 {

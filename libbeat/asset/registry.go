@@ -42,7 +42,7 @@ func SetFields(beat, name string, asset func() string) error {
 	return nil
 }
 
-// GetFields returns a byte array contains all fields for the given beat
+// GetFields returns a byte array containing all fields for the given beat
 func GetFields(beat string) ([]byte, error) {
 	var fields []byte
 	for _, data := range FieldsRegistry[beat] {
