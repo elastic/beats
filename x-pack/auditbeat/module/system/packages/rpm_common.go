@@ -20,14 +20,14 @@ func rpmPackagesByExec() ([]*Package, error) {
 	}
 
 	lines := strings.Split(string(out), "\n")
-	packages := []*Package{}
+	var packages []*Package
 	for _, line := range lines {
 		if len(strings.TrimSpace(line)) == 0 {
 			continue
 		}
 		words := strings.SplitN(line, "|", 9)
 		if len(words) < 9 {
-			return nil, fmt.Errorf("Line '%s' doesn't have enough elements", line)
+			return nil, fmt.Errorf("line '%s' doesn't have enough elements", line)
 		}
 		pkg := Package{
 			Name:    words[0],
@@ -42,13 +42,13 @@ func rpmPackagesByExec() ([]*Package, error) {
 		}
 		ts, err := strconv.ParseInt(words[5], 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("Error converting %s to string: %v", words[5], err)
+			return nil, fmt.Errorf("error converting %s to string: %v", words[5], err)
 		}
 		pkg.InstallTime = time.Unix(ts, 0)
 
 		pkg.Size, err = strconv.ParseUint(words[6], 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("Error converting %s to string: %v", words[6], err)
+			return nil, fmt.Errorf("error converting %s to string: %v", words[6], err)
 		}
 
 		// Avoid "(none)" in favor of empty strings

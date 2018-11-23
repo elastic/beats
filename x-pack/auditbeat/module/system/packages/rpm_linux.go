@@ -14,92 +14,93 @@ import (
 	"github.com/coreos/pkg/dlopen"
 )
 
-//#include <stdio.h>
-//#include <stdlib.h>
-//
-//#include <rpm/rpmlib.h>
-//#include <rpm/header.h>
-//#include <rpm/rpmts.h>
-//#include <rpm/rpmdb.h>
-//
-//rpmts
-//my_rpmtsCreate(void *f) {
-//  rpmts (*rpmtsCreate)();
-//  rpmtsCreate = (rpmts (*)())f;
-//
-//  return rpmtsCreate();
-//}
-//
-//int
-//my_rpmReadConfigFiles(void *f) {
-//  int (*rpmReadConfigFiles)(const char*, const char*);
-//  rpmReadConfigFiles = (int (*)(const char*, const char*))f;
-//  return rpmReadConfigFiles(NULL, NULL);
-//}
-//
-//rpmdbMatchIterator
-//my_rpmtsInitIterator(void *f, rpmts ts) {
-//  rpmdbMatchIterator (*rpmtsInitIterator)(const rpmts, rpmTag, const void*, size_t);
-//  rpmtsInitIterator = (rpmdbMatchIterator (*)(const rpmts, rpmTag, const void*, size_t))f;
-//
-//  return rpmtsInitIterator(ts, RPMDBI_PACKAGES, NULL, 0);
-//}
-//
-//Header
-//my_rpmdbNextIterator(void *f, rpmdbMatchIterator mi) {
-//  Header (*rpmdbNextIterator)(rpmdbMatchIterator);
-//  rpmdbNextIterator = (Header (*)(rpmdbMatchIterator))f;
-//
-//  return rpmdbNextIterator(mi);
-//}
-//
-//Header
-//my_headerLink(void *f, Header h) {
-//  Header (*headerLink)(Header);
-//  headerLink = (Header (*)(Header))f;
-//
-//  return headerLink(h);
-//}
-//
-//int
-//my_headerGetEntry(void *f, Header h, rpm_tag_t tag, char **p) {
-//  int (*headerGetEntry)(Header, rpm_tag_t, rpm_tagtype_t*, rpm_data_t*, rpm_count_t*);
-//  headerGetEntry = (int (*)(Header, rpm_tag_t, rpm_tagtype_t*, rpm_data_t*, rpm_count_t*))f;
-//
-//  return headerGetEntry(h, tag, NULL, (void**)p, NULL);
-//}
-//
-//int
-//my_headerGetEntryInt(void *f, Header h, rpm_tag_t tag, int **p) {
-//  int (*headerGetEntry)(Header, rpm_tag_t, rpm_tagtype_t*, rpm_data_t*, rpm_count_t*);
-//  headerGetEntry = (int (*)(Header, rpm_tag_t, rpm_tagtype_t*, rpm_data_t*, rpm_count_t*))f;
-//
-//  return headerGetEntry(h, tag, NULL, (void**)p, NULL);
-//}
-//
-//void
-//my_headerFree(void *f, Header h) {
-//	Header (*headerFree)(Header);
-//  headerFree = (Header (*)(Header))f;
-//
-//	headerFree(h);
-//}
-//
-//void
-//my_rpmdbFreeIterator(void *f, rpmdbMatchIterator mi) {
-//  rpmdbMatchIterator (*rpmdbFreeIterator)(rpmdbMatchIterator);
-//  rpmdbFreeIterator = (rpmdbMatchIterator (*)(rpmdbMatchIterator))f;
-//
-//  rpmdbFreeIterator(mi);
-//}
-//
-//void
-//my_rpmtsFree(void *f, rpmts ts) {
-//  rpmts (*rpmtsFree)(rpmts);
-//  rpmtsFree = (rpmts (*)(rpmts))f;
-//
-//  rpmtsFree(ts);
-//}
+/*
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <rpm/rpmlib.h>
+#include <rpm/header.h>
+#include <rpm/rpmts.h>
+#include <rpm/rpmdb.h>
+
+rpmts
+my_rpmtsCreate(void *f) {
+  rpmts (*rpmtsCreate)();
+  rpmtsCreate = (rpmts (*)())f;
+
+  return rpmtsCreate();
+}
+
+int
+my_rpmReadConfigFiles(void *f) {
+  int (*rpmReadConfigFiles)(const char*, const char*);
+  rpmReadConfigFiles = (int (*)(const char*, const char*))f;
+  return rpmReadConfigFiles(NULL, NULL);
+}
+
+rpmdbMatchIterator
+my_rpmtsInitIterator(void *f, rpmts ts) {
+  rpmdbMatchIterator (*rpmtsInitIterator)(const rpmts, rpmTag, const void*, size_t);
+  rpmtsInitIterator = (rpmdbMatchIterator (*)(const rpmts, rpmTag, const void*, size_t))f;
+
+  return rpmtsInitIterator(ts, RPMDBI_PACKAGES, NULL, 0);
+}
+
+Header
+my_rpmdbNextIterator(void *f, rpmdbMatchIterator mi) {
+  Header (*rpmdbNextIterator)(rpmdbMatchIterator);
+  rpmdbNextIterator = (Header (*)(rpmdbMatchIterator))f;
+
+  return rpmdbNextIterator(mi);
+}
+
+Header
+my_headerLink(void *f, Header h) {
+  Header (*headerLink)(Header);
+  headerLink = (Header (*)(Header))f;
+
+  return headerLink(h);
+}
+
+int
+my_headerGetEntry(void *f, Header h, rpm_tag_t tag, char **p) {
+  int (*headerGetEntry)(Header, rpm_tag_t, rpm_tagtype_t*, rpm_data_t*, rpm_count_t*);
+  headerGetEntry = (int (*)(Header, rpm_tag_t, rpm_tagtype_t*, rpm_data_t*, rpm_count_t*))f;
+
+  return headerGetEntry(h, tag, NULL, (void**)p, NULL);
+}
+
+int
+my_headerGetEntryInt(void *f, Header h, rpm_tag_t tag, int **p) {
+  int (*headerGetEntry)(Header, rpm_tag_t, rpm_tagtype_t*, rpm_data_t*, rpm_count_t*);
+  headerGetEntry = (int (*)(Header, rpm_tag_t, rpm_tagtype_t*, rpm_data_t*, rpm_count_t*))f;
+
+  return headerGetEntry(h, tag, NULL, (void**)p, NULL);
+}
+
+void
+my_headerFree(void *f, Header h) {
+	Header (*headerFree)(Header);
+  headerFree = (Header (*)(Header))f;
+
+	headerFree(h);
+}
+
+void
+my_rpmdbFreeIterator(void *f, rpmdbMatchIterator mi) {
+  rpmdbMatchIterator (*rpmdbFreeIterator)(rpmdbMatchIterator);
+  rpmdbFreeIterator = (rpmdbMatchIterator (*)(rpmdbMatchIterator))f;
+
+  rpmdbFreeIterator(mi);
+}
+
+void
+my_rpmtsFree(void *f, rpmts ts) {
+  rpmts (*rpmtsFree)(rpmts);
+  rpmtsFree = (rpmts (*)(rpmts))f;
+
+  rpmtsFree(ts);
+}*/
 import "C"
 
 // Constants in sync with /usr/include/rpm/rpmtag.h
@@ -189,8 +190,6 @@ func dlopenCFunctions() (*cFunctions, error) {
 }
 
 func listRPMPackages() ([]*Package, error) {
-	// TODO; cache these handles
-
 	if cFun == nil {
 		var err error
 		cFun, err = dlopenCFunctions()
@@ -215,7 +214,7 @@ func listRPMPackages() ([]*Package, error) {
 	}
 	defer C.my_rpmdbFreeIterator(cFun.rpmdbFreeIterator, mi)
 
-	packages := []*Package{}
+	var packages []*Package
 	for header := C.my_rpmdbNextIterator(cFun.rpmdbNextIterator, mi); header != nil; header = C.my_rpmdbNextIterator(cFun.rpmdbNextIterator, mi) {
 
 		pkg, err := packageFromHeader(header, cFun)
