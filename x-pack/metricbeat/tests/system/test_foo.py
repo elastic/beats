@@ -12,7 +12,7 @@ class TestFoo(metricbeat.BaseTest):
     @attr('integration')
     def test_status(self):
         """
-        MySQL module outputs an event.
+        Foo module outputs an event.
         """
         self.render_config_template(modules=[{
             "name": "foo",
@@ -28,10 +28,5 @@ class TestFoo(metricbeat.BaseTest):
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
         evt = output[0]
-
-        print(evt)
-
-        # self.assertItemsEqual(self.de_dot(MYSQL_FIELDS), evt.keys())
-        # mysql_info = evt["mysql"]["status"]
 
         self.assert_fields_are_documented(evt)

@@ -43,9 +43,6 @@ def write_modules(modules, full):    # Iterate over all modules
     global config_yml
 
     for (module, beat_path) in modules:
-
-        # beat_path = path + "/" + module + "/_meta"
-
         module_configs = beat_path + "/config.yml"
 
         # By default, short config is read if short is set

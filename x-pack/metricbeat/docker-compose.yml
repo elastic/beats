@@ -14,5 +14,5 @@ services:
     - ./module/foo/_meta/env
 
   # Modules
-  aerospike:
+  foo:
     build: ./module/foo/_meta
