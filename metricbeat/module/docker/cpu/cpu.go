@@ -51,10 +51,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	cpuConfig := struct {
+		Cores bool `config:"cpu.cores"`
+	}{
+		Cores: true,
+	}
+	if err := base.Module().UnpackConfig(&cpuConfig); err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		dockerClient:  client,
-		cpuService:    &CPUService{},
+		cpuService:    &CPUService{Cores: cpuConfig.Cores},
 		dedot:         config.DeDot,
 	}, nil
 }
