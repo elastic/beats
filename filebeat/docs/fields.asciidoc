@@ -3393,66 +3393,6 @@ haproxy Module
 
 
 
-[float]
-== destination fields
-
-Destination information
-
-
-*`haproxy.destination.port`*::
-+
---
-type: long
-
-Port of the destination host
-
---
-
-*`haproxy.destination.ip`*::
-+
---
-IP of the destination host
-
---
-
-*`haproxy.process_name`*::
-+
---
-Name of the process
-
---
-
-*`haproxy.pid`*::
-+
---
-type: long
-
-PID of the process
-
---
-
-[float]
-== client fields
-
-Information about the client doing the request
-
-
-*`haproxy.client.ip`*::
-+
---
-IP address of the client which initiated the TCP connection to haproxy.
-
---
-
-*`haproxy.client.port`*::
-+
---
-type: long
-
-TCP port of the client which initiated the connection.
-
---
-
 *`haproxy.frontend_name`*::
 +
 --
@@ -3562,71 +3502,19 @@ The HAProxy source of the log
 
 --
 
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-*`haproxy.geoip.continent_name`*::
-+
---
-type: keyword
-
-Name of the continent.
-
---
-
-*`haproxy.geoip.country_iso_code`*::
-+
---
-type: keyword
-
-Country ISO code.
-
---
-
-*`haproxy.geoip.location`*::
-+
---
-type: geo_point
-
-Represents a geopoint with the longitude and latitude.
-
---
-
-*`haproxy.geoip.region_name`*::
-+
---
-type: keyword
-
-Name of the region
-
---
-
-*`haproxy.geoip.city_name`*::
-+
---
-type: keyword
-
-City name.
-
---
-
-*`haproxy.geoip.region_iso_code`*::
-+
---
-type: keyword
-
-ISO code of the region
-
---
-
 *`haproxy.termination_state`*::
 +
 --
 Condition the session was in when the session ended.
+
+--
+
+*`haproxy.mode`*::
++
+--
+type: text
+
+mode that the frontend is operating (TCP or HTTP)
 
 --
 
@@ -3681,12 +3569,108 @@ Number of connection retries experienced by this session when trying to connect 
 
 --
 
-*`haproxy.mode`*::
+[float]
+== client fields
+
+Information about the client doing the request
+
+
+*`haproxy.client.ip`*::
 +
 --
-type: text
+IP address of the client which initiated the TCP connection to haproxy.
+If connection is via unix socket, socket path is in this field.
 
-mode that the frontend is operating (TCP or HTTP)
+
+--
+
+*`source.port`*::
++
+--
+type: alias
+
+--
+
+*`process.name`*::
++
+--
+type: alias
+
+--
+
+*`process.pid`*::
++
+--
+type: alias
+
+--
+
+[float]
+== destination fields
+
+Destination information
+
+
+*`destination.port`*::
++
+--
+type: alias
+
+--
+
+*`destination.ip`*::
++
+--
+type: alias
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`source.geo.continent_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.location`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: alias
 
 --
 
@@ -3976,98 +3960,6 @@ Contains fields for IIS access logs.
 
 
 
-*`iis.access.server_ip`*::
-+
---
-type: keyword
-
-The server IP address.
-
-
---
-
-*`iis.access.method`*::
-+
---
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
---
-
-*`iis.access.url`*::
-+
---
-type: keyword
-
-The request HTTP URL.
-
-
---
-
-*`iis.access.query_string`*::
-+
---
-type: keyword
-
-The request query string, if any.
-
-
---
-
-*`iis.access.port`*::
-+
---
-type: long
-
-The request port number.
-
-
---
-
-*`iis.access.user_name`*::
-+
---
-type: keyword
-
-The user name used when basic authentication is used.
-
-
---
-
-*`iis.access.remote_ip`*::
-+
---
-type: keyword
-
-The client IP address.
-
-
---
-
-*`iis.access.referrer`*::
-+
---
-type: keyword
-
-The HTTP referrer.
-
-
---
-
-*`iis.access.response_code`*::
-+
---
-type: long
-
-The HTTP response code.
-
-
---
-
 *`iis.access.sub_status`*::
 +
 --
@@ -4118,32 +4010,12 @@ The name of the server on which the log file entry was generated.
 
 --
 
-*`iis.access.http_version`*::
-+
---
-type: keyword
-
-The HTTP version.
-
-
---
-
 *`iis.access.cookie`*::
 +
 --
 type: keyword
 
 The content of the cookie sent or received, if any.
-
-
---
-
-*`iis.access.hostname`*::
-+
---
-type: keyword
-
-The host header name, if any.
 
 
 --
@@ -4172,191 +4044,194 @@ The number of bytes of the server request body.
 
 --
 
-*`iis.access.agent`*::
+*`destination.ip`*::
 +
 --
-type: text
-
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
-
+type: alias
 
 --
 
-[float]
-== user_agent fields
-
-Contains the parsed user agent field. Only present if the user agent Elasticsearch plugin is available and used.
-
-
-
-*`iis.access.user_agent.device`*::
+*`http.request.method`*::
 +
 --
-type: keyword
-
-The name of the physical device.
-
+type: alias
 
 --
 
-*`iis.access.user_agent.major`*::
+*`url.path`*::
 +
 --
-type: long
-
-The major version of the user agent.
-
+type: alias
 
 --
 
-*`iis.access.user_agent.minor`*::
+*`url.query`*::
 +
 --
-type: long
-
-The minor version of the user agent.
-
+type: alias
 
 --
 
-*`iis.access.user_agent.patch`*::
+*`destination.port`*::
 +
 --
-type: keyword
-
-The patch version of the user agent.
-
+type: alias
 
 --
 
-*`iis.access.user_agent.name`*::
+*`user.name`*::
 +
 --
-type: keyword
-
-example: Chrome
-
-The name of the user agent.
-
+type: alias
 
 --
 
-*`iis.access.user_agent.os`*::
+*`source.ip`*::
 +
 --
-type: keyword
-
-The name of the operating system.
-
+type: alias
 
 --
 
-*`iis.access.user_agent.os_major`*::
+*`http.request.referrer`*::
 +
 --
-type: long
-
-The major version of the operating system.
-
+type: alias
 
 --
 
-*`iis.access.user_agent.os_minor`*::
+*`http.response.status_code`*::
 +
 --
-type: long
-
-The minor version of the operating system.
-
+type: alias
 
 --
 
-*`iis.access.user_agent.os_name`*::
+*`http.version`*::
 +
 --
-type: keyword
-
-The name of the operating system.
-
+type: alias
 
 --
 
-*`iis.access.user_agent.original`*::
+*`host.hostname`*::
 +
 --
-type: text
-
-Original user agent value before parsing by ingest-user-agent plugin.
-
-
-Field is not indexed.
+type: alias
 
 --
 
-[float]
-== geoip fields
 
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-*`iis.access.geoip.continent_name`*::
+*`user_agent.device`*::
 +
 --
-type: keyword
-
-The name of the continent.
-
+type: alias
 
 --
 
-*`iis.access.geoip.country_iso_code`*::
+*`user_agent.major`*::
 +
 --
-type: keyword
-
-Country ISO code.
-
+type: alias
 
 --
 
-*`iis.access.geoip.location`*::
+*`user_agent.minor`*::
 +
 --
-type: geo_point
-
-The longitude and latitude.
-
+type: alias
 
 --
 
-*`iis.access.geoip.region_name`*::
+*`user_agent.patch`*::
 +
 --
-type: keyword
-
-The region name.
-
+type: alias
 
 --
 
-*`iis.access.geoip.city_name`*::
+*`user_agent.name`*::
 +
 --
-type: keyword
-
-The city name.
-
+type: alias
 
 --
 
-*`iis.access.geoip.region_iso_code`*::
+*`user_agent.os.full_name`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
+--
 
+*`user_agent.os.major`*::
++
+--
+type: alias
+
+--
+
+*`user_agent.os.minor`*::
++
+--
+type: alias
+
+--
+
+*`user_agent.os.name`*::
++
+--
+type: alias
+
+--
+
+*`user_agent.original`*::
++
+--
+type: alias
+
+--
+
+
+*`source.geo.continent_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.location`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: alias
 
 --
 
@@ -4955,6 +4830,18 @@ Content length of the HTTP response body.
 +
 --
 type: keyword
+
+--
+
+*`http.request.referrer`*::
++
+--
+type: keyword
+
+example: https://blog.example.com/
+
+Referrer for this HTTP request.
+
 
 --
 
@@ -6039,6 +5926,13 @@ Module for parsing system log files.
 
 
 
+*`host.hostname`*::
++
+--
+type: keyword
+
+--
+
 [float]
 == system fields
 
@@ -6363,45 +6257,38 @@ Contains fields from the syslog system logs.
 
 
 
-*`system.syslog.timestamp`*::
+*`@timestamp`*::
 +
 --
-The timestamp as read from the syslog message.
-
+type: alias
 
 --
 
-*`system.syslog.hostname`*::
+*`host.hostname`*::
 +
 --
-The hostname as read from the syslog message.
-
+type: alias
 
 --
 
-*`system.syslog.program`*::
+*`process.name`*::
 +
 --
-The process name as read from the syslog message.
-
+type: alias
 
 --
 
-*`system.syslog.pid`*::
+*`process.pid`*::
 +
 --
-The PID of the process that sent the syslog message.
-
+type: alias
 
 --
 
-*`system.syslog.message`*::
+*`message`*::
 +
 --
-type: text
-
-The message in the log line.
-
+type: alias
 
 --
 
