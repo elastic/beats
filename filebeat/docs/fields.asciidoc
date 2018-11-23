@@ -5303,75 +5303,52 @@ Contains fields for the Nginx access logs.
 
 
 
-*`nginx.access.remote_ip_list`*::
+*`network.forwarded_ip`*::
 +
 --
-type: array
-
-An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.
-
+type: alias
 
 --
 
-*`nginx.access.remote_ip`*::
+*`source.ip`*::
 +
 --
-type: keyword
-
-Client IP address. The first public IP address from the `remote_ip_list` array. If no public IP addresses are present, this field contains the first private IP address from the `remote_ip_list` array.
-
+type: alias
 
 --
 
-*`nginx.access.user_name`*::
+*`user.name`*::
 +
 --
-type: keyword
-
-The user name used when basic authentication is used.
-
+type: alias
 
 --
 
-*`nginx.access.method`*::
+*`http.request.method`*::
 +
 --
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
+type: alias
 
 --
 
-*`nginx.access.url`*::
+*`url.original`*::
 +
 --
-type: keyword
-
-The request HTTP URL.
-
+type: alias
 
 --
 
-*`nginx.access.http_version`*::
+*`http.version`*::
 +
 --
-type: keyword
-
-The HTTP version.
-
+type: alias
 
 --
 
-*`nginx.access.response_code`*::
+*`http.response.status_code`*::
 +
 --
-type: long
-
-The HTTP response code.
-
+type: alias
 
 --
 
@@ -5387,201 +5364,131 @@ The number of bytes of the server response body.
 
 --
 
-*`nginx.access.referrer`*::
+*`http.referrer`*::
 +
 --
-type: keyword
-
-The HTTP referrer.
-
+type: alias
 
 --
 
-*`nginx.access.agent`*::
+*`user_agent.original`*::
 +
 --
-type: text
-
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
-
+type: alias
 
 --
 
-[float]
-== user_agent fields
 
-Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
-
-
-
-*`nginx.access.user_agent.device`*::
+*`user_agent.device`*::
 +
 --
-type: keyword
-
-The name of the physical device.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.major`*::
+*`user_agent.major`*::
 +
 --
-type: long
-
-The major version of the user agent.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.minor`*::
+*`user_agent.minor`*::
 +
 --
-type: long
-
-The minor version of the user agent.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.patch`*::
+*`user_agent.patch`*::
 +
 --
-type: keyword
-
-The patch version of the user agent.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.name`*::
+*`user_agent.name`*::
 +
 --
-type: keyword
-
-example: Chrome
-
-The name of the user agent.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.os`*::
+*`user_agent.os.full_name`*::
 +
 --
-type: keyword
-
-The name of the operating system.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.os_major`*::
+*`user_agent.os.major`*::
 +
 --
-type: long
-
-The major version of the operating system.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.os_minor`*::
+*`user_agent.os.minor`*::
 +
 --
-type: long
-
-The minor version of the operating system.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.os_name`*::
+*`user_agent.os.name`*::
 +
 --
-type: keyword
-
-The name of the operating system.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.original`*::
+*`user_agent.original`*::
 +
 --
-type: text
-
-Original user agent value before parsing by ingest-user-agent plugin.
-
-
-Field is not indexed.
+type: alias
 
 --
 
-[float]
-== geoip fields
 
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-*`nginx.access.geoip.continent_name`*::
+*`source.geo.continent_name`*::
 +
 --
-type: keyword
-
-The name of the continent.
-
+type: alias
 
 --
 
-*`nginx.access.geoip.country_iso_code`*::
+*`source.geo.country_iso_code`*::
 +
 --
-type: keyword
-
-Country ISO code.
-
+type: alias
 
 --
 
-*`nginx.access.geoip.location`*::
+*`source.geo.location`*::
 +
 --
-type: geo_point
-
-The longitude and latitude.
-
+type: alias
 
 --
 
-*`nginx.access.geoip.region_name`*::
+*`source.geo.region_name`*::
 +
 --
-type: keyword
-
-The region name.
-
+type: alias
 
 --
 
-*`nginx.access.geoip.city_name`*::
+*`source.geo.city_name`*::
 +
 --
-type: keyword
-
-The city name.
-
+type: alias
 
 --
 
-*`nginx.access.geoip.region_iso_code`*::
+*`source.geo.region_iso_code`*::
 +
 --
-type: keyword
-
-Region ISO code.
-
+type: alias
 
 --
 
