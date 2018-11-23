@@ -94,7 +94,7 @@ func TestZip(t *testing.T) {
 }
 
 func TestDocker(t *testing.T) {
-	dockers := getFiles(t, regexp.MustCompile(`\.docker.tar$`))
+	dockers := getFiles(t, regexp.MustCompile(`\.docker.gz$`))
 	for _, docker := range dockers {
 		checkDocker(t, docker)
 	}
@@ -514,7 +514,13 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 	var info *dockerInfo
 	layers := make(map[string]*packageFile)
 
-	tarReader := tar.NewReader(file)
+	gzipReader, err := gzip.NewReader(file)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer gzipReader.Close()
+
+	tarReader := tar.NewReader(gzipReader)
 	for {
 		header, err := tarReader.Next()
 		if err != nil {
