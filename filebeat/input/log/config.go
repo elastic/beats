@@ -27,7 +27,6 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
@@ -102,9 +101,6 @@ type config struct {
 	MaxBytes     int               `config:"max_bytes" validate:"min=0,nonzero"`
 	Multiline    *multiline.Config `config:"multiline"`
 	JSON         *readjson.Config  `config:"json"`
-
-	// Add Debug readers, the reader will be added after the original io.Reader.
-	DebugReaders map[string]*common.Config `config:"debug_readers"`
 
 	// Hidden on purpose, used by the docker input:
 	DockerJSON *struct {
