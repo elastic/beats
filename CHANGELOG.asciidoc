@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v6.5.1...6.5[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
 - Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 
 *Packetbeat*
