@@ -18,6 +18,8 @@
 package jolokia
 
 import (
+	"github.com/gofrs/uuid"
+
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
@@ -48,7 +50,7 @@ type Provider struct {
 
 // AutodiscoverBuilder builds a Jolokia Discovery autodiscover provider, it fails if
 // there is some problem with the configuration
-func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("The Jolokia Discovery autodiscover is experimental")
 
 	config := defaultConfig()
@@ -58,7 +60,8 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	}
 
 	discovery := &Discovery{
-		Interfaces: config.Interfaces,
+		ProviderUUID: uuid,
+		Interfaces:   config.Interfaces,
 	}
 
 	mapper, err := template.NewConfigMapper(config.Templates)

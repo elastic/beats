@@ -194,7 +194,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 		// Update meta no matter what
 		dynFields := a.meta.Store(hash, meta)
 
-		if a.runners.Has(hash) {
+		if a.configs[eventID][hash] != nil {
 			logp.Debug(debugK, "Config %v is already running", config)
 			continue
 		}
@@ -246,12 +246,17 @@ func getMeta(event bus.Event) common.MapStr {
 
 // getID returns the event "id" field string if present
 func getID(e bus.Event) string {
-	if res, ok := e["id"]; ok {
-		if id, ok := res.(string); ok {
-			return id
-		}
+	provider, ok := e["provider"]
+	if !ok {
+		return ""
 	}
-	return ""
+
+	id, ok := e["id"]
+	if !ok {
+		return ""
+	}
+
+	return fmt.Sprintf("%s:%s", provider, id)
 }
 
 // Stop autodiscover process
