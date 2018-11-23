@@ -648,7 +648,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/fsnotify/fsevents
-Revision: 4d5197691b054c220286f7c6ea167de9753d902d
+Revision: e1d381a4d27063baac2e9d3c5887ceb4ab059287
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/fsnotify/fsevents/LICENSE:
 --------------------------------------------------------------------
@@ -1713,7 +1713,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 --------------------------------------------------------------------
 Dependency: github.com/magefile/mage
-Revision: 5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034
+Revision: 11d15918ff3aa6f75cd6d3340a9507bb5309c679
 License type (autodetected): Apache-2.0
 ./vendor/github.com/magefile/mage/LICENSE:
 --------------------------------------------------------------------
@@ -2849,7 +2849,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/crypto
-Revision: 5119cf507ed5294cc409c092980c7497ee5d6fd2
+Revision: 85e1b3f9139abd58575d728a509643924e3b2ebf
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/crypto/LICENSE:
 --------------------------------------------------------------------
@@ -2918,7 +2918,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: 0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe
+Revision: d989b31c87461dc8ab2f1cac6792814e27fadea9
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------

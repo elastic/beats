@@ -73,7 +73,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		Namespace:   config.Namespace,
 	})
 	if err != nil {
-		logp.Err("kubernetes: Couldn't create watcher for %t", &kubernetes.Pod{})
+		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
 		return nil, err
 	}
 

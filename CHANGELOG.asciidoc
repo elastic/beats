@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 - Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 - Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
+- Fix issue with not collecting Elasticsearch cross-cluster replication stats correctly. {pull}9179[9179]
 
 *Packetbeat*
 
@@ -67,6 +68,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 *Metricbeat*
 
 - Add setting to disable docker cpu metrics per core. {pull}9194[9194]
+- The `elasticsearch/node` metricset now reports the Elasticsearch cluster UUID. {pull}8771[8771]
 
 *Packetbeat*
 
@@ -122,6 +124,10 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Rename `offset` to `log.offset`. {pull}8923[8923]
 - Rename `source_ecs` to `source` in the Filebeat Suricata module. {pull}8983[8983]
 - Remove warnings for deprecated options: "spool_size", "publish_async", "idle_timeout". {pull}9002[9002]
+- Rename many `system.syslog.*` fields to map to ECS. {pull}9135[9135]
+- Rename many `iis.access.*` fields to map to ECS. {pull}9084[9084]
+- IIS module's user agent string is no longer encoded (`+` replaced with spaces). {pull}9084[9084]
+- Rename many `haproxy.*` fields to map to ECS. {pull}9117[9117]
 
 *Metricbeat*
 
