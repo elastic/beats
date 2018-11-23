@@ -79,7 +79,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	var stats uwsgiStat
 	err := json.Unmarshal(content, &stats)
 	if err != nil {
-		logp.Err("uwsgi statistics parsing failed with error: ", err)
+		logp.Err("uwsgi statistics parsing failed with error: %+v", err)
 		return nil, err
 	}
 

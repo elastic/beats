@@ -72,7 +72,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch gathers stats for each index from the _stats API
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+m.recoveryPath)
+	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.getServiceURI())
 	if err != nil {
 		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 		elastic.ReportAndLogError(err, r, m.Log)
@@ -85,6 +85,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
+	info, err := elasticsearch.GetInfo(m.HTTP, m.getServiceURI())
+	if err != nil {
+		elastic.ReportAndLogError(err, r, m.Log)
+		return
+	}
+
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		elastic.ReportAndLogError(err, r, m.Log)
@@ -92,13 +98,18 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 
 	if m.MetricSet.XPack {
-		err = eventsMappingXPack(r, m, content)
+		err = eventsMappingXPack(r, m, *info, content)
 	} else {
-		err = eventsMapping(r, content)
+		err = eventsMapping(r, *info, content)
 	}
 
 	if err != nil {
 		m.Log.Error(err)
 		return
 	}
+}
+
+func (m *MetricSet) getServiceURI() string {
+	return m.HostData().SanitizedURI + m.recoveryPath
+
 }

@@ -1,9 +1,10 @@
 [
     {
         "@timestamp": "2017-10-30T09:57:58,243", 
-        "fileset.module": "logstash", 
-        "fileset.name": "slowlog", 
+        "event.dataset": "slowlog", 
+        "event.module": "logstash", 
         "input.type": "log", 
+        "log.offset": 0, 
         "logstash.slowlog.event": "\"{\\\"@version\\\":\\\"1\\\",\\\"@timestamp\\\":\\\"2017-10-30T13:57:55.130Z\\\",\\\"host\\\":\\\"sashimi\\\",\\\"sequence\\\":0,\\\"message\\\":\\\"Hello world!\\\"}\"", 
         "logstash.slowlog.level": "WARN", 
         "logstash.slowlog.message": "event processing time {:plugin_params=>{\"time\"=>3, \"id\"=>\"e4e12a4e3082615c5427079bf4250dbfa338ebac10f8ea9912d7b98a14f56b8c\"}, :took_in_nanos=>3027675106, :took_in_millis=>3027, :event=>\"{\\\"@version\\\":\\\"1\\\",\\\"@timestamp\\\":\\\"2017-10-30T13:57:55.130Z\\\",\\\"host\\\":\\\"sashimi\\\",\\\"sequence\\\":0,\\\"message\\\":\\\"Hello world!\\\"}\"}", 
@@ -12,8 +13,6 @@
         "logstash.slowlog.plugin_params": "{\"time\"=>3, \"id\"=>\"e4e12a4e3082615c5427079bf4250dbfa338ebac10f8ea9912d7b98a14f56b8c\"}", 
         "logstash.slowlog.plugin_type": "filters", 
         "logstash.slowlog.took_in_millis": 3027, 
-        "logstash.slowlog.took_in_nanos": 3027675106, 
-        "offset": 0, 
-        "prospector.type": "log"
+        "logstash.slowlog.took_in_nanos": 3027675106
     }
 ]

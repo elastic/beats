@@ -14,10 +14,13 @@
 
 :global-flags: Also see <<global-flags,Global flags>>.
 
-:export-command-short-desc: Exports the configuration, index template or a dashboard to stdout
+:deploy-command-short-desc: Deploys the specified function to your serverless environment
+:export-command-short-desc: Exports the configuration, index template, or a dashboard to stdout
 :help-command-short-desc: Shows help for any command
 :keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
 :modules-command-short-desc: Manages configured modules
+:package-command-short-desc: Packages the configuration and executable in a zip file
+:remove-command-short-desc: Removes the specified function from your serverless environment
 :run-command-short-desc: Runs {beatname_uc}. This command is used by default if you start {beatname_uc} without specifying a command
 
 ifndef::deprecate_dashboard_loading[]
@@ -38,6 +41,7 @@ ifdef::deprecate_dashboard_loading[]
 
 endif::[]
 
+:update-command-short-desc: Updates the specified function
 :test-command-short-desc: Tests the configuration
 :version-command-short-desc: Shows information about the current version
 
@@ -78,26 +82,44 @@ endif::[]
 [options="header"]
 |=======================
 |Commands |
+ifeval::[("{beatname_lc}"=="functionbeat")]
+|<<deploy-command,`deploy`>> | {deploy-command-short-desc}.
+endif::[]
 |<<export-command,`export`>> |{export-command-short-desc}.
 |<<help-command,`help`>> |{help-command-short-desc}.
 |<<keystore-command,`keystore`>> |{keystore-command-short-desc}.
+ifeval::[("{beatname_lc}"=="functionbeat")]
+|<<package-command,`package`>> |{package-command-short-desc}.
+|<<remove-command,`remove`>> |{remove-command-short-desc}.
+endif::[]
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
 |<<modules-command,`modules`>> |{modules-command-short-desc}.
 endif::[]
 |<<run-command,`run`>> |{run-command-short-desc}.
 |<<setup-command,`setup`>> |{setup-command-short-desc}.
 |<<test-command,`test`>> |{test-command-short-desc}.
+ifeval::[("{beatname_lc}"=="functionbeat")]
+|<<update-command,`update`>> |{update-command-short-desc}.
+endif::[]
 |<<version-command,`version`>> |{version-command-short-desc}.
 |=======================
 
 Also see <<global-flags,Global flags>>.
+
+ifeval::[("{beatname_lc}"=="functionbeat")]
+[[deploy-command]]
+==== `deploy` command
+
+{deploy-command-short-desc}. 
+
+endif::[]
 
 [[export-command]]
 ==== `export` command
 
 {export-command-short-desc}. You can use this
 command to quickly view your configuration, see the contents of the index
-template or export a dashboard from Kibana.
+template, or export a dashboard from Kibana.
 
 *SYNOPSIS*
 
@@ -252,6 +274,18 @@ Shows help for the `keystore` command.
 
 see <<keystore>> for more examples.
 
+ifeval::[("{beatname_lc}"=="functionbeat")]
+[[package-command]]
+==== `package` command
+
+{package-command-short-desc}. 
+
+[[remove-command]]
+==== `remove` command
+
+{remove-command-short-desc}. 
+
+endif::[]
 
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
 
@@ -439,10 +473,10 @@ endif::[]
 +
 ifdef::has_ml_jobs[]
 Loads the initial setup, including Elasticsearch template, Kibana index pattern,
-Kibana dashboards and Machine learning jobs.
+Kibana dashboards (when available), and Machine learning jobs.
 endif::[]
 ifndef::has_ml_jobs[]
-Loads the initial setup, including Elasticsearch template, Kibana index pattern and Kibana dashboards.
+Loads the initial setup, including Elasticsearch template, Kibana index pattern, and Kibana dashboards (when available).
 endif::[]
 If you want to use the command without running {beatname_uc}, use the <<setup-command,`setup`>> command instead.
 
@@ -511,10 +545,10 @@ environment without actually running {beatname_uc} and ingesting data.
 
 ifndef::deprecate_dashboard_loading[]
 *`--dashboards`*::
-Sets up the Kibana dashboards only. This option loads the dashboards from the
-{beatname_uc} package. For more options, such as loading customized dashboards,
-see {beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards]
-in the _Beats Developer Guide_.
+Sets up the Kibana dashboards (when available). This option loads the dashboards
+from the {beatname_uc} package. For more options, such as loading customized
+dashboards, see {beatsdevguide}/import-dashboards.html[Importing Existing Beat
+Dashboards] in the _Beats Developer Guide_.
 endif::[]
 
 ifdef::deprecate_dashboard_loading[]
@@ -617,6 +651,14 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 {beatname_lc} test config
 {beatname_lc} test modules system cpu
 -----
+
+endif::[]
+
+ifeval::[("{beatname_lc}"=="functionbeat")]
+[[update-command]]
+==== `update` command
+
+{update-command-short-desc}. 
 
 endif::[]
 

@@ -11,12 +11,12 @@ modules."""
 def get_importable_lines(go_beat_path, import_line):
     path = abspath("input")
 
-    imported_prospector_lines = []
+    imported_input_lines = []
 
     # Skip the file folder, its not an input but I will do the move with another PR
-    prospectors = [p for p in listdir(path) if isdir(join(path, p)) and p.find("file") is -1]
-    for prospector in sorted(prospectors):
-        prospector_import = import_line.format(beat_path=go_beat_path, module="input", name=prospector)
-        imported_prospector_lines.append(prospector_import)
+    inputs = [p for p in listdir(path) if isdir(join(path, p)) and p.find("file") is -1]
+    for input in sorted(inputs):
+        input_import = import_line.format(beat_path=go_beat_path, module="input", name=input)
+        imported_input_lines.append(input_import)
 
-    return imported_prospector_lines
+    return imported_input_lines

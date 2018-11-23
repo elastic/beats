@@ -214,13 +214,11 @@ include::../../libbeat/docs/step-look-at-config.asciidoc[]
 [id="{beatname_lc}-template"]
 === Step 3: Load the index template in Elasticsearch
 
-:allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-:allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]
 
 [id="{beatname_lc}-starting"]
@@ -234,14 +232,7 @@ NOTE: If you use an init.d script to start {beatname_uc} on deb or rpm, you can'
 specify command line flags (see <<command-line-options>>). To specify flags,
 start {beatname_uc} in the foreground.
 
-*deb:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo service {beatname_lc} start
-----------------------------------------------------------------------
-
-*rpm:*
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
@@ -258,7 +249,7 @@ See <<running-on-docker>>.
 ----------------------------------------------------------------------
 sudo chown root {beatname_lc}.yml <1>
 sudo chown root modules.d/system.yml <1>
-sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
+sudo ./{beatname_lc} -e -c {beatname_lc}.yml
 ----------------------------------------------------------------------
 <1> You'll be running {beatname_uc} as root, so you need to change ownership of the
 configuration file and any configurations enabled in the `modules.d` directory,

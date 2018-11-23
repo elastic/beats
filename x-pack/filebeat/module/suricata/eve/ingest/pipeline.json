@@ -7,14 +7,14 @@
     }
   , {"convert":
       {"field": "suricata.eve.src_ip"
-      ,"target_field": "source_ecs.ip"
+      ,"target_field": "source.ip"
       ,"type": "string"
       ,"ignore_missing": true
       }
     }
   , {"convert":
       {"field": "suricata.eve.src_port"
-      ,"target_field": "source_ecs.port"
+      ,"target_field": "source.port"
       ,"type": "integer"
       ,"ignore_missing": true
       }
@@ -138,8 +138,8 @@
     }
 
   , { "geoip":
-      { "field": "source_ecs.ip"
-      , "target_field": "source_ecs.geo"
+      { "field": "source.ip"
+      , "target_field": "source.geo"
       , "ignore_missing": true
       }
     }

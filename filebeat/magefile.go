@@ -75,7 +75,7 @@ func Clean() error {
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
-// Use BEAT_VERSION_QUALIFIER to control the version qualifier.
+// Use VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
@@ -123,6 +123,15 @@ func GoTestUnit(ctx context.Context) error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
 	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+}
+
+// ExportDashboard exports a dashboard and writes it into the correct directory
+//
+// Required ENV variables:
+// * MODULE: Name of the module
+// * ID: Dashboard id
+func ExportDashboard() error {
+	return mage.ExportDashboard()
 }
 
 // -----------------------------------------------------------------------------
@@ -174,34 +183,40 @@ func customizePackaging() {
 
 		modulesDTarget = "modules.d"
 		modulesD       = mage.PackageFile{
-			Mode:   0644,
-			Source: "modules.d",
-			Config: true,
+			Mode:    0644,
+			Source:  "modules.d",
+			Config:  true,
+			Modules: true,
 		}
 		modulesDXPack = mage.PackageFile{
-			Mode:   0644,
-			Source: dirModulesDGeneratedXPack,
-			Config: true,
+			Mode:    0644,
+			Source:  dirModulesDGeneratedXPack,
+			Config:  true,
+			Modules: true,
 		}
 	)
 
 	for _, args := range mage.Packages {
 		mods := module
 		modsD := modulesD
+		pkgType := args.Types[0]
 		if args.Spec.License == "Elastic License" {
 			mods = moduleXPack
 			modsD = modulesDXPack
 			replacePackageFileSource(args, map[string]string{
 				"fields.yml":                  "../x-pack/{{.BeatName}}/fields.yml",
-				"{{.BeatName}}.yml":           "../x-pack/{{.BeatName}}/{{.BeatName}}.yml",
 				"{{.BeatName}}.reference.yml": "../x-pack/{{.BeatName}}/{{.BeatName}}.reference.yml",
 				"_meta/kibana.generated":      "../x-pack/{{.BeatName}}/build/kibana",
 			})
+			if pkgType != mage.Docker {
+				replacePackageFileSource(args, map[string]string{
+					"{{.BeatName}}.yml": "../x-pack/{{.BeatName}}/{{.BeatName}}.yml",
+				})
+			}
 		}
 
-		pkgType := args.Types[0]
 		switch pkgType {
-		case mage.TarGz, mage.Zip:
+		case mage.TarGz, mage.Zip, mage.Docker:
 			args.Spec.Files[moduleTarget] = mods
 			args.Spec.Files[modulesDTarget] = modsD
 		case mage.Deb, mage.RPM:

@@ -31,7 +31,7 @@ var usageText = `
 Usage: kibana_index_pattern [flags]
   kibana_index_pattern generates Kibana index patterns from the Beat's
   fields.yml file. It will create a index pattern file that is usable with both
-  Kibana 5.x and 6.x.
+  Kibana 6.x and 7.x.
 Options:
 `[1:]
 
@@ -67,11 +67,12 @@ func main() {
 		log.Fatal("Index pattern must be set (-index).")
 	}
 
-	version5, _ := common.NewVersion("5.0.0")
-	version6, _ := common.NewVersion("6.0.0")
-	versions := []common.Version{*version5, *version6}
+	versions := []string{
+		"6.0.0",
+	}
 	for _, version := range versions {
-		indexPattern, err := kibana.NewGenerator(indexPattern, beatName, fieldsYAMLFile, outputDir, beatVersion, version)
+		version, _ := common.NewVersion(version)
+		indexPattern, err := kibana.NewGenerator(indexPattern, beatName, fieldsYAMLFile, outputDir, beatVersion, *version)
 		if err != nil {
 			log.Fatal(err)
 		}

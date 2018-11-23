@@ -75,7 +75,7 @@ func Clean() error {
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
-// Use BEAT_VERSION_QUALIFIER to control the version qualifier.
+// Use VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
@@ -101,6 +101,15 @@ func Update() error {
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
 	return mage.GenerateFieldsYAML("module")
+}
+
+// ExportDashboard exports a dashboard and writes it into the correct directory
+//
+// Required ENV variables:
+// * MODULE: Name of the module
+// * ID: Dashboard id
+func ExportDashboard() error {
+	return mage.ExportDashboard()
 }
 
 // GoTestUnit executes the Go unit tests.
@@ -208,6 +217,8 @@ func customizePackaging() {
 		case mage.Deb, mage.RPM, mage.DMG:
 			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", shortConfig)
 			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
+		case mage.Docker:
+			args.Spec.ExtraVar("user", "root")
 		default:
 			panic(errors.Errorf("unhandled package type: %v", pkgType))
 		}

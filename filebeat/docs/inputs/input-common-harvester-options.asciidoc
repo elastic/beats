@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-//// This content is shared by Filebeat inputs that use the prospector
+//// This content is shared by Filebeat inputs that use the input
 //// but do not process files (the options for managing files
 //// on disk are not relevant)
 //// If you add IDs to sections, make sure you use attributes to create

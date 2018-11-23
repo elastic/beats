@@ -72,25 +72,12 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	err := cfgwarn.CheckRemoved5xSettings(rawConfig, "spool_size", "publish_async", "idle_timeout")
-	if err != nil {
+	if err := cfgwarn.CheckRemoved6xSettings(
+		rawConfig,
+		"prospectors",
+		"config.prospectors",
+	); err != nil {
 		return nil, err
-	}
-
-	if len(config.Prospectors) > 0 {
-		cfgwarn.Deprecate("7.0.0", "prospectors are deprecated, Use `inputs` instead.")
-		if len(config.Inputs) > 0 {
-			return nil, fmt.Errorf("prospectors and inputs used in the configuration file, define only inputs not both")
-		}
-		config.Inputs = config.Prospectors
-	}
-
-	if config.ConfigProspector != nil {
-		cfgwarn.Deprecate("7.0.0", "config.prospectors are deprecated, Use `config.inputs` instead.")
-		if config.ConfigInput != nil {
-			return nil, fmt.Errorf("config.prospectors and config.inputs used in the configuration file, define only config.inputs not both")
-		}
-		config.ConfigInput = config.ConfigProspector
 	}
 
 	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version, true)

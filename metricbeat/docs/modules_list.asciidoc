@@ -62,9 +62,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-http-server,server>> beta[]  
 |<<metricbeat-module-jolokia,Jolokia>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-jolokia-jmx,jmx>>   
-|<<metricbeat-module-kafka,Kafka>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-kafka-consumergroup,consumergroup>> beta[]  
-|<<metricbeat-metricset-kafka-partition,partition>> beta[]  
+|<<metricbeat-module-kafka,Kafka>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.2+| .2+|  |<<metricbeat-metricset-kafka-consumergroup,consumergroup>>   
+|<<metricbeat-metricset-kafka-partition,partition>>   
 |<<metricbeat-module-kibana,Kibana>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>> beta[]  
 |<<metricbeat-metricset-kibana-status,status>> beta[]  
