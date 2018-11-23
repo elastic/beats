@@ -86,7 +86,7 @@ func (r *Reader) Read(p []byte) (int, error) {
 			r.predicate(r.offset, r.buffer.Bytes())
 			r.buffer = bytes.Buffer{}
 		}
-		r.log.Info("Stopping debug reader, max execution reached.")
+		r.log.Info("Stopping debug reader, max execution reached")
 		r.state = stopped
 		return r.reader.Read(p)
 	}
