@@ -146,7 +146,7 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 	// Save the container as artifact
 	outputFile := b.OutputFile
 	if outputFile == "" {
-		outputTar, err := b.Expand(defaultBinaryName + ".docker.gz")
+		outputTar, err := b.Expand(defaultBinaryName + ".docker.tar.gz")
 		if err != nil {
 			return err
 		}

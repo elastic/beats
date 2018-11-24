@@ -80,7 +80,8 @@ func TestDeb(t *testing.T) {
 }
 
 func TestTar(t *testing.T) {
-	tars := getFiles(t, regexp.MustCompile(`\.tar\.gz$`))
+	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
+	tars := getFiles(t, regexp.MustCompile(`-\w+\.tar\.gz$`))
 	for _, tar := range tars {
 		checkTar(t, tar)
 	}
@@ -94,7 +95,7 @@ func TestZip(t *testing.T) {
 }
 
 func TestDocker(t *testing.T) {
-	dockers := getFiles(t, regexp.MustCompile(`\.docker.gz$`))
+	dockers := getFiles(t, regexp.MustCompile(`\.docker\.tar\.gz$`))
 	for _, docker := range dockers {
 		checkDocker(t, docker)
 	}
