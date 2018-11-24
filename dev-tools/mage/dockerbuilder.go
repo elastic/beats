@@ -18,7 +18,6 @@
 package mage
 
 import (
-	"bufio"
 	"bytes"
 	"compress/gzip"
 	"fmt"
@@ -154,7 +153,7 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 	}
 	var stderr bytes.Buffer
 	cmd := exec.Command("docker", "save", tag)
-	cmd.Stderr = bufio.NewWriter(&stderr)
+	cmd.Stderr = &stderr
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
