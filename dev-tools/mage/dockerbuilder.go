@@ -18,6 +18,8 @@
 package mage
 
 import (
+	"bufio"
+	"bytes"
 	"compress/gzip"
 	"fmt"
 	"io"
@@ -150,7 +152,9 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 		}
 		outputFile = filepath.Join(distributionsDir, outputTar)
 	}
+	var stderr bytes.Buffer
 	cmd := exec.Command("docker", "save", tag)
+	cmd.Stderr = bufio.NewWriter(&stderr)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
@@ -180,6 +184,9 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 	}
 
 	if err = cmd.Wait(); err != nil {
+		if errmsg := strings.TrimSpace(stderr.String()); errmsg != "" {
+			err = errors.Wrap(errors.New(errmsg), err.Error())
+		}
 		return err
 	}
 	return errors.Wrap(CreateSHA512File(outputFile), "failed to create .sha512 file")
