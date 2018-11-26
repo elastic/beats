@@ -4,6 +4,8 @@ import json
 import os
 import shutil
 import subprocess
+import sys
+import unittest
 
 
 class Test(BaseTest):
@@ -82,20 +84,22 @@ class Test(BaseTest):
         assert exit_code == 0
         assert self.log_contains("Config OK") is True
 
-    def test_invalid_config_with_removed_settings(self):
-        """
-        Checks if libbeat fails to load if removed settings have been used:
-        """
-        self.render_config_template(console={"pretty": "false"})
+    # NOTE(ph): I've removed the code to crash with theses settings, but the test is still usefull if
+    # more settings are added.
+    # def test_invalid_config_with_removed_settings(self):
+    #     """
+    #     Checks if libbeat fails to load if removed settings have been used:
+    #     """
+    #     self.render_config_template(console={"pretty": "false"})
 
-        exit_code = self.run_beat(extra_args=[
-            "-E", "queue_size=2048",
-            "-E", "bulk_queue_size=1",
-        ])
+    #     exit_code = self.run_beat(extra_args=[
+    #         "-E", "queue_size=2048",
+    #         "-E", "bulk_queue_size=1",
+    #     ])
 
-        assert exit_code == 1
-        assert self.log_contains("setting 'queue_size' has been removed")
-        assert self.log_contains("setting 'bulk_queue_size' has been removed")
+    #     assert exit_code == 1
+    #     assert self.log_contains("setting 'queue_size' has been removed")
+    #     assert self.log_contains("setting 'bulk_queue_size' has been removed")
 
     def test_version_simple(self):
         """
@@ -175,6 +179,7 @@ class Test(BaseTest):
             lambda: self.log_contains("Total non-zero metrics"),
             max_timeout=2)
 
+    @unittest.skipIf(sys.platform == 'darwin', 'flaky test https://github.com/elastic/beats/issues/9216')
     def test_persistent_uuid(self):
         self.render_config_template()
 

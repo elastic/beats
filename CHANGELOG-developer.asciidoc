@@ -32,12 +32,14 @@ The list below covers the major changes between 6.3.0 and master only.
 - Outputs must implement String. {pull}6404[6404]
 - Renamed `-beat-name` CLI option used in `kibana_index_pattern.go` to `-beat` for consistency with other scripts in `dev-tools/cmd`. {pull}8615[8615]
 - Systemd unit file template used on Linux packaging now includes environment variables to ease flag overriding. One of them includes the `-e` flag, making beats log to stderr by default on systemd uses. {pull}8942[8942]
+- Removed dashboards and index patterns generation for Kibana 5. {pull}8927[8927]
 
 ==== Bugfixes
 
 - Fix permissions of generated Filebeat filesets. {pull}7140[7140]
 - Collect fields from _meta/fields.yml too. {pull}8397[8397]
 - Fix issue on asset generation that could lead to different results in Windows. {pull}8464[8464]
+- Remove default version qualifier, you can use `VERSION_QUALIFIER` environment variable to set it. {pull}9148[9148]
 
 ==== Added
 
@@ -66,3 +68,5 @@ The list below covers the major changes between 6.3.0 and master only.
 - Add `mage.AddPlatforms` to allow to specify dependent platforms when building a beat. {pull}8889[8889]
 - Add `cfgwarn.CheckRemoved6xSetting(s)` to display a warning for options removed in 7.0. {pull}8909[8909]
 - Add docker image building to `mage.Package`. {pull}8898[8898]
+- Simplified exporting of dashboards. {pull}7730[7730]
+- Update Beats to use go 1.11.2 {pull}8746[8746]

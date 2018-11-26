@@ -2,40 +2,11 @@
   title: "haproxy"
   description: >
     haproxy Module
-  fields: 
+  fields:
     - name: haproxy
       type: group
       description: >
       fields:
-
-        - name: destination
-          description: Destination information
-          type: group
-          fields:
-          - name: port
-            description: Port of the destination host
-            type: long
-
-          - name: ip
-            description: IP of the destination host
-
-        - name: process_name
-          description: Name of the process
-
-        - name: pid
-          description: PID of the process
-          type: long
-
-        - name: client
-          description: Information about the client doing the request
-          type: group
-          fields:
-          - name: ip
-            description: IP address of the client which initiated the TCP connection to haproxy.
-
-          - name: port
-            description: TCP port of the client which initiated the connection.
-            type: long
 
         - name: frontend_name
           description: Name of the frontend (or listener) which received and processed the connection.
@@ -80,39 +51,17 @@
         - name: error_message
           description: Error message logged by HAProxy in case of error.
           type: text
-          
+
         - name: source
           type: text
           description: The HAProxy source of the log
-        
-        - name: geoip
-          type: group
-          description: >
-            Contains GeoIP information gathered based on the client.ip field.
-            Only present if the GeoIP Elasticsearch plugin is available and
-            used.
-          fields:
-            - name: continent_name
-              type: keyword
-              description: Name of the continent.
-            - name: country_iso_code
-              type: keyword
-              description: Country ISO code.
-            - name: location
-              type: geo_point
-              description: Represents a geopoint with the longitude and latitude.
-            - name: region_name
-              type: keyword
-              description: Name of the region
-            - name: city_name
-              type: keyword
-              description: City name.
-            - name: region_iso_code
-              type: keyword
-              description: ISO code of the region
 
         - name: termination_state
           description: Condition the session was in when the session ended.
+
+        - name: mode
+          type: text
+          description: mode that the frontend is operating (TCP or HTTP)
 
         - name: connections
           description: Contains various counts of connections active in the process.
@@ -137,6 +86,63 @@
             - name: retries
               description: Number of connection retries experienced by this session when trying to connect to the server.
               type: long
-        - name: mode
-          type: text
-          description: mode that the frontend is operating (TCP or HTTP)
+
+        - name: client
+          description: Information about the client doing the request
+          type: group
+          fields:
+          - name: ip
+            description: >
+              IP address of the client which initiated the TCP connection to haproxy.
+
+              If connection is via unix socket, socket path is in this field.
+          - name: port
+            type: alias
+            path: source.port
+
+
+
+        - name: process_name
+          type: alias
+          path: process.name
+
+        - name: pid
+          type: alias
+          path: process.pid
+
+        - name: destination
+          description: Destination information
+          type: group
+          fields:
+          - name: port
+            type: alias
+            path: destination.port
+          - name: ip
+            type: alias
+            path: destination.ip
+
+        - name: geoip
+          type: group
+          description: >
+            Contains GeoIP information gathered based on the client.ip field.
+            Only present if the GeoIP Elasticsearch plugin is available and
+            used.
+          fields:
+            - name: continent_name
+              type: alias
+              path: source.geo.continent_name
+            - name: country_iso_code
+              type: alias
+              path: source.geo.country_iso_code
+            - name: location
+              type: alias
+              path: source.geo.location
+            - name: region_name
+              type: alias
+              path: source.geo.region_name
+            - name: city_name
+              type: alias
+              path: source.geo.city_name
+            - name: region_iso_code
+              type: alias
+              path: source.geo.region_iso_code

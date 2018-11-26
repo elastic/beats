@@ -19,6 +19,7 @@ import (
 
 func init() {
 	mage.BeatDescription = "Functionbeat is a beat implementation for a serverless architecture."
+	mage.BeatLicense = "Elastic"
 }
 
 // Build builds the Beat binary.

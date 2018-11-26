@@ -570,11 +570,6 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Beat.Config = &b.Config.BeatConfig
 
-	err = cfgwarn.CheckRemoved5xSettings(cfg, "queue_size", "bulk_queue_size")
-	if err != nil {
-		return err
-	}
-
 	if name := b.Config.Name; name != "" {
 		b.Info.Name = name
 	}

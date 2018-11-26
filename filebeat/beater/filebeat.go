@@ -72,12 +72,11 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	err := cfgwarn.CheckRemoved5xSettings(rawConfig, "spool_size", "publish_async", "idle_timeout")
-	if err != nil {
-		return nil, err
-	}
-
-	if err := cfgwarn.CheckRemoved6xSettings(rawConfig, "prospectors", "config.prospectors"); err != nil {
+	if err := cfgwarn.CheckRemoved6xSettings(
+		rawConfig,
+		"prospectors",
+		"config.prospectors",
+	); err != nil {
 		return nil, err
 	}
 
