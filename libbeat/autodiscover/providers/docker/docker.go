@@ -40,7 +40,7 @@ type Provider struct {
 	builders      autodiscover.Builders
 	appenders     autodiscover.Appenders
 	watcher       docker.Watcher
-	templates     *template.Mapper
+	templates     template.Mapper
 	stop          chan interface{}
 	startListener bus.Listener
 	stopListener  bus.Listener
