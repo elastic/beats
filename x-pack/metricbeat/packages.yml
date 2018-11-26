@@ -69,3 +69,22 @@ specs:
         '/usr/share/{{.BeatName}}/kibana':
           source: build/kibana
           mode: 0644
+
+  - os: linux
+    types: [docker]
+    spec:
+      <<: *docker_spec
+      <<: *elastic_docker_spec
+      <<: *elastic_license_for_binaries
+      files:
+        '{{.BeatName}}.yml':
+          source: '../../metricbeat/metricbeat.docker.yml'
+          mode: 0600
+          config: true
+        modules.d:
+          mode: 0644
+          source: build/package/modules.d
+          config: true
+        kibana:
+          source: build/kibana
+          mode: 0644
