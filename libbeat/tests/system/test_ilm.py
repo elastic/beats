@@ -175,12 +175,12 @@ class Test(BaseTest):
 
         # Delete templates
         try:
-            self.es.transport.perform_request('DELETE', "/_template/mockbeat*/" + self.policy_name)
+            self.es.transport.perform_request('DELETE', "/_template/mockbeat*")
         except:
             pass
 
         # Delete indices
         try:
-            self.es.transport.perform_request('DELETE', "/foo*,mockbeat*" + self.policy_name)
+            self.es.transport.perform_request('DELETE', "/foo*,mockbeat*")
         except:
             pass
