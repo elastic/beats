@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package ec2
 
 import (
@@ -129,6 +133,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 }
 
+// MockFetch methods implements the data gathering and data conversion using MockEC2Client and MockCloudWatchClient
 func (m *MetricSet) MockFetch(report mb.ReporterV2) {
 	svcEC2Mock := &MockEC2Client{}
 	instanceIDs, err := getInstancesPerRegion(svcEC2Mock)
@@ -162,25 +167,128 @@ func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
 
 func reportEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceID string, report mb.ReporterV2) {
 	for _, output := range getMetricDataOutput.MetricDataResults {
-		if *output.Id == "m1" && len(output.Values) > 0 {
+		if len(output.Values) == 0 {
+			break
+		}
+		switch *output.Id {
+		case "cpu1":
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
 					"instance_id":     instanceID,
 					"cpu_utilization": *output.Values[0],
 				},
 			})
-		} else if *output.Id == "m2" && len(output.Values) > 0 {
+		case "cpu2":
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
 					"instance_id":      instanceID,
 					"cpu_credit_usage": *output.Values[0],
 				},
 			})
-		} else if *output.Id == "m3" && len(output.Values) > 0 {
+		case "cpu3":
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
 					"instance_id":        instanceID,
 					"cpu_credit_balance": *output.Values[0],
+				},
+			})
+		case "cpu4":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id":                instanceID,
+					"cpu_surplus_credit_balance": *output.Values[0],
+				},
+			})
+		case "cpu5":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id":                 instanceID,
+					"cpu_surplus_credits_charged": *output.Values[0],
+				},
+			})
+		case "network1":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id":        instanceID,
+					"network_packets_in": *output.Values[0],
+				},
+			})
+		case "network2":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"cloud.provider":      "ec2",
+					"cloud.instance.id":   instanceID,
+					"network_packets_out": *output.Values[0],
+				},
+			})
+		case "network3":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id": instanceID,
+					"network_in":  *output.Values[0],
+				},
+			})
+		case "network4":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id": instanceID,
+					"network_out": *output.Values[0],
+				},
+			})
+		case "disk1":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id":     instanceID,
+					"disk_read_bytes": *output.Values[0],
+				},
+			})
+		case "disk2":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id":      instanceID,
+					"disk_write_bytes": *output.Values[0],
+				},
+			})
+		case "disk3":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id":   instanceID,
+					"disk_read_ops": *output.Values[0],
+				},
+			})
+		case "disk4":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id":    instanceID,
+					"disk_write_ops": *output.Values[0],
+				},
+			})
+		case "status1":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id":         instanceID,
+					"status_check_failed": *output.Values[0],
+				},
+			})
+		case "status2":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id":         instanceID,
+					"status_check_failed": *output.Values[0],
+				},
+			})
+		case "status3":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id":                instanceID,
+					"status_check_failed_system": *output.Values[0],
+				},
+			})
+		case "status4":
+			report.Event(mb.Event{
+				MetricSetFields: common.MapStr{
+					"instance_id":                  instanceID,
+					"cpu_credit_balance_instances": *output.Values[0],
 				},
 			})
 		}
@@ -234,15 +342,31 @@ func getMetricDataPerRegion(instanceID string, nextToken *string, svc cloudwatch
 		Value: &instanceID,
 	}
 
-	metricDataQuery1 := createMetricDataQuery("m1", "CPUUtilization", []*cloudwatch.Dimension{&dim1})
-	metricDataQuery2 := createMetricDataQuery("m2", "CPUCreditUsage", []*cloudwatch.Dimension{&dim1})
-	metricDataQuery3 := createMetricDataQuery("m3", "CPUCreditBalance", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery1 := createMetricDataQuery("cpu1", "CPUUtilization", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery2 := createMetricDataQuery("cpu2", "CPUCreditUsage", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery3 := createMetricDataQuery("cpu3", "CPUCreditBalance", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery4 := createMetricDataQuery("cpu4", "CPUSurplusCreditBalance", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery5 := createMetricDataQuery("cpu5", "CPUSurplusCreditsCharged", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery6 := createMetricDataQuery("network1", "NetworkPacketsIn", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery7 := createMetricDataQuery("network2", "NetworkPacketsOut", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery8 := createMetricDataQuery("network3", "NetworkIn", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery9 := createMetricDataQuery("network4", "NetworkOut", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery10 := createMetricDataQuery("disk1", "DiskReadBytes", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery11 := createMetricDataQuery("disk2", "DiskWriteBytes", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery12 := createMetricDataQuery("disk3", "DiskReadOps", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery13 := createMetricDataQuery("disk4", "DiskWriteOps", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery14 := createMetricDataQuery("status1", "StatusCheckFailed", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery15 := createMetricDataQuery("status2", "StatusCheckFailed_System", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery16 := createMetricDataQuery("status3", "StatusCheckFailed_Instances", []*cloudwatch.Dimension{&dim1})
 
 	getMetricDataInput := &cloudwatch.GetMetricDataInput{
-		NextToken:         nextToken,
-		StartTime:         &startTime,
-		EndTime:           &endTime,
-		MetricDataQueries: []*cloudwatch.MetricDataQuery{&metricDataQuery1, &metricDataQuery2, &metricDataQuery3},
+		NextToken: nextToken,
+		StartTime: &startTime,
+		EndTime:   &endTime,
+		MetricDataQueries: []*cloudwatch.MetricDataQuery{&metricDataQuery1, &metricDataQuery2, &metricDataQuery3, &metricDataQuery4,
+			&metricDataQuery5, &metricDataQuery6, &metricDataQuery7, &metricDataQuery8,
+			&metricDataQuery9, &metricDataQuery10, &metricDataQuery11, &metricDataQuery12,
+			&metricDataQuery13, &metricDataQuery14, &metricDataQuery15, &metricDataQuery16},
 	}
 
 	getMetricDataOutput, err := svc.GetMetricData(getMetricDataInput)

@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package ec2
 
 import (
@@ -55,7 +59,7 @@ func (m *MockEC2Client) DescribeInstances(input *ec2.DescribeInstancesInput) (ou
 }
 
 func (m *MockCloudWatchClient) GetMetricData(input *cloudwatch.GetMetricDataInput) (output *cloudwatch.GetMetricDataOutput, err error) {
-	id := "m1"
+	id := "cpu1"
 	label := "CPUUtilization"
 	value := 0.25
 	output = &cloudwatch.GetMetricDataOutput{
@@ -101,7 +105,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 		t.FailNow()
 	}
 	assert.Equal(t, 1, len(getMetricDataOutput.MetricDataResults))
-	assert.Equal(t, "m1", *getMetricDataOutput.MetricDataResults[0].Id)
+	assert.Equal(t, "cpu1", *getMetricDataOutput.MetricDataResults[0].Id)
 	assert.Equal(t, "CPUUtilization", *getMetricDataOutput.MetricDataResults[0].Label)
 	assert.Equal(t, 0.25, *getMetricDataOutput.MetricDataResults[0].Values[0])
 }
