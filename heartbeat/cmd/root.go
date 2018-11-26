@@ -22,11 +22,18 @@ import (
 	_ "github.com/elastic/beats/heartbeat/monitors/defaults"
 
 	"github.com/elastic/beats/heartbeat/beater"
-	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
 // Name of this beat
 var Name = "heartbeat"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmd(Name, "", beater.New)
+var RootCmd *cmd.BeatsRootCmd
+
+func init() {
+	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{
+		Name: Name,
+	})
+}

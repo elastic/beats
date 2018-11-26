@@ -21,12 +21,18 @@ import (
 	"os"
 
 	"github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/mock"
 )
 
-var RootCmd = cmd.GenRootCmd(mock.Name, mock.Version, mock.New)
+// RootCmd to handle beats cli
+var RootCmd *cmd.BeatsRootCmd
 
 func main() {
+	RootCmd = cmd.GenRootCmdWithSettings(mock.New, instance.Settings{
+		Name:    mock.Name,
+		Version: mock.Version,
+	})
 	if err := RootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}

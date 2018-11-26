@@ -23,8 +23,8 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/filebeat/beater"
-
-	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
 // Name of this beat
@@ -38,7 +38,10 @@ func init() {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("once"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("modules"))
 
-	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
+	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{
+		Name:     Name,
+		RunFlags: runFlags,
+	})
 	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
 	RootCmd.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
 	RootCmd.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))

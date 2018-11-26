@@ -8,14 +8,19 @@ import (
 	"os"
 
 	"github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/mock"
 	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
 )
 
 // RootCmd to test libbeat
-var RootCmd = cmd.GenRootCmd(mock.Name, mock.Version, mock.New)
+var RootCmd *cmd.BeatsRootCmd
 
 func main() {
+	RootCmd = cmd.GenRootCmdWithSettings(mock.New, instance.Settings{
+		Name:    mock.Name,
+		Version: mock.Version,
+	})
 	xpackcmd.AddXPack(RootCmd, mock.Name)
 	if err := RootCmd.Execute(); err != nil {
 		os.Exit(1)
