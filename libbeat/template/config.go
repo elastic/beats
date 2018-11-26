@@ -17,7 +17,37 @@
 
 package template
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"github.com/elastic/beats/libbeat/common"
+)
+
+func Unpack(c *common.Config) (*TemplatesConfig, error) {
+	var templatesRaw = struct {
+		Templates []*common.Config `config:"templates"`
+	}{}
+
+	if err := c.Unpack(&templatesRaw); err != nil {
+		return nil, err
+	}
+
+	var tc TemplatesConfig
+
+	// use `settings.template.templates` if configured
+	for _, t := range templatesRaw.Templates {
+		var tmplCfg = DefaultTemplateCfg()
+		t.Unpack(&tmplCfg)
+		tc.Templates = append(tc.Templates, tmplCfg)
+	}
+
+	// fallback if no `settings.template.templates` was configured
+	if len(tc.Templates) == 0 {
+		var tmplCfg = DefaultTemplateCfg()
+		c.Unpack(&tmplCfg)
+		tc.Templates = append(tc.Templates, tmplCfg)
+	}
+
+	return &tc, nil
+}
 
 type TemplateConfig struct {
 	AppendFields common.Fields `config:"append_fields"`
@@ -39,11 +69,7 @@ type TemplateConfig struct {
 }
 
 type TemplatesConfig struct {
-	//TODO: check for this attribute
-	Enabled   bool `config:"enabled"`
-	Overwrite bool `config:"overwrite"`
-
-	Templates []TemplateConfig `config:"templates"`
+	Templates []TemplateConfig `config:"-"`
 
 	Settings TemplateSettings `config:"settings"`
 }
@@ -54,16 +80,16 @@ type TemplateSettings struct {
 }
 
 var (
-	// DefaultConfig for index template
-	DefaultConfig = TemplatesConfig{
-		Enabled: true,
-		Templates: []TemplateConfig{
-			TemplateConfig{Fields: ""},
-		},
-	}
-
 	// Defaults used in the template
 	defaultDateDetection         = false
 	defaultTotalFieldsLimit      = 10000
 	defaultNumberOfRoutingShards = 30
 )
+
+func DefaultTemplateCfg() TemplateConfig {
+	return TemplateConfig{
+		Enabled:   true,
+		Overwrite: false,
+		Fields:    "",
+	}
+}

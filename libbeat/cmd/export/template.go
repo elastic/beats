@@ -20,29 +20,22 @@ package export
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/template"
 )
 
 func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersion string) *cobra.Command {
-	fmt.Println(name)
-	fmt.Println(idxPrefix)
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "template",
 		Short: "Export index template(s) to stdout",
-		//TODO: generally use Loader here
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _ := cmd.Flags().GetString("es.version")
 			index, _ := cmd.Flags().GetString("index")
 
-			b, err := instance.NewBeat(name, idxPrefix, beatVersion)
+			b, err := instance.NewBeat(name, index, version)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
@@ -53,54 +46,16 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 				os.Exit(1)
 			}
 
-			templatesCfg := template.DefaultConfig
-			if b.Config.Template.Enabled() {
-				err = b.Config.Template.Unpack(&templatesCfg)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error getting template settings: %+v", err)
-					os.Exit(1)
-				}
+			loader, err := template.NewConsoleLoader(b.Config.Template, b.Info, version)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error generating template loader: %+v", err)
+				os.Exit(1)
 			}
 
-			for _, cfg := range templatesCfg.Templates {
-				tmpl, err := template.NewTemplate(b.Info.Version, index, version, cfg)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
-					os.Exit(1)
-				}
-
-				var templateString common.MapStr
-				if cfg.Fields != "" {
-					fieldsPath := paths.Resolve(paths.Config, cfg.Fields)
-					templateString, err = tmpl.LoadFile(fieldsPath)
-				} else if cfg.Modules != "" {
-
-					fields, err := asset.GetFieldsFor(name, strings.Split(cfg.Modules, ","))
-					if err != nil {
-						fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
-						os.Exit(1)
-					}
-					templateString, err = tmpl.LoadBytes(fields)
-				} else {
-
-					fields, err := asset.GetFields(name)
-					if err != nil {
-						fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
-						os.Exit(1)
-					}
-					templateString, err = tmpl.LoadBytes(fields)
-				}
-
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
-					os.Exit(1)
-				}
-
-				_, err = os.Stdout.WriteString(templateString.StringToPrint() + "\n")
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error writing template: %+v", err)
-					os.Exit(1)
-				}
+			err = loader.Load()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
+				os.Exit(1)
 			}
 		},
 	}
