@@ -132,7 +132,7 @@ directly into Elasticsearch. If you want to modify the default policy and load i
 can run `{beatname_lc} export ilm-policy` which will print the policy to stdout. You can modify it and then upload
 it to Elasticsearch. Alternative you can load the default policy and modify it in the Kibana ILM policy editor.
 
-===== Expert ILM setups
+==== Expert ILM setups
 
 WARNING: In general we only recommend you to modify the settings below if you know what you are doing.
 
