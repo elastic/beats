@@ -32,7 +32,7 @@
       path: http.response.status_code
     - name: referrer
       type: alias
-      path: http.referrer
+      path: http.request.referrer
     - name: agent
       type: alias
       path: user_agent.original

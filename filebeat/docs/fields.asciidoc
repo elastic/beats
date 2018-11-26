@@ -5364,7 +5364,7 @@ type: alias
 
 --
 
-*`http.referrer`*::
+*`http.request.referrer`*::
 +
 --
 type: alias
