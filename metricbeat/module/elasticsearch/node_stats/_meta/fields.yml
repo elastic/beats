@@ -4,10 +4,6 @@
     Node
   release: beta
   fields:
-    - name: id
-      type: keyword
-      description: >
-        Node ID
     - name: stats
       type: group
       description: >

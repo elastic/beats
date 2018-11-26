@@ -5391,6 +5391,26 @@ Elasticsearch state id.
 
 --
 
+*`elasticsearch.node.id`*::
++
+--
+type: keyword
+
+Node ID
+
+
+--
+
+*`elasticsearch.node.name`*::
++
+--
+type: keyword
+
+Node name.
+
+
+--
+
 [float]
 == ccr fields
 
@@ -5928,16 +5948,6 @@ node
 
 
 
-*`elasticsearch.node.name`*::
-+
---
-type: keyword
-
-Node name.
-
-
---
-
 *`elasticsearch.node.version`*::
 +
 --
@@ -6029,16 +6039,6 @@ If process locked in memory.
 Node
 
 
-
-*`elasticsearch.node.id`*::
-+
---
-type: keyword
-
-Node ID
-
-
---
 
 [float]
 == stats fields
