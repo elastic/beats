@@ -1,0 +1,9 @@
+- name: bar
+  type: group
+  description: >
+    bar
+  fields:
+    - name: counter
+      type: long
+      description: >
+        Example field
