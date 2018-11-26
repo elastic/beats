@@ -40,7 +40,7 @@ type config struct {
 	CRIForce bool `config:"cri.force"`
 
 	// Keep original raw message
-	KeepOriginal bool `config:"keep_original_message"`
+	KeepOriginal bool `config:"keep_original"`
 }
 
 type containers struct {

@@ -24,7 +24,7 @@ type Config struct {
 	OverwriteKeys       bool   `config:"overwrite_keys"`
 	AddErrorKey         bool   `config:"add_error_key"`
 	IgnoreDecodingError bool   `config:"ignore_decoding_error"`
-	KeepOriginal        bool   `config:"keep_original_message"`
+	KeepOriginal        bool   `config:"keep_original"`
 }
 
 // Validate validates the Config option for JSON reader.

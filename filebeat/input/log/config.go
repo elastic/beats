@@ -108,7 +108,7 @@ type config struct {
 		Partial      bool   `config:"partial"`
 		ForceCRI     bool   `config:"force_cri_logs"`
 		CRIFlags     bool   `config:"cri_flags"`
-		KeepOriginal bool   `config:"keep_original_message"`
+		KeepOriginal bool   `config:"keep_original"`
 	} `config:"docker-json"`
 }
 

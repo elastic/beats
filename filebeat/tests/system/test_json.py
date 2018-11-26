@@ -413,14 +413,14 @@ class Test(BaseTest):
 
     def test_keep_original(self):
         """
-        JSON events contain raw version if json.keep_original_message is set
+        JSON events contain raw version if json.keep_original is set
         """
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             json=dict(
                 keys_under_root=True,
-                keep_original_message=True,
+                keep_original=True,
             )
         )
 
@@ -440,14 +440,14 @@ class Test(BaseTest):
 
     def test_keep_original_multiline(self):
         """
-        Multiline JSON events contain raw version if json.keep_original_message is set
+        Multiline JSON events contain raw version if json.keep_original is set
         """
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             json=dict(
                 keys_under_root=True,
-                keep_original_message=True,
+                keep_original=True,
                 message_key="log_line",
             ),
             multiline=True,
