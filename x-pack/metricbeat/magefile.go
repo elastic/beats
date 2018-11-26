@@ -146,7 +146,7 @@ func PythonUnitTest() error {
 	return mage.PythonNoseTest(mage.DefaultPythonTestUnitArgs())
 }
 
-// PythonUnitTest executes the python system tests in the integration environment (Docker).
+// PythonIntegTest executes the python system tests in the integration environment (Docker).
 func PythonIntegTest(ctx context.Context) error {
 	if !mage.IsInIntegTestEnv() {
 		mg.Deps(Fields)
@@ -221,7 +221,7 @@ func referenceConfig() error {
 	if err != nil {
 		return err
 	}
-	//defer os.Remove(modulesConfigYml)
+	defer os.Remove(modulesConfigYml)
 
 	var configParts = []string{
 		mage.OSSBeatDir("_meta/common.reference.yml"),
