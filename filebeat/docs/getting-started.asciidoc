@@ -75,6 +75,25 @@ tar xzvf filebeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+[[linux]]
+*linux:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-linux-x86_64.tar.gz
+tar xzvf filebeat-{version}-linux-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
 [[docker]]
 *docker:*
 
@@ -223,12 +242,12 @@ sudo service {beatname_lc} start
 docker run {dockerimage}
 ----------------------------------------------------------------------
 
-*mac:*
+*mac and linux:*
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo chown root filebeat.yml <1>
-sudo ./filebeat -e -c filebeat.yml
+sudo ./filebeat -e
 ----------------------------------------------------------------------
 <1> You'll be running Filebeat as root, so you need to change ownership
 of the configuration file, or run Filebeat with `--strict.perms=false`

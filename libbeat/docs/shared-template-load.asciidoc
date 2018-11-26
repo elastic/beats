@@ -155,14 +155,24 @@ ifdef::mac_os[]
 ----
 endif::mac_os[]
 
-ifdef::mac_os[]
+ifdef::linux_os[]
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+----
+endif::linux_os[]
+
+
+ifdef::docker_platform[]
 *docker:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 docker run {dockerimage} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
-endif::mac_os[]
+endif::docker_platform[]
 
 ifdef::win_os[]
 ifndef::win_only[]
@@ -187,7 +197,9 @@ endif::win_os[]
 If you've already used {beatname_uc} to index data into Elasticsearch,
 the index may contain old documents. After you load the index template,
 you can delete the old documents from +{beatname_lc}-*+ to force Kibana to look
-at the newest documents. Use this command:
+at the newest documents.
+
+Use this command:
 
 ifdef::deb_os,rpm_os[]
 *deb and rpm:*
@@ -206,6 +218,15 @@ ifdef::mac_os[]
 curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
 ----------------------------------------------------------------------
 endif::mac_os[]
+
+ifdef::linux_os[]
+*linux:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
+----------------------------------------------------------------------
+endif::linux_os[]
 
 ifdef::win_os[]
 ifndef::win_only[]
@@ -249,6 +270,15 @@ ifdef::mac_os[]
 ----
 endif::mac_os[]
 
+ifdef::linux_os[]
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} export template > {beatname_lc}.template.json
+----
+endif::linux_os[]
+
 ifdef::win_os[]
 ifndef::win_only[]
 *win:*
@@ -279,6 +309,15 @@ ifdef::mac_os[]
 curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
 ----
 endif::mac_os[]
+
+ifdef::linux_os[]
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
+----
+endif::linux_os[]
 
 ifdef::win_os[]
 ifndef::win_only[]
