@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Add missing namespace field in http server metricset {pull}7890[7890]
 - Fix race condition when enriching events with kubernetes metadata. {issue}9055[9055] {issue}9067[9067]
 - Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
+- Fix issue with not collecting Elasticsearch cross-cluster replication stats correctly. {pull}9179[9179]
 
 *Packetbeat*
 
