@@ -51,6 +51,8 @@ used for development is Go {go-version}.
 The location where you clone is important. Please clone under the source
 directory of your `GOPATH`. If you don't have `GOPATH` already set, you can
 simply set it to the `go` directory in your home (`export GOPATH=$HOME/go`).
+Don't forget setting up new PATH variable for correct mage execution:
+`export PATH="$GOPATH/bin:$PATH"`
 
 [source,shell]
 --------------------------------------------------------------------------------
