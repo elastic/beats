@@ -42,6 +42,7 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains("Overwriting setup.template for ILM"))
+        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
         # Check if template is loaded with settings
@@ -56,6 +57,21 @@ class Test(BaseTest):
         now = d.strftime("%Y.%m.%d")
         index_name = self.alias_name + "-" + now + "-000001"
         assert index_name in alias
+
+        # Make sure the correct index + alias was created
+        alias = self.es.transport.perform_request('GET', '/_alias/' + self.alias_name)
+        d = datetime.datetime.now()
+        now = d.strftime("%Y.%m.%d")
+        index_name = self.alias_name + "-" + now + "-000001"
+        assert index_name in alias
+        assert alias[index_name]["aliases"][self.alias_name]["is_write_index"] == True
+
+        # Asserts that data is actually written to the ILM indices
+        self.wait_until(lambda: self.es.transport.perform_request(
+            'GET', '/' + index_name + '/_search')["hits"]["total"] > 0)
+
+        data = self.es.transport.perform_request('GET', '/' + index_name + '/_search')
+        assert data["hits"]["total"] > 0
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
