@@ -6,6 +6,7 @@ import codecs
 import time
 import base64
 import io
+import re
 import unittest
 from parameterized import parameterized
 
@@ -850,7 +851,8 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        self.wait_until(lambda: self.log_contains("Matching null byte found at offset 13"),
-                        max_timeout=5)
+        # 13 on unix, 14 on windows.
+        self.wait_until(lambda: self.log_contains(re.compile(
+            'Matching null byte found at offset (13|14)')), max_timeout=5)
 
         filebeat.check_kill_and_wait()
