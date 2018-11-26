@@ -4,6 +4,15 @@
     Module for parsing system log files.
   short_config: true
   fields:
+    - name: host.hostname
+      type: keyword
+      decription: >
+        Hostname of the host.
+
+        It can contain what `hostname` returns on Unix systems, the fully
+        qualified domain name, or a name specified by the user. The sender
+        decides which value to use.
+
     - name: system
       type: group
       description: >

@@ -56,7 +56,7 @@ func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 	confs := configs{}
 	err := cfg.Unpack(&confs)
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack config appender due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack config appender due to error: %+v", err)
 	}
 
 	var configMaps []configMap
@@ -66,7 +66,7 @@ func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 		if conf.ConditionConfig != nil {
 			cond, err = conditions.NewCondition(conf.ConditionConfig)
 			if err != nil {
-				logp.Warn("config", "unable to create condition due to error: %v", err)
+				logp.Warn("unable to create condition due to error: %+v", err)
 				continue
 			}
 		}
@@ -76,7 +76,7 @@ func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 		cf := common.MapStr{}
 		err = conf.Config.Unpack(&cf)
 		if err != nil {
-			logp.Warn("config", "unable to unpack config due to error: %v", err)
+			logp.Warn("unable to unpack config due to error: %+v", err)
 			continue
 		}
 		cm.config = cf

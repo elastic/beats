@@ -69,6 +69,16 @@ func Update() {
 	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
 }
 
+// Fmt formats source code and adds file headers.
+func Fmt() {
+	mg.Deps(mage.Format)
+}
+
+// Check runs fmt and update then returns an error if any modifications are found.
+func Check() {
+	mg.SerialDeps(mage.Format, Update, mage.Check)
+}
+
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	mage.AddIntegTestUsage()

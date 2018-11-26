@@ -1,0 +1,101 @@
+diff --git a/libbeat/kibana/fields_transformer.go b/libbeat/kibana/fields_transformer.go
+index 8f4f7005a..72827eb64 100644
+--- a/libbeat/kibana/fields_transformer.go
++++ b/libbeat/kibana/fields_transformer.go
+@@ -20,59 +20,37 @@ package kibana
+ import (
+ 	"errors"
+ 	"fmt"
++	"github.com/elastic/beats/libbeat/logp"
+ 
+ 	"github.com/elastic/beats/libbeat/common"
+ )
+ 
+-type fieldsTransformer struct {
+-	fields                    common.Fields
+-	transformedFields         []common.MapStr
+-	transformedFieldFormatMap common.MapStr
+-	version                   *common.Version
+-	keys                      common.MapStr
+-}
++var (
++	truthy = true
++	falsy = false
++)
+ 
+-func newFieldsTransformer(version *common.Version, fields common.Fields) (*fieldsTransformer, error) {
++func transform(version *common.Version, fields common.Fields) (common.MapStr, error) {
+ 	if version == nil {
+-		return nil, errors.New("Version must be given")
+-	}
+-	return &fieldsTransformer{
+-		fields:                    fields,
+-		version:                   version,
+-		transformedFields:         []common.MapStr{},
+-		transformedFieldFormatMap: common.MapStr{},
+-		keys: common.MapStr{},
+-	}, nil
+-}
+-
+-func (t *fieldsTransformer) transform() (transformed common.MapStr, err error) {
+-	defer func() {
+-		if r := recover(); r != nil {
+-			var ok bool
+-			if err, ok = r.(error); !ok {
+-				err = fmt.Errorf("Unrecoverable Error %v", r)
+-			}
+-		}
+-	}()
+-
+-	t.transformFields(t.fields, "")
++		return nil, errors.New("version is required")
++	}
++	transformedFields := map[string]common.Field{
++		// some meta fields
++		"_id":    {Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy},
++		"_type":  {Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &truthy, Aggregatable: &truthy},
++		"_index": {Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy},
++		"_score": {Type: "integer", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy},
++	}
+ 
+-	// add some meta fields
+-	truthy := true
+-	falsy := false
+-	t.add(common.Field{Path: "_id", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
+-	t.add(common.Field{Path: "_type", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &truthy, Aggregatable: &truthy})
+-	t.add(common.Field{Path: "_index", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
+-	t.add(common.Field{Path: "_score", Type: "integer", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
++	var transformedFieldFormatMap common.MapStr
+ 
+-	transformed = common.MapStr{
+-		"fields":         t.transformedFields,
+-		"fieldFormatMap": t.transformedFieldFormatMap,
+-	}
+-	return
++	return common.MapStr{
++		"fields":         transformedFields,
++		"fieldFormatMap": transformedFieldFormatMap,
++	}, nil
+ }
+ 
+-func (t *fieldsTransformer) transformFields(commonFields common.Fields, path string) {
++func transformFields(commonFields common.Fields, path string) {
+ 	for _, f := range commonFields {
+ 		f.Path = f.Name
+ 		if path != "" {
+@@ -104,15 +82,6 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
+ 	}
+ }
+ 
+-func (t *fieldsTransformer) add(f common.Field) {
+-	field, fieldFormat := transformField(t.version, f)
+-	t.transformedFields = append(t.transformedFields, field)
+-	if fieldFormat != nil {
+-		t.transformedFieldFormatMap[field["name"].(string)] = fieldFormat
+-	}
+-
+-}
+-
+ func transformField(version *common.Version, f common.Field) (common.MapStr, common.MapStr) {
+ 	field := common.MapStr{
+ 		"name":         f.Path,
