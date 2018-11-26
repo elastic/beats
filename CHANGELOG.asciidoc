@@ -76,6 +76,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 *Auditbeat*
 
 *Filebeat*
+- Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]
 
 - Allow to force CRI format parsing for better performance {pull}8424[8424]
 
