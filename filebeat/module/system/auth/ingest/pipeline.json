@@ -51,6 +51,11 @@
             }
         },
         {
+            "remove": {
+                "field": "system.auth.timestamp"
+            }
+        },
+        {
             "geoip": {
                 "field": "source.ip",
                 "target_field": "source.geo",

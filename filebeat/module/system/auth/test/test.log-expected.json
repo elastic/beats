@@ -12,7 +12,6 @@
         "source.port": 63673, 
         "system.auth.ssh.method": "publickey", 
         "system.auth.ssh.signature": "RSA 39:33:99:e9:a0:dc:f2:33:a3:e5:72:3b:7c:3a:56:84", 
-        "system.auth.timestamp": "Feb 21 21:54:44", 
         "user.name": "vagrant"
     }, 
     {
@@ -27,7 +26,6 @@
         "source.ip": "192.168.33.1", 
         "source.port": 58803, 
         "system.auth.ssh.method": "password", 
-        "system.auth.timestamp": "Feb 23 00:13:35", 
         "user.name": "vagrant"
     }, 
     {
@@ -40,7 +38,6 @@
         "log.offset": 254, 
         "process.pid": 3430, 
         "source.ip": "10.0.2.2", 
-        "system.auth.timestamp": "Feb 21 21:56:12", 
         "user.name": "test"
     }, 
     {
@@ -61,7 +58,6 @@
         "source.ip": "116.31.116.24", 
         "source.port": 29160, 
         "system.auth.ssh.method": "password", 
-        "system.auth.timestamp": "Feb 20 08:35:22", 
         "user.name": "root"
     }, 
     {
@@ -75,7 +71,6 @@
         "system.auth.sudo.pwd": "/home/vagrant", 
         "system.auth.sudo.tty": "pts/0", 
         "system.auth.sudo.user": "root", 
-        "system.auth.timestamp": "Feb 21 23:35:33", 
         "user.name": "vagrant"
     }, 
     {
@@ -91,8 +86,7 @@
         "source.geo.location.lat": 34.7725, 
         "source.geo.location.lon": 113.7266, 
         "source.ip": "123.57.245.163", 
-        "system.auth.ssh.dropped_ip": "123.57.245.163", 
-        "system.auth.timestamp": "Feb 19 15:30:04"
+        "system.auth.ssh.dropped_ip": "123.57.245.163"
     }, 
     {
         "@timestamp": "2018-02-23T00:08:48.000Z", 
@@ -105,7 +99,6 @@
         "system.auth.sudo.pwd": "/home/vagrant", 
         "system.auth.sudo.tty": "pts/1", 
         "system.auth.sudo.user": "root", 
-        "system.auth.timestamp": "Feb 23 00:08:48", 
         "user.name": "vagrant"
     }, 
     {
@@ -120,20 +113,7 @@
         "system.auth.sudo.pwd": "/home/vagrant", 
         "system.auth.sudo.tty": "pts/1", 
         "system.auth.sudo.user": "root", 
-        "system.auth.timestamp": "Feb 24 00:13:02", 
         "user.name": "tsg"
-    }, 
-    {
-        "@timestamp": "2018-02-22T11:47:05.000Z", 
-        "event.dataset": "auth", 
-        "event.module": "system", 
-        "host.hostname": "localhost", 
-        "input.type": "log", 
-        "log.offset": 861, 
-        "process.pid": 6991, 
-        "system.auth.groupadd.gid": 48, 
-        "system.auth.groupadd.name": "apache", 
-        "system.auth.timestamp": "Feb 22 11:47:05"
     }, 
     {
         "@timestamp": "2018-02-22T11:47:05.000Z", 
@@ -144,7 +124,6 @@
         "input.type": "log", 
         "log.offset": 934, 
         "process.pid": 6995, 
-        "system.auth.timestamp": "Feb 22 11:47:05", 
         "system.auth.useradd.home": "/usr/share/httpd", 
         "system.auth.useradd.shell": "/sbin/nologin", 
         "user.id": 48, 
