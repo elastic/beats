@@ -1,10 +1,10 @@
 [
     {
         "@timestamp": "2016-12-26T14:16:29.000Z", 
+        "apache2.access.body_sent.bytes": "209", 
         "event.dataset": "access", 
         "event.module": "apache2", 
         "http.request.method": "GET", 
-        "http.response.body_sent.bytes": "209", 
         "http.response.status_code": "404", 
         "http.version": "1.1", 
         "input.type": "log", 
@@ -15,11 +15,11 @@
     }, 
     {
         "@timestamp": "2016-12-26T16:22:13.000Z", 
+        "apache2.access.body_sent.bytes": "499", 
         "event.dataset": "access", 
         "event.module": "apache2", 
         "http.request.method": "GET", 
         "http.request.referer": "-", 
-        "http.response.body_sent.bytes": "499", 
         "http.response.status_code": "404", 
         "http.version": "1.1", 
         "input.type": "log", 
@@ -41,11 +41,11 @@
     }, 
     {
         "@timestamp": "2017-05-29T19:02:48.000Z", 
+        "apache2.access.body_sent.bytes": "612", 
         "event.dataset": "access", 
         "event.module": "apache2", 
         "http.request.method": "GET", 
         "http.request.referer": "-", 
-        "http.response.body_sent.bytes": "612", 
         "http.response.status_code": "404", 
         "http.version": "1.1", 
         "input.type": "log", 
