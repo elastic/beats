@@ -105,12 +105,14 @@ func (m AttributeMapping) Get(mbean, attr string) (Attribute, bool) {
 }
 
 // MBeanName is an internal struct used to store
-// the information by the parsed ```mbean``` (bean name) configuration
-// field in ```jmx.mappings```.
+// the information by the parsed `mbean` (bean name) configuration
+// field in `jmx.mappings`.
 type MBeanName struct {
 	Domain     string
 	Properties map[string]string
 }
+
+var mbeanRegexp = regexp.MustCompile("([^,=:*?]+)=([^,=:\"]+|\".*\")")
 
 // Canonicalize Returns the canonical form of the name; that is, a string representation where the
 // properties are sorted in lexical order.
@@ -125,13 +127,13 @@ func (m *MBeanName) Canonicalize(escape bool) string {
 
 	var propertySlice []string
 
-	r2 := regexp.MustCompile(`(["]|[.]|[!]|[\/])`)
+	r2 := strings.NewReplacer("\"", "!\"", ".", "!.", "!", "!!", "/", "!/")
 
 	for key, value := range m.Properties {
 
 		tmpVal := value
 		if escape {
-			tmpVal = r2.ReplaceAllString(value, "!$1")
+			tmpVal = r2.Replace(value)
 		}
 
 		propertySlice = append(propertySlice, key+"="+tmpVal)
@@ -169,8 +171,6 @@ func ParseMBeanName(mBeanName string) (*MBeanName, error) {
 		// Some property didn't match
 		return nil, fmt.Errorf("mbean properties must be in the form key=value: %s", mBeanName)
 	}
-
-	var mbeanRegexp = regexp.MustCompile("([^,=:*?]+)=([^,=:\"]+|\".*\")")
 
 	// Using this regexp we will split the properties in a 2 dimensional array
 	// instead of just splitting by commas because values can be quoted
