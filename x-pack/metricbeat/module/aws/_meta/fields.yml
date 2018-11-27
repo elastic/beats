@@ -1,0 +1,11 @@
+- key: aws
+  title: "aws"
+  description: >
+    experimental[]
+
+    aws module
+  fields:
+    - name: aws
+      type: group
+      description: >
+      fields:

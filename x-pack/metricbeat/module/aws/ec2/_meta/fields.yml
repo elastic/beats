@@ -1,0 +1,9 @@
+- name: ec2
+  type: group
+  description: >
+    ec2
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
