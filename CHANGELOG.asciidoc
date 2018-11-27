@@ -237,6 +237,7 @@ https://github.com/elastic/beats/compare/v6.4.0...v6.5.0[View commits]
 - Added autodiscovery support {pull}8415[8415]
 - Added support for extra TLS/x509 metadata. {pull}7944[7944]
 - Added stats and state metrics for number of monitors and endpoints started. {pull}8621[8621]
+- Add last monitor status to dashboard table. Further break out monitors in dashboard table by monitor.ip. {pull}9022[9022]
 
 *Journalbeat*
 
