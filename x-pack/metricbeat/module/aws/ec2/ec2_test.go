@@ -30,12 +30,13 @@ type MockCloudWatchClient struct {
 	cloudwatchiface.CloudWatchAPI
 }
 
+var regionName = "us-west-1"
+
 func (m *MockEC2Client) DescribeRegions(input *ec2.DescribeRegionsInput) (output *ec2.DescribeRegionsOutput, err error) {
-	region1 := "us-west-1"
 	output = &ec2.DescribeRegionsOutput{
 		Regions: []*ec2.Region{
 			&ec2.Region{
-				RegionName: &region1,
+				RegionName: &regionName,
 			},
 		},
 	}
@@ -43,8 +44,8 @@ func (m *MockEC2Client) DescribeRegions(input *ec2.DescribeRegionsInput) (output
 }
 
 func (m *MockEC2Client) DescribeInstances(input *ec2.DescribeInstancesInput) (output *ec2.DescribeInstancesOutput, err error) {
-	instance1 := &ec2.Instance{InstanceId: aws.String("i-123")}
-	instance2 := &ec2.Instance{InstanceId: aws.String("i-456")}
+	instance1 := &ec2.Instance{InstanceId: aws.String("i-123"), InstanceType: aws.String("t1.medium")}
+	instance2 := &ec2.Instance{InstanceId: aws.String("i-456"), InstanceType: aws.String("t2.micro")}
 	output = &ec2.DescribeInstancesOutput{
 		Reservations: []*ec2.Reservation{
 			&ec2.Reservation{
@@ -82,17 +83,23 @@ func TestGetRegions(t *testing.T) {
 		t.FailNow()
 	}
 	assert.Equal(t, 1, len(regionsList))
-	assert.Equal(t, "us-west-1", regionsList[0])
+	assert.Equal(t, regionName, regionsList[0])
 }
 
 func TestGetInstanceIDs(t *testing.T) {
 	mockSvc := &MockEC2Client{}
-	instanceIDs, err := getInstancesPerRegion(mockSvc)
+	instanceIDs, output, err := getInstancesPerRegion(mockSvc)
 	if err != nil {
 		fmt.Println("failed getInstancesPerRegion: ", err)
 		t.FailNow()
 	}
+
 	assert.Equal(t, 2, len(instanceIDs))
+	assert.Equal(t, 1, len(output))
+	reservations := output[0].Reservations
+	assert.Equal(t, 1, len(reservations))
+	instances := reservations[0].Instances
+	assert.Equal(t, 2, len(instances))
 	assert.Equal(t, "i-123", instanceIDs[0])
 	assert.Equal(t, "i-456", instanceIDs[1])
 }
@@ -127,25 +134,40 @@ func TestFetch(t *testing.T) {
 	t.Logf("Module: %s Metricset: %s", awsMetricSet.Module().Name(), awsMetricSet.Name())
 
 	if mock {
-		assert.Equal(t, 2, len(events))
+		assert.Equal(t, 4, len(events))
 	}
 
 	for _, event := range events {
-		checkSpecificMetric("cpu_utilization", event, t)
+		checkSpecificMetric("cpu_utilization", "float64", event, t)
+		checkSpecificMetric("instance.id", "string", event, t)
 	}
 }
 
-func checkSpecificMetric(metricName string, event mb.Event, t *testing.T) {
+func checkSpecificMetric(metricName string, expectFormat string, event mb.Event, t *testing.T) {
 	if ok, err := event.MetricSetFields.HasKey(metricName); ok {
 		assert.NoError(t, err)
-		cpuUtilization, err := event.MetricSetFields.GetValue(metricName)
+		metricValue, err := event.MetricSetFields.GetValue(metricName)
 		assert.NoError(t, err)
-		if userPercentFloat, ok := cpuUtilization.(float64); !ok {
-			fmt.Println("failed: userPercentFloat = ", userPercentFloat)
-			t.Fail()
-		} else {
-			assert.True(t, userPercentFloat >= 0)
-			fmt.Println("succeed: userPercentFloat = ", userPercentFloat)
+		switch expectFormat {
+		case "float64":
+			if userPercentFloat, ok := metricValue.(float64); !ok {
+				fmt.Println("failed: userPercentFloat = ", userPercentFloat)
+				t.Fail()
+			} else {
+				assert.True(t, userPercentFloat >= 0)
+				fmt.Println("succeed: userPercentFloat = ", userPercentFloat)
+			}
+		case "string":
+			if userString, ok := metricValue.(string); !ok {
+				fmt.Println("failed: userString = ", userString)
+				t.Fail()
+			} else {
+				if userString != "i-456" {
+					assert.Equal(t, userString, "i-123")
+				} else {
+					assert.Equal(t, userString, "i-456")
+				}
+			}
 		}
 	}
 }
@@ -181,9 +203,6 @@ func getCredentials(mock bool) (map[string]interface{}, error) {
 	accessKeyId := *tempToken.Credentials.AccessKeyId
 	secretAccessKey := *tempToken.Credentials.SecretAccessKey
 	sessionToken := *tempToken.Credentials.SessionToken
-	fmt.Println("accessKeyId = ", accessKeyId)
-	fmt.Println("secretAccessKey = ", secretAccessKey)
-	fmt.Println("sessionToken = ", sessionToken)
 	creds := map[string]interface{}{
 		"module":            "aws",
 		"metricsets":        []string{"ec2"},

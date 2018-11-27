@@ -109,10 +109,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			Region:      &regionName,
 			Credentials: creds,
 		})
-		instanceIDs, err := getInstancesPerRegion(svcEC2)
+		instanceIDs, describeInstancesOutput, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
 			report.Error(errors.Wrap(err, "getInstancesPerRegion failed"))
 		}
+		// report instance metadata
+		reportEC2Events(describeInstancesOutput, regionName, report)
 
 		svcCloudwatch := cloudwatch.New(sess, &awssdk.Config{
 			Region:      &regionName,
@@ -127,7 +129,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 				if err != nil {
 					report.Error(errors.Wrap(err, "getMetricDataPerRegion failed"))
 				}
-				reportEvents(getMetricDataOutput, instanceID, report)
+				reportCloudWatchEvents(getMetricDataOutput, instanceID, report)
 			}
 		}
 	}
@@ -136,10 +138,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 // MockFetch methods implements the data gathering and data conversion using MockEC2Client and MockCloudWatchClient
 func (m *MetricSet) MockFetch(report mb.ReporterV2) {
 	svcEC2Mock := &MockEC2Client{}
-	instanceIDs, err := getInstancesPerRegion(svcEC2Mock)
+	instanceIDs, describeInstancesOutput, err := getInstancesPerRegion(svcEC2Mock)
 	if err != nil {
 		report.Error(errors.Wrap(err, "getInstancesPerRegion failed"))
 	}
+	reportEC2Events(describeInstancesOutput, "us-west-1", report)
 
 	svcCloudwatchMock := &MockCloudWatchClient{}
 	for _, instanceID := range instanceIDs {
@@ -147,7 +150,7 @@ func (m *MetricSet) MockFetch(report mb.ReporterV2) {
 		if err != nil {
 			report.Error(errors.Wrap(err, "getMetricDataPerRegion failed"))
 		}
-		reportEvents(getMetricDataOutput, instanceID, report)
+		reportCloudWatchEvents(getMetricDataOutput, instanceID, report)
 	}
 }
 
@@ -165,7 +168,7 @@ func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
 	return
 }
 
-func reportEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceID string, report mb.ReporterV2) {
+func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceID string, report mb.ReporterV2) {
 	for _, output := range getMetricDataOutput.MetricDataResults {
 		if len(output.Values) == 0 {
 			break
@@ -216,8 +219,7 @@ func reportEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceI
 		case "network2":
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					"cloud.provider":      "ec2",
-					"cloud.instance.id":   instanceID,
+					"instance_id":         instanceID,
 					"network_packets_out": *output.Values[0],
 				},
 			})
@@ -273,35 +275,29 @@ func reportEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceI
 		case "status2":
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					"instance_id":         instanceID,
-					"status_check_failed": *output.Values[0],
+					"instance_id":                instanceID,
+					"status_check_failed_system": *output.Values[0],
 				},
 			})
 		case "status3":
 			report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
-					"instance_id":                instanceID,
-					"status_check_failed_system": *output.Values[0],
-				},
-			})
-		case "status4":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
 					"instance_id":                  instanceID,
-					"cpu_credit_balance_instances": *output.Values[0],
+					"status_check_failed_instance": *output.Values[0],
 				},
 			})
 		}
 	}
 }
 
-func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, err error) {
-	describeEC2InstancesOutput := ec2.DescribeInstancesOutput{NextToken: nil}
+func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, describeInstancesOutput []*ec2.DescribeInstancesOutput, err error) {
+	describeInstancesOutput = []*ec2.DescribeInstancesOutput{}
+	output := ec2.DescribeInstancesOutput{NextToken: nil}
 	init := true
-	for init || describeEC2InstancesOutput.NextToken != nil {
+	for init || output.NextToken != nil {
 		init = false
 		describeInstanceInput := &ec2.DescribeInstancesInput{
-			NextToken: describeEC2InstancesOutput.NextToken,
+			NextToken: output.NextToken,
 			Filters: []*ec2.Filter{
 				&ec2.Filter{
 					Name:   awssdk.String("instance-state-name"),
@@ -309,19 +305,38 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, err error
 				},
 			},
 		}
-		describeEC2InstancesOutput, err := svc.DescribeInstances(describeInstanceInput)
+
+		output, err := svc.DescribeInstances(describeInstanceInput)
 		if err != nil {
 			fmt.Println("Error DescribeInstances: ", err)
-			return nil, err
+			return nil, nil, err
 		}
 
-		for _, reservation := range describeEC2InstancesOutput.Reservations {
+		for _, reservation := range output.Reservations {
 			for _, instance := range reservation.Instances {
 				instanceIDs = append(instanceIDs, *instance.InstanceId)
 			}
 		}
+		describeInstancesOutput = append(describeInstancesOutput, output)
 	}
 	return
+}
+
+func reportEC2Events(describeInstancesOutput []*ec2.DescribeInstancesOutput, regionName string, report mb.ReporterV2) {
+	for _, output := range describeInstancesOutput {
+		for _, reservation := range output.Reservations {
+			for _, instance := range reservation.Instances {
+				report.Event(mb.Event{
+					MetricSetFields: common.MapStr{
+						"provider":     "ec2",
+						"instance.id":  *instance.InstanceId,
+						"machine.type": *instance.InstanceType,
+						"region":       regionName,
+					},
+				})
+			}
+		}
+	}
 }
 
 func getMetricDataPerRegion(instanceID string, nextToken *string, svc cloudwatchiface.CloudWatchAPI) (*cloudwatch.GetMetricDataOutput, error) {
@@ -357,7 +372,7 @@ func getMetricDataPerRegion(instanceID string, nextToken *string, svc cloudwatch
 	metricDataQuery13 := createMetricDataQuery("disk4", "DiskWriteOps", []*cloudwatch.Dimension{&dim1})
 	metricDataQuery14 := createMetricDataQuery("status1", "StatusCheckFailed", []*cloudwatch.Dimension{&dim1})
 	metricDataQuery15 := createMetricDataQuery("status2", "StatusCheckFailed_System", []*cloudwatch.Dimension{&dim1})
-	metricDataQuery16 := createMetricDataQuery("status3", "StatusCheckFailed_Instances", []*cloudwatch.Dimension{&dim1})
+	metricDataQuery16 := createMetricDataQuery("status3", "StatusCheckFailed_Instance", []*cloudwatch.Dimension{&dim1})
 
 	getMetricDataInput := &cloudwatch.GetMetricDataInput{
 		NextToken: nextToken,

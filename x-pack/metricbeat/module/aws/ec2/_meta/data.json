@@ -12,13 +12,15 @@
     },
     "aws":{
         "ec2":{
-            "instance": {
-                "instance_id": "1"
-            },
             "cpu": {
+                "instance_id": "1",
                 "cpu_utilization": 0.25,
                 "cpu_credit_usage": 0.01,
-                "cpu_credit_balance": 70
+                "cpu_credit_balance": 70,
+                "provider": "ec2",
+                "region": "us-west-1",
+                "instance.id": "1",
+                "machine.type": "t2.medium"
             }
         }
     },
