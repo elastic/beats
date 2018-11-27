@@ -21,38 +21,48 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 )
 
+// A Job represents a unit of execution, and may return multiple continuation jobs.
 type Job interface {
 	Name() string
 	Run() (*beat.Event, []Job, error)
 }
 
+// NamedJob represents a job with an explicitly specified name.
 type NamedJob struct {
 	name string
 	run  func() (*beat.Event, []Job, error)
 }
 
+// CreateNamedJob makes a new NamedJob.
 func CreateNamedJob(name string, run func() (*beat.Event, []Job, error)) *NamedJob {
 	return &NamedJob{name, run}
 }
 
+// Name returns the name of this job.
 func (f *NamedJob) Name() string {
 	return f.name
 }
 
+// Run executes the job.
 func (f *NamedJob) Run() (*beat.Event, []Job, error) {
 	return f.run()
 }
 
+// AnonJob represents a job with no assigned name, backed by just a function.
 type AnonJob func() (*beat.Event, []Job, error)
 
+// Name returns "" for AnonJob values.
 func (aj AnonJob) Name() string {
 	return ""
 }
 
+// Run executes the function.
 func (aj AnonJob) Run() (*beat.Event, []Job, error) {
 	return aj()
 }
 
+// AfterJob creates a wrapped version of the given Job that runs additional
+// code after the original Job, possibly altering return values.
 func AfterJob(j Job, after func(*beat.Event, []Job, error) (*beat.Event, []Job, error)) Job {
 
 	return CreateNamedJob(
@@ -65,6 +75,9 @@ func AfterJob(j Job, after func(*beat.Event, []Job, error) (*beat.Event, []Job, 
 	)
 }
 
+// AfterJobSuccess creates a wrapped version of the given Job that runs additional
+// code after the original job if the original Job succeeds, possibly altering
+// return values.
 func AfterJobSuccess(j Job, after func(*beat.Event, []Job, error) (*beat.Event, []Job, error)) Job {
 	return AfterJob(j, func(event *beat.Event, cont []Job, err error) (*beat.Event, []Job, error) {
 		if err != nil {
@@ -85,6 +98,8 @@ func MakeSimpleJob(f func() (*beat.Event, error)) Job {
 	})
 }
 
+// WrapAll takes a list of jobs and wraps them all with the provided Job wrapping
+// function.
 func WrapAll(jobs []Job, fn func(Job) Job) []Job {
 	var wrapped []Job
 	for _, j := range jobs {

@@ -57,7 +57,7 @@ func newHTTPMonitorHostJob(
 		Transport:     transport,
 		Timeout:       config.Timeout,
 	}
-	request, err := BuildRequest(addr, config, enc)
+	request, err := buildRequest(addr, config, enc)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func newHTTPMonitorHostJob(
 		)), nil
 }
 
-func NewHTTPMonitorIPsJob(
+func newHTTPMonitorIPsJob(
 	config *Config,
 	addr string,
 	tls *transport.TLSConfig,
@@ -101,7 +101,7 @@ func NewHTTPMonitorIPsJob(
 	typ := config.Name
 	id := fmt.Sprintf("%v@%v", typ, addr)
 
-	req, err := BuildRequest(addr, config, enc)
+	req, err := buildRequest(addr, config, enc)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func NewHTTPMonitorIPsJob(
 
 	settings := monitors.MakeHostJobSettings(id, hostname, config.Mode)
 
-	pingFactory := CreatePingFactory(config, hostname, port, tls, req, body, validator)
+	pingFactory := createPingFactory(config, hostname, port, tls, req, body, validator)
 	job, err := monitors.MakeByHostJob(settings, pingFactory)
 
 	fields := common.MapStr{
@@ -131,7 +131,7 @@ func NewHTTPMonitorIPsJob(
 	return monitors.WithJobId(id, monitors.WithFields(fields, job)), err
 }
 
-func CreatePingFactory(
+func createPingFactory(
 	config *Config,
 	hostname string,
 	port uint16,
@@ -219,7 +219,7 @@ func CreatePingFactory(
 	})
 }
 
-func BuildRequest(addr string, config *Config, enc contentEncoder) (*http.Request, error) {
+func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Request, error) {
 	method := strings.ToUpper(config.Check.Request.Method)
 	request, err := http.NewRequest(method, addr, nil)
 	if err != nil {

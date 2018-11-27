@@ -61,7 +61,7 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	config, err := common.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	jobs, endpoints, err := Create("tls", config)
+	jobs, endpoints, err := create("tls", config)
 	require.NoError(t, err)
 
 	job := jobs[0]
@@ -232,7 +232,7 @@ func TestLargeResponse(t *testing.T) {
 	config, err := common.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	jobs, _, err := Create("largeresp", config)
+	jobs, _, err := create("largeresp", config)
 	require.NoError(t, err)
 
 	job := jobs[0]

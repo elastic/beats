@@ -63,6 +63,9 @@ var DefaultIPSettings = IPSettings{
 	Mode: PingAny,
 }
 
+// emptyTask is a helper value for a Noop.
+var emptyTask = MakeSimpleCont(func() (*beat.Event, error) { return nil, nil })
+
 // Network determines the Network type used for IP name resolution, based on the
 // provided settings.
 func (s IPSettings) Network() string {
@@ -77,6 +80,10 @@ func (s IPSettings) Network() string {
 	return ""
 }
 
+// WithErrAsField wraps the given Job's execution such that any error returned
+// by the original Job will be set as a field. The original error will not be
+// passed through as a return value. Errors may still be present but only if there
+// is an actual error wrapping the error.
 func WithErrAsField(job Job) Job {
 	return AfterJob(job, func(event *beat.Event, jobs []Job, err error) (*beat.Event, []Job, error) {
 
@@ -96,6 +103,9 @@ func WithErrAsField(job Job) Job {
 	})
 }
 
+// TimeAndCheckJob executes the given Job, checking the duration of its run and setting
+// its status.
+// It adds the monitor.duration and monitor.status fields.
 func TimeAndCheckJob(job Job) Job {
 	// This should probably execute before job.Run
 	return CreateNamedJob(
@@ -122,6 +132,7 @@ func TimeAndCheckJob(job Job) Job {
 	)
 }
 
+// WithJobId wraps the given Job setting the monitor.id field.
 func WithJobId(id string, job Job) Job {
 	return CreateNamedJob(
 		id,
@@ -151,8 +162,6 @@ func MakePingIPFactory(
 		return MakeSimpleCont(func() (*beat.Event, error) { return f(ip) })
 	}
 }
-
-var emptyTask = MakeSimpleCont(func() (*beat.Event, error) { return nil, nil })
 
 // MakePingAllIPFactory wraps a function for building a recursive Task Runner from function callbacks.
 func MakePingAllIPFactory(
@@ -446,6 +455,7 @@ func addFields(to *common.MapStr, m common.MapStr) {
 	fields.DeepUpdate(m)
 }
 
+// MergeEventFields merges the given common.MapStr into the given Event's Fields.
 func MergeEventFields(e *beat.Event, merge common.MapStr) {
 	if e.Fields != nil {
 		e.Fields.DeepUpdate(merge)

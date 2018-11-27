@@ -31,12 +31,13 @@ import (
 )
 
 func init() {
-	monitors.RegisterActive("http", Create)
+	monitors.RegisterActive("http", create)
 }
 
 var debugf = logp.MakeDebug("http")
 
-func Create(
+// Create makes a new HTTP monitor
+func create(
 	name string,
 	cfg *common.Config,
 ) (jobs []monitors.Job, endpoints int, err error) {
@@ -91,7 +92,7 @@ func Create(
 		}
 	} else {
 		for i, url := range config.URLs {
-			jobs[i], err = NewHTTPMonitorIPsJob(&config, url, tls, enc, body, validator)
+			jobs[i], err = newHTTPMonitorIPsJob(&config, url, tls, enc, body, validator)
 			if err != nil {
 				return nil, 0, err
 			}
