@@ -119,6 +119,17 @@
         "@timestamp": "2018-02-22T11:47:05.000Z", 
         "event.dataset": "auth", 
         "event.module": "system", 
+        "host.hostname": "localhost", 
+        "input.type": "log", 
+        "log.offset": 861, 
+        "process.pid": 6991, 
+        "system.auth.groupadd.gid": 48, 
+        "system.auth.groupadd.name": "apache"
+    }, 
+    {
+        "@timestamp": "2018-02-22T11:47:05.000Z", 
+        "event.dataset": "auth", 
+        "event.module": "system", 
         "group.id": 48, 
         "host.hostname": "localhost", 
         "input.type": "log", 
