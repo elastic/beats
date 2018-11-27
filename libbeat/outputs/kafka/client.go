@@ -129,6 +129,7 @@ func (c *client) Publish(batch publisher.Batch) error {
 		msg, err := c.getEventMessage(d)
 		if err != nil {
 			logp.Err("Dropping event: %v", err)
+			logp.Debug("kafka", "Failed event: %v", d)
 			ref.done()
 			c.observer.Dropped(1)
 			continue
