@@ -43,6 +43,7 @@ type LoginRecord struct {
 	Type      RecordType
 	PID       int
 	TTY       string
+	UID       int
 	Username  string
 	Hostname  string
 	IP        net.IP
@@ -153,6 +154,7 @@ func createLoginRecord(utmpC *C.struct_utmp) LoginRecord {
 		Timestamp: utmp.utTv,
 		PID:       utmp.utPid,
 		TTY:       utmp.utLine,
+		UID:       -1,
 	}
 
 	switch utmp.utType {

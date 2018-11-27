@@ -200,6 +200,14 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 }
 
 func (ms *MetricSet) processLoginRecord(record *LoginRecord) {
+	user, err := user.Lookup(record.Username)
+	if err == nil {
+		uid, err := strconv.Atoi(user.Uid)
+		if err == nil {
+			record.UID = uid
+		}
+	}
+
 	switch record.Type {
 	case UserLogin:
 		// Store TTY from user login record for enrichment when user logout
@@ -209,6 +217,7 @@ func (ms *MetricSet) processLoginRecord(record *LoginRecord) {
 		savedRecord, found := ms.ttyLookup[record.TTY]
 		if found {
 			record.Username = savedRecord.Username
+			record.UID = savedRecord.UID
 			record.IP = savedRecord.IP
 			record.Hostname = savedRecord.Hostname
 		} else {
@@ -365,13 +374,9 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 			"name": loginRecord.Username,
 		})
 
-		user, err := user.Lookup(loginRecord.Username)
-		if err == nil {
-			uid, err := strconv.ParseUint(user.Uid, 10, 32)
-			if err == nil {
-				event.MetricSetFields.Put("user.uid", uid)
-				event.RootFields.Put("user.id", uid)
-			}
+		if loginRecord.UID != -1 {
+			event.MetricSetFields.Put("user.uid", loginRecord.UID)
+			event.RootFields.Put("user.id", loginRecord.UID)
 		}
 	}
 
