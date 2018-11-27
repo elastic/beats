@@ -24,6 +24,7 @@ import (
 )
 
 var (
+	// Runner is the compose test runner for apache
 	Runner = compose.TestRunner{
 		Service: "apache",
 		Options: map[string][]string{

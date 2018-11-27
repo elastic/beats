@@ -24,6 +24,7 @@ import (
 )
 
 var (
+	// Runner is a compose test runner for Redis tests
 	Runner = compose.TestRunner{
 		Service: "redis",
 		Options: compose.RunnerOptions{

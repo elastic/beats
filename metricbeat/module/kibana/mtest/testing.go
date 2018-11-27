@@ -22,6 +22,7 @@ import (
 )
 
 var (
+	// Runner is the compose test runner for kibana tests
 	Runner = compose.TestRunner{
 		Service:  "kibana",
 		Parallel: true,

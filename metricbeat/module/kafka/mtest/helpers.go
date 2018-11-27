@@ -26,6 +26,7 @@ import (
 	saramacluster "github.com/bsm/sarama-cluster"
 )
 
+// GenerateKafkaData generates kafka data for tests
 func GenerateKafkaData(t *testing.T, topic string, host string) {
 	t.Logf("Send Kafka Event to topic: %v", topic)
 
@@ -64,6 +65,7 @@ func GenerateKafkaData(t *testing.T, topic string, host string) {
 	}
 }
 
+// StartConsumer starts a kafka consumer for tests
 func StartConsumer(t *testing.T, topic, host string) (io.Closer, error) {
 	brokers := []string{host}
 	topics := []string{topic}

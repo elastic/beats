@@ -34,15 +34,30 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+// TestRunner starts a service with different combinations of options and
+// runs tests on each one of these combinations
 type TestRunner struct {
-	Service  string
-	Options  RunnerOptions
+	// Name of the service managed by this runner
+	Service string
+
+	// Map of options with the list of possible values
+	Options RunnerOptions
+
+	// Set to true if this runner can run in parallel with other runners
 	Parallel bool
-	Timeout  int
+
+	// Timeout to start the managed service
+	Timeout int
 }
 
+// Suite is a set of tests to be run with a TestRunner
+// Each test must be one of:
+// - func(R)
+// - func(*testing.T, R)
+// - func(*testing.T)
 type Suite map[string]interface{}
 
+// RunnerOptions are the possible options of a runner scenario
 type RunnerOptions map[string][]string
 
 func (r *TestRunner) scenarios() []map[string]string {
@@ -107,6 +122,7 @@ func (r *TestRunner) runHostOverride(t *testing.T, tests Suite) bool {
 	return true
 }
 
+// Run runs a tests suite
 func (r *TestRunner) Run(t *testing.T, tests Suite) {
 	t.Helper()
 
@@ -198,26 +214,31 @@ type runnerControl struct {
 	scenario map[string]string
 }
 
+// WithT creates a copy of R with the given T
 func (r *runnerControl) WithT(t *testing.T) R {
 	ctl := *r
 	ctl.T = t
 	return &ctl
 }
 
+// Host returns the host:port the test should use to connect to the service
 func (r *runnerControl) Host() string {
 	return r.host
 }
 
+// Hostname is the address of the host
 func (r *runnerControl) Hostname() string {
 	hostname, _, _ := net.SplitHostPort(r.host)
 	return hostname
 }
 
+// Port is the port of the host
 func (r *runnerControl) Port() string {
 	_, port, _ := net.SplitHostPort(r.host)
 	return port
 }
 
+// Option returns the value of an option for the current scenario
 func (r *runnerControl) Option(key string) string {
 	return r.scenario[key]
 }

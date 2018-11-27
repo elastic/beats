@@ -24,6 +24,7 @@ import (
 )
 
 var (
+	// Runner is the compose test runner for kafka tests
 	Runner = compose.TestRunner{
 		Service: "kafka",
 		Options: compose.RunnerOptions{

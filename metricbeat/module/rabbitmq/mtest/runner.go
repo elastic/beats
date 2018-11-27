@@ -22,6 +22,7 @@ import (
 )
 
 var (
+	// Runner is a compose test runner for RabbitMQ tests
 	Runner = compose.TestRunner{
 		Service:  "rabbitmq",
 		Parallel: true,

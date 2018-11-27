@@ -21,11 +21,13 @@ import (
 	"github.com/elastic/beats/libbeat/tests/compose"
 )
 
+// Runner is the compose test runner for mongodb
 var Runner = compose.TestRunner{
 	Service:  "mongodb",
 	Parallel: true,
 }
 
+// GetConfig creates a config for a metricset and host
 func GetConfig(metricset, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "mongodb",

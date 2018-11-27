@@ -22,12 +22,14 @@ import (
 )
 
 var (
+	// Runner is a compose test runner for prometheus
 	Runner = compose.TestRunner{
 		Service:  "prometheus",
 		Parallel: true,
 	}
 )
 
+// GetConfig creates a configuration for a metricset and host
 func GetConfig(metricset, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "prometheus",

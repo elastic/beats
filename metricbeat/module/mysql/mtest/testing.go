@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/tests/compose"
 )
 
+// Runner is a compose test runner for mysql
 var Runner = compose.TestRunner{
 	Service:  "mysql",
 	Parallel: true,

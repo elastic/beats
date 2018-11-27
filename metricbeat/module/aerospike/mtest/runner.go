@@ -24,6 +24,7 @@ import (
 )
 
 var (
+	// Runner is the compose test runner for aerospike
 	Runner = compose.TestRunner{
 		Service: "aerospike",
 		Options: compose.RunnerOptions{

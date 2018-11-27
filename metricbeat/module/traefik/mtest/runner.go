@@ -22,6 +22,7 @@ import (
 )
 
 var (
+	// Runner is a compose test runner for traefik
 	Runner = compose.TestRunner{
 		Service:  "traefik",
 		Parallel: true,

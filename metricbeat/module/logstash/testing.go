@@ -22,6 +22,7 @@ import (
 )
 
 var (
+	// Runner is the compose test runner for logstash
 	Runner = compose.TestRunner{
 		Service:  "logstash",
 		Parallel: true,

@@ -23,11 +23,13 @@ import (
 	"github.com/elastic/beats/libbeat/tests/compose"
 )
 
+// Runner is a compose test runner for php fpm
 var Runner = compose.TestRunner{
 	Service:  "phpfpm",
 	Parallel: true,
 }
 
+// GetConfig creates a configuration for a metricset and host
 func GetConfig(metricset, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "php_fpm",
