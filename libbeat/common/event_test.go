@@ -236,7 +236,7 @@ func TestNormalizeValue(t *testing.T) {
 	type myuint64 uint64
 
 	runTests(checkEq, map[string]testCase{
-		"nil": {nil, nil},
+		"nil":                               {nil, nil},
 		"pointers are dereferenced":         {&someString, someString},
 		"drop nil string pointer":           {nilStringPtr, nil},
 		"drop nil time pointer":             {nilTimePtr, nil},
