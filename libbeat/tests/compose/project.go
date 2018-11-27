@@ -59,7 +59,6 @@ type Driver interface {
 	Down(ctx context.Context) error
 	Kill(ctx context.Context, signal string, service string) error
 	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
-	// Containers(ctx context.Context, projectFilter Filter, filter ...string) ([]string, error)
 
 	SetParameters(map[string]string)
 
