@@ -2,7 +2,7 @@
 journalbeat.inputs:
 - paths: [{{ journal_path }}]
   seek: {{ seek_method }}
-  {% if cursor_seek_fallback and seek_method == 'cursor' %}
+  {% if cursor_seek_fallback %}
   cursor_seek_fallback: {{ cursor_seek_fallback }}
   {% endif %}
   include_matches: [{{ matches }}]
