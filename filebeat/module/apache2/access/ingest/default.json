@@ -4,14 +4,22 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "(%{IP:source.ip}|%{HOSTNAME:source.domain}) - %{DATA:user.name} \\[%{HTTPDATE:apache2.access.time}\\] \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.status_code} (?:%{NUMBER:apache2.access.body_sent.bytes}|-)( \"%{DATA:http.request.referer}\")?( \"%{DATA:user_agent.original}\")?",
-        "(%{IP:source.ip}|%{HOSTNAME:source.domain}) - %{DATA:user.name} \\[%{HTTPDATE:apache2.access.time}\\] \"-\" %{NUMBER:http.response.status_code} -"
+        "%{IPORHOST:apache2.access.remote_ip} - %{DATA:user.name} \\[%{HTTPDATE:apache2.access.time}\\] \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.status_code} (?:%{NUMBER:apache2.access.body_sent.bytes}|-)( \"%{DATA:http.request.referer}\")?( \"%{DATA:user_agent.original}\")?",
+        "%{IPORHOST:apache2.access.remote_ip} - %{DATA:user.name} \\[%{HTTPDATE:apache2.access.time}\\] \"-\" %{NUMBER:http.response.status_code} -"
         ],
       "ignore_missing": true
     }
   },{
     "remove":{
       "field": "message"
+    }
+  }, {
+    "grok": {
+      "field": "apache2.access.remote_ip",
+      "ignore_missing": true,
+      "patterns": [
+        "^(%{IP:source.ip}|%{HOSTNAME:source.domain})$"
+      ]
     }
   }, {
     "rename": {

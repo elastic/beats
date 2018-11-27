@@ -10,16 +10,6 @@
       description: >
         The number of bytes of the server response body.
 
-    - name: source.hostname
-      type: keyword
-      description: >
-        test
-
-    - name: http.request.referer
-      type: keyword
-      description: >
-        Http request referer.
-
     - name: apache2
       type: group
       description: >

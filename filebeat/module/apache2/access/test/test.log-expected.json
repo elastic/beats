@@ -2,6 +2,7 @@
     {
         "@timestamp": "2016-12-26T14:16:29.000Z", 
         "apache2.access.body_sent.bytes": "209", 
+        "apache2.access.remote_ip": "::1", 
         "event.dataset": "access", 
         "event.module": "apache2", 
         "http.request.method": "GET", 
@@ -16,6 +17,7 @@
     {
         "@timestamp": "2016-12-26T16:22:13.000Z", 
         "apache2.access.body_sent.bytes": "499", 
+        "apache2.access.remote_ip": "192.168.33.1", 
         "event.dataset": "access", 
         "event.module": "apache2", 
         "http.request.method": "GET", 
@@ -31,6 +33,7 @@
     }, 
     {
         "@timestamp": "2016-12-26T14:16:48.000Z", 
+        "apache2.access.remote_ip": "::1", 
         "event.dataset": "access", 
         "event.module": "apache2", 
         "http.response.status_code": "408", 
@@ -42,6 +45,7 @@
     {
         "@timestamp": "2017-05-29T19:02:48.000Z", 
         "apache2.access.body_sent.bytes": "612", 
+        "apache2.access.remote_ip": "172.17.0.1", 
         "event.dataset": "access", 
         "event.module": "apache2", 
         "http.request.method": "GET", 
