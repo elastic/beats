@@ -6034,16 +6034,9 @@ If process locked in memory.
 --
 
 [float]
-== node fields
+== node.stats fields
 
-Node
-
-
-
-[float]
-== stats fields
-
-Node stats
+node_stats
 
 
 
