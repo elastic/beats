@@ -5852,30 +5852,6 @@ type: keyword
 
 --
 
-*`group.id`*::
-+
---
-type: keyword
-
-required: False
-
-ID of the group.
-
-
---
-
-*`group.name`*::
-+
---
-type: keyword
-
-required: False
-
-Name of the group.
-
-
---
-
 [float]
 == system fields
 
@@ -5890,48 +5866,72 @@ Fields from the Linux authorization logs.
 
 
 
-*`@timestamp`*::
+*`system.auth.timestamp`*::
 +
 --
-type: alias
+The timestamp as read from the auth message.
+
 
 --
 
-*`host.hostname`*::
+*`system.auth.hostname`*::
 +
 --
-type: alias
+The hostname as read from the auth message.
+
 
 --
 
-*`process.name`*::
+*`system.auth.program`*::
 +
 --
-type: alias
+The process name as read from the auth message.
+
 
 --
 
-*`process.pid`*::
+*`system.auth.pid`*::
 +
 --
-type: alias
+type: long
+
+The PID of the process that sent the auth message.
+
 
 --
 
-*`message`*::
+*`system.auth.message`*::
 +
 --
-type: alias
+type: text
+
+The message in the log line.
+
 
 --
 
-*`user.name`*::
+*`system.auth.user`*::
 +
 --
-type: alias
+The Unix user that this event refers to.
+
 
 --
 
+[float]
+== ssh fields
+
+Fields specific to SSH login events.
+
+
+
+*`system.auth.ssh.event`*::
++
+--
+The SSH login event. Can be one of "Accepted", "Failed", or "Invalid". "Accepted" means a successful login. "Invalid" means that the user is not configured on the system. "Failed" means that the SSH login attempt has failed.
+
+
+--
 
 *`system.auth.ssh.method`*::
 +
@@ -5941,10 +5941,12 @@ The SSH authentication method. Can be one of "password" or "publickey".
 
 --
 
-*`system.auth.ssh.signature`*::
+*`system.auth.ssh.ip`*::
 +
 --
-The signature of the client public key.
+type: ip
+
+The client IP from where the login attempt was made.
 
 
 --
@@ -5959,67 +5961,88 @@ The client IP from SSH connections that are open and immediately dropped.
 
 --
 
-*`event.action`*::
+*`system.auth.ssh.port`*::
 +
 --
-type: alias
+type: long
+
+The client port from where the login attempt was made.
+
 
 --
 
-*`source.ip`*::
+*`system.auth.ssh.signature`*::
 +
 --
-type: alias
+The signature of the client public key.
+
 
 --
 
-*`source.port`*::
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the `system.auth.ip` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`system.auth.ssh.geoip.continent_name`*::
 +
 --
-type: alias
+type: keyword
+
+The name of the continent.
+
 
 --
 
-
-*`source.geo.continent_name`*::
+*`system.auth.ssh.geoip.city_name`*::
 +
 --
-type: alias
+type: keyword
+
+The name of the city.
+
 
 --
 
-*`source.geo.country_iso_code`*::
+*`system.auth.ssh.geoip.region_name`*::
 +
 --
-type: alias
+type: keyword
+
+The name of the region.
+
 
 --
 
-*`source.geo.location`*::
+*`system.auth.ssh.geoip.country_iso_code`*::
 +
 --
-type: alias
+type: keyword
+
+Country ISO code.
+
 
 --
 
-*`source.geo.region_name`*::
+*`system.auth.ssh.geoip.location`*::
 +
 --
-type: alias
+type: geo_point
+
+The longitude and latitude.
+
 
 --
 
-*`source.geo.city_name`*::
+*`system.auth.ssh.geoip.region_iso_code`*::
 +
 --
-type: alias
+type: keyword
 
---
+Region ISO code.
 
-*`source.geo.region_iso_code`*::
-+
---
-type: alias
 
 --
 
@@ -6081,6 +6104,32 @@ Fields specific to events created by the `useradd` command.
 
 
 
+*`system.auth.useradd.name`*::
++
+--
+The user name being added.
+
+
+--
+
+*`system.auth.useradd.uid`*::
++
+--
+type: long
+
+The user ID.
+
+--
+
+*`system.auth.useradd.gid`*::
++
+--
+type: long
+
+The group ID.
+
+--
+
 *`system.auth.useradd.home`*::
 +
 --
@@ -6095,27 +6144,6 @@ The default shell for the new user.
 
 --
 
-*`user.name`*::
-+
---
-type: alias
-
---
-
-*`user.id`*::
-+
---
-type: alias
-
---
-
-*`group.id`*::
-+
---
-type: alias
-
---
-
 [float]
 == groupadd fields
 
@@ -6123,17 +6151,21 @@ Fields specific to events created by the `groupadd` command.
 
 
 
-*`group.name`*::
+*`system.auth.groupadd.name`*::
 +
 --
-type: alias
+The name of the new group.
+
 
 --
 
-*`group.id`*::
+*`system.auth.groupadd.gid`*::
 +
 --
-type: alias
+type: long
+
+The ID of the new group.
+
 
 --
 
