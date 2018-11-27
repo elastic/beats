@@ -98,6 +98,11 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
 
         # Make sure the correct index + alias was created
+        print '/_alias/' + alias_name
+        logfile = self.beat_name + ".log"
+        with open(os.path.join(self.working_dir, logfile), "r") as f:
+            print f.read()
+
         alias = self.es.transport.perform_request('GET', '/_alias/' + alias_name)
         index_name = alias_name + "-1"
         assert index_name in alias
@@ -125,6 +130,12 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
 
         # Make sure the correct index + alias was created
+        print '/_alias/' + self.alias_name
+        logfile = self.beat_name + ".log"
+        with open(os.path.join(self.working_dir, logfile), "r") as f:
+            print f.read()
+
+        assert True == False
         alias = self.es.transport.perform_request('GET', '/_alias/' + self.alias_name)
         index_name = self.alias_name + "-1"
         assert index_name in alias
