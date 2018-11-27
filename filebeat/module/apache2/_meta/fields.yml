@@ -4,12 +4,6 @@
     Apache2 Module
   short_config: true
   fields:
-    - name: http.response.body_sent.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes of the server response body.
-
     - name: apache2
       type: group
       description: >

@@ -45,18 +45,6 @@ Apache2 Module
 
 
 
-*`http.response.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
-
-
---
-
 [float]
 == apache2 fields
 
@@ -71,10 +59,25 @@ Contains fields for the Apache2 HTTPD access logs.
 
 
 
-*`source.ip`*::
+*`apache2.access.remote_ip`*::
 +
 --
-type: alias
+type: keyword
+
+Client IP address or hostname.
+
+
+--
+
+*`apache2.access.body_sent.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
 
 --
 
@@ -113,213 +116,131 @@ type: alias
 
 --
 
-*`apache2.access.body_sent.bytes`*::
+*`http.request.referrer`*::
 +
 --
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
-
+type: alias
 
 --
 
-*`apache2.access.referrer`*::
+*`user_agent.original`*::
 +
 --
-type: keyword
-
-The HTTP referrer.
-
+type: alias
 
 --
 
-*`apache2.access.agent`*::
+
+*`user_agent.device`*::
 +
 --
-type: text
-
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
-
+type: alias
 
 --
 
-[float]
-== user_agent fields
-
-Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
-
-
-
-*`apache2.access.user_agent.device`*::
+*`user_agent.major`*::
 +
 --
-type: keyword
-
-The name of the physical device.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.major`*::
+*`user_agent.minor`*::
 +
 --
-type: long
-
-The major version of the user agent.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.minor`*::
+*`user_agent.patch`*::
 +
 --
-type: long
-
-The minor version of the user agent.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.patch`*::
+*`user_agent.name`*::
 +
 --
-type: keyword
-
-The patch version of the user agent.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.name`*::
+*`user_agent.os.full_name`*::
 +
 --
-type: keyword
-
-example: Chrome
-
-The name of the user agent.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.os`*::
+*`user_agent.os.major`*::
 +
 --
-type: keyword
-
-The name of the operating system.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.os_major`*::
+*`user_agent.os.minor`*::
 +
 --
-type: long
-
-The major version of the operating system.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.os_minor`*::
+*`user_agent.os.name`*::
 +
 --
-type: long
-
-The minor version of the operating system.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.os_name`*::
+*`user_agent.original`*::
 +
 --
-type: keyword
-
-The name of the operating system.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.original`*::
+
+*`source.geo.continent_name`*::
 +
 --
-type: text
-
-Original user agent value before parsing by ingest-user-agent plugin.
-
-
-Field is not indexed.
+type: alias
 
 --
 
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-*`apache2.access.geoip.continent_name`*::
+*`source.geo.country_iso_code`*::
 +
 --
-type: keyword
-
-The name of the continent.
-
+type: alias
 
 --
 
-*`apache2.access.geoip.country_iso_code`*::
+*`source.geo.location`*::
 +
 --
-type: keyword
-
-Country ISO code.
-
+type: alias
 
 --
 
-*`apache2.access.geoip.location`*::
+*`source.geo.region_name`*::
 +
 --
-type: geo_point
-
-The longitude and latitude.
-
+type: alias
 
 --
 
-*`apache2.access.geoip.region_name`*::
+*`source.geo.city_name`*::
 +
 --
-type: keyword
-
-The region name.
-
+type: alias
 
 --
 
-*`apache2.access.geoip.city_name`*::
+*`source.geo.region_iso_code`*::
 +
 --
-type: keyword
-
-The city name.
-
-
---
-
-*`apache2.access.geoip.region_iso_code`*::
-+
---
-type: keyword
-
-Region ISO code.
-
+type: alias
 
 --
 
