@@ -252,7 +252,6 @@ func (r *msgRef) dec() {
 		return
 	}
 
-	// XXX: Events with encoding problems shouldn't be retried
 	r.batch.RetryEvents(r.slice)
 	logp.Err("Failed to publish events caused by: %v", err)
 	logp.Debug("logstash", "Failed events: %v", r.slice)

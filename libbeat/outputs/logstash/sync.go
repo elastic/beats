@@ -145,7 +145,6 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 		st.Acked(n)
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
-			// XXX: Events with encoding problems shouldn't be retried
 			batch.RetryEvents(events)
 
 			if c.win != nil {
