@@ -162,11 +162,6 @@
 
 ## Apache
 
-- from: apache2.access.remote_ip
-  to: source.ip
-  alias: true
-  copy_to: false
-
 - from: apache2.access.user_name
   to: user.name
   alias: true
@@ -192,13 +187,8 @@
   alias: true
   copy_to: false
 
-- from: apache2.access.body_sent.bytes
-  to: http.response.body_sent.bytes
-  alias: true
-  copy_to: false
-
 - from: apache2.access.referrer
-  to: http.request.referer
+  to: http.request.referrer
   alias: true
   copy_to: false
 
