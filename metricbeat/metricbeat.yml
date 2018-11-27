@@ -21,9 +21,24 @@ metricbeat.config.modules:
 
 #==================== Elasticsearch template setting ==========================
 
-setup.template.name: "metricbeat-simi"
-setup.template.pattern: "metricbeat-simi*"
-#setup.template.fields: "${path.config}/simi-fields.yml"
+# Example config for templates
+# 
+# When `setup.template.templates` is configured, the old configuration is ignored.
+#setup.template.name: "metricbeat"
+#setup.template.pattern: "metricbeat*"
+#setup.template.fields: "${path.config}/fields.yml"
+#setup.template.enabled: false 
+#setup.template.overwrite: true
+setup.template.templates:
+  - name: "metricbeat-mix"
+    pattern: "*"
+    modules: "aerospike,apache,system"
+    overwrite: true
+  - name: "metricbeat-docker"
+    pattern: "docker*"
+    modules: "docker"
+    enabled: true 
+    overwrite: true
 
 setup.template.settings:
   index.number_of_shards: 1
@@ -101,8 +116,6 @@ output.elasticsearch:
   #protocol: "https"
   #username: "elastic"
   #password: "changeme"
-  
-  #index: "metricbeat-simi-%{+yyyy.MM.dd}"
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
