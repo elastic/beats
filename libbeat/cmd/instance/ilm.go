@@ -72,7 +72,7 @@ func (b *Beat) writeAliasLoadingCallback() (func(esClient *elasticsearch.Client)
 		// Check if alias already exists
 		status, b, err := esClient.Request("HEAD", "/_alias/"+config.RolloverAlias, "", nil, nil)
 		if err != nil && status != 404 {
-			logp.Err("Failed create write alias: %s: %+v", err, string(b))
+			logp.Err("Failed to check write alias: %s: %+v", err, string(b))
 			return errors.Wrap(err, "failed to check for write alias")
 		}
 		if status == 200 {
