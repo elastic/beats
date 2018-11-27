@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/filebeat/generator"
 )
 
+// Generate creates directories and placeholder files required by a fileset.
 func Generate(module, fileset, modulesPath, beatsPath string) error {
 	modulePath := path.Join(modulesPath, "module", module)
 	if !generator.DirExists(modulePath) {

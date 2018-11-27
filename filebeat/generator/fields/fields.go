@@ -60,10 +60,6 @@ var (
 	}
 )
 
-type Generator struct {
-	filesetPath string
-}
-
 type pipeline struct {
 	Description string                   `json:"description"`
 	Processors  []map[string]interface{} `json:"processors"`
@@ -84,22 +80,23 @@ type fieldYml struct {
 	Fields      []*fieldYml `yaml:"fields,omitempty"`
 }
 
+// Generate reads a pipeline and creates a fields.yml file based on it.
 func Generate(beatsPath, module, fileset string, noDoc bool) error {
 	filesetPath := filepath.Join(beatsPath, "module", module, fileset)
 	p, err := readPipeline(filesetPath)
 	if err != nil {
-		return fmt.Errorf("cannot read pipeline: %v\n", err)
+		return fmt.Errorf("cannot read pipeline: %+v", err)
 	}
 
 	var d []byte
 	data, err = p.toFieldsYml(noDoc)
 	if err != nil {
-		return fmt.Errorf("cannot generate fields.yml: %v\n", err)
+		return fmt.Errorf("cannot generate fields.yml: %+v", err)
 	}
 
 	err = writeFieldsYml(filesetPath, data)
 	if err != nil {
-		return fmt.Errorf("cannot write field.yml: %v\n", err)
+		return fmt.Errorf("cannot write field.yml: %+v", err)
 	}
 }
 
