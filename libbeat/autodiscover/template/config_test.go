@@ -108,5 +108,6 @@ func TestNilConditionConfig(t *testing.T) {
 	}
 
 	_, err = NewConfigMapper(mappings)
-	assert.Error(t, err)
+	assert.NoError(t, err)
+	assert.Nil(t, mappings[0].ConditionConfig)
 }
