@@ -4,8 +4,8 @@
 #
 # Variables
 #
-PWD           := $(CURDIR)
 .DEFAULT_GOAL := help
+PWD           := $(CURDIR)
 
 #
 # Includes
@@ -13,8 +13,12 @@ PWD           := $(CURDIR)
 include $(ES_BEATS)/dev-tools/make/mage.mk
 
 #
-# Targets
+# Targets (alphabetically sorted).
 #
+.PHONY: check
+check: mage
+	mage check
+
 .PHONY: clean
 clean: mage
 	mage clean
@@ -23,16 +27,17 @@ clean: mage
 fmt: mage
 	mage fmt
 
-.PHONY: check
-check: mage
-	mage check
-
-.PHONY: testsuite
-testsuite: mage
-	mage update build unitTest integTest
-
 # Default target.
 .PHONY: help
 help:
 	@echo Use mage rather than make. Here are the available mage targets:
 	@mage -l
+
+.PHONY: testsuite
+testsuite: mage
+	mage update build unitTest integTest
+
+.PHONY: update
+update: mage
+	mage update
+
