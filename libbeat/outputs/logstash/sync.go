@@ -153,7 +153,6 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 			_ = c.Close()
 
 			logp.Err("Failed to publish events caused by: %v", err)
-			logp.Debug("logstash", "Failed events: %v", events)
 
 			rest := len(events)
 			st.Failed(rest)
