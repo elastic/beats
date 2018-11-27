@@ -252,3 +252,80 @@
   to: source.geo.region_iso_code
   alias: true
   copy_to: false
+
+- from: nginx.access.remote_ip_list
+  to: network.forwarded_ip
+  alias: true
+  copy_to: false
+
+- from: nginx.access.user_name
+  to: user.name
+  alias: true
+  copy_to: false
+
+- from: nginx.access.url
+  to: url.original
+  alias: true
+  copy_to: false
+
+- from: nginx.access.agent
+  to: user_agent.original
+  alias: true
+  copy_to: false
+
+ # Note: `http` is not officially in ECS yet
+
+- from: nginx.access.response_code
+  to: http.response.status_code
+  alias: true
+  copy_to: false
+
+- from: nginx.access.referrer
+  to: http.request.referrer
+  alias: true
+  copy_to: false
+
+- from: nginx.access.method
+  to: http.request.method
+  alias: true
+  copy_to: false
+
+- from: nginx.access.http_version
+  to: http.version
+  alias: true
+  copy_to: false
+
+- from: nginx.access.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  copy_to: false
+
+- from: nginx.access.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  copy_to: false
+
+- from: nginx.access.geoip.location
+  to: source.geo.location
+  alias: true
+  copy_to: false
+
+- from: nginx.access.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  copy_to: false
+
+- from: nginx.access.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  copy_to: false
+
+- from: nginx.access.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  copy_to: false
+
+- from: nginx.access.agent
+  to: user_agent.original
+  alias: true
+  copy_to: false
