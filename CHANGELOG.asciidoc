@@ -137,6 +137,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Rename many `nginx.access.*` fields to map to ECS. {pull}9081[9081]
 - Rename many `system.auth.*` fields to map to ECS. {pull}9138[9138]
 - Rename many `apache2.access.*` fields to map to ECS. {pull}8901[8901]
+- Rename many `apache2.access.*` fields to map to ECS. {pull}9245[9245]
 
 *Metricbeat*
 
@@ -198,7 +199,6 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Make docker input check if container strings are empty {pull}7960[7960]
 - Keep unparsed user agent information in user_agent.original. {pull}8537[8537]
 - Allow to force CRI format parsing for better performance {pull}8424[8424]
-- Migrate Apache access fileset to ECS. {pull}8901[8901]
 
 *Heartbeat*
 
