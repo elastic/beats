@@ -129,7 +129,6 @@ func (c *client) Publish(batch publisher.Batch) error {
 		msg, err := c.getEventMessage(d)
 		if err != nil {
 			logp.Err("Dropping event: %v", err)
-			logp.Debug("kafka", "Failed event: %v", d)
 			ref.done()
 			c.observer.Dropped(1)
 			continue
@@ -180,6 +179,7 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 	serializedEvent, err := c.codec.Encode(c.index, event)
 	if err != nil {
+		logp.Debug("kafka", "Failed event: %v", event)
 		return nil, err
 	}
 
