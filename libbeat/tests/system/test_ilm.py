@@ -95,6 +95,7 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains("Overwriting setup.template for ILM"))
+        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
         # Make sure the correct index + alias was created
@@ -127,6 +128,7 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains("Overwriting setup.template for ILM"))
+        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
         # Make sure the correct index + alias was created
@@ -135,7 +137,6 @@ class Test(BaseTest):
         with open(os.path.join(self.working_dir, logfile), "r") as f:
             print f.read()
 
-        assert True == False
         alias = self.es.transport.perform_request('GET', '/_alias/' + self.alias_name)
         index_name = self.alias_name + "-1"
         assert index_name in alias
