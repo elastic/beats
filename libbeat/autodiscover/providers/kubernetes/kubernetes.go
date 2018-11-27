@@ -168,11 +168,10 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 			continue
 		}
 		cmeta := common.MapStr{
-			"provider": p.uuid,
-			"id":       cid,
-			"name":     c.GetName(),
-			"image":    c.GetImage(),
-			"runtime":  runtimes[c.GetName()],
+			"id":      cid,
+			"name":    c.GetName(),
+			"image":   c.GetImage(),
+			"runtime": runtimes[c.GetName()],
 		}
 		meta := p.metagen.ContainerMetadata(pod, c.GetName())
 
