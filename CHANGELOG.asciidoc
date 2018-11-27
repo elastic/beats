@@ -70,6 +70,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 ==== Added
 
 *Affecting all Beats*
+- Unify dashboard exporter tools. {pull}9097[9097]
 
 - Dissect will now flag event on parsing error. {pull}8751[8751]
 - Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]
