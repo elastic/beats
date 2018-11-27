@@ -88,8 +88,7 @@ func Generate(beatsPath, module, fileset string, noDoc bool) error {
 		return fmt.Errorf("cannot read pipeline: %+v", err)
 	}
 
-	var d []byte
-	data, err = p.toFieldsYml(noDoc)
+	data, err := p.toFieldsYml(noDoc)
 	if err != nil {
 		return fmt.Errorf("cannot generate fields.yml: %+v", err)
 	}
@@ -98,6 +97,7 @@ func Generate(beatsPath, module, fileset string, noDoc bool) error {
 	if err != nil {
 		return fmt.Errorf("cannot write field.yml: %+v", err)
 	}
+	return nil
 }
 
 func readPipeline(filesetPath string) (*pipeline, error) {
@@ -118,11 +118,7 @@ func readPipeline(filesetPath string) (*pipeline, error) {
 
 func writeFieldsYml(filesetPath string, fieldsBytes []byte) error {
 	output := filepath.Join(filesetPath, "_meta/fields.yml")
-	err := ioutil.WriteFile(p, f, 0644)
-	if err != nil {
-		return err
-	}
-	return nil
+	return ioutil.WriteFile(output, fieldsBytes, 0644)
 }
 
 func newFieldYml(name, typeName string, noDoc bool) *fieldYml {
