@@ -84,6 +84,25 @@ tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+[[linux]]
+*linux:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
 [[docker]]
 *docker:*
 
@@ -178,7 +197,7 @@ The following examples enable the `apache` and `mysql` configs in the
 {beatname_lc} modules enable apache mysql
 ----
 +
-*mac:*
+*mac and linux:*
 +
 ["source","sh",subs="attributes"]
 ----
@@ -243,13 +262,13 @@ sudo service {beatname_lc} start
 
 See <<running-on-docker>>.
 
-*mac:*
+*mac and linux:*
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo chown root {beatname_lc}.yml <1>
 sudo chown root modules.d/system.yml <1>
-sudo ./{beatname_lc} -e -c {beatname_lc}.yml
+sudo ./{beatname_lc} -e
 ----------------------------------------------------------------------
 <1> You'll be running {beatname_uc} as root, so you need to change ownership of the
 configuration file and any configurations enabled in the `modules.d` directory,

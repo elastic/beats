@@ -213,9 +213,13 @@ https://github.com/elastic/beats/tree/master/dev-tools/cmd/dashboards[dev-tools]
 for exporting Kibana 5.x dashboards. See the dev-tools
 https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.
 
+Alternatively, if the scripts above are not available, you can use your Beat binary to export Kibana 6.0 dashboards or later.
+
 ==== Exporting Kibana 6.0 dashboards and newer
 
 The `dev-tools/cmd/export_dashboards.go` script helps you export your customized Kibana 6.0 dashboards and newer. You might need to export a single dashboard or all the dashboards available for a module or Beat.
+
+It is also possible to use a Beat binary to export.
 
 ===== Export a single Kibana dashboard
 
@@ -224,6 +228,11 @@ To export a single dashboard for a module you can use the following command insi
 [source,shell]
 ---------------
 MODULE=redis ID=AV4REOpp5NkDleZmzKkE mage exportDashboard
+---------------
+
+[source,shell]
+---------------
+./filebeat export dashboard -id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b >> Filebeat-redis.json
 ---------------
 
 This generates a `AV4REOpp5NkDleZmzKkE.json` file inside dashboard directory in the redis module.
@@ -255,11 +264,16 @@ dashboards:
 
 Each dashboard is defined by an `id` and the name of json `file` where the dashboard is saved locally.
 
-By passing the yml file to the `export_dashboards.go` script, you can export all the dashboards defined:
+By passing the yml file to the `export_dashboards.go` script or to the Beat, you can export all the dashboards defined:
 
 [source,shell]
 -------------------
 go run dev-tools/cmd/dashboards/export_dashboards.go -yml filebeat/module/system/module.yml
+-------------------
+
+[source,shell]
+-------------------
+./filebeat export dashboard -yml filebeat/module/system/module.yml
 -------------------
 
 
@@ -271,6 +285,8 @@ If you are using the Kibana Spaces feature and want to export dashboards from a 
 -------------------
 go run dev-tools/cmd/dashboards/export_dashboards.go -space-id my-space [other-options]
 -------------------
+
+In case of running `export dashboard` of a Beat, you need to set the Space ID in `setup.kibana.space.id`.
 
 
 ==== Exporting Kibana 5.x dashboards

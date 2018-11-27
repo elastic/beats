@@ -94,6 +94,10 @@ jobs:
       env: TARGETS="-C metricbeat crosscompile"
       go: $GO_VERSION
       stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/metricbeat testsuite"
+      go: $GO_VERSION
+      stage: test
 
     # Packetbeat
     - os: linux
