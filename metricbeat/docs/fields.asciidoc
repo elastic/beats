@@ -5391,6 +5391,26 @@ Elasticsearch state id.
 
 --
 
+*`elasticsearch.node.id`*::
++
+--
+type: keyword
+
+Node ID
+
+
+--
+
+*`elasticsearch.node.name`*::
++
+--
+type: keyword
+
+Node name.
+
+
+--
+
 [float]
 == ccr fields
 
@@ -5927,16 +5947,6 @@ The number of records with either a missing date field or a date that could not 
 node
 
 
-
-*`elasticsearch.node.name`*::
-+
---
-type: keyword
-
-Node name.
-
-
---
 
 *`elasticsearch.node.version`*::
 +
