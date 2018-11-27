@@ -32,6 +32,8 @@ import (
 
 type taskCanceller func() error
 
+// configuredJob represents a job combined with its config and any
+// subsequent processors.
 type configuredJob struct {
 	job        Job
 	config     jobConfig
@@ -39,24 +41,6 @@ type configuredJob struct {
 	processors *processors.Processors
 	cancelFn   taskCanceller
 	client     beat.Client
-}
-
-type jobConfig struct {
-	Name     string             `config:"name"`
-	Type     string             `config:"type"`
-	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
-
-	// Fields and tags to add to monitor.
-	EventMetadata common.EventMetadata    `config:",inline"`
-	Processors    processors.PluginConfig `config:"processors"`
-}
-
-// InvalidMonitorProcessorsError is used to indicate situations when processors could not be loaded.
-// This special type is used because these errors are caught and handled gracefully.
-type InvalidMonitorProcessorsError struct{ root error }
-
-func (e InvalidMonitorProcessorsError) Error() string {
-	return fmt.Sprintf("could not load monitor processors: %s", e.root)
 }
 
 func newConfiguredJob(job Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
@@ -78,6 +62,25 @@ func newConfiguredJob(job Job, config jobConfig, monitor *Monitor) (*configuredJ
 	}
 
 	return t, nil
+}
+
+// jobConfig represents fields needed to execute a single job.
+type jobConfig struct {
+	Name     string             `config:"name"`
+	Type     string             `config:"type"`
+	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
+
+	// Fields and tags to add to monitor.
+	EventMetadata common.EventMetadata    `config:",inline"`
+	Processors    processors.PluginConfig `config:"processors"`
+}
+
+// InvalidMonitorProcessorsError is used to indicate situations when processors could not be loaded.
+// This special type is used because these errors are caught and handled gracefully.
+type InvalidMonitorProcessorsError struct{ root error }
+
+func (e InvalidMonitorProcessorsError) Error() string {
+	return fmt.Sprintf("could not load monitor processors: %s", e.root)
 }
 
 func (t *configuredJob) prepareSchedulerJob(meta common.MapStr, job Job) scheduler.TaskFunc {

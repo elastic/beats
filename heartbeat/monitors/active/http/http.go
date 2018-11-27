@@ -99,8 +99,8 @@ func create(
 		}
 	}
 
-	wrapped := monitors.WrapAll(jobs, monitors.WithErrAsField)
-	return wrapped, len(config.URLs), nil
+	errWrapped := monitors.WrapAll(jobs, monitors.WithErrAsField)
+	return errWrapped, len(config.URLs), nil
 }
 
 func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport, error) {

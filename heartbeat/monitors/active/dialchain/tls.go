@@ -58,7 +58,7 @@ func TLSLayer(cfg *transport.TLSConfig, to time.Duration) Layer {
 
 			// TODO: extract TLS connection parameters from connection object.
 			timer.stop()
-			event.Fields.Put("tls.rtt.handshake", look.RTT(timer.duration()))
+			event.PutValue("tls.rtt.handshake", look.RTT(timer.duration()))
 
 			// Pointers because we need a nil value
 			var chainNotValidBefore *time.Time
@@ -80,8 +80,8 @@ func TLSLayer(cfg *transport.TLSConfig, to time.Duration) Layer {
 				}
 			}
 
-			event.Fields.Put("tls.certificate_not_valid_before", *chainNotValidBefore)
-			event.Fields.Put("tls.certificate_not_valid_after", *chainNotValidAfter)
+			event.PutValue("tls.certificate_not_valid_before", *chainNotValidBefore)
+			event.PutValue("tls.certificate_not_valid_after", *chainNotValidAfter)
 
 			return conn, nil
 		}), nil

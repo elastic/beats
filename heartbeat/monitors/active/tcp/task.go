@@ -70,7 +70,7 @@ func pingHost(
 		},
 	}
 	if err != nil {
-		event.Fields["error"] = reason.FailValidate(err)
+		event.PutValue("error", reason.FailValidate(err))
 	}
 	return event, nil
 }
