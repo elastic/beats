@@ -69,3 +69,4 @@ The list below covers the major changes between 6.3.0 and master only.
 - Add docker image building to `mage.Package`. {pull}8898[8898]
 - Simplified exporting of dashboards. {pull}7730[7730]
 - Update Beats to use go 1.11.2 {pull}8746[8746]
+- Allow/Merge fields.yml overrides {pull}9188[9188]
