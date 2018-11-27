@@ -67,7 +67,7 @@ drawbacks:
 
 1. https://jolokia.org/reference/html/protocol.html#protocol-proxy[Proxy requests]
 are not allowed.
-1. If more than one `jmx.mappings` are defined, then Metricbeat will perform as many GET requests as the mappings defined. 
+2. If more than one `jmx.mappings` are defined, then Metricbeat will perform as many GET requests as the mappings defined. 
    For example the following configuration with 3 mappings:
 
 [source,yaml]
