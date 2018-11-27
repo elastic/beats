@@ -45,6 +45,7 @@ import (
 	file_helper "github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/reader/debug"
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
@@ -555,7 +556,12 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = readfile.NewEncodeReader(h.log, h.encoding, h.config.BufferSize)
+	reader, err := debug.AppendReaders(h.log)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err = readfile.NewEncodeReader(reader, h.encoding, h.config.BufferSize)
 	if err != nil {
 		return nil, err
 	}

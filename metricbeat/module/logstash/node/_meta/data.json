@@ -1,17 +1,17 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "logstash": {
         "node": {
-            "host": "5256c6d0f05a",
+            "host": "Shaunaks-MBP-2",
             "jvm": {
-                "pid": 1,
-                "version": "1.8.0_161"
+                "pid": 3674,
+                "version": "1.8.0_171"
             },
-            "version": "6.2.3"
+            "version": "7.0.0-alpha1"
         }
     },
     "metricset": {
@@ -19,5 +19,8 @@
         "module": "logstash",
         "name": "node",
         "rtt": 115
+    },
+    "service": {
+        "name": "logstash"
     }
 }

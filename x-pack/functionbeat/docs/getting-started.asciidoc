@@ -189,6 +189,8 @@ set AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
 set AWS_DEFAULT_REGION=us-east-1
 ----
 
+Set `AWS_DEFAULT_REGION` to the region where your services are running.
+
 After setting credentials, run the `deploy` command to deploy the function.
 The following command deploys a function called `cloudwatch`: 
 

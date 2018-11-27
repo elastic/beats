@@ -6,6 +6,7 @@ import platform
 import time
 import shutil
 import stat
+import unittest
 
 from filebeat import BaseTest
 from nose.plugins.skip import SkipTest
@@ -847,10 +848,12 @@ class Test(BaseTest):
         else:
             assert data[0]["offset"] == 2
 
+    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/7690")
     def test_clean_removed(self):
         """
         Checks that files which were removed, the state is removed
         """
+
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
             scan_frequency="0.1s",

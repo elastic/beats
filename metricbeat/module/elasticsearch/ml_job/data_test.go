@@ -17,35 +17,14 @@
 
 // +build !integration
 
-package node
+package ml_job
 
 import (
-	"io/ioutil"
 	"testing"
-
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-var info = elasticsearch.Info{
-	ClusterID:   "1234",
-	ClusterName: "helloworld",
-}
-
-func TestGetMappings(t *testing.T) {
-	elasticsearch.TestMapperWithInfo(t, "./_meta/test/node.*.json", eventsMapping)
-}
-
-func TestInvalid(t *testing.T) {
-	file := "./_meta/test/invalid.json"
-
-	content, err := ioutil.ReadFile(file)
-	assert.NoError(t, err)
-
-	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, info, content)
-	assert.Error(t, err)
+func TestMapper(t *testing.T) {
+	elasticsearch.TestMapperWithInfo(t, "./_meta/test/ml.*.json", eventsMapping)
 }
