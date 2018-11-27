@@ -85,7 +85,9 @@ func defaultConfig() *Config {
 	return &Config{
 		Period: 60 * time.Second,
 		Blacklist: ConfigBlacklistSettings{
-			"output": "console|file",
+			Patterns: map[string]string{
+				"output": "console|file",
+			},
 		},
 	}
 }

@@ -9,8 +9,59 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
 )
+
+func TestConfigBlacklistSettingsUnpack(t *testing.T) {
+	tests := []struct {
+		name     string
+		config   *common.Config
+		error    bool
+		expected ConfigBlacklistSettings
+	}{
+		{
+			name: "Simple config",
+			config: common.MustNewConfigFrom(map[string]interface{}{
+				"foo": "bar",
+			}),
+			expected: ConfigBlacklistSettings{
+				Patterns: map[string]string{
+					"foo": "bar",
+				},
+			},
+		},
+		{
+			name:   "Wrong config",
+			config: common.MustNewConfigFrom([]string{"a", "b"}),
+			error:  true,
+		},
+		{
+			name: "Tree config",
+			config: common.MustNewConfigFrom(map[string]interface{}{
+				"foo": map[string]interface{}{
+					"bar": "baz",
+				},
+			}),
+			expected: ConfigBlacklistSettings{
+				Patterns: map[string]string{
+					"foo.bar": "baz",
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var result ConfigBlacklistSettings
+			err := test.config.Unpack(&result)
+			if test.error {
+				assert.Error(t, err)
+			}
+			assert.Equal(t, test.expected, result)
+		})
+	}
+}
 
 func TestConfigBlacklist(t *testing.T) {
 	tests := []struct {
@@ -294,7 +345,10 @@ func TestConfigBlacklist(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			bl, err := NewConfigBlacklist(test.patterns)
+			cfg := ConfigBlacklistSettings{
+				Patterns: test.patterns,
+			}
+			bl, err := NewConfigBlacklist(cfg)
 			if err != nil {
 				t.Fatal(err)
 			}

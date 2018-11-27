@@ -23,46 +23,33 @@ type ConfigBlacklist struct {
 }
 
 // ConfigBlacklistSettings holds a list of fields and regular expressions to blacklist
-type ConfigBlacklistSettings map[string]string
+type ConfigBlacklistSettings struct {
+	Patterns map[string]string `yaml:",inline"`
+}
 
 // Unpack unpacks nested fields set with dot notation like foo.bar into the proper nesting
 // in a nested map/slice structure.
-func (f ConfigBlacklistSettings) Unpack(to interface{}) error {
-	m, ok := to.(map[string]interface{})
+func (f *ConfigBlacklistSettings) Unpack(from interface{}) error {
+	m, ok := from.(map[string]interface{})
 	if !ok {
-		return fmt.Errorf("wrong type, expect map")
+		return fmt.Errorf("wrong type, map is expected")
 	}
 
-	var expand func(key string, value interface{})
-
-	expand = func(key string, value interface{}) {
-		switch v := value.(type) {
-		case map[string]interface{}:
-			for k, val := range v {
-				expand(fmt.Sprintf("%v.%v", key, k), val)
-			}
-		case []interface{}:
-			for i := range v {
-				expand(fmt.Sprintf("%v.%v", key, i), v[i])
-			}
-		default:
-			m[key] = fmt.Sprintf("%s", value)
-		}
+	f.Patterns = map[string]string{}
+	for k, v := range common.MapStr(m).Flatten() {
+		f.Patterns[k] = fmt.Sprintf("%s", v)
 	}
 
-	for k, val := range m {
-		expand(k, val)
-	}
 	return nil
 }
 
 // NewConfigBlacklist filters configs from CM according to a given blacklist
-func NewConfigBlacklist(patterns ConfigBlacklistSettings) (*ConfigBlacklist, error) {
+func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 	list := ConfigBlacklist{
 		patterns: map[string]*regexp.Regexp{},
 	}
 
-	for field, pattern := range patterns {
+	for field, pattern := range cfg.Patterns {
 		exp, err := regexp.Compile(pattern)
 		if err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("Given expression is not a valid regexp: %s", pattern))
