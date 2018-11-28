@@ -69,6 +69,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Journalbeat*
 
+- Add cursor_seek_fallback option. {pull}9234[9234]
+
 *Metricbeat*
 
 - Add setting to disable docker cpu metrics per core. {pull}9194[9194]

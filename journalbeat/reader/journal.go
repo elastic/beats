@@ -146,8 +146,16 @@ func (r *Reader) seek(cursor string) {
 	switch r.config.Seek {
 	case config.SeekCursor:
 		if cursor == "" {
-			r.journal.SeekHead()
-			r.logger.Debug("Seeking method set to cursor, but no state is saved for reader. Starting to read from the beginning")
+			switch r.config.CursorSeekFallback {
+			case config.SeekHead:
+				r.journal.SeekHead()
+				r.logger.Debug("Seeking method set to cursor, but no state is saved for reader. Starting to read from the beginning")
+			case config.SeekTail:
+				r.journal.SeekTail()
+				r.logger.Debug("Seeking method set to cursor, but no state is saved for reader. Starting to read from the end")
+			default:
+				r.logger.Error("Invalid option for cursor_seek_fallback")
+			}
 			return
 		}
 		r.journal.SeekCursor(cursor)
