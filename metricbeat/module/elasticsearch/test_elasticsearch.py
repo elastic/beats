@@ -34,15 +34,15 @@ class Test(metricbeat.BaseTest):
         """
         elasticsearch metricset tests
         """
-        self.check_skip(metricset)
-
-        self.start_trial()
-        if metricset == "ml_job":
-            self.create_ml_job()
-        if metricset == "ccr":
-            self.create_ccr_stats()
-
         es = Elasticsearch(self.get_hosts())
+        self.check_skip(metricset, es)
+
+        self.start_trial(es)
+        if metricset == "ml_job":
+            self.create_ml_job(es)
+        if metricset == "ccr":
+            self.create_ccr_stats(es)
+
         es.indices.create(index='test-index', ignore=400)
         self.check_metricset("elasticsearch", metricset, self.get_hosts(), self.FIELDS +
                              ["service.name"], extras={"index_recovery.active_only": "false"})
@@ -51,9 +51,7 @@ class Test(metricbeat.BaseTest):
         return [os.getenv('ES_HOST', 'localhost') + ':' +
                 os.getenv('ES_PORT', '9200')]
 
-    def create_ml_job(self):
-        es = Elasticsearch(self.get_hosts())
-
+    def create_ml_job(self, es):
         # Check if an ml job already exists
         response = es.transport.perform_request('GET', "/_xpack/ml/anomaly_detectors/_all/")
         if response["count"] > 0:
@@ -68,14 +66,12 @@ class Test(metricbeat.BaseTest):
         path = "/_xpack/ml/anomaly_detectors/test"
         es.transport.perform_request('PUT', path, body=body)
 
-    def create_ccr_stats(self):
-        self.setup_ccr_remote()
-        self.create_ccr_leader_index()
-        self.create_ccr_follower_index()
+    def create_ccr_stats(self, es):
+        self.setup_ccr_remote(es)
+        self.create_ccr_leader_index(es)
+        self.create_ccr_follower_index(es)
 
-    def setup_ccr_remote(self):
-        es = Elasticsearch(self.get_hosts())
-
+    def setup_ccr_remote(self, es):
         file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr",
                             "_meta", "test", "test_remote_settings.json")
 
@@ -86,9 +82,7 @@ class Test(metricbeat.BaseTest):
         path = "/_cluster/settings"
         es.transport.perform_request('PUT', path, body=body)
 
-    def create_ccr_leader_index(self):
-        es = Elasticsearch(self.get_hosts())
-
+    def create_ccr_leader_index(self, es):
         file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr", "_meta", "test", "test_leader_index.json")
 
         body = {}
@@ -98,9 +92,7 @@ class Test(metricbeat.BaseTest):
         path = "/pied_piper"
         es.transport.perform_request('PUT', path, body=body)
 
-    def create_ccr_follower_index(self):
-        es = Elasticsearch(self.get_hosts())
-
+    def create_ccr_follower_index(self, es):
         file = os.path.join(self.beat_path, "module", "elasticsearch", "ccr",
                             "_meta", "test", "test_follower_index.json")
 
@@ -111,9 +103,7 @@ class Test(metricbeat.BaseTest):
         path = "/rats/_ccr/follow"
         es.transport.perform_request('PUT', path, body=body)
 
-    def start_trial(self):
-        es = Elasticsearch(self.get_hosts())
-
+    def start_trial(self, es):
         # Check if trial is already enabled
         response = es.transport.perform_request('GET', "/_xpack/license")
         if response["license"]["type"] == "trial":
@@ -126,21 +116,16 @@ class Test(metricbeat.BaseTest):
             e = sys.exc_info()[0]
             print "Trial already enabled. Error: {}".format(e)
 
-    def check_skip(self, metricset):
+    def check_skip(self, metricset, es):
         if metricset != "ccr":
             return
 
-        version = self.get_version()
+        version = self.get_version(es)
         if semver.compare(version, "6.5.0") == -1:
             # Skip CCR metricset system test for Elasticsearch versions < 6.5.0 as CCR Stats
             # API endpoint is not available
             raise SkipTest("elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
 
-    def get_version(self):
-        host = self.get_hosts()[0]
-        res = urllib2.urlopen("http://" + host + "/").read()
-
-        body = json.loads(res)
-        version = body["version"]["number"]
-
-        return version
+    def get_version(self, es):
+        response = es.transport.perform_request('GET', "/")
+        return response["version"]["number"]
