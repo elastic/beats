@@ -110,13 +110,12 @@ func init() {
 // MetricSet collects login records from /var/log/wtmp.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config      Config
-	bucket      datastore.Bucket
-	log         *logp.Logger
-	paths       []string
-	fileRecords map[uint64]FileRecord
-	ttyLookup   map[string]*LoginRecord
-	utmpReader  *UtmpFileReader
+	config     Config
+	bucket     datastore.Bucket
+	log        *logp.Logger
+	paths      []string
+	ttyLookup  map[string]*LoginRecord
+	utmpReader *UtmpFileReader
 }
 
 // New constructs a new MetricSet.
@@ -138,12 +137,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config:        config,
 		log:           logp.NewLogger(metricsetName),
 		bucket:        bucket,
-		fileRecords:   make(map[uint64]FileRecord),
 		ttyLookup:     make(map[string]*LoginRecord),
 	}
 
 	ms.utmpReader = &UtmpFileReader{
-		log: ms.log,
+		log:         ms.log,
+		fileRecords: make(map[uint64]FileRecord),
 	}
 
 	ms.paths, err = filepath.Glob(config.WtmpFilePattern)
@@ -174,78 +173,40 @@ func (ms *MetricSet) Close() error {
 // Fetch collects any new login records from /var/log/wtmp. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	// Store inodes still in use for clean up at the end
-	currentInodes := make(map[uint64]struct{}, len(ms.fileRecords))
+	currentInodes := make(map[uint64]struct{}, len(ms.utmpReader.fileRecords))
 
 	var newRecords []LoginRecord
 
 	for _, path := range ms.paths {
 		fileInfo, err := os.Stat(path)
-		if err != nil {
-			if os.IsNotExist(err) {
-				// Skip - file might have been rotated out
-				ms.log.Debugf("File %v does not exist anymore.", path)
-			} else {
-				ms.log.Error(err)
-				report.Error(err)
-			}
-			continue // Don't stop because of just one file
-		}
-
 		statsI := fileInfo.Sys()
 		if statsI == nil {
 			ms.log.Error(err)
 			report.Error(err)
-			return
+			continue
 		}
 		stats := statsI.(*syscall.Stat_t)
 		currentInodes[stats.Ino] = struct{}{}
-		ctime := time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)
 
-		fileRecord, isKnownFile := ms.fileRecords[stats.Ino]
-		hasChanged := !fileRecord.LastCtime.Equal(ctime)
-		if !isKnownFile || fileRecord.LastCtime.Before(ctime) {
-			ms.log.Debugf("Reading file %v (new=%t, changed=%t)", path, !isKnownFile, hasChanged)
+		loginRecords, err := ms.utmpReader.ReadNew(path)
+		if err != nil {
+			ms.log.Error(err)
+			report.Error(err)
+			continue // Don't stop because of just one file
+		}
+		ms.log.Debugf("Read %d new records.", len(loginRecords))
 
-			var loginRecords []LoginRecord
-
-			if isKnownFile {
-				loginRecords, err = ms.utmpReader.ReadAfter(path, &fileRecord.LastLoginRecord)
-			} else {
-				loginRecords, err = ms.utmpReader.ReadAfter(path, nil)
-			}
-			ms.log.Debugf("Read %d new records.", len(loginRecords))
-
-			if err != nil {
-				ms.log.Error(err)
-				report.Error(err)
-				return
-			}
-
-			newFileRecord := FileRecord{
-				Inode:     stats.Ino,
-				LastCtime: ctime,
-			}
-
-			if len(loginRecords) > 0 {
-				newFileRecord.LastLoginRecord = loginRecords[len(loginRecords)-1]
-
-				for _, loginRecord := range loginRecords {
-					ms.processLoginRecord(&loginRecord)
-					newRecords = append(newRecords, loginRecord)
-				}
-			} else {
-				ms.log.Warnf("Unexpectedly, there are no new records in file %v.", path)
-			}
-
-			ms.fileRecords[stats.Ino] = newFileRecord
+		for _, loginRecord := range loginRecords {
+			ms.processLoginRecord(&loginRecord)
+			newRecords = append(newRecords, loginRecord)
 		}
 	}
 
 	// Clean up old file records (where the inode no longer exists)
-	for inode, _ := range ms.fileRecords {
+	for inode, _ := range ms.utmpReader.fileRecords {
 		if _, found := currentInodes[inode]; !found {
 			ms.log.Debugf("Deleting old inode %d", inode)
-			delete(ms.fileRecords, inode)
+			delete(ms.utmpReader.fileRecords, inode)
 		}
 	}
 
@@ -310,7 +271,7 @@ func (ms *MetricSet) saveFileRecordsToDisk() error {
 	var buf bytes.Buffer
 	encoder := gob.NewEncoder(&buf)
 
-	for _, fileRecord := range ms.fileRecords {
+	for _, fileRecord := range ms.utmpReader.fileRecords {
 		err := encoder.Encode(fileRecord)
 		if err != nil {
 			return errors.Wrap(err, "error encoding file record")
@@ -322,7 +283,7 @@ func (ms *MetricSet) saveFileRecordsToDisk() error {
 		return errors.Wrap(err, "error writing file records to disk")
 	}
 
-	ms.log.Debugf("Wrote %d file records to disk", len(ms.fileRecords))
+	ms.log.Debugf("Wrote %d file records to disk", len(ms.utmpReader.fileRecords))
 	return nil
 }
 
@@ -378,7 +339,7 @@ func (ms *MetricSet) restoreFileRecordsFromDisk() error {
 			fileRecord := new(FileRecord)
 			err = decoder.Decode(fileRecord)
 			if err == nil {
-				ms.fileRecords[fileRecord.Inode] = *fileRecord
+				ms.utmpReader.fileRecords[fileRecord.Inode] = *fileRecord
 			} else if err == io.EOF {
 				// Read all
 				break
@@ -387,7 +348,7 @@ func (ms *MetricSet) restoreFileRecordsFromDisk() error {
 			}
 		}
 	}
-	ms.log.Debugf("Restored %d file records from disk", len(ms.fileRecords))
+	ms.log.Debugf("Restored %d file records from disk", len(ms.utmpReader.fileRecords))
 
 	return nil
 }
