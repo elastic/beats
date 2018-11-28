@@ -34,6 +34,7 @@ type ilmConfig struct {
 	Pattern       string `config:"ilm.pattern"`
 }
 
+// ILMPolicy contains the default policy
 var ILMPolicy = common.MapStr{
 	"policy": common.MapStr{
 		"phases": common.MapStr{
@@ -50,8 +51,10 @@ var ILMPolicy = common.MapStr{
 }
 
 const (
-	ILMPolicyName     = "beats-default-policy"
-	ILMDefaultPattern = "%7Bnow%2Fd%7D-000001" // {now/d} escaped
+	// ILMPolicyName
+	ILMPolicyName = "beats-default-policy"
+	// ILMPolicyName is the default policy name: {now/d} escaped
+	ILMDefaultPattern = "%7Bnow%2Fd%7D-000001"
 )
 
 // Build and return a callback to load ILM write alias
