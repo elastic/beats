@@ -77,7 +77,7 @@ type ClientSettings struct {
 	Observer           outputs.Observer
 }
 
-type connectCallback func(client *Client) error
+type ConnectCallback func(client *Client) error
 
 // Connection manages the connection for a given client.
 type Connection struct {

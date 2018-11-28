@@ -54,7 +54,7 @@ var (
 // Callbacks must not depend on the result of a previous one,
 // because the ordering is not fixed.
 type callbacksRegistry struct {
-	callbacks map[uuid.UUID]connectCallback
+	callbacks map[uuid.UUID]ConnectCallback
 	mutex     sync.Mutex
 }
 
@@ -88,14 +88,14 @@ func RegisterGlobalCallback(callback connectCallback) (uuid.UUID, error) {
 
 func newCallbacksRegistry() callbacksRegistry {
 	return callbacksRegistry{
-		callbacks: make(map[uuid.UUID]connectCallback),
+		callbacks: make(map[uuid.UUID]ConnectCallback),
 	}
 }
 
 // RegisterConnectCallback registers a callback for the elasticsearch output
 // The callback is called each time the client connects to elasticsearch.
 // It returns the key of the newly added callback, so it can be deregistered later.
-func RegisterConnectCallback(callback connectCallback) (uuid.UUID, error) {
+func RegisterConnectCallback(callback ConnectCallback) (uuid.UUID, error) {
 	connectCallbackRegistry.mutex.Lock()
 	defer connectCallbackRegistry.mutex.Unlock()
 

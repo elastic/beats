@@ -767,8 +767,7 @@ func (b *Beat) registerESIndexManagement() error {
 	return nil
 }
 
-// Build and return a callback to load index template into ES
-func (b *Beat) indexSetupCallback() func(esClient *elasticsearch.Client) error {
+func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *elasticsearch.Client) error {
 		m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
 		return m.Setup(true, true)
@@ -796,6 +795,32 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) 
 	}
 
 	return outputs.Load(b.index, b.Info, stats, cfg.Name(), cfg.Config())
+}
+
+// Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
+func (b *Beat) clusterUUIDFetchingCalling() (elasticsearch.ConnectCallback, error) {
+	var response struct {
+		ClusterUUID string `json:"cluster_uuid"`
+	}
+
+	callback := func(esClient *elasticsearch.Client) error {
+		status, body, err := esClient.Request("GET", "/", "", nil, nil)
+		if err != nil {
+			return errw.Wrap(err, "error querying /")
+		}
+		if status > 299 {
+			return fmt.Errorf("Error querying /. Status: %d. Response body: %s", status, body)
+		}
+		err = json.Unmarshal(body, &response)
+		if err != nil {
+			return fmt.Errorf("Error unmarshaling json when querying /. Body: %s", body)
+		}
+
+		// TODO: "Save" cluster_uuid somewhere? State namespace? New namespace?
+		return nil
+	}
+
+	return callback, nil
 }
 
 // handleError handles the given error by logging it and then returning the
