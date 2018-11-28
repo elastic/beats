@@ -86,12 +86,84 @@ output.elasticsearch:
   protocol: "https"
   username: "{beatname_lc}_internal"
   password: "{pwd}"
-
 ------------------------------------------------------------------------------
 
 
 For more information about securing {beatname_uc}, see
 <<securing-{beatname_lc}>>.
+
+
+To configure the Elasticsearch output with https://www.elastic.co/guide/en/elasticsearch/reference/6.x/getting-started-index-lifecycle-management.html[index lifecycle management] feature configure it as following:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  ilm.enabled: true
+------------------------------------------------------------------------------
+
+This will overwrite your index settings and adjust the Beats template to contain the correct settings.
+
+Note: If you have loaded a template before into Elasticsearch with the same version you must overwrite the template.
+Note: This feature only works with X-Pack Basic.
+
+The default `rollover_alias` used is `{beatname_lc}-{beat.version}`. It's not possible to remove the `{beat.version}`
+from the rollover_alias name but the prefix part can be adjusted. This will also directly affect the name of the
+rollover indices. The default pattern used for the rollover index is `%7Bnow%2Fd%7D-000001`. It can be adjusted with the
+`ilm.pattern` config. See config below for an example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["localhost"]
+  ilm.enabled: true
+  ilm.rollover_alias: "metricbeat"
+  ilm.pattern: "%7Bnow%2Fd%7D-000001"
+------------------------------------------------------------------------------
+
+Note: If you modify the rollover_alias or the pattern you have to overwrite the index template again as the settings
+`index.lifecycle.name` and `index.lifecycle.rollover_alias` change automatically in the template.
+
+For ilm pattern date math can be used, see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-rollover-index.html#_using_date_math_with_the_rollover_api[the rollover docs] for more details.
+It's important when date math is used that the special characters are escaped in the configuration.
+
+To load the default policy you can run `{beatname_lc} setup --ilm-policy`. It will load the default policy
+directly into Elasticsearch. If you want to modify the default policy and load it manually in Elasticsearch, you
+can run `{beatname_lc} export ilm-policy` which will print the policy to stdout. You can modify it and then upload
+it to Elasticsearch. Alternative you can load the default policy and modify it in the Kibana ILM policy editor.
+
+==== Expert ILM setups
+
+WARNING: In general we only recommend you to modify the settings below if you know what you are doing.
+
+The current ILM settings are focused on the most common use cases with an automated alias setup. It is
+possible to for example use multiple write alias with dynamic index patterns but it requires manual
+setup of the write alias. Here is a guide on the configuration options that will need a change.
+
+Let's assume we have an index pattern `foo-%{event.module}` and `event.module` can have the values `system`
+and `apache`. The first thing that must be done is setting up a rollover index for `foo-system` and
+`foo-apache`. For details on how to do this see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-rollover-index.html#_using_date_math_with_the_rollover_api[Rollover Index docs].
+
+The next step is to set the index pattern in the Elasticsearch output.
+
+```
+output.elasticesarch.index: foo-%{event.module}
+```
+
+This assumes every event contains `event.module` as otherwise the above will not work. As the index name
+is changed, the template name, template pattern, rollover_alias and lifecycle.name as index settings have to be set. The best way to set these is through an Elasticsearch template. It's possible to disable
+the template loading in Beats and set them in your own template. Otherwise the following config options
+in the Beat can be used:
+
+```
+setup.template.name: "foo"
+setup.template.pattern: "foo-*"
+setup.template.settings.index.lifecycle.rollover_alias: "foo-000001"
+setup.template.settings.index.lifecycle.name: "foo"
+```
+
+With all the above settings manually set it's important to NOT set `ilm.enabled` as otherwise all the above
+settings would be overwritten.
 
 ==== Compatibility
 
