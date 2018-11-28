@@ -9,70 +9,65 @@ import (
 	"os"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/cloudwatch"
-	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
+
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-type MockEC2Client struct {
-	ec2iface.EC2API
-}
-
-type MockCloudWatchClient struct {
-	cloudwatchiface.CloudWatchAPI
-}
-
 var regionName = "us-west-1"
 
-func (m *MockEC2Client) DescribeRegions(input *ec2.DescribeRegionsInput) (output *ec2.DescribeRegionsOutput, err error) {
-	output = &ec2.DescribeRegionsOutput{
-		Regions: []*ec2.Region{
-			&ec2.Region{
-				RegionName: &regionName,
-			},
-		},
-	}
-	return
-}
-
-func (m *MockEC2Client) DescribeInstances(input *ec2.DescribeInstancesInput) (output *ec2.DescribeInstancesOutput, err error) {
-	instance1 := &ec2.Instance{InstanceId: aws.String("i-123"), InstanceType: aws.String("t1.medium")}
-	instance2 := &ec2.Instance{InstanceId: aws.String("i-456"), InstanceType: aws.String("t2.micro")}
-	output = &ec2.DescribeInstancesOutput{
-		Reservations: []*ec2.Reservation{
-			&ec2.Reservation{
-				Instances: []*ec2.Instance{
-					instance1,
-					instance2,
+func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
+	return ec2.DescribeRegionsRequest{
+		Request: &awssdk.Request{
+			Data: &ec2.DescribeRegionsOutput{
+				Regions: []ec2.Region{
+					ec2.Region{
+						RegionName: &regionName,
+					},
 				},
 			},
 		},
 	}
-	return
 }
 
-func (m *MockCloudWatchClient) GetMetricData(input *cloudwatch.GetMetricDataInput) (output *cloudwatch.GetMetricDataOutput, err error) {
-	id := "cpu1"
-	label := "CPUUtilization"
-	value := 0.25
-	output = &cloudwatch.GetMetricDataOutput{
-		MetricDataResults: []*cloudwatch.MetricDataResult{
-			&cloudwatch.MetricDataResult{
-				Id:     &id,
-				Label:  &label,
-				Values: []*float64{&value},
+func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInput) ec2.DescribeInstancesRequest {
+	instance1 := ec2.Instance{InstanceId: awssdk.String("i-123"), InstanceType: ec2.InstanceTypeT2Medium}
+	instance2 := ec2.Instance{InstanceId: awssdk.String("i-456"), InstanceType: ec2.InstanceTypeT2Micro}
+	return ec2.DescribeInstancesRequest{
+		Request: &awssdk.Request{
+			Data: &ec2.DescribeInstancesOutput{
+				Reservations: []ec2.RunInstancesOutput{
+					ec2.RunInstancesOutput{Instances: []ec2.Instance{instance1, instance2}},
+				},
 			},
 		},
 	}
-	return
+}
+
+func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
+	id := "cpu1"
+	label := "CPUUtilization"
+	value := 0.25
+	return cloudwatch.GetMetricDataRequest{
+		Request: &awssdk.Request{
+			Data: &cloudwatch.GetMetricDataOutput{
+				MetricDataResults: []cloudwatch.MetricDataResult{
+					cloudwatch.MetricDataResult{
+						Id:     &id,
+						Label:  &label,
+						Values: []float64{value},
+					},
+				},
+			},
+		},
+	}
 }
 
 func TestGetRegions(t *testing.T) {
@@ -114,7 +109,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 	assert.Equal(t, 1, len(getMetricDataOutput.MetricDataResults))
 	assert.Equal(t, "cpu1", *getMetricDataOutput.MetricDataResults[0].Id)
 	assert.Equal(t, "CPUUtilization", *getMetricDataOutput.MetricDataResults[0].Label)
-	assert.Equal(t, 0.25, *getMetricDataOutput.MetricDataResults[0].Values[0])
+	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
 }
 
 func TestFetch(t *testing.T) {
@@ -182,19 +177,19 @@ func getCredentials(mock bool) (map[string]interface{}, error) {
 		return creds, nil
 	}
 
-	sess, err := session.NewSession()
+	cfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
-		fmt.Println("NewSession failed: ", err)
-		return nil, err
+		fmt.Println("failed to load config: ", err.Error())
 	}
 
-	stsSvc := sts.New(sess)
+	stsSvc := sts.New(cfg)
 	getSessionTokenInput := sts.GetSessionTokenInput{
-		SerialNumber: aws.String(os.Getenv("SERIAL_NUMBER")),
-		TokenCode:    aws.String(os.Getenv("MFA_TOKEN")),
+		SerialNumber: awssdk.String(os.Getenv("SERIAL_NUMBER")),
+		TokenCode:    awssdk.String(os.Getenv("MFA_TOKEN")),
 	}
 
-	tempToken, err := stsSvc.GetSessionToken(&getSessionTokenInput)
+	req := stsSvc.GetSessionTokenRequest(&getSessionTokenInput)
+	tempToken, err := req.Send()
 	if err != nil {
 		fmt.Println("GetSessionToken failed: ", err)
 		return nil, err
