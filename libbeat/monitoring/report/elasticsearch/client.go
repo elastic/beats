@@ -122,7 +122,15 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 			}
 		}
 
-		err = c.bulkToProduction(params, event, t)
+		switch params["format"] {
+		case "production":
+			err = c.bulkToProduction(params, event, t)
+		case "monitoring":
+			err = c.bulkToMonitoring(event)
+		default:
+			err = fmt.Errorf("unsupported reporting format: %v", params["format"])
+		}
+
 		if err != nil {
 			failed = append(failed, event)
 			reason = err
@@ -162,5 +170,27 @@ func (c *publishClient) bulkToProduction(params map[string]string, event publish
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
 	_, err = c.es.SendMonitoringBulk(params, bulk[:])
+	return err
+}
+
+// TODO: figure out why this isn't actually indexing anything!
+func (c *publishClient) bulkToMonitoring(event publisher.Event) error {
+	action := common.MapStr{
+		"index": common.MapStr{
+			"_type":    "doc",
+			"_index":   "monitoring-beats-6-1", // FIXME
+			"_routing": nil,
+		},
+	}
+	document := report.Event{
+		Timestamp: event.Content.Timestamp,
+		Fields:    event.Content.Fields,
+	}
+	bulk := [2]interface{}{action, document}
+
+	// Currently one request per event is sent. Reason is that each event can contain different
+	// interval params and X-Pack requires to send the interval param.
+	// FIXME: index name (first param below)
+	_, err := c.es.BulkWith("monitoring-beats-6-1", "doc", nil, nil, bulk[:])
 	return err
 }
