@@ -168,6 +168,31 @@ class Test(BaseTest):
         policy = self.es.transport.perform_request('GET', "/_ilm/policy/" + self.policy_name)
         assert self.policy_name in policy
 
+    @attr('integration')
+    def test_export_ilm_policy(self):
+        """
+        Test ilm policy export
+        """
+
+        self.clean()
+
+        shutil.copy(self.beat_path + "/_meta/config.yml",
+                    os.path.join(self.working_dir, "libbeat.yml"))
+        shutil.copy(self.beat_path + "/fields.yml",
+                    os.path.join(self.working_dir, "fields.yml"))
+
+        exit_code = self.run_beat(
+            logging_args=["-v", "-d", "*"],
+            extra_args=["export",
+                        "ilm-policy",
+                        ],
+            config="libbeat.yml")
+
+        assert exit_code == 0
+
+        assert self.log_contains('"max_age": "30d"')
+        assert self.log_contains('"max_size": "50gb"')
+
     def clean(self, alias_name=""):
 
         if alias_name == "":
