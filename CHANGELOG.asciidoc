@@ -54,6 +54,8 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 *Journalbeat*
 
+- Add missing journalbeat non breaking fixes. {pull}9106[9106]
+
 *Metricbeat*
 
 - Add missing namespace field in http server metricset {pull}7890[7890]
