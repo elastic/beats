@@ -51,9 +51,9 @@ var ILMPolicy = common.MapStr{
 }
 
 const (
-	// ILMPolicyName
+	// ILMPolicyName is the default policy name
 	ILMPolicyName = "beats-default-policy"
-	// ILMPolicyName is the default policy name: {now/d} escaped
+	// ILMDefaultPattern is the default policy name: {now/d} escaped
 	ILMDefaultPattern = "%7Bnow%2Fd%7D-000001"
 )
 
