@@ -32,7 +32,6 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/paths"
 )
 
 // Checkpoint persists event log state information to disk.
@@ -87,8 +86,6 @@ func NewCheckpoint(file string, maxUpdates int, interval time.Duration) (*Checkp
 		states:        make(map[string]JournalState),
 		save:          make(chan JournalState, 1),
 	}
-
-	c.file = paths.Resolve(paths.Data, c.file)
 
 	// Minimum batch size.
 	if c.maxUpdates < 1 {

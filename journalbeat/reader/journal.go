@@ -158,7 +158,6 @@ func (r *Reader) seek(cursor string) {
 		r.logger.Debug("Seeked to position defined in cursor")
 	case config.SeekTail:
 		r.journal.SeekTail()
-		r.journal.Next()
 		r.logger.Debug("Tailing the journal file")
 	case config.SeekHead:
 		r.journal.SeekHead()
@@ -225,7 +224,7 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	}
 
 	if len(custom) != 0 {
-		fields.Put("journald.custom", custom)
+		fields["custom"] = custom
 	}
 
 	state := checkpoint.JournalState{
