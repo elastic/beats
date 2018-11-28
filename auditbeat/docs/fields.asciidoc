@@ -4679,17 +4679,21 @@ Minor version of the operating system.
 
 --
 
-*`agent.type`*::
+*`beat.name`*::
 +
 --
 type: alias
 
+path: agent.type
+
 --
 
-*`agent.hostname`*::
+*`beat.hostname`*::
 +
 --
 type: alias
+
+path: agent.hostname
 
 --
 
