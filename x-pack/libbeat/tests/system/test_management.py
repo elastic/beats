@@ -96,7 +96,7 @@ class TestManagement(BaseTest):
         proc = self.start_beat(extra_args=[
             "-E", "management.period=1s",
             # do not blacklist file output
-            "-E", "management.blacklist.output='.*'",
+            "-E", "management.blacklist.output='elasticsearch'",
         ])
 
         # Wait for beat to apply new conf
@@ -155,7 +155,10 @@ class TestManagement(BaseTest):
         output_file = os.path.join("output", "mockbeat_managed")
 
         # Start beat
-        proc = self.start_beat()
+        proc = self.start_beat(extra_args=[
+            # do not blacklist file output
+            "-E", "management.blacklist.output='elasticsearch'",
+        ])
         self.wait_until(cond=lambda: self.output_has(
             1, output_file=output_file))
         proc.check_kill_and_wait()
@@ -168,7 +171,7 @@ class TestManagement(BaseTest):
             "-E", "management.kibana.host=wronghost",
             "-E", "management.kibana.timeout=0.5s",
             # do not blacklist file output
-            "-E", "management.blacklist.output='.*'",
+            "-E", "management.blacklist.output='elasticsearch'",
         ])
         self.wait_until(cond=lambda: self.output_has(
             1, output_file=output_file))
