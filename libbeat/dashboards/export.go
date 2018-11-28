@@ -84,14 +84,9 @@ func ExportAll(client *kibana.Client, list ListYML) ([]common.MapStr, error) {
 }
 
 // SaveToFile creates the required directories if needed and saves dashboard.
-func SaveToFile(dashboard common.MapStr, filename, root, versionStr string) error {
-	version, err := common.NewVersion(versionStr)
-	if err != nil {
-		return err
-	}
-
+func SaveToFile(dashboard common.MapStr, filename, root string, version common.Version) error {
 	dashboardsPath := "_meta/kibana/" + strconv.Itoa(version.Major) + "/dashboard"
-	err = generator.CreateDirectories(root, dashboardsPath)
+	err := generator.CreateDirectories(root, dashboardsPath)
 	if err != nil {
 		return err
 	}
