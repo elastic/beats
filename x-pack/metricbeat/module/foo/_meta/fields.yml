@@ -1,0 +1,11 @@
+- key: foo
+  title: "foo"
+  description: >
+    experimental[]
+
+    foo module
+  fields:
+    - name: foo
+      type: group
+      description: >
+      fields:

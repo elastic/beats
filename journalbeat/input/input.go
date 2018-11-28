@@ -67,11 +67,12 @@ func New(
 	var readers []*reader.Reader
 	if len(config.Paths) == 0 {
 		cfg := reader.Config{
-			Path:       reader.LocalSystemJournalID, // used to identify the state in the registry
-			Backoff:    config.Backoff,
-			MaxBackoff: config.MaxBackoff,
-			Seek:       config.Seek,
-			Matches:    config.Matches,
+			Path:               reader.LocalSystemJournalID, // used to identify the state in the registry
+			Backoff:            config.Backoff,
+			MaxBackoff:         config.MaxBackoff,
+			Seek:               config.Seek,
+			CursorSeekFallback: config.CursorSeekFallback,
+			Matches:            config.Matches,
 		}
 
 		state := states[reader.LocalSystemJournalID]
@@ -84,11 +85,12 @@ func New(
 
 	for _, p := range config.Paths {
 		cfg := reader.Config{
-			Path:       p,
-			Backoff:    config.Backoff,
-			MaxBackoff: config.MaxBackoff,
-			Seek:       config.Seek,
-			Matches:    config.Matches,
+			Path:               p,
+			Backoff:            config.Backoff,
+			MaxBackoff:         config.MaxBackoff,
+			Seek:               config.Seek,
+			CursorSeekFallback: config.CursorSeekFallback,
+			Matches:            config.Matches,
 		}
 		state := states[p]
 		r, err := reader.New(cfg, done, state, logger)

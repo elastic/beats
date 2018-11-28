@@ -4845,6 +4845,18 @@ Referrer for this HTTP request.
 
 --
 
+*`url.original`*::
++
+--
+type: keyword
+
+example: https://blog.example.com/
+
+Full original url. The field is stored as keyword.
+
+
+--
+
 *`event.dataset`*::
 +
 --
@@ -5291,78 +5303,6 @@ Contains fields for the Nginx access logs.
 
 
 
-*`nginx.access.remote_ip_list`*::
-+
---
-type: array
-
-An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.
-
-
---
-
-*`nginx.access.remote_ip`*::
-+
---
-type: keyword
-
-Client IP address. The first public IP address from the `remote_ip_list` array. If no public IP addresses are present, this field contains the first private IP address from the `remote_ip_list` array.
-
-
---
-
-*`nginx.access.user_name`*::
-+
---
-type: keyword
-
-The user name used when basic authentication is used.
-
-
---
-
-*`nginx.access.method`*::
-+
---
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
---
-
-*`nginx.access.url`*::
-+
---
-type: keyword
-
-The request HTTP URL.
-
-
---
-
-*`nginx.access.http_version`*::
-+
---
-type: keyword
-
-The HTTP version.
-
-
---
-
-*`nginx.access.response_code`*::
-+
---
-type: long
-
-The HTTP response code.
-
-
---
-
 *`nginx.access.body_sent.bytes`*::
 +
 --
@@ -5375,201 +5315,180 @@ The number of bytes of the server response body.
 
 --
 
-*`nginx.access.referrer`*::
+*`network.forwarded_ip`*::
 +
 --
-type: keyword
-
-The HTTP referrer.
-
+type: alias
 
 --
 
-*`nginx.access.agent`*::
+*`source.ip`*::
 +
 --
-type: text
-
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
-
+type: alias
 
 --
 
-[float]
-== user_agent fields
-
-Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
-
-
-
-*`nginx.access.user_agent.device`*::
+*`user.name`*::
 +
 --
-type: keyword
-
-The name of the physical device.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.major`*::
+*`http.request.method`*::
 +
 --
-type: long
-
-The major version of the user agent.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.minor`*::
+*`url.original`*::
 +
 --
-type: long
-
-The minor version of the user agent.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.patch`*::
+*`http.version`*::
 +
 --
-type: keyword
-
-The patch version of the user agent.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.name`*::
+*`http.response.status_code`*::
 +
 --
-type: keyword
-
-example: Chrome
-
-The name of the user agent.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.os`*::
+*`http.request.referrer`*::
 +
 --
-type: keyword
-
-The name of the operating system.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.os_major`*::
+*`user_agent.original`*::
 +
 --
-type: long
-
-The major version of the operating system.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.os_minor`*::
+
+*`user_agent.device`*::
 +
 --
-type: long
-
-The minor version of the operating system.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.os_name`*::
+*`user_agent.major`*::
 +
 --
-type: keyword
-
-The name of the operating system.
-
+type: alias
 
 --
 
-*`nginx.access.user_agent.original`*::
+*`user_agent.minor`*::
 +
 --
-type: text
-
-Original user agent value before parsing by ingest-user-agent plugin.
-
-
-Field is not indexed.
+type: alias
 
 --
 
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-*`nginx.access.geoip.continent_name`*::
+*`user_agent.patch`*::
 +
 --
-type: keyword
-
-The name of the continent.
-
+type: alias
 
 --
 
-*`nginx.access.geoip.country_iso_code`*::
+*`user_agent.name`*::
 +
 --
-type: keyword
-
-Country ISO code.
-
+type: alias
 
 --
 
-*`nginx.access.geoip.location`*::
+*`user_agent.os.full_name`*::
 +
 --
-type: geo_point
-
-The longitude and latitude.
-
+type: alias
 
 --
 
-*`nginx.access.geoip.region_name`*::
+*`user_agent.os.major`*::
 +
 --
-type: keyword
-
-The region name.
-
+type: alias
 
 --
 
-*`nginx.access.geoip.city_name`*::
+*`user_agent.os.minor`*::
 +
 --
-type: keyword
-
-The city name.
-
+type: alias
 
 --
 
-*`nginx.access.geoip.region_iso_code`*::
+*`user_agent.os.name`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
+--
 
+*`user_agent.original`*::
++
+--
+type: alias
+
+--
+
+
+*`source.geo.continent_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.location`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: alias
 
 --
 
@@ -5933,6 +5852,30 @@ type: keyword
 
 --
 
+*`group.id`*::
++
+--
+type: keyword
+
+required: False
+
+ID of the group.
+
+
+--
+
+*`group.name`*::
++
+--
+type: keyword
+
+required: False
+
+Name of the group.
+
+
+--
+
 [float]
 == system fields
 
@@ -5947,72 +5890,48 @@ Fields from the Linux authorization logs.
 
 
 
-*`system.auth.timestamp`*::
+*`@timestamp`*::
 +
 --
-The timestamp as read from the auth message.
-
+type: alias
 
 --
 
-*`system.auth.hostname`*::
+*`host.hostname`*::
 +
 --
-The hostname as read from the auth message.
-
+type: alias
 
 --
 
-*`system.auth.program`*::
+*`process.name`*::
 +
 --
-The process name as read from the auth message.
-
+type: alias
 
 --
 
-*`system.auth.pid`*::
+*`process.pid`*::
 +
 --
-type: long
-
-The PID of the process that sent the auth message.
-
+type: alias
 
 --
 
-*`system.auth.message`*::
+*`message`*::
 +
 --
-type: text
-
-The message in the log line.
-
+type: alias
 
 --
 
-*`system.auth.user`*::
+*`user.name`*::
 +
 --
-The Unix user that this event refers to.
-
-
---
-
-[float]
-== ssh fields
-
-Fields specific to SSH login events.
-
-
-
-*`system.auth.ssh.event`*::
-+
---
-The SSH login event. Can be one of "Accepted", "Failed", or "Invalid". "Accepted" means a successful login. "Invalid" means that the user is not configured on the system. "Failed" means that the SSH login attempt has failed.
-
+type: alias
 
 --
+
 
 *`system.auth.ssh.method`*::
 +
@@ -6022,12 +5941,10 @@ The SSH authentication method. Can be one of "password" or "publickey".
 
 --
 
-*`system.auth.ssh.ip`*::
+*`system.auth.ssh.signature`*::
 +
 --
-type: ip
-
-The client IP from where the login attempt was made.
+The signature of the client public key.
 
 
 --
@@ -6042,88 +5959,67 @@ The client IP from SSH connections that are open and immediately dropped.
 
 --
 
-*`system.auth.ssh.port`*::
+*`event.action`*::
 +
 --
-type: long
-
-The client port from where the login attempt was made.
-
+type: alias
 
 --
 
-*`system.auth.ssh.signature`*::
+*`source.ip`*::
 +
 --
-The signature of the client public key.
-
+type: alias
 
 --
 
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the `system.auth.ip` field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-*`system.auth.ssh.geoip.continent_name`*::
+*`source.port`*::
 +
 --
-type: keyword
-
-The name of the continent.
-
+type: alias
 
 --
 
-*`system.auth.ssh.geoip.city_name`*::
+
+*`source.geo.continent_name`*::
 +
 --
-type: keyword
-
-The name of the city.
-
+type: alias
 
 --
 
-*`system.auth.ssh.geoip.region_name`*::
+*`source.geo.country_iso_code`*::
 +
 --
-type: keyword
-
-The name of the region.
-
+type: alias
 
 --
 
-*`system.auth.ssh.geoip.country_iso_code`*::
+*`source.geo.location`*::
 +
 --
-type: keyword
-
-Country ISO code.
-
+type: alias
 
 --
 
-*`system.auth.ssh.geoip.location`*::
+*`source.geo.region_name`*::
 +
 --
-type: geo_point
-
-The longitude and latitude.
-
+type: alias
 
 --
 
-*`system.auth.ssh.geoip.region_iso_code`*::
+*`source.geo.city_name`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
+--
 
+*`source.geo.region_iso_code`*::
++
+--
+type: alias
 
 --
 
@@ -6185,32 +6081,6 @@ Fields specific to events created by the `useradd` command.
 
 
 
-*`system.auth.useradd.name`*::
-+
---
-The user name being added.
-
-
---
-
-*`system.auth.useradd.uid`*::
-+
---
-type: long
-
-The user ID.
-
---
-
-*`system.auth.useradd.gid`*::
-+
---
-type: long
-
-The group ID.
-
---
-
 *`system.auth.useradd.home`*::
 +
 --
@@ -6225,6 +6095,27 @@ The default shell for the new user.
 
 --
 
+*`user.name`*::
++
+--
+type: alias
+
+--
+
+*`user.id`*::
++
+--
+type: alias
+
+--
+
+*`group.id`*::
++
+--
+type: alias
+
+--
+
 [float]
 == groupadd fields
 
@@ -6232,21 +6123,17 @@ Fields specific to events created by the `groupadd` command.
 
 
 
-*`system.auth.groupadd.name`*::
+*`group.name`*::
 +
 --
-The name of the new group.
-
+type: alias
 
 --
 
-*`system.auth.groupadd.gid`*::
+*`group.id`*::
 +
 --
-type: long
-
-The ID of the new group.
-
+type: alias
 
 --
 

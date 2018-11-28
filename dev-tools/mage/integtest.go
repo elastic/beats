@@ -274,7 +274,7 @@ func dockerComposeBuildImages() error {
 		return err
 	}
 
-	args := []string{"build", "--pull", "--force-rm"}
+	args := []string{"-p", dockerComposeProjectName(), "build", "--pull", "--force-rm"}
 	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
 		args = append(args, "--no-cache")
 	}
