@@ -33,7 +33,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Keep a mapping of autodiscover instances and deployed configs. {pull}8851[8851]
+- Fix autodiscover configurations stopping when metadata is missing. {pull}8851[8851]
 
 *Auditbeat*
 
