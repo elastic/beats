@@ -109,7 +109,6 @@
   alias: true
   copy_to: false
 
-<<<<<<< HEAD
 - from: system.auth.hostname
   to: host.hostname
   alias: true
