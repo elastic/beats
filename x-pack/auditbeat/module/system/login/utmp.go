@@ -13,41 +13,19 @@ import "C"
 import (
 	"encoding/binary"
 	"net"
-	"strconv"
+	"reflect"
 	"time"
 	"unsafe"
 
-	"github.com/OneOfOne/xxhash"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
-type RecordType int
-
-const (
-	Unknown RecordType = iota
-	UserLogin
-	UserLogout
-)
-
-var recordTypeToString = map[RecordType]string{
-	Unknown:    "unknown",
-	UserLogin:  "user_login",
-	UserLogout: "user_logout",
-}
-
-// LoginRecord represents a login record.
-type LoginRecord struct {
-	utmp      Utmp
-	Type      RecordType
-	PID       int
-	TTY       string
-	UID       int
-	Username  string
-	Hostname  string
-	IP        net.IP
-	Timestamp time.Time
+type FileRecord struct {
+	Inode           uint64
+	LastCtime       time.Time
+	LastLoginRecord LoginRecord
 }
 
 // Utmp contains data from the C utmp struct.
@@ -61,51 +39,27 @@ type Utmp struct {
 	utAddrV6 [4]uint32
 }
 
-// String returns the string representation for a RecordType.
-func (recordType RecordType) String() string {
-	s, found := recordTypeToString[recordType]
-	if found {
-		return s
-	} else {
-		return ""
+func newUtmp(utmpC *C.struct_utmp) Utmp {
+	// See utmp(5) for the utmp struct fields.
+	return Utmp{
+		utType:   int(utmpC.ut_type),
+		utPid:    int(utmpC.ut_pid),
+		utLine:   C.GoString(&utmpC.ut_line[0]),
+		utUser:   C.GoString(&utmpC.ut_user[0]),
+		utHost:   C.GoString(&utmpC.ut_host[0]),
+		utTv:     time.Unix(int64(utmpC.ut_tv.tv_sec), int64(utmpC.ut_tv.tv_usec)*1000),
+		utAddrV6: [4]uint32{uint32(utmpC.ut_addr_v6[0]), uint32(utmpC.ut_addr_v6[1]), uint32(utmpC.ut_addr_v6[2]), uint32(utmpC.ut_addr_v6[3])},
 	}
 }
 
-// Hash creates a hash for LoginRecord.
-func (login LoginRecord) Hash() uint64 {
-	h := xxhash.New64()
-	h.WriteString(strconv.Itoa(login.PID))
-	h.WriteString(login.Timestamp.String())
-	return h.Sum64()
+type UtmpFileReader struct {
+	log *logp.Logger
 }
 
-func (login LoginRecord) toMapStr() common.MapStr {
-	mapstr := common.MapStr{
-		"type":      login.Type.String(),
-		"pid":       login.PID,
-		"tty":       login.TTY,
-		"timestamp": login.Timestamp,
-	}
-
-	if login.Username != "" {
-		mapstr.Put("user", common.MapStr{
-			"name": login.Username,
-		})
-	}
-
-	if login.Hostname != "" {
-		mapstr.Put("hostname", login.Hostname)
-	}
-
-	if !login.IP.IsUnspecified() {
-		mapstr.Put("ip", login.IP)
-	}
-
-	return mapstr
-}
-
-// ReadUtmpFile reads a UTMP formatted file (usually /var/log/wtmp).
-func ReadUtmpFile(utmpFile string) ([]LoginRecord, error) {
+// ReadAfter reads a UTMP formatted file (usually /var/log/wtmp*)
+// and returns the records after the provided last known record.
+// If record is nil, it returns all records in the file.
+func (r *UtmpFileReader) ReadAfter(utmpFile string, lastKnownRecord *LoginRecord) ([]LoginRecord, error) {
 	cs := C.CString(utmpFile)
 	defer C.free(unsafe.Pointer(cs))
 
@@ -120,15 +74,27 @@ func ReadUtmpFile(utmpFile string) ([]LoginRecord, error) {
 	C.setutent()
 	defer C.endutent()
 
+	reachedNewRecords := (lastKnownRecord == nil)
 	var loginRecords []LoginRecord
 	for {
-		utmp, err := C.getutent()
+		utmpC, err := C.getutent()
 		if err != nil {
 			return nil, errors.Wrap(err, "error getting entry in UTMP file")
 		}
 
-		if utmp != nil {
-			loginRecords = append(loginRecords, createLoginRecord(utmp))
+		if utmpC != nil {
+			utmp := newUtmp(utmpC)
+
+			if reachedNewRecords {
+				r.log.Debugf("utmp: (ut_type=%d, ut_pid=%d, ut_line=%v, ut_user=%v, ut_host=%v, ut_tv.tv_sec=%v, ut_addr_v6=%v)",
+					utmp.utType, utmp.utPid, utmp.utLine, utmp.utUser, utmp.utHost, utmp.utTv, utmp.utAddrV6)
+
+				loginRecords = append(loginRecords, createLoginRecord(utmp))
+			}
+
+			if lastKnownRecord != nil && reflect.DeepEqual(utmp, lastKnownRecord.Utmp) {
+				reachedNewRecords = true
+			}
 		} else {
 			break
 		}
@@ -137,20 +103,9 @@ func ReadUtmpFile(utmpFile string) ([]LoginRecord, error) {
 	return loginRecords, nil
 }
 
-func createLoginRecord(utmpC *C.struct_utmp) LoginRecord {
-	// See utmp(5) for the utmp struct fields.
-	utmp := Utmp{
-		utType:   int(utmpC.ut_type),
-		utPid:    int(utmpC.ut_pid),
-		utLine:   C.GoString(&utmpC.ut_line[0]),
-		utUser:   C.GoString(&utmpC.ut_user[0]),
-		utHost:   C.GoString(&utmpC.ut_host[0]),
-		utTv:     time.Unix(int64(utmpC.ut_tv.tv_sec), int64(utmpC.ut_tv.tv_usec)*1000),
-		utAddrV6: [4]uint32{uint32(utmpC.ut_addr_v6[0]), uint32(utmpC.ut_addr_v6[1]), uint32(utmpC.ut_addr_v6[2]), uint32(utmpC.ut_addr_v6[3])},
-	}
-
+func createLoginRecord(utmp Utmp) LoginRecord {
 	record := LoginRecord{
-		utmp:      utmp,
+		Utmp:      utmp,
 		Timestamp: utmp.utTv,
 		PID:       utmp.utPid,
 		TTY:       utmp.utLine,

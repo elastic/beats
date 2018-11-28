@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"io"
+	"net"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -38,10 +39,66 @@ const (
 	eventTypeEvent = "event"
 )
 
-type FileRecord struct {
-	Inode           uint64
-	LastCtime       time.Time
-	LastLoginRecord LoginRecord
+type RecordType int
+
+const (
+	Unknown RecordType = iota
+	UserLogin
+	UserLogout
+)
+
+var recordTypeToString = map[RecordType]string{
+	Unknown:    "unknown",
+	UserLogin:  "user_login",
+	UserLogout: "user_logout",
+}
+
+// LoginRecord represents a login record.
+type LoginRecord struct {
+	Utmp      Utmp
+	Type      RecordType
+	PID       int
+	TTY       string
+	UID       int
+	Username  string
+	Hostname  string
+	IP        net.IP
+	Timestamp time.Time
+}
+
+// String returns the string representation for a RecordType.
+func (recordType RecordType) String() string {
+	s, found := recordTypeToString[recordType]
+	if found {
+		return s
+	} else {
+		return ""
+	}
+}
+
+func (login LoginRecord) toMapStr() common.MapStr {
+	mapstr := common.MapStr{
+		"type":      login.Type.String(),
+		"pid":       login.PID,
+		"tty":       login.TTY,
+		"timestamp": login.Timestamp,
+	}
+
+	if login.Username != "" {
+		mapstr.Put("user", common.MapStr{
+			"name": login.Username,
+		})
+	}
+
+	if login.Hostname != "" {
+		mapstr.Put("hostname", login.Hostname)
+	}
+
+	if !login.IP.IsUnspecified() {
+		mapstr.Put("ip", login.IP)
+	}
+
+	return mapstr
 }
 
 func init() {
@@ -59,6 +116,7 @@ type MetricSet struct {
 	paths       []string
 	fileRecords map[uint64]FileRecord
 	ttyLookup   map[string]*LoginRecord
+	utmpReader  *UtmpFileReader
 }
 
 // New constructs a new MetricSet.
@@ -82,6 +140,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		bucket:        bucket,
 		fileRecords:   make(map[uint64]FileRecord),
 		ttyLookup:     make(map[string]*LoginRecord),
+	}
+
+	ms.utmpReader = &UtmpFileReader{
+		log: ms.log,
 	}
 
 	ms.paths, err = filepath.Glob(config.WtmpFilePattern)
@@ -140,38 +202,42 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		ctime := time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)
 
 		fileRecord, isKnownFile := ms.fileRecords[stats.Ino]
+		hasChanged := !fileRecord.LastCtime.Equal(ctime)
 		if !isKnownFile || fileRecord.LastCtime.Before(ctime) {
-			loginRecords, err := ReadUtmpFile(path)
+			ms.log.Debugf("Reading file %v (new=%t, changed=%t)", path, !isKnownFile, hasChanged)
+
+			var loginRecords []LoginRecord
+
+			if isKnownFile {
+				loginRecords, err = ms.utmpReader.ReadAfter(path, &fileRecord.LastLoginRecord)
+			} else {
+				loginRecords, err = ms.utmpReader.ReadAfter(path, nil)
+			}
+			ms.log.Debugf("Read %d new records.", len(loginRecords))
+
 			if err != nil {
 				ms.log.Error(err)
 				report.Error(err)
 				return
 			}
 
-			// When we've read the file before, we want to read through its
-			// entries until we reach the last known record, then start
-			// emitting everything after that.
-			reachedNewRecords := !isKnownFile
-			for _, loginRecord := range loginRecords {
-				if reachedNewRecords {
-					ms.log.Debugf("utmp: (ut_type=%d, ut_pid=%d, ut_line=%v, ut_user=%v, ut_host=%v, ut_tv.tv_sec=%v, ut_addr_v6=%v)",
-						loginRecord.utmp.utType, loginRecord.utmp.utPid, loginRecord.utmp.utLine, loginRecord.utmp.utUser,
-						loginRecord.utmp.utHost, loginRecord.utmp.utTv, loginRecord.utmp.utAddrV6)
+			newFileRecord := FileRecord{
+				Inode:     stats.Ino,
+				LastCtime: ctime,
+			}
 
+			if len(loginRecords) > 0 {
+				newFileRecord.LastLoginRecord = loginRecords[len(loginRecords)-1]
+
+				for _, loginRecord := range loginRecords {
 					ms.processLoginRecord(&loginRecord)
 					newRecords = append(newRecords, loginRecord)
 				}
-
-				if isKnownFile && loginRecord.Hash() == fileRecord.LastLoginRecord.Hash() {
-					reachedNewRecords = true
-				}
+			} else {
+				ms.log.Warnf("Unexpectedly, there are no new records in file %v.", path)
 			}
 
-			ms.fileRecords[stats.Ino] = FileRecord{
-				Inode:           stats.Ino,
-				LastCtime:       ctime,
-				LastLoginRecord: loginRecords[len(loginRecords)-1],
-			}
+			ms.fileRecords[stats.Ino] = newFileRecord
 		}
 	}
 
