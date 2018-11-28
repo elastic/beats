@@ -14,8 +14,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 
 import metricbeat
 
+
 def setup_module():
     sleep(25)
+
 
 class Test(metricbeat.BaseTest):
 
