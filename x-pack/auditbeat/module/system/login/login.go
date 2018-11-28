@@ -11,12 +11,8 @@ import (
 	"encoding/gob"
 	"io"
 	"net"
-	"os"
 	"os/user"
-	"path/filepath"
-	"sort"
 	"strconv"
-	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -113,7 +109,6 @@ type MetricSet struct {
 	config     Config
 	bucket     datastore.Bucket
 	log        *logp.Logger
-	paths      []string
 	ttyLookup  map[string]*LoginRecord
 	utmpReader *UtmpFileReader
 }
@@ -142,16 +137,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	ms.utmpReader = &UtmpFileReader{
 		log:         ms.log,
+		filePattern: config.WtmpFilePattern,
 		fileRecords: make(map[uint64]FileRecord),
 	}
-
-	ms.paths, err = filepath.Glob(config.WtmpFilePattern)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to expand file pattern")
-	}
-	// Sort paths in reverse order (oldest/most-rotated file first)
-	sort.Sort(sort.Reverse(sort.StringSlice(ms.paths)))
-	ms.log.Debugf("Reading files: %v", ms.paths)
 
 	// Load state (file records, tty mapping) from disk
 	err = ms.restoreStateFromDisk()
@@ -172,51 +160,21 @@ func (ms *MetricSet) Close() error {
 
 // Fetch collects any new login records from /var/log/wtmp. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	// Store inodes still in use for clean up at the end
-	currentInodes := make(map[uint64]struct{}, len(ms.utmpReader.fileRecords))
-
-	var newRecords []LoginRecord
-
-	for _, path := range ms.paths {
-		fileInfo, err := os.Stat(path)
-		statsI := fileInfo.Sys()
-		if statsI == nil {
-			ms.log.Error(err)
-			report.Error(err)
-			continue
-		}
-		stats := statsI.(*syscall.Stat_t)
-		currentInodes[stats.Ino] = struct{}{}
-
-		loginRecords, err := ms.utmpReader.ReadNew(path)
-		if err != nil {
-			ms.log.Error(err)
-			report.Error(err)
-			continue // Don't stop because of just one file
-		}
-		ms.log.Debugf("Read %d new records.", len(loginRecords))
-
-		for _, loginRecord := range loginRecords {
-			ms.processLoginRecord(&loginRecord)
-			newRecords = append(newRecords, loginRecord)
-		}
+	loginRecords, err := ms.utmpReader.ReadNew()
+	if err != nil {
+		ms.log.Error(err)
+		report.Error(err)
+		return
 	}
+	ms.log.Debugf("Read %d new records.", len(loginRecords))
 
-	// Clean up old file records (where the inode no longer exists)
-	for inode, _ := range ms.utmpReader.fileRecords {
-		if _, found := currentInodes[inode]; !found {
-			ms.log.Debugf("Deleting old inode %d", inode)
-			delete(ms.utmpReader.fileRecords, inode)
-		}
-	}
-
-	// Emit events
-	for _, loginRecord := range newRecords {
+	for _, loginRecord := range loginRecords {
+		ms.processLoginRecord(&loginRecord)
 		report.Event(ms.loginEvent(loginRecord))
 	}
 
 	// Save latest read records to disk
-	if len(newRecords) > 0 {
+	if len(loginRecords) > 0 {
 		err := ms.saveStateToDisk()
 		if err != nil {
 			ms.log.Error(err)

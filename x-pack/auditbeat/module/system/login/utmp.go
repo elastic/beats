@@ -15,7 +15,9 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 	"reflect"
+	"sort"
 	"syscall"
 	"time"
 	"unsafe"
@@ -57,65 +59,102 @@ func newUtmp(utmpC *C.struct_utmp) Utmp {
 
 type UtmpFileReader struct {
 	log         *logp.Logger
+	filePattern string
 	fileRecords map[uint64]FileRecord
 }
 
-// ReadNew reads and returns any new UTMP entries in a UTMP formatted file (usually /var/log/wtmp).
-func (r *UtmpFileReader) ReadNew(path string) ([]LoginRecord, error) {
-	fileInfo, err := os.Stat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			// Skip - file might have been rotated out
-			r.log.Debugf("File %v does not exist anymore.", path)
-			return nil, nil
-		} else {
-			return nil, errors.Wrapf(err, "unexpected error when reading file %v", path)
-		}
-	}
+// ReadNew returns any new UTMP entries in any of the configured UTMP formatted files (usually /var/log/wtmp).
+func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
+	fileInfos, err := r.fileInfos()
+	defer r.deleteOldRecords(fileInfos)
 
-	statsI := fileInfo.Sys()
-	if statsI == nil {
-		return nil, fmt.Errorf("empty stats when reading file %v", path)
-	}
-	stats := statsI.(*syscall.Stat_t)
+	var loginRecords []LoginRecord
+	for path, fileInfo := range fileInfos {
+		inode := fileInfo.Sys().(*syscall.Stat_t).Ino
 
-	fileRecord, isKnownFile := r.fileRecords[stats.Ino]
-	var oldSize int64 = 0
-	if isKnownFile {
-		oldSize = fileRecord.Size
-	}
-	newSize := fileInfo.Size()
-	if !isKnownFile || newSize != oldSize {
-		r.log.Debugf("Reading file %v (inode=%v, oldSize=%v, newSize=%v)", path, stats.Ino, oldSize, newSize)
-
-		var utmpRecords []Utmp
-
-		// Once we start reading a file, we update the file record even if something fails -
-		// otherwise we will just keep trying to re-read very frequently forever.
-		defer r.updateFileRecord(stats.Ino, newSize, &utmpRecords)
-
+		fileRecord, isKnownFile := r.fileRecords[inode]
+		var oldSize int64 = 0
 		if isKnownFile {
-			utmpRecords, err = r.readAfter(path, &fileRecord.LastUtmp)
-		} else {
-			utmpRecords, err = r.readAfter(path, nil)
+			oldSize = fileRecord.Size
 		}
+		newSize := fileInfo.Size()
+		if !isKnownFile || newSize != oldSize {
+			r.log.Debugf("Reading file %v (inode=%v, oldSize=%v, newSize=%v)", path, inode, oldSize, newSize)
 
-		if err != nil {
-			return nil, errors.Wrapf(err, "error reading file %v", path)
-		} else if len(utmpRecords) == 0 {
-			return nil, fmt.Errorf("unexpectedly, there are no new records in file %v", path)
-		} else {
-			var loginRecords []LoginRecord
+			var utmpRecords []Utmp
 
-			for _, utmp := range utmpRecords {
-				loginRecords = append(loginRecords, newLoginRecord(utmp))
+			// Once we start reading a file, we update the file record even if something fails -
+			// otherwise we will just keep trying to re-read very frequently forever.
+			defer r.updateFileRecord(inode, newSize, &utmpRecords)
+
+			if isKnownFile {
+				utmpRecords, err = r.readAfter(path, &fileRecord.LastUtmp)
+			} else {
+				utmpRecords, err = r.readAfter(path, nil)
 			}
 
-			return loginRecords, nil
+			if err != nil {
+				return nil, errors.Wrapf(err, "error reading file %v", path)
+			} else if len(utmpRecords) == 0 {
+				return nil, fmt.Errorf("unexpectedly, there are no new records in file %v", path)
+			} else {
+				for _, utmp := range utmpRecords {
+					loginRecords = append(loginRecords, newLoginRecord(utmp))
+				}
+			}
 		}
-	} else {
-		return nil, nil
 	}
+
+	return loginRecords, nil
+}
+
+// deleteOldRecords clean up old file records where the inode no longer exists.
+func (r *UtmpFileReader) deleteOldRecords(fileInfos map[string]os.FileInfo) {
+	for savedInode, _ := range r.fileRecords {
+		found := false
+		for _, fileInfo := range fileInfos {
+			inode := fileInfo.Sys().(*syscall.Stat_t).Ino
+			if inode == savedInode {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			r.log.Debugf("Deleting file record for old inode %d", savedInode)
+			delete(r.fileRecords, savedInode)
+		}
+	}
+}
+
+func (r *UtmpFileReader) fileInfos() (map[string]os.FileInfo, error) {
+	paths, err := filepath.Glob(r.filePattern)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to expand file pattern")
+	}
+
+	// Sort paths in reverse order (oldest/most-rotated file first)
+	sort.Sort(sort.Reverse(sort.StringSlice(paths)))
+
+	fileInfos := make(map[string]os.FileInfo, len(r.fileRecords))
+	for _, path := range paths {
+		fileInfo, err := os.Stat(path)
+		if err != nil {
+			if os.IsNotExist(err) {
+				// Skip - file might have been rotated out
+				r.log.Debugf("File %v does not exist anymore.", path)
+				continue
+			} else {
+				return nil, errors.Wrapf(err, "unexpected error when reading file %v", path)
+			}
+		} else if fileInfo.Sys() == nil {
+			return nil, fmt.Errorf("empty stat result for file %v", path)
+		}
+
+		fileInfos[path] = fileInfo
+	}
+
+	return fileInfos, nil
 }
 
 func (r *UtmpFileReader) updateFileRecord(inode uint64, size int64, utmpRecords *[]Utmp) {
