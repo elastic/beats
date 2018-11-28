@@ -255,12 +255,12 @@ func (r *reporter) initLoop(c config) {
 	log.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", "state", c.StatePeriod)
+	go r.snapshotLoop("state", "state", getClusterUUID(), c.StatePeriod)
 	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod)
+	go r.snapshotLoop("stats", "metrics", getClusterUUID(), c.MetricsPeriod)
 }
 
-func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) {
+func (r *reporter) snapshotLoop(namespace, prefix, clusterUUID string, period time.Duration) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
@@ -291,15 +291,22 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) 
 		if len(r.tags) > 0 {
 			fields["tags"] = r.tags
 		}
+
+		meta := common.MapStr{
+			"type":        "beats_" + namespace,
+			"interval_ms": int64(period / time.Millisecond),
+			// Converting to seconds as interval only accepts `s` as unit
+			"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
+		}
+
+		if clusterUUID != "" {
+			meta.Put("cluster_uuid", clusterUUID)
+		}
+
 		r.client.Publish(beat.Event{
 			Timestamp: ts,
 			Fields:    fields,
-			Meta: common.MapStr{
-				"type":        "beats_" + namespace,
-				"interval_ms": int64(period / time.Millisecond),
-				// Converting to seconds as interval only accepts `s` as unit
-				"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
-			},
+			Meta:      meta,
 		})
 	}
 }
@@ -366,4 +373,20 @@ func makeMeta(beat beat.Info) common.MapStr {
 		"host":    beat.Hostname,
 		"uuid":    beat.ID,
 	}
+}
+
+func getClusterUUID() string {
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	outputsRegistry := stateRegistry.GetRegistry("outputs")
+	if outputsRegistry == nil {
+		return ""
+	}
+
+	elasticsearchRegistry := outputsRegistry.GetRegistry("elasticearch")
+	if elasticsearchRegistry == nil {
+		return ""
+	}
+
+	// FIXME: this isn't going to work and probably needs to be accessed via a visitor
+	return monitoring.NewString(elasticsearchRegistry, "cluster_uuid").Get()
 }

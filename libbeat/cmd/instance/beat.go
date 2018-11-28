@@ -816,7 +816,11 @@ func (b *Beat) clusterUUIDFetchingCalling() (elasticsearch.ConnectCallback, erro
 			return fmt.Errorf("Error unmarshaling json when querying /. Body: %s", body)
 		}
 
-		// TODO: "Save" cluster_uuid somewhere? State namespace? New namespace?
+		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+		outputsRegistry := stateRegistry.NewRegistry("outputs")
+		elasticsearchRegistry := outputsRegistry.NewRegistry("elasticsearch")
+		monitoring.NewString(elasticsearchRegistry, "cluster_uuid").Set(response.ClusterUUID)
+
 		return nil
 	}
 
