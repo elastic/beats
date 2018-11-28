@@ -5,7 +5,6 @@ import unittest
 from elasticsearch import Elasticsearch, TransportError
 from parameterized import parameterized
 from nose.plugins.skip import SkipTest
-from time import sleep
 import urllib2
 import json
 import semver
@@ -13,10 +12,6 @@ import semver
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 
 import metricbeat
-
-
-def setup_module():
-    sleep(25)
 
 
 class Test(metricbeat.BaseTest):
