@@ -72,8 +72,8 @@ func (b *Beat) writeAliasLoadingCallback() (func(esClient *elasticsearch.Client)
 		// Check if alias already exists
 		status, b, err := esClient.Request("HEAD", "/_alias/"+config.RolloverAlias, "", nil, nil)
 		if err != nil && status != 404 {
-			logp.Err("Failed to check write alias: %s: %+v", err, string(b))
-			return errors.Wrap(err, "failed to check for write alias")
+			logp.Err("Failed to check for alias: %s: %+v", err, string(b))
+			return errors.Wrap(err, "failed to check for alias")
 		}
 		if status == 200 {
 			logp.Info("Write alias already exists")
@@ -88,14 +88,18 @@ func (b *Beat) writeAliasLoadingCallback() (func(esClient *elasticsearch.Client)
 			},
 		}
 
-		// Create write alias
-		_, res, err := esClient.Request("PUT", "/"+firstIndex, "", nil, body)
-		if err != nil {
-			logp.Err("Error alias creating stuff: %s, %s", err, string(res))
+		// Create alias with write index
+		code, res, err := esClient.Request("PUT", "/"+firstIndex, "", nil, body)
+		if code == 400 {
+			logp.Err("Error creating alias with write index. As return code is 400, assuming already exists: %s, %s", err, string(res))
+			return nil
+
+		} else if err != nil {
+			logp.Err("Error creating alias with write index: %s, %s", err, string(res))
 			return errors.Wrap(err, "failed to create write alias: "+string(res))
 		}
 
-		logp.Info("Write alias created")
+		logp.Info("Alias with write index created: %s", firstIndex)
 
 		return nil
 	}
