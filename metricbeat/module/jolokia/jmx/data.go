@@ -96,23 +96,61 @@ type eventKey struct {
 	mbean, event string
 }
 
-func eventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
-	var entries []Entry
+// BaseResponseMapper describes how a Jolokia response is going to be converted to a Metricbeat event
+type BaseResponseMapper interface {
+	EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error)
+}
+
+// JolokiaGETResponseMapper describes how a Jolokia response from a GET request is going to
+// be converted to a Metricbeat event
+type JolokiaGETResponseMapper struct {
+}
+
+// JolokiaPOSTResponseMapper describes how a Jolokia response from a POST request is going to
+// be converted to a Metricbeat event
+type JolokiaPOSTResponseMapper struct {
+}
+
+// EventMapping maps a Jolokia response from a GET request is to one or more Metricbeat events
+func (m *JolokiaGETResponseMapper) EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
+
 	var singleEntry Entry
-	isSingleEntry := false
+
+	// When we use GET, the response is a single Entry
+	if err := json.Unmarshal(content, &singleEntry); err != nil {
+		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
+	}
+
+	return eventMapping([]Entry{singleEntry}, mapping)
+}
+
+// EventMapping maps a Jolokia response from a POST request is to one or more Metricbeat events
+func (m *JolokiaPOSTResponseMapper) EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
+
+	var entries []Entry
 
 	// When we use POST, the response is an array of Entry objects
 	if err := json.Unmarshal(content, &entries); err != nil {
-		// When we use GET, the response is a single Entry
-		if err := json.Unmarshal(content, &singleEntry); err != nil {
-			return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
-		}
-		isSingleEntry = true
+
+		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
 	}
 
-	if isSingleEntry {
-		entries = append(entries, singleEntry)
+	return eventMapping(entries, mapping)
+}
+
+// NewEventMapper is a factory method which creates and returns an implementation
+// class of BaseResponseMapper interface. HTTP GET and POST response mapping are currently supported.
+func NewEventMapper(httpMethod string) BaseResponseMapper {
+
+	if httpMethod == "GET" {
+		return &JolokiaGETResponseMapper{}
 	}
+
+	return &JolokiaPOSTResponseMapper{}
+
+}
+
+func eventMapping(entries []Entry, mapping AttributeMapping) ([]common.MapStr, error) {
 
 	// Generate a different event for each wildcard mbean, and and additional one
 	// for non-wildcard requested mbeans, group them by event name if defined

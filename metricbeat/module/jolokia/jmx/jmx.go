@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
@@ -54,9 +53,9 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	mapping   AttributeMapping
+	mapping   []JMXMapping
 	namespace string
-	http      []*JolokiaHTTPRequest
+	http      JolokiaHTTPRequestBuilder
 	log       *logp.Logger
 }
 
@@ -74,27 +73,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	jolokiaHTTPBuild := NewJolokiaHTTPRequestBuiler(config.HTTPMethod)
 
-	// Prepare Http request objects and attribute mappings according to selected Http method
-	httpReqs, mapping, err := jolokiaHTTPBuild.BuildRequestsAndMappings(config.Mappings)
-	if err != nil {
-		return nil, err
-	}
-
 	log := logp.NewLogger(metricsetName).With("host", base.HostData().Host)
-
-	if logp.IsDebug(metricsetName) {
-
-		for _, r := range httpReqs {
-			log.Debugw("Jolokia request URI and body",
-				"httpMethod", r.HTTPMethod, "URI", r.URI, "body", string(r.Body), "type", "request")
-		}
-	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		mapping:       mapping,
+		mapping:       config.Mappings,
 		namespace:     config.Namespace,
-		http:          httpReqs,
+		http:          jolokiaHTTPBuild,
 		log:           log,
 	}, nil
 }
@@ -104,34 +89,9 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	var allEvents []common.MapStr
 
-	for _, r := range m.http {
-
-		http, err := helper.NewHTTP(m.BaseMetricSet)
-
-		http.SetMethod(r.HTTPMethod)
-
-		if r.HTTPMethod == "GET" {
-			http.SetURI(m.BaseMetricSet.HostData().SanitizedURI + r.URI)
-		} else {
-			http.SetBody(r.Body)
-		}
-
-		resBody, err := http.FetchContent()
-		if err != nil {
-			return nil, err
-		}
-
-		if logp.IsDebug(metricsetName) {
-			m.log.Debugw("Jolokia response body",
-				"host", m.HostData().Host, "uri", http.GetURI(), "body", string(resBody), "type", "response")
-		}
-
-		events, err := eventMapping(resBody, m.mapping)
-		if err != nil {
-			return nil, err
-		}
-
-		allEvents = append(allEvents, events...)
+	allEvents, err := m.http.Fetch(m)
+	if err != nil {
+		return nil, err
 	}
 
 	// Set dynamic namespace.

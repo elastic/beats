@@ -54,7 +54,12 @@ func TestEventMapper(t *testing.T) {
 			Attr: "serverInfo", Field: "server_info"},
 	}
 
-	events, err := eventMapping(jolokiaResponse, mapping)
+	// Construct a new POST response event mapper
+	eventMapper := NewEventMapper("POST")
+
+	// Map response to Metricbeat events
+	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
+
 	assert.Nil(t, err)
 
 	expected := []common.MapStr{
@@ -91,7 +96,7 @@ func TestEventMapper(t *testing.T) {
 	assert.ElementsMatch(t, expected, events)
 }
 
-// TestEventGroupingMapperGetRequest tests responses which are returned
+// TestEventGroupingMapper tests responses which are returned
 // from a Jolokia POST request.
 func TestEventGroupingMapper(t *testing.T) {
 	absPath, err := filepath.Abs("./_meta/test")
@@ -120,7 +125,12 @@ func TestEventGroupingMapper(t *testing.T) {
 			Attr: "serverInfo", Field: "server_info"},
 	}
 
-	events, err := eventMapping(jolokiaResponse, mapping)
+	// Construct a new POST response event mapper
+	eventMapper := NewEventMapper("POST")
+
+	// Map response to Metricbeat events
+	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
+
 	assert.Nil(t, err)
 
 	expected := []common.MapStr{
@@ -182,7 +192,12 @@ func TestEventGroupingMapperGetRequest(t *testing.T) {
 			Attr: "NonHEapMemoryUsage", Field: "memory.non_heap_usage", Event: "memory"},
 	}
 
-	events, err := eventMapping(jolokiaResponse, mapping)
+	// Construct a new GET response event mapper
+	eventMapper := NewEventMapper("GET")
+
+	// Map response to Metricbeat events
+	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
+
 	assert.Nil(t, err)
 
 	expected := []common.MapStr{
@@ -224,7 +239,11 @@ func TestEventMapperWithWildcard(t *testing.T) {
 			Attr: "maxConnections", Field: "max_connections"},
 	}
 
-	events, err := eventMapping(jolokiaResponse, mapping)
+	// Construct a new POST response event mapper
+	eventMapper := NewEventMapper("POST")
+
+	// Map response to Metricbeat events
+	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(events))
 
@@ -261,7 +280,11 @@ func TestEventGroupingMapperWithWildcard(t *testing.T) {
 			Attr: "maxConnections", Field: "max_connections", Event: "network"},
 	}
 
-	events, err := eventMapping(jolokiaResponse, mapping)
+	// Construct a new POST response event mapper
+	eventMapper := NewEventMapper("POST")
+
+	// Map response to Metricbeat events
+	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
 	assert.Nil(t, err)
 	assert.Equal(t, 4, len(events))
 
@@ -285,4 +308,36 @@ func TestEventGroupingMapperWithWildcard(t *testing.T) {
 	}
 
 	assert.ElementsMatch(t, expected, events)
+}
+
+func TestNewBaseResponseMapper(t *testing.T) {
+
+	cases := []struct {
+		httpMethod string
+		expected   BaseResponseMapper
+	}{
+
+		{
+			httpMethod: "GET",
+			expected:   &JolokiaGETResponseMapper{},
+		},
+		{
+			httpMethod: "",
+			expected:   &JolokiaPOSTResponseMapper{},
+		},
+		{
+			httpMethod: "GET",
+			expected:   &JolokiaGETResponseMapper{},
+		},
+		{
+			httpMethod: "POST",
+			expected:   &JolokiaPOSTResponseMapper{},
+		},
+	}
+
+	for _, c := range cases {
+		jolokiaEventMapper := NewEventMapper(c.httpMethod)
+
+		assert.Equal(t, c.expected, jolokiaEventMapper, "httpMethod: "+c.httpMethod)
+	}
 }
