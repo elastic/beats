@@ -122,23 +122,7 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 			}
 		}
 
-		meta := common.MapStr{
-			"_index":   "",
-			"_routing": nil,
-			"_type":    t,
-		}
-		bulk := [2]interface{}{
-			common.MapStr{"index": meta},
-			report.Event{
-				Timestamp: event.Content.Timestamp,
-				Fields:    event.Content.Fields,
-			},
-		}
-
-		// Currently one request per event is sent. Reason is that each event can contain different
-		// interval params and X-Pack requires to send the interval param.
-		_, err = c.es.SendMonitoringBulk(params, bulk[:])
-
+		err = c.bulkToProduction(params, event, t)
 		if err != nil {
 			failed = append(failed, event)
 			reason = err
@@ -159,4 +143,24 @@ func (c *publishClient) Test(d testing.Driver) {
 
 func (c *publishClient) String() string {
 	return "publish(" + c.es.String() + ")"
+}
+
+func (c *publishClient) bulkToProduction(params map[string]string, event publisher.Event, docType interface{}) error {
+	meta := common.MapStr{
+		"_index":   "",
+		"_routing": nil,
+		"_type":    t,
+	}
+	bulk := [2]interface{}{
+		common.MapStr{"index": meta},
+		report.Event{
+			Timestamp: event.Content.Timestamp,
+			Fields:    event.Content.Fields,
+		}
+	}
+
+	// Currently one request per event is sent. Reason is that each event can contain different
+	// interval params and X-Pack requires to send the interval param.
+	_, err = c.es.SendMonitoringBulk(params, bulk[:])
+	return err
 }
