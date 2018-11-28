@@ -51,6 +51,47 @@
 
 ## Suricata module
 
+# Processor fields
+
+# Cloud
+- form: meta.cloud.provider
+  to: cloud.provider
+  alias: true
+  alias6: true
+
+- form: meta.cloud.instance_id
+  to: cloud.instance.id
+  alias: true
+  alias6: true
+
+- form: meta.cloud.instance_name
+  to: cloud.instance.name
+  alias: true
+  alias6: true
+
+- form: meta.cloud.machine_type
+  to: cloud.machine.type
+  alias: true
+  alias6: true
+
+- form: meta.cloud.availability_zone
+  to: cloud.availability_zone
+  alias: true
+  alias6: true
+
+- form: meta.cloud.project_id
+  to: cloud.project.id
+  alias: true
+  alias6: true
+
+- form: meta.cloud.region
+  to: cloud.region
+  alias: true
+  alias6: true
+
+
+# Suricata module
+
 - from: source_ecs.ip
   to: source.ip
   alias: true
