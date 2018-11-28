@@ -201,9 +201,14 @@
   alias: false
   copy_to: false
 
-# This expands all geoip fields
+# These expand all fields under geoip and user_agent
 - from: apache2.access.geoip.*
-  to: source.geoip.*
+  to: source.geo.*
+  alias: false
+  copy_to: false
+
+- from: apache2.access.user_agent.*
+  to: user_agent.*
   alias: false
   copy_to: false
 
