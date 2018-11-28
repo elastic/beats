@@ -177,6 +177,45 @@ class TestManagement(BaseTest):
             1, output_file=output_file))
         proc.check_kill_and_wait()
 
+    def test_blocklist(self):
+        """
+        Config cache is used if Kibana is not available
+        """
+        # Enroll the beat
+        config_path = os.path.join(self.working_dir, "mockbeat.yml")
+        self.render_config_template("mockbeat", config_path)
+        exit_code = self.enroll(KIBANA_PASSWORD)
+        assert exit_code == 0
+
+        # Update output configuration
+        self.create_and_assing_tag([
+            {
+                "type": "output",
+                "configs": [
+                    {
+                        "output": "file",
+                        "file": {
+                            "path": os.path.join(self.working_dir, "output"),
+                            "filename": "mockbeat_managed",
+                        }
+                    }
+                ]
+            }
+        ])
+
+        output_file = os.path.join("output", "mockbeat_managed")
+
+        # Start beat
+        proc = self.start_beat(extra_args=[
+            # do not blacklist file output
+            "-E", "management.blacklist.output='output'",
+        ])
+
+        self.wait_until(
+            cond=lambda: self.log_contains("Got a blacklisted configuration, ignoring it"))
+        proc.check_kill_and_wait()
+        assert not os.path.isfile(os.path.join(self.working_dir, output_file))
+
     def enroll(self, password):
         return self.run_beat(
             extra_args=["enroll", self.get_kibana_url(),
