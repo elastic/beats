@@ -147,6 +147,16 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
+#--------------------------------- Aws Module ---------------------------------
+- module: aws
+  metricsets: ["ec2"]
+  mock: '${AWS_MOCK:false}'
+  period: 300s
+  hosts: ["localhost"]
+  access_key_id: '${AWS_ACCESS_KEY_ID}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY}'
+  session_token: '${AWS_SESSION_TOKEN}'
+
 #--------------------------------- Ceph Module ---------------------------------
 - module: ceph
   metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]

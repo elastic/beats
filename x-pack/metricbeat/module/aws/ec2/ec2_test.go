@@ -200,14 +200,14 @@ func getCredentials(mock bool) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	accessKeyId := *tempToken.Credentials.AccessKeyId
+	accessKeyID := *tempToken.Credentials.AccessKeyId
 	secretAccessKey := *tempToken.Credentials.SecretAccessKey
 	sessionToken := *tempToken.Credentials.SessionToken
 	creds := map[string]interface{}{
 		"module":            "aws",
 		"metricsets":        []string{"ec2"},
 		"mock":              "false",
-		"access_key_id":     accessKeyId,
+		"access_key_id":     accessKeyID,
 		"secret_access_key": secretAccessKey,
 		"session_token":     sessionToken,
 	}
