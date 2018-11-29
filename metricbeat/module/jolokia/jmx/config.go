@@ -19,7 +19,7 @@ package jmx
 
 import (
 	"encoding/json"
-	"errors"
+
 	"fmt"
 	"regexp"
 	"sort"
@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/pkg/errors"
 )
 
 type JMXMapping struct {
@@ -120,7 +121,7 @@ var mbeanRegexp = regexp.MustCompile("([^,=:*?]+)=([^,=:\"]+|\".*\")")
 
 // This replacer is responsible for adding a "!" before special characters in GET request URIs
 // For more information refer: https://jolokia.org/reference/html/protocol.html
-var mbeanGetEssapeReplacer = strings.NewReplacer("\"", "!\"", ".", "!.", "!", "!!", "/", "!/")
+var mbeanGetEscapeReplacer = strings.NewReplacer("\"", "!\"", ".", "!.", "!", "!!", "/", "!/")
 
 // Canonicalize Returns the canonical form of the name; that is, a string representation where the
 // properties are sorted in lexical order.
@@ -139,7 +140,7 @@ func (m *MBeanName) Canonicalize(escape bool) string {
 
 		tmpVal := value
 		if escape {
-			tmpVal = mbeanGetEssapeReplacer.Replace(value)
+			tmpVal = mbeanGetEscapeReplacer.Replace(value)
 		}
 
 		propertySlice = append(propertySlice, key+"="+tmpVal)
@@ -230,24 +231,26 @@ type JolokiaHTTPRequest struct {
 	Body []byte
 }
 
-// JolokiaHTTPRequestBuilder is an interface which describes
-// the behaviour of the builder which generates the HTTP request
-// which is sent to Jolokia
-type JolokiaHTTPRequestBuilder interface {
+// JolokiaHTTPRequestFetcher is an interface which describes
+// the behaviour of the builder which generates,fetches the HTTP request,
+// which is sent to Jolokia and then parses and maps the response to
+// Metricbeat events.
+type JolokiaHTTPRequestFetcher interface {
 	// BuildRequestsAndMappings builds the request information and mappings needed to fetch information from Jolokia server
 	BuildRequestsAndMappings(configMappings []JMXMapping) ([]*JolokiaHTTPRequest, AttributeMapping, error)
 	// Fetches the information from Jolokia server regarding MBeans
 	Fetch(m *MetricSet) ([]common.MapStr, error)
+	EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error)
 }
 
-// JolokiaHTTPGetBuilder constructs an HTTP GET request
+// JolokiaHTTPGetFetcher constructs and executes an HTTP GET request
 // which will read MBean information from Jolokia
-type JolokiaHTTPGetBuilder struct {
+type JolokiaHTTPGetFetcher struct {
 }
 
 // BuildRequestsAndMappings generates HTTP GET request
 // such as URI,Body.
-func (pc *JolokiaHTTPGetBuilder) BuildRequestsAndMappings(configMappings []JMXMapping) ([]*JolokiaHTTPRequest, AttributeMapping, error) {
+func (pc *JolokiaHTTPGetFetcher) BuildRequestsAndMappings(configMappings []JMXMapping) ([]*JolokiaHTTPRequest, AttributeMapping, error) {
 
 	// Create Jolokia URLs
 	uris, responseMapping, err := pc.buildGetRequestURIs(configMappings)
@@ -272,7 +275,7 @@ func (pc *JolokiaHTTPGetBuilder) BuildRequestsAndMappings(configMappings []JMXMa
 // Builds a GET URI which will have the following format:
 //
 // /read/<mbean>/<attribute>/[path]?ignoreErrors=true&canonicalNaming=false
-func (pc *JolokiaHTTPGetBuilder) buildJolokiaGETUri(mbean string, attr []Attribute) string {
+func (pc *JolokiaHTTPGetFetcher) buildJolokiaGETUri(mbean string, attr []Attribute) string {
 	initialURI := "/read/%s?ignoreErrors=true&canonicalNaming=false"
 
 	var attrList []string
@@ -287,7 +290,7 @@ func (pc *JolokiaHTTPGetBuilder) buildJolokiaGETUri(mbean string, attr []Attribu
 	return tmpURL
 }
 
-func (pc *JolokiaHTTPGetBuilder) mBeanAttributeHasField(attr *Attribute) bool {
+func (pc *JolokiaHTTPGetFetcher) mBeanAttributeHasField(attr *Attribute) bool {
 
 	if attr.Field != "" && (strings.Trim(attr.Field, " ") != "") {
 		return true
@@ -296,7 +299,7 @@ func (pc *JolokiaHTTPGetBuilder) mBeanAttributeHasField(attr *Attribute) bool {
 	return false
 }
 
-func (pc *JolokiaHTTPGetBuilder) buildGetRequestURIs(mappings []JMXMapping) ([]string, AttributeMapping, error) {
+func (pc *JolokiaHTTPGetFetcher) buildGetRequestURIs(mappings []JMXMapping) ([]string, AttributeMapping, error) {
 
 	responseMapping := make(AttributeMapping)
 	var urls []string
@@ -332,7 +335,7 @@ func (pc *JolokiaHTTPGetBuilder) buildGetRequestURIs(mappings []JMXMapping) ([]s
 }
 
 // Fetch perfrorms one or more GET requests to Jolokia server and gets information about MBeans.
-func (pc *JolokiaHTTPGetBuilder) Fetch(m *MetricSet) ([]common.MapStr, error) {
+func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 
 	var allEvents []common.MapStr
 
@@ -367,11 +370,8 @@ func (pc *JolokiaHTTPGetBuilder) Fetch(m *MetricSet) ([]common.MapStr, error) {
 				"host", m.HostData().Host, "uri", http.GetURI(), "body", string(resBody), "type", "response")
 		}
 
-		// Construct a new event mapper
-		eventMapper := NewEventMapper(r.HTTPMethod)
-
 		// Map response to Metricbeat events
-		events, err := eventMapper.EventMapping(resBody, mapping)
+		events, err := pc.EventMapping(resBody, mapping)
 		if err != nil {
 			return nil, err
 		}
@@ -383,14 +383,27 @@ func (pc *JolokiaHTTPGetBuilder) Fetch(m *MetricSet) ([]common.MapStr, error) {
 
 }
 
-// JolokiaHTTPPostBuilder constructs an HTTP GET request
+// EventMapping maps a Jolokia response from a GET request is to one or more Metricbeat events
+func (pc *JolokiaHTTPGetFetcher) EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
+
+	var singleEntry Entry
+
+	// When we use GET, the response is a single Entry
+	if err := json.Unmarshal(content, &singleEntry); err != nil {
+		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
+	}
+
+	return eventMapping([]Entry{singleEntry}, mapping)
+}
+
+// JolokiaHTTPPostFetcher constructs and executes an HTTP GET request
 // which will read MBean information from Jolokia
-type JolokiaHTTPPostBuilder struct {
+type JolokiaHTTPPostFetcher struct {
 }
 
 // BuildRequestsAndMappings generates HTTP POST request
 // such as URI,Body.
-func (pc *JolokiaHTTPPostBuilder) BuildRequestsAndMappings(configMappings []JMXMapping) ([]*JolokiaHTTPRequest, AttributeMapping, error) {
+func (pc *JolokiaHTTPPostFetcher) BuildRequestsAndMappings(configMappings []JMXMapping) ([]*JolokiaHTTPRequest, AttributeMapping, error) {
 
 	body, mapping, err := pc.buildRequestBodyAndMapping(configMappings)
 	if err != nil {
@@ -415,7 +428,7 @@ func (pc *JolokiaHTTPPostBuilder) BuildRequestsAndMappings(configMappings []JMXM
 //   cannot contain any of the characters comma, equals, colon, or quote.
 var propertyRegexp = regexp.MustCompile("[^,=:*?]+=([^,=:\"]+|\".*\")")
 
-func (pc *JolokiaHTTPPostBuilder) buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, AttributeMapping, error) {
+func (pc *JolokiaHTTPPostFetcher) buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, AttributeMapping, error) {
 	responseMapping := make(AttributeMapping)
 	var blocks []RequestBlock
 
@@ -461,7 +474,7 @@ func (pc *JolokiaHTTPPostBuilder) buildRequestBodyAndMapping(mappings []JMXMappi
 }
 
 // Fetch perfrorms a POST request to Jolokia server and gets information about MBeans.
-func (pc *JolokiaHTTPPostBuilder) Fetch(m *MetricSet) ([]common.MapStr, error) {
+func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 
 	// Prepare Http POST request object and attribute mappings according to selected Http method
 	httpReqs, mapping, err := pc.BuildRequestsAndMappings(m.mapping)
@@ -492,11 +505,8 @@ func (pc *JolokiaHTTPPostBuilder) Fetch(m *MetricSet) ([]common.MapStr, error) {
 			"host", m.HostData().Host, "uri", http.GetURI(), "body", string(resBody), "type", "response")
 	}
 
-	// Construct a new event mapper
-	eventMapper := NewEventMapper(httpReqs[0].HTTPMethod)
-
 	// Map response to Metricbeat events
-	events, err := eventMapper.EventMapping(resBody, mapping)
+	events, err := pc.EventMapping(resBody, mapping)
 	if err != nil {
 		return nil, err
 	}
@@ -504,14 +514,28 @@ func (pc *JolokiaHTTPPostBuilder) Fetch(m *MetricSet) ([]common.MapStr, error) {
 	return events, nil
 }
 
-// NewJolokiaHTTPRequestBuiler is a factory method which creates and returns an implementation
-// class of NewJolokiaHTTPRequestBuiler interface. HTTP GET and POST are currently supported.
-func NewJolokiaHTTPRequestBuiler(httpMethod string) JolokiaHTTPRequestBuilder {
+// EventMapping maps a Jolokia response from a POST request is to one or more Metricbeat events
+func (pc *JolokiaHTTPPostFetcher) EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
 
-	if httpMethod == "GET" {
-		return &JolokiaHTTPGetBuilder{}
+	var entries []Entry
+
+	// When we use POST, the response is an array of Entry objects
+	if err := json.Unmarshal(content, &entries); err != nil {
+
+		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
 	}
 
-	return &JolokiaHTTPPostBuilder{}
+	return eventMapping(entries, mapping)
+}
+
+// NewJolokiaHTTPRequestFetcher is a factory method which creates and returns an implementation
+// class of JolokiaHTTPRequestFetcher interface. HTTP GET and POST are currently supported.
+func NewJolokiaHTTPRequestFetcher(httpMethod string) JolokiaHTTPRequestFetcher {
+
+	if httpMethod == "GET" {
+		return &JolokiaHTTPGetFetcher{}
+	}
+
+	return &JolokiaHTTPPostFetcher{}
 
 }

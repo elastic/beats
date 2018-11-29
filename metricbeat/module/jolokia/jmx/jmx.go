@@ -55,7 +55,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	mapping   []JMXMapping
 	namespace string
-	http      JolokiaHTTPRequestBuilder
+	http      JolokiaHTTPRequestFetcher
 	log       *logp.Logger
 }
 
@@ -71,7 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	jolokiaHTTPBuild := NewJolokiaHTTPRequestBuiler(config.HTTPMethod)
+	jolokiaHTTPBuild := NewJolokiaHTTPRequestFetcher(config.HTTPMethod)
 
 	log := logp.NewLogger(metricsetName).With("host", base.HostData().Host)
 

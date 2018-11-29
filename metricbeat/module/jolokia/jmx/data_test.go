@@ -55,7 +55,7 @@ func TestEventMapper(t *testing.T) {
 	}
 
 	// Construct a new POST response event mapper
-	eventMapper := NewEventMapper("POST")
+	eventMapper := NewJolokiaHTTPRequestFetcher("POST")
 
 	// Map response to Metricbeat events
 	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
@@ -126,7 +126,7 @@ func TestEventGroupingMapper(t *testing.T) {
 	}
 
 	// Construct a new POST response event mapper
-	eventMapper := NewEventMapper("POST")
+	eventMapper := NewJolokiaHTTPRequestFetcher("POST")
 
 	// Map response to Metricbeat events
 	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
@@ -193,7 +193,7 @@ func TestEventGroupingMapperGetRequest(t *testing.T) {
 	}
 
 	// Construct a new GET response event mapper
-	eventMapper := NewEventMapper("GET")
+	eventMapper := NewJolokiaHTTPRequestFetcher("GET")
 
 	// Map response to Metricbeat events
 	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
@@ -240,7 +240,7 @@ func TestEventMapperWithWildcard(t *testing.T) {
 	}
 
 	// Construct a new POST response event mapper
-	eventMapper := NewEventMapper("POST")
+	eventMapper := NewJolokiaHTTPRequestFetcher("POST")
 
 	// Map response to Metricbeat events
 	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
@@ -281,7 +281,7 @@ func TestEventGroupingMapperWithWildcard(t *testing.T) {
 	}
 
 	// Construct a new POST response event mapper
-	eventMapper := NewEventMapper("POST")
+	eventMapper := NewJolokiaHTTPRequestFetcher("POST")
 
 	// Map response to Metricbeat events
 	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
@@ -308,36 +308,4 @@ func TestEventGroupingMapperWithWildcard(t *testing.T) {
 	}
 
 	assert.ElementsMatch(t, expected, events)
-}
-
-func TestNewBaseResponseMapper(t *testing.T) {
-
-	cases := []struct {
-		httpMethod string
-		expected   BaseResponseMapper
-	}{
-
-		{
-			httpMethod: "GET",
-			expected:   &JolokiaGETResponseMapper{},
-		},
-		{
-			httpMethod: "",
-			expected:   &JolokiaPOSTResponseMapper{},
-		},
-		{
-			httpMethod: "GET",
-			expected:   &JolokiaGETResponseMapper{},
-		},
-		{
-			httpMethod: "POST",
-			expected:   &JolokiaPOSTResponseMapper{},
-		},
-	}
-
-	for _, c := range cases {
-		jolokiaEventMapper := NewEventMapper(c.httpMethod)
-
-		assert.Equal(t, c.expected, jolokiaEventMapper, "httpMethod: "+c.httpMethod)
-	}
 }

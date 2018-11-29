@@ -65,8 +65,8 @@ func TestBuildJolokiaGETUri(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		jolokiaGETBuilder := &JolokiaHTTPGetBuilder{}
-		getURI := jolokiaGETBuilder.buildJolokiaGETUri(c.mbean, c.attributes)
+		jolokiaGETFetcher := &JolokiaHTTPGetFetcher{}
+		getURI := jolokiaGETFetcher.buildJolokiaGETUri(c.mbean, c.attributes)
 
 		assert.Equal(t, c.expected, getURI, "mbean: "+c.mbean)
 
@@ -370,8 +370,8 @@ func TestMBeanAttributeHasField(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		jolokiaGETBuilder := &JolokiaHTTPGetBuilder{}
-		hasField := jolokiaGETBuilder.mBeanAttributeHasField(c.attribute)
+		jolokiaGETFetcher := &JolokiaHTTPGetFetcher{}
+		hasField := jolokiaGETFetcher.mBeanAttributeHasField(c.attribute)
 
 		assert.Equal(t, c.expected, hasField, "mbean attribute: "+c.attribute.Attr, "mbean attribute field: "+c.attribute.Field)
 	}
@@ -515,9 +515,9 @@ func TestBuildGETRequestsAndMappings(t *testing.T) {
 
 	for _, c := range cases {
 
-		jolokiaGETBuilder := &JolokiaHTTPGetBuilder{}
+		jolokiaGETFetcher := &JolokiaHTTPGetFetcher{}
 
-		httpReqs, attrMaps, myerr := jolokiaGETBuilder.BuildRequestsAndMappings(c.mappings)
+		httpReqs, attrMaps, myerr := jolokiaGETFetcher.BuildRequestsAndMappings(c.mappings)
 
 		if c.ok == false {
 			assert.Error(t, myerr, "should have failed for httpMethod: "+c.httpMethod)
@@ -628,7 +628,7 @@ func TestBuildPOSTRequestsAndMappings(t *testing.T) {
 
 	for _, c := range cases {
 
-		jolokiaPOSTBuilder := &JolokiaHTTPPostBuilder{}
+		jolokiaPOSTBuilder := &JolokiaHTTPPostFetcher{}
 
 		httpReqs, attrMaps, myerr := jolokiaPOSTBuilder.BuildRequestsAndMappings(c.mappings)
 
@@ -651,29 +651,29 @@ func TestNewJolokiaHTTPClient(t *testing.T) {
 
 	cases := []struct {
 		httpMethod string
-		expected   JolokiaHTTPRequestBuilder
+		expected   JolokiaHTTPRequestFetcher
 	}{
 
 		{
 			httpMethod: "GET",
-			expected:   &JolokiaHTTPGetBuilder{},
+			expected:   &JolokiaHTTPGetFetcher{},
 		},
 		{
 			httpMethod: "",
-			expected:   &JolokiaHTTPPostBuilder{},
+			expected:   &JolokiaHTTPPostFetcher{},
 		},
 		{
 			httpMethod: "GET",
-			expected:   &JolokiaHTTPGetBuilder{},
+			expected:   &JolokiaHTTPGetFetcher{},
 		},
 		{
 			httpMethod: "POST",
-			expected:   &JolokiaHTTPPostBuilder{},
+			expected:   &JolokiaHTTPPostFetcher{},
 		},
 	}
 
 	for _, c := range cases {
-		jolokiaGETClient := NewJolokiaHTTPRequestBuiler(c.httpMethod)
+		jolokiaGETClient := NewJolokiaHTTPRequestFetcher(c.httpMethod)
 
 		assert.Equal(t, c.expected, jolokiaGETClient, "httpMethod: "+c.httpMethod)
 	}
