@@ -14,9 +14,8 @@ This topic shows you how to run the basic modules with minimal extra
 configuration. For detailed documentation and the full list of available
 modules, see <<filebeat-modules>>.
 
-If you are using a log file type that isn't supported by one of the available
-{beatname_uc} modules, you'll need to set up and configure {beatname_uc} manually by
-following the numbered steps under <<filebeat-getting-started>>.
+Can't find a module for your log file type? Follow the numbered steps under
+<<filebeat-getting-started>> to set up and configure {beatname_uc} manually.
 
 ==== Prerequisites
 
@@ -106,6 +105,50 @@ include::./include/set-paths.asciidoc[]
 See <<configuration-filebeat-modules>> for more information about setting
 variables and advanced options.
 
+[[load-ingest-pipelines]]
+==== Load ingest pipelines manually
+
+The ingest pipelines used to parse log lines are set up automatically the first
+time you run the module, assuming the {es} output is enabled. If you're sending
+events to {ls}, or plan to use
+<<configuration-central-management,{beats} central management>>, you need to
+load the ingest pipelines manually. To do this, run the `setup` command with
+the `--pipelines` option specified. If you used the
+<<modules-command,`modules`>> command to enable modules in the `modules.d`
+directory, also specify the `--modules` flag. For example, the following command
+loads the ingest pipelines used by all metricsets enabled in the system, nginx,
+and mysql modules:
+
+// override modulename attribute so it works with the --modules option
+:modulename: system,nginx,mysql
+
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup --pipelines --modules {modulename}
+----
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --pipelines --modules {modulename}
+----
+
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --pipelines --modules {modulename}
+----
+
+*win:*
+
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe setup --pipelines --modules {modulename}
+----
 
 :has_module_steps!:
 :modulename!:

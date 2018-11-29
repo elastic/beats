@@ -622,7 +622,10 @@ Specifies a comma-separated list of modules. Use this flag to avoid errors when
 there are no modules defined in the +{beatname_lc}.yml+ file.
 
 *`--pipelines`*::
-Sets up ingest pipelines for configured filesets.
+Sets up ingest pipelines for configured filesets. {beatname_uc} looks for
+enabled modules in the +{beatname_lc}.yml+ file. If you used the
+<<modules-command,`modules`>> command to enable modules in the `modules.d`
+directory, also specify the `--modules` flag.
 endif::[]
 
 *`--template`*::
@@ -630,13 +633,30 @@ Sets up the index template only.
 
 {global-flags}
 
-*EXAMPLE*
+*EXAMPLES*
 
+ifeval::["{beatname_lc}"=="filebeat"]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} setup --dashboards
+{beatname_lc} setup --machine-learning
+{beatname_lc} setup --pipelines
+{beatname_lc} setup --pipelines --modules system,nginx,mysql <1>
+{beatname_lc} setup --template
 -----
+<1> If you used the <<modules-command,`modules`>> command to enable modules in
+the `modules.d` directory, also specify the `--modules` flag to indicate which
+modules to load pipelines for.
+endif::[]
 
+ifeval::["{beatname_lc}"!="filebeat"]
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} setup --dashboards
+{beatname_lc} setup --machine-learning
+{beatname_lc} setup --template
+-----
+endif::[]
 
 [[test-command]]
 ==== `test` command
