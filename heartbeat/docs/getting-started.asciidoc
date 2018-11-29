@@ -110,10 +110,7 @@ endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-["source", "shell", subs="attributes"]
-------------------------------------------------
-docker pull {dockerimage}
-------------------------------------------------
+See <<running-on-docker, Running on Docker>> for deploying Docker containers
 
 endif::[]
 
