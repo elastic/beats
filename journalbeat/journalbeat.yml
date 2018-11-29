@@ -28,6 +28,12 @@ journalbeat.inputs:
   # Fallback position if no cursor data is available.
   #cursor_seek_fallback: head
 
+  # List of specific units to monitor.
+  #units: ["httpd.service"]
+  # Gather kernel logs when units are provided. By default it is true.
+  #kernel: true
+  # Specificies syslog identifiers to monitor.
+  #identifiers: ["docker"]
   # Exact matching for field values of events.
   # Matching for nginx entries: "systemd.unit=nginx"
   #include_matches: []

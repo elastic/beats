@@ -88,11 +88,6 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 }
 
 func newReader(logger *logp.Logger, done chan struct{}, c Config, journal *sdjournal.Journal, state checkpoint.JournalState) (*Reader, error) {
-	err := setupMatches(journal, c.Matches)
-	if err != nil {
-		return nil, err
-	}
-
 	r := &Reader{
 		journal: journal,
 		config:  c,
@@ -100,6 +95,11 @@ func newReader(logger *logp.Logger, done chan struct{}, c Config, journal *sdjou
 		logger:  logger,
 		backoff: common.NewBackoff(done, c.Backoff, c.MaxBackoff),
 	}
+	err := r.setupFiltering()
+	if err != nil {
+		return nil, err
+	}
+
 	r.seek(state.Cursor)
 
 	instance.AddJournalToMonitor(c.Path, journal)
@@ -107,38 +107,20 @@ func newReader(logger *logp.Logger, done chan struct{}, c Config, journal *sdjou
 	return r, nil
 }
 
-func setupMatches(j *sdjournal.Journal, matches []string) error {
-	for _, m := range matches {
-		elems := strings.Split(m, "=")
-		if len(elems) != 2 {
-			return fmt.Errorf("invalid match format: %s", m)
-		}
-
-		var p string
-		for journalKey, eventField := range journaldEventFields {
-			if elems[0] == eventField.name {
-				p = journalKey + "=" + elems[1]
-			}
-		}
-
-		// pass custom fields as is
-		if p == "" {
-			p = m
-		}
-
-		logp.Debug("journal", "Added matcher expression: %s", p)
-
-		err := j.AddMatch(p)
-		if err != nil {
-			return fmt.Errorf("error adding match to journal %v", err)
-		}
-
-		err = j.AddDisjunction()
-		if err != nil {
-			return fmt.Errorf("error adding disjunction to journal: %v", err)
-		}
+func (r *Reader) setupFiltering() error {
+	err := r.addUnits()
+	if err != nil {
+		return fmt.Errorf("error while adding units to monitor to reader: %+v", err)
 	}
-	return nil
+	err = r.addKernel()
+	if err != nil {
+		return fmt.Errorf("error while adding kernel transport to monitor to reader: %+v", err)
+	}
+	err = r.addSyslogIdentifiers()
+	if err != nil {
+		return fmt.Errorf("error while adding syslog identifiers to monitor to reader: %+v", err)
+	}
+	return r.addMatches()
 }
 
 // seek seeks to the position determined by the coniguration and cursor state.

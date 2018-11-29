@@ -38,8 +38,15 @@ type Config struct {
 	Seek config.SeekMode `config:"seek"`
 	// CursorSeekFallback sets where to seek if registry file is not available.
 	CursorSeekFallback config.SeekMode `config:"cursor_seek_fallback"`
+
 	// Matches store the key value pairs to match entries.
 	Matches []string `config:"include_matches"`
+	// Units is the list of units to monitor.
+	Units []string `config:"units"`
+	// Kernel specifies if kernel logs are collected.
+	Kernel bool `config:"kernel"`
+	// SyslogIdentifiers is the list of syslog identifiers to monitor.
+	SyslogIdentifiers []string `config:"identifiers"`
 
 	// Fields and tags to add to events.
 	common.EventMetadata `config:",inline"`
@@ -54,5 +61,6 @@ var (
 		MaxBackoff:         20 * time.Second,
 		Seek:               config.SeekCursor,
 		CursorSeekFallback: config.SeekHead,
+		Kernel:             true,
 	}
 )
