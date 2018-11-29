@@ -7,12 +7,8 @@
 package login
 
 import (
-	"bytes"
-	"encoding/gob"
-	"io"
+	"fmt"
 	"net"
-	"os/user"
-	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
@@ -35,49 +31,32 @@ const (
 	eventTypeEvent = "event"
 )
 
-type RecordType int
-
-const (
-	Unknown RecordType = iota
-	UserLogin
-	UserLogout
-)
-
-var recordTypeToString = map[RecordType]string{
-	Unknown:    "unknown",
-	UserLogin:  "user_login",
-	UserLogout: "user_logout",
-}
-
 // LoginRecord represents a login record.
 type LoginRecord struct {
 	Utmp      Utmp
-	Type      RecordType
+	Type      string
 	PID       int
 	TTY       string
 	UID       int
 	Username  string
 	Hostname  string
-	IP        net.IP
+	IP        *net.IP
 	Timestamp time.Time
-}
-
-// String returns the string representation for a RecordType.
-func (recordType RecordType) String() string {
-	s, found := recordTypeToString[recordType]
-	if found {
-		return s
-	} else {
-		return ""
-	}
+	Origin    string
 }
 
 func (login LoginRecord) toMapStr() common.MapStr {
 	mapstr := common.MapStr{
-		"type":      login.Type.String(),
-		"pid":       login.PID,
-		"tty":       login.TTY,
-		"timestamp": login.Timestamp,
+		"type": login.Type,
+		"utmp": fmt.Sprintf("%v", login.Utmp),
+	}
+
+	if login.TTY != "" {
+		mapstr.Put("tty", login.TTY)
+	}
+
+	if login.PID != -1 {
+		mapstr.Put("pid", login.PID)
 	}
 
 	if login.Username != "" {
@@ -90,7 +69,7 @@ func (login LoginRecord) toMapStr() common.MapStr {
 		mapstr.Put("hostname", login.Hostname)
 	}
 
-	if !login.IP.IsUnspecified() {
+	if login.IP != nil {
 		mapstr.Put("ip", login.IP)
 	}
 
@@ -107,9 +86,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	config     Config
-	bucket     datastore.Bucket
 	log        *logp.Logger
-	ttyLookup  map[string]*LoginRecord
 	utmpReader *UtmpFileReader
 }
 
@@ -131,20 +108,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		config:        config,
 		log:           logp.NewLogger(metricsetName),
-		bucket:        bucket,
-		ttyLookup:     make(map[string]*LoginRecord),
 	}
 
-	ms.utmpReader = &UtmpFileReader{
-		log:         ms.log,
-		filePattern: config.WtmpFilePattern,
-		fileRecords: make(map[uint64]FileRecord),
-	}
-
-	// Load state (file records, tty mapping) from disk
-	err = ms.restoreStateFromDisk()
+	ms.utmpReader, err = NewUtmpFileReader(ms.log, bucket, config.WtmpFilePattern)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to restore state from disk")
+		return nil, err
 	}
 
 	return ms, nil
@@ -152,10 +120,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Close cleans up the MetricSet when it finishes.
 func (ms *MetricSet) Close() error {
-	if ms.bucket != nil {
-		return ms.bucket.Close()
-	}
-	return nil
+	return ms.utmpReader.Close()
 }
 
 // Fetch collects any new login records from /var/log/wtmp. It is invoked periodically.
@@ -166,16 +131,15 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		report.Error(err)
 		return
 	}
-	ms.log.Debugf("Read %d new records.", len(loginRecords))
+	ms.log.Debugf("%d new login records.", len(loginRecords))
 
 	for _, loginRecord := range loginRecords {
-		ms.processLoginRecord(&loginRecord)
 		report.Event(ms.loginEvent(loginRecord))
 	}
 
 	// Save latest read records to disk
 	if len(loginRecords) > 0 {
-		err := ms.saveStateToDisk()
+		err := ms.utmpReader.saveStateToDisk()
 		if err != nil {
 			ms.log.Error(err)
 			report.Error(err)
@@ -184,171 +148,14 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 }
 
-func (ms *MetricSet) processLoginRecord(record *LoginRecord) {
-	user, err := user.Lookup(record.Username)
-	if err == nil {
-		uid, err := strconv.Atoi(user.Uid)
-		if err == nil {
-			record.UID = uid
-		}
-	}
-
-	switch record.Type {
-	case UserLogin:
-		// Store TTY from user login record for enrichment when user logout
-		// record comes along (which, alas, does not contain the username).
-		ms.ttyLookup[record.TTY] = record
-	case UserLogout:
-		savedRecord, found := ms.ttyLookup[record.TTY]
-		if found {
-			record.Username = savedRecord.Username
-			record.UID = savedRecord.UID
-			record.IP = savedRecord.IP
-			record.Hostname = savedRecord.Hostname
-		} else {
-			ms.log.Debugf("No matching login record found for logout on %v", record.TTY)
-		}
-	}
-}
-
-func (ms *MetricSet) saveStateToDisk() error {
-	err := ms.saveFileRecordsToDisk()
-	if err != nil {
-		return err
-	}
-
-	err = ms.saveTTYLookupToDisk()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (ms *MetricSet) saveFileRecordsToDisk() error {
-	var buf bytes.Buffer
-	encoder := gob.NewEncoder(&buf)
-
-	for _, fileRecord := range ms.utmpReader.fileRecords {
-		err := encoder.Encode(fileRecord)
-		if err != nil {
-			return errors.Wrap(err, "error encoding file record")
-		}
-	}
-
-	err := ms.bucket.Store(bucketKeyFileRecords, buf.Bytes())
-	if err != nil {
-		return errors.Wrap(err, "error writing file records to disk")
-	}
-
-	ms.log.Debugf("Wrote %d file records to disk", len(ms.utmpReader.fileRecords))
-	return nil
-}
-
-func (ms *MetricSet) saveTTYLookupToDisk() error {
-	var buf bytes.Buffer
-	encoder := gob.NewEncoder(&buf)
-
-	for _, loginRecord := range ms.ttyLookup {
-		err := encoder.Encode(*loginRecord)
-		if err != nil {
-			return errors.Wrap(err, "error encoding login record")
-		}
-	}
-
-	err := ms.bucket.Store(bucketKeyTTYLookup, buf.Bytes())
-	if err != nil {
-		return errors.Wrap(err, "error writing login records to disk")
-	}
-
-	ms.log.Debugf("Wrote %d open login records to disk", len(ms.ttyLookup))
-	return nil
-}
-
-func (ms *MetricSet) restoreStateFromDisk() error {
-	err := ms.restoreFileRecordsFromDisk()
-	if err != nil {
-		return err
-	}
-
-	err = ms.restoreTTYLookupFromDisk()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (ms *MetricSet) restoreFileRecordsFromDisk() error {
-	var decoder *gob.Decoder
-	err := ms.bucket.Load(bucketKeyFileRecords, func(blob []byte) error {
-		if len(blob) > 0 {
-			buf := bytes.NewBuffer(blob)
-			decoder = gob.NewDecoder(buf)
-		}
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-
-	if decoder != nil {
-		for {
-			fileRecord := new(FileRecord)
-			err = decoder.Decode(fileRecord)
-			if err == nil {
-				ms.utmpReader.fileRecords[fileRecord.Inode] = *fileRecord
-			} else if err == io.EOF {
-				// Read all
-				break
-			} else {
-				return errors.Wrap(err, "error decoding file record")
-			}
-		}
-	}
-	ms.log.Debugf("Restored %d file records from disk", len(ms.utmpReader.fileRecords))
-
-	return nil
-}
-
-func (ms *MetricSet) restoreTTYLookupFromDisk() error {
-	var decoder *gob.Decoder
-	err := ms.bucket.Load(bucketKeyTTYLookup, func(blob []byte) error {
-		if len(blob) > 0 {
-			buf := bytes.NewBuffer(blob)
-			decoder = gob.NewDecoder(buf)
-		}
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-
-	if decoder != nil {
-		for {
-			loginRecord := new(LoginRecord)
-			err = decoder.Decode(loginRecord)
-			if err == nil {
-				ms.ttyLookup[loginRecord.TTY] = loginRecord
-			} else if err == io.EOF {
-				// Read all
-				break
-			} else {
-				return errors.Wrap(err, "error decoding login record")
-			}
-		}
-	}
-	ms.log.Debugf("Restored %d open login records from disk", len(ms.ttyLookup))
-
-	return nil
-}
-
 func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 	event := mb.Event{
+		Timestamp: loginRecord.Timestamp,
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"type":   eventTypeEvent,
-				"action": loginRecord.Type.String(),
+				"action": loginRecord.Type,
+				"origin": loginRecord.Origin,
 			},
 		},
 		MetricSetFields: loginRecord.toMapStr(),
@@ -364,6 +171,25 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 			event.RootFields.Put("user.id", loginRecord.UID)
 		}
 	}
+
+	var eventSummary string
+
+	switch loginRecord.Type {
+	case Boot:
+		eventSummary = "System boot"
+	case Shutdown:
+		eventSummary = "Shutdown"
+	case UserLogin:
+		eventSummary = fmt.Sprintf("Login by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
+			loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
+			loginRecord.Hostname, loginRecord.IP)
+	case UserLogout:
+		eventSummary = fmt.Sprintf("Logout by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
+			loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
+			loginRecord.Hostname, loginRecord.IP)
+	}
+
+	event.RootFields.Put("event.summary", eventSummary)
 
 	return event
 }

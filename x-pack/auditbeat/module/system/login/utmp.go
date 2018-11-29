@@ -11,20 +11,34 @@ package login
 import "C"
 
 import (
+	"bytes"
 	"encoding/binary"
+	"encoding/gob"
 	"fmt"
+	"io"
 	"net"
 	"os"
+	"os/user"
 	"path/filepath"
 	"reflect"
 	"sort"
+	"strconv"
 	"syscall"
 	"time"
 	"unsafe"
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/auditbeat/datastore"
 	"github.com/elastic/beats/libbeat/logp"
+)
+
+const (
+	Unknown    = "unknown"
+	Shutdown   = "shutdown"
+	Boot       = "boot"
+	UserLogin  = "user_login"
+	UserLogout = "user_logout"
 )
 
 type FileRecord struct {
@@ -59,8 +73,39 @@ func newUtmp(utmpC *C.struct_utmp) Utmp {
 
 type UtmpFileReader struct {
 	log         *logp.Logger
+	bucket      datastore.Bucket
 	filePattern string
 	fileRecords map[uint64]FileRecord
+	ttyLookup   map[string]LoginRecord
+}
+
+// NewUtmpFileReader creates and initializes a new UTMP file reader.
+func NewUtmpFileReader(log *logp.Logger, bucket datastore.Bucket, filePattern string) (*UtmpFileReader, error) {
+	r := &UtmpFileReader{
+		log:         log,
+		bucket:      bucket,
+		filePattern: filePattern,
+		fileRecords: make(map[uint64]FileRecord),
+		ttyLookup:   make(map[string]LoginRecord),
+	}
+
+	// Load state (file records, tty mapping) from disk
+	err := r.restoreStateFromDisk()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to restore state from disk")
+	}
+
+	return r, nil
+}
+
+// Close performs any cleanup tasks when the UTMP reader is done.
+func (r *UtmpFileReader) Close() error {
+	err := r.bucket.Close()
+	if err != nil {
+		return errors.Wrap(err, "error closing bucket")
+	}
+
+	return nil
 }
 
 // ReadNew returns any new UTMP entries in any of the configured UTMP formatted files (usually /var/log/wtmp).
@@ -99,7 +144,11 @@ func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 				return nil, fmt.Errorf("unexpectedly, there are no new records in file %v", path)
 			} else {
 				for _, utmp := range utmpRecords {
-					loginRecords = append(loginRecords, newLoginRecord(utmp))
+					loginRecord := r.processLoginRecord(utmp)
+					if loginRecord != nil {
+						loginRecord.Origin = path
+						loginRecords = append(loginRecords, *loginRecord)
+					}
 				}
 			}
 		}
@@ -223,32 +272,109 @@ func (r *UtmpFileReader) readAfter(utmpFile string, lastKnownRecord *Utmp) ([]Ut
 	return utmpRecords, nil
 }
 
-func newLoginRecord(utmp Utmp) LoginRecord {
+// processLoginRecord receives UTMP login records in order and returns a LoginRecord
+// where appropriate.
+func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 	record := LoginRecord{
 		Utmp:      utmp,
 		Timestamp: utmp.UtTv,
-		PID:       utmp.UtPid,
-		TTY:       utmp.UtLine,
 		UID:       -1,
+		PID:       -1,
+	}
+
+	if utmp.UtLine != "~" {
+		record.TTY = utmp.UtLine
 	}
 
 	switch utmp.UtType {
 	// See utmp(5) for C constants.
-	case C.USER_PROCESS:
+	case C.RUN_LVL: // 1
+		// The runlevel - though a number - is stored as
+		// the ASCII character of that number.
+		runlevel := string(rune(utmp.UtPid))
+
+		// 0 - halt; 6 - reboot
+		if utmp.UtUser == "shutdown" || runlevel == "0" || runlevel == "6" {
+			record.Type = Shutdown
+
+			// Clear any old logins
+			r.ttyLookup = make(map[string]LoginRecord)
+		} else {
+			// Ignore runlevel changes that are not shutdown or reboot.
+			return nil
+		}
+	case C.BOOT_TIME: // 2
+		if utmp.UtLine == "~" && utmp.UtUser == "reboot" {
+			record.Type = Boot
+
+			// Clear any old logins
+			r.ttyLookup = make(map[string]LoginRecord)
+		} else {
+			record.Type = Unknown
+		}
+	case C.USER_PROCESS: // 7
 		record.Type = UserLogin
+
 		record.Username = utmp.UtUser
-		record.IP = createIP(utmp.UtAddrV6)
+		record.UID = lookupUsername(record.Username)
+		record.PID = utmp.UtPid
+		record.IP = newIP(utmp.UtAddrV6)
 		record.Hostname = utmp.UtHost
-	case C.DEAD_PROCESS:
-		record.Type = UserLogout
+
+		// Store TTY from user login record for enrichment when user logout
+		// record comes along (which, alas, does not contain the username).
+		r.ttyLookup[record.TTY] = record
+	case C.DEAD_PROCESS: // 8
+		savedRecord, found := r.ttyLookup[record.TTY]
+		if found {
+			record.Type = UserLogout
+			record.Username = savedRecord.Username
+			record.UID = savedRecord.UID
+			record.PID = savedRecord.PID
+			record.IP = savedRecord.IP
+			record.Hostname = savedRecord.Hostname
+		} else {
+			// Skip - this is usually the DEAD_PROCESS event for
+			// a previous INIT_PROCESS or LOGIN_PROCESS event -
+			// those are ignored - (see default case below).
+			return nil
+		}
 	default:
-		record.Type = Unknown
+		/*
+			Every other record type is ignored:
+			- EMPTY - empty record
+			- NEW_TIME and OLD_TIME - could be useful, but not written when time changes,
+			  at least not using `date`
+			- INIT_PROCESS and LOGIN_PROCESS - written on boot but do not contain any
+			  interesting information
+			- ACCOUNTING - not implemented according to manpage
+		*/
+		return nil
 	}
 
-	return record
+	return &record
 }
 
-func createIP(utAddrV6 [4]uint32) net.IP {
+// lookupUsername looks up a username and returns its UID.
+// It does not pass through errors (e.g. when the user is not found)
+// but will return -1 instead.
+func lookupUsername(username string) int {
+	if username != "" {
+		user, err := user.Lookup(username)
+		if err == nil {
+			uid, err := strconv.Atoi(user.Uid)
+			if err == nil {
+				return uid
+			}
+		}
+	}
+
+	return -1
+}
+
+func newIP(utAddrV6 [4]uint32) *net.IP {
+	var ip net.IP
+
 	// See utmp(5) for the utmp struct fields.
 	if utAddrV6[1] != 0 || utAddrV6[2] != 0 || utAddrV6[3] != 0 {
 		// IPv6
@@ -257,11 +383,145 @@ func createIP(utAddrV6 [4]uint32) net.IP {
 		binary.LittleEndian.PutUint32(b[4:8], utAddrV6[1])
 		binary.LittleEndian.PutUint32(b[8:12], utAddrV6[2])
 		binary.LittleEndian.PutUint32(b[12:], utAddrV6[3])
-		return net.IP(b)
+		ip = net.IP(b)
 	} else {
 		// IPv4
 		b := make([]byte, 4)
 		binary.LittleEndian.PutUint32(b, utAddrV6[0])
-		return net.IP(b)
+		ip = net.IP(b)
 	}
+
+	return &ip
+}
+
+func (r *UtmpFileReader) saveStateToDisk() error {
+	err := r.saveFileRecordsToDisk()
+	if err != nil {
+		return err
+	}
+
+	err = r.saveTTYLookupToDisk()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *UtmpFileReader) saveFileRecordsToDisk() error {
+	var buf bytes.Buffer
+	encoder := gob.NewEncoder(&buf)
+
+	for _, fileRecord := range r.fileRecords {
+		err := encoder.Encode(fileRecord)
+		if err != nil {
+			return errors.Wrap(err, "error encoding file record")
+		}
+	}
+
+	err := r.bucket.Store(bucketKeyFileRecords, buf.Bytes())
+	if err != nil {
+		return errors.Wrap(err, "error writing file records to disk")
+	}
+
+	r.log.Debugf("Wrote %d file records to disk", len(r.fileRecords))
+	return nil
+}
+
+func (r *UtmpFileReader) saveTTYLookupToDisk() error {
+	var buf bytes.Buffer
+	encoder := gob.NewEncoder(&buf)
+
+	for _, loginRecord := range r.ttyLookup {
+		err := encoder.Encode(loginRecord)
+		if err != nil {
+			return errors.Wrap(err, "error encoding login record")
+		}
+	}
+
+	err := r.bucket.Store(bucketKeyTTYLookup, buf.Bytes())
+	if err != nil {
+		return errors.Wrap(err, "error writing login records to disk")
+	}
+
+	r.log.Debugf("Wrote %d open login records to disk", len(r.ttyLookup))
+	return nil
+}
+
+func (r *UtmpFileReader) restoreStateFromDisk() error {
+	err := r.restoreFileRecordsFromDisk()
+	if err != nil {
+		return err
+	}
+
+	err = r.restoreTTYLookupFromDisk()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *UtmpFileReader) restoreFileRecordsFromDisk() error {
+	var decoder *gob.Decoder
+	err := r.bucket.Load(bucketKeyFileRecords, func(blob []byte) error {
+		if len(blob) > 0 {
+			buf := bytes.NewBuffer(blob)
+			decoder = gob.NewDecoder(buf)
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	if decoder != nil {
+		for {
+			fileRecord := new(FileRecord)
+			err = decoder.Decode(fileRecord)
+			if err == nil {
+				r.fileRecords[fileRecord.Inode] = *fileRecord
+			} else if err == io.EOF {
+				// Read all
+				break
+			} else {
+				return errors.Wrap(err, "error decoding file record")
+			}
+		}
+	}
+	r.log.Debugf("Restored %d file records from disk", len(r.fileRecords))
+
+	return nil
+}
+
+func (r *UtmpFileReader) restoreTTYLookupFromDisk() error {
+	var decoder *gob.Decoder
+	err := r.bucket.Load(bucketKeyTTYLookup, func(blob []byte) error {
+		if len(blob) > 0 {
+			buf := bytes.NewBuffer(blob)
+			decoder = gob.NewDecoder(buf)
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	if decoder != nil {
+		for {
+			loginRecord := new(LoginRecord)
+			err = decoder.Decode(loginRecord)
+			if err == nil {
+				r.ttyLookup[loginRecord.TTY] = *loginRecord
+			} else if err == io.EOF {
+				// Read all
+				break
+			} else {
+				return errors.Wrap(err, "error decoding login record")
+			}
+		}
+	}
+	r.log.Debugf("Restored %d open logins from disk", len(r.ttyLookup))
+
+	return nil
 }
