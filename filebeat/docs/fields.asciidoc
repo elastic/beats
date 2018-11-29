@@ -81,166 +81,212 @@ The number of bytes of the server response body.
 
 --
 
-*`user.name`*::
+*`apache2.access.user_name`*::
 +
 --
 type: alias
 
+alias to: user.name
+
 --
 
-*`http.request.method`*::
+*`apache2.access.method`*::
 +
 --
 type: alias
 
+alias to: http.request.method
+
 --
 
-*`url.original`*::
+*`apache2.access.url`*::
 +
 --
 type: alias
 
+alias to: url.original
+
 --
 
-*`http.version`*::
+*`apache2.access.http_version`*::
 +
 --
 type: alias
 
+alias to: http.version
+
 --
 
-*`http.response.status_code`*::
+*`apache2.access.response_code`*::
 +
 --
 type: alias
 
+alias to: http.response.status_code
+
 --
 
-*`http.request.referrer`*::
+*`apache2.access.referrer`*::
 +
 --
 type: alias
 
+alias to: http.request.referrer
+
 --
 
-*`user_agent.original`*::
+*`apache2.access.agent`*::
 +
 --
 type: alias
 
+alias to: user_agent.original
+
 --
 
 
-*`user_agent.device`*::
+*`apache2.access.user_agent.device`*::
 +
 --
 type: alias
 
+alias to: user_agent.device
+
 --
 
-*`user_agent.major`*::
+*`apache2.access.user_agent.major`*::
 +
 --
 type: alias
 
+alias to: user_agent.major
+
 --
 
-*`user_agent.minor`*::
+*`apache2.access.user_agent.minor`*::
 +
 --
 type: alias
 
+alias to: user_agent.minor
+
 --
 
-*`user_agent.patch`*::
+*`apache2.access.user_agent.patch`*::
 +
 --
 type: alias
 
+alias to: user_agent.patch
+
 --
 
-*`user_agent.name`*::
+*`apache2.access.user_agent.name`*::
 +
 --
 type: alias
 
+alias to: user_agent.name
+
 --
 
-*`user_agent.os.full_name`*::
+*`apache2.access.user_agent.os`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.full_name
+
 --
 
-*`user_agent.os.major`*::
+*`apache2.access.user_agent.os_major`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.major
+
 --
 
-*`user_agent.os.minor`*::
+*`apache2.access.user_agent.os_minor`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.minor
+
 --
 
-*`user_agent.os.name`*::
+*`apache2.access.user_agent.os_name`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.name
+
 --
 
-*`user_agent.original`*::
+*`apache2.access.user_agent.original`*::
 +
 --
 type: alias
 
+alias to: user_agent.original
+
 --
 
 
-*`source.geo.continent_name`*::
+*`apache2.access.geoip.continent_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.continent_name
+
 --
 
-*`source.geo.country_iso_code`*::
+*`apache2.access.geoip.country_iso_code`*::
 +
 --
 type: alias
 
+alias to: source.geo.country_iso_code
+
 --
 
-*`source.geo.location`*::
+*`apache2.access.geoip.location`*::
 +
 --
 type: alias
 
+alias to: source.geo.location
+
 --
 
-*`source.geo.region_name`*::
+*`apache2.access.geoip.region_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.region_name
+
 --
 
-*`source.geo.city_name`*::
+*`apache2.access.geoip.city_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.city_name
+
 --
 
-*`source.geo.region_iso_code`*::
+*`apache2.access.geoip.region_iso_code`*::
 +
 --
 type: alias
+
+alias to: source.geo.region_iso_code
 
 --
 
