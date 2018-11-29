@@ -105,6 +105,25 @@
         },
 
         {
+            "remove": {
+                "field": "kibana.log.meta.req.referer",
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "kibana.log.meta.statusCode",
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "kibana.log.meta.method",
+                "ignore_missing": true
+            }
+        },
+
+        {
             "date": {
                 "field": "read_timestamp",
                 "formats" : ["ISO8601"],
