@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-06-19T05:16:15,549", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.event_type": "authentication_failed", 
         "elasticsearch.audit.layer": "rest", 
         "elasticsearch.audit.origin_address": "147.107.128.77", 
@@ -15,6 +16,7 @@
     }, 
     {
         "@timestamp": "2018-06-19T05:07:52,304", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.event_type": "authentication_failed", 
         "elasticsearch.audit.layer": "rest", 
         "elasticsearch.audit.origin_address": "172.22.0.3", 
@@ -30,6 +32,7 @@
     }, 
     {
         "@timestamp": "2018-06-19T05:00:15,778", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.action": "indices:data/read/scroll/clear", 
         "elasticsearch.audit.event_type": "access_granted", 
         "elasticsearch.audit.layer": "transport", 
@@ -46,6 +49,7 @@
     }, 
     {
         "@timestamp": "2018-06-19T05:07:45,544", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.event_type": "anonymous_access_denied", 
         "elasticsearch.audit.layer": "rest", 
         "elasticsearch.audit.origin_address": "172.22.0.3", 
@@ -60,6 +64,7 @@
     }, 
     {
         "@timestamp": "2018-06-19T05:26:27,268", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.event_type": "authentication_failed", 
         "elasticsearch.audit.layer": "rest", 
         "elasticsearch.audit.origin_address": "147.107.128.77", 
@@ -74,6 +79,7 @@
     }, 
     {
         "@timestamp": "2018-06-19T05:55:26,898", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.action": "cluster:monitor/main", 
         "elasticsearch.audit.event_type": "access_denied", 
         "elasticsearch.audit.layer": "transport", 
@@ -90,6 +96,7 @@
     }, 
     {
         "@timestamp": "2018-06-19T05:24:15,190", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.event_type": "authentication_failed", 
         "elasticsearch.audit.layer": "rest", 
         "elasticsearch.audit.origin_address": "172.18.0.3", 

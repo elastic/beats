@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2017-11-30T13:38:16,911", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.c.ParseField", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -12,6 +13,7 @@
     }, 
     {
         "@timestamp": "2017-11-30T13:38:16,941", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.c.ParseField", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -23,6 +25,7 @@
     }, 
     {
         "@timestamp": "2017-11-30T13:39:28,986", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.UidFieldMapper", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -34,6 +37,7 @@
     }, 
     {
         "@timestamp": "2017-11-30T13:39:36,339", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.UidFieldMapper", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -45,6 +49,7 @@
     }, 
     {
         "@timestamp": "2017-11-30T13:40:49,540", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.UidFieldMapper", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -56,6 +61,7 @@
     }, 
     {
         "@timestamp": "2017-11-30T14:08:37,413", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.UidFieldMapper", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -67,6 +73,7 @@
     }, 
     {
         "@timestamp": "2017-11-30T14:08:37,413", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.UidFieldMapper", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -78,6 +85,7 @@
     }, 
     {
         "@timestamp": "2017-11-30T14:08:46,006", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.UidFieldMapper", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -89,6 +97,7 @@
     }, 
     {
         "@timestamp": "2017-11-30T14:08:46,006", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.UidFieldMapper", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -100,6 +109,7 @@
     }, 
     {
         "@timestamp": "2017-12-01T14:05:54,017", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.AllFieldMapper", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -111,6 +121,7 @@
     }, 
     {
         "@timestamp": "2017-12-01T14:05:54,019", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.AllFieldMapper", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -122,6 +133,7 @@
     }, 
     {
         "@timestamp": "2017-12-01T14:06:52,059", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.AllFieldMapper", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -133,6 +145,7 @@
     }, 
     {
         "@timestamp": "2017-12-01T14:46:10,428", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.s.a.InternalOrder$Parser", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -144,6 +157,7 @@
     }, 
     {
         "@timestamp": "2017-12-04T16:17:18,271", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -155,6 +169,7 @@
     }, 
     {
         "@timestamp": "2017-12-04T16:17:18,282", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.MapperService", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
@@ -166,6 +181,7 @@
     }, 
     {
         "@timestamp": "2017-12-04T16:20:43,248", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.server.component": "o.e.d.i.m.MapperService", 
         "event.dataset": "deprecation", 
         "event.module": "elasticsearch", 
