@@ -34,6 +34,13 @@
           "remove": {
               "field": "elasticsearch.slowlog.timestamp"
           }
+      },
+      {
+          "script": {
+              "lang": "painless",
+              "source": "ctx.event.duration = ctx.elasticsearch.slowlog.took_millis * 1000000",
+              "if": "ctx.elasticsearch.slowlog.containsKey('took_millis')"
+          }
       }
   ],
   "on_failure" : [{
