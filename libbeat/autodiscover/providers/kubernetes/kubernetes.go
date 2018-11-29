@@ -20,6 +20,8 @@ package kubernetes
 import (
 	"time"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
@@ -39,6 +41,7 @@ func init() {
 type Provider struct {
 	config    *Config
 	bus       bus.Bus
+	uuid      uuid.UUID
 	watcher   kubernetes.Watcher
 	metagen   kubernetes.MetaGenerator
 	templates template.Mapper
@@ -47,7 +50,7 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Beta("The kubernetes autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
@@ -95,6 +98,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	p := &Provider{
 		config:    config,
 		bus:       bus,
+		uuid:      uuid,
 		templates: mapper,
 		builders:  builders,
 		appenders: appenders,
@@ -185,6 +189,8 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 		// Without this check there would be overlapping configurations with and without ports.
 		if len(c.Ports) == 0 {
 			event := bus.Event{
+				"provider":   p.uuid,
+				"id":         cid,
 				flag:         true,
 				"host":       host,
 				"kubernetes": kubemeta,
@@ -197,6 +203,8 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 
 		for _, port := range c.Ports {
 			event := bus.Event{
+				"provider":   p.uuid,
+				"id":         cid,
 				flag:         true,
 				"host":       host,
 				"port":       port.GetContainerPort(),
