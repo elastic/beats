@@ -60,7 +60,7 @@ def document_field(output, field, field_path):
     if "required" in field:
         output.write("required: {}\n\n".format(field["required"]))
     if "path" in field:
-        output.write("path: {}\n\n".format(field["path"]))
+        output.write("alias to: {}\n\n".format(field["path"]))
     if "description" in field:
         output.write("{}\n\n".format(field["description"]))
 

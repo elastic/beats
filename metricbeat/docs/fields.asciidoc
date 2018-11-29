@@ -5329,7 +5329,7 @@ Minor version of the operating system.
 --
 type: alias
 
-path: agent.type
+alias to: agent.type
 
 --
 
@@ -5338,7 +5338,7 @@ path: agent.type
 --
 type: alias
 
-path: agent.hostname
+alias to: agent.hostname
 
 --
 

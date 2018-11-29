@@ -2654,7 +2654,7 @@ Minor version of the operating system.
 --
 type: alias
 
-path: agent.type
+alias to: agent.type
 
 --
 
@@ -2663,7 +2663,7 @@ path: agent.type
 --
 type: alias
 
-path: agent.hostname
+alias to: agent.hostname
 
 --
 
@@ -3496,7 +3496,7 @@ If connection is via unix socket, socket path is in this field.
 --
 type: alias
 
-path: source.port
+alias to: source.port
 
 --
 
@@ -3505,7 +3505,7 @@ path: source.port
 --
 type: alias
 
-path: process.name
+alias to: process.name
 
 --
 
@@ -3514,7 +3514,7 @@ path: process.name
 --
 type: alias
 
-path: process.pid
+alias to: process.pid
 
 --
 
@@ -3529,7 +3529,7 @@ Destination information
 --
 type: alias
 
-path: destination.port
+alias to: destination.port
 
 --
 
@@ -3538,7 +3538,7 @@ path: destination.port
 --
 type: alias
 
-path: destination.ip
+alias to: destination.ip
 
 --
 
@@ -3554,7 +3554,7 @@ Contains GeoIP information gathered based on the client.ip field. Only present i
 --
 type: alias
 
-path: source.geo.continent_name
+alias to: source.geo.continent_name
 
 --
 
@@ -3563,7 +3563,7 @@ path: source.geo.continent_name
 --
 type: alias
 
-path: source.geo.country_iso_code
+alias to: source.geo.country_iso_code
 
 --
 
@@ -3572,7 +3572,7 @@ path: source.geo.country_iso_code
 --
 type: alias
 
-path: source.geo.location
+alias to: source.geo.location
 
 --
 
@@ -3581,7 +3581,7 @@ path: source.geo.location
 --
 type: alias
 
-path: source.geo.region_name
+alias to: source.geo.region_name
 
 --
 
@@ -3590,7 +3590,7 @@ path: source.geo.region_name
 --
 type: alias
 
-path: source.geo.city_name
+alias to: source.geo.city_name
 
 --
 
@@ -3599,7 +3599,7 @@ path: source.geo.city_name
 --
 type: alias
 
-path: source.geo.region_iso_code
+alias to: source.geo.region_iso_code
 
 --
 
@@ -3978,7 +3978,7 @@ The number of bytes of the server request body.
 --
 type: alias
 
-path: destination.ip
+alias to: destination.ip
 
 --
 
@@ -3987,7 +3987,7 @@ path: destination.ip
 --
 type: alias
 
-path: http.request.method
+alias to: http.request.method
 
 --
 
@@ -3996,7 +3996,7 @@ path: http.request.method
 --
 type: alias
 
-path: url.path
+alias to: url.path
 
 --
 
@@ -4005,7 +4005,7 @@ path: url.path
 --
 type: alias
 
-path: url.query
+alias to: url.query
 
 --
 
@@ -4014,7 +4014,7 @@ path: url.query
 --
 type: alias
 
-path: destination.port
+alias to: destination.port
 
 --
 
@@ -4023,7 +4023,7 @@ path: destination.port
 --
 type: alias
 
-path: user.name
+alias to: user.name
 
 --
 
@@ -4032,7 +4032,7 @@ path: user.name
 --
 type: alias
 
-path: source.ip
+alias to: source.ip
 
 --
 
@@ -4041,7 +4041,7 @@ path: source.ip
 --
 type: alias
 
-path: http.request.referrer
+alias to: http.request.referrer
 
 --
 
@@ -4050,7 +4050,7 @@ path: http.request.referrer
 --
 type: alias
 
-path: http.response.status_code
+alias to: http.response.status_code
 
 --
 
@@ -4059,7 +4059,7 @@ path: http.response.status_code
 --
 type: alias
 
-path: http.version
+alias to: http.version
 
 --
 
@@ -4068,7 +4068,7 @@ path: http.version
 --
 type: alias
 
-path: host.hostname
+alias to: host.hostname
 
 --
 
@@ -4078,7 +4078,7 @@ path: host.hostname
 --
 type: alias
 
-path: user_agent.device
+alias to: user_agent.device
 
 --
 
@@ -4087,7 +4087,7 @@ path: user_agent.device
 --
 type: alias
 
-path: user_agent.major
+alias to: user_agent.major
 
 --
 
@@ -4096,7 +4096,7 @@ path: user_agent.major
 --
 type: alias
 
-path: user_agent.minor
+alias to: user_agent.minor
 
 --
 
@@ -4105,7 +4105,7 @@ path: user_agent.minor
 --
 type: alias
 
-path: user_agent.patch
+alias to: user_agent.patch
 
 --
 
@@ -4114,7 +4114,7 @@ path: user_agent.patch
 --
 type: alias
 
-path: user_agent.name
+alias to: user_agent.name
 
 --
 
@@ -4123,7 +4123,7 @@ path: user_agent.name
 --
 type: alias
 
-path: user_agent.os.full_name
+alias to: user_agent.os.full_name
 
 --
 
@@ -4132,7 +4132,7 @@ path: user_agent.os.full_name
 --
 type: alias
 
-path: user_agent.os.major
+alias to: user_agent.os.major
 
 --
 
@@ -4141,7 +4141,7 @@ path: user_agent.os.major
 --
 type: alias
 
-path: user_agent.os.minor
+alias to: user_agent.os.minor
 
 --
 
@@ -4150,7 +4150,7 @@ path: user_agent.os.minor
 --
 type: alias
 
-path: user_agent.os.name
+alias to: user_agent.os.name
 
 --
 
@@ -4159,7 +4159,7 @@ path: user_agent.os.name
 --
 type: alias
 
-path: user_agent.original
+alias to: user_agent.original
 
 --
 
@@ -4169,7 +4169,7 @@ path: user_agent.original
 --
 type: alias
 
-path: source.geo.continent_name
+alias to: source.geo.continent_name
 
 --
 
@@ -4178,7 +4178,7 @@ path: source.geo.continent_name
 --
 type: alias
 
-path: source.geo.country_iso_code
+alias to: source.geo.country_iso_code
 
 --
 
@@ -4187,7 +4187,7 @@ path: source.geo.country_iso_code
 --
 type: alias
 
-path: source.geo.location
+alias to: source.geo.location
 
 --
 
@@ -4196,7 +4196,7 @@ path: source.geo.location
 --
 type: alias
 
-path: source.geo.region_name
+alias to: source.geo.region_name
 
 --
 
@@ -4205,7 +4205,7 @@ path: source.geo.region_name
 --
 type: alias
 
-path: source.geo.city_name
+alias to: source.geo.city_name
 
 --
 
@@ -4214,7 +4214,7 @@ path: source.geo.city_name
 --
 type: alias
 
-path: source.geo.region_iso_code
+alias to: source.geo.region_iso_code
 
 --
 
@@ -4833,7 +4833,7 @@ Referrer for this HTTP request.
 --
 type: alias
 
-path: event.dataset
+alias to: event.dataset
 
 --
 
@@ -4842,7 +4842,7 @@ path: event.dataset
 --
 type: alias
 
-path: event.module
+alias to: event.module
 
 --
 
@@ -5295,7 +5295,7 @@ The number of bytes of the server response body.
 --
 type: alias
 
-path: network.forwarded_ip
+alias to: network.forwarded_ip
 
 --
 
@@ -5304,7 +5304,7 @@ path: network.forwarded_ip
 --
 type: alias
 
-path: source.ip
+alias to: source.ip
 
 --
 
@@ -5313,7 +5313,7 @@ path: source.ip
 --
 type: alias
 
-path: user.name
+alias to: user.name
 
 --
 
@@ -5322,7 +5322,7 @@ path: user.name
 --
 type: alias
 
-path: http.request.method
+alias to: http.request.method
 
 --
 
@@ -5331,7 +5331,7 @@ path: http.request.method
 --
 type: alias
 
-path: url.original
+alias to: url.original
 
 --
 
@@ -5340,7 +5340,7 @@ path: url.original
 --
 type: alias
 
-path: http.version
+alias to: http.version
 
 --
 
@@ -5349,7 +5349,7 @@ path: http.version
 --
 type: alias
 
-path: http.response.status_code
+alias to: http.response.status_code
 
 --
 
@@ -5358,7 +5358,7 @@ path: http.response.status_code
 --
 type: alias
 
-path: http.request.referrer
+alias to: http.request.referrer
 
 --
 
@@ -5367,7 +5367,7 @@ path: http.request.referrer
 --
 type: alias
 
-path: user_agent.original
+alias to: user_agent.original
 
 --
 
@@ -5377,7 +5377,7 @@ path: user_agent.original
 --
 type: alias
 
-path: user_agent.device
+alias to: user_agent.device
 
 --
 
@@ -5386,7 +5386,7 @@ path: user_agent.device
 --
 type: alias
 
-path: user_agent.major
+alias to: user_agent.major
 
 --
 
@@ -5395,7 +5395,7 @@ path: user_agent.major
 --
 type: alias
 
-path: user_agent.minor
+alias to: user_agent.minor
 
 --
 
@@ -5404,7 +5404,7 @@ path: user_agent.minor
 --
 type: alias
 
-path: user_agent.patch
+alias to: user_agent.patch
 
 --
 
@@ -5413,7 +5413,7 @@ path: user_agent.patch
 --
 type: alias
 
-path: user_agent.name
+alias to: user_agent.name
 
 --
 
@@ -5422,7 +5422,7 @@ path: user_agent.name
 --
 type: alias
 
-path: user_agent.os.full_name
+alias to: user_agent.os.full_name
 
 --
 
@@ -5431,7 +5431,7 @@ path: user_agent.os.full_name
 --
 type: alias
 
-path: user_agent.os.major
+alias to: user_agent.os.major
 
 --
 
@@ -5440,7 +5440,7 @@ path: user_agent.os.major
 --
 type: alias
 
-path: user_agent.os.minor
+alias to: user_agent.os.minor
 
 --
 
@@ -5449,7 +5449,7 @@ path: user_agent.os.minor
 --
 type: alias
 
-path: user_agent.os.name
+alias to: user_agent.os.name
 
 --
 
@@ -5458,7 +5458,7 @@ path: user_agent.os.name
 --
 type: alias
 
-path: user_agent.original
+alias to: user_agent.original
 
 --
 
@@ -5468,7 +5468,7 @@ path: user_agent.original
 --
 type: alias
 
-path: source.geo.continent_name
+alias to: source.geo.continent_name
 
 --
 
@@ -5477,7 +5477,7 @@ path: source.geo.continent_name
 --
 type: alias
 
-path: source.geo.country_iso_code
+alias to: source.geo.country_iso_code
 
 --
 
@@ -5486,7 +5486,7 @@ path: source.geo.country_iso_code
 --
 type: alias
 
-path: source.geo.location
+alias to: source.geo.location
 
 --
 
@@ -5495,7 +5495,7 @@ path: source.geo.location
 --
 type: alias
 
-path: source.geo.region_name
+alias to: source.geo.region_name
 
 --
 
@@ -5504,7 +5504,7 @@ path: source.geo.region_name
 --
 type: alias
 
-path: source.geo.city_name
+alias to: source.geo.city_name
 
 --
 
@@ -5513,7 +5513,7 @@ path: source.geo.city_name
 --
 type: alias
 
-path: source.geo.region_iso_code
+alias to: source.geo.region_iso_code
 
 --
 
@@ -5920,7 +5920,7 @@ Fields from the Linux authorization logs.
 --
 type: alias
 
-path: @timestamp
+alias to: @timestamp
 
 --
 
@@ -5929,7 +5929,7 @@ path: @timestamp
 --
 type: alias
 
-path: host.hostname
+alias to: host.hostname
 
 --
 
@@ -5938,7 +5938,7 @@ path: host.hostname
 --
 type: alias
 
-path: process.name
+alias to: process.name
 
 --
 
@@ -5947,7 +5947,7 @@ path: process.name
 --
 type: alias
 
-path: process.pid
+alias to: process.pid
 
 --
 
@@ -5956,7 +5956,7 @@ path: process.pid
 --
 type: alias
 
-path: message
+alias to: message
 
 --
 
@@ -5965,7 +5965,7 @@ path: message
 --
 type: alias
 
-path: user.name
+alias to: user.name
 
 --
 
@@ -6001,7 +6001,7 @@ The client IP from SSH connections that are open and immediately dropped.
 --
 type: alias
 
-path: event.action
+alias to: event.action
 
 --
 
@@ -6010,7 +6010,7 @@ path: event.action
 --
 type: alias
 
-path: source.ip
+alias to: source.ip
 
 --
 
@@ -6019,7 +6019,7 @@ path: source.ip
 --
 type: alias
 
-path: source.port
+alias to: source.port
 
 --
 
@@ -6029,7 +6029,7 @@ path: source.port
 --
 type: alias
 
-path: source.geo.continent_name
+alias to: source.geo.continent_name
 
 --
 
@@ -6038,7 +6038,7 @@ path: source.geo.continent_name
 --
 type: alias
 
-path: source.geo.country_iso_code
+alias to: source.geo.country_iso_code
 
 --
 
@@ -6047,7 +6047,7 @@ path: source.geo.country_iso_code
 --
 type: alias
 
-path: source.geo.location
+alias to: source.geo.location
 
 --
 
@@ -6056,7 +6056,7 @@ path: source.geo.location
 --
 type: alias
 
-path: source.geo.region_name
+alias to: source.geo.region_name
 
 --
 
@@ -6065,7 +6065,7 @@ path: source.geo.region_name
 --
 type: alias
 
-path: source.geo.city_name
+alias to: source.geo.city_name
 
 --
 
@@ -6074,7 +6074,7 @@ path: source.geo.city_name
 --
 type: alias
 
-path: source.geo.region_iso_code
+alias to: source.geo.region_iso_code
 
 --
 
@@ -6155,7 +6155,7 @@ The default shell for the new user.
 --
 type: alias
 
-path: user.name
+alias to: user.name
 
 --
 
@@ -6164,7 +6164,7 @@ path: user.name
 --
 type: alias
 
-path: user.id
+alias to: user.id
 
 --
 
@@ -6173,7 +6173,7 @@ path: user.id
 --
 type: alias
 
-path: group.id
+alias to: group.id
 
 --
 
@@ -6189,7 +6189,7 @@ Fields specific to events created by the `groupadd` command.
 --
 type: alias
 
-path: group.name
+alias to: group.name
 
 --
 
@@ -6198,7 +6198,7 @@ path: group.name
 --
 type: alias
 
-path: group.id
+alias to: group.id
 
 --
 
@@ -6214,7 +6214,7 @@ Contains fields from the syslog system logs.
 --
 type: alias
 
-path: @timestamp
+alias to: @timestamp
 
 --
 
@@ -6223,7 +6223,7 @@ path: @timestamp
 --
 type: alias
 
-path: host.hostname
+alias to: host.hostname
 
 --
 
@@ -6232,7 +6232,7 @@ path: host.hostname
 --
 type: alias
 
-path: process.name
+alias to: process.name
 
 --
 
@@ -6241,7 +6241,7 @@ path: process.name
 --
 type: alias
 
-path: process.pid
+alias to: process.pid
 
 --
 
@@ -6250,7 +6250,7 @@ path: process.pid
 --
 type: alias
 
-path: message
+alias to: message
 
 --
 
