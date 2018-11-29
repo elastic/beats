@@ -41,6 +41,7 @@ type Event struct {
 	Timestamp time.Time     // Timestamp when the event data was collected.
 	Error     error         // Error that occurred while collecting the event data.
 	Host      string        // Host from which the data was collected.
+	Service   string        // Service type
 	Took      time.Duration // Amount of time it took to collect the event data.
 }
 
@@ -64,6 +65,12 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 		b.Fields.Put(module, e.ModuleFields)
 		e.ModuleFields = nil
 	}
+
+	// If service is not set, falls back to the module name
+	if e.Service == "" {
+		e.Service = module
+	}
+	e.RootFields.Put("service.type", e.Service)
 
 	if len(e.MetricSetFields) > 0 {
 		switch e.Namespace {

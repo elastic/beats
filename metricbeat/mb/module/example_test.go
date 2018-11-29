@@ -99,6 +99,9 @@ func ExampleWrapper() {
 	//     "module": "fake",
 	//     "name": "eventfetcher",
 	//     "rtt": 111
+	//   },
+	//   "service": {
+	//     "type": "fake"
 	//   }
 	// }
 }

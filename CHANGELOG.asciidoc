@@ -75,6 +75,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 - Add setting to disable docker cpu metrics per core. {pull}9194[9194]
 - The `elasticsearch/node` metricset now reports the Elasticsearch cluster UUID. {pull}8771[8771]
+- Add service.type field to Metricbeat. {pull}8965[8965]
 
 *Packetbeat*
 
