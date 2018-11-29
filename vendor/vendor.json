@@ -457,6 +457,12 @@
 			"revisionTime": "2018-01-08T23:06:52Z"
 		},
 		{
+			"checksumSHA1": "d/czTNq3bacK85PFEKcHvW6aR80=",
+			"path": "github.com/danwakefield/fnmatch",
+			"revision": "cbb64ac3d964b81592e64f957ad53df015803288",
+			"revisionTime": "2016-04-03T17:12:40Z"
+		},
+		{
 			"checksumSHA1": "dvabztWVQX8f6oMLRyv4dLH+TGY=",
 			"path": "github.com/davecgh/go-spew/spew",
 			"revision": "346938d642f2ec3594ed81d874461961cd0faa76",
