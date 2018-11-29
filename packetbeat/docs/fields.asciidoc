@@ -1322,85 +1322,15 @@ These fields contain data about the environment in which the transaction or flow
 
 
 
-*`server`*::
-+
---
-The name of the server that served the transaction.
-
-
---
-
-*`client_server`*::
-+
---
-The name of the server that initiated the transaction.
-
-
---
-
-*`client_service`*::
-+
---
-The name of the logical service that initiated the transaction.
-
-
---
-
-*`ip`*::
-+
---
-format: dotted notation.
-
-The IP address of the server that served the transaction.
-
-
---
-
-*`client_ip`*::
-+
---
-format: dotted notation.
-
-The IP address of the server that initiated the transaction.
-
-
---
-
 *`real_ip`*::
 +
 --
+type: ip
+
 format: Dotted notation.
 
 If the server initiating the transaction is a proxy, this field contains the original client IP address. For HTTP, for example, the IP address extracted from a configurable HTTP header, by default `X-Forwarded-For`.
 Unless this field is disabled, it always has a value, and it matches the `client_ip` for non proxy clients.
-
-
---
-
-[float]
-== client_geoip fields
-
-The GeoIP information of the client.
-
-
-*`client_geoip.location`*::
-+
---
-type: geo_point
-
-example: {'lat': 51, 'lon': 9}
-
-The GeoIP location of the `client_ip` address. This field is available only if you define a https://www.elastic.co/guide/en/elasticsearch/plugins/master/using-ingest-geoip.html[GeoIP Processor] as a pipeline in the https://www.elastic.co/guide/en/elasticsearch/plugins/master/ingest-geoip.html[Ingest GeoIP processor plugin] or using Logstash.
-
-
---
-
-*`client_port`*::
-+
---
-format: dotted notation.
-
-The layer 4 port of the process that initiated the transaction.
 
 
 --
@@ -1425,17 +1355,7 @@ The type of the transaction (for example, HTTP, MySQL, Redis, or RUM) or "flow" 
 
 --
 
-*`port`*::
-+
---
-format: dotted notation.
-
-The layer 4 port of the process that served the transaction.
-
-
---
-
-*`proc`*::
+*`server.process.name`*::
 +
 --
 The name of the process that served the transaction.
@@ -1443,7 +1363,7 @@ The name of the process that served the transaction.
 
 --
 
-*`cmdline`*::
+*`server.process.args`*::
 +
 --
 The command-line of the process that served the transaction.
@@ -1451,7 +1371,31 @@ The command-line of the process that served the transaction.
 
 --
 
-*`client_proc`*::
+*`server.process.executable`*::
++
+--
+Absolute path to the server process executable.
+
+
+--
+
+*`server.process.working_directory`*::
++
+--
+The working directory of the server process.
+
+
+--
+
+*`server.process.start`*::
++
+--
+The time the server process started.
+
+
+--
+
+*`client.process.name`*::
 +
 --
 The name of the process that initiated the transaction.
@@ -1459,7 +1403,7 @@ The name of the process that initiated the transaction.
 
 --
 
-*`client_cmdline`*::
+*`client.process.args`*::
 +
 --
 The command-line of the process that initiated the transaction.
@@ -1467,10 +1411,26 @@ The command-line of the process that initiated the transaction.
 
 --
 
-*`release`*::
+*`client.process.executable`*::
 +
 --
-The software release of the service serving the transaction. This can be the commit id or a semantic version.
+Absolute path to the client process executable.
+
+
+--
+
+*`client.process.working_directory`*::
++
+--
+The working directory of the client process.
+
+
+--
+
+*`client.process.start`*::
++
+--
+The time the client process started.
 
 
 --
@@ -7093,16 +7053,6 @@ The JA3 string used to calculate the hash.
 These fields contain data about the transaction itself.
 
 
-
-*`direction`*::
-+
---
-required: True
-
-Indicates whether the transaction is inbound (emitted by server) or outbound (emitted by the client). Values can be in or out. No defaults.
-
-
---
 
 *`status`*::
 +

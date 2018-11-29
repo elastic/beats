@@ -4,29 +4,8 @@
       These fields contain data about the environment in which the
       transaction or flow was captured.
   fields:
-    - name: server
-      description: >
-        The name of the server that served the transaction.
-
-    - name: client_server
-      description: >
-        The name of the server that initiated the transaction.
-
-    - name: client_service
-      description: >
-        The name of the logical service that initiated the transaction.
-
-    - name: ip
-      description: >
-        The IP address of the server that served the transaction.
-      format: dotted notation.
-
-    - name: client_ip
-      description: >
-        The IP address of the server that initiated the transaction.
-      format: dotted notation.
-
     - name: real_ip
+      type: ip
       description: >
         If the server initiating the transaction is a proxy, this field
         contains the original client IP address.
@@ -36,24 +15,6 @@
         Unless this field is disabled, it always has a value, and it matches
         the `client_ip` for non proxy clients.
       format: Dotted notation.
-
-    - name: client_geoip
-      description: The GeoIP information of the client.
-      type: group
-      fields:
-        - name: location
-          type: geo_point
-          example: {lat: 51, lon: 9}
-          description: >
-            The GeoIP location of the `client_ip` address. This field is available
-            only if you define a
-            https://www.elastic.co/guide/en/elasticsearch/plugins/master/using-ingest-geoip.html[GeoIP Processor] as a pipeline in the
-            https://www.elastic.co/guide/en/elasticsearch/plugins/master/ingest-geoip.html[Ingest GeoIP processor plugin] or using Logstash.
-
-    - name: client_port
-      description: >
-        The layer 4 port of the process that initiated the transaction.
-      format: dotted notation.
 
     - name: transport
       description: >
@@ -66,31 +27,45 @@
         The type of the transaction (for example, HTTP, MySQL, Redis, or RUM) or "flow" in case of flows.
       required: true
 
-    - name: port
-      description: >
-        The layer 4 port of the process that served the transaction.
-      format: dotted notation.
-
-    - name: proc
+    - name: server.process.name
       description: >
         The name of the process that served the transaction.
 
-    - name: cmdline
+    - name: server.process.args
       description: >
         The command-line of the process that served the transaction.
 
-    - name: client_proc
+    - name: server.process.executable
+      description: >
+        Absolute path to the server process executable.
+
+    - name: server.process.working_directory
+      description: >
+        The working directory of the server process.
+
+    - name: server.process.start
+      description: >
+        The time the server process started.
+
+    - name: client.process.name
       description: >
         The name of the process that initiated the transaction.
 
-    - name: client_cmdline
+    - name: client.process.args
       description: >
         The command-line of the process that initiated the transaction.
 
-    - name: release
+    - name: client.process.executable
       description: >
-        The software release of the service serving the transaction.
-        This can be the commit id or a semantic version.
+        Absolute path to the client process executable.
+
+    - name: client.process.working_directory
+      description: >
+        The working directory of the client process.
+
+    - name: client.process.start
+      description: >
+        The time the client process started.
 
 - key: flows_event
   title: "Flow Event"
@@ -119,15 +94,6 @@
   description: >
     These fields contain data about the transaction itself.
   fields:
-
-    - name: direction
-      required: true
-      description: >
-        Indicates whether the transaction is inbound (emitted by server)
-        or outbound (emitted by the client). Values can be in or out. No defaults.
-      possible_values:
-        - in
-        - out
 
     - name: status
       description: >

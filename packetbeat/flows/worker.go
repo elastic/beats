@@ -344,28 +344,48 @@ func createEvent(
 	}
 	network["bytes"] = totalBytes
 	network["packets"] = totalPackets
-
 	fields["network"] = network
-	fields["source"] = source
-	fields["destination"] = dest
 
 	// Set process information if it's available
 	if tuple.IPLength != 0 && tuple.SrcPort != 0 {
-		if cmdline := procs.ProcWatcher.FindProcessesTuple(&tuple, proto); cmdline != nil {
-			src, dst := common.MakeEndpointPair(tuple.BaseTuple, cmdline)
-
-			for key, value := range map[string]string{
-				"client_proc":    src.Name,
-				"client_cmdline": src.Cmdline,
-				"proc":           dst.Name,
-				"cmdline":        dst.Cmdline,
-			} {
-				if len(value) != 0 {
-					fields[key] = value
+		if proc := procs.ProcWatcher.FindProcessesTuple(&tuple, proto); proc != nil {
+			if proc.Src.PID > 0 {
+				p := common.MapStr{
+					"pid":               proc.Src.PID,
+					"name":              proc.Src.Name,
+					"args":              proc.Src.Args,
+					"ppid":              proc.Src.PPID,
+					"executable":        proc.Src.Exe,
+					"start":             proc.Src.StartTime,
+					"working_directory": proc.Src.CWD,
 				}
+				if proc.Src.CWD != "" {
+					p["working_directory"] = proc.Src.CWD
+				}
+				source["process"] = p
+				fields["process"] = p
+			}
+			if proc.Dst.PID > 0 {
+				p := common.MapStr{
+					"pid":               proc.Dst.PID,
+					"name":              proc.Dst.Name,
+					"args":              proc.Dst.Args,
+					"ppid":              proc.Dst.PPID,
+					"executable":        proc.Dst.Exe,
+					"start":             proc.Dst.StartTime,
+					"working_directory": proc.Src.CWD,
+				}
+				if proc.Dst.CWD != "" {
+					p["working_directory"] = proc.Dst.CWD
+				}
+				dest["process"] = p
+				fields["process"] = p
 			}
 		}
 	}
+
+	fields["source"] = source
+	fields["destination"] = dest
 
 	return beat.Event{
 		Timestamp: timestamp,

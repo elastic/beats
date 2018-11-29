@@ -28,6 +28,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 *Packetbeat*
 
 - Renamed the flow event fields to follow Elastic Common Schema. {pull}9121[9121]
+- Renamed several client and server fields. IP, port, and process metadata are
+  now contained under the client and server namespaces. {issue}9303[9303]
 
 *Winlogbeat*
 
