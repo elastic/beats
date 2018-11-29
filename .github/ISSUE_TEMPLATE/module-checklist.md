@@ -8,8 +8,6 @@ about: "Meta issue to track the creation, updating of a new module or dataset."
 
 This checklist is intended for Devs which create or update a module to make sure modules are consistent.
 
-The idea of having this in Markdown is that it can be copied 1-1 to a Github issue and be used as meta issue.
-
 ## Modules
 
 For a metricset to go GA, the following criterias should be met:
