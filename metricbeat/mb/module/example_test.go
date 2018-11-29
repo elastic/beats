@@ -86,7 +86,7 @@ func ExampleWrapper() {
 	// {
 	//   "@metadata": {
 	//     "beat": "noindex",
-	//     "type": "doc",
+	//     "type": "_doc",
 	//     "version": "1.2.3"
 	//   },
 	//   "@timestamp": "2016-05-10T23:27:58.485Z",
