@@ -74,6 +74,36 @@
                 "ignore_missing": true
             }
         },
+
+        {
+            "rename": {
+                "field": "kibana.log.meta.req.headers.referer",
+                "target_field": "http.request.referrer",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.req.headers.user-agent",
+                "target_field": "user_agent.original",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.req.remoteAddress",
+                "target_field": "source.ip",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "kibana.log.meta.req.url",
+                "target_field": "url.original",
+                "ignore_missing": true
+            }
+        },
+
         {
             "date": {
                 "field": "read_timestamp",
