@@ -34,7 +34,7 @@ import (
 type ESClient interface {
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() string
+	GetVersion() common.Version
 }
 
 type Loader struct {
@@ -79,7 +79,8 @@ func (l *Loader) Load() error {
 	exists := l.CheckTemplate(templateName)
 	if !exists || l.config.Overwrite {
 
-		logp.Info("Loading template for Elasticsearch version: %s", l.client.GetVersion())
+		version := l.client.GetVersion()
+		logp.Info("Loading template for Elasticsearch version: %s", version.String())
 		if l.config.Overwrite {
 			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
 		}

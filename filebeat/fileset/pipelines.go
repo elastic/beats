@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -33,7 +34,7 @@ type PipelineLoaderFactory func() (PipelineLoader, error)
 type PipelineLoader interface {
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() string
+	GetVersion() common.Version
 }
 
 // LoadPipelines loads the pipelines for each configured fileset.
