@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 *Journalbeat*
 
 - Add the ability to check against JSON HTTP bodies with conditions. {pull}8667[8667]
+- Add cursor_seek_fallback option. {pull}9234[9234]
 
 *Metricbeat*
 
