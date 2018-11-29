@@ -44,22 +44,85 @@ endif::[]
 ==== Configure {beatname_uc} on Docker
 
 The Docker image provides several methods for configuring {beatname_uc}. The
-conventional approach is to provide a configuration file via a bind mount, but 
+conventional approach is to provide a configuration file via a volume mount, but 
 it's also possible to create a custom image with your
 configuration included.
 
 [float]
-===== Bind-mounted configuration
+===== Volume-mounted configuration
 
-One way to configure {beatname_uc} on Docker is to provide +{beatname_lc}.yml+ via a bind mount.
-With +docker run+, the bind mount can be specified like this:
+One way to configure {beatname_uc} on Docker is to provide +{beatname_lc}.yml+ via a volume mount.
+With +docker run+, the volume mount can be specified like this:
 
+ifeval::["{beatname_lc}"=="filebeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
-  --mount type=bind,source="$(pwd)"/{beatname_lc}.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml \
-  {dockerimage}
+docker run -d \
+--name={beatname_lc} \
+--user=root \
+--volume="/var/lib/docker/containers:/var/lib/docker/containers:ro" \
+--volume="$(pwd)/{beatname_lc}.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+--volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
+{dockerimage} {beatname_lc} -e -strict.perms=false
 --------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run -d \
+--name={beatname_lc} \
+--user=root \
+--volume="$(pwd)/{beatname_lc}.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+--volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
+--volume="/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro" \
+--volume="/proc:/hostfs/proc:ro" \
+--volume="/:/hostfs:ro" \
+{dockerimage} {beatname_lc} -e
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="packetbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run -d \
+  --name={beatname_lc} \
+  --user={beatname_lc} \
+  --volume="$(pwd)/{beatname_lc}.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  --cap-add="NET_RAW" \
+  --cap-add="NET_ADMIN" \
+  --network=host \
+  {dockerimage} \
+  --strict.perms=false -e
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="auditbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run -d \
+  --name={beatname_lc} \
+  --user=root \
+  --volume="$(pwd)/{beatname_lc}.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  --cap-add="AUDIT_CONTROL" \
+  --cap-add="AUDIT_READ" \
+  --pid=host \
+  {dockerimage} -e \
+  --strict.perms=false
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="heartbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run -d \
+  --name={beatname_lc} \
+  --user={beatname_lc} \
+  --volume="$(pwd)/{beatname_lc}.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  {dockerimage} \
+  --strict.perms=false -e
+--------------------------------------------
+endif::[]
 
 [float]
 ===== Custom image configuration
