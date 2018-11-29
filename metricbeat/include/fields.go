@@ -31,5 +31,9 @@ func init() {
 
 // Asset returns asset data
 func Asset() string {
+<<<<<<< HEAD
 	return "eJyUlEFu2zAQRfc+xUf20QG0KFCkBbrqKhcYk+OQCMlRyZFV3T4gJTmxEduwdzQ1//+ZedIz3nnuYSRGSTtAvQbu8bKdLReT/aBeUo8fOwB4kaTkU1mLcPAcbAEdyQfaB4ZPoBDAR04KnQcu3Q7rY/2uaTwjUeQekTV7U1i7KHYM3C6/da2/V8etDnKAOsZSA3WkeOPEmZRtu2ne3TWven7Qaat93MxJ0dtmf6TomRkZ5xPjkCVict64iwwT1eGHwEbZdnh1vpzE2pgRaUYSxZ4xZC51EZPj1HQsKZ1LIIihEOarPWTdWqjr7BEkva1/ZP43+sy2h+bxzlR/NyKyjMlCsx+gPjZcojdZChtJtrGyaAyZTR3yKn1jmWUgw2cJ33meJNvbef5upXXydk4UvflULhfjqMK3mub/FIfwNVu5D5kVM8btPenwM0w0FzTQBE9WzNNFisL56A1/ZfhkzIGKVmfKxt1vfeNtlVxz75kUB1bjuHzyUlm8SLJgb8dMVfwaH1f8f61lW4blY+ETEiXBCYXvDEmpsD6+7YW+tbxJdruPAAAA///0dI4s"
+=======
+	return "eJyUU81u2zAMvucpPnTn5gF8GFAUA3baqS/ASExFVBI9ianntx+k2G0dtAnqmyR/PyQ/3uOF5wFOU9K8A0ws8oDH9ey5uiKjieYBP3cA8KjZSHJdQDgKR19BrySRDpEhGRQj+JWzweaR636H5bdh1znukSnxgMRWxFW2fVJ/itwfP1Vt31PgjoMeYYFxxsACGZ45cyFj31+69v4rrXb+ptKK/b5Y0GrXxX5rtY0YuSCZcSyaMAVx4cLDRK35MbIz9ns8BalvZL3NSDQjq+HAGAvXNogpcO48noy2FIjqKMb5yxqKrSW0cQ6Imp+Xi8J/T1LYD7ByutHVXz0RRU/Zw4qMMEk9Lklc0cpOs69Xp1ZHcryx8sLzpMVfF/6zQluL/ZwpiXtnvpRsxNeq43+UxvjRW72dJq/ulNaF2OMhTjRX9EQp7ry6uwsXlcurOP4Y1jdhjlStKVNx4Xbpa7AWysX3gclwZHOB63swWugWJz/wEKXnJI1kcohi87LGG6fn/G8W+DwbavDlZiQLn+z7/wAAAP//JUZpkw=="
+>>>>>>> Introduce aliases for 7.x fields in 6.x
 }

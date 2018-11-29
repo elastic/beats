@@ -1,0 +1,72 @@
+# The ECS migration file contains the information about all the Beats fields which are migrated to ECS in 7.0.
+# The goal of the file is to potentially have scripts on top of this information to convert visualisations and templates
+# based on this information in an automated way and to keep track of all changes which were applied.
+#
+# The format of the file is as following:
+#
+# - from: source-field-in-6.x
+#   to: target-filed-in-ECS
+#   # Alias field is useful for fields where many-1 mapping from new to old are needed
+#   alias: true-if-alias-is-required-in-7
+#   # Alias6 field is useful for fields where there is a 1-1 mapping from old to new. If absent, defaults to false.
+#   alias6: true-if-alias-is-required-in-6
+#   # Copy to is useful for fields where multiple fields map to the same ECS field
+#   copy_to: true-if-field-should-be-copied-to-target-in-6x
+
+# Beat fields
+
+- from: beat.hostname
+  to: host.hostname
+  alias6: true
+  alias: true
+
+- from: beat.timezone
+  to: event.timezone
+  alias6: true
+  alias: true
+
+# Cloud processor fields
+- to: cloud.provider
+  from: meta.cloud.provider
+  alias6: true
+- to: cloud.instance.id
+  from: meta.cloud.instance_id
+  alias6: true
+- to: cloud.instance.name
+  from: meta.cloud.instance_name
+  alias6: true
+- to: cloud.machine.type
+  from: meta.cloud.machine_type
+  alias6: true
+- to: cloud.availability_zone
+  from: meta.cloud.availability_zone
+  alias6: true
+- to: cloud.project.id
+  from: meta.cloud.project_id
+  alias6: true
+- to: cloud.region
+  from: meta.cloud.region
+  alias6: true
+
+# Docker processor fields
+- to: container.name
+  from: docker.container.name
+  alias6: true
+
+- to: container.image.name
+  from: docker.container.image
+  alias6: true
+
+- to: container.id
+  from: docker.container.id
+  alias6: true
+
+# Filebeat fields
+- to: event.module
+  from: fileset.module
+  index: filebeat
+
+# Metricbeat fields
+- to: event.module
+  from: metricset.module
+  index: metricbeat

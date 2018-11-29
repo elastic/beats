@@ -370,3 +370,8 @@
           type: long
           description: File size in bytes (field is only added when `type` is
             `file`).
+
+    # Alias compatibility fields
+    - name: event.module
+      type: alias
+      path: fileset.module
