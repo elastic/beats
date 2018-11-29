@@ -43,7 +43,7 @@ func (r *Reader) addMatches() error {
 			p = m
 		}
 
-		r.logger.Debug("journal", "Added matcher expression: %s", p)
+		r.logger.Debugf("Added matcher expression: %s", p)
 
 		err := r.journal.AddMatch(p)
 		if err != nil {
