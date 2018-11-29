@@ -20,9 +20,8 @@ package dialchain
 import (
 	"net"
 
-	"github.com/elastic/beats/libbeat/beat"
-
 	"github.com/elastic/beats/heartbeat/look"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 

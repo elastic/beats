@@ -35,13 +35,13 @@ import (
 // Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
 type Monitor struct {
-	name       string
-	config     *common.Config
-	registrar  *pluginsReg
-	uniqueName string
-	scheduler  *scheduler.Scheduler
-	jobTasks   []*configuredJob
-	enabled    bool
+	name           string
+	config         *common.Config
+	registrar      *pluginsReg
+	uniqueName     string
+	scheduler      *scheduler.Scheduler
+	configuredJobs []*configuredJob
+	enabled        bool
 	// endpoints is a count of endpoints this monitor measures.
 	endpoints int
 	// internalsMtx is used to synchronize access to critical
@@ -96,7 +96,7 @@ func newMonitor(
 	m := &Monitor{
 		name:              monitorPlugin.name,
 		scheduler:         scheduler,
-		jobTasks:          []*configuredJob{},
+		configuredJobs:    []*configuredJob{},
 		pipelineConnector: pipelineConnector,
 		watchPollTasks:    []*configuredJob{},
 		internalsMtx:      sync.Mutex{},
@@ -110,7 +110,7 @@ func newMonitor(
 		return nil, fmt.Errorf("job err %v", err)
 	}
 
-	m.jobTasks, err = m.makeTasks(config, jobs)
+	m.configuredJobs, err = m.makeTasks(config, jobs)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (m *Monitor) makeTasks(config *common.Config, jobs []Job) ([]*configuredJob
 		t, err := newConfiguredJob(job, mtConf, m)
 		if err != nil {
 			// Failure to compile monitor processors should not crash hb or prevent progress
-			if _, ok := err.(InvalidMonitorProcessorsError); ok {
+			if _, ok := err.(ProcessorsError); ok {
 				logp.Critical("Failed to load monitor processors: %v", err)
 				continue
 			}
@@ -229,7 +229,7 @@ func (m *Monitor) Start() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
 
-	for _, t := range m.jobTasks {
+	for _, t := range m.configuredJobs {
 		t.Start()
 	}
 
@@ -246,7 +246,7 @@ func (m *Monitor) Stop() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
 
-	for _, t := range m.jobTasks {
+	for _, t := range m.configuredJobs {
 		t.Stop()
 	}
 

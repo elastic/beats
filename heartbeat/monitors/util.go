@@ -107,7 +107,6 @@ func WithErrAsField(job Job) Job {
 // its status.
 // It adds the monitor.duration and monitor.status fields.
 func TimeAndCheckJob(job Job) Job {
-	// This should probably execute before job.Run
 	return CreateNamedJob(
 		job.Name(),
 		func() (*beat.Event, []Job, error) {
@@ -231,8 +230,7 @@ func MakeByIPJob(
 		"monitor": common.MapStr{"ip": addr.String()},
 	}
 
-	job := TimeAndCheckJob(WithFields(fields, pingFactory(addr)))
-	return job, nil
+	return TimeAndCheckJob(WithFields(fields, pingFactory(addr))), nil
 }
 
 // MakeByHostJob creates a new Job including host lookup. The pingFactory will be used to

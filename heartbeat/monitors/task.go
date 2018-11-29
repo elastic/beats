@@ -52,7 +52,7 @@ func newConfiguredJob(job Job, config jobConfig, monitor *Monitor) (*configuredJ
 
 	processors, err := processors.New(config.Processors)
 	if err != nil {
-		return nil, InvalidMonitorProcessorsError{err}
+		return nil, ProcessorsError{err}
 	}
 	t.processors = processors
 
@@ -75,11 +75,11 @@ type jobConfig struct {
 	Processors    processors.PluginConfig `config:"processors"`
 }
 
-// InvalidMonitorProcessorsError is used to indicate situations when processors could not be loaded.
+// ProcessorsError is used to indicate situations when processors could not be loaded.
 // This special type is used because these errors are caught and handled gracefully.
-type InvalidMonitorProcessorsError struct{ root error }
+type ProcessorsError struct{ root error }
 
-func (e InvalidMonitorProcessorsError) Error() string {
+func (e ProcessorsError) Error() string {
 	return fmt.Sprintf("could not load monitor processors: %s", e.root)
 }
 
