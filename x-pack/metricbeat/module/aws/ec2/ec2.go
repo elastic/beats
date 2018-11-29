@@ -33,12 +33,12 @@ func init() {
 	)
 }
 
-// Define a mock MockEC2Client struct to be used in your unit tests.
+// MockCloudWatchClient struct is used for unit tests.
 type MockEC2Client struct {
 	ec2iface.EC2API
 }
 
-// Define a mock MockCloudWatchClient struct to be used in your unit tests.
+// MockCloudWatchClient struct is used for unit tests.
 type MockCloudWatchClient struct {
 	cloudwatchiface.CloudWatchAPI
 }
@@ -100,12 +100,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	for _, regionName := range regionsList {
 		cfg.Region = regionName
 		svcEC2 := ec2.New(cfg)
-		instanceIDs, describeInstancesOutput, err := getInstancesPerRegion(svcEC2)
+		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
 			report.Error(errors.Wrap(err, "getInstancesPerRegion failed"))
 		}
-		// report instance metadata
-		reportEC2Events(describeInstancesOutput, regionName, report)
 
 		svcCloudwatch := cloudwatch.New(cfg)
 		for _, instanceID := range instanceIDs {
@@ -117,7 +115,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 				if err != nil {
 					report.Error(errors.Wrap(err, "getMetricDataPerRegion failed"))
 				}
-				reportCloudWatchEvents(getMetricDataOutput, instanceID, report)
+				reportCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], report)
 			}
 		}
 	}
@@ -126,11 +124,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 // MockFetch methods implements the data gathering and data conversion using MockEC2Client and MockCloudWatchClient
 func (m *MetricSet) MockFetch(report mb.ReporterV2) {
 	svcEC2Mock := &MockEC2Client{}
-	instanceIDs, describeInstancesOutput, err := getInstancesPerRegion(svcEC2Mock)
+	instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2Mock)
 	if err != nil {
 		report.Error(errors.Wrap(err, "getInstancesPerRegion failed"))
 	}
-	reportEC2Events(describeInstancesOutput, "us-west-1", report)
 
 	svcCloudwatchMock := &MockCloudWatchClient{}
 	for _, instanceID := range instanceIDs {
@@ -138,7 +135,7 @@ func (m *MetricSet) MockFetch(report mb.ReporterV2) {
 		if err != nil {
 			report.Error(errors.Wrap(err, "getMetricDataPerRegion failed"))
 		}
-		reportCloudWatchEvents(getMetricDataOutput, instanceID, report)
+		reportCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], report)
 	}
 }
 
@@ -156,130 +153,98 @@ func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
 	return
 }
 
-func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceID string, report mb.ReporterV2) {
+func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceID string, instanceOutput ec2.Instance, report mb.ReporterV2) {
+	machineType, err := instanceOutput.InstanceType.MarshalValue()
+	if err != nil {
+		report.Error(errors.Wrap(err, "instance.InstanceType.MarshalValue failed"))
+	}
+
 	for _, output := range getMetricDataOutput.MetricDataResults {
 		if len(output.Values) == 0 {
 			break
 		}
+		event := mb.Event{}
+		event.RootFields = common.MapStr{}
+		event.RootFields.Put("service.name", aws.ModuleName)
+		event.ModuleFields = common.MapStr{}
+		event.ModuleFields.Put("cloud.provider", "aws")
+		event.ModuleFields.Put("cloud.instance.id", instanceID)
+		event.ModuleFields.Put("cloud.machine.type", machineType)
+		event.ModuleFields.Put("cloud.availability_zone", *instanceOutput.Placement.AvailabilityZone)
+		event.ModuleFields.Put("cloud.image.id", *instanceOutput.ImageId)
+
 		switch *output.Id {
 		case "cpu1":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":     instanceID,
-					"cpu_utilization": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"cpu_utilization": output.Values[0],
+			}
 		case "cpu2":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":      instanceID,
-					"cpu_credit_usage": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"cpu_credit_usage": output.Values[0],
+			}
 		case "cpu3":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":        instanceID,
-					"cpu_credit_balance": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"cpu_credit_balance": output.Values[0],
+			}
 		case "cpu4":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":                instanceID,
-					"cpu_surplus_credit_balance": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"cpu_surplus_credit_balance": output.Values[0],
+			}
 		case "cpu5":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":                 instanceID,
-					"cpu_surplus_credits_charged": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"cpu_surplus_credits_charged": output.Values[0],
+			}
 		case "network1":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":        instanceID,
-					"network_packets_in": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"network_packets_in": output.Values[0],
+			}
 		case "network2":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":         instanceID,
-					"network_packets_out": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"network_packets_out": output.Values[0],
+			}
 		case "network3":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id": instanceID,
-					"network_in":  output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"network_in": output.Values[0],
+			}
 		case "network4":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id": instanceID,
-					"network_out": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"network_out": output.Values[0],
+			}
 		case "disk1":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":     instanceID,
-					"disk_read_bytes": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"disk_read_bytes": output.Values[0],
+			}
 		case "disk2":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":      instanceID,
-					"disk_write_bytes": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"disk_write_bytes": output.Values[0],
+			}
 		case "disk3":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":   instanceID,
-					"disk_read_ops": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"disk_read_ops": output.Values[0],
+			}
 		case "disk4":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":    instanceID,
-					"disk_write_ops": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"disk_write_ops": output.Values[0],
+			}
 		case "status1":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":         instanceID,
-					"status_check_failed": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"status_check_failed": output.Values[0],
+			}
 		case "status2":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":                instanceID,
-					"status_check_failed_system": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"status_check_failed_system": output.Values[0],
+			}
 		case "status3":
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"instance_id":                  instanceID,
-					"status_check_failed_instance": output.Values[0],
-				},
-			})
+			event.MetricSetFields = common.MapStr{
+				"status_check_failed_instance": output.Values[0],
+			}
 		}
+		report.Event(event)
 	}
 }
 
-func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, describeInstancesOutput []*ec2.DescribeInstancesOutput, err error) {
-	describeInstancesOutput = []*ec2.DescribeInstancesOutput{}
+func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {
+	instancesOutputs = map[string]ec2.Instance{}
 	output := ec2.DescribeInstancesOutput{NextToken: nil}
 	init := true
 	for init || output.NextToken != nil {
@@ -302,34 +267,13 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, describeI
 
 		for _, reservation := range output.Reservations {
 			for _, instance := range reservation.Instances {
-				instanceIDs = append(instanceIDs, *instance.InstanceId)
+				instanceID := *instance.InstanceId
+				instanceIDs = append(instanceIDs, instanceID)
+				instancesOutputs[instanceID] = instance
 			}
 		}
-		describeInstancesOutput = append(describeInstancesOutput, output)
 	}
 	return
-}
-
-func reportEC2Events(describeInstancesOutput []*ec2.DescribeInstancesOutput, regionName string, report mb.ReporterV2) {
-	for _, output := range describeInstancesOutput {
-		for _, reservation := range output.Reservations {
-			for _, instance := range reservation.Instances {
-				machineType, err := instance.InstanceType.MarshalValue()
-				if err != nil {
-					report.Error(errors.Wrap(err, "instance.InstanceType.MarshalValue failed"))
-					break
-				}
-				report.Event(mb.Event{
-					MetricSetFields: common.MapStr{
-						"provider":     "ec2",
-						"instance.id":  *instance.InstanceId,
-						"machine.type": machineType,
-						"region":       regionName,
-					},
-				})
-			}
-		}
-	}
 }
 
 func getMetricDataPerRegion(instanceID string, nextToken *string, svc cloudwatchiface.CloudWatchAPI) (*cloudwatch.GetMetricDataOutput, error) {

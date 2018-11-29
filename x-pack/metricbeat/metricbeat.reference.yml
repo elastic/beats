@@ -153,9 +153,9 @@ metricbeat.modules:
   mock: '${AWS_MOCK:false}'
   period: 300s
   hosts: ["localhost"]
-  access_key_id: '${AWS_ACCESS_KEY_ID}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY}'
-  session_token: '${AWS_SESSION_TOKEN}'
+  access_key_id: '${AWS_ACCESS_KEY_ID:ASIAZENKQPPNQTAAGYMO}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:W4MKyJPULE+OhkUDFJSy+gXYEe4diGbdsrGHb+Zq}'
+  session_token: '${AWS_SESSION_TOKEN:FQoGZXIvYXdzEFUaDOeOvI2uqbga/hcsViKwAd+V1mJY2K4CTdEzINTX6XWACBAYysvFIDEkKBMaZ5fYJehhXafDddRCt7Fomm5hzLsrclSqWyOH2DSFAAUMV7EE+CzyCVIcwZoNiRMU2RvjyxnQya0nMo6E5euqcTyKHFYRHHHRqMqs2hm5ZiGmShwBslqtb7QiMpdyF5mykixO0y+aCREirWqTYlzoIb23fsebzlsq6rpkO6AegwjurX9XKkQRl7cJ+SkaQy1+l4vFKJfH/d8F}'
 
 #--------------------------------- Ceph Module ---------------------------------
 - module: ceph

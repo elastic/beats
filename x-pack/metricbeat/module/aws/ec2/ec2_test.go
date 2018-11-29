@@ -11,6 +11,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -38,8 +40,18 @@ func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) 
 }
 
 func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInput) ec2.DescribeInstancesRequest {
-	instance1 := ec2.Instance{InstanceId: awssdk.String("i-123"), InstanceType: ec2.InstanceTypeT2Medium}
-	instance2 := ec2.Instance{InstanceId: awssdk.String("i-456"), InstanceType: ec2.InstanceTypeT2Micro}
+	instance1 := ec2.Instance{
+		InstanceId:   awssdk.String("i-123"),
+		InstanceType: ec2.InstanceTypeT2Medium,
+		Placement:    &ec2.Placement{AvailabilityZone: awssdk.String("us-west-1a")},
+		ImageId:      awssdk.String("image-123"),
+	}
+	instance2 := ec2.Instance{
+		InstanceId:   awssdk.String("i-456"),
+		InstanceType: ec2.InstanceTypeT2Micro,
+		Placement:    &ec2.Placement{AvailabilityZone: awssdk.String("us-west-1b")},
+		ImageId:      awssdk.String("image-456"),
+	}
 	return ec2.DescribeInstancesRequest{
 		Request: &awssdk.Request{
 			Data: &ec2.DescribeInstancesOutput{
@@ -83,20 +95,23 @@ func TestGetRegions(t *testing.T) {
 
 func TestGetInstanceIDs(t *testing.T) {
 	mockSvc := &MockEC2Client{}
-	instanceIDs, output, err := getInstancesPerRegion(mockSvc)
+	instanceIDs, instancesOutputs, err := getInstancesPerRegion(mockSvc)
 	if err != nil {
 		fmt.Println("failed getInstancesPerRegion: ", err)
 		t.FailNow()
 	}
 
 	assert.Equal(t, 2, len(instanceIDs))
-	assert.Equal(t, 1, len(output))
-	reservations := output[0].Reservations
-	assert.Equal(t, 1, len(reservations))
-	instances := reservations[0].Instances
-	assert.Equal(t, 2, len(instances))
+	assert.Equal(t, 2, len(instancesOutputs))
+
 	assert.Equal(t, "i-123", instanceIDs[0])
+	assert.Equal(t, ec2.InstanceType("t2.medium"), instancesOutputs["i-123"].InstanceType)
+	assert.Equal(t, awssdk.String("image-123"), instancesOutputs["i-123"].ImageId)
+	assert.Equal(t, awssdk.String("us-west-1a"), instancesOutputs["i-123"].Placement.AvailabilityZone)
+
 	assert.Equal(t, "i-456", instanceIDs[1])
+	assert.Equal(t, ec2.InstanceType("t2.micro"), instancesOutputs["i-456"].InstanceType)
+	assert.Equal(t, awssdk.String("us-west-1b"), instancesOutputs["i-456"].Placement.AvailabilityZone)
 }
 
 func TestGetMetricDataPerRegion(t *testing.T) {
@@ -129,16 +144,27 @@ func TestFetch(t *testing.T) {
 	t.Logf("Module: %s Metricset: %s", awsMetricSet.Module().Name(), awsMetricSet.Name())
 
 	if mock {
-		assert.Equal(t, 4, len(events))
+		assert.Equal(t, 2, len(events))
 	}
 
 	for _, event := range events {
-		checkSpecificMetric("cpu_utilization", "float64", event, t)
-		checkSpecificMetric("instance.id", "string", event, t)
+		checkRootField("service", event, t)
+		checkMetricSetField("cpu_utilization", "float64", event, t)
+		checkMetricSetField("instance.id", "string", event, t)
 	}
 }
 
-func checkSpecificMetric(metricName string, expectFormat string, event mb.Event, t *testing.T) {
+func checkRootField(fieldName string, event mb.Event, t *testing.T) {
+	expectedKeyValue := common.MapStr{"name": "aws"}
+	if ok, err := event.RootFields.HasKey(fieldName); ok {
+		assert.NoError(t, err)
+		fieldValue, err := event.RootFields.GetValue(fieldName)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedKeyValue, fieldValue)
+	}
+}
+
+func checkMetricSetField(metricName string, expectFormat string, event mb.Event, t *testing.T) {
 	if ok, err := event.MetricSetFields.HasKey(metricName); ok {
 		assert.NoError(t, err)
 		metricValue, err := event.MetricSetFields.GetValue(metricName)
@@ -156,12 +182,6 @@ func checkSpecificMetric(metricName string, expectFormat string, event mb.Event,
 			if userString, ok := metricValue.(string); !ok {
 				fmt.Println("failed: userString = ", userString)
 				t.Fail()
-			} else {
-				if userString != "i-456" {
-					assert.Equal(t, userString, "i-123")
-				} else {
-					assert.Equal(t, userString, "i-456")
-				}
 			}
 		}
 	}
@@ -198,6 +218,10 @@ func getCredentials(mock bool) (map[string]interface{}, error) {
 	accessKeyID := *tempToken.Credentials.AccessKeyId
 	secretAccessKey := *tempToken.Credentials.SecretAccessKey
 	sessionToken := *tempToken.Credentials.SessionToken
+	os.Setenv("AWS_ACCESS_KEY_ID", accessKeyID)
+	os.Setenv("AWS_SECRET_ACCESS_KEY", secretAccessKey)
+	os.Setenv("AWS_SESSION_TOKEN", sessionToken)
+
 	creds := map[string]interface{}{
 		"module":            "aws",
 		"metricsets":        []string{"ec2"},

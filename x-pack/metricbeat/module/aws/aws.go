@@ -19,6 +19,9 @@ type MetricSet struct {
 	mb.BaseMetricSet
 }
 
+// ModuleName is the name of this module.
+const ModuleName = "aws"
+
 func init() {
 	if err := mb.Registry.AddModule("aws", newModule); err != nil {
 		panic(err)
