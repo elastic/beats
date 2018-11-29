@@ -74,6 +74,12 @@
                 "ignore_missing": true
             }
         },
+        {
+            "uppercase": {
+                "field": "http.request.method",
+                "ignore_missing": true
+            }
+        },
 
         {
             "rename": {
