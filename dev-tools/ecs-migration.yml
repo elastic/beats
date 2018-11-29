@@ -45,6 +45,10 @@
   alias: true
   copy_to: false
 
+# Filebeat modules
+
+## Suricata module
+
 - from: source_ecs.ip
   to: source.ip
   alias: true
@@ -153,6 +157,59 @@
 - from: system.auth.ssh.geoip.*
   to: source.geo.*
   alias: true
+  copy_to: false
+
+## Apache
+
+- from: apache2.access.user_name
+  to: user.name
+  alias: true
+  copy_to: false
+
+- from: apache2.access.method
+  to: http.request.method
+  alias: true
+  copy_to: false
+
+- from: apache2.access.url
+  to: url.original
+  alias: true
+  copy_to: false
+
+- from: apache2.access.http_version
+  to: http.version
+  alias: true
+  copy_to: false
+
+- from: apache2.access.response_code
+  to: http.response.status_code
+  alias: true
+  copy_to: false
+
+- from: apache2.access.referrer
+  to: http.request.referrer
+  alias: true
+  copy_to: false
+
+- from: apache2.access.agent
+  to: user_agent.original
+  alias: true
+  copy_to: false
+
+- from: read_timestamp
+  to: event.created
+  alias: false
+  copy_to: false
+
+# These expand all fields under geoip and user_agent
+- from: apache2.access.geoip.*
+  to: source.geo.*
+  alias: false
+  copy_to: false
+
+- from: apache2.access.user_agent.*
+  to: user_agent.*
+  alias: false
   copy_to: false
 
 # From Auditbeat's auditd module.

@@ -2272,10 +2272,10 @@ URL fields provide a complete URL, with scheme, host, and path. The URL object c
 
 
 
-*`url.href`*::
+*`url.original`*::
 +
 --
-type: text
+type: keyword
 
 example: https://elastic.co:443/search?q=elasticsearch#top
 
@@ -2283,16 +2283,6 @@ Full url. The field is stored as keyword.
 `url.href` is a [multi field](https://www.elastic.co/guide/en/ elasticsearch/reference/6.2/ multi-fields.html#_multi_fields_with_multiple_analyzers). The data is stored as keyword `url.href` and test `url.href.analyzed`. These fields enable you to run a query against part of the url still works splitting up the URL at ingest time.
 `href` is an analyzed field so the parsed information can be accessed through `href.analyzed` in queries.
 
-
-*`url.href.raw`*::
-+
---
-type: keyword
-
-The full URL. This is a non-analyzed field that is useful for aggregations.
-
-
---
 
 --
 

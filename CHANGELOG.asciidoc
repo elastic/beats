@@ -137,6 +137,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Rename many `haproxy.*` fields to map to ECS. {pull}9117[9117]
 - Rename many `nginx.access.*` fields to map to ECS. {pull}9081[9081]
 - Rename many `system.auth.*` fields to map to ECS. {pull}9138[9138]
+- Rename many `apache2.access.*` fields to map to ECS. {pull}9245[9245]
 
 *Metricbeat*
 

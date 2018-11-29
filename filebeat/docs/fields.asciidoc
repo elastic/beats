@@ -64,59 +64,7 @@ Contains fields for the Apache2 HTTPD access logs.
 --
 type: keyword
 
-Client IP address.
-
-
---
-
-*`apache2.access.user_name`*::
-+
---
-type: keyword
-
-The user name used when basic authentication is used.
-
-
---
-
-*`apache2.access.method`*::
-+
---
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
---
-
-*`apache2.access.url`*::
-+
---
-type: keyword
-
-The request HTTP URL.
-
-
---
-
-*`apache2.access.http_version`*::
-+
---
-type: keyword
-
-The HTTP version.
-
-
---
-
-*`apache2.access.response_code`*::
-+
---
-type: long
-
-The HTTP response code.
+Client IP address or hostname.
 
 
 --
@@ -133,201 +81,166 @@ The number of bytes of the server response body.
 
 --
 
-*`apache2.access.referrer`*::
+*`user.name`*::
 +
 --
-type: keyword
-
-The HTTP referrer.
-
+type: alias
 
 --
 
-*`apache2.access.agent`*::
+*`http.request.method`*::
 +
 --
-type: text
-
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
-
+type: alias
 
 --
 
-[float]
-== user_agent fields
-
-Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
-
-
-
-*`apache2.access.user_agent.device`*::
+*`url.original`*::
 +
 --
-type: keyword
-
-The name of the physical device.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.major`*::
+*`http.version`*::
 +
 --
-type: long
-
-The major version of the user agent.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.minor`*::
+*`http.response.status_code`*::
 +
 --
-type: long
-
-The minor version of the user agent.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.patch`*::
+*`http.request.referrer`*::
 +
 --
-type: keyword
-
-The patch version of the user agent.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.name`*::
+*`user_agent.original`*::
 +
 --
-type: keyword
-
-example: Chrome
-
-The name of the user agent.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.os`*::
+
+*`user_agent.device`*::
 +
 --
-type: keyword
-
-The name of the operating system.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.os_major`*::
+*`user_agent.major`*::
 +
 --
-type: long
-
-The major version of the operating system.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.os_minor`*::
+*`user_agent.minor`*::
 +
 --
-type: long
-
-The minor version of the operating system.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.os_name`*::
+*`user_agent.patch`*::
 +
 --
-type: keyword
-
-The name of the operating system.
-
+type: alias
 
 --
 
-*`apache2.access.user_agent.original`*::
+*`user_agent.name`*::
 +
 --
-type: text
-
-Original user agent value before parsing by ingest-user-agent plugin.
-
-
-Field is not indexed.
+type: alias
 
 --
 
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-*`apache2.access.geoip.continent_name`*::
+*`user_agent.os.full_name`*::
 +
 --
-type: keyword
-
-The name of the continent.
-
+type: alias
 
 --
 
-*`apache2.access.geoip.country_iso_code`*::
+*`user_agent.os.major`*::
 +
 --
-type: keyword
-
-Country ISO code.
-
+type: alias
 
 --
 
-*`apache2.access.geoip.location`*::
+*`user_agent.os.minor`*::
 +
 --
-type: geo_point
-
-The longitude and latitude.
-
+type: alias
 
 --
 
-*`apache2.access.geoip.region_name`*::
+*`user_agent.os.name`*::
 +
 --
-type: keyword
-
-The region name.
-
+type: alias
 
 --
 
-*`apache2.access.geoip.city_name`*::
+*`user_agent.original`*::
 +
 --
-type: keyword
-
-The city name.
-
+type: alias
 
 --
 
-*`apache2.access.geoip.region_iso_code`*::
+
+*`source.geo.continent_name`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
+--
 
+*`source.geo.country_iso_code`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.location`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: alias
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: alias
 
 --
 
@@ -2444,10 +2357,10 @@ URL fields provide a complete URL, with scheme, host, and path. The URL object c
 
 
 
-*`url.href`*::
+*`url.original`*::
 +
 --
-type: text
+type: keyword
 
 example: https://elastic.co:443/search?q=elasticsearch#top
 
@@ -2455,16 +2368,6 @@ Full url. The field is stored as keyword.
 `url.href` is a [multi field](https://www.elastic.co/guide/en/ elasticsearch/reference/6.2/ multi-fields.html#_multi_fields_with_multiple_analyzers). The data is stored as keyword `url.href` and test `url.href.analyzed`. These fields enable you to run a query against part of the url still works splitting up the URL at ingest time.
 `href` is an analyzed field so the parsed information can be accessed through `href.analyzed` in queries.
 
-
-*`url.href.raw`*::
-+
---
-type: keyword
-
-The full URL. This is a non-analyzed field that is useful for aggregations.
-
-
---
 
 --
 
@@ -4841,18 +4744,6 @@ type: keyword
 example: https://blog.example.com/
 
 Referrer for this HTTP request.
-
-
---
-
-*`url.original`*::
-+
---
-type: keyword
-
-example: https://blog.example.com/
-
-Full original url. The field is stored as keyword.
 
 
 --
