@@ -2,9 +2,10 @@
 journalbeat.inputs:
 - paths: [{{ journal_path }}]
   seek: {{ seek_method }}
-  {% if cursor_seek_fallback %}
-  cursor_seek_fallback: {{ cursor_seek_fallback }}
-  {% endif %}
+  {% if cursor_seek_fallback %}cursor_seek_fallback: {{ cursor_seek_fallback }}{% endif %}
+  units: {{ units }}
+  {% if kernel %}kernel: true{% else %}kernel: false{% endif %}
+  identifiers: {{ identifiers }}
   include_matches: [{{ matches }}]
 
 journalbeat.registry: {{ registry_file }}

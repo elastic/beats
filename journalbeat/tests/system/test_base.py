@@ -171,6 +171,107 @@ class Test(BaseTest):
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
+    def test_read_events_filtered_based_on_unit_without_kernel(self):
+        """
+        Journalbeat is able to filter based on configured unit without kernel messages.
+        """
+
+        self.render_config_template(
+            journal_path=self.beat_path + "/tests/system/input/filtering.journal",
+            seek_method="head",
+            units=["docker.service"],
+            kernel=False,
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+        journalbeat_proc = self.start_beat()
+
+        required_log_snippets = [
+            # journalbeat can be started
+            "journalbeat is running",
+            # appropiate filters are added
+            "Added matcher expression to filter units [docker.service]",
+            # message can be read from test journal
+            "The {index}/{type}/_search endpoint is deprecated, use {index}/_search instead",
+            # Fourteen events of docker unit is published
+            "journalbeat successfully published 14 events",
+        ]
+        for snippet in required_log_snippets:
+            self.wait_until(lambda: self.log_contains(snippet),
+                            name="Line in '{}' Journalbeat log".format(snippet))
+
+        exit_code = journalbeat_proc.kill_and_wait()
+        assert exit_code == 0
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
+    def test_read_events_filtered_based_on_unit_with_kernel(self):
+        """
+        Journalbeat is able to filter based on configured unit with kernel messages.
+        """
+
+        self.render_config_template(
+            journal_path=self.beat_path + "/tests/system/input/filtering.journal",
+            seek_method="head",
+            units=["docker.service"],
+            kernel=True,
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+        journalbeat_proc = self.start_beat()
+
+        required_log_snippets = [
+            # journalbeat can be started
+            "journalbeat is running",
+            # appropiate filters are added
+            "Added matcher expression to filter units [docker.service]",
+            "Added matcher expression to monitor kernel logs",
+            # message can be read from test journal
+            "unknown possible thermal alarm or keyboard event received",
+            "please report the conditions when this event happened to",
+            "The {index}/{type}/_search endpoint is deprecated, use {index}/_search instead",
+            # Twenty events with kernel transport or docker unit is published
+            "journalbeat successfully published 20 events",
+        ]
+        for snippet in required_log_snippets:
+            self.wait_until(lambda: self.log_contains(snippet),
+                            name="Line in '{}' Journalbeat log".format(snippet))
+
+        exit_code = journalbeat_proc.kill_and_wait()
+        assert exit_code == 0
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
+    def test_read_events_filtered_syslog_identifier(self):
+        """
+        Journalbeat is able to filter based on configured syslog identifiers.
+        """
+
+        self.render_config_template(
+            journal_path=self.beat_path + "/tests/system/input/test.journal",
+            seek_method="head",
+            identifiers=["kernel"],
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+        journalbeat_proc = self.start_beat()
+
+        required_log_snippets = [
+            # journalbeat can be started
+            "journalbeat is running",
+            # journalbeat can seek to the position defined in the cursor
+            "Added matcher expression",
+            # message can be read from test journal
+            "unknown possible thermal alarm or keyboard event received",
+            "unhandled HKEY event 0x60b0",
+            "please report the conditions when this event happened to",
+            "unhandled HKEY event 0x60b1",
+            # Six events with syslog identifier "kernel" is publised
+            "journalbeat successfully published 6 events",
+        ]
+        for snippet in required_log_snippets:
+            self.wait_until(lambda: self.log_contains(snippet),
+                            name="Line in '{}' Journalbeat log".format(snippet))
+
+        exit_code = journalbeat_proc.kill_and_wait()
+        assert exit_code == 0
+
 
 if __name__ == '__main__':
     unittest.main()
