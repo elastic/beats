@@ -44,17 +44,9 @@ func TestDeDotLabels(t *testing.T) {
 	t.Run("dedot disabled", func(t *testing.T) {
 		result := DeDotLabels(labels, false)
 		assert.Equal(t, common.MapStr{
-			"com": common.MapStr{
-				"docker": common.MapStr{
-					"swarm": common.MapStr{
-						"task": common.MapStr{
-							"value": "",
-							"id":    "1",
-							"name":  "foobar",
-						},
-					},
-				},
-			},
+			"com.docker.swarm.task":      "",
+			"com.docker.swarm.task.id":   "1",
+			"com.docker.swarm.task.name": "foobar",
 		}, result)
 	})
 }

@@ -76,7 +76,7 @@
             List of keywords used to tag each event.
     
         - name: labels
-          type: object
+          type: json
           example: {key1: value1, key2: value2}
           description: >
             Key/value pairs.
@@ -188,8 +188,7 @@
           description: >
             Container name.
         - name: labels
-          type: object
-          object_type: keyword
+          type: json
           description: >
             Image labels.
     

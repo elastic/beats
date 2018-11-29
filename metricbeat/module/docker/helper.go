@@ -23,7 +23,6 @@ import (
 	"github.com/docker/docker/api/types"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
 type Container struct {
@@ -83,8 +82,7 @@ func DeDotLabels(labels map[string]string, dedot bool) common.MapStr {
 			label := common.DeDot(k)
 			outputLabels.Put(label, v)
 		} else {
-			// If we don't dedot we ensure there are no mapping errors with safemapstr
-			safemapstr.Put(outputLabels, k, v)
+			outputLabels[k] = v
 		}
 	}
 

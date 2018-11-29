@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/docker"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -128,7 +127,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	}
 	labelMap := common.MapStr{}
 	for k, v := range container.Labels {
-		safemapstr.Put(labelMap, k, v)
+		labelMap[k] = v
 	}
 
 	meta := common.MapStr{

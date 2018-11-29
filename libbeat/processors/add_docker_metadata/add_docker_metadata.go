@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
@@ -173,7 +172,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		if len(container.Labels) > 0 {
 			labels := common.MapStr{}
 			for k, v := range container.Labels {
-				safemapstr.Put(labels, k, v)
+				labels[k] = v
 			}
 			meta.Put("container.labels", labels)
 		}

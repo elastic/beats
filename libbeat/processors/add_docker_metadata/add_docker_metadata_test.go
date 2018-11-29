@@ -134,13 +134,9 @@ func TestMatchContainer(t *testing.T) {
 				"id":    "container_id",
 				"image": "image",
 				"labels": common.MapStr{
-					"a": common.MapStr{
-						"x": "1",
-					},
-					"b": common.MapStr{
-						"value": "2",
-						"foo":   "3",
-					},
+					"a.x":   "1",
+					"b":     "2",
+					"b.foo": "3",
 				},
 				"name": "name",
 			},

@@ -36,8 +36,7 @@
              Total size of the all cached images associated to the current image.
 
     - name: labels
-      type: object
-      object_type: keyword
+      type: json
       description: >
         Image labels.
 

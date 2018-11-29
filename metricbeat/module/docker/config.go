@@ -25,7 +25,7 @@ type Config struct {
 // DefaultConfig returns default module config
 func DefaultConfig() Config {
 	return Config{
-		DeDot: true,
+		DeDot: false,
 	}
 }
 

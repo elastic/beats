@@ -770,7 +770,7 @@ Container name.
 *`docker.container.labels`*::
 +
 --
-type: object
+type: json
 
 Image labels.
 
@@ -889,7 +889,7 @@ List of keywords used to tag each event.
 *`base.labels`*::
 +
 --
-type: object
+type: json
 
 example: {'key2': 'value2', 'key1': 'value1'}
 
@@ -1065,7 +1065,7 @@ Container name.
 *`container.labels`*::
 +
 --
-type: object
+type: json
 
 Image labels.
 
@@ -4614,7 +4614,7 @@ Kubernetes node name
 *`kubernetes.labels`*::
 +
 --
-type: object
+type: json
 
 Kubernetes labels map
 
@@ -4624,7 +4624,7 @@ Kubernetes labels map
 *`kubernetes.annotations`*::
 +
 --
-type: object
+type: json
 
 Kubernetes annotations map
 

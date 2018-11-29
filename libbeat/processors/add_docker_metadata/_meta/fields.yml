@@ -21,7 +21,6 @@
           description: >
             Container name.
         - name: container.labels
-          type: object
-          object_type: keyword
+          type: json
           description: >
             Image labels.

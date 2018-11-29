@@ -64,11 +64,9 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 				"name":  "name1",
 				"image": "image",
 				"labels": common.MapStr{
-					"label1": "val1",
-					"label2": common.MapStr{
-						"foo":   "val3",
-						"value": "val2",
-					},
+					"label1":     "val1",
+					"label2":     "val2",
+					"label2.foo": "val3",
 				},
 			},
 		},

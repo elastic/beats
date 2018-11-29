@@ -71,7 +71,7 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 	labelMap := common.MapStr{}
 	if len(g.IncludeLabels) == 0 {
 		for k, v := range obj.GetMetadata().Labels {
-			safemapstr.Put(labelMap, k, v)
+			labelMap[k] = v
 		}
 	} else {
 		labelMap = generateMapSubset(objMeta.Labels, g.IncludeLabels)
@@ -150,7 +150,7 @@ func generateMapSubset(input map[string]string, keys []string) common.MapStr {
 	for _, key := range keys {
 		value, ok := input[key]
 		if ok {
-			safemapstr.Put(output, key, value)
+			output[key] = value
 		}
 	}
 
