@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -105,8 +104,8 @@ func TestIngest(t *testing.T) {
 	}
 
 	client := getTestingElasticsearch(t)
-	if strings.HasPrefix(client.Connection.version, "2.") {
-		t.Skip("Skipping tests as pipeline not available in 2.x releases")
+	if client.Connection.version.Major < 5 {
+		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
 	status, _, err := client.DeletePipeline(pipeline, nil)

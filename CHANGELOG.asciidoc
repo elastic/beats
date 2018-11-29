@@ -79,6 +79,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 *Affecting all Beats*
 - Unify dashboard exporter tools. {pull}9097[9097]
+- Use _doc as document type of the Elasticsearch major version is 7. {pull}9056[9056]
 
 - Dissect will now flag event on parsing error. {pull}8751[8751]
 - Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]

@@ -73,6 +73,7 @@ func GenDashboardCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 					if decode {
 						r = dashboards.DecodeExported(r)
 					}
+
 					err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(yml), client.GetVersion())
 					if err != nil {
 						fmt.Fprintf(os.Stderr, "Error saving dashboard '%s' to file '%s' : %+v\n",
