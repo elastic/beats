@@ -5,8 +5,8 @@
       "grok": {
         "field": "message",
         "patterns": [
-          "(%{POSINT:process.pid}:%{CHAR:redis.log.role} )?%{REDISTIMESTAMP:redis.log.timestamp} %{REDISLEVEL:log.level} %{GREEDYDATA:message}",
-          "%{POSINT:process.pid}:signal-handler \\(%{POSINT:redis.log.timestamp}\\) %{GREEDYDATA:message}"
+          "(%{POSINT:process.pid:int}:%{CHAR:redis.log.role} )?%{REDISTIMESTAMP:redis.log.timestamp} %{REDISLEVEL:log.level} %{GREEDYDATA:message}",
+          "%{POSINT:process.pid:int}:signal-handler \\(%{POSINT:redis.log.timestamp}\\) %{GREEDYDATA:message}"
         ],
         "pattern_definitions": {
           "CHAR": "[a-zA-Z]",
