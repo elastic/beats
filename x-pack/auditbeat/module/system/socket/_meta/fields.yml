@@ -4,10 +4,6 @@
     `socket` contains socket information.
   release: experimental
   fields:
-    - name: state
-      type: keyword
-      description: >
-        TCP state.
     - name: network
       type: group
       fields:

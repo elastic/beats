@@ -68,7 +68,6 @@ type MetricSet struct {
 // Socket represents information about a socket.
 type Socket struct {
 	Family       linux.AddressFamily
-	State        linux.TCPState
 	LocalIP      net.IP
 	LocalPort    int
 	RemoteIP     net.IP
@@ -86,7 +85,6 @@ type Socket struct {
 func newSocket(diag *linux.InetDiagMsg) *Socket {
 	return &Socket{
 		Family:     linux.AddressFamily(diag.Family),
-		State:      linux.TCPState(diag.State),
 		LocalIP:    diag.SrcIP(),
 		LocalPort:  diag.SrcPort(),
 		RemoteIP:   diag.DstIP(),
@@ -113,7 +111,6 @@ func (s Socket) toMapStr() common.MapStr {
 		"network": common.MapStr{
 			"type": s.Family.String(),
 		},
-		"state": s.State.String(),
 		"user": common.MapStr{
 			"uid": s.UID,
 		},
