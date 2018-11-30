@@ -40,6 +40,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Filebeat*
 
+- Don't generate incomplete configurations when logs collection is disabled by hints. {pull}[]
+
 *Heartbeat*
 
 *Journalbeat*
