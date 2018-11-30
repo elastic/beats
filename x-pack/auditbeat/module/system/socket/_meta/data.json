@@ -4,43 +4,30 @@
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
-    "event": {
-        "action": "socket_opened",
-        "dataset": "socket",
-        "module": "system",
-        "type": "event"
+    "user": {
+        "name": "vagrant",
+        "id": 1000
     },
     "process": {
-        "name": "lynx",
-        "pid": 12016
+        "pid": 4021,
+        "name": "lynx"
     },
-    "system": {
-        "socket": {
-            "network": {
-                "type": "ipv4",
-                "direction": "outgoing"
-            },
-            "state": "CLOSE-WAIT",
-            "user": {
-                "uid": 1000,
-                "name": "vagrant"
-            },
-            "source": {
-                "ip": "10.0.2.15",
-                "port": 56148
-            },
-            "destination": {
-                "ip": "216.58.213.68",
-                "port": 80
-            },
-            "process": {
-                "pid": 12016,
-                "name": "lynx"
-            }
-        }
+    "source": {
+        "ip": "10.0.2.15",
+        "port": 33956
     },
-    "user": {
-        "id": 1000,
-        "name": "vagrant"
+    "destination": {
+        "port": 443,
+        "ip": "52.10.168.186"
+    },
+    "event": {
+        "type": "event",
+        "action": "socket_opened",
+        "module": "system",
+        "dataset": "socket"
+    },
+    "network": {
+        "type": "ipv4",
+        "direction": "outbound"
     }
 }

@@ -67,18 +67,18 @@ type MetricSet struct {
 
 // Socket represents information about a socket.
 type Socket struct {
-	Family       linux.AddressFamily
-	LocalIP      net.IP
-	LocalPort    int
-	RemoteIP     net.IP
-	RemotePort   int
-	Inode        uint32
-	Direction    sock.Direction
-	UID          uint32
-	Username     string
-	ProcessPID   int
-	ProcessName  string
-	ProcessError error
+	Family      linux.AddressFamily
+	LocalIP     net.IP
+	LocalPort   int
+	RemoteIP    net.IP
+	RemotePort  int
+	Inode       uint32
+	Direction   sock.Direction
+	UID         uint32
+	Username    string
+	ProcessPID  int
+	ProcessName string
+	Error       error
 }
 
 // newSocket creates a new socket out of a netlink diag message.
@@ -107,60 +107,60 @@ func (s Socket) Hash() uint64 {
 }
 
 func (s Socket) toMapStr() common.MapStr {
-	evt := common.MapStr{
+	mapstr := common.MapStr{
 		"network": common.MapStr{
 			"type": s.Family.String(),
 		},
 		"user": common.MapStr{
-			"uid": s.UID,
+			"id": s.UID,
 		},
+	}
+
+	if s.Username != "" {
+		mapstr.Put("user.name", s.Username)
+	}
+
+	if s.ProcessName != "" {
+		mapstr.Put("process", common.MapStr{
+			"pid":  s.ProcessPID,
+			"name": s.ProcessName,
+		})
 	}
 
 	switch s.Direction {
 	case sock.Outgoing:
-		evt.Put("network.direction", "outbound")
-		evt.Put("source", common.MapStr{
+		mapstr.Put("network.direction", "outbound")
+		mapstr.Put("source", common.MapStr{
 			"ip":   s.LocalIP,
 			"port": s.LocalPort,
 		})
-		evt.Put("destination", common.MapStr{
+		mapstr.Put("destination", common.MapStr{
 			"ip":   s.RemoteIP,
 			"port": s.RemotePort,
 		})
 	case sock.Incoming:
-		evt.Put("network.direction", "inbound")
-		evt.Put("source", common.MapStr{
+		mapstr.Put("network.direction", "inbound")
+		mapstr.Put("source", common.MapStr{
 			"ip":   s.RemoteIP,
 			"port": s.RemotePort,
 		})
-		evt.Put("destination", common.MapStr{
+		mapstr.Put("destination", common.MapStr{
 			"ip":   s.LocalIP,
 			"port": s.LocalPort,
 		})
 	case sock.Listening:
-		evt.Put("network.direction", "listening")
-		evt.Put("destination", common.MapStr{
+		mapstr.Put("network.direction", "listening")
+		mapstr.Put("destination", common.MapStr{
 			"ip":   s.LocalIP,
 			"port": s.LocalPort,
 		})
 	}
 
-	if s.Username != "" {
-		evt.Put("user.name", s.Username)
+	if s.Error != nil {
+		mapstr.Put("error.message", s.Error.Error())
 	}
 
-	if s.ProcessName != "" {
-		evt["process"] = common.MapStr{
-			"pid":  s.ProcessPID,
-			"name": s.ProcessName,
-		}
-	}
-
-	if s.ProcessError != nil {
-		evt.Put("process.error", s.ProcessError.Error())
-	}
-
-	return evt
+	return mapstr
 }
 
 // New constructs a new MetricSet.
@@ -323,28 +323,11 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 
 func socketEvent(socket *Socket, eventType string, eventAction string) mb.Event {
 	event := mb.Event{
-		RootFields: common.MapStr{
-			"event": common.MapStr{
-				"type":   eventType,
-				"action": eventAction,
-			},
-			"user": common.MapStr{
-				"id": socket.UID,
-			},
-		},
-		MetricSetFields: socket.toMapStr(),
+		RootFields: socket.toMapStr(),
 	}
 
-	if socket.Username != "" {
-		event.RootFields.Put("user.name", socket.Username)
-	}
-
-	if socket.ProcessName != "" {
-		event.RootFields.Put("process", common.MapStr{
-			"pid":  socket.ProcessPID,
-			"name": socket.ProcessName,
-		})
-	}
+	event.RootFields.Put("event.type", eventType)
+	event.RootFields.Put("event.action", eventAction)
 
 	return event
 }
@@ -377,9 +360,9 @@ func (ms *MetricSet) enrichSocket(socket *Socket) error {
 			socket.ProcessPID = proc.PID
 			socket.ProcessName = proc.Command
 		} else if socket.Inode == 0 {
-			socket.ProcessError = fmt.Errorf("process has exited (inode=%v)", socket.Inode)
+			socket.Error = fmt.Errorf("process has exited (inode=%v)", socket.Inode)
 		} else {
-			socket.ProcessError = fmt.Errorf("process not found (inode=%v)", socket.Inode)
+			socket.Error = fmt.Errorf("process not found (inode=%v)", socket.Inode)
 		}
 	}
 

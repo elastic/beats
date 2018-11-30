@@ -757,6 +757,11 @@
               description: >
                 Name given by operators to sections of their network.
     
+        - name: type
+          type: keyword
+          description: >
+            In the OSI Model this would be the Network Layer. IPv4, IPv6, IPSec, PIM, etc
+          example: IPv4
         - name: protocol
           type: keyword
           description: >

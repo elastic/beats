@@ -40,7 +40,7 @@ func TestFetch(t *testing.T) {
 	if errs != nil {
 		t.Fatal("fetch", errs)
 	}
-	_, err := events[0].MetricSetFields.HasKey("destination.port")
+	_, err := events[0].RootFields.HasKey("destination.port")
 	assert.NoError(t, err)
 
 	ln, err := net.Listen("tcp", ":0")
@@ -84,7 +84,7 @@ func TestFetch(t *testing.T) {
 		}
 		assert.Equal(t, "socket.test", processName)
 
-		uid, ok := getRequiredValue("user.uid", evt, t).(uint32)
+		uid, ok := getRequiredValue("user.id", evt, t).(uint32)
 		if !ok {
 			t.Fatal("user.uid is not a uint32")
 		}
@@ -104,7 +104,7 @@ func TestFetch(t *testing.T) {
 }
 
 func getRequiredValue(key string, mbEvent mb.Event, t testing.TB) interface{} {
-	v, err := mbEvent.MetricSetFields.GetValue(key)
+	v, err := mbEvent.RootFields.GetValue(key)
 	if err != nil {
 		t.Fatalf("err=%v, key=%v, event=%v", key, err, mbEvent)
 	}
