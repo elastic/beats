@@ -34,7 +34,7 @@ func init() {
 	)
 }
 
-// MockCloudWatchClient struct is used for unit tests.
+// MockEC2Client struct is used for unit tests.
 type MockEC2Client struct {
 	ec2iface.EC2API
 }
@@ -176,75 +176,44 @@ func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	event.ModuleFields.Put("cloud.image.id", *instanceOutput.ImageId)
 	event.ModuleFields.Put("cloud.region", regionName)
 
+	event.MetricSetFields = common.MapStr{}
 	for _, output := range getMetricDataOutput.MetricDataResults {
 		if len(output.Values) == 0 {
-			break
+			continue
 		}
 		switch *output.Id {
 		case "cpu1":
-			event.MetricSetFields = common.MapStr{
-				"cpu.total.pct": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.cpu.total.pct", output.Values[0])
 		case "cpu2":
-			event.MetricSetFields = common.MapStr{
-				"cpu.credit_usage": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.cpu.credit_usage", output.Values[0])
 		case "cpu3":
-			event.MetricSetFields = common.MapStr{
-				"cpu.credit_balance": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.cpu.credit_balance", output.Values[0])
 		case "cpu4":
-			event.MetricSetFields = common.MapStr{
-				"cpu.surplus_credit_balance": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.cpu.surplus_credit_balance", output.Values[0])
 		case "cpu5":
-			event.MetricSetFields = common.MapStr{
-				"cpu.surplus_credits_charged": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.cpu.surplus_credits_charged", output.Values[0])
 		case "network1":
-			event.MetricSetFields = common.MapStr{
-				"network.packets_in": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.network.in.packets", output.Values[0])
 		case "network2":
-			event.MetricSetFields = common.MapStr{
-				"network.packets_out": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.network.out.packets", output.Values[0])
 		case "network3":
-			event.MetricSetFields = common.MapStr{
-				"network.in.bytes": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.network.in.bytes", output.Values[0])
 		case "network4":
-			event.MetricSetFields = common.MapStr{
-				"network.out.bytes": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.network.out.bytes", output.Values[0])
 		case "disk1":
-			event.MetricSetFields = common.MapStr{
-				"disk.read.bytes": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.diskio.read.bytes", output.Values[0])
 		case "disk2":
-			event.MetricSetFields = common.MapStr{
-				"disk.write.bytes": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.diskio.write.bytes", output.Values[0])
 		case "disk3":
-			event.MetricSetFields = common.MapStr{
-				"disk.read_ops": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.diskio.read.ops", output.Values[0])
 		case "disk4":
-			event.MetricSetFields = common.MapStr{
-				"disk.write_ops": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.diskio.write.ops", output.Values[0])
 		case "status1":
-			event.MetricSetFields = common.MapStr{
-				"status.check_failed": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.status.check_failed", output.Values[0])
 		case "status2":
-			event.MetricSetFields = common.MapStr{
-				"status.check_failed_system": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.status.check_failed_system", output.Values[0])
 		case "status3":
-			event.MetricSetFields = common.MapStr{
-				"status.check_failed_instance": output.Values[0],
-			}
+			event.MetricSetFields.Put("ec2.status.check_failed_instance", output.Values[0])
 		}
 	}
 	report.Event(event)

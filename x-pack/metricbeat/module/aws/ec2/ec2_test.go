@@ -11,14 +11,11 @@ import (
 
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 
-	"github.com/aws/aws-sdk-go-v2/aws/external"
-
 	"github.com/elastic/beats/libbeat/common"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/metricbeat/mb"
@@ -129,15 +126,14 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
 }
 
-func TestFetch(t *testing.T) {
-	mock := true
-	tempCredentials, err := getCredentials(mock)
-	if err != nil {
-		fmt.Println("failed getCredentials: ", err)
-		t.FailNow()
+func TestMockFetch(t *testing.T) {
+	mockCreds := map[string]interface{}{
+		"module":     "aws",
+		"metricsets": []string{"ec2"},
+		"mock":       "true",
 	}
 
-	awsMetricSet := mbtest.NewReportingMetricSetV2(t, tempCredentials)
+	awsMetricSet := mbtest.NewReportingMetricSetV2(t, mockCreds)
 	events, errs := mbtest.ReportingFetchV2(awsMetricSet)
 	assert.Empty(t, errs)
 	if !assert.NotEmpty(t, events) {
@@ -145,14 +141,82 @@ func TestFetch(t *testing.T) {
 	}
 	t.Logf("Module: %s Metricset: %s", awsMetricSet.Module().Name(), awsMetricSet.Name())
 
-	if mock {
-		assert.Equal(t, 2, len(events))
-	}
-
+	assert.Equal(t, 2, len(events))
 	for _, event := range events {
+		// RootField
 		checkRootField("service", event, t)
-		checkModuleField("cloud", event, t)
-		checkMetricSetField("cpu.total.pct", "float64", event, t)
+		// ModuleField
+		checkModuleField("cloud.availability_zone", event, t)
+		checkModuleField("cloud.provider", event, t)
+		checkModuleField("cloud.image.id", event, t)
+		checkModuleField("cloud.instance.id", event, t)
+		checkModuleField("cloud.machine.type", event, t)
+		checkModuleField("cloud.provider", event, t)
+		checkModuleField("cloud.region", event, t)
+		// MetricSetField
+		cpuTotalPct, err := event.MetricSetFields.GetValue("ec2.cpu.total.pct")
+		assert.NoError(t, err)
+		assert.Equal(t, 0.25, cpuTotalPct)
+	}
+}
+
+func TestFetch(t *testing.T) {
+	accessKeyID, okAccessKeyID := os.LookupEnv("AWS_ACCESS_KEY_ID")
+	secretAccessKey, okSecretAccessKey := os.LookupEnv("AWS_SECRET_ACCESS_KEY")
+	sessionToken, okSessionToken := os.LookupEnv("AWS_SESSION_TOKEN")
+	if !okAccessKeyID || accessKeyID == "" {
+		t.Skip("Skipping TestFetch; $AWS_ACCESS_KEY_ID not set or set to empty")
+	} else if !okSecretAccessKey || secretAccessKey == "" {
+		t.Skip("Skipping TestFetch; $AWS_SECRET_ACCESS_KEY not set or set to empty")
+	} else {
+		tempCreds := map[string]interface{}{
+			"module":     "aws",
+			"metricsets": []string{"ec2"},
+			"mock":       "false",
+		}
+		tempCreds["access_key_id"] = accessKeyID
+		tempCreds["secret_access_key"] = secretAccessKey
+		if okSessionToken && sessionToken != "" {
+			tempCreds["session_token"] = sessionToken
+		}
+
+		awsMetricSet := mbtest.NewReportingMetricSetV2(t, tempCreds)
+		events, errs := mbtest.ReportingFetchV2(awsMetricSet)
+		assert.Empty(t, errs)
+		if !assert.NotEmpty(t, events) {
+			t.FailNow()
+		}
+		t.Logf("Module: %s Metricset: %s", awsMetricSet.Module().Name(), awsMetricSet.Name())
+
+		for _, event := range events {
+			// RootField
+			checkRootField("service", event, t)
+			// ModuleField
+			checkModuleField("cloud.availability_zone", event, t)
+			checkModuleField("cloud.provider", event, t)
+			checkModuleField("cloud.image.id", event, t)
+			checkModuleField("cloud.instance.id", event, t)
+			checkModuleField("cloud.machine.type", event, t)
+			checkModuleField("cloud.provider", event, t)
+			checkModuleField("cloud.region", event, t)
+			// MetricSetField
+			checkMetricSetField("ec2.cpu.total.pct", event, t)
+			checkMetricSetField("ec2.cpu.credit_usage", event, t)
+			checkMetricSetField("ec2.cpu.credit_balance", event, t)
+			checkMetricSetField("ec2.cpu.surplus_credit_balance", event, t)
+			checkMetricSetField("ec2.cpu.surplus_credits_charged", event, t)
+			checkMetricSetField("network.in.packets", event, t)
+			checkMetricSetField("network.out.packets", event, t)
+			checkMetricSetField("network.in.bytes", event, t)
+			checkMetricSetField("network.out.bytes", event, t)
+			checkMetricSetField("diskio.read.bytes", event, t)
+			checkMetricSetField("diskio.write.bytes", event, t)
+			checkMetricSetField("diskio.read.ops", event, t)
+			checkMetricSetField("diskio.write.ops", event, t)
+			checkMetricSetField("status.check_failed", event, t)
+			checkMetricSetField("status.check_failed_system", event, t)
+			checkMetricSetField("status.check_failed_instance", event, t)
+		}
 	}
 }
 
@@ -167,82 +231,25 @@ func checkRootField(fieldName string, event mb.Event, t *testing.T) {
 }
 
 func checkModuleField(fieldName string, event mb.Event, t *testing.T) {
-	if ok, err := event.ModuleFields.HasKey(fieldName); ok {
-		assert.NoError(t, err)
-	} else {
-		fmt.Println("Error: " + fieldName + " does not exist in this event")
-		t.FailNow()
+	metricValue, err := event.ModuleFields.GetValue(fieldName)
+	assert.NoError(t, err)
+	if userString, ok := metricValue.(string); !ok {
+		fmt.Println("Field "+fieldName+" is not a string: ", userString)
+		t.Fail()
 	}
 }
 
-func checkMetricSetField(metricName string, expectFormat string, event mb.Event, t *testing.T) {
+func checkMetricSetField(metricName string, event mb.Event, t *testing.T) {
 	if ok, err := event.MetricSetFields.HasKey(metricName); ok {
 		assert.NoError(t, err)
 		metricValue, err := event.MetricSetFields.GetValue(metricName)
 		assert.NoError(t, err)
-		switch expectFormat {
-		case "float64":
-			if userPercentFloat, ok := metricValue.(float64); !ok {
-				fmt.Println("failed: userPercentFloat = ", userPercentFloat)
-				t.Fail()
-			} else {
-				assert.True(t, userPercentFloat >= 0)
-				fmt.Println("succeed: userPercentFloat = ", userPercentFloat)
-			}
-		case "string":
-			if userString, ok := metricValue.(string); !ok {
-				fmt.Println("failed: userString = ", userString)
-				t.Fail()
-			}
+		if userPercentFloat, ok := metricValue.(float64); !ok {
+			fmt.Println("failed: userPercentFloat = ", userPercentFloat)
+			t.Fail()
+		} else {
+			assert.True(t, userPercentFloat >= 0)
+			fmt.Println("succeed: userPercentFloat = ", userPercentFloat)
 		}
-	} else {
-		fmt.Println("Error: " + metricName + " does not exist in this event")
-		t.FailNow()
 	}
-}
-
-func getCredentials(mock bool) (map[string]interface{}, error) {
-	if mock {
-		creds := map[string]interface{}{
-			"module":     "aws",
-			"metricsets": []string{"ec2"},
-			"mock":       "true",
-		}
-		return creds, nil
-	}
-
-	cfg, err := external.LoadDefaultAWSConfig()
-	if err != nil {
-		fmt.Println("failed to load config: ", err.Error())
-	}
-
-	stsSvc := sts.New(cfg)
-	getSessionTokenInput := sts.GetSessionTokenInput{
-		SerialNumber: awssdk.String(os.Getenv("SERIAL_NUMBER")),
-		TokenCode:    awssdk.String(os.Getenv("MFA_TOKEN")),
-	}
-
-	req := stsSvc.GetSessionTokenRequest(&getSessionTokenInput)
-	tempToken, err := req.Send()
-	if err != nil {
-		fmt.Println("GetSessionToken failed: ", err)
-		return nil, err
-	}
-
-	accessKeyID := *tempToken.Credentials.AccessKeyId
-	secretAccessKey := *tempToken.Credentials.SecretAccessKey
-	sessionToken := *tempToken.Credentials.SessionToken
-	os.Setenv("AWS_ACCESS_KEY_ID", accessKeyID)
-	os.Setenv("AWS_SECRET_ACCESS_KEY", secretAccessKey)
-	os.Setenv("AWS_SESSION_TOKEN", sessionToken)
-
-	creds := map[string]interface{}{
-		"module":            "aws",
-		"metricsets":        []string{"ec2"},
-		"mock":              "false",
-		"access_key_id":     accessKeyID,
-		"secret_access_key": secretAccessKey,
-		"session_token":     sessionToken,
-	}
-	return creds, nil
 }
