@@ -18,7 +18,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/auditbeat/datastore"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -31,9 +30,6 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "socket"
-
-	bucketName              = "auditbeat.socket.v1"
-	bucketKeyStateTimestamp = "state_timestamp"
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
@@ -61,7 +57,6 @@ type MetricSet struct {
 	ptable    *sock.ProcTable
 	listeners *sock.ListenerTable
 
-	bucket    datastore.Bucket
 	lastState time.Time
 }
 
@@ -172,11 +167,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
 	}
 
-	bucket, err := datastore.OpenBucket(bucketName)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open persistent datastore")
-	}
-
 	ptable, err := sock.NewProcTable("")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create process table")
@@ -190,34 +180,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		netlink:       sock.NewNetlinkSession(),
 		ptable:        ptable,
 		listeners:     sock.NewListenerTable(),
-		bucket:        bucket,
-	}
-
-	// Load from disk: Time when state was last sent
-	err = bucket.Load(bucketKeyStateTimestamp, func(blob []byte) error {
-		if len(blob) > 0 {
-			return ms.lastState.UnmarshalBinary(blob)
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	if !ms.lastState.IsZero() {
-		ms.log.Debugf("Last state was sent at %v. Next state update by %v.", ms.lastState, ms.lastState.Add(ms.config.effectiveStatePeriod()))
-	} else {
-		ms.log.Debug("No state timestamp found")
 	}
 
 	return ms, nil
-}
-
-// Close cleans up the MetricSet when it finishes.
-func (ms *MetricSet) Close() error {
-	if ms.bucket != nil {
-		return ms.bucket.Close()
-	}
-	return nil
 }
 
 // Fetch collects the user information. It is invoked periodically.
@@ -242,11 +207,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 // reportState reports all existing sockets on the system.
 func (ms *MetricSet) reportState(report mb.ReporterV2) error {
-	// Only update lastState if this state update was regularly scheduled,
-	// i.e. not caused by an Auditbeat restart (when the cache would be empty).
-	if !ms.cache.IsEmpty() {
-		ms.lastState = time.Now()
-	}
+	ms.lastState = time.Now()
 
 	sockets, err := ms.getSockets()
 	if err != nil {
@@ -275,16 +236,6 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 	// This will initialize the cache with the current sockets
 	ms.cache.DiffAndUpdateCache(convertToCacheable(sockets))
-
-	// Save time so we know when to send the state again (config.StatePeriod)
-	timeBytes, err := ms.lastState.MarshalBinary()
-	if err != nil {
-		return err
-	}
-	err = ms.bucket.Store(bucketKeyStateTimestamp, timeBytes)
-	if err != nil {
-		return errors.Wrap(err, "error writing state timestamp to disk")
-	}
 
 	return nil
 }

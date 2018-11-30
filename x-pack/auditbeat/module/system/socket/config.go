@@ -27,5 +27,5 @@ func (c *Config) effectiveStatePeriod() time.Duration {
 }
 
 var defaultConfig = Config{
-	StatePeriod: 12 * time.Hour,
+	StatePeriod: 1 * time.Hour,
 }
