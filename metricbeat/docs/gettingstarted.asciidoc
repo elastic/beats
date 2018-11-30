@@ -118,6 +118,21 @@ See <<running-on-docker, Running on Docker>> for deploying Docker containers
 
 endif::[]
 
+[[kubernetes]]
+*kubernetes:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+See <<running-on-kubernetes, Running on Kubernetes>> for deploying with Kubernetes
+
+endif::[]
+
 [[win]]
 *win:*
 
