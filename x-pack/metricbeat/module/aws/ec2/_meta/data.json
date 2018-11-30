@@ -10,18 +10,37 @@
         "name":"ec2",
         "rtt":44269
     },
+    "service": {
+        "name": "aws"
+    },
     "aws":{
-        "ec2":{
-            "cpu": {
-                "instance_id": "1",
-                "cpu_utilization": 0.25,
-                "cpu_credit_usage": 0.01,
-                "cpu_credit_balance": 70,
-                "provider": "ec2",
-                "region": "us-west-1",
-                "instance.id": "1",
-                "machine.type": "t2.medium"
+        "cloud": {
+            "provider": "ec2",
+            "region": "us-west-1",
+            "instance": {
+                "id": "i-123"
+            },
+            "machine": {
+                "type": "m2.large"
+            },
+            "availability_zone": "us-west-1a",
+            "image": {
+                "id": "ami-123"
             }
+        },
+        "ec2": {
+            "cpu.total.pct": 1.75,
+            "disk.read.bytes": 0,
+            "disk.write.bytes": 0,
+            "disk.read_ops": 0,
+            "disk.write_ops": 0,
+            "network.in.bytes": 25,
+            "network.out.bytes": 60,
+            "network.packets_in": 1.5,
+            "network.packets_out": 1.5,
+            "status.check_failed": 0,
+            "status.check_failed_instance": 0,
+            "status.check_failed_system": 0
         }
     },
     "type":"metricsets"

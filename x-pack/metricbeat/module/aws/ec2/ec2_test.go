@@ -9,6 +9,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -149,18 +151,27 @@ func TestFetch(t *testing.T) {
 
 	for _, event := range events {
 		checkRootField("service", event, t)
-		checkMetricSetField("cpu_utilization", "float64", event, t)
-		checkMetricSetField("instance.id", "string", event, t)
+		checkModuleField("cloud", event, t)
+		checkMetricSetField("cpu.total.pct", "float64", event, t)
 	}
 }
 
 func checkRootField(fieldName string, event mb.Event, t *testing.T) {
-	expectedKeyValue := common.MapStr{"name": "aws"}
+	expectedKeyValue := common.MapStr{"name": aws.ModuleName}
 	if ok, err := event.RootFields.HasKey(fieldName); ok {
 		assert.NoError(t, err)
 		fieldValue, err := event.RootFields.GetValue(fieldName)
 		assert.NoError(t, err)
 		assert.Equal(t, expectedKeyValue, fieldValue)
+	}
+}
+
+func checkModuleField(fieldName string, event mb.Event, t *testing.T) {
+	if ok, err := event.ModuleFields.HasKey(fieldName); ok {
+		assert.NoError(t, err)
+	} else {
+		fmt.Println("Error: " + fieldName + " does not exist in this event")
+		t.FailNow()
 	}
 }
 
@@ -184,6 +195,9 @@ func checkMetricSetField(metricName string, expectFormat string, event mb.Event,
 				t.Fail()
 			}
 		}
+	} else {
+		fmt.Println("Error: " + metricName + " does not exist in this event")
+		t.FailNow()
 	}
 }
 
