@@ -49,6 +49,16 @@ it's also possible to create a custom image with your
 configuration included.
 
 [float]
+===== The configuration file
+
+ifeval::["{beatname_lc}"=="filebeat"]
+In a Docker environment very little configuration of {beatname_uc} is needed because of the Autodiscover feature of {beatname_uc}.  Download this file as a starting point:
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/docker/filebeat-docker.yaml
+------------------------------------------------
+
 ===== Volume-mounted configuration
 
 One way to configure {beatname_uc} on Docker is to provide +{beatname_lc}.yml+ via a volume mount.
@@ -58,12 +68,13 @@ ifeval::["{beatname_lc}"=="filebeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run -d \
---name={beatname_lc} \
+--name=filebeat \
 --user=root \
+--volume="$(pwd)/filebeat-docker-match.yml:/usr/share/filebeat/filebeat.yml:ro" \
 --volume="/var/lib/docker/containers:/var/lib/docker/containers:ro" \
---volume="$(pwd)/{beatname_lc}.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
 --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
-{dockerimage} {beatname_lc} -e -strict.perms=false
+-e ELASTICSEARCH_HOSTS=elasticsearch:9200 \
+{dockerimage} filebeat -e -strict.perms=false
 --------------------------------------------
 endif::[]
 
@@ -123,6 +134,10 @@ docker run -d \
   --strict.perms=false -e
 --------------------------------------------
 endif::[]
+
+===== Customize your configuration
+
+The {beatname_lc}-docker.yml downloaded earlier is setup to Autodiscover Elasticsearch, ibana, and Redis containers.  Edit the configuration file {beatname_lc}-docker.yml and customize it to match your environment as directed in the Autodiscover page, then re-deploy your {beatname_uc} container.
 
 [float]
 ===== Custom image configuration
