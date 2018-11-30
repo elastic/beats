@@ -4,7 +4,7 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "\"?%{IP_LIST:nginx.access.remote_ip_list} - %{DATA:nginx.access.user_name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:nginx.access.response_code} %{NUMBER:nginx.access.body_sent.bytes} \"%{DATA:nginx.access.referrer}\" \"%{DATA:nginx.access.agent}\""
+        "\"?%{IP_LIST:network.forwarded_ip} - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:http.response.status_code:int} %{NUMBER:nginx.access.body_sent.bytes:int} \"%{DATA:http.request.referrer}\" \"%{DATA:nginx.access.agent}\""
         ],
       "pattern_definitions": {
         "IP_LIST": "%{IP}(\"?,?\\s*%{IP})*"
@@ -15,7 +15,7 @@
     "grok": {
       "field": "nginx.access.info",
       "patterns": [
-          "%{WORD:nginx.access.method} %{DATA:nginx.access.url} HTTP/%{NUMBER:nginx.access.http_version}",
+          "%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}",
           ""
       ],
       "ignore_missing": true
@@ -26,13 +26,18 @@
     }
   }, {
     "split": {
-      "field": "nginx.access.remote_ip_list",
+      "field": "network.forwarded_ip",
       "separator": "\"?,?\\s+"
+    }
+  }, {
+    "set": {
+      "field": "source.ip",
+      "value": ""
     }
   }, {
     "script": {
       "lang": "painless",
-      "inline": "boolean isPrivate(def ip) { try { StringTokenizer tok = new StringTokenizer(ip, '.'); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   def found = false;   for (def item : ctx.nginx.access.remote_ip_list) {     if (!isPrivate(item)) {       ctx.nginx.access.remote_ip = item;       found = true;       break;     }   }   if (!found) {     ctx.nginx.access.remote_ip = ctx.nginx.access.remote_ip_list[0];   }"
+      "inline": "boolean isPrivate(def ip) { try { StringTokenizer tok = new StringTokenizer(ip, '.'); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   def found = false;   for (def item : ctx.network.forwarded_ip) {     if (!isPrivate(item)) {       ctx.source.ip = item;       found = true;       break;     }   }   if (!found) {     ctx.source.ip = ctx.network.forwarded_ip[0];   }"
       }
   }, {
     "remove":{
@@ -53,20 +58,49 @@
     "remove": {
       "field": "nginx.access.time"
     }
-  }, {
-    "user_agent": {
-      "field": "nginx.access.agent",
-      "target_field": "nginx.access.user_agent"
-    }
+
+  }, { "user_agent": { "field": "nginx.access.agent" }
   }, {
     "rename": {
       "field": "nginx.access.agent",
-      "target_field": "nginx.access.user_agent.original"
+      "target_field": "user_agent.original"
     }
   }, {
+    "rename": {
+      "field": "user_agent.os",
+      "target_field": "user_agent.os.full_name",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_name",
+      "target_field": "user_agent.os.name",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_major",
+      "target_field": "user_agent.os.major",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_minor",
+      "target_field": "user_agent.os.minor",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_patch",
+      "target_field": "user_agent.os.patch",
+      "ignore_missing": true
+    }
+
+  },{
     "geoip": {
-      "field": "nginx.access.remote_ip",
-      "target_field": "nginx.access.geoip"
+      "field": "source.ip",
+      "target_field": "source.geo",
+      "ignore_missing": true
     }
   }],
   "on_failure" : [{

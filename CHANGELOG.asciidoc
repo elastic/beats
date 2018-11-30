@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 ==== Breaking changes
 
 *Affecting all Beats*
+- Automaticall cap signed integers to 63bits. {pull}8991[8991]
 
 *Auditbeat*
 
@@ -33,6 +34,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix autodiscover configurations stopping when metadata is missing. {pull}8851[8851]
+
 *Auditbeat*
 
 *Filebeat*
@@ -46,6 +49,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 - Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
 - Fix issue with not collecting Elasticsearch cross-cluster replication stats correctly. {pull}9179[9179]
+- The `node.name` field in the `elasticsearch/node` metricset now correctly reports the Elasticsarch node name. Previously this field was incorrectly reporting the node ID instead. {pull}9209[9209]
 
 *Packetbeat*
 
@@ -56,6 +60,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 ==== Added
 
 *Affecting all Beats*
+- Unify dashboard exporter tools. {pull}9097[9097]
+- Use _doc as document type of the Elasticsearch major version is 7. {pull}9056[9056]
 
 *Auditbeat*
 
@@ -66,10 +72,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Journalbeat*
 
+- Add cursor_seek_fallback option. {pull}9234[9234]
+
 *Metricbeat*
 
 - Add setting to disable docker cpu metrics per core. {pull}9194[9194]
 - The `elasticsearch/node` metricset now reports the Elasticsearch cluster UUID. {pull}8771[8771]
+- Add service.type field to Metricbeat. {pull}8965[8965]
 
 *Packetbeat*
 
@@ -129,6 +138,9 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Rename many `iis.access.*` fields to map to ECS. {pull}9084[9084]
 - IIS module's user agent string is no longer encoded (`+` replaced with spaces). {pull}9084[9084]
 - Rename many `haproxy.*` fields to map to ECS. {pull}9117[9117]
+- Rename many `nginx.access.*` fields to map to ECS. {pull}9081[9081]
+- Rename many `system.auth.*` fields to map to ECS. {pull}9138[9138]
+- Rename many `apache2.access.*` fields to map to ECS. {pull}9245[9245]
 
 *Metricbeat*
 
@@ -205,6 +217,8 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Add experimental socket summary metricset to system module {pull}6782[6782]
 - Collect custom cluster `display_name` in `elasticsearch/cluster_stats` metricset. {pull}8445[8445]
 - Test etcd module with etcd 3.3. {pull}9068[9068]
+- All `elasticsearch` metricsets now have module-level `cluster.id` and `cluster.name` fields. {pull}8770[8770] {pull}8771[8771] {pull}9164[9164] {pull}9165[9165] {pull}9166[9166] {pull}9168[9168]
+- All `elasticsearch` node-level metricsets now have `node.id` and `node.name` fields. {pull}9168[9168] {pull}9209[9209]
 
 *Packetbeat*
 
@@ -305,6 +319,7 @@ https://github.com/elastic/beats/compare/v6.4.0...v6.5.0[View commits]
 - Add Beats Central Management {pull}8559[8559]
 - Report configured queue type. {pull}8091[8091]
 - Enable `host` and `cloud` metadata processors by default. {pull}8596[8596]
+- Autodiscovery no longer requires that the `condition` field be set. If left unset all configs will be matched. {pull}9029[9029]
 
 *Filebeat*
 
