@@ -7,9 +7,9 @@
         "log.level": "LOG", 
         "log.offset": 0, 
         "message": "database system was shut down at 2017-06-17 16:58:04 CEST", 
-        "postgresql.log.thread_id": "4974", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.585", 
-        "postgresql.log.timezone": "CEST"
+        "postgresql.log.timezone": "CEST", 
+        "process.pid": "4974"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.605Z", 
@@ -19,9 +19,9 @@
         "log.level": "LOG", 
         "log.offset": 100, 
         "message": "MultiXact member wraparound protections are now enabled", 
-        "postgresql.log.thread_id": "4974", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.605", 
-        "postgresql.log.timezone": "CEST"
+        "postgresql.log.timezone": "CEST", 
+        "process.pid": "4974"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.615Z", 
@@ -31,9 +31,9 @@
         "log.level": "LOG", 
         "log.offset": 198, 
         "message": "autovacuum launcher started", 
-        "postgresql.log.thread_id": "4978", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.615", 
-        "postgresql.log.timezone": "CEST"
+        "postgresql.log.timezone": "CEST", 
+        "process.pid": "4978"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.616Z", 
@@ -43,9 +43,9 @@
         "log.level": "LOG", 
         "log.offset": 268, 
         "message": "database system is ready to accept connections", 
-        "postgresql.log.thread_id": "4973", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.616", 
-        "postgresql.log.timezone": "CEST"
+        "postgresql.log.timezone": "CEST", 
+        "process.pid": "4973"
     }, 
     {
         "@timestamp": "2017-07-31T13:36:42.956Z", 
@@ -56,9 +56,9 @@
         "log.offset": 357, 
         "message": "incomplete startup packet", 
         "postgresql.log.database": "unknown", 
-        "postgresql.log.thread_id": "4980", 
         "postgresql.log.timestamp": "2017-07-31 13:36:42.956", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "4980", 
         "user.name": "unknown"
     }, 
     {
@@ -75,9 +75,9 @@
         "postgresql.log.database": "postgres", 
         "postgresql.log.duration": "37.118", 
         "postgresql.log.query": "SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;", 
-        "postgresql.log.thread_id": "4983", 
         "postgresql.log.timestamp": "2017-07-31 13:36:43.557", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "4983", 
         "user.name": "postgres"
     }, 
     {
@@ -94,9 +94,9 @@
         "postgresql.log.database": "postgres", 
         "postgresql.log.duration": "2.895", 
         "postgresql.log.query": "SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;", 
-        "postgresql.log.thread_id": "4986", 
         "postgresql.log.timestamp": "2017-07-31 13:36:44.104", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "4986", 
         "user.name": "postgres"
     }, 
     {
@@ -113,9 +113,9 @@
         "postgresql.log.database": "postgres", 
         "postgresql.log.duration": "2.809", 
         "postgresql.log.query": "SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;", 
-        "postgresql.log.thread_id": "4989", 
         "postgresql.log.timestamp": "2017-07-31 13:36:44.642", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "4989", 
         "user.name": "postgres"
     }, 
     {
@@ -127,9 +127,9 @@
         "log.offset": 1727, 
         "message": "database \"users\" does not exist", 
         "postgresql.log.database": "users", 
-        "postgresql.log.thread_id": "5407", 
         "postgresql.log.timestamp": "2017-07-31 13:39:16.249", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "5407", 
         "user.name": "postgres"
     }, 
     {
@@ -141,9 +141,9 @@
         "log.offset": 1818, 
         "message": "database \"user\" does not exist", 
         "postgresql.log.database": "user", 
-        "postgresql.log.thread_id": "5500", 
         "postgresql.log.timestamp": "2017-07-31 13:39:17.945", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "5500", 
         "user.name": "postgres"
     }, 
     {
@@ -160,9 +160,9 @@
         "postgresql.log.database": "postgres", 
         "postgresql.log.duration": "37.598", 
         "postgresql.log.query": "SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;", 
-        "postgresql.log.thread_id": "5404", 
         "postgresql.log.timestamp": "2017-07-31 13:39:21.025", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "5404", 
         "user.name": "postgres"
     }, 
     {
@@ -176,9 +176,9 @@
         "postgresql.log.database": "clients", 
         "postgresql.log.duration": "9.482", 
         "postgresql.log.query": "select * from clients;", 
-        "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:39:31.619", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "5502", 
         "user.name": "postgres"
     }, 
     {
@@ -192,9 +192,9 @@
         "postgresql.log.database": "clients", 
         "postgresql.log.duration": "0.765", 
         "postgresql.log.query": "select id from clients;", 
-        "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:39:40.147", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "5502", 
         "user.name": "postgres"
     }, 
     {
@@ -211,9 +211,9 @@
         "postgresql.log.database": "clients", 
         "postgresql.log.duration": "26.082", 
         "postgresql.log.query": "SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;", 
-        "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:40:54.310", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "5502", 
         "user.name": "postgres"
     }, 
     {
@@ -227,9 +227,9 @@
         "postgresql.log.database": "clients", 
         "postgresql.log.duration": "36.162", 
         "postgresql.log.query": "create table cats(name varchar(50) primary key, toy varchar (50) not null, born timestamp not null);", 
-        "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:43:22.645", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "5502", 
         "user.name": "postgres"
     }, 
     {
@@ -243,9 +243,9 @@
         "postgresql.log.database": "c$lients", 
         "postgresql.log.duration": "10.540", 
         "postgresql.log.query": "insert into cats(name, toy, born) values('kate', 'ball', now());", 
-        "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:46:02.670", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "5502", 
         "user.name": "postgres"
     }, 
     {
@@ -259,9 +259,9 @@
         "postgresql.log.database": "_clients$db", 
         "postgresql.log.duration": "5.156", 
         "postgresql.log.query": "insert into cats(name, toy, born) values('frida', 'horse', now());", 
-        "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:46:23.016", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "5502", 
         "user.name": "postgres"
     }, 
     {
@@ -275,9 +275,9 @@
         "postgresql.log.database": "clients_db", 
         "postgresql.log.duration": "25.871", 
         "postgresql.log.query": "create table dogs(name varchar(50) primary key, owner varchar (50) not null, born timestamp not null);", 
-        "postgresql.log.thread_id": "5502", 
         "postgresql.log.timestamp": "2017-07-31 13:46:55.637", 
         "postgresql.log.timezone": "CEST", 
+        "process.pid": "5502", 
         "user.name": "postgres"
     }
 ]
