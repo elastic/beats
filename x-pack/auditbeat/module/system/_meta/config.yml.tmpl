@@ -1,5 +1,6 @@
 {{ if .Reference -}}
 {{ end -}}
+{{ if ne .GOOS "windows" -}}
 - module: system
 
   metricsets:
@@ -7,16 +8,13 @@
     - packages
     - processes
     {{ if eq .GOOS "linux" -}}
+    - socket
     - user
     {{- end }}
 
   state.period: 12h
 
   report_changes: true
-
-  {{ if eq .GOOS "darwin" -}}
-  {{ else if eq .GOOS "windows" -}}
-  {{ else -}}
-  {{- end }}
+{{- end }}
 {{ if .Reference }}
 {{- end }}
