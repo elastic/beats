@@ -1,0 +1,8 @@
+The System `socket` metricset provides ... TODO.
+
+The module is implemented for Linux only.
+
+[float]
+=== Configuration options
+
+TODO

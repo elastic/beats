@@ -44,6 +44,22 @@ class Test(AuditbeatXPackTest):
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "processes", COMMON_FIELDS + fields, warnings_allowed=True)
 
+    @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
+    def test_metricset_socket(self):
+        """
+        socket metricset collects information about open sockets on a system.
+        """
+
+        fields = ["destination.port"]
+
+        # Metricset is experimental and that generates a warning, TODO: remove later
+        # TODO: Remove try/catch once `network.type` is in fields.ecs.yml
+        try:
+            self.check_metricset("system", "socket", COMMON_FIELDS + fields, warnings_allowed=True)
+        except Exception as e:
+            if "network.type" not in str(e):
+                raise
+
     def test_metricset_user(self):
         """
         user metricset collects information about users on a server.
