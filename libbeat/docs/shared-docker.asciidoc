@@ -41,6 +41,45 @@ https://www.docker.elastic.co[www.docker.elastic.co].
 endif::[]
 
 [float]
+==== Run the Beat setup
+
+Running the Beat with the setup command will create the index pattern, load visualizations, dashboards, and machine learning jobs.  Run this command:
+
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat") or ("{beatname_lc}"=="heartbeat")]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"]
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="packetbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+--cap-add=NET_ADMIN \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"]
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="auditbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+  --cap-add="AUDIT_CONTROL" \
+  --cap-add="AUDIT_READ" \
+  {dockerimage} \
+  setup -E setup.kibana.host=kibana:5601 \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"]
+--------------------------------------------
+endif::[]
+
+NOTE: Substitute your Kibana and Elasticsearch hosts and ports above
+
 ==== Configure {beatname_uc} on Docker
 
 The Docker image provides several methods for configuring {beatname_uc}. The
@@ -144,6 +183,7 @@ docker run -d \
   --strict.perms=false -e
 --------------------------------------------
 endif::[]
+NOTE: Substitute your Elasticsearch hosts and ports above
 
 ===== Customize your configuration
 
