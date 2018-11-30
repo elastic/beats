@@ -298,6 +298,8 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 			record.Type = Shutdown
 
 			// Clear any old logins
+			// TODO: Issue logout events for login events that are still around
+			// at this point.
 			r.ttyLookup = make(map[string]LoginRecord)
 		} else {
 			// Ignore runlevel changes that are not shutdown or reboot.
@@ -308,6 +310,8 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 			record.Type = Boot
 
 			// Clear any old logins
+			// TODO: Issue logout events for login events that are still around
+			// at this point.
 			r.ttyLookup = make(map[string]LoginRecord)
 		} else {
 			record.Type = Unknown
