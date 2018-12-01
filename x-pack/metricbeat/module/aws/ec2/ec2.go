@@ -183,37 +183,37 @@ func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 		}
 		switch *output.Id {
 		case "cpu1":
-			event.MetricSetFields.Put("ec2.cpu.total.pct", output.Values[0])
+			event.MetricSetFields.Put("cpu.total.pct", output.Values[0])
 		case "cpu2":
-			event.MetricSetFields.Put("ec2.cpu.credit_usage", output.Values[0])
+			event.MetricSetFields.Put("cpu.credit_usage", output.Values[0])
 		case "cpu3":
-			event.MetricSetFields.Put("ec2.cpu.credit_balance", output.Values[0])
+			event.MetricSetFields.Put("cpu.credit_balance", output.Values[0])
 		case "cpu4":
-			event.MetricSetFields.Put("ec2.cpu.surplus_credit_balance", output.Values[0])
+			event.MetricSetFields.Put("cpu.surplus_credit_balance", output.Values[0])
 		case "cpu5":
-			event.MetricSetFields.Put("ec2.cpu.surplus_credits_charged", output.Values[0])
+			event.MetricSetFields.Put("cpu.surplus_credits_charged", output.Values[0])
 		case "network1":
-			event.MetricSetFields.Put("ec2.network.in.packets", output.Values[0])
+			event.MetricSetFields.Put("network.in.packets", output.Values[0])
 		case "network2":
-			event.MetricSetFields.Put("ec2.network.out.packets", output.Values[0])
+			event.MetricSetFields.Put("network.out.packets", output.Values[0])
 		case "network3":
-			event.MetricSetFields.Put("ec2.network.in.bytes", output.Values[0])
+			event.MetricSetFields.Put("network.in.bytes", output.Values[0])
 		case "network4":
-			event.MetricSetFields.Put("ec2.network.out.bytes", output.Values[0])
+			event.MetricSetFields.Put("network.out.bytes", output.Values[0])
 		case "disk1":
-			event.MetricSetFields.Put("ec2.diskio.read.bytes", output.Values[0])
+			event.MetricSetFields.Put("diskio.read.bytes", output.Values[0])
 		case "disk2":
-			event.MetricSetFields.Put("ec2.diskio.write.bytes", output.Values[0])
+			event.MetricSetFields.Put("diskio.write.bytes", output.Values[0])
 		case "disk3":
-			event.MetricSetFields.Put("ec2.diskio.read.ops", output.Values[0])
+			event.MetricSetFields.Put("diskio.read.ops", output.Values[0])
 		case "disk4":
-			event.MetricSetFields.Put("ec2.diskio.write.ops", output.Values[0])
+			event.MetricSetFields.Put("diskio.write.ops", output.Values[0])
 		case "status1":
-			event.MetricSetFields.Put("ec2.status.check_failed", output.Values[0])
+			event.MetricSetFields.Put("status.check_failed", output.Values[0])
 		case "status2":
-			event.MetricSetFields.Put("ec2.status.check_failed_system", output.Values[0])
+			event.MetricSetFields.Put("status.check_failed_system", output.Values[0])
 		case "status3":
-			event.MetricSetFields.Put("ec2.status.check_failed_instance", output.Values[0])
+			event.MetricSetFields.Put("status.check_failed_instance", output.Values[0])
 		}
 	}
 	report.Event(event)

@@ -1,47 +1,63 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"aws",
-        "name":"ec2",
-        "rtt":44269
+    "aws": {
+        "cloud": {
+            "availability_zone": "eu-central-1b",
+            "image": {
+                "id": "ami-556ef13a"
+            },
+            "instance": {
+                "id": "i-08027f3dcddb9a976"
+            },
+            "machine": {
+                "type": "i3.4xlarge"
+            },
+            "provider": "ec2",
+            "region": "eu-central-1"
+        },
+        "ec2": {
+            "cpu": {
+                "total": {
+                    "pct": 1.810416666664726
+                }
+            },
+            "diskio": {
+                "read": {
+                    "bytes": 0,
+                    "ops": 0
+                },
+                "write": {
+                    "bytes": 13766656,
+                    "ops": 1410.6
+                }
+            },
+            "network": {
+                "in": {
+                    "bytes": 86.4,
+                    "packets": 1.6
+                },
+                "out": {
+                    "bytes": 64,
+                    "packets": 1.6
+                }
+            },
+            "status": {
+                "check_failed": 0,
+                "check_failed_instance": 0,
+                "check_failed_system": 0
+            }
+        }
+    },
+    "metricset": {
+        "module": "aws",
+        "name": "ec2",
+        "rtt": 115
     },
     "service": {
         "name": "aws"
-    },
-    "aws":{
-        "cloud": {
-            "provider": "ec2",
-            "region": "us-west-1",
-            "instance": {
-                "id": "i-123"
-            },
-            "machine": {
-                "type": "m2.large"
-            },
-            "availability_zone": "us-west-1a",
-            "image": {
-                "id": "ami-123"
-            }
-        },
-        "ec2": {
-            "cpu.total.pct": 1.75,
-            "diskio.read.bytes": 0,
-            "diskio.write.bytes": 0,
-            "diskio.read.ops": 0,
-            "diskio.write.ops": 0,
-            "network.in.bytes": 25,
-            "network.out.bytes": 60,
-            "network.in.packets": 1.5,
-            "network.out.packets": 1.5,
-            "status.check_failed": 0,
-            "status.check_failed_instance": 0,
-            "status.check_failed_system": 0
-        }
-    },
-    "type":"metricsets"
+    }
 }

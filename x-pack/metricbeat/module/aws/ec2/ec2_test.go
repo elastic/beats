@@ -154,7 +154,7 @@ func TestMockFetch(t *testing.T) {
 		checkModuleField("cloud.provider", event, t)
 		checkModuleField("cloud.region", event, t)
 		// MetricSetField
-		cpuTotalPct, err := event.MetricSetFields.GetValue("ec2.cpu.total.pct")
+		cpuTotalPct, err := event.MetricSetFields.GetValue("cpu.total.pct")
 		assert.NoError(t, err)
 		assert.Equal(t, 0.25, cpuTotalPct)
 	}
@@ -200,11 +200,11 @@ func TestFetch(t *testing.T) {
 			checkModuleField("cloud.provider", event, t)
 			checkModuleField("cloud.region", event, t)
 			// MetricSetField
-			checkMetricSetField("ec2.cpu.total.pct", event, t)
-			checkMetricSetField("ec2.cpu.credit_usage", event, t)
-			checkMetricSetField("ec2.cpu.credit_balance", event, t)
-			checkMetricSetField("ec2.cpu.surplus_credit_balance", event, t)
-			checkMetricSetField("ec2.cpu.surplus_credits_charged", event, t)
+			checkMetricSetField("cpu.total.pct", event, t)
+			checkMetricSetField("cpu.credit_usage", event, t)
+			checkMetricSetField("cpu.credit_balance", event, t)
+			checkMetricSetField("cpu.surplus_credit_balance", event, t)
+			checkMetricSetField("cpu.surplus_credits_charged", event, t)
 			checkMetricSetField("network.in.packets", event, t)
 			checkMetricSetField("network.out.packets", event, t)
 			checkMetricSetField("network.in.bytes", event, t)
@@ -216,6 +216,11 @@ func TestFetch(t *testing.T) {
 			checkMetricSetField("status.check_failed", event, t)
 			checkMetricSetField("status.check_failed_system", event, t)
 			checkMetricSetField("status.check_failed_instance", event, t)
+		}
+
+		err := mbtest.WriteEventsReporterV2(awsMetricSet, t, "")
+		if err != nil {
+			t.Fatal("write", err)
 		}
 	}
 }
