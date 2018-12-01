@@ -38,10 +38,10 @@ original Packetbeat authors.
 
 For general information about contributing to Beats, see <<beats-contributing>>.
 
-After you have https://golang.org/doc/install[installed Go] and set up the
+After you have https://golang.org/doc/install[installed Go], set up the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
-your preferred workspace location, clone the Beats repository in the correct location
-under `GOPATH`:
+your preferred workspace location, and added the `$GOPATH/bin` directory to your
+PATH variable, clone the Beats repository in the correct location under `GOPATH`:
 
 [source,shell]
 ----------------------------------------------------------------------
