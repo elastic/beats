@@ -1,50 +1,10 @@
-- name: packages
+- name: login
   type: group
   description: >
-    `packages` contains information about installed packages.
+    `login` contains additional information about a login event.
   release: experimental
   fields:
-  - name: package
-    type: array
+  - name: tty
+    type: keyword
     description: >
-        One or more packages.
-    fields:
-    - name: status
-      type: keyword
-      description: >
-        Package change - `new`, `installed` or `removed`.
-    - name: package.name
-      type: keyword
-      description: >
-        Package name.
-    - name: package.version
-      type: keyword
-      description: >
-        Package version.
-    - name: package.release
-      type: keyword
-      description: >
-        Package release.
-    - name: package.arch
-      type: keyword
-      description: >
-        Package architecture.
-    - name: package.license
-      type: keyword
-      description: >
-        Package license.
-    - name: package.installtime
-      type: date
-      description: >
-        Package install time.
-    - name: package.size
-      type: long
-      description: >
-        Package size.
-    - name: package.summary
-      description: >
-        Package summary.
-    - name: package.url
-      type: keyword
-      description: >
-        Package URL.
+        Terminal used by a user.
