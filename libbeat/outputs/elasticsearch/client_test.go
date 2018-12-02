@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -36,6 +37,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/version"
 )
 
 func readStatusItem(in []byte) (int, string, error) {
@@ -380,4 +382,90 @@ func TestAddToURL(t *testing.T) {
 		url := addToURL(test.url, test.path, test.pipeline, test.params)
 		assert.Equal(t, url, test.expected)
 	}
+}
+
+type testBulkRecorder struct {
+	data     []interface{}
+	inAction bool
+}
+
+func TestBulkEncodeEvents(t *testing.T) {
+	cases := map[string]struct {
+		docType string
+		config  common.MapStr
+		events  []common.MapStr
+	}{
+		"ES 6.x event": {
+			docType: "doc",
+			config:  common.MapStr{},
+			events:  []common.MapStr{{"message": "test"}},
+		},
+		"ES 7.x event": {
+			docType: "_doc",
+			config:  common.MapStr{},
+			events:  []common.MapStr{{"message": "test"}},
+		},
+	}
+
+	for name, test := range cases {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			cfg := common.MustNewConfigFrom(test.config)
+
+			index, pipeline, err := buildSelectors(beat.Info{
+				IndexPrefix: "test",
+				Version:     version.GetDefaultVersion(),
+			}, cfg)
+			require.NoError(t, err)
+
+			events := make([]publisher.Event, len(test.events))
+			for i, fields := range test.events {
+				events[i] = publisher.Event{
+					Content: beat.Event{
+						Timestamp: time.Now(),
+						Fields:    fields,
+					},
+				}
+			}
+
+			recorder := &testBulkRecorder{}
+
+			encoded := bulkEncodePublishRequest(recorder, index, pipeline, test.docType, events)
+			assert.Equal(t, len(events), len(encoded), "all events should have been encoded")
+			assert.False(t, recorder.inAction, "incomplete bulk")
+
+			// check meta-data for each event
+			for i := 0; i < len(recorder.data); i += 2 {
+				var meta bulkEventMeta
+				switch v := recorder.data[i].(type) {
+				case bulkCreateAction:
+					meta = v.Create
+				case bulkIndexAction:
+					meta = v.Index
+				default:
+					panic("unknown type")
+				}
+
+				assert.NotEqual(t, "", meta.Index)
+				assert.Equal(t, test.docType, meta.DocType)
+			}
+
+			// TODO: customer per test case validation
+		})
+	}
+}
+
+func (r *testBulkRecorder) Add(meta, obj interface{}) error {
+	if r.inAction {
+		panic("can not add a new action if other action is active")
+	}
+
+	r.data = append(r.data, meta, obj)
+	return nil
+}
+
+func (r *testBulkRecorder) AddRaw(raw interface{}) error {
+	r.data = append(r.data)
+	r.inAction = !r.inAction
+	return nil
 }

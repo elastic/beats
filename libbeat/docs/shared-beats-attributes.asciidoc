@@ -19,6 +19,7 @@
 :ES-version: {stack-version}
 :LS-version: {stack-version}
 :Kibana-version: {stack-version}
+:cm-ui: Central Management
 :beat_monitoring_user: beats_system
 :beat_monitoring_user_version: 6.3.0
 :beat_monitoring_version: 6.2

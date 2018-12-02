@@ -15,6 +15,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :deb_os:
 :rpm_os:
 :mac_os:
+:linux_os:
 :docker_platform:
 :win_os:
 
@@ -33,6 +34,8 @@ include::./upgrading.asciidoc[]
 include::./how-metricbeat-works.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
+
+include::../../libbeat/docs/shared-central-management.asciidoc[]
 
 include::./modules.asciidoc[]
 

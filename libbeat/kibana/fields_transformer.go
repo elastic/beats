@@ -29,7 +29,7 @@ type fieldsTransformer struct {
 	transformedFields         []common.MapStr
 	transformedFieldFormatMap common.MapStr
 	version                   *common.Version
-	keys                      common.MapStr
+	keys                      map[string]int
 }
 
 func newFieldsTransformer(version *common.Version, fields common.Fields) (*fieldsTransformer, error) {
@@ -41,7 +41,7 @@ func newFieldsTransformer(version *common.Version, fields common.Fields) (*field
 		version:                   version,
 		transformedFields:         []common.MapStr{},
 		transformedFieldFormatMap: common.MapStr{},
-		keys: common.MapStr{},
+		keys:                      map[string]int{},
 	}, nil
 }
 
@@ -79,17 +79,11 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
 			f.Path = path + "." + f.Name
 		}
 
-		if t.keys[f.Path] != nil {
-			msg := fmt.Sprintf("ERROR: Field <%s> is duplicated. Please update and try again.\n", f.Path)
-			panic(errors.New(msg))
-		}
-
 		if f.Type == "group" {
 			if f.Enabled == nil || *f.Enabled {
 				t.transformFields(f.Fields, f.Path)
 			}
 		} else {
-			t.keys[f.Path] = true
 			t.add(f)
 
 			if f.MultiFields != nil {
@@ -104,13 +98,35 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
 	}
 }
 
+func (t *fieldsTransformer) update(target *common.MapStr, override common.Field) error {
+	field, _ := transformField(t.version, override)
+	if override.Type == "" || (*target)["type"] == field["type"] {
+		target.Update(field)
+		if !override.Overwrite {
+			// compatible duplication
+			return fmt.Errorf("field <%s> is duplicated, remove it or set 'overwrite: true'", override.Path)
+		}
+		return nil
+	}
+	// incompatible duplication
+	return fmt.Errorf("field <%s> is duplicated", override.Path)
+}
+
 func (t *fieldsTransformer) add(f common.Field) {
+	if idx := t.keys[f.Path]; idx > 0 {
+		target := &t.transformedFields[idx-1] // 1-indexed
+		if err := t.update(target, f); err != nil {
+			panic(err)
+		}
+		return
+	}
+
 	field, fieldFormat := transformField(t.version, f)
 	t.transformedFields = append(t.transformedFields, field)
+	t.keys[f.Path] = len(t.transformedFields) // 1-index
 	if fieldFormat != nil {
 		t.transformedFieldFormatMap[field["name"].(string)] = fieldFormat
 	}
-
 }
 
 func transformField(version *common.Version, f common.Field) (common.MapStr, common.MapStr) {

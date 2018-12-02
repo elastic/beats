@@ -60,7 +60,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	var connections []map[string]interface{}
 	err := json.Unmarshal(content, &connections)
 	if err != nil {
-		logp.Err("Error: ", err)
+		logp.Err("Error: %+v", err)
 		return nil, err
 	}
 

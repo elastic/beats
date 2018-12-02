@@ -23,11 +23,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	dk "github.com/elastic/beats/libbeat/tests/docker"
-
-	"github.com/stretchr/testify/assert"
 )
 
 // Test docker start emits an autodiscover event
@@ -37,9 +38,13 @@ func TestDockerStart(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	UUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
 	bus := bus.New("test")
 	config := common.NewConfig()
-	provider, err := AutodiscoverBuilder(bus, config)
+	provider, err := AutodiscoverBuilder(bus, UUID, config)
 	if err != nil {
 		t.Fatal(err)
 	}

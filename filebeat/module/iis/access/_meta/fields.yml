@@ -3,43 +3,6 @@
   description: >
     Contains fields for IIS access logs.
   fields:
-    - name: server_ip
-      type: keyword
-      description: >
-        The server IP address.
-    - name: method
-      type: keyword
-      example: GET
-      description: >
-        The request HTTP method.
-    - name: url
-      type: keyword
-      description: >
-        The request HTTP URL.
-    - name: query_string
-      type: keyword
-      description: >
-        The request query string, if any.
-    - name: port
-      type: long
-      description: >
-        The request port number.
-    - name: user_name
-      type: keyword
-      description: >
-        The user name used when basic authentication is used.
-    - name: remote_ip
-      type: keyword
-      description: >
-        The client IP address.
-    - name: referrer
-      type: keyword
-      description: >
-        The HTTP referrer.
-    - name: response_code
-      type: long
-      description: >
-        The HTTP response code.
     - name: sub_status
       type: long
       description: >
@@ -60,18 +23,10 @@
       type: keyword
       description: >
         The name of the server on which the log file entry was generated.
-    - name: http_version
-      type: keyword
-      description: >
-        The HTTP version.
     - name: cookie
       type: keyword
       description: >
         The content of the cookie sent or received, if any.
-    - name: hostname
-      type: keyword
-      description: >
-        The host header name, if any.
     - name: body_sent.bytes
       type: long
       format: bytes
@@ -82,87 +37,91 @@
       format: bytes
       description: >
         The number of bytes of the server request body.
-    - name: agent
-      type: text
-      description: >
-        Contains the un-parsed user agent string. Only present if the user
-        agent Elasticsearch plugin is not available or not used.
+
+    - name: server_ip
+      type: alias
+      path: destination.ip
+    - name: method
+      type: alias
+      path: http.request.method
+    - name: url
+      type: alias
+      path: url.path
+    - name: query_string
+      type: alias
+      path: url.query
+    - name: port
+      type: alias
+      path: destination.port
+    - name: user_name
+      type: alias
+      path: user.name
+    - name: remote_ip
+      type: alias
+      path: source.ip
+    - name: referrer
+      type: alias
+      path: http.request.referrer
+    - name: response_code
+      type: alias
+      path: http.response.status_code
+    - name: http_version
+      type: alias
+      path: http.version
+    - name: hostname
+      type: alias
+      path: host.hostname
     - name: user_agent
       type: group
-      description: >
-        Contains the parsed user agent field. Only present if the user
-        agent Elasticsearch plugin is available and used.
       fields:
         - name: device
-          type: keyword
-          description: >
-            The name of the physical device.
+          type: alias
+          path: user_agent.device
         - name: major
-          type: long
-          description: >
-            The major version of the user agent.
+          type: alias
+          path: user_agent.major
         - name: minor
-          type: long
-          description: >
-            The minor version of the user agent.
+          type: alias
+          path: user_agent.minor
         - name: patch
-          type: keyword
-          description: >
-            The patch version of the user agent.
+          type: alias
+          path: user_agent.patch
         - name: name
-          type: keyword
-          example: Chrome
-          description: >
-            The name of the user agent.
+          type: alias
+          path: user_agent.name
         - name: os
-          type: keyword
-          description: >
-            The name of the operating system.
+          type: alias
+          path: user_agent.os.full_name
         - name: os_major
-          type: long
-          description: >
-            The major version of the operating system.
+          type: alias
+          path: user_agent.os.major
         - name: os_minor
-          type: long
-          description: >
-            The minor version of the operating system.
+          type: alias
+          path: user_agent.os.minor
         - name: os_name
-          type: keyword
-          description: >
-            The name of the operating system.
+          type: alias
+          path: user_agent.os.name
         - name: original
-          type: text
-          index: false
-          description: >
-            Original user agent value before parsing by ingest-user-agent plugin.
+          type: alias
+          path: user_agent.original
     - name: geoip
       type: group
-      description: >
-        Contains GeoIP information gathered based on the remote_ip field.
-        Only present if the GeoIP Elasticsearch plugin is available and
-        used.
       fields:
         - name: continent_name
-          type: keyword
-          description: >
-            The name of the continent.
+          type: alias
+          path: source.geo.continent_name
         - name: country_iso_code
-          type: keyword
-          description: >
-            Country ISO code.
+          type: alias
+          path: source.geo.country_iso_code
         - name: location
-          type: geo_point
-          description: >
-            The longitude and latitude.
+          type: alias
+          path: source.geo.location
         - name: region_name
-          type: keyword
-          description: >
-            The region name.
+          type: alias
+          path: source.geo.region_name
         - name: city_name
-          type: keyword
-          description: >
-            The city name.
+          type: alias
+          path: source.geo.city_name
         - name: region_iso_code
-          type: keyword
-          description: >
-            Region ISO code.
+          type: alias
+          path: source.geo.region_iso_code

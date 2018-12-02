@@ -6,6 +6,8 @@ GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 ES_BEATS?=..
 FIELDS_FILE_PATH=module
 
+DOCS_BRANCH=$(shell grep doc-branch ../libbeat/docs/version.asciidoc | cut -c 14-)
+
 include ${ES_BEATS}/libbeat/scripts/Makefile
 
 # Collects all module dashboards
@@ -23,8 +25,8 @@ configs: python-env
 	@cat ${ES_BEATS}/filebeat/_meta/common.reference.p1.yml > _meta/beat.reference.yml
 	@${PYTHON_ENV}/bin/python  ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
 	@cat ${ES_BEATS}/filebeat/_meta/common.reference.p2.yml >> _meta/beat.reference.yml
-	@rm -rf modules.d && mkdir -p modules.d
-	@for MODULE in `find module -type d -maxdepth 1 -mindepth 1 -exec basename {} \;`; do cp -a $(PWD)/module/$$MODULE/_meta/config.yml modules.d/$$MODULE.yml.disabled; done
+	@rm -rf modules.d
+	${PYTHON_ENV}/bin/python ${ES_BEATS}/script/modules_collector.py --beat ${BEAT_NAME} --docs_branch=$(DOCS_BRANCH)
 	@chmod go-w modules.d/*
 
 # Collects all module docs

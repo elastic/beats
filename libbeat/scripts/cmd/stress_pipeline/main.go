@@ -28,19 +28,15 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	logpcfg "github.com/elastic/beats/libbeat/logp/configure"
-	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/libbeat/publisher/pipeline/stress"
-	"github.com/elastic/beats/libbeat/service"
-
-	// import queue types
-	_ "github.com/elastic/beats/libbeat/publisher/queue/memqueue"
-	_ "github.com/elastic/beats/libbeat/publisher/queue/spool"
-
-	// import outputs
 	_ "github.com/elastic/beats/libbeat/outputs/console"
 	_ "github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/beats/libbeat/outputs/fileout"
 	_ "github.com/elastic/beats/libbeat/outputs/logstash"
+	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/libbeat/publisher/pipeline/stress"
+	_ "github.com/elastic/beats/libbeat/publisher/queue/memqueue"
+	_ "github.com/elastic/beats/libbeat/publisher/queue/spool"
+	"github.com/elastic/beats/libbeat/service"
 )
 
 var (

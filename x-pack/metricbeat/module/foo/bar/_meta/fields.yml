@@ -1,0 +1,9 @@
+- name: bar
+  type: group
+  description: >
+    bar
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

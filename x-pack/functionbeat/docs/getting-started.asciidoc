@@ -1,4 +1,5 @@
 [id="{beatname_lc}-getting-started"]
+[role="xpack"]
 == Getting Started With {beatname_uc}
 
 include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
@@ -10,6 +11,7 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 * <<view-kibana-dashboards>>
 
 [id="{beatname_lc}-installation"]
+[role="xpack"]
 === Step 1: Download the {beatname_uc} package
 
 The {beatname_uc} package contains the command line tools, configuration file,
@@ -75,6 +77,7 @@ https://www.elastic.co/downloads/beats/{beatname_lc}[downloads page].
 endif::[]
 
 [id="{beatname_lc}-configuration"]
+[role="xpack"]
 === Step 2: Configure {beatname_uc}
 
 Before deploying {beatname_uc} to your serverless environment, you need to
@@ -153,12 +156,14 @@ include::{libbeat-dir}/docs/step-test-config.asciidoc[]
 include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 
 [id="{beatname_lc}-template"]
+[role="xpack"]
 === Step 3: Load the index template in Elasticsearch
 
 :allplatforms:
 include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
 [id="{beatname_lc}-deploying"]
+[role="xpack"]
 === Step 4: Deploy {beatname_uc} code to your serverless environment
 
 Before deploying functions to your serverless environment, make sure your user
@@ -184,6 +189,8 @@ set AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
 set AWS_DEFAULT_REGION=us-east-1
 ----
 
+Set `AWS_DEFAULT_REGION` to the region where your services are running.
+
 After setting credentials, run the `deploy` command to deploy the function.
 The following command deploys a function called `cloudwatch`: 
 
@@ -208,6 +215,7 @@ TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
 
 [[view-kibana-dashboards]]
+[role="xpack"]
 === Step 5: View your data in Kibana
 
 There are currently no example dashboards available for {beatname_uc}.
