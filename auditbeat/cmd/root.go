@@ -27,9 +27,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb/module"
 )
 
-// Name of the beat (auditbeat).
-const Name = "auditbeat"
-
 // RootCmd for running auditbeat.
 var RootCmd *cmd.BeatsRootCmd
 
@@ -40,12 +37,14 @@ var ShowCmd = &cobra.Command{
 }
 
 func init() {
+
+	const beatName = "auditbeat"
 	create := beater.Creator(
 		beater.WithModuleOptions(
 			module.WithEventModifier(core.AddDatasetToEvent),
 		),
 	)
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
-	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", create, runFlags)
+	var runFlags = pflag.NewFlagSet(beatName, pflag.ExitOnError)
+	RootCmd = cmd.GenRootCmdWithRunFlags(beatName, "", create, runFlags)
 	RootCmd.AddCommand(ShowCmd)
 }
