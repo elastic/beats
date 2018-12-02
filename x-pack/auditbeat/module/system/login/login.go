@@ -24,11 +24,15 @@ const (
 	moduleName    = "system"
 	metricsetName = "login"
 
-	bucketName           = "auditbeat.login.v1"
-	bucketKeyFileRecords = "file_records"
-	bucketKeyTTYLookup   = "tty_lookup"
+	bucketName = "auditbeat.login.v1"
 
 	eventTypeEvent = "event"
+
+	LoginRecordTypeUnknown    = "unknown"
+	LoginRecordTypeShutdown   = "shutdown"
+	LoginRecordTypeBoot       = "boot"
+	LoginRecordTypeUserLogin  = "user_login"
+	LoginRecordTypeUserLogout = "user_logout"
 )
 
 // LoginRecord represents a login record.
@@ -46,31 +50,13 @@ type LoginRecord struct {
 }
 
 func (login LoginRecord) toMapStr() common.MapStr {
-	mapstr := common.MapStr{
-		"type": login.Type,
-		"utmp": fmt.Sprintf("%v", login.Utmp),
-	}
+	mapstr := common.MapStr{}
+
+	// Very useful for debugging
+	//mapstr.Put("utmp", fmt.Sprintf("%v", login.Utmp))
 
 	if login.TTY != "" {
 		mapstr.Put("tty", login.TTY)
-	}
-
-	if login.PID != -1 {
-		mapstr.Put("pid", login.PID)
-	}
-
-	if login.Username != "" {
-		mapstr.Put("user", common.MapStr{
-			"name": login.Username,
-		})
-	}
-
-	if login.Hostname != "" {
-		mapstr.Put("hostname", login.Hostname)
-	}
-
-	if login.IP != nil {
-		mapstr.Put("ip", login.IP)
 	}
 
 	return mapstr
@@ -162,28 +148,37 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 	}
 
 	if loginRecord.Username != "" {
-		event.RootFields.Put("user", common.MapStr{
-			"name": loginRecord.Username,
-		})
+		event.RootFields.Put("user.name", loginRecord.Username)
 
 		if loginRecord.UID != -1 {
-			event.MetricSetFields.Put("user.uid", loginRecord.UID)
 			event.RootFields.Put("user.id", loginRecord.UID)
 		}
+	}
+
+	if loginRecord.PID != -1 {
+		event.RootFields.Put("process.pid", loginRecord.PID)
+	}
+
+	if loginRecord.IP != nil {
+		event.RootFields.Put("source.ip", loginRecord.IP)
+	}
+
+	if loginRecord.Hostname != "" && loginRecord.Hostname != loginRecord.IP.String() {
+		event.RootFields.Put("source.hostname", loginRecord.Hostname)
 	}
 
 	var eventSummary string
 
 	switch loginRecord.Type {
-	case Boot:
+	case LoginRecordTypeBoot:
 		eventSummary = "System boot"
-	case Shutdown:
+	case LoginRecordTypeShutdown:
 		eventSummary = "Shutdown"
-	case UserLogin:
+	case LoginRecordTypeUserLogin:
 		eventSummary = fmt.Sprintf("Login by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
 			loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
 			loginRecord.Hostname, loginRecord.IP)
-	case UserLogout:
+	case LoginRecordTypeUserLogout:
 		eventSummary = fmt.Sprintf("Logout by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
 			loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
 			loginRecord.Hostname, loginRecord.IP)

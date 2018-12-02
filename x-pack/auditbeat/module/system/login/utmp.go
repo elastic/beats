@@ -34,15 +34,15 @@ import (
 )
 
 const (
-	Unknown    = "unknown"
-	Shutdown   = "shutdown"
-	Boot       = "boot"
-	UserLogin  = "user_login"
-	UserLogout = "user_logout"
+	bucketKeyFileRecords   = "file_records"
+	bucketKeyLoginSessions = "login_sessions"
 )
 
+type Inode uint64
+
+// FileRecord represents a UTMP file at a point in time.
 type FileRecord struct {
-	Inode    uint64
+	Inode    Inode
 	Size     int64
 	LastUtmp Utmp
 }
@@ -71,22 +71,23 @@ func newUtmp(utmpC *C.struct_utmp) Utmp {
 	}
 }
 
+// UtmpFileReader can read a UTMP formatted file (usually /var/log/wtmp).
 type UtmpFileReader struct {
-	log         *logp.Logger
-	bucket      datastore.Bucket
-	filePattern string
-	fileRecords map[uint64]FileRecord
-	ttyLookup   map[string]LoginRecord
+	log           *logp.Logger
+	bucket        datastore.Bucket
+	filePattern   string
+	fileRecords   map[Inode]FileRecord
+	loginSessions map[string]LoginRecord
 }
 
 // NewUtmpFileReader creates and initializes a new UTMP file reader.
 func NewUtmpFileReader(log *logp.Logger, bucket datastore.Bucket, filePattern string) (*UtmpFileReader, error) {
 	r := &UtmpFileReader{
-		log:         log,
-		bucket:      bucket,
-		filePattern: filePattern,
-		fileRecords: make(map[uint64]FileRecord),
-		ttyLookup:   make(map[string]LoginRecord),
+		log:           log,
+		bucket:        bucket,
+		filePattern:   filePattern,
+		fileRecords:   make(map[Inode]FileRecord),
+		loginSessions: make(map[string]LoginRecord),
 	}
 
 	// Load state (file records, tty mapping) from disk
@@ -115,7 +116,7 @@ func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 
 	var loginRecords []LoginRecord
 	for path, fileInfo := range fileInfos {
-		inode := fileInfo.Sys().(*syscall.Stat_t).Ino
+		inode := Inode(fileInfo.Sys().(*syscall.Stat_t).Ino)
 
 		fileRecord, isKnownFile := r.fileRecords[inode]
 		var oldSize int64 = 0
@@ -123,6 +124,17 @@ func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 			oldSize = fileRecord.Size
 		}
 		newSize := fileInfo.Size()
+
+		if newSize < oldSize {
+			// UTMP files are append-only and so this is weird. It might be a sign of
+			// a highly unlikely inode reuse - or of something more nefarious.
+			// Setting isKnownFile to false se we read the whole file from the beginning.
+			isKnownFile = false
+
+			r.log.Warnf("Unexpectedly, the file with inode %v (path=%v) is smaller than before - reading whole file.",
+				inode, path)
+		}
+
 		if !isKnownFile || newSize != oldSize {
 			r.log.Debugf("Reading file %v (inode=%v, oldSize=%v, newSize=%v)", path, inode, oldSize, newSize)
 
@@ -162,7 +174,7 @@ func (r *UtmpFileReader) deleteOldRecords(fileInfos map[string]os.FileInfo) {
 	for savedInode, _ := range r.fileRecords {
 		found := false
 		for _, fileInfo := range fileInfos {
-			inode := fileInfo.Sys().(*syscall.Stat_t).Ino
+			inode := Inode(fileInfo.Sys().(*syscall.Stat_t).Ino)
 			if inode == savedInode {
 				found = true
 				break
@@ -206,7 +218,7 @@ func (r *UtmpFileReader) fileInfos() (map[string]os.FileInfo, error) {
 	return fileInfos, nil
 }
 
-func (r *UtmpFileReader) updateFileRecord(inode uint64, size int64, utmpRecords *[]Utmp) {
+func (r *UtmpFileReader) updateFileRecord(inode Inode, size int64, utmpRecords *[]Utmp) {
 	newFileRecord := FileRecord{
 		Inode: inode,
 		Size:  size,
@@ -227,8 +239,8 @@ func (r *UtmpFileReader) updateFileRecord(inode uint64, size int64, utmpRecords 
 // ReadAfter reads a UTMP formatted file (usually /var/log/wtmp*)
 // and returns the records after the provided last known record.
 // If record is nil, it returns all records in the file.
-func (r *UtmpFileReader) readAfter(utmpFile string, lastKnownRecord *Utmp) ([]Utmp, error) {
-	cs := C.CString(utmpFile)
+func (r *UtmpFileReader) readAfter(path string, lastKnownRecord *Utmp) ([]Utmp, error) {
+	cs := C.CString(path)
 	defer C.free(unsafe.Pointer(cs))
 
 	success, err := C.utmpname(cs)
@@ -265,6 +277,18 @@ func (r *UtmpFileReader) readAfter(utmpFile string, lastKnownRecord *Utmp) ([]Ut
 			}
 		} else {
 			// Eventually, we have read all UTMP records in the file.
+
+			if !reachedNewRecords && lastKnownRecord != nil {
+				// For some reason, this file did not contain the saved record.
+				// This might be a sign of a highly unlikely inode reuse -
+				// or of something more nefarious. We go back to the beginning and
+				// read the whole file this time.
+				r.log.Warnf("Unexpectedly, the file %v did not contain the saved login record %v - reading whole file.",
+					path, lastKnownRecord)
+
+				return r.readAfter(path, nil)
+			}
+
 			break
 		}
 	}
@@ -295,29 +319,29 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 
 		// 0 - halt; 6 - reboot
 		if utmp.UtUser == "shutdown" || runlevel == "0" || runlevel == "6" {
-			record.Type = Shutdown
+			record.Type = LoginRecordTypeShutdown
 
 			// Clear any old logins
 			// TODO: Issue logout events for login events that are still around
 			// at this point.
-			r.ttyLookup = make(map[string]LoginRecord)
+			r.loginSessions = make(map[string]LoginRecord)
 		} else {
 			// Ignore runlevel changes that are not shutdown or reboot.
 			return nil
 		}
 	case C.BOOT_TIME: // 2
 		if utmp.UtLine == "~" && utmp.UtUser == "reboot" {
-			record.Type = Boot
+			record.Type = LoginRecordTypeBoot
 
 			// Clear any old logins
 			// TODO: Issue logout events for login events that are still around
 			// at this point.
-			r.ttyLookup = make(map[string]LoginRecord)
+			r.loginSessions = make(map[string]LoginRecord)
 		} else {
-			record.Type = Unknown
+			record.Type = LoginRecordTypeUnknown
 		}
 	case C.USER_PROCESS: // 7
-		record.Type = UserLogin
+		record.Type = LoginRecordTypeUserLogin
 
 		record.Username = utmp.UtUser
 		record.UID = lookupUsername(record.Username)
@@ -327,11 +351,11 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 
 		// Store TTY from user login record for enrichment when user logout
 		// record comes along (which, alas, does not contain the username).
-		r.ttyLookup[record.TTY] = record
+		r.loginSessions[record.TTY] = record
 	case C.DEAD_PROCESS: // 8
-		savedRecord, found := r.ttyLookup[record.TTY]
+		savedRecord, found := r.loginSessions[record.TTY]
 		if found {
-			record.Type = UserLogout
+			record.Type = LoginRecordTypeUserLogout
 			record.Username = savedRecord.Username
 			record.UID = savedRecord.UID
 			record.PID = savedRecord.PID
@@ -436,19 +460,19 @@ func (r *UtmpFileReader) saveTTYLookupToDisk() error {
 	var buf bytes.Buffer
 	encoder := gob.NewEncoder(&buf)
 
-	for _, loginRecord := range r.ttyLookup {
+	for _, loginRecord := range r.loginSessions {
 		err := encoder.Encode(loginRecord)
 		if err != nil {
 			return errors.Wrap(err, "error encoding login record")
 		}
 	}
 
-	err := r.bucket.Store(bucketKeyTTYLookup, buf.Bytes())
+	err := r.bucket.Store(bucketKeyLoginSessions, buf.Bytes())
 	if err != nil {
 		return errors.Wrap(err, "error writing login records to disk")
 	}
 
-	r.log.Debugf("Wrote %d open login records to disk", len(r.ttyLookup))
+	r.log.Debugf("Wrote %d open login sessions to disk", len(r.loginSessions))
 	return nil
 }
 
@@ -500,7 +524,7 @@ func (r *UtmpFileReader) restoreFileRecordsFromDisk() error {
 
 func (r *UtmpFileReader) restoreTTYLookupFromDisk() error {
 	var decoder *gob.Decoder
-	err := r.bucket.Load(bucketKeyTTYLookup, func(blob []byte) error {
+	err := r.bucket.Load(bucketKeyLoginSessions, func(blob []byte) error {
 		if len(blob) > 0 {
 			buf := bytes.NewBuffer(blob)
 			decoder = gob.NewDecoder(buf)
@@ -516,7 +540,7 @@ func (r *UtmpFileReader) restoreTTYLookupFromDisk() error {
 			loginRecord := new(LoginRecord)
 			err = decoder.Decode(loginRecord)
 			if err == nil {
-				r.ttyLookup[loginRecord.TTY] = *loginRecord
+				r.loginSessions[loginRecord.TTY] = *loginRecord
 			} else if err == io.EOF {
 				// Read all
 				break
@@ -525,7 +549,7 @@ func (r *UtmpFileReader) restoreTTYLookupFromDisk() error {
 			}
 		}
 	}
-	r.log.Debugf("Restored %d open logins from disk", len(r.ttyLookup))
+	r.log.Debugf("Restored %d open login sessions from disk", len(r.loginSessions))
 
 	return nil
 }
