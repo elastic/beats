@@ -380,6 +380,7 @@ func bulkEncodePublishRequest(
 		}
 		if err := body.Add(meta, event); err != nil {
 			logp.Err("Failed to encode event: %s", err)
+			logp.Debug("elasticsearch", "Failed event: %v", event)
 			continue
 		}
 		okEvents = append(okEvents, data[i])
