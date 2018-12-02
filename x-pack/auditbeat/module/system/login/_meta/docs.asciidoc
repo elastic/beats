@@ -1,4 +1,4 @@
-The System `logins` metricset provides ... TODO.
+The System `login` metricset provides ... TODO.
 
 The module is implemented for Linux.
 

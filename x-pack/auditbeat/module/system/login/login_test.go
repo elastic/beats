@@ -23,7 +23,7 @@ func TestData(t *testing.T) {
 	}
 
 	// We use event[1], because the first event is usually a boring system boot.
-	// TODO: Add wtmp file for testing.
+	// TODO: Add sample wtmp file for testing.
 	fullEvent := mbtest.StandardizeEvent(f, events[1], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }

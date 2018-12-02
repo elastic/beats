@@ -28,9 +28,8 @@ const (
 
 	eventTypeEvent = "event"
 
-	LoginRecordTypeUnknown    = "unknown"
-	LoginRecordTypeShutdown   = "shutdown"
 	LoginRecordTypeBoot       = "boot"
+	LoginRecordTypeShutdown   = "shutdown"
 	LoginRecordTypeUserLogin  = "user_login"
 	LoginRecordTypeUserLogout = "user_logout"
 )
@@ -52,7 +51,7 @@ type LoginRecord struct {
 func (login LoginRecord) toMapStr() common.MapStr {
 	mapstr := common.MapStr{}
 
-	// Very useful for debugging
+	// Very useful for development
 	//mapstr.Put("utmp", fmt.Sprintf("%v", login.Utmp))
 
 	if login.TTY != "" {
@@ -96,7 +95,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		log:           logp.NewLogger(metricsetName),
 	}
 
-	ms.utmpReader, err = NewUtmpFileReader(ms.log, bucket, config.WtmpFilePattern)
+	ms.utmpReader, err = NewUtmpFileReader(ms.log, bucket, config.UtmpFilePattern)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +122,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		report.Event(ms.loginEvent(loginRecord))
 	}
 
-	// Save latest read records to disk
+	// Save new state to disk
 	if len(loginRecords) > 0 {
 		err := ms.utmpReader.saveStateToDisk()
 		if err != nil {
@@ -173,7 +172,7 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 	case LoginRecordTypeBoot:
 		eventSummary = "System boot"
 	case LoginRecordTypeShutdown:
-		eventSummary = "Shutdown"
+		eventSummary = "System shutdown"
 	case LoginRecordTypeUserLogin:
 		eventSummary = fmt.Sprintf("Login by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
 			loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,

@@ -109,7 +109,7 @@ func (r *UtmpFileReader) Close() error {
 	return nil
 }
 
-// ReadNew returns any new UTMP entries in any of the configured UTMP formatted files (usually /var/log/wtmp).
+// ReadNew returns any new UTMP entries in any files matching the configured pattern.
 func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 	fileInfos, err := r.fileInfos()
 	defer r.deleteOldRecords(fileInfos)
@@ -128,11 +128,17 @@ func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 		if newSize < oldSize {
 			// UTMP files are append-only and so this is weird. It might be a sign of
 			// a highly unlikely inode reuse - or of something more nefarious.
-			// Setting isKnownFile to false se we read the whole file from the beginning.
+			// Setting isKnownFile to false so we read the whole file from the beginning.
 			isKnownFile = false
 
 			r.log.Warnf("Unexpectedly, the file with inode %v (path=%v) is smaller than before - reading whole file.",
 				inode, path)
+		}
+
+		if !isKnownFile && newSize == 0 {
+			// Empty new file - save but don't read.
+			r.updateFileRecord(inode, newSize, nil)
+			continue
 		}
 
 		if !isKnownFile || newSize != oldSize {
@@ -169,7 +175,7 @@ func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 	return loginRecords, nil
 }
 
-// deleteOldRecords clean up old file records where the inode no longer exists.
+// deleteOldRecords cleans up old file records where the inode no longer exists.
 func (r *UtmpFileReader) deleteOldRecords(fileInfos map[string]os.FileInfo) {
 	for savedInode, _ := range r.fileRecords {
 		found := false
@@ -182,7 +188,7 @@ func (r *UtmpFileReader) deleteOldRecords(fileInfos map[string]os.FileInfo) {
 		}
 
 		if !found {
-			r.log.Debugf("Deleting file record for old inode %d", savedInode)
+			r.log.Debugf("Deleting file record for old inode %d.", savedInode)
 			delete(r.fileRecords, savedInode)
 		}
 	}
@@ -206,10 +212,17 @@ func (r *UtmpFileReader) fileInfos() (map[string]os.FileInfo, error) {
 				r.log.Debugf("File %v does not exist anymore.", path)
 				continue
 			} else {
-				return nil, errors.Wrapf(err, "unexpected error when reading file %v", path)
+				return nil, errors.Wrapf(err, "unexpected error when looking up file %v", path)
 			}
 		} else if fileInfo.Sys() == nil {
 			return nil, fmt.Errorf("empty stat result for file %v", path)
+		}
+
+		if r.log.IsDebug() {
+			inode := Inode(fileInfo.Sys().(*syscall.Stat_t).Ino)
+			if _, isKnownFile := r.fileRecords[inode]; !isKnownFile {
+				r.log.Debugf("Found new file: %v (size=%v)", path, fileInfo.Size())
+			}
 		}
 
 		fileInfos[path] = fileInfo
@@ -224,7 +237,7 @@ func (r *UtmpFileReader) updateFileRecord(inode Inode, size int64, utmpRecords *
 		Size:  size,
 	}
 
-	if len(*utmpRecords) > 0 {
+	if utmpRecords != nil && len(*utmpRecords) > 0 {
 		newFileRecord.LastUtmp = (*utmpRecords)[len(*utmpRecords)-1]
 	} else {
 		oldFileRecord, found := r.fileRecords[inode]
@@ -245,10 +258,10 @@ func (r *UtmpFileReader) readAfter(path string, lastKnownRecord *Utmp) ([]Utmp, 
 
 	success, err := C.utmpname(cs)
 	if err != nil {
-		return nil, errors.Wrap(err, "error selecting UTMP file")
+		return nil, errors.Wrapf(err, "error selecting UTMP file %v", path)
 	}
 	if success != 0 {
-		return nil, errors.New("selecting UTMP file failed")
+		return nil, fmt.Errorf("selecting UTMP file %v failed", path)
 	}
 
 	C.setutent()
@@ -259,7 +272,7 @@ func (r *UtmpFileReader) readAfter(path string, lastKnownRecord *Utmp) ([]Utmp, 
 	for {
 		utmpC, err := C.getutent()
 		if err != nil {
-			return nil, errors.Wrap(err, "error getting entry in UTMP file")
+			return nil, errors.Wrapf(err, "error getting entry in UTMP file %v", path)
 		}
 
 		if utmpC != nil {
@@ -272,7 +285,7 @@ func (r *UtmpFileReader) readAfter(path string, lastKnownRecord *Utmp) ([]Utmp, 
 				utmpRecords = append(utmpRecords, utmp)
 			}
 
-			if lastKnownRecord != nil && reflect.DeepEqual(utmp, *lastKnownRecord) {
+			if !reachedNewRecords && lastKnownRecord != nil && reflect.DeepEqual(utmp, *lastKnownRecord) {
 				reachedNewRecords = true
 			}
 		} else {
@@ -284,7 +297,7 @@ func (r *UtmpFileReader) readAfter(path string, lastKnownRecord *Utmp) ([]Utmp, 
 				// or of something more nefarious. We go back to the beginning and
 				// read the whole file this time.
 				r.log.Warnf("Unexpectedly, the file %v did not contain the saved login record %v - reading whole file.",
-					path, lastKnownRecord)
+					path, *lastKnownRecord)
 
 				return r.readAfter(path, nil)
 			}
@@ -296,8 +309,9 @@ func (r *UtmpFileReader) readAfter(path string, lastKnownRecord *Utmp) ([]Utmp, 
 	return utmpRecords, nil
 }
 
-// processLoginRecord receives UTMP login records in order and returns a LoginRecord
-// where appropriate.
+// processLoginRecord receives UTMP login records in order and returns
+// a corresponding LoginRecord. Some UTMP records do not translate
+// into a LoginRecord, in this case the return value is nil.
 func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 	record := LoginRecord{
 		Utmp:      utmp,
@@ -326,7 +340,7 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 			// at this point.
 			r.loginSessions = make(map[string]LoginRecord)
 		} else {
-			// Ignore runlevel changes that are not shutdown or reboot.
+			// Ignore runlevel changes that are not halt or reboot.
 			return nil
 		}
 	case C.BOOT_TIME: // 2
@@ -338,7 +352,8 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 			// at this point.
 			r.loginSessions = make(map[string]LoginRecord)
 		} else {
-			record.Type = LoginRecordTypeUnknown
+			// Ignore unknown record
+			return nil
 		}
 	case C.USER_PROCESS: // 7
 		record.Type = LoginRecordTypeUserLogin
@@ -428,7 +443,7 @@ func (r *UtmpFileReader) saveStateToDisk() error {
 		return err
 	}
 
-	err = r.saveTTYLookupToDisk()
+	err = r.saveLoginSessionsToDisk()
 	if err != nil {
 		return err
 	}
@@ -456,7 +471,7 @@ func (r *UtmpFileReader) saveFileRecordsToDisk() error {
 	return nil
 }
 
-func (r *UtmpFileReader) saveTTYLookupToDisk() error {
+func (r *UtmpFileReader) saveLoginSessionsToDisk() error {
 	var buf bytes.Buffer
 	encoder := gob.NewEncoder(&buf)
 
@@ -482,7 +497,7 @@ func (r *UtmpFileReader) restoreStateFromDisk() error {
 		return err
 	}
 
-	err = r.restoreTTYLookupFromDisk()
+	err = r.restoreLoginSessionsFromDisk()
 	if err != nil {
 		return err
 	}
@@ -522,7 +537,7 @@ func (r *UtmpFileReader) restoreFileRecordsFromDisk() error {
 	return nil
 }
 
-func (r *UtmpFileReader) restoreTTYLookupFromDisk() error {
+func (r *UtmpFileReader) restoreLoginSessionsFromDisk() error {
 	var decoder *gob.Decoder
 	err := r.bucket.Load(bucketKeyLoginSessions, func(blob []byte) error {
 		if len(blob) > 0 {
