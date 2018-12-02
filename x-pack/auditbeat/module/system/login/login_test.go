@@ -22,7 +22,9 @@ func TestData(t *testing.T) {
 		t.Fatal("no events were generated")
 	}
 
-	fullEvent := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
+	// We use event[1], because the first event is usually a boring system boot.
+	// TODO: Add wtmp file for testing.
+	fullEvent := mbtest.StandardizeEvent(f, events[1], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 

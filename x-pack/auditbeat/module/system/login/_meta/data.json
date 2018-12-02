@@ -5,21 +5,25 @@
         "name": "host.example.com"
     },
     "event": {
-        "action": "login",
+        "action": "user_login",
         "dataset": "login",
         "module": "system",
+        "origin": "/var/log/wtmp.1",
+        "summary": "Login by user vagrant (UID: 1000) on pts/0 (PID: 9355) from 10.0.2.2 (IP: 10.0.2.2).",
         "type": "event"
+    },
+    "process": {
+        "pid": 9355
+    },
+    "service": {
+        "type": "system"
+    },
+    "source": {
+        "ip": "10.0.2.2"
     },
     "system": {
         "login": {
-            "hostname": "10.0.2.2",
-            "ip": "10.0.2.2",
-            "pid": 14728,
-            "record_type": "USER_PROCESS",
-            "timestamp": "2018-11-19T13:48:39.038Z",
-            "uid": 1000,
-            "tty": "pts/2",
-            "username": "vagrant"
+            "tty": "pts/0"
         }
     },
     "user": {
