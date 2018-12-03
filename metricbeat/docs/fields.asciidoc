@@ -5324,17 +5324,21 @@ Minor version of the operating system.
 
 --
 
-*`agent.type`*::
+*`beat.name`*::
 +
 --
 type: alias
 
+alias to: agent.type
+
 --
 
-*`agent.hostname`*::
+*`beat.hostname`*::
 +
 --
 type: alias
+
+alias to: agent.hostname
 
 --
 

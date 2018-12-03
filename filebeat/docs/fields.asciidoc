@@ -81,166 +81,212 @@ The number of bytes of the server response body.
 
 --
 
-*`user.name`*::
+*`apache2.access.user_name`*::
 +
 --
 type: alias
 
+alias to: user.name
+
 --
 
-*`http.request.method`*::
+*`apache2.access.method`*::
 +
 --
 type: alias
 
+alias to: http.request.method
+
 --
 
-*`url.original`*::
+*`apache2.access.url`*::
 +
 --
 type: alias
 
+alias to: url.original
+
 --
 
-*`http.version`*::
+*`apache2.access.http_version`*::
 +
 --
 type: alias
 
+alias to: http.version
+
 --
 
-*`http.response.status_code`*::
+*`apache2.access.response_code`*::
 +
 --
 type: alias
 
+alias to: http.response.status_code
+
 --
 
-*`http.request.referrer`*::
+*`apache2.access.referrer`*::
 +
 --
 type: alias
 
+alias to: http.request.referrer
+
 --
 
-*`user_agent.original`*::
+*`apache2.access.agent`*::
 +
 --
 type: alias
 
+alias to: user_agent.original
+
 --
 
 
-*`user_agent.device`*::
+*`apache2.access.user_agent.device`*::
 +
 --
 type: alias
 
+alias to: user_agent.device
+
 --
 
-*`user_agent.major`*::
+*`apache2.access.user_agent.major`*::
 +
 --
 type: alias
 
+alias to: user_agent.major
+
 --
 
-*`user_agent.minor`*::
+*`apache2.access.user_agent.minor`*::
 +
 --
 type: alias
 
+alias to: user_agent.minor
+
 --
 
-*`user_agent.patch`*::
+*`apache2.access.user_agent.patch`*::
 +
 --
 type: alias
 
+alias to: user_agent.patch
+
 --
 
-*`user_agent.name`*::
+*`apache2.access.user_agent.name`*::
 +
 --
 type: alias
 
+alias to: user_agent.name
+
 --
 
-*`user_agent.os.full_name`*::
+*`apache2.access.user_agent.os`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.full_name
+
 --
 
-*`user_agent.os.major`*::
+*`apache2.access.user_agent.os_major`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.major
+
 --
 
-*`user_agent.os.minor`*::
+*`apache2.access.user_agent.os_minor`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.minor
+
 --
 
-*`user_agent.os.name`*::
+*`apache2.access.user_agent.os_name`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.name
+
 --
 
-*`user_agent.original`*::
+*`apache2.access.user_agent.original`*::
 +
 --
 type: alias
 
+alias to: user_agent.original
+
 --
 
 
-*`source.geo.continent_name`*::
+*`apache2.access.geoip.continent_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.continent_name
+
 --
 
-*`source.geo.country_iso_code`*::
+*`apache2.access.geoip.country_iso_code`*::
 +
 --
 type: alias
 
+alias to: source.geo.country_iso_code
+
 --
 
-*`source.geo.location`*::
+*`apache2.access.geoip.location`*::
 +
 --
 type: alias
 
+alias to: source.geo.location
+
 --
 
-*`source.geo.region_name`*::
+*`apache2.access.geoip.region_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.region_name
+
 --
 
-*`source.geo.city_name`*::
+*`apache2.access.geoip.city_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.city_name
+
 --
 
-*`source.geo.region_iso_code`*::
+*`apache2.access.geoip.region_iso_code`*::
 +
 --
 type: alias
+
+alias to: source.geo.region_iso_code
 
 --
 
@@ -2649,17 +2695,21 @@ Minor version of the operating system.
 
 --
 
-*`agent.type`*::
+*`beat.name`*::
 +
 --
 type: alias
 
+alias to: agent.type
+
 --
 
-*`agent.hostname`*::
+*`beat.hostname`*::
 +
 --
 type: alias
+
+alias to: agent.hostname
 
 --
 
@@ -3487,24 +3537,30 @@ If connection is via unix socket, socket path is in this field.
 
 --
 
-*`source.port`*::
+*`haproxy.client.port`*::
 +
 --
 type: alias
 
+alias to: source.port
+
 --
 
-*`process.name`*::
+*`haproxy.process_name`*::
 +
 --
 type: alias
 
+alias to: process.name
+
 --
 
-*`process.pid`*::
+*`haproxy.pid`*::
 +
 --
 type: alias
+
+alias to: process.pid
 
 --
 
@@ -3514,17 +3570,21 @@ type: alias
 Destination information
 
 
-*`destination.port`*::
+*`haproxy.destination.port`*::
 +
 --
 type: alias
 
+alias to: destination.port
+
 --
 
-*`destination.ip`*::
+*`haproxy.destination.ip`*::
 +
 --
 type: alias
+
+alias to: destination.ip
 
 --
 
@@ -3535,45 +3595,57 @@ Contains GeoIP information gathered based on the client.ip field. Only present i
 
 
 
-*`source.geo.continent_name`*::
+*`haproxy.geoip.continent_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.continent_name
+
 --
 
-*`source.geo.country_iso_code`*::
+*`haproxy.geoip.country_iso_code`*::
 +
 --
 type: alias
 
+alias to: source.geo.country_iso_code
+
 --
 
-*`source.geo.location`*::
+*`haproxy.geoip.location`*::
 +
 --
 type: alias
 
+alias to: source.geo.location
+
 --
 
-*`source.geo.region_name`*::
+*`haproxy.geoip.region_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.region_name
+
 --
 
-*`source.geo.city_name`*::
+*`haproxy.geoip.city_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.city_name
+
 --
 
-*`source.geo.region_iso_code`*::
+*`haproxy.geoip.region_iso_code`*::
 +
 --
 type: alias
+
+alias to: source.geo.region_iso_code
 
 --
 
@@ -3947,194 +4019,248 @@ The number of bytes of the server request body.
 
 --
 
-*`destination.ip`*::
+*`iis.access.server_ip`*::
 +
 --
 type: alias
 
+alias to: destination.ip
+
 --
 
-*`http.request.method`*::
+*`iis.access.method`*::
 +
 --
 type: alias
 
+alias to: http.request.method
+
 --
 
-*`url.path`*::
+*`iis.access.url`*::
 +
 --
 type: alias
 
+alias to: url.path
+
 --
 
-*`url.query`*::
+*`iis.access.query_string`*::
 +
 --
 type: alias
 
+alias to: url.query
+
 --
 
-*`destination.port`*::
+*`iis.access.port`*::
 +
 --
 type: alias
 
+alias to: destination.port
+
 --
 
-*`user.name`*::
+*`iis.access.user_name`*::
 +
 --
 type: alias
 
+alias to: user.name
+
 --
 
-*`source.ip`*::
+*`iis.access.remote_ip`*::
 +
 --
 type: alias
 
+alias to: source.ip
+
 --
 
-*`http.request.referrer`*::
+*`iis.access.referrer`*::
 +
 --
 type: alias
 
+alias to: http.request.referrer
+
 --
 
-*`http.response.status_code`*::
+*`iis.access.response_code`*::
 +
 --
 type: alias
 
+alias to: http.response.status_code
+
 --
 
-*`http.version`*::
+*`iis.access.http_version`*::
 +
 --
 type: alias
 
+alias to: http.version
+
 --
 
-*`host.hostname`*::
+*`iis.access.hostname`*::
 +
 --
 type: alias
 
+alias to: host.hostname
+
 --
 
 
-*`user_agent.device`*::
+*`iis.access.user_agent.device`*::
 +
 --
 type: alias
 
+alias to: user_agent.device
+
 --
 
-*`user_agent.major`*::
+*`iis.access.user_agent.major`*::
 +
 --
 type: alias
 
+alias to: user_agent.major
+
 --
 
-*`user_agent.minor`*::
+*`iis.access.user_agent.minor`*::
 +
 --
 type: alias
 
+alias to: user_agent.minor
+
 --
 
-*`user_agent.patch`*::
+*`iis.access.user_agent.patch`*::
 +
 --
 type: alias
 
+alias to: user_agent.patch
+
 --
 
-*`user_agent.name`*::
+*`iis.access.user_agent.name`*::
 +
 --
 type: alias
 
+alias to: user_agent.name
+
 --
 
-*`user_agent.os.full_name`*::
+*`iis.access.user_agent.os`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.full_name
+
 --
 
-*`user_agent.os.major`*::
+*`iis.access.user_agent.os_major`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.major
+
 --
 
-*`user_agent.os.minor`*::
+*`iis.access.user_agent.os_minor`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.minor
+
 --
 
-*`user_agent.os.name`*::
+*`iis.access.user_agent.os_name`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.name
+
 --
 
-*`user_agent.original`*::
+*`iis.access.user_agent.original`*::
 +
 --
 type: alias
 
+alias to: user_agent.original
+
 --
 
 
-*`source.geo.continent_name`*::
+*`iis.access.geoip.continent_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.continent_name
+
 --
 
-*`source.geo.country_iso_code`*::
+*`iis.access.geoip.country_iso_code`*::
 +
 --
 type: alias
 
+alias to: source.geo.country_iso_code
+
 --
 
-*`source.geo.location`*::
+*`iis.access.geoip.location`*::
 +
 --
 type: alias
 
+alias to: source.geo.location
+
 --
 
-*`source.geo.region_name`*::
+*`iis.access.geoip.region_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.region_name
+
 --
 
-*`source.geo.city_name`*::
+*`iis.access.geoip.city_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.city_name
+
 --
 
-*`source.geo.region_iso_code`*::
+*`iis.access.geoip.region_iso_code`*::
 +
 --
 type: alias
+
+alias to: source.geo.region_iso_code
 
 --
 
@@ -4748,17 +4874,21 @@ Referrer for this HTTP request.
 
 --
 
-*`event.dataset`*::
+*`fileset.name`*::
 +
 --
 type: alias
 
+alias to: event.dataset
+
 --
 
-*`event.module`*::
+*`fileset.module`*::
 +
 --
 type: alias
+
+alias to: event.module
 
 --
 
@@ -5206,180 +5336,230 @@ The number of bytes of the server response body.
 
 --
 
-*`network.forwarded_ip`*::
+*`nginx.access.remote_ip_list`*::
 +
 --
 type: alias
 
+alias to: network.forwarded_ip
+
 --
 
-*`source.ip`*::
+*`nginx.access.remote_ip`*::
 +
 --
 type: alias
 
+alias to: source.ip
+
 --
 
-*`user.name`*::
+*`nginx.access.user_name`*::
 +
 --
 type: alias
 
+alias to: user.name
+
 --
 
-*`http.request.method`*::
+*`nginx.access.method`*::
 +
 --
 type: alias
 
+alias to: http.request.method
+
 --
 
-*`url.original`*::
+*`nginx.access.url`*::
 +
 --
 type: alias
 
+alias to: url.original
+
 --
 
-*`http.version`*::
+*`nginx.access.http_version`*::
 +
 --
 type: alias
 
+alias to: http.version
+
 --
 
-*`http.response.status_code`*::
+*`nginx.access.response_code`*::
 +
 --
 type: alias
 
+alias to: http.response.status_code
+
 --
 
-*`http.request.referrer`*::
+*`nginx.access.referrer`*::
 +
 --
 type: alias
 
+alias to: http.request.referrer
+
 --
 
-*`user_agent.original`*::
+*`nginx.access.agent`*::
 +
 --
 type: alias
 
+alias to: user_agent.original
+
 --
 
 
-*`user_agent.device`*::
+*`nginx.access.user_agent.device`*::
 +
 --
 type: alias
 
+alias to: user_agent.device
+
 --
 
-*`user_agent.major`*::
+*`nginx.access.user_agent.major`*::
 +
 --
 type: alias
 
+alias to: user_agent.major
+
 --
 
-*`user_agent.minor`*::
+*`nginx.access.user_agent.minor`*::
 +
 --
 type: alias
 
+alias to: user_agent.minor
+
 --
 
-*`user_agent.patch`*::
+*`nginx.access.user_agent.patch`*::
 +
 --
 type: alias
 
+alias to: user_agent.patch
+
 --
 
-*`user_agent.name`*::
+*`nginx.access.user_agent.name`*::
 +
 --
 type: alias
 
+alias to: user_agent.name
+
 --
 
-*`user_agent.os.full_name`*::
+*`nginx.access.user_agent.os`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.full_name
+
 --
 
-*`user_agent.os.major`*::
+*`nginx.access.user_agent.os_major`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.major
+
 --
 
-*`user_agent.os.minor`*::
+*`nginx.access.user_agent.os_minor`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.minor
+
 --
 
-*`user_agent.os.name`*::
+*`nginx.access.user_agent.os_name`*::
 +
 --
 type: alias
 
+alias to: user_agent.os.name
+
 --
 
-*`user_agent.original`*::
+*`nginx.access.user_agent.original`*::
 +
 --
 type: alias
 
+alias to: user_agent.original
+
 --
 
 
-*`source.geo.continent_name`*::
+*`nginx.access.geoip.continent_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.continent_name
+
 --
 
-*`source.geo.country_iso_code`*::
+*`nginx.access.geoip.country_iso_code`*::
 +
 --
 type: alias
 
+alias to: source.geo.country_iso_code
+
 --
 
-*`source.geo.location`*::
+*`nginx.access.geoip.location`*::
 +
 --
 type: alias
 
+alias to: source.geo.location
+
 --
 
-*`source.geo.region_name`*::
+*`nginx.access.geoip.region_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.region_name
+
 --
 
-*`source.geo.city_name`*::
+*`nginx.access.geoip.city_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.city_name
+
 --
 
-*`source.geo.region_iso_code`*::
+*`nginx.access.geoip.region_iso_code`*::
 +
 --
 type: alias
+
+alias to: source.geo.region_iso_code
 
 --
 
@@ -5781,45 +5961,57 @@ Fields from the Linux authorization logs.
 
 
 
-*`@timestamp`*::
+*`system.auth.timestamp`*::
 +
 --
 type: alias
 
+alias to: @timestamp
+
 --
 
-*`host.hostname`*::
+*`system.auth.hostname`*::
 +
 --
 type: alias
 
+alias to: host.hostname
+
 --
 
-*`process.name`*::
+*`system.auth.program`*::
 +
 --
 type: alias
 
+alias to: process.name
+
 --
 
-*`process.pid`*::
+*`system.auth.pid`*::
 +
 --
 type: alias
 
+alias to: process.pid
+
 --
 
-*`message`*::
+*`system.auth.message`*::
 +
 --
 type: alias
 
+alias to: message
+
 --
 
-*`user.name`*::
+*`system.auth.user`*::
 +
 --
 type: alias
+
+alias to: user.name
 
 --
 
@@ -5850,67 +6042,85 @@ The client IP from SSH connections that are open and immediately dropped.
 
 --
 
-*`event.action`*::
+*`system.auth.ssh.event`*::
 +
 --
 type: alias
 
+alias to: event.action
+
 --
 
-*`source.ip`*::
+*`system.auth.ssh.ip`*::
 +
 --
 type: alias
 
+alias to: source.ip
+
 --
 
-*`source.port`*::
+*`system.auth.ssh.port`*::
 +
 --
 type: alias
 
+alias to: source.port
+
 --
 
 
-*`source.geo.continent_name`*::
+*`system.auth.ssh.geoip.continent_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.continent_name
+
 --
 
-*`source.geo.country_iso_code`*::
+*`system.auth.ssh.geoip.country_iso_code`*::
 +
 --
 type: alias
 
+alias to: source.geo.country_iso_code
+
 --
 
-*`source.geo.location`*::
+*`system.auth.ssh.geoip.location`*::
 +
 --
 type: alias
 
+alias to: source.geo.location
+
 --
 
-*`source.geo.region_name`*::
+*`system.auth.ssh.geoip.region_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.region_name
+
 --
 
-*`source.geo.city_name`*::
+*`system.auth.ssh.geoip.city_name`*::
 +
 --
 type: alias
 
+alias to: source.geo.city_name
+
 --
 
-*`source.geo.region_iso_code`*::
+*`system.auth.ssh.geoip.region_iso_code`*::
 +
 --
 type: alias
+
+alias to: source.geo.region_iso_code
 
 --
 
@@ -5986,24 +6196,30 @@ The default shell for the new user.
 
 --
 
-*`user.name`*::
+*`system.auth.useradd.name`*::
 +
 --
 type: alias
 
+alias to: user.name
+
 --
 
-*`user.id`*::
+*`system.auth.useradd.uid`*::
 +
 --
 type: alias
 
+alias to: user.id
+
 --
 
-*`group.id`*::
+*`system.auth.useradd.gid`*::
 +
 --
 type: alias
+
+alias to: group.id
 
 --
 
@@ -6014,17 +6230,21 @@ Fields specific to events created by the `groupadd` command.
 
 
 
-*`group.name`*::
+*`system.auth.groupadd.name`*::
 +
 --
 type: alias
 
+alias to: group.name
+
 --
 
-*`group.id`*::
+*`system.auth.groupadd.gid`*::
 +
 --
 type: alias
+
+alias to: group.id
 
 --
 
@@ -6035,38 +6255,48 @@ Contains fields from the syslog system logs.
 
 
 
-*`@timestamp`*::
+*`system.syslog.timestamp`*::
 +
 --
 type: alias
 
+alias to: @timestamp
+
 --
 
-*`host.hostname`*::
+*`system.syslog.hostname`*::
 +
 --
 type: alias
 
+alias to: host.hostname
+
 --
 
-*`process.name`*::
+*`system.syslog.program`*::
 +
 --
 type: alias
 
+alias to: process.name
+
 --
 
-*`process.pid`*::
+*`system.syslog.pid`*::
 +
 --
 type: alias
 
+alias to: process.pid
+
 --
 
-*`message`*::
+*`system.syslog.message`*::
 +
 --
 type: alias
+
+alias to: message
 
 --
 
