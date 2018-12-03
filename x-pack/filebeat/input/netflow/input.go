@@ -10,10 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-netflow"
+	"github.com/elastic/beats/libbeat/common/atomic"
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
@@ -25,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder"
 )
 
 const (
@@ -48,7 +48,7 @@ type packet struct {
 type netflowInput struct {
 	mutex     sync.Mutex
 	udp       *udp.Server
-	decoder   *netflow.Decoder
+	decoder   *decoder.Decoder
 	outlet    channel.Outleter
 	forwarder *harvester.Forwarder
 	logger    *logp.Logger
@@ -84,7 +84,7 @@ func NewInput(
 		return nil, err
 	}
 
-	decoder, err := netflow.NewDecoder(netflow.NewConfig().
+	decoder, err := decoder.NewDecoder(decoder.NewConfig().
 		WithProtocols(config.Protocols...).
 		WithExpiration(config.ExpirationTimeout))
 	if err != nil {

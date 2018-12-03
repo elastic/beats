@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package netflow
 
 import (
@@ -17,11 +21,10 @@ import (
 	"github.com/tsg/gopacket/pcap"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/go-netflow"
-	"github.com/elastic/go-netflow/protocol"
-	"github.com/elastic/go-netflow/test"
-
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder"
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/protocol"
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/test"
 )
 
 var (
@@ -147,13 +150,13 @@ func readDatTests(t testing.TB) *DatTests {
 func getFlowsFromDat(t testing.TB, name string, datFiles ...string) TestResult {
 	t.Helper()
 
-	config := netflow.NewConfig().
+	config := decoder.NewConfig().
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
 		WithExpiration(0).
 		WithLogOutput(test.TestLogWriter{t})
 
-	decoder, err := netflow.NewDecoder(config)
+	decoder, err := decoder.NewDecoder(config)
 	if !assert.NoError(t, err) {
 		t.Fatal(err)
 	}
@@ -198,13 +201,13 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 	}
 	defer r.Close()
 
-	config := netflow.NewConfig().
+	config := decoder.NewConfig().
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
 		WithExpiration(0).
 		WithLogOutput(test.TestLogWriter{t})
 
-	decoder, err := netflow.NewDecoder(config)
+	decoder, err := decoder.NewDecoder(config)
 	if !assert.NoError(t, err) {
 		t.Fatal(err)
 	}
