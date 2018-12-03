@@ -90,23 +90,12 @@ configuration included.
 [float]
 ===== The configuration file
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
-In a Docker environment very little configuration of {beatname_uc} is needed because of the Autodiscover feature of {beatname_uc}. Download this file as a starting point:
-
-["source","sh",subs="attributes,callouts"]
-------------------------------------------------
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/docker/{beatname_lc}.docker.yaml
-------------------------------------------------
-endif::[]
-
-ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="metricbeat")]
 Download this file as a starting point:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
 curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/{beatname_lc}/{beatname_lc}.docker.yml
 ------------------------------------------------
-endif::[]
 
 ===== Volume-mounted configuration
 
@@ -187,14 +176,7 @@ NOTE: Substitute your Elasticsearch hosts and ports above
 
 ===== Customize your configuration
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
-The {beatname_lc}-docker.yml downloaded earlier is setup to collect system data from the server and autodiscover Elasticsearch, Kibana, and Redis containers.  Edit the configuration file {beatname_lc}-docker.yml and customize it to match your environment as directed in the <<configuration-autodiscover,Autodiscover page>>, then re-deploy your {beatname_uc} container.
-endif::[]
-
-ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="metricbeat")]
 The {beatname_lc}-docker.yml downloaded earlier should be customized for your environment.  See <<configuring-howto-{beatname_lc}>> for more details. Edit the configuration file and customize it to match your environment then re-deploy your {beatname_uc} container.
-endif::[]
-
 
 [float]
 ===== Custom image configuration
