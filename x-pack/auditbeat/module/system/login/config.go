@@ -6,10 +6,10 @@ package login
 
 // Config defines the metricset's configuration options.
 type Config struct {
-	UtmpFilePattern string `config:"login.utmp_file_pattern"`
+	UtmpFilePattern string `config:"login.utmp_file_pattern" validate:"required"`
 }
 
-// Validate validates the host metricset config.
+// Validate validates the login metricset config.
 func (c *Config) Validate() error {
 	return nil
 }
