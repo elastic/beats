@@ -40,6 +40,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 *Auditbeat*
 
 *Filebeat*
+- Correctly parse `December` or `Dec` in the Syslog input. {pull}xxx[xxx]
 
 - Fix installation of haproxy dashboard. {issue}9307[9307] {pull}[]
 
