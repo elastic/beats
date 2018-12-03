@@ -26,7 +26,7 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/filebeat/scripts/generator"
+	"github.com/elastic/beats/filebeat/generator"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/kibana"
 )

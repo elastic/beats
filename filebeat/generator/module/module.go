@@ -15,38 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
+package module
 
 import (
-	"flag"
 	"fmt"
-	"os"
+	"path"
 
-	"github.com/elastic/beats/filebeat/generator/fields"
+	"github.com/elastic/beats/filebeat/generator"
 )
 
-func main() {
-	module := flag.String("module", "", "Name of the module")
-	fileset := flag.String("fileset", "", "Name of the fileset")
-	beatsPath := flag.String("beats_path", ".", "Path to elastic/beats")
-	noDoc := flag.Bool("nodoc", false, "Generate documentation for fields")
-	flag.Parse()
-
-	if *module == "" {
-		fmt.Println("Missing parameter: module")
-		os.Exit(1)
+// Generate creates directories and placeholder files required by a new module.
+func Generate(module, modulesPath, beatsPath string) error {
+	modulePath := path.Join(modulesPath, "module", module)
+	if generator.DirExists(modulePath) {
+		return fmt.Errorf("module already exists: %s", module)
 	}
 
-	if *fileset == "" {
-		fmt.Println("Missing parameter: fileset")
-		os.Exit(1)
-	}
-
-	err := fields.Generate(*beatsPath, *module, *fileset, *noDoc)
+	err := generator.CreateDirectories(modulePath, "_meta")
 	if err != nil {
-		fmt.Printf("Error while generating fields.yml: %v\n", err)
-		os.Exit(2)
+		return err
 	}
 
-	fmt.Printf("Fields.yml generated for %s/%s\n", *module, *fileset)
+	replace := map[string]string{"module": module}
+	templatesPath := path.Join(beatsPath, "scripts", "module")
+	filesToCopy := []string{
+		path.Join("_meta", "fields.yml"),
+		path.Join("_meta", "docs.asciidoc"),
+		path.Join("_meta", "config.yml"),
+		"module.yml",
+	}
+	return generator.CopyTemplates(templatesPath, modulePath, filesToCopy, replace)
 }
