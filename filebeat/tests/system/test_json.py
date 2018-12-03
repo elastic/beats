@@ -336,6 +336,7 @@ class Test(BaseTest):
         )
         assert len(output) == 1
         assert output[0]["message"] == message
+        assert output[0]["event.original"] == "invalidjson\n"
         assert True == self.log_contains_count("Error decoding JSON")
 
     def test_with_generic_filtering_remove_headers(self):

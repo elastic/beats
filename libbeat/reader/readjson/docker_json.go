@@ -179,6 +179,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		var logLine logLine
 		err = p.parseLine(&message, &logLine)
 		if err != nil {
+			message.Raw = message.Content
 			return message, err
 		}
 

@@ -28,6 +28,7 @@ import (
 type Message struct {
 	Ts      time.Time     // timestamp the content was read
 	Content []byte        // actual content read
+	Raw     []byte        // unparsed event read from disk
 	Bytes   int           // total number of bytes read to generate the message
 	Fields  common.MapStr // optional fields that can be added by reader
 }

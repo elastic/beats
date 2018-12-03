@@ -43,7 +43,7 @@ func NewJSONReader(r reader.Reader, cfg *Config) *JSONReader {
 
 // decodeJSON unmarshals the text parameter into a MapStr and
 // returns the new text column if one was requested.
-func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
+func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr, error) {
 	var jsonFields map[string]interface{}
 
 	err := unmarshal(text, &jsonFields)
@@ -54,11 +54,11 @@ func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
 		if r.cfg.AddErrorKey {
 			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
 		}
-		return text, jsonFields
+		return text, jsonFields, err
 	}
 
 	if len(r.cfg.MessageKey) == 0 {
-		return []byte(""), jsonFields
+		return []byte(""), jsonFields, nil
 	}
 
 	textValue, ok := jsonFields[r.cfg.MessageKey]
@@ -66,7 +66,7 @@ func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
 		if r.cfg.AddErrorKey {
 			jsonFields["error"] = createJSONError(fmt.Sprintf("Key '%s' not found", r.cfg.MessageKey))
 		}
-		return []byte(""), jsonFields
+		return []byte(""), jsonFields, fmt.Errorf("key not found")
 	}
 
 	textString, ok := textValue.(string)
@@ -74,10 +74,10 @@ func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
 		if r.cfg.AddErrorKey {
 			jsonFields["error"] = createJSONError(fmt.Sprintf("Value of key '%s' is not a string", r.cfg.MessageKey))
 		}
-		return []byte(""), jsonFields
+		return []byte(""), jsonFields, fmt.Errorf("invalid value of key")
 	}
 
-	return []byte(textString), jsonFields
+	return []byte(textString), jsonFields, nil
 }
 
 // unmarshal is equivalent with json.Unmarshal but it converts numbers
@@ -101,7 +101,11 @@ func (r *JSONReader) Next() (reader.Message, error) {
 	}
 
 	var fields common.MapStr
-	message.Content, fields = r.decode(message.Content)
+	raw := message.Content
+	message.Content, fields, err = r.decode(message.Content)
+	if err != nil {
+		message.Raw = raw
+	}
 	message.AddFields(common.MapStr{"json": fields})
 	return message, nil
 }

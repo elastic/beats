@@ -314,6 +314,9 @@ func (h *Harvester) Run() error {
 					},
 				},
 			}
+			if len(message.Raw) > 0 {
+				fields.Put("event.original", string(message.Raw))
+			}
 			fields.DeepUpdate(message.Fields)
 
 			// Check if json fields exist
