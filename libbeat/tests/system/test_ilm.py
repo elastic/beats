@@ -57,13 +57,6 @@ class Test(BaseTest):
         now = d.strftime("%Y.%m.%d")
         index_name = self.alias_name + "-" + now + "-000001"
         assert index_name in alias
-
-        # Make sure the correct index + alias was created
-        alias = self.es.transport.perform_request('GET', '/_alias/' + self.alias_name)
-        d = datetime.datetime.now()
-        now = d.strftime("%Y.%m.%d")
-        index_name = self.alias_name + "-" + now + "-000001"
-        assert index_name in alias
         assert alias[index_name]["aliases"][self.alias_name]["is_write_index"] == True
 
         # Asserts that data is actually written to the ILM indices
@@ -140,6 +133,43 @@ class Test(BaseTest):
         alias = self.es.transport.perform_request('GET', '/_alias/' + self.alias_name)
         index_name = self.alias_name + "-1"
         assert index_name in alias
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_pattern_date(self):
+        """
+        Test ilm pattern with date inside
+        """
+
+        self.render_config_template(
+            elasticsearch={
+                "hosts": self.get_elasticsearch_url(),
+                "ilm.enabled": True,
+                "ilm.pattern": "'{now/d}'"
+            },
+        )
+
+        self.clean()
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains("Overwriting setup.template for ILM"))
+        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
+        proc.check_kill_and_wait()
+
+        # Make sure the correct index + alias was created
+        print '/_alias/' + self.alias_name
+        logfile = self.beat_name + ".log"
+        with open(os.path.join(self.working_dir, logfile), "r") as f:
+            print f.read()
+
+        # Make sure the correct index + alias was created
+        alias = self.es.transport.perform_request('GET', '/_alias/' + self.alias_name)
+        d = datetime.datetime.now()
+        now = d.strftime("%Y.%m.%d")
+        index_name = self.alias_name + "-" + now
+        assert index_name in alias
+        assert alias[index_name]["aliases"][self.alias_name]["is_write_index"] == True
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')

@@ -18,11 +18,11 @@
 package instance
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/url"
 
 	"github.com/pkg/errors"
-
-	"encoding/json"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -53,8 +53,8 @@ var ILMPolicy = common.MapStr{
 const (
 	// ILMPolicyName is the default policy name
 	ILMPolicyName = "beats-default-policy"
-	// ILMDefaultPattern is the default policy name: {now/d} escaped
-	ILMDefaultPattern = "%7Bnow%2Fd%7D-000001"
+	// ILMDefaultPattern is the default pattern
+	ILMDefaultPattern = "{now/d}-000001"
 )
 
 // Build and return a callback to load ILM write alias
@@ -69,8 +69,10 @@ func (b *Beat) writeAliasLoadingCallback() (func(esClient *elasticsearch.Client)
 			return err
 		}
 
+		// Escaping because of date pattern
+		pattern := url.PathEscape(config.Pattern)
 		// This always assume it's a date pattern by sourrounding it by <...>
-		firstIndex := fmt.Sprintf("%%3C%s-%s%%3E", config.RolloverAlias, config.Pattern)
+		firstIndex := fmt.Sprintf("%%3C%s-%s%%3E", config.RolloverAlias, pattern)
 
 		// Check if alias already exists
 		status, b, err := esClient.Request("HEAD", "/_alias/"+config.RolloverAlias, "", nil, nil)
