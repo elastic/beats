@@ -41,6 +41,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Filebeat*
 
+- Fix installation of haproxy dashboard. {issue}9307[9307] {pull}[]
+
 *Heartbeat*
 
 *Journalbeat*
