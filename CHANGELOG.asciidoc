@@ -44,6 +44,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 - Fix installation of haproxy dashboard. {issue}9307[9307] {pull}[]
 
+- Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
+- Stop runners disabled by hints after previously being started. {pull}9305[9305]
+
 *Heartbeat*
 
 *Journalbeat*
