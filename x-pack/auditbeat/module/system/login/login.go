@@ -28,9 +28,13 @@ const (
 
 	eventTypeEvent = "event"
 
-	LoginRecordTypeBoot       = "boot"
-	LoginRecordTypeShutdown   = "shutdown"
-	LoginRecordTypeUserLogin  = "user_login"
+	// LoginRecordTypeBoot represents a system boot.
+	LoginRecordTypeBoot = "boot"
+	// LoginRecordTypeShutdown represents a system shutdown (halt or reboot).
+	LoginRecordTypeShutdown = "shutdown"
+	// LoginRecordTypeUserLogin represents a user login.
+	LoginRecordTypeUserLogin = "user_login"
+	// LoginRecordTypeUserLogout represents a user logout.
 	LoginRecordTypeUserLogout = "user_logout"
 )
 

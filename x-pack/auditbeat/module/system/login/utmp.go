@@ -38,6 +38,7 @@ const (
 	bucketKeyLoginSessions = "login_sessions"
 )
 
+// Inode represents a file's inode on Linux.
 type Inode uint64
 
 // FileRecord represents a UTMP file at a point in time.
@@ -119,7 +120,7 @@ func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 		inode := Inode(fileInfo.Sys().(*syscall.Stat_t).Ino)
 
 		fileRecord, isKnownFile := r.fileRecords[inode]
-		var oldSize int64 = 0
+		var oldSize int64
 		if isKnownFile {
 			oldSize = fileRecord.Size
 		}
@@ -177,7 +178,7 @@ func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 
 // deleteOldRecords cleans up old file records where the inode no longer exists.
 func (r *UtmpFileReader) deleteOldRecords(fileInfos map[string]os.FileInfo) {
-	for savedInode, _ := range r.fileRecords {
+	for savedInode := range r.fileRecords {
 		found := false
 		for _, fileInfo := range fileInfos {
 			inode := Inode(fileInfo.Sys().(*syscall.Stat_t).Ino)
