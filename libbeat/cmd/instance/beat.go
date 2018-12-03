@@ -513,8 +513,7 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 		}
 
 		if policy {
-			err := b.loadILMPolicy()
-			if err != nil {
+			if err := b.loadILMPolicy(); err != nil {
 				return err
 			}
 			fmt.Println("Loaded Index Lifecycle Management (ILM) policies")
@@ -753,11 +752,10 @@ func (b *Beat) registerTemplateLoading() error {
 		}
 
 		if esCfg.Index != "" && (templateCfg.Name == "" || templateCfg.Pattern == "") && (b.Config.Template == nil || b.Config.Template.Enabled()) {
-			return fmt.Errorf("setup.template.name and setup.template.pattern have to be set if index name is modified")
+			return errors.New("setup.template.name and setup.template.pattern have to be set if index name is modified")
 		}
 
 		if b.Config.ILM.Enabled() {
-
 			cfgwarn.Beta("Index lifecycle management is enabled which is in beta.")
 			logp.Info("Overwriting setup.template for ILM")
 
@@ -780,11 +778,11 @@ func (b *Beat) registerTemplateLoading() error {
 			logp.Info("Overwrite template settings for rollover_alias and lifecycle.name.")
 			err = b.Config.Template.SetString("settings.index.lifecycle.rollover_alias", -1, ilmCfg.RolloverAlias)
 			if err != nil {
-				logp.Err("error setting rollover_alias setting: %s", err)
+				logp.Err("Error setting rollover_alias setting: %s", err)
 			}
 			err = b.Config.Template.SetString("settings.index.lifecycle.name", -1, ILMPolicyName)
 			if err != nil {
-				logp.Err("error setting index lifecycle name setting err: %s", err)
+				logp.Err("Error setting index lifecycle name setting err: %s", err)
 			}
 
 			// Set the ingestion index to the rollover alias
@@ -829,7 +827,7 @@ func (b *Beat) registerTemplateLoading() error {
 			}
 			elasticsearch.RegisterConnectCallback(callback)
 		} else if b.Config.ILM.Enabled() {
-			return fmt.Errorf("templates cannot be disable when using ILM")
+			return errors.New("templates cannot be disable when using ILM")
 		}
 	}
 

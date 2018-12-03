@@ -25,8 +25,8 @@ import (
 	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
-// GetILMPolicy is the command used to export the ilm policy.
-func GetILMPolicy() *cobra.Command {
+// GenGetILMPolicyCmd is the command used to export the ilm policy.
+func GenGetILMPolicyCmd() *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "ilm-policy",
 		Short: "Export ILM policy",

@@ -111,7 +111,6 @@ func (b *Beat) writeAliasLoadingCallback() (func(esClient *elasticsearch.Client)
 }
 
 func (b *Beat) loadILMPolicy() error {
-
 	esClient, err := getElasticsearchClient(b)
 	if err != nil {
 		return err
@@ -149,13 +148,13 @@ func checkElasticsearchVersionIlm(client *elasticsearch.Client) error {
 		return err
 	}
 
-	requiredVersion, err := common.NewVersion("6.5.0")
+	requiredVersion, err := common.NewVersion("6.6.0")
 	if err != nil {
 		return err
 	}
 
 	if esVersion.LessThan(requiredVersion) {
-		return fmt.Errorf("ILM requires at least Elasticsearc 6.5.0. Used version: %s", esV)
+		return fmt.Errorf("ILM requires at least Elasticsearc 6.6.0. Used version: %s", esV)
 	}
 
 	return nil
