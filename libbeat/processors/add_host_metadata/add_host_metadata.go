@@ -48,8 +48,7 @@ type addHostMetadata struct {
 }
 
 const (
-	processorName   = "add_host_metadata"
-	cacheExpiration = time.Minute * 5
+	processorName = "add_host_metadata"
 )
 
 func newHostMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
@@ -78,10 +77,14 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *addHostMetadata) expired() bool {
+	if p.config.CacheTTL <= 0 {
+		return true
+	}
+
 	p.lastUpdate.Lock()
 	defer p.lastUpdate.Unlock()
 
-	if p.lastUpdate.Add(cacheExpiration).After(time.Now()) {
+	if p.lastUpdate.Add(p.config.CacheTTL).After(time.Now()) {
 		return false
 	}
 	p.lastUpdate.Time = time.Now()
@@ -164,6 +167,6 @@ func (p *addHostMetadata) getNetInfo() ([]string, []string, error) {
 }
 
 func (p *addHostMetadata) String() string {
-	return fmt.Sprintf("%v=[netinfo.enabled=[%v]]",
-		processorName, p.config.NetInfoEnabled)
+	return fmt.Sprintf("%v=[netinfo.enabled=[%v], cache.ttl=[%v]]",
+		processorName, p.config.NetInfoEnabled, p.config.CacheTTL)
 }
