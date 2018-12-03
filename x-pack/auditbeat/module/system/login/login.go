@@ -170,24 +170,24 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 		event.RootFields.Put("source.hostname", loginRecord.Hostname)
 	}
 
-	var eventSummary string
+	var message string
 
 	switch loginRecord.Type {
 	case LoginRecordTypeBoot:
-		eventSummary = "System boot"
+		message = "System boot"
 	case LoginRecordTypeShutdown:
-		eventSummary = "System shutdown"
+		message = "System shutdown"
 	case LoginRecordTypeUserLogin:
-		eventSummary = fmt.Sprintf("Login by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
+		message = fmt.Sprintf("Login by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
 			loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
 			loginRecord.Hostname, loginRecord.IP)
 	case LoginRecordTypeUserLogout:
-		eventSummary = fmt.Sprintf("Logout by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
+		message = fmt.Sprintf("Logout by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
 			loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
 			loginRecord.Hostname, loginRecord.IP)
 	}
 
-	event.RootFields.Put("event.summary", eventSummary)
+	event.RootFields.Put("message", message)
 
 	return event
 }
