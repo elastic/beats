@@ -7,10 +7,23 @@
 package user
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
-// GetUsers is not implemented on all systems.
-func GetUsers() (users []*User, err error) {
-	return nil, errors.New("not implemented")
+const (
+	moduleName    = "system"
+	metricsetName = "user"
+)
+
+func init() {
+	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+		mb.DefaultMetricSet(),
+	)
+}
+
+// New returns an error.
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return nil, fmt.Errorf("the %v/%v dataset is only supported on Linux", moduleName, metricsetName)
 }
