@@ -1,44 +1,16 @@
-filebeat.modules:
-  - module: system
-    syslog:
-      enabled: true
-      #var.paths: ["/var/log/syslog"]
-    auth:
-      enabled: true
-      #var.paths: ["/var/log/authlog"]
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
 
+# To enable hints based autodiscover, remove `filebeat.config.inputs` configuration and uncomment this:
 filebeat.autodiscover:
   providers:
     - type: docker
-      templates:
-        - condition:
-            contains:
-              docker.container.image: elasticsearch
-          config:
-            - module: elasticsearch
-        - condition:
-            contains:
-              docker.container.image: kibana
-          config:
-            - module: kibana
-        - condition:
-            contains:
-              docker.container.image: redis
-          config:
-            - module: redis
-              log:
-                input:
-                  type: docker
-                  containers.ids:
-                    - "${data.docker.container.id}"
-              slowlog:
-                enabled: true
-                var.hosts: ["${data.host}:${data.port}"]
+      hints.enabled: true
 
 processors:
-  - add_cloud_metadata:
-  - add_docker_metadata:
-
+- add_cloud_metadata: ~
 
 output.elasticsearch:
   hosts: '${ELASTICSEARCH_HOSTS:elasticsearch:9200}'

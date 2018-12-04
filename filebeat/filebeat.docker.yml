@@ -3,12 +3,6 @@ filebeat.config:
     path: ${path.config}/modules.d/*.yml
     reload.enabled: false
 
-# To enable hints based autodiscover, remove `filebeat.config.inputs` configuration and uncomment this:
-filebeat.autodiscover:
-  providers:
-    - type: docker
-      hints.enabled: true
-
 processors:
 - add_cloud_metadata: ~
 
