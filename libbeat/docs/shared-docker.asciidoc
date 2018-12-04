@@ -127,7 +127,7 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 docker run -d \
   --name={beatname_lc} \
   --user=root \
-  --volume="$(pwd)/{beatname_lc}.docker.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
   --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
   --volume="/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro" \
   --volume="/proc:/hostfs/proc:ro" \
@@ -143,7 +143,7 @@ ifeval::["{beatname_lc}"=="packetbeat"]
 docker run -d \
   --name={beatname_lc} \
   --user={beatname_lc} \
-  --volume="$(pwd)/{beatname_lc}.docker.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
   --cap-add="NET_RAW" \
   --cap-add="NET_ADMIN" \
   --network=host \
@@ -159,7 +159,7 @@ ifeval::["{beatname_lc}"=="auditbeat"]
 docker run -d \
   --name={beatname_lc} \
   --user=root \
-  --volume="$(pwd)/{beatname_lc}.docker.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
   --cap-add="AUDIT_CONTROL" \
   --cap-add="AUDIT_READ" \
   --pid=host \
@@ -175,7 +175,7 @@ ifeval::["{beatname_lc}"=="heartbeat"]
 docker run -d \
   --name={beatname_lc} \
   --user={beatname_lc} \
-  --volume="$(pwd)/{beatname_lc}.docker.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
   {dockerimage} \
   --strict.perms=false -e \
   -E output.elasticsearch.hosts=["elasticsearch:9200"]
