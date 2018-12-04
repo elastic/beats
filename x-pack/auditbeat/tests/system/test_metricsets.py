@@ -60,6 +60,7 @@ class Test(AuditbeatXPackTest):
             if "network.type" not in str(e):
                 raise
 
+    @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
     def test_metricset_user(self):
         """
         user metricset collects information about users on a server.
