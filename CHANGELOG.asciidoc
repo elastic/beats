@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 ==== Breaking changes
 
 *Affecting all Beats*
+
 - Automaticall cap signed integers to 63bits. {pull}8991[8991]
 
 *Auditbeat*
@@ -40,10 +41,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 *Auditbeat*
 
 *Filebeat*
-- Correctly parse `December` or `Dec` in the Syslog input. {pull}xxx[xxx]
 
-- Fix installation of haproxy dashboard. {issue}9307[9307] {pull}[]
-
+- Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
+- Fix installation of haproxy dashboard. {issue}9307[9307] {pull}9313[9313]
 - Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
 - Stop runners disabled by hints after previously being started. {pull}9305[9305]
 
@@ -67,12 +67,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 ==== Added
 
 *Affecting all Beats*
+
 - Unify dashboard exporter tools. {pull}9097[9097]
 - Use _doc as document type of the Elasticsearch major version is 7. {pull}9056[9056]
 
 *Auditbeat*
 
 *Filebeat*
+
 - Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]
 
 *Heartbeat*
