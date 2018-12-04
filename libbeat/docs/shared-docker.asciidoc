@@ -191,11 +191,9 @@ NOTE: Substitute your Elasticsearch hosts and ports above, and if you are using 
 
 ===== Customize your configuration
 
-The {beatname_lc}-docker.yml downloaded earlier should be customized for your environment.  
-
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
 
-See <<configuration-autodiscover-hints>> for more details. Add labels to your application Docker containers and they will be picked up by the Beats Autodiscover feature when they are deployed.  Here is an example command for an Apache httpd container with labels to configure the Filebeat and Metricbeat modles for Apache httpd:
+The {beatname_lc}.docker.yml file you downloaded earlier is configured to deploy Beats modules based on the Docker labels applied to your containers.  See <<configuration-autodiscover-hints>> for more details. Add labels to your application Docker containers and they will be picked up by the Beats Autodiscover feature when they are deployed.  Here is an example command for an Apache HTTP Server container with labels to configure the Filebeat and Metricbeat modles for Apache HTTP Server:
 
 ["source", "sh", subs="attributes"]
 --------------------------------------------
@@ -215,7 +213,8 @@ docker run \
 endif::[]
 
 ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="metricbeat")]
-See <<configuring-howto-{beatname_lc}>> for more details. Edit the configuration file and customize it to match your environment then re-deploy your {beatname_uc} container.
+
+The {beatname_lc}.docker.yml downloaded earlier should be customized for your environment. See <<configuring-howto-{beatname_lc}>> for more details. Edit the configuration file and customize it to match your environment then re-deploy your {beatname_uc} container.
 endif::[]
 
 
