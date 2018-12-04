@@ -141,15 +141,7 @@
       type: text
       description: >
         The name of the frontend used
-    - name: frontend_name_keyword
-      type: keyword
-      description: >
-        The name of the frontend used
     - name: backend_url
       type: text
-      description:
-        The url of the backend where request is forwarded
-    - name: backend_url_keyword
-      type: keyword
       description:
         The url of the backend where request is forwarded

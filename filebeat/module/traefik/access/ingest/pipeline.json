@@ -29,18 +29,6 @@
             }
         },
         {
-            "set": {
-                "value": "{{traefik.access.frontend_name}}",
-                "field": "traefik.access.frontend_name_keyword"
-            }
-        },
-        {
-            "set": {
-                "value": "{{traefik.access.backend_url}}",
-                "field": "traefik.access.backend_url_keyword"
-            }
-        },
-        {
             "date": {
                 "field": "traefik.access.time",
                 "target_field": "@timestamp",
