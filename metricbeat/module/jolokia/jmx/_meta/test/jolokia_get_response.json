@@ -1,0 +1,26 @@
+{
+    "request": {
+        "mbean": "java.lang:type=Memory",
+        "attribute": [
+            "HeapMemoryUsage",
+            "NonHeapMemoryUsage"
+        ],
+        "type": "read"
+    },
+    "value": {
+        "HeapMemoryUsage": {
+            "init": 1073741824,
+            "committed": 1037959168,
+            "max": 1037959168,
+            "used": 227420472
+        },
+        "NonHeapMemoryUsage": {
+            "init": 2555904,
+            "committed": 53477376,
+            "max": -1,
+            "used": 50519768
+        }
+    },
+    "timestamp": 1472298687,
+    "status": 200
+}
