@@ -157,7 +157,7 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Enabled ilm to use index lifecycle management instead daily indices.
+  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
   #ilm.enabled: false
 
   # Optional protocol and basic auth credentials.

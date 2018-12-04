@@ -151,7 +151,7 @@ func checkElasticsearchVersionIlm(client *elasticsearch.Client) error {
 	}
 
 	if esV.LessThan(requiredVersion) {
-		return fmt.Errorf("ILM requires at least Elasticsearc 6.6.0. Used version: %s", esV)
+		return fmt.Errorf("ILM requires at least Elasticsearc 6.6.0. Used version: %s", esV.String())
 	}
 
 	return nil
