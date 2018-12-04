@@ -39,6 +39,8 @@ https://github.com/elastic/beats/compare/v6.5.1...6.5[Check the HEAD diff]
 
 *Filebeat*
 
+- Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
+- Stop runners disabled by hints after previously being started. {pull}9305[9305]
 - Fix installation of haproxy dashboard. {issue}9307[9307] {pull}9313[9313]
 
 *Heartbeat*
