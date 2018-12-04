@@ -243,7 +243,7 @@ func (ms *MetricSet) getProcessInfos() ([]*ProcessInfo, error) {
 	// e.g. https://github.com/elastic/go-sysinfo/blob/master/providers/darwin/process_darwin_amd64.go#L41
 	pids, err := process.Pids()
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to fetch the list of PIDs")
+		return nil, errors.Wrap(err, "failed to fetch the list of PIDs")
 	}
 
 	var processInfos []*ProcessInfo
@@ -251,12 +251,12 @@ func (ms *MetricSet) getProcessInfos() ([]*ProcessInfo, error) {
 	for _, pid := range pids {
 		process, err := sysinfo.Process(pid)
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed to load process")
+			return nil, errors.Wrap(err, "failed to load process")
 		}
 
 		pInfo, err := process.Info()
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed to load process information")
+			return nil, errors.Wrap(err, "failed to load process information")
 		}
 
 		processInfos = append(processInfos, &ProcessInfo{pInfo})
