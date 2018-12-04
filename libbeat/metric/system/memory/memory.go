@@ -69,6 +69,14 @@ func GetSwap() (*SwapStat, error) {
 		return nil, err
 	}
 
+	// This shouldn't happen, but it has been reported to happen and
+	// this can provoke too big values for used swap.
+	// Workaround this by assuming that all swap is free in that case.
+	if swap.Free > swap.Total || swap.Used > swap.Total {
+		swap.Free = swap.Total
+		swap.Used = 0
+	}
+
 	return &SwapStat{Swap: swap}, nil
 }
 
