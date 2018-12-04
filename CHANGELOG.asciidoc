@@ -226,6 +226,7 @@ https://github.com/elastic/beats/compare/v6.4.0...v6.5.0[View commits]
 - Add Beats Central Management {pull}8559[8559]
 - Report configured queue type. {pull}8091[8091]
 - Enable `host` and `cloud` metadata processors by default. {pull}8596[8596]
+- Autodiscovery no longer requires that the `condition` field be set. If left unset all configs will be matched. {pull}9029[9029]
 
 *Filebeat*
 

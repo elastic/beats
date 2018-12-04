@@ -42,7 +42,7 @@ type Provider struct {
 	bus       bus.Bus
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
-	templates *template.Mapper
+	templates template.Mapper
 	discovery DiscoveryProber
 }
 
