@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 *Auditbeat*
 
 *Filebeat*
+- Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
 
 - Fix improperly set config for CRI Flag in Docker Input {pull}8899[8899]
 - Just enabling the `elasticsearch` fileset and starting Filebeat no longer causes an error. {pull}8891[8891]
