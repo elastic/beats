@@ -70,13 +70,13 @@ func (pInfo ProcessInfo) Hash() uint64 {
 func (pInfo ProcessInfo) toMapStr() common.MapStr {
 	return common.MapStr{
 		// https://github.com/elastic/ecs#-process-fields
-		"name":      pInfo.Name,
-		"args":      pInfo.Args,
-		"pid":       pInfo.PID,
-		"ppid":      pInfo.PPID,
-		"cwd":       pInfo.CWD,
-		"exe":       pInfo.Exe,
-		"starttime": pInfo.StartTime,
+		"name":              pInfo.Name,
+		"args":              pInfo.Args,
+		"pid":               pInfo.PID,
+		"ppid":              pInfo.PPID,
+		"working_directory": pInfo.CWD,
+		"executable":        pInfo.Exe,
+		"start_time":        pInfo.StartTime,
 	}
 }
 
@@ -219,12 +219,8 @@ func processEvent(pInfo *ProcessInfo, eventType string, eventAction string) mb.E
 				"type":   eventType,
 				"action": eventAction,
 			},
-			"process": common.MapStr{
-				"pid":  pInfo.PID,
-				"name": pInfo.Name,
-			},
+			"process": pInfo.toMapStr(),
 		},
-		MetricSetFields: pInfo.toMapStr(),
 	}
 }
 
