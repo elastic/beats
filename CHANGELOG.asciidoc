@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v6.4.3...6.4[Check the HEAD diff]
 *Auditbeat*
 
 *Filebeat*
+- Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
 
 *Heartbeat*
 
