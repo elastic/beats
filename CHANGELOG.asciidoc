@@ -49,6 +49,9 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Make sure the Filebeat Elastic licensed packages uses the Elastic binary instead of the OSS. {pull}8836[8836]
 - Fix installation of haproxy dashboard. {issue}9307[9307] {pull}9313[9313]
 
+- Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
+- Stop runners disabled by hints after previously being started. {pull}9305[9305]
+
 *Heartbeat*
 
 - Heartbeat now always downloads the entire body of HTTP endpoints, even if no checks against the body content are declared. This fixes an issue where timing metrics would be incorrect in scenarios where the body wasn't used since the connection would be closed soon after the headers were sent, but before the entire body was. {pull}8894[8894]
