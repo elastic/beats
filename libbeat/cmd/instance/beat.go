@@ -776,7 +776,7 @@ func (b *Beat) registerTemplateLoading() error {
 				return errw.Wrap(err, "error setting setup.template.name")
 			}
 			pattern := fmt.Sprintf("%s-*", ilmCfg.RolloverAlias)
-			logp.Info("Set setup.template.pattern to '%s' and pattern to '%s' as ILM is enabled.", pattern)
+			logp.Info("Set setup.template.pattern to '%s' as ILM is enabled.", pattern)
 			err = b.Config.Template.SetString("pattern", -1, pattern)
 			if err != nil {
 				return errw.Wrap(err, "error setting setup.template.pattern")
