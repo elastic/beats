@@ -744,7 +744,7 @@ filebeat.inputs:
 #- type: netflow
   #enabled: false
 
-  # Address to bind the NetFlow collector to
+  # Address where the NetFlow Collector will bind
   #host: ":2055"
 
   # Maximum size of the message received over UDP
