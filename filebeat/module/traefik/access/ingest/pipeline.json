@@ -3,27 +3,41 @@
     "processors": [
         {
             "grok": {
-                "field": "traefik.access.message",
+                "field": "message",
                 "patterns": [
-                    "(?:%{NUMBER:traefik.access.body_sent.bytes}|-)( \"%{DATA:traefik.access.referrer}\")?( \"%{DATA:traefik.access.agent}\")?(?:%{NUMBER:traefik.access.request_count}|-)?( \"%{DATA:traefik.access.frontend_name}\")?( \"%{DATA:traefik.access.backend_url}\")?"
+                    "%{IPORHOST:traefik.access.remote_ip} %{GREEDYDATA:traefik.access.user_identifier} %{GREEDYDATA:traefik.access.user_name} \\[%{HTTPDATE:traefik.access.time}\\] \"%{WORD:traefik.access.method} %{DATA:traefik.access.url} HTTP/%{NUMBER:traefik.access.http_version}\" %{NUMBER:traefik.access.response_code:int} %{NUMBER:traefik.access.body_sent.bytes:int}( \"%{GREEDYDATA:traefik.access.referrer}\" \"%{DATA:traefik.access.agent}\" %{NUMBER:traefik.access.request_count:int} \"%{DATA:traefik.access.frontend_name}\" \"%{DATA:traefik.access.backend_url}\" %{NUMBER:traefik.access.duration:int}ms)?"
                 ],
                 "ignore_missing": true
             }
         },
         {
             "remove": {
-                "field": "message"
+                "field": "message",
+                "ignore_missing": true
             }
         },
         {
             "remove": {
-                "field": "traefik.access.message"
+                "field": "traefik.access.message",
+                "ignore_missing": true
             }
         },
         {
             "rename": {
                 "field": "@timestamp",
                 "target_field": "read_timestamp"
+            }
+        },
+        {
+            "set": {
+                "value": "{{traefik.access.frontend_name}}",
+                "field": "traefik.access.frontend_name_keyword"
+            }
+        },
+        {
+            "set": {
+                "value": "{{traefik.access.backend_url}}",
+                "field": "traefik.access.backend_url_keyword"
             }
         },
         {
@@ -50,7 +64,8 @@
         {
             "rename": {
                 "field": "traefik.access.agent",
-                "target_field": "traefik.access.user_agent.original"
+                "target_field": "traefik.access.user_agent.original",
+                "ignore_failure": true
             }
         },
         {
