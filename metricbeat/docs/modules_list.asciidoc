@@ -21,6 +21,8 @@ This file is generated! See scripts/docs_collector.py
 .3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>> beta[]  
 |<<metricbeat-metricset-couchbase-cluster,cluster>> beta[]  
 |<<metricbeat-metricset-couchbase-node,node>> beta[]  
+|<<metricbeat-module-couchdb,couchdb>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-couchdb-server,server>> experimental[]  
 |<<metricbeat-module-docker,Docker>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .8+| .8+|  |<<metricbeat-metricset-docker-container,container>>   
 |<<metricbeat-metricset-docker-cpu,cpu>>   
@@ -157,6 +159,7 @@ include::modules/aerospike.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/ceph.asciidoc[]
 include::modules/couchbase.asciidoc[]
+include::modules/couchdb.asciidoc[]
 include::modules/docker.asciidoc[]
 include::modules/dropwizard.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
