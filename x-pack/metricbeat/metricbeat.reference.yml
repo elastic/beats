@@ -152,9 +152,6 @@ metricbeat.modules:
   metricsets: ["ec2"]
   mock: '${AWS_MOCK:false}'
   period: 300s
-  access_key_id: '${AWS_ACCESS_KEY_ID}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY}'
-  session_token: '${AWS_SESSION_TOKEN}'
 
 #--------------------------------- Ceph Module ---------------------------------
 - module: ceph

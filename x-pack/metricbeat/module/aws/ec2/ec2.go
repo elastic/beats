@@ -5,18 +5,17 @@
 package ec2
 
 import (
-	"fmt"
-	"os"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws/external"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -53,6 +52,27 @@ type MetricSet struct {
 	config *aws.Config
 }
 
+// metricIDNameMap is a translating map between createMetricDataQuery id
+// and aws ec2 module metric name.
+var metricIDNameMap = map[string]string{
+	"cpu1":     "cpu.total.pct",
+	"cpu2":     "cpu.credit_usage",
+	"cpu3":     "cpu.credit_balance",
+	"cpu4":     "cpu.surplus_credit_balance",
+	"cpu5":     "cpu.surplus_credits_charged",
+	"network1": "network.in.packets",
+	"network2": "network.out.packets",
+	"network3": "network.in.bytes",
+	"network4": "network.out.bytes",
+	"disk1":    "diskio.read.bytes",
+	"disk2":    "diskio.write.bytes",
+	"disk3":    "diskio.read.ops",
+	"disk4":    "diskio.write.ops",
+	"status1":  "status.check_failed",
+	"status2":  "status.check_failed_system",
+	"status3":  "status.check_failed_instance",
+}
+
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -62,10 +82,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-
-	os.Setenv("AWS_ACCESS_KEY_ID", config.AccessKeyID)
-	os.Setenv("AWS_SECRET_ACCESS_KEY", config.SecretAccessKey)
-	os.Setenv("AWS_SESSION_TOKEN", config.SessionToken)
 
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
@@ -91,7 +107,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	//actual fetch function
 	cfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
-		fmt.Println("Failed to load config: ", err.Error())
+		logp.Err("Failed to load config: %s", err.Error())
 	}
 
 	cfg.Region = "us-west-1"
@@ -107,7 +123,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		svcEC2 := ec2.New(cfg)
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
-			report.Error(errors.Wrap(err, "getInstancesPerRegion failed"))
+			report.Error(errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName))
+			continue
 		}
 
 		svcCloudwatch := cloudwatch.New(cfg)
@@ -150,7 +167,7 @@ func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
 	req := svc.DescribeRegionsRequest(input)
 	output, err := req.Send()
 	if err != nil {
-		fmt.Println("Failed DescribeRegions: ", err)
+		logp.Err("Failed DescribeRegions: %s", err)
 		return
 	}
 	for _, region := range output.Regions {
@@ -168,53 +185,19 @@ func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	event := mb.Event{}
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", aws.ModuleName)
-	event.ModuleFields = common.MapStr{}
-	event.ModuleFields.Put("cloud.provider", "ec2")
-	event.ModuleFields.Put("cloud.instance.id", instanceID)
-	event.ModuleFields.Put("cloud.machine.type", machineType)
-	event.ModuleFields.Put("cloud.availability_zone", *instanceOutput.Placement.AvailabilityZone)
-	event.ModuleFields.Put("cloud.image.id", *instanceOutput.ImageId)
-	event.ModuleFields.Put("cloud.region", regionName)
+	event.RootFields.Put("cloud.provider", "ec2")
+	event.RootFields.Put("cloud.instance.id", instanceID)
+	event.RootFields.Put("cloud.machine.type", machineType)
+	event.RootFields.Put("cloud.availability_zone", *instanceOutput.Placement.AvailabilityZone)
+	event.RootFields.Put("cloud.image.id", *instanceOutput.ImageId)
+	event.RootFields.Put("cloud.region", regionName)
 
 	event.MetricSetFields = common.MapStr{}
 	for _, output := range getMetricDataOutput.MetricDataResults {
 		if len(output.Values) == 0 {
 			continue
 		}
-		switch *output.Id {
-		case "cpu1":
-			event.MetricSetFields.Put("cpu.total.pct", output.Values[0])
-		case "cpu2":
-			event.MetricSetFields.Put("cpu.credit_usage", output.Values[0])
-		case "cpu3":
-			event.MetricSetFields.Put("cpu.credit_balance", output.Values[0])
-		case "cpu4":
-			event.MetricSetFields.Put("cpu.surplus_credit_balance", output.Values[0])
-		case "cpu5":
-			event.MetricSetFields.Put("cpu.surplus_credits_charged", output.Values[0])
-		case "network1":
-			event.MetricSetFields.Put("network.in.packets", output.Values[0])
-		case "network2":
-			event.MetricSetFields.Put("network.out.packets", output.Values[0])
-		case "network3":
-			event.MetricSetFields.Put("network.in.bytes", output.Values[0])
-		case "network4":
-			event.MetricSetFields.Put("network.out.bytes", output.Values[0])
-		case "disk1":
-			event.MetricSetFields.Put("diskio.read.bytes", output.Values[0])
-		case "disk2":
-			event.MetricSetFields.Put("diskio.write.bytes", output.Values[0])
-		case "disk3":
-			event.MetricSetFields.Put("diskio.read.ops", output.Values[0])
-		case "disk4":
-			event.MetricSetFields.Put("diskio.write.ops", output.Values[0])
-		case "status1":
-			event.MetricSetFields.Put("status.check_failed", output.Values[0])
-		case "status2":
-			event.MetricSetFields.Put("status.check_failed_system", output.Values[0])
-		case "status3":
-			event.MetricSetFields.Put("status.check_failed_instance", output.Values[0])
-		}
+		event.MetricSetFields.Put(metricIDNameMap[*output.Id], output.Values[0])
 	}
 	report.Event(event)
 }
@@ -237,7 +220,7 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 		req := svc.DescribeInstancesRequest(describeInstanceInput)
 		output, err := req.Send()
 		if err != nil {
-			fmt.Println("Error DescribeInstances: ", err)
+			logp.Err("Error DescribeInstances: %s", err)
 			return nil, nil, err
 		}
 
@@ -253,11 +236,12 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 }
 
 func getMetricDataPerRegion(instanceID string, nextToken *string, svc cloudwatchiface.CloudWatchAPI) (*cloudwatch.GetMetricDataOutput, error) {
-	//TODO:remove hard coded variables
+	// Amazon EC2 sends metrics to Amazon CloudWatch with 5-minute default frequency.
+	// Set starttime 10 minutes earlier than the endtime in order to make sure GetMetricDataRequest gets the latest data point for each metric.
 	endTime := time.Now()
 	duration, err := time.ParseDuration("-10m")
 	if err != nil {
-		fmt.Println("Error ParseDuration: ", err)
+		logp.Err("Error ParseDuration: %s", err)
 		return nil, err
 	}
 
@@ -300,7 +284,7 @@ func getMetricDataPerRegion(instanceID string, nextToken *string, svc cloudwatch
 	req := svc.GetMetricDataRequest(getMetricDataInput)
 	getMetricDataOutput, err := req.Send()
 	if err != nil {
-		fmt.Println("GetMetricDataInput Error = ", err.Error())
+		logp.Err("GetMetricDataInput Error = %s", err.Error())
 		return nil, err
 	}
 	return getMetricDataOutput, nil

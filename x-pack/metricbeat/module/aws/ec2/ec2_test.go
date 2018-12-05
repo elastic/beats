@@ -9,10 +9,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
-
-	"github.com/elastic/beats/libbeat/common"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -144,15 +140,14 @@ func TestMockFetch(t *testing.T) {
 	assert.Equal(t, 2, len(events))
 	for _, event := range events {
 		// RootField
-		checkRootField("service", event, t)
-		// ModuleField
-		checkModuleField("cloud.availability_zone", event, t)
-		checkModuleField("cloud.provider", event, t)
-		checkModuleField("cloud.image.id", event, t)
-		checkModuleField("cloud.instance.id", event, t)
-		checkModuleField("cloud.machine.type", event, t)
-		checkModuleField("cloud.provider", event, t)
-		checkModuleField("cloud.region", event, t)
+		checkRootField("service.name", event, t)
+		checkRootField("cloud.availability_zone", event, t)
+		checkRootField("cloud.provider", event, t)
+		checkRootField("cloud.image.id", event, t)
+		checkRootField("cloud.instance.id", event, t)
+		checkRootField("cloud.machine.type", event, t)
+		checkRootField("cloud.provider", event, t)
+		checkRootField("cloud.region", event, t)
 		// MetricSetField
 		cpuTotalPct, err := event.MetricSetFields.GetValue("cpu.total.pct")
 		assert.NoError(t, err)
@@ -190,15 +185,14 @@ func TestFetch(t *testing.T) {
 
 		for _, event := range events {
 			// RootField
-			checkRootField("service", event, t)
-			// ModuleField
-			checkModuleField("cloud.availability_zone", event, t)
-			checkModuleField("cloud.provider", event, t)
-			checkModuleField("cloud.image.id", event, t)
-			checkModuleField("cloud.instance.id", event, t)
-			checkModuleField("cloud.machine.type", event, t)
-			checkModuleField("cloud.provider", event, t)
-			checkModuleField("cloud.region", event, t)
+			checkRootField("service.name", event, t)
+			checkRootField("cloud.availability_zone", event, t)
+			checkRootField("cloud.provider", event, t)
+			checkRootField("cloud.image.id", event, t)
+			checkRootField("cloud.instance.id", event, t)
+			checkRootField("cloud.machine.type", event, t)
+			checkRootField("cloud.provider", event, t)
+			checkRootField("cloud.region", event, t)
 			// MetricSetField
 			checkMetricSetField("cpu.total.pct", event, t)
 			checkMetricSetField("cpu.credit_usage", event, t)
@@ -226,21 +220,14 @@ func TestFetch(t *testing.T) {
 }
 
 func checkRootField(fieldName string, event mb.Event, t *testing.T) {
-	expectedKeyValue := common.MapStr{"name": aws.ModuleName}
 	if ok, err := event.RootFields.HasKey(fieldName); ok {
 		assert.NoError(t, err)
-		fieldValue, err := event.RootFields.GetValue(fieldName)
+		metricValue, err := event.RootFields.GetValue(fieldName)
 		assert.NoError(t, err)
-		assert.Equal(t, expectedKeyValue, fieldValue)
-	}
-}
-
-func checkModuleField(fieldName string, event mb.Event, t *testing.T) {
-	metricValue, err := event.ModuleFields.GetValue(fieldName)
-	assert.NoError(t, err)
-	if userString, ok := metricValue.(string); !ok {
-		fmt.Println("Field "+fieldName+" is not a string: ", userString)
-		t.Fail()
+		if userString, ok := metricValue.(string); !ok {
+			fmt.Println("Field "+fieldName+" is not a string: ", userString)
+			t.Fail()
+		}
 	}
 }
 

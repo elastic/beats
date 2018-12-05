@@ -5,44 +5,30 @@
         "name": "host.example.com"
     },
     "aws": {
-        "cloud": {
-            "availability_zone": "eu-central-1b",
-            "image": {
-                "id": "ami-556ef13a"
-            },
-            "instance": {
-                "id": "i-08027f3dcddb9a976"
-            },
-            "machine": {
-                "type": "i3.4xlarge"
-            },
-            "provider": "ec2",
-            "region": "eu-central-1"
-        },
         "ec2": {
             "cpu": {
                 "total": {
-                    "pct": 1.810416666664726
+                    "pct": 1.9520833333372138
                 }
             },
             "diskio": {
                 "read": {
-                    "bytes": 0,
-                    "ops": 0
+                    "bytes": 1313177.6,
+                    "ops": 241.4
                 },
                 "write": {
-                    "bytes": 13766656,
-                    "ops": 1410.6
+                    "bytes": 35465625.6,
+                    "ops": 1809
                 }
             },
             "network": {
                 "in": {
-                    "bytes": 86.4,
-                    "packets": 1.6
+                    "bytes": 42,
+                    "packets": 1
                 },
                 "out": {
-                    "bytes": 64,
-                    "packets": 1.6
+                    "bytes": 28,
+                    "packets": 1
                 }
             },
             "status": {
@@ -52,12 +38,27 @@
             }
         }
     },
+    "cloud": {
+        "availability_zone": "eu-central-1b",
+        "image": {
+            "id": "ami-556ef13a"
+        },
+        "instance": {
+            "id": "i-08027f3dcddb9a976"
+        },
+        "machine": {
+            "type": "i3.4xlarge"
+        },
+        "provider": "ec2",
+        "region": "eu-central-1"
+    },
     "metricset": {
         "module": "aws",
         "name": "ec2",
         "rtt": 115
     },
     "service": {
-        "name": "aws"
+        "name": "aws",
+        "type": "aws"
     }
 }
