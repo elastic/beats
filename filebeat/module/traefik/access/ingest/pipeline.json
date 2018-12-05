@@ -3,9 +3,9 @@
     "processors": [
         {
             "grok": {
-                "field": "message",
+                "field": "traefik.access.message",
                 "patterns": [
-                    "%{IPORHOST:traefik.access.remote_ip} %{GREEDYDATA:traefik.access.user_identifier} %{GREEDYDATA:traefik.access.user_name} \\[%{HTTPDATE:traefik.access.time}\\] \"%{WORD:traefik.access.method} %{DATA:traefik.access.url} HTTP/%{NUMBER:traefik.access.http_version}\" %{NUMBER:traefik.access.response_code:int} %{NUMBER:traefik.access.body_sent.bytes:int}( \"%{GREEDYDATA:traefik.access.referrer}\" \"%{DATA:traefik.access.agent}\" %{NUMBER:traefik.access.request_count:int} \"%{DATA:traefik.access.frontend_name}\" \"%{DATA:traefik.access.backend_url}\" %{NUMBER:traefik.access.duration:int}ms)?"
+                    "%{NUMBER:traefik.access.body_sent.bytes:int}( \"%{GREEDYDATA:traefik.access.referrer}\" \"%{DATA:traefik.access.agent}\" %{NUMBER:traefik.access.request_count:int} \"%{DATA:traefik.access.frontend_name}\" \"%{DATA:traefik.access.backend_url}\" %{NUMBER:traefik.access.duration:int}ms)?"
                 ],
                 "ignore_missing": true
             }
