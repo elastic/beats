@@ -34,7 +34,7 @@ func MapHostInfo(info types.HostInfo) common.MapStr {
 				"platform": info.OS.Platform,
 				"version":  info.OS.Version,
 				"family":   info.OS.Family,
-				"name": info.OS.Name,
+				"name":     info.OS.Name,
 				"kernel":   info.KernelVersion,
 			},
 		},
