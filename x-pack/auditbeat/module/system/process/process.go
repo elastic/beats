@@ -76,7 +76,7 @@ func (pInfo ProcessInfo) toMapStr() common.MapStr {
 		"ppid":              pInfo.PPID,
 		"working_directory": pInfo.CWD,
 		"executable":        pInfo.Exe,
-		"start_time":        pInfo.StartTime,
+		"start":             pInfo.StartTime,
 	}
 }
 

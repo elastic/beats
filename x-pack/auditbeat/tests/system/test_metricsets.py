@@ -46,7 +46,7 @@ class Test(AuditbeatXPackTest):
         try:
             self.check_metricset("system", "process", COMMON_FIELDS + fields, warnings_allowed=True)
         except Exception as e:
-            if "process.working_directory" not in str(e):
+            if "process.working_directory" not in str(e) and "process.start" not in str(e):
                 raise
 
     @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
