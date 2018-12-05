@@ -56,6 +56,8 @@ environment. The `development` tag might have:
 another that reads metrics from Apache HTTP servers
 * Two Filebeat module configuration blocks: one that reads Apache HTTP server
 logs and another that reads system logs
+* One heartbeat monitor configuration block: checks that a public facing website
+is live.
 * One Elasticsearch output configuration block that sends the output to your
 {es} development cluster
 

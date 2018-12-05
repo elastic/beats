@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
@@ -42,10 +43,11 @@ type Client struct {
 	Connection
 	tlsConfig *transport.TLSConfig
 
-	index    outil.Selector
-	pipeline *outil.Selector
-	params   map[string]string
-	timeout  time.Duration
+	index     outil.Selector
+	pipeline  *outil.Selector
+	params    map[string]string
+	timeout   time.Duration
+	eventType string
 
 	// buffered bulk requests
 	bulkRequ *bulkRequest
@@ -89,7 +91,7 @@ type Connection struct {
 	onConnectCallback func() error
 
 	encoder bodyEncoder
-	version string
+	version common.Version
 }
 
 type bulkIndexAction struct {
@@ -130,7 +132,9 @@ var (
 )
 
 const (
-	eventType = "doc"
+	defaultEventTypeES6 = "doc"
+	defaultEventTypeES7 = "_doc"
+	defaultEventType    = defaultEventTypeES7
 )
 
 // NewClient instantiates a new client.
@@ -215,6 +219,7 @@ func NewClient(
 		pipeline:  pipeline,
 		params:    params,
 		timeout:   s.Timeout,
+		eventType: defaultEventType,
 
 		bulkRequ: bulkRequ,
 
@@ -302,7 +307,7 @@ func (client *Client) publishEvents(
 	// events slice
 
 	origCount := len(data)
-	data = bulkEncodePublishRequest(body, client.index, client.pipeline, data)
+	data = bulkEncodePublishRequest(body, client.index, client.pipeline, client.eventType, data)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
@@ -362,18 +367,20 @@ func bulkEncodePublishRequest(
 	body bulkWriter,
 	index outil.Selector,
 	pipeline *outil.Selector,
+	eventType string,
 	data []publisher.Event,
 ) []publisher.Event {
 	okEvents := data[:0]
 	for i := range data {
 		event := &data[i].Content
-		meta, err := createEventBulkMeta(index, pipeline, event)
+		meta, err := createEventBulkMeta(index, pipeline, eventType, event)
 		if err != nil {
 			logp.Err("Failed to encode event meta data: %s", err)
 			continue
 		}
 		if err := body.Add(meta, event); err != nil {
 			logp.Err("Failed to encode event: %s", err)
+			logp.Debug("elasticsearch", "Failed event: %v", event)
 			continue
 		}
 		okEvents = append(okEvents, data[i])
@@ -384,6 +391,7 @@ func bulkEncodePublishRequest(
 func createEventBulkMeta(
 	indexSel outil.Selector,
 	pipelineSel *outil.Selector,
+	eventType string,
 	event *beat.Event,
 ) (interface{}, error) {
 	pipeline, err := getPipeline(event, pipelineSel)
@@ -633,8 +641,8 @@ func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte
 	return body, nil
 }
 
-// GetVersion returns the elasticsearch version the client is connected to
-func (client *Client) GetVersion() string {
+// GetVersion returns the elasticsearch version the client is connected to.
+func (client *Client) GetVersion() common.Version {
 	return client.Connection.version
 }
 
@@ -666,7 +674,7 @@ func (client *Client) Test(d testing.Driver) {
 
 		err = client.Connect()
 		d.Fatal("talk to server", err)
-		d.Info("version", client.version)
+		d.Info("version", client.version.String())
 	})
 }
 
@@ -674,12 +682,38 @@ func (client *Client) String() string {
 	return "elasticsearch(" + client.Connection.URL + ")"
 }
 
-// Connect connects the client.
-func (conn *Connection) Connect() error {
-	var err error
-	conn.version, err = conn.Ping()
+// Connect connects the client. It runs a GET request against the root URL of
+// the configured host, updates the known Elasticsearch version and calls
+// globally configured handlers.
+func (client *Client) Connect() error {
+	err := client.Connection.Connect()
 	if err != nil {
 		return err
+	}
+
+	if client.GetVersion().Major < 7 {
+		client.eventType = defaultEventTypeES6
+	} else {
+		client.eventType = defaultEventType
+	}
+
+	return nil
+}
+
+// Connect connects the client. It runs a GET request against the root URL of
+// the configured host, updates the known Elasticsearch version and calls
+// globally configured handlers.
+func (conn *Connection) Connect() error {
+	versionString, err := conn.Ping()
+	if err != nil {
+		return err
+	}
+
+	if version, err := common.NewVersion(versionString); err != nil {
+		logp.Err("Invalid version from Elasticsearch: %v", versionString)
+		conn.version = common.Version{}
+	} else {
+		conn.version = *version
 	}
 
 	err = conn.onConnectCallback()
@@ -808,7 +842,9 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	return status, obj, err
 }
 
-func (conn *Connection) GetVersion() string {
+// GetVersion returns the elasticsearch version the client is connected to.
+// The version is read and updated on 'Connect'.
+func (conn *Connection) GetVersion() common.Version {
 	return conn.version
 }
 

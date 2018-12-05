@@ -35,7 +35,7 @@ func DirExists(dir string) bool {
 }
 
 // CreateDirectories create directories in baseDir
-func CreateDirectories(baseDir string, directories []string) error {
+func CreateDirectories(baseDir string, directories ...string) error {
 	for _, d := range directories {
 		p := path.Join(baseDir, d)
 		err := os.MkdirAll(p, 0750)

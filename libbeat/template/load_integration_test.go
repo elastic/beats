@@ -21,16 +21,25 @@ package template
 
 import (
 	"encoding/json"
+	"fmt"
 	"path/filepath"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
 	"github.com/elastic/beats/libbeat/version"
 )
+
+type testTemplate struct {
+	t      *testing.T
+	client ESClient
+	common.MapStr
+}
 
 func TestCheckTemplate(t *testing.T) {
 	client := estest.GetTestingElasticsearch(t)
@@ -108,24 +117,6 @@ func TestLoadInvalidTemplate(t *testing.T) {
 
 	// Make sure template was not loaded
 	assert.False(t, loader.CheckTemplate(templateName))
-}
-
-func getTemplate(t *testing.T, client ESClient, templateName string) common.MapStr {
-	status, body, err := client.Request("GET", "/_template/"+templateName, "", nil, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, status, 200)
-
-	var response common.MapStr
-	err = json.Unmarshal(body, &response)
-	assert.NoError(t, err)
-
-	return common.MapStr(response[templateName].(map[string]interface{}))
-}
-
-func newConfigFrom(t *testing.T, from interface{}) *common.Config {
-	cfg, err := common.NewConfigFrom(from)
-	assert.NoError(t, err)
-	return cfg
 }
 
 // Tests loading the templates for each beat
@@ -213,13 +204,8 @@ func TestTemplateSettings(t *testing.T) {
 
 	// Check that it contains the mapping
 	templateJSON := getTemplate(t, client, tmpl.GetName())
-	val, err := templateJSON.GetValue("settings.index.number_of_shards")
-	assert.NoError(t, err)
-	assert.Equal(t, val.(string), "1")
-
-	val, err = templateJSON.GetValue("mappings.doc._source.enabled")
-	assert.NoError(t, err)
-	assert.Equal(t, val.(bool), false)
+	assert.Equal(t, 1, templateJSON.NumberOfShards())
+	assert.Equal(t, false, templateJSON.SourceEnabled())
 
 	// Delete template again to clean up
 	client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
@@ -276,8 +262,7 @@ func TestOverwrite(t *testing.T) {
 
 	// Overwrite was not enabled, so the first version should still be there
 	templateJSON := getTemplate(t, client, templateName)
-	_, err = templateJSON.GetValue("mappings.doc._source.enabled")
-	assert.Error(t, err)
+	assert.Equal(t, true, templateJSON.SourceEnabled())
 
 	// Load template again, this time with custom settings AND overwrite: true
 	config = newConfigFrom(t, TemplateConfig{
@@ -297,9 +282,7 @@ func TestOverwrite(t *testing.T) {
 
 	// Overwrite was enabled, so the custom setting should be there
 	templateJSON = getTemplate(t, client, templateName)
-	val, err := templateJSON.GetValue("mappings.doc._source.enabled")
-	assert.NoError(t, err)
-	assert.Equal(t, val.(bool), false)
+	assert.Equal(t, false, templateJSON.SourceEnabled())
 
 	// Delete template again to clean up
 	client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
@@ -387,4 +370,59 @@ func TestTemplateWithData(t *testing.T) {
 
 	// Make sure it was removed
 	assert.False(t, loader.CheckTemplate(tmpl.GetName()))
+}
+
+func newConfigFrom(t *testing.T, from interface{}) *common.Config {
+	cfg, err := common.NewConfigFrom(from)
+	assert.NoError(t, err)
+	return cfg
+}
+
+func getTemplate(t *testing.T, client ESClient, templateName string) testTemplate {
+	status, body, err := client.Request("GET", "/_template/"+templateName, "", nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, status, 200)
+
+	var response common.MapStr
+	err = json.Unmarshal(body, &response)
+	assert.NoError(t, err)
+
+	return testTemplate{
+		t:      t,
+		client: client,
+		MapStr: common.MapStr(response[templateName].(map[string]interface{})),
+	}
+}
+
+func (tt *testTemplate) SourceEnabled() bool {
+	docType := "_doc"
+	major := tt.client.GetVersion().Major
+	if major < 7 {
+		docType = "doc"
+	}
+
+	key := fmt.Sprintf("mappings.%v._source.enabled", docType)
+
+	// _source.enabled is true if it's missing (default)
+	b, _ := tt.HasKey(key)
+	if !b {
+		return true
+	}
+
+	val, err := tt.GetValue(key)
+	if !assert.NoError(tt.t, err) {
+		doc, _ := json.MarshalIndent(tt.MapStr, "", "    ")
+		tt.t.Fatal(fmt.Sprintf("failed to read '%v' in %s", key, doc))
+	}
+
+	return val.(bool)
+}
+
+func (tt *testTemplate) NumberOfShards() int {
+	val, err := tt.GetValue("settings.index.number_of_shards")
+	require.NoError(tt.t, err)
+
+	i, err := strconv.Atoi(val.(string))
+	require.NoError(tt.t, err)
+	return i
 }

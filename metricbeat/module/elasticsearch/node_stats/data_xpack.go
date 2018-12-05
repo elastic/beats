@@ -163,7 +163,7 @@ var (
 	}
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`
@@ -181,12 +181,6 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	// of ES and it's not know if the request will be routed to the same node as before.
 	var errs multierror.Errors
 	for nodeID, node := range nodesStruct.Nodes {
-		clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HTTP.GetURI(), nodeID)
-		if err != nil {
-			errs = append(errs, errors.Wrap(err, "could not fetch cluster id"))
-			continue
-		}
-
 		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HTTP.GetURI())
 		if err != nil {
 			errs = append(errs, errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
@@ -205,7 +199,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 
 		event.RootFields = common.MapStr{
 			"timestamp":    time.Now(),
-			"cluster_uuid": clusterID,
+			"cluster_uuid": info.ClusterID,
 			"interval_ms":  m.Module().Config().Period.Nanoseconds() / 1000 / 1000,
 			"type":         "node_stats",
 			"node_stats":   nodeData,
