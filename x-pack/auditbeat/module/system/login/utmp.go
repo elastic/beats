@@ -334,7 +334,7 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 
 		// 0 - halt; 6 - reboot
 		if utmp.UtUser == "shutdown" || runlevel == "0" || runlevel == "6" {
-			record.Type = LoginRecordTypeShutdown
+			record.Type = shutdownRecord
 
 			// Clear any old logins
 			// TODO: Issue logout events for login events that are still around
@@ -346,7 +346,7 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 		}
 	case C.BOOT_TIME: // 2
 		if utmp.UtLine == "~" && utmp.UtUser == "reboot" {
-			record.Type = LoginRecordTypeBoot
+			record.Type = bootRecord
 
 			// Clear any old logins
 			// TODO: Issue logout events for login events that are still around
@@ -357,7 +357,7 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 			return nil
 		}
 	case C.USER_PROCESS: // 7
-		record.Type = LoginRecordTypeUserLogin
+		record.Type = userLoginRecord
 
 		record.Username = utmp.UtUser
 		record.UID = lookupUsername(record.Username)
@@ -371,7 +371,7 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 	case C.DEAD_PROCESS: // 8
 		savedRecord, found := r.loginSessions[record.TTY]
 		if found {
-			record.Type = LoginRecordTypeUserLogout
+			record.Type = userLogoutRecord
 			record.Username = savedRecord.Username
 			record.UID = savedRecord.UID
 			record.PID = savedRecord.PID

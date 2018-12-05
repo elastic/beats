@@ -27,21 +27,38 @@ const (
 	bucketName = "auditbeat.login.v1"
 
 	eventTypeEvent = "event"
-
-	// LoginRecordTypeBoot represents a system boot.
-	LoginRecordTypeBoot = "boot"
-	// LoginRecordTypeShutdown represents a system shutdown (halt or reboot).
-	LoginRecordTypeShutdown = "shutdown"
-	// LoginRecordTypeUserLogin represents a user login.
-	LoginRecordTypeUserLogin = "user_login"
-	// LoginRecordTypeUserLogout represents a user logout.
-	LoginRecordTypeUserLogout = "user_logout"
 )
+
+// loginRecordType represents the type of a login record.
+type loginRecordType uint8
+
+const (
+	bootRecord loginRecordType = iota + 1
+	shutdownRecord
+	userLoginRecord
+	userLogoutRecord
+)
+
+// String returns the string representation of a LoginRecordType.
+func (t loginRecordType) string() string {
+	switch t {
+	case bootRecord:
+		return "boot"
+	case shutdownRecord:
+		return "shutdown"
+	case userLoginRecord:
+		return "user_login"
+	case userLogoutRecord:
+		return "user_logout"
+	default:
+		return ""
+	}
+}
 
 // LoginRecord represents a login record.
 type LoginRecord struct {
 	Utmp      Utmp
-	Type      string
+	Type      loginRecordType
 	PID       int
 	TTY       string
 	UID       int
@@ -143,7 +160,7 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"type":   eventTypeEvent,
-				"action": loginRecord.Type,
+				"action": loginRecord.Type.string(),
 				"origin": loginRecord.Origin,
 			},
 		},
@@ -173,15 +190,15 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 	var message string
 
 	switch loginRecord.Type {
-	case LoginRecordTypeBoot:
+	case bootRecord:
 		message = "System boot"
-	case LoginRecordTypeShutdown:
+	case shutdownRecord:
 		message = "System shutdown"
-	case LoginRecordTypeUserLogin:
+	case userLoginRecord:
 		message = fmt.Sprintf("Login by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
 			loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
 			loginRecord.Hostname, loginRecord.IP)
-	case LoginRecordTypeUserLogout:
+	case userLogoutRecord:
 		message = fmt.Sprintf("Logout by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
 			loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
 			loginRecord.Hostname, loginRecord.IP)
