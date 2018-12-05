@@ -7,7 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/
 from beat.beat import TestCase
 
 COMMON_FIELDS = ["@timestamp", "beat", "metricset.name", "metricset.host",
-                 "metricset.module", "metricset.rtt", "host.name"]
+                 "metricset.module", "metricset.rtt", "host.name", "event"]
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 

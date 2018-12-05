@@ -38,3 +38,13 @@
       example: elasticsearch
       description: >
         Name of the service metricbeat fetches the data from.
+
+    - name: event.duration
+      type: long
+      description: >
+        Duration of the event in nano seconds.
+
+    - name: event.dataset
+      type: long
+      description: >
+        Event dataset name.

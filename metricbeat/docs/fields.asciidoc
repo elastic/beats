@@ -1879,6 +1879,26 @@ Name of the service metricbeat fetches the data from.
 
 --
 
+*`event.duration`*::
++
+--
+type: long
+
+Duration of the event in nano seconds.
+
+
+--
+
+*`event.dataset`*::
++
+--
+type: long
+
+Event dataset name.
+
+
+--
+
 [[exported-fields-couchbase]]
 == Couchbase fields
 
