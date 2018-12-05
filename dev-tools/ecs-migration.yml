@@ -6,44 +6,46 @@
 #
 # - from: source-field-in-6.x
 #   to: target-filed-in-ECS
-#   # Alias field is useful for fields where there is a 1-1 mapping from old to new
-#   alias: true-if-alias-is-required-in-6x
+#   # Alias field is useful for fields where many-1 mapping from new to old are needed
+#   alias: true-if-alias-is-required-in-7
+#   # Alias6 field is useful for fields where there is a 1-1 mapping from old to new. If absent, defaults to false.
+#   alias6: true-if-alias-is-required-in-6
 #   # Copy to is useful for fields where multiple fields map to the same ECS field
 #   copy_to: true-if-field-should-be-copied-to-target-in-6x
 
 - from: offset
   to: log.offset
+  alias6: true
   alias: true
-  copy_to: false
 
 - from: fileset.name
   to: event.dataset
+  alias6: true
   alias: true
-  copy_to: false
 
 - from: fileset.module
   to: event.module
+  alias6: true
   alias: true
 
 - from: source
   to: ["log.file.path", "log.source.ip"]
   alias: false
-  copy_to: false
 
 - from: beat.name
   to: agent.type
+  alias6: true
   alias: true
-  copy_to: false
 
 - from: beat.hostname
   to: agent.hostname
+  alias6: true
   alias: true
-  copy_to: false
 
 - from: beat.version
   to: agent.version
+  alias6: true
   alias: true
-  copy_to: false
 
 # Filebeat modules
 
@@ -52,62 +54,50 @@
 - from: source_ecs.ip
   to: source.ip
   alias: true
-  copy_to: false
 
 - from: source_ecs.port
   to: source.port
   alias: true
-  copy_to: false
 
 - from: source_ecs.geo.continent_name
   to: source.geo.continent_name
   alias: true
-  copy_to: false
 
 - from: source_ecs.geo.country_iso_code
   to: source.geo.country_iso_code
   alias: true
-  copy_to: false
 
 - from: source_ecs.geo.location
   to: source.geo.location
   alias: true
-  copy_to: false
 
 - from: source_ecs.geo.region_name
   to: source.geo.region_name
   alias: true
-  copy_to: false
 
 - from: source_ecs.geo.city_name
   to: source.geo.city_name
   alias: true
-  copy_to: false
 
 - from: source_ecs.geo.region_iso_code
   to: source.geo.region_iso_code
   alias: true
-  copy_to: false
 
 - from: system.syslog.hostname
   to: host.hostname
   alias: true
-  copy_to: false
 
 - from: system.syslog.program
   to: process.name
   alias: true
-  copy_to: false
 
 - from: system.syslog.pid
   to: process.pid
   alias: true
-  copy_to: false
 
 - from: system.syslog.message
   to: message
   alias: true
-  copy_to: false
 
 - from: system.auth.hostname
   to: host.hostname
@@ -117,280 +107,224 @@
 - from: system.auth.pid
   to: process.pid
   alias: true
-  copy_to: false
 
 - from: system.auth.groupadd.gid
   to: group.id
   alias: true
-  copy_to: false
 
 - from: system.auth.useradd.uid
   to: user.id
   alias: true
-  copy_to: false
 
 - from: system.auth.useradd.user
   to: user.name
   alias: true
-  copy_to: false
 
 - from: system.auth.ssh.event
   to: event.action
   alias: true
-  copy_to: false
 
 - from: system.auth.program
   to: process.name
   alias: true
-  copy_to: false
 
 - from: system.auth.ssh.ip
   to: source.ip
   alias: true
-  copy_to: false
 
 - from: system.auth.ssh.port
   to: source.port
   alias: true
-  copy_to: false
 
 - from: system.auth.ssh.geoip.*
   to: source.geo.*
   alias: true
-  copy_to: false
 
 ## Apache
 
 - from: apache2.access.user_name
   to: user.name
   alias: true
-  copy_to: false
 
 - from: apache2.access.method
   to: http.request.method
   alias: true
-  copy_to: false
 
 - from: apache2.access.url
   to: url.original
   alias: true
-  copy_to: false
 
 - from: apache2.access.http_version
   to: http.version
   alias: true
-  copy_to: false
 
 - from: apache2.access.response_code
   to: http.response.status_code
   alias: true
-  copy_to: false
 
 - from: apache2.access.referrer
   to: http.request.referrer
   alias: true
-  copy_to: false
 
 - from: apache2.access.agent
   to: user_agent.original
   alias: true
-  copy_to: false
 
 - from: read_timestamp
   to: event.created
-  alias: false
-  copy_to: false
+  alias: true
 
 # These expand all fields under geoip and user_agent
 - from: apache2.access.geoip.*
   to: source.geo.*
-  alias: false
-  copy_to: false
+  alias: true
 
 - from: apache2.access.user_agent.*
   to: user_agent.*
-  alias: false
-  copy_to: false
-
-# From Auditbeat's auditd module.
-- from: source.hostname
-  to: source.domain
   alias: true
-  copy_to: false
+
+# IIS module
 
 - from: iis.access.server_ip
   to: destination.ip
   alias: true
-  copy_to: false
 
 - from: iis.access.remote_ip
   to: source.ip
   alias: true
-  copy_to: false
 
 - from: iis.access.url
   to: url.path
   alias: true
-  copy_to: false
 
 - from: iis.access.query_string
   to: url.query
   alias: true
-  copy_to: false
 
 - from: iis.access.port
   to: destination.port
   alias: true
-  copy_to: false
 
 - from: iis.access.user_name
   to: user.name
   alias: true
-  copy_to: false
 
 - from: iis.access.hostname
   to: destination.domain
   alias: true
-  copy_to: false
 
 - from: iis.access.user_agent.original
   to: user_agent.original
   alias: true
-  copy_to: false
 
 - from: iis.access.geoip.continent_name
   to: source.geo.continent_name
   alias: true
-  copy_to: false
 
 - from: iis.access.geoip.country_iso_code
   to: source.geo.country_iso_code
   alias: true
-  copy_to: false
 
 - from: iis.access.geoip.location
   to: source.geo.location
   alias: true
-  copy_to: false
 
 - from: iis.access.geoip.region_name
   to: source.geo.region_name
   alias: true
-  copy_to: false
 
 - from: iis.access.geoip.city_name
   to: source.geo.city_name
   alias: true
-  copy_to: false
 
 - from: iis.access.geoip.region_iso_code
   to: source.geo.region_iso_code
   alias: true
-  copy_to: false
 
 # Note: `http` is not officially in ECS yet
 
 - from: iis.access.method
   to: http.request.method
   alias: true
-  copy_to: false
 
 - from: iis.access.response_code
   to: http.response.status_code
   alias: true
-  copy_to: false
 
 - from: iis.access.referrer
   to: http.request.referrer
   alias: true
-  copy_to: false
 
+# HAProxy module
 - from: haproxy.client.port
   to: source.port
   alias: true
-  copy_to: false
 
 - from: haproxy.process_name
   to: process.name
   alias: true
-  copy_to: false
 
 - from: haproxy.pid
   to: process.pid
   alias: true
-  copy_to: false
 
 - from: haproxy.destination.ip
   to: destination.ip
   alias: true
-  copy_to: false
 
 - from: haproxy.destination.port
   to: destination.port
   alias: true
-  copy_to: false
 
 - from: haproxy.geoip.continent_name
   to: source.geo.continent_name
   alias: true
-  copy_to: false
 
 - from: haproxy.geoip.country_iso_code
   to: source.geo.country_iso_code
   alias: true
-  copy_to: false
 
 - from: haproxy.geoip.location
   to: source.geo.location
   alias: true
-  copy_to: false
 
 - from: haproxy.geoip.region_name
   to: source.geo.region_name
   alias: true
-  copy_to: false
 
 - from: haproxy.geoip.city_name
   to: source.geo.city_name
   alias: true
-  copy_to: false
 
 - from: haproxy.geoip.region_iso_code
   to: source.geo.region_iso_code
   alias: true
-  copy_to: false
 
 - from: nginx.access.remote_ip_list
   to: network.forwarded_ip
   alias: true
-  copy_to: false
 
 - from: nginx.access.user_name
   to: user.name
   alias: true
-  copy_to: false
 
 - from: nginx.access.url
   to: url.original
   alias: true
-  copy_to: false
 
 - from: nginx.access.agent
   to: user_agent.original
   alias: true
-  copy_to: false
 
  # Note: `http` is not officially in ECS yet
 
 - from: nginx.access.response_code
   to: http.response.status_code
   alias: true
-  copy_to: false
 
 - from: nginx.access.referrer
   to: http.request.referrer
   alias: true
-  copy_to: false
 
 - from: nginx.access.method
   to: http.request.method
@@ -400,39 +334,36 @@
 - from: nginx.access.http_version
   to: http.version
   alias: true
-  copy_to: false
 
 - from: nginx.access.geoip.continent_name
   to: source.geo.continent_name
   alias: true
-  copy_to: false
 
 - from: nginx.access.geoip.country_iso_code
   to: source.geo.country_iso_code
   alias: true
-  copy_to: false
 
 - from: nginx.access.geoip.location
   to: source.geo.location
   alias: true
-  copy_to: false
 
 - from: nginx.access.geoip.region_name
   to: source.geo.region_name
   alias: true
-  copy_to: false
 
 - from: nginx.access.geoip.city_name
   to: source.geo.city_name
   alias: true
-  copy_to: false
 
 - from: nginx.access.geoip.region_iso_code
   to: source.geo.region_iso_code
   alias: true
-  copy_to: false
 
 - from: nginx.access.agent
   to: user_agent.original
   alias: true
-  copy_to: false
+
+# From Auditbeat's auditd module.
+- from: source.hostname
+  to: source.domain
+  alias: true
