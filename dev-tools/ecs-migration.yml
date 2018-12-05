@@ -142,31 +142,31 @@
 
 ## Apache
 
-- from: apache2.access.user_name
+- from: apache.access.user_name
   to: user.name
   alias: true
 
-- from: apache2.access.method
+- from: apache.access.method
   to: http.request.method
   alias: true
 
-- from: apache2.access.url
+- from: apache.access.url
   to: url.original
   alias: true
 
-- from: apache2.access.http_version
+- from: apache.access.http_version
   to: http.version
   alias: true
 
-- from: apache2.access.response_code
+- from: apache.access.response_code
   to: http.response.status_code
   alias: true
 
-- from: apache2.access.referrer
+- from: apache.access.referrer
   to: http.request.referrer
   alias: true
 
-- from: apache2.access.agent
+- from: apache.access.agent
   to: user_agent.original
   alias: true
 
@@ -175,11 +175,11 @@
   alias: true
 
 # These expand all fields under geoip and user_agent
-- from: apache2.access.geoip.*
+- from: apache.access.geoip.*
   to: source.geo.*
   alias: true
 
-- from: apache2.access.user_agent.*
+- from: apache.access.user_agent.*
   to: user_agent.*
   alias: true
 

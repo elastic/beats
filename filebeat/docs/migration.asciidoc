@@ -148,7 +148,7 @@ The equivalent `inputs` section would look like this:
 - type: stdin <1>
 - type: log
   paths:
-    - /var/log/apache2/httpd-*.log
+    - /var/log/apache/httpd-*.log
 -------------------------------------------------------------------------------------
 
 <1> The explicit `type` option was introduced to differentiate between normal files and

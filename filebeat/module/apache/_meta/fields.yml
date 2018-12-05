@@ -1,11 +1,11 @@
-- key: apache2
-  title: "Apache2"
+- key: apache
+  title: "Apache"
   description: >
-    Apache2 Module
+    Apache Module
   short_config: true
   fields:
-    - name: apache2
+    - name: apache
       type: group
       description: >
-        Apache2 fields.
+        Apache fields.
       fields:

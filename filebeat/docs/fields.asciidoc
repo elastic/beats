@@ -12,7 +12,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
-* <<exported-fields-apache2>>
+* <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
@@ -38,28 +38,28 @@ grouped in the following categories:
 * <<exported-fields-traefik>>
 
 --
-[[exported-fields-apache2]]
-== Apache2 fields
+[[exported-fields-apache]]
+== Apache fields
 
-Apache2 Module
+Apache Module
 
 
 
 [float]
-== apache2 fields
+== apache fields
 
-Apache2 fields.
+Apache fields.
 
 
 
 [float]
 == access fields
 
-Contains fields for the Apache2 HTTPD access logs.
+Contains fields for the Apache HTTP Server access logs.
 
 
 
-*`apache2.access.remote_ip`*::
+*`apache.access.remote_ip`*::
 +
 --
 type: keyword
@@ -69,7 +69,7 @@ Client IP address or hostname.
 
 --
 
-*`apache2.access.body_sent.bytes`*::
+*`apache.access.body_sent.bytes`*::
 +
 --
 type: long
@@ -81,7 +81,7 @@ The number of bytes of the server response body.
 
 --
 
-*`apache2.access.user_name`*::
+*`apache.access.user_name`*::
 +
 --
 type: alias
@@ -90,7 +90,7 @@ alias to: user.name
 
 --
 
-*`apache2.access.method`*::
+*`apache.access.method`*::
 +
 --
 type: alias
@@ -99,7 +99,7 @@ alias to: http.request.method
 
 --
 
-*`apache2.access.url`*::
+*`apache.access.url`*::
 +
 --
 type: alias
@@ -108,7 +108,7 @@ alias to: url.original
 
 --
 
-*`apache2.access.http_version`*::
+*`apache.access.http_version`*::
 +
 --
 type: alias
@@ -117,7 +117,7 @@ alias to: http.version
 
 --
 
-*`apache2.access.response_code`*::
+*`apache.access.response_code`*::
 +
 --
 type: alias
@@ -126,7 +126,7 @@ alias to: http.response.status_code
 
 --
 
-*`apache2.access.referrer`*::
+*`apache.access.referrer`*::
 +
 --
 type: alias
@@ -135,7 +135,7 @@ alias to: http.request.referrer
 
 --
 
-*`apache2.access.agent`*::
+*`apache.access.agent`*::
 +
 --
 type: alias
@@ -145,7 +145,7 @@ alias to: user_agent.original
 --
 
 
-*`apache2.access.user_agent.device`*::
+*`apache.access.user_agent.device`*::
 +
 --
 type: alias
@@ -154,7 +154,7 @@ alias to: user_agent.device
 
 --
 
-*`apache2.access.user_agent.major`*::
+*`apache.access.user_agent.major`*::
 +
 --
 type: alias
@@ -163,7 +163,7 @@ alias to: user_agent.major
 
 --
 
-*`apache2.access.user_agent.minor`*::
+*`apache.access.user_agent.minor`*::
 +
 --
 type: alias
@@ -172,7 +172,7 @@ alias to: user_agent.minor
 
 --
 
-*`apache2.access.user_agent.patch`*::
+*`apache.access.user_agent.patch`*::
 +
 --
 type: alias
@@ -181,7 +181,7 @@ alias to: user_agent.patch
 
 --
 
-*`apache2.access.user_agent.name`*::
+*`apache.access.user_agent.name`*::
 +
 --
 type: alias
@@ -190,7 +190,7 @@ alias to: user_agent.name
 
 --
 
-*`apache2.access.user_agent.os`*::
+*`apache.access.user_agent.os`*::
 +
 --
 type: alias
@@ -199,7 +199,7 @@ alias to: user_agent.os.full_name
 
 --
 
-*`apache2.access.user_agent.os_major`*::
+*`apache.access.user_agent.os_major`*::
 +
 --
 type: alias
@@ -208,7 +208,7 @@ alias to: user_agent.os.major
 
 --
 
-*`apache2.access.user_agent.os_minor`*::
+*`apache.access.user_agent.os_minor`*::
 +
 --
 type: alias
@@ -217,7 +217,7 @@ alias to: user_agent.os.minor
 
 --
 
-*`apache2.access.user_agent.os_name`*::
+*`apache.access.user_agent.os_name`*::
 +
 --
 type: alias
@@ -226,7 +226,7 @@ alias to: user_agent.os.name
 
 --
 
-*`apache2.access.user_agent.original`*::
+*`apache.access.user_agent.original`*::
 +
 --
 type: alias
@@ -236,7 +236,7 @@ alias to: user_agent.original
 --
 
 
-*`apache2.access.geoip.continent_name`*::
+*`apache.access.geoip.continent_name`*::
 +
 --
 type: alias
@@ -245,7 +245,7 @@ alias to: source.geo.continent_name
 
 --
 
-*`apache2.access.geoip.country_iso_code`*::
+*`apache.access.geoip.country_iso_code`*::
 +
 --
 type: alias
@@ -254,7 +254,7 @@ alias to: source.geo.country_iso_code
 
 --
 
-*`apache2.access.geoip.location`*::
+*`apache.access.geoip.location`*::
 +
 --
 type: alias
@@ -263,7 +263,7 @@ alias to: source.geo.location
 
 --
 
-*`apache2.access.geoip.region_name`*::
+*`apache.access.geoip.region_name`*::
 +
 --
 type: alias
@@ -272,7 +272,7 @@ alias to: source.geo.region_name
 
 --
 
-*`apache2.access.geoip.city_name`*::
+*`apache.access.geoip.city_name`*::
 +
 --
 type: alias
@@ -281,7 +281,7 @@ alias to: source.geo.city_name
 
 --
 
-*`apache2.access.geoip.region_iso_code`*::
+*`apache.access.geoip.region_iso_code`*::
 +
 --
 type: alias
@@ -297,7 +297,7 @@ Fields from the Apache error logs.
 
 
 
-*`apache2.error.level`*::
+*`apache.error.level`*::
 +
 --
 type: keyword
@@ -307,7 +307,7 @@ The severity level of the message.
 
 --
 
-*`apache2.error.client`*::
+*`apache.error.client`*::
 +
 --
 type: keyword
@@ -317,7 +317,7 @@ The IP address of the client that generated the error.
 
 --
 
-*`apache2.error.message`*::
+*`apache.error.message`*::
 +
 --
 type: text
@@ -327,7 +327,7 @@ The logged message.
 
 --
 
-*`apache2.error.pid`*::
+*`apache.error.pid`*::
 +
 --
 type: long
@@ -337,7 +337,7 @@ The process ID.
 
 --
 
-*`apache2.error.tid`*::
+*`apache.error.tid`*::
 +
 --
 type: long
@@ -347,7 +347,7 @@ The thread ID.
 
 --
 
-*`apache2.error.module`*::
+*`apache.error.module`*::
 +
 --
 type: keyword

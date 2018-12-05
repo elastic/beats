@@ -1,12 +1,12 @@
 {
-  "description": "Pipeline for parsing apache2 error logs",
+  "description": "Pipeline for parsing apache error logs",
   "processors": [
     {
       "grok": {
         "field": "message",
         "patterns": [
-          "\\[%{APACHE_TIME:apache2.error.timestamp}\\] \\[%{LOGLEVEL:apache2.error.level}\\]( \\[client %{IPORHOST:apache2.error.client}\\])? %{GREEDYDATA:apache2.error.message}",
-          "\\[%{APACHE_TIME:apache2.error.timestamp}\\] \\[%{DATA:apache2.error.module}:%{LOGLEVEL:apache2.error.level}\\] \\[pid %{NUMBER:apache2.error.pid}(:tid %{NUMBER:apache2.error.tid})?\\]( \\[client %{IPORHOST:apache2.error.client}\\])? %{GREEDYDATA:apache2.error.message1}"
+          "\\[%{APACHE_TIME:apache.error.timestamp}\\] \\[%{LOGLEVEL:apache.error.level}\\]( \\[client %{IPORHOST:apache.error.client}\\])? %{GREEDYDATA:apache.error.message}",
+          "\\[%{APACHE_TIME:apache.error.timestamp}\\] \\[%{DATA:apache.error.module}:%{LOGLEVEL:apache.error.level}\\] \\[pid %{NUMBER:apache.error.pid}(:tid %{NUMBER:apache.error.tid})?\\]( \\[client %{IPORHOST:apache.error.client}\\])? %{GREEDYDATA:apache.error.message1}"
         ],
         "pattern_definitions": {
           "APACHE_TIME": "%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{YEAR}"
@@ -21,14 +21,14 @@
     },
     {
       "rename": {
-        "field": "apache2.error.message1",
-        "target_field": "apache2.error.message",
+        "field": "apache.error.message1",
+        "target_field": "apache.error.message",
         "ignore_failure": true
       }
     },
     {
       "date": {
-        "field": "apache2.error.timestamp",
+        "field": "apache.error.timestamp",
         "target_field": "@timestamp",
         "formats": ["EEE MMM dd H:m:s YYYY", "EEE MMM dd H:m:s.SSSSSS YYYY"],
         "ignore_failure": true
@@ -36,7 +36,7 @@
     },
     {
       "remove": {
-        "field": "apache2.error.timestamp",
+        "field": "apache.error.timestamp",
         "ignore_failure": true
       }
     }

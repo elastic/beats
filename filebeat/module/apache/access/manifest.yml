@@ -3,10 +3,10 @@ module_version: 1.0
 var:
   - name: paths
     default:
-      - /var/log/apache2/access.log*
-      - /var/log/apache2/other_vhosts_access.log*
+      - /var/log/apache/access.log*
+      - /var/log/apache/other_vhosts_access.log*
     os.darwin:
-      - /usr/local/var/log/apache2/access_log*
+      - /usr/local/var/log/apache/access_log*
     os.windows:
       - "C:/tools/Apache/httpd-2.*/Apache24/logs/access.log*"
       - "C:/Program Files/Apache Software Foundation/Apache2.*/logs/access.log*"

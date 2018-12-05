@@ -42,7 +42,7 @@ multiple input sections:
     - /var/log/wifi.log
 - type: log <2>
   paths:
-    - "/var/log/apache2/*"
+    - "/var/log/apache/*"
   fields:
     apache: true
   fields_under_root: true
@@ -50,7 +50,7 @@ multiple input sections:
 
 <1> Harvests lines from two files:  `system.log` and
 `wifi.log`.
-<2> Harvests lines from every file in the `apache2` directory, and uses the
+<2> Harvests lines from every file in the `apache` directory, and uses the
 `fields` configuration option to add a field called `apache` to the output.
 
 

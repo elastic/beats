@@ -1,0 +1,4 @@
+dashboards:
+- id: Filebeat-Apache-Dashboard
+  file: Filebeat-apache.json
+
