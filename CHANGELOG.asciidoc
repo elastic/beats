@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v6.5.2...6.5[Check the HEAD diff]
 *Auditbeat*
 
 *Filebeat*
+- Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
 
 - Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
 - Stop runners disabled by hints after previously being started. {pull}9305[9305]
