@@ -103,23 +103,43 @@ func NewUtmpFileReader(log *logp.Logger, bucket datastore.Bucket, filePattern st
 // Close performs any cleanup tasks when the UTMP reader is done.
 func (r *UtmpFileReader) Close() error {
 	err := r.bucket.Close()
-	if err != nil {
-		return errors.Wrap(err, "error closing bucket")
-	}
-
-	return nil
+	return errors.Wrap(err, "error closing bucket")
 }
 
 // ReadNew returns any new UTMP entries in any files matching the configured pattern.
 func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
-	fileInfos, err := r.fileInfos()
-	defer r.deleteOldRecords(fileInfos)
+	var inodes []Inode
+	defer r.deleteOldRecords(&inodes)
+
+	paths, err := filepath.Glob(r.filePattern)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to expand file pattern")
+	}
+
+	// Sort paths in reverse order (oldest/most-rotated file first)
+	sort.Sort(sort.Reverse(sort.StringSlice(paths)))
 
 	var loginRecords []LoginRecord
-	for path, fileInfo := range fileInfos {
+	for _, path := range paths {
+		fileInfo, err := os.Stat(path)
+		if err != nil {
+			if os.IsNotExist(err) {
+				// Skip - file might have been rotated out
+				r.log.Debugf("File %v does not exist anymore.", path)
+				continue
+			} else {
+				return nil, errors.Wrapf(err, "unexpected error when looking up file %v", path)
+			}
+		}
+
 		inode := Inode(fileInfo.Sys().(*syscall.Stat_t).Ino)
+		inodes = append(inodes, inode)
 
 		fileRecord, isKnownFile := r.fileRecords[inode]
+		if !isKnownFile {
+			r.log.Debugf("Found new file: %v (size=%v)", path, fileInfo.Size())
+		}
+
 		var oldSize int64
 		if isKnownFile {
 			oldSize = fileRecord.Size
@@ -177,11 +197,10 @@ func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 }
 
 // deleteOldRecords cleans up old file records where the inode no longer exists.
-func (r *UtmpFileReader) deleteOldRecords(fileInfos map[string]os.FileInfo) {
+func (r *UtmpFileReader) deleteOldRecords(existingInodes *[]Inode) {
 	for savedInode := range r.fileRecords {
 		found := false
-		for _, fileInfo := range fileInfos {
-			inode := Inode(fileInfo.Sys().(*syscall.Stat_t).Ino)
+		for _, inode := range *existingInodes {
 			if inode == savedInode {
 				found = true
 				break
@@ -193,43 +212,6 @@ func (r *UtmpFileReader) deleteOldRecords(fileInfos map[string]os.FileInfo) {
 			delete(r.fileRecords, savedInode)
 		}
 	}
-}
-
-func (r *UtmpFileReader) fileInfos() (map[string]os.FileInfo, error) {
-	paths, err := filepath.Glob(r.filePattern)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to expand file pattern")
-	}
-
-	// Sort paths in reverse order (oldest/most-rotated file first)
-	sort.Sort(sort.Reverse(sort.StringSlice(paths)))
-
-	fileInfos := make(map[string]os.FileInfo, len(r.fileRecords))
-	for _, path := range paths {
-		fileInfo, err := os.Stat(path)
-		if err != nil {
-			if os.IsNotExist(err) {
-				// Skip - file might have been rotated out
-				r.log.Debugf("File %v does not exist anymore.", path)
-				continue
-			} else {
-				return nil, errors.Wrapf(err, "unexpected error when looking up file %v", path)
-			}
-		} else if fileInfo.Sys() == nil {
-			return nil, fmt.Errorf("empty stat result for file %v", path)
-		}
-
-		if r.log.IsDebug() {
-			inode := Inode(fileInfo.Sys().(*syscall.Stat_t).Ino)
-			if _, isKnownFile := r.fileRecords[inode]; !isKnownFile {
-				r.log.Debugf("Found new file: %v (size=%v)", path, fileInfo.Size())
-			}
-		}
-
-		fileInfos[path] = fileInfo
-	}
-
-	return fileInfos, nil
 }
 
 func (r *UtmpFileReader) updateFileRecord(inode Inode, size int64, utmpRecords *[]Utmp) {
@@ -521,10 +503,10 @@ func (r *UtmpFileReader) restoreFileRecordsFromDisk() error {
 
 	if decoder != nil {
 		for {
-			fileRecord := new(FileRecord)
-			err = decoder.Decode(fileRecord)
+			var fileRecord FileRecord
+			err = decoder.Decode(&fileRecord)
 			if err == nil {
-				r.fileRecords[fileRecord.Inode] = *fileRecord
+				r.fileRecords[fileRecord.Inode] = fileRecord
 			} else if err == io.EOF {
 				// Read all
 				break
