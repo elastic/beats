@@ -167,7 +167,7 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 	}
 
 	if loginRecord.Hostname != "" && loginRecord.Hostname != loginRecord.IP.String() {
-		event.RootFields.Put("source.hostname", loginRecord.Hostname)
+		event.RootFields.Put("source.domain", loginRecord.Hostname)
 	}
 
 	var message string
