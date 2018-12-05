@@ -8,6 +8,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -27,7 +28,11 @@ const (
 	eventActionHost = "host"
 )
 
+// Host represents information about a host.
 type Host struct {
+	info  types.HostInfo
+	addrs []net.Addr
+	macs  []net.HardwareAddr
 }
 
 func init() {
@@ -67,17 +72,37 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	ms.lastState = time.Now()
 
-	host, err := sysinfo.Host()
+	host, err := getHost()
 	if err != nil {
-		return errors.Wrap(err, "failed to load host information")
+		return err
 	}
 
-	report.Event(hostEvent(host.Info(), eventTypeState, eventActionHost))
+	report.Event(hostEvent(host, eventTypeState, eventActionHost))
 
 	return nil
 }
 
-func hostEvent(hostInfo types.HostInfo, eventType string, eventAction string) mb.Event {
+func getHost() (*Host, error) {
+	sysinfoHost, err := sysinfo.Host()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to load host information")
+	}
+
+	addrs, macs, err := getNetInfo()
+	if err != nil {
+		return nil, err
+	}
+
+	host := &Host{
+		info:  sysinfoHost.Info(),
+		addrs: addrs,
+		macs:  macs,
+	}
+
+	return host, nil
+}
+
+func hostEvent(host *Host, eventType string, eventAction string) mb.Event {
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
@@ -87,84 +112,82 @@ func hostEvent(hostInfo types.HostInfo, eventType string, eventAction string) mb
 		},
 		MetricSetFields: common.MapStr{
 			// https://github.com/elastic/ecs#-host-fields
-			"uptime":              hostInfo.Uptime(),
-			"boottime":            hostInfo.BootTime,
-			"containerized":       hostInfo.Containerized,
-			"timezone.name":       hostInfo.Timezone,
-			"timezone.offset.sec": hostInfo.TimezoneOffsetSec,
-			"name":                hostInfo.Hostname,
-			"id":                  hostInfo.UniqueID,
+			"uptime":              host.info.Uptime(),
+			"boottime":            host.info.BootTime,
+			"containerized":       host.info.Containerized,
+			"timezone.name":       host.info.Timezone,
+			"timezone.offset.sec": host.info.TimezoneOffsetSec,
+			"name":                host.info.Hostname,
+			"id":                  host.info.UniqueID,
 			// TODO "host.type": ?
-			"architecture": hostInfo.Architecture,
-			"ip":           hostInfo.IPs,
-			"mac":          hostInfo.MACs,
+			"architecture": host.info.Architecture,
 
 			// https://github.com/elastic/ecs#-operating-system-fields
 			"os": common.MapStr{
-				"platform": hostInfo.OS.Platform,
-				"name":     hostInfo.OS.Name,
-				"family":   hostInfo.OS.Family,
-				"version":  hostInfo.OS.Version,
-				"kernel":   hostInfo.KernelVersion,
+				"platform": host.info.OS.Platform,
+				"name":     host.info.OS.Name,
+				"family":   host.info.OS.Family,
+				"version":  host.info.OS.Version,
+				"kernel":   host.info.KernelVersion,
 			},
 		},
 	}
 
+	var ipStrings []string
+	for _, addr := range host.addrs {
+		switch v := addr.(type) {
+		case *net.IPNet:
+			ipStrings = append(ipStrings, v.IP.String())
+		case *net.IPAddr:
+			ipStrings = append(ipStrings, v.IP.String())
+		}
+	}
+	event.MetricSetFields.Put("ip", ipStrings)
+
+	var macStrings []string
+	for _, mac := range host.macs {
+		macStr := mac.String()
+		if macStr != "" {
+			macStrings = append(macStrings, macStr)
+		}
+	}
+	event.MetricSetFields.Put("mac", macStrings)
+
 	return event
 }
 
-// NetworkInterface represent information on a network interface.
-type NetworkInterface struct {
-	net.Interface
+// getNetInfo is originally copied from libbeat/processors/add_host_metadata.go.
+// TODO: Maybe these two can share an implementation?
+func getNetInfo() ([]net.Addr, []net.HardwareAddr, error) {
+	var addrList []net.Addr
+	var hwList []net.HardwareAddr
 
-	ips []net.IP
-}
-
-func (ifc NetworkInterface) toMapStr() common.MapStr {
-	return common.MapStr{
-		"index": ifc.Index,
-		"mtu":   ifc.MTU,
-		"name":  ifc.Name,
-		"mac":   ifc.HardwareAddr.String(),
-		"flags": ifc.Flags.String(),
-		"ip":    ifc.ips,
-	}
-}
-
-// getInterfaces fetches information about the system's network interfaces.
-// TODO: Move to go-sysinfo?
-func getNetworkInterfaces() ([]NetworkInterface, error) {
-	ifcs, err := net.Interfaces()
+	// Get all interfaces and loop through them
+	ifaces, err := net.Interfaces()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	var networkInterfaces []NetworkInterface
+	// Keep track of all errors
+	var errs multierror.Errors
 
-	for _, ifc := range ifcs {
-		addrs, err := ifc.Addrs()
+	for _, i := range ifaces {
+		// Skip loopback interfaces
+		if i.Flags&net.FlagLoopback == net.FlagLoopback {
+			continue
+		}
+
+		hwList = append(hwList, i.HardwareAddr)
+
+		addrs, err := i.Addrs()
 		if err != nil {
-			return nil, err
+			// If we get an error, keep track of it and continue with the next interface
+			errs = append(errs, err)
+			continue
 		}
 
-		var ips []net.IP
-		for _, addr := range addrs {
-			ip, _, err := net.ParseCIDR(addr.String())
-			if err != nil {
-				return nil, err
-			}
-
-			ips = append(ips, ip)
-		}
-
-		isLoopback := ifc.Flags&net.FlagLoopback != 0
-		if !isLoopback {
-			networkInterfaces = append(networkInterfaces, NetworkInterface{
-				ifc,
-				ips,
-			})
-		}
+		addrList = append(addrList, addrs...)
 	}
 
-	return networkInterfaces, nil
+	return addrList, hwList, errs.Err()
 }
