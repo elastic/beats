@@ -1,0 +1,11 @@
+- key: couchdb
+  title: "couchdb"
+  description: >
+    experimental[]
+
+    couchdb module
+  fields:
+    - name: couchdb
+      type: group
+      description: >
+      fields:

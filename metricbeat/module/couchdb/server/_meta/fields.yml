@@ -1,0 +1,801 @@
+- name: server
+  type: group
+  description: >
+    Contains CouchDB server stats
+  fields:
+    - name: httpd
+      type: group
+      description: >
+        Example field
+      fields:
+        - name: viewReads
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: bulk_requests
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: clients_requesting_changes
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: temporary_view_reads
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: requests
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+    - name: httpd_request_methods
+      type: group
+      description: >
+        Example field
+      fields:
+        - name: COPY
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: HEAD
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: > 
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: POST
+          type: group
+          description: >                  
+          fields:
+            - name: description
+              type: keyword  
+              description: >
+            - name: current          
+              type: scaled_float
+              description: >             
+            - name: sum
+              type: scaled_float                    
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev    
+              type: scaled_float
+              description: >     
+            - name: min
+              type: scaled_float          
+              description: >
+            - name: max                    
+              type: scaled_float
+              description: >
+        - name: DELETE
+          type: group
+          description: >       
+          fields:
+            - name: description
+              type: keyword  
+              description: >
+            - name: current          
+              type: scaled_float
+              description: >             
+            - name: sum
+              type: scaled_float                    
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev    
+              type: scaled_float
+              description: >     
+            - name: min
+              type: scaled_float          
+              description: >
+            - name: max                    
+              type: scaled_float
+              description: >
+        - name: GET
+          type: group
+          description: >                  
+          fields:
+            - name: description
+              type: keyword  
+              description: >
+            - name: current          
+              type: scaled_float
+              description: >             
+            - name: sum
+              type: scaled_float                    
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev    
+              type: scaled_float
+              description: >     
+            - name: min
+              type: scaled_float          
+              description: >
+            - name: max                    
+              type: scaled_float
+              description: >
+        - name: PUT
+          type: group
+          description: >                  
+          fields:
+            - name: description
+              type: keyword  
+              description: >
+            - name: current          
+              type: scaled_float
+              description: >             
+            - name: sum
+              type: scaled_float                    
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev    
+              type: scaled_float
+              description: >     
+            - name: min
+              type: scaled_float          
+              description: >
+            - name: max                    
+              type: scaled_float
+              description: >
+    - name: httpd_status_codes
+      type: group
+      description: >
+        Example field
+      fields:
+        - name: num200
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num201
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean  
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num202
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean  
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num301
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean  
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num304
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean  
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num400
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean  
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num401
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean  
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num403
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean  
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num404
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean  
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num405
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num409
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num412
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: num500
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+    - name: couchdb 
+      type: group
+      description: >
+        Example field
+      fields:
+        - name: database_writes
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: open_databases
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: >  
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: auth_cache_misses
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: > 
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: request_time
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: > 
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: database_reads
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: > 
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: auth_cache_hits
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: > 
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+        - name: open_os_files
+          type: group
+          description: >
+          fields:
+            - name: description
+              type: keyword
+              description: >
+            - name: current
+              type: scaled_float
+              description: >
+            - name: sum
+              type: scaled_float
+              description: > 
+            - name: mean
+              type: scaled_float
+              description: >
+            - name: stddev
+              type: scaled_float
+              description: >
+            - name: min
+              type: scaled_float
+              description: >
+            - name: max
+              type: scaled_float
+              description: >
+
