@@ -1,12 +1,13 @@
 [[running-with-systemd]]
-=== { beatname_uc } and systemd 
+=== {beatname_uc} and systemd
 
-DEB and RPM packages include a service unit for Linux systems with systemd. On
-these systems { beatname_uc } can be managed with the usual systemd commands:
+The DEB and RPM packages include a service unit for Linux systems with
+systemd. On these systems, you can manage {beatname_uc} by using the usual
+systemd commands.
 
-==== Starting and stoping { beatname_uc}
+==== Start and stop {beatname_uc}
 
-When using systemd, { beatname_uc } can be started or stopped with `systemctl`.
+Use `systemctl` to start or stop {beatname_uc}:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
@@ -18,8 +19,8 @@ systemctl start {beatname_lc}
 systemctl stop {beatname_lc}
 ------------------------------------------------
 
-Service start on system boot can be enabled or disabled with `systemctl`,
-{ beatname_uc } is enabled when installed.
+By default, the {beatname_uc} service starts automatically when the system
+boots. To enable or disable auto start use:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
@@ -32,42 +33,45 @@ systemctl disable {beatname_lc}
 ------------------------------------------------
 
 
-==== { beatname_uc } status and logs
+==== {beatname_uc} status and logs
 
-Service status can be also obtained with `systemctl`.
+To get the service status, use `systemctl`:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
 systemctl status {beatname_lc}
 ------------------------------------------------
 
-Logs are stored by default in journald, they can be viewed with `journalctl`.
+Logs are stored by default in journald. To view the Logs, use `journalctl`:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
 journalctl -u {beatname_lc}.service
 ------------------------------------------------
 
-NOTE: Unit file included in packages sets by default `-e` flag, that flag makes
-{ beatname_uc } to log to stderr and disables other log outputs. Systemd stores
-all output sent to stderr in journald.
+NOTE: The unit file included in the packages sets the `-e` flag by default.
+This flag makes {beatname_uc} log to stderr and disables other log outputs.
+Systemd stores all output sent to stderr in journald.
 
 [float]
-=== Customizing systemd unit for { beatname_uc }
+=== Customize systemd unit for {beatname_uc}
 
-Systemd service unit file includes some environment variables that can be
-overriden to change default options.
-[cols="<h,<,<m,<m",options="header",]
+The systemd service unit file includes environment variables that you can
+override to change the default options.
+
+[cols="<h,<,<m",options="header",]
 |=======================================
 | Variable | Description | Default value
 | BEAT_LOG_OPTS | Log options | `-e`
-| BEAT_CONFIG_OPTS | Flags for configuration file path | `-c /etc/{ beatname_lc }/{ beatname_lc }.yml`
-| BEAT_PATH_OPTS | Other paths | -path.home /usr/share/{ beatname_lc } -path.config /etc/{ beatname_lc } -path.data /var/lib/{ beatname_lc } -path.logs /var/log/{ beatname_lc }
+| BEAT_CONFIG_OPTS | Flags for configuration file path | `-c /etc/{beatname_lc}/{beatname_lc}.yml`
+| BEAT_PATH_OPTS | Other paths | -path.home /usr/share/{beatname_lc} -path.config /etc/{beatname_lc} -path.data /var/lib/{beatname_lc} -path.logs /var/log/{beatname_lc}
 |=======================================
 
-These variables can be overriden with a drop-in unit file placed in `/etc/systemd/system/{ beatname_lc }.service.d` directory.
+To override these variables, create a drop-in unit file in the
++/etc/systemd/system/{beatname_lc}.service.d+ directory.
 
-For example a file with the following content placed in `/etc/systemd/system/{ beatname_lc }.service.d/debug.conf`
+For example a file with the following content placed in
++/etc/systemd/system/{beatname_lc}.service.d/debug.conf+
 would override `BEAT_LOG_OPTS` to enable debug for Elasticsearch output.
 
 ["source", "systemd", subs="attributes"]
@@ -76,8 +80,8 @@ would override `BEAT_LOG_OPTS` to enable debug for Elasticsearch output.
 Environment=BEAT_LOG_OPTS="-e -d elasticsearch"
 ------------------------------------------------
 
-It can also be emptied to rely on settings on the configuration file for
-logging.
+To use settings from the {beatname_uc} file, empty the environment
+variable. For example:
 
 ["source", "systemd", subs="attributes"]
 ------------------------------------------------
@@ -85,15 +89,15 @@ logging.
 Environment=BEAT_LOG_OPTS=""
 ------------------------------------------------
 
-Remember to reload systemd configuration and restart the service to apply
-changes on these files.
+To apply your changes, reload the systemd configuration and restart
+the service:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
 systemctl daemon-reload
-systemctl restart { beatname_lc }
+systemctl restart {beatname_lc}
 ------------------------------------------------
 
-NOTE: It is recommended to use some configuration management tool to include
-drop-in unit files, but when needed to add a drop-in by hand `systemctl edit { beatname_lc }.service
-can be used-
+NOTE: It is recommended that you use a configuration management tool to
+include drop-in unit files. If you need to add a drop-in manually, use
+`systemctl edit {beatname_lc}.service`.
