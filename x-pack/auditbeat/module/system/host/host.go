@@ -6,21 +6,29 @@ package host
 
 import (
 	"net"
+	"time"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
-
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 )
 
 const (
 	moduleName    = "system"
 	metricsetName = "host"
+
+	eventTypeState = "state"
+
+	eventActionHost = "host"
 )
+
+type Host struct {
+}
 
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
@@ -31,7 +39,8 @@ func init() {
 // MetricSet collects data about the host.
 type MetricSet struct {
 	mb.BaseMetricSet
-	log *logp.Logger
+	log       *logp.Logger
+	lastState time.Time
 }
 
 // New constructs a new MetricSet.
@@ -46,54 +55,62 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch collects data about the host. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
+	err := ms.reportState(report)
+	if err != nil {
+		ms.log.Error(err)
+		report.Error(err)
+		return
+	}
+}
+
+// reportState reports the current state of the host.
+func (ms *MetricSet) reportState(report mb.ReporterV2) error {
+	ms.lastState = time.Now()
+
 	host, err := sysinfo.Host()
 	if err != nil {
-		errW := errors.Wrap(err, "Failed to load host information")
-		ms.log.Error(errW)
-		report.Error(errW)
-		return
+		return errors.Wrap(err, "failed to load host information")
 	}
 
-	networkInterfaces, err := getNetworkInterfaces()
-	if err != nil {
-		errW := errors.Wrap(err, "Failed to load network interface information")
-		ms.log.Error(errW)
-		report.Error(errW)
-		return
-	}
+	report.Event(hostEvent(host.Info(), eventTypeState, eventActionHost))
 
-	var networkInterfaceMapStr []common.MapStr
-	for _, ifc := range networkInterfaces {
-		networkInterfaceMapStr = append(networkInterfaceMapStr, ifc.toMapStr())
-	}
+	return nil
+}
 
-	report.Event(mb.Event{
+func hostEvent(hostInfo types.HostInfo, eventType string, eventAction string) mb.Event {
+	event := mb.Event{
+		RootFields: common.MapStr{
+			"event": common.MapStr{
+				"type":   eventType,
+				"action": eventAction,
+			},
+		},
 		MetricSetFields: common.MapStr{
 			// https://github.com/elastic/ecs#-host-fields
-			"uptime":              host.Info().Uptime(),
-			"boottime":            host.Info().BootTime,
-			"containerized":       host.Info().Containerized,
-			"timezone.name":       host.Info().Timezone,
-			"timezone.offset.sec": host.Info().TimezoneOffsetSec,
-			"name":                host.Info().Hostname,
-			"id":                  host.Info().UniqueID,
+			"uptime":              hostInfo.Uptime(),
+			"boottime":            hostInfo.BootTime,
+			"containerized":       hostInfo.Containerized,
+			"timezone.name":       hostInfo.Timezone,
+			"timezone.offset.sec": hostInfo.TimezoneOffsetSec,
+			"name":                hostInfo.Hostname,
+			"id":                  hostInfo.UniqueID,
 			// TODO "host.type": ?
-			"architecture": host.Info().Architecture,
+			"architecture": hostInfo.Architecture,
+			"ip":           hostInfo.IPs,
+			"mac":          hostInfo.MACs,
 
 			// https://github.com/elastic/ecs#-operating-system-fields
 			"os": common.MapStr{
-				"platform": host.Info().OS.Platform,
-				"name":     host.Info().OS.Name,
-				"family":   host.Info().OS.Family,
-				"version":  host.Info().OS.Version,
-				"kernel":   host.Info().KernelVersion,
-			},
-
-			"network": common.MapStr{
-				"interfaces": networkInterfaceMapStr,
+				"platform": hostInfo.OS.Platform,
+				"name":     hostInfo.OS.Name,
+				"family":   hostInfo.OS.Family,
+				"version":  hostInfo.OS.Version,
+				"kernel":   hostInfo.KernelVersion,
 			},
 		},
-	})
+	}
+
+	return event
 }
 
 // NetworkInterface represent information on a network interface.
