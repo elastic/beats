@@ -4,6 +4,31 @@
     Apache Module
   short_config: true
   fields:
+    - name: apache2.access.remote_ip
+      type: alias
+      path: apache.access.remote_ip
+    - name: apache2.access.body_sent.bytes
+      type: alias
+      path: apache.access.body_sent.bytes
+    - name: apache2.error.level
+      type: alias
+      path: apache.error.level
+    - name: apache2.error.client
+      type: alias
+      path: apache.error.client
+    - name: apache2.error.message
+      type: alias
+      path: apache.error.message
+    - name: apache2.error.pid
+      type: alias
+      path: apache.error.pid
+    - name: apache2.error.tid
+      type: alias
+      path: apache.error.tid
+    - name: apache2.error.module
+      type: alias
+      path: apache.error.module
+
     - name: apache
       type: group
       description: >

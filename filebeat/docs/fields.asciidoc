@@ -45,6 +45,78 @@ Apache Module
 
 
 
+*`apache2.access.remote_ip`*::
++
+--
+type: alias
+
+alias to: apache.access.remote_ip
+
+--
+
+*`apache2.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: apache.access.body_sent.bytes
+
+--
+
+*`apache2.error.level`*::
++
+--
+type: alias
+
+alias to: apache.error.level
+
+--
+
+*`apache2.error.client`*::
++
+--
+type: alias
+
+alias to: apache.error.client
+
+--
+
+*`apache2.error.message`*::
++
+--
+type: alias
+
+alias to: apache.error.message
+
+--
+
+*`apache2.error.pid`*::
++
+--
+type: alias
+
+alias to: apache.error.pid
+
+--
+
+*`apache2.error.tid`*::
++
+--
+type: alias
+
+alias to: apache.error.tid
+
+--
+
+*`apache2.error.module`*::
++
+--
+type: alias
+
+alias to: apache.error.module
+
+--
+
 [float]
 == apache fields
 
