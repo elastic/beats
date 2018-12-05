@@ -95,7 +95,7 @@ configuration included.
 [float]
 ===== The configuration file
 
-Download this file as a starting point:
+Download this example configuration file as a starting point:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
