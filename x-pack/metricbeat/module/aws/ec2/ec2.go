@@ -247,7 +247,6 @@ func getMetricDataPerRegion(instanceID string, nextToken *string, svc cloudwatch
 
 	startTime := endTime.Add(duration)
 
-	//TODO:add function getMetricNames from environment variables
 	dimName := "InstanceId"
 	dim := cloudwatch.Dimension{
 		Name:  &dimName,
