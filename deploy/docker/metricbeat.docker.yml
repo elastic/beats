@@ -4,7 +4,6 @@ metricbeat.config:
     # Reload module configs as they change:
     reload.enabled: false
 
-# To enable hints based autodiscover, remove `metricbeat.config.inputs` configuration and uncomment this:
 metricbeat.autodiscover:
   providers:
     - type: docker
