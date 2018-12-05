@@ -225,6 +225,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 - Always include Pod UID as part of Pod metadata. {pull}9517[9517]
 - Autodiscovery no longer requires that the `condition` field be set. If left unset all configs will be matched. {pull}9029[9029]
 - Add geo fields to `add_host_metadata` processor. {pull}9392[9392]
+- Always include Pod UID as part of Pod metadata. {pull]9517[9517]
+- Add `agent.id` and `agent.ephemeral_id` fields to all beats. {pull}9404[9404]
+
+*Auditbeat*
+
+- Add system module. {pull}9546[9546]
 
 *Filebeat*
 

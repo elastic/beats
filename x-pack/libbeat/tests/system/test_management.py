@@ -244,7 +244,7 @@ class TestManagement(BaseTest):
                          auth=('elastic', KIBANA_PASSWORD))
         assert r.status_code in (200, 201)
 
-        # Retrieve beat UUID
+        # Retrieve beat ID
         meta = json.loads(
             open(os.path.join(self.working_dir, 'data', 'meta.json'), 'r').read())
 
