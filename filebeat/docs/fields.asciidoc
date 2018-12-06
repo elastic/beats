@@ -45,6 +45,14 @@ Apache Module
 
 
 
+[float]
+== apache2 fields
+
+Aliases for backward compatibility with old apache2 fields
+
+
+
+
 *`apache2.access.remote_ip`*::
 +
 --
@@ -62,6 +70,216 @@ type: alias
 alias to: apache.access.body_sent.bytes
 
 --
+
+*`apache2.access.user_name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`apache2.access.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`apache2.access.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`apache2.access.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`apache2.access.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`apache2.access.referrer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`apache2.access.agent`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`apache2.access.user_agent.device`*::
++
+--
+type: alias
+
+alias to: user_agent.device
+
+--
+
+*`apache2.access.user_agent.major`*::
++
+--
+type: alias
+
+alias to: user_agent.major
+
+--
+
+*`apache2.access.user_agent.minor`*::
++
+--
+type: alias
+
+alias to: user_agent.minor
+
+--
+
+*`apache2.access.user_agent.patch`*::
++
+--
+type: alias
+
+alias to: user_agent.patch
+
+--
+
+*`apache2.access.user_agent.name`*::
++
+--
+type: alias
+
+alias to: user_agent.name
+
+--
+
+*`apache2.access.user_agent.os`*::
++
+--
+type: alias
+
+alias to: user_agent.os.full_name
+
+--
+
+*`apache2.access.user_agent.os_major`*::
++
+--
+type: alias
+
+alias to: user_agent.os.major
+
+--
+
+*`apache2.access.user_agent.os_minor`*::
++
+--
+type: alias
+
+alias to: user_agent.os.minor
+
+--
+
+*`apache2.access.user_agent.os_name`*::
++
+--
+type: alias
+
+alias to: user_agent.os.name
+
+--
+
+*`apache2.access.user_agent.original`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`apache2.access.geoip.continent_name`*::
++
+--
+type: alias
+
+alias to: source.geo.continent_name
+
+--
+
+*`apache2.access.geoip.country_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.country_iso_code
+
+--
+
+*`apache2.access.geoip.location`*::
++
+--
+type: alias
+
+alias to: source.geo.location
+
+--
+
+*`apache2.access.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`apache2.access.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
+
+--
+
+*`apache2.access.geoip.region_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.region_iso_code
+
+--
+
 
 *`apache2.error.level`*::
 +
@@ -150,215 +368,6 @@ format: bytes
 
 The number of bytes of the server response body.
 
-
---
-
-*`apache.access.user_name`*::
-+
---
-type: alias
-
-alias to: user.name
-
---
-
-*`apache.access.method`*::
-+
---
-type: alias
-
-alias to: http.request.method
-
---
-
-*`apache.access.url`*::
-+
---
-type: alias
-
-alias to: url.original
-
---
-
-*`apache.access.http_version`*::
-+
---
-type: alias
-
-alias to: http.version
-
---
-
-*`apache.access.response_code`*::
-+
---
-type: alias
-
-alias to: http.response.status_code
-
---
-
-*`apache.access.referrer`*::
-+
---
-type: alias
-
-alias to: http.request.referrer
-
---
-
-*`apache.access.agent`*::
-+
---
-type: alias
-
-alias to: user_agent.original
-
---
-
-
-*`apache.access.user_agent.device`*::
-+
---
-type: alias
-
-alias to: user_agent.device
-
---
-
-*`apache.access.user_agent.major`*::
-+
---
-type: alias
-
-alias to: user_agent.major
-
---
-
-*`apache.access.user_agent.minor`*::
-+
---
-type: alias
-
-alias to: user_agent.minor
-
---
-
-*`apache.access.user_agent.patch`*::
-+
---
-type: alias
-
-alias to: user_agent.patch
-
---
-
-*`apache.access.user_agent.name`*::
-+
---
-type: alias
-
-alias to: user_agent.name
-
---
-
-*`apache.access.user_agent.os`*::
-+
---
-type: alias
-
-alias to: user_agent.os.full_name
-
---
-
-*`apache.access.user_agent.os_major`*::
-+
---
-type: alias
-
-alias to: user_agent.os.major
-
---
-
-*`apache.access.user_agent.os_minor`*::
-+
---
-type: alias
-
-alias to: user_agent.os.minor
-
---
-
-*`apache.access.user_agent.os_name`*::
-+
---
-type: alias
-
-alias to: user_agent.os.name
-
---
-
-*`apache.access.user_agent.original`*::
-+
---
-type: alias
-
-alias to: user_agent.original
-
---
-
-
-*`apache.access.geoip.continent_name`*::
-+
---
-type: alias
-
-alias to: source.geo.continent_name
-
---
-
-*`apache.access.geoip.country_iso_code`*::
-+
---
-type: alias
-
-alias to: source.geo.country_iso_code
-
---
-
-*`apache.access.geoip.location`*::
-+
---
-type: alias
-
-alias to: source.geo.location
-
---
-
-*`apache.access.geoip.region_name`*::
-+
---
-type: alias
-
-alias to: source.geo.region_name
-
---
-
-*`apache.access.geoip.city_name`*::
-+
---
-type: alias
-
-alias to: source.geo.city_name
-
---
-
-*`apache.access.geoip.region_iso_code`*::
-+
---
-type: alias
-
-alias to: source.geo.region_iso_code
 
 --
 
