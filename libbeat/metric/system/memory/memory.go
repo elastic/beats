@@ -21,6 +21,7 @@ package memory
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -73,6 +74,9 @@ func GetSwap() (*SwapStat, error) {
 	// this can provoke too big values for used swap.
 	// Workaround this by assuming that all swap is free in that case.
 	if swap.Free > swap.Total || swap.Used > swap.Total {
+		logp.Debug("memory",
+			"Odd values for swap memory, total: %v free: %v used: %v. Assuming all swap is free.",
+			swap.Total, swap.Free, swap.Used)
 		swap.Free = swap.Total
 		swap.Used = 0
 	}
