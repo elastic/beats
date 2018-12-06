@@ -36,6 +36,14 @@
     type: keyword
     description: >
         Host architecture (e.g. x86_64).
+  - name: mac
+    type: keyword
+    description: >
+        MAC addresses.
+  - name: ip
+    type: ip
+    description: >
+        IP addresses.
   - name: os
     type: group
     description: >
@@ -61,37 +69,3 @@
       type: keyword
       description: >
         The operating system's kernel version.
-  - name: network
-    type: group
-    description: >
-      `network` contains network information from the system.
-    fields:
-    - name: interfaces
-      type: array
-      description: >
-        `interfaces` contains information about network interfaces.
-      fields:
-      - name: index
-        type: integer
-        description: >
-          Index of the interface.
-      - name: mtu
-        type: integer
-        description: >
-          Maximum transmission unit.
-      - name: name
-        type: keyword
-        description: >
-          Interface name.
-      - name: mac
-        type: keyword
-        description: >
-          MAC address.
-      - name: flags
-        type: text
-        description: >
-          Interface flags.
-      - name: ip
-        type: ip
-        description: >
-          IP addresses.
