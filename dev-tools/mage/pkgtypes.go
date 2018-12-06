@@ -704,8 +704,8 @@ func addUidGidEnvArgs(args []string) ([]string, error) {
 	}
 
 	return append(args,
-		"--env", "EXEC_UID="+strconv.Itoa(uid),
-		"--env", "EXEC_GID="+strconv.Itoa(gid),
+		"-e", "EXEC_UID="+strconv.Itoa(uid),
+		"-e", "EXEC_GID="+strconv.Itoa(gid),
 	), nil
 }
 

@@ -179,6 +179,10 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		// and the UID/GID won't meet the strict requirements.
 		"-e", "BEAT_STRICT_PERMS=false",
 	}
+	args, err = addUidGidEnvArgs(args)
+	if err != nil {
+		return err
+	}
 	for _, envVar := range passThroughEnvVars {
 		args = append(args, "-e", envVar+"="+os.Getenv(envVar))
 	}
