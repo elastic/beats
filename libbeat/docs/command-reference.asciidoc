@@ -184,6 +184,10 @@ If {kib} is not running on `localhost:5061`, you must also adjust the
 Exports the index template to stdout. You can specify the `--es.version` and
 `--index` flags to further define what gets exported.
 
+[[ilm-policy-subcommand]]
+*`ilm-policy`*::
+Exports ILM policy to stdout.
+
 *FLAGS*
 
 *`--es.version VERSION`*::
