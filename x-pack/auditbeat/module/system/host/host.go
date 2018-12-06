@@ -44,6 +44,7 @@ func init() {
 // MetricSet collects data about the host.
 type MetricSet struct {
 	mb.BaseMetricSet
+	config    config
 	log       *logp.Logger
 	lastState time.Time
 }
@@ -52,19 +53,29 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
 
+	config := defaultConfig()
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
+		config:        config,
 		log:           logp.NewLogger(moduleName),
 	}, nil
 }
 
 // Fetch collects data about the host. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	err := ms.reportState(report)
-	if err != nil {
-		ms.log.Error(err)
-		report.Error(err)
-		return
+	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
+	if needsStateUpdate {
+		ms.log.Debug("State update needed.")
+		err := ms.reportState(report)
+		if err != nil {
+			ms.log.Error(err)
+			report.Error(err)
+		}
+		ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
 	}
 }
 
