@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -142,6 +143,10 @@ func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...st
 
 func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars ...string) error {
 	if IsInIntegTestEnv() {
+		// Fix file permissions after test is done writing files as root.
+		if runtime.GOOS != "windows" {
+			defer DockerChown("build")
+		}
 		return test()
 	}
 
