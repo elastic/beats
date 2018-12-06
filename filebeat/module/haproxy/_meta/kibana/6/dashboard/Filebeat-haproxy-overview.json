@@ -144,10 +144,9 @@
         "title": "IP Geohashes [Filebeat HAProxy]",
         "uiStateJSON": {
           "mapCenter": [
-            -9.275622176792098,
-            28.4765625
-          ],
-          "mapZoom": 2
+            14.944784875088372,
+            5.09765625
+          ]
         },
         "version": 1,
         "visState": {
@@ -175,49 +174,32 @@
               "type": "geohash_grid"
             }
           ],
-          "params": {
+	  "params": {
             "addTooltip": true,
-            "heatClusterSize": 1.5,
+            "heatBlur": 15,
+            "heatMaxZoom": 16,
+            "heatMinOpacity": 0.1,
+            "heatNormalizeData": true,
+            "heatRadius": 25,
             "isDesaturated": true,
             "legendPosition": "bottomright",
             "mapCenter": [
-              0,
-              0
+                15,
+                5
             ],
             "mapType": "Scaled Circle Markers",
             "mapZoom": 2,
             "wms": {
-              "baseLayersAreLoaded": {
-                "_c": [],
-                "_d": true,
-                "_h": 0,
-                "_n": false,
-                "_s": 1,
-                "_v": true
-              },
               "enabled": false,
               "options": {
+                "attribution": "Maps provided by USGS",
                 "format": "image/png",
-                "transparent": true
+                "layers": "0",
+                "styles": "",
+                "transparent": true,
+                "version": "1.3.0"
               },
-              "selectedTmsLayer": {
-                "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
-                "id": "road_map",
-                "maxZoom": 18,
-                "minZoom": 0,
-                "subdomains": [],
-                "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.3.2\u0026license=222b9c80-1528-4ddf-9a40-cc59d57f55bf"
-              },
-              "tmsLayers": [
-                {
-                  "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
-                  "id": "road_map",
-                  "maxZoom": 18,
-                  "minZoom": 0,
-                  "subdomains": [],
-                  "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.3.2\u0026license=222b9c80-1528-4ddf-9a40-cc59d57f55bf"
-                }
-              ]
+              "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
             }
           },
           "title": "IP Geohashes [Filebeat HAProxy]",
