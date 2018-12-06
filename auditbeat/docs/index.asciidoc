@@ -17,6 +17,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :mac_os:
 :docker_platform:
 :win_os:
+:linux_os:
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
