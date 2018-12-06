@@ -61,8 +61,8 @@
       },
       "id": "55251360-aa32-11e8-9c06-877f0445e3e0",
       "type": "visualization",
-      "updated_at": "2018-08-27T19:50:02.901Z",
-      "version": 2
+      "updated_at": "2018-12-06T10:39:48.825Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -125,8 +125,8 @@
       },
       "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0",
       "type": "visualization",
-      "updated_at": "2018-08-27T19:50:50.255Z",
-      "version": 1
+      "updated_at": "2018-12-06T10:39:48.825Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -174,7 +174,7 @@
               "type": "geohash_grid"
             }
           ],
-	  "params": {
+          "params": {
             "addTooltip": true,
             "heatBlur": 15,
             "heatMaxZoom": 16,
@@ -184,8 +184,8 @@
             "isDesaturated": true,
             "legendPosition": "bottomright",
             "mapCenter": [
-                15,
-                5
+              15,
+              5
             ],
             "mapType": "Scaled Circle Markers",
             "mapZoom": 2,
@@ -208,8 +208,8 @@
       },
       "id": "11f8b9c0-aa32-11e8-9c06-877f0445e3e0",
       "type": "visualization",
-      "updated_at": "2018-08-27T19:49:15.098Z",
-      "version": 2
+      "updated_at": "2018-12-06T10:39:48.825Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -350,8 +350,8 @@
       },
       "id": "68af8ef0-aa33-11e8-9c06-877f0445e3e0",
       "type": "visualization",
-      "updated_at": "2018-08-27T19:57:55.070Z",
-      "version": 2
+      "updated_at": "2018-12-06T10:39:48.825Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -360,27 +360,84 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "highlightAll": true,
             "query": {
               "language": "lucene",
               "query": ""
-            },
-            "version": true
+            }
           }
         },
         "optionsJSON": {
-          "darkTheme": false
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
         },
-        "panelsJSON": null,
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "1",
+              "w": 24,
+              "x": 24,
+              "y": 16
+            },
+            "id": "55251360-aa32-11e8-9c06-877f0445e3e0",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "6.5.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 24,
+              "x": 0,
+              "y": 16
+            },
+            "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "6.5.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 16,
+              "i": "3",
+              "w": 24,
+              "x": 0,
+              "y": 0
+            },
+            "id": "11f8b9c0-aa32-11e8-9c06-877f0445e3e0",
+            "panelIndex": "3",
+            "type": "visualization",
+            "version": "6.5.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 16,
+              "i": "4",
+              "w": 24,
+              "x": 24,
+              "y": 0
+            },
+            "id": "68af8ef0-aa33-11e8-9c06-877f0445e3e0",
+            "panelIndex": "4",
+            "type": "visualization",
+            "version": "6.5.2"
+          }
+        ],
         "timeRestore": false,
-        "title": "[Filebeat HAProxy] Overview",
+        "title": "[Filebeat HAproxy] Overview",
         "version": 1
       },
       "id": "3560d580-aa34-11e8-9c06-877f0445e3e0",
       "type": "dashboard",
-      "updated_at": "2018-08-27T20:03:04.536Z",
-      "version": 1
+      "updated_at": "2018-12-06T10:57:06.975Z",
+      "version": 2
     }
   ],
-  "version": "6.3.2"
+  "version": "6.5.2"
 }
