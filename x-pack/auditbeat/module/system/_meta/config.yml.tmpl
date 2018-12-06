@@ -14,6 +14,10 @@
 
   state.period: 12h
 
+  {{ if eq .GOOS "linux" -}}
+  user.detect_password_changes: false
+  {{- end }}
+
   report_changes: true
 {{- end }}
 {{ if .Reference }}

@@ -46,10 +46,35 @@ const (
 	eventActionPasswordChanged = "password_changed"
 )
 
+type passwordType uint8
+
+const (
+	detectionDisabled passwordType = iota + 1
+	shadowPassword
+	passwordDisabled
+	noPassword
+	cryptPassword
+)
+
+func (t passwordType) string() string {
+	switch t {
+	case shadowPassword:
+		return "shadow_password"
+	case passwordDisabled:
+		return "password_disabled"
+	case noPassword:
+		return "no_password"
+	case cryptPassword:
+		return "crypt_password"
+	default:
+		return ""
+	}
+}
+
 // User represents a user. Fields according to getpwent(3).
 type User struct {
 	Name             string
-	PasswordType     string
+	PasswordType     passwordType
 	PasswordChanged  time.Time
 	PasswordHashHash []byte
 	UID              uint32
@@ -72,7 +97,7 @@ func (user User) Hash() uint64 {
 	h := xxhash.New64()
 	// Use everything except userInfo
 	h.WriteString(user.Name)
-	h.WriteString(user.PasswordType)
+	h.WriteString(user.PasswordType.string())
 	h.WriteString(user.PasswordChanged.String())
 	h.Write(user.PasswordHashHash)
 	h.WriteString(strconv.Itoa(int(user.UID)))
@@ -90,10 +115,7 @@ func (user User) Hash() uint64 {
 
 func (user User) toMapStr() common.MapStr {
 	evt := common.MapStr{
-		"name": user.Name,
-		"password": common.MapStr{
-			"type": user.PasswordType,
-		},
+		"name":  user.Name,
 		"uid":   user.UID,
 		"gid":   user.GID,
 		"dir":   user.Dir,
@@ -102,6 +124,10 @@ func (user User) toMapStr() common.MapStr {
 
 	if user.UserInfo != "" {
 		evt.Put("user_information", user.UserInfo)
+	}
+
+	if user.PasswordType != detectionDisabled {
+		evt.Put("password.type", user.PasswordType.string())
 	}
 
 	if !user.PasswordChanged.IsZero() {
@@ -131,7 +157,7 @@ func init() {
 // MetricSet collects data about a system's users.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config     Config
+	config     config
 	log        *logp.Logger
 	cache      *cache.Cache
 	bucket     datastore.Bucket
@@ -146,7 +172,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("the %v/%v dataset is only supported on Linux", moduleName, metricsetName)
 	}
 
-	config := defaultConfig
+	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
 	}
@@ -224,7 +250,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	ms.lastState = time.Now()
 
-	users, err := GetUsers()
+	users, err := GetUsers(ms.config.DetectPasswordChanges)
 	if err != nil {
 		return errors.Wrap(err, "failed to get users")
 	}
@@ -261,7 +287,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 // reportChanges detects and reports any changes to users on this system since the last call.
 func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	currentTime := time.Now()
-	changed, err := haveFilesChanged(ms.lastChange)
+	changed, err := ms.haveFilesChanged(ms.lastChange)
 	if err != nil {
 		return err
 	}
@@ -270,7 +296,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 	ms.lastChange = currentTime
 
-	users, err := GetUsers()
+	users, err := GetUsers(ms.config.DetectPasswordChanges)
 	if err != nil {
 		return errors.Wrap(err, "failed to get users")
 	}
@@ -287,25 +313,31 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 
 		for _, userFromCache := range newInCache {
 			newUser := userFromCache.(*User)
-			matchingMissingUser, found := missingUserMap[newUser.UID]
+			oldUser, found := missingUserMap[newUser.UID]
 
 			if found {
 				// Report password change separately
-				if newUser.PasswordChanged.Before(matchingMissingUser.PasswordChanged) ||
-					!bytes.Equal(newUser.PasswordHashHash, matchingMissingUser.PasswordHashHash) ||
-					newUser.PasswordType != matchingMissingUser.PasswordType {
-					report.Event(userEvent(newUser, eventTypeEvent, eventActionPasswordChanged))
+				if ms.config.DetectPasswordChanges && newUser.PasswordType != detectionDisabled &&
+					oldUser.PasswordType != detectionDisabled {
+
+					passwordChanged := newUser.PasswordChanged.Before(oldUser.PasswordChanged) ||
+						!bytes.Equal(newUser.PasswordHashHash, oldUser.PasswordHashHash) ||
+						newUser.PasswordType != oldUser.PasswordType
+
+					if passwordChanged {
+						report.Event(userEvent(newUser, eventTypeEvent, eventActionPasswordChanged))
+					}
 				}
 
 				// Hack to check if only the password changed
-				matchingMissingUser.PasswordChanged = newUser.PasswordChanged
-				matchingMissingUser.PasswordHashHash = newUser.PasswordHashHash
-				matchingMissingUser.PasswordType = newUser.PasswordType
-				if newUser.Hash() != matchingMissingUser.Hash() {
+				oldUser.PasswordChanged = newUser.PasswordChanged
+				oldUser.PasswordHashHash = newUser.PasswordHashHash
+				oldUser.PasswordType = newUser.PasswordType
+				if newUser.Hash() != oldUser.Hash() {
 					report.Event(userEvent(newUser, eventTypeEvent, eventActionUserChanged))
 				}
 
-				delete(missingUserMap, matchingMissingUser.UID)
+				delete(missingUserMap, oldUser.UID)
 			} else {
 				report.Event(userEvent(newUser, eventTypeEvent, eventActionUserAdded))
 			}
@@ -411,7 +443,7 @@ func (ms *MetricSet) saveUsersToDisk(users []*User) error {
 
 // haveFilesChanged checks if any of the relevant files (/etc/passwd, /etc/shadow, /etc/group)
 // have changed.
-func haveFilesChanged(since time.Time) (bool, error) {
+func (ms *MetricSet) haveFilesChanged(since time.Time) (bool, error) {
 	const passwdFile = "/etc/passwd"
 	const shadowFile = "/etc/shadow"
 	const groupFile = "/etc/group"
@@ -424,11 +456,13 @@ func haveFilesChanged(since time.Time) (bool, error) {
 		return true, nil
 	}
 
-	if err := syscall.Stat(shadowFile, &stats); err != nil {
-		return true, errors.Wrapf(err, "failed to stat %v", shadowFile)
-	}
-	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
-		return true, nil
+	if ms.config.DetectPasswordChanges {
+		if err := syscall.Stat(shadowFile, &stats); err != nil {
+			return true, errors.Wrapf(err, "failed to stat %v", shadowFile)
+		}
+		if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
+			return true, nil
+		}
 	}
 
 	if err := syscall.Stat(groupFile, &stats); err != nil {
