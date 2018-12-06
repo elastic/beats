@@ -6,7 +6,6 @@ package ec2
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -126,7 +125,6 @@ func TestMockFetch(t *testing.T) {
 	mockCreds := map[string]interface{}{
 		"module":     "aws",
 		"metricsets": []string{"ec2"},
-		"mock":       "true",
 	}
 
 	awsMetricSet := mbtest.NewReportingMetricSetV2(t, mockCreds)
@@ -156,67 +154,58 @@ func TestMockFetch(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	accessKeyID, okAccessKeyID := os.LookupEnv("AWS_ACCESS_KEY_ID")
-	secretAccessKey, okSecretAccessKey := os.LookupEnv("AWS_SECRET_ACCESS_KEY")
-	sessionToken, okSessionToken := os.LookupEnv("AWS_SESSION_TOKEN")
-	if !okAccessKeyID || accessKeyID == "" {
-		t.Skip("Skipping TestFetch; $AWS_ACCESS_KEY_ID not set or set to empty")
-	} else if !okSecretAccessKey || secretAccessKey == "" {
-		t.Skip("Skipping TestFetch; $AWS_SECRET_ACCESS_KEY not set or set to empty")
-	} else {
-		tempCreds := map[string]interface{}{
-			"module":     "aws",
-			"metricsets": []string{"ec2"},
-			"mock":       "false",
-		}
-		tempCreds["access_key_id"] = accessKeyID
-		tempCreds["secret_access_key"] = secretAccessKey
-		if okSessionToken && sessionToken != "" {
-			tempCreds["session_token"] = sessionToken
-		}
-
-		awsMetricSet := mbtest.NewReportingMetricSetV2(t, tempCreds)
-		events, errs := mbtest.ReportingFetchV2(awsMetricSet)
-		assert.Empty(t, errs)
-		if !assert.NotEmpty(t, events) {
-			t.FailNow()
-		}
-		t.Logf("Module: %s Metricset: %s", awsMetricSet.Module().Name(), awsMetricSet.Name())
-
-		for _, event := range events {
-			// RootField
-			checkRootField("service.name", event, t)
-			checkRootField("cloud.availability_zone", event, t)
-			checkRootField("cloud.provider", event, t)
-			checkRootField("cloud.image.id", event, t)
-			checkRootField("cloud.instance.id", event, t)
-			checkRootField("cloud.machine.type", event, t)
-			checkRootField("cloud.provider", event, t)
-			checkRootField("cloud.region", event, t)
-			// MetricSetField
-			checkMetricSetField("cpu.total.pct", event, t)
-			checkMetricSetField("cpu.credit_usage", event, t)
-			checkMetricSetField("cpu.credit_balance", event, t)
-			checkMetricSetField("cpu.surplus_credit_balance", event, t)
-			checkMetricSetField("cpu.surplus_credits_charged", event, t)
-			checkMetricSetField("network.in.packets", event, t)
-			checkMetricSetField("network.out.packets", event, t)
-			checkMetricSetField("network.in.bytes", event, t)
-			checkMetricSetField("network.out.bytes", event, t)
-			checkMetricSetField("diskio.read.bytes", event, t)
-			checkMetricSetField("diskio.write.bytes", event, t)
-			checkMetricSetField("diskio.read.ops", event, t)
-			checkMetricSetField("diskio.write.ops", event, t)
-			checkMetricSetField("status.check_failed", event, t)
-			checkMetricSetField("status.check_failed_system", event, t)
-			checkMetricSetField("status.check_failed_instance", event, t)
-		}
-
-		err := mbtest.WriteEventsReporterV2(awsMetricSet, t, "")
-		if err != nil {
-			t.Fatal("write", err)
-		}
+	tempCreds := map[string]interface{}{
+		"module":                  "aws",
+		"metricsets":              []string{"ec2"},
+		"aws_config_profile_name": "metricbeat-aws",
 	}
+
+	awsMetricSet := mbtest.NewReportingMetricSetV2(t, tempCreds)
+	events, errs := mbtest.ReportingFetchV2(awsMetricSet)
+	if errs != nil {
+		t.Skip("Skipping TestFetch: please check aws_config_profile_name in config.yml")
+	}
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+	t.Logf("Module: %s Metricset: %s", awsMetricSet.Module().Name(), awsMetricSet.Name())
+
+	for _, event := range events {
+		// RootField
+		checkRootField("service.name", event, t)
+		checkRootField("cloud.availability_zone", event, t)
+		checkRootField("cloud.provider", event, t)
+		checkRootField("cloud.image.id", event, t)
+		checkRootField("cloud.instance.id", event, t)
+		checkRootField("cloud.machine.type", event, t)
+		checkRootField("cloud.provider", event, t)
+		checkRootField("cloud.region", event, t)
+		// MetricSetField
+		checkMetricSetField("cpu.total.pct", event, t)
+		checkMetricSetField("cpu.credit_usage", event, t)
+		checkMetricSetField("cpu.credit_balance", event, t)
+		checkMetricSetField("cpu.surplus_credit_balance", event, t)
+		checkMetricSetField("cpu.surplus_credits_charged", event, t)
+		checkMetricSetField("network.in.packets", event, t)
+		checkMetricSetField("network.out.packets", event, t)
+		checkMetricSetField("network.in.bytes", event, t)
+		checkMetricSetField("network.out.bytes", event, t)
+		checkMetricSetField("diskio.read.bytes", event, t)
+		checkMetricSetField("diskio.write.bytes", event, t)
+		checkMetricSetField("diskio.read.ops", event, t)
+		checkMetricSetField("diskio.write.ops", event, t)
+		checkMetricSetField("status.check_failed", event, t)
+		checkMetricSetField("status.check_failed_system", event, t)
+		checkMetricSetField("status.check_failed_instance", event, t)
+	}
+
+	err := mbtest.WriteEventsReporterV2(awsMetricSet, t, "")
+	if err != nil {
+		t.Fatal("write", err)
+	}
+
 }
 
 func checkRootField(fieldName string, event mb.Event, t *testing.T) {

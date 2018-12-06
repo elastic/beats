@@ -99,13 +99,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	//mock Fetch
-	if m.config.Mock == "true" {
+	if m.config.AwsConfigProfileName == "" {
 		m.MockFetch(report)
 		return
 	}
 
 	//actual fetch function
-	cfg, err := external.LoadDefaultAWSConfig()
+	cfg, err := external.LoadDefaultAWSConfig(external.WithSharedConfigProfile(m.config.AwsConfigProfileName))
 	if err != nil {
 		logp.Err("Failed to load config: %s", err.Error())
 	}

@@ -1,1 +1,8 @@
-This is the ec2 metricset of the module aws.
+The ec2 metricset of aws module allows you to monitor your AWS EC2 instances,
+including `cpu`, `network`, `disk` and `status`.
+
+=== Dashboard
+
+The aws ec2 metricset comes with a predefined dashboard. For example:
+
+image::../images/metricbeat-aws-ec2-overview.png[]

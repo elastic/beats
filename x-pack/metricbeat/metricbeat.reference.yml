@@ -150,8 +150,7 @@ metricbeat.modules:
 #--------------------------------- Aws Module ---------------------------------
 - module: aws
   metricsets: ["ec2"]
-  mock: '${AWS_MOCK:false}'
-  period: 300s
+  aws_config_profile_name: "metricbeat-aws"
 
 #--------------------------------- Ceph Module ---------------------------------
 - module: ceph

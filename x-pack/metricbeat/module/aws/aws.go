@@ -8,7 +8,7 @@ import "github.com/elastic/beats/metricbeat/mb"
 
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
-	Mock string `config:"mock" validate:"nonzero,required"`
+	AwsConfigProfileName string `config:"aws_config_profile_name"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
