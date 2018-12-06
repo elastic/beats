@@ -233,13 +233,13 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"module": "apache",
+						"module": "apache2",
 					},
 				},
 			},
 			len: 1,
 			result: common.MapStr{
-				"module": "apache",
+				"module": "apache2",
 				"error": map[string]interface{}{
 					"enabled": true,
 					"input": map[string]interface{}{
@@ -280,14 +280,14 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"module":  "apache",
+						"module":  "apache2",
 						"fileset": "access",
 					},
 				},
 			},
 			len: 1,
 			result: common.MapStr{
-				"module": "apache",
+				"module": "apache2",
 				"access": map[string]interface{}{
 					"enabled": true,
 					"input": map[string]interface{}{
@@ -328,7 +328,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"module":         "apache",
+						"module":         "apache2",
 						"fileset.stdout": "access",
 						"fileset.stderr": "error",
 					},
@@ -336,7 +336,7 @@ func TestGenerateHints(t *testing.T) {
 			},
 			len: 1,
 			result: common.MapStr{
-				"module": "apache",
+				"module": "apache2",
 				"access": map[string]interface{}{
 					"enabled": true,
 					"input": map[string]interface{}{
