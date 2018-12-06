@@ -265,20 +265,21 @@ func findElasticBeatsDir() (string, error) {
 
 // SetElasticBeatsDir explicitly sets the location of the Elastic Beats
 // directory. If not set then it will attempt to locate it.
-func SetElasticBeatsDir(dir string) {
+func SetElasticBeatsDir(dir string) error {
 	elasticBeatsDirLock.Lock()
 	defer elasticBeatsDirLock.Unlock()
 
 	info, err := os.Stat(dir)
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to read elastic beats dir at %v", dir))
+		return errors.Wrapf(err, "failed to read elastic beats dir at %v", dir)
 	}
 
 	if !info.IsDir() {
-		panic(errors.Errorf("elastic beats dir=%v is not a directory", dir))
+		return errors.Errorf("elastic beats dir=%v is not a directory", dir)
 	}
 
 	elasticBeatsDirValue = filepath.Clean(dir)
+	return nil
 }
 
 var (
