@@ -149,6 +149,7 @@ metricbeat.modules:
 
 #--------------------------------- Aws Module ---------------------------------
 - module: aws
+  period: 300s
   metricsets: ["ec2"]
   aws_config_profile_name: "metricbeat-aws"
 
