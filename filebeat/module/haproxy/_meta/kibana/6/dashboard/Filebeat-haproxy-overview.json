@@ -156,7 +156,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "field": "haproxy.client_ip"
+                "field": "haproxy.client.ip"
               },
               "schema": "metric",
               "type": "cardinality"
