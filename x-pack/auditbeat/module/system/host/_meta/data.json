@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "event": {
-        "action": "",
+        "action": "host",
         "dataset": "host",
         "module": "system",
         "type": "state"
