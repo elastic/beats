@@ -144,9 +144,8 @@ configurations.
 manage configuration settings in central management.
 ifndef::no_dashboards[]
 * If you plan to use the sample {kib} dashboards provided with {beatname_uc},
-either <<load-kibana-dashboards,load the dashboards>> before enrolling the
-Beat, or <<configuration-dashboards,enable dashboard loading>> when you define
-the configuration in central management.
+<<load-kibana-dashboards,load the dashboards>> before enrolling the
+Beat.
 endif::[]
 ifeval::[("{beatname_lc}"=="filebeat")]
 * If you plan to define module configurations in central management, set up the
