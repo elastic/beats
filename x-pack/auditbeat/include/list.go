@@ -9,7 +9,7 @@ import (
 	// factories with the global registry.
 	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/host"
 	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/packages"
-	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/processes"
+	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/process"
 	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/socket"
 	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/user"
 )

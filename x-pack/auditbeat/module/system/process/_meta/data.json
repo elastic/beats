@@ -1,0 +1,25 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "action": "existing_process",
+        "dataset": "process",
+        "id": "203e3d86-6b94-4e36-b906-930187073b93",
+        "module": "system",
+        "type": "state"
+    },
+    "process": {
+        "args": [
+            "/sbin/init"
+        ],
+        "executable": "/lib/systemd/systemd",
+        "name": "systemd",
+        "pid": 1,
+        "ppid": 0,
+        "start": "2018-12-03T23:49:23.08Z",
+        "working_directory": "/"
+    }
+}
