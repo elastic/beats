@@ -23,7 +23,7 @@
                             "enabled": true, 
                             "id": "1", 
                             "params": {
-                                "field": "apache.access.remote_ip"
+                                "field": "apache2.access.remote_ip"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -33,7 +33,7 @@
                             "id": "2", 
                             "params": {
                                 "autoPrecision": true, 
-                                "field": "apache.access.geoip.location"
+                                "field": "apache2.access.geoip.location"
                             }, 
                             "schema": "segment", 
                             "type": "geohash_grid"
@@ -109,7 +109,7 @@
                             "id": "3", 
                             "params": {
                                 "customLabel": "URL", 
-                                "field": "apache.access.url", 
+                                "field": "apache2.access.url", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "row": false, 
@@ -122,7 +122,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "apache.access.response_code", 
+                                "field": "apache2.access.response_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -165,7 +165,7 @@
                             "enabled": true, 
                             "id": "1", 
                             "params": {
-                                "field": "apache.access.remote_ip"
+                                "field": "apache2.access.remote_ip"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -174,7 +174,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "apache.access.user_agent.name", 
+                                "field": "apache2.access.user_agent.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -186,7 +186,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "apache.access.user_agent.major", 
+                                "field": "apache2.access.user_agent.major", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -229,7 +229,7 @@
                             "enabled": true, 
                             "id": "1", 
                             "params": {
-                                "field": "apache.access.remote_ip"
+                                "field": "apache2.access.remote_ip"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -238,7 +238,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "apache.access.user_agent.os_name", 
+                                "field": "apache2.access.user_agent.os_name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -250,7 +250,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "apache.access.user_agent.os_major", 
+                                "field": "apache2.access.user_agent.os_major", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -313,7 +313,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "apache.error.level", 
+                                "field": "apache2.error.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -389,7 +389,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "apache.access.response_code", 
+                                "field": "apache2.access.response_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -423,10 +423,10 @@
         {
             "attributes": {
                 "columns": [
-                    "apache.error.client", 
-                    "apache.error.level", 
-                    "apache.error.module", 
-                    "apache.error.message"
+                    "apache2.error.client", 
+                    "apache2.error.level", 
+                    "apache2.error.module", 
+                    "apache2.error.message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -450,7 +450,7 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "_exists_:apache.error"
+                                "query": "_exists_:apache2.error"
                             }
                         }
                     }
@@ -469,10 +469,10 @@
         {
             "attributes": {
                 "columns": [
-                    "apache.access.remote_ip", 
-                    "apache.access.method", 
-                    "apache.access.url", 
-                    "apache.access.response_code"
+                    "apache2.access.remote_ip", 
+                    "apache2.access.method", 
+                    "apache2.access.url", 
+                    "apache2.access.response_code"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -496,7 +496,7 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "_exists_:apache.access"
+                                "query": "_exists_:apache2.access"
                             }
                         }
                     }
@@ -593,10 +593,10 @@
                     {
                         "col": 1, 
                         "columns": [
-                            "apache.error.client", 
-                            "apache.error.level", 
-                            "apache.error.module", 
-                            "apache.error.message"
+                            "apache2.error.client", 
+                            "apache2.error.level", 
+                            "apache2.error.module", 
+                            "apache2.error.message"
                         ], 
                         "id": "Apache-errors-log", 
                         "panelIndex": 7, 
