@@ -355,7 +355,7 @@
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Filebeat Haproxy module dashboard",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -369,9 +369,7 @@
           }
         },
         "optionsJSON": {
-          "darkTheme": false,
-          "hidePanelTitles": false,
-          "useMargins": true
+          "darkTheme": false
         },
         "panelsJSON": null,
         "timeRestore": false,
