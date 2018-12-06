@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// Server type defines all fields of the Server Metricset
 type Server struct {
 	Httpd               Httpd               `json:"httpd"`
 	HttpdRequestMethods HttpdRequestMethods `json:"httpd_request_methods"`
@@ -30,6 +31,7 @@ type Server struct {
 	Couchdb             Couchdb             `json:"couchdb"`
 }
 
+// Httpd type defines httpd fields of the Server Metricset
 type Httpd struct {
 	ViewReads                General `json:"view_reads"`
 	BulkRequests             General `json:"bulk_requests"`
@@ -38,6 +40,7 @@ type Httpd struct {
 	Requests                 General `json:"requests"`
 }
 
+// HttpdRequestMethods type defines httpd requests methods fields of the Server Metricset
 type HttpdRequestMethods struct {
 	Copy   General `json:"COPY"`
 	Head   General `json:"HEAD"`
@@ -47,6 +50,7 @@ type HttpdRequestMethods struct {
 	Put    General `json:"PUT"`
 }
 
+// HttpdStatusCodes type defines httpd status codes fields of the Server Metricset
 type HttpdStatusCodes struct {
 	Num200 General `json:"200"`
 	Num201 General `json:"201"`
@@ -63,6 +67,7 @@ type HttpdStatusCodes struct {
 	Num500 General `json:"500"`
 }
 
+// Couchdb type defines couchdb fields of the Server Metricset
 type Couchdb struct {
 	OpenOsFiles     General `json:"open_os_files"`
 	OpenDatabases   General `json:"open_databases"`
@@ -73,6 +78,7 @@ type Couchdb struct {
 	AuthCacheMisses General `json:"auth_cache_misses"`
 }
 
+// General type defines common fields of the Server Metricset
 type General struct {
 	Description string  `json:"description"`
 	Current     float64 `json:"current"`

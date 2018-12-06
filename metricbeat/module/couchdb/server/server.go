@@ -44,11 +44,13 @@ func init() {
 	)
 }
 
+// MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	http *helper.HTTP
 }
 
+// New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The couchdb server metricset is experimental.")
 
@@ -67,6 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
+// Fetch methods implements the data gathering and data conversion to the right format.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 	content, err := m.http.FetchContent()
 	if err != nil {
