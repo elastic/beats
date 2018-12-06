@@ -5,6 +5,9 @@
 package host
 
 import (
+	"bytes"
+	"encoding/gob"
+	"io"
 	"net"
 	"time"
 
@@ -12,6 +15,7 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/auditbeat/datastore"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -23,6 +27,9 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "host"
+
+	bucketName        = "host.v1"
+	bucketKeyLastHost = "lastHost"
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
@@ -119,6 +126,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	config    config
 	log       *logp.Logger
+	bucket    datastore.Bucket
 	lastState time.Time
 	lastHost  *Host
 }
@@ -132,11 +140,30 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
 	}
 
-	return &MetricSet{
+	bucket, err := datastore.OpenBucket(bucketName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open persistent datastore")
+	}
+
+	ms := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
 		log:           logp.NewLogger(moduleName),
-	}, nil
+		bucket:        bucket,
+	}
+
+	// Load state (lastHost) from disk
+	err = ms.restoreStateFromDisk()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to restore state from disk")
+	}
+
+	return ms, nil
+}
+
+// Close cleans up the MetricSet when it finishes.
+func (ms *MetricSet) Close() error {
+	return ms.saveStateToDisk()
 }
 
 // Fetch collects data about the host. It is invoked periodically.
@@ -189,6 +216,8 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		return nil
 	}
 
+	var events []mb.Event
+
 	// Report ID changes as a separate, special event.
 	if ms.lastHost.info.UniqueID != currentHost.info.UniqueID {
 		/*
@@ -197,21 +226,30 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		*/
 		eventOldHost := hostEvent(ms.lastHost, eventTypeEvent, eventActionIdChanged)
 		eventOldHost.MetricSetFields.Put("new_id", currentHost.info.UniqueID)
-		report.Event(eventOldHost)
+		events = append(events, eventOldHost)
 
 		eventNewHost := hostEvent(currentHost, eventTypeEvent, eventActionIdChanged)
 		eventNewHost.MetricSetFields.Put("old_id", ms.lastHost.info.UniqueID)
-		report.Event(eventNewHost)
+		events = append(events, eventNewHost)
 	}
 
 	// Report reboots separately
 	if !currentHost.info.BootTime.Equal(ms.lastHost.info.BootTime) {
-		report.Event(hostEvent(currentHost, eventTypeEvent, eventActionReboot))
+		events = append(events, hostEvent(currentHost, eventTypeEvent, eventActionReboot))
+
 	}
 
 	// Report any other changes.
 	if ms.lastHost.changeDetectionHash() != currentHost.changeDetectionHash() {
-		report.Event(hostEvent(currentHost, eventTypeEvent, eventActionHostChanged))
+		events = append(events, hostEvent(currentHost, eventTypeEvent, eventActionHostChanged))
+	}
+
+	for _, event := range events {
+		report.Event(event)
+	}
+
+	if len(events) > 0 {
+		ms.saveStateToDisk()
 	}
 
 	return nil
@@ -248,6 +286,55 @@ func hostEvent(host *Host, eventType string, eventAction string) mb.Event {
 		},
 		MetricSetFields: host.toMapStr(),
 	}
+}
+
+func (ms *MetricSet) saveStateToDisk() error {
+	var buf bytes.Buffer
+	encoder := gob.NewEncoder(&buf)
+	err := encoder.Encode(*ms.lastHost)
+	if err != nil {
+		return errors.Wrap(err, "error encoding host information")
+	}
+
+	err = ms.bucket.Store(bucketKeyLastHost, buf.Bytes())
+	if err != nil {
+		return errors.Wrap(err, "error writing host information to disk")
+	}
+
+	ms.log.Debug("Wrote host information to disk.")
+	return nil
+}
+
+func (ms *MetricSet) restoreStateFromDisk() error {
+	var decoder *gob.Decoder
+	err := ms.bucket.Load(bucketKeyLastHost, func(blob []byte) error {
+		if len(blob) > 0 {
+			buf := bytes.NewBuffer(blob)
+			decoder = gob.NewDecoder(buf)
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	if decoder != nil {
+		var lastHost Host
+		err = decoder.Decode(&lastHost)
+		if err == nil {
+			ms.lastHost = &lastHost
+		} else if err != io.EOF {
+			return errors.Wrap(err, "error decoding host information")
+		}
+	}
+
+	if ms.lastHost != nil {
+		ms.log.Debug("Restored last host information from disk.")
+	} else {
+		ms.log.Debug("No last host information found on disk.")
+	}
+
+	return nil
 }
 
 // getNetInfo is originally copied from libbeat/processors/add_host_metadata.go.
