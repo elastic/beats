@@ -1,248 +1,696 @@
-################### Heartbeat Configuration Example #########################
+########################## Metricbeat Configuration ###########################
 
 # This file is a full configuration example documenting all non-deprecated
-# options in comments. For a shorter configuration example, that contains
-# only some common options, please see heartbeat.yml in the same directory.
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see metricbeat.yml in the same directory.
 #
 # You can find the full configuration reference here:
-# https://www.elastic.co/guide/en/beats/heartbeat/index.html
+# https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
-############################# Heartbeat ######################################
+#============================  Config Reloading ===============================
 
-# Configure monitors
-heartbeat.monitors:
-- type: icmp # monitor type `icmp` (requires root) uses ICMP Echo Request to ping
-             # configured hosts
+# Config reloading allows to dynamically load modules. Each file which is
+# monitored must contain one or multiple modules as a list.
+metricbeat.config.modules:
 
-  # Monitor name used for job name and document type.
-  #name: icmp
+  # Glob pattern for configuration reloading
+  path: ${path.config}/conf.d/*.yml
 
-  # Enable/Disable monitor
-  #enabled: true
+  # Period on which files under path should be checked for changes
+  reload.period: 10s
 
-  # Configure task schedule using cron-like syntax
-  schedule: '*/5 * * * * * *' # exactly every 5 seconds like 10:00:00, 10:00:05, ...
+  # Set to true to enable config reloading
+  reload.enabled: false
 
-  # List of hosts to ping
+# Maximum amount of time to randomly delay the start of a metricset. Use 0 to
+# disable startup delay.
+metricbeat.max_start_delay: 10s
+
+#============================== Autodiscover ===================================
+
+# Autodiscover allows you to detect changes in the system and spawn new modules
+# as they happen.
+
+#metricbeat.autodiscover:
+  # List of enabled autodiscover providers
+#  providers:
+#    - type: docker
+#      templates:
+#        - condition:
+#            equals.docker.container.image: etcd
+#          config:
+#            - module: etcd
+#              metricsets: ["leader", "self", "store"]
+#              period: 10s
+#              hosts: ["${host}:2379"]
+
+#==========================  Modules configuration =============================
+metricbeat.modules:
+
+#-------------------------------- System Module --------------------------------
+- module: system
+  metricsets:
+    - cpu             # CPU usage
+    - load            # CPU load averages
+    - memory          # Memory usage
+    - network         # Network IO
+    - process         # Per process metrics
+    - process_summary # Process summary
+    - uptime          # System Uptime
+    #- core           # Per CPU core usage
+    #- diskio         # Disk IO
+    #- filesystem     # File system usage for each mountpoint
+    #- fsstat         # File system summary metrics
+    #- raid           # Raid
+    #- socket         # Sockets and connection info (linux only)
+  enabled: true
+  period: 10s
+  processes: ['.*']
+
+  # Configure the metric types that are included by these metricsets.
+  cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
+  core.metrics: ["percentages"]  # The other available option is ticks.
+
+  # A list of filesystem types to ignore. The filesystem metricset will not
+  # collect data from filesystems matching any of the specified types, and
+  # fsstats will not include data from these filesystems in its summary stats.
+  # If not set, types associated to virtual filesystems are automatically
+  # added when this information is available in the system (e.g. the list of
+  # `nodev` types in `/proc/filesystem`).
+  #filesystem.ignore_types: []
+
+  # These options allow you to filter out all processes that are not
+  # in the top N by CPU or memory, in order to reduce the number of documents created.
+  # If both the `by_cpu` and `by_memory` options are used, the union of the two sets
+  # is included.
+  #process.include_top_n:
+
+    # Set to false to disable this feature and include all processes
+    #enabled: true
+
+    # How many processes to include from the top by CPU. The processes are sorted
+    # by the `system.process.cpu.total.pct` field.
+    #by_cpu: 0
+
+    # How many processes to include from the top by memory. The processes are sorted
+    # by the `system.process.memory.rss.bytes` field.
+    #by_memory: 0
+
+  # If false, cmdline of a process is not cached.
+  #process.cmdline.cache.enabled: true
+
+  # Enable collection of cgroup metrics from processes on Linux.
+  #process.cgroups.enabled: true
+
+  # A list of regular expressions used to whitelist environment variables
+  # reported with the process metricset's events. Defaults to empty.
+  #process.env.whitelist: []
+
+  # Include the cumulative CPU tick values with the process metrics. Defaults
+  # to false.
+  #process.include_cpu_ticks: false
+
+  # Raid mount point to monitor
+  #raid.mount_point: '/'
+
+  # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
+  #socket.reverse_lookup.enabled: false
+  #socket.reverse_lookup.success_ttl: 60s
+  #socket.reverse_lookup.failure_ttl: 60s
+
+  # Diskio configurations
+  #diskio.include_devices: []
+
+#------------------------------ Aerospike Module ------------------------------
+- module: aerospike
+  metricsets: ["namespace"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:3000"]
+
+#-------------------------------- Apache Module --------------------------------
+- module: apache
+  metricsets: ["status"]
+  period: 10s
+  enabled: true
+
+  # Apache hosts
+  hosts: ["http://127.0.0.1"]
+
+  # Path to server status. Default server-status
+  #server_status_path: "server-status"
+
+  # Username of hosts.  Empty by default
+  #username: username
+
+  # Password of hosts. Empty by default
+  #password: password
+
+#--------------------------------- Ceph Module ---------------------------------
+- module: ceph
+  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
+  period: 10s
+  hosts: ["localhost:5000"]
+  enabled: true
+
+#------------------------------ Couchbase Module ------------------------------
+- module: couchbase
+  metricsets: ["bucket", "cluster", "node"]
+  period: 10s
+  hosts: ["localhost:8091"]
+  enabled: true
+
+#-------------------------------- Docker Module --------------------------------
+- module: docker
+  metricsets:
+    - "container"
+    - "cpu"
+    - "diskio"
+    - "healthcheck"
+    - "info"
+    #- "image"
+    - "memory"
+    - "network"
+  hosts: ["unix:///var/run/docker.sock"]
+  period: 10s
+  enabled: true
+
+  # If set to true, replace dots in labels with `_`.
+  #labels.dedot: false
+
+  # If set to true, collects metrics per core.
+  #cpu.cores: true
+
+  # To connect to Docker over TLS you must specify a client and CA certificate.
+  #ssl:
+    #certificate_authority: "/etc/pki/root/ca.pem"
+    #certificate:           "/etc/pki/client/cert.pem"
+    #key:                   "/etc/pki/client/cert.key"
+
+#------------------------------ Dropwizard Module ------------------------------
+- module: dropwizard
+  metricsets: ["collector"]
+  period: 10s
+  hosts: ["localhost:8080"]
+  metrics_path: /metrics/metrics
+  namespace: example
+  enabled: true
+
+#---------------------------- Elasticsearch Module ----------------------------
+- module: elasticsearch
+  metricsets:
+    - node
+    - node_stats
+    #- index
+    #- index_recovery
+    #- index_summary
+    #- shard
+    #- ml_job
+  period: 10s
+  hosts: ["http://localhost:9200"]
+  #username: "elastic"
+  #password: "changeme"
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Set to false to fetch all entries
+  #index_recovery.active_only: true
+
+#------------------------------ Envoyproxy Module ------------------------------
+- module: envoyproxy
+  metricsets: ["server"]
+  period: 10s
+  hosts: ["localhost:9901"]
+
+#--------------------------------- Etcd Module ---------------------------------
+- module: etcd
+  metricsets: ["leader", "self", "store"]
+  period: 10s
+  hosts: ["localhost:2379"]
+
+#--------------------------------- Foo Module ---------------------------------
+- module: foo
+  metricsets: ["bar"]
+  enabled: false
+  period: 10s
   hosts: ["localhost"]
 
-  # Configure IP protocol types to ping on if hostnames are configured.
-  # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
-  ipv4: true
-  ipv6: true
-  mode: any
 
-  # Total running time per ping test.
-  timeout: 16s
+#-------------------------------- Golang Module --------------------------------
+- module: golang
+  #metricsets:
+  #  - expvar
+  #  - heap
+  period: 10s
+  hosts: ["localhost:6060"]
+  heap.path: "/debug/vars"
+  expvar:
+    namespace: "example"
+    path: "/debug/vars"
 
-  # Waiting duration until another ICMP Echo Request is emitted.
-  wait: 1s
+#------------------------------- Graphite Module -------------------------------
+- module: graphite
+  metricsets: ["server"]
+  enabled: true
 
-  # The tags of the monitors are included in their own field with each
-  # transaction published. Tags make it easy to group servers by different
-  # logical properties.
-  #tags: ["service-X", "web-tier"]
+  # Host address to listen on. Default localhost.
+  #host: localhost
 
-  # Optional fields that you can specify to add additional information to the
-  # monitor output. Fields can be scalar values, arrays, dictionaries, or any nested
-  # combination of these.
+  # Listening port. Default 2003.
+  #port: 2003
+
+  # Protocol to listen on. This can be udp or tcp. Default udp.
+  #protocol: "udp"
+
+  # Receive buffer size in bytes
+  #receive_buffer_size: 1024
+
+  #templates:
+  #  - filter: "test.*.bash.*" # This would match metrics like test.localhost.bash.stats
+  #    namespace: "test"
+  #    template: ".host.shell.metric*" # test.localhost.bash.stats would become metric=stats and tags host=localhost,shell=bash
+  #    delimiter: "_"
+
+
+#------------------------------- HAProxy Module -------------------------------
+- module: haproxy
+  metricsets: ["info", "stat"]
+  period: 10s
+  hosts: ["tcp://127.0.0.1:14567"]
+  enabled: true
+
+#--------------------------------- HTTP Module ---------------------------------
+- module: http
+  #metricsets:
+  #  - json
+  period: 10s
+  hosts: ["localhost:80"]
+  namespace: "json_namespace"
+  path: "/"
+  #body: ""
+  #method: "GET"
+  #username: "user"
+  #password: "secret"
+  #request.enabled: false
+  #response.enabled: false
+  #json.is_array: false
+  #dedot.enabled: false
+
+- module: http
+  #metricsets:
+  #  - server
+  host: "localhost"
+  port: "8080"
+  enabled: false
+  #paths:
+  #  - path: "/foo"
+  #    namespace: "foo"
+  #    fields: # added to the the response in root. overwrites existing fields
+  #      key: "value"
+
+#------------------------------- Jolokia Module -------------------------------
+- module: jolokia
+  #metricsets: ["jmx"]
+  period: 10s
+  hosts: ["localhost"]
+  namespace: "metrics"
+  #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+  #username: "user"
+  #password: "secret"
+  jmx.mappings:
+    #- mbean: 'java.lang:type=Runtime'
+    #  attributes:
+    #    - attr: Uptime
+    #      field: uptime
+    #- mbean: 'java.lang:type=Memory'
+    #  attributes:
+    #    - attr: HeapMemoryUsage
+    #      field: memory.heap_usage
+    #    - attr: NonHeapMemoryUsage
+    #      field: memory.non_heap_usage
+    # GC Metrics - this depends on what is available on your JVM
+    #- mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
+    #  attributes:
+    #    - attr: CollectionTime
+    #      field: gc.cms_collection_time
+    #    - attr: CollectionCount
+    #      field: gc.cms_collection_count
+
+  jmx.application:
+  jmx.instance:
+
+#-------------------------------- Kafka Module --------------------------------
+- module: kafka
+  metricsets: ["consumergroup", "partition"]
+  period: 10s
+  hosts: ["localhost:9092"]
+  enabled: true
+
+  #client_id: metricbeat
+  #retries: 3
+  #backoff: 250ms
+
+  # List of Topics to query metadata for. If empty, all topics will be queried.
+  #topics: []
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # SASL authentication
+  #username: ""
+  #password: ""
+
+#-------------------------------- Kibana Module --------------------------------
+- module: kibana
+  metricsets: ["status"]
+  period: 10s
+  hosts: ["localhost:5601"]
+  basepath: ""
+  enabled: true
+
+#------------------------------ Kubernetes Module ------------------------------
+# Node metrics, from kubelet:
+- module: kubernetes
+  metricsets:
+    - container
+    - node
+    - pod
+    - system
+    - volume
+  period: 10s
+  hosts: ["localhost:10255"]
+  enabled: true
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # Enriching parameters:
+  add_metadata: true
+  in_cluster: true
+  # When used outside the cluster:
+  #host: node_name
+  #kube_config: ~/.kube/config
+
+# State metrics from kube-state-metrics service:
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - state_node
+    - state_deployment
+    - state_replicaset
+    - state_statefulset
+    - state_pod
+    - state_container
+  period: 10s
+  hosts: ["kube-state-metrics:8080"]
+
+  # Enriching parameters:
+  add_metadata: true
+  in_cluster: true
+  # When used outside the cluster:
+  #host: node_name
+  #kube_config: ~/.kube/config
+
+# Kubernetes events
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - event
+
+# Kubernetes API server
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - apiserver
+  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
+#--------------------------------- Kvm Module ---------------------------------
+- module: kvm
+  metricsets: ["dommemstat"]
+  enabled: true
+  period: 10s
+  hosts: ["unix:///var/run/libvirt/libvirt-sock"]
+  # For remote hosts, setup network access in libvirtd.conf
+  # and use the tcp scheme:
+  # hosts: [ "tcp://<host>:16509" ]
+
+  # Timeout to connect to Libvirt server
+  #timeout: 1s
+
+#------------------------------- Logstash Module -------------------------------
+- module: logstash
+  metricsets: ["node", "node_stats"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:9600"]
+
+#------------------------------ Memcached Module ------------------------------
+- module: memcached
+  metricsets: ["stats"]
+  period: 10s
+  hosts: ["localhost:11211"]
+  enabled: true
+
+#------------------------------- MongoDB Module -------------------------------
+- module: mongodb
+  metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
+  period: 10s
+  enabled: true
+
+  # The hosts must be passed as MongoDB URLs in the format:
+  # [mongodb://][user:pass@]host[:port].
+  # The username and password can also be set using the respective configuration
+  # options. The credentials in the URL take precedence over the username and
+  # password configuration options.
+  hosts: ["localhost:27017"]
+
+  # Optional SSL. By default is off.
+  #ssl.enabled: true
+
+  # Mode of verification of server certificate ('none' or 'full')
+  #ssl.verification_mode: 'full'
+
+  # List of root certificates for TLS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # Username to use when connecting to MongoDB. Empty by default.
+  #username: user
+
+  # Password to use when connecting to MongoDB. Empty by default.
+  #password: pass
+
+#-------------------------------- Munin Module --------------------------------
+- module: munin
+  metricsets: ["node"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:4949"]
+  node.namespace: node
+
+#-------------------------------- MySQL Module --------------------------------
+- module: mysql
+  metricsets:
+    - "status"
+  #  - "galera_status"
+  period: 10s
+
+  # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # The username and password can either be set in the DSN or using the username
+  # and password config options. Those specified in the DSN take precedence.
+  hosts: ["root:secret@tcp(127.0.0.1:3306)/"]
+
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # By setting raw to true, all raw fields from the status metricset will be added to the event.
+  #raw: false
+
+#-------------------------------- Nginx Module --------------------------------
+- module: nginx
+  metricsets: ["stubstatus"]
+  enabled: true
+  period: 10s
+
+  # Nginx hosts
+  hosts: ["http://127.0.0.1"]
+
+  # Path to server status. Default server-status
+  server_status_path: "server-status"
+
+#------------------------------- PHP_FPM Module -------------------------------
+- module: php_fpm
+  metricsets:
+  - pool
+  #- process
+  enabled: true
+  period: 10s
+  status_path: "/status"
+  hosts: ["localhost:8080"]
+
+#------------------------------ PostgreSQL Module ------------------------------
+- module: postgresql
+  enabled: true
+  metricsets:
+    # Stats about every PostgreSQL database
+    - database
+
+    # Stats about the background writer process's activity
+    - bgwriter
+
+    # Stats about every PostgreSQL process
+    - activity
+
+  period: 10s
+
+  # The host must be passed as PostgreSQL URL. Example:
+  # postgres://localhost:5432?sslmode=disable
+  # The available parameters are documented here:
+  # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
+  hosts: ["postgres://localhost:5432"]
+
+  # Username to use when connecting to PostgreSQL. Empty by default.
+  #username: user
+
+  # Password to use when connecting to PostgreSQL. Empty by default.
+  #password: pass
+
+#------------------------------ Prometheus Module ------------------------------
+- module: prometheus
+  metricsets: ["stats"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:9090"]
+  #metrics_path: /metrics
+  #namespace: example
+
+- module: prometheus
+  metricsets: ["collector"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:9090"]
+  #metrics_path: /metrics
+  #namespace: example
+
+  # This can be used for service account based authorization:
+  #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+#------------------------------- RabbitMQ Module -------------------------------
+- module: rabbitmq
+  metricsets: ["node", "queue", "connection"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:15672"]
+
+  # Management path prefix, if `management.path_prefix` is set in RabbitMQ
+  # configuration, it has to be set to the same value.
+  #management_path_prefix: ""
+
+  #username: guest
+  #password: guest
+
+#-------------------------------- Redis Module --------------------------------
+- module: redis
+  metricsets: ["info", "keyspace"]
+  enabled: true
+  period: 10s
+
+  # Redis hosts
+  hosts: ["127.0.0.1:6379"]
+
+  # Timeout after which time a metricset should return an error
+  # Timeout is by default defined as period, as a fetch of a metricset
+  # should never take longer then period, as otherwise calls can pile up.
+  #timeout: 1s
+
+  # Optional fields to be added to each event
   #fields:
-  #  env: staging
+  #  datacenter: west
 
-  # If this option is set to true, the custom fields are stored as top-level
-  # fields in the output document instead of being grouped under a fields
-  # sub-dictionary. Default is false.
-  #fields_under_root: false
+  # Network type to be used for redis connection. Default: tcp
+  #network: tcp
 
-  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
+  # Max number of concurrent connections. Default: 10
+  #maxconn: 10
 
-    # Interval between file file changed checks.
-    #interval: 5s
+  # Filters can be used to reduce the number of fields sent.
+  #processors:
+  #  - include_fields:
+  #      fields: ["beat", "metricset", "redis.info.stats"]
 
-# Define a directory to load monitor definitions from. Definitions take the form
-# of individual yaml files.
-# heartbeat.config.monitors:
-  # Directory + glob pattern to search for configuration files
-  #path: /path/to/my/monitors.d/*.yml
-  # If enabled, heartbeat will periodically check the config.monitors path for changes
-  #reload.enabled: true
-  # How often to check for changes
-  #reload.period: 1s
+  # Redis AUTH password. Empty by default.
+  #password: foobared
 
-- type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
-            # by sending/receiving a custom payload
+#------------------------------- Traefik Module -------------------------------
+- module: traefik
+  metricsets: ["health"]
+  period: 10s
+  hosts: ["localhost:8080"]
 
-  # Monitor name used for job name and document type
-  #name: tcp
+#-------------------------------- Uwsgi Module --------------------------------
+- module: uwsgi
+  metricsets: ["status"]
+  enable: true
+  period: 10s
+  hosts: ["tcp://127.0.0.1:9191"]
 
-  # Enable/Disable monitor
-  #enabled: true
+#------------------------------- VSphere Module -------------------------------
+- module: vsphere
+  enabled: true
+  metricsets: ["datastore", "host", "virtualmachine"]
+  period: 10s
+  hosts: ["https://localhost/sdk"]
 
-  # Configure task schedule
-  schedule: '@every 5s' # every 5 seconds from start of beat
+  username: "user"
+  password: "password"
+  # If insecure is true, don't verify the server's certificate chain
+  insecure: false
+  # Get custom fields when using virtualmachine metric set. Default false.
+  # get_custom_fields: false
 
-  # configure hosts to ping.
-  # Entries can be:
-  #   - plain host name or IP like `localhost`:
-  #       Requires ports configs to be checked. If ssl is configured,
-  #       a SSL/TLS based connection will be established. Otherwise plain tcp connection
-  #       will be established
-  #   - hostname + port like `localhost:12345`:
-  #       Connect to port on given host. If ssl is configured,
-  #       a SSL/TLS based connection will be established. Otherwise plain tcp connection
-  #       will be established
-  #   - full url syntax. `scheme://<host>:[port]`. The `<scheme>` can be one of
-  #     `tcp`, `plain`, `ssl` and `tls`. If `tcp`, `plain` is configured, a plain
-  #     tcp connection will be established, even if ssl is configured.
-  #     Using `tls`/`ssl`, an SSL connection is established. If no ssl is configured,
-  #     system defaults will be used (not supported on windows).
-  #     If `port` is missing in url, the ports setting is required.
-  hosts: ["localhost:9200"]
+#------------------------------- Windows Module -------------------------------
+- module: windows
+  metricsets: ["perfmon"]
+  enabled: true
+  period: 10s
+  perfmon.ignore_non_existent_counters: true
+  perfmon.counters:
+  #  - instance_label: processor.name
+  #    instance_name: total
+  #    measurement_label: processor.time.total.pct
+  #    query: '\Processor Information(_Total)\% Processor Time'
 
-  # Configure IP protocol types to ping on if hostnames are configured.
-  # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
-  ipv4: true
-  ipv6: true
-  mode: any
+- module: windows
+  metricsets: ["service"]
+  enabled: true
+  period: 60s
 
-  # List of ports to ping if host does not contain a port number
-  # ports: [80, 9200, 5044]
-
-  # Total test connection and data exchange timeout
-  #timeout: 16s
-
-  # Optional payload string to send to remote and expected answer. If none is
-  # configured, the endpoint is expected to be up if connection attempt was
-  # successful. If only `send_string` is configured, any response will be
-  # accepted as ok. If only `receive_string` is configured, no payload will be
-  # send, but client expects to receive expected payload on connect.
-  #check:
-    #send: ''
-    #receive: ''
-
-  # SOCKS5 proxy url
-  # proxy_url: ''
-
-  # Resolve hostnames locally instead on SOCKS5 server:
-  #proxy_use_local_resolver: false
-
-  # TLS/SSL connection settings:
-  #ssl:
-    # Certificate Authorities
-    #certificate_authorities: ['']
-
-    # Required TLS protocols
-    #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
-
-  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
+#------------------------------ ZooKeeper Module ------------------------------
+- module: zookeeper
+  enabled: true
+  metricsets: ["mntr"]
+  period: 10s
+  hosts: ["localhost:2181"]
 
 
-- type: http # monitor type `http`. Connect via HTTP an optionally verify response
-
-  # Monitor name used for job name and document type
-  #name: http
-
-  # Enable/Disable monitor
-  #enabled: true
-
-  # Configure task schedule
-  schedule: '@every 5s' # every 5 seconds from start of beat
-
-  # Configure URLs to ping
-  urls: ["http://localhost:9200"]
-
-  # Configure IP protocol types to ping on if hostnames are configured.
-  # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
-  ipv4: true
-  ipv6: true
-  mode: any
-
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
-  # Optional HTTP proxy url.
-  #proxy_url: ''
-
-  # Total test connection and data exchange timeout
-  #timeout: 16s
-
-  # Optional Authentication Credentials
-  #username: ''
-  #password: ''
-
-  # TLS/SSL connection settings for use with HTTPS endpoint. If not configured
-  # system defaults will be used.
-  #ssl:
-    # Certificate Authorities
-    #certificate_authorities: ['']
-
-    # Required TLS protocols
-    #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
-
-  # Request settings:
-  #check.request:
-    # Configure HTTP method to use. Only 'HEAD', 'GET' and 'POST' methods are allowed.
-    #method: "GET"
-
-    # Dictionary of additional HTTP headers to send:
-    #headers:
-
-    # Optional request body content
-    #body:
-
-  # Expected response settings
-  #check.response:
-    # Expected status code. If not configured or set to 0 any status code not
-    # being 404 is accepted.
-    #status: 0
-
-    # Required response headers.
-    #headers:
-
-    # Required response contents.
-    #body:
-
-    # Parses the body as JSON, then checks against the given condition expression
-    #json:
-    #- description: Explanation of what the check does
-    #  condition:
-    #    equals:
-    #      myField: expectedValue
-
-
-  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
-
-heartbeat.scheduler:
-  # Limit number of concurrent tasks executed by heartbeat. The task limit if
-  # disabled if set to 0. The default is 0.
-  #limit: 0
-
-  # Set the scheduler it's timezone
-  #location: ''
 
 #================================ General ======================================
 
@@ -361,7 +809,7 @@ heartbeat.scheduler:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields,
+# The supported processors are drop_fields, drop_event, include_fields, 
 # decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
@@ -451,7 +899,7 @@ heartbeat.scheduler:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
 #
-# The following example decodes fields containing JSON strings
+# The following example decodes fields containing JSON strings 
 # and replaces the strings with valid JSON objects.
 #
 #processors:
@@ -464,7 +912,7 @@ heartbeat.scheduler:
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using metricbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -492,7 +940,7 @@ output.elasticsearch:
 
   # Enabled ilm (beta) to use index lifecycle management instead daily indices.
   #ilm.enabled: false
-  #ilm.rollover_alias: "heartbeat"
+  #ilm.rollover_alias: "metricbeat"
   #ilm.pattern: "{now/d}-000001"
 
   # Set gzip compression level.
@@ -514,10 +962,10 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "heartbeat" plus date
-  # and generates [heartbeat-]YYYY.MM.DD keys.
+  # Optional index name. The default is "metricbeat" plus date
+  # and generates [metricbeat-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "heartbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
+  #index: "metricbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -639,9 +1087,9 @@ output.elasticsearch:
   # Logstash after a network error. The default is 60s.
   #backoff.max: 60s
 
-  # Optional index name. The default index name is set to heartbeat
+  # Optional index name. The default index name is set to metricbeat
   # in all lowercase.
-  #index: 'heartbeat'
+  #index: 'metricbeat'
 
   # SOCKS5 proxy server URL
   #proxy_url: socks5://user:password@socks5-server:2233
@@ -735,7 +1183,7 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version heartbeat is assumed to run against. Defaults to the "1.0.0".
+  # Kafka version metricbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 
   # Configure JSON encoding
@@ -870,8 +1318,8 @@ output.elasticsearch:
   #port: 6379
 
   # The name of the Redis list or channel the events are published to. The
-  # default is heartbeat.
-  #key: heartbeat
+  # default is metricbeat.
+  #key: metricbeat
 
   # The password to authenticate with. The default is no authentication.
   #password:
@@ -982,14 +1430,14 @@ output.elasticsearch:
 
   # Path to the directory where to save the generated files. The option is
   # mandatory.
-  #path: "/tmp/heartbeat"
+  #path: "/tmp/metricbeat"
 
-  # Name of the generated files. The default is `heartbeat` and it generates
-  # files: `heartbeat`, `heartbeat.1`, `heartbeat.2`, etc.
-  #filename: heartbeat
+  # Name of the generated files. The default is `metricbeat` and it generates
+  # files: `metricbeat`, `metricbeat.1`, `metricbeat.2`, etc.
+  #filename: metricbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every heartbeat restart, the files are rotated. The default value is 10240
+  # every metricbeat restart, the files are rotated. The default value is 10240
   # kB.
   #rotate_every_kb: 10000
 
@@ -1017,26 +1465,26 @@ output.elasticsearch:
 
 #================================= Paths ======================================
 
-# The home path for the heartbeat installation. This is the default base path
+# The home path for the metricbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the heartbeat installation. This is the default
+# The configuration path for the metricbeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the heartbeat installation. This is the default base path
-# for all the files in which heartbeat needs to store its data. If not set by a
+# The data path for the metricbeat installation. This is the default base path
+# for all the files in which metricbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a heartbeat installation. This is the default location for
+# The logs path for a metricbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -1066,7 +1514,7 @@ output.elasticsearch:
 # In case the archive contains the dashboards from multiple Beats, this lets you
 # select which one to load. You can load all the dashboards in the archive by
 # setting this to the empty string.
-#setup.dashboards.beat: heartbeat
+#setup.dashboards.beat: metricbeat
 
 # The name of the Kibana index to use for setting the configuration. Default is ".kibana"
 #setup.dashboards.kibana_index: .kibana
@@ -1099,14 +1547,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "heartbeat-%{[beat.version]}"
+# Template name. By default the template name is "metricbeat-%{[beat.version]}"
 # The template name and pattern has to be set in case the elasticsearch index pattern is modified.
-#setup.template.name: "heartbeat-%{[beat.version]}"
+#setup.template.name: "metricbeat-%{[beat.version]}"
 
 # Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
 # The template name and pattern has to be set in case the elasticsearch index pattern is modified.
-#setup.template.pattern: "heartbeat-%{[beat.version]}-*"
+#setup.template.pattern: "metricbeat-%{[beat.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -1219,7 +1667,7 @@ setup.kibana:
 # Send all logging output to Windows Event Logs. The default is false.
 #logging.to_eventlog: false
 
-# If enabled, heartbeat periodically logs its internal metrics that have changed
+# If enabled, metricbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -1234,10 +1682,10 @@ logging.to_files: true
 logging.files:
   # Configure the path where the logs are written. The default is the logs directory
   # under the home path (the binary location).
-  #path: /var/log/heartbeat
+  #path: /var/log/metricbeat
 
   # The name of the files where the logs are written to.
-  #name: heartbeat
+  #name: metricbeat
 
   # Configure log file size limit. If limit is reached, log file will be
   # automatically rotated
@@ -1262,7 +1710,7 @@ logging.files:
 
 
 #============================== Xpack Monitoring =====================================
-# heartbeat can export internal metrics to a central Elasticsearch monitoring cluster.
+# metricbeat can export internal metrics to a central Elasticsearch monitoring cluster.
 # This requires xpack monitoring to be enabled in Elasticsearch.
 # The reporting is disabled by default.
 
