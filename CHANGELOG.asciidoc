@@ -40,6 +40,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Propagate Sync error when running SafeFileRotate. {pull}9069[9069]
 - Log events at the debug level when dropped by encoding problems. {pull}9251[9251]
 - Refresh host metadata in add_host_metadata. {pull}9359[9359]
+- When collecting swap metrics for beats telemetry or system metricbeat module handle cases of free swap being bigger than total swap by assuming no swap is being used. {issue}6271[6271] {pull}9383[9383]
 
 *Auditbeat*
 
