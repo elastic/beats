@@ -3,9 +3,9 @@ module_version: 1.0
 var:
   - name: paths
     default:
-      - /var/log/apache/error.log*
+      - /var/log/apache2/error.log*
     os.darwin:
-      - /usr/local/var/log/apache/error_log*
+      - /usr/local/var/log/apache2/error_log*
     os.windows:
       - "C:/tools/Apache/httpd-2.*/Apache24/logs/error.log*"
       - "C:/Program Files/Apache Software Foundation/Apache2.*/logs/error.log*"

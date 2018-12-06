@@ -29,7 +29,7 @@ input type more than once. For example:
     - /var/log/wifi.log
 - type: log
   paths:
-    - "/var/log/apache/*"
+    - "/var/log/apache2/*"
   fields:
     apache: true
   fields_under_root: true
