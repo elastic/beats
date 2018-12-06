@@ -61,8 +61,72 @@
       },
       "id": "55251360-aa32-11e8-9c06-877f0445e3e0",
       "type": "visualization",
-      "updated_at": "2018-12-06T11:17:12.883Z",
-      "version": 1
+      "updated_at": "2018-12-06T11:35:36.721Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "filebeat-*",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Frontend breakdown [Filebeat HAProxy]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "haproxy.frontend_name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Frontend breakdown [Filebeat HAProxy]",
+          "type": "pie"
+        }
+      },
+      "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0",
+      "type": "visualization",
+      "updated_at": "2018-12-06T11:35:36.721Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -144,8 +208,8 @@
       },
       "id": "11f8b9c0-aa32-11e8-9c06-877f0445e3e0",
       "type": "visualization",
-      "updated_at": "2018-12-06T11:17:12.883Z",
-      "version": 1
+      "updated_at": "2018-12-06T11:35:36.721Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -286,72 +350,8 @@
       },
       "id": "68af8ef0-aa33-11e8-9c06-877f0445e3e0",
       "type": "visualization",
-      "updated_at": "2018-12-06T11:17:12.883Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "filebeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Frontend breakdown [Filebeat HAProxy]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "haproxy.frontend_name",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Frontend breakdown [Filebeat HAProxy]",
-          "type": "pie"
-        }
-      },
-      "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0",
-      "type": "visualization",
-      "updated_at": "2018-12-06T11:17:12.883Z",
-      "version": 1
+      "updated_at": "2018-12-06T11:35:36.721Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -379,7 +379,7 @@
               "i": "1",
               "w": 24,
               "x": 0,
-              "y": 15
+              "y": 0
             },
             "id": "55251360-aa32-11e8-9c06-877f0445e3e0",
             "panelIndex": "1",
@@ -392,10 +392,10 @@
               "h": 15,
               "i": "2",
               "w": 24,
-              "x": 0,
+              "x": 24,
               "y": 0
             },
-            "id": "11f8b9c0-aa32-11e8-9c06-877f0445e3e0",
+            "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0",
             "panelIndex": "2",
             "type": "visualization",
             "version": "6.5.2"
@@ -406,10 +406,10 @@
               "h": 15,
               "i": "3",
               "w": 24,
-              "x": 24,
-              "y": 0
+              "x": 0,
+              "y": 15
             },
-            "id": "68af8ef0-aa33-11e8-9c06-877f0445e3e0",
+            "id": "11f8b9c0-aa32-11e8-9c06-877f0445e3e0",
             "panelIndex": "3",
             "type": "visualization",
             "version": "6.5.2"
@@ -423,7 +423,7 @@
               "x": 24,
               "y": 15
             },
-            "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0",
+            "id": "68af8ef0-aa33-11e8-9c06-877f0445e3e0",
             "panelIndex": "4",
             "type": "visualization",
             "version": "6.5.2"
@@ -435,8 +435,8 @@
       },
       "id": "3560d580-aa34-11e8-9c06-877f0445e3e0",
       "type": "dashboard",
-      "updated_at": "2018-12-06T11:20:21.738Z",
-      "version": 3
+      "updated_at": "2018-12-06T11:40:40.204Z",
+      "version": 6
     }
   ],
   "version": "6.5.2"
