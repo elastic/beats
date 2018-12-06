@@ -45,6 +45,6 @@
         Duration of the event in nano seconds.
 
     - name: event.dataset
-      type: long
+      type: keyword
       description: >
         Event dataset name.
