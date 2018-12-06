@@ -145,7 +145,7 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 	if IsInIntegTestEnv() {
 		// Fix file permissions after test is done writing files as root.
 		if runtime.GOOS != "windows" {
-			defer DockerChown("build")
+			defer DockerChown(".")
 		}
 		return test()
 	}
