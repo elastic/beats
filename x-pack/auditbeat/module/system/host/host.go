@@ -77,7 +77,7 @@ func (host *Host) toMapStr() common.MapStr {
 		"containerized":       host.info.Containerized,
 		"timezone.name":       host.info.Timezone,
 		"timezone.offset.sec": host.info.TimezoneOffsetSec,
-		"name":                host.info.Hostname,
+		"hostname":            host.info.Hostname,
 		"id":                  host.info.UniqueID,
 		// TODO "host.type": ?
 		"architecture": host.info.Architecture,

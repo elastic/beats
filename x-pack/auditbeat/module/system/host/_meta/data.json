@@ -35,7 +35,7 @@
                 "02:42:83:be:1a:3a",
                 "02:42:9e:d3:d8:88"
             ],
-            "name": "ubuntu-bionic",
+            "hostname": "ubuntu-bionic",
             "os": {
                 "family": "debian",
                 "kernel": "4.15.0-39-generic",

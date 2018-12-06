@@ -24,7 +24,7 @@
     type: long
     description: >
         Timezone offset in seconds.
-  - name: name
+  - name: hostname
     type: keyword
     description: >
         Hostname.
