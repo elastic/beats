@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Log events at the debug level when dropped by encoding problems. {pull}9251[9251]
 - Refresh host metadata in add_host_metadata. {pull}9359[9359]
 - When collecting swap metrics for beats telemetry or system metricbeat module handle cases of free swap being bigger than total swap by assuming no swap is being used. {issue}6271[6271] {pull}9383[9383]
+- Adding logging traces at debug level when the pipeline client receives the following events: onFilteredOut, onDroppedOnPublish. {pull}9016[9016]
 
 *Auditbeat*
 
@@ -336,8 +337,6 @@ https://github.com/elastic/beats/compare/v6.4.0...v6.5.0[View commits]
 - Report configured queue type. {pull}8091[8091]
 - Enable `host` and `cloud` metadata processors by default. {pull}8596[8596]
 - Autodiscovery no longer requires that the `condition` field be set. If left unset all configs will be matched. {pull}9029[9029]
-- Dissect will now flag event on parsing error. {pull}8751[8751]
-- Adding logging traces at debug level when the pipeline client receives the following events: onFilteredOut, onDroppedOnPublish. {pull}9016[9016]
 
 *Auditbeat*
 
