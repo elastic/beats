@@ -113,7 +113,7 @@ auditbeat.modules:
   metricsets:
     - host
     - packages
-    - processes
+    - process
     - socket
     - user
 
