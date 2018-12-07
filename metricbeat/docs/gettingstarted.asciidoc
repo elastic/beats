@@ -222,6 +222,8 @@ include::../../libbeat/docs/step-test-config.asciidoc[]
 
 include::../../libbeat/docs/step-look-at-config.asciidoc[]
 
+include::../../libbeat/docs/shared-cm-tip.asciidoc[]
+
 [id="{beatname_lc}-template"]
 === Step 3: Load the index template in Elasticsearch
 
