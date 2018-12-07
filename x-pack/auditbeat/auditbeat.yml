@@ -46,6 +46,19 @@ auditbeat.modules:
   - /usr/sbin
   - /etc
 
+- module: system
+
+  metricsets:
+    - host
+    - packages
+    - process
+    - socket
+    - user
+
+  state.period: 12h
+
+  report_changes: true
+
 
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:
@@ -119,9 +132,6 @@ setup.kibana:
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
-
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"

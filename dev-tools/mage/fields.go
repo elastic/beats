@@ -21,6 +21,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/pkg/errors"
+
 	"github.com/magefile/mage/sh"
 )
 
@@ -83,17 +85,12 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 		return err
 	}
 
-	licenseType := BeatLicense
-	if licenseType == "ASL 2.0" {
-		licenseType = "ASL2"
-	}
-
 	assetCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, assetCmdPath),
 		"-pkg", "include",
 		"-in", fieldsYML,
 		"-out", createDir(out),
-		"-license", licenseType,
+		"-license", toLibbeatLicenseName(BeatLicense),
 		BeatName,
 	)
 
@@ -111,17 +108,44 @@ func GenerateModuleFieldsGo() error {
 		return err
 	}
 
-	licenseType := BeatLicense
-	if licenseType == "ASL 2.0" {
-		licenseType = "ASL2"
-	}
-
 	moduleFieldsCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, moduleFieldsCmdPath),
 		"-beat", BeatName,
-		"-license", licenseType,
+		"-license", toLibbeatLicenseName(BeatLicense),
 		filepath.Join(CWD(), "module"),
 	)
 
 	return moduleFieldsCmd()
+}
+
+// GenerateModuleIncludeListGo generates an include/list.go file containing
+// a import statement for each module and dataset.
+func GenerateModuleIncludeListGo() error {
+	const moduleIncludeListCmdPath = "dev-tools/cmd/module_include_list/module_include_list.go"
+
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+
+	includeListCmd := sh.RunCmd("go", "run",
+		filepath.Join(beatsDir, moduleIncludeListCmdPath),
+		"-license", toLibbeatLicenseName(BeatLicense),
+		filepath.Join(CWD(), "module"),
+	)
+
+	return includeListCmd()
+}
+
+// toLibbeatLicenseName translates the license type used in packages to
+// the identifiers used by github.com/elastic/beatslibbeat/licenses.
+func toLibbeatLicenseName(name string) string {
+	switch name {
+	case "ASL 2.0":
+		return "ASL2"
+	case "Elastic License":
+		return "Elastic"
+	default:
+		panic(errors.Errorf("invalid license name '%v'", name))
+	}
 }

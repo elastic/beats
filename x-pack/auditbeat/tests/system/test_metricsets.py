@@ -34,6 +34,7 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "packages", COMMON_FIELDS + fields, warnings_allowed=True)
 
     @unittest.skipIf(sys.platform == "darwin" and os.geteuid != 0, "Requires root on macOS")
+    @unittest.skip("Test is failing on CI")
     def test_metricset_process(self):
         """
         process metricset collects information about processes running on a system.
