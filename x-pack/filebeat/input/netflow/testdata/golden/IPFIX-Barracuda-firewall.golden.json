@@ -15,6 +15,7 @@
         },
         "event": {
           "created": "2017-06-29T13:58:28Z",
+          "duration": 20269000000,
           "type": "netflow"
         },
         "flow": {
@@ -77,6 +78,7 @@
         },
         "event": {
           "created": "2017-06-29T13:58:28Z",
+          "duration": 20269000000,
           "type": "netflow"
         },
         "flow": {
@@ -139,6 +141,7 @@
         },
         "event": {
           "created": "2017-06-29T13:58:28Z",
+          "duration": 20306000000,
           "type": "netflow"
         },
         "flow": {
@@ -201,6 +204,7 @@
         },
         "event": {
           "created": "2017-06-29T13:58:28Z",
+          "duration": 20306000000,
           "type": "netflow"
         },
         "flow": {
@@ -263,6 +267,7 @@
         },
         "event": {
           "created": "2017-06-29T13:58:28Z",
+          "duration": 20317000000,
           "type": "netflow"
         },
         "flow": {
@@ -325,6 +330,7 @@
         },
         "event": {
           "created": "2017-06-29T13:58:28Z",
+          "duration": 20317000000,
           "type": "netflow"
         },
         "flow": {
@@ -387,6 +393,7 @@
         },
         "event": {
           "created": "2017-06-29T13:58:28Z",
+          "duration": 20368000000,
           "type": "netflow"
         },
         "flow": {
@@ -449,6 +456,7 @@
         },
         "event": {
           "created": "2017-06-29T13:58:28Z",
+          "duration": 20368000000,
           "type": "netflow"
         },
         "flow": {

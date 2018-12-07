@@ -15,6 +15,7 @@
         },
         "event": {
           "created": "2018-04-18T08:16:47Z",
+          "duration": 0,
           "type": "netflow"
         },
         "flow": {
@@ -89,6 +90,7 @@
         },
         "event": {
           "created": "2018-04-18T08:16:47Z",
+          "duration": 0,
           "type": "netflow"
         },
         "flow": {

@@ -126,6 +126,11 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 			ecsEvent["duration"] = ecsEvent["end"].(time.Time).Sub(ecsEvent["start"].(time.Time)).Nanoseconds()
 		}
 	}
+	if ecsEvent["duration"] == nil {
+		if duration, found := getKeyUint64(flow.Fields, "flowDurationMilliseconds"); found {
+			ecsEvent["duration"] = time.Duration(duration) * time.Millisecond
+		}
+	}
 
 	flowDirection, hasFlowDirection := getKeyUint64(flow.Fields, "flowDirection")
 	// ECS Fields -- source and destination
