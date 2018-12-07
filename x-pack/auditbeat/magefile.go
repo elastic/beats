@@ -151,7 +151,7 @@ func GoIntegTest(ctx context.Context) error {
 
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
-	mg.Deps(mage.BuildSystemTestBinary)
+	mg.SerialDeps(Fields, mage.BuildSystemTestBinary)
 	return mage.PythonNoseTest(mage.DefaultPythonTestUnitArgs())
 }
 
