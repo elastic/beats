@@ -9,6 +9,7 @@ import (
 	"encoding/gob"
 	"io"
 	"net"
+	"strconv"
 	"time"
 
 	"github.com/OneOfOne/xxhash"
@@ -77,19 +78,19 @@ type Host struct {
 func (host *Host) changeDetectionHash() uint64 {
 	h := xxhash.New64()
 
-	mapstr := host.toMapStr()
+	if host.info.Containerized != nil {
+		h.WriteString(strconv.FormatBool(*host.info.Containerized))
+	}
 
-	// We detect changes to the ID separately, so ignore here.
-	mapstr.Delete("id")
+	h.WriteString(host.info.Timezone)
+	h.WriteString(strconv.Itoa(host.info.TimezoneOffsetSec))
+	h.WriteString(host.info.Architecture)
+	h.WriteString(host.info.OS.Platform)
+	h.WriteString(host.info.OS.Name)
+	h.WriteString(host.info.OS.Family)
+	h.WriteString(host.info.OS.Version)
+	h.WriteString(host.info.KernelVersion)
 
-	// Changes in uptime and boottime indicate a system reboot,
-	// which we report separately.
-	mapstr.Delete("uptime")
-	mapstr.Delete("boottime")
-
-	mapstr.Delete("hostname")
-
-	h.WriteString(mapstr.String())
 	return h.Sum64()
 }
 
@@ -98,7 +99,6 @@ func (host *Host) toMapStr() common.MapStr {
 		// https://github.com/elastic/ecs#-host-fields
 		"uptime":              host.uptime,
 		"boottime":            host.info.BootTime,
-		"containerized":       host.info.Containerized,
 		"timezone.name":       host.info.Timezone,
 		"timezone.offset.sec": host.info.TimezoneOffsetSec,
 		"hostname":            host.info.Hostname,
@@ -114,6 +114,10 @@ func (host *Host) toMapStr() common.MapStr {
 			"version":  host.info.OS.Version,
 			"kernel":   host.info.KernelVersion,
 		},
+	}
+
+	if host.info.Containerized != nil {
+		mapstr.Put("containerized", host.info.Containerized)
 	}
 
 	var ipStrings []string
