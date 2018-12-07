@@ -137,4 +137,3 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		MetricSetFields: calculateConnStats(conns),
 	})
 }
-
