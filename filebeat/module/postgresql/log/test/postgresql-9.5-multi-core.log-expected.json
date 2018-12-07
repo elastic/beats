@@ -68,7 +68,7 @@
         "postgresql.log.user": "postgres"
     }, 
     {
-        "@timestamp": "2018-12-07T19:08:07.221Z", 
+        "@timestamp": "2018-12-07T22:10:43.443Z", 
         "event.dataset": "log", 
         "event.module": "postgresql", 
         "input.type": "log", 
@@ -82,7 +82,7 @@
         "postgresql.log.timezone": "EST"
     }, 
     {
-        "@timestamp": "2018-12-07T19:08:07.221Z", 
+        "@timestamp": "2018-12-07T22:10:43.443Z", 
         "event.dataset": "log", 
         "event.module": "postgresql", 
         "input.type": "log", 
@@ -96,7 +96,7 @@
         "postgresql.log.timezone": "EST"
     }, 
     {
-        "@timestamp": "2018-12-07T19:08:07.221Z", 
+        "@timestamp": "2018-12-07T22:10:43.443Z", 
         "event.dataset": "log", 
         "event.module": "postgresql", 
         "input.type": "log", 
@@ -110,7 +110,7 @@
         "postgresql.log.timezone": "EST"
     }, 
     {
-        "@timestamp": "2018-12-07T19:08:07.221Z", 
+        "@timestamp": "2018-12-07T22:10:43.443Z", 
         "event.dataset": "log", 
         "event.module": "postgresql", 
         "input.type": "log", 
@@ -126,7 +126,7 @@
         "postgresql.log.user": "postgres"
     }, 
     {
-        "@timestamp": "2018-12-07T19:08:07.221Z", 
+        "@timestamp": "2018-12-07T22:10:43.443Z", 
         "event.dataset": "log", 
         "event.module": "postgresql", 
         "input.type": "log", 
