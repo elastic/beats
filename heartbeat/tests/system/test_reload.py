@@ -28,7 +28,7 @@ class Test(BaseTest):
                 cfg_file, self.http_cfg("myid", "http://203.0.113.1:8186"))
 
             self.wait_until(lambda: self.last_output_line()[
-                            "http.url"] == "http://203.0.113.1:8186")
+                            "url.full"] == "http://203.0.113.1:8186")
 
             self.assert_last_status("down")
 

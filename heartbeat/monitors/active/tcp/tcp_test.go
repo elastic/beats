@@ -92,7 +92,7 @@ func setupServer(t *testing.T, serverCreator func(http.Handler) *httptest.Server
 }
 
 func tcpMonitorChecks(host string, ip string, port uint16, status string) mapval.Validator {
-	return hbtest.MonitorChecks(host, ip, "tcp", status)
+	return hbtest.BaseChecks(ip, status)
 }
 
 func TestUpEndpointJob(t *testing.T) {
@@ -104,16 +104,11 @@ func TestUpEndpointJob(t *testing.T) {
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.MonitorChecks(
-				"localhost",
-				"127.0.0.1",
-				"tcp",
-				"up",
-			),
-			hbtest.RespondingTCPChecks(port),
+			hbtest.BaseChecks("127.0.0.1", "up"),
+			hbtest.SimpleURLChecks(t, "tcp", "localhost", port),
+			hbtest.RespondingTCPChecks(),
 			mapval.MustCompile(mapval.Map{
 				"resolve": mapval.Map{
-					"host":   "localhost",
 					"ip":     "127.0.0.1",
 					"rtt.us": mapval.IsDuration,
 				},
@@ -152,13 +147,9 @@ func TestTLSConnection(t *testing.T) {
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.TLSChecks(0, 0, cert),
-			hbtest.MonitorChecks(
-				serverURL.Hostname(),
-				ip,
-				"ssl",
-				"up",
-			),
-			hbtest.RespondingTCPChecks(port),
+			hbtest.RespondingTCPChecks(),
+			hbtest.BaseChecks(ip, "up"),
+			hbtest.SimpleURLChecks(t, "ssl", serverURL.Hostname(), port),
 		)),
 		event.Fields,
 	)
@@ -176,8 +167,8 @@ func TestConnectionRefusedEndpointJob(t *testing.T) {
 		t,
 		mapval.Strict(mapval.Compose(
 			tcpMonitorChecks(ip, ip, port, "down"),
+			hbtest.SimpleURLChecks(t, "tcp", ip, port),
 			hbtest.ErrorChecks(dialErr, "io"),
-			hbtest.TCPBaseChecks(port),
 		)),
 		event.Fields,
 	)
@@ -193,8 +184,8 @@ func TestUnreachableEndpointJob(t *testing.T) {
 		t,
 		mapval.Strict(mapval.Compose(
 			tcpMonitorChecks(ip, ip, port, "down"),
+			hbtest.SimpleURLChecks(t, "tcp", ip, port),
 			hbtest.ErrorChecks(dialErr, "io"),
-			hbtest.TCPBaseChecks(port),
 		)),
 		event.Fields,
 	)

@@ -32,14 +32,14 @@ import (
 func pingHost(
 	event *beat.Event,
 	dialer transport.Dialer,
-	host string,
+	addr string,
 	timeout time.Duration,
 	validator ConnCheck,
 ) error {
 	start := time.Now()
 	deadline := start.Add(timeout)
 
-	conn, err := dialer.Dial("tcp", host)
+	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
 		debugf("dial failed with: %v", err)
 		return reason.IOFailed(err)
