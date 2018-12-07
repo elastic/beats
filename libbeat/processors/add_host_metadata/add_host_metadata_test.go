@@ -51,6 +51,10 @@ func TestConfigDefault(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
+	v, err = newEvent.GetValue("host.os.name")
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
+
 	v, err = newEvent.GetValue("host.ip")
 	assert.Error(t, err)
 	assert.Nil(t, v)
@@ -81,6 +85,10 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	assert.NoError(t, err)
 
 	v, err := newEvent.GetValue("host.os.family")
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
+
+	v, err = newEvent.GetValue("host.os.name")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
