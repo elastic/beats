@@ -14,11 +14,6 @@ type config struct {
 	HostStatePeriod time.Duration `config:"host.state.period"`
 }
 
-// validate validates the metricset config.
-func (c *config) validate() error {
-	return nil
-}
-
 func (c *config) effectiveStatePeriod() time.Duration {
 	if c.HostStatePeriod != 0 {
 		return c.HostStatePeriod
