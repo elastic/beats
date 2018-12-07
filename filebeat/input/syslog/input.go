@@ -204,6 +204,11 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 	f := common.MapStr{
 		"message": strings.TrimRight(ev.Message(), "\n"),
 		"source":  metadata.RemoteAddr.String(),
+		"log": common.MapStr{
+			"source": common.MapStr{
+				"address": metadata.RemoteAddr.String(),
+			},
+		},
 	}
 
 	syslog := common.MapStr{}

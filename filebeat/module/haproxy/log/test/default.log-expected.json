@@ -18,6 +18,7 @@
         "haproxy.process_name": "haproxy", 
         "haproxy.source": "1.2.3.4", 
         "input.type": "log", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/haproxy/log/test/default.log", 
         "offset": 0, 
         "prospector.type": "log"
     }

@@ -9,6 +9,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "starting", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,377] INFO starting (kafka.server.KafkaServer)", 
         "offset": 0, 
         "prospector.type": "log"
@@ -23,6 +24,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Connecting to zookeeper on localhost:2181", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,379] INFO Connecting to zookeeper on localhost:2181 (kafka.server.KafkaServer)", 
         "offset": 67, 
         "prospector.type": "log"
@@ -37,6 +39,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Client environment:java.io.tmpdir=/tmp", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,400] INFO Client environment:java.io.tmpdir=/tmp (org.apache.zookeeper.ZooKeeper)", 
         "offset": 167, 
         "prospector.type": "log"
@@ -51,6 +54,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Client environment:java.compiler=<NA>", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,400] INFO Client environment:java.compiler=<NA> (org.apache.zookeeper.ZooKeeper)", 
         "offset": 270, 
         "prospector.type": "log"
@@ -65,6 +69,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Initiating client connection, connectString=localhost:2181 sessionTimeout=6000 watcher=org.I0Itec.zkclient.ZkClient@5ffead27", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,401] INFO Initiating client connection, connectString=localhost:2181 sessionTimeout=6000 watcher=org.I0Itec.zkclient.ZkClient@5ffead27 (org.apache.zookeeper.ZooKeeper)", 
         "offset": 372, 
         "prospector.type": "log"
@@ -79,6 +84,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Waiting for keeper state SyncConnected", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,413] INFO Waiting for keeper state SyncConnected (org.I0Itec.zkclient.ZkClient)", 
         "offset": 561, 
         "prospector.type": "log"
@@ -93,6 +99,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Opening socket connection to server localhost/0:0:0:0:0:0:0:1:2181. Will not attempt to authenticate using SASL (unknown error)", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,415] INFO Opening socket connection to server localhost/0:0:0:0:0:0:0:1:2181. Will not attempt to authenticate using SASL (unknown error) (org.apache.zookeeper.ClientCnxn)", 
         "offset": 662, 
         "prospector.type": "log"
@@ -107,6 +114,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Socket connection established to localhost/0:0:0:0:0:0:0:1:2181, initiating session", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,420] INFO Socket connection established to localhost/0:0:0:0:0:0:0:1:2181, initiating session (org.apache.zookeeper.ClientCnxn)", 
         "offset": 855, 
         "prospector.type": "log"
@@ -121,6 +129,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Session establishment complete on server localhost/0:0:0:0:0:0:0:1:2181, sessionid = 0x15dabf8d4140000, negotiated timeout = 6000", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,457] INFO Session establishment complete on server localhost/0:0:0:0:0:0:0:1:2181, sessionid = 0x15dabf8d4140000, negotiated timeout = 6000 (org.apache.zookeeper.ClientCnxn)", 
         "offset": 1004, 
         "prospector.type": "log"
@@ -135,6 +144,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "zookeeper state changed (SyncConnected)", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,458] INFO zookeeper state changed (SyncConnected) (org.I0Itec.zkclient.ZkClient)", 
         "offset": 1199, 
         "prospector.type": "log"
@@ -149,6 +159,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "WARN", 
         "kafka.log.message": "No meta.properties file under dir /tmp/kafka-logs/meta.properties", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,748] WARN No meta.properties file under dir /tmp/kafka-logs/meta.properties (kafka.server.BrokerMetadataCheckpoint)", 
         "offset": 1301, 
         "prospector.type": "log"
@@ -163,6 +174,7 @@
         "kafka.log.component": "ThrottledRequestReaper-Fetch", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Starting", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,800] INFO [ThrottledRequestReaper-Fetch]: Starting (kafka.server.ClientQuotaManager$ThrottledRequestReaper)", 
         "offset": 1438, 
         "prospector.type": "log"
@@ -177,6 +189,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Log directory '/tmp/kafka-logs' not found, creating it.", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,866] INFO Log directory '/tmp/kafka-logs' not found, creating it. (kafka.log.LogManager)", 
         "offset": 1567, 
         "prospector.type": "log"
@@ -191,6 +204,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Loading logs.", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:20,873] INFO Loading logs. (kafka.log.LogManager)", 
         "offset": 1677, 
         "prospector.type": "log"
@@ -205,6 +219,7 @@
         "kafka.log.component": "ExpirationReaper-0-Heartbeat", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Starting", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:21,062] INFO [ExpirationReaper-0-Heartbeat]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)", 
         "offset": 1745, 
         "prospector.type": "log"
@@ -219,6 +234,7 @@
         "kafka.log.component": "unknown", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Result of znode creation is: OK", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:21,063] INFO Result of znode creation is: OK (kafka.utils.ZKCheckedEphemeral)", 
         "offset": 1881, 
         "prospector.type": "log"
@@ -233,6 +249,7 @@
         "kafka.log.component": "Group Metadata Manager on Broker 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Removed 0 expired offsets in 1 milliseconds.", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:21,095] INFO [Group Metadata Manager on Broker 0]: Removed 0 expired offsets in 1 milliseconds. (kafka.coordinator.group.GroupMetadataManager)", 
         "offset": 1977, 
         "prospector.type": "log"
@@ -247,6 +264,7 @@
         "kafka.log.component": "ProducerId Manager 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Acquired new producerId block (brokerId:0,blockStartProducerId:0,blockEndProducerId:999) by writing to Zk with path version 1", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:21,127] INFO [ProducerId Manager 0]: Acquired new producerId block (brokerId:0,blockStartProducerId:0,blockEndProducerId:999) by writing to Zk with path version 1 (kafka.coordinator.transaction.ProducerIdManager)", 
         "offset": 2138, 
         "prospector.type": "log"
@@ -261,6 +279,7 @@
         "kafka.log.component": "Transaction Coordinator 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Starting up.", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:21,162] INFO [Transaction Coordinator 0]: Starting up. (kafka.coordinator.transaction.TransactionCoordinator)", 
         "offset": 2369, 
         "prospector.type": "log"
@@ -275,6 +294,7 @@
         "kafka.log.component": "Transaction Marker Channel Manager 0", 
         "kafka.log.level": "INFO", 
         "kafka.log.message": "Starting", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log", 
         "message": "[2017-08-04 10:48:21,167] INFO [Transaction Marker Channel Manager 0]: Starting (kafka.coordinator.transaction.TransactionMarkerChannelManager)", 
         "offset": 2497, 
         "prospector.type": "log"

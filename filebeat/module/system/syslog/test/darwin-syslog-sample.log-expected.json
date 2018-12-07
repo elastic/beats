@@ -5,6 +5,7 @@
         "fileset.module": "system", 
         "fileset.name": "syslog", 
         "input.type": "log", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/system/syslog/test/darwin-syslog-sample.log", 
         "log.flags": [
             "multiline"
         ], 
@@ -22,6 +23,7 @@
         "fileset.module": "system", 
         "fileset.name": "syslog", 
         "input.type": "log", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/system/syslog/test/darwin-syslog-sample.log", 
         "offset": 907, 
         "prospector.type": "log", 
         "system.syslog.hostname": "a-mac-with-esc-key", 
@@ -36,6 +38,7 @@
         "fileset.module": "system", 
         "fileset.name": "syslog", 
         "input.type": "log", 
+        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/system/syslog/test/darwin-syslog-sample.log", 
         "offset": 1176, 
         "prospector.type": "log", 
         "system.syslog.message": "--- last message repeated 1 time ---", 

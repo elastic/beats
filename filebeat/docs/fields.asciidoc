@@ -3128,6 +3128,26 @@ This field contains the flags of the event.
 
 --
 
+*`log.source.address`*::
++
+--
+type: keyword
+
+Log source address.
+
+
+--
+
+*`log.file.path`*::
++
+--
+type: keyword
+
+Log source path.
+
+
+--
+
 *`event.created`*::
 +
 --

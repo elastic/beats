@@ -55,6 +55,11 @@ func TestWhenPriorityIsSet(t *testing.T) {
 			"facility_label": "user-level",
 			"priority":       13,
 		},
+		"log": common.MapStr{
+			"source": common.MapStr{
+				"address": "127.0.0.1",
+			},
+		},
 	}
 
 	assert.Equal(t, expected, event.Fields)
@@ -77,6 +82,11 @@ func TestWhenPriorityIsNotSet(t *testing.T) {
 		},
 		"event":  common.MapStr{},
 		"syslog": common.MapStr{},
+		"log": common.MapStr{
+			"source": common.MapStr{
+				"address": "127.0.0.1",
+			},
+		},
 	}
 
 	assert.Equal(t, expected, event.Fields)
