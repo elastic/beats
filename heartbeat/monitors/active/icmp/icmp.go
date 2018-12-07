@@ -98,16 +98,19 @@ func create(
 	return errWrappedJobs, len(config.Hosts), nil
 }
 
-func createPingIPFactory(config *Config) func(*net.IPAddr) (*beat.Event, error) {
-	return func(ip *net.IPAddr) (*beat.Event, error) {
+func createPingIPFactory(config *Config) func(*beat.Event, *net.IPAddr) error {
+	return func(event *beat.Event, ip *net.IPAddr) error {
 		rtt, n, err := loop.ping(ip, config.Timeout, config.Wait)
+		if err != nil {
+			return err
+		}
 
 		icmpFields := common.MapStr{"requests": n}
 		if err == nil {
 			icmpFields["rtt"] = look.RTT(rtt)
+			monitors.MergeEventFields(event, icmpFields)
 		}
 
-		event := &beat.Event{Fields: common.MapStr{"icmp": icmpFields}}
-		return event, err
+		return nil
 	}
 }

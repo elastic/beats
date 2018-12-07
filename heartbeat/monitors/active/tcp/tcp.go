@@ -88,8 +88,8 @@ func create(
 		}
 
 		epJobs, err := dialchain.MakeDialerJobs(db, typ, scheme, eps, config.Mode,
-			func(dialer transport.Dialer, addr string) (*beat.Event, error) {
-				return pingHost(dialer, addr, timeout, validator)
+			func(event *beat.Event, dialer transport.Dialer, addr string) error {
+				return pingHost(event, dialer, addr, timeout, validator)
 			})
 		if err != nil {
 			return nil, 0, err

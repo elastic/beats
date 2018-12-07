@@ -111,20 +111,16 @@ func (b *Builder) Build(addr string, event *beat.Event) (transport.Dialer, error
 
 // Run executes the given function with a new dialer instance.
 func (b *Builder) Run(
+	event *beat.Event,
 	addr string,
-	fn func(transport.Dialer) (*beat.Event, error),
-) (*beat.Event, error) {
-	event := &beat.Event{}
+	fn func(*beat.Event, transport.Dialer) error,
+) error {
 	dialer, err := b.Build(addr, event)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	results, err := fn(dialer)
-	if results != nil {
-		monitors.MergeEventFields(event, results.Fields)
-	}
-	return event, err
+	return fn(event, dialer)
 }
 
 // MakeDialerJobs creates a set of monitoring jobs. The jobs behavior depends
@@ -137,7 +133,7 @@ func MakeDialerJobs(
 	typ, scheme string,
 	endpoints []Endpoint,
 	mode monitors.IPSettings,
-	fn func(dialer transport.Dialer, addr string) (*beat.Event, error),
+	fn func(event *beat.Event, dialer transport.Dialer, addr string) error,
 ) ([]monitors.Job, error) {
 	var jobs []monitors.Job
 	for _, endpoint := range endpoints {
@@ -156,7 +152,7 @@ func makeEndpointJobs(
 	typ, scheme string,
 	endpoint Endpoint,
 	mode monitors.IPSettings,
-	fn func(transport.Dialer, string) (*beat.Event, error),
+	fn func(*beat.Event, transport.Dialer, string) error,
 ) ([]monitors.Job, error) {
 
 	fields := common.MapStr{
@@ -173,9 +169,9 @@ func makeEndpointJobs(
 		jobs := make([]monitors.Job, len(endpoint.Ports))
 		for i, port := range endpoint.Ports {
 			address := net.JoinHostPort(endpoint.Host, strconv.Itoa(int(port)))
-			jobs[i] = monitors.MakeSimpleJob(func() (*beat.Event, error) {
-				return b.Run(address, func(dialer transport.Dialer) (*beat.Event, error) {
-					return fn(dialer, address)
+			jobs[i] = monitors.MakeSimpleJob(func(event *beat.Event) error {
+				return b.Run(event, address, func(event *beat.Event, dialer transport.Dialer) error {
+					return fn(event, dialer, address)
 				})
 			})
 		}
@@ -189,14 +185,16 @@ func makeEndpointJobs(
 
 	job, err := monitors.MakeByHostJob(settings,
 		monitors.MakePingAllIPPortFactory(endpoint.Ports,
-			func(ip *net.IPAddr, port uint16) (*beat.Event, error) {
+			func(event *beat.Event, ip *net.IPAddr, port uint16) error {
 				// use address from resolved IP
 				portStr := strconv.Itoa(int(port))
 				ipAddr := net.JoinHostPort(ip.String(), portStr)
 				hostAddr := net.JoinHostPort(endpoint.Host, portStr)
-				return b.Run(ipAddr, func(dialer transport.Dialer) (*beat.Event, error) {
-					return fn(dialer, hostAddr)
-				})
+				cb := func(event *beat.Event, dialer transport.Dialer) error {
+					return fn(event, dialer, hostAddr)
+				}
+				err := b.Run(event, ipAddr, cb)
+				return err
 			}))
 	if err != nil {
 		return nil, err

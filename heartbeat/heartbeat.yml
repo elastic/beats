@@ -14,7 +14,7 @@ heartbeat.monitors:
 - type: http
 
   # List or urls to query
-  urls: ["http://localhost:9200"]
+  urls: ["http://127.0.0.1:9200"]
 
   # Configure task schedule
   schedule: '@every 10s'
