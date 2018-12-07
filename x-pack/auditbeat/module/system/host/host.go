@@ -40,7 +40,7 @@ type eventAction uint8
 
 const (
 	eventActionHost eventAction = iota + 1
-	eventActionIdChanged
+	eventActionIDChanged
 	eventActionReboot
 	eventActionHostnameChanged
 	eventActionHostChanged
@@ -50,7 +50,7 @@ func (action eventAction) string() string {
 	switch action {
 	case eventActionHost:
 		return "host"
-	case eventActionIdChanged:
+	case eventActionIDChanged:
 		return "host_id_changed"
 	case eventActionReboot:
 		return "reboot"
@@ -252,11 +252,11 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		 Issue two events - one for the host with the old ID, one for the new
 		 - to link them (since the unique ID is what identifies a host).
 		*/
-		eventOldHost := hostEvent(ms.lastHost, eventTypeEvent, eventActionIdChanged)
+		eventOldHost := hostEvent(ms.lastHost, eventTypeEvent, eventActionIDChanged)
 		eventOldHost.MetricSetFields.Put("new_id", currentHost.info.UniqueID)
 		events = append(events, eventOldHost)
 
-		eventNewHost := hostEvent(currentHost, eventTypeEvent, eventActionIdChanged)
+		eventNewHost := hostEvent(currentHost, eventTypeEvent, eventActionIDChanged)
 		eventNewHost.MetricSetFields.Put("old_id", ms.lastHost.info.UniqueID)
 		events = append(events, eventNewHost)
 	}
