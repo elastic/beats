@@ -894,11 +894,14 @@ beta[]
 processors:
 - add_host_metadata:
     netinfo.enabled: false
+    cache.ttl: 5m
 -------------------------------------------------------------------------------
 
 It has the following settings:
 
 `netinfo.enabled`:: (Optional) Default false. Include IP addresses and MAC addresses as fields host.ip and host.mac
+
+`cache.ttl`:: (Optional) The processor uses an internal cache for the host metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
 The fields added to the event are looking as following:
@@ -921,8 +924,6 @@ The fields added to the event are looking as following:
    }
 }
 -------------------------------------------------------------------------------
-
-NOTE: The host information is refreshed every 5 minutes.
 
 [[dissect]]
 === Dissect strings

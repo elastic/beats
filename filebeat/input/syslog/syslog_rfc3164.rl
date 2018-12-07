@@ -14,7 +14,7 @@
   # Timestamp
   # https://tools.ietf.org/html/rfc3164#section-4.1.2
   # Match: "Jan" and "January"
-  month = ( "Jan" ("uary")? | "Feb" "ruary"? | "Mar" "ch"? | "Apr" "il"? | "Ma" "y"? | "Jun" "e"? | "Jul" "y"? | "Aug" "ust"? | "Sep" ("tember")? | "Oct" "ober"? | "Nov" "ember"? | "ec" "ember"?) >tok %month;
+  month = ( "Jan" ("uary")? | "Feb" "ruary"? | "Mar" "ch"? | "Apr" "il"? | "Ma" "y"? | "Jun" "e"? | "Jul" "y"? | "Aug" "ust"? | "Sep" ("tember")? | "Oct" "ober"? | "Nov" "ember"? | "Dec" "ember"?) >tok %month;
 
   # Match: " 5" and "10" as the day
   multiple_digits_day = (([12][0-9]) | ("3"[01]))>tok %day;

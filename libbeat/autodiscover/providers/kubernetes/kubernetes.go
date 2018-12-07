@@ -44,7 +44,7 @@ type Provider struct {
 	uuid      uuid.UUID
 	watcher   kubernetes.Watcher
 	metagen   kubernetes.MetaGenerator
-	templates *template.Mapper
+	templates template.Mapper
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
 }

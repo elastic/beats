@@ -232,6 +232,7 @@ func TestEmitEvent(t *testing.T) {
 						},
 					},
 				},
+				"config": []*common.Config{},
 			},
 		},
 		{
