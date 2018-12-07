@@ -52,7 +52,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "172.16.32.100:123 - 0.0.0.0:123 UDP",
           "id": "i1KQBFMlwFg",
           "locality": "private"
         },
@@ -114,7 +113,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "172.16.32.248:123 - 0.0.0.0:123 UDP",
           "id": "0Wj-QgIvFZE",
           "locality": "private"
         },
@@ -176,7 +174,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "172.16.32.100:123 - 0.0.0.0:123 UDP",
           "id": "i1KQBFMlwFg",
           "locality": "private"
         },
@@ -238,7 +235,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "172.16.32.201:123 - 0.0.0.0:123 UDP",
           "id": "_cbZpOjyGGQ",
           "locality": "private"
         },
@@ -300,7 +296,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "172.16.32.100:123 - 0.0.0.0:123 UDP",
           "id": "i1KQBFMlwFg",
           "locality": "private"
         },
@@ -362,7 +357,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "172.16.32.202:123 - 0.0.0.0:123 UDP",
           "id": "jDcbOcubrco",
           "locality": "private"
         },
@@ -422,7 +416,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:34304 - 0.0.0.0:0 IPv6-ICMP",
           "id": "tYpw8DU5u10",
           "locality": "private"
         },
@@ -482,7 +475,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:65058 - 172.16.32.201:22 TCP",
           "id": "74wObESpHnY",
           "locality": "private"
         },

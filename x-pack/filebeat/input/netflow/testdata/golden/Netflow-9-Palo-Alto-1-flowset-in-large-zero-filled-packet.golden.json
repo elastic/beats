@@ -21,7 +21,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:50234 - 134.220.2.6:88 TCP",
           "id": "NBJEjpgh6PA",
           "locality": "public"
         },

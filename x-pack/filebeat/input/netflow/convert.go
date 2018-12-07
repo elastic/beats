@@ -202,7 +202,6 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	if dstIP == nil {
 		dstIP = net.IPv4(0, 0, 0, 0).To4()
 	}
-	ecsFlow["five_tuple"] = makeFiveTuple(srcIP, srcPort, dstIP, dstPort, protocol)
 	ecsFlow["id"] = flowID(srcIP, dstIP, srcPort, dstPort, uint8(protocol))
 	ecsFlow["locality"] = getIPLocality(srcIP, dstIP).String()
 
@@ -400,28 +399,6 @@ func (p IPProtocol) String() string {
 		return name
 	}
 	return "unknown (" + strconv.Itoa(int(p)) + ")"
-}
-
-func makeFiveTuple(srcIP net.IP, srcPort uint16, dstIP net.IP, dstPort uint16, protocol IPProtocol) string {
-	if srcPort < dstPort {
-		srcIP, dstIP = dstIP, srcIP
-		srcPort, dstPort = dstPort, srcPort
-	}
-	var b strings.Builder
-	b.WriteString(srcIP.String())
-	b.WriteByte(':')
-	b.WriteString(strconv.Itoa(int(srcPort)))
-
-	b.WriteString(" - ")
-
-	b.WriteString(dstIP.String())
-	b.WriteByte(':')
-	b.WriteString(strconv.Itoa(int(dstPort)))
-
-	b.WriteByte(' ')
-	b.WriteString(protocol.String())
-	return b.String()
-
 }
 
 func flowID(srcIP, dstIP net.IP, srcPort, dstPort uint16, proto uint8) string {

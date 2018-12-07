@@ -18,7 +18,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.0.1:51053 - 0.0.0.0:443 TCP",
           "id": "urCm_V5Qsz0",
           "locality": "private"
         },
@@ -102,7 +101,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:51053 - 10.0.0.1:443 TCP",
           "id": "1fCxVMA_rD0",
           "locality": "private"
         },
@@ -174,7 +172,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.0.1:51053 - 0.0.0.0:443 TCP",
           "id": "urCm_V5Qsz0",
           "locality": "private"
         },

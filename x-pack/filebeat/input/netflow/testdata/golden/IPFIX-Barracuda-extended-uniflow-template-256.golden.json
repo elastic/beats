@@ -19,7 +19,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "10.236.5.4:51917 - 0.0.0.0:443 TCP",
           "id": "xrwrnNR_Xgs",
           "locality": "private"
         },
@@ -94,7 +93,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:51917 - 64.235.151.76:443 TCP",
           "id": "7BBLL0QpIjw",
           "locality": "public"
         },

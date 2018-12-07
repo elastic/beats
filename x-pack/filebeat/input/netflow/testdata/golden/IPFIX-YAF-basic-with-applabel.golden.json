@@ -20,7 +20,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "172.16.32.201:46086 - 0.0.0.0:53 UDP",
           "id": "_tbAAnwoAu8",
           "locality": "private"
         },
@@ -89,7 +88,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "172.16.32.100:63499 - 0.0.0.0:9997 TCP",
           "id": "qznEzwF6uiM",
           "locality": "private"
         },

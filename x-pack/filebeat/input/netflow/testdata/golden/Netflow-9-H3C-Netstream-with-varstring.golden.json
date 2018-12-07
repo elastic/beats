@@ -21,7 +21,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "20.20.20.20:137 - 0.0.0.0:137 UDP",
           "id": "ZqqgTzKUqi8",
           "locality": "public"
         },

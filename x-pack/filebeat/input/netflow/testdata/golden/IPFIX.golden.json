@@ -51,7 +51,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.253.1:60560 - 0.0.0.0:22 TCP",
           "id": "5dY_LIjk4jM",
           "locality": "private"
         },
@@ -112,7 +111,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:60560 - 192.168.253.128:22 TCP",
           "id": "D9c6mFRsdDc",
           "locality": "private"
         },
@@ -173,7 +171,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:35262 - 192.168.253.2:53 UDP",
           "id": "Htn9CGiiIcE",
           "locality": "private"
         },
@@ -234,7 +231,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.253.132:35262 - 0.0.0.0:53 UDP",
           "id": "zasoUAZZ0VY",
           "locality": "private"
         },
@@ -295,7 +291,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:49935 - 54.214.9.161:443 TCP",
           "id": "S1-OrWp2NPk",
           "locality": "public"
         },
@@ -356,7 +351,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.253.132:49935 - 0.0.0.0:443 TCP",
           "id": "KbgtQk9RbTg",
           "locality": "private"
         },
@@ -417,7 +411,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.253.130:38254 - 0.0.0.0:9200 TCP",
           "id": "aMDg_zpGiEg",
           "locality": "private"
         },
@@ -478,7 +471,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.253.1:60560 - 0.0.0.0:22 TCP",
           "id": "5dY_LIjk4jM",
           "locality": "private"
         },
@@ -539,7 +531,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:60560 - 192.168.253.128:22 TCP",
           "id": "D9c6mFRsdDc",
           "locality": "private"
         },
@@ -600,7 +591,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.253.1:65308 - 0.0.0.0:22 TCP",
           "id": "5rzmeAVHDXo",
           "locality": "private"
         },
@@ -661,7 +651,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:65308 - 192.168.253.128:22 TCP",
           "id": "yZq2BehxSew",
           "locality": "private"
         },
@@ -722,7 +711,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.253.1:5353 - 0.0.0.0:5353 UDP",
           "id": "Ft-4Om5rIsk",
           "locality": "private"
         },

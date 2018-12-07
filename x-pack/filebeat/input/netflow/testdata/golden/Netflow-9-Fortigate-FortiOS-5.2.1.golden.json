@@ -54,7 +54,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.99.7:61910 - 0.0.0.0:443 TCP",
           "id": "jJrTIsjNw1M",
           "locality": "private"
         },

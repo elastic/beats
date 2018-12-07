@@ -21,7 +21,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:50073 - 100.78.40.201:8080 TCP",
           "id": "-6Te1tDf44E",
           "locality": "public"
         },
@@ -82,7 +81,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "10.231.128.150:50073 - 0.0.0.0:8080 TCP",
           "id": "R1qTxPMgj7U",
           "locality": "private"
         },
@@ -143,7 +141,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:53483 - 100.78.40.201:8080 TCP",
           "id": "99lFCpKjscc",
           "locality": "public"
         },
@@ -204,7 +201,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "10.27.8.20:53483 - 0.0.0.0:8080 TCP",
           "id": "qKNwoK4AM-I",
           "locality": "private"
         },

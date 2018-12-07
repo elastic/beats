@@ -18,7 +18,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:17549 - 192.168.14.1:0 ICMP",
           "id": "4sqHgIUNdhc",
           "locality": "private"
         },
@@ -75,7 +74,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.23.22:17549 - 0.0.0.0:0 ICMP",
           "id": "3zooPayCX08",
           "locality": "private"
         },
@@ -132,7 +130,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:17549 - 164.164.37.11:0 ICMP",
           "id": "rjHIoePwVUY",
           "locality": "public"
         },
@@ -189,7 +186,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.23.20:17805 - 0.0.0.0:0 ICMP",
           "id": "kTUBU9vFxdg",
           "locality": "private"
         },
@@ -246,7 +242,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:17805 - 164.164.37.11:0 ICMP",
           "id": "xPJhkFDpNiU",
           "locality": "public"
         },
@@ -303,7 +298,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.14.11:17805 - 0.0.0.0:0 ICMP",
           "id": "AxuXms6GBGk",
           "locality": "private"
         },
@@ -360,7 +354,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:17805 - 2.2.2.11:0 ICMP",
           "id": "gFKfPBsWfLM",
           "locality": "public"
         },
@@ -417,7 +410,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "2.2.2.11:17805 - 0.0.0.0:0 ICMP",
           "id": "eHdG6rUdn28",
           "locality": "public"
         },
@@ -474,7 +466,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:17805 - 192.168.14.1:0 ICMP",
           "id": "JVI-3U3vTiM",
           "locality": "private"
         },
@@ -531,7 +522,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "164.164.37.11:0 - 0.0.0.0:0 ICMP",
           "id": "pc77-XHjAxs",
           "locality": "public"
         },
@@ -588,7 +578,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.23.22:18061 - 0.0.0.0:0 ICMP",
           "id": "Qh5mk2U4KjY",
           "locality": "private"
         },
@@ -645,7 +634,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:18061 - 164.164.37.11:0 ICMP",
           "id": "v3tlG0bhLIU",
           "locality": "public"
         },
@@ -702,7 +690,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.23.20:18061 - 0.0.0.0:0 ICMP",
           "id": "arIGi4uQChk",
           "locality": "private"
         },
@@ -759,7 +746,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:18061 - 164.164.37.11:0 ICMP",
           "id": "v3tlG0bhLIU",
           "locality": "public"
         },

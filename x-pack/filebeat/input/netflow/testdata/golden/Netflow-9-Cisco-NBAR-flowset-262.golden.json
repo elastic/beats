@@ -22,7 +22,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:2048 - 10.30.18.62:0 ICMP",
           "id": "uz9_zfua5qU",
           "locality": "private"
         },
@@ -97,7 +96,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "10.30.18.62:34220 - 0.0.0.0:161 UDP",
           "id": "1w3FDvLEFgo",
           "locality": "private"
         },
@@ -172,7 +170,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:2048 - 10.10.172.60:0 ICMP",
           "id": "qkbx0XD7pSA",
           "locality": "private"
         },
@@ -247,7 +244,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "10.10.172.60:123 - 0.0.0.0:123 UDP",
           "id": "4c7uUPCsBCk",
           "locality": "private"
         },
@@ -322,7 +318,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "10.10.172.60:45269 - 0.0.0.0:161 UDP",
           "id": "f2adL0TDrgs",
           "locality": "private"
         },

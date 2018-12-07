@@ -13,7 +13,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -76,7 +75,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -139,7 +137,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -202,7 +199,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -265,7 +261,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -328,7 +323,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -391,7 +385,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -454,7 +447,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -517,7 +509,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -580,7 +571,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -643,7 +633,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -706,7 +695,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -769,7 +757,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -832,7 +819,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -895,7 +881,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -958,7 +943,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1021,7 +1005,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1084,7 +1067,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1147,7 +1129,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1210,7 +1191,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1273,7 +1253,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1336,7 +1315,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1399,7 +1377,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1462,7 +1439,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1525,7 +1501,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1588,7 +1563,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1651,7 +1625,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1714,7 +1687,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },
@@ -1777,7 +1749,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:0 - 0.0.0.0:0 TCP",
           "id": "Vhs9T5k296w",
           "locality": "private"
         },

@@ -21,7 +21,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.100.151:45380 - 0.0.0.0:80 TCP",
           "id": "FGsJnTnhFRo",
           "locality": "private"
         },
@@ -89,7 +88,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:44778 - 208.100.17.187:443 TCP",
           "id": "pS0eG-KmtWY",
           "locality": "public"
         },
@@ -157,7 +155,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.100.151:44778 - 0.0.0.0:443 TCP",
           "id": "UX9yKGG1l0g",
           "locality": "private"
         },
@@ -225,7 +222,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:50618 - 208.100.17.189:443 TCP",
           "id": "8IX_jKHlTYI",
           "locality": "public"
         },
@@ -293,7 +289,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.100.151:50618 - 0.0.0.0:443 TCP",
           "id": "xuTsRrER3sQ",
           "locality": "private"
         },
@@ -361,7 +356,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:33660 - 178.255.83.1:80 TCP",
           "id": "8jdxbghGmCM",
           "locality": "public"
         },
@@ -429,7 +423,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.100.151:33660 - 0.0.0.0:80 TCP",
           "id": "cgdcVU_EGQA",
           "locality": "private"
         },
@@ -497,7 +490,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:33646 - 178.255.83.1:80 TCP",
           "id": "GcDNnOgnA5Q",
           "locality": "public"
         },
@@ -565,7 +557,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.100.151:33646 - 0.0.0.0:80 TCP",
           "id": "O3J0MRnKFRc",
           "locality": "private"
         },
@@ -633,7 +624,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:52970 - 192.168.100.111:53 UDP",
           "id": "r_38fQYHkQc",
           "locality": "private"
         },
@@ -697,7 +687,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.100.150:52970 - 0.0.0.0:53 UDP",
           "id": "YROWQT5rfG8",
           "locality": "private"
         },
@@ -761,7 +750,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:49311 - 192.168.100.111:53 UDP",
           "id": "ahrbxvQPrLM",
           "locality": "private"
         },
@@ -825,7 +813,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.100.150:49311 - 0.0.0.0:53 UDP",
           "id": "gvmqdtyoP-k",
           "locality": "private"
         },
@@ -889,7 +876,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:51746 - 192.168.100.111:80 TCP",
           "id": "HhwdAeswnyA",
           "locality": "private"
         },
@@ -953,7 +939,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.100.150:51746 - 0.0.0.0:80 TCP",
           "id": "RSopBOCi7lM",
           "locality": "private"
         },
@@ -1017,7 +1002,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "0.0.0.0:51745 - 192.168.100.111:80 TCP",
           "id": "egrl1hI_KGo",
           "locality": "private"
         },
@@ -1081,7 +1065,6 @@
           "type": "netflow"
         },
         "flow": {
-          "five_tuple": "192.168.100.150:51745 - 0.0.0.0:80 TCP",
           "id": "uEhXi585RDg",
           "locality": "private"
         },
