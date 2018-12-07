@@ -35,6 +35,18 @@
               type: integer
               description: >
                 All TCP listening ports
+            - name: established
+              type: integer
+              description: >
+                TCP established ports
+            - name: close_wait
+              type: integer
+              description: >
+                TCP close_wait ports
+            - name: time_wait
+              type: integer
+              description: >
+                TCP time_wait ports
     - name: udp
       type: group
       description: >
@@ -49,5 +61,6 @@
               type: integer
               description: >
                 All open TCP connections
+
 
 
