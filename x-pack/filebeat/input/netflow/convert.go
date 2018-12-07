@@ -47,7 +47,6 @@ func toBeatEvent(flow record.Record) (event beat.Event) {
 
 func toBeatEventCommon(flow record.Record) (event beat.Event) {
 	// replace net.HardwareAddress with its String() representation
-
 	fixMacAddresses(flow.Fields)
 	// Nest Exporter into netflow fields
 	flow.Fields["exporter"] = common.MapStr(flow.Exporter)
@@ -442,7 +441,7 @@ func flowID(srcIP, dstIP net.IP, srcPort, dstPort uint16, proto uint8) string {
 type Direction uint8
 
 const (
-	// Acording to IPFIX flowDirection field definition
+	// According to IPFIX flowDirection field definition
 	DirectionInbound Direction = iota
 	DirectionOutbound
 )

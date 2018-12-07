@@ -121,7 +121,7 @@ func (p *netflowInput) Run() {
 		logger.Info("Starting UDP input")
 
 		if err := p.decoder.Start(); err != nil {
-			logger.Error("Failed to start netflow decoder: %v", err)
+			logger.Errorw("Failed to start netflow decoder", "error", err)
 			p.outlet.Close()
 			return
 		}
