@@ -33,12 +33,31 @@ const (
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
-
-	eventActionHost        = "host"
-	eventActionIdChanged   = "host_id_changed"
-	eventActionReboot      = "reboot"
-	eventActionHostChanged = "host_changed"
 )
+
+type eventAction uint8
+
+const (
+	eventActionHost eventAction = iota + 1
+	eventActionIdChanged
+	eventActionReboot
+	eventActionHostChanged
+)
+
+func (action eventAction) string() string {
+	switch action {
+	case eventActionHost:
+		return "host"
+	case eventActionIdChanged:
+		return "host_id_changed"
+	case eventActionReboot:
+		return "reboot"
+	case eventActionHostChanged:
+		return "host_changed"
+	default:
+		return ""
+	}
+}
 
 // Host represents information about a host.
 type Host struct {
@@ -275,12 +294,12 @@ func getHost() (*Host, error) {
 	return host, nil
 }
 
-func hostEvent(host *Host, eventType string, eventAction string) mb.Event {
+func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	return mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"type":   eventType,
-				"action": eventAction,
+				"action": action.string(),
 			},
 		},
 		MetricSetFields: host.toMapStr(),
