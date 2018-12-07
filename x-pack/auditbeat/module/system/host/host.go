@@ -41,6 +41,7 @@ const (
 	eventActionHost eventAction = iota + 1
 	eventActionIdChanged
 	eventActionReboot
+	eventActionHostnameChanged
 	eventActionHostChanged
 )
 
@@ -52,6 +53,8 @@ func (action eventAction) string() string {
 		return "host_id_changed"
 	case eventActionReboot:
 		return "reboot"
+	case eventActionHostnameChanged:
+		return "hostname_changed"
 	case eventActionHostChanged:
 		return "host_changed"
 	default:
@@ -83,6 +86,8 @@ func (host *Host) changeDetectionHash() uint64 {
 	// which we report separately.
 	mapstr.Delete("uptime")
 	mapstr.Delete("boottime")
+
+	mapstr.Delete("hostname")
 
 	h.WriteString(mapstr.String())
 	return h.Sum64()
@@ -255,6 +260,11 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	// Report reboots separately
 	if !currentHost.info.BootTime.Equal(ms.lastHost.info.BootTime) {
 		events = append(events, hostEvent(currentHost, eventTypeEvent, eventActionReboot))
+	}
+
+	// Report hostname changes separately
+	if currentHost.info.Hostname != ms.lastHost.info.Hostname {
+		events = append(events, hostEvent(currentHost, eventTypeEvent, eventActionHostnameChanged))
 	}
 
 	// Report any other changes.
