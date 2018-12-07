@@ -13,6 +13,10 @@
       type: long
       description: >
           Process id
+    - name: core_id
+      type: long
+      description: >
+          Core id
     - name: user
       example: "admin"
       description:

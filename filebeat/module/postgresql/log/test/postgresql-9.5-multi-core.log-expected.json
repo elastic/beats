@@ -1,0 +1,57 @@
+[
+    {
+        "@timestamp": "2018-12-07T07:02:44.126Z", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
+        "input.type": "log", 
+        "log.offset": 0, 
+        "message": "2018-11-17 03:14:01 EST [835-1] LOG:  autovacuum launcher started", 
+        "postgresql.log.thread_id": "835", 
+        "postgresql.log.timestamp": "2018-11-17 03:14:01", 
+        "postgresql.log.timezone": "EST"
+    }, 
+    {
+        "@timestamp": "2018-12-07T07:02:44.126Z", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
+        "input.type": "log", 
+        "log.offset": 66, 
+        "message": "2018-11-17 05:01:38 EST [832-1] LOG:  checkpoints are occurring too frequently (25 seconds apart)", 
+        "postgresql.log.thread_id": "832", 
+        "postgresql.log.timestamp": "2018-11-17 05:01:38", 
+        "postgresql.log.timezone": "EST"
+    }, 
+    {
+        "@timestamp": "2018-12-07T07:02:44.126Z", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
+        "input.type": "log", 
+        "log.offset": 164, 
+        "message": "2018-11-17 05:01:38 EST [832-2] HINT:  Consider increasing the configuration parameter \"max_wal_size\".", 
+        "postgresql.log.thread_id": "832", 
+        "postgresql.log.timestamp": "2018-11-17 05:01:38", 
+        "postgresql.log.timezone": "EST"
+    }, 
+    {
+        "@timestamp": "2018-12-07T07:02:44.126Z", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
+        "input.type": "log", 
+        "log.offset": 267, 
+        "message": "2018-11-17 03:13:56 EST [768-1] postgres@postgres FATAL:  the database system is starting up", 
+        "postgresql.log.thread_id": "768", 
+        "postgresql.log.timestamp": "2018-11-17 03:13:56", 
+        "postgresql.log.timezone": "EST"
+    }, 
+    {
+        "@timestamp": "2018-12-07T07:02:44.126Z", 
+        "event.dataset": "log", 
+        "event.module": "postgresql", 
+        "input.type": "log", 
+        "log.offset": 360, 
+        "message": "2018-11-17 03:13:57 EST [771-1] postgres@postgres FATAL:  the database system is starting up", 
+        "postgresql.log.thread_id": "771", 
+        "postgresql.log.timestamp": "2018-11-17 03:13:57", 
+        "postgresql.log.timezone": "EST"
+    }
+]
