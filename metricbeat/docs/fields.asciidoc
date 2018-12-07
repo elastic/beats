@@ -18367,7 +18367,7 @@ type: long
 
 format: bytes
 
-Used memory by the Lua engine.        
+Used memory by the Lua engine.
 
 
 --
@@ -18379,7 +18379,7 @@ type: long
 
 format: bytes
 
-The size in bytes of the dataset 
+The size in bytes of the dataset
 
 
 --
@@ -18624,7 +18624,7 @@ type: long
 
 format: bytes
 
-The size in bytes of copy-on-write allocations during the last RBD save operation                
+The size in bytes of copy-on-write allocations during the last RBD save operation
 
 
 --
@@ -18753,7 +18753,7 @@ type: long
 
 format: bytes
 
-AOF current file size             
+AOF current file size
 
 
 --
@@ -18857,7 +18857,7 @@ Total size in bytes of the replication backlog buffer
 --
 type: long
 
-The master offset of the replication backlog buffer          
+The master offset of the replication backlog buffer
 
 
 --
@@ -22075,12 +22075,42 @@ All open TCP connections
 
 --
 
+*`system.socket.summary.tcp.all.close_wait`*::
++
+--
+type: integer
+
+TCP close_wait ports
+
+
+--
+
+*`system.socket.summary.tcp.all.established`*::
++
+--
+type: integer
+
+TCP established ports
+
+
+--
+
 *`system.socket.summary.tcp.all.listening`*::
 +
 --
 type: integer
 
-All TCP listening ports
+TCP listening ports
+
+
+--
+
+*`system.socket.summary.tcp.all.time_wait`*::
++
+--
+type: integer
+
+TCP time_wait ports
 
 
 --
