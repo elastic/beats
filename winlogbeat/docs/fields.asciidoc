@@ -180,7 +180,7 @@ The Event Logging API was designed for Windows Server 2003 or Windows 2000 opera
 [[exported-fields-docker-processor]]
 == Docker fields
 
-Docker stats collected from Docker.
+Docker stats added by the `add_docker_metadata` processor.
 
 
 

@@ -1,7 +1,7 @@
 - key: docker
   title: Docker
   description: >
-    Docker stats collected from Docker.
+    Docker stats added by the `add_docker_metadata` processor.
   short_config: false
   anchor: docker-processor
   fields:

@@ -2384,7 +2384,7 @@ Number of items/documents that are replicas.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-Docker stats collected from Docker.
+Docker stats added by the `add_docker_metadata` processor.
 
 
 
