@@ -79,8 +79,7 @@ func readPasswdFile(readPassword bool) ([]*User, error) {
 				user.PasswordType = noPassword
 			default:
 				user.PasswordType = cryptPassword
-				hash := sha512.Sum512([]byte(C.GoString(passwd.pw_passwd)))
-				user.PasswordHashHash = hash[:]
+				user.PasswordHashHash = multiRoundHash(C.GoString(passwd.pw_passwd))
 			}
 		} else {
 			user.PasswordType = detectionDisabled
@@ -130,8 +129,8 @@ func enrichWithShadow(users []*User) error {
 				} else if strings.HasPrefix(shadow.Password, "!") || strings.HasPrefix(shadow.Password, "*") {
 					user.PasswordType = passwordDisabled
 				} else {
-					hash := sha512.Sum512([]byte(shadow.Password))
-					user.PasswordHashHash = hash[:]
+
+					user.PasswordHashHash = multiRoundHash(shadow.Password)
 				}
 			}
 		}
@@ -215,4 +214,13 @@ func readShadowFile() (map[string]shadowFileEntry, error) {
 	}
 
 	return shadowEntries, nil
+}
+
+// multiRoundHash performs 10 rounds of SHA-512 hashing.
+func multiRoundHash(s string) []byte {
+	hash := sha512.Sum512([]byte(s))
+	for i := 9; i > 0; i++ {
+		hash = sha512.Sum512(hash)
+	}
+	return hash[:]
 }
