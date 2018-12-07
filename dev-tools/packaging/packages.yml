@@ -250,10 +250,9 @@ specs:
       spec:
         <<: *docker_spec
 
-  elastic_beat_without_xpack:
-    ###
-    # OSS Packages
-    ###
+  # Elastic Beat with Apache License (OSS) and binary taken the current
+  # directory.
+  elastic_beat_oss:
     - os: windows
       types: [zip]
       spec:
@@ -297,6 +296,8 @@ specs:
         <<: *apache_license_for_binaries
         name: '{{.BeatName}}-oss'
 
+  # Elastic Beat with Elastic License and binary taken the current directory.
+  elastic_beat_xpack:
     ###
     # Elastic Licensed Packages
     ###
@@ -337,54 +338,8 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
 
-  # Official Beats
-  elastic_beat:
-    ###
-    # OSS Packages
-    ###
-    - os: windows
-      types: [zip]
-      spec:
-        <<: *windows_binary_spec
-        <<: *apache_license_for_binaries
-        name: '{{.BeatName}}-oss'
-
-    - os: darwin
-      types: [tgz]
-      spec:
-        <<: *binary_spec
-        <<: *apache_license_for_binaries
-        name: '{{.BeatName}}-oss'
-
-    - os: darwin
-      types: [dmg]
-      spec:
-        <<: *macos_beat_pkg_spec
-        <<: *apache_license_for_macos_pkg
-        name: '{{.BeatName}}-oss'
-
-    - os: linux
-      types: [tgz]
-      spec:
-        <<: *binary_spec
-        <<: *apache_license_for_binaries
-        name: '{{.BeatName}}-oss'
-
-    - os: linux
-      types: [deb, rpm]
-      spec:
-        <<: *deb_rpm_spec
-        <<: *apache_license_for_deb_rpm
-        name: '{{.BeatName}}-oss'
-
-    - os: linux
-      types: [docker]
-      spec:
-        <<: *docker_spec
-        <<: *elastic_docker_spec
-        <<: *apache_license_for_binaries
-        name: '{{.BeatName}}-oss'
-
+  # Elastic Beat with Elastic License and binary taken from the x-pack dir.
+  elastic_beat_xpack_separate_binaries:
     ###
     # Elastic Licensed Packages
     ###

@@ -309,9 +309,9 @@ coverage-report:
 fields: mage
 	@mage fields
 
+ifndef EXCLUDE_COMMON_UPDATE_TARGET
 .PHONY: update
-update: ## @build Update expects the most recent version of libbeat in the GOPATH
-update: python-env fields collect
+update: python-env fields collect ## @build Update expects the most recent version of libbeat in the GOPATH
 	@echo "Updating generated files for ${BEAT_NAME}"
 
 	@mkdir -p _meta
@@ -353,6 +353,7 @@ endif
 	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go \
 	  -index '${BEAT_INDEX_PREFIX}-*' -beat ${BEAT_NAME} -fields $(PWD)/fields.yml \
 	  -version ${BEAT_VERSION} -out _meta/kibana.generated
+endif
 
 .PHONY: docs
 docs:  ## @build Builds the documents for the beat

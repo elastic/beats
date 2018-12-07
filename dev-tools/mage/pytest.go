@@ -131,7 +131,7 @@ func PythonNoseTest(params PythonTestArgs) error {
 	// We check both the VE and the normal PATH because on Windows if the
 	// requirements are met by the globally installed package they are not
 	// installed to the VE.
-	nosetestsPath, err := lookVirtualenvPath(ve, "nosetests")
+	nosetestsPath, err := LookVirtualenvPath(ve, "nosetests")
 	if err != nil {
 		return err
 	}
@@ -236,9 +236,9 @@ func virtualenvPath(ve string, parts ...string) string {
 	return filepath.Join(append([]string{ve, "bin"}, parts...)...)
 }
 
-// lookVirtualenvPath looks for an executable in the path and it includes the
+// LookVirtualenvPath looks for an executable in the path and it includes the
 // virtualenv in the search.
-func lookVirtualenvPath(ve, file string) (string, error) {
+func LookVirtualenvPath(ve, file string) (string, error) {
 	// This is kind of unsafe w.r.t. concurrent execs because they could end
 	// up with different PATHs. But it allows us to search the VE path without
 	// having to re-implement the exec.LookPath logic. And does not require us

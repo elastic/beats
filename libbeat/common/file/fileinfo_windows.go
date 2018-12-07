@@ -27,5 +27,9 @@ func stat(name string, statFunc func(name string) (os.FileInfo, error)) (FileInf
 		return nil, err
 	}
 
+	return wrap(info)
+}
+
+func wrap(info os.FileInfo) (FileInfo, error) {
 	return fileInfo{FileInfo: info}, nil
 }

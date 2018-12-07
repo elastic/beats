@@ -9,18 +9,17 @@ package main
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
+	auditbeat "github.com/elastic/beats/auditbeat/scripts/mage"
 	"github.com/elastic/beats/dev-tools/mage"
 )
 
 func init() {
 	mage.BeatDescription = "Audit the activities of users and processes on your system."
+	mage.BeatLicense = "Elastic License"
 }
 
 // Build builds the Beat binary.
@@ -34,19 +33,14 @@ func GolangCrossBuild() error {
 	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
 }
 
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return mage.BuildGoDaemon()
-}
-
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	return mage.CrossBuild()
 }
 
-// CrossBuildXPack cross-builds the beat with XPack for all target platforms.
-func CrossBuildXPack() error {
-	return mage.CrossBuildXPack()
+// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
+func BuildGoDaemon() error {
+	return mage.BuildGoDaemon()
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
@@ -62,15 +56,17 @@ func Clean() error {
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
+// Use VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	mage.UseElasticBeatPackaging()
-	customizePackaging()
+	mage.UseElasticBeatXPackPackaging()
+	mage.PackageKibanaDashboardsFromBuildDir()
+	auditbeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(makeConfigTemplates, CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
 
@@ -79,14 +75,9 @@ func TestPackages() error {
 	return mage.TestPackages()
 }
 
-// Update updates the generated files (aka make update).
-func Update() error {
-	return sh.Run("make", "update")
-}
-
-// Fields generates a fields.yml and fields.go for each module.
+// Fields generates a fields.yml and include/fields.go.
 func Fields() {
-	mg.Deps(fieldsYML, mage.GenerateModuleFieldsGo)
+	mg.SerialDeps(fieldsYML, mage.GenerateAllInOneFieldsGo)
 }
 
 // fieldsYML generates a fields.yml based on auditbeat + x-pack/auditbeat/modules.
@@ -94,170 +85,83 @@ func fieldsYML() error {
 	return mage.GenerateFieldsYAML(mage.OSSBeatDir("module"), "module")
 }
 
-// GoTestUnit executes the Go unit tests.
+// ExportDashboard exports a dashboard and writes it into the correct directory.
+//
+// Required environment variables:
+// - MODULE: Name of the module
+// - ID:     Dashboard id
+func ExportDashboard() error {
+	return mage.ExportDashboard()
+}
+
+// Dashboards collects all the dashboards and generates index patterns.
+func Dashboards() error {
+	return mage.KibanaDashboards(mage.OSSBeatDir("module"), "module")
+}
+
+// Config generates both the short and reference configs.
+func Config() error {
+	return auditbeat.Config(
+		mage.OSSBeatDir(auditbeat.ConfigTemplateGlob),
+		auditbeat.ConfigTemplateGlob)
+}
+
+// Update is an alias for running fields, dashboards, config.
+func Update() {
+	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
+}
+
+// Fmt formats source code and adds file headers.
+func Fmt() {
+	mg.Deps(mage.Format)
+}
+
+// Check runs fmt and update then returns an error if any modifications are found.
+func Check() {
+	mg.SerialDeps(mage.Format, Update, mage.Check)
+}
+
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	mage.AddIntegTestUsage()
+	defer mage.StopIntegTestEnv()
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
+// UnitTest executes the unit tests.
+func UnitTest() {
+	mg.SerialDeps(GoUnitTest, PythonUnitTest)
+}
+
+// GoUnitTest executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
+func GoUnitTest(ctx context.Context) error {
 	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
 }
 
-// GoTestIntegration executes the Go integration tests.
+// GoIntegTest executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+func GoIntegTest(ctx context.Context) error {
+	return mage.RunIntegTest("goIntegTest", func() error {
+		return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+	})
 }
 
-// -----------------------------------------------------------------------------
-// Customizations specific to Auditbeat.
-// - Config files are Go templates.
-
-const (
-	configTemplateGlob      = "module/*/_meta/config*.yml.tmpl"
-	shortConfigTemplate     = "build/auditbeat.yml.tmpl"
-	referenceConfigTemplate = "build/auditbeat.reference.yml.tmpl"
-)
-
-func makeConfigTemplates() error {
-	configFiles, err := mage.FindFiles(configTemplateGlob)
-	if err != nil {
-		return errors.Wrap(err, "failed to find config templates")
-	}
-
-	var shortIn []string
-	shortIn = append(shortIn, "_meta/common.p1.yml")
-	shortIn = append(shortIn, configFiles...)
-	shortIn = append(shortIn, "_meta/common.p2.yml")
-	shortIn = append(shortIn, "../libbeat/_meta/config.yml")
-	if !mage.IsUpToDate(shortConfigTemplate, shortIn...) {
-		fmt.Println(">> Building", shortConfigTemplate)
-		mage.MustFileConcat(shortConfigTemplate, 0600, shortIn...)
-		mage.MustFindReplace(shortConfigTemplate, regexp.MustCompile("beatname"), "{{.BeatName}}")
-		mage.MustFindReplace(shortConfigTemplate, regexp.MustCompile("beat-index-prefix"), "{{.BeatIndexPrefix}}")
-	}
-
-	var referenceIn []string
-	referenceIn = append(referenceIn, "_meta/common.reference.yml")
-	referenceIn = append(referenceIn, configFiles...)
-	referenceIn = append(referenceIn, "../libbeat/_meta/config.reference.yml")
-	if !mage.IsUpToDate(referenceConfigTemplate, referenceIn...) {
-		fmt.Println(">> Building", referenceConfigTemplate)
-		mage.MustFileConcat(referenceConfigTemplate, 0644, referenceIn...)
-		mage.MustFindReplace(referenceConfigTemplate, regexp.MustCompile("beatname"), "{{.BeatName}}")
-		mage.MustFindReplace(referenceConfigTemplate, regexp.MustCompile("beat-index-prefix"), "{{.BeatIndexPrefix}}")
-	}
-
-	return nil
+// PythonUnitTest executes the python system tests.
+func PythonUnitTest() error {
+	mg.SerialDeps(Fields, mage.BuildSystemTestBinary)
+	return mage.PythonNoseTest(mage.DefaultPythonTestUnitArgs())
 }
 
-// customizePackaging modifies the package specs to use templated config files
-// instead of the defaults.
-//
-// Customizations specific to Auditbeat:
-// - Include audit.rules.d directory in packages.
-func customizePackaging() {
-	var (
-		shortConfig = mage.PackageFile{
-			Mode:   0600,
-			Source: "{{.PackageDir}}/auditbeat.yml",
-			Dep:    generateShortConfig,
-			Config: true,
-		}
-		referenceConfig = mage.PackageFile{
-			Mode:   0644,
-			Source: "{{.PackageDir}}/auditbeat.reference.yml",
-			Dep:    generateReferenceConfig,
-		}
-	)
-
-	archiveRulesDir := "audit.rules.d"
-	linuxPkgRulesDir := "/etc/{{.BeatName}}/audit.rules.d"
-	rulesSrcDir := "module/auditd/_meta/audit.rules.d"
-	sampleRules := mage.PackageFile{
-		Mode:   0644,
-		Source: rulesSrcDir,
-		Dep: func(spec mage.PackageSpec) error {
-			if spec.OS == "linux" {
-				params := map[string]interface{}{
-					"ArchBits": archBits,
-				}
-				rulesFile := spec.MustExpand(rulesSrcDir+"/sample-rules-linux-{{call .ArchBits .GOARCH}}bit.conf", params)
-				if err := mage.Copy(rulesFile, spec.MustExpand("{{.PackageDir}}/audit.rules.d/sample-rules.conf.disabled")); err != nil {
-					return errors.Wrap(err, "failed to copy sample rules")
-				}
-			}
-			return nil
-		},
+// PythonIntegTest executes the python system tests in the integration environment (Docker).
+func PythonIntegTest(ctx context.Context) error {
+	if !mage.IsInIntegTestEnv() {
+		mg.Deps(Fields)
 	}
-
-	for _, args := range mage.Packages {
-		pkgType := args.Types[0]
-		switch pkgType {
-		case mage.TarGz, mage.Zip:
-			args.Spec.ReplaceFile("{{.BeatName}}.yml", shortConfig)
-			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfig)
-		case mage.Deb, mage.RPM, mage.DMG:
-			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", shortConfig)
-			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
-		default:
-			panic(errors.Errorf("unhandled package type: %v", pkgType))
-		}
-		if args.OS == "linux" {
-			rulesDest := archiveRulesDir
-			if pkgType != mage.TarGz {
-				rulesDest = linuxPkgRulesDir
-			}
-			args.Spec.Files[rulesDest] = sampleRules
-		}
-	}
-}
-
-func generateReferenceConfig(spec mage.PackageSpec) error {
-	params := map[string]interface{}{
-		"Reference": true,
-		"ArchBits":  archBits,
-	}
-	return spec.ExpandFile(referenceConfigTemplate,
-		"{{.PackageDir}}/auditbeat.reference.yml", params)
-}
-
-func generateShortConfig(spec mage.PackageSpec) error {
-	params := map[string]interface{}{
-		"Reference": false,
-		"ArchBits":  archBits,
-	}
-	return spec.ExpandFile(shortConfigTemplate,
-		"{{.PackageDir}}/auditbeat.yml", params)
-}
-
-// archBits returns the number of bit width of the GOARCH architecture value.
-// This function is used by the auditd module configuration templates to
-// generate architecture specific audit rules.
-func archBits(goarch string) int {
-	switch goarch {
-	case "386", "arm":
-		return 32
-	default:
-		return 64
-	}
-}
-
-// Configs generates the auditbeat.yml and auditbeat.reference.yml config files.
-// Set DEV_OS and DEV_ARCH to change the target host for the generated configs.
-// Defaults to linux/amd64.
-func Configs() {
-	mg.Deps(makeConfigTemplates)
-
-	params := map[string]interface{}{
-		"GOOS":      mage.EnvOr("DEV_OS", "linux"),
-		"GOARCH":    mage.EnvOr("DEV_ARCH", "amd64"),
-		"ArchBits":  archBits,
-		"Reference": false,
-	}
-	fmt.Printf(">> Building auditbeat.yml for %v/%v\n", params["GOOS"], params["GOARCH"])
-	mage.MustExpandFile(shortConfigTemplate, "auditbeat.yml", params)
-
-	params["Reference"] = true
-	fmt.Printf(">> Building auditbeat.reference.yml for %v/%v\n", params["GOOS"], params["GOARCH"])
-	mage.MustExpandFile(referenceConfigTemplate, "auditbeat.reference.yml", params)
+	return mage.RunIntegTest("pythonIntegTest", func() error {
+		mg.Deps(mage.BuildSystemTestBinary)
+		return mage.PythonNoseTest(mage.DefaultPythonTestIntegrationArgs())
+	})
 }

@@ -108,6 +108,19 @@ auditbeat.modules:
 
   # Detect changes to files included in subdirectories. Disabled by default.
   recursive: false
+- module: system
+
+  metricsets:
+    - host
+    - packages
+    - process
+    - socket
+    - user
+
+  state.period: 12h
+
+  report_changes: true
+
 
 #================================ General ======================================
 

@@ -46,6 +46,19 @@ auditbeat.modules:
   - /usr/sbin
   - /etc
 
+- module: system
+
+  metricsets:
+    - host
+    - packages
+    - process
+    - socket
+    - user
+
+  state.period: 12h
+
+  report_changes: true
+
 
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:
