@@ -127,8 +127,16 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 		}
 	}
 	if ecsEvent["duration"] == nil {
-		if duration, found := getKeyUint64(flow.Fields, "flowDurationMilliseconds"); found {
-			ecsEvent["duration"] = time.Duration(duration) * time.Millisecond
+		if durationMillis, found := getKeyUint64(flow.Fields, "flowDurationMilliseconds"); found {
+			duration := time.Duration(durationMillis) * time.Millisecond
+			ecsEvent["duration"] = duration
+
+			// Here we're missing at least one of (start, end)
+			if start := ecsEvent["start"]; start != nil {
+				ecsEvent["end"] = start.(time.Time).Add(duration)
+			} else if end := ecsEvent["end"]; end != nil {
+				ecsEvent["start"] = end.(time.Time).Add(-duration)
+			}
 		}
 	}
 
