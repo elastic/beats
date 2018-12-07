@@ -726,6 +726,11 @@ output.elasticsearch:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
 
+  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
+  #ilm.enabled: false
+  #ilm.rollover_alias: "packetbeat"
+  #ilm.pattern: "{now/d}-000001"
+
   # Set gzip compression level.
   #compression_level: 0
 

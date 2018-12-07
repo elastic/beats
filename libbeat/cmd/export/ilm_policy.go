@@ -15,25 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cmd
+package export
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/libbeat/cmd/export"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
-func genExportCmd(settings instance.Settings, name, idxPrefix, beatVersion string) *cobra.Command {
-	exportCmd := &cobra.Command{
-		Use:   "export",
-		Short: "Export current config or index template",
+// GenGetILMPolicyCmd is the command used to export the ilm policy.
+func GenGetILMPolicyCmd() *cobra.Command {
+	genTemplateConfigCmd := &cobra.Command{
+		Use:   "ilm-policy",
+		Short: "Export ILM policy",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println(instance.ILMPolicy.StringToPrint())
+		},
 	}
 
-	exportCmd.AddCommand(export.GenExportConfigCmd(settings, name, idxPrefix, beatVersion))
-	exportCmd.AddCommand(export.GenTemplateConfigCmd(settings, name, idxPrefix, beatVersion))
-	exportCmd.AddCommand(export.GenDashboardCmd(name, idxPrefix, beatVersion))
-	exportCmd.AddCommand(export.GenGetILMPolicyCmd())
-
-	return exportCmd
+	return genTemplateConfigCmd
 }
