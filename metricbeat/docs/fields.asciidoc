@@ -1892,7 +1892,7 @@ Duration of the event in nano seconds.
 *`event.dataset`*::
 +
 --
-type: long
+type: keyword
 
 Event dataset name.
 
