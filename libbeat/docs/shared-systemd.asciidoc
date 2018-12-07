@@ -63,8 +63,8 @@ override to change the default options.
 |=======================================
 | Variable | Description | Default value
 | BEAT_LOG_OPTS | Log options | `-e`
-| BEAT_CONFIG_OPTS | Flags for configuration file path | `-c /etc/{beatname_lc}/{beatname_lc}.yml`
-| BEAT_PATH_OPTS | Other paths | -path.home /usr/share/{beatname_lc} -path.config /etc/{beatname_lc} -path.data /var/lib/{beatname_lc} -path.logs /var/log/{beatname_lc}
+| BEAT_CONFIG_OPTS | Flags for configuration file path | +-c /etc/{beatname_lc}/{beatname_lc}.yml+
+| BEAT_PATH_OPTS | Other paths | +-path.home /usr/share/{beatname_lc} -path.config /etc/{beatname_lc} -path.data /var/lib/{beatname_lc} -path.logs /var/log/{beatname_lc}+
 |=======================================
 
 To override these variables, create a drop-in unit file in the
@@ -100,4 +100,4 @@ systemctl restart {beatname_lc}
 
 NOTE: It is recommended that you use a configuration management tool to
 include drop-in unit files. If you need to add a drop-in manually, use
-`systemctl edit {beatname_lc}.service`.
++systemctl edit {beatname_lc}.service+.
