@@ -236,7 +236,6 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	// Report reboots separately
 	if !currentHost.info.BootTime.Equal(ms.lastHost.info.BootTime) {
 		events = append(events, hostEvent(currentHost, eventTypeEvent, eventActionReboot))
-
 	}
 
 	// Report any other changes.
