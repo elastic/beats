@@ -80,6 +80,8 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	mage.UseElasticBeatPackaging()
+	customizePackaging()
+
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
@@ -112,4 +114,14 @@ func GoTestUnit(ctx context.Context) error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
 	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+}
+
+func customizePackaging() {
+	for _, args := range mage.Packages {
+		pkgType := args.Types[0]
+		switch pkgType {
+		case mage.Docker:
+			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw=eip")
+		}
+	}
 }
