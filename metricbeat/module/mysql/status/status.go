@@ -71,6 +71,12 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
+	var cerr error
+	cerr = m.db.Close()
+	if cerr != nil {
+		return nil, errors.Wrap(cerr, "mysql-status close failed")
+	}
+
 	event := eventMapping(status)
 
 	if m.Module().Config().Raw {
