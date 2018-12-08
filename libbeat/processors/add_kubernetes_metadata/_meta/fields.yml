@@ -1,5 +1,5 @@
 - key: kubernetes
-  title: Kubernetes
+  title: Kubernetes processor
   description: >
     Kubernetes metadata added by the kubernetes processor
   short_config: false

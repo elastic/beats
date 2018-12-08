@@ -1,5 +1,5 @@
 - key: docker
-  title: Docker
+  title: Docker processor
   description: >
     Docker stats added by the `add_docker_metadata` processor.
   short_config: false

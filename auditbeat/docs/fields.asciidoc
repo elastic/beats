@@ -2673,7 +2673,7 @@ The object's SELinux level.
 --
 
 [[exported-fields-docker-processor]]
-== Docker fields
+== Docker processor fields
 
 Docker stats added by the `add_docker_metadata` processor.
 
@@ -4873,7 +4873,7 @@ The operating system's kernel version.
 --
 
 [[exported-fields-kubernetes-processor]]
-== Kubernetes fields
+== Kubernetes processor fields
 
 Kubernetes metadata added by the kubernetes processor
 

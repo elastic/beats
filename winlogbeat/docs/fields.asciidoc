@@ -178,7 +178,7 @@ The Event Logging API was designed for Windows Server 2003 or Windows 2000 opera
 --
 
 [[exported-fields-docker-processor]]
-== Docker fields
+== Docker processor fields
 
 Docker stats added by the `add_docker_metadata` processor.
 
@@ -2509,7 +2509,7 @@ The operating system's kernel version.
 --
 
 [[exported-fields-kubernetes-processor]]
-== Kubernetes fields
+== Kubernetes processor fields
 
 Kubernetes metadata added by the kubernetes processor
 
