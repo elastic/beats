@@ -107,7 +107,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	//actual fetch function
 	cfg, err := external.LoadDefaultAWSConfig(external.WithSharedConfigProfile(m.config.AwsConfigProfileName))
 	if err != nil {
-		logp.Err("Failed to load config: %s", err.Error())
+		report.Error(errors.Wrap(err, "Failed to load config"))
+		return
 	}
 
 	cfg.Region = "us-west-1"
@@ -116,6 +117,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	regionsList, err := getRegions(svcEC2)
 	if err != nil {
 		report.Error(errors.Wrap(err, "getRegions failed"))
+		return
 	}
 
 	for _, regionName := range regionsList {
@@ -136,6 +138,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 				output, err := getMetricDataPerRegion(instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
 				if err != nil {
 					report.Error(errors.Wrap(err, "getMetricDataPerRegion failed"))
+					return
 				}
 				getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 			}
@@ -167,7 +170,7 @@ func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
 	req := svc.DescribeRegionsRequest(input)
 	output, err := req.Send()
 	if err != nil {
-		logp.Err("Failed DescribeRegions: %s", err)
+		logp.Error(errors.Wrap(err, "Failed DescribeRegions"))
 		return
 	}
 	for _, region := range output.Regions {
@@ -220,7 +223,7 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 		req := svc.DescribeInstancesRequest(describeInstanceInput)
 		output, err := req.Send()
 		if err != nil {
-			logp.Err("Error DescribeInstances: %s", err)
+			logp.Error(errors.Wrap(err, "Error DescribeInstances"))
 			return nil, nil, err
 		}
 
@@ -241,7 +244,7 @@ func getMetricDataPerRegion(instanceID string, nextToken *string, svc cloudwatch
 	endTime := time.Now()
 	duration, err := time.ParseDuration("-10m")
 	if err != nil {
-		logp.Err("Error ParseDuration: %s", err)
+		logp.Error(errors.Wrap(err, "Error ParseDuration"))
 		return nil, err
 	}
 
@@ -283,7 +286,7 @@ func getMetricDataPerRegion(instanceID string, nextToken *string, svc cloudwatch
 	req := svc.GetMetricDataRequest(getMetricDataInput)
 	getMetricDataOutput, err := req.Send()
 	if err != nil {
-		logp.Err("GetMetricDataInput Error = %s", err.Error())
+		logp.Error(errors.Wrap(err, "Error GetMetricDataInput"))
 		return nil, err
 	}
 	return getMetricDataOutput, nil
