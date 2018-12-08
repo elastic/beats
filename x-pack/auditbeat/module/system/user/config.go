@@ -15,11 +15,6 @@ type config struct {
 	DetectPasswordChanges bool          `config:"user.detect_password_changes"`
 }
 
-// validate validates the host metricset config.
-func (c *config) validate() error {
-	return nil
-}
-
 func (c *config) effectiveStatePeriod() time.Duration {
 	if c.UserStatePeriod != 0 {
 		return c.UserStatePeriod
