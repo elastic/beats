@@ -1,0 +1,34 @@
+{
+  "@timestamp": "2018-11-15T14:41:24.000Z",
+  "destination": {
+    "bytes": 460,
+    "ip": "198.51.100.2",
+    "mac": "06:05:04:03:02:01",
+    "packets": 2,
+    "port": 80
+  },
+  "event": {
+    "duration": 3000000000,
+    "end": "2018-11-15T14:41:24.000Z",
+    "start": "2018-11-15T14:41:21.000Z",
+    "type": "flow"
+  },
+  "flow": {
+    "final": true,
+    "id": "FQQA/wz/Dv//////Fv8BAQEBAgMEBQYGBQQDAgGrAMsAcQPGM2QC9ZdQAA",
+    "vlan": 171
+  },
+  "network": {
+    "bytes": 470,
+    "packets": 3,
+    "transport": "tcp",
+    "type": "ipv4"
+  },
+  "source": {
+    "bytes": 10,
+    "ip": "203.0.113.3",
+    "mac": "01:02:03:04:05:06",
+    "packets": 1,
+    "port": 38901
+  }
+}
