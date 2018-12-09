@@ -133,6 +133,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 *Affecting all Beats*
 
 - Dissect syntax change, use * instead of ? when working with field reference. {issue}8054[8054]
+- On systems with systemd, the Beats log is now written to journald by default rather than file. To revert this behaviour override BEAT_LOG_OPTS with an empty value. {pull}8942[8942].
 - Removed dashboards and index patterns generation for Kibana 5. {pull}8927[8927]
 
 *Auditbeat*
