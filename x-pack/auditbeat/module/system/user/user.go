@@ -61,7 +61,7 @@ const (
 	cryptPassword
 )
 
-func (t passwordType) string() string {
+func (t passwordType) String() string {
 	switch t {
 	case shadowPassword:
 		return "shadow_password"
