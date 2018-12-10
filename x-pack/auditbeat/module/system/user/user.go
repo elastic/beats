@@ -102,7 +102,7 @@ func (user User) Hash() uint64 {
 	h := xxhash.New64()
 	// Use everything except userInfo
 	h.WriteString(user.Name)
-	binary.Write(h, binary.BigEndian, user.PasswordType)
+	binary.Write(h, binary.BigEndian, uint8(user.PasswordType))
 	h.WriteString(user.PasswordChanged.String())
 	h.Write(user.PasswordHashHash)
 	h.WriteString(strconv.Itoa(int(user.UID)))

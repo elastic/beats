@@ -129,7 +129,6 @@ func enrichWithShadow(users []*User) error {
 				} else if strings.HasPrefix(shadow.Password, "!") || strings.HasPrefix(shadow.Password, "*") {
 					user.PasswordType = passwordDisabled
 				} else {
-
 					user.PasswordHashHash = multiRoundHash(shadow.Password)
 				}
 			}
