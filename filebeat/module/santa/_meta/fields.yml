@@ -1,0 +1,42 @@
+- key: santa
+  title: "Google Santa"
+  description: >
+    Santa Module
+  fields:
+    - name: santa
+      type: group
+      description: >
+      fields:
+
+        - name: action
+          type: keyword
+          example: EXEC
+          description: Action
+
+        - name: decision
+          type: keyword
+          example: ALLOW
+          description: Decision that santad took.
+
+        - name: reason
+          type: keyword
+          example: CERT
+          description: Reason for the decsision.
+
+        - name: mode
+          type: keyword
+          example: M
+          description: Operating mode of Santa.
+
+    - name: certificate.common_name
+      type: keyword
+      description: Common name from code signing certificate.
+
+    - name: certificate.sha256
+      type: keyword
+      description: SHA256 hash of code signing certificate.
+
+    # Auditbeat FIM is using this field for the same purpose.
+    - name: hash.sha256
+      type: keyword
+      description: Hash of process executable.

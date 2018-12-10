@@ -351,6 +351,14 @@ filebeat.modules:
     # Optional, the password to use when connecting to Redis.
     #var.password:
 
+#----------------------------- Google Santa Module -----------------------------
+- module: santa
+  log:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the the default path.
+    #var.paths:
+
 #------------------------------- Suricata Module -------------------------------
 - module: suricata
   # All logs
