@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.5.2...6.5[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.5.3...6.5[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -33,16 +33,9 @@ https://github.com/elastic/beats/compare/v6.5.2...6.5[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Log events at the debug level when dropped by encoding problems. {pull}9251[9251]
-
 *Auditbeat*
 
 *Filebeat*
-- Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
-
-- Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
-- Stop runners disabled by hints after previously being started. {pull}9305[9305]
-- Fix installation of haproxy dashboard. {issue}9307[9307] {pull}9313[9313]
 
 *Heartbeat*
 
@@ -100,6 +93,23 @@ https://github.com/elastic/beats/compare/v6.5.2...6.5[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.5.3]]
+=== Beats version 6.5.3
+https://github.com/elastic/beats/compare/v6.5.2...v6.5.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Log events at the debug level when dropped by encoding problems. {pull}9251[9251]
+
+*Filebeat*
+
+- Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
+- Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
+- Stop runners disabled by hints after previously being started. {pull}9305[9305]
+- Fix installation of haproxy dashboard. {issue}9307[9307] {pull}9313[9313]
 
 [[release-notes-6.5.2]]
 === Beats version 6.5.2
