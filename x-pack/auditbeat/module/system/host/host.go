@@ -6,6 +6,7 @@ package host
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/gob"
 	"io"
 	"net"
@@ -83,7 +84,7 @@ func (host *Host) changeDetectionHash() uint64 {
 	}
 
 	h.WriteString(host.info.Timezone)
-	h.WriteString(strconv.Itoa(host.info.TimezoneOffsetSec))
+	binary.Write(h, binary.BigEndian, int32(host.info.TimezoneOffsetSec))
 	h.WriteString(host.info.Architecture)
 	h.WriteString(host.info.OS.Platform)
 	h.WriteString(host.info.OS.Name)
