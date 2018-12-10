@@ -44,7 +44,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.1.228",

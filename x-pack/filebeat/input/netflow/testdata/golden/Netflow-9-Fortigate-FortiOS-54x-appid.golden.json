@@ -58,7 +58,7 @@
           "bytes": 748,
           "direction": "unknown",
           "packets": 6,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "192.168.100.151",
@@ -125,7 +125,7 @@
           "bytes": 6948,
           "direction": "unknown",
           "packets": 10,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "208.100.17.187",
@@ -192,7 +192,7 @@
           "bytes": 1584,
           "direction": "unknown",
           "packets": 14,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "192.168.100.151",
@@ -259,7 +259,7 @@
           "bytes": 8201,
           "direction": "unknown",
           "packets": 11,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "208.100.17.189",
@@ -326,7 +326,7 @@
           "bytes": 1729,
           "direction": "unknown",
           "packets": 15,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "192.168.100.151",
@@ -393,7 +393,7 @@
           "bytes": 1122,
           "direction": "unknown",
           "packets": 5,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "178.255.83.1",
@@ -460,7 +460,7 @@
           "bytes": 705,
           "direction": "unknown",
           "packets": 5,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "192.168.100.151",
@@ -527,7 +527,7 @@
           "bytes": 1123,
           "direction": "unknown",
           "packets": 5,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "178.255.83.1",
@@ -594,7 +594,7 @@
           "bytes": 706,
           "direction": "unknown",
           "packets": 5,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "192.168.100.151",
@@ -657,7 +657,7 @@
           "bytes": 74,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "192.168.100.111",
@@ -720,7 +720,7 @@
           "bytes": 58,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "192.168.100.150",
@@ -783,7 +783,7 @@
           "bytes": 74,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "192.168.100.111",
@@ -846,7 +846,7 @@
           "bytes": 58,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "192.168.100.150",
@@ -909,7 +909,7 @@
           "bytes": 1071,
           "direction": "unknown",
           "packets": 5,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "192.168.100.111",
@@ -972,7 +972,7 @@
           "bytes": 1147,
           "direction": "unknown",
           "packets": 6,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "192.168.100.150",
@@ -1035,7 +1035,7 @@
           "bytes": 1980,
           "direction": "unknown",
           "packets": 6,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "192.168.100.111",
@@ -1098,7 +1098,7 @@
           "bytes": 2164,
           "direction": "unknown",
           "packets": 8,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "192.168.100.150",

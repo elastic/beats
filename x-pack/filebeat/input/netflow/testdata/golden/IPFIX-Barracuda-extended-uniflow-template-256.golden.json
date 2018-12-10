@@ -64,7 +64,7 @@
           "bytes": 0,
           "direction": "unknown",
           "packets": 0,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.236.5.4",
@@ -138,7 +138,7 @@
           "bytes": 0,
           "direction": "unknown",
           "packets": 0,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "64.235.151.76",

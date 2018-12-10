@@ -52,7 +52,7 @@
           "bytes": 76,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "172.16.32.100",
@@ -113,7 +113,7 @@
           "bytes": 76,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "172.16.32.248",
@@ -174,7 +174,7 @@
           "bytes": 76,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "172.16.32.100",
@@ -235,7 +235,7 @@
           "bytes": 76,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -296,7 +296,7 @@
           "bytes": 76,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "172.16.32.100",
@@ -357,7 +357,7 @@
           "bytes": 76,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "172.16.32.202",
@@ -416,7 +416,7 @@
           "bytes": 672,
           "direction": "unknown",
           "packets": 7,
-          "protocol": "IPv6-ICMP"
+          "protocol": "ipv6-icmp"
         },
         "source": {
           "port": 0

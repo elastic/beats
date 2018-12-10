@@ -64,7 +64,7 @@
           "bytes": 702,
           "direction": "inbound",
           "packets": 9,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "20.20.20.20",

@@ -395,10 +395,10 @@ const (
 )
 
 var ipProtocolNames = map[IPProtocol]string{
-	ICMP:     "ICMP",
-	TCP:      "TCP",
-	UDP:      "UDP",
-	IPv6ICMP: "IPv6-ICMP",
+	ICMP:     "icmp",
+	TCP:      "tcp",
+	UDP:      "udp",
+	IPv6ICMP: "ipv6-icmp",
 }
 
 func (p IPProtocol) String() string {

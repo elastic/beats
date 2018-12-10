@@ -64,7 +64,7 @@
           "bytes": 44,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "ICMP"
+          "protocol": "icmp"
         },
         "source": {
           "ip": "10.30.18.62",
@@ -138,7 +138,7 @@
           "bytes": 106,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.30.18.62",
@@ -212,7 +212,7 @@
           "bytes": 44,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "ICMP"
+          "protocol": "icmp"
         },
         "source": {
           "ip": "10.10.172.60",
@@ -286,7 +286,7 @@
           "bytes": 76,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.10.172.60",
@@ -360,7 +360,7 @@
           "bytes": 2794,
           "direction": "inbound",
           "packets": 36,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.10.172.60",

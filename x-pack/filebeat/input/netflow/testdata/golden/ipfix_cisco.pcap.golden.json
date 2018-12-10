@@ -58,7 +58,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -120,7 +120,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -182,7 +182,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -244,7 +244,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -306,7 +306,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -368,7 +368,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -430,7 +430,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -492,7 +492,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -554,7 +554,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -616,7 +616,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -678,7 +678,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -740,7 +740,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -802,7 +802,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -864,7 +864,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -926,7 +926,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -988,7 +988,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1050,7 +1050,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1112,7 +1112,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1174,7 +1174,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1236,7 +1236,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1298,7 +1298,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1360,7 +1360,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1422,7 +1422,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1484,7 +1484,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1546,7 +1546,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1608,7 +1608,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1670,7 +1670,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1732,7 +1732,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null
@@ -1794,7 +1794,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "TCP"
+          "protocol": "tcp"
         }
       },
       "Private": null

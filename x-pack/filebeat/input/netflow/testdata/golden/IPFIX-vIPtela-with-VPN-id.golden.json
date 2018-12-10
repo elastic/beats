@@ -59,7 +59,7 @@
           "bytes": 775,
           "direction": "unknown",
           "packets": 8,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.113.7.54",

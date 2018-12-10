@@ -60,7 +60,7 @@
           "bytes": 40,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.9.146",
@@ -129,7 +129,7 @@
           "bytes": 104,
           "direction": "outbound",
           "packets": 2,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.17.42",
@@ -198,7 +198,7 @@
           "bytes": 52,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.22.111",
@@ -267,7 +267,7 @@
           "bytes": 435,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.0.23.59",
@@ -336,7 +336,7 @@
           "bytes": 969,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.34.71",
@@ -405,7 +405,7 @@
           "bytes": 104,
           "direction": "outbound",
           "packets": 2,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.10.133",
@@ -474,7 +474,7 @@
           "bytes": 52,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.37.29",
@@ -543,7 +543,7 @@
           "bytes": 614,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.32.176",
@@ -612,7 +612,7 @@
           "bytes": 4350,
           "direction": "outbound",
           "packets": 3,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.12.21",
@@ -681,7 +681,7 @@
           "bytes": 533,
           "direction": "outbound",
           "packets": 2,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.4.212",
@@ -750,7 +750,7 @@
           "bytes": 13660,
           "direction": "inbound",
           "packets": 325,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.33.122",
@@ -819,7 +819,7 @@
           "bytes": 89,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.20.242",
@@ -888,7 +888,7 @@
           "bytes": 833,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.13.25",
@@ -957,7 +957,7 @@
           "bytes": 1625,
           "direction": "inbound",
           "packets": 2,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.25.59",
@@ -1026,7 +1026,7 @@
           "bytes": 142184,
           "direction": "outbound",
           "packets": 97,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.7.73",
@@ -1095,7 +1095,7 @@
           "bytes": 3016,
           "direction": "outbound",
           "packets": 58,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.19.50",
@@ -1164,7 +1164,7 @@
           "bytes": 31500,
           "direction": "inbound",
           "packets": 21,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.28.150",
@@ -1233,7 +1233,7 @@
           "bytes": 2919,
           "direction": "inbound",
           "packets": 3,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.26.188",
@@ -1302,7 +1302,7 @@
           "bytes": 4514,
           "direction": "outbound",
           "packets": 5,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.29.34",
@@ -1371,7 +1371,7 @@
           "bytes": 326,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.8.200",
@@ -1440,7 +1440,7 @@
           "bytes": 112,
           "direction": "outbound",
           "packets": 2,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.0.29.46",

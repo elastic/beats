@@ -59,7 +59,7 @@
           "bytes": 174,
           "direction": "inbound",
           "packets": 2,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.1.0.135",
@@ -128,7 +128,7 @@
           "bytes": 87,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.1.0.136",
@@ -197,7 +197,7 @@
           "bytes": 1920,
           "direction": "inbound",
           "packets": 15,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.1.0.232",
@@ -266,7 +266,7 @@
           "bytes": 610,
           "direction": "inbound",
           "packets": 8,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.1.0.232",
@@ -335,7 +335,7 @@
           "bytes": 2420,
           "direction": "inbound",
           "packets": 21,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.5.0.91",
@@ -404,7 +404,7 @@
           "bytes": 10204,
           "direction": "inbound",
           "packets": 30,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.1.0.30",
@@ -473,7 +473,7 @@
           "bytes": 216,
           "direction": "inbound",
           "packets": 4,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.3.0.100",
@@ -542,7 +542,7 @@
           "bytes": 152,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.1.0.135",
@@ -610,7 +610,7 @@
           "bytes": 260,
           "direction": "outbound",
           "packets": 5,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "192.168.1.98",
@@ -677,7 +677,7 @@
           "bytes": 32,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.4.0.251",
@@ -744,7 +744,7 @@
           "bytes": 135,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.4.0.251",
@@ -811,7 +811,7 @@
           "bytes": 135,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.4.0.251",
@@ -878,7 +878,7 @@
           "bytes": 135,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.4.0.251",
@@ -945,7 +945,7 @@
           "bytes": 135,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.4.0.251",
@@ -1012,7 +1012,7 @@
           "bytes": 135,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "10.4.0.251",
@@ -1079,7 +1079,7 @@
           "bytes": 3668,
           "direction": "outbound",
           "packets": 21,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "192.168.1.102",

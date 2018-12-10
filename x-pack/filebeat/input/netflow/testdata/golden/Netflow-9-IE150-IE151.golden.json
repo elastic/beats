@@ -50,7 +50,7 @@
           "bytes": 78,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "192.168.0.3",
@@ -109,7 +109,7 @@
           "bytes": 232,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "UDP"
+          "protocol": "udp"
         },
         "source": {
           "ip": "192.168.0.4",

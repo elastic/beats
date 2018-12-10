@@ -63,7 +63,7 @@
           "bytes": 1027087,
           "direction": "inbound",
           "packets": 697,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.30",
@@ -135,7 +135,7 @@
           "bytes": 6200,
           "direction": "inbound",
           "packets": 6,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.12",
@@ -207,7 +207,7 @@
           "bytes": 11896,
           "direction": "inbound",
           "packets": 21,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.33",
@@ -279,7 +279,7 @@
           "bytes": 1041,
           "direction": "inbound",
           "packets": 3,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.35",
@@ -351,7 +351,7 @@
           "bytes": 1740,
           "direction": "inbound",
           "packets": 20,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.36",
@@ -423,7 +423,7 @@
           "bytes": 2998,
           "direction": "inbound",
           "packets": 16,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.36",
@@ -495,7 +495,7 @@
           "bytes": 55773,
           "direction": "inbound",
           "packets": 37,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.28",
@@ -567,7 +567,7 @@
           "bytes": 3239438,
           "direction": "inbound",
           "packets": 2135,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.35",
@@ -639,7 +639,7 @@
           "bytes": 5701,
           "direction": "inbound",
           "packets": 20,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.15",
@@ -711,7 +711,7 @@
           "bytes": 4255012,
           "direction": "inbound",
           "packets": 2804,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.2",
@@ -783,7 +783,7 @@
           "bytes": 37557,
           "direction": "inbound",
           "packets": 25,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.28",
@@ -855,7 +855,7 @@
           "bytes": 23676,
           "direction": "inbound",
           "packets": 68,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.25",
@@ -927,7 +927,7 @@
           "bytes": 22821,
           "direction": "inbound",
           "packets": 30,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.25",
@@ -999,7 +999,7 @@
           "bytes": 526,
           "direction": "inbound",
           "packets": 2,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.12",
@@ -1071,7 +1071,7 @@
           "bytes": 33129,
           "direction": "inbound",
           "packets": 220,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.17",
@@ -1143,7 +1143,7 @@
           "bytes": 5092,
           "direction": "inbound",
           "packets": 9,
-          "protocol": "TCP"
+          "protocol": "tcp"
         },
         "source": {
           "ip": "10.22.166.36",
