@@ -18,6 +18,7 @@
 package udp
 
 import (
+	"net"
 	"sync"
 	"time"
 
@@ -66,6 +67,7 @@ func NewInput(
 
 	forwarder := harvester.NewForwarder(out)
 	callback := func(data []byte, metadata inputsource.NetworkMetadata) {
+		remoteHost, remotePort, _ := net.SplitHostPort(metadata.RemoteAddr.String())
 		e := util.NewData()
 		e.Event = beat.Event{
 			Timestamp: time.Now(),
@@ -76,10 +78,13 @@ func NewInput(
 				"message": string(data),
 				"log": common.MapStr{
 					"source": common.MapStr{
-						"ip": metadata.RemoteAddr.String(),
+						"ip": remoteHost,
 					},
 				},
 			},
+		}
+		if remotePort != "" {
+			e.Event.Fields.Put("log.source.port", remotePort)
 		}
 		forwarder.Send(e)
 	}

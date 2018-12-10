@@ -18,6 +18,7 @@
 package syslog
 
 import (
+	"net"
 	"strings"
 	"sync"
 	"time"
@@ -201,13 +202,17 @@ func (p *Input) Wait() {
 }
 
 func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) *beat.Event {
+	remoteHost, remotePort, _ := net.SplitHostPort(metadata.RemoteAddr.String())
 	f := common.MapStr{
 		"message": strings.TrimRight(ev.Message(), "\n"),
 		"log": common.MapStr{
 			"source": common.MapStr{
-				"ip": metadata.RemoteAddr.String(),
+				"ip": remoteHost,
 			},
 		},
+	}
+	if remotePort != "" {
+		f.Put("log.source.port", remotePort)
 	}
 
 	syslog := common.MapStr{}

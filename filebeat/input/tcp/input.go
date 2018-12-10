@@ -19,6 +19,7 @@ package tcp
 
 import (
 	"fmt"
+	"net"
 	"sync"
 	"time"
 
@@ -126,6 +127,7 @@ func (p *Input) Wait() {
 }
 
 func createEvent(raw []byte, metadata inputsource.NetworkMetadata) *util.Data {
+	remoteHost, remotePort, _ := net.SplitHostPort(metadata.RemoteAddr.String())
 	data := util.NewData()
 	data.Event = beat.Event{
 		Timestamp: time.Now(),
@@ -133,10 +135,13 @@ func createEvent(raw []byte, metadata inputsource.NetworkMetadata) *util.Data {
 			"message": string(raw),
 			"log": common.MapStr{
 				"source": common.MapStr{
-					"ip": metadata.RemoteAddr.String(),
+					"ip": remoteHost,
 				},
 			},
 		},
+	}
+	if remotePort != "" {
+		data.Event.Fields.Put("log.source.port", remotePort)
 	}
 	return data
 }

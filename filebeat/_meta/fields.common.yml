@@ -17,6 +17,12 @@
       description: >
         Source IP from which the log event was read / sent from.
 
+    - name: log.source.port
+      type: long
+      required: false
+      description: >
+        Source port from which the log event was read / sent from.
+
     - name: log.offset
       type: long
       required: false

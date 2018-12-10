@@ -29,7 +29,7 @@
   alias: true
 
 - from: source
-  to: ["log.file.path", "log.source.ip"]
+  to: ["log.file.path", "log.source.ip", "log.source.port"]
   alias: false
 
 - from: beat.name
