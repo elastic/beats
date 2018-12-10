@@ -47,7 +47,7 @@ const (
 	eventActionHostChanged
 )
 
-func (action eventAction) string() string {
+func (action eventAction) String() string {
 	switch action {
 	case eventActionHost:
 		return "host"
@@ -104,8 +104,7 @@ func (host *Host) toMapStr() common.MapStr {
 		"timezone.offset.sec": host.info.TimezoneOffsetSec,
 		"hostname":            host.info.Hostname,
 		"id":                  host.info.UniqueID,
-		// TODO "host.type": ?
-		"architecture": host.info.Architecture,
+		"architecture":        host.info.Architecture,
 
 		// https://github.com/elastic/ecs#-operating-system-fields
 		"os": common.MapStr{
@@ -314,7 +313,7 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"type":   eventType,
-				"action": action.string(),
+				"action": action.String(),
 			},
 		},
 		MetricSetFields: host.toMapStr(),
