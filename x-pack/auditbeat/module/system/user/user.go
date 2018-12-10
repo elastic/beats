@@ -8,6 +8,7 @@ package user
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/gob"
 	"fmt"
 	"io"
@@ -31,6 +32,10 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "user"
+
+	passwdFile = "/etc/passwd"
+	groupFile  = "/etc/group"
+	shadowFile = "/etc/shadow"
 
 	bucketName              = "user.v1"
 	bucketKeyUsers          = "users"
@@ -97,7 +102,7 @@ func (user User) Hash() uint64 {
 	h := xxhash.New64()
 	// Use everything except userInfo
 	h.WriteString(user.Name)
-	h.WriteString(user.PasswordType.string())
+	binary.Write(h, binary.BigEndian, user.PasswordType)
 	h.WriteString(user.PasswordChanged.String())
 	h.Write(user.PasswordHashHash)
 	h.WriteString(strconv.Itoa(int(user.UID)))
@@ -157,12 +162,13 @@ func init() {
 // MetricSet collects data about a system's users.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config     config
-	log        *logp.Logger
-	cache      *cache.Cache
-	bucket     datastore.Bucket
-	lastState  time.Time
-	lastChange time.Time
+	config    config
+	log       *logp.Logger
+	cache     *cache.Cache
+	bucket    datastore.Bucket
+	lastState time.Time
+	userFiles []string
+	lastRead  time.Time
 }
 
 // New constructs a new MetricSet.
@@ -188,6 +194,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		log:           logp.NewLogger(metricsetName),
 		cache:         cache.New(),
 		bucket:        bucket,
+	}
+
+	if ms.config.DetectPasswordChanges {
+		ms.userFiles = []string{passwdFile, groupFile, shadowFile}
+	} else {
+		ms.userFiles = []string{passwdFile, groupFile}
 	}
 
 	// Load from disk: Time when state was last sent
@@ -287,14 +299,19 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 // reportChanges detects and reports any changes to users on this system since the last call.
 func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	currentTime := time.Now()
-	changed, err := ms.haveFilesChanged(ms.lastChange)
-	if err != nil {
-		return err
+
+	// If this is not the first call to Fetch/reportChanges,
+	// check if files have changed since the last time before going any further.
+	if !ms.lastRead.IsZero() {
+		changed, err := ms.haveFilesChanged()
+		if err != nil {
+			return err
+		}
+		if !changed {
+			return nil
+		}
 	}
-	if !changed {
-		return nil
-	}
-	ms.lastChange = currentTime
+	ms.lastRead = currentTime
 
 	users, err := GetUsers(ms.config.DetectPasswordChanges)
 	if err != nil {
@@ -441,35 +458,20 @@ func (ms *MetricSet) saveUsersToDisk(users []*User) error {
 	return nil
 }
 
-// haveFilesChanged checks if any of the relevant files (/etc/passwd, /etc/shadow, /etc/group)
-// have changed.
-func (ms *MetricSet) haveFilesChanged(since time.Time) (bool, error) {
-	const passwdFile = "/etc/passwd"
-	const shadowFile = "/etc/shadow"
-	const groupFile = "/etc/group"
-
+// haveFilesChanged checks if the ctime of any of the user files has changed.
+func (ms *MetricSet) haveFilesChanged() (bool, error) {
 	var stats syscall.Stat_t
-	if err := syscall.Stat(passwdFile, &stats); err != nil {
-		return true, errors.Wrapf(err, "failed to stat %v", passwdFile)
-	}
-	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
-		return true, nil
-	}
-
-	if ms.config.DetectPasswordChanges {
-		if err := syscall.Stat(shadowFile, &stats); err != nil {
-			return true, errors.Wrapf(err, "failed to stat %v", shadowFile)
+	for _, path := range ms.userFiles {
+		if err := syscall.Stat(path, &stats); err != nil {
+			return true, errors.Wrapf(err, "failed to stat %v", path)
 		}
-		if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
+
+		ctime := time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)
+		if ms.lastRead.Before(ctime) {
+			ms.log.Debugf("File changed: %v (lastRead=%v, ctime=%v)", path, ms.lastRead, ctime)
+
 			return true, nil
 		}
-	}
-
-	if err := syscall.Stat(groupFile, &stats); err != nil {
-		return true, errors.Wrapf(err, "failed to stat %v", groupFile)
-	}
-	if since.Before(time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)) {
-		return true, nil
 	}
 
 	return false, nil

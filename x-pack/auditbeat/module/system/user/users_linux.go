@@ -27,8 +27,8 @@ var (
 
 // GetUsers retrieves a list of users using information from
 // /etc/passwd, /etc/group, and - if configured - /etc/shadow.
-func GetUsers(readPassword bool) ([]*User, error) {
-	users, err := readPasswdFile(readPassword)
+func GetUsers(readPasswords bool) ([]*User, error) {
+	users, err := readPasswdFile(readPasswords)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func GetUsers(readPassword bool) ([]*User, error) {
 		return nil, err
 	}
 
-	if readPassword {
+	if readPasswords {
 		err = enrichWithShadow(users)
 		if err != nil {
 			return nil, err
@@ -48,7 +48,7 @@ func GetUsers(readPassword bool) ([]*User, error) {
 	return users, nil
 }
 
-func readPasswdFile(readPassword bool) ([]*User, error) {
+func readPasswdFile(readPasswords bool) ([]*User, error) {
 	var users []*User
 
 	C.setpwent()
@@ -69,7 +69,7 @@ func readPasswdFile(readPassword bool) ([]*User, error) {
 			Shell:    C.GoString(passwd.pw_shell),
 		}
 
-		if readPassword {
+		if readPasswords {
 			switch C.GoString(passwd.pw_passwd) {
 			case "x":
 				user.PasswordType = shadowPassword
@@ -219,8 +219,8 @@ func readShadowFile() (map[string]shadowFileEntry, error) {
 // multiRoundHash performs 10 rounds of SHA-512 hashing.
 func multiRoundHash(s string) []byte {
 	hash := sha512.Sum512([]byte(s))
-	for i := 9; i > 0; i++ {
-		hash = sha512.Sum512(hash)
+	for i := 0; i < 9; i++ {
+		hash = sha512.Sum512(hash[:])
 	}
 	return hash[:]
 }
