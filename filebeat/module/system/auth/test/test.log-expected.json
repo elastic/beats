@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-02-21T21:54:44.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -18,6 +19,7 @@
     }, 
     {
         "@timestamp": "2018-02-23T00:13:35.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -34,6 +36,7 @@
     }, 
     {
         "@timestamp": "2018-02-21T21:56:12.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -48,6 +51,7 @@
     }, 
     {
         "@timestamp": "2018-02-20T08:35:22.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -56,11 +60,11 @@
         "system.auth.hostname": "slave22", 
         "system.auth.pid": "5774", 
         "system.auth.ssh.event": "Failed", 
+        "system.auth.ssh.geoip.city_name": "Shenzhen", 
         "system.auth.ssh.geoip.continent_name": "Asia", 
         "system.auth.ssh.geoip.country_iso_code": "CN", 
-        "system.auth.ssh.geoip.location.lat": 23.1167, 
-        "system.auth.ssh.geoip.location.lon": 113.25, 
-        "system.auth.ssh.geoip.region_iso_code": "CN-GD", 
+        "system.auth.ssh.geoip.location.lat": 22.5333, 
+        "system.auth.ssh.geoip.location.lon": 114.1333, 
         "system.auth.ssh.geoip.region_name": "Guangdong", 
         "system.auth.ssh.ip": "116.31.116.24", 
         "system.auth.ssh.method": "password", 
@@ -70,6 +74,7 @@
     }, 
     {
         "@timestamp": "2018-02-21T23:35:33.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -85,6 +90,7 @@
     }, 
     {
         "@timestamp": "2018-02-19T15:30:04.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -97,6 +103,7 @@
     }, 
     {
         "@timestamp": "2018-02-23T00:08:48.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -112,6 +119,7 @@
     }, 
     {
         "@timestamp": "2018-02-24T00:13:02.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -128,6 +136,7 @@
     }, 
     {
         "@timestamp": "2018-02-22T11:47:05.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -141,6 +150,7 @@
     }, 
     {
         "@timestamp": "2018-02-22T11:47:05.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
