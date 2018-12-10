@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2018-12-10T08:22:58.426Z", 
+        "@timestamp": "2018-12-10T11:33:32.020Z", 
         "event.dataset": "icinga.startup", 
         "fileset.module": "icinga", 
         "fileset.name": "startup", 
@@ -12,7 +12,7 @@
         "prospector.type": "log"
     }, 
     {
-        "@timestamp": "2018-12-10T08:22:58.426Z", 
+        "@timestamp": "2018-12-10T11:33:32.020Z", 
         "event.dataset": "icinga.startup", 
         "fileset.module": "icinga", 
         "fileset.name": "startup", 
