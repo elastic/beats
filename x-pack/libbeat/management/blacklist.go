@@ -9,10 +9,10 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
 )
 
@@ -61,28 +61,19 @@ func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 	return &list, nil
 }
 
-// Filter returns a copy of the given ConfigBlocks with the
-func (c *ConfigBlacklist) Filter(configBlocks api.ConfigBlocks) api.ConfigBlocks {
-	var result api.ConfigBlocks
+// Filter an error if any of the given config blocks is blacklisted
+func (c *ConfigBlacklist) Filter(configBlocks api.ConfigBlocks) error {
+	var errs multierror.Errors
 
 	for _, configs := range configBlocks {
-		newConfigs := api.ConfigBlocksWithType{Type: configs.Type}
-
 		for _, block := range configs.Blocks {
 			if c.isBlacklisted(configs.Type, block) {
-				logp.Err("Got a blacklisted configuration, ignoring it")
-				continue
+				errs = append(errs, fmt.Errorf("Config for '%s' is blacklisted", configs.Type))
 			}
-
-			newConfigs.Blocks = append(newConfigs.Blocks, block)
-		}
-
-		if len(newConfigs.Blocks) > 0 {
-			result = append(result, newConfigs)
 		}
 	}
 
-	return result
+	return errs.Err()
 }
 
 func (c *ConfigBlacklist) isBlacklisted(blockType string, block *api.ConfigBlock) bool {

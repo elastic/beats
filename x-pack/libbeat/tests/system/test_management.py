@@ -177,9 +177,9 @@ class TestManagement(BaseTest):
             1, output_file=output_file))
         proc.check_kill_and_wait()
 
-    def test_blocklist(self):
+    def test_blacklist(self):
         """
-        Config cache is used if Kibana is not available
+        Blacklist blocks bad configs
         """
         # Enroll the beat
         config_path = os.path.join(self.working_dir, "mockbeat.yml")
@@ -206,13 +206,10 @@ class TestManagement(BaseTest):
         output_file = os.path.join("output", "mockbeat_managed")
 
         # Start beat
-        proc = self.start_beat(extra_args=[
-            # do not blacklist file output
-            "-E", "management.blacklist.output='output'",
-        ])
+        proc = self.start_beat()
 
         self.wait_until(
-            cond=lambda: self.log_contains("Got a blacklisted configuration, ignoring it"))
+            cond=lambda: self.log_contains("Config for 'output' is blacklisted"))
         proc.check_kill_and_wait()
         assert not os.path.isfile(os.path.join(self.working_dir, output_file))
 

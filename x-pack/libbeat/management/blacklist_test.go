@@ -69,9 +69,6 @@ func TestConfigBlacklist(t *testing.T) {
 		patterns    map[string]string
 		blocks      api.ConfigBlocks
 		blacklisted bool
-
-		// only fill if blacklisted == true
-		expected api.ConfigBlocks
 	}{
 		{
 			name:        "No patterns",
@@ -106,20 +103,6 @@ func TestConfigBlacklist(t *testing.T) {
 								},
 							},
 						},
-						{
-							Raw: map[string]interface{}{
-								"elasticsearch": map[string]interface{}{
-									"host": "localhost",
-								},
-							},
-						},
-					},
-				},
-			},
-			expected: api.ConfigBlocks{
-				api.ConfigBlocksWithType{
-					Type: "output",
-					Blocks: []*api.ConfigBlock{
 						{
 							Raw: map[string]interface{}{
 								"elasticsearch": map[string]interface{}{
@@ -181,21 +164,6 @@ func TestConfigBlacklist(t *testing.T) {
 					},
 				},
 			},
-			expected: api.ConfigBlocks{
-				api.ConfigBlocksWithType{
-					Type: "metricbeat.modules",
-					Blocks: []*api.ConfigBlock{
-						{
-							Raw: map[string]interface{}{
-								"module": "kubernetes",
-								"metricsets": []string{
-									"default",
-								},
-							},
-						},
-					},
-				},
-			},
 		},
 		{
 			name:        "Blacklisted value in a deep list",
@@ -231,37 +199,6 @@ func TestConfigBlacklist(t *testing.T) {
 								},
 							},
 						},
-						{
-							Raw: map[string]interface{}{
-								"type": "docker",
-								"containers": map[string]interface{}{
-									"ids": []string{
-										"256425931c2",
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			expected: api.ConfigBlocks{
-				api.ConfigBlocksWithType{
-					Type: "metricbeat.modules",
-					Blocks: []*api.ConfigBlock{
-						{
-							Raw: map[string]interface{}{
-								"module": "kubernetes",
-								"metricsets": []string{
-									"event",
-									"default",
-								},
-							},
-						},
-					},
-				},
-				api.ConfigBlocksWithType{
-					Type: "filebeat.inputs",
-					Blocks: []*api.ConfigBlock{
 						{
 							Raw: map[string]interface{}{
 								"type": "docker",
@@ -323,23 +260,6 @@ func TestConfigBlacklist(t *testing.T) {
 					},
 				},
 			},
-			expected: api.ConfigBlocks{
-				api.ConfigBlocksWithType{
-					Type: "list",
-					Blocks: []*api.ConfigBlock{
-						{
-							Raw: map[string]interface{}{
-								"of": map[string]interface{}{
-									"elements": []interface{}{
-										map[string]interface{}{
-											"allowed": "yes",
-										},
-									},
-								},
-							},
-						},
-					},
-				}},
 		},
 	}
 
@@ -353,13 +273,8 @@ func TestConfigBlacklist(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			result := bl.Filter(test.blocks)
-			equal := api.ConfigBlocksEqual(result, test.blocks)
-			assert.Equal(t, test.blacklisted, !equal)
-
-			if test.blacklisted {
-				assert.Equal(t, test.expected, result)
-			}
+			err = bl.Filter(test.blocks)
+			assert.Equal(t, test.blacklisted, err != nil)
 		})
 	}
 }

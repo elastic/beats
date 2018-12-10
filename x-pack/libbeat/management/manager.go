@@ -199,10 +199,14 @@ func (cm *ConfigManager) apply() {
 	}
 
 	// Filter unwanted configs from the list
-	configs := cm.blacklist.Filter(cm.cache.Configs)
+	errors := cm.blacklist.Filter(cm.cache.Configs)
+	if errors != nil {
+		cm.logger.Error(errors)
+		return
+	}
 
 	// Reload configs
-	for _, b := range configs {
+	for _, b := range cm.cache.Configs {
 		err := cm.reload(b.Type, b.Blocks)
 		configOK = configOK && err == nil
 		missing[b.Type] = false
@@ -216,7 +220,7 @@ func (cm *ConfigManager) apply() {
 	}
 
 	if !configOK {
-		logp.Info("Failed to apply settings, reporting error on next fetch")
+		cm.logger.Info("Failed to apply settings, reporting error on next fetch")
 	}
 
 	// Update configOK flag with the result of this apply
