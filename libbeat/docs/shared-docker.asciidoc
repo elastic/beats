@@ -102,7 +102,7 @@ Download this example configuration file as a starting point:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://raw.githubusercontent.com/elastic/beats/deploy/docker/{beatname_lc}.docker.yml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/docker/{beatname_lc}.docker.yml
 ------------------------------------------------
 
 ===== Volume-mounted configuration
