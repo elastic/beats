@@ -64,6 +64,8 @@ https://github.com/elastic/beats/compare/v6.5.2...6.5[Check the HEAD diff]
 
 *Filebeat*
 
+- Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
+
 *Heartbeat*
 
 *Journalbeat*
