@@ -57,6 +57,8 @@ auditbeat.modules:
 
   state.period: 12h
 
+  user.detect_password_changes: false
+
   report_changes: true
 
 
