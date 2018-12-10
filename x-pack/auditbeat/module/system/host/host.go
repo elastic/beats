@@ -8,7 +8,9 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
+	"fmt"
 	"io"
+	"math"
 	"net"
 	"strconv"
 	"time"
@@ -123,12 +125,7 @@ func (host *Host) toMapStr() common.MapStr {
 
 	var ipStrings []string
 	for _, addr := range host.addrs {
-		switch v := addr.(type) {
-		case *net.IPNet:
-			ipStrings = append(ipStrings, v.IP.String())
-		case *net.IPAddr:
-			ipStrings = append(ipStrings, v.IP.String())
-		}
+		ipStrings = append(ipStrings, ipString(addr))
 	}
 	mapstr.Put("ip", ipStrings)
 
@@ -142,6 +139,17 @@ func (host *Host) toMapStr() common.MapStr {
 	mapstr.Put("mac", macStrings)
 
 	return mapstr
+}
+
+func ipString(addr net.Addr) string {
+	switch v := addr.(type) {
+	case *net.IPNet:
+		return v.IP.String()
+	case *net.IPAddr:
+		return v.IP.String()
+	default:
+		return ""
+	}
 }
 
 func init() {
@@ -317,8 +325,57 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 				"kind":   eventType,
 				"action": action.String(),
 			},
+			"message": hostMessage(host, action),
 		},
 		MetricSetFields: host.toMapStr(),
+	}
+}
+
+func hostMessage(host *Host, action eventAction) string {
+	// Hostname + IP of the first non-loopback interface.
+	hostString := fmt.Sprintf("%v (IP: %v)", host.info.Hostname, ipString(host.addrs[0]))
+
+	var message string
+	switch action {
+	case eventActionHost:
+		message = fmt.Sprintf("%v host %v is up for %v",
+			host.info.OS.Name, hostString, fmtDuration(host.uptime))
+	case eventActionIDChanged:
+		message = fmt.Sprintf("ID of host %v has changed", hostString)
+	case eventActionReboot:
+		message = fmt.Sprintf("Host %v restarted", hostString)
+	case eventActionHostnameChanged:
+		message = fmt.Sprintf("Hostname changed to %v", hostString)
+	case eventActionHostChanged:
+		message = fmt.Sprintf("Host %v changed", hostString)
+	}
+
+	return message
+}
+
+func fmtDuration(d time.Duration) string {
+	const dayMinutes = 60 * 24
+
+	remainingMinutes := math.Floor(d.Minutes())
+	days := math.Floor(remainingMinutes / dayMinutes)
+
+	remainingMinutes -= days * dayMinutes
+	hours := math.Floor(remainingMinutes / 60)
+
+	remainingMinutes -= hours * 60
+	minutes := math.Floor(remainingMinutes)
+
+	return fmt.Sprintf("%.f %v, %.f %v, %.f %v",
+		days, inflect("day", int(days)),
+		hours, inflect("hour", int(hours)),
+		minutes, inflect("minute", int(minutes)))
+}
+
+func inflect(noun string, count int) string {
+	if count == 1 {
+		return noun
+	} else {
+		return noun + "s"
 	}
 }
 

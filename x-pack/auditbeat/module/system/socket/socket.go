@@ -11,6 +11,7 @@ import (
 	"net"
 	"os/user"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -34,11 +35,28 @@ const (
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
-
-	eventActionExistingSocket = "existing_socket"
-	eventActionSocketOpened   = "socket_opened"
-	eventActionSocketClosed   = "socket_closed"
 )
+
+type eventAction uint8
+
+const (
+	eventActionExistingSocket eventAction = iota + 1
+	eventActionSocketOpened
+	eventActionSocketClosed
+)
+
+func (action eventAction) String() string {
+	switch action {
+	case eventActionExistingSocket:
+		return "existing_socket"
+	case eventActionSocketOpened:
+		return "socket_opened"
+	case eventActionSocketClosed:
+		return "socket_closed"
+	default:
+		return ""
+	}
+}
 
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
@@ -106,7 +124,8 @@ func (s Socket) Hash() uint64 {
 func (s Socket) toMapStr() common.MapStr {
 	mapstr := common.MapStr{
 		"network": common.MapStr{
-			"type": s.Family.String(),
+			"type":      s.Family.String(),
+			"direction": ecsDirectionString(s.Direction),
 		},
 		"user": common.MapStr{
 			"id": s.UID,
@@ -126,7 +145,6 @@ func (s Socket) toMapStr() common.MapStr {
 
 	switch s.Direction {
 	case sock.Outgoing:
-		mapstr.Put("network.direction", "outbound")
 		mapstr.Put("source", common.MapStr{
 			"ip":   s.LocalIP,
 			"port": s.LocalPort,
@@ -136,7 +154,6 @@ func (s Socket) toMapStr() common.MapStr {
 			"port": s.RemotePort,
 		})
 	case sock.Incoming:
-		mapstr.Put("network.direction", "inbound")
 		mapstr.Put("source", common.MapStr{
 			"ip":   s.RemoteIP,
 			"port": s.RemotePort,
@@ -146,7 +163,6 @@ func (s Socket) toMapStr() common.MapStr {
 			"port": s.LocalPort,
 		})
 	case sock.Listening:
-		mapstr.Put("network.direction", "listening")
 		mapstr.Put("destination", common.MapStr{
 			"ip":   s.LocalIP,
 			"port": s.LocalPort,
@@ -158,6 +174,21 @@ func (s Socket) toMapStr() common.MapStr {
 	}
 
 	return mapstr
+}
+
+// ecsDirectionString is a custom alternative to the existing String()
+// to be compatible with recommended ECS values for network.direction.
+func ecsDirectionString(direction sock.Direction) string {
+	switch direction {
+	case sock.Incoming:
+		return "inbound"
+	case sock.Outgoing:
+		return "outbound"
+	case sock.Listening:
+		return "listening"
+	default:
+		return "unknown"
+	}
 }
 
 // New constructs a new MetricSet.
@@ -274,15 +305,44 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	return nil
 }
 
-func socketEvent(socket *Socket, eventType string, eventAction string) mb.Event {
+func socketEvent(socket *Socket, eventType string, action eventAction) mb.Event {
 	event := mb.Event{
 		RootFields: socket.toMapStr(),
 	}
 
 	event.RootFields.Put("event.kind", eventType)
-	event.RootFields.Put("event.action", eventAction)
+	event.RootFields.Put("event.action", action.String())
+	event.RootFields.Put("message", socketMessage(socket, action))
 
 	return event
+}
+
+func socketMessage(socket *Socket, action eventAction) string {
+	var actionString string
+	switch action {
+	case eventActionSocketOpened:
+		actionString = "OPENED"
+	case eventActionSocketClosed:
+		actionString = "CLOSED"
+	case eventActionExistingSocket:
+		actionString = "OPEN"
+	}
+
+	var endpointString string
+	switch socket.Direction {
+	case sock.Incoming:
+		endpointString = fmt.Sprintf("%v:%d -> %v:%d",
+			socket.RemoteIP, socket.RemotePort, socket.LocalIP, socket.LocalPort)
+	case sock.Outgoing:
+		endpointString = fmt.Sprintf("%v:%d -> %v:%d",
+			socket.LocalIP, socket.LocalPort, socket.RemoteIP, socket.RemotePort)
+	case sock.Listening:
+		endpointString = fmt.Sprintf("%v:%d", socket.LocalIP, socket.LocalPort)
+	}
+
+	return fmt.Sprintf("%v socket (%v) %v by process %v (PID: %d) and user %v (UID: %d)",
+		strings.Title(ecsDirectionString(socket.Direction)), endpointString, actionString,
+		socket.ProcessName, socket.ProcessPID, socket.Username, socket.UID)
 }
 
 func convertToCacheable(sockets []*Socket) []cache.Cacheable {
