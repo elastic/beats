@@ -57,7 +57,7 @@ filebeat.inputs:
   # Defines if the pattern set under pattern should be negated or not. Default is false.
   #multiline.negate: false
 
-  # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+  # Match can be set to "after" or "before". It is used to define if lines should be appended to a pattern
   # that was (not) matched before or after or as long as a pattern is not matched based on negate.
   # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
   #multiline.match: after
