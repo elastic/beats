@@ -153,6 +153,10 @@ func transformField(version *common.Version, f common.Field) (common.MapStr, com
 		field["searchable"] = false
 	}
 
+	if f.Type == "object" && f.Enabled != nil {
+		field["enabled"] = getVal(f.Enabled, true)
+	}
+
 	if f.Type == "text" {
 		field["aggregatable"] = false
 	}
