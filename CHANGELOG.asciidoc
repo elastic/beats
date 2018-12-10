@@ -38,6 +38,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Fix autodiscover configurations stopping when metadata is missing. {pull}8851[8851]
 - Log events at the debug level when dropped by encoding problems. {pull}9251[9251]
 - Refresh host metadata in add_host_metadata. {pull}9359[9359]
+- When collecting swap metrics for beats telemetry or system metricbeat module handle cases of free swap being bigger than total swap by assuming no swap is being used. {issue}6271[6271] {pull}9383[9383]
 
 *Auditbeat*
 
@@ -47,6 +48,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Fix installation of haproxy dashboard. {issue}9307[9307] {pull}9313[9313]
 - Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
 - Stop runners disabled by hints after previously being started. {pull}9305[9305]
+- Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
 
 *Heartbeat*
 
@@ -72,6 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Unify dashboard exporter tools. {pull}9097[9097]
 - Use _doc as document type of the Elasticsearch major version is 7. {pull}9056[9056]
 - Add cache.ttl to add_host_metadata. {pull}9359[9359]
+- Add support for index lifecycle management (beta). {pull}7963[7963]
 
 *Auditbeat*
 
@@ -79,6 +82,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 - Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]
 - Added `syslog_host` variable to HAProxy module to allow syslog listener to bind to configured host. {pull}9366[9366]
+- Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
 
 *Heartbeat*
 
@@ -92,7 +96,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - The `elasticsearch/node` metricset now reports the Elasticsearch cluster UUID. {pull}8771[8771]
 - Add service.type field to Metricbeat. {pull}8965[8965]
 - Support GET requests in Jolokia module. {issue}8566[8566] {pull}9226[9226]
-- Add freebsd support for the uptime metricset. {pull}[]
+- Add freebsd support for the uptime metricset. {pull}9413[9413]
+- Add `host.os.name` field to add_host_metadata processor. {issue}8948[8948] {pull}9405[9405]
 
 *Packetbeat*
 
@@ -130,6 +135,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 *Affecting all Beats*
 
 - Dissect syntax change, use * instead of ? when working with field reference. {issue}8054[8054]
+- On systems with systemd, the Beats log is now written to journald by default rather than file. To revert this behaviour override BEAT_LOG_OPTS with an empty value. {pull}8942[8942].
 - Removed dashboards and index patterns generation for Kibana 5. {pull}8927[8927]
 
 *Auditbeat*

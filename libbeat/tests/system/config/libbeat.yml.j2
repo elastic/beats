@@ -66,6 +66,9 @@ output:
   {% if elasticsearch.index %}
     index: {{elasticsearch.index}}
   {% endif %}
+  {% if elasticsearch.ilm %}
+    ilm.enabled: {{elasticsearch.ilm}}
+  {% endif %}
 {%- endif %}
 
 {% if logstash %}

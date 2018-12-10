@@ -102,20 +102,7 @@ endif::[]
 [[docker]]
 *docker:*
 
-ifeval::["{release-state}"=="unreleased"]
-
-Version {stack-version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source", "shell", subs="attributes"]
-------------------------------------------------
-docker pull {dockerimage}
-------------------------------------------------
-
-endif::[]
+See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
 [[win]]
 *win:*
