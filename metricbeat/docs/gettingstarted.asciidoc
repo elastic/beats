@@ -106,20 +106,12 @@ endif::[]
 [[docker]]
 *docker:*
 
-ifeval::["{release-state}"=="unreleased"]
+See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+[[kubernetes]]
+*kubernetes:*
 
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source", "shell", subs="attributes"]
-------------------------------------------------
-docker pull {dockerimage}
-------------------------------------------------
-
-endif::[]
+See <<running-on-kubernetes, Running on Kubernetes>> for deploying with Kubernetes.
 
 [[win]]
 *win:*
@@ -229,6 +221,8 @@ include::../../libbeat/docs/step-configure-credentials.asciidoc[]
 include::../../libbeat/docs/step-test-config.asciidoc[]
 
 include::../../libbeat/docs/step-look-at-config.asciidoc[]
+
+include::../../libbeat/docs/shared-cm-tip.asciidoc[]
 
 [id="{beatname_lc}-template"]
 === Step 3: Load the index template in Elasticsearch
