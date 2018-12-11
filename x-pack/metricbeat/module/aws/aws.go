@@ -8,7 +8,9 @@ import "github.com/elastic/beats/metricbeat/mb"
 
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
-	AwsConfigProfileName string `config:"aws_config_profile_name"`
+	AwsAccessKeyId     string `config:"aws_access_key_id"`
+	AwsSecretAccessKey string `config:"aws_secret_access_key"`
+	AwsSessionToken    string `config:"aws_session_token"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
