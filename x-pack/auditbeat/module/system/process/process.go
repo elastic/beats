@@ -7,6 +7,7 @@ package process
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -289,9 +290,24 @@ func (ms *MetricSet) getProcessInfos() ([]*ProcessInfo, error) {
 
 		pInfo, err := process.Info()
 		if err != nil {
-			if os.IsPermission(err) && os.Geteuid() != 0 {
-				// Running as non-root, so we have no access to other user's processes.
-				continue
+			if os.Geteuid() != 0 {
+				if runtime.GOOS == "darwin" {
+					/*
+						Skip process info errors on darwin when not root -
+						these will usually be permission issues when trying to read
+						other user's processes. Unfortunately, os.IsPermission does not
+						work because it is a custom error created using errors.New in
+						getProcTaskAllInfo() in go-sysinfo/providers/darwin/process_darwin_amd64.go
+
+						TODO: Fix go-sysinfo to have better error.
+					*/
+					continue
+				}
+
+				if os.IsPermission(err) {
+					// Running as non-root, so we have no access to other user's processes.
+					continue
+				}
 			}
 
 			return nil, errors.Wrap(err, "failed to load process information")
