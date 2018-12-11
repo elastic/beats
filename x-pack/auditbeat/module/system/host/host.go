@@ -374,9 +374,8 @@ func fmtDuration(d time.Duration) string {
 func inflect(noun string, count int) string {
 	if count == 1 {
 		return noun
-	} else {
-		return noun + "s"
 	}
+	return noun + "s"
 }
 
 func (ms *MetricSet) saveStateToDisk() error {
