@@ -29,6 +29,7 @@ class Test(AuditbeatXPackTest):
             if "event.kind" not in str(e):
                 raise
 
+    @unittest.skip("Packages metricset is disabled")
     def test_metricset_packages(self):
         """
         packages metricset collects information about installed packages on a system.
