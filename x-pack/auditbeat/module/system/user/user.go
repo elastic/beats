@@ -54,7 +54,7 @@ const (
 type passwordType uint8
 
 const (
-	detectionDisabled passwordType = iota + 1
+	detectionDisabled passwordType = iota
 	shadowPassword
 	passwordDisabled
 	noPassword
