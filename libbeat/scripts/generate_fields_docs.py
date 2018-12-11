@@ -39,12 +39,12 @@ def document_fields(output, section, sections, path):
             document_field(output, field, newpath)
 
 
-def document_field(output, field, path):
+def document_field(output, field, field_path):
 
-    if "path" not in field:
-        field["path"] = path
+    if "field_path" not in field:
+        field["field_path"] = field_path
 
-    output.write("*`{}`*::\n+\n--\n".format(field["path"]))
+    output.write("*`{}`*::\n+\n--\n".format(field["field_path"]))
 
     if "deprecated" in field:
         output.write("\ndeprecated[{}]\n\n".format(field["deprecated"]))
@@ -57,7 +57,8 @@ def document_field(output, field, path):
         output.write("format: {}\n\n".format(field["format"]))
     if "required" in field:
         output.write("required: {}\n\n".format(field["required"]))
-
+    if "path" in field:
+        output.write("alias to: {}\n\n".format(field["path"]))
     if "description" in field:
         output.write("{}\n\n".format(field["description"]))
 
@@ -71,7 +72,7 @@ def document_field(output, field, path):
 
     if "multi_fields" in field:
         for subfield in field["multi_fields"]:
-            document_field(output, subfield, path + "." + subfield["name"])
+            document_field(output, subfield, field_path + "." + subfield["name"])
     output.write("--\n\n")
 
 
