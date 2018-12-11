@@ -31,7 +31,6 @@
 - from: source
   to:
   - log.file.path
-  - log.source.ip
   - log.source.address
   alias: false
 
