@@ -132,7 +132,7 @@ func (user User) toMapStr() common.MapStr {
 	}
 
 	if user.PasswordType != detectionDisabled {
-		evt.Put("password.type", user.PasswordType.string())
+		evt.Put("password.type", user.PasswordType.String())
 	}
 
 	if !user.PasswordChanged.IsZero() {
