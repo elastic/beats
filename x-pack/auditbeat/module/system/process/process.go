@@ -6,6 +6,7 @@ package process
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 
@@ -288,6 +289,11 @@ func (ms *MetricSet) getProcessInfos() ([]*ProcessInfo, error) {
 
 		pInfo, err := process.Info()
 		if err != nil {
+			if os.IsPermission(err) && os.Geteuid() != 0 {
+				// Running as non-root, so we have no access to other user's processes.
+				continue
+			}
+
 			return nil, errors.Wrap(err, "failed to load process information")
 		}
 
