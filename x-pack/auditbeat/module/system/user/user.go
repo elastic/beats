@@ -94,6 +94,8 @@ func (t passwordType) String() string {
 		return "no_password"
 	case cryptPassword:
 		return "crypt_password"
+	default:
+		return ""
 	}
 }
 
