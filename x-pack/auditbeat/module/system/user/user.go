@@ -432,7 +432,7 @@ func userMessage(user *User, action eventAction) string {
 	case eventActionUserChanged:
 		actionString = "Changed"
 	case eventActionPasswordChanged:
-		actionString = "Password change for"
+		actionString = "Password changed for"
 	}
 
 	return fmt.Sprintf("%v user %v (UID: %v, Groups: %v)",
