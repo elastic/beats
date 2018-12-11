@@ -95,8 +95,8 @@ class TestManagement(BaseTest):
         # Start beat
         proc = self.start_beat(extra_args=[
             "-E", "management.period=1s",
-            # do not blacklist file output
-            "-E", "management.blacklist.output='elasticsearch'",
+            # do not blacklist file/elasticsearch outputs
+            "-E", "management.blacklist.output='foo'",
         ])
 
         # Wait for beat to apply new conf
