@@ -119,6 +119,11 @@ auditbeat.modules:
 
   state.period: 12h
 
+  # Enabled by default. Auditbeat will read password fields in
+  # /etc/passwd and /etc/shadow and store a hash locally to
+  # detect any changes.
+  user.detect_password_changes: true
+
   report_changes: true
 
 

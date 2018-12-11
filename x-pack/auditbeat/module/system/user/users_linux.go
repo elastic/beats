@@ -25,17 +25,31 @@ var (
 	epoch = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 )
 
-// GetUsers retrieves a list of users using getpwent(3).
-func GetUsers() (users []*User, err error) {
-	gidToGroup, userToGroup, err := readGroupFile()
+// GetUsers retrieves a list of users using information from
+// /etc/passwd, /etc/group, and - if configured - /etc/shadow.
+func GetUsers(readPasswords bool) ([]*User, error) {
+	users, err := readPasswdFile(readPasswords)
 	if err != nil {
 		return nil, err
 	}
 
-	shadowEntries, err := readShadowFile()
+	err = enrichWithGroups(users)
 	if err != nil {
 		return nil, err
 	}
+
+	if readPasswords {
+		err = enrichWithShadow(users)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return users, nil
+}
+
+func readPasswdFile(readPasswords bool) ([]*User, error) {
+	var users []*User
 
 	C.setpwent()
 	defer C.endpwent()
@@ -55,6 +69,35 @@ func GetUsers() (users []*User, err error) {
 			Shell:    C.GoString(passwd.pw_shell),
 		}
 
+		if readPasswords {
+			switch C.GoString(passwd.pw_passwd) {
+			case "x":
+				user.PasswordType = shadowPassword
+			case "*":
+				user.PasswordType = passwordDisabled
+			case "":
+				user.PasswordType = noPassword
+			default:
+				user.PasswordType = cryptPassword
+				user.PasswordHashHash = multiRoundHash(C.GoString(passwd.pw_passwd))
+			}
+		} else {
+			user.PasswordType = detectionDisabled
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+func enrichWithGroups(users []*User) error {
+	gidToGroup, userToGroup, err := readGroupFile()
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users {
 		primaryGroup, found := gidToGroup[user.GID]
 		if found {
 			user.Groups = append(user.Groups, primaryGroup)
@@ -64,24 +107,18 @@ func GetUsers() (users []*User, err error) {
 		if found {
 			user.Groups = append(user.Groups, secondaryGroups...)
 		}
+	}
 
-		const shadowPassword = "shadow_password"
-		const passwordDisabled = "password_disabled"
-		const noPassword = "no_password"
-		const cryptPassword = "crypt_password"
-		switch C.GoString(passwd.pw_passwd) {
-		case "x":
-			user.PasswordType = shadowPassword
-		case "*":
-			user.PasswordType = passwordDisabled
-		case "":
-			user.PasswordType = noPassword
-		default:
-			user.PasswordType = cryptPassword
-			hash := sha512.Sum512([]byte(C.GoString(passwd.pw_passwd)))
-			user.PasswordHashHash = hash[:]
-		}
+	return nil
+}
 
+func enrichWithShadow(users []*User) error {
+	shadowEntries, err := readShadowFile()
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users {
 		if user.PasswordType == shadowPassword {
 			shadow, found := shadowEntries[user.Name]
 			if found {
@@ -92,16 +129,13 @@ func GetUsers() (users []*User, err error) {
 				} else if strings.HasPrefix(shadow.Password, "!") || strings.HasPrefix(shadow.Password, "*") {
 					user.PasswordType = passwordDisabled
 				} else {
-					hash := sha512.Sum512([]byte(shadow.Password))
-					user.PasswordHashHash = hash[:]
+					user.PasswordHashHash = multiRoundHash(shadow.Password)
 				}
 			}
 		}
-
-		users = append(users, user)
 	}
 
-	return users, nil
+	return nil
 }
 
 // readGroupFile reads /etc/group and returns two maps:
@@ -179,4 +213,13 @@ func readShadowFile() (map[string]shadowFileEntry, error) {
 	}
 
 	return shadowEntries, nil
+}
+
+// multiRoundHash performs 10 rounds of SHA-512 hashing.
+func multiRoundHash(s string) []byte {
+	hash := sha512.Sum512([]byte(s))
+	for i := 0; i < 9; i++ {
+		hash = sha512.Sum512(hash[:])
+	}
+	return hash[:]
 }
