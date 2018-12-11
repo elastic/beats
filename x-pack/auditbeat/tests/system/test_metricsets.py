@@ -18,7 +18,7 @@ class Test(AuditbeatXPackTest):
         host metricset collects general information about a server.
         """
 
-        fields = ["system.host.uptime", "system.host.network.interfaces", "system.host.os.name"]
+        fields = ["system.host.uptime", "system.host.ip", "system.host.os.name"]
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "host", COMMON_FIELDS + fields, warnings_allowed=True)
