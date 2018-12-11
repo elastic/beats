@@ -43,7 +43,7 @@ const (
 type eventAction uint8
 
 const (
-	eventActionHost eventAction = iota + 1
+	eventActionHost eventAction = iota
 	eventActionIDChanged
 	eventActionReboot
 	eventActionHostnameChanged

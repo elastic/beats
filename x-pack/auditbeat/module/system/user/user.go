@@ -50,7 +50,7 @@ const (
 type eventAction uint8
 
 const (
-	eventActionExistingUser eventAction = iota + 1
+	eventActionExistingUser eventAction = iota
 	eventActionUserAdded
 	eventActionUserRemoved
 	eventActionUserChanged

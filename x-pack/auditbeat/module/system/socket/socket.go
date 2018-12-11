@@ -40,7 +40,7 @@ const (
 type eventAction uint8
 
 const (
-	eventActionExistingSocket eventAction = iota + 1
+	eventActionExistingSocket eventAction = iota
 	eventActionSocketOpened
 	eventActionSocketClosed
 )

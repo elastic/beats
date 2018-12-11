@@ -39,7 +39,7 @@ const (
 type eventAction uint8
 
 const (
-	eventActionExistingProcess eventAction = iota + 1
+	eventActionExistingProcess eventAction = iota
 	eventActionProcessStarted
 	eventActionProcessStopped
 )
