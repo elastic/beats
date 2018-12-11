@@ -48,6 +48,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
+	"github.com/elastic/beats/libbeat/ilm"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/logp/configure"
@@ -65,7 +66,7 @@ import (
 	"github.com/elastic/beats/libbeat/version"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
-	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
@@ -105,9 +106,6 @@ type beatConfig struct {
 	Dashboards *common.Config `config:"setup.dashboards"`
 	Template   *common.Config `config:"setup.template"`
 	Kibana     *common.Config `config:"setup.kibana"`
-
-	// ILM Config options
-	ILM *common.Config `config:"output.elasticsearch.ilm"`
 }
 
 var (
@@ -285,6 +283,11 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	err = b.registerWriteAlias()
+	if err != nil {
+		return nil, err
+	}
+
 	reg := monitoring.Default.GetRegistry("libbeat")
 	if reg == nil {
 		reg = monitoring.Default.NewRegistry("libbeat")
@@ -450,25 +453,18 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 		}
 
 		if template {
-			outCfg := b.Config.Output
-
-			if outCfg.Name() != "elasticsearch" {
-				return fmt.Errorf("Template loading requested but the Elasticsearch output is not configured/enabled")
-			}
-
-			esConfig := outCfg.Config()
 			if tmplCfg := b.Config.Template; tmplCfg == nil || tmplCfg.Enabled() {
 				loadCallback, err := b.templateLoadingCallback()
 				if err != nil {
 					return err
 				}
 
-				esClient, err := elasticsearch.NewConnectedClient(esConfig)
+				// Load template
+				esClient, err := b.esClient()
 				if err != nil {
 					return err
 				}
 
-				// Load template
 				err = loadCallback(esClient)
 				if err != nil {
 					return err
@@ -513,7 +509,13 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 		}
 
 		if policy {
-			if err := b.loadILMPolicy(); err != nil {
+			esClient, err := b.esClient()
+			if err != nil {
+				return err
+			}
+
+			loader, err := ilm.NewESLoader(b.Config.Output.Config(), esClient, b.Info)
+			if err := loader.LoadPolicies(); err != nil {
 				return err
 			}
 			fmt.Println("Loaded Index Lifecycle Management (ILM) policy")
@@ -521,6 +523,14 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 
 		return nil
 	}())
+}
+
+func (b *Beat) esClient() (*elasticsearch.Client, error) {
+	if b.Config.Output.Name() != "elasticsearch" {
+		return nil, fmt.Errorf("elasticsearch output is not configured/enabled")
+	}
+
+	return elasticsearch.NewConnectedClient(b.Config.Output.Config())
 }
 
 // handleFlags parses the command line flags. It handles the '-version' flag
@@ -725,6 +735,19 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	return nil
 }
 
+func (b *Beat) registerWriteAlias() error {
+	if b.Config.Output.Name() != "elasticsearch" {
+		return nil
+	}
+
+	writeAliasCallback, err := b.writeAliasLoadingCallback()
+	if err != nil {
+		return err
+	}
+	elasticsearch.RegisterConnectCallback(writeAliasCallback)
+	return nil
+}
+
 // registerTemplateLoading registers the loading of the template as a callback with
 // the elasticsearch output. It is important the the registration happens before
 // the publisher is created.
@@ -765,15 +788,32 @@ func (b *Beat) registerTemplateLoading() error {
 				return err
 			}
 			elasticsearch.RegisterConnectCallback(callback)
-		} else if b.Config.ILM.Enabled() {
-			return errors.New("templates cannot be disable when using ILM")
 		}
 	}
 
 	return nil
 }
 
-// Build and return a callback to load index template into ES
+// Build and return a callback to load ILM write alias
+func (b *Beat) writeAliasLoadingCallback() (func(esClient *elasticsearch.Client) error, error) {
+	callback := func(esClient *elasticsearch.Client) error {
+		loader, err := ilm.NewESLoader(b.Config.Output.Config(), esClient, b.Info)
+		if err != nil {
+			return fmt.Errorf("Error creating Elasticsearch ilm loader: %v", err)
+		}
+
+		err = loader.LoadWriteAlias()
+		if err != nil {
+			return fmt.Errorf("Error loading Elasticsearch write alias: %v", err)
+		}
+
+		return nil
+	}
+
+	return callback, nil
+}
+
+// Build and return a callback to load index templates into ES
 func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) error, error) {
 	callback := func(esClient *elasticsearch.Client) error {
 		if b.Config.Template == nil {
