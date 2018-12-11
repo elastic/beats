@@ -42,7 +42,7 @@ func TestWhenPriorityIsSet(t *testing.T) {
 	expected := common.MapStr{
 		"log": common.MapStr{
 			"source": common.MapStr{
-				"ip": "127.0.0.1",
+				"address": "127.0.0.1",
 			},
 		},
 		"message":  "hello world",
@@ -75,7 +75,7 @@ func TestWhenPriorityIsNotSet(t *testing.T) {
 	expected := common.MapStr{
 		"log": common.MapStr{
 			"source": common.MapStr{
-				"ip": "127.0.0.1",
+				"address": "127.0.0.1",
 			},
 		},
 		"message":  "hello world",

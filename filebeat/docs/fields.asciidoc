@@ -4711,6 +4711,18 @@ Source IP from which the log event was read / sent from.
 
 --
 
+*`log.source.address`*::
++
+--
+type: keyword
+
+required: False
+
+Source address from which the log event was read / sent from.
+
+
+--
+
 *`log.offset`*::
 +
 --
