@@ -66,8 +66,8 @@ def document_field(output, field, field_path):
         if not field["index"]:
             output.write("{}\n\n".format("Field is not indexed."))
 
-    if "enable" in field:
-        if not field["enable"]:
+    if "enabled" in field:
+        if not field["enabled"]:
             output.write("{}\n\n".format("Object is not enabled."))
 
     if "multi_fields" in field:
