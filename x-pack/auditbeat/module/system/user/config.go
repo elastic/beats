@@ -8,24 +8,23 @@ import (
 	"time"
 )
 
-// Config defines the metricset's configuration options.
-type Config struct {
-	StatePeriod     time.Duration `config:"state.period"`
-	UserStatePeriod time.Duration `config:"user.state.period"`
+// config defines the metricset's configuration options.
+type config struct {
+	StatePeriod           time.Duration `config:"state.period"`
+	UserStatePeriod       time.Duration `config:"user.state.period"`
+	DetectPasswordChanges bool          `config:"user.detect_password_changes"`
 }
 
-// Validate validates the host metricset config.
-func (c *Config) Validate() error {
-	return nil
-}
-
-func (c *Config) effectiveStatePeriod() time.Duration {
+func (c *config) effectiveStatePeriod() time.Duration {
 	if c.UserStatePeriod != 0 {
 		return c.UserStatePeriod
 	}
 	return c.StatePeriod
 }
 
-var defaultConfig = Config{
-	StatePeriod: 12 * time.Hour,
+func defaultConfig() config {
+	return config{
+		StatePeriod:           12 * time.Hour,
+		DetectPasswordChanges: false,
+	}
 }
