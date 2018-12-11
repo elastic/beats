@@ -30,6 +30,7 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "socket"
+	namespace     = "system.audit.socket"
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
@@ -42,6 +43,7 @@ const (
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
+		mb.WithNamespace(namespace),
 	)
 }
 

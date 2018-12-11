@@ -31,6 +31,7 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "packages"
+	namespace     = "system.audit.packages"
 
 	redhat = "redhat"
 	debian = "debian"
@@ -40,6 +41,7 @@ const (
 func init() {
 	/*mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
+		mb.WithNamespace(namespace),
 	)*/
 }
 
