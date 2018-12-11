@@ -99,7 +99,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	//mock Fetch
-	if m.config.AwsAccessKeyId == "" || m.config.AwsSecretAccessKey == "" {
+	if m.config.AwsAccessKeyID == "" || m.config.AwsSecretAccessKey == "" {
 		m.MockFetch(report)
 		return
 	}
