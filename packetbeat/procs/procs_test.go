@@ -20,37 +20,35 @@
 package procs
 
 import (
-	"fmt"
 	"net"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/packetbeat/protos/applayer"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/packetbeat/protos/applayer"
 )
 
 type testingImpl struct {
 	localIPs     []net.IP
-	portToPID    map[applayer.Transport]map[uint16]int
+	portToPID    map[applayer.Transport]map[endpoint]int
 	pidToCmdline map[int]string
 }
 
 type runningProcess struct {
 	cmdline string
 	pid     int
-	ports   []uint16
+	ports   []endpoint
 	proto   applayer.Transport
 }
 
 func newTestingImpl(localIPs []net.IP, processes []runningProcess) *testingImpl {
 	impl := &testingImpl{
 		localIPs: localIPs,
-		portToPID: map[applayer.Transport]map[uint16]int{
-			applayer.TransportTCP: make(map[uint16]int),
-			applayer.TransportUDP: make(map[uint16]int),
+		portToPID: map[applayer.Transport]map[endpoint]int{
+			applayer.TransportTCP: make(map[endpoint]int),
+			applayer.TransportUDP: make(map[endpoint]int),
 		},
 		pidToCmdline: make(map[int]string),
 	}
@@ -63,7 +61,7 @@ func newTestingImpl(localIPs []net.IP, processes []runningProcess) *testingImpl 
 	return impl
 }
 
-func (impl *testingImpl) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[uint16]int, err error) {
+func (impl *testingImpl) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error) {
 	return impl.portToPID[transport], nil
 }
 
@@ -90,40 +88,76 @@ func TestFindProcessTuple(t *testing.T) {
 	}
 	impl := newTestingImpl(
 		[]net.IP{
+			net.ParseIP("127.0.0.1"),
 			net.ParseIP("192.168.1.1"),
 			net.ParseIP("7777::33"),
 		},
 		[]runningProcess{
 			{
+				cmdline: "/usr/bin/mylocal_service",
+				pid:     9997,
+				ports: []endpoint{
+					{address: "127.0.0.1", port: 38842},
+				},
+				proto: applayer.TransportTCP,
+			},
+			{
+				cmdline: "/usr/local/bin/myexternal_service",
+				pid:     9998,
+				ports: []endpoint{
+					{address: "192.168.1.1", port: 38842},
+				},
+				proto: applayer.TransportTCP,
+			},
+			{
+				cmdline: "/opt/someapp/ipv6_only_app",
+				pid:     9999,
+				ports: []endpoint{
+					{address: anyIPv6, port: 38842},
+				},
+				proto: applayer.TransportTCP,
+			},
+			{
 				cmdline: "curl -o /dev/null http://example.net/",
 				pid:     101,
-				ports:   []uint16{65535},
-				proto:   applayer.TransportTCP,
+				ports: []endpoint{
+					{address: anyIPv4, port: 65535},
+				},
+				proto: applayer.TransportTCP,
 			},
 			{
 				cmdline: "/usr/X11/bin/webbrowser",
 				pid:     102,
-				ports:   []uint16{3201, 3202, 3203},
-				proto:   applayer.TransportTCP,
+				ports: []endpoint{
+					{anyIPv4, 3201},
+					{anyIPv6, 3201},
+					{anyIPv4, 3202},
+					{anyIPv4, 3203},
+				},
+				proto: applayer.TransportTCP,
 			},
 			{
 				cmdline: "nc -v -l -p 80",
 				pid:     105,
-				ports:   []uint16{80},
-				proto:   applayer.TransportTCP,
+				ports: []endpoint{
+					{anyIPv4, 80},
+				},
+				proto: applayer.TransportTCP,
 			},
 			{
 				cmdline: "bind",
 				pid:     333,
-				ports:   []uint16{53},
-				proto:   applayer.TransportUDP,
+				ports: []endpoint{
+					{anyIPv6, 53},
+				},
+				proto: applayer.TransportUDP,
 			},
 		})
 	procs := ProcessesWatcher{}
 	err := procs.initWithImpl(config, impl)
 	assert.NoError(t, err)
 
-	for idx, testCase := range []struct {
+	for _, testCase := range []struct {
 		name                                   string
 		srcIP, dstIP, src, dst, srcCmd, dstCmd string
 		srcPort, dstPort                       int
@@ -183,7 +217,7 @@ func TestFindProcessTuple(t *testing.T) {
 			preAction: func() {
 				// add a new running process
 				impl.pidToCmdline[555] = "/usr/bin/nmap -sT -P443 10.0.0.0/8"
-				impl.portToPID[applayer.TransportTCP][55555] = 555
+				impl.portToPID[applayer.TransportTCP][endpoint{anyIPv6, 55555}] = 555
 			},
 			proto: applayer.TransportTCP,
 			srcIP: "7777::33", srcPort: 55555,
@@ -199,28 +233,52 @@ func TestFindProcessTuple(t *testing.T) {
 			src: "", srcCmd: "",
 			dst: "", dstCmd: "bind",
 		},
+		{
+			name:  "Local bound port",
+			proto: applayer.TransportTCP,
+			srcIP: "127.0.0.1", srcPort: 38841,
+			dstIP: "127.0.0.1", dstPort: 38842,
+			src: "", srcCmd: "",
+			dst: "", dstCmd: "/usr/bin/mylocal_service",
+		},
+		{
+			name:  "Network bound port",
+			proto: applayer.TransportTCP,
+			srcIP: "192.168.255.37", srcPort: 65535,
+			dstIP: "192.168.1.1", dstPort: 38842,
+			src: "", srcCmd: "",
+			dst: "", dstCmd: "/usr/local/bin/myexternal_service",
+		},
+		{
+			name:  "IPv6 bound port",
+			proto: applayer.TransportTCP,
+			srcIP: "7fff::11", srcPort: 38842,
+			dstIP: "7777::33", dstPort: 38842,
+			src: "", srcCmd: "",
+			dst: "", dstCmd: "/opt/someapp/ipv6_only_app",
+		},
 	} {
-		msg := fmt.Sprintf("test case #%d: %s", idx+1, testCase.name)
+		t.Run(testCase.name, func(t *testing.T) {
+			if testCase.preAction != nil {
+				testCase.preAction()
+			}
+			input := common.IPPortTuple{
+				BaseTuple: common.BaseTuple{
+					SrcIP:   net.ParseIP(testCase.srcIP),
+					SrcPort: uint16(testCase.srcPort),
+					DstIP:   net.ParseIP(testCase.dstIP),
+					DstPort: uint16(testCase.dstPort),
+				},
+			}
+			result := procs.FindProcessesTuple(&input, testCase.proto)
+			// nil result is not valid
+			assert.NotNil(t, result)
 
-		if testCase.preAction != nil {
-			testCase.preAction()
-		}
-		input := common.IPPortTuple{
-			BaseTuple: common.BaseTuple{
-				SrcIP:   net.ParseIP(testCase.srcIP),
-				SrcPort: uint16(testCase.srcPort),
-				DstIP:   net.ParseIP(testCase.dstIP),
-				DstPort: uint16(testCase.dstPort),
-			},
-		}
-		result := procs.FindProcessesTuple(&input, testCase.proto)
-		// nil result is not valid
-		assert.NotNil(t, result, msg)
-
-		assert.Equal(t, testCase.src, string(result.Src), msg)
-		assert.Equal(t, testCase.dst, string(result.Dst), msg)
-		assert.Equal(t, testCase.srcCmd, string(result.SrcCommand), msg)
-		assert.Equal(t, testCase.dstCmd, string(result.DstCommand), msg)
+			assert.Equal(t, testCase.src, string(result.Src))
+			assert.Equal(t, testCase.dst, string(result.Dst))
+			assert.Equal(t, testCase.srcCmd, string(result.SrcCommand))
+			assert.Equal(t, testCase.dstCmd, string(result.DstCommand))
+		})
 	}
 
 }

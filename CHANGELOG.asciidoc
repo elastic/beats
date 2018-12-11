@@ -75,6 +75,8 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix issue with process monitor associating traffic to the wrong process. {issue}9151[9151] {pull}9443[9443]
+
 *Winlogbeat*
 
 *Functionbeat*
