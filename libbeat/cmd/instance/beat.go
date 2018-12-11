@@ -980,16 +980,22 @@ func initPaths(cfg *common.Config) error {
 	return nil
 }
 
-func chooseMonitoringConfig(beatCfg beatConfig) (monitoringCfg *common.Config, err error) {
-	if beatCfg.MonitoringNew.Enabled() && beatCfg.Monitoring.Enabled() {
-		err = fmt.Errorf("both xpack.monitoring.* and monitoring.* cannot be set. Prefer to set monitoring.* and set monitoring.hosts to monitoring cluster hosts")
-	} else if beatCfg.Monitoring.Enabled() {
-		cfgwarn.Deprecate("7.0", "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.hosts to monitoring cluster hosts")
-		monitoringCfg = beatCfg.Monitoring
+func selectMonitoringConfig(beatCfg beatConfig) (*common.Config, error) {
+	switch {
+	case beatCfg.MonitoringNew.Enabled() && beatCfg.Monitoring.Enabled():
+		const errMonitoringBothConfigEnabled = "both xpack.monitoring.* and monitoring.* cannot be set. Prefer to set monitoring.* and set monitoring.hosts to monitoring cluster hosts"
+		return nil, errors.New(errMonitoringBothConfigEnabled)
+	case beatCfg.Monitoring.Enabled():
+		const warnMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.hosts to monitoring cluster hosts"
+		cfgwarn.Deprecate("7.0", warnMonitoringDeprecatedConfig)
+		monitoringCfg := beatCfg.Monitoring
 		monitoringCfg.SetString("format", -1, "production")
-	} else {
-		monitoringCfg = beatCfg.MonitoringNew
+		return monitoringCfg, nil
+	case beatCfg.MonitoringNew.Enabled():
+		monitoringCfg := beatCfg.MonitoringNew
 		monitoringCfg.SetString("format", -1, "monitoring")
+		return monitoringCfg, nil
+	default:
+		return nil, nil
 	}
-	return
 }
