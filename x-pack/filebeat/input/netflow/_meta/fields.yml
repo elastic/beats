@@ -1,0 +1,1383 @@
+- key: netflow
+  title: "NetFlow"
+  description: >
+    Fields from NetFlow and IPFIX flows.
+  fields:
+    - name: netflow
+      type: group
+      description: >
+        Fields from NetFlow and IPFIX.
+      fields:
+        - name: type
+          type: keyword
+          description: >
+            The type of NetFlow record described by this event.
+
+        - name: exporter
+          type: group
+          description: >
+            Metadata related to the exporter device that generated this record.
+          fields:
+            - name: address
+              type: keyword
+              description: >
+                Exporter's network address in IP:port format.
+
+            - name: sourceId
+              type: long
+              description: >
+                Observation domain ID to which this record belongs.
+
+            - name: timestamp
+              type: date
+              description: >
+                Time and date of export.
+
+            - name: uptimeMillis
+              type: long
+              description: >
+                How long the exporter process has been running, in milliseconds.
+
+            - name: version
+              type: int
+              description: >
+                NetFlow version used.
+
+        - name: octetDeltaCount
+          type: long
+
+        - name: packetDeltaCount
+          type: long
+
+        - name: deltaFlowCount
+          type: long
+
+        - name: protocolIdentifier
+          type: short
+
+        - name: ipClassOfService
+          type: short
+
+        - name: tcpControlBits
+          type: integer
+
+        - name: sourceTransportPort
+          type: integer
+
+        - name: sourceIPv4Address
+          type: ip
+
+        - name: sourceIPv4PrefixLength
+          type: short
+
+        - name: ingressInterface
+          type: long
+
+        - name: destinationTransportPort
+          type: integer
+
+        - name: destinationIPv4Address
+          type: ip
+
+        - name: destinationIPv4PrefixLength
+          type: short
+
+        - name: egressInterface
+          type: long
+
+        - name: ipNextHopIPv4Address
+          type: ip
+
+        - name: bgpSourceAsNumber
+          type: long
+
+        - name: bgpDestinationAsNumber
+          type: long
+
+        - name: bgpNextHopIPv4Address
+          type: ip
+
+        - name: postMCastPacketDeltaCount
+          type: long
+
+        - name: postMCastOctetDeltaCount
+          type: long
+
+        - name: flowEndSysUpTime
+          type: long
+
+        - name: flowStartSysUpTime
+          type: long
+
+        - name: postOctetDeltaCount
+          type: long
+
+        - name: postPacketDeltaCount
+          type: long
+
+        - name: minimumIpTotalLength
+          type: long
+
+        - name: maximumIpTotalLength
+          type: long
+
+        - name: sourceIPv6Address
+          type: ip
+
+        - name: destinationIPv6Address
+          type: ip
+
+        - name: sourceIPv6PrefixLength
+          type: short
+
+        - name: destinationIPv6PrefixLength
+          type: short
+
+        - name: flowLabelIPv6
+          type: long
+
+        - name: icmpTypeCodeIPv4
+          type: integer
+
+        - name: igmpType
+          type: short
+
+        - name: samplingInterval
+          type: long
+
+        - name: samplingAlgorithm
+          type: short
+
+        - name: flowActiveTimeout
+          type: integer
+
+        - name: flowIdleTimeout
+          type: integer
+
+        - name: engineType
+          type: short
+
+        - name: engineId
+          type: short
+
+        - name: exportedOctetTotalCount
+          type: long
+
+        - name: exportedMessageTotalCount
+          type: long
+
+        - name: exportedFlowRecordTotalCount
+          type: long
+
+        - name: ipv4RouterSc
+          type: ip
+
+        - name: sourceIPv4Prefix
+          type: ip
+
+        - name: destinationIPv4Prefix
+          type: ip
+
+        - name: mplsTopLabelType
+          type: short
+
+        - name: mplsTopLabelIPv4Address
+          type: ip
+
+        - name: samplerId
+          type: short
+
+        - name: samplerMode
+          type: short
+
+        - name: samplerRandomInterval
+          type: long
+
+        - name: classId
+          type: short
+
+        - name: minimumTTL
+          type: short
+
+        - name: maximumTTL
+          type: short
+
+        - name: fragmentIdentification
+          type: long
+
+        - name: postIpClassOfService
+          type: short
+
+        - name: sourceMacAddress
+          type: keyword
+
+        - name: postDestinationMacAddress
+          type: keyword
+
+        - name: vlanId
+          type: integer
+
+        - name: postVlanId
+          type: integer
+
+        - name: ipVersion
+          type: short
+
+        - name: flowDirection
+          type: short
+
+        - name: ipNextHopIPv6Address
+          type: ip
+
+        - name: bgpNextHopIPv6Address
+          type: ip
+
+        - name: ipv6ExtensionHeaders
+          type: long
+
+        - name: mplsTopLabelStackSection
+          type: short
+
+        - name: mplsLabelStackSection2
+          type: short
+
+        - name: mplsLabelStackSection3
+          type: short
+
+        - name: mplsLabelStackSection4
+          type: short
+
+        - name: mplsLabelStackSection5
+          type: short
+
+        - name: mplsLabelStackSection6
+          type: short
+
+        - name: mplsLabelStackSection7
+          type: short
+
+        - name: mplsLabelStackSection8
+          type: short
+
+        - name: mplsLabelStackSection9
+          type: short
+
+        - name: mplsLabelStackSection10
+          type: short
+
+        - name: destinationMacAddress
+          type: keyword
+
+        - name: postSourceMacAddress
+          type: keyword
+
+        - name: interfaceName
+          type: keyword
+
+        - name: interfaceDescription
+          type: keyword
+
+        - name: samplerName
+          type: keyword
+
+        - name: octetTotalCount
+          type: long
+
+        - name: packetTotalCount
+          type: long
+
+        - name: flagsAndSamplerId
+          type: long
+
+        - name: fragmentOffset
+          type: integer
+
+        - name: forwardingStatus
+          type: short
+
+        - name: mplsVpnRouteDistinguisher
+          type: short
+
+        - name: mplsTopLabelPrefixLength
+          type: short
+
+        - name: srcTrafficIndex
+          type: long
+
+        - name: dstTrafficIndex
+          type: long
+
+        - name: applicationDescription
+          type: keyword
+
+        - name: applicationId
+          type: short
+
+        - name: applicationName
+          type: keyword
+
+        - name: postIpDiffServCodePoint
+          type: short
+
+        - name: multicastReplicationFactor
+          type: long
+
+        - name: className
+          type: keyword
+
+        - name: classificationEngineId
+          type: short
+
+        - name: layer2packetSectionOffset
+          type: integer
+
+        - name: layer2packetSectionSize
+          type: integer
+
+        - name: layer2packetSectionData
+          type: short
+
+        - name: bgpNextAdjacentAsNumber
+          type: long
+
+        - name: bgpPrevAdjacentAsNumber
+          type: long
+
+        - name: exporterIPv4Address
+          type: ip
+
+        - name: exporterIPv6Address
+          type: ip
+
+        - name: droppedOctetDeltaCount
+          type: long
+
+        - name: droppedPacketDeltaCount
+          type: long
+
+        - name: droppedOctetTotalCount
+          type: long
+
+        - name: droppedPacketTotalCount
+          type: long
+
+        - name: flowEndReason
+          type: short
+
+        - name: commonPropertiesId
+          type: long
+
+        - name: observationPointId
+          type: long
+
+        - name: icmpTypeCodeIPv6
+          type: integer
+
+        - name: mplsTopLabelIPv6Address
+          type: ip
+
+        - name: lineCardId
+          type: long
+
+        - name: portId
+          type: long
+
+        - name: meteringProcessId
+          type: long
+
+        - name: exportingProcessId
+          type: long
+
+        - name: templateId
+          type: integer
+
+        - name: wlanChannelId
+          type: short
+
+        - name: wlanSSID
+          type: keyword
+
+        - name: flowId
+          type: long
+
+        - name: observationDomainId
+          type: long
+
+        - name: flowStartSeconds
+          type: date
+
+        - name: flowEndSeconds
+          type: date
+
+        - name: flowStartMilliseconds
+          type: date
+
+        - name: flowEndMilliseconds
+          type: date
+
+        - name: flowStartMicroseconds
+          type: date
+
+        - name: flowEndMicroseconds
+          type: date
+
+        - name: flowStartNanoseconds
+          type: date
+
+        - name: flowEndNanoseconds
+          type: date
+
+        - name: flowStartDeltaMicroseconds
+          type: long
+
+        - name: flowEndDeltaMicroseconds
+          type: long
+
+        - name: systemInitTimeMilliseconds
+          type: date
+
+        - name: flowDurationMilliseconds
+          type: long
+
+        - name: flowDurationMicroseconds
+          type: long
+
+        - name: observedFlowTotalCount
+          type: long
+
+        - name: ignoredPacketTotalCount
+          type: long
+
+        - name: ignoredOctetTotalCount
+          type: long
+
+        - name: notSentFlowTotalCount
+          type: long
+
+        - name: notSentPacketTotalCount
+          type: long
+
+        - name: notSentOctetTotalCount
+          type: long
+
+        - name: destinationIPv6Prefix
+          type: ip
+
+        - name: sourceIPv6Prefix
+          type: ip
+
+        - name: postOctetTotalCount
+          type: long
+
+        - name: postPacketTotalCount
+          type: long
+
+        - name: flowKeyIndicator
+          type: long
+
+        - name: postMCastPacketTotalCount
+          type: long
+
+        - name: postMCastOctetTotalCount
+          type: long
+
+        - name: icmpTypeIPv4
+          type: short
+
+        - name: icmpCodeIPv4
+          type: short
+
+        - name: icmpTypeIPv6
+          type: short
+
+        - name: icmpCodeIPv6
+          type: short
+
+        - name: udpSourcePort
+          type: integer
+
+        - name: udpDestinationPort
+          type: integer
+
+        - name: tcpSourcePort
+          type: integer
+
+        - name: tcpDestinationPort
+          type: integer
+
+        - name: tcpSequenceNumber
+          type: long
+
+        - name: tcpAcknowledgementNumber
+          type: long
+
+        - name: tcpWindowSize
+          type: integer
+
+        - name: tcpUrgentPointer
+          type: integer
+
+        - name: tcpHeaderLength
+          type: short
+
+        - name: ipHeaderLength
+          type: short
+
+        - name: totalLengthIPv4
+          type: integer
+
+        - name: payloadLengthIPv6
+          type: integer
+
+        - name: ipTTL
+          type: short
+
+        - name: nextHeaderIPv6
+          type: short
+
+        - name: mplsPayloadLength
+          type: long
+
+        - name: ipDiffServCodePoint
+          type: short
+
+        - name: ipPrecedence
+          type: short
+
+        - name: fragmentFlags
+          type: short
+
+        - name: octetDeltaSumOfSquares
+          type: long
+
+        - name: octetTotalSumOfSquares
+          type: long
+
+        - name: mplsTopLabelTTL
+          type: short
+
+        - name: mplsLabelStackLength
+          type: long
+
+        - name: mplsLabelStackDepth
+          type: long
+
+        - name: mplsTopLabelExp
+          type: short
+
+        - name: ipPayloadLength
+          type: long
+
+        - name: udpMessageLength
+          type: integer
+
+        - name: isMulticast
+          type: short
+
+        - name: ipv4IHL
+          type: short
+
+        - name: ipv4Options
+          type: long
+
+        - name: tcpOptions
+          type: long
+
+        - name: paddingOctets
+          type: short
+
+        - name: collectorIPv4Address
+          type: ip
+
+        - name: collectorIPv6Address
+          type: ip
+
+        - name: exportInterface
+          type: long
+
+        - name: exportProtocolVersion
+          type: short
+
+        - name: exportTransportProtocol
+          type: short
+
+        - name: collectorTransportPort
+          type: integer
+
+        - name: exporterTransportPort
+          type: integer
+
+        - name: tcpSynTotalCount
+          type: long
+
+        - name: tcpFinTotalCount
+          type: long
+
+        - name: tcpRstTotalCount
+          type: long
+
+        - name: tcpPshTotalCount
+          type: long
+
+        - name: tcpAckTotalCount
+          type: long
+
+        - name: tcpUrgTotalCount
+          type: long
+
+        - name: ipTotalLength
+          type: long
+
+        - name: postNATSourceIPv4Address
+          type: ip
+
+        - name: postNATDestinationIPv4Address
+          type: ip
+
+        - name: postNAPTSourceTransportPort
+          type: integer
+
+        - name: postNAPTDestinationTransportPort
+          type: integer
+
+        - name: natOriginatingAddressRealm
+          type: short
+
+        - name: natEvent
+          type: short
+
+        - name: initiatorOctets
+          type: long
+
+        - name: responderOctets
+          type: long
+
+        - name: firewallEvent
+          type: short
+
+        - name: ingressVRFID
+          type: long
+
+        - name: egressVRFID
+          type: long
+
+        - name: VRFname
+          type: keyword
+
+        - name: postMplsTopLabelExp
+          type: short
+
+        - name: tcpWindowScale
+          type: integer
+
+        - name: biflowDirection
+          type: short
+
+        - name: ethernetHeaderLength
+          type: short
+
+        - name: ethernetPayloadLength
+          type: integer
+
+        - name: ethernetTotalLength
+          type: integer
+
+        - name: dot1qVlanId
+          type: integer
+
+        - name: dot1qPriority
+          type: short
+
+        - name: dot1qCustomerVlanId
+          type: integer
+
+        - name: dot1qCustomerPriority
+          type: short
+
+        - name: metroEvcId
+          type: keyword
+
+        - name: metroEvcType
+          type: short
+
+        - name: pseudoWireId
+          type: long
+
+        - name: pseudoWireType
+          type: integer
+
+        - name: pseudoWireControlWord
+          type: long
+
+        - name: ingressPhysicalInterface
+          type: long
+
+        - name: egressPhysicalInterface
+          type: long
+
+        - name: postDot1qVlanId
+          type: integer
+
+        - name: postDot1qCustomerVlanId
+          type: integer
+
+        - name: ethernetType
+          type: integer
+
+        - name: postIpPrecedence
+          type: short
+
+        - name: collectionTimeMilliseconds
+          type: date
+
+        - name: exportSctpStreamId
+          type: integer
+
+        - name: maxExportSeconds
+          type: date
+
+        - name: maxFlowEndSeconds
+          type: date
+
+        - name: messageMD5Checksum
+          type: short
+
+        - name: messageScope
+          type: short
+
+        - name: minExportSeconds
+          type: date
+
+        - name: minFlowStartSeconds
+          type: date
+
+        - name: opaqueOctets
+          type: short
+
+        - name: sessionScope
+          type: short
+
+        - name: maxFlowEndMicroseconds
+          type: date
+
+        - name: maxFlowEndMilliseconds
+          type: date
+
+        - name: maxFlowEndNanoseconds
+          type: date
+
+        - name: minFlowStartMicroseconds
+          type: date
+
+        - name: minFlowStartMilliseconds
+          type: date
+
+        - name: minFlowStartNanoseconds
+          type: date
+
+        - name: collectorCertificate
+          type: short
+
+        - name: exporterCertificate
+          type: short
+
+        - name: dataRecordsReliability
+          type: boolean
+
+        - name: observationPointType
+          type: short
+
+        - name: newConnectionDeltaCount
+          type: long
+
+        - name: connectionSumDurationSeconds
+          type: long
+
+        - name: connectionTransactionId
+          type: long
+
+        - name: postNATSourceIPv6Address
+          type: ip
+
+        - name: postNATDestinationIPv6Address
+          type: ip
+
+        - name: natPoolId
+          type: long
+
+        - name: natPoolName
+          type: keyword
+
+        - name: anonymizationFlags
+          type: integer
+
+        - name: anonymizationTechnique
+          type: integer
+
+        - name: informationElementIndex
+          type: integer
+
+        - name: p2pTechnology
+          type: keyword
+
+        - name: tunnelTechnology
+          type: keyword
+
+        - name: encryptedTechnology
+          type: keyword
+
+        - name: bgpValidityState
+          type: short
+
+        - name: IPSecSPI
+          type: long
+
+        - name: greKey
+          type: long
+
+        - name: natType
+          type: short
+
+        - name: initiatorPackets
+          type: long
+
+        - name: responderPackets
+          type: long
+
+        - name: observationDomainName
+          type: keyword
+
+        - name: selectionSequenceId
+          type: long
+
+        - name: selectorId
+          type: long
+
+        - name: informationElementId
+          type: integer
+
+        - name: selectorAlgorithm
+          type: integer
+
+        - name: samplingPacketInterval
+          type: long
+
+        - name: samplingPacketSpace
+          type: long
+
+        - name: samplingTimeInterval
+          type: long
+
+        - name: samplingTimeSpace
+          type: long
+
+        - name: samplingSize
+          type: long
+
+        - name: samplingPopulation
+          type: long
+
+        - name: samplingProbability
+          type: double
+
+        - name: dataLinkFrameSize
+          type: integer
+
+        - name: ipHeaderPacketSection
+          type: short
+
+        - name: ipPayloadPacketSection
+          type: short
+
+        - name: dataLinkFrameSection
+          type: short
+
+        - name: mplsLabelStackSection
+          type: short
+
+        - name: mplsPayloadPacketSection
+          type: short
+
+        - name: selectorIdTotalPktsObserved
+          type: long
+
+        - name: selectorIdTotalPktsSelected
+          type: long
+
+        - name: absoluteError
+          type: double
+
+        - name: relativeError
+          type: double
+
+        - name: observationTimeSeconds
+          type: date
+
+        - name: observationTimeMilliseconds
+          type: date
+
+        - name: observationTimeMicroseconds
+          type: date
+
+        - name: observationTimeNanoseconds
+          type: date
+
+        - name: digestHashValue
+          type: long
+
+        - name: hashIPPayloadOffset
+          type: long
+
+        - name: hashIPPayloadSize
+          type: long
+
+        - name: hashOutputRangeMin
+          type: long
+
+        - name: hashOutputRangeMax
+          type: long
+
+        - name: hashSelectedRangeMin
+          type: long
+
+        - name: hashSelectedRangeMax
+          type: long
+
+        - name: hashDigestOutput
+          type: boolean
+
+        - name: hashInitialiserValue
+          type: long
+
+        - name: selectorName
+          type: keyword
+
+        - name: upperCILimit
+          type: double
+
+        - name: lowerCILimit
+          type: double
+
+        - name: confidenceLevel
+          type: double
+
+        - name: informationElementDataType
+          type: short
+
+        - name: informationElementDescription
+          type: keyword
+
+        - name: informationElementName
+          type: keyword
+
+        - name: informationElementRangeBegin
+          type: long
+
+        - name: informationElementRangeEnd
+          type: long
+
+        - name: informationElementSemantics
+          type: short
+
+        - name: informationElementUnits
+          type: integer
+
+        - name: privateEnterpriseNumber
+          type: long
+
+        - name: virtualStationInterfaceId
+          type: short
+
+        - name: virtualStationInterfaceName
+          type: keyword
+
+        - name: virtualStationUUID
+          type: short
+
+        - name: virtualStationName
+          type: keyword
+
+        - name: layer2SegmentId
+          type: long
+
+        - name: layer2OctetDeltaCount
+          type: long
+
+        - name: layer2OctetTotalCount
+          type: long
+
+        - name: ingressUnicastPacketTotalCount
+          type: long
+
+        - name: ingressMulticastPacketTotalCount
+          type: long
+
+        - name: ingressBroadcastPacketTotalCount
+          type: long
+
+        - name: egressUnicastPacketTotalCount
+          type: long
+
+        - name: egressBroadcastPacketTotalCount
+          type: long
+
+        - name: monitoringIntervalStartMilliSeconds
+          type: date
+
+        - name: monitoringIntervalEndMilliSeconds
+          type: date
+
+        - name: portRangeStart
+          type: integer
+
+        - name: portRangeEnd
+          type: integer
+
+        - name: portRangeStepSize
+          type: integer
+
+        - name: portRangeNumPorts
+          type: integer
+
+        - name: staMacAddress
+          type: keyword
+
+        - name: staIPv4Address
+          type: ip
+
+        - name: wtpMacAddress
+          type: keyword
+
+        - name: ingressInterfaceType
+          type: long
+
+        - name: egressInterfaceType
+          type: long
+
+        - name: rtpSequenceNumber
+          type: integer
+
+        - name: userName
+          type: keyword
+
+        - name: applicationCategoryName
+          type: keyword
+
+        - name: applicationSubCategoryName
+          type: keyword
+
+        - name: applicationGroupName
+          type: keyword
+
+        - name: originalFlowsPresent
+          type: long
+
+        - name: originalFlowsInitiated
+          type: long
+
+        - name: originalFlowsCompleted
+          type: long
+
+        - name: distinctCountOfSourceIPAddress
+          type: long
+
+        - name: distinctCountOfDestinationIPAddress
+          type: long
+
+        - name: distinctCountOfSourceIPv4Address
+          type: long
+
+        - name: distinctCountOfDestinationIPv4Address
+          type: long
+
+        - name: distinctCountOfSourceIPv6Address
+          type: long
+
+        - name: distinctCountOfDestinationIPv6Address
+          type: long
+
+        - name: valueDistributionMethod
+          type: short
+
+        - name: rfc3550JitterMilliseconds
+          type: long
+
+        - name: rfc3550JitterMicroseconds
+          type: long
+
+        - name: rfc3550JitterNanoseconds
+          type: long
+
+        - name: dot1qDEI
+          type: boolean
+
+        - name: dot1qCustomerDEI
+          type: boolean
+
+        - name: flowSelectorAlgorithm
+          type: integer
+
+        - name: flowSelectedOctetDeltaCount
+          type: long
+
+        - name: flowSelectedPacketDeltaCount
+          type: long
+
+        - name: flowSelectedFlowDeltaCount
+          type: long
+
+        - name: selectorIDTotalFlowsObserved
+          type: long
+
+        - name: selectorIDTotalFlowsSelected
+          type: long
+
+        - name: samplingFlowInterval
+          type: long
+
+        - name: samplingFlowSpacing
+          type: long
+
+        - name: flowSamplingTimeInterval
+          type: long
+
+        - name: flowSamplingTimeSpacing
+          type: long
+
+        - name: hashFlowDomain
+          type: integer
+
+        - name: transportOctetDeltaCount
+          type: long
+
+        - name: transportPacketDeltaCount
+          type: long
+
+        - name: originalExporterIPv4Address
+          type: ip
+
+        - name: originalExporterIPv6Address
+          type: ip
+
+        - name: originalObservationDomainId
+          type: long
+
+        - name: intermediateProcessId
+          type: long
+
+        - name: ignoredDataRecordTotalCount
+          type: long
+
+        - name: dataLinkFrameType
+          type: integer
+
+        - name: sectionOffset
+          type: integer
+
+        - name: sectionExportedOctets
+          type: integer
+
+        - name: dot1qServiceInstanceTag
+          type: short
+
+        - name: dot1qServiceInstanceId
+          type: long
+
+        - name: dot1qServiceInstancePriority
+          type: short
+
+        - name: dot1qCustomerSourceMacAddress
+          type: keyword
+
+        - name: dot1qCustomerDestinationMacAddress
+          type: keyword
+
+        - name: postLayer2OctetDeltaCount
+          type: long
+
+        - name: postMCastLayer2OctetDeltaCount
+          type: long
+
+        - name: postLayer2OctetTotalCount
+          type: long
+
+        - name: postMCastLayer2OctetTotalCount
+          type: long
+
+        - name: minimumLayer2TotalLength
+          type: long
+
+        - name: maximumLayer2TotalLength
+          type: long
+
+        - name: droppedLayer2OctetDeltaCount
+          type: long
+
+        - name: droppedLayer2OctetTotalCount
+          type: long
+
+        - name: ignoredLayer2OctetTotalCount
+          type: long
+
+        - name: notSentLayer2OctetTotalCount
+          type: long
+
+        - name: layer2OctetDeltaSumOfSquares
+          type: long
+
+        - name: layer2OctetTotalSumOfSquares
+          type: long
+
+        - name: layer2FrameDeltaCount
+          type: long
+
+        - name: layer2FrameTotalCount
+          type: long
+
+        - name: pseudoWireDestinationIPv4Address
+          type: ip
+
+        - name: ignoredLayer2FrameTotalCount
+          type: long
+
+        - name: mibObjectValueInteger
+          type: integer
+
+        - name: mibObjectValueOctetString
+          type: short
+
+        - name: mibObjectValueOID
+          type: short
+
+        - name: mibObjectValueBits
+          type: short
+
+        - name: mibObjectValueIPAddress
+          type: ip
+
+        - name: mibObjectValueCounter
+          type: long
+
+        - name: mibObjectValueGauge
+          type: long
+
+        - name: mibObjectValueTimeTicks
+          type: long
+
+        - name: mibObjectValueUnsigned
+          type: long
+
+        - name: mibObjectIdentifier
+          type: short
+
+        - name: mibSubIdentifier
+          type: long
+
+        - name: mibIndexIndicator
+          type: long
+
+        - name: mibCaptureTimeSemantics
+          type: short
+
+        - name: mibContextEngineID
+          type: short
+
+        - name: mibContextName
+          type: keyword
+
+        - name: mibObjectName
+          type: keyword
+
+        - name: mibObjectDescription
+          type: keyword
+
+        - name: mibObjectSyntax
+          type: keyword
+
+        - name: mibModuleName
+          type: keyword
+
+        - name: mobileIMSI
+          type: keyword
+
+        - name: mobileMSISDN
+          type: keyword
+
+        - name: httpStatusCode
+          type: integer
+
+        - name: sourceTransportPortsLimit
+          type: integer
+
+        - name: httpRequestMethod
+          type: keyword
+
+        - name: httpRequestHost
+          type: keyword
+
+        - name: httpRequestTarget
+          type: keyword
+
+        - name: httpMessageVersion
+          type: keyword
+
+        - name: natInstanceID
+          type: long
+
+        - name: internalAddressRealm
+          type: short
+
+        - name: externalAddressRealm
+          type: short
+
+        - name: natQuotaExceededEvent
+          type: long
+
+        - name: natThresholdEvent
+          type: long
+
+        - name: httpUserAgent
+          type: keyword
+
+        - name: httpContentType
+          type: keyword
+
+        - name: httpReasonPhrase
+          type: keyword
+
+        - name: maxSessionEntries
+          type: long
+
+        - name: maxBIBEntries
+          type: long
+
+        - name: maxEntriesPerUser
+          type: long
+
+        - name: maxSubscribers
+          type: long
+
+        - name: maxFragmentsPendingReassembly
+          type: long
+
+        - name: addressPoolHighThreshold
+          type: long
+
+        - name: addressPoolLowThreshold
+          type: long
+
+        - name: addressPortMappingHighThreshold
+          type: long
+
+        - name: addressPortMappingLowThreshold
+          type: long
+
+        - name: addressPortMappingPerUserHighThreshold
+          type: long
+
+        - name: globalAddressMappingHighThreshold
+          type: long
+
+        - name: vpnIdentifier
+          type: short
+
