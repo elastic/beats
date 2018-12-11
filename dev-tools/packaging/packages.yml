@@ -395,7 +395,7 @@ specs:
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
-            source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: darwin
       types: [tgz]
@@ -404,7 +404,7 @@ specs:
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
-            source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: darwin
       types: [dmg]
@@ -419,7 +419,7 @@ specs:
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
-            source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
       types: [deb, rpm]
@@ -428,7 +428,7 @@ specs:
         <<: *elastic_license_for_deb_rpm
         files:
           /usr/share/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
-            source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
       types: [docker]
@@ -438,4 +438,4 @@ specs:
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
-            source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
