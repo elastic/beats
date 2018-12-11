@@ -15,9 +15,10 @@
   state.period: 12h
 
   {{ if eq .GOOS "linux" -}}
-  # When set to true, detects changes to password fields in
-  # /etc/passwd and /etc/shadow.
-  user.detect_password_changes: false
+  # Enabled by default. Auditbeat will read password fields in
+  # /etc/passwd and /etc/shadow and store a hash locally to
+  # detect any changes.
+  user.detect_password_changes: true
   {{- end }}
 
   report_changes: true
