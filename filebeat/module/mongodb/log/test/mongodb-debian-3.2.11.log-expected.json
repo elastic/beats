@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -13,6 +14,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -25,6 +27,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -37,6 +40,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.677Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -49,6 +53,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.724Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -61,6 +66,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.724Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -73,6 +79,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.744Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -85,6 +92,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:55.170Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -97,6 +105,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:55.487Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -109,6 +118,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -121,6 +131,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -133,6 +144,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -145,6 +157,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -157,6 +170,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -169,6 +183,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.688Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -181,6 +196,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -193,6 +209,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -205,6 +222,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -217,6 +235,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -229,6 +248,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:55.170Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -241,6 +261,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:56.180Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -253,6 +274,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:15:42.095Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -265,6 +287,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -277,6 +300,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -289,6 +313,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.688Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -301,6 +326,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -313,6 +339,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -325,6 +352,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -337,6 +365,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:55.487Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -349,6 +378,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:56.180Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -361,6 +391,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:11:41.401Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -373,6 +404,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.605Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -385,6 +417,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.605Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -397,6 +430,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "event.dataset": "mongodb.log", 
         "fileset.module": "mongodb", 
         "fileset.name": "log", 
         "input.type": "log", 

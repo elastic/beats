@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2017-04-04T09:16:34.000Z", 
+        "event.dataset": "icinga.main", 
         "fileset.module": "icinga", 
         "fileset.name": "main", 
         "icinga.main.facility": "Notification", 
@@ -12,6 +13,7 @@
     }, 
     {
         "@timestamp": "2017-04-04T09:16:34.000Z", 
+        "event.dataset": "icinga.main", 
         "fileset.module": "icinga", 
         "fileset.name": "main", 
         "icinga.main.facility": "PluginNotificationTask", 
@@ -26,6 +28,7 @@
     }, 
     {
         "@timestamp": "2017-04-04T09:16:48.000Z", 
+        "event.dataset": "icinga.main", 
         "fileset.module": "icinga", 
         "fileset.name": "main", 
         "icinga.main.facility": "IdoMysqlConnection", 

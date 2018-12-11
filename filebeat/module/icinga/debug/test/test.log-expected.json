@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2017-04-04T11:43:09.000Z", 
+        "event.dataset": "icinga.debug", 
         "fileset.module": "icinga", 
         "fileset.name": "debug", 
         "icinga.debug.facility": "GraphiteWriter", 
@@ -12,6 +13,7 @@
     }, 
     {
         "@timestamp": "2017-04-04T11:43:09.000Z", 
+        "event.dataset": "icinga.debug", 
         "fileset.module": "icinga", 
         "fileset.name": "debug", 
         "icinga.debug.facility": "IdoMysqlConnection", 
@@ -23,6 +25,7 @@
     }, 
     {
         "@timestamp": "2017-04-04T11:43:11.000Z", 
+        "event.dataset": "icinga.debug", 
         "fileset.module": "icinga", 
         "fileset.name": "debug", 
         "icinga.debug.facility": "Process", 

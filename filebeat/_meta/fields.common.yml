@@ -56,6 +56,10 @@
       description: >
         The Filebeat fileset that generated this event.
 
+    - name: event.dataset
+      description: >
+        The Filebeat dataset that generated this event.
+
     - name: syslog.facility
       type: long
       required: false

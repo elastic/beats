@@ -3008,6 +3008,14 @@ The Filebeat fileset that generated this event.
 
 --
 
+*`event.dataset`*::
++
+--
+The Filebeat dataset that generated this event.
+
+
+--
+
 *`syslog.facility`*::
 +
 --

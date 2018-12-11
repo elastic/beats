@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2017-10-02T20:22:07.000Z", 
+        "event.dataset": "traefik.access", 
         "fileset.module": "traefik", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -30,6 +31,7 @@
     }, 
     {
         "@timestamp": "2017-10-02T20:22:08.000Z", 
+        "event.dataset": "traefik.access", 
         "fileset.module": "traefik", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -66,6 +68,7 @@
     }, 
     {
         "@timestamp": "2018-02-28T17:30:33.000Z", 
+        "event.dataset": "traefik.access", 
         "fileset.module": "traefik", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -102,6 +105,7 @@
     }, 
     {
         "@timestamp": "2018-11-29T15:03:51.000Z", 
+        "event.dataset": "traefik.access", 
         "fileset.module": "traefik", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -131,6 +135,7 @@
     }, 
     {
         "@timestamp": "2018-01-19T10:01:02.000Z", 
+        "event.dataset": "traefik.access", 
         "fileset.module": "traefik", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -163,6 +168,7 @@
     }, 
     {
         "@timestamp": "2018-01-19T10:01:02.000Z", 
+        "event.dataset": "traefik.access", 
         "fileset.module": "traefik", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -195,6 +201,7 @@
     }, 
     {
         "@timestamp": "2000-10-10T20:55:36.000Z", 
+        "event.dataset": "traefik.access", 
         "fileset.module": "traefik", 
         "fileset.name": "access", 
         "input.type": "log", 

@@ -95,8 +95,8 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]
 - Added `syslog_host` variable to HAProxy module to allow syslog listener to bind to configured host. {pull}9366[9366]
 - Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
-
 - Allow to force CRI format parsing for better performance {pull}8424[8424]
+- Add event.dataset to module events. {pull}9457[9457]
 
 *Heartbeat*
 

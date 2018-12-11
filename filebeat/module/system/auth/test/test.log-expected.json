@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-02-21T21:54:44.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -18,6 +19,7 @@
     }, 
     {
         "@timestamp": "2018-02-23T00:13:35.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -34,6 +36,7 @@
     }, 
     {
         "@timestamp": "2018-02-21T21:56:12.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -48,6 +51,7 @@
     }, 
     {
         "@timestamp": "2018-02-20T08:35:22.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -70,6 +74,7 @@
     }, 
     {
         "@timestamp": "2018-02-21T23:35:33.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -85,6 +90,7 @@
     }, 
     {
         "@timestamp": "2018-02-19T15:30:04.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -97,6 +103,7 @@
     }, 
     {
         "@timestamp": "2018-02-23T00:08:48.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -112,6 +119,7 @@
     }, 
     {
         "@timestamp": "2018-02-24T00:13:02.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -128,6 +136,7 @@
     }, 
     {
         "@timestamp": "2018-02-22T11:47:05.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 
@@ -141,6 +150,7 @@
     }, 
     {
         "@timestamp": "2018-02-22T11:47:05.000Z", 
+        "event.dataset": "system.auth", 
         "fileset.module": "system", 
         "fileset.name": "auth", 
         "input.type": "log", 

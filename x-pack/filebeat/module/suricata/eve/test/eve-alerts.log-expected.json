@@ -10,6 +10,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "93.184.216.34", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -54,7 +55,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "example.net",
+        "url.hostname": "example.net", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -74,6 +75,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "93.184.216.34", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -118,7 +120,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "example.net",
+        "url.hostname": "example.net", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -138,6 +140,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "93.184.216.34", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -182,7 +185,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "example.net",
+        "url.hostname": "example.net", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -202,6 +205,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "93.184.216.34", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -246,7 +250,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "example.org",
+        "url.hostname": "example.org", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -266,6 +270,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "93.184.216.34", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -310,7 +315,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "example.org",
+        "url.hostname": "example.org", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -330,6 +335,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "93.184.216.34", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -374,7 +380,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "example.org",
+        "url.hostname": "example.org", 
         "user_agent.device": "Other", 
         "user_agent.major": "7", 
         "user_agent.minor": "58", 
@@ -394,6 +400,7 @@
         "destination.geo.region_name": "England", 
         "destination.ip": "91.189.88.152", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -437,7 +444,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "security.ubuntu.com",
+        "url.hostname": "security.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -456,6 +463,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "91.189.91.23", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -499,7 +507,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "archive.ubuntu.com",
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -518,6 +526,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "91.189.91.23", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -561,7 +570,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "archive.ubuntu.com",
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -580,6 +589,7 @@
         "destination.geo.region_name": "England", 
         "destination.ip": "91.189.88.152", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -623,7 +633,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "security.ubuntu.com",
+        "url.hostname": "security.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -642,6 +652,7 @@
         "destination.geo.region_name": "England", 
         "destination.ip": "91.189.88.152", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -685,7 +696,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "security.ubuntu.com",
+        "url.hostname": "security.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -704,6 +715,7 @@
         "destination.geo.region_name": "England", 
         "destination.ip": "91.189.88.152", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -747,7 +759,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "security.ubuntu.com",
+        "url.hostname": "security.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -766,6 +778,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "91.189.91.23", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -809,7 +822,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "archive.ubuntu.com",
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -828,6 +841,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "91.189.91.23", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -871,7 +885,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "archive.ubuntu.com",
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -890,6 +904,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "91.189.91.23", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -933,7 +948,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "archive.ubuntu.com",
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -952,6 +967,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "91.189.91.23", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -995,7 +1011,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "archive.ubuntu.com",
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -1014,6 +1030,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "91.189.91.23", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -1057,7 +1074,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "archive.ubuntu.com",
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -1076,6 +1093,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "91.189.91.23", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -1119,7 +1137,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "archive.ubuntu.com",
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -1138,6 +1156,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "91.189.91.23", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -1179,7 +1198,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "archive.ubuntu.com",
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 
@@ -1198,6 +1217,7 @@
         "destination.geo.region_name": "Massachusetts", 
         "destination.ip": "91.189.91.23", 
         "destination.port": 80, 
+        "event.dataset": "suricata.eve", 
         "event.type": "alert", 
         "fileset.module": "suricata", 
         "fileset.name": "eve", 
@@ -1239,7 +1259,7 @@
         "tags": [
             "suricata"
         ], 
-        "url.hostname": "archive.ubuntu.com",
+        "url.hostname": "archive.ubuntu.com", 
         "user_agent.device": "Other", 
         "user_agent.major": "1", 
         "user_agent.minor": "3", 

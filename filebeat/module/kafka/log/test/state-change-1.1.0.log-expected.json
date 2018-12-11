@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-07-16T10:17:06.489Z", 
+        "event.dataset": "kafka.log", 
         "fileset.module": "kafka", 
         "fileset.name": "log", 
         "input.type": "log", 

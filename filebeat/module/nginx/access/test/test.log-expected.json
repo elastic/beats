@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2016-12-07T10:05:07.000Z", 
+        "event.dataset": "nginx.access", 
         "fileset.module": "nginx", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -31,6 +32,7 @@
     }, 
     {
         "@timestamp": "2017-05-29T19:02:48.000Z", 
+        "event.dataset": "nginx.access", 
         "fileset.module": "nginx", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -58,6 +60,7 @@
     }, 
     {
         "@timestamp": "2016-12-07T10:05:07.000Z", 
+        "event.dataset": "nginx.access", 
         "fileset.module": "nginx", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -95,6 +98,7 @@
     }, 
     {
         "@timestamp": "2016-12-07T10:05:07.000Z", 
+        "event.dataset": "nginx.access", 
         "fileset.module": "nginx", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -130,6 +134,7 @@
     }, 
     {
         "@timestamp": "2016-01-22T13:18:29.000Z", 
+        "event.dataset": "nginx.access", 
         "fileset.module": "nginx", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -164,6 +169,7 @@
     }, 
     {
         "@timestamp": "2016-12-30T06:47:09.000Z", 
+        "event.dataset": "nginx.access", 
         "fileset.module": "nginx", 
         "fileset.name": "access", 
         "input.type": "log", 
@@ -196,6 +202,7 @@
     }, 
     {
         "@timestamp": "2018-04-12T07:48:40.000Z", 
+        "event.dataset": "nginx.access", 
         "fileset.module": "nginx", 
         "fileset.name": "access", 
         "input.type": "log", 
