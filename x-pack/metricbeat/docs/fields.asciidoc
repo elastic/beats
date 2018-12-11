@@ -1,0 +1,29 @@
+
+////
+This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+////
+
+[[exported-fields]]
+= Exported fields
+
+[partintro]
+
+--
+This document describes the fields that are exported by Metricbeat. They are
+grouped in the following categories:
+
+* <<exported-fields-aws1>>
+
+--
+[[exported-fields-aws]]
+== aws1 fields
+
+`aws` module collects AWS monitoring metrics from AWS Cloudwatch. experimental[]
+aws module
+
+
+[float]
+== aws fields
+
+
+

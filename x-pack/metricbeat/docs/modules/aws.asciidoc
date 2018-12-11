@@ -1,3 +1,12 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-aws]]
+== aws module
+
+experimental[]
+
 This module periodically fetches monitoring metrics from AWS Cloudwatch.
 
 The default metricset is `ec2`.
@@ -46,3 +55,11 @@ metricbeat.modules:
 The Postgres  module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat-aws-ec2-overview.png[]
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-aws-ec2,activity>>
+
+include::aws/ec2.asciidoc[]
