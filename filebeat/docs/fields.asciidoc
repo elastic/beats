@@ -12,6 +12,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
+* <<exported-fields-alias>>
 * <<exported-fields-apache2>>
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
@@ -37,6 +38,121 @@ grouped in the following categories:
 * <<exported-fields-traefik>>
 
 --
+[[exported-fields-alias]]
+== Alias fields
+
+Alias fields for compatibility with 7.x.
+
+
+
+*`host.hostname`*::
++
+--
+type: alias
+
+alias to: beat.hostname
+
+--
+
+*`event.timezone`*::
++
+--
+type: alias
+
+alias to: beat.timezone
+
+--
+
+*`cloud.provider`*::
++
+--
+type: alias
+
+alias to: meta.cloud.provider
+
+--
+
+*`cloud.instance.id`*::
++
+--
+type: alias
+
+alias to: meta.cloud.instance_id
+
+--
+
+*`cloud.instance.name`*::
++
+--
+type: alias
+
+alias to: meta.cloud.instance_name
+
+--
+
+*`cloud.machine.type`*::
++
+--
+type: alias
+
+alias to: meta.cloud.machine_type
+
+--
+
+*`cloud.availability_zone`*::
++
+--
+type: alias
+
+alias to: meta.cloud.availability_zone
+
+--
+
+*`cloud.project.id`*::
++
+--
+type: alias
+
+alias to: meta.cloud.project_id
+
+--
+
+*`cloud.region`*::
++
+--
+type: alias
+
+alias to: meta.cloud.region
+
+--
+
+*`container.id`*::
++
+--
+type: alias
+
+alias to: docker.container.id
+
+--
+
+*`container.name`*::
++
+--
+type: alias
+
+alias to: docker.container.name
+
+--
+
+*`container.image.name`*::
++
+--
+type: alias
+
+alias to: docker.container.image
+
+--
+
 [[exported-fields-apache2]]
 == Apache2 fields
 
@@ -3554,6 +3670,15 @@ Path to the file.
 type: long
 
 File size in bytes (field is only added when `type` is `file`).
+
+--
+
+*`event.module`*::
++
+--
+type: alias
+
+alias to: fileset.module
 
 --
 

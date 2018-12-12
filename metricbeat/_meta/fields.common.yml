@@ -49,3 +49,8 @@
       type: keyword
       description: >
         Event dataset name.
+
+    # Alias compatiblity fields
+    - name: event.module
+      type: alias
+      path: metricset.module
