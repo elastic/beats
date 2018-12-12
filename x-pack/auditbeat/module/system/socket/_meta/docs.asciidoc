@@ -1,8 +1,3 @@
-The System `socket` metricset provides ... TODO.
+This is the `process` metricset of the system module.
 
-The module is implemented for Linux only.
-
-[float]
-=== Configuration options
-
-TODO
+It is implemented for Linux only.
