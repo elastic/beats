@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
@@ -172,11 +171,15 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		if len(container.Labels) > 0 {
-			labels := common.MapStr{}
+			//dedot first
+			outputLabels := common.MapStr{}
 			for k, v := range container.Labels {
-				safemapstr.Put(labels, k, v)
+				// This is necessary so that ES does not interpret '.' fields as new
+				// nested JSON objects, and also makes this compatible with ES 2.x.
+				label := common.DeDot(k)
+				outputLabels.Put(label, v)
 			}
-			meta.Put("container.labels", labels)
+			meta.Put("container.labels", outputLabels)
 		}
 
 		meta.Put("container.id", container.ID)
