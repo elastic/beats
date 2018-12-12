@@ -312,7 +312,7 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	return mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"type":   eventType,
+				"kind":   eventType,
 				"action": action.String(),
 			},
 		},

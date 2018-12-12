@@ -7,7 +7,7 @@
     "event": {
         "module": "system",
         "dataset": "user",
-        "type": "state",
+        "kind": "state",
         "action": "existing_user",
         "id": "57ee8bb6-a3da-4c43-b0d9-0688ccdc88d0"
     },

@@ -8,7 +8,7 @@
         "action": "host",
         "dataset": "host",
         "module": "system",
-        "type": "state"
+        "kind": "state"
     },
     "service": {
         "type": "system"

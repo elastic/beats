@@ -277,7 +277,7 @@ func socketEvent(socket *Socket, eventType string, eventAction string) mb.Event 
 		RootFields: socket.toMapStr(),
 	}
 
-	event.RootFields.Put("event.type", eventType)
+	event.RootFields.Put("event.kind", eventType)
 	event.RootFields.Put("event.action", eventAction)
 
 	return event

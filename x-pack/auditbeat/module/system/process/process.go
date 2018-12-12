@@ -216,7 +216,7 @@ func processEvent(pInfo *ProcessInfo, eventType string, eventAction string) mb.E
 	return mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"type":   eventType,
+				"kind":   eventType,
 				"action": eventAction,
 			},
 			"process": pInfo.toMapStr(),
