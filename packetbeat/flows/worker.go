@@ -18,7 +18,6 @@
 package flows
 
 import (
-	"encoding/base64"
 	"encoding/binary"
 	"errors"
 	"net"
@@ -206,14 +205,22 @@ func createEvent(
 	intNames, uintNames, floatNames []string,
 ) beat.Event {
 	timestamp := ts
-	fields := common.MapStr{
-		"start_time": common.Time(f.createTS),
-		"last_time":  common.Time(f.ts),
-		"type":       "flow",
-		"flow_id":    common.NetString(f.id.Serialize()),
-		"final":      isOver,
-	}
 
+	event := common.MapStr{
+		"start":    common.Time(f.createTS),
+		"end":      common.Time(f.ts),
+		"duration": f.ts.Sub(f.createTS),
+		"type":     "flow",
+	}
+	flow := common.MapStr{
+		"id":    common.NetString(f.id.Serialize()),
+		"final": isOver,
+	}
+	fields := common.MapStr{
+		"event": event,
+		"flow":  flow,
+	}
+	network := common.MapStr{}
 	source := common.MapStr{}
 	dest := common.MapStr{}
 	tuple := common.IPPortTuple{}
@@ -227,59 +234,65 @@ func createEvent(
 
 	// add vlan
 	if vlan := f.id.OutterVLan(); vlan != nil {
-		fields["outer_vlan"] = binary.LittleEndian.Uint16(vlan)
+		vlanID := uint64(binary.LittleEndian.Uint16(vlan))
+		putOrAppendUint64(flow, "vlan", vlanID)
 	}
 	if vlan := f.id.VLan(); vlan != nil {
-		fields["vlan"] = binary.LittleEndian.Uint16(vlan)
+		vlanID := uint64(binary.LittleEndian.Uint16(vlan))
+		putOrAppendUint64(flow, "vlan", vlanID)
 	}
 
 	// add icmp
 	if icmp := f.id.ICMPv4(); icmp != nil {
-		fields["icmp_id"] = binary.LittleEndian.Uint16(icmp)
+		network["transport"] = "icmp"
 	} else if icmp := f.id.ICMPv6(); icmp != nil {
-		fields["icmp_id"] = binary.LittleEndian.Uint16(icmp)
+		network["transport"] = "ipv6-icmp"
 	}
 
 	// ipv4 layer meta data
 	if src, dst, ok := f.id.OutterIPv4Addr(); ok {
 		srcIP, dstIP := net.IP(src), net.IP(dst)
-		source["outer_ip"] = srcIP.String()
-		dest["outer_ip"] = dstIP.String()
+		source["ip"] = srcIP.String()
+		dest["ip"] = dstIP.String()
 		tuple.SrcIP = srcIP
 		tuple.DstIP = dstIP
 		tuple.IPLength = 4
+		network["type"] = "ipv4"
 	}
 	if src, dst, ok := f.id.IPv4Addr(); ok {
 		srcIP, dstIP := net.IP(src), net.IP(dst)
-		source["ip"] = srcIP.String()
-		dest["ip"] = dstIP.String()
+		putOrAppendString(source, "ip", srcIP.String())
+		putOrAppendString(dest, "ip", dstIP.String())
 		// Save IPs for process matching if an outer layer was not present
 		if tuple.IPLength == 0 {
 			tuple.SrcIP = srcIP
 			tuple.DstIP = dstIP
 			tuple.IPLength = 4
 		}
+		network["type"] = "ipv4"
 	}
 
 	// ipv6 layer meta data
 	if src, dst, ok := f.id.OutterIPv6Addr(); ok {
 		srcIP, dstIP := net.IP(src), net.IP(dst)
-		source["outer_ipv6"] = srcIP.String()
-		dest["outer_ipv6"] = dstIP.String()
+		putOrAppendString(source, "ip", srcIP.String())
+		putOrAppendString(dest, "ip", dstIP.String())
 		tuple.SrcIP = srcIP
 		tuple.DstIP = dstIP
 		tuple.IPLength = 6
+		network["type"] = "ipv6"
 	}
 	if src, dst, ok := f.id.IPv6Addr(); ok {
 		srcIP, dstIP := net.IP(src), net.IP(dst)
-		source["ipv6"] = net.IP(src).String()
-		dest["ipv6"] = net.IP(dst).String()
+		putOrAppendString(source, "ip", srcIP.String())
+		putOrAppendString(dest, "ip", dstIP.String())
 		// Save IPs for process matching if an outer layer was not present
 		if tuple.IPLength == 0 {
 			tuple.SrcIP = srcIP
 			tuple.DstIP = dstIP
 			tuple.IPLength = 6
 		}
+		network["type"] = "ipv6"
 	}
 
 	// udp layer meta data
@@ -287,7 +300,7 @@ func createEvent(
 		tuple.SrcPort = binary.LittleEndian.Uint16(src)
 		tuple.DstPort = binary.LittleEndian.Uint16(dst)
 		source["port"], dest["port"] = tuple.SrcPort, tuple.DstPort
-		fields["transport"] = "udp"
+		network["transport"] = "udp"
 		proto = applayer.TransportUDP
 	}
 
@@ -296,23 +309,45 @@ func createEvent(
 		tuple.SrcPort = binary.LittleEndian.Uint16(src)
 		tuple.DstPort = binary.LittleEndian.Uint16(dst)
 		source["port"], dest["port"] = tuple.SrcPort, tuple.DstPort
-		fields["transport"] = "tcp"
+		network["transport"] = "tcp"
 		proto = applayer.TransportTCP
 	}
 
-	if id := f.id.ConnectionID(); id != nil {
-		fields["connection_id"] = base64.StdEncoding.EncodeToString(id)
-	}
-
+	var totalBytes, totalPackets uint64
 	if f.stats[0] != nil {
-		source["stats"] = encodeStats(f.stats[0], intNames, uintNames, floatNames)
+		// Source stats.
+		stats := encodeStats(f.stats[0], intNames, uintNames, floatNames)
+		for k, v := range stats {
+			source[k] = v
+		}
+
+		if v, found := stats["bytes"]; found {
+			totalBytes += v.(uint64)
+		}
+		if v, found := stats["packets"]; found {
+			totalPackets += v.(uint64)
+		}
 	}
 	if f.stats[1] != nil {
-		dest["stats"] = encodeStats(f.stats[1], intNames, uintNames, floatNames)
-	}
+		// Destination stats.
+		stats := encodeStats(f.stats[1], intNames, uintNames, floatNames)
+		for k, v := range stats {
+			dest[k] = v
+		}
 
+		if v, found := stats["bytes"]; found {
+			totalBytes += v.(uint64)
+		}
+		if v, found := stats["packets"]; found {
+			totalPackets += v.(uint64)
+		}
+	}
+	network["bytes"] = totalBytes
+	network["packets"] = totalPackets
+
+	fields["network"] = network
 	fields["source"] = source
-	fields["dest"] = dest
+	fields["destination"] = dest
 
 	// Set process information if it's available
 	if tuple.IPLength != 0 && tuple.SrcPort != 0 {
@@ -375,4 +410,44 @@ func encodeStats(
 	}
 
 	return report
+}
+
+func putOrAppendString(m common.MapStr, key, value string) {
+	old, found := m[key]
+	if !found {
+		m[key] = value
+		return
+	}
+
+	if old != nil {
+		switch v := old.(type) {
+		case string:
+			m[key] = []string{v, value}
+		case []string:
+			m[key] = append(v, value)
+		}
+	}
+}
+
+func putOrAppendUint64(m common.MapStr, key string, value uint64) {
+	old, found := m[key]
+	if !found {
+		m[key] = value
+		return
+	}
+
+	if old != nil {
+		switch v := old.(type) {
+		case uint8:
+			m[key] = []uint64{uint64(v), value}
+		case uint16:
+			m[key] = []uint64{uint64(v), value}
+		case uint32:
+			m[key] = []uint64{uint64(v), value}
+		case uint64:
+			m[key] = []uint64{uint64(v), value}
+		case []uint64:
+			m[key] = append(v, value)
+		}
+	}
 }
