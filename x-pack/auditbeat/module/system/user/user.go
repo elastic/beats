@@ -14,6 +14,7 @@ import (
 	"io"
 	"runtime"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -44,13 +45,34 @@ const (
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
-
-	eventActionExistingUser    = "existing_user"
-	eventActionUserAdded       = "user_added"
-	eventActionUserRemoved     = "user_removed"
-	eventActionUserChanged     = "user_changed"
-	eventActionPasswordChanged = "password_changed"
 )
+
+type eventAction uint8
+
+const (
+	eventActionExistingUser eventAction = iota
+	eventActionUserAdded
+	eventActionUserRemoved
+	eventActionUserChanged
+	eventActionPasswordChanged
+)
+
+func (action eventAction) String() string {
+	switch action {
+	case eventActionExistingUser:
+		return "existing_user"
+	case eventActionUserAdded:
+		return "user_added"
+	case eventActionUserRemoved:
+		return "user_removed"
+	case eventActionUserChanged:
+		return "user_changed"
+	case eventActionPasswordChanged:
+		return "password_changed"
+	default:
+		return ""
+	}
+}
 
 type passwordType uint8
 
@@ -383,20 +405,52 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	return nil
 }
 
-func userEvent(user *User, eventType string, eventAction string) mb.Event {
+func userEvent(user *User, eventType string, action eventAction) mb.Event {
 	return mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"kind":   eventType,
-				"action": eventAction,
+				"action": action.String(),
 			},
 			"user": common.MapStr{
 				"id":   user.UID,
 				"name": user.Name,
 			},
+			"message": userMessage(user, action),
 		},
 		MetricSetFields: user.toMapStr(),
 	}
+}
+
+func userMessage(user *User, action eventAction) string {
+	var actionString string
+	switch action {
+	case eventActionExistingUser:
+		actionString = "Existing"
+	case eventActionUserAdded:
+		actionString = "New"
+	case eventActionUserRemoved:
+		actionString = "Removed"
+	case eventActionUserChanged:
+		actionString = "Changed"
+	case eventActionPasswordChanged:
+		actionString = "Password changed for"
+	}
+
+	return fmt.Sprintf("%v user %v (UID: %v, Groups: %v)",
+		actionString, user.Name, user.UID, fmtGroups(user.Groups))
+}
+
+func fmtGroups(groups []Group) string {
+	var b strings.Builder
+
+	b.WriteString(groups[0].Name)
+	for _, group := range groups[1:] {
+		b.WriteString(",")
+		b.WriteString(group.Name)
+	}
+
+	return b.String()
 }
 
 func convertToCacheable(users []*User) []cache.Cacheable {

@@ -24,13 +24,15 @@ func TestData(t *testing.T) {
 		t.Fatal("no events were generated")
 	}
 
-	fullEvent := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
+	// The first user (events[0]) is usually root, the last one should be more interesting.
+	fullEvent := mbtest.StandardizeEvent(f, events[len(events)-1], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"user"},
+		"module":                       "system",
+		"metricsets":                   []string{"user"},
+		"user.detect_password_changes": true,
 	}
 }
