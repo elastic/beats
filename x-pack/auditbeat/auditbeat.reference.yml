@@ -114,10 +114,10 @@ auditbeat.modules:
 # or stops).
 - module: system
   metricsets:
-    - host     # General host information, e.g. uptime, IPs
-    - process  # Started and stopped processes
-    - socket   # Opened and closed processes
-    - user     # User information
+    - host    # General host information, e.g. uptime, IPs
+    - process # Started and stopped processes
+    - socket  # Opened and closed processes
+    - user    # User information
 
   # How often metricsets send state updates with the
   # current state of the system (e.g. all currently
@@ -134,7 +134,6 @@ auditbeat.modules:
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
   user.detect_password_changes: true
-
 
 #================================ General ======================================
 
@@ -253,7 +252,7 @@ auditbeat.modules:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields,
+# The supported processors are drop_fields, drop_event, include_fields, 
 # decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
@@ -343,7 +342,7 @@ auditbeat.modules:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
 #
-# The following example decodes fields containing JSON strings
+# The following example decodes fields containing JSON strings 
 # and replaces the strings with valid JSON objects.
 #
 #processors:

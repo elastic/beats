@@ -48,21 +48,20 @@ auditbeat.modules:
 
 - module: system
   metricsets:
-    - host     # General host information, e.g. uptime, IPs
-    - process  # Started and stopped processes
-    - socket   # Opened and closed processes
-    - user     # User information
+    - host    # General host information, e.g. uptime, IPs
+    - process # Started and stopped processes
+    - socket  # Opened and closed processes
+    - user    # User information
 
   # How often metricsets send state updates with the
   # current state of the system (e.g. all currently
   # running processes, all open sockets).
   state.period: 12h
-
+  
   # Enabled by default. Auditbeat will read password fields in
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
   user.detect_password_changes: true
-
 
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:
