@@ -6,20 +6,20 @@ package management
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
 )
 
 // ConfigBlacklist takes a ConfigBlocks object and filter it based on the given
 // blacklist settings
 type ConfigBlacklist struct {
-	patterns map[string]*regexp.Regexp
+	patterns map[string]match.Matcher
 }
 
 // ConfigBlacklistSettings holds a list of fields and regular expressions to blacklist
@@ -46,11 +46,11 @@ func (f *ConfigBlacklistSettings) Unpack(from interface{}) error {
 // NewConfigBlacklist filters configs from CM according to a given blacklist
 func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 	list := ConfigBlacklist{
-		patterns: map[string]*regexp.Regexp{},
+		patterns: map[string]match.Matcher{},
 	}
 
 	for field, pattern := range cfg.Patterns {
-		exp, err := regexp.Compile(pattern)
+		exp, err := match.Compile(pattern)
 		if err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("Given expression is not a valid regexp: %s", pattern))
 		}
@@ -104,7 +104,7 @@ func (c *ConfigBlacklist) isBlacklisted(blockType string, block *api.ConfigBlock
 	return false
 }
 
-func (c *ConfigBlacklist) isBlacklistedBlock(pattern *regexp.Regexp, segments []string, current *common.Config) bool {
+func (c *ConfigBlacklist) isBlacklistedBlock(pattern match.Matcher, segments []string, current *common.Config) bool {
 	if current.IsDict() {
 		switch len(segments) {
 		case 0:
