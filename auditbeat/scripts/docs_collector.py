@@ -163,7 +163,7 @@ For a description of each field in the metricset, see the
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Collects modules docs")
-    parser.add_argument("--base-paths", dest='base_paths', nargs='+', help="Path to Beat")
+    parser.add_argument("--base-paths", dest='base_paths', nargs='+', help="Base paths")
 
     args = parser.parse_args()
 

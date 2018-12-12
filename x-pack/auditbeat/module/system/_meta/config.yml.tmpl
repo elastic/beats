@@ -21,15 +21,13 @@
   # current state of the system (e.g. all currently
   # running processes, all open sockets).
   state.period: 12h
-
-  {{ if .Reference -}}
+  {{ if .Reference }}
   # The state.period can be overridden for any metricset.
   host.state.period: 12h
   process.state.period: 12h
   socket.state.period: 12h
   user.state.period: 12h
-  {{- end }}
-
+  {{ end }}
   {{ if eq .GOOS "linux" -}}
   # Enabled by default. Auditbeat will read password fields in
   # /etc/passwd and /etc/shadow and store a hash locally to
