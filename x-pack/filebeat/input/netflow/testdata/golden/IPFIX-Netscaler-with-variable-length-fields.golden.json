@@ -72,6 +72,7 @@
         },
         "network": {
           "bytes": 40,
+          "community_id": "1:VtyB9RHgAkNqVk0mIUunFcpOSfk=",
           "direction": "unknown",
           "packets": 1,
           "protocol": "tcp"
@@ -143,6 +144,7 @@
         },
         "network": {
           "bytes": 1525,
+          "community_id": "1:mUmoe1yk2N8K21TGbG3DxjqkRYg=",
           "direction": "unknown",
           "packets": 2,
           "protocol": "tcp"
@@ -226,6 +228,7 @@
         },
         "network": {
           "bytes": 1541,
+          "community_id": "1:VtyB9RHgAkNqVk0mIUunFcpOSfk=",
           "direction": "unknown",
           "packets": 2,
           "protocol": "tcp"

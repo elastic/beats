@@ -82,6 +82,7 @@
         },
         "network": {
           "bytes": 260,
+          "community_id": "1:5zkwPg6j1HR922PEK8GyaxzrFwQ=",
           "direction": "unknown",
           "packets": 5,
           "protocol": "tcp"
@@ -142,6 +143,7 @@
         },
         "network": {
           "bytes": 1000,
+          "community_id": "1:US3awEhv6suG72vxm+M1HkgqctM=",
           "direction": "unknown",
           "packets": 6,
           "protocol": "tcp"
@@ -202,6 +204,7 @@
         },
         "network": {
           "bytes": 601,
+          "community_id": "1:ASd6tw0cxo+COe02J7RUWx1Zpz0=",
           "direction": "unknown",
           "packets": 2,
           "protocol": "udp"
@@ -262,6 +265,7 @@
         },
         "network": {
           "bytes": 148,
+          "community_id": "1:wys1qTextK4PoWX8LNF3Ftn2XGU=",
           "direction": "unknown",
           "packets": 2,
           "protocol": "udp"
@@ -322,6 +326,7 @@
         },
         "network": {
           "bytes": 5946,
+          "community_id": "1:l7BnKMlyrD4MPxU3tD15rivudaU=",
           "direction": "unknown",
           "packets": 14,
           "protocol": "tcp"
@@ -382,6 +387,7 @@
         },
         "network": {
           "bytes": 2608,
+          "community_id": "1:LHK7P1y0Hk2e91GsVeb/Y2Ka9x4=",
           "direction": "unknown",
           "packets": 13,
           "protocol": "tcp"
@@ -442,6 +448,7 @@
         },
         "network": {
           "bytes": 60,
+          "community_id": "1:3JM19rLv8Up/ifiBcncNv9+u1ac=",
           "direction": "unknown",
           "packets": 1,
           "protocol": "tcp"
@@ -502,6 +509,7 @@
         },
         "network": {
           "bytes": 256,
+          "community_id": "1:5zkwPg6j1HR922PEK8GyaxzrFwQ=",
           "direction": "unknown",
           "packets": 4,
           "protocol": "tcp"
@@ -562,6 +570,7 @@
         },
         "network": {
           "bytes": 1916,
+          "community_id": "1:US3awEhv6suG72vxm+M1HkgqctM=",
           "direction": "unknown",
           "packets": 3,
           "protocol": "tcp"
@@ -622,6 +631,7 @@
         },
         "network": {
           "bytes": 168,
+          "community_id": "1:Qil1AUeHYTzgVk9ced1uu+tH7xQ=",
           "direction": "unknown",
           "packets": 2,
           "protocol": "tcp"
@@ -682,6 +692,7 @@
         },
         "network": {
           "bytes": 84,
+          "community_id": "1:0XgIQvzxYzeiJ3zUXDK29zsihcI=",
           "direction": "unknown",
           "packets": 1,
           "protocol": "tcp"
@@ -742,6 +753,7 @@
         },
         "network": {
           "bytes": 232,
+          "community_id": "1:l3uSgEhzehRFeZ+njR5WuFsGEr8=",
           "direction": "unknown",
           "packets": 1,
           "protocol": "udp"

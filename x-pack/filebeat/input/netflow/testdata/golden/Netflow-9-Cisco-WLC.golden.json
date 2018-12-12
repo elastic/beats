@@ -41,6 +41,7 @@
         },
         "network": {
           "bytes": 3320,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "inbound",
           "name": "Test-env",
           "packets": 83
@@ -95,6 +96,7 @@
         },
         "network": {
           "bytes": 3320,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "outbound",
           "name": "Test-env",
           "packets": 83
@@ -145,6 +147,7 @@
         },
         "network": {
           "bytes": 7760,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "inbound",
           "name": "Test-env",
           "packets": 69
@@ -199,6 +202,7 @@
         },
         "network": {
           "bytes": 10229,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "outbound",
           "name": "Test-env",
           "packets": 69
@@ -249,6 +253,7 @@
         },
         "network": {
           "bytes": 215,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "inbound",
           "name": "Test-env",
           "packets": 1
@@ -301,6 +306,7 @@
         },
         "network": {
           "bytes": 40854,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "inbound",
           "name": "Test-env",
           "packets": 225
@@ -355,6 +361,7 @@
         },
         "network": {
           "bytes": 35866,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "outbound",
           "name": "Test-env",
           "packets": 154
@@ -405,6 +412,7 @@
         },
         "network": {
           "bytes": 12279,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "inbound",
           "name": "Test-env",
           "packets": 63
@@ -459,6 +467,7 @@
         },
         "network": {
           "bytes": 27287,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "outbound",
           "name": "Test-env",
           "packets": 61
@@ -509,6 +518,7 @@
         },
         "network": {
           "bytes": 147145,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "inbound",
           "name": "Test-env",
           "packets": 773
@@ -563,6 +573,7 @@
         },
         "network": {
           "bytes": 1182695,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "outbound",
           "name": "Test-env",
           "packets": 1379
@@ -613,6 +624,7 @@
         },
         "network": {
           "bytes": 6777,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "inbound",
           "name": "Test-env",
           "packets": 26
@@ -667,6 +679,7 @@
         },
         "network": {
           "bytes": 8625,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "outbound",
           "name": "Test-env",
           "packets": 26
@@ -717,6 +730,7 @@
         },
         "network": {
           "bytes": 2433001,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "inbound",
           "name": "Test-env",
           "packets": 20434
@@ -771,6 +785,7 @@
         },
         "network": {
           "bytes": 56599680,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "outbound",
           "name": "Test-env",
           "packets": 40726
@@ -821,6 +836,7 @@
         },
         "network": {
           "bytes": 1658,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "inbound",
           "name": "Test-env",
           "packets": 15
@@ -875,6 +891,7 @@
         },
         "network": {
           "bytes": 950,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "outbound",
           "name": "Test-env",
           "packets": 14
@@ -925,6 +942,7 @@
         },
         "network": {
           "bytes": 1495567,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "inbound",
           "name": "Test-env",
           "packets": 16145
@@ -979,6 +997,7 @@
         },
         "network": {
           "bytes": 80973880,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
           "direction": "outbound",
           "name": "Test-env",
           "packets": 53362
