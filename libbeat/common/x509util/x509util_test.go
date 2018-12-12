@@ -19,9 +19,8 @@ package x509util
 
 import (
 	"crypto/x509"
-	"testing"
-
 	"encoding/pem"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

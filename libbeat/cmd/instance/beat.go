@@ -34,10 +34,8 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
-
-	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/asset"
@@ -65,28 +63,9 @@ import (
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
-
-	// Register publisher pipeline modules
-	_ "github.com/elastic/beats/libbeat/publisher/includes"
-
-	// Register default processors.
-	_ "github.com/elastic/beats/libbeat/processors/actions"
-	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_docker_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_host_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_locale"
-	_ "github.com/elastic/beats/libbeat/processors/add_process_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/dissect"
-	_ "github.com/elastic/beats/libbeat/processors/dns"
-
-	// Register autodiscover providers
-	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
-	_ "github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
-	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
-
-	// Register default monitoring reporting
-	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
+	ucfg "github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
@@ -126,6 +105,9 @@ type beatConfig struct {
 	Dashboards *common.Config `config:"setup.dashboards"`
 	Template   *common.Config `config:"setup.template"`
 	Kibana     *common.Config `config:"setup.kibana"`
+
+	// ILM Config options
+	ILM *common.Config `config:"output.elasticsearch.ilm"`
 }
 
 var (
@@ -149,12 +131,13 @@ func init() {
 // CryptGenRandom is used.
 func initRand() {
 	n, err := cryptRand.Int(cryptRand.Reader, big.NewInt(math.MaxInt64))
-	seed := n.Int64()
+	var seed int64
 	if err != nil {
 		// fallback to current timestamp
 		seed = time.Now().UnixNano()
+	} else {
+		seed = n.Int64()
 	}
-
 	rand.Seed(seed)
 }
 
@@ -450,7 +433,7 @@ func (b *Beat) TestConfig(bt beat.Creator) error {
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
-func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pipelines bool) error {
+func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning, pipelines, policy bool) error {
 	return handleError(func() error {
 		err := b.Init()
 		if err != nil {
@@ -495,14 +478,20 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pip
 			fmt.Println("Loaded index template")
 		}
 
-		if dashboards {
+		if setupDashboards {
 			fmt.Println("Loading dashboards (Kibana must be running and reachable)")
 			err = b.loadDashboards(context.Background(), true)
-			if err != nil {
-				return err
-			}
 
-			fmt.Println("Loaded dashboards")
+			if err != nil {
+				switch err := errw.Cause(err).(type) {
+				case *dashboards.ErrNotFound:
+					fmt.Printf("Skipping loading dashboards, %+v\n", err)
+				default:
+					return err
+				}
+			} else {
+				fmt.Println("Loaded dashboards")
+			}
 		}
 
 		if machineLearning && b.SetupMLCallback != nil {
@@ -521,6 +510,13 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pip
 			}
 
 			fmt.Println("Loaded Ingest pipelines")
+		}
+
+		if policy {
+			if err := b.loadILMPolicy(); err != nil {
+				return err
+			}
+			fmt.Println("Loaded Index Lifecycle Management (ILM) policy")
 		}
 
 		return nil
@@ -563,8 +559,13 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("could not initialize the keystore: %v", err)
 	}
 
-	// TODO: Allow the options to be more flexible for dynamic changes
-	common.OverwriteConfigOpts(keystore.ConfigOpts(store))
+	if settings.DisableConfigResolver {
+		common.OverwriteConfigOpts(obfuscateConfigOpts())
+	} else {
+		// TODO: Allow the options to be more flexible for dynamic changes
+		common.OverwriteConfigOpts(configOpts(store))
+	}
+
 	b.keystore = store
 	err = cloudid.OverwriteSettings(cfg)
 	if err != nil {
@@ -578,11 +579,6 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	b.Beat.Config = &b.Config.BeatConfig
-
-	err = cfgwarn.CheckRemoved5xSettings(cfg, "queue_size", "bulk_queue_size")
-	if err != nil {
-		return err
-	}
 
 	if name := b.Config.Name; name != "" {
 		b.Info.Name = name
@@ -721,7 +717,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		err := dashboards.ImportDashboards(ctx, b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
 			b.Config.Kibana, esConfig, b.Config.Dashboards, nil)
 		if err != nil {
-			return fmt.Errorf("Error importing Kibana dashboards: %v", err)
+			return errw.Wrap(err, "Error importing Kibana dashboards")
 		}
 		logp.Info("Kibana dashboards successfully loaded.")
 	}
@@ -733,11 +729,11 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // the elasticsearch output. It is important the the registration happens before
 // the publisher is created.
 func (b *Beat) registerTemplateLoading() error {
-	var cfg template.TemplateConfig
+	var templateCfg template.TemplateConfig
 
 	// Check if outputting to file is enabled, and output to file if it is
 	if b.Config.Template.Enabled() {
-		err := b.Config.Template.Unpack(&cfg)
+		err := b.Config.Template.Unpack(&templateCfg)
 		if err != nil {
 			return fmt.Errorf("unpacking template config fails: %v", err)
 		}
@@ -755,8 +751,82 @@ func (b *Beat) registerTemplateLoading() error {
 			return err
 		}
 
-		if esCfg.Index != "" && (cfg.Name == "" || cfg.Pattern == "") && (b.Config.Template == nil || b.Config.Template.Enabled()) {
-			return fmt.Errorf("setup.template.name and setup.template.pattern have to be set if index name is modified.")
+		if esCfg.Index != "" &&
+			(templateCfg.Name == "" || templateCfg.Pattern == "") &&
+			(b.Config.Template == nil || b.Config.Template.Enabled()) {
+			return errors.New("setup.template.name and setup.template.pattern have to be set if index name is modified")
+		}
+
+		if b.Config.ILM.Enabled() {
+			cfgwarn.Beta("Index lifecycle management is enabled which is in beta.")
+
+			ilmCfg, err := getILMConfig(b)
+			if err != nil {
+				return err
+			}
+
+			// In case no template settings are set, config must be created
+			if b.Config.Template == nil {
+				b.Config.Template = common.NewConfig()
+			}
+			// Template name and pattern can't be configure when using ILM
+			logp.Info("Set setup.template.name to '%s' as ILM is enabled.", ilmCfg.RolloverAlias)
+			err = b.Config.Template.SetString("name", -1, ilmCfg.RolloverAlias)
+			if err != nil {
+				return errw.Wrap(err, "error setting setup.template.name")
+			}
+			pattern := fmt.Sprintf("%s-*", ilmCfg.RolloverAlias)
+			logp.Info("Set setup.template.pattern to '%s' as ILM is enabled.", pattern)
+			err = b.Config.Template.SetString("pattern", -1, pattern)
+			if err != nil {
+				return errw.Wrap(err, "error setting setup.template.pattern")
+			}
+
+			// rollover_alias and lifecycle.name can't be configured and will be overwritten
+			logp.Info("Set settings.index.lifecycle.rollover_alias in template to %s as ILM is enabled.", ilmCfg.RolloverAlias)
+			err = b.Config.Template.SetString("settings.index.lifecycle.rollover_alias", -1, ilmCfg.RolloverAlias)
+			if err != nil {
+				return errw.Wrap(err, "error setting settings.index.lifecycle.rollover_alias")
+			}
+			logp.Info("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", ILMPolicyName)
+			err = b.Config.Template.SetString("settings.index.lifecycle.name", -1, ILMPolicyName)
+			if err != nil {
+				return errw.Wrap(err, "error setting settings.index.lifecycle.name")
+			}
+
+			// Set the ingestion index to the rollover alias
+			logp.Info("Set output.elasticsearch.index to '%s' as ILM is enabled.", ilmCfg.RolloverAlias)
+			esCfg.Index = ilmCfg.RolloverAlias
+			err = b.Config.Output.Config().SetString("index", -1, ilmCfg.RolloverAlias)
+			if err != nil {
+				return errw.Wrap(err, "error setting output.elasticsearch.index")
+			}
+
+			writeAliasCallback, err := b.writeAliasLoadingCallback()
+			if err != nil {
+				return err
+			}
+
+			// Load write alias already on
+			esConfig := b.Config.Output.Config()
+
+			// Check that ILM is enabled and the right elasticsearch version exists
+			esClient, err := elasticsearch.NewConnectedClient(esConfig)
+			if err != nil {
+				return err
+			}
+
+			err = checkElasticsearchVersionIlm(esClient)
+			if err != nil {
+				return err
+			}
+
+			err = checkILMFeatureEnabled(esClient)
+			if err != nil {
+				return err
+			}
+
+			elasticsearch.RegisterConnectCallback(writeAliasCallback)
 		}
 
 		if b.Config.Template == nil || (b.Config.Template != nil && b.Config.Template.Enabled()) {
@@ -768,6 +838,8 @@ func (b *Beat) registerTemplateLoading() error {
 				return err
 			}
 			elasticsearch.RegisterConnectCallback(callback)
+		} else if b.Config.ILM.Enabled() {
+			return errors.New("templates cannot be disable when using ILM")
 		}
 	}
 
@@ -878,5 +950,25 @@ func logSystemInfo(info beat.Info) {
 		if len(process) > 0 {
 			log.Infow("Process info", "process", process)
 		}
+	}
+}
+
+// configOpts returns ucfg config options with a resolver linked to the current keystore.
+// TODO: Refactor to allow insert into the config option array without having to redefine everything
+func configOpts(store keystore.Keystore) []ucfg.Option {
+	return []ucfg.Option{
+		ucfg.PathSep("."),
+		ucfg.Resolve(keystore.ResolverWrap(store)),
+		ucfg.ResolveEnv,
+		ucfg.VarExp,
+	}
+}
+
+// obfuscateConfigOpts disables any resolvers in the configuration, instead we return the field
+// reference string directly.
+func obfuscateConfigOpts() []ucfg.Option {
+	return []ucfg.Option{
+		ucfg.PathSep("."),
+		ucfg.ResolveNOOP,
 	}
 }

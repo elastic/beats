@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-kafka]]
 == Kafka module
 
-beta[]
-
 This is the Kafka module.
 
 The default metricsets are `consumergroup` and `partition`.

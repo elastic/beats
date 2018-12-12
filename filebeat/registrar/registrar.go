@@ -207,7 +207,7 @@ func mergeStates(st, other *file.State) {
 	}
 
 	// update file meta-data. As these are updated concurrently by the
-	// prospectors, select the newer state based on the update timestamp.
+	// inputs, select the newer state based on the update timestamp.
 	var meta, metaOld, metaNew map[string]string
 	if st.Timestamp.Before(other.Timestamp) {
 		st.Source = other.Source

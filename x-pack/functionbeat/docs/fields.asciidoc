@@ -28,34 +28,10 @@ Contains common beat fields available in all event types.
 
 
 
-*`beat.name`*::
-+
---
-The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
-
-
---
-
-*`beat.hostname`*::
-+
---
-The hostname as returned by the operating system on which the Beat is running.
-
-
---
-
 *`beat.timezone`*::
 +
 --
 The timezone as returned by the operating system on which the Beat is running.
-
-
---
-
-*`beat.version`*::
-+
---
-The version of the beat that generated this event.
 
 
 --
@@ -256,7 +232,7 @@ Version of the agent.
 
 --
 
-*`agent.name`*::
+*`agent.type`*::
 +
 --
 type: keyword
@@ -264,6 +240,16 @@ type: keyword
 example: filebeat
 
 Name of the agent.
+
+
+--
+
+*`agent.hostname`*::
++
+--
+type: keyword
+
+Hostname of the agent.
 
 
 --
@@ -533,16 +519,6 @@ Can be one or multiple IPv4 or IPv6 addresses.
 
 --
 
-*`destination.hostname`*::
-+
---
-type: keyword
-
-Hostname of the destination.
-
-
---
-
 *`destination.port`*::
 +
 --
@@ -573,12 +549,68 @@ Destination domain.
 
 --
 
-*`destination.subdomain`*::
+[float]
+== geo fields
+
+Geolocation for destination.
+
+
+*`destination.geo.continent_name`*::
 +
 --
 type: keyword
 
-Destination subdomain.
+Name of the continent.
+
+
+--
+
+*`destination.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`destination.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`destination.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`destination.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`destination.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
 
 
 --
@@ -1721,16 +1753,130 @@ This id normally changes across restarts, but `service.id` does not.
 --
 
 [float]
+== source fields
+
+Source fields describe details about the source of the event.
+
+
+
+*`source.ip`*::
++
+--
+type: ip
+
+IP address of the source.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`source.port`*::
++
+--
+type: long
+
+Port of the source.
+
+
+--
+
+*`source.mac`*::
++
+--
+type: keyword
+
+MAC address of the source.
+
+
+--
+
+*`source.domain`*::
++
+--
+type: keyword
+
+Source domain.
+
+
+--
+
+[float]
+== geo fields
+
+Geolocation for source.
+
+
+*`source.geo.continent_name`*::
++
+--
+type: keyword
+
+Name of the continent.
+
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`source.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+[float]
 == url fields
 
 URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
 
 
 
-*`url.href`*::
+*`url.original`*::
 +
 --
-type: text
+type: keyword
 
 example: https://elastic.co:443/search?q=elasticsearch#top
 
@@ -1738,16 +1884,6 @@ Full url. The field is stored as keyword.
 `url.href` is a [multi field](https://www.elastic.co/guide/en/ elasticsearch/reference/6.2/ multi-fields.html#_multi_fields_with_multiple_analyzers). The data is stored as keyword `url.href` and test `url.href.analyzed`. These fields enable you to run a query against part of the url still works splitting up the URL at ingest time.
 `href` is an analyzed field so the parsed information can be accessed through `href.analyzed` in queries.
 
-
-*`url.href.raw`*::
-+
---
-type: keyword
-
-The full URL. This is a non-analyzed field that is useful for aggregations.
-
-
---
 
 --
 
@@ -2026,6 +2162,24 @@ type: long
 
 Minor version of the operating system.
 
+
+--
+
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: agent.type
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
 
 --
 

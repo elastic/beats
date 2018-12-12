@@ -1,5 +1,5 @@
 filebeat:
-  prospectors:
+  inputs:
     -
       # Paths that should be crawled and fetched
       paths:

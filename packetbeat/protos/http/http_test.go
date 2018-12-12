@@ -720,7 +720,7 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 		t.Error("Unexpected state", st.parseState)
 	}
 
-	logp.Debug("http", "parseOffset", st.parseOffset)
+	logp.Debug("http", "parseOffset: %d", st.parseOffset)
 
 	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(st, msg)
 	if ok != true || complete != false {

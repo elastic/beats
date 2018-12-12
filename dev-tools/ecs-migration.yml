@@ -1,0 +1,369 @@
+# The ECS migration file contains the information about all the Beats fields which are migrated to ECS in 7.0.
+# The goal of the file is to potentially have scripts on top of this information to convert visualisations and templates
+# based on this information in an automated way and to keep track of all changes which were applied.
+#
+# The format of the file is as following:
+#
+# - from: source-field-in-6.x
+#   to: target-filed-in-ECS
+#   # Alias field is useful for fields where many-1 mapping from new to old are needed
+#   alias: true-if-alias-is-required-in-7
+#   # Alias6 field is useful for fields where there is a 1-1 mapping from old to new. If absent, defaults to false.
+#   alias6: true-if-alias-is-required-in-6
+#   # Copy to is useful for fields where multiple fields map to the same ECS field
+#   copy_to: true-if-field-should-be-copied-to-target-in-6x
+
+- from: offset
+  to: log.offset
+  alias6: true
+  alias: true
+
+- from: fileset.name
+  to: event.dataset
+  alias6: true
+  alias: true
+
+- from: fileset.module
+  to: event.module
+  alias6: true
+  alias: true
+
+- from: source
+  to: ["log.file.path", "log.source.ip"]
+  alias: false
+
+- from: beat.name
+  to: agent.type
+  alias6: true
+  alias: true
+
+- from: beat.hostname
+  to: agent.hostname
+  alias6: true
+  alias: true
+
+- from: beat.version
+  to: agent.version
+  alias6: true
+  alias: true
+
+# Filebeat modules
+
+## Suricata module
+
+- from: source_ecs.ip
+  to: source.ip
+  alias: true
+
+- from: source_ecs.port
+  to: source.port
+  alias: true
+
+- from: source_ecs.geo.continent_name
+  to: source.geo.continent_name
+  alias: true
+
+- from: source_ecs.geo.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+
+- from: source_ecs.geo.location
+  to: source.geo.location
+  alias: true
+
+- from: source_ecs.geo.region_name
+  to: source.geo.region_name
+  alias: true
+
+- from: source_ecs.geo.city_name
+  to: source.geo.city_name
+  alias: true
+
+- from: source_ecs.geo.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+
+- from: system.syslog.hostname
+  to: host.hostname
+  alias: true
+
+- from: system.syslog.program
+  to: process.name
+  alias: true
+
+- from: system.syslog.pid
+  to: process.pid
+  alias: true
+
+- from: system.syslog.message
+  to: message
+  alias: true
+
+- from: system.auth.hostname
+  to: host.hostname
+  alias: true
+  copy_to: false
+
+- from: system.auth.pid
+  to: process.pid
+  alias: true
+
+- from: system.auth.groupadd.gid
+  to: group.id
+  alias: true
+
+- from: system.auth.useradd.uid
+  to: user.id
+  alias: true
+
+- from: system.auth.useradd.user
+  to: user.name
+  alias: true
+
+- from: system.auth.ssh.event
+  to: event.action
+  alias: true
+
+- from: system.auth.program
+  to: process.name
+  alias: true
+
+- from: system.auth.ssh.ip
+  to: source.ip
+  alias: true
+
+- from: system.auth.ssh.port
+  to: source.port
+  alias: true
+
+- from: system.auth.ssh.geoip.*
+  to: source.geo.*
+  alias: true
+
+## Apache
+
+- from: apache2.access.user_name
+  to: user.name
+  alias: true
+
+- from: apache2.access.method
+  to: http.request.method
+  alias: true
+
+- from: apache2.access.url
+  to: url.original
+  alias: true
+
+- from: apache2.access.http_version
+  to: http.version
+  alias: true
+
+- from: apache2.access.response_code
+  to: http.response.status_code
+  alias: true
+
+- from: apache2.access.referrer
+  to: http.request.referrer
+  alias: true
+
+- from: apache2.access.agent
+  to: user_agent.original
+  alias: true
+
+- from: read_timestamp
+  to: event.created
+  alias: true
+
+# These expand all fields under geoip and user_agent
+- from: apache2.access.geoip.*
+  to: source.geo.*
+  alias: true
+
+- from: apache2.access.user_agent.*
+  to: user_agent.*
+  alias: true
+
+# IIS module
+
+- from: iis.access.server_ip
+  to: destination.ip
+  alias: true
+
+- from: iis.access.remote_ip
+  to: source.ip
+  alias: true
+
+- from: iis.access.url
+  to: url.path
+  alias: true
+
+- from: iis.access.query_string
+  to: url.query
+  alias: true
+
+- from: iis.access.port
+  to: destination.port
+  alias: true
+
+- from: iis.access.user_name
+  to: user.name
+  alias: true
+
+- from: iis.access.hostname
+  to: destination.domain
+  alias: true
+
+- from: iis.access.user_agent.original
+  to: user_agent.original
+  alias: true
+
+- from: iis.access.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+
+- from: iis.access.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+
+- from: iis.access.geoip.location
+  to: source.geo.location
+  alias: true
+
+- from: iis.access.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+
+- from: iis.access.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+
+- from: iis.access.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+
+# Note: `http` is not officially in ECS yet
+
+- from: iis.access.method
+  to: http.request.method
+  alias: true
+
+- from: iis.access.response_code
+  to: http.response.status_code
+  alias: true
+
+- from: iis.access.referrer
+  to: http.request.referrer
+  alias: true
+
+# HAProxy module
+- from: haproxy.client.port
+  to: source.port
+  alias: true
+
+- from: haproxy.process_name
+  to: process.name
+  alias: true
+
+- from: haproxy.pid
+  to: process.pid
+  alias: true
+
+- from: haproxy.destination.ip
+  to: destination.ip
+  alias: true
+
+- from: haproxy.destination.port
+  to: destination.port
+  alias: true
+
+- from: haproxy.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+
+- from: haproxy.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+
+- from: haproxy.geoip.location
+  to: source.geo.location
+  alias: true
+
+- from: haproxy.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+
+- from: haproxy.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+
+- from: haproxy.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+
+- from: nginx.access.remote_ip_list
+  to: network.forwarded_ip
+  alias: true
+
+- from: nginx.access.user_name
+  to: user.name
+  alias: true
+
+- from: nginx.access.url
+  to: url.original
+  alias: true
+
+- from: nginx.access.agent
+  to: user_agent.original
+  alias: true
+
+ # Note: `http` is not officially in ECS yet
+
+- from: nginx.access.response_code
+  to: http.response.status_code
+  alias: true
+
+- from: nginx.access.referrer
+  to: http.request.referrer
+  alias: true
+
+- from: nginx.access.method
+  to: http.request.method
+  alias: true
+  copy_to: false
+
+- from: nginx.access.http_version
+  to: http.version
+  alias: true
+
+- from: nginx.access.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+
+- from: nginx.access.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+
+- from: nginx.access.geoip.location
+  to: source.geo.location
+  alias: true
+
+- from: nginx.access.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+
+- from: nginx.access.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+
+- from: nginx.access.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+
+- from: nginx.access.agent
+  to: user_agent.original
+  alias: true
+
+# From Auditbeat's auditd module.
+- from: source.hostname
+  to: source.domain
+  alias: true

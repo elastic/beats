@@ -37,6 +37,7 @@ func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cob
  * Kibana dashboards (where available).
  * ML jobs (where available).
  * Ingest pipelines (where available).
+ * ILM policy (for Elasticsearch 6.5 and newer).
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			beat, err := instance.NewBeat(name, idxPrefix, version)
@@ -49,16 +50,18 @@ func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cob
 			dashboards, _ := cmd.Flags().GetBool("dashboards")
 			machineLearning, _ := cmd.Flags().GetBool("machine-learning")
 			pipelines, _ := cmd.Flags().GetBool("pipelines")
+			policy, _ := cmd.Flags().GetBool("ilm-policy")
 
 			// No flags: setup all
-			if !template && !dashboards && !machineLearning && !pipelines {
+			if !template && !dashboards && !machineLearning && !pipelines && !policy {
 				template = true
 				dashboards = true
 				machineLearning = true
 				pipelines = true
+				policy = true
 			}
 
-			if err = beat.Setup(beatCreator, template, dashboards, machineLearning, pipelines); err != nil {
+			if err = beat.Setup(beatCreator, template, dashboards, machineLearning, pipelines, policy); err != nil {
 				os.Exit(1)
 			}
 		},
@@ -68,6 +71,7 @@ func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cob
 	setup.Flags().Bool("dashboards", false, "Setup dashboards")
 	setup.Flags().Bool("machine-learning", false, "Setup machine learning job configurations")
 	setup.Flags().Bool("pipelines", false, "Setup Ingest pipelines")
+	setup.Flags().Bool("ilm-policy", false, "Setup ILM policy")
 
 	return &setup
 }

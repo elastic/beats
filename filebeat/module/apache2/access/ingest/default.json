@@ -4,8 +4,8 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "%{IPORHOST:apache2.access.remote_ip} - %{DATA:apache2.access.user_name} \\[%{HTTPDATE:apache2.access.time}\\] \"%{WORD:apache2.access.method} %{DATA:apache2.access.url} HTTP/%{NUMBER:apache2.access.http_version}\" %{NUMBER:apache2.access.response_code} (?:%{NUMBER:apache2.access.body_sent.bytes}|-)( \"%{DATA:apache2.access.referrer}\")?( \"%{DATA:apache2.access.agent}\")?",
-        "%{IPORHOST:apache2.access.remote_ip} - %{DATA:apache2.access.user_name} \\[%{HTTPDATE:apache2.access.time}\\] \"-\" %{NUMBER:apache2.access.response_code} -"
+        "%{IPORHOST:apache2.access.remote_ip} - %{DATA:user.name} \\[%{HTTPDATE:apache2.access.time}\\] \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.status_code:int} (?:%{NUMBER:apache2.access.body_sent.bytes:int}|-)( \"%{DATA:http.request.referrer}\")?( \"%{DATA:apache2.access.agent}\")?",
+        "%{IPORHOST:apache2.access.remote_ip} - %{DATA:user.name} \\[%{HTTPDATE:apache2.access.time}\\] \"-\" %{NUMBER:http.response.status_code:int} -"
         ],
       "ignore_missing": true
     }
@@ -14,9 +14,17 @@
       "field": "message"
     }
   }, {
+    "grok": {
+      "field": "apache2.access.remote_ip",
+      "ignore_missing": true,
+      "patterns": [
+        "^(%{IP:source.ip}|%{HOSTNAME:source.domain})$"
+      ]
+    }
+  }, {
     "rename": {
       "field": "@timestamp",
-      "target_field": "read_timestamp"
+      "target_field": "event.created"
     }
   }, {
     "date": {
@@ -31,19 +39,49 @@
   }, {
     "user_agent": {
       "field": "apache2.access.agent",
-      "target_field": "apache2.access.user_agent",
       "ignore_failure": true
     }
   }, {
     "rename": {
+      "field": "user_agent.os",
+      "target_field": "user_agent.os.full_name",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_name",
+      "target_field": "user_agent.os.name",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_major",
+      "target_field": "user_agent.os.major",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_minor",
+      "target_field": "user_agent.os.minor",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_patch",
+      "target_field": "user_agent.os.patch",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
       "field": "apache2.access.agent",
-      "target_field": "apache2.access.user_agent.original",
-      "ignore_failure": true
+      "target_field": "user_agent.original",
+      "ignore_missing": true
     }
   }, {
     "geoip": {
-      "field": "apache2.access.remote_ip",
-      "target_field": "apache2.access.geoip"
+      "field": "source.ip",
+      "target_field": "source.geo",
+      "ignore_missing": true
     }
   }],
   "on_failure" : [{

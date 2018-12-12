@@ -4,9 +4,9 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "%{TIMESTAMP_ISO8601:iis.access.time} %{IPORHOST:iis.access.server_ip} %{WORD:iis.access.method} %{URIPATH:iis.access.url} %{NOTSPACE:iis.access.query_string} %{NUMBER:iis.access.port} %{NOTSPACE:iis.access.user_name} %{IPORHOST:iis.access.remote_ip} %{NOTSPACE:iis.access.agent} %{NOTSPACE:iis.access.referrer} %{NUMBER:iis.access.response_code} %{NUMBER:iis.access.sub_status} %{NUMBER:iis.access.win32_status} %{NUMBER:iis.access.request_time_ms}",
-        "%{TIMESTAMP_ISO8601:iis.access.time} %{NOTSPACE:iis.access.site_name} %{WORD:iis.access.method} %{URIPATH:iis.access.url} %{NOTSPACE:iis.access.query_string} %{NUMBER:iis.access.port} %{NOTSPACE:iis.access.user_name} %{IPORHOST:iis.access.remote_ip} %{NOTSPACE:iis.access.agent} %{NOTSPACE:iis.access.cookie} %{NOTSPACE:iis.access.referrer} %{NOTSPACE:iis.access.hostname} %{NUMBER:iis.access.response_code} %{NUMBER:iis.access.sub_status} %{NUMBER:iis.access.win32_status} %{NUMBER:iis.access.body_sent.bytes} %{NUMBER:iis.access.body_received.bytes} %{NUMBER:iis.access.request_time_ms}",
-        "%{TIMESTAMP_ISO8601:iis.access.time} %{NOTSPACE:iis.access.site_name} %{NOTSPACE:iis.access.server_name} %{IPORHOST:iis.access.server_ip} %{WORD:iis.access.method} %{URIPATH:iis.access.url} %{NOTSPACE:iis.access.query_string} %{NUMBER:iis.access.port} %{NOTSPACE:iis.access.user_name} %{IPORHOST:iis.access.remote_ip} HTTP/%{NUMBER:iis.access.http_version} %{NOTSPACE:iis.access.agent} %{NOTSPACE:iis.access.cookie} %{NOTSPACE:iis.access.referrer} %{NOTSPACE:iis.access.hostname} %{NUMBER:iis.access.response_code} %{NUMBER:iis.access.sub_status} %{NUMBER:iis.access.win32_status} %{NUMBER:iis.access.body_sent.bytes} %{NUMBER:iis.access.body_received.bytes} %{NUMBER:iis.access.request_time_ms}"
+        "%{TIMESTAMP_ISO8601:iis.access.time} %{IPORHOST:destination.ip} %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:int} %{NOTSPACE:user.name} %{IPORHOST:source.ip} %{NOTSPACE:iis.access.agent} %{NOTSPACE:http.request.referrer} %{NUMBER:http.response.status_code:int} %{NUMBER:iis.access.sub_status:int} %{NUMBER:iis.access.win32_status:int} %{NUMBER:iis.access.request_time_ms:int}",
+        "%{TIMESTAMP_ISO8601:iis.access.time} %{NOTSPACE:iis.access.site_name} %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:int} %{NOTSPACE:user.name} %{IPORHOST:source.ip} %{NOTSPACE:iis.access.agent} %{NOTSPACE:iis.access.cookie} %{NOTSPACE:http.request.referrer} %{NOTSPACE:destination.domain} %{NUMBER:http.response.status_code:int} %{NUMBER:iis.access.sub_status:int} %{NUMBER:iis.access.win32_status:int} %{NUMBER:iis.access.body_sent.bytes:int} %{NUMBER:iis.access.body_received.bytes:int} %{NUMBER:iis.access.request_time_ms:int}",
+        "%{TIMESTAMP_ISO8601:iis.access.time} %{NOTSPACE:iis.access.site_name} %{NOTSPACE:iis.access.server_name} %{IPORHOST:destination.ip} %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:int} %{NOTSPACE:user.name} %{IPORHOST:source.ip} HTTP/%{NUMBER:http.version} %{NOTSPACE:iis.access.agent} %{NOTSPACE:iis.access.cookie} %{NOTSPACE:http.request.referrer} %{NOTSPACE:destination.domain} %{NUMBER:http.response.status_code:int} %{NUMBER:iis.access.sub_status:int} %{NUMBER:iis.access.win32_status:int} %{NUMBER:iis.access.body_sent.bytes:int} %{NUMBER:iis.access.body_received.bytes:int} %{NUMBER:iis.access.request_time_ms:int}"
         ],
       "ignore_missing": true
     }
@@ -30,19 +30,52 @@
       "field": "iis.access.time"
     }
   }, {
+    "urldecode": {
+      "field": "iis.access.agent"
+    }
+  }, {
     "user_agent": {
-      "field": "iis.access.agent",
-      "target_field": "iis.access.user_agent"
+      "field": "iis.access.agent"
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os",
+      "target_field": "user_agent.os.full_name",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_name",
+      "target_field": "user_agent.os.name",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_major",
+      "target_field": "user_agent.os.major",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_minor",
+      "target_field": "user_agent.os.minor",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "user_agent.os_patch",
+      "target_field": "user_agent.os.patch",
+      "ignore_missing": true
     }
   }, {
     "rename": {
       "field": "iis.access.agent",
-      "target_field": "iis.access.user_agent.original"
+      "target_field": "user_agent.original"
     }
   }, {
     "geoip": {
-      "field": "iis.access.remote_ip",
-      "target_field": "iis.access.geoip"
+      "field": "source.ip",
+      "target_field": "source.geo"
     }
   }],
   "on_failure" : [{

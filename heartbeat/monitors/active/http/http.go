@@ -70,7 +70,10 @@ func create(
 		body = buf.Bytes()
 	}
 
-	validator := makeValidateResponse(&config.Check.Response)
+	validator, err := makeValidateResponse(&config.Check.Response)
+	if err != nil {
+		return nil, 0, err
+	}
 
 	jobs = make([]monitors.Job, len(config.URLs))
 

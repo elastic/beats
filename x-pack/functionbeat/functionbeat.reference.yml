@@ -25,7 +25,7 @@ functionbeat.provider.aws.functions:
     description: "lambda function for cloudwatch logs"
 
     # Concurrency, is the reserved number of instances for that function.
-    # Default is unreserved.
+    # Default is 5.
     #
     # Note: There is a hard limit of 1000 functions of any kind per account.
     #concurrency: 5
@@ -62,7 +62,7 @@ functionbeat.provider.aws.functions:
     description: "lambda function for sqs events"
 
     # Concurrency, is the reserved number of instances for that function.
-    # Default is unreserved.
+    # Default is 5.
     #
     # Note: There is a hard limit of 1000 functions of any kind per account.
     #concurrency: 5
@@ -338,6 +338,11 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
+
+  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
+  #ilm.enabled: false
+  #ilm.rollover_alias: "functionbeat"
+  #ilm.pattern: "{now/d}-000001"
 
   # Set gzip compression level.
   #compression_level: 0

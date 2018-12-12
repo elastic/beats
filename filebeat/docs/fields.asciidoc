@@ -64,59 +64,7 @@ Contains fields for the Apache2 HTTPD access logs.
 --
 type: keyword
 
-Client IP address.
-
-
---
-
-*`apache2.access.user_name`*::
-+
---
-type: keyword
-
-The user name used when basic authentication is used.
-
-
---
-
-*`apache2.access.method`*::
-+
---
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
---
-
-*`apache2.access.url`*::
-+
---
-type: keyword
-
-The request HTTP URL.
-
-
---
-
-*`apache2.access.http_version`*::
-+
---
-type: keyword
-
-The HTTP version.
-
-
---
-
-*`apache2.access.response_code`*::
-+
---
-type: long
-
-The HTTP response code.
+Client IP address or hostname.
 
 
 --
@@ -133,201 +81,212 @@ The number of bytes of the server response body.
 
 --
 
+*`apache2.access.user_name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`apache2.access.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`apache2.access.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`apache2.access.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`apache2.access.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
 *`apache2.access.referrer`*::
 +
 --
-type: keyword
+type: alias
 
-The HTTP referrer.
-
+alias to: http.request.referrer
 
 --
 
 *`apache2.access.agent`*::
 +
 --
-type: text
+type: alias
 
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
-
+alias to: user_agent.original
 
 --
-
-[float]
-== user_agent fields
-
-Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
-
 
 
 *`apache2.access.user_agent.device`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the physical device.
-
+alias to: user_agent.device
 
 --
 
 *`apache2.access.user_agent.major`*::
 +
 --
-type: long
+type: alias
 
-The major version of the user agent.
-
+alias to: user_agent.major
 
 --
 
 *`apache2.access.user_agent.minor`*::
 +
 --
-type: long
+type: alias
 
-The minor version of the user agent.
-
+alias to: user_agent.minor
 
 --
 
 *`apache2.access.user_agent.patch`*::
 +
 --
-type: keyword
+type: alias
 
-The patch version of the user agent.
-
+alias to: user_agent.patch
 
 --
 
 *`apache2.access.user_agent.name`*::
 +
 --
-type: keyword
+type: alias
 
-example: Chrome
-
-The name of the user agent.
-
+alias to: user_agent.name
 
 --
 
 *`apache2.access.user_agent.os`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the operating system.
-
+alias to: user_agent.os.full_name
 
 --
 
 *`apache2.access.user_agent.os_major`*::
 +
 --
-type: long
+type: alias
 
-The major version of the operating system.
-
+alias to: user_agent.os.major
 
 --
 
 *`apache2.access.user_agent.os_minor`*::
 +
 --
-type: long
+type: alias
 
-The minor version of the operating system.
-
+alias to: user_agent.os.minor
 
 --
 
 *`apache2.access.user_agent.os_name`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the operating system.
-
+alias to: user_agent.os.name
 
 --
 
 *`apache2.access.user_agent.original`*::
 +
 --
-type: text
+type: alias
 
-Original user agent value before parsing by ingest-user-agent plugin.
-
-
-Field is not indexed.
+alias to: user_agent.original
 
 --
-
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
 
 
 *`apache2.access.geoip.continent_name`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the continent.
-
+alias to: source.geo.continent_name
 
 --
 
 *`apache2.access.geoip.country_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Country ISO code.
-
+alias to: source.geo.country_iso_code
 
 --
 
 *`apache2.access.geoip.location`*::
 +
 --
-type: geo_point
+type: alias
 
-The longitude and latitude.
-
+alias to: source.geo.location
 
 --
 
 *`apache2.access.geoip.region_name`*::
 +
 --
-type: keyword
+type: alias
 
-The region name.
-
+alias to: source.geo.region_name
 
 --
 
 *`apache2.access.geoip.city_name`*::
 +
 --
-type: keyword
+type: alias
 
-The city name.
-
+alias to: source.geo.city_name
 
 --
 
 *`apache2.access.geoip.region_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
-
+alias to: source.geo.region_iso_code
 
 --
 
@@ -599,34 +558,10 @@ Contains common beat fields available in all event types.
 
 
 
-*`beat.name`*::
-+
---
-The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
-
-
---
-
-*`beat.hostname`*::
-+
---
-The hostname as returned by the operating system on which the Beat is running.
-
-
---
-
 *`beat.timezone`*::
 +
 --
 The timezone as returned by the operating system on which the Beat is running.
-
-
---
-
-*`beat.version`*::
-+
---
-The version of the beat that generated this event.
 
 
 --
@@ -827,7 +762,7 @@ Version of the agent.
 
 --
 
-*`agent.name`*::
+*`agent.type`*::
 +
 --
 type: keyword
@@ -835,6 +770,16 @@ type: keyword
 example: filebeat
 
 Name of the agent.
+
+
+--
+
+*`agent.hostname`*::
++
+--
+type: keyword
+
+Hostname of the agent.
 
 
 --
@@ -1104,16 +1049,6 @@ Can be one or multiple IPv4 or IPv6 addresses.
 
 --
 
-*`destination.hostname`*::
-+
---
-type: keyword
-
-Hostname of the destination.
-
-
---
-
 *`destination.port`*::
 +
 --
@@ -1144,12 +1079,68 @@ Destination domain.
 
 --
 
-*`destination.subdomain`*::
+[float]
+== geo fields
+
+Geolocation for destination.
+
+
+*`destination.geo.continent_name`*::
 +
 --
 type: keyword
 
-Destination subdomain.
+Name of the continent.
+
+
+--
+
+*`destination.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`destination.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`destination.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`destination.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`destination.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
 
 
 --
@@ -2292,16 +2283,130 @@ This id normally changes across restarts, but `service.id` does not.
 --
 
 [float]
+== source fields
+
+Source fields describe details about the source of the event.
+
+
+
+*`source.ip`*::
++
+--
+type: ip
+
+IP address of the source.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`source.port`*::
++
+--
+type: long
+
+Port of the source.
+
+
+--
+
+*`source.mac`*::
++
+--
+type: keyword
+
+MAC address of the source.
+
+
+--
+
+*`source.domain`*::
++
+--
+type: keyword
+
+Source domain.
+
+
+--
+
+[float]
+== geo fields
+
+Geolocation for source.
+
+
+*`source.geo.continent_name`*::
++
+--
+type: keyword
+
+Name of the continent.
+
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+type: keyword
+
+Country ISO code.
+
+
+--
+
+*`source.geo.location`*::
++
+--
+type: geo_point
+
+Longitude and latitude.
+
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: keyword
+
+Region name.
+
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: keyword
+
+City name.
+
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: keyword
+
+Region ISO code.
+
+
+--
+
+[float]
 == url fields
 
 URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
 
 
 
-*`url.href`*::
+*`url.original`*::
 +
 --
-type: text
+type: keyword
 
 example: https://elastic.co:443/search?q=elasticsearch#top
 
@@ -2309,16 +2414,6 @@ Full url. The field is stored as keyword.
 `url.href` is a [multi field](https://www.elastic.co/guide/en/ elasticsearch/reference/6.2/ multi-fields.html#_multi_fields_with_multiple_analyzers). The data is stored as keyword `url.href` and test `url.href.analyzed`. These fields enable you to run a query against part of the url still works splitting up the URL at ingest time.
 `href` is an analyzed field so the parsed information can be accessed through `href.analyzed` in queries.
 
-
-*`url.href.raw`*::
-+
---
-type: keyword
-
-The full URL. This is a non-analyzed field that is useful for aggregations.
-
-
---
 
 --
 
@@ -2597,6 +2692,24 @@ type: long
 
 Minor version of the operating system.
 
+
+--
+
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: agent.type
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
 
 --
 
@@ -3233,66 +3346,6 @@ haproxy Module
 
 
 
-[float]
-== destination fields
-
-Destination information
-
-
-*`haproxy.destination.port`*::
-+
---
-type: long
-
-Port of the destination host
-
---
-
-*`haproxy.destination.ip`*::
-+
---
-IP of the destination host
-
---
-
-*`haproxy.process_name`*::
-+
---
-Name of the process
-
---
-
-*`haproxy.pid`*::
-+
---
-type: long
-
-PID of the process
-
---
-
-[float]
-== client fields
-
-Information about the client doing the request
-
-
-*`haproxy.client.ip`*::
-+
---
-IP address of the client which initiated the TCP connection to haproxy.
-
---
-
-*`haproxy.client.port`*::
-+
---
-type: long
-
-TCP port of the client which initiated the connection.
-
---
-
 *`haproxy.frontend_name`*::
 +
 --
@@ -3402,71 +3455,19 @@ The HAProxy source of the log
 
 --
 
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-*`haproxy.geoip.continent_name`*::
-+
---
-type: keyword
-
-Name of the continent.
-
---
-
-*`haproxy.geoip.country_iso_code`*::
-+
---
-type: keyword
-
-Country ISO code.
-
---
-
-*`haproxy.geoip.location`*::
-+
---
-type: geo_point
-
-Represents a geopoint with the longitude and latitude.
-
---
-
-*`haproxy.geoip.region_name`*::
-+
---
-type: keyword
-
-Name of the region
-
---
-
-*`haproxy.geoip.city_name`*::
-+
---
-type: keyword
-
-City name.
-
---
-
-*`haproxy.geoip.region_iso_code`*::
-+
---
-type: keyword
-
-ISO code of the region
-
---
-
 *`haproxy.termination_state`*::
 +
 --
 Condition the session was in when the session ended.
+
+--
+
+*`haproxy.mode`*::
++
+--
+type: text
+
+mode that the frontend is operating (TCP or HTTP)
 
 --
 
@@ -3521,12 +3522,130 @@ Number of connection retries experienced by this session when trying to connect 
 
 --
 
-*`haproxy.mode`*::
+[float]
+== client fields
+
+Information about the client doing the request
+
+
+*`haproxy.client.ip`*::
 +
 --
-type: text
+IP address of the client which initiated the TCP connection to haproxy.
+If connection is via unix socket, socket path is in this field.
 
-mode that the frontend is operating (TCP or HTTP)
+
+--
+
+*`haproxy.client.port`*::
++
+--
+type: alias
+
+alias to: source.port
+
+--
+
+*`haproxy.process_name`*::
++
+--
+type: alias
+
+alias to: process.name
+
+--
+
+*`haproxy.pid`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+[float]
+== destination fields
+
+Destination information
+
+
+*`haproxy.destination.port`*::
++
+--
+type: alias
+
+alias to: destination.port
+
+--
+
+*`haproxy.destination.ip`*::
++
+--
+type: alias
+
+alias to: destination.ip
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`haproxy.geoip.continent_name`*::
++
+--
+type: alias
+
+alias to: source.geo.continent_name
+
+--
+
+*`haproxy.geoip.country_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.country_iso_code
+
+--
+
+*`haproxy.geoip.location`*::
++
+--
+type: alias
+
+alias to: source.geo.location
+
+--
+
+*`haproxy.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`haproxy.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
+
+--
+
+*`haproxy.geoip.region_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.region_iso_code
 
 --
 
@@ -3816,98 +3935,6 @@ Contains fields for IIS access logs.
 
 
 
-*`iis.access.server_ip`*::
-+
---
-type: keyword
-
-The server IP address.
-
-
---
-
-*`iis.access.method`*::
-+
---
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
---
-
-*`iis.access.url`*::
-+
---
-type: keyword
-
-The request HTTP URL.
-
-
---
-
-*`iis.access.query_string`*::
-+
---
-type: keyword
-
-The request query string, if any.
-
-
---
-
-*`iis.access.port`*::
-+
---
-type: long
-
-The request port number.
-
-
---
-
-*`iis.access.user_name`*::
-+
---
-type: keyword
-
-The user name used when basic authentication is used.
-
-
---
-
-*`iis.access.remote_ip`*::
-+
---
-type: keyword
-
-The client IP address.
-
-
---
-
-*`iis.access.referrer`*::
-+
---
-type: keyword
-
-The HTTP referrer.
-
-
---
-
-*`iis.access.response_code`*::
-+
---
-type: long
-
-The HTTP response code.
-
-
---
-
 *`iis.access.sub_status`*::
 +
 --
@@ -3958,32 +3985,12 @@ The name of the server on which the log file entry was generated.
 
 --
 
-*`iis.access.http_version`*::
-+
---
-type: keyword
-
-The HTTP version.
-
-
---
-
 *`iis.access.cookie`*::
 +
 --
 type: keyword
 
 The content of the cookie sent or received, if any.
-
-
---
-
-*`iis.access.hostname`*::
-+
---
-type: keyword
-
-The host header name, if any.
 
 
 --
@@ -4012,191 +4019,248 @@ The number of bytes of the server request body.
 
 --
 
-*`iis.access.agent`*::
+*`iis.access.server_ip`*::
 +
 --
-type: text
+type: alias
 
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
-
+alias to: destination.ip
 
 --
 
-[float]
-== user_agent fields
+*`iis.access.method`*::
++
+--
+type: alias
 
-Contains the parsed user agent field. Only present if the user agent Elasticsearch plugin is available and used.
+alias to: http.request.method
 
+--
+
+*`iis.access.url`*::
++
+--
+type: alias
+
+alias to: url.path
+
+--
+
+*`iis.access.query_string`*::
++
+--
+type: alias
+
+alias to: url.query
+
+--
+
+*`iis.access.port`*::
++
+--
+type: alias
+
+alias to: destination.port
+
+--
+
+*`iis.access.user_name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`iis.access.remote_ip`*::
++
+--
+type: alias
+
+alias to: source.ip
+
+--
+
+*`iis.access.referrer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`iis.access.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`iis.access.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`iis.access.hostname`*::
++
+--
+type: alias
+
+alias to: host.hostname
+
+--
 
 
 *`iis.access.user_agent.device`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the physical device.
-
+alias to: user_agent.device
 
 --
 
 *`iis.access.user_agent.major`*::
 +
 --
-type: long
+type: alias
 
-The major version of the user agent.
-
+alias to: user_agent.major
 
 --
 
 *`iis.access.user_agent.minor`*::
 +
 --
-type: long
+type: alias
 
-The minor version of the user agent.
-
+alias to: user_agent.minor
 
 --
 
 *`iis.access.user_agent.patch`*::
 +
 --
-type: keyword
+type: alias
 
-The patch version of the user agent.
-
+alias to: user_agent.patch
 
 --
 
 *`iis.access.user_agent.name`*::
 +
 --
-type: keyword
+type: alias
 
-example: Chrome
-
-The name of the user agent.
-
+alias to: user_agent.name
 
 --
 
 *`iis.access.user_agent.os`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the operating system.
-
+alias to: user_agent.os.full_name
 
 --
 
 *`iis.access.user_agent.os_major`*::
 +
 --
-type: long
+type: alias
 
-The major version of the operating system.
-
+alias to: user_agent.os.major
 
 --
 
 *`iis.access.user_agent.os_minor`*::
 +
 --
-type: long
+type: alias
 
-The minor version of the operating system.
-
+alias to: user_agent.os.minor
 
 --
 
 *`iis.access.user_agent.os_name`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the operating system.
-
+alias to: user_agent.os.name
 
 --
 
 *`iis.access.user_agent.original`*::
 +
 --
-type: text
+type: alias
 
-Original user agent value before parsing by ingest-user-agent plugin.
-
-
-Field is not indexed.
+alias to: user_agent.original
 
 --
-
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
 
 
 *`iis.access.geoip.continent_name`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the continent.
-
+alias to: source.geo.continent_name
 
 --
 
 *`iis.access.geoip.country_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Country ISO code.
-
+alias to: source.geo.country_iso_code
 
 --
 
 *`iis.access.geoip.location`*::
 +
 --
-type: geo_point
+type: alias
 
-The longitude and latitude.
-
+alias to: source.geo.location
 
 --
 
 *`iis.access.geoip.region_name`*::
 +
 --
-type: keyword
+type: alias
 
-The region name.
-
+alias to: source.geo.region_name
 
 --
 
 *`iis.access.geoip.city_name`*::
 +
 --
-type: keyword
+type: alias
 
-The city name.
-
+alias to: source.geo.city_name
 
 --
 
 *`iis.access.geoip.region_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
-
+alias to: source.geo.region_iso_code
 
 --
 
@@ -4623,19 +4687,31 @@ Contains log file lines.
 
 
 
-*`source`*::
+*`log.file.path`*::
 +
 --
 type: keyword
 
-required: True
+required: False
 
 The file from which the line was read. This field contains the absolute path to the file. For example: `/var/log/system.log`.
 
 
 --
 
-*`offset`*::
+*`log.source.ip`*::
++
+--
+type: ip
+
+required: False
+
+Source IP from which the log event was read / sent from.
+
+
+--
+
+*`log.offset`*::
 +
 --
 type: long
@@ -4671,19 +4747,6 @@ Log stream when reading container logs, can be 'stdout' or 'stderr'
 
 --
 
-*`prospector.type`*::
-+
---
-
-deprecated[6.3]
-
-required: True
-
-The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `input.type`)
-
-
---
-
 *`input.type`*::
 +
 --
@@ -4698,22 +4761,6 @@ The input type from which the event was generated. This field is set to the valu
 +
 --
 In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
-
-
---
-
-*`fileset.module`*::
-+
---
-The Filebeat module that generated this event.
-
-
---
-
-*`fileset.name`*::
-+
---
-The Filebeat fileset that generated this event.
 
 
 --
@@ -4807,165 +4854,41 @@ Content length of the HTTP response body.
 --
 
 
-*`source_ecs.ip`*::
-+
---
-type: ip
-
-IP address of the source.
-
-
---
-
-*`source_ecs.port`*::
-+
---
-type: long
-
-Port of the source.
-
-
---
-
-[float]
-== geo fields
-
-Geolocation for source.
-
-
-*`source_ecs.geo.continent_name`*::
-+
---
-type: keyword
-
-Name of the continent.
-
-
---
-
-*`source_ecs.geo.country_iso_code`*::
-+
---
-type: keyword
-
-Country ISO code.
-
-
---
-
-*`source_ecs.geo.location`*::
-+
---
-type: geo_point
-
-Longitude and latitude.
-
-
---
-
-*`source_ecs.geo.region_name`*::
-+
---
-type: keyword
-
-Region name.
-
-
---
-
-*`source_ecs.geo.city_name`*::
-+
---
-type: keyword
-
-City name.
-
-
---
-
-*`source_ecs.geo.region_iso_code`*::
-+
---
-type: keyword
-
-Region ISO code.
-
-
---
-
-
-[float]
-== geo fields
-
-Geolocation for destination.
-
-
-*`destination.geo.continent_name`*::
-+
---
-type: keyword
-
-Name of the continent.
-
-
---
-
-*`destination.geo.country_iso_code`*::
-+
---
-type: keyword
-
-Country ISO code.
-
-
---
-
-*`destination.geo.location`*::
-+
---
-type: geo_point
-
-Longitude and latitude.
-
-
---
-
-*`destination.geo.region_name`*::
-+
---
-type: keyword
-
-Region name.
-
-
---
-
-*`destination.geo.city_name`*::
-+
---
-type: keyword
-
-City name.
-
-
---
-
-*`destination.geo.region_iso_code`*::
-+
---
-type: keyword
-
-Region ISO code.
-
-
---
-
-
 
 *`user_agent.os.full_name`*::
 +
 --
 type: keyword
+
+--
+
+*`http.request.referrer`*::
++
+--
+type: keyword
+
+example: https://blog.example.com/
+
+Referrer for this HTTP request.
+
+
+--
+
+*`fileset.name`*::
++
+--
+type: alias
+
+alias to: event.dataset
+
+--
+
+*`fileset.module`*::
++
+--
+type: alias
+
+alias to: event.module
 
 --
 
@@ -5401,78 +5324,6 @@ Contains fields for the Nginx access logs.
 
 
 
-*`nginx.access.remote_ip_list`*::
-+
---
-type: array
-
-An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.
-
-
---
-
-*`nginx.access.remote_ip`*::
-+
---
-type: keyword
-
-Client IP address. The first public IP address from the `remote_ip_list` array. If no public IP addresses are present, this field contains the first private IP address from the `remote_ip_list` array.
-
-
---
-
-*`nginx.access.user_name`*::
-+
---
-type: keyword
-
-The user name used when basic authentication is used.
-
-
---
-
-*`nginx.access.method`*::
-+
---
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
---
-
-*`nginx.access.url`*::
-+
---
-type: keyword
-
-The request HTTP URL.
-
-
---
-
-*`nginx.access.http_version`*::
-+
---
-type: keyword
-
-The HTTP version.
-
-
---
-
-*`nginx.access.response_code`*::
-+
---
-type: long
-
-The HTTP response code.
-
-
---
-
 *`nginx.access.body_sent.bytes`*::
 +
 --
@@ -5485,201 +5336,230 @@ The number of bytes of the server response body.
 
 --
 
+*`nginx.access.remote_ip_list`*::
++
+--
+type: alias
+
+alias to: network.forwarded_ip
+
+--
+
+*`nginx.access.remote_ip`*::
++
+--
+type: alias
+
+alias to: source.ip
+
+--
+
+*`nginx.access.user_name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`nginx.access.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`nginx.access.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`nginx.access.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`nginx.access.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
 *`nginx.access.referrer`*::
 +
 --
-type: keyword
+type: alias
 
-The HTTP referrer.
-
+alias to: http.request.referrer
 
 --
 
 *`nginx.access.agent`*::
 +
 --
-type: text
+type: alias
 
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
-
+alias to: user_agent.original
 
 --
-
-[float]
-== user_agent fields
-
-Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
-
 
 
 *`nginx.access.user_agent.device`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the physical device.
-
+alias to: user_agent.device
 
 --
 
 *`nginx.access.user_agent.major`*::
 +
 --
-type: long
+type: alias
 
-The major version of the user agent.
-
+alias to: user_agent.major
 
 --
 
 *`nginx.access.user_agent.minor`*::
 +
 --
-type: long
+type: alias
 
-The minor version of the user agent.
-
+alias to: user_agent.minor
 
 --
 
 *`nginx.access.user_agent.patch`*::
 +
 --
-type: keyword
+type: alias
 
-The patch version of the user agent.
-
+alias to: user_agent.patch
 
 --
 
 *`nginx.access.user_agent.name`*::
 +
 --
-type: keyword
+type: alias
 
-example: Chrome
-
-The name of the user agent.
-
+alias to: user_agent.name
 
 --
 
 *`nginx.access.user_agent.os`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the operating system.
-
+alias to: user_agent.os.full_name
 
 --
 
 *`nginx.access.user_agent.os_major`*::
 +
 --
-type: long
+type: alias
 
-The major version of the operating system.
-
+alias to: user_agent.os.major
 
 --
 
 *`nginx.access.user_agent.os_minor`*::
 +
 --
-type: long
+type: alias
 
-The minor version of the operating system.
-
+alias to: user_agent.os.minor
 
 --
 
 *`nginx.access.user_agent.os_name`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the operating system.
-
+alias to: user_agent.os.name
 
 --
 
 *`nginx.access.user_agent.original`*::
 +
 --
-type: text
+type: alias
 
-Original user agent value before parsing by ingest-user-agent plugin.
-
-
-Field is not indexed.
+alias to: user_agent.original
 
 --
-
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
 
 
 *`nginx.access.geoip.continent_name`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the continent.
-
+alias to: source.geo.continent_name
 
 --
 
 *`nginx.access.geoip.country_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Country ISO code.
-
+alias to: source.geo.country_iso_code
 
 --
 
 *`nginx.access.geoip.location`*::
 +
 --
-type: geo_point
+type: alias
 
-The longitude and latitude.
-
+alias to: source.geo.location
 
 --
 
 *`nginx.access.geoip.region_name`*::
 +
 --
-type: keyword
+type: alias
 
-The region name.
-
+alias to: source.geo.region_name
 
 --
 
 *`nginx.access.geoip.city_name`*::
 +
 --
-type: keyword
+type: alias
 
-The city name.
-
+alias to: source.geo.city_name
 
 --
 
 *`nginx.access.geoip.region_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
-
+alias to: source.geo.region_iso_code
 
 --
 
@@ -6036,6 +5916,37 @@ Module for parsing system log files.
 
 
 
+*`host.hostname`*::
++
+--
+type: keyword
+
+--
+
+*`group.id`*::
++
+--
+type: keyword
+
+required: False
+
+ID of the group.
+
+
+--
+
+*`group.name`*::
++
+--
+type: keyword
+
+required: False
+
+Name of the group.
+
+
+--
+
 [float]
 == system fields
 
@@ -6053,69 +5964,57 @@ Fields from the Linux authorization logs.
 *`system.auth.timestamp`*::
 +
 --
-The timestamp as read from the auth message.
+type: alias
 
+alias to: @timestamp
 
 --
 
 *`system.auth.hostname`*::
 +
 --
-The hostname as read from the auth message.
+type: alias
 
+alias to: host.hostname
 
 --
 
 *`system.auth.program`*::
 +
 --
-The process name as read from the auth message.
+type: alias
 
+alias to: process.name
 
 --
 
 *`system.auth.pid`*::
 +
 --
-type: long
+type: alias
 
-The PID of the process that sent the auth message.
-
+alias to: process.pid
 
 --
 
 *`system.auth.message`*::
 +
 --
-type: text
+type: alias
 
-The message in the log line.
-
+alias to: message
 
 --
 
 *`system.auth.user`*::
 +
 --
-The Unix user that this event refers to.
+type: alias
 
-
---
-
-[float]
-== ssh fields
-
-Fields specific to SSH login events.
-
-
-
-*`system.auth.ssh.event`*::
-+
---
-The SSH login event. Can be one of "Accepted", "Failed", or "Invalid". "Accepted" means a successful login. "Invalid" means that the user is not configured on the system. "Failed" means that the SSH login attempt has failed.
-
+alias to: user.name
 
 --
+
 
 *`system.auth.ssh.method`*::
 +
@@ -6125,12 +6024,10 @@ The SSH authentication method. Can be one of "password" or "publickey".
 
 --
 
-*`system.auth.ssh.ip`*::
+*`system.auth.ssh.signature`*::
 +
 --
-type: ip
-
-The client IP from where the login attempt was made.
+The signature of the client public key.
 
 
 --
@@ -6145,88 +6042,85 @@ The client IP from SSH connections that are open and immediately dropped.
 
 --
 
+*`system.auth.ssh.event`*::
++
+--
+type: alias
+
+alias to: event.action
+
+--
+
+*`system.auth.ssh.ip`*::
++
+--
+type: alias
+
+alias to: source.ip
+
+--
+
 *`system.auth.ssh.port`*::
 +
 --
-type: long
+type: alias
 
-The client port from where the login attempt was made.
-
-
---
-
-*`system.auth.ssh.signature`*::
-+
---
-The signature of the client public key.
-
+alias to: source.port
 
 --
-
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the `system.auth.ip` field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
 
 
 *`system.auth.ssh.geoip.continent_name`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the continent.
-
-
---
-
-*`system.auth.ssh.geoip.city_name`*::
-+
---
-type: keyword
-
-The name of the city.
-
-
---
-
-*`system.auth.ssh.geoip.region_name`*::
-+
---
-type: keyword
-
-The name of the region.
-
+alias to: source.geo.continent_name
 
 --
 
 *`system.auth.ssh.geoip.country_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Country ISO code.
-
+alias to: source.geo.country_iso_code
 
 --
 
 *`system.auth.ssh.geoip.location`*::
 +
 --
-type: geo_point
+type: alias
 
-The longitude and latitude.
+alias to: source.geo.location
 
+--
+
+*`system.auth.ssh.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`system.auth.ssh.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
 
 --
 
 *`system.auth.ssh.geoip.region_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
-
+alias to: source.geo.region_iso_code
 
 --
 
@@ -6288,32 +6182,6 @@ Fields specific to events created by the `useradd` command.
 
 
 
-*`system.auth.useradd.name`*::
-+
---
-The user name being added.
-
-
---
-
-*`system.auth.useradd.uid`*::
-+
---
-type: long
-
-The user ID.
-
---
-
-*`system.auth.useradd.gid`*::
-+
---
-type: long
-
-The group ID.
-
---
-
 *`system.auth.useradd.home`*::
 +
 --
@@ -6328,6 +6196,33 @@ The default shell for the new user.
 
 --
 
+*`system.auth.useradd.name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`system.auth.useradd.uid`*::
++
+--
+type: alias
+
+alias to: user.id
+
+--
+
+*`system.auth.useradd.gid`*::
++
+--
+type: alias
+
+alias to: group.id
+
+--
+
 [float]
 == groupadd fields
 
@@ -6338,18 +6233,18 @@ Fields specific to events created by the `groupadd` command.
 *`system.auth.groupadd.name`*::
 +
 --
-The name of the new group.
+type: alias
 
+alias to: group.name
 
 --
 
 *`system.auth.groupadd.gid`*::
 +
 --
-type: long
+type: alias
 
-The ID of the new group.
-
+alias to: group.id
 
 --
 
@@ -6363,42 +6258,45 @@ Contains fields from the syslog system logs.
 *`system.syslog.timestamp`*::
 +
 --
-The timestamp as read from the syslog message.
+type: alias
 
+alias to: @timestamp
 
 --
 
 *`system.syslog.hostname`*::
 +
 --
-The hostname as read from the syslog message.
+type: alias
 
+alias to: host.hostname
 
 --
 
 *`system.syslog.program`*::
 +
 --
-The process name as read from the syslog message.
+type: alias
 
+alias to: process.name
 
 --
 
 *`system.syslog.pid`*::
 +
 --
-The PID of the process that sent the syslog message.
+type: alias
 
+alias to: process.pid
 
 --
 
 *`system.syslog.message`*::
 +
 --
-type: text
+type: alias
 
-The message in the log line.
-
+alias to: message
 
 --
 
@@ -6433,12 +6331,32 @@ Client IP address.
 
 --
 
+*`traefik.access.duration`*::
++
+--
+type: long
+
+Duration of the access entry.
+
+
+--
+
 *`traefik.access.user_name`*::
 +
 --
 type: keyword
 
 The user name used when basic authentication is used.
+
+
+--
+
+*`traefik.access.user_identifier`*::
++
+--
+type: keyword
+
+Is the RFC 1413 identity of the client
 
 
 --
@@ -6530,6 +6448,16 @@ Contains the parsed User agent field. Only present if the user agent Elasticsear
 type: keyword
 
 The name of the physical device.
+
+
+--
+
+*`traefik.access.user_agent.build`*::
++
+--
+type: keyword
+
+The build of the user agent.
 
 
 --

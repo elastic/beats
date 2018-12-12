@@ -184,6 +184,7 @@ func (t *SimpleTransport) readResponse(
 ) (*http.Response, error) {
 	reader := bufio.NewReader(conn)
 	resp, err := http.ReadResponse(reader, req)
+	resp.Body = comboConnReadCloser{conn, resp.Body}
 	if err != nil {
 		return nil, err
 	}

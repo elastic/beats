@@ -213,44 +213,33 @@ https://github.com/elastic/beats/tree/master/dev-tools/cmd/dashboards[dev-tools]
 for exporting Kibana 5.x dashboards. See the dev-tools
 https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.
 
-/////////////////////
-NOT YET IMPLEMENTED
-NOTE: You can make use of the Makefile from the Beat GitHub repository to export all the Kibana dashboards for a Beat
-from your Elasticsearch. If Elasticsearch is running on localhost, then you just need to run the following command from the Beat repository:
-
-[source,shell]
------------------------------
-make export-dashboards
------------------------------
-
-If Elasticsearch is running on a different host, then you can use the `ES_URL` variable:
-
-[source,shell]
-----------------------------
-ES_URL="http://192.168.3.206:9200" make export-dashboards
-----------------------------
-
-/////////////////////
+Alternatively, if the scripts above are not available, you can use your Beat binary to export Kibana 6.0 dashboards or later.
 
 ==== Exporting Kibana 6.0 dashboards and newer
 
 The `dev-tools/cmd/export_dashboards.go` script helps you export your customized Kibana 6.0 dashboards and newer. You might need to export a single dashboard or all the dashboards available for a module or Beat.
 
+It is also possible to use a Beat binary to export.
 
 ===== Export a single Kibana dashboard
 
-You can export a single dashboard by passing the dashboard ID in the `-dashboard` flag.
-
-NOTE: The dashboard ID is available in the dashboard URL. For example, in case the dashboard URL is
-`app/kibana#/dashboard/7fea2930-478e-11e7-b1f0-cb29bac6bf8b?_g=()&_a=(description:'Overview%2...`, the dashboard ID is `7fea2930-478e-11e7-b1f0-cb29bac6bf8b`.
+To export a single dashboard for a module you can use the following command inside a Beat with modules:
 
 [source,shell]
 ---------------
-cd filebeat/module/redis/_meta/kibana/default/dashboard
-go run ../../../../../../../dev-tools/cmd/dashboards/export_dashboards.go -id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b -output Filebeat-redis.json
+MODULE=redis ID=AV4REOpp5NkDleZmzKkE mage exportDashboard
 ---------------
 
-This generates the `Filebeat-redis.json` file that contains the dashboard for the Redis module of Filebeat, including the dependencies (visualizations and searches).
+[source,shell]
+---------------
+./filebeat export dashboard -id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b >> Filebeat-redis.json
+---------------
+
+This generates a `AV4REOpp5NkDleZmzKkE.json` file inside dashboard directory in the redis module.
+It contains all dependencies like visualizations and searches.
+
+NOTE: The dashboard ID is available in the dashboard URL. For example, in case the dashboard URL is
+`app/kibana#/dashboard/AV4REOpp5NkDleZmzKkE?_g=()&_a=(description:'Overview%2...`, the dashboard ID is `AV4REOpp5NkDleZmzKkE`.
 
 ===== Export all module/Beat dashboards
 
@@ -275,11 +264,16 @@ dashboards:
 
 Each dashboard is defined by an `id` and the name of json `file` where the dashboard is saved locally.
 
-By passing the yml file to the `export_dashboards.go` script, you can export all the dashboards defined:
+By passing the yml file to the `export_dashboards.go` script or to the Beat, you can export all the dashboards defined:
 
 [source,shell]
 -------------------
 go run dev-tools/cmd/dashboards/export_dashboards.go -yml filebeat/module/system/module.yml
+-------------------
+
+[source,shell]
+-------------------
+./filebeat export dashboard -yml filebeat/module/system/module.yml
 -------------------
 
 
@@ -291,6 +285,8 @@ If you are using the Kibana Spaces feature and want to export dashboards from a 
 -------------------
 go run dev-tools/cmd/dashboards/export_dashboards.go -space-id my-space [other-options]
 -------------------
+
+In case of running `export dashboard` of a Beat, you need to set the Space ID in `setup.kibana.space.id`.
 
 
 ==== Exporting Kibana 5.x dashboards

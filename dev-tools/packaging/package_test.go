@@ -25,9 +25,11 @@ import (
 	"archive/zip"
 	"bytes"
 	"compress/gzip"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -78,7 +80,8 @@ func TestDeb(t *testing.T) {
 }
 
 func TestTar(t *testing.T) {
-	tars := getFiles(t, regexp.MustCompile(`\.tar\.gz$`))
+	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
+	tars := getFiles(t, regexp.MustCompile(`-\w+\.tar\.gz$`))
 	for _, tar := range tars {
 		checkTar(t, tar)
 	}
@@ -88,6 +91,13 @@ func TestZip(t *testing.T) {
 	zips := getFiles(t, regexp.MustCompile(`^\w+beat-\S+.zip$`))
 	for _, zip := range zips {
 		checkZip(t, zip)
+	}
+}
+
+func TestDocker(t *testing.T) {
+	dockers := getFiles(t, regexp.MustCompile(`\.docker\.tar\.gz$`))
+	for _, docker := range dockers {
+		checkDocker(t, docker)
 	}
 }
 
@@ -157,6 +167,18 @@ func checkZip(t *testing.T, file string) {
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 	checkModulesPermissions(t, p)
+}
+
+func checkDocker(t *testing.T, file string) {
+	p, info, err := readDocker(file)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	checkDockerEntryPoint(t, p, info)
+	checkModulesPresent(t, "", p)
+	checkModulesDPresent(t, "", p)
 }
 
 // Verify that the main configuration file is installed with a 0600 file mode.
@@ -311,6 +333,30 @@ func checkModules(t *testing.T, name, prefix string, r *regexp.Regexp, p *packag
 	})
 }
 
+func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
+	expectedMode := os.FileMode(0755)
+
+	t.Run(fmt.Sprintf("%s entrypoint", p.Name), func(t *testing.T) {
+		if len(info.Config.Entrypoint) == 0 {
+			t.Fatal("no entrypoint")
+		}
+
+		entrypoint := info.Config.Entrypoint[0]
+		if strings.HasPrefix(entrypoint, "/") {
+			entrypoint := strings.TrimPrefix(entrypoint, "/")
+			entry, found := p.Contents[entrypoint]
+			if !found {
+				t.Fatalf("%s entrypoint not found in docker", entrypoint)
+			}
+			if mode := entry.Mode.Perm(); mode != expectedMode {
+				t.Fatalf("%s entrypoint mode is %s, expected: %s", entrypoint, mode, expectedMode)
+			}
+		} else {
+			t.Fatal("TODO: check if binary is in $PATH")
+		}
+	})
+}
+
 // Helpers
 
 type packageFile struct {
@@ -456,4 +502,129 @@ func readZip(zipFile string) (*packageFile, error) {
 	}
 
 	return p, nil
+}
+
+func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
+	file, err := os.Open(dockerFile)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer file.Close()
+
+	var manifest *dockerManifest
+	var info *dockerInfo
+	layers := make(map[string]*packageFile)
+
+	gzipReader, err := gzip.NewReader(file)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer gzipReader.Close()
+
+	tarReader := tar.NewReader(gzipReader)
+	for {
+		header, err := tarReader.Next()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return nil, nil, err
+		}
+
+		switch {
+		case header.Name == "manifest.json":
+			manifest, err = readDockerManifest(tarReader)
+			if err != nil {
+				return nil, nil, err
+			}
+		case strings.HasSuffix(header.Name, ".json") && header.Name != "manifest.json":
+			info, err = readDockerInfo(tarReader)
+			if err != nil {
+				return nil, nil, err
+			}
+		case strings.HasSuffix(header.Name, "/layer.tar"):
+			layer, err := readTarContents(header.Name, tarReader)
+			if err != nil {
+				return nil, nil, err
+			}
+			layers[filepath.Dir(header.Name)] = layer
+		}
+	}
+
+	if len(info.Config.Entrypoint) == 0 {
+		return nil, nil, fmt.Errorf("no entrypoint")
+	}
+
+	workingDir := info.Config.WorkingDir
+	entrypoint := info.Config.Entrypoint[0]
+
+	// Read layers in order and for each file keep only the entry seen in the later layer
+	p := &packageFile{Name: filepath.Base(dockerFile), Contents: map[string]packageEntry{}}
+	for _, layer := range manifest.Layers {
+		layerID := filepath.Dir(layer)
+		layerFile, found := layers[layerID]
+		if !found {
+			return nil, nil, fmt.Errorf("layer not found: %s", layerID)
+		}
+		for name, entry := range layerFile.Contents {
+			// Check only files in working dir and entrypoint
+			if strings.HasPrefix("/"+name, workingDir) || "/"+name == entrypoint {
+				p.Contents[name] = entry
+			}
+		}
+	}
+
+	if len(p.Contents) == 0 {
+		return nil, nil, fmt.Errorf("no files found in docker working directory (%s)", info.Config.WorkingDir)
+	}
+
+	return p, info, nil
+}
+
+type dockerManifest struct {
+	Config   string
+	RepoTags []string
+	Layers   []string
+}
+
+func readDockerManifest(r io.Reader) (*dockerManifest, error) {
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	var manifests []*dockerManifest
+	err = json.Unmarshal(data, &manifests)
+	if err != nil {
+		return nil, err
+
+	}
+
+	if len(manifests) != 1 {
+		return nil, fmt.Errorf("one and only one manifest expected, %d found", len(manifests))
+	}
+
+	return manifests[0], nil
+}
+
+type dockerInfo struct {
+	Config struct {
+		WorkingDir string
+		Entrypoint []string
+	} `json:"config"`
+}
+
+func readDockerInfo(r io.Reader) (*dockerInfo, error) {
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	var info dockerInfo
+	err = json.Unmarshal(data, &info)
+	if err != nil {
+		return nil, err
+	}
+
+	return &info, nil
 }

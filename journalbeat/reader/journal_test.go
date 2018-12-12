@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//+build linux,cgo
+
 package reader
 
 import (
@@ -63,8 +65,10 @@ func TestToEvent(t *testing.T) {
 				},
 			},
 			expectedFields: common.MapStr{
-				"custom": common.MapStr{
-					"my_custom_field": "value",
+				"journald": common.MapStr{
+					"custom": common.MapStr{
+						"my_custom_field": "value",
+					},
 				},
 			},
 		},

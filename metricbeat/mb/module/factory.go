@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -44,10 +43,6 @@ func NewFactory(options ...Option) *Factory {
 func (r *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	var errs multierror.Errors
 
-	err := cfgwarn.CheckRemoved5xSettings(c, "filters")
-	if err != nil {
-		errs = append(errs, err)
-	}
 	connector, err := NewConnector(p, c, meta)
 	if err != nil {
 		errs = append(errs, err)
