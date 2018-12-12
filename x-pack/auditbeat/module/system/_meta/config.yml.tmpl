@@ -28,7 +28,7 @@
   process.state.period: 12h
   socket.state.period: 12h
   user.state.period: 12h
-  {{ end -}}
+  {{- end }}
 
   {{ if eq .GOOS "linux" -}}
   # Enabled by default. Auditbeat will read password fields in

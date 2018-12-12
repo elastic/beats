@@ -19,6 +19,7 @@ package mage
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/magefile/mage/sh"
@@ -28,13 +29,17 @@ import (
 )
 
 // CollectDocs collects documentation from modules.
-//
-// TODO: This needs to be updated to collect docs from x-pack/auditbeat.
-func CollectDocs() error {
+func CollectDocs(basePaths ...string) error {
+
 	// Generate config.yml files for each module.
-	configFiles, err := mage.FindFiles(ConfigTemplateGlob)
-	if err != nil {
-		return errors.Wrap(err, "failed to find config templates")
+	var configFiles []string
+	for _, path := range basePaths {
+		files, err := mage.FindFiles(filepath.Join(path, ConfigTemplateGlob))
+		if err != nil {
+			return errors.Wrap(err, "failed to find config templates")
+		}
+
+		configFiles = append(configFiles, files...)
 	}
 
 	var configs []string
@@ -52,10 +57,10 @@ func CollectDocs() error {
 	defer mage.Clean(configs)
 
 	// Remove old.
-	if err = os.RemoveAll(mage.OSSBeatDir("docs/modules")); err != nil {
+	if err := os.RemoveAll(mage.OSSBeatDir("docs/modules")); err != nil {
 		return err
 	}
-	if err = os.MkdirAll(mage.OSSBeatDir("docs/modules"), 0755); err != nil {
+	if err := os.MkdirAll(mage.OSSBeatDir("docs/modules"), 0755); err != nil {
 		return err
 	}
 
@@ -71,7 +76,8 @@ func CollectDocs() error {
 	}
 
 	// TODO: Port this script to Go.
-	return sh.Run(python,
-		mage.OSSBeatDir("scripts/docs_collector.py"),
-		"--beat", mage.BeatName)
+	args := []string{mage.OSSBeatDir("scripts/docs_collector.py"), "--base-paths"}
+	args = append(args, basePaths...)
+
+	return sh.Run(python, args...)
 }

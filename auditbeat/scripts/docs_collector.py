@@ -6,10 +6,13 @@ import six
 # Collects docs for all modules and metricset
 
 
-def collect(beat_name):
+def collect(base_paths):
 
-    base_dir = "module"
-    path = os.path.abspath("module")
+    # Always use the auditbeat/docs/ directory, regardless
+    # of where this script was called from.
+    docs_path = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, "docs"))
+
+    beat_name = os.path.basename(base_paths[0])
 
     generated_note = """////
 This file is generated! See scripts/docs_collector.py
@@ -19,17 +22,25 @@ This file is generated! See scripts/docs_collector.py
 
     modules_list = {}
 
-    # Iterate over all modules
-    for module in sorted(os.listdir(base_dir)):
+    # Dict: module name -> module path
+    module_dirs = {}
+    for path in base_paths:
+        module_dir = os.path.join(path, "module")
+        for module_name in os.listdir(module_dir):
+            module_dirs[module_name] = os.path.join(module_dir, module_name)
 
-        module_doc = path + "/" + module + "/_meta/docs.asciidoc"
+    # Iterate over all modules
+    for module in sorted(module_dirs):
+        module_dir = module_dirs[module]
+
+        module_doc = os.path.join(module_dir, "_meta/docs.asciidoc")
 
         # Only check folders where docs.asciidoc exists
         if os.path.isfile(module_doc) == False:
             continue
 
         # Create directory for each module
-        os.mkdir(os.path.abspath("docs") + "/modules/" + module)
+        os.mkdir(os.path.join(docs_path, "modules", module))
 
         module_file = generated_note
         module_file += "[id=\"{beatname_lc}-module-" + module + "\"]\n"
@@ -37,7 +48,7 @@ This file is generated! See scripts/docs_collector.py
         with open(module_doc) as f:
             module_file += f.read()
 
-        beat_path = path + "/" + module + "/_meta"
+        beat_path = os.path.join(module_dir, "_meta")
 
         # Load title from fields.yml
         with open(beat_path + "/fields.yml") as f:
@@ -76,9 +87,9 @@ is an example configuration:
         module_includes = ""
 
         # Iterate over all metricsets
-        for metricset in sorted(os.listdir(base_dir + "/" + module)):
+        for metricset in sorted(os.listdir(module_dir)):
 
-            metricset_docs = path + "/" + module + "/" + metricset + "/_meta/docs.asciidoc"
+            metricset_docs = os.path.join(module_dir, metricset, "_meta/docs.asciidoc")
 
             # Only check folders where fields.yml exists
             if os.path.isfile(metricset_docs) == False:
@@ -121,7 +132,7 @@ For a description of each field in the metricset, see the
                 metricset_file += "----\n"
 
             # Write metricset docs
-            with open(os.path.abspath("docs") + "/modules/" + module + "/" + metricset + ".asciidoc", 'w') as f:
+            with open(os.path.join(docs_path, "modules", module, metricset + ".asciidoc"), 'w') as f:
                 f.write(metricset_file)
 
         if len(module_links) > 0:
@@ -133,7 +144,7 @@ For a description of each field in the metricset, see the
             module_file += module_includes
 
         # Write module docs
-        with open(os.path.abspath("docs") + "/modules/" + module + ".asciidoc", 'w') as f:
+        with open(os.path.join(docs_path, "modules", module + ".asciidoc"), 'w') as f:
             f.write(module_file)
 
     module_list_output = generated_note
@@ -152,9 +163,8 @@ For a description of each field in the metricset, see the
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Collects modules docs")
-    parser.add_argument("--beat", help="Beat name")
+    parser.add_argument("--base-paths", dest='base_paths', nargs='+', help="Path to Beat")
 
     args = parser.parse_args()
-    beat_name = args.beat
 
-    collect(beat_name)
+    collect(args.base_paths)
