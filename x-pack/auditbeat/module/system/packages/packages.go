@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build ignore
-
 package packages
 
 import (
@@ -40,9 +38,9 @@ const (
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	/*mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
-	)
+	)*/
 }
 
 // MetricSet collects data about the host.

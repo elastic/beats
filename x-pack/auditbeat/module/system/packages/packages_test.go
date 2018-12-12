@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build ignore
-
 package packages
 
 import (
@@ -13,6 +11,8 @@ import (
 )
 
 func TestData(t *testing.T) {
+	t.Skip("Packages metricset is disabled")
+
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	err := mbtest.WriteEventsReporterV2(f, t, "")
 	if err != nil {
