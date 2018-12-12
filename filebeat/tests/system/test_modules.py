@@ -177,11 +177,6 @@ class Test(BaseTest):
                 obj = self.flatten_object(obj, {}, "")
                 clean_keys(obj)
 
-                # Remove timestamp for comparison where timestamp is not part of the log line
-                if obj["fileset.module"] == "icinga" and obj["fileset.name"] == "startup":
-                    delete_key(obj, "@timestamp")
-                    delete_key(ev, "@timestamp")
-
                 if ev == obj:
                     found = True
                     break
