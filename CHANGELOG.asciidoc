@@ -27,6 +27,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Packetbeat*
 
+- Renamed the flow event fields to follow Elastic Common Schema. {pull}9121[9121]
+
 *Winlogbeat*
 
 *Functionbeat*
