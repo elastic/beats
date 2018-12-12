@@ -25,7 +25,7 @@ type mockEventHandler struct {
 	events     chan cloudformation.StackEvent
 }
 
-func (m *mockEventHandler) skip(event cloudformation.StackEvent) bool {
+func (m *mockEventHandler) sync(event cloudformation.StackEvent) bool {
 	if m.skipCount.Load() >= m.skipEvents {
 		return false
 	}
@@ -251,7 +251,7 @@ func testReportSkipEvents(t *testing.T) {
 	tests := []struct {
 		name  string
 		event cloudformation.StackEvent
-		skip  bool
+		sync  bool
 	}{
 		{
 			name: "is stack event but happened before",
@@ -260,7 +260,7 @@ func testReportSkipEvents(t *testing.T) {
 				EventId:      ptr("1"),
 				Timestamp:    ptrTime(now.Add(-10 * time.Second)),
 			},
-			skip: true,
+			sync: true,
 		},
 		{
 			name: "is not a stack event",
@@ -269,7 +269,7 @@ func testReportSkipEvents(t *testing.T) {
 				EventId:      ptr("2"),
 				Timestamp:    ptrTime(now.Add(10 * time.Second)),
 			},
-			skip: true,
+			sync: true,
 		},
 		{
 			name: "is a stack event and happens after but with wrong status",
@@ -279,7 +279,7 @@ func testReportSkipEvents(t *testing.T) {
 				EventId:        ptr("2"),
 				Timestamp:      ptrTime(now.Add(11 * time.Second)),
 			},
-			skip: true,
+			sync: true,
 		},
 		{
 			name: "is a stack event and happens after with a CREATE_IN_PROGRESS status",
@@ -289,7 +289,7 @@ func testReportSkipEvents(t *testing.T) {
 				EventId:        ptr("2"),
 				Timestamp:      ptrTime(now.Add(11 * time.Second)),
 			},
-			skip: false,
+			sync: false,
 		},
 		{
 			name: "is a stack event and happens after with an UPDATE_IN_PROGRESS status",
@@ -299,7 +299,7 @@ func testReportSkipEvents(t *testing.T) {
 				EventId:        ptr("2"),
 				Timestamp:      ptrTime(now.Add(11 * time.Second)),
 			},
-			skip: false,
+			sync: false,
 		},
 		{
 			name: "is a stack event and happens after with an DELETE_IN_PROGRESS status",
@@ -309,7 +309,7 @@ func testReportSkipEvents(t *testing.T) {
 				EventId:        ptr("2"),
 				Timestamp:      ptrTime(now.Add(11 * time.Second)),
 			},
-			skip: false,
+			sync: false,
 		},
 	}
 
@@ -320,7 +320,7 @@ func testReportSkipEvents(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.skip, reporter.skip(test.event))
+			assert.Equal(t, test.sync, reporter.sync(test.event))
 		})
 	}
 }
