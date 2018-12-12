@@ -31,7 +31,7 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "packages"
-	namespace     = "system.audit.packages"
+	//namespace     = "system.audit.packages"
 
 	redhat = "redhat"
 	debian = "debian"
