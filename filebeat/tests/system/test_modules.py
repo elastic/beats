@@ -9,6 +9,7 @@ from elasticsearch import Elasticsearch
 import json
 import logging
 from parameterized import parameterized
+from unittest import SkipTest
 
 
 def load_fileset_test_cases():
@@ -17,6 +18,7 @@ def load_fileset_test_cases():
     To execute tests for only 1 module, set the env variable TESTING_FILEBEAT_MODULES
     to the specific module name or a , separated lists of modules.
     """
+    raise SkipTest
     modules_dir = os.getenv("MODULES_PATH")
     if not modules_dir:
         current_dir = os.path.dirname(os.path.abspath(__file__))
