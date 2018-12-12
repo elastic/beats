@@ -332,8 +332,13 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 }
 
 func hostMessage(host *Host, action eventAction) string {
+	var firstIP string
+	if len(host.addrs) > 0 {
+		firstIP = ipString(host.addrs[0])
+	}
+
 	// Hostname + IP of the first non-loopback interface.
-	hostString := fmt.Sprintf("%v (IP: %v)", host.info.Hostname, ipString(host.addrs[0]))
+	hostString := fmt.Sprintf("%v (IP: %v)", host.info.Hostname, firstIP)
 
 	var message string
 	switch action {
