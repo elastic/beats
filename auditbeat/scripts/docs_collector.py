@@ -156,7 +156,7 @@ For a description of each field in the metricset, see the
         module_list_output += "include::modules/" + m + ".asciidoc[]\n"
 
     # Write module link list
-    with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w') as f:
+    with open(os.path.join(docs_path, "modules_list.asciidoc"), 'w') as f:
         f.write(module_list_output)
 
 
