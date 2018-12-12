@@ -21,7 +21,7 @@
         "ip": "52.10.168.186"
     },
     "event": {
-        "type": "event",
+        "kind": "event",
         "action": "socket_opened",
         "module": "system",
         "dataset": "socket"

@@ -9,7 +9,7 @@
         "dataset": "process",
         "id": "203e3d86-6b94-4e36-b906-930187073b93",
         "module": "system",
-        "type": "state"
+        "kind": "state"
     },
     "process": {
         "args": [

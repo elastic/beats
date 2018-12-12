@@ -385,7 +385,7 @@ func userEvent(user *User, eventType string, eventAction string) mb.Event {
 	return mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"type":   eventType,
+				"kind":   eventType,
 				"action": eventAction,
 			},
 			"user": common.MapStr{
