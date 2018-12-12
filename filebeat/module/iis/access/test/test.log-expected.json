@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-01-01T08:09:10.000Z", 
+        "event.dataset": "iis.access", 
         "fileset.module": "iis", 
         "fileset.name": "access", 
         "iis.access.geoip.city_name": "Berlin", 
@@ -35,6 +36,7 @@
     }, 
     {
         "@timestamp": "2018-01-01T09:10:11.000Z", 
+        "event.dataset": "iis.access", 
         "fileset.module": "iis", 
         "fileset.name": "access", 
         "iis.access.body_received.bytes": "456", 
@@ -66,6 +68,7 @@
     }, 
     {
         "@timestamp": "2018-01-01T10:11:12.000Z", 
+        "event.dataset": "iis.access", 
         "fileset.module": "iis", 
         "fileset.name": "access", 
         "iis.access.body_received.bytes": "456", 

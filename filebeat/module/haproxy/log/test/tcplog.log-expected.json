@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-09-20T15:44:23.285Z", 
+        "event.dataset": "haproxy.log", 
         "fileset.module": "haproxy", 
         "fileset.name": "log", 
         "haproxy.backend_name": "app", 

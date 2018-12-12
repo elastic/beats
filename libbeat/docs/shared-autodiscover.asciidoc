@@ -12,8 +12,8 @@ config file. To enable autodiscover, you specify a list of providers.
 === Providers
 
 Autodiscover providers work by watching for events on the system and translating those events into internal autodiscover
-events with a common format. When you configure the provider, you can use fields from the autodiscover event to set
-conditions that, when met, launch specific configurations.
+events with a common format. When you configure the provider, you can optionally use fields from the autodiscover event
+to set conditions that, when met, launch specific configurations.
 
 On start, {beatname_uc} will scan existing containers and launch the proper configs for them. Then it will watch for new
 start/stop events. This ensures you don't need to worry about state, but only define your desired configs.

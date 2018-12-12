@@ -7,10 +7,18 @@
       type: keyword
       description: >
         Client IP address.
+    - name: duration
+      type: long
+      description: >
+        Duration of the access entry.
     - name: user_name
       type: keyword
       description: >
         The user name used when basic authentication is used.
+    - name: user_identifier
+      type: keyword
+      description: >
+        Is the RFC 1413 identity of the client
     - name: method
       type: keyword
       example: GET
@@ -52,6 +60,10 @@
           type: keyword
           description: >
             The name of the physical device.
+        - name: build
+          type: keyword
+          description: >
+            The build of the user agent.
         - name: major
           type: long
           description: >

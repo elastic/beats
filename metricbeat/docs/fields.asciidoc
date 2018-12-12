@@ -1838,6 +1838,9 @@ Hostname of the machine from which the metricset was collected. This field may n
 *`metricset.rtt`*::
 +
 --
+
+deprecated[True]
+
 type: long
 
 required: True
@@ -1875,6 +1878,26 @@ The document type. Always set to "doc".
 example: elasticsearch
 
 Name of the service metricbeat fetches the data from.
+
+
+--
+
+*`event.duration`*::
++
+--
+type: long
+
+Duration of the event in nano seconds.
+
+
+--
+
+*`event.dataset`*::
++
+--
+type: keyword
+
+Event dataset name.
 
 
 --

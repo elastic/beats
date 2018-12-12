@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-05-30T12:23:52.442Z", 
+        "event.dataset": "redis.log", 
         "fileset.module": "redis", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -13,6 +14,7 @@
     }, 
     {
         "@timestamp": "2018-05-30T10:05:20.000Z", 
+        "event.dataset": "redis.log", 
         "fileset.module": "redis", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -23,6 +25,7 @@
     }, 
     {
         "@timestamp": "2018-05-31T04:32:08.000Z", 
+        "event.dataset": "redis.log", 
         "fileset.module": "redis", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -33,6 +36,7 @@
     }, 
     {
         "@timestamp": "2017-05-30T10:57:24.000Z", 
+        "event.dataset": "redis.log", 
         "fileset.module": "redis", 
         "fileset.name": "log", 
         "input.type": "log", 

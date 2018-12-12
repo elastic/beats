@@ -107,6 +107,9 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 	if len(fields) > 0 {
 		fields = common.MapStr{
 			"fileset": fields,
+			"event": common.MapStr{
+				"dataset": config.Module + "." + config.Fileset,
+			},
 		}
 	}
 	if config.Type != "" {

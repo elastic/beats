@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2017-10-23T14:20:12,046", 
+        "event.dataset": "logstash.log", 
         "fileset.module": "logstash", 
         "fileset.name": "log", 
         "input.type": "log", 
@@ -12,6 +13,7 @@
     }, 
     {
         "@timestamp": "2017-11-20T03:55:00,318", 
+        "event.dataset": "logstash.log", 
         "fileset.module": "logstash", 
         "fileset.name": "log", 
         "input.type": "log", 

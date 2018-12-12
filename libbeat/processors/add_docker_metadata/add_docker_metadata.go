@@ -26,6 +26,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/gosigar/cgroup"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
@@ -33,7 +35,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
-	"github.com/elastic/gosigar/cgroup"
 )
 
 const (

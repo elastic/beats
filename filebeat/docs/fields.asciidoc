@@ -3008,6 +3008,14 @@ The Filebeat fileset that generated this event.
 
 --
 
+*`event.dataset`*::
++
+--
+The Filebeat dataset that generated this event.
+
+
+--
+
 *`syslog.facility`*::
 +
 --
@@ -3116,6 +3124,26 @@ Logging level.
 +
 --
 This field contains the flags of the event.
+
+
+--
+
+*`log.source.address`*::
++
+--
+type: keyword
+
+Log source address.
+
+
+--
+
+*`log.file.path`*::
++
+--
+type: keyword
+
+Log source path.
 
 
 --
@@ -4993,12 +5021,32 @@ Client IP address.
 
 --
 
+*`traefik.access.duration`*::
++
+--
+type: long
+
+Duration of the access entry.
+
+
+--
+
 *`traefik.access.user_name`*::
 +
 --
 type: keyword
 
 The user name used when basic authentication is used.
+
+
+--
+
+*`traefik.access.user_identifier`*::
++
+--
+type: keyword
+
+Is the RFC 1413 identity of the client
 
 
 --
@@ -5090,6 +5138,16 @@ Contains the parsed User agent field. Only present if the user agent Elasticsear
 type: keyword
 
 The name of the physical device.
+
+
+--
+
+*`traefik.access.user_agent.build`*::
++
+--
+type: keyword
+
+The build of the user agent.
 
 
 --

@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2017-10-30T09:57:58,243", 
+        "event.dataset": "logstash.slowlog", 
         "fileset.module": "logstash", 
         "fileset.name": "slowlog", 
         "input.type": "log", 

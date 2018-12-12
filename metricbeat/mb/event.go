@@ -18,6 +18,7 @@
 package mb
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -116,14 +117,21 @@ func AddMetricSetInfo(module, metricset string, event *Event) {
 	if event.Host != "" {
 		info["host"] = event.Host
 	}
-	if event.Took > 0 {
-		info["rtt"] = event.Took / time.Microsecond
-	}
+
 	if event.Namespace != "" {
 		info["namespace"] = event.Namespace
 	}
 	info = common.MapStr{
 		"metricset": info,
+		"event": common.MapStr{
+			"dataset": fmt.Sprintf("%s.%s", module, metricset),
+		},
+	}
+
+	if event.Took > 0 {
+		// rtt is deprecated and will be removed in 7.0. Replaced by event.duration.
+		info.Put("metricset.rtt", event.Took/time.Microsecond)
+		info.Put("event.duration", event.Took/time.Nanosecond)
 	}
 
 	if event.RootFields == nil {

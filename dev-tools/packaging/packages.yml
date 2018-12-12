@@ -157,6 +157,22 @@ shared:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl'
         mode: 0755
 
+  - &docker_spec
+    <<: *binary_spec
+    extra_vars:
+      from: 'centos:7'
+      user: '{{ .BeatName }}'
+      linux_capabilities: ''
+    files:
+      '{{.BeatName}}.yml':
+        source: '{{.BeatName}}.docker.yml'
+        mode: 0600
+        config: true
+
+  - &elastic_docker_spec
+    extra_vars:
+      repository: 'docker.elastic.co/beats'
+
   #
   # License modifiers for Apache 2.0
   #
@@ -229,6 +245,11 @@ specs:
       spec:
         <<: *deb_rpm_spec
 
+    - os: linux
+      types: [docker]
+      spec:
+        <<: *docker_spec
+
   elastic_beat_without_xpack:
     ###
     # OSS Packages
@@ -268,6 +289,14 @@ specs:
         <<: *apache_license_for_deb_rpm
         name: '{{.BeatName}}-oss'
 
+    - os: linux
+      types: [docker]
+      spec:
+        <<: *docker_spec
+        <<: *elastic_docker_spec
+        <<: *apache_license_for_binaries
+        name: '{{.BeatName}}-oss'
+
     ###
     # Elastic Licensed Packages
     ###
@@ -300,6 +329,13 @@ specs:
       spec:
         <<: *deb_rpm_spec
         <<: *elastic_license_for_deb_rpm
+
+    - os: linux
+      types: [docker]
+      spec:
+        <<: *docker_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
 
   # Official Beats
   elastic_beat:
@@ -339,6 +375,14 @@ specs:
       spec:
         <<: *deb_rpm_spec
         <<: *apache_license_for_deb_rpm
+        name: '{{.BeatName}}-oss'
+
+    - os: linux
+      types: [docker]
+      spec:
+        <<: *docker_spec
+        <<: *elastic_docker_spec
+        <<: *apache_license_for_binaries
         name: '{{.BeatName}}-oss'
 
     ###
@@ -384,4 +428,14 @@ specs:
         <<: *elastic_license_for_deb_rpm
         files:
           /usr/share/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
+            source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      types: [docker]
+      spec:
+        <<: *docker_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
             source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}

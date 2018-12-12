@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-01-01T08:09:10.000Z", 
+        "event.dataset": "iis.error", 
         "fileset.module": "iis", 
         "fileset.name": "error", 
         "iis.error.http_version": "1.1", 
@@ -19,6 +20,7 @@
     }, 
     {
         "@timestamp": "2018-01-01T09:10:11.000Z", 
+        "event.dataset": "iis.error", 
         "fileset.module": "iis", 
         "fileset.name": "error", 
         "iis.error.geoip.city_name": "Berlin", 
@@ -44,6 +46,7 @@
     }, 
     {
         "@timestamp": "2018-01-01T10:11:12.000Z", 
+        "event.dataset": "iis.error", 
         "fileset.module": "iis", 
         "fileset.name": "error", 
         "iis.error.geoip.city_name": "Berlin", 
@@ -69,6 +72,7 @@
     }, 
     {
         "@timestamp": "2018-01-01T11:12:13.000Z", 
+        "event.dataset": "iis.error", 
         "fileset.module": "iis", 
         "fileset.name": "error", 
         "iis.error.geoip.city_name": "Berlin", 
