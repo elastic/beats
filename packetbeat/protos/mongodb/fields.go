@@ -24,7 +24,11 @@ import (
 )
 
 func init() {
+<<<<<<< HEAD
 	if err := asset.SetFields("packetbeat", "mongodb", asset.ModuleFieldsPri, AssetMongodb); err != nil {
+=======
+	if err := asset.SetFields("packetbeat", "Mongodb", asset.ModuleFieldsPri, AssetMongodb); err != nil {
+>>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }
@@ -32,5 +36,9 @@ func init() {
 // AssetMongodb returns asset data.
 // This is the base64 encoded gzipped contents of protos/mongodb.
 func AssetMongodb() string {
+<<<<<<< HEAD
 	return "eJysVsFuGzcQvesrBoEPCSAJ6FWHAk1bAyma2LBdFD3V3N1ZkQjJ2XBIy/r7gkPuareSARWpTxY58+bN4+NwN/AVjztw5PfUNSuAaKLFHbz7nFd+ad6tADrkNpghGvI7+HEFAFB2P254wNb0pgV8QR+hN2g73sKTRsb6C5wJgQK0lhjtUdKjnnZ7CvKzIsLBBIQhUKSWrCCBNnuNASy+oK1pgvI+5+KrcoPFNTx/SxiOz6B8B88BmVJo8fkDqGGwR4g0VRCqDIrhgNZuV1AxdwK6Aa8czhURwscBd7APlIa6Ms+Z52Fudlq9KN7496lfdB7wW0KOoBVDQE42YgfGg/IFdA1RGy6FoSUflfGcERagEgoOmdUeIWBMwWMHzVFqMYYXDNsz1n2y9meyFttM9ItyeF0L+XhyLrRTsiBur4oCI/xzM62K6JXsUJGlU1E1irFEHkzUNXYBsV4USmz8HhR0FOH99sNkrkWBJbfbuYfG+Kl2TySG+lflRslpvN1VT7Rt1AWhfXINhid6/GqGGY/iL0t+f53ujxiLdAUva9ZRm5w4OxKQMxE2wFGFmCXpA7l66wLHKTbbK68Wu+XA3DljhM2i3EGjr17KQaeU8bDk7r3d7YOkfke/T1JR7gd24NSrccm91Xxz8v1blB7q/ndSukRgknSwFxQZT+Q2kLuuzp8aA46obQosHjVcKmSzjZjn1eRYrivzE/z2ePfl5IyoVcwlAnLR9fyURxVkGQ5GroKMJSCPkMcQBQS0KMqsQVmbtTpo02pwiSM4FVst105NpRf45TiNb23qyjicmY8xLtncE7Np7KnmmAk3QnINNxQ6DE3+Txsf13CDr4NVxq/lnt+wVwNriudaFkvdyth/xHzhr53zF6W1xpkqa30Jp97qyJ4sda74JS6nJ+Gy+KhafVK/Tl6ZV9SDqs+KUGNNyXbza7ScsuNAND7iHgO8KJsQfrhg9v8o08dzmeoHBs4MKHYp0OMwOuUQpKFTUQTo0GLEc1ol4n8jVQsWpw4YegpuPnmgvjLG5536xvkKcswtFAReAyMK5B8F8m7AIPE8ESjp0zgfvx0+K5+UPW+1zItP3fUjrU4Y06GPucdwMmQ16N393w+/3v/+V/44M1zucVN4FyeIRgf5iqmZE9/xYd2u/gkAAP//aSQ/9Q=="
+=======
+	return "eJysV91u20YTvddTDAIDSQBJwHfriw/ITwO4aGLDdlH0yh6SI3GR/WF2di2rT1/s7JISK8qV4uYqInfOmTk8MztewHfaXoJxdu2aagYQVNB0CW++piefqzczgIa49qoLytlL+P8MACC//bjgjmq1UjXQE9kAK0W64SXct8RUfoFR3jsPtXZMeivhoR3erpyXnwURNsoTdN4FVzstSNCqdUseND2RLmGC8i7F0jOaTtMcHn9E8ttHQNvAoyd20df0+B6w6/QWghsYJFUGZNiQ1ssZFMxLAV2ARUP7ikjC244uYe1d7MqT/Zj9OErFDk8nxev/Xa1GlXv6EYkDtMjgiaMO1ICygDaDziG0ijMx1M4GVJYTwghUjoIhZlwTeArRW2qg2goXk38ivzzIehW1/uS0pjol+g0NnVZC+jwpFuohWBCXJ50CJfmnYmoMZFHeuCxLgwErZMonNyq05ewIYj4iiqzsGhAaF+Dd8v1grhHBOLcv+x7qzw/cK+fEUP9grlC+xvGqVs4tK5wQ2kZTkb93d99Vt5dH9pd2dn2a7ncUsnQZL2nWuDoacXZw4IwKsAAO6EOSZOWdKV3nOQxnk73S02y3dDBVzhRgMaLbtGSLl9KhXUj/saT3jld7K6GvqPdeGKU/qAGDz8pEc6z4auf7YyndlvevTGkqgUHSTk8o0n+RL96Z03j+aMlTj1pHz+JRxZkhma3HPGSTz3IazQf49e76284ZocWQKDxx1vXwK/cqyGPYKGkFGUvgLEEaQ84TkCZRZg6oddJq06q6BRM5gMFQt9J2OFCP8PPnVLbWscnjcM98TGGczY1jVpXecfaRcCFJzuHC+YZ8lf7XKhvmcEHPnUZl59LnF2yx49aFQy2zpb7I2L+j1PCnzvlJabUyqshabsKhtjKyB0sdKj6Vy+5KmBafsG536pfJK/PKrQDLtSKpceuibvbbaDxl+4GobKA1eXhCHQn+N2H2M2X6eChTWTBoz4BilwzdD6NdjIPYNRhEgIY0BTpMK5/4z5IqhNmpHfmV82Z/8kC5ZZRNb8odZwvINpWQEXgOTCSQv2fI6468nOchgRw+jPN+d/iKNqI+LDXPi6vm9JFWJoxqyIZUo98Zshj0+ubh9peb3/5My5ni3MdVzjs7QTTayBZTIod8+4t1ORstW76rjy5ao3yvbX178wmm185/2cye1VEZEma/MgWPljFf5zsVSsIjbVHrB1Z/0VmXSKJKkZAi81qDfi3fdoJDZvzPkeTr4SQWDhginyJOAZXzE0BBmfMT7bE772pi2eASzhH4Bw5H58kLaMm8bTSY1hhsMN0RqRsnSDCG9mGl8en43Eo86VgyR106UgKmXOKpWUZ13qbRm4T8W4bIlPpxnkqo01Ka5nUM7SJa9XyMcf0aRmm/n6F80UMDPFPtbIN+OxDxeUwc0Jy3PX/wlQo+UV59LjegrFOSEhisW2UJDG5hTTYN3Sn7CXc5a1/4E+l+72Ldsbzlnmc5m/0dAAD//4VyuRA="
+>>>>>>> Introduce local fields generation
 }

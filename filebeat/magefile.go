@@ -117,17 +117,9 @@ func includeList() error {
 
 // Fields generates fields.yml and fields.go files for the Beat.
 func Fields() {
-	mg.Deps(libbeatAndFilebeatCommonFieldsGo, moduleFieldsGo)
+	mg.Deps(moduleFieldsGo)
+	mage.GenerateFieldsGo("beat")
 	mg.Deps(fieldsYML)
-}
-
-// libbeatAndFilebeatCommonFieldsGo generates a fields.go containing both
-// libbeat and filebeat's common fields.
-func libbeatAndFilebeatCommonFieldsGo() error {
-	if err := mage.GenerateFieldsYAML(); err != nil {
-		return err
-	}
-	return mage.GenerateAllInOneFieldsGo()
 }
 
 // moduleFieldsGo generates a fields.go for each module.

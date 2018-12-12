@@ -20,6 +20,9 @@ package beat
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/management"
+
+	// Include basic fields
+	_ "github.com/elastic/beats/libbeat/include"
 )
 
 // Creator initializes and configures a new Beater instance used to execute

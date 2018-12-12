@@ -19,6 +19,7 @@ package mage
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -60,13 +61,8 @@ func generateFieldsYAML(baseDir, output string, moduleDirs ...string) error {
 	return globalFieldsCmd(moduleDirs...)
 }
 
-// GenerateAllInOneFieldsGo generates an all-in-one fields.go file.
-func GenerateAllInOneFieldsGo() error {
-	return GenerateFieldsGo("fields.yml", "include/fields.go")
-}
-
-// GenerateFieldsGo generates a .go file containing the fields.yml data.
-func GenerateFieldsGo(fieldsYML, out string) error {
+// GenerateFieldsGo generates a *.go file from the related *.yml file in the build directory.
+func GenerateFieldsGo(name string) error {
 	const assetCmdPath = "dev-tools/cmd/asset/asset.go"
 
 	beatsDir, err := ElasticBeatsDir()
@@ -76,10 +72,11 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 
 	assetCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, assetCmdPath),
-		"-pkg", "include",
-		"-in", fieldsYML,
-		"-out", createDir(out),
 		"-license", toLibbeatLicenseName(BeatLicense),
+		"-pkg", "include",
+		"-in", "./build/fields/"+name+".yml",
+		"-out", "include/"+name+".go",
+		"-name", strings.Title(name),
 		BeatName,
 	)
 

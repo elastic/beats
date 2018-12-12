@@ -35,6 +35,10 @@ var DefaultCleanPaths = []string{
 	"_meta/kibana.generated",
 	"_meta/kibana/6/index-pattern/{{.BeatName}}.json",
 	"_meta/kibana/7/index-pattern/{{.BeatName}}.json",
+	"include/fields.go",
+	"include/module.go",
+	"include/beat.go",
+	"include/libbeat.go",
 }
 
 // Clean clean generated build artifacts.

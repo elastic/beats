@@ -98,6 +98,7 @@ func Update() error {
 
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
+	mage.GenerateFieldsGo("beat")
 	return mage.GenerateFieldsYAML()
 }
 

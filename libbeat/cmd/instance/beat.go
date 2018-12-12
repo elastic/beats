@@ -193,10 +193,18 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		return nil, err
 	}
 
+	// All Beat need the libbeat fields
+	libbeatFields, err := asset.GetFields("libbeat")
+	if err != nil {
+		return nil, err
+	}
+
 	fields, err := asset.GetFields(name)
 	if err != nil {
 		return nil, err
 	}
+
+	fields = append(libbeatFields[:], fields[:]...)
 
 	id, err := uuid.NewV4()
 	if err != nil {

@@ -24,13 +24,29 @@ import (
 )
 
 func init() {
+<<<<<<< HEAD
 	if err := asset.SetFields("filebeat", "mongodb", asset.ModuleFieldsPri, AssetMongodb); err != nil {
+=======
+	if err := asset.SetFields("filebeat", "Mongodb", asset.ModuleFieldsPri, AssetMongodb); err != nil {
+>>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }
 
+<<<<<<< HEAD
 // AssetMongodb returns asset data.
 // This is the base64 encoded gzipped contents of module/mongodb.
 func AssetMongodb() string {
+=======
+<<<<<<< HEAD
+// Asset returns asset data
+func Asset() string {
+>>>>>>> Introduce local fields generation
 	return "eJyUkdFO6zAMhu/7FL92vz1AL4502LS7wjOE1g3WkjhK0rHy9CjtJFoIBXxp6/f3Wd7jQmMNK05L91wBiZOhGrt7Z1cBHcU2sE8srsa/CgAa6QZD6CXAqxDZaTQ5cHqAEY2eDcVDBfRMpov1lNnDKUtLVq40eqqhgwz+3ing5jpPy9AHsUvaBMq1hC2BRvRiy1fgJjTXUVxS7OKd8L1ByeLDoxXrxZFLq/WbZOA8uDbPlEGrEmkJ/KZyA9LDUoxK0ypEN2V9fuHxqWn+P55Ww/n4C42vErqiokt0+5PgcY78qMOOk3Kd4ZjI/UKqYBfpSoHTWEgrwyqu+l6ll+n3B0NXMquZZR3UfFAKAxVQpVO2SaXEZ857AAAA//9KC+uk"
+=======
+// AssetMongodb returns asset data.
+// This is the base64 encoded gzipped contents of module/mongodb.
+func AssetMongodb() string {
+	return "eJyUk8FOg0AQhu88xZ/e2wfgYKJtmnhAD/oCKwzbSZcZsrutxac3SzHSiCXMceD/v29CWONIXY5GxWr1kQGRo6Mcq2GzyoCKQum5jayS4yEDgEKrkyPU6tEaH1gsihTYPcGpRc2OwiYDaiZXhbzPrCGmoTErTexaymG9ntphM4G7zr4vQ+21GdN6UJoxbAx0akctf4F3oWm2KtGwhIHwv8GUxa9HoDN5jt1N+10w8DZk4OhMDlqjoRCMpZs36WKaNn2255v19dQjdZ/qqwmhUptWhSQuMdqfpEzPjENpIln1/GXSYlZu+1oUjy+7hYoS6bJIcHuNzOqwcDRSOQ6RZJHUVO2M1PuBfmJgQTxQ/6M4FtpMsPubvwMAAP//pW75AQ=="
+>>>>>>> Introduce local fields generation
 }

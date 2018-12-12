@@ -94,7 +94,15 @@ func Update() error {
 }
 
 // Fields generates a fields.yml for the Beat.
-func Fields() error {
+func Fields() {
+	mg.Deps(generateBeatsFields, generateYML)
+}
+
+func generateBeatsFields() error {
+	return mage.GenerateFieldsGo("beat")
+}
+
+func generateYML() error {
 	return mage.GenerateFieldsYAML("module")
 }
 

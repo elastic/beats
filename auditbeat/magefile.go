@@ -107,17 +107,11 @@ func Config() error {
 
 // Fields generates fields.yml and fields.go files for the Beat.
 func Fields() {
-	mg.Deps(libbeatAndAuditbeatCommonFieldsGo, moduleFieldsGo)
-	mg.Deps(fieldsYML)
+	mg.Deps(beatFieldsGo, moduleFieldsGo, fieldsYML)
 }
 
-// libbeatAndAuditbeatCommonFieldsGo generates a fields.go containing both
-// libbeat and auditbeat's common fields.
-func libbeatAndAuditbeatCommonFieldsGo() error {
-	if err := mage.GenerateFieldsYAML(); err != nil {
-		return err
-	}
-	return mage.GenerateAllInOneFieldsGo()
+func beatFieldsGo() error {
+	return mage.GenerateFieldsGo("beat")
 }
 
 // moduleFieldsGo generates a fields.go for each module.

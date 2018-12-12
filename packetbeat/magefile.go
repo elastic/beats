@@ -155,17 +155,9 @@ func includeList() error {
 
 // Fields generates fields.yml and fields.go files for the Beat.
 func Fields() {
-	mg.Deps(libbeatAndPacketbeatCommonFieldsGo, protosFieldsGo)
+	mg.Deps(protosFieldsGo)
+	mage.GenerateFieldsGo("beat")
 	mg.Deps(fieldsYML)
-}
-
-// libbeatAndPacketbeatCommonFieldsGo generates a fields.go containing both
-// libbeat and packetbeat's common fields.
-func libbeatAndPacketbeatCommonFieldsGo() error {
-	if err := mage.GenerateFieldsYAML(); err != nil {
-		return err
-	}
-	return mage.GenerateAllInOneFieldsGo()
 }
 
 // protosFieldsGo generates a fields.go for each protocol.

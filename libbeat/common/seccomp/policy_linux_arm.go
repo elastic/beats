@@ -20,6 +20,7 @@ package seccomp
 import "github.com/elastic/go-seccomp-bpf"
 
 func init() {
+<<<<<<< HEAD:libbeat/common/seccomp/policy_linux_arm.go
 	defaultPolicy = &seccomp.Policy{
 		DefaultAction: seccomp.ActionAllow,
 		Syscalls: []seccomp.SyscallGroup{
@@ -35,3 +36,15 @@ func init() {
 		},
 	}
 }
+=======
+	if err := asset.SetFields("packetbeat", "Applayer", asset.ModuleFieldsPri, AssetApplayer); err != nil {
+		panic(err)
+	}
+}
+
+// AssetApplayer returns asset data.
+// This is the base64 encoded gzipped contents of protos/applayer.
+func AssetApplayer() string {
+	return "eJwBAAD//wAAAAE="
+}
+>>>>>>> Introduce local fields generation:packetbeat/protos/applayer/fields.go

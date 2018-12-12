@@ -20,6 +20,7 @@ package udp
 import (
 	"time"
 
+<<<<<<< HEAD:filebeat/inputsource/udp/config.go
 	"github.com/elastic/beats/libbeat/common/cfgtype"
 )
 
@@ -28,4 +29,16 @@ type Config struct {
 	Host           string           `config:"host"`
 	MaxMessageSize cfgtype.ByteSize `config:"max_message_size" validate:"positive,nonzero"`
 	Timeout        time.Duration    `config:"timeout"`
+=======
+func init() {
+	if err := asset.SetFields("packetbeat", "Udp", asset.ModuleFieldsPri, AssetUdp); err != nil {
+		panic(err)
+	}
+}
+
+// AssetUdp returns asset data.
+// This is the base64 encoded gzipped contents of protos/udp.
+func AssetUdp() string {
+	return "eJwBAAD//wAAAAE="
+>>>>>>> Introduce local fields generation:packetbeat/protos/udp/fields.go
 }

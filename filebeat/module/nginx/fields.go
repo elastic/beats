@@ -24,13 +24,30 @@ import (
 )
 
 func init() {
+<<<<<<< HEAD
 	if err := asset.SetFields("filebeat", "nginx", asset.ModuleFieldsPri, AssetNginx); err != nil {
+=======
+	if err := asset.SetFields("filebeat", "Nginx", asset.ModuleFieldsPri, AssetNginx); err != nil {
+>>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }
 
+<<<<<<< HEAD
 // AssetNginx returns asset data.
 // This is the base64 encoded gzipped contents of module/nginx.
 func AssetNginx() string {
 	return "eJy0l8Fu4zgMhu95CqLn1g+QwwKLAgV62MViT3tzFYl2iMqil5Q7k7cf2EnT1JUdy+nolNjm/38UaUt6gFc8bCHUFH5uACJFj1u4+7v/f7cBcKhWqI3EYQt/bAAA/mLXeYSKBVojSqGGuEcYQsBzDRV51GIDoHuWWFoOFdVbiNLhBqAi9E63g9QDBNPgh30/4qHFLdTCXXu6kmDox9MgBJVwMwXQj0u/S09jLaqeL6eMZ8z78cghGgp6shhm5APkqN/znFFSOJdIgg1HLKktPWn89Mg7nhExh9GdGcR+/BmOUcDVyQGe/wHjnKAqagHPEUjBQG8KO7SmUwQaLlpuGg4QGShY3zm8hx0qOdQhU+sJwxgULuTvP1kda7VH41AUPL0ivPz38MTyw4hD1/96Kb6o/YvGg3IndgAnBUGNLOh6rpfjnYLai9Dk7O7YHUrFEIvdIaKmp9eTGd9pTdxvYR9jWwhqy0Gx6LWSMg3VYo6VOPX7TJkzEc6ZrvDsFKXsf2Z69nFFIm6JZ4Nxz27dPP/focYiqbAoXfG5iYovWKimYMahSwx77PINRYnDmozTocu66diTpWWXW93PTa3RxE5TOss4KhRBuaXeExpL7E399Uu0pLnLITC39NPv2DTHeGWBidXgUtLhG9lxNeZTS6Z31Em9yHNZjmkmwjNZboTglEkmAmtRdd6nPoh5KFMK+Ty3oqT7dw3LtFLW21AjT6xwa14EyyFSwBBvmfHTAlojF1f1lk685S5EOZSknPpyrkK7qrgUzrMdHrsdakZpKYxgTRy+qX7zYouLR/HwXQ01I5U5Q9/XStcFp9DekVCE5fcdkgb5rDOS5RDQxiGt9N7Sc6jzTkiPZ00ghyFSRShXThMe3zB3j+m5LlJxS/Y37US2026tcH8CLb5GLvGLq/3iXtC4YpVrg6qmzt3GpqPGfr8CAAD//56RUkQ="
+=======
+<<<<<<< HEAD
+// Asset returns asset data
+func Asset() string {
+	return "eJysl8F2ozoMhvd5Cp3uywOwuJuec3f3rmbPcUGAp8ZiJJFO3n4OJG1TxiY2iVcpRf//yRIGPcMbnkrwnfW/DwBq1WEJT//Pfz8dABqUmu2olnwJ/xwAAP6jZnIILTGMhsX6DrRHWELAUQetdSjFAUB6Yq1q8q3tSlCe8ADQWnSNlIvUM3gz4Jf9vPQ0Ygkd0zRergQY5vXvIgQt0xADmNe137WnqWsU+bwcMt4wn9cLeTXWy8Vi2ZEvkLP+zPOJEsK5Rnql5lQJei1eT4ry7Z4PPke+W/2jJR6MlhAK2sCf148ewU/DKzJQexaYf8xZCPIRGRhlJC+4wH0lEuRnHEixsmPlrGgQ3zhr1oyj0b4Ej/pO/Fa0xO+GG2wqO65uHGzH5pzKpZk2GDLthSausdjlOQlyNf/M9JzjikBciueA2lOTadirjgXjrwlFi6BCUrrschNlVxDbznqzDk0xnLGrI7JY8nsyDoemddO5+6uamtzqXjb7LFCIGp0kpJPG0SIz8j31jmik2JsOfe7zvDwUS2Bu6ePPWJxjfWxD5Ki9lmzwaOt1NbZTC6YX1dna2muQwfykdVl2cMRkkjGsfwhGRCYVYzRa9/djxGRSMQLn8g6KiEoqBIVMMhFIinZyLvSCykOpHtSnJHe36gzzmG6dYe5sWJLY3uaz3Fuk8Em7hyWulHVud0iRb7E9R3ZNXq1Hr/fs+OVTr0MqbuqlbnxNk1c+VVYo9I7fhXZTMRXOUb3cdj/UhlIqDGNnyT+ofttiycWzenpUQ21IZe7Q41rptmAM7QMJmb8dkQ+elRf5rFG5Ju+x1iWt8BQUGJRvDMMvn5pgG/RqW4t8Y+R1eMTcachRV4TiUr7Ex0i2cbeRqUaR4u/IFD/d7ac9o2mKXa4Dipgud+AKR639/gQAAP//qeS/3Q=="
+=======
+// AssetNginx returns asset data.
+// This is the base64 encoded gzipped contents of module/nginx.
+func AssetNginx() string {
+	return "eJysmMFymzAQhu9+ip2c0pmGB+DQS9rO9NBODrkzCiygRmjpanHit+8InMRhJCxsdMIY/f+32kWw3MEzHnKwjbavOwDRYjCHmz/+980OoEJXsu5Fk83h2w4A4DdVg0GoiaFX7LRtQFqEcQoYaqDWBl22A3AtsRQl2Vo3OQgPuAOoNZrK5aPUHVjV4Ye9H3LoMYeGaeiPZwIMfvwchaBm6mIAfpz6nXqqskTn3k+HjBfM/bgnK0pbd7QYV+QDZNL3PO8oIZxTpCeqDoVDK9nTQdB9uuaNz5BtZn/UxJ2SHEKTFvD9eGwR7NA9IQPVk4A/8FE45D0yMLqerMMR7iOQID9jR4KF7gujnQTxldFqztgraXOwKC/Ez1lN/KK4wqrQ/ezCTjesplCOxbTAsNLe0cAlZhd5Dg658IcrPf28LDAvxbNDaalaadiK9BnjvwGdZEGFpHDZrA2UTUasG23VfGqKoccu9shOk70k4vDUtGqaqr8oqVqb3eNiTwKZEyWDC+mkcdTIjHxNviMaKfaqQbv2fh5vinHi2tTH77E4x3zbhshWeypZ4V6X82wshxYML6qztLSnIJ36S/O0XMARk0nG0HYTjIhMKkavpGyvx4jJpGIE9uULKCIqqRAUMlmJQC6rB2NCD6h1KMVGdUru6lL1MNtUq4e5smDJxdZ2Pcu1SQrvtJewxJVW7dsNUuRd7JItuyQr2qKVa1b8+KrXIGVn9VIXvqTBCh8K7Sj0jL8I7axiKpyhcrzseqgFpVQYxkaT3Sh/y2LJydNy2KqgFqRWrtB2pXReMIb2hoTMn7bIjXvlUX5Vq2xwj+Eu5BkPL8TzvuZMH/xjAvCicItZk01IX6FkLbpU5ksWxOh1uAULdOlnCB6Yxu8FukIrutbIcPvw63vEVzbzfWwZVXViGzYsyVosZSyjrazv3zXP2nfonGrCHZjg67wnSPjqMZXcm+7/AAAA///B08Vj"
+>>>>>>> Introduce local fields generation
+>>>>>>> Introduce local fields generation
 }

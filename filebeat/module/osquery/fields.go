@@ -24,7 +24,11 @@ import (
 )
 
 func init() {
+<<<<<<< HEAD
 	if err := asset.SetFields("filebeat", "osquery", asset.ModuleFieldsPri, AssetOsquery); err != nil {
+=======
+	if err := asset.SetFields("filebeat", "Osquery", asset.ModuleFieldsPri, AssetOsquery); err != nil {
+>>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }

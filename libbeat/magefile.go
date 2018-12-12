@@ -37,6 +37,10 @@ func Clean() error {
 
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
+	mage.GenerateFieldsGo("libbeat")
+	mage.GenerateFieldsGo("beat")
+	mage.GenerateFieldsGo("module")
+
 	return mage.GenerateFieldsYAML("processors")
 }
 

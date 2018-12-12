@@ -24,7 +24,11 @@ import (
 )
 
 func init() {
+<<<<<<< HEAD
 	if err := asset.SetFields("filebeat", "kafka", asset.ModuleFieldsPri, AssetKafka); err != nil {
+=======
+	if err := asset.SetFields("filebeat", "Kafka", asset.ModuleFieldsPri, AssetKafka); err != nil {
+>>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }
@@ -32,5 +36,9 @@ func init() {
 // AssetKafka returns asset data.
 // This is the base64 encoded gzipped contents of module/kafka.
 func AssetKafka() string {
+<<<<<<< HEAD
 	return "eJykkjtuwzAQRHudYuDeOoCKNOkSpMsFFtZKJsQfyLUT3z6gGP8Y2paR7cQRZ55Gu8bEhw4TDRM1gCjR3GH1np5XDdBz3ATlRTnb4aUBgFmDcf1OcwMMinUfu1law5Lhs10aOXjuMAa3878nFc9rm0sr7cbTWc3spmGeDKvdCK0sx/ZCLBOvUnnP+ko5ZpNWFAvFk2xn0rZ2z6gxUGaTsONqnuEYaeQnE+u3buVVgzfOeGfZSjV64sOXC32h3ak7zevRErLluXoVU46yI4bgTFsH0RTLr/wHxBvtKXs+RSGBNvW/UO7cAgbgM9lB2RNDWsK2eLG2h4+aedTOIro/LUnGvdMTHu7smUz4u9yqhVjAR/aGpyBww5mubX4CAAD//40BKYM="
+=======
+	return "eJysk09uszAQxfec4in7cAAW3+bbteouFxiFgVgY27KHtLl9Zdz8c51ApM4OD37vx5thi4FPDQbqBqoAUaK5weY9Pm8qoOWw98qJsqbBvwoA5h5G206aK6BTrNvQzK0tDI18lYslJ8cNem8n93NS0LyXuZXStr+clcQeCqZKsNr20MpwqG+aueOdKx9Z33XO3qQVhazjSA4zaV26N6reU2ITP3HRb+QQqOcXHcu3HvkVjfd2dNawkaL1wKdP69us9yTuWP/PkpADz9GrEH2U6dF5O9ZlEE0h/8oEIfyV0y0QvNGRkuBLCOJpXx5BvnArGIBdlIMyF4a4gXX2YmkJl2LBwnxW0f1KSRLuk5ywuLB4NrSVWMBH0oYjL7Ddle4xTjfp/Lf7G5bdgWfxczz5NL8DAAD//1wZSZY="
+>>>>>>> Introduce local fields generation
 }
