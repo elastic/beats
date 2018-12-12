@@ -350,7 +350,7 @@ func TestExpireTransaction(t *testing.T) {
 	results := &eventStore{}
 	dns := newDNS(results, testing.Verbose())
 
-	trans := newTransaction(time.Now(), dnsTuple{}, common.CmdlineTuple{})
+	trans := newTransaction(time.Now(), dnsTuple{}, common.ProcessTuple{})
 	trans.request = &dnsMessage{
 		data: &mkdns.Msg{
 			Question: []mkdns.Question{{}},
@@ -370,7 +370,7 @@ func TestPublishTransaction_emptyDnsRequest(t *testing.T) {
 	results := &eventStore{}
 	dns := newDNS(results, testing.Verbose())
 
-	trans := newTransaction(time.Now(), dnsTuple{}, common.CmdlineTuple{})
+	trans := newTransaction(time.Now(), dnsTuple{}, common.ProcessTuple{})
 	trans.request = &dnsMessage{
 		data: &mkdns.Msg{},
 	}
@@ -385,7 +385,7 @@ func TestPublishTransaction_emptyDnsResponse(t *testing.T) {
 	results := &eventStore{}
 	dns := newDNS(results, testing.Verbose())
 
-	trans := newTransaction(time.Now(), dnsTuple{}, common.CmdlineTuple{})
+	trans := newTransaction(time.Now(), dnsTuple{}, common.ProcessTuple{})
 	trans.response = &dnsMessage{
 		data: &mkdns.Msg{},
 	}
