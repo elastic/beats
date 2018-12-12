@@ -37,6 +37,8 @@ https://github.com/elastic/beats/compare/v6.5.3...6.5[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
+
 *Heartbeat*
 
 *Journalbeat*
