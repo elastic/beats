@@ -15,7 +15,6 @@
         "iis.error.server_port": "80", 
         "iis.error.url": "/qos/1kbfile.txt", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/iis/error/test/test.log", 
         "offset": 186, 
         "prospector.type": "log"
     }, 
@@ -42,7 +41,6 @@
         "iis.error.server_port": "80", 
         "iis.error.url": "/ThisIsMyUrl.htm", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/iis/error/test/test.log", 
         "offset": 286, 
         "prospector.type": "log"
     }, 
@@ -69,7 +67,6 @@
         "iis.error.server_port": "80", 
         "iis.error.url": "/", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/iis/error/test/test.log", 
         "offset": 384, 
         "prospector.type": "log"
     }, 
@@ -92,7 +89,6 @@
         "iis.error.server_ip": "127.0.0.1", 
         "iis.error.server_port": "80", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/iis/error/test/test.log", 
         "offset": 470, 
         "prospector.type": "log"
     }

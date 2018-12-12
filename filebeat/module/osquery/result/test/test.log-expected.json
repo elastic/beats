@@ -5,7 +5,6 @@
         "fileset.module": "osquery", 
         "fileset.name": "result", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/osquery/result/test/test.log", 
         "offset": 0, 
         "osquery.result.action": "removed", 
         "osquery.result.calendar_time": "Thu Dec 28 14:40:08 2017 UTC", 

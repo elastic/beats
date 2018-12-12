@@ -15,7 +15,6 @@
         "fileset.module": "auditd", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/auditd/log/test/test.log", 
         "offset": 0, 
         "prospector.type": "log"
     }, 
@@ -51,7 +50,6 @@
         "fileset.module": "auditd", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/auditd/log/test/test.log", 
         "offset": 174, 
         "prospector.type": "log"
     }

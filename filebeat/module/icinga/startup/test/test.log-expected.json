@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2018-12-12T09:43:56.288Z", 
+        "@timestamp": "2018-12-12T11:22:05.182Z", 
         "event.dataset": "icinga.startup", 
         "fileset.module": "icinga", 
         "fileset.name": "startup", 
@@ -8,12 +8,11 @@
         "icinga.startup.message": "Icinga application loader (version: r2.6.3-1)", 
         "icinga.startup.severity": "information", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/icinga/startup/test/test.log", 
         "offset": 0, 
         "prospector.type": "log"
     }, 
     {
-        "@timestamp": "2018-12-12T09:43:56.288Z", 
+        "@timestamp": "2018-12-12T11:22:05.182Z", 
         "event.dataset": "icinga.startup", 
         "fileset.module": "icinga", 
         "fileset.name": "startup", 
@@ -21,7 +20,6 @@
         "icinga.startup.message": "Loading configuration file(s).", 
         "icinga.startup.severity": "information", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/icinga/startup/test/test.log", 
         "offset": 63, 
         "prospector.type": "log"
     }

@@ -5,7 +5,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:36:42.585 CEST [4974] LOG:  database system was shut down at 2017-06-17 16:58:04 CEST", 
         "offset": 0, 
         "postgresql.log.level": "LOG", 
@@ -21,7 +20,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:36:42.605 CEST [4974] LOG:  MultiXact member wraparound protections are now enabled", 
         "offset": 100, 
         "postgresql.log.level": "LOG", 
@@ -37,7 +35,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:36:42.615 CEST [4978] LOG:  autovacuum launcher started", 
         "offset": 198, 
         "postgresql.log.level": "LOG", 
@@ -53,7 +50,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:36:42.616 CEST [4973] LOG:  database system is ready to accept connections", 
         "offset": 268, 
         "postgresql.log.level": "LOG", 
@@ -69,7 +65,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:36:42.956 CEST [4980] [unknown]@[unknown] LOG:  incomplete startup packet", 
         "offset": 357, 
         "postgresql.log.database": "unknown", 
@@ -87,7 +82,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "log.flags": [
             "multiline"
         ], 
@@ -109,7 +103,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "log.flags": [
             "multiline"
         ], 
@@ -131,7 +124,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "log.flags": [
             "multiline"
         ], 
@@ -153,7 +145,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:39:16.249 CEST [5407] postgres@users FATAL:  database \"users\" does not exist", 
         "offset": 1727, 
         "postgresql.log.database": "users", 
@@ -171,7 +162,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:39:17.945 CEST [5500] postgres@user FATAL:  database \"user\" does not exist", 
         "offset": 1818, 
         "postgresql.log.database": "user", 
@@ -189,7 +179,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "log.flags": [
             "multiline"
         ], 
@@ -211,7 +200,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:39:31.619 CEST [5502] postgres@clients LOG:  duration: 9.482 ms  statement: select * from clients;", 
         "offset": 2620, 
         "postgresql.log.database": "clients", 
@@ -230,7 +218,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:39:40.147 CEST [5502] postgres@clients LOG:  duration: 0.765 ms  statement: select id from clients;", 
         "offset": 2733, 
         "postgresql.log.database": "clients", 
@@ -249,7 +236,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "log.flags": [
             "multiline"
         ], 
@@ -271,7 +257,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:43:22.645 CEST [5502] postgres@clients LOG:  duration: 36.162 ms  statement: create table cats(name varchar(50) primary key, toy varchar (50) not null, born timestamp not null);", 
         "offset": 3559, 
         "postgresql.log.database": "clients", 
@@ -290,7 +275,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:46:02.670 CEST [5502] postgres@c$lients LOG:  duration: 10.540 ms  statement: insert into cats(name, toy, born) values('kate', 'ball', now());", 
         "offset": 3751, 
         "postgresql.log.database": "c$lients", 
@@ -309,7 +293,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:46:23.016 CEST [5502] postgres@_clients$db LOG:  duration: 5.156 ms  statement: insert into cats(name, toy, born) values('frida', 'horse', now());", 
         "offset": 3908, 
         "postgresql.log.database": "_clients$db", 
@@ -328,7 +311,6 @@
         "fileset.module": "postgresql", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian-with-slowlog.log", 
         "message": "2017-07-31 13:46:55.637 CEST [5502] postgres@clients_db LOG:  duration: 25.871 ms  statement: create table dogs(name varchar(50) primary key, owner varchar (50) not null, born timestamp not null);", 
         "offset": 4069, 
         "postgresql.log.database": "clients_db", 

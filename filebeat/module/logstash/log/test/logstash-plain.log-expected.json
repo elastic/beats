@@ -5,7 +5,6 @@
         "fileset.module": "logstash", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/logstash/log/test/logstash-plain.log", 
         "logstash.log.level": "INFO", 
         "logstash.log.message": "Initializing module {:module_name=>\"fb_apache\", :directory=>\"/usr/share/logstash/modules/fb_apache/configuration\"}", 
         "logstash.log.module": "logstash.modules.scaffold", 
@@ -18,7 +17,6 @@
         "fileset.module": "logstash", 
         "fileset.name": "log", 
         "input.type": "log", 
-        "log.file.path": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/logstash/log/test/logstash-plain.log", 
         "log.flags": [
             "multiline"
         ], 
