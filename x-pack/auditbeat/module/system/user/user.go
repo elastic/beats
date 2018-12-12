@@ -32,6 +32,7 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "user"
+	namespace     = "system.audit.user"
 
 	passwdFile = "/etc/passwd"
 	groupFile  = "/etc/group"
@@ -156,6 +157,7 @@ func (user User) toMapStr() common.MapStr {
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
+		mb.WithNamespace(namespace),
 	)
 }
 

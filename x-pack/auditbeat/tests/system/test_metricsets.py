@@ -18,7 +18,7 @@ class Test(AuditbeatXPackTest):
         host metricset collects general information about a server.
         """
 
-        fields = ["system.host.uptime", "system.host.ip", "system.host.os.name"]
+        fields = ["system.audit.host.uptime", "system.audit.host.ip", "system.audit.host.os.name"]
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         # TODO: Remove try/catch once new fields are in fields.ecs.yml
@@ -35,7 +35,7 @@ class Test(AuditbeatXPackTest):
         packages metricset collects information about installed packages on a system.
         """
 
-        fields = ["system.packages.package"]
+        fields = ["system.audit.packages.package"]
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "packages", COMMON_FIELDS + fields, warnings_allowed=True)
@@ -81,7 +81,7 @@ class Test(AuditbeatXPackTest):
         user metricset collects information about users on a server.
         """
 
-        fields = ["system.user.name"]
+        fields = ["system.audit.user.name"]
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         # TODO: Remove try/catch once new fields are in fields.ecs.yml
