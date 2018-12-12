@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
+* <<exported-fields-aws>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
@@ -807,6 +808,187 @@ Waiting for connections.
 type: long
 
 Total.
+
+
+--
+
+[[exported-fields-aws]]
+== aws fields
+
+`aws` module collects AWS monitoring metrics from AWS Cloudwatch. experimental[]
+aws module
+
+
+
+[float]
+== aws fields
+
+
+
+
+[float]
+== ec2 fields
+
+`ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
+
+
+
+*`aws.ec2.cpu.total.pct`*::
++
+--
+type: scaled_float
+
+The percentage of allocated EC2 compute units that are currently in use on the instance.
+
+
+--
+
+*`aws.ec2.cpu.credit_usage`*::
++
+--
+type: scaled_float
+
+The number of CPU credits spent by the instance for CPU utilization.
+
+
+--
+
+*`aws.ec2.cpu.credit_balance`*::
++
+--
+type: scaled_float
+
+The number of earned CPU credits that an instance has accrued since it was launched or started.
+
+
+--
+
+*`aws.ec2.cpu.surplus_credit_balance`*::
++
+--
+type: scaled_float
+
+The number of surplus credits that have been spent by an unlimited instance when its CPUCreditBalance value is zero.
+
+
+--
+
+*`aws.ec2.cpu.surplus_credits_charged`*::
++
+--
+type: scaled_float
+
+The number of spent surplus credits that are not paid down by earned CPU credits, and which thus incur an additional charge.
+
+
+--
+
+*`aws.ec2.network.in.packets`*::
++
+--
+type: scaled_float
+
+The number of packets received on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.network.out.packets`*::
++
+--
+type: scaled_float
+
+The number of packets sent out on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.network.in.bytes`*::
++
+--
+type: scaled_float
+
+The number of bytes received on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.network.out.bytes`*::
++
+--
+type: scaled_float
+
+The number of bytes sent out on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.diskio.read.bytes`*::
++
+--
+type: scaled_float
+
+Bytes read from all instance store volumes available to the instance.
+
+
+--
+
+*`aws.ec2.diskio.write.bytes`*::
++
+--
+type: scaled_float
+
+Bytes written to all instance store volumes available to the instance.
+
+
+--
+
+*`aws.ec2.diskio.read.ops`*::
++
+--
+type: scaled_float
+
+Completed read operations from all instance store volumes available to the instance in a specified period of time.
+
+
+--
+
+*`aws.ec2.diskio.write.ops`*::
++
+--
+type: scaled_float
+
+Completed write operations to all instance store volumes available to the instance in a specified period of time.
+
+
+--
+
+*`aws.ec2.status.check_failed`*::
++
+--
+type: long
+
+Reports whether the instance has passed both the instance status check and the system status check in the last minute.
+
+
+--
+
+*`aws.ec2.status.check_failed_system`*::
++
+--
+type: long
+
+Reports whether the instance has passed the system status check in the last minute.
+
+
+--
+
+*`aws.ec2.status.check_failed_instance`*::
++
+--
+type: long
+
+Reports whether the instance has passed the instance status check in the last minute.
 
 
 --

@@ -5,15 +5,15 @@ The default metricset is `ec2`.
 [float]
 === Module-specific configuration notes
 
-This module environment variable `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN` references in the
-config file to set values that need to be configurable during deployment.
+This module environment variable `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN` and `AWS_REGION`
+references in the config file to set values that need to be configurable during deployment.
 
 There are two different kinds of AWS credentials can be used here: `access keys` and `temporary security credentials`.
 `aws_access_key_id` and `aws_secret_access_key` are the two parts of `access keys` for AWS to authenticate AWS API requests.
 `access keys` are long-term credentials for an IAM user or the AWS account root user. A more AWS recommended way is to use
 `temporary security credentials` instead of `access keys`. `temporary security credentials` consist of an access key ID,
 a secret access key, and a security token which typically returned from `GetSessionToken`. MFA-enabled IAM users would
-need to submit an MFA code while calling `GetSessionToken`.
+need to submit an MFA code while calling `GetSessionToken`. `aws_default_region` is to set the region for SDK to use.
 
 If `aws_access_key_id` or `aws_secret_access_key` not set, this module will report mock data instead.
 
@@ -28,19 +28,7 @@ metricbeat.modules:
   aws_access_key_id: '${AWS_ACCESS_KEY_ID}'
   aws_secret_access_key: '${AWS_SECRET_ACCESS_KEY}'
   aws_session_token: '${AWS_SESSION_TOKEN}'
-----
-
-To specify a default value in the config file, use:
-
-[source,yaml]
-----
-metricbeat.modules:
-- module: aws
-  period: 300s
-  metricsets: ["ec2"]
-  aws_access_key_id: '${AWS_ACCESS_KEY_ID:AKIAIOSFODNN7EXAMPLE}'
-  aws_secret_access_key: '${AWS_SECRET_ACCESS_KEY:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY}'
-  aws_session_token: '${AWS_SESSION_TOKEN:FQoGZXIvYXdzEIP//////////wEaDKtMOZcoQlimxFbnviKwASxTfn5z+}'
+  aws_default_region: '${AWS_REGION:us-west-1}'
 ----
 
 The Postgres  module comes with a predefined dashboard. For example:

@@ -11,6 +11,7 @@ type Config struct {
 	AwsAccessKeyID     string `config:"aws_access_key_id"`
 	AwsSecretAccessKey string `config:"aws_secret_access_key"`
 	AwsSessionToken    string `config:"aws_session_token"`
+	AwsDefaultRegion   string `config:"aws_default_region"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
