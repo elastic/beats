@@ -1998,7 +1998,6 @@ Name of the service metricbeat fetches the data from.
 
 --
 
-<<<<<<< HEAD
 *`event.duration`*::
 +
 --
@@ -2016,14 +2015,15 @@ type: keyword
 
 Event dataset name.
 
-=======
+
+--
+
 *`event.module`*::
 +
 --
 type: alias
 
 alias to: metricset.module
->>>>>>> Introduce aliases for 7.x fields in 6.x
 
 --
 
