@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
@@ -59,6 +60,7 @@ type addDockerMetadata struct {
 	pidFields []string      // Field names that contain PIDs.
 	cgroups   *common.Cache // Cache of PID (int) to cgropus (map[string]string).
 	hostFS    string        // Directory where /proc is found
+	dedot     bool          // If set to true, replace dots in labels with `_`.
 }
 
 func newDockerMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
@@ -102,6 +104,7 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 		sourceProcessor: sourceProcessor,
 		pidFields:       config.MatchPIDs,
 		hostFS:          config.HostFS,
+		dedot:           config.DeDot,
 	}, nil
 }
 
@@ -172,14 +175,16 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 
 		if len(container.Labels) > 0 {
 			//dedot first
-			outputLabels := common.MapStr{}
+			labels := common.MapStr{}
 			for k, v := range container.Labels {
-				// This is necessary so that ES does not interpret '.' fields as new
-				// nested JSON objects, and also makes this compatible with ES 2.x.
-				label := common.DeDot(k)
-				outputLabels.Put(label, v)
+				if d.dedot {
+					label := common.DeDot(k)
+					labels.Put(label, v)
+				} else {
+					safemapstr.Put(labels, k, v)
+				}
 			}
-			meta.Put("container.labels", outputLabels)
+			meta.Put("container.labels", labels)
 		}
 
 		meta.Put("container.id", container.ID)
