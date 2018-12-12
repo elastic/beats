@@ -323,7 +323,6 @@ output.elasticsearch:
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
