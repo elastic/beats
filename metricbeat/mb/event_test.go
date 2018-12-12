@@ -180,6 +180,10 @@ func TestAddMetricSetInfo(t *testing.T) {
 				"name":   metricSetName,
 				"rtt":    time.Duration(500000),
 			},
+			"event": common.MapStr{
+				"duration": time.Duration(500000000),
+				"dataset":  moduleName + "." + metricSetName,
+			},
 		}, e.RootFields)
 	})
 
@@ -192,6 +196,9 @@ func TestAddMetricSetInfo(t *testing.T) {
 			"metricset": common.MapStr{
 				"module": moduleName,
 				"name":   metricSetName,
+			},
+			"event": common.MapStr{
+				"dataset": moduleName + "." + metricSetName,
 			},
 		}, e.RootFields)
 	})

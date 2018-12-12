@@ -92,7 +92,7 @@ class Test(metricbeat.BaseTest):
         Test local processors for Redis info event.
         """
         fields = ["clients", "cpu"]
-        eventFields = ['beat', 'metricset']
+        eventFields = ['beat', 'metricset', 'event']
         eventFields += ['redis.info.' + f for f in fields]
         self.render_config_template(modules=[{
             "name": "redis",
