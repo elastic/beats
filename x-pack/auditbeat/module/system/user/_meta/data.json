@@ -7,9 +7,9 @@
     "event": {
         "action": "existing_user",
         "dataset": "user",
-        "id": "b4ae235c-598c-4230-a585-7e9804f64631",
-        "module": "system",
-        "kind": "state"
+        "id": "b0bbc4e2-9540-4aaf-b74e-ef9de506e852",
+        "kind": "state",
+        "module": "system"
     },
     "message": "Existing user elastic (UID: 1002, Groups: elastic,docker)",
     "service": {

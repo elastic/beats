@@ -31,7 +31,8 @@ func TestData(t *testing.T) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"user"},
+		"module":                       "system",
+		"metricsets":                   []string{"user"},
+		"user.detect_password_changes": true,
 	}
 }
