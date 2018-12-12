@@ -5,7 +5,9 @@
 
   metricsets:
     - host
+    {{ if false -}}
     - packages
+    {{- end -}}
     - process
     {{ if eq .GOOS "linux" -}}
     - socket
@@ -20,8 +22,10 @@
   # detect any changes.
   user.detect_password_changes: true
   {{- end }}
-
+  {{- if false -}}
+  {{/* Only remaining use in packages, to be removed completely. */}}
   report_changes: true
+  {{- end -}}
 {{- end }}
 {{ if .Reference }}
 {{- end }}

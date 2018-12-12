@@ -38,9 +38,9 @@ const (
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	/*mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
-	)
+	)*/
 }
 
 // MetricSet collects data about the host.

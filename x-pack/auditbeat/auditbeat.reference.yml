@@ -112,7 +112,6 @@ auditbeat.modules:
 
   metricsets:
     - host
-    - packages
     - process
     - socket
     - user
@@ -123,8 +122,6 @@ auditbeat.modules:
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
   user.detect_password_changes: true
-
-  report_changes: true
 
 
 #================================ General ======================================
