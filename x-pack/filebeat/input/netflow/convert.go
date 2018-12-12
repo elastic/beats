@@ -69,9 +69,7 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 	// ECS Fields -- device
 	ecsDevice := common.MapStr{}
 	if exporter, ok := getKeyString(flow.Exporter, "address"); ok {
-		if lastColon := strings.LastIndexByte(exporter, ':'); lastColon > -1 {
-			ecsDevice["ip"] = exporter[:lastColon]
-		}
+		ecsDevice["ip"] = extractIPFromIPPort(exporter)
 	}
 
 	event.Timestamp = flow.Timestamp
@@ -81,6 +79,20 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 		"device":  ecsDevice,
 	}
 	return
+}
+
+func extractIPFromIPPort(address string) string {
+	// address can be "n.n.n.n:port" or "[hhhh:hhhh::hhhh]:port"
+	if lastColon := strings.LastIndexByte(address, ':'); lastColon > -1 {
+		address = address[:lastColon]
+	}
+	if len(address) > 0 && address[0] == '[' {
+		address = address[1:]
+	}
+	if n := len(address); n > 0 && address[n-1] == ']' {
+		address = address[:n-1]
+	}
+	return address
 }
 
 func optionsToBeatEvent(flow record.Record) (event beat.Event) {
