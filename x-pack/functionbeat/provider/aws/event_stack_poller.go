@@ -5,7 +5,6 @@
 package aws
 
 import (
-	"sort"
 	"sync"
 	"time"
 
@@ -19,13 +18,13 @@ import (
 const eventAWSCloudFormationStack = "AWS::CloudFormation::Stack"
 
 type eventStackHandler interface {
-	skip(event cloudformation.StackEvent) bool
+	sync(event cloudformation.StackEvent) bool
 	handle(event cloudformation.StackEvent)
 }
 
 // eventStackPoller takes a stack id and will report any events coming from it.
 // The event stream for a stack will return all the events for a specific existance of a stack,
-// its important to be able to skip some events and only report the meaninful events.
+// its important to be able to skip some events and only report the meaningful events.
 type eventStackPoller struct {
 	log           *logp.Logger
 	svc           cloudformationiface.CloudFormationAPI
@@ -88,13 +87,15 @@ func (e *eventStackPoller) poll() {
 
 		// Events are in reverse order. we need older -> new, but we do not rely on the time but just
 		// the position in the slice.
-		sort.Sort(sort.Reverse(stackEventSlice(resp.StackEvents)))
+		for i, j := 0, len(resp.StackEvents)-1; i < j; i, j = i+1, j-1 {
+			resp.StackEvents[i], resp.StackEvents[j] = resp.StackEvents[j], resp.StackEvents[i]
+		}
 
 		for _, event := range resp.StackEvents {
 			// Since we receive all the events from the beginning of the stack we have
 			// to first position ourself to an event of interest.
 			if !foundFirstEvent {
-				if !e.handler.skip(event) {
+				if !e.handler.sync(event) {
 					// keep current event and position to the first meaningful event.
 					foundFirstEvent = true
 				} else {
@@ -127,23 +128,15 @@ func (e *eventStackPoller) poll() {
 	}
 }
 
-type stackEventSlice []cloudformation.StackEvent
-
-func (idx stackEventSlice) Len() int { return len(idx) }
-
-func (idx stackEventSlice) Less(i, j int) bool { return i < j }
-
-func (idx stackEventSlice) Swap(i, j int) { idx[i], idx[j] = idx[j], idx[i] }
-
 type reportStackEvent struct {
 	skipBefore time.Time
 	callback   func(event cloudformation.StackEvent)
 }
 
-func (r *reportStackEvent) skip(event cloudformation.StackEvent) bool {
+func (r *reportStackEvent) sync(event cloudformation.StackEvent) bool {
 	// Ignore anything before the Start pointer and everything which is not AWS::CloudFormation::Stack
 	if r.skipBefore.Before(*event.Timestamp) && *event.ResourceType == eventAWSCloudFormationStack {
-		// We are only interested in events thats START a request.
+		// We are only interested in events thats `START` a request.
 		switch event.ResourceStatus {
 		case cloudformation.ResourceStatusCreateInProgress:
 			return false

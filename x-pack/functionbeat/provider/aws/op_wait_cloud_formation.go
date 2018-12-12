@@ -76,9 +76,7 @@ func (o *opWaitCloudFormation) Execute(ctx executionContext) error {
 			return nil
 		}
 
-		select {
-		case <-time.After(periodicCheck):
-		}
+		<-time.After(periodicCheck)
 	}
 }
 

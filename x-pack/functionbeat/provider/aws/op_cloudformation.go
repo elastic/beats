@@ -5,7 +5,8 @@
 package aws
 
 import (
-	"bytes"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -82,28 +83,26 @@ func makeEventStackPoller(
 		&reportStackEvent{skipBefore: ctx.StartedAt, callback: func(event cloudformation.StackEvent) {
 			// Returned values for a stack events are hit or miss, so lets try to create a
 			// meaningful string.
-			var buf bytes.Buffer
+			var buf strings.Builder
+			fmt.Fprintf(&buf, "Stack event received")
 
-			buf.WriteString("Stack event received")
-			if event.ResourceType != nil {
-				buf.WriteString(", ResourceType: ")
-				buf.WriteString(*event.ResourceType)
-			}
-
-			if event.LogicalResourceId != nil {
-				buf.WriteString(", LogicalResourceId: ")
-				buf.WriteString(*event.LogicalResourceId)
-			}
-
-			buf.WriteString(", ResourceStatus: ")
-			buf.WriteString(string(event.ResourceStatus))
-
-			if event.ResourceStatusReason != nil {
-				buf.WriteString(", ResourceStatusReason: ")
-				buf.WriteString(*event.ResourceStatusReason)
-			}
+			writeOptKV(&buf, "ResourceType", event.ResourceType)
+			writeOptKV(&buf, "LogicalResourceId", event.LogicalResourceId)
+			s := string(event.ResourceStatus)
+			writeOptKV(&buf, "ResourceStatus", &s)
+			writeOptKV(&buf, "ResourceStatusReason", event.ResourceStatusReason)
 
 			log.Info(buf.String())
 		}},
 	)
+}
+
+func writeKV(buf *strings.Builder, key string, value string) {
+	fmt.Fprintf(buf, ", %s: %s", key, value)
+}
+
+func writeOptKV(buf *strings.Builder, key string, value *string) {
+	if value != nil {
+		writeKV(buf, key, *value)
+	}
 }
