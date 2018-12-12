@@ -310,6 +310,11 @@ func (h *Harvester) Run() error {
 			fields := common.MapStr{
 				"source": state.Source,
 				"offset": startingOffset, // Offset here is the offset before the starting char.
+				"log": common.MapStr{
+					"file": common.MapStr{
+						"path": state.Source,
+					},
+				},
 			}
 			fields.DeepUpdate(message.Fields)
 

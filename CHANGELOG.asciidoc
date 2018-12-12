@@ -99,6 +99,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
 - Allow to force CRI format parsing for better performance {pull}8424[8424]
 - Add event.dataset to module events. {pull}9457[9457]
+- Add field log.source.address and log.file.path to replace source. {pull}9435[9435]
 
 *Heartbeat*
 
@@ -127,6 +128,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 *Affecting all Beats*
 
 *Filebeat*
+- Deprecate field source. Will be replaced by log.source.address and log.file.path in 7.0. {pull}9435[9435]
 
 *Heartbeat*
 

@@ -116,6 +116,16 @@
       description: >
         This field contains the flags of the event.
 
+    - name: log.source.address
+      type: keyword
+      description: >
+        Log source address.
+
+    - name: log.file.path
+      type: keyword
+      description: >
+        Log source path.
+
     - name: event.created
       type: date
       description: >
