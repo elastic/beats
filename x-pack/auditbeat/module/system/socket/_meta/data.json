@@ -4,30 +4,35 @@
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
-    "user": {
-        "name": "vagrant",
-        "id": 1000
-    },
-    "process": {
-        "pid": 4021,
-        "name": "lynx"
-    },
-    "source": {
-        "ip": "10.0.2.15",
-        "port": 33956
-    },
     "destination": {
-        "port": 443,
-        "ip": "52.10.168.186"
+        "ip": "10.0.2.15",
+        "port": 22
     },
     "event": {
-        "kind": "event",
-        "action": "socket_opened",
-        "module": "system",
-        "dataset": "socket"
+        "action": "existing_socket",
+        "dataset": "socket",
+        "id": "6aff69f8-7267-4604-9701-d7b67a7c65bc",
+        "kind": "state",
+        "module": "system"
     },
+    "message": "Inbound socket (10.0.2.2:55270 -\u003e 10.0.2.15:22) OPEN by process sshd (PID: 22799) and user root (UID: 0)",
     "network": {
-        "type": "ipv4",
-        "direction": "outbound"
+        "direction": "inbound",
+        "type": "ipv4"
+    },
+    "process": {
+        "name": "sshd",
+        "pid": 22799
+    },
+    "service": {
+        "type": "system"
+    },
+    "source": {
+        "ip": "10.0.2.2",
+        "port": 55270
+    },
+    "user": {
+        "id": 0,
+        "name": "root"
     }
 }

@@ -5,6 +5,7 @@
 package process
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -33,11 +34,28 @@ const (
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
-
-	eventActionExistingProcess = "existing_process"
-	eventActionProcessStarted  = "process_started"
-	eventActionProcessStopped  = "process_stopped"
 )
+
+type eventAction uint8
+
+const (
+	eventActionExistingProcess eventAction = iota
+	eventActionProcessStarted
+	eventActionProcessStopped
+)
+
+func (action eventAction) String() string {
+	switch action {
+	case eventActionExistingProcess:
+		return "existing_process"
+	case eventActionProcessStarted:
+		return "process_started"
+	case eventActionProcessStopped:
+		return "process_stopped"
+	default:
+		return ""
+	}
+}
 
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
@@ -214,16 +232,32 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	return nil
 }
 
-func processEvent(pInfo *ProcessInfo, eventType string, eventAction string) mb.Event {
+func processEvent(pInfo *ProcessInfo, eventType string, action eventAction) mb.Event {
 	return mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"kind":   eventType,
-				"action": eventAction,
+				"action": action.String(),
 			},
 			"process": pInfo.toMapStr(),
+			"message": processMessage(pInfo, action),
 		},
 	}
+}
+
+func processMessage(pInfo *ProcessInfo, action eventAction) string {
+	var actionString string
+	switch action {
+	case eventActionProcessStarted:
+		actionString = "STARTED"
+	case eventActionProcessStopped:
+		actionString = "STOPPED"
+	case eventActionExistingProcess:
+		actionString = "is RUNNING"
+	}
+
+	return fmt.Sprintf("Process %v (PID: %d) %v",
+		pInfo.Name, pInfo.PID, actionString)
 }
 
 func convertToCacheable(processInfos []*ProcessInfo) []cache.Cacheable {

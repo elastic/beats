@@ -495,8 +495,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 if "name" not in field:
                     continue
 
-                # Chain together names
-                if name != "":
+                # Chain together names. Names in group `base` are top-level.
+                if name != "" and name != "base":
                     newName = name + "." + field["name"]
                 else:
                     newName = field["name"]
