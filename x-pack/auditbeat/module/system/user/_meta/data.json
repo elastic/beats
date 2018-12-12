@@ -16,22 +16,24 @@
         "name": "ubuntu"
     },
     "system": {
-        "user": {
-            "uid": 1001,
-            "gid": 1001,
-            "name": "ubuntu",
-            "dir": "/home/ubuntu",
-            "shell": "/bin/bash",
-            "user_information": "Ubuntu",
-            "group": [
-                {
-                    "name": "sudo",
-                    "gid": 27
+        "audit": {
+            "user": {
+                "uid": 1001,
+                "gid": 1001,
+                "name": "ubuntu",
+                "dir": "/home/ubuntu",
+                "shell": "/bin/bash",
+                "user_information": "Ubuntu",
+                "group": [
+                    {
+                        "name": "sudo",
+                        "gid": 27
+                    }
+                ],
+                "password": {
+                    "type": "shadow_password",
+                    "last_changed": "2018-09-21T00:00:00.000Z"
                 }
-            ],
-            "password": {
-                "type": "shadow_password",
-                "last_changed": "2018-09-21T00:00:00.000Z"
             }
         }
     }

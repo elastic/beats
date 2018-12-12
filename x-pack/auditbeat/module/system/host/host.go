@@ -29,6 +29,7 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "host"
+	namespace     = "system.audit.host"
 
 	bucketName        = "host.v1"
 	bucketKeyLastHost = "lastHost"
@@ -146,6 +147,7 @@ func (host *Host) toMapStr() common.MapStr {
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
+		mb.WithNamespace(namespace),
 	)
 }
 

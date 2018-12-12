@@ -26,6 +26,7 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "process"
+	namespace     = "system.audit.process"
 
 	bucketName              = "auditbeat.process.v1"
 	bucketKeyStateTimestamp = "state_timestamp"
@@ -41,6 +42,7 @@ const (
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
+		mb.WithNamespace(namespace),
 	)
 }
 
