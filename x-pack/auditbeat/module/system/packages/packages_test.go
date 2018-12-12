@@ -11,6 +11,8 @@ import (
 )
 
 func TestData(t *testing.T) {
+	t.Skip("Packages metricset is disabled")
+
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	err := mbtest.WriteEventsReporterV2(f, t, "")
 	if err != nil {
