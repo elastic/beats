@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -55,11 +57,29 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 			if err != nil {
 				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
 			}
+
+			var pipelineIDsLoaded []string
 			for _, pipeline := range pipelines {
 				err = loadPipeline(esClient, pipeline.id, pipeline.contents, overwrite)
 				if err != nil {
-					return fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
+					err = fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
+					break
 				}
+				pipelineIDsLoaded = append(pipelineIDsLoaded, pipeline.id)
+			}
+
+			if err != nil {
+				// Rollback pipelines and return errors
+				// TODO: Instead of attempting to load all pipelines and then rolling back loaded ones when there's an
+				// error, validate all pipelines before loading any of them. This requires https://github.com/elastic/elasticsearch/issues/35495.
+				errs := multierror.Errors{err}
+				for _, pipelineID := range pipelineIDsLoaded {
+					err = deletePipeline(esClient, pipelineID)
+					if err != nil {
+						errs = append(errs, err)
+					}
+				}
+				return errs.Err()
 			}
 		}
 	}
@@ -67,7 +87,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 }
 
 func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}, overwrite bool) error {
-	path := "/_ingest/pipeline/" + pipelineID
+	path := makeIngestPipelinePath(pipelineID)
 	if !overwrite {
 		status, _, _ := esClient.Request("GET", path, "", nil, nil)
 		if status == 200 {
@@ -81,6 +101,16 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 	}
 	logp.Info("Elasticsearch pipeline with ID '%s' loaded", pipelineID)
 	return nil
+}
+
+func deletePipeline(esClient PipelineLoader, pipelineID string) error {
+	path := makeIngestPipelinePath(pipelineID)
+	_, _, err := esClient.Request("DELETE", path, "", nil, nil)
+	return err
+}
+
+func makeIngestPipelinePath(pipelineID string) string {
+	return "/_ingest/pipeline/" + pipelineID
 }
 
 func interpretError(initialErr error, body []byte) error {
