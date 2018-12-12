@@ -31,14 +31,15 @@ func init() {
 // ConfigManager handles internal config updates. By retrieving
 // new configs from Kibana and applying them to the Beat
 type ConfigManager struct {
-	config   *Config
-	cache    *Cache
-	logger   *logp.Logger
-	client   *api.Client
-	beatUUID uuid.UUID
-	done     chan struct{}
-	registry *reload.Registry
-	wg       sync.WaitGroup
+	config    *Config
+	cache     *Cache
+	logger    *logp.Logger
+	client    *api.Client
+	beatUUID  uuid.UUID
+	done      chan struct{}
+	registry  *reload.Registry
+	wg        sync.WaitGroup
+	blacklist *ConfigBlacklist
 }
 
 // NewConfigManager returns a X-Pack Beats Central Management manager
@@ -56,8 +57,16 @@ func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID
 func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	var client *api.Client
 	var cache *Cache
+	var blacklist *ConfigBlacklist
+
 	if c.Enabled {
 		var err error
+
+		// Initialize configs blacklist
+		blacklist, err = NewConfigBlacklist(c.Blacklist)
+		if err != nil {
+			return nil, errors.Wrap(err, "wrong settings for configurations blacklist")
+		}
 
 		// Initialize central management settings cache
 		cache = &Cache{
@@ -74,16 +83,18 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 		if err != nil {
 			return nil, errors.Wrap(err, "initializing kibana client")
 		}
+
 	}
 
 	return &ConfigManager{
-		config:   c,
-		cache:    cache,
-		logger:   logp.NewLogger(management.DebugK),
-		client:   client,
-		done:     make(chan struct{}),
-		beatUUID: beatUUID,
-		registry: registry,
+		config:    c,
+		cache:     cache,
+		blacklist: blacklist,
+		logger:    logp.NewLogger(management.DebugK),
+		client:    client,
+		done:      make(chan struct{}),
+		beatUUID:  beatUUID,
+		registry:  registry,
 	}, nil
 }
 
@@ -187,6 +198,13 @@ func (cm *ConfigManager) apply() {
 		missing[name] = true
 	}
 
+	// Filter unwanted configs from the list
+	errors := cm.blacklist.Filter(cm.cache.Configs)
+	if errors != nil {
+		cm.logger.Error(errors)
+		return
+	}
+
 	// Reload configs
 	for _, b := range cm.cache.Configs {
 		err := cm.reload(b.Type, b.Blocks)
@@ -202,7 +220,7 @@ func (cm *ConfigManager) apply() {
 	}
 
 	if !configOK {
-		logp.Info("Failed to apply settings, reporting error on next fetch")
+		cm.logger.Info("Failed to apply settings, reporting error on next fetch")
 	}
 
 	// Update configOK flag with the result of this apply

@@ -32,12 +32,11 @@ type YmlFile struct {
 }
 
 func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]*YmlFile, error) {
-	var commonFields []string
 	var libbeatFieldFiles []*YmlFile
 	var err error
+	commonFields := []string{filepath.Join(esBeatsPath, "libbeat/_meta/fields.ecs.yml")}
 	if !isLibbeat(beatPath) {
 		commonFields = append(commonFields,
-			filepath.Join(esBeatsPath, "libbeat/_meta/fields.ecs.yml"),
 			filepath.Join(esBeatsPath, "libbeat/_meta/fields.common.yml"),
 		)
 

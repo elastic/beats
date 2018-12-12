@@ -42,7 +42,7 @@ type message struct {
 
 	isRequest    bool
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	direction    uint8
 
 	//Request Info

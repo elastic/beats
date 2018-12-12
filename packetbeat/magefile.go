@@ -136,8 +136,13 @@ func Update() error {
 	return sh.Run("make", "update")
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
+// Fields generates a fields.yml and fields.go for the Beat.
+func Fields() {
+	mg.SerialDeps(fieldsYML, mage.GenerateAllInOneFieldsGo)
+}
+
+// fieldsYML generates the fields.yml file.
+func fieldsYML() error {
 	return mage.GenerateFieldsYAML("protos")
 }
 

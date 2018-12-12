@@ -27,6 +27,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Packetbeat*
 
+- Renamed the flow event fields to follow Elastic Common Schema. {pull}9121[9121]
+- Renamed several client and server fields. IP, port, and process metadata are
+  now contained under the client and server namespaces. {issue}9303[9303]
+
 *Winlogbeat*
 
 *Functionbeat*
@@ -39,6 +43,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Log events at the debug level when dropped by encoding problems. {pull}9251[9251]
 - Refresh host metadata in add_host_metadata. {pull}9359[9359]
 - When collecting swap metrics for beats telemetry or system metricbeat module handle cases of free swap being bigger than total swap by assuming no swap is being used. {issue}6271[6271] {pull}9383[9383]
+- Adding logging traces at debug level when the pipeline client receives the following events: onFilteredOut, onDroppedOnPublish. {pull}9016[9016]
 
 *Auditbeat*
 
@@ -62,6 +67,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - The `node.name` field in the `elasticsearch/node` metricset now correctly reports the Elasticsarch node name. Previously this field was incorrectly reporting the node ID instead. {pull}9209[9209]
 
 *Packetbeat*
+
+- Fix issue with process monitor associating traffic to the wrong process. {issue}9151[9151] {pull}9443[9443]
 
 *Winlogbeat*
 
