@@ -1,0 +1,525 @@
+{
+  "test_name": "IPFIX Procera",
+  "events": [
+    {
+      "Timestamp": "2018-04-15T03:30:00Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "138.44.161.14",
+          "locality": "public",
+          "port": 47838
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
+        },
+        "flow": {
+          "id": "q-trxhRGXW0",
+          "locality": "public"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 7575,
+          "bgpSourceAsNumber": 7575,
+          "destinationIPv4Address": "138.44.161.14",
+          "destinationIPv6Address": "::",
+          "destinationTransportPort": 47838,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2875616939,
+            "timestamp": "2018-04-15T03:30:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSeconds": "2018-04-15T03:29:02Z",
+          "flowStartSeconds": "2018-04-15T03:26:50Z",
+          "proceraBaseService": "Being analyzed",
+          "proceraContentCategories": "",
+          "proceraFlowBehavior": "INITIAL,SERVER_IS_LOCAL,BEGINNING",
+          "proceraHttpContentType": "",
+          "proceraHttpFileLength": 0,
+          "proceraHttpLocation": "",
+          "proceraHttpUrl": "",
+          "proceraIncomingOctets": 60,
+          "proceraOutgoingOctets": 0,
+          "proceraService": "Being analyzed",
+          "proceraSubscriberIdentifier": "",
+          "proceraTemplateName": "IPFIX",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "181.214.87.71",
+          "sourceIPv6Address": "::",
+          "sourceTransportPort": 53787,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "181.214.87.71",
+          "locality": "public",
+          "port": 53787
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-04-15T03:30:00Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "0.0.0.0",
+          "locality": "private",
+          "port": 135
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
+        },
+        "flow": {
+          "id": "GYmhjYyvaAI",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 0,
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "0.0.0.0",
+          "destinationIPv6Address": "2001:388:cf0a:6::2",
+          "destinationTransportPort": 135,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2875616939,
+            "timestamp": "2018-04-15T03:30:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSeconds": "2018-04-15T03:29:02Z",
+          "flowStartSeconds": "2018-04-15T03:28:44Z",
+          "proceraBaseService": "IP protocol 58 (IPv6-ICMP)",
+          "proceraContentCategories": "",
+          "proceraFlowBehavior": "INITIAL,SERVER_IS_LOCAL,BEGINNING,ESTABLISHED",
+          "proceraHttpContentType": "",
+          "proceraHttpFileLength": 0,
+          "proceraHttpLocation": "",
+          "proceraHttpUrl": "",
+          "proceraIncomingOctets": 86,
+          "proceraOutgoingOctets": 78,
+          "proceraService": "IP protocol 58 (IPv6-ICMP)",
+          "proceraSubscriberIdentifier": "",
+          "proceraTemplateName": "IPFIX",
+          "protocolIdentifier": 58,
+          "sourceIPv4Address": "0.0.0.0",
+          "sourceIPv6Address": "2001:388:cf0a:6::1",
+          "sourceTransportPort": 136,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "ipv6-icmp"
+        },
+        "source": {
+          "ip": "0.0.0.0",
+          "locality": "private",
+          "port": 136
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-04-15T03:30:00Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "138.44.161.14",
+          "locality": "public",
+          "port": 22252
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
+        },
+        "flow": {
+          "id": "s0UY7AEXtbs",
+          "locality": "public"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 7575,
+          "bgpSourceAsNumber": 7575,
+          "destinationIPv4Address": "138.44.161.14",
+          "destinationIPv6Address": "::",
+          "destinationTransportPort": 22252,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2875616939,
+            "timestamp": "2018-04-15T03:30:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSeconds": "2018-04-15T03:29:06Z",
+          "flowStartSeconds": "2018-04-15T03:27:00Z",
+          "proceraBaseService": "Being analyzed",
+          "proceraContentCategories": "",
+          "proceraFlowBehavior": "INITIAL,SERVER_IS_LOCAL,BEGINNING",
+          "proceraHttpContentType": "",
+          "proceraHttpFileLength": 0,
+          "proceraHttpLocation": "",
+          "proceraHttpUrl": "",
+          "proceraIncomingOctets": 60,
+          "proceraOutgoingOctets": 0,
+          "proceraService": "Being analyzed",
+          "proceraSubscriberIdentifier": "",
+          "proceraTemplateName": "IPFIX",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "5.188.11.35",
+          "sourceIPv6Address": "::",
+          "sourceTransportPort": 44155,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "5.188.11.35",
+          "locality": "public",
+          "port": 44155
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-04-15T03:30:00Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "138.44.161.14",
+          "locality": "public",
+          "port": 8
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
+        },
+        "flow": {
+          "id": "r-qsT9TbSHw",
+          "locality": "public"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 7575,
+          "bgpSourceAsNumber": 226,
+          "destinationIPv4Address": "138.44.161.14",
+          "destinationIPv6Address": "::",
+          "destinationTransportPort": 8,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2875616939,
+            "timestamp": "2018-04-15T03:30:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSeconds": "2018-04-15T03:29:46Z",
+          "flowStartSeconds": "2018-04-15T03:29:02Z",
+          "proceraBaseService": "IP protocol 1 (ICMP)",
+          "proceraContentCategories": "",
+          "proceraFlowBehavior": "INITIAL,SERVER_IS_LOCAL,BEGINNING",
+          "proceraHttpContentType": "",
+          "proceraHttpFileLength": 0,
+          "proceraHttpLocation": "",
+          "proceraHttpUrl": "",
+          "proceraIncomingOctets": 60,
+          "proceraOutgoingOctets": 0,
+          "proceraService": "IP protocol 1 (ICMP)",
+          "proceraSubscriberIdentifier": "",
+          "proceraTemplateName": "IPFIX",
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "206.117.25.89",
+          "sourceIPv6Address": "::",
+          "sourceTransportPort": 0,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "206.117.25.89",
+          "locality": "public",
+          "port": 0
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-04-15T03:30:00Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "0.0.0.0",
+          "locality": "private",
+          "port": 135
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
+        },
+        "flow": {
+          "id": "GYmhjYyvaAI",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 0,
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "0.0.0.0",
+          "destinationIPv6Address": "2001:388:cf0a:6::2",
+          "destinationTransportPort": 135,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2875616939,
+            "timestamp": "2018-04-15T03:30:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSeconds": "2018-04-15T03:29:46Z",
+          "flowStartSeconds": "2018-04-15T03:29:14Z",
+          "proceraBaseService": "IP protocol 58 (IPv6-ICMP)",
+          "proceraContentCategories": "",
+          "proceraFlowBehavior": "INITIAL,SERVER_IS_LOCAL,BEGINNING,ESTABLISHED",
+          "proceraHttpContentType": "",
+          "proceraHttpFileLength": 0,
+          "proceraHttpLocation": "",
+          "proceraHttpUrl": "",
+          "proceraIncomingOctets": 86,
+          "proceraOutgoingOctets": 78,
+          "proceraService": "IP protocol 58 (IPv6-ICMP)",
+          "proceraSubscriberIdentifier": "",
+          "proceraTemplateName": "IPFIX",
+          "protocolIdentifier": 58,
+          "sourceIPv4Address": "0.0.0.0",
+          "sourceIPv6Address": "2001:388:cf0a:6::1",
+          "sourceTransportPort": 136,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "ipv6-icmp"
+        },
+        "source": {
+          "ip": "0.0.0.0",
+          "locality": "private",
+          "port": 136
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-04-15T03:30:00Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "138.44.161.14",
+          "locality": "public",
+          "port": 7451
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
+        },
+        "flow": {
+          "id": "dF2yRC2ldzk",
+          "locality": "public"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 7575,
+          "bgpSourceAsNumber": 7575,
+          "destinationIPv4Address": "138.44.161.14",
+          "destinationIPv6Address": "::",
+          "destinationTransportPort": 7451,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2875616939,
+            "timestamp": "2018-04-15T03:30:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSeconds": "2018-04-15T03:30:00Z",
+          "flowStartSeconds": "2018-04-15T03:28:59Z",
+          "proceraBaseService": "Being analyzed",
+          "proceraContentCategories": "",
+          "proceraFlowBehavior": "INITIAL,SERVER_IS_LOCAL,BEGINNING",
+          "proceraHttpContentType": "",
+          "proceraHttpFileLength": 0,
+          "proceraHttpLocation": "",
+          "proceraHttpUrl": "",
+          "proceraIncomingOctets": 60,
+          "proceraOutgoingOctets": 0,
+          "proceraService": "Being analyzed",
+          "proceraSubscriberIdentifier": "",
+          "proceraTemplateName": "IPFIX",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "185.232.29.199",
+          "sourceIPv6Address": "::",
+          "sourceTransportPort": 55869,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "185.232.29.199",
+          "locality": "public",
+          "port": 55869
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-04-15T03:30:00Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "138.44.161.14",
+          "locality": "public",
+          "port": 2000
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
+        },
+        "flow": {
+          "id": "Nv4c6iSK_5U",
+          "locality": "public"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 7575,
+          "bgpSourceAsNumber": 7575,
+          "destinationIPv4Address": "138.44.161.14",
+          "destinationIPv6Address": "::",
+          "destinationTransportPort": 2000,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2875616939,
+            "timestamp": "2018-04-15T03:30:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSeconds": "2018-04-15T03:30:00Z",
+          "flowStartSeconds": "2018-04-15T03:29:30Z",
+          "proceraBaseService": "Being analyzed",
+          "proceraContentCategories": "",
+          "proceraFlowBehavior": "INITIAL,SERVER_IS_LOCAL,BEGINNING",
+          "proceraHttpContentType": "",
+          "proceraHttpFileLength": 0,
+          "proceraHttpLocation": "",
+          "proceraHttpUrl": "",
+          "proceraIncomingOctets": 60,
+          "proceraOutgoingOctets": 0,
+          "proceraService": "Being analyzed",
+          "proceraSubscriberIdentifier": "",
+          "proceraTemplateName": "IPFIX",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "177.188.228.137",
+          "sourceIPv6Address": "::",
+          "sourceTransportPort": 9430,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "177.188.228.137",
+          "locality": "public",
+          "port": 9430
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-04-15T03:30:00Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "138.44.161.13",
+          "locality": "public",
+          "port": 179
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
+        },
+        "flow": {
+          "id": "PhIIQeuDikc",
+          "locality": "public"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 7575,
+          "bgpSourceAsNumber": 7575,
+          "destinationIPv4Address": "138.44.161.13",
+          "destinationIPv6Address": "::",
+          "destinationTransportPort": 179,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2875616939,
+            "timestamp": "2018-04-15T03:30:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSeconds": "2018-04-15T03:30:00Z",
+          "flowStartSeconds": "2018-04-15T03:25:00Z",
+          "proceraBaseService": "BGP-4",
+          "proceraContentCategories": "",
+          "proceraFlowBehavior": "INTERACTIVE,CLIENT_IS_LOCAL,INBOUND,ESTABLISHED,ACTIVE",
+          "proceraHttpContentType": "",
+          "proceraHttpFileLength": 0,
+          "proceraHttpLocation": "",
+          "proceraHttpUrl": "",
+          "proceraIncomingOctets": 7076,
+          "proceraOutgoingOctets": 3310,
+          "proceraService": "BGP-4",
+          "proceraSubscriberIdentifier": "",
+          "proceraTemplateName": "IPFIX",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "138.44.161.14",
+          "sourceIPv6Address": "::",
+          "sourceTransportPort": 33689,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "138.44.161.14",
+          "locality": "public",
+          "port": 33689
+        }
+      },
+      "Private": null
+    }
+  ]
+}

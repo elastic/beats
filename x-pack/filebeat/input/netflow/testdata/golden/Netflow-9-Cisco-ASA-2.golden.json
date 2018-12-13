@@ -1,0 +1,1156 @@
+{
+  "test_name": "Netflow 9 Cisco ASA 2",
+  "events": [
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.17",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "4FwX8zOnzn4",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.17",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 2,
+          "flowId": 742819709,
+          "flowStartMilliseconds": "2016-07-21T13:50:32.955Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 81,
+          "observationTimeMilliseconds": "2016-07-21T13:50:33.015Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 61775,
+          "postNATDestinationIPv4Address": "192.168.0.17",
+          "postNATSourceIPv4Address": "192.168.0.2",
+          "protocolIdentifier": 6,
+          "responderOctets": 763,
+          "sourceIPv4Address": "192.168.0.2",
+          "sourceTransportPort": 61775,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.2",
+          "locality": "private",
+          "port": 61775
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.17",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "Ad8vSa7issI",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.17",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 5,
+          "flowId": 742819710,
+          "flowStartMilliseconds": "2016-07-21T13:50:32.955Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 81,
+          "observationTimeMilliseconds": "2016-07-21T13:50:33.035Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 61776,
+          "postNATDestinationIPv4Address": "192.168.0.17",
+          "postNATSourceIPv4Address": "192.168.0.2",
+          "protocolIdentifier": 6,
+          "responderOctets": 6207,
+          "sourceIPv4Address": "192.168.0.2",
+          "sourceTransportPort": 61776,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.2",
+          "locality": "private",
+          "port": 61776
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.17",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "Ad8vSa7issI",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.17",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 2,
+          "flowId": 742819710,
+          "flowStartMilliseconds": "2016-07-21T13:50:32.955Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 81,
+          "observationTimeMilliseconds": "2016-07-21T13:50:33.035Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 61776,
+          "postNATDestinationIPv4Address": "192.168.0.17",
+          "postNATSourceIPv4Address": "192.168.0.2",
+          "protocolIdentifier": 6,
+          "responderOctets": 6207,
+          "sourceIPv4Address": "192.168.0.2",
+          "sourceTransportPort": 61776,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.2",
+          "locality": "private",
+          "port": 61776
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.18",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "1W6ybGAqMAo",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.18",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 5,
+          "flowId": 742819619,
+          "flowStartMilliseconds": "2016-07-21T13:50:32.475Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 81,
+          "observationTimeMilliseconds": "2016-07-21T13:50:33.115Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 56635,
+          "postNATDestinationIPv4Address": "192.168.0.18",
+          "postNATSourceIPv4Address": "192.168.0.1",
+          "protocolIdentifier": 6,
+          "responderOctets": 9075,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 56635,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 56635
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.18",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "1W6ybGAqMAo",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.18",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 2,
+          "flowId": 742819619,
+          "flowStartMilliseconds": "2016-07-21T13:50:32.475Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 81,
+          "observationTimeMilliseconds": "2016-07-21T13:50:33.115Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 56635,
+          "postNATDestinationIPv4Address": "192.168.0.18",
+          "postNATSourceIPv4Address": "192.168.0.1",
+          "protocolIdentifier": 6,
+          "responderOctets": 9075,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 56635,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 56635
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.17",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "VQT0jF243AA",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.17",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 5,
+          "flowId": 742819707,
+          "flowStartMilliseconds": "2016-07-21T13:50:32.955Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 81,
+          "observationTimeMilliseconds": "2016-07-21T13:50:33.185Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 61773,
+          "postNATDestinationIPv4Address": "192.168.0.17",
+          "postNATSourceIPv4Address": "192.168.0.2",
+          "protocolIdentifier": 6,
+          "responderOctets": 5536,
+          "sourceIPv4Address": "192.168.0.2",
+          "sourceTransportPort": 61773,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.2",
+          "locality": "private",
+          "port": 61773
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.17",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "VQT0jF243AA",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.17",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 2,
+          "flowId": 742819707,
+          "flowStartMilliseconds": "2016-07-21T13:50:32.955Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 81,
+          "observationTimeMilliseconds": "2016-07-21T13:50:33.185Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 61773,
+          "postNATDestinationIPv4Address": "192.168.0.17",
+          "postNATSourceIPv4Address": "192.168.0.2",
+          "protocolIdentifier": 6,
+          "responderOctets": 5536,
+          "sourceIPv4Address": "192.168.0.2",
+          "sourceTransportPort": 61773,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.2",
+          "locality": "private",
+          "port": 61773
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.18",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "RA26743dDmc",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.18",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 1,
+          "flowId": 742819773,
+          "flowStartMilliseconds": "2016-07-21T13:50:33.385Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2016-07-21T13:50:33.385Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 56649,
+          "postNATDestinationIPv4Address": "192.168.0.18",
+          "postNATSourceIPv4Address": "192.168.0.1",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 56649,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 56649
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.18",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "RA26743dDmc",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.18",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 5,
+          "flowId": 742819773,
+          "flowStartMilliseconds": "2016-07-21T13:50:33.385Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 69,
+          "observationTimeMilliseconds": "2016-07-21T13:50:33.475Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 56649,
+          "postNATDestinationIPv4Address": "192.168.0.18",
+          "postNATSourceIPv4Address": "192.168.0.1",
+          "protocolIdentifier": 6,
+          "responderOctets": 14179,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 56649,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 56649
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.18",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "RA26743dDmc",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.18",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 2,
+          "flowId": 742819773,
+          "flowStartMilliseconds": "2016-07-21T13:50:33.385Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 69,
+          "observationTimeMilliseconds": "2016-07-21T13:50:33.475Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 56649,
+          "postNATDestinationIPv4Address": "192.168.0.18",
+          "postNATSourceIPv4Address": "192.168.0.1",
+          "protocolIdentifier": 6,
+          "responderOctets": 14179,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 56649,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 56649
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.17",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "bQYn_AhcGkw",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.17",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 1,
+          "flowId": 742820025,
+          "flowStartMilliseconds": "2016-07-21T13:50:35.035Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2016-07-21T13:50:35.035Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 61777,
+          "postNATDestinationIPv4Address": "192.168.0.17",
+          "postNATSourceIPv4Address": "192.168.0.2",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.0.2",
+          "sourceTransportPort": 61777,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.2",
+          "locality": "private",
+          "port": 61777
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.17",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "bQYn_AhcGkw",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.17",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 5,
+          "flowId": 742820025,
+          "flowStartMilliseconds": "2016-07-21T13:50:35.035Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 69,
+          "observationTimeMilliseconds": "2016-07-21T13:50:35.125Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 61777,
+          "postNATDestinationIPv4Address": "192.168.0.17",
+          "postNATSourceIPv4Address": "192.168.0.2",
+          "protocolIdentifier": 6,
+          "responderOctets": 14178,
+          "sourceIPv4Address": "192.168.0.2",
+          "sourceTransportPort": 61777,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.2",
+          "locality": "private",
+          "port": 61777
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.17",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "bQYn_AhcGkw",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.17",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 2,
+          "flowId": 742820025,
+          "flowStartMilliseconds": "2016-07-21T13:50:35.035Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 69,
+          "observationTimeMilliseconds": "2016-07-21T13:50:35.125Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 61777,
+          "postNATDestinationIPv4Address": "192.168.0.17",
+          "postNATSourceIPv4Address": "192.168.0.2",
+          "protocolIdentifier": 6,
+          "responderOctets": 14178,
+          "sourceIPv4Address": "192.168.0.2",
+          "sourceTransportPort": 61777,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.2",
+          "locality": "private",
+          "port": 61777
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.17",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "gx9XsEXj188",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.17",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 1,
+          "flowId": 742820153,
+          "flowStartMilliseconds": "2016-07-21T13:50:35.785Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2016-07-21T13:50:35.785Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 56650,
+          "postNATDestinationIPv4Address": "192.168.0.17",
+          "postNATSourceIPv4Address": "192.168.0.1",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 56650,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 56650
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.17",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "gx9XsEXj188",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.17",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 5,
+          "flowId": 742820153,
+          "flowStartMilliseconds": "2016-07-21T13:50:35.785Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 75,
+          "observationTimeMilliseconds": "2016-07-21T13:50:35.925Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 56650,
+          "postNATDestinationIPv4Address": "192.168.0.17",
+          "postNATSourceIPv4Address": "192.168.0.1",
+          "protocolIdentifier": 6,
+          "responderOctets": 881,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 56650,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 56650
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.17",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "gx9XsEXj188",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.17",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 2,
+          "flowId": 742820153,
+          "flowStartMilliseconds": "2016-07-21T13:50:35.785Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 75,
+          "observationTimeMilliseconds": "2016-07-21T13:50:35.925Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 56650,
+          "postNATDestinationIPv4Address": "192.168.0.17",
+          "postNATSourceIPv4Address": "192.168.0.1",
+          "protocolIdentifier": 6,
+          "responderOctets": 881,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 56650,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 56650
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.18",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "4JJK6i2GTfU",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.18",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 1,
+          "flowId": 742820223,
+          "flowStartMilliseconds": "2016-07-21T13:50:36.395Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2016-07-21T13:50:36.395Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 56651,
+          "postNATDestinationIPv4Address": "192.168.0.18",
+          "postNATSourceIPv4Address": "192.168.0.1",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 56651,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 56651
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.18",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "4JJK6i2GTfU",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.18",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 5,
+          "flowId": 742820223,
+          "flowStartMilliseconds": "2016-07-21T13:50:36.395Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 69,
+          "observationTimeMilliseconds": "2016-07-21T13:50:36.495Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 56651,
+          "postNATDestinationIPv4Address": "192.168.0.18",
+          "postNATSourceIPv4Address": "192.168.0.1",
+          "protocolIdentifier": 6,
+          "responderOctets": 14178,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 56651,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 56651
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-07-21T13:50:37Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.18",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-07-21T13:50:37Z"
+        },
+        "flow": {
+          "id": "4JJK6i2GTfU",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.18",
+          "destinationTransportPort": 80,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-07-21T13:50:37Z",
+            "uptimeMillis": 739410190,
+            "version": 9
+          },
+          "firewallEvent": 2,
+          "flowId": 742820223,
+          "flowStartMilliseconds": "2016-07-21T13:50:36.395Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "initiatorOctets": 69,
+          "observationTimeMilliseconds": "2016-07-21T13:50:36.495Z",
+          "postNAPTDestinationTransportPort": 80,
+          "postNAPTSourceTransportPort": 56651,
+          "postNATDestinationIPv4Address": "192.168.0.18",
+          "postNATSourceIPv4Address": "192.168.0.1",
+          "protocolIdentifier": 6,
+          "responderOctets": 14178,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 56651,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 56651
+        }
+      },
+      "Private": null
+    }
+  ]
+}

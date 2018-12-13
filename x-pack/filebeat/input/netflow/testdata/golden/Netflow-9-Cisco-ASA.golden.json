@@ -1,0 +1,789 @@
+{
+  "test_name": "Netflow 9 Cisco ASA",
+  "events": [
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "2.2.2.11",
+          "locality": "public",
+          "port": 17549
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "4sqHgIUNdhc",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "2.2.2.11",
+          "destinationTransportPort": 17549,
+          "egressInterface": 2,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8500,
+          "flowStartMilliseconds": "2015-10-09T09:47:47.569Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2015-10-09T09:47:49.599Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "192.168.14.1",
+          "sourceTransportPort": 0,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "192.168.14.1",
+          "locality": "private",
+          "port": 0
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "164.164.37.11",
+          "locality": "public",
+          "port": 0
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "3zooPayCX08",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "164.164.37.11",
+          "destinationTransportPort": 0,
+          "egressInterface": 3,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8501,
+          "flowStartMilliseconds": "2015-10-09T09:47:48.169Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 8,
+          "ingressInterface": 2,
+          "observationTimeMilliseconds": "2015-10-09T09:47:50.179Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "192.168.23.22",
+          "sourceTransportPort": 17549,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "192.168.23.22",
+          "locality": "private",
+          "port": 17549
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.23.22",
+          "locality": "private",
+          "port": 17549
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "rjHIoePwVUY",
+          "locality": "public"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.23.22",
+          "destinationTransportPort": 17549,
+          "egressInterface": 2,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8502,
+          "flowStartMilliseconds": "2015-10-09T09:47:48.179Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2015-10-09T09:47:50.219Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "164.164.37.11",
+          "sourceTransportPort": 0,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "164.164.37.11",
+          "locality": "public",
+          "port": 0
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "164.164.37.11",
+          "locality": "public",
+          "port": 0
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "kTUBU9vFxdg",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "164.164.37.11",
+          "destinationTransportPort": 0,
+          "egressInterface": 3,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8503,
+          "flowStartMilliseconds": "2015-10-09T09:47:48.399Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 8,
+          "ingressInterface": 2,
+          "observationTimeMilliseconds": "2015-10-09T09:47:50.419Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "192.168.23.20",
+          "sourceTransportPort": 17805,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "192.168.23.20",
+          "locality": "private",
+          "port": 17805
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.23.20",
+          "locality": "private",
+          "port": 17805
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "xPJhkFDpNiU",
+          "locality": "public"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.23.20",
+          "destinationTransportPort": 17805,
+          "egressInterface": 2,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8504,
+          "flowStartMilliseconds": "2015-10-09T09:47:48.409Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2015-10-09T09:47:50.429Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "164.164.37.11",
+          "sourceTransportPort": 0,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "164.164.37.11",
+          "locality": "public",
+          "port": 0
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "2.2.2.11",
+          "locality": "public",
+          "port": 0
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "AxuXms6GBGk",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "2.2.2.11",
+          "destinationTransportPort": 0,
+          "egressInterface": 2,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8505,
+          "flowStartMilliseconds": "2015-10-09T09:47:48.589Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 8,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2015-10-09T09:47:50.619Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "192.168.14.11",
+          "sourceTransportPort": 17805,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "192.168.14.11",
+          "locality": "private",
+          "port": 17805
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.14.11",
+          "locality": "private",
+          "port": 17805
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "gFKfPBsWfLM",
+          "locality": "public"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.14.11",
+          "destinationTransportPort": 17805,
+          "egressInterface": 3,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8506,
+          "flowStartMilliseconds": "2015-10-09T09:47:48.599Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 2,
+          "observationTimeMilliseconds": "2015-10-09T09:47:50.639Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "2.2.2.11",
+          "sourceTransportPort": 0,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "2.2.2.11",
+          "locality": "public",
+          "port": 0
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.14.1",
+          "locality": "private",
+          "port": 0
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "eHdG6rUdn28",
+          "locality": "public"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.14.1",
+          "destinationTransportPort": 0,
+          "egressInterface": 3,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8507,
+          "flowStartMilliseconds": "2015-10-09T09:47:48.609Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 8,
+          "ingressInterface": 2,
+          "observationTimeMilliseconds": "2015-10-09T09:47:50.639Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "2.2.2.11",
+          "sourceTransportPort": 17805,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "2.2.2.11",
+          "locality": "public",
+          "port": 17805
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "2.2.2.11",
+          "locality": "public",
+          "port": 17805
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "JVI-3U3vTiM",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "2.2.2.11",
+          "destinationTransportPort": 17805,
+          "egressInterface": 2,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8508,
+          "flowStartMilliseconds": "2015-10-09T09:47:48.619Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2015-10-09T09:47:50.639Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "192.168.14.1",
+          "sourceTransportPort": 0,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "192.168.14.1",
+          "locality": "private",
+          "port": 0
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.23.1",
+          "locality": "private",
+          "port": 0
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "pc77-XHjAxs",
+          "locality": "public"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.23.1",
+          "destinationTransportPort": 0,
+          "egressInterface": 2,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8525,
+          "flowStartMilliseconds": "2015-10-09T09:47:51.269Z",
+          "icmpCodeIPv4": 3,
+          "icmpTypeIPv4": 3,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2015-10-09T09:47:51.269Z",
+          "octetTotalCount": 160,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "164.164.37.11",
+          "sourceTransportPort": 0,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 160,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "164.164.37.11",
+          "locality": "public",
+          "port": 0
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "164.164.37.11",
+          "locality": "public",
+          "port": 0
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "Qh5mk2U4KjY",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "164.164.37.11",
+          "destinationTransportPort": 0,
+          "egressInterface": 3,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8509,
+          "flowStartMilliseconds": "2015-10-09T09:47:49.249Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 8,
+          "ingressInterface": 2,
+          "observationTimeMilliseconds": "2015-10-09T09:47:51.269Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "192.168.23.22",
+          "sourceTransportPort": 18061,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "192.168.23.22",
+          "locality": "private",
+          "port": 18061
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.23.22",
+          "locality": "private",
+          "port": 18061
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "v3tlG0bhLIU",
+          "locality": "public"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.23.22",
+          "destinationTransportPort": 18061,
+          "egressInterface": 2,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8510,
+          "flowStartMilliseconds": "2015-10-09T09:47:49.259Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2015-10-09T09:47:51.289Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "164.164.37.11",
+          "sourceTransportPort": 0,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "164.164.37.11",
+          "locality": "public",
+          "port": 0
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "164.164.37.11",
+          "locality": "public",
+          "port": 0
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "arIGi4uQChk",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "164.164.37.11",
+          "destinationTransportPort": 0,
+          "egressInterface": 3,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8511,
+          "flowStartMilliseconds": "2015-10-09T09:47:49.469Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 8,
+          "ingressInterface": 2,
+          "observationTimeMilliseconds": "2015-10-09T09:47:51.489Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "192.168.23.20",
+          "sourceTransportPort": 18061,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "192.168.23.20",
+          "locality": "private",
+          "port": 18061
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-09T09:47:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.23.20",
+          "locality": "private",
+          "port": 18061
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
+        },
+        "flow": {
+          "id": "v3tlG0bhLIU",
+          "locality": "public"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.23.20",
+          "destinationTransportPort": 18061,
+          "egressInterface": 2,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-10-09T09:47:51Z",
+            "uptimeMillis": 2064637,
+            "version": 9
+          },
+          "flowId": 8512,
+          "flowStartMilliseconds": "2015-10-09T09:47:49.479Z",
+          "icmpCodeIPv4": 0,
+          "icmpTypeIPv4": 0,
+          "ingressInterface": 3,
+          "observationTimeMilliseconds": "2015-10-09T09:47:51.509Z",
+          "octetTotalCount": 56,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "164.164.37.11",
+          "sourceTransportPort": 0,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 56,
+          "direction": "unknown",
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "164.164.37.11",
+          "locality": "public",
+          "port": 0
+        }
+      },
+      "Private": null
+    }
+  ]
+}
