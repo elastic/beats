@@ -57,7 +57,7 @@ auditbeat.modules:
   # current state of the system (e.g. all currently
   # running processes, all open sockets).
   state.period: 12h
-  
+
   # Enabled by default. Auditbeat will read password fields in
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
