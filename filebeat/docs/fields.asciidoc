@@ -6681,6 +6681,16 @@ Process id
 
 --
 
+*`postgresql.log.core_id`*::
++
+--
+type: long
+
+Core id
+
+
+--
+
 *`postgresql.log.user`*::
 +
 --
