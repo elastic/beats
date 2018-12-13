@@ -116,7 +116,7 @@ auditbeat.modules:
   metricsets:
     - host    # General host information, e.g. uptime, IPs
     - process # Started and stopped processes
-    - socket  # Opened and closed processes
+    - socket  # Opened and closed sockets
     - user    # User information
 
   # How often metricsets send state updates with the
