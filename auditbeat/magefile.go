@@ -126,7 +126,7 @@ func Update() {
 
 // Docs collects the documentation.
 func Docs() error {
-	return auditbeat.CollectDocs(mage.OSSBeatDir())
+	return auditbeat.CollectDocs(mage.OSSBeatDir(), auditbeat.XpackBeatDir())
 }
 
 // Fmt formats source code and adds file headers.

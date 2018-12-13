@@ -114,7 +114,7 @@ func Update() {
 
 // Docs collects the documentation.
 func Docs() error {
-	return auditbeat.CollectDocs(mage.OSSBeatDir(), xpackBeatDir())
+	return auditbeat.CollectDocs(mage.OSSBeatDir(), auditbeat.XpackBeatDir())
 }
 
 // Fmt formats source code and adds file headers.
@@ -170,8 +170,4 @@ func PythonIntegTest(ctx context.Context) error {
 		mg.Deps(mage.BuildSystemTestBinary)
 		return mage.PythonNoseTest(mage.DefaultPythonTestIntegrationArgs())
 	})
-}
-
-func xpackBeatDir() string {
-	return mage.OSSBeatDir("../x-pack", mage.BeatName)
 }

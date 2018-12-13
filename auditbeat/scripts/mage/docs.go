@@ -83,3 +83,8 @@ func CollectDocs(basePaths ...string) error {
 
 	return sh.Run(python, args...)
 }
+
+// XpackBeatDir returns the x-pack/{beatname} directory for a Beat.
+func XpackBeatDir() string {
+	return mage.OSSBeatDir("../x-pack", mage.BeatName)
+}
