@@ -1781,6 +1781,10 @@ Contains common fields available in all event types.
 *`metricset.module`*::
 +
 --
+type: alias
+
+alias to: event.module
+
 The name of the module that generated the event.
 
 
@@ -1794,32 +1798,10 @@ The name of the metricset that generated the event.
 
 --
 
-*`metricset.host`*::
+*`service.address`*::
 +
 --
-Hostname of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
-
-
---
-
-*`metricset.rtt`*::
-+
---
-type: long
-
-required: True
-
-Event round trip time in microseconds.
-
-
---
-
-*`metricset.namespace`*::
-+
---
-type: keyword
-
-Namespace of dynamic metricsets.
+Connection address of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
 
 
 --

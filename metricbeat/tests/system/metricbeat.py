@@ -7,7 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/
 from beat.beat import TestCase
 
 COMMON_FIELDS = ["@timestamp", "agent", "metricset.name", "metricset.host",
-                 "metricset.module", "metricset.rtt", "host.name", "service.name"]
+                 "metricset.module", "metricset.rtt", "host.name", "service.name", "event"]
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -85,11 +85,13 @@ class BaseTest(TestCase):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
+        print output
         self.assertTrue(len(output) >= 1)
         evt = output[0]
         print(evt)
 
         fields = COMMON_FIELDS + fields
+        print fields
         self.assertItemsEqual(self.de_dot(fields), evt.keys())
 
         self.assert_fields_are_documented(evt)
