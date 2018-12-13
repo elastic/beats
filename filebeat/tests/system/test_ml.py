@@ -133,6 +133,6 @@ class Test(BaseTest):
         for obj in ["Datafeed", "Job", "Dashboard", "Search", "Visualization"]:
             self.wait_log_contains("{obj} already exists".format(obj=obj),
                                    logfile=output_path,
-                                   max_timeout=30)
+                                   max_timeout=60)
 
         beat.kill()

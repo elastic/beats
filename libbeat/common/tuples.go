@@ -20,6 +20,7 @@ package common
 import (
 	"fmt"
 	"net"
+	"time"
 )
 
 // In order for the IpPortTuple and the TcpTuple to be used as
@@ -155,22 +156,31 @@ func (t *TCPTuple) Hashable() HashableTCPTuple {
 	return t.raw
 }
 
-// CmdlineTuple contains the source and destination process names, as found by
+// ProcessTuple contains the source and destination process names, as found by
 // the proc module.
-type CmdlineTuple struct {
-	// Source and destination processes names as specified in packetbeat.procs.monitored
-	Src, Dst []byte
-	// Source and destination full command lines
-	SrcCommand, DstCommand []byte
+type ProcessTuple struct {
+	Src, Dst Process
+}
+
+// Process contains process information.
+type Process struct {
+	PID       int       // Process ID.
+	PPID      int       // Parent process ID.
+	Name      string    // Name of process (or alias given by cmdline_grep config).
+	Args      []string  // Process arguments.
+	Exe       string    // Absolute path to exe.
+	CWD       string    // Current working directory.
+	StartTime time.Time // Start time of process.
 }
 
 // Reverse returns a copy of the receiver with the source and destination fields
 // swapped.
-func (c *CmdlineTuple) Reverse() CmdlineTuple {
-	return CmdlineTuple{
-		Src:        c.Dst,
-		Dst:        c.Src,
-		SrcCommand: c.DstCommand,
-		DstCommand: c.SrcCommand,
+func (c *ProcessTuple) Reverse() ProcessTuple {
+	if c == nil {
+		return ProcessTuple{}
+	}
+	return ProcessTuple{
+		Src: c.Dst,
+		Dst: c.Src,
 	}
 }

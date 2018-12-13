@@ -11,7 +11,8 @@ from beat.beat import Proc
 TRANS_REQUIRED_FIELDS = ["@timestamp", "type", "status",
                          "agent.type", "agent.hostname", "agent.version"]
 
-FLOWS_REQUIRED_FIELDS = ["@timestamp", "type",
+FLOWS_REQUIRED_FIELDS = ["@timestamp", "event.type", "event.start",
+                         "event.end", "event.duration", "flow.id",
                          "agent.type", "agent.hostname", "agent.version"]
 
 
@@ -113,7 +114,9 @@ class BaseTest(TestCase):
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
                 document = self.flatten_object(json.loads(line), self.dict_fields)
-                if not types or document["type"] in types:
+                if not types or \
+                    ("type" in document and document["type"] in types) or \
+                        ("event.type" in document and document["event.type"] in types):
                     jsons.append(document)
         self.all_have_fields(jsons, required_fields or TRANS_REQUIRED_FIELDS)
         self.all_fields_are_expected(jsons, self.expected_fields)

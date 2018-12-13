@@ -13,11 +13,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Update add_cloud_metadata fields to adjust to ECS. {pull}9265[9265]
 - Automaticall cap signed integers to 63bits. {pull}8991[8991]
+- Rename beat.timezone to event.timezone. {pull}9458[9458]
 
 *Auditbeat*
 
 *Filebeat*
+
+- Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
 
 *Heartbeat*
 
@@ -25,11 +29,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Metricbeat*
 
+- Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
+
 *Packetbeat*
+
+- Renamed the flow event fields to follow Elastic Common Schema. {pull}9121[9121]
+- Renamed several client and server fields. IP, port, and process metadata are
+  now contained under the client and server namespaces. {issue}9303[9303]
 
 *Winlogbeat*
 
 *Functionbeat*
+
+- The CLI will now log CloudFormation Stack events. {issue}8912[8912]
 
 ==== Bugfixes
 
@@ -65,6 +77,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Packetbeat*
 
+- Fix issue with process monitor associating traffic to the wrong process. {issue}9151[9151] {pull}9443[9443]
+
 *Winlogbeat*
 
 *Functionbeat*
@@ -85,6 +99,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]
 - Added `syslog_host` variable to HAProxy module to allow syslog listener to bind to configured host. {pull}9366[9366]
 - Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
+- Add support for multi-core thread_id in postgresql module {issue}9156[9156] {pull}9482[9482]
 
 *Heartbeat*
 
