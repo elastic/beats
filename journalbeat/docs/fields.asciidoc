@@ -94,53 +94,7 @@ Metadata from cloud providers added by the add_cloud_metadata processor.
 
 
 
-*`meta.cloud.provider`*::
-+
---
-example: ec2
-
-Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
-
-
---
-
-*`meta.cloud.instance_id`*::
-+
---
-Instance ID of the host machine.
-
-
---
-
-*`meta.cloud.instance_name`*::
-+
---
-Instance name of the host machine.
-
-
---
-
-*`meta.cloud.machine_type`*::
-+
---
-example: t2.medium
-
-Machine type of the host machine.
-
-
---
-
-*`meta.cloud.availability_zone`*::
-+
---
-example: us-east-1c
-
-Availability zone in which this host is running.
-
-
---
-
-*`meta.cloud.project_id`*::
+*`cloud.project.id`*::
 +
 --
 example: project-x
@@ -150,11 +104,66 @@ Name of the project in Google Cloud.
 
 --
 
+*`meta.cloud.provider`*::
++
+--
+type: alias
+
+alias to: cloud.provider
+
+--
+
+*`meta.cloud.instance_id`*::
++
+--
+type: alias
+
+alias to: cloud.instance.id
+
+--
+
+*`meta.cloud.instance_name`*::
++
+--
+type: alias
+
+alias to: cloud.instance.name
+
+--
+
+*`meta.cloud.machine_type`*::
++
+--
+type: alias
+
+alias to: cloud.machine.type
+
+--
+
+*`meta.cloud.availability_zone`*::
++
+--
+type: alias
+
+alias to: cloud.availability_zone
+
+--
+
+*`meta.cloud.project_id`*::
++
+--
+type: alias
+
+alias to: cloud.project.id
+
+--
+
 *`meta.cloud.region`*::
 +
 --
-Region in which this host is running.
+type: alias
 
+alias to: cloud.region
 
 --
 
