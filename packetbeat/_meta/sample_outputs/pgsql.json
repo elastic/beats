@@ -1,0 +1,42 @@
+{
+    "@timestamp": "2015-01-10T19:45:43.161Z",
+    "@metadata": {
+        "beat": "packetbeat",
+        "type": "doc",
+        "version": "7.0.0"
+    },
+    "bytes_out": 202,
+    "bytes_in": 25,
+    "type": "pgsql",
+    "agent": {
+        "type": "packetbeat",
+        "hostname": "host.example.com",
+        "version": "7.0.0"
+    },
+    "server": {
+        "ip": "127.0.0.1",
+        "port": 5432,
+        "domain": "host.example.com"
+    },
+    "pgsql": {
+        "error_code": "",
+        "error_message": "",
+        "error_severity": "",
+        "iserror": false,
+        "num_rows": 4,
+        "num_fields": 3
+    },
+    "client": {
+        "ip": "127.0.0.1",
+        "port": 37881,
+        "domain": "host.example.com"
+    },
+    "method": "SELECT",
+    "status": "OK",
+    "responsetime": 1,
+    "response": "a,b,c\nmea,meb,mec\nmea1,meb1,mec1\nmea2,meb2,mec2\nmea3,meb3,mec3\n",
+    "query": "select * from test",
+    "host": {
+        "name": "host.example.com"
+    }
+}

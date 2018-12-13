@@ -76,7 +76,7 @@ type pgsqlMessage struct {
 
 	direction    uint8
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 }
 
 type pgsqlTransaction struct {

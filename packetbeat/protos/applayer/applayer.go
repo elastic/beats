@@ -122,7 +122,7 @@ type Message struct {
 	Ts           time.Time
 	Tuple        common.IPPortTuple
 	Transport    Transport
-	CmdlineTuple *common.CmdlineTuple
+	CmdlineTuple *common.ProcessTuple
 	Direction    NetDirection
 	IsRequest    bool
 	Size         uint64
@@ -182,7 +182,7 @@ func (t *Transaction) Init(
 	transport Transport,
 	direction NetDirection,
 	time time.Time,
-	cmdline *common.CmdlineTuple,
+	cmdline *common.ProcessTuple,
 	notes []string,
 ) {
 	t.Type = typ
