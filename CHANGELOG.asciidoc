@@ -38,6 +38,8 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 *Functionbeat*
 
+- The CLI will now log CloudFormation Stack events. {issue}8912[8912]
+
 ==== Bugfixes
 
 *Affecting all Beats*
