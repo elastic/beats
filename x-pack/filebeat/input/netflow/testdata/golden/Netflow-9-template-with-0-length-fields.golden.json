@@ -14,11 +14,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:48.299Z",
-          "start": "2016-12-23T01:34:48.299Z",
-          "type": "netflow"
+          "start": "2016-12-23T01:34:48.299Z"
         },
         "flow": {
           "id": "39W8LA5XBnc",
@@ -79,11 +79,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:48.299Z",
-          "start": "2016-12-23T01:34:48.299Z",
-          "type": "netflow"
+          "start": "2016-12-23T01:34:48.299Z"
         },
         "flow": {
           "id": "BXrAI1HW--A",
@@ -144,11 +144,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.469Z",
-          "start": "2016-12-23T01:34:51.469Z",
-          "type": "netflow"
+          "start": "2016-12-23T01:34:51.469Z"
         },
         "flow": {
           "id": "39W8LA5XBnc",
@@ -209,11 +209,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.469Z",
-          "start": "2016-12-23T01:34:51.469Z",
-          "type": "netflow"
+          "start": "2016-12-23T01:34:51.469Z"
         },
         "flow": {
           "id": "Jx-Zk4nwIkE",
@@ -274,11 +274,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.469Z",
-          "start": "2016-12-23T01:34:51.469Z",
-          "type": "netflow"
+          "start": "2016-12-23T01:34:51.469Z"
         },
         "flow": {
           "id": "39W8LA5XBnc",
@@ -339,11 +339,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.469Z",
-          "start": "2016-12-23T01:34:51.469Z",
-          "type": "netflow"
+          "start": "2016-12-23T01:34:51.469Z"
         },
         "flow": {
           "id": "Jx-Zk4nwIkE",
@@ -404,11 +404,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.569Z",
-          "start": "2016-12-23T01:34:51.569Z",
-          "type": "netflow"
+          "start": "2016-12-23T01:34:51.569Z"
         },
         "flow": {
           "id": "39W8LA5XBnc",
@@ -469,11 +469,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.569Z",
-          "start": "2016-12-23T01:34:51.569Z",
-          "type": "netflow"
+          "start": "2016-12-23T01:34:51.569Z"
         },
         "flow": {
           "id": "IEwgskWJz00",
@@ -534,11 +534,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.569Z",
-          "start": "2016-12-23T01:34:51.569Z",
-          "type": "netflow"
+          "start": "2016-12-23T01:34:51.569Z"
         },
         "flow": {
           "id": "39W8LA5XBnc",
@@ -599,11 +599,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.569Z",
-          "start": "2016-12-23T01:34:51.569Z",
-          "type": "netflow"
+          "start": "2016-12-23T01:34:51.569Z"
         },
         "flow": {
           "id": "IEwgskWJz00",

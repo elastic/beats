@@ -15,11 +15,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
-          "start": "2017-02-14T11:10:19.368Z",
-          "type": "netflow"
+          "start": "2017-02-14T11:10:19.368Z"
         },
         "flow": {
           "id": "uz9_zfua5qU",
@@ -89,11 +89,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
-          "start": "2017-02-14T11:10:19.368Z",
-          "type": "netflow"
+          "start": "2017-02-14T11:10:19.368Z"
         },
         "flow": {
           "id": "1w3FDvLEFgo",
@@ -163,11 +163,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.924Z",
-          "start": "2017-02-14T11:10:19.924Z",
-          "type": "netflow"
+          "start": "2017-02-14T11:10:19.924Z"
         },
         "flow": {
           "id": "qkbx0XD7pSA",
@@ -237,11 +237,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.996Z",
-          "start": "2017-02-14T11:10:19.996Z",
-          "type": "netflow"
+          "start": "2017-02-14T11:10:19.996Z"
         },
         "flow": {
           "id": "4c7uUPCsBCk",
@@ -311,11 +311,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2017-02-14T11:10:36Z",
           "duration": 72000000,
           "end": "2017-02-14T11:10:20.008Z",
-          "start": "2017-02-14T11:10:19.936Z",
-          "type": "netflow"
+          "start": "2017-02-14T11:10:19.936Z"
         },
         "flow": {
           "id": "f2adL0TDrgs",

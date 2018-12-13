@@ -9,8 +9,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-08T19:06:29Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2015-10-08T19:06:29Z"
         },
         "netflow": {
           "exporter": {
@@ -27,7 +27,7 @@
           "scope": {
             "octetDeltaCount": 0
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null

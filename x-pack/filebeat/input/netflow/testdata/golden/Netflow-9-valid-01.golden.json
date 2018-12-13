@@ -14,11 +14,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2015-10-08T19:04:30Z",
           "duration": 1000000,
           "end": "2015-10-08T19:03:46.141Z",
-          "start": "2015-10-08T19:03:46.14Z",
-          "type": "netflow"
+          "start": "2015-10-08T19:03:46.14Z"
         },
         "flow": {
           "id": "i1KQBFMlwFg",
@@ -75,11 +75,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2015-10-08T19:04:30Z",
           "duration": 1000000,
           "end": "2015-10-08T19:03:46.141Z",
-          "start": "2015-10-08T19:03:46.14Z",
-          "type": "netflow"
+          "start": "2015-10-08T19:03:46.14Z"
         },
         "flow": {
           "id": "0Wj-QgIvFZE",
@@ -136,11 +136,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2015-10-08T19:04:30Z",
           "duration": 1000000,
           "end": "2015-10-08T19:03:51.814Z",
-          "start": "2015-10-08T19:03:51.813Z",
-          "type": "netflow"
+          "start": "2015-10-08T19:03:51.813Z"
         },
         "flow": {
           "id": "i1KQBFMlwFg",
@@ -197,11 +197,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2015-10-08T19:04:30Z",
           "duration": 1000000,
           "end": "2015-10-08T19:03:51.814Z",
-          "start": "2015-10-08T19:03:51.813Z",
-          "type": "netflow"
+          "start": "2015-10-08T19:03:51.813Z"
         },
         "flow": {
           "id": "_cbZpOjyGGQ",
@@ -258,11 +258,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2015-10-08T19:04:30Z",
           "duration": 0,
           "end": "2015-10-08T19:03:55.958Z",
-          "start": "2015-10-08T19:03:55.958Z",
-          "type": "netflow"
+          "start": "2015-10-08T19:03:55.958Z"
         },
         "flow": {
           "id": "i1KQBFMlwFg",
@@ -319,11 +319,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2015-10-08T19:04:30Z",
           "duration": 0,
           "end": "2015-10-08T19:03:55.958Z",
-          "start": "2015-10-08T19:03:55.958Z",
-          "type": "netflow"
+          "start": "2015-10-08T19:03:55.958Z"
         },
         "flow": {
           "id": "jDcbOcubrco",
@@ -378,11 +378,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2015-10-08T19:04:30Z",
           "duration": 38081000000,
           "end": "2015-10-08T19:04:25.9Z",
-          "start": "2015-10-08T19:03:47.819Z",
-          "type": "netflow"
+          "start": "2015-10-08T19:03:47.819Z"
         },
         "flow": {
           "id": "tYpw8DU5u10",

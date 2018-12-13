@@ -14,11 +14,11 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-01-16T09:45:02Z",
           "duration": 0,
           "end": "2018-01-16T09:44:47Z",
-          "start": "2018-01-16T09:44:47Z",
-          "type": "netflow"
+          "start": "2018-01-16T09:44:47Z"
         },
         "flow": {
           "id": "sjsTHOXy2lQ",

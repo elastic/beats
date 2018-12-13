@@ -14,9 +14,9 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-04-18T08:16:47Z",
-          "duration": 0,
-          "type": "netflow"
+          "duration": 0
         },
         "flow": {
           "id": "xrwrnNR_Xgs",
@@ -88,9 +88,9 @@
           "ip": "192.0.2.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-04-18T08:16:47Z",
-          "duration": 0,
-          "type": "netflow"
+          "duration": 0
         },
         "flow": {
           "id": "7BBLL0QpIjw",

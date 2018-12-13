@@ -14,11 +14,11 @@
           "ip": "10.100.4.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-08-09T16:49:04Z",
           "duration": 287000000,
           "end": "2018-08-09T16:43:00.307Z",
-          "start": "2018-08-09T16:43:00.02Z",
-          "type": "netflow"
+          "start": "2018-08-09T16:43:00.02Z"
         },
         "flow": {
           "id": "T5g_yptWDLc",
@@ -81,11 +81,11 @@
           "ip": "10.100.4.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-08-09T16:49:04Z",
           "duration": 30209000000,
           "end": "2018-08-09T16:43:01.317Z",
-          "start": "2018-08-09T16:42:31.108Z",
-          "type": "netflow"
+          "start": "2018-08-09T16:42:31.108Z"
         },
         "flow": {
           "id": "p77rp-QQcy4",
@@ -148,11 +148,11 @@
           "ip": "10.100.4.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-08-09T16:49:04Z",
           "duration": 0,
           "end": "2018-08-09T16:43:01.41Z",
-          "start": "2018-08-09T16:43:01.41Z",
-          "type": "netflow"
+          "start": "2018-08-09T16:43:01.41Z"
         },
         "flow": {
           "id": "yqWGb1dLOqc",
@@ -215,11 +215,11 @@
           "ip": "10.100.4.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-08-09T16:49:04Z",
           "duration": 59651000000,
           "end": "2018-08-09T16:43:02.334Z",
-          "start": "2018-08-09T16:42:02.683Z",
-          "type": "netflow"
+          "start": "2018-08-09T16:42:02.683Z"
         },
         "flow": {
           "id": "l0jbykreH8E",
@@ -282,11 +282,11 @@
           "ip": "10.100.4.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-08-09T16:49:04Z",
           "duration": 40015000000,
           "end": "2018-08-09T16:43:02.876Z",
-          "start": "2018-08-09T16:42:22.861Z",
-          "type": "netflow"
+          "start": "2018-08-09T16:42:22.861Z"
         },
         "flow": {
           "id": "N1T6lJguTIg",
@@ -349,11 +349,11 @@
           "ip": "10.100.4.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-08-09T16:49:04Z",
           "duration": 37121000000,
           "end": "2018-08-09T16:43:02.43Z",
-          "start": "2018-08-09T16:42:25.309Z",
-          "type": "netflow"
+          "start": "2018-08-09T16:42:25.309Z"
         },
         "flow": {
           "id": "5FJxwkuWO2k",
@@ -416,11 +416,11 @@
           "ip": "10.100.4.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-08-09T16:49:04Z",
           "duration": 31322000000,
           "end": "2018-08-09T16:43:02.43Z",
-          "start": "2018-08-09T16:42:31.108Z",
-          "type": "netflow"
+          "start": "2018-08-09T16:42:31.108Z"
         },
         "flow": {
           "id": "J7S4xARTVFk",
@@ -483,11 +483,11 @@
           "ip": "10.100.4.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-08-09T16:49:04Z",
           "duration": 31226000000,
           "end": "2018-08-09T16:43:02.334Z",
-          "start": "2018-08-09T16:42:31.108Z",
-          "type": "netflow"
+          "start": "2018-08-09T16:42:31.108Z"
         },
         "flow": {
           "id": "eSnZLaMkN_I",
@@ -550,11 +550,11 @@
           "ip": "10.100.4.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-08-09T16:49:04Z",
           "duration": 30976000000,
           "end": "2018-08-09T16:43:02.334Z",
-          "start": "2018-08-09T16:42:31.358Z",
-          "type": "netflow"
+          "start": "2018-08-09T16:42:31.358Z"
         },
         "flow": {
           "id": "_8K2vONzLd4",
@@ -617,11 +617,11 @@
           "ip": "10.100.4.1"
         },
         "event": {
+          "action": "netflow",
           "created": "2018-08-09T16:49:04Z",
           "duration": 0,
           "end": "2018-08-09T16:43:06.28Z",
-          "start": "2018-08-09T16:43:06.28Z",
-          "type": "netflow"
+          "start": "2018-08-09T16:43:06.28Z"
         },
         "flow": {
           "id": "brcE2vs5Uso",

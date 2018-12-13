@@ -9,8 +9,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -27,7 +27,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -40,8 +40,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -58,7 +58,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -71,8 +71,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -89,7 +89,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -102,8 +102,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -120,7 +120,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -133,8 +133,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -151,7 +151,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -164,8 +164,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -182,7 +182,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -195,8 +195,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -213,7 +213,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -226,8 +226,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -244,7 +244,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -257,8 +257,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -275,7 +275,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -288,8 +288,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -306,7 +306,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -319,8 +319,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -337,7 +337,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -350,8 +350,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -368,7 +368,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -381,8 +381,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -399,7 +399,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -412,8 +412,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -430,7 +430,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -443,8 +443,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -461,7 +461,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -474,8 +474,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -492,7 +492,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -505,8 +505,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -523,7 +523,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -536,8 +536,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -554,7 +554,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null
@@ -567,8 +567,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-06T10:09:48Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-06T10:09:48Z"
         },
         "netflow": {
           "exporter": {
@@ -585,7 +585,7 @@
           "scope": {
             "octetDeltaCount": 3250896451
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null

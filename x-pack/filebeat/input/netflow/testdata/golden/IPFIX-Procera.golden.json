@@ -14,8 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2018-04-15T03:30:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
         },
         "flow": {
           "id": "q-trxhRGXW0",
@@ -79,8 +79,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2018-04-15T03:30:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
         },
         "flow": {
           "id": "GYmhjYyvaAI",
@@ -144,8 +144,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2018-04-15T03:30:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
         },
         "flow": {
           "id": "s0UY7AEXtbs",
@@ -209,8 +209,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2018-04-15T03:30:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
         },
         "flow": {
           "id": "r-qsT9TbSHw",
@@ -274,8 +274,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2018-04-15T03:30:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
         },
         "flow": {
           "id": "GYmhjYyvaAI",
@@ -339,8 +339,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2018-04-15T03:30:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
         },
         "flow": {
           "id": "dF2yRC2ldzk",
@@ -404,8 +404,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2018-04-15T03:30:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
         },
         "flow": {
           "id": "Nv4c6iSK_5U",
@@ -469,8 +469,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2018-04-15T03:30:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-04-15T03:30:00Z"
         },
         "flow": {
           "id": "PhIIQeuDikc",

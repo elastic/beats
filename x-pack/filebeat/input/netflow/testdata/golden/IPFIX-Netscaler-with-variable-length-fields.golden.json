@@ -14,8 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-11-11T12:09:19Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2016-11-11T12:09:19Z"
         },
         "flow": {
           "id": "urCm_V5Qsz0",
@@ -97,8 +97,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-11-11T12:09:19Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2016-11-11T12:09:19Z"
         },
         "flow": {
           "id": "1fCxVMA_rD0",
@@ -168,8 +168,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-11-11T12:09:19Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2016-11-11T12:09:19Z"
         },
         "flow": {
           "id": "urCm_V5Qsz0",

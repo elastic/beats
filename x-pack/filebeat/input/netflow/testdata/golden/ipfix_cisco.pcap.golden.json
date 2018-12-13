@@ -9,8 +9,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -71,8 +71,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -133,8 +133,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -195,8 +195,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -257,8 +257,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -319,8 +319,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -381,8 +381,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -443,8 +443,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -505,8 +505,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -567,8 +567,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -629,8 +629,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -691,8 +691,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -753,8 +753,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -815,8 +815,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -877,8 +877,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -939,8 +939,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1001,8 +1001,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1063,8 +1063,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1125,8 +1125,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1187,8 +1187,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1249,8 +1249,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1311,8 +1311,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1373,8 +1373,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1435,8 +1435,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1497,8 +1497,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1559,8 +1559,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1621,8 +1621,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1683,8 +1683,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1745,8 +1745,8 @@
           "ip": "10.101.255.2"
         },
         "event": {
-          "created": "2018-07-03T10:47:00Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
         },
         "flow": {
           "id": "Vhs9T5k296w",

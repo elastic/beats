@@ -14,8 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "qKMtgI7Ed9s",
@@ -74,8 +74,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "5FNp7ndavXc",
@@ -134,8 +134,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "5dxciNWUCt0",
@@ -194,8 +194,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "TJxuTh4pSgE",
@@ -254,8 +254,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "eVcvPUJANB4",
@@ -314,8 +314,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "Dr8WeOCZm_4",
@@ -374,8 +374,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "P7HJmFBUOa8",
@@ -434,8 +434,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "E6FN06gC8JE",
@@ -494,8 +494,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "D9tiVWmcw2o",
@@ -554,8 +554,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "ZNd__DyTXzg",
@@ -614,8 +614,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "r4pPq83nIfU",
@@ -674,8 +674,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "W0ydMavNfpM",
@@ -734,8 +734,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "euOQwbFToDs",
@@ -794,8 +794,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "vtn0fYyiQAs",
@@ -854,8 +854,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "kgBNXXN8ed4",
@@ -914,8 +914,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "kgBNXXN8ed4",
@@ -974,8 +974,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "AYD5HyisGMY",
@@ -1034,8 +1034,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "AYD5HyisGMY",
@@ -1094,8 +1094,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "he8fZsMllBk",
@@ -1154,8 +1154,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "he8fZsMllBk",
@@ -1214,8 +1214,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "fanKYX35CDM",
@@ -1274,8 +1274,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "fanKYX35CDM",
@@ -1334,8 +1334,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "1I_ey2YYTSM",
@@ -1394,8 +1394,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "1I_ey2YYTSM",
@@ -1454,8 +1454,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "P7bcxAuBWAY",
@@ -1514,8 +1514,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "P7bcxAuBWAY",
@@ -1574,8 +1574,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "rBSLKqUfMAo",
@@ -1634,8 +1634,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "rBSLKqUfMAo",
@@ -1692,8 +1692,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -1746,8 +1746,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -1800,8 +1800,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -1854,8 +1854,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -1908,8 +1908,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -1962,8 +1962,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2016,8 +2016,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2070,8 +2070,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2124,8 +2124,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2178,8 +2178,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2232,8 +2232,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2286,8 +2286,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2340,8 +2340,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2394,8 +2394,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2448,8 +2448,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2502,8 +2502,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2556,8 +2556,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2610,8 +2610,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-07-19T16:18:08Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-07-19T16:18:08Z"
         },
         "flow": {
           "id": "RlrAo_U1Y14",

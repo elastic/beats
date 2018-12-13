@@ -14,8 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "1970-01-01T00:08:22Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "1970-01-01T00:08:22Z"
         },
         "flow": {
           "id": "oFN7CMNpOLQ",

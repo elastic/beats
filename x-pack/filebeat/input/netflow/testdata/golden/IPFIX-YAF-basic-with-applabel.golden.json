@@ -16,8 +16,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-25T13:03:38Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2016-12-25T13:03:38Z"
         },
         "flow": {
           "id": "_tbAAnwoAu8",
@@ -84,8 +84,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-25T12:58:38Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2016-12-25T12:58:38Z"
         },
         "flow": {
           "id": "qznEzwF6uiM",
@@ -151,8 +151,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2016-12-25T13:03:33Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2016-12-25T13:03:33Z"
         },
         "netflow": {
           "exporter": {
@@ -180,7 +180,7 @@
             "exportedFlowRecordTotalCount": 31,
             "systemInitTimeMilliseconds": "2016-12-25T12:58:32Z"
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null

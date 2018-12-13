@@ -9,8 +9,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2018-06-01T15:11:53Z",
-          "type": "netflow/options"
+          "action": "netflow_options",
+          "created": "2018-06-01T15:11:53Z"
         },
         "netflow": {
           "exporter": {
@@ -35,7 +35,7 @@
           "scope": {
             "exportingProcessId": 2
           },
-          "type": "netflow/options"
+          "type": "netflow_options"
         }
       },
       "Private": null

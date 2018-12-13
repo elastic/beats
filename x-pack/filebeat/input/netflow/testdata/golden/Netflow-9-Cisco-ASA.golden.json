@@ -14,8 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "4sqHgIUNdhc",
@@ -70,8 +70,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "3zooPayCX08",
@@ -126,8 +126,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "rjHIoePwVUY",
@@ -182,8 +182,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "kTUBU9vFxdg",
@@ -238,8 +238,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "xPJhkFDpNiU",
@@ -294,8 +294,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "AxuXms6GBGk",
@@ -350,8 +350,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "gFKfPBsWfLM",
@@ -406,8 +406,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "eHdG6rUdn28",
@@ -462,8 +462,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "JVI-3U3vTiM",
@@ -518,8 +518,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "pc77-XHjAxs",
@@ -574,8 +574,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "Qh5mk2U4KjY",
@@ -630,8 +630,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "v3tlG0bhLIU",
@@ -686,8 +686,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "arIGi4uQChk",
@@ -742,8 +742,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2015-10-09T09:47:51Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2015-10-09T09:47:51Z"
         },
         "flow": {
           "id": "v3tlG0bhLIU",

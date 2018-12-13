@@ -14,8 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-12-01T17:04:39Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-12-01T17:04:39Z"
         },
         "flow": {
           "id": "XApOh2nrI60",
@@ -73,8 +73,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "created": "2017-12-01T17:04:39Z",
-          "type": "netflow"
+          "action": "netflow",
+          "created": "2017-12-01T17:04:39Z"
         },
         "flow": {
           "id": "eTDK1gD4I9Y",
