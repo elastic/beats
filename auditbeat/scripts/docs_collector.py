@@ -40,7 +40,7 @@ This file is generated! See scripts/docs_collector.py
             continue
 
         # Create directory for each module
-        os.mkdir(os.path.join(docs_path, "modules", module))
+        os.mkdir(os.path.join(module_docs_path(module_dir), "modules", module))
 
         module_file = generated_note
         module_file += "[id=\"{beatname_lc}-module-" + module + "\"]\n"
@@ -132,7 +132,7 @@ For a description of each field in the metricset, see the
                 metricset_file += "----\n"
 
             # Write metricset docs
-            with open(os.path.join(docs_path, "modules", module, metricset + ".asciidoc"), 'w') as f:
+            with open(os.path.join(module_docs_path(module_dir), "modules", module, metricset + ".asciidoc"), 'w') as f:
                 f.write(metricset_file)
 
         if len(module_links) > 0:
@@ -144,7 +144,7 @@ For a description of each field in the metricset, see the
             module_file += module_includes
 
         # Write module docs
-        with open(os.path.join(docs_path, "modules", module + ".asciidoc"), 'w') as f:
+        with open(os.path.join(module_docs_path(module_dir), "modules", module + ".asciidoc"), 'w') as f:
             f.write(module_file)
 
     module_list_output = generated_note
@@ -152,13 +152,19 @@ For a description of each field in the metricset, see the
         module_list_output += "  * <<{beatname_lc}-module-" + m + "," + title + ">>\n"
 
     module_list_output += "\n\n--\n\n"
-    for m, title in sorted(six.iteritems(modules_list)):
-        module_list_output += "include::modules/" + m + ".asciidoc[]\n"
+    for module_name, module_path in sorted(six.iteritems(module_dirs)):
+        rel_path_to_module_docs = os.path.relpath(module_docs_path(module_path), docs_path)
+        module_list_output += "include::" + os.path.join(rel_path_to_module_docs, "modules", module_name + ".asciidoc") + "[]\n"
 
     # Write module link list
     with open(os.path.join(docs_path, "modules_list.asciidoc"), 'w') as f:
         f.write(module_list_output)
 
+# Returns the docs path for a module.
+# E.g. modules in x-pack/auditbeat/modules are put in x-pack/auditbeat/docs
+# (but linked to from beats/auditbeat/docs/modules_list.asciidoc)
+def module_docs_path(module_path):
+    return os.path.abspath(os.path.join(module_path, os.pardir, os.pardir, "docs"))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

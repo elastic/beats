@@ -57,11 +57,13 @@ func CollectDocs(basePaths ...string) error {
 	defer mage.Clean(configs)
 
 	// Remove old.
-	if err := os.RemoveAll(mage.OSSBeatDir("docs/modules")); err != nil {
-		return err
-	}
-	if err := os.MkdirAll(mage.OSSBeatDir("docs/modules"), 0755); err != nil {
-		return err
+	for _, path := range basePaths {
+		if err := os.RemoveAll(filepath.Join(path, "docs/modules")); err != nil {
+			return err
+		}
+		if err := os.MkdirAll(filepath.Join(path, "docs/modules"), 0755); err != nil {
+			return err
+		}
 	}
 
 	// Run the docs_collector.py script.
