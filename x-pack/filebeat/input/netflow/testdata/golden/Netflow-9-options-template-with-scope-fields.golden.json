@@ -1,0 +1,36 @@
+{
+  "test_name": "Netflow 9 options template with scope fields",
+  "events": [
+    {
+      "Timestamp": "2015-10-08T19:06:29Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow_options",
+          "created": "2015-10-08T19:06:29Z"
+        },
+        "netflow": {
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 147,
+            "timestamp": "2015-10-08T19:06:29Z",
+            "uptimeMillis": 33990,
+            "version": 9
+          },
+          "options": {
+            "exportedFlowRecordTotalCount": 1,
+            "exportedMessageTotalCount": 0
+          },
+          "scope": {
+            "octetDeltaCount": 0
+          },
+          "type": "netflow_options"
+        }
+      },
+      "Private": null
+    }
+  ]
+}

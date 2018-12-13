@@ -1,0 +1,1515 @@
+{
+  "test_name": "Netflow 9 macaddress",
+  "events": [
+    {
+      "Timestamp": "2015-10-10T08:46:56Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow_options",
+          "created": "2015-10-10T08:46:56Z"
+        },
+        "netflow": {
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:46:56Z",
+            "uptimeMillis": 30024,
+            "version": 9
+          },
+          "options": {
+            "exportedFlowRecordTotalCount": 1,
+            "exportedMessageTotalCount": 0
+          },
+          "scope": {
+            "octetDeltaCount": 0
+          },
+          "type": "netflow_options"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 22
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "owSGnhdQc1k",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 22,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 65058,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 65058
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "mac": "00:0c:29:8d:af:c3",
+          "port": 123
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "_cbZpOjyGGQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.100",
+          "destinationMacAddress": "00:0c:29:8d:af:c3",
+          "destinationTransportPort": 123,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 123,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 123
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 123
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "i1KQBFMlwFg",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 123,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "172.16.32.100",
+          "sourceMacAddress": "00:0c:29:8d:af:c3",
+          "sourceTransportPort": 123,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "mac": "00:0c:29:8d:af:c3",
+          "port": 123
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "O3ETdQvmCOg",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 80,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59157,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59157
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59157
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "GuhchkSUWPk",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59157,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 80,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 80
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 443
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "w09kRuEnun8",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 443,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59158,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59158
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59158
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "2TaHSp0QckA",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59158,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 443,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 139
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "5DhRBSR-wO8",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 139,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59159,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59159
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59159
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "In7-hVVW5Rw",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59159,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 139,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 139
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 23
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "p6xawkqu_zY",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 23,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59160,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59160
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59160
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "JyqRDg0Pe1I",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59160,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 23,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 23
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 995
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "izkM8H_PkUs",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 995,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59161,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59161
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59161
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "xQ18aAZ-pr8",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59161,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 995,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 995
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 443
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "-1gdgg3n334",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 443,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59162,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59162
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59162
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "CnVw8CbHrMY",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59162,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 443,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 135
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "_P6iyZeEPpY",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 135,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59163,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59163
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59163
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "H8S4xKKvY9c",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59163,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 135,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 135
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 110
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "RHnG3UfiYVs",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 110,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59164,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59164
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59164
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "DCtFd6UwimY",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59164,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 110,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 110
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 111
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "S6vU3RZ9qRo",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 111,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59165,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59165
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59165
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "g5SWzYolCH8",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59165,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 111,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 111
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 143
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "Pa6VrN0hfFM",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 143,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59166,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59166
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59166
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "Ma9Hrn8BuXE",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59166,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 143,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 143
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 3389
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "Pol0ObD1Z-8",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 3389,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59167,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59167
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59167
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "j3DHUjySbaU",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59167,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 3389,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 3389
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "QEHbEEyzRwc",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 80,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59168,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59168
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59168
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "In_yyQ3MzQ4",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59168,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 80,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 80
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 25
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "b69Xoj2gRmY",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.201",
+          "destinationMacAddress": "00:0c:29:70:86:09",
+          "destinationTransportPort": 25,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.1",
+          "sourceMacAddress": "00:50:56:c0:00:01",
+          "sourceTransportPort": 59169,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59169
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59169
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-10-10T08:47:01Z"
+        },
+        "flow": {
+          "id": "7kt-7t6WhAc",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.1",
+          "destinationMacAddress": "00:50:56:c0:00:01",
+          "destinationTransportPort": 59169,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptimeMillis": 34488,
+            "version": 9
+          },
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceMacAddress": "00:0c:29:70:86:09",
+          "sourceTransportPort": 25,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 25
+        }
+      },
+      "Private": null
+    }
+  ]
+}

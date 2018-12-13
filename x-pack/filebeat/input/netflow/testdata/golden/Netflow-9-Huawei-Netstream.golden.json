@@ -1,0 +1,77 @@
+{
+  "test_name": "Netflow 9 Huawei Netstream",
+  "events": [
+    {
+      "Timestamp": "2018-01-29T03:02:20Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.111.112.204",
+          "locality": "private",
+          "port": 2598
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-01-29T03:02:20Z",
+          "duration": 327060000000,
+          "end": "2018-01-29T03:02:19Z",
+          "start": "2018-01-29T02:56:51.94Z"
+        },
+        "flow": {
+          "id": "edQPxE87Y_A",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 0,
+          "bgpNextHopIPv4Address": "0.0.0.0",
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "10.111.112.204",
+          "destinationIPv4PrefixLength": 25,
+          "destinationTransportPort": 2598,
+          "egressInterface": 31,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2018-01-29T03:02:20Z",
+            "uptimeMillis": 2678492632,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 2678491632,
+          "flowStartSysUpTime": 2678164572,
+          "forwardingStatus": 0,
+          "ingressInterface": 8,
+          "ipClassOfService": 0,
+          "ipNextHopIPv4Address": "10.108.252.41",
+          "octetDeltaCount": 200,
+          "packetDeltaCount": 4,
+          "paddingOctets": "AAAA",
+          "postVlanId": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "sourceIPv4Address": "10.108.219.53",
+          "sourceIPv4PrefixLength": 24,
+          "sourceTransportPort": 45587,
+          "tcpControlBits": 24,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 200,
+          "direction": "outbound",
+          "packets": 4,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.108.219.53",
+          "locality": "private",
+          "port": 45587
+        }
+      },
+      "Private": null
+    }
+  ]
+}
