@@ -95,14 +95,18 @@ func TestParseDHCPRequest(t *testing.T) {
 	expected := beat.Event{
 		Timestamp: pkt.Ts,
 		Fields: common.MapStr{
-			"type":        "dhcpv4",
-			"transport":   "udp",
-			"status":      "OK",
-			"client_ip":   "0.0.0.0",
-			"client_port": 68,
-			"ip":          "255.255.255.255",
-			"port":        67,
-			"bytes_in":    272,
+			"type":      "dhcpv4",
+			"transport": "udp",
+			"status":    "OK",
+			"src": &common.Endpoint{
+				IP:   "0.0.0.0",
+				Port: 68,
+			},
+			"dst": &common.Endpoint{
+				IP:   "255.255.255.255",
+				Port: 67,
+			},
+			"bytes_in": 272,
 			"dhcpv4": common.MapStr{
 				"client_mac":     "00:0b:82:01:fc:42",
 				"flags":          "unicast",
@@ -149,14 +153,18 @@ func TestParseDHCPACK(t *testing.T) {
 	expected := beat.Event{
 		Timestamp: pkt.Ts,
 		Fields: common.MapStr{
-			"type":        "dhcpv4",
-			"transport":   "udp",
-			"status":      "OK",
-			"client_ip":   "192.168.0.10",
-			"client_port": 68,
-			"ip":          "192.168.0.1",
-			"port":        67,
-			"bytes_out":   300,
+			"type":      "dhcpv4",
+			"transport": "udp",
+			"status":    "OK",
+			"src": &common.Endpoint{
+				IP:   "192.168.0.10",
+				Port: 68,
+			},
+			"dst": &common.Endpoint{
+				IP:   "192.168.0.1",
+				Port: 67,
+			},
+			"bytes_out": 300,
 			"dhcpv4": common.MapStr{
 				"assigned_ip":    "192.168.0.10",
 				"client_mac":     "00:0b:82:01:fc:42",

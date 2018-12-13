@@ -27,8 +27,10 @@ import (
 func newDoMetadataFetcher(config *common.Config) (*metadataFetcher, error) {
 	doSchema := func(m map[string]interface{}) common.MapStr {
 		out, _ := s.Schema{
-			"instance_id": c.StrFromNum("droplet_id"),
-			"region":      c.Str("region"),
+			"instance": s.Object{
+				"id": c.StrFromNum("droplet_id"),
+			},
+			"region": c.Str("region"),
 		}.Apply(m)
 		return out
 	}

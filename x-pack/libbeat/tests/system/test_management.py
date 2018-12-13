@@ -93,7 +93,11 @@ class TestManagement(BaseTest):
         ])
 
         # Start beat
-        proc = self.start_beat(extra_args=["-E", "management.period=1s"])
+        proc = self.start_beat(extra_args=[
+            "-E", "management.period=1s",
+            # do not blacklist file/elasticsearch outputs
+            "-E", "management.blacklist.output='foo'",
+        ])
 
         # Wait for beat to apply new conf
         self.wait_log_contains("Applying settings for output")
@@ -151,7 +155,10 @@ class TestManagement(BaseTest):
         output_file = os.path.join("output", "mockbeat_managed")
 
         # Start beat
-        proc = self.start_beat()
+        proc = self.start_beat(extra_args=[
+            # do not blacklist file output
+            "-E", "management.blacklist.output='elasticsearch'",
+        ])
         self.wait_until(cond=lambda: self.output_has(
             1, output_file=output_file))
         proc.check_kill_and_wait()
@@ -163,10 +170,48 @@ class TestManagement(BaseTest):
         proc = self.start_beat(extra_args=[
             "-E", "management.kibana.host=wronghost",
             "-E", "management.kibana.timeout=0.5s",
+            # do not blacklist file output
+            "-E", "management.blacklist.output='elasticsearch'",
         ])
         self.wait_until(cond=lambda: self.output_has(
             1, output_file=output_file))
         proc.check_kill_and_wait()
+
+    def test_blacklist(self):
+        """
+        Blacklist blocks bad configs
+        """
+        # Enroll the beat
+        config_path = os.path.join(self.working_dir, "mockbeat.yml")
+        self.render_config_template("mockbeat", config_path)
+        exit_code = self.enroll(KIBANA_PASSWORD)
+        assert exit_code == 0
+
+        # Update output configuration
+        self.create_and_assing_tag([
+            {
+                "type": "output",
+                "configs": [
+                    {
+                        "output": "file",
+                        "file": {
+                            "path": os.path.join(self.working_dir, "output"),
+                            "filename": "mockbeat_managed",
+                        }
+                    }
+                ]
+            }
+        ])
+
+        output_file = os.path.join("output", "mockbeat_managed")
+
+        # Start beat
+        proc = self.start_beat()
+
+        self.wait_until(
+            cond=lambda: self.log_contains("Config for 'output' is blacklisted"))
+        proc.check_kill_and_wait()
+        assert not os.path.isfile(os.path.join(self.working_dir, output_file))
 
     def enroll(self, password):
         return self.run_beat(
