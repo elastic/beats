@@ -5,6 +5,7 @@
 package ec2
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/external"
@@ -129,6 +130,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		return
 	}
 
+	//Calculate duration based on period
+	durationString := convertPeriodToDuration(m.config.Period)
+
 	for _, regionName := range regionsList {
 		cfg.Region = regionName
 		svcEC2 := ec2.New(cfg)
@@ -144,7 +148,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 			for init || getMetricDataOutput.NextToken != nil {
 				init = false
-				output, err := getMetricDataPerRegion(instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
+				output, err := getMetricDataPerRegion(durationString, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
 				if err != nil {
 					report.Error(errors.Wrap(err, "getMetricDataPerRegion failed"))
 					return
@@ -164,9 +168,12 @@ func (m *MetricSet) MockFetch(report mb.ReporterV2) {
 		report.Error(errors.Wrap(err, "getInstancesPerRegion failed"))
 	}
 
+	//Calculate duration based on period
+	durationString := convertPeriodToDuration(m.config.Period)
+
 	svcCloudwatchMock := &MockCloudWatchClient{}
 	for _, instanceID := range instanceIDs {
-		getMetricDataOutput, err := getMetricDataPerRegion(instanceID, nil, svcCloudwatchMock)
+		getMetricDataOutput, err := getMetricDataPerRegion(durationString, instanceID, nil, svcCloudwatchMock)
 		if err != nil {
 			report.Error(errors.Wrap(err, "getMetricDataPerRegion failed"))
 		}
@@ -247,11 +254,24 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 	return
 }
 
-func getMetricDataPerRegion(instanceID string, nextToken *string, svc cloudwatchiface.CloudWatchAPI) (*cloudwatch.GetMetricDataOutput, error) {
+func convertPeriodToDuration(period string) (duration string) {
 	// Amazon EC2 sends metrics to Amazon CloudWatch with 5-minute default frequency.
-	// Set starttime 10 minutes earlier than the endtime in order to make sure GetMetricDataRequest gets the latest data point for each metric.
+	// If detailed monitoring is enabled, then data will be available in 1-minute period.
+	// Set starttime double the default frequency (10 minutes) earlier than the endtime in order to make sure
+	// GetMetricDataRequest gets the latest data point for each metric.
+	numberPeriod, err := strconv.Atoi(period[0 : len(period)-1])
+	if err != nil {
+		logp.Error(errors.Wrap(err, "Error converting string to int. Use default duration -10m instead."))
+		return "-10m"
+	}
+	unitPeriod := period[len(period)-1:]
+	duration = "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
+	return
+}
+
+func getMetricDataPerRegion(durationString string, instanceID string, nextToken *string, svc cloudwatchiface.CloudWatchAPI) (*cloudwatch.GetMetricDataOutput, error) {
 	endTime := time.Now()
-	duration, err := time.ParseDuration("-10m")
+	duration, err := time.ParseDuration(durationString)
 	if err != nil {
 		logp.Error(errors.Wrap(err, "Error ParseDuration"))
 		return nil, err

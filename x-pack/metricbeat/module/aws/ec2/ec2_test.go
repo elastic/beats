@@ -111,7 +111,7 @@ func TestGetInstanceIDs(t *testing.T) {
 
 func TestGetMetricDataPerRegion(t *testing.T) {
 	mockSvc := &MockCloudWatchClient{}
-	getMetricDataOutput, err := getMetricDataPerRegion("i-123", nil, mockSvc)
+	getMetricDataOutput, err := getMetricDataPerRegion("-10m", "i-123", nil, mockSvc)
 	if err != nil {
 		fmt.Println("failed getMetricDataPerRegion: ", err)
 		t.FailNow()
@@ -167,6 +167,7 @@ func TestFetch(t *testing.T) {
 	} else {
 		tempCreds := map[string]interface{}{
 			"module":                "aws",
+			"period":                "300s",
 			"metricsets":            []string{"ec2"},
 			"aws_access_key_id":     accessKeyID,
 			"aws_secret_access_key": secretAccessKey,
@@ -250,4 +251,22 @@ func checkMetricSetField(metricName string, event mb.Event, t *testing.T) {
 			fmt.Println("succeed: userPercentFloat = ", userPercentFloat)
 		}
 	}
+}
+
+func TestConvertPeriodToDuration(t *testing.T) {
+	period1 := "300s"
+	duration1 := convertPeriodToDuration(period1)
+	assert.Equal(t, "-600s", duration1)
+
+	period2 := "30ss"
+	duration2 := convertPeriodToDuration(period2)
+	assert.Equal(t, "-10m", duration2)
+
+	period3 := "10m"
+	duration3 := convertPeriodToDuration(period3)
+	assert.Equal(t, "-20m", duration3)
+
+	period4 := "5sm"
+	duration4 := convertPeriodToDuration(period4)
+	assert.Equal(t, "-10m", duration4)
 }
