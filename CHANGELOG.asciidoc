@@ -19,6 +19,8 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 *Filebeat*
 
+- Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
+
 *Heartbeat*
 
 *Journalbeat*
@@ -26,6 +28,9 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 *Metricbeat*
 
 - Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
+- Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
+
+*Packetbeat*
 
 *Packetbeat*
 
