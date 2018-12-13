@@ -47,6 +47,11 @@
   alias6: true
   alias: true
 
+- from: beat.timezone
+  to: event.timezone
+  alias6: true
+  alias: true
+
 # Filebeat modules
 
 ## Suricata module

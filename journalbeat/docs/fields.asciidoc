@@ -31,8 +31,9 @@ Contains common beat fields available in all event types.
 *`beat.timezone`*::
 +
 --
-The timezone as returned by the operating system on which the Beat is running.
+type: alias
 
+alias to: event.timezone
 
 --
 
