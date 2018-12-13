@@ -174,7 +174,6 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		if len(container.Labels) > 0 {
-			//dedot first
 			labels := common.MapStr{}
 			for k, v := range container.Labels {
 				if d.dedot {
