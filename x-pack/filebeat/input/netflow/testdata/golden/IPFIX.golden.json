@@ -1,0 +1,758 @@
+{
+  "test_name": "IPFIX",
+  "events": [
+    {
+      "Timestamp": "2015-05-13T11:20:26Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow_options",
+          "created": "2015-05-13T11:20:26Z"
+        },
+        "netflow": {
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:26Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "options": {
+            "samplingPacketInterval": 1,
+            "samplingPacketSpace": 0,
+            "selectorAlgorithm": 1,
+            "systemInitTimeMilliseconds": "2015-05-13T11:20:13.506Z"
+          },
+          "scope": {
+            "meteringProcessId": 2679
+          },
+          "type": "netflow_options"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:26Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.253.128",
+          "locality": "private",
+          "port": 22
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:26Z"
+        },
+        "flow": {
+          "id": "5dY_LIjk4jM",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.253.128",
+          "destinationTransportPort": 22,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:26Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 12726,
+          "flowStartSysUpTime": 0,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 260,
+          "packetDeltaCount": 5,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.253.1",
+          "sourceTransportPort": 60560,
+          "tcpControlBits": 16,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 260,
+          "direction": "unknown",
+          "packets": 5,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.253.1",
+          "locality": "private",
+          "port": 60560
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:26Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.253.1",
+          "locality": "private",
+          "port": 60560
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:26Z"
+        },
+        "flow": {
+          "id": "D9c6mFRsdDc",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.253.1",
+          "destinationTransportPort": 60560,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:26Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 12726,
+          "flowStartSysUpTime": 0,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 1000,
+          "packetDeltaCount": 6,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.253.128",
+          "sourceTransportPort": 22,
+          "tcpControlBits": 24,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 1000,
+          "direction": "unknown",
+          "packets": 6,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.253.128",
+          "locality": "private",
+          "port": 22
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:26Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.253.132",
+          "locality": "private",
+          "port": 35262
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:26Z"
+        },
+        "flow": {
+          "id": "Htn9CGiiIcE",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.253.132",
+          "destinationTransportPort": 35262,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:26Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 1142,
+          "flowStartSysUpTime": 1104,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 601,
+          "packetDeltaCount": 2,
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "192.168.253.2",
+          "sourceTransportPort": 53,
+          "tcpControlBits": 0,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 601,
+          "direction": "unknown",
+          "packets": 2,
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "192.168.253.2",
+          "locality": "private",
+          "port": 53
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:26Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.253.2",
+          "locality": "private",
+          "port": 53
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:26Z"
+        },
+        "flow": {
+          "id": "zasoUAZZ0VY",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.253.2",
+          "destinationTransportPort": 53,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:26Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 1142,
+          "flowStartSysUpTime": 1104,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 148,
+          "packetDeltaCount": 2,
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "192.168.253.132",
+          "sourceTransportPort": 35262,
+          "tcpControlBits": 0,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 148,
+          "direction": "unknown",
+          "packets": 2,
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "192.168.253.132",
+          "locality": "private",
+          "port": 35262
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:26Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.253.132",
+          "locality": "private",
+          "port": 49935
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:26Z"
+        },
+        "flow": {
+          "id": "S1-OrWp2NPk",
+          "locality": "public"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.253.132",
+          "destinationTransportPort": 49935,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:26Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 2392,
+          "flowStartSysUpTime": 1142,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 5946,
+          "packetDeltaCount": 14,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "54.214.9.161",
+          "sourceTransportPort": 443,
+          "tcpControlBits": 26,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 5946,
+          "direction": "unknown",
+          "packets": 14,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "54.214.9.161",
+          "locality": "public",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:26Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "54.214.9.161",
+          "locality": "public",
+          "port": 443
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:26Z"
+        },
+        "flow": {
+          "id": "KbgtQk9RbTg",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "54.214.9.161",
+          "destinationTransportPort": 443,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:26Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 2392,
+          "flowStartSysUpTime": 1142,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 2608,
+          "packetDeltaCount": 13,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.253.132",
+          "sourceTransportPort": 49935,
+          "tcpControlBits": 26,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 2608,
+          "direction": "unknown",
+          "packets": 13,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.253.132",
+          "locality": "private",
+          "port": 49935
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:26Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.4.36.64",
+          "locality": "private",
+          "port": 9200
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:26Z"
+        },
+        "flow": {
+          "id": "aMDg_zpGiEg",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "10.4.36.64",
+          "destinationTransportPort": 9200,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:26Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 1356,
+          "flowStartSysUpTime": 1356,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 60,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.253.130",
+          "sourceTransportPort": 38254,
+          "tcpControlBits": 2,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 60,
+          "direction": "unknown",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.253.130",
+          "locality": "private",
+          "port": 38254
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:28Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.253.128",
+          "locality": "private",
+          "port": 22
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:28Z"
+        },
+        "flow": {
+          "id": "5dY_LIjk4jM",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.253.128",
+          "destinationTransportPort": 22,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:28Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 14611,
+          "flowStartSysUpTime": 12727,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 256,
+          "packetDeltaCount": 4,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.253.1",
+          "sourceTransportPort": 60560,
+          "tcpControlBits": 24,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 256,
+          "direction": "unknown",
+          "packets": 4,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.253.1",
+          "locality": "private",
+          "port": 60560
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:28Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.253.1",
+          "locality": "private",
+          "port": 60560
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:28Z"
+        },
+        "flow": {
+          "id": "D9c6mFRsdDc",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.253.1",
+          "destinationTransportPort": 60560,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:28Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 14611,
+          "flowStartSysUpTime": 12727,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 1916,
+          "packetDeltaCount": 3,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.253.128",
+          "sourceTransportPort": 22,
+          "tcpControlBits": 24,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 1916,
+          "direction": "unknown",
+          "packets": 3,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.253.128",
+          "locality": "private",
+          "port": 22
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:28Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.253.128",
+          "locality": "private",
+          "port": 22
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:28Z"
+        },
+        "flow": {
+          "id": "5rzmeAVHDXo",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.253.128",
+          "destinationTransportPort": 22,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:28Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 12726,
+          "flowStartSysUpTime": 12725,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 168,
+          "packetDeltaCount": 2,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.253.1",
+          "sourceTransportPort": 65308,
+          "tcpControlBits": 24,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 168,
+          "direction": "unknown",
+          "packets": 2,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.253.1",
+          "locality": "private",
+          "port": 65308
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:28Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.253.1",
+          "locality": "private",
+          "port": 65308
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:28Z"
+        },
+        "flow": {
+          "id": "yZq2BehxSew",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.253.1",
+          "destinationTransportPort": 65308,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:28Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 12726,
+          "flowStartSysUpTime": 12725,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 84,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.253.128",
+          "sourceTransportPort": 22,
+          "tcpControlBits": 24,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 84,
+          "direction": "unknown",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.253.128",
+          "locality": "private",
+          "port": 22
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-05-13T11:20:28Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "224.0.0.251",
+          "locality": "private",
+          "port": 5353
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2015-05-13T11:20:28Z"
+        },
+        "flow": {
+          "id": "Ft-4Om5rIsk",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "224.0.0.251",
+          "destinationTransportPort": 5353,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2015-05-13T11:20:28Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 12741,
+          "flowStartSysUpTime": 12741,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 0,
+          "ipClassOfService": 0,
+          "ipVersion": 4,
+          "octetDeltaCount": 232,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "192.168.253.1",
+          "sourceTransportPort": 5353,
+          "tcpControlBits": 0,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 232,
+          "direction": "unknown",
+          "packets": 1,
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "192.168.253.1",
+          "locality": "private",
+          "port": 5353
+        }
+      },
+      "Private": null
+    }
+  ]
+}

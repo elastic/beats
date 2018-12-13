@@ -1,0 +1,993 @@
+{
+  "test_name": "Netflow 9 Cisco WLC",
+  "events": [
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQAB3w==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 3320,
+          "packetDeltaCount": 83,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 3320,
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 83
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQAB3w==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 3320,
+          "packetDeltaCount": 83,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 3320,
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 83
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAANQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 7760,
+          "packetDeltaCount": 69,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 7760,
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 69
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAANQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 10229,
+          "packetDeltaCount": 69,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 10229,
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 69
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAAig==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 215,
+          "packetDeltaCount": 1,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 215,
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 1
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQAAAQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 40854,
+          "packetDeltaCount": 225,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 40854,
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 225
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQAAAQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 35866,
+          "packetDeltaCount": 154,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 35866,
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 154
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAAUA==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 12279,
+          "packetDeltaCount": 63,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 12279,
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 63
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAAUA==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 27287,
+          "packetDeltaCount": 61,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 27287,
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 61
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 147145,
+          "packetDeltaCount": 773,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 147145,
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 773
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 1182695,
+          "packetDeltaCount": 1379,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 1182695,
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 1379
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQACCA==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 6777,
+          "packetDeltaCount": 26,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 6777,
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 26
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQACCA==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 8625,
+          "packetDeltaCount": 26,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 8625,
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 26
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwABuw==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 2433001,
+          "packetDeltaCount": 20434,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 2433001,
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 20434
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwABuw==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 56599680,
+          "packetDeltaCount": 40726,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 56599680,
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 40726
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AQAAAQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 1658,
+          "packetDeltaCount": 15,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 1658,
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 15
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AQAAAQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 950,
+          "packetDeltaCount": 14,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 950,
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 14
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABrw==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 1495567,
+          "packetDeltaCount": 16145,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 1495567,
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 16145
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-06-22T06:31:14Z"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABrw==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptimeMillis": 1336647838,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "ipDiffServCodePoint": 0,
+          "octetDeltaCount": 80973880,
+          "packetDeltaCount": 53362,
+          "postIpDiffServCodePoint": 0,
+          "staIPv4Address": "192.168.20.121",
+          "staMacAddress": "34:02:86:75:c0:51",
+          "type": "netflow",
+          "wlanSSID": "Test-env",
+          "wtpMacAddress": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 80973880,
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 53362
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    }
+  ]
+}

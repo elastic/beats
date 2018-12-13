@@ -1,0 +1,58 @@
+{
+  "test_name": "IPFIX Nokia BRAS",
+  "events": [
+    {
+      "Timestamp": "2017-12-14T07:23:45Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.0.34",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-12-14T07:23:45Z"
+        },
+        "flow": {
+          "id": "VHOuRvMCrLs",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "10.0.0.34",
+          "destinationTransportPort": 80,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2228226,
+            "timestamp": "2017-12-14T07:23:45Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowId": 3389049088,
+          "flowStartMilliseconds": "2017-12-14T07:23:45.148Z",
+          "natInsideSvcid": 100,
+          "natOutsideSvcid": 0,
+          "natSubString": "USER1@10.10.0.123",
+          "paddingOctets": "AA==",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.1.228",
+          "sourceTransportPort": 5878,
+          "type": "netflow"
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.1.228",
+          "locality": "private",
+          "port": 5878
+        }
+      },
+      "Private": null
+    }
+  ]
+}

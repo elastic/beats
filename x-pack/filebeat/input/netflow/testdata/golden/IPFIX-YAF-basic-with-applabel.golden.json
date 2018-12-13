@@ -1,0 +1,189 @@
+{
+  "test_name": "IPFIX YAF basic with applabel",
+  "events": [
+    {
+      "Timestamp": "2016-12-25T13:03:38Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "bytes": 200,
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "packets": 2,
+          "port": 53
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-25T13:03:38Z"
+        },
+        "flow": {
+          "id": "_tbAAnwoAu8",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.100",
+          "destinationTransportPort": 53,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-12-25T13:03:38Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowAttributes": 1,
+          "flowEndMilliseconds": "2016-12-25T12:58:35.819Z",
+          "flowEndReason": 1,
+          "flowStartMilliseconds": "2016-12-25T12:58:35.818Z",
+          "ipClassOfService": 0,
+          "octetTotalCount": 132,
+          "packetTotalCount": 2,
+          "protocolIdentifier": 17,
+          "reverseFlowAttributes": 0,
+          "reverseFlowDeltaMilliseconds": 1,
+          "reverseIpClassOfService": 0,
+          "reverseOctetTotalCount": 200,
+          "reversePacketTotalCount": 2,
+          "reverseVlanId": 0,
+          "silkAppLabel": 53,
+          "sourceIPv4Address": "172.16.32.201",
+          "sourceTransportPort": 46086,
+          "type": "netflow",
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 532,
+          "direction": "unknown",
+          "packets": 6,
+          "protocol": "udp"
+        },
+        "source": {
+          "bytes": 132,
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "packets": 200,
+          "port": 46086
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-25T12:58:38Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "bytes": 92,
+          "ip": "172.16.32.215",
+          "locality": "private",
+          "packets": 2,
+          "port": 9997
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-25T12:58:38Z"
+        },
+        "flow": {
+          "id": "qznEzwF6uiM",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.32.215",
+          "destinationTransportPort": 9997,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-12-25T12:58:38Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowAttributes": 0,
+          "flowEndMilliseconds": "2016-12-25T12:58:34.347Z",
+          "flowEndReason": 3,
+          "flowStartMilliseconds": "2016-12-25T12:58:33.345Z",
+          "initialTCPFlags": 194,
+          "ipClassOfService": 2,
+          "octetTotalCount": 172,
+          "packetTotalCount": 4,
+          "protocolIdentifier": 6,
+          "reverseFlowAttributes": 0,
+          "reverseFlowDeltaMilliseconds": 0,
+          "reverseInitialTCPFlags": 18,
+          "reverseIpClassOfService": 0,
+          "reverseOctetTotalCount": 92,
+          "reversePacketTotalCount": 2,
+          "reverseTcpSequenceNumber": 3788795034,
+          "reverseUnionTCPFlags": 17,
+          "reverseVlanId": 0,
+          "silkAppLabel": 0,
+          "sourceIPv4Address": "172.16.32.100",
+          "sourceTransportPort": 63499,
+          "tcpSequenceNumber": 340533701,
+          "type": "netflow",
+          "unionTCPFlags": 17,
+          "vlanId": 0
+        },
+        "network": {
+          "bytes": 356,
+          "direction": "unknown",
+          "packets": 8,
+          "protocol": "tcp"
+        },
+        "source": {
+          "bytes": 172,
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "packets": 92,
+          "port": 63499
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-25T13:03:33Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow_options",
+          "created": "2016-12-25T13:03:33Z"
+        },
+        "netflow": {
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-12-25T13:03:33Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "options": {
+            "assembledFragmentCount": 0,
+            "droppedPacketTotalCount": 0,
+            "expiredFragmentCount": 0,
+            "exporterIPv4Address": "172.16.32.201",
+            "exportingProcessId": 0,
+            "flowTableFlushEventCount": 39,
+            "flowTablePeakCount": 58,
+            "ignoredPacketTotalCount": 58,
+            "meanFlowRate": 0,
+            "meanPacketRate": 6,
+            "notSentPacketTotalCount": 0,
+            "packetTotalCount": 1960
+          },
+          "scope": {
+            "exportedFlowRecordTotalCount": 31,
+            "systemInitTimeMilliseconds": "2016-12-25T12:58:32Z"
+          },
+          "type": "netflow_options"
+        }
+      },
+      "Private": null
+    }
+  ]
+}
