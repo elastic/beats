@@ -125,8 +125,19 @@ func Update() {
 }
 
 // Docs collects the documentation.
-func Docs() error {
+func Docs() {
+	mg.SerialDeps(xpackFields, combinedDocs)
+}
+
+// combinedDocs builds combined documentation for both OSS and X-Pack.
+func combinedDocs() error {
 	return auditbeat.CollectDocs(mage.OSSBeatDir(), auditbeat.XpackBeatDir())
+}
+
+// xpackFields creates x-pack/auditbeat/fields.yml - necessary to build
+// a combined documentation.
+func xpackFields() error {
+	return mage.Mage(auditbeat.XpackBeatDir(), "fields")
 }
 
 // Fmt formats source code and adds file headers.
