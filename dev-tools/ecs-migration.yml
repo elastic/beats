@@ -375,7 +375,6 @@
 - from: nginx.access.method
   to: http.request.method
   alias: true
-  copy_to: false
 
 - from: nginx.access.http_version
   to: http.version
@@ -413,3 +412,29 @@
 - from: source.hostname
   to: source.domain
   alias: true
+
+# Metricbeat base fields
+- from: metricset.name
+  to: event.dataset
+  alias: false
+  comment: Data structure of field changed, old field will stay around
+  breaking: true
+
+- from: metricset.module
+  to: event.module
+  alias: true
+
+- from: metricset.rrt
+  to: event.duration
+  alias: false
+  comment: Unit changed, old field will stay around if needed
+  breaking: true
+
+- from: metricset.host
+  to: service.address
+  alias: true
+
+- from: metricset.namespace
+  to: event.dataset
+  alias: false
+  comment: No alias mapping as field did not always exist
