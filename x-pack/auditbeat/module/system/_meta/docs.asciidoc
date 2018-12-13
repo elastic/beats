@@ -1,4 +1,8 @@
+[role="xpack"]
+
 == System Module
+
+experimental[]
 
 The `system` module collects various security related information about
 a server. All metricsets send both periodic state information (e.g. all currently
