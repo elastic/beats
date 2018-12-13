@@ -58,7 +58,7 @@ func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cob
 				dashboards = true
 				machineLearning = true
 				pipelines = true
-				policy = true
+				policy = false
 			}
 
 			if err = beat.Setup(beatCreator, template, dashboards, machineLearning, pipelines, policy); err != nil {
