@@ -107,6 +107,10 @@ is an example configuration:
 
             # Add reference to metricset file and include file
             metricset_file += reference + "\n"
+
+            # Create title out of module and metricset set name
+            metricset_file += "=== {} {} metricset\n\n".format(title, metricset)
+
             metricset_file += 'include::../../../module/' + module + '/' + metricset + '/_meta/docs.asciidoc[]' + "\n"
 
             # TODO: This should point directly to the exported fields of the metricset, not the whole module
@@ -119,7 +123,7 @@ For a description of each field in the metricset, see the
 
 """
 
-            data_file = path + "/" + module + "/" + metricset + "/_meta/data.json"
+            data_file = os.path.join(module_dir, metricset, "_meta/data.json")
 
             # Add data.json example json document
             if os.path.isfile(data_file) == True:
