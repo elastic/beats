@@ -38,7 +38,7 @@ func newOpUploadToBucket(
 	}
 }
 
-func (o *opUploadToBucket) Execute() error {
+func (o *opUploadToBucket) Execute(_ executionContext) error {
 	o.log.Debugf("Uploading file '%s' to bucket '%s' with size %d bytes", o.path, o.bucketName, len(o.raw))
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(o.bucketName),
@@ -56,10 +56,10 @@ func (o *opUploadToBucket) Execute() error {
 	return nil
 }
 
-func (o *opUploadToBucket) Rollback() error {
+func (o *opUploadToBucket) Rollback(ctx executionContext) error {
 	// The error will be logged but we do not enforce a hard failure because the file could have
 	// been removed before.
-	err := newOpDeleteFileBucket(o.log, o.config, o.bucketName, o.path).Execute()
+	err := newOpDeleteFileBucket(o.log, o.config, o.bucketName, o.path).Execute(ctx)
 	if err != nil {
 		o.log.Debugf("Fail to delete file on bucket, error: %+v", err)
 	}
