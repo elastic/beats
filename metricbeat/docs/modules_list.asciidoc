@@ -8,9 +8,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-aerospike,Aerospike>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-aerospike-namespace,namespace>> beta[]  
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
-|<<metricbeat-module-aws,aws>>  experimental[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.1+| .1+|  |<<metricbeat-metricset-aws-ec2,ec2>> experimental[]  
+.1+| .1+|  |<<metricbeat-metricset-apache-status,status>>
 |<<metricbeat-module-ceph,Ceph>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .7+| .7+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>> beta[]  
 |<<metricbeat-metricset-ceph-cluster_health,cluster_health>> beta[]  
@@ -161,7 +159,6 @@ This file is generated! See scripts/docs_collector.py
 
 include::modules/aerospike.asciidoc[]
 include::modules/apache.asciidoc[]
-include::modules/aws.asciidoc[]
 include::modules/ceph.asciidoc[]
 include::modules/couchbase.asciidoc[]
 include::modules/docker.asciidoc[]

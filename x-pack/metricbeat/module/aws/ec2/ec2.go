@@ -5,11 +5,11 @@
 package ec2
 
 import (
-	"fmt"
 	"time"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
+
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -111,7 +111,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		report.Error(errors.Wrap(err, "Failed to load config"))
 		return
 	}
-	fmt.Println("------ cfg region = ", cfg.Region)
+
+	cfg.Credentials = awssdk.StaticCredentialsProvider{
+		Value: awssdk.Credentials{
+			AccessKeyID:     m.config.AwsAccessKeyID,
+			SecretAccessKey: m.config.AwsSecretAccessKey,
+			SessionToken:    m.config.AwsSessionToken,
+		},
+	}
+	cfg.Region = m.config.AwsDefaultRegion
 
 	svcEC2 := ec2.New(cfg)
 	//Get a list of regions
@@ -123,7 +131,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
 	for _, regionName := range regionsList {
 		cfg.Region = regionName
-		fmt.Println("cfg region = ", cfg.Region)
 		svcEC2 := ec2.New(cfg)
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
