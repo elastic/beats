@@ -154,17 +154,22 @@ For a description of each field in the metricset, see the
     module_list_output += "\n\n--\n\n"
     for module_name, module_path in sorted(six.iteritems(module_dirs)):
         rel_path_to_module_docs = os.path.relpath(module_docs_path(module_path), docs_path)
-        module_list_output += "include::" + os.path.join(rel_path_to_module_docs, "modules", module_name + ".asciidoc") + "[]\n"
+        module_list_output += "include::" + \
+            os.path.join(rel_path_to_module_docs, "modules", module_name + ".asciidoc") + "[]\n"
 
     # Write module link list
     with open(os.path.join(docs_path, "modules_list.asciidoc"), 'w') as f:
         f.write(module_list_output)
 
-# Returns the docs path for a module.
-# E.g. modules in x-pack/auditbeat/modules are put in x-pack/auditbeat/docs
-# (but linked to from beats/auditbeat/docs/modules_list.asciidoc)
+
 def module_docs_path(module_path):
+    """
+    Returns the docs path for a module.
+    E.g. modules in x-pack/auditbeat/modules are put in x-pack/auditbeat/docs
+    (but linked to from beats/auditbeat/docs/modules_list.asciidoc)
+    """
     return os.path.abspath(os.path.join(module_path, os.pardir, os.pardir, "docs"))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
