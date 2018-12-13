@@ -25,7 +25,7 @@ requests==2.20.0
 six==1.11.0
 termcolor==1.1.0
 texttable==0.9.1
-urllib3==1.22
+urllib3==1.23
 websocket-client==0.47.0
 parameterized==0.6.1
 jsondiff==1.1.2

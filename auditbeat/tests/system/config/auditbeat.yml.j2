@@ -17,6 +17,8 @@ auditbeat.modules:
   {% endif -%}
 {%- endfor %}
 
+auditbeat.max_start_delay: 0
+
 queue.mem:
   events: 4
   flush.min_events: 0

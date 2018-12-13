@@ -73,13 +73,13 @@ func TestRetrieveAlibabaCloudMetadata(t *testing.T) {
 	}
 
 	expected := common.MapStr{
-		"meta": common.MapStr{
-			"cloud": common.MapStr{
-				"provider":          "ecs",
-				"instance_id":       "i-wz9g2hqiikg0aliyun2b",
-				"region":            "cn-shenzhen",
-				"availability_zone": "cn-shenzhen-a",
+		"cloud": common.MapStr{
+			"provider": "ecs",
+			"instance": common.MapStr{
+				"id": "i-wz9g2hqiikg0aliyun2b",
 			},
+			"region":            "cn-shenzhen",
+			"availability_zone": "cn-shenzhen-a",
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)
