@@ -54,9 +54,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 22,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 22,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -64,10 +64,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 65058,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 65058,
           "type": "netflow"
         },
         "network": {
@@ -105,9 +105,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.100",
-          "destinationMacAddress": "00:0c:29:8d:af:c3",
-          "destinationTransportPort": 123,
+          "destination_ipv4_address": "172.16.32.100",
+          "destination_mac_address": "00:0c:29:8d:af:c3",
+          "destination_transport_port": 123,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -115,10 +115,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 123,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 123,
           "type": "netflow"
         },
         "network": {
@@ -156,9 +156,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 123,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 123,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -166,10 +166,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "172.16.32.100",
-          "sourceMacAddress": "00:0c:29:8d:af:c3",
-          "sourceTransportPort": 123,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.16.32.100",
+          "source_mac_address": "00:0c:29:8d:af:c3",
+          "source_transport_port": 123,
           "type": "netflow"
         },
         "network": {
@@ -207,9 +207,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 80,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 80,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -217,10 +217,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59157,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59157,
           "type": "netflow"
         },
         "network": {
@@ -258,9 +258,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59157,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59157,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -268,10 +268,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 80,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -309,9 +309,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 443,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 443,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -319,10 +319,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59158,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59158,
           "type": "netflow"
         },
         "network": {
@@ -360,9 +360,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59158,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59158,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -370,10 +370,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 443,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 443,
           "type": "netflow"
         },
         "network": {
@@ -411,9 +411,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 139,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 139,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -421,10 +421,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59159,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59159,
           "type": "netflow"
         },
         "network": {
@@ -462,9 +462,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59159,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59159,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -472,10 +472,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 139,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 139,
           "type": "netflow"
         },
         "network": {
@@ -513,9 +513,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 23,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 23,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -523,10 +523,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59160,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59160,
           "type": "netflow"
         },
         "network": {
@@ -564,9 +564,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59160,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59160,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -574,10 +574,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 23,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 23,
           "type": "netflow"
         },
         "network": {
@@ -615,9 +615,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 995,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 995,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -625,10 +625,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59161,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59161,
           "type": "netflow"
         },
         "network": {
@@ -666,9 +666,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59161,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59161,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -676,10 +676,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 995,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 995,
           "type": "netflow"
         },
         "network": {
@@ -717,9 +717,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 443,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 443,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -727,10 +727,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59162,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59162,
           "type": "netflow"
         },
         "network": {
@@ -768,9 +768,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59162,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59162,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -778,10 +778,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 443,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 443,
           "type": "netflow"
         },
         "network": {
@@ -819,9 +819,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 135,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 135,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -829,10 +829,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59163,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59163,
           "type": "netflow"
         },
         "network": {
@@ -870,9 +870,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59163,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59163,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -880,10 +880,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 135,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 135,
           "type": "netflow"
         },
         "network": {
@@ -921,9 +921,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 110,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 110,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -931,10 +931,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59164,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59164,
           "type": "netflow"
         },
         "network": {
@@ -972,9 +972,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59164,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59164,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -982,10 +982,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 110,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 110,
           "type": "netflow"
         },
         "network": {
@@ -1023,9 +1023,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 111,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 111,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -1033,10 +1033,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59165,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59165,
           "type": "netflow"
         },
         "network": {
@@ -1074,9 +1074,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59165,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59165,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -1084,10 +1084,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 111,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 111,
           "type": "netflow"
         },
         "network": {
@@ -1125,9 +1125,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 143,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 143,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -1135,10 +1135,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59166,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59166,
           "type": "netflow"
         },
         "network": {
@@ -1176,9 +1176,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59166,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59166,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -1186,10 +1186,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 143,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 143,
           "type": "netflow"
         },
         "network": {
@@ -1227,9 +1227,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 3389,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 3389,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -1237,10 +1237,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59167,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59167,
           "type": "netflow"
         },
         "network": {
@@ -1278,9 +1278,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59167,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59167,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -1288,10 +1288,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 3389,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 3389,
           "type": "netflow"
         },
         "network": {
@@ -1329,9 +1329,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 80,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 80,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -1339,10 +1339,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59168,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59168,
           "type": "netflow"
         },
         "network": {
@@ -1380,9 +1380,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59168,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59168,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -1390,10 +1390,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 80,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -1431,9 +1431,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.201",
-          "destinationMacAddress": "00:0c:29:70:86:09",
-          "destinationTransportPort": 25,
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 25,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -1441,10 +1441,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.1",
-          "sourceMacAddress": "00:50:56:c0:00:01",
-          "sourceTransportPort": 59169,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59169,
           "type": "netflow"
         },
         "network": {
@@ -1482,9 +1482,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.16.32.1",
-          "destinationMacAddress": "00:50:56:c0:00:01",
-          "destinationTransportPort": 59169,
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59169,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 97,
@@ -1492,10 +1492,10 @@
             "uptime_millis": 34488,
             "version": 9
           },
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.16.32.201",
-          "sourceMacAddress": "00:0c:29:70:86:09",
-          "sourceTransportPort": 25,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 25,
           "type": "netflow"
         },
         "network": {

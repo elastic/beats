@@ -58,9 +58,9 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "31.13.87.36",
-          "destinationTransportPort": 443,
-          "egressInterface": 3,
+          "destination_ipv4_address": "31.13.87.36",
+          "destination_transport_port": 443,
+          "egress_interface": 3,
           "exporter": {
             "address": "192.0.2.1:4444",
             "source_id": 1,
@@ -68,16 +68,16 @@
             "uptime_millis": 20412178,
             "version": 9
           },
-          "flowEndSysUpTime": 621770700,
-          "flowStartSysUpTime": 621761700,
-          "ingressInterface": 9,
-          "octetDeltaCount": 152,
-          "packetDeltaCount": 3,
-          "postOctetDeltaCount": 0,
-          "postPacketDeltaCount": 0,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.99.7",
-          "sourceTransportPort": 61910,
+          "flow_end_sys_up_time": 621770700,
+          "flow_start_sys_up_time": 621761700,
+          "ingress_interface": 9,
+          "octet_delta_count": 152,
+          "packet_delta_count": 3,
+          "post_octet_delta_count": 0,
+          "post_packet_delta_count": 0,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.99.7",
+          "source_transport_port": 61910,
           "type": "netflow"
         },
         "network": {

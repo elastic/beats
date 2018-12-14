@@ -5,6 +5,7 @@
 package netflow
 
 import (
+	"strings"
 	"sync"
 	"unicode"
 
@@ -49,6 +50,11 @@ func (c *caseConverter) ToSnakeCase(orig record.Map) common.MapStr {
 // format. This function is tailored to some specifics of NetFlow field names.
 // Don't reuse it.
 func CamelCaseToSnakeCase(in string) string {
+	// Lowercase those few fields that are already snake-cased
+	if strings.ContainsRune(in, '_') {
+		return strings.ToLower(in)
+	}
+
 	out := make([]rune, 0, len(in)+4)
 	runes := []rune(in)
 	upperStrike := 1

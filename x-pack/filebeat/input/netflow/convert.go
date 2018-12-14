@@ -74,7 +74,7 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 
 	event.Timestamp = flow.Timestamp
 	event.Fields = common.MapStr{
-		"netflow": common.MapStr(flow.Fields),
+		"netflow": fieldNameConverter.ToSnakeCase(flow.Fields),
 		"event":   ecsEvent,
 		"device":  ecsDevice,
 	}
@@ -101,7 +101,7 @@ func optionsToBeatEvent(flow record.Record) (event beat.Event) {
 		if iface, found := event.Fields[key]; found {
 			if opts, ok := iface.(record.Map); ok {
 				fixMacAddresses(opts)
-				event.Fields[key] = common.MapStr(opts)
+				event.Fields[key] = fieldNameConverter.ToSnakeCase(opts)
 			}
 		}
 	}
