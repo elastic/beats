@@ -1,0 +1,70 @@
+{
+  "test_name": "Netflow 9 Palo Alto 1 flowset in large zero filled packet",
+  "events": [
+    {
+      "Timestamp": "2018-06-06T13:20:17Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "134.220.1.156",
+          "locality": "public",
+          "port": 50234
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-06-06T13:20:17Z",
+          "duration": 0,
+          "end": "2018-06-06T13:20:02Z",
+          "start": "2018-06-06T13:20:02Z"
+        },
+        "flow": {
+          "id": "NBJEjpgh6PA",
+          "locality": "public"
+        },
+        "netflow": {
+          "destinationIPv4Address": "134.220.1.156",
+          "destinationTransportPort": 50234,
+          "egressInterface": 500010002,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 16777216,
+            "timestamp": "2018-06-06T13:20:17Z",
+            "uptimeMillis": 1062408704,
+            "version": 9
+          },
+          "firewallEvent": 2,
+          "flowDirection": 0,
+          "flowEndSysUpTime": 1062393704,
+          "flowId": 1428388,
+          "flowStartSysUpTime": 1062393704,
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 500010024,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 363,
+          "packetDeltaCount": 3,
+          "privateEnterpriseNumber": 25461,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "134.220.2.6",
+          "sourceTransportPort": 88,
+          "tcpControlBits": 94,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 363,
+          "direction": "inbound",
+          "packets": 3,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "134.220.2.6",
+          "locality": "public",
+          "port": 88
+        }
+      },
+      "Private": null
+    }
+  ]
+}

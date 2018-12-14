@@ -7,6 +7,7 @@ RUN \
          python-pip \
          rsync \
          virtualenv \
+         libpcap-dev \
       && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip
