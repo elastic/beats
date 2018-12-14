@@ -5,8 +5,45 @@
 package netflow
 
 import (
+	"sync"
 	"unicode"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
 )
+
+var fieldNameConverter = caseConverter{
+	conversion: make(map[string]string),
+}
+
+type caseConverter struct {
+	rwMutex    sync.RWMutex
+	conversion map[string]string
+}
+
+func (c *caseConverter) memoize(nfName, converted string) string {
+	c.rwMutex.Lock()
+	defer c.rwMutex.Unlock()
+	c.conversion[nfName] = converted
+	return converted
+}
+
+func (c *caseConverter) ToSnakeCase(orig record.Map) common.MapStr {
+	result := common.MapStr(make(map[string]interface{}, len(orig)))
+	c.rwMutex.RLock()
+	defer c.rwMutex.RUnlock()
+
+	for nfName, value := range orig {
+		name, found := c.conversion[nfName]
+		if !found {
+			c.rwMutex.RUnlock()
+			name = c.memoize(nfName, CamelCaseToSnakeCase(nfName))
+			c.rwMutex.RLock()
+		}
+		result[name] = value
+	}
+	return result
+}
 
 // CamelCaseToSnakeCase converts a camel-case identifier to snake-case
 // format. This function is tailored to some specifics of NetFlow field names.
