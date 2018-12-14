@@ -355,17 +355,9 @@ module and fileset name: `{module}.{fileset}.field`, e.g.
 `nginx.access.remote_ip`. Also, please review our <<event-conventions>>.
 
 [[ingest-json-entry-point-pipeline]]
-{ref}/conditionals-with-multiple-pipelines.html[In 6.6 and later], ingest pipelines can use the
-`pipeline` processor to delegate parts of the processings to other pipelines.
-
-[source,json]
-----
-{
-  "pipeline": {
-    "name": "name-of-another-pipeline"
-  }
-}
-----
+In 6.6 and later, ingest pipelines can use the
+{ref}/conditionals-with-multiple-pipelines.html[`pipeline` processor] to delegate
+parts of the processings to other pipelines.
 
 This can be useful if you want a fileset to ingest the same _logical_ information
 presented in different formats, e.g. csv vs. json versions of the same log files.
@@ -373,7 +365,7 @@ Imagine an entry point ingest pipeline that detects the format of a log entry an
 delegates further processing of that log entry, depending on the format, to another
 pipeline.
 
-[source,json]
+["source","json",subs="callouts"]
 ----
 {
   "processors": [
@@ -391,18 +383,20 @@ pipeline.
     {
       "pipeline": {
         "if": "ctx.first_char == '{'"
-        "name": "json-log-processing-pipeline"
+        "name": "{< IngestPipeline "json-log-processing-pipeline" >}" <1>
       }
     },
     {
       "pipeline": {
         "if": "ctx.first_char != '{'"
-        "name": "plain-log-processing-pipeline"
+        "name": "{< IngestPipeline "plain-log-processing-pipeline" >}"
       }
     }
   ]
 }
 ----
+<1>  Use the `IngestPipeline` template function to resolve the name. This function converts the
+specified name into the fully qualified pipeline ID that is stored in Elasticsearch.
 
 In order for the above pipeline to work, Filebeat must load the entry point pipeline
 as well as any sub-pipelines into Elasticsearch. You can tell Filebeat to do
@@ -416,25 +410,6 @@ ingest_pipeline:
   - ingest/plain_logs.json
   - ingest/json_logs.json
 ----
-
-Additionally, any `pipeline` processors referencing one of the pipelines in the
-metricset in the processor's `name` field must do so using the `IngestPipeline`
-template function.
-
-[source,json]
-----
-    {
-      "pipeline": {
-        "if": "ctx.first_char != '{'"
-        "name": "{< IngestPipeline "plain_logs" >}"
-      }
-    }
-  ]
-}
-----
-
-Using the template function allows Filebeat to convert the specified pipeline name
-into the fully-qualified pipeline ID that is stored in Elasticsearch.
 
 While developing the pipeline definition, we recommend making use of the
 {elasticsearch}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
