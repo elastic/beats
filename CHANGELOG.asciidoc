@@ -122,6 +122,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Add setting to disable docker cpu metrics per core. {pull}9194[9194]
 - The `elasticsearch/node` metricset now reports the Elasticsearch cluster UUID. {pull}8771[8771]
 - Support GET requests in Jolokia module. {issue}8566[8566] {pull}9226[9226]
+- Add freebsd support for the uptime metricset. {pull}9413[9413]
 - Add `host.os.name` field to add_host_metadata processor. {issue}8948[8948] {pull}9405[9405]
 - Add field `event.dataset` which is `{module}.{metricset).
 
