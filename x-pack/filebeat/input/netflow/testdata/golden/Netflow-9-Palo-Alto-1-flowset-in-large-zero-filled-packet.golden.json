@@ -57,6 +57,7 @@
         "network": {
           "bytes": 363,
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 3,
           "transport": "tcp"
         },

@@ -87,6 +87,7 @@
         "network": {
           "bytes": 152,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 3,
           "transport": "tcp"
         },

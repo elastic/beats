@@ -60,6 +60,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -124,6 +125,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -188,6 +190,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -252,6 +255,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -316,6 +320,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -380,6 +385,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -444,6 +450,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -508,6 +515,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -572,6 +580,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -636,6 +645,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -700,6 +710,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -764,6 +775,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -828,6 +840,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -892,6 +905,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -956,6 +970,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1020,6 +1035,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1084,6 +1100,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1148,6 +1165,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1212,6 +1230,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1276,6 +1295,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1340,6 +1360,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1404,6 +1425,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1468,6 +1490,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1532,6 +1555,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1596,6 +1620,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1660,6 +1685,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1724,6 +1750,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1788,6 +1815,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1852,6 +1880,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },

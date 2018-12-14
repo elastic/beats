@@ -57,6 +57,7 @@
         "network": {
           "bytes": 70,
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 1,
           "transport": "tcp"
         },
@@ -124,6 +125,7 @@
         "network": {
           "bytes": 111,
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 1,
           "transport": "tcp"
         },
@@ -191,6 +193,7 @@
         "network": {
           "bytes": 70,
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 1,
           "transport": "tcp"
         },
@@ -258,6 +261,7 @@
         "network": {
           "bytes": 70,
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 1,
           "transport": "tcp"
         },
@@ -325,6 +329,7 @@
         "network": {
           "bytes": 78,
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 1,
           "transport": "tcp"
         },
@@ -392,6 +397,7 @@
         "network": {
           "bytes": 78,
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 1,
           "transport": "tcp"
         },
@@ -459,6 +465,7 @@
         "network": {
           "bytes": 70,
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 1,
           "transport": "tcp"
         },
@@ -526,6 +533,7 @@
         "network": {
           "bytes": 70,
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 1,
           "transport": "tcp"
         },

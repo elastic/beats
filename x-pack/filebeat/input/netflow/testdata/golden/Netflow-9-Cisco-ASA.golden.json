@@ -49,6 +49,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -107,6 +108,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -165,6 +167,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -223,6 +226,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -281,6 +285,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -339,6 +344,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -397,6 +403,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -455,6 +462,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -513,6 +521,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -571,6 +580,7 @@
         "network": {
           "bytes": 160,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -629,6 +639,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -687,6 +698,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -745,6 +757,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -803,6 +816,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {

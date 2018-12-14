@@ -57,6 +57,7 @@
         "network": {
           "bytes": 0,
           "direction": "outbound",
+          "iana_number": 2,
           "packets": 0,
           "transport": "unknown (2)"
         },
@@ -124,6 +125,7 @@
         "network": {
           "bytes": 0,
           "direction": "outbound",
+          "iana_number": 2,
           "packets": 0,
           "transport": "unknown (2)"
         },
@@ -191,6 +193,7 @@
         "network": {
           "bytes": 0,
           "direction": "inbound",
+          "iana_number": 2,
           "packets": 0,
           "transport": "unknown (2)"
         },
@@ -258,6 +261,7 @@
         "network": {
           "bytes": 32,
           "direction": "inbound",
+          "iana_number": 2,
           "packets": 1,
           "transport": "unknown (2)"
         },
@@ -325,6 +329,7 @@
         "network": {
           "bytes": 0,
           "direction": "outbound",
+          "iana_number": 2,
           "packets": 0,
           "transport": "unknown (2)"
         },
@@ -392,6 +397,7 @@
         "network": {
           "bytes": 0,
           "direction": "outbound",
+          "iana_number": 2,
           "packets": 0,
           "transport": "unknown (2)"
         },
@@ -459,6 +465,7 @@
         "network": {
           "bytes": 0,
           "direction": "inbound",
+          "iana_number": 2,
           "packets": 0,
           "transport": "unknown (2)"
         },
@@ -526,6 +533,7 @@
         "network": {
           "bytes": 32,
           "direction": "inbound",
+          "iana_number": 2,
           "packets": 1,
           "transport": "unknown (2)"
         },
@@ -593,6 +601,7 @@
         "network": {
           "bytes": 0,
           "direction": "outbound",
+          "iana_number": 2,
           "packets": 0,
           "transport": "unknown (2)"
         },
@@ -660,6 +669,7 @@
         "network": {
           "bytes": 0,
           "direction": "outbound",
+          "iana_number": 2,
           "packets": 0,
           "transport": "unknown (2)"
         },

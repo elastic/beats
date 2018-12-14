@@ -59,6 +59,7 @@
         "network": {
           "bytes": 748,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 6,
           "transport": "tcp"
         },
@@ -128,6 +129,7 @@
         "network": {
           "bytes": 6948,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 10,
           "transport": "tcp"
         },
@@ -197,6 +199,7 @@
         "network": {
           "bytes": 1584,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 14,
           "transport": "tcp"
         },
@@ -266,6 +269,7 @@
         "network": {
           "bytes": 8201,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 11,
           "transport": "tcp"
         },
@@ -335,6 +339,7 @@
         "network": {
           "bytes": 1729,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 15,
           "transport": "tcp"
         },
@@ -404,6 +409,7 @@
         "network": {
           "bytes": 1122,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 5,
           "transport": "tcp"
         },
@@ -473,6 +479,7 @@
         "network": {
           "bytes": 705,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 5,
           "transport": "tcp"
         },
@@ -542,6 +549,7 @@
         "network": {
           "bytes": 1123,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 5,
           "transport": "tcp"
         },
@@ -611,6 +619,7 @@
         "network": {
           "bytes": 706,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 5,
           "transport": "tcp"
         },
@@ -676,6 +685,7 @@
         "network": {
           "bytes": 74,
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -741,6 +751,7 @@
         "network": {
           "bytes": 58,
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -806,6 +817,7 @@
         "network": {
           "bytes": 74,
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -871,6 +883,7 @@
         "network": {
           "bytes": 58,
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -936,6 +949,7 @@
         "network": {
           "bytes": 1071,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 5,
           "transport": "tcp"
         },
@@ -1001,6 +1015,7 @@
         "network": {
           "bytes": 1147,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 6,
           "transport": "tcp"
         },
@@ -1066,6 +1081,7 @@
         "network": {
           "bytes": 1980,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 6,
           "transport": "tcp"
         },
@@ -1131,6 +1147,7 @@
         "network": {
           "bytes": 2164,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 8,
           "transport": "tcp"
         },

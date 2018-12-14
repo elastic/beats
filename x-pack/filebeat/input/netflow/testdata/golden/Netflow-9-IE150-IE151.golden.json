@@ -51,6 +51,7 @@
         "network": {
           "bytes": 78,
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -112,6 +113,7 @@
         "network": {
           "bytes": 232,
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },

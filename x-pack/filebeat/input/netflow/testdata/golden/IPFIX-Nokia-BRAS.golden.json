@@ -46,6 +46,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         },
         "source": {

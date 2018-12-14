@@ -65,6 +65,7 @@
         "network": {
           "bytes": 44,
           "direction": "inbound",
+          "iana_number": 1,
           "packets": 1,
           "transport": "icmp"
         },
@@ -141,6 +142,7 @@
         "network": {
           "bytes": 106,
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -217,6 +219,7 @@
         "network": {
           "bytes": 44,
           "direction": "inbound",
+          "iana_number": 1,
           "packets": 1,
           "transport": "icmp"
         },
@@ -293,6 +296,7 @@
         "network": {
           "bytes": 76,
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -369,6 +373,7 @@
         "network": {
           "bytes": 2794,
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 36,
           "transport": "udp"
         },

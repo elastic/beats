@@ -58,6 +58,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         },
         "source": {
@@ -125,6 +126,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 58,
           "transport": "ipv6-icmp"
         },
         "source": {
@@ -192,6 +194,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         },
         "source": {
@@ -259,6 +262,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 1,
           "transport": "icmp"
         },
         "source": {
@@ -326,6 +330,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 58,
           "transport": "ipv6-icmp"
         },
         "source": {
@@ -393,6 +398,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         },
         "source": {
@@ -460,6 +466,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         },
         "source": {
@@ -527,6 +534,7 @@
         },
         "network": {
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         },
         "source": {

@@ -64,6 +64,7 @@
         "network": {
           "bytes": 200,
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 4,
           "transport": "tcp"
         },

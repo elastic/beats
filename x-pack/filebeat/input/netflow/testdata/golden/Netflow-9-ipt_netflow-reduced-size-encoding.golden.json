@@ -60,6 +60,7 @@
         "network": {
           "bytes": 156,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 3,
           "transport": "tcp"
         },
@@ -131,6 +132,7 @@
         "network": {
           "bytes": 48,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 1,
           "transport": "tcp"
         },
@@ -202,6 +204,7 @@
         "network": {
           "bytes": 584,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 11,
           "transport": "tcp"
         },
@@ -273,6 +276,7 @@
         "network": {
           "bytes": 577,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 4,
           "transport": "tcp"
         },
@@ -344,6 +348,7 @@
         "network": {
           "bytes": 152,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 3,
           "transport": "tcp"
         },
@@ -415,6 +420,7 @@
         "network": {
           "bytes": 152,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 3,
           "transport": "tcp"
         },
@@ -486,6 +492,7 @@
         "network": {
           "bytes": 1809,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 15,
           "transport": "tcp"
         },
@@ -557,6 +564,7 @@
         "network": {
           "bytes": 234,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 3,
           "transport": "tcp"
         },
@@ -628,6 +636,7 @@
         "network": {
           "bytes": 1681,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 22,
           "transport": "tcp"
         },
@@ -699,6 +708,7 @@
         "network": {
           "bytes": 152,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 3,
           "transport": "tcp"
         },
@@ -770,6 +780,7 @@
         "network": {
           "bytes": 1866,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 3,
           "transport": "tcp"
         },
@@ -841,6 +852,7 @@
         "network": {
           "bytes": 187,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 3,
           "transport": "tcp"
         },

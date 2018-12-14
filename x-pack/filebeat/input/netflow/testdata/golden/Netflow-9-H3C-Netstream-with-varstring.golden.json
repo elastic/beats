@@ -65,6 +65,7 @@
         "network": {
           "bytes": 702,
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 9,
           "transport": "udp"
         },

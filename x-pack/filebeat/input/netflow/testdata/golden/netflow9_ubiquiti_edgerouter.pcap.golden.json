@@ -59,6 +59,7 @@
         "network": {
           "bytes": 421,
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 6,
           "transport": "tcp"
         },
@@ -128,6 +129,7 @@
         "network": {
           "bytes": 7621,
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 131,
           "transport": "tcp"
         },
@@ -197,6 +199,7 @@
         "network": {
           "bytes": 95,
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -266,6 +269,7 @@
         "network": {
           "bytes": 3162,
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 30,
           "transport": "tcp"
         },
@@ -335,6 +339,7 @@
         "network": {
           "bytes": 2711,
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 13,
           "transport": "tcp"
         },
@@ -404,6 +409,7 @@
         "network": {
           "bytes": 20855,
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 346,
           "transport": "tcp"
         },
@@ -473,6 +479,7 @@
         "network": {
           "bytes": 7495,
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 129,
           "transport": "tcp"
         },
@@ -542,6 +549,7 @@
         "network": {
           "bytes": 7049,
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 119,
           "transport": "tcp"
         },
@@ -611,6 +619,7 @@
         "network": {
           "bytes": 1348,
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 13,
           "transport": "tcp"
         },
@@ -680,6 +689,7 @@
         "network": {
           "bytes": 82,
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },

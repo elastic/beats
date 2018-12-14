@@ -242,6 +242,7 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	ecsNetwork := common.MapStr{}
 	if proto, found := getKeyUint64(flow.Fields, "protocolIdentifier"); found {
 		ecsNetwork["transport"] = IPProtocol(proto).String()
+		ecsNetwork["iana_number"] = proto
 	}
 	countBytes, hasBytes := getKeyUint64(flow.Fields, "octetDeltaCount")
 	if !hasBytes {

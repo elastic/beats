@@ -58,6 +58,7 @@
         "network": {
           "bytes": 532,
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 6,
           "transport": "udp"
         },
@@ -134,6 +135,7 @@
         "network": {
           "bytes": 356,
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 8,
           "transport": "tcp"
         },
