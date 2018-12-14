@@ -340,7 +340,7 @@ func makeClient(
 		return nil, err
 	}
 
-	return newPublishClient(esClient, params), nil
+	return newPublishClient(esClient, params)
 }
 
 func closing(log *logp.Logger, c io.Closer) {

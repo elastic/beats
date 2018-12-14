@@ -39,12 +39,17 @@ type publishClient struct {
 func newPublishClient(
 	es *esout.Client,
 	params map[string]string,
-) *publishClient {
+) (*publishClient, error) {
+	format := params["_format"]
+	if format != report.ReportingFormatProduction && format != report.ReportingFormatMonitoring {
+		return nil, fmt.Errorf("unsupported reporting format: %v", format)
+	}
+
 	p := &publishClient{
 		es:     es,
 		params: params,
 	}
-	return p
+	return p, nil
 }
 
 func (c *publishClient) Connect() error {
@@ -127,8 +132,6 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 			err = c.bulkToProduction(params, event, t)
 		case report.ReportingFormatMonitoring:
 			err = c.bulkToMonitoring(event)
-		default:
-			err = fmt.Errorf("unsupported reporting format: %v", params["_format"])
 		}
 
 		if err != nil {
