@@ -1,0 +1,1803 @@
+{
+  "test_name": "ipfix_cisco",
+  "events": [
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAAUA==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 0,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184158,
+          "flowStartSysUpTime": 564184140,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 719,
+          "initiatorPackets": 5,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 49,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAAUA==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 0,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184154,
+          "flowStartSysUpTime": 564184140,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 1477,
+          "initiatorPackets": 6,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 49,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQACCA==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 1,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 89,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184144,
+          "flowStartSysUpTime": 564184142,
+          "ingressInterface": 13,
+          "ingressVRFID": 0,
+          "initiatorOctets": 1,
+          "initiatorPackets": 1,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 125,
+          "newConnectionDeltaCount": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 1,
+          "type": "netflow",
+          "vlanId": 290,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAAUA==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 2,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 0,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184216,
+          "flowStartSysUpTime": 564184131,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 108580,
+          "initiatorPackets": 79,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 49,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAAUA==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 0,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184208,
+          "flowStartSysUpTime": 564184176,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 342,
+          "initiatorPackets": 5,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 49,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "artClientNetworkTimeSum": 2,
+          "artCountLateResponses": 0,
+          "artCountResponses": 3,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 2,
+          "artNetworkTimeSum": 97,
+          "artResponseTimeSum": 153,
+          "artServerNetworkTimeSum": 95,
+          "artServerResponseTimeMaximum": 8,
+          "artServerResponseTimeSum": 13,
+          "artTotalResponseTimeSum": 156,
+          "artTotalTransactionTimeSum": 100,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 24,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564197394,
+          "flowStartSysUpTime": 564184067,
+          "ingressInterface": 13,
+          "ingressVRFID": 0,
+          "initiatorOctets": 1851,
+          "initiatorPackets": 17,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 125,
+          "newConnectionDeltaCount": 2,
+          "protocolIdentifier": 6,
+          "responderOctets": 9437,
+          "responderPackets": 18,
+          "type": "netflow",
+          "vlanId": 290,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAAUA==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 0,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184216,
+          "flowStartSysUpTime": 564184182,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 51480,
+          "initiatorPackets": 39,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 49,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "artClientNetworkTimeSum": 10,
+          "artCountLateResponses": 0,
+          "artCountResponses": 15,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 14,
+          "artNetworkTimeSum": 374,
+          "artResponseTimeSum": 516,
+          "artServerNetworkTimeSum": 364,
+          "artServerResponseTimeMaximum": 27,
+          "artServerResponseTimeSum": 117,
+          "artTotalResponseTimeSum": 541,
+          "artTotalTransactionTimeSum": 512,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 35,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564203810,
+          "flowStartSysUpTime": 564184040,
+          "ingressInterface": 13,
+          "ingressVRFID": 0,
+          "initiatorOctets": 5135,
+          "initiatorPackets": 55,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 126,
+          "newConnectionDeltaCount": 6,
+          "protocolIdentifier": 6,
+          "responderOctets": 36894,
+          "responderPackets": 47,
+          "type": "netflow",
+          "vlanId": 290,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQACYw==",
+          "artClientNetworkTimeSum": 5,
+          "artCountLateResponses": 0,
+          "artCountResponses": 6,
+          "artCountRetransmissions": 1,
+          "artCountTransactions": 6,
+          "artNetworkTimeSum": 23,
+          "artResponseTimeSum": 123,
+          "artServerNetworkTimeSum": 18,
+          "artServerResponseTimeMaximum": 31,
+          "artServerResponseTimeSum": 78,
+          "artTotalResponseTimeSum": 138,
+          "artTotalTransactionTimeSum": 123,
+          "biflowDirection": 2,
+          "connectionSumDurationSeconds": 64,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564200378,
+          "flowStartSysUpTime": 564184163,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 6400,
+          "initiatorPackets": 20,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 61,
+          "newConnectionDeltaCount": 2,
+          "protocolIdentifier": 6,
+          "responderOctets": 6533,
+          "responderPackets": 14,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQAAMQ==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 109,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564185840,
+          "flowStartSysUpTime": 564184196,
+          "ingressInterface": 13,
+          "ingressVRFID": 0,
+          "initiatorOctets": 5684,
+          "initiatorPackets": 491,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 125,
+          "newConnectionDeltaCount": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 290,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 0,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184254,
+          "flowStartSysUpTime": 564184154,
+          "ingressInterface": 13,
+          "ingressVRFID": 0,
+          "initiatorOctets": 4965,
+          "initiatorPackets": 13,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 125,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 290,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQACYw==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 2,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 119878,
+          "biflowDirection": 2,
+          "connectionSumDurationSeconds": 239,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184362,
+          "flowStartSysUpTime": 564184214,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 0,
+          "initiatorPackets": 2,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 61,
+          "newConnectionDeltaCount": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 138,
+          "responderPackets": 4,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQACCA==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 1,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 44,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184220,
+          "flowStartSysUpTime": 564184220,
+          "ingressInterface": 13,
+          "ingressVRFID": 0,
+          "initiatorOctets": 1,
+          "initiatorPackets": 1,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 125,
+          "newConnectionDeltaCount": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 290,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "artClientNetworkTimeSum": 3,
+          "artCountLateResponses": 0,
+          "artCountResponses": 3,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 2,
+          "artNetworkTimeSum": 149,
+          "artResponseTimeSum": 444,
+          "artServerNetworkTimeSum": 146,
+          "artServerResponseTimeMaximum": 3,
+          "artServerResponseTimeSum": 6,
+          "artTotalResponseTimeSum": 453,
+          "artTotalTransactionTimeSum": 296,
+          "biflowDirection": 2,
+          "connectionSumDurationSeconds": 62,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564215068,
+          "flowStartSysUpTime": 564184067,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 1571,
+          "initiatorPackets": 13,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 220,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 6079,
+          "responderPackets": 10,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 0,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184252,
+          "flowStartSysUpTime": 564183878,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 2807,
+          "initiatorPackets": 6,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 61,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQAAAQ==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 59,
+          "egressInterface": 4,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184248,
+          "flowStartSysUpTime": 564184248,
+          "ingressInterface": 1,
+          "ingressVRFID": 0,
+          "initiatorOctets": 0,
+          "initiatorPackets": 1,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 124,
+          "newConnectionDeltaCount": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "artClientNetworkTimeSum": 2,
+          "artCountLateResponses": 0,
+          "artCountResponses": 4,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 4,
+          "artNetworkTimeSum": 6,
+          "artResponseTimeSum": 23,
+          "artServerNetworkTimeSum": 4,
+          "artServerResponseTimeMaximum": 3,
+          "artServerResponseTimeSum": 7,
+          "artTotalResponseTimeSum": 31,
+          "artTotalTransactionTimeSum": 23,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 32,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564200378,
+          "flowStartSysUpTime": 564184251,
+          "ingressInterface": 13,
+          "ingressVRFID": 0,
+          "initiatorOctets": 1877,
+          "initiatorPackets": 11,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 125,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 3409,
+          "responderPackets": 7,
+          "type": "netflow",
+          "vlanId": 290,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 0,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184286,
+          "flowStartSysUpTime": 564184040,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 2255,
+          "initiatorPackets": 7,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 61,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAAUA==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 0,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184314,
+          "flowStartSysUpTime": 564184284,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 538,
+          "initiatorPackets": 5,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 49,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 0,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQACZg==",
+          "artClientNetworkTimeSum": 2,
+          "artCountLateResponses": 0,
+          "artCountResponses": 5,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 5,
+          "artNetworkTimeSum": 9,
+          "artResponseTimeSum": 72,
+          "artServerNetworkTimeSum": 7,
+          "artServerResponseTimeMaximum": 25,
+          "artServerResponseTimeSum": 55,
+          "artTotalResponseTimeSum": 77,
+          "artTotalTransactionTimeSum": 59870,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 181,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564214304,
+          "flowStartSysUpTime": 564184296,
+          "ingressInterface": 13,
+          "ingressVRFID": 0,
+          "initiatorOctets": 1487,
+          "initiatorPackets": 21,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 125,
+          "newConnectionDeltaCount": 2,
+          "protocolIdentifier": 6,
+          "responderOctets": 6305,
+          "responderPackets": 15,
+          "type": "netflow",
+          "vlanId": 290,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQACYw==",
+          "artClientNetworkTimeSum": 2,
+          "artCountLateResponses": 0,
+          "artCountResponses": 3,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 3,
+          "artNetworkTimeSum": 12,
+          "artResponseTimeSum": 39,
+          "artServerNetworkTimeSum": 10,
+          "artServerResponseTimeMaximum": 14,
+          "artServerResponseTimeSum": 15,
+          "artTotalResponseTimeSum": 45,
+          "artTotalTransactionTimeSum": 39,
+          "biflowDirection": 2,
+          "connectionSumDurationSeconds": 32,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564200376,
+          "flowStartSysUpTime": 564184268,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 1973,
+          "initiatorPackets": 10,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 61,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 3110,
+          "responderPackets": 7,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAFmQ==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 2,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 2,
+          "connectionSumDurationSeconds": 119,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564214242,
+          "flowStartSysUpTime": 564184300,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 2,
+          "initiatorPackets": 4,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 124,
+          "newConnectionDeltaCount": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 2,
+          "responderPackets": 4,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAAUA==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 2,
+          "artCountTransactions": 0,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 0,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 179,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184580,
+          "flowStartSysUpTime": 564184306,
+          "ingressInterface": 13,
+          "ingressVRFID": 0,
+          "initiatorOctets": 2,
+          "initiatorPackets": 2,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 125,
+          "newConnectionDeltaCount": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 2,
+          "type": "netflow",
+          "vlanId": 290,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 2,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 18,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 119,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184326,
+          "flowStartSysUpTime": 564184326,
+          "ingressInterface": 13,
+          "ingressVRFID": 0,
+          "initiatorOctets": 0,
+          "initiatorPackets": 4,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 125,
+          "newConnectionDeltaCount": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 0,
+          "responderPackets": 2,
+          "type": "netflow",
+          "vlanId": 290,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAFmQ==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 1,
+          "artCountRetransmissions": 1,
+          "artCountTransactions": 1,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 5,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 5,
+          "artServerResponseTimeSum": 5,
+          "artTotalResponseTimeSum": 8,
+          "artTotalTransactionTimeSum": 12,
+          "biflowDirection": 1,
+          "connectionSumDurationSeconds": 119,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564214476,
+          "flowStartSysUpTime": 564184326,
+          "ingressInterface": 13,
+          "ingressVRFID": 0,
+          "initiatorOctets": 1005,
+          "initiatorPackets": 4,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 125,
+          "newConnectionDeltaCount": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 174,
+          "responderPackets": 3,
+          "type": "netflow",
+          "vlanId": 290,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 2,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 119644,
+          "biflowDirection": 2,
+          "connectionSumDurationSeconds": 238,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184490,
+          "flowStartSysUpTime": 564184336,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 0,
+          "initiatorPackets": 2,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 61,
+          "newConnectionDeltaCount": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 138,
+          "responderPackets": 4,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "artClientNetworkTimeSum": 0,
+          "artCountLateResponses": 0,
+          "artCountResponses": 0,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 1,
+          "artNetworkTimeSum": 0,
+          "artResponseTimeSum": 0,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 0,
+          "artServerResponseTimeSum": 0,
+          "artTotalResponseTimeSum": 0,
+          "artTotalTransactionTimeSum": 59790,
+          "biflowDirection": 2,
+          "connectionSumDurationSeconds": 119,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184350,
+          "flowStartSysUpTime": 564184348,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 0,
+          "initiatorPackets": 1,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 43,
+          "newConnectionDeltaCount": 0,
+          "protocolIdentifier": 6,
+          "responderOctets": 31,
+          "responderPackets": 2,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQABxQ==",
+          "artClientNetworkTimeSum": 3,
+          "artCountLateResponses": 0,
+          "artCountResponses": 6,
+          "artCountRetransmissions": 0,
+          "artCountTransactions": 6,
+          "artNetworkTimeSum": 3,
+          "artResponseTimeSum": 33,
+          "artServerNetworkTimeSum": 0,
+          "artServerResponseTimeMaximum": 28,
+          "artServerResponseTimeSum": 33,
+          "artTotalResponseTimeSum": 51,
+          "artTotalTransactionTimeSum": 43,
+          "biflowDirection": 2,
+          "connectionSumDurationSeconds": 0,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564184586,
+          "flowStartSysUpTime": 564184356,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 8989,
+          "initiatorPackets": 19,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 124,
+          "newConnectionDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "responderOctets": 13482,
+          "responderPackets": 17,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "device": {
+          "ip": "10.101.255.2"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-07-03T10:47:00Z"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "DQACYw==",
+          "artClientNetworkTimeSum": 20,
+          "artCountLateResponses": 0,
+          "artCountResponses": 25,
+          "artCountRetransmissions": 4,
+          "artCountTransactions": 25,
+          "artNetworkTimeSum": 58,
+          "artResponseTimeSum": 301,
+          "artServerNetworkTimeSum": 38,
+          "artServerResponseTimeMaximum": 31,
+          "artServerResponseTimeSum": 168,
+          "artTotalResponseTimeSum": 363,
+          "artTotalTransactionTimeSum": 332,
+          "biflowDirection": 2,
+          "connectionSumDurationSeconds": 116,
+          "egressInterface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "sourceId": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndSysUpTime": 564215336,
+          "flowStartSysUpTime": 564184380,
+          "ingressInterface": 10,
+          "ingressVRFID": 0,
+          "initiatorOctets": 233345,
+          "initiatorPackets": 236,
+          "ipDiffServCodePoint": 0,
+          "ipTTL": 61,
+          "newConnectionDeltaCount": 8,
+          "protocolIdentifier": 6,
+          "responderOctets": 28373,
+          "responderPackets": 133,
+          "type": "netflow",
+          "vlanId": 0,
+          "waasoptimizationSegment": 16
+        },
+        "network": {
+          "direction": "unknown",
+          "protocol": "tcp"
+        }
+      },
+      "Private": null
+    }
+  ]
+}

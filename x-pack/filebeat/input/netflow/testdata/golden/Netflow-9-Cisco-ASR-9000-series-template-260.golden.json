@@ -1,0 +1,1454 @@
+{
+  "test_name": "Netflow 9 Cisco ASR 9000 series template 260",
+  "events": [
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.31.81",
+          "locality": "private",
+          "port": 443
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 0,
+          "end": "2016-12-06T10:08:53.94Z",
+          "start": "2016-12-06T10:08:53.94Z"
+        },
+        "flow": {
+          "id": "w6H0EF64-XY",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64496,
+          "bgpNextHopIPv4Address": "10.0.14.33",
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "10.0.31.81",
+          "destinationIPv4PrefixLength": 20,
+          "destinationTransportPort": 443,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704740613,
+          "flowStartSysUpTime": 1704740613,
+          "forwardingStatus": 64,
+          "ingressInterface": 110,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 40,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.9.146",
+          "sourceIPv4PrefixLength": 16,
+          "sourceTransportPort": 54017,
+          "tcpControlBits": 16,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 40,
+          "direction": "outbound",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.9.146",
+          "locality": "private",
+          "port": 54017
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.35.4",
+          "locality": "private",
+          "port": 443
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 641000000,
+          "end": "2016-12-06T10:08:54.583Z",
+          "start": "2016-12-06T10:08:53.942Z"
+        },
+        "flow": {
+          "id": "_1c-gcbRBYA",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64496,
+          "bgpNextHopIPv4Address": "10.0.14.33",
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "10.0.35.4",
+          "destinationIPv4PrefixLength": 16,
+          "destinationTransportPort": 443,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704741256,
+          "flowStartSysUpTime": 1704740615,
+          "forwardingStatus": 64,
+          "ingressInterface": 87,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 104,
+          "packetDeltaCount": 2,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.17.42",
+          "sourceIPv4PrefixLength": 21,
+          "sourceTransportPort": 36484,
+          "tcpControlBits": 16,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 104,
+          "direction": "outbound",
+          "packets": 2,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.17.42",
+          "locality": "private",
+          "port": 36484
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.34.141",
+          "locality": "private",
+          "port": 443
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 0,
+          "end": "2016-12-06T10:08:53.945Z",
+          "start": "2016-12-06T10:08:53.945Z"
+        },
+        "flow": {
+          "id": "c7on4lOqINw",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64496,
+          "bgpNextHopIPv4Address": "10.0.14.33",
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "10.0.34.141",
+          "destinationIPv4PrefixLength": 16,
+          "destinationTransportPort": 443,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704740618,
+          "flowStartSysUpTime": 1704740618,
+          "forwardingStatus": 64,
+          "ingressInterface": 104,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 52,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.22.111",
+          "sourceIPv4PrefixLength": 24,
+          "sourceTransportPort": 16814,
+          "tcpControlBits": 17,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 52,
+          "direction": "outbound",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.22.111",
+          "locality": "private",
+          "port": 16814
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.36.170",
+          "locality": "private",
+          "port": 64812
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 0,
+          "end": "2016-12-06T10:08:53.947Z",
+          "start": "2016-12-06T10:08:53.947Z"
+        },
+        "flow": {
+          "id": "RUvfFagvRcI",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64497,
+          "bgpNextHopIPv4Address": "10.0.14.31",
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "10.0.36.170",
+          "destinationIPv4PrefixLength": 19,
+          "destinationTransportPort": 64812,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704740620,
+          "flowStartSysUpTime": 1704740620,
+          "forwardingStatus": 64,
+          "ingressInterface": 86,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 435,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "10.0.23.59",
+          "sourceIPv4PrefixLength": 25,
+          "sourceTransportPort": 53,
+          "tcpControlBits": 0,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 435,
+          "direction": "outbound",
+          "packets": 1,
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "10.0.23.59",
+          "locality": "private",
+          "port": 53
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.20.242",
+          "locality": "private",
+          "port": 2013
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 0,
+          "end": "2016-12-06T10:08:53.948Z",
+          "start": "2016-12-06T10:08:53.948Z"
+        },
+        "flow": {
+          "id": "8rGfuJtEqFQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 65442,
+          "bgpNextHopIPv4Address": "10.0.18.5",
+          "bgpSourceAsNumber": 64496,
+          "destinationIPv4Address": "10.0.20.242",
+          "destinationIPv4PrefixLength": 21,
+          "destinationTransportPort": 2013,
+          "egressInterface": 106,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 1704740621,
+          "flowStartSysUpTime": 1704740621,
+          "forwardingStatus": 64,
+          "ingressInterface": 158,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 969,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.34.71",
+          "sourceIPv4PrefixLength": 16,
+          "sourceTransportPort": 443,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 969,
+          "direction": "inbound",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.34.71",
+          "locality": "private",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.30.102",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 83000000,
+          "end": "2016-12-06T10:08:53.948Z",
+          "start": "2016-12-06T10:08:53.865Z"
+        },
+        "flow": {
+          "id": "tH2X1gpW5co",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64496,
+          "bgpNextHopIPv4Address": "10.0.14.33",
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "10.0.30.102",
+          "destinationIPv4PrefixLength": 16,
+          "destinationTransportPort": 80,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704740621,
+          "flowStartSysUpTime": 1704740538,
+          "forwardingStatus": 64,
+          "ingressInterface": 110,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 104,
+          "packetDeltaCount": 2,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.10.133",
+          "sourceIPv4PrefixLength": 16,
+          "sourceTransportPort": 35273,
+          "tcpControlBits": 16,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 104,
+          "direction": "outbound",
+          "packets": 2,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.10.133",
+          "locality": "private",
+          "port": 35273
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.6.24",
+          "locality": "private",
+          "port": 56771
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 0,
+          "end": "2016-12-06T10:08:53.951Z",
+          "start": "2016-12-06T10:08:53.951Z"
+        },
+        "flow": {
+          "id": "Z7W3qCijE1k",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 65431,
+          "bgpNextHopIPv4Address": "10.0.0.242",
+          "bgpSourceAsNumber": 15133,
+          "destinationIPv4Address": "10.0.6.24",
+          "destinationIPv4PrefixLength": 16,
+          "destinationTransportPort": 56771,
+          "egressInterface": 162,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 1704740624,
+          "flowStartSysUpTime": 1704740624,
+          "forwardingStatus": 64,
+          "ingressInterface": 102,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 32,
+          "octetDeltaCount": 52,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.37.29",
+          "sourceIPv4PrefixLength": 24,
+          "sourceTransportPort": 80,
+          "tcpControlBits": 16,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 52,
+          "direction": "inbound",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.37.29",
+          "locality": "private",
+          "port": 80
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.11.113",
+          "locality": "private",
+          "port": 56830
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 0,
+          "end": "2016-12-06T10:08:53.951Z",
+          "start": "2016-12-06T10:08:53.951Z"
+        },
+        "flow": {
+          "id": "tw9xgUqsD84",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 65432,
+          "bgpNextHopIPv4Address": "10.0.18.105",
+          "bgpSourceAsNumber": 64496,
+          "destinationIPv4Address": "10.0.11.113",
+          "destinationIPv4PrefixLength": 16,
+          "destinationTransportPort": 56830,
+          "egressInterface": 46,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 1704740624,
+          "flowStartSysUpTime": 1704740624,
+          "forwardingStatus": 64,
+          "ingressInterface": 158,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 614,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.32.176",
+          "sourceIPv4PrefixLength": 20,
+          "sourceTransportPort": 443,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 614,
+          "direction": "inbound",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.32.176",
+          "locality": "private",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.15.38",
+          "locality": "private",
+          "port": 40078
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 5418000000,
+          "end": "2016-12-06T10:08:53.952Z",
+          "start": "2016-12-06T10:08:48.534Z"
+        },
+        "flow": {
+          "id": "bjSOPCYMrLM",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64498,
+          "bgpNextHopIPv4Address": "10.0.14.27",
+          "bgpSourceAsNumber": 32934,
+          "destinationIPv4Address": "10.0.15.38",
+          "destinationIPv4PrefixLength": 24,
+          "destinationTransportPort": 40078,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704740625,
+          "flowStartSysUpTime": 1704735207,
+          "forwardingStatus": 64,
+          "ingressInterface": 87,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 4350,
+          "packetDeltaCount": 3,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.12.21",
+          "sourceIPv4PrefixLength": 24,
+          "sourceTransportPort": 443,
+          "tcpControlBits": 16,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 4350,
+          "direction": "outbound",
+          "packets": 3,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.12.21",
+          "locality": "private",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.3.110",
+          "locality": "private",
+          "port": 443
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 3317000000,
+          "end": "2016-12-06T10:08:57.27Z",
+          "start": "2016-12-06T10:08:53.953Z"
+        },
+        "flow": {
+          "id": "cW2GilRshZ0",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 70,
+          "bgpNextHopIPv4Address": "10.0.16.101",
+          "bgpSourceAsNumber": 65431,
+          "destinationIPv4Address": "10.0.3.110",
+          "destinationIPv4PrefixLength": 17,
+          "destinationTransportPort": 443,
+          "egressInterface": 102,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704743943,
+          "flowStartSysUpTime": 1704740626,
+          "forwardingStatus": 64,
+          "ingressInterface": 162,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 533,
+          "packetDeltaCount": 2,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.4.212",
+          "sourceIPv4PrefixLength": 16,
+          "sourceTransportPort": 50691,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 533,
+          "direction": "outbound",
+          "packets": 2,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.4.212",
+          "locality": "private",
+          "port": 50691
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.1.136",
+          "locality": "private",
+          "port": 80
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 19894000000,
+          "end": "2016-12-06T10:09:04.383Z",
+          "start": "2016-12-06T10:08:44.489Z"
+        },
+        "flow": {
+          "id": "j4xTFnwcWbM",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 0,
+          "bgpNextHopIPv4Address": "0.0.0.0",
+          "bgpSourceAsNumber": 64497,
+          "destinationIPv4Address": "10.0.1.136",
+          "destinationIPv4PrefixLength": 27,
+          "destinationTransportPort": 80,
+          "egressInterface": 104,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 1704751056,
+          "flowStartSysUpTime": 1704731162,
+          "forwardingStatus": 64,
+          "ingressInterface": 158,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 13660,
+          "packetDeltaCount": 325,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.33.122",
+          "sourceIPv4PrefixLength": 21,
+          "sourceTransportPort": 58814,
+          "tcpControlBits": 16,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 13660,
+          "direction": "inbound",
+          "packets": 325,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.33.122",
+          "locality": "private",
+          "port": 58814
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.34.71",
+          "locality": "private",
+          "port": 443
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 0,
+          "end": "2016-12-06T10:08:53.955Z",
+          "start": "2016-12-06T10:08:53.955Z"
+        },
+        "flow": {
+          "id": "yblfrCeNW2I",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64496,
+          "bgpNextHopIPv4Address": "10.0.14.33",
+          "bgpSourceAsNumber": 65442,
+          "destinationIPv4Address": "10.0.34.71",
+          "destinationIPv4PrefixLength": 16,
+          "destinationTransportPort": 443,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704740628,
+          "flowStartSysUpTime": 1704740628,
+          "forwardingStatus": 64,
+          "ingressInterface": 106,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 96,
+          "octetDeltaCount": 89,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.20.242",
+          "sourceIPv4PrefixLength": 21,
+          "sourceTransportPort": 2013,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 89,
+          "direction": "outbound",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.20.242",
+          "locality": "private",
+          "port": 2013
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.15.38",
+          "locality": "private",
+          "port": 51621
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 0,
+          "end": "2016-12-06T10:08:53.957Z",
+          "start": "2016-12-06T10:08:53.957Z"
+        },
+        "flow": {
+          "id": "si1uY_f-7f4",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64498,
+          "bgpNextHopIPv4Address": "10.0.14.27",
+          "bgpSourceAsNumber": 32934,
+          "destinationIPv4Address": "10.0.15.38",
+          "destinationIPv4PrefixLength": 24,
+          "destinationTransportPort": 51621,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704740630,
+          "flowStartSysUpTime": 1704740630,
+          "forwardingStatus": 64,
+          "ingressInterface": 87,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 833,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.13.25",
+          "sourceIPv4PrefixLength": 24,
+          "sourceTransportPort": 443,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 833,
+          "direction": "outbound",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.13.25",
+          "locality": "private",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.2.18",
+          "locality": "private",
+          "port": 62464
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 89000000,
+          "end": "2016-12-06T10:08:53.959Z",
+          "start": "2016-12-06T10:08:53.87Z"
+        },
+        "flow": {
+          "id": "fwH1X67d6AY",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 65437,
+          "bgpNextHopIPv4Address": "10.0.18.126",
+          "bgpSourceAsNumber": 64496,
+          "destinationIPv4Address": "10.0.2.18",
+          "destinationIPv4PrefixLength": 16,
+          "destinationTransportPort": 62464,
+          "egressInterface": 110,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 1704740632,
+          "flowStartSysUpTime": 1704740543,
+          "forwardingStatus": 64,
+          "ingressInterface": 158,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 1625,
+          "packetDeltaCount": 2,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.25.59",
+          "sourceIPv4PrefixLength": 16,
+          "sourceTransportPort": 443,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 1625,
+          "direction": "inbound",
+          "packets": 2,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.25.59",
+          "locality": "private",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.27.168",
+          "locality": "private",
+          "port": 465
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 17325000000,
+          "end": "2016-12-06T10:09:05.882Z",
+          "start": "2016-12-06T10:08:48.557Z"
+        },
+        "flow": {
+          "id": "Y1GmiKeQUZ0",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64496,
+          "bgpNextHopIPv4Address": "10.0.14.33",
+          "bgpSourceAsNumber": 65436,
+          "destinationIPv4Address": "10.0.27.168",
+          "destinationIPv4PrefixLength": 16,
+          "destinationTransportPort": 465,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704752555,
+          "flowStartSysUpTime": 1704735230,
+          "forwardingStatus": 64,
+          "ingressInterface": 86,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 142184,
+          "packetDeltaCount": 97,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.7.73",
+          "sourceIPv4PrefixLength": 16,
+          "sourceTransportPort": 60312,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 142184,
+          "direction": "outbound",
+          "packets": 97,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.7.73",
+          "locality": "private",
+          "port": 60312
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.27.169",
+          "locality": "private",
+          "port": 995
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 2705000000,
+          "end": "2016-12-06T10:08:56.186Z",
+          "start": "2016-12-06T10:08:53.481Z"
+        },
+        "flow": {
+          "id": "xxE1JcqC8_Q",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64496,
+          "bgpNextHopIPv4Address": "10.0.14.33",
+          "bgpSourceAsNumber": 65463,
+          "destinationIPv4Address": "10.0.27.169",
+          "destinationIPv4PrefixLength": 16,
+          "destinationTransportPort": 995,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704742859,
+          "flowStartSysUpTime": 1704740154,
+          "forwardingStatus": 64,
+          "ingressInterface": 106,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 3016,
+          "packetDeltaCount": 58,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.19.50",
+          "sourceIPv4PrefixLength": 18,
+          "sourceTransportPort": 34452,
+          "tcpControlBits": 16,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 3016,
+          "direction": "outbound",
+          "packets": 58,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.19.50",
+          "locality": "private",
+          "port": 34452
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.24.13",
+          "locality": "private",
+          "port": 49917
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 361000000,
+          "end": "2016-12-06T10:08:54.28Z",
+          "start": "2016-12-06T10:08:53.919Z"
+        },
+        "flow": {
+          "id": "BY9xdCNkYNY",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 0,
+          "bgpNextHopIPv4Address": "0.0.0.0",
+          "bgpSourceAsNumber": 64496,
+          "destinationIPv4Address": "10.0.24.13",
+          "destinationIPv4PrefixLength": 25,
+          "destinationTransportPort": 49917,
+          "egressInterface": 104,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 1704740953,
+          "flowStartSysUpTime": 1704740592,
+          "forwardingStatus": 64,
+          "ingressInterface": 158,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 31500,
+          "packetDeltaCount": 21,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.28.150",
+          "sourceIPv4PrefixLength": 16,
+          "sourceTransportPort": 443,
+          "tcpControlBits": 16,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 31500,
+          "direction": "inbound",
+          "packets": 21,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.28.150",
+          "locality": "private",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.21.200",
+          "locality": "private",
+          "port": 50254
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 378000000,
+          "end": "2016-12-06T10:08:54.037Z",
+          "start": "2016-12-06T10:08:53.659Z"
+        },
+        "flow": {
+          "id": "HFvBXzMrYew",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 0,
+          "bgpNextHopIPv4Address": "0.0.0.0",
+          "bgpSourceAsNumber": 64496,
+          "destinationIPv4Address": "10.0.21.200",
+          "destinationIPv4PrefixLength": 25,
+          "destinationTransportPort": 50254,
+          "egressInterface": 87,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 1704740710,
+          "flowStartSysUpTime": 1704740332,
+          "forwardingStatus": 64,
+          "ingressInterface": 158,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 2919,
+          "packetDeltaCount": 3,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.26.188",
+          "sourceIPv4PrefixLength": 16,
+          "sourceTransportPort": 993,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 2919,
+          "direction": "inbound",
+          "packets": 3,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.26.188",
+          "locality": "private",
+          "port": 993
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.15.38",
+          "locality": "private",
+          "port": 35983
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 11106000000,
+          "end": "2016-12-06T10:09:03.759Z",
+          "start": "2016-12-06T10:08:52.653Z"
+        },
+        "flow": {
+          "id": "chZ_nMncgV4",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64498,
+          "bgpNextHopIPv4Address": "10.0.14.27",
+          "bgpSourceAsNumber": 15169,
+          "destinationIPv4Address": "10.0.15.38",
+          "destinationIPv4PrefixLength": 24,
+          "destinationTransportPort": 35983,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704750432,
+          "flowStartSysUpTime": 1704739326,
+          "forwardingStatus": 64,
+          "ingressInterface": 75,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 4514,
+          "packetDeltaCount": 5,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.29.34",
+          "sourceIPv4PrefixLength": 24,
+          "sourceTransportPort": 443,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 4514,
+          "direction": "outbound",
+          "packets": 5,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.29.34",
+          "locality": "private",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.5.224",
+          "locality": "private",
+          "port": 51671
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 0,
+          "end": "2016-12-06T10:08:53.964Z",
+          "start": "2016-12-06T10:08:53.964Z"
+        },
+        "flow": {
+          "id": "LJ6ITsDaFGU",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 65431,
+          "bgpNextHopIPv4Address": "10.0.0.242",
+          "bgpSourceAsNumber": 789,
+          "destinationIPv4Address": "10.0.5.224",
+          "destinationIPv4PrefixLength": 16,
+          "destinationTransportPort": 51671,
+          "egressInterface": 162,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 1704740637,
+          "flowStartSysUpTime": 1704740637,
+          "forwardingStatus": 64,
+          "ingressInterface": 102,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 326,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.8.200",
+          "sourceIPv4PrefixLength": 16,
+          "sourceTransportPort": 23128,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 326,
+          "direction": "inbound",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.8.200",
+          "locality": "private",
+          "port": 23128
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-06T10:09:24Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.15.38",
+          "locality": "private",
+          "port": 52364
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-06T10:09:24Z",
+          "duration": 1587000000,
+          "end": "2016-12-06T10:08:53.964Z",
+          "start": "2016-12-06T10:08:52.377Z"
+        },
+        "flow": {
+          "id": "UIGf2vRMiQY",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgpDestinationAsNumber": 64498,
+          "bgpNextHopIPv4Address": "10.0.14.27",
+          "bgpSourceAsNumber": 15169,
+          "destinationIPv4Address": "10.0.15.38",
+          "destinationIPv4PrefixLength": 24,
+          "destinationTransportPort": 52364,
+          "egressInterface": 158,
+          "egressVRFID": 1610612736,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2177,
+            "timestamp": "2016-12-06T10:09:24Z",
+            "uptimeMillis": 1704770673,
+            "version": 9
+          },
+          "flowDirection": 1,
+          "flowEndSysUpTime": 1704740637,
+          "flowStartSysUpTime": 1704739050,
+          "forwardingStatus": 64,
+          "ingressInterface": 75,
+          "ingressVRFID": 1610612736,
+          "ipClassOfService": 0,
+          "octetDeltaCount": 112,
+          "packetDeltaCount": 2,
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.29.46",
+          "sourceIPv4PrefixLength": 24,
+          "sourceTransportPort": 443,
+          "tcpControlBits": 18,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 112,
+          "direction": "outbound",
+          "packets": 2,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.29.46",
+          "locality": "private",
+          "port": 443
+        }
+      },
+      "Private": null
+    }
+  ]
+}

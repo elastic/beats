@@ -27,6 +27,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -157,20 +158,37 @@ func createPingFactory(
 		var (
 			writeStart, readStart, writeEnd time.Time
 		)
+		// Ensure memory consistency for these callbacks.
+		// It seems they can be invoked still sometime after the request is done
+		cbMutex := sync.Mutex{}
 
 		client := &http.Client{
 			CheckRedirect: checkRedirect,
 			Timeout:       timeout,
 			Transport: &SimpleTransport{
-				Dialer:       dialer,
-				OnStartWrite: func() { writeStart = time.Now() },
-				OnEndWrite:   func() { writeEnd = time.Now() },
-				OnStartRead:  func() { readStart = time.Now() },
+				Dialer: dialer,
+				OnStartWrite: func() {
+					cbMutex.Lock()
+					writeStart = time.Now()
+					cbMutex.Unlock()
+				},
+				OnEndWrite: func() {
+					cbMutex.Lock()
+					writeEnd = time.Now()
+					cbMutex.Unlock()
+				},
+				OnStartRead: func() {
+					cbMutex.Lock()
+					readStart = time.Now()
+					cbMutex.Unlock()
+				},
 			},
 		}
 
 		_, end, result, err := execPing(client, request, body, timeout, validator)
 		event.DeepUpdate(result)
+		cbMutex.Lock()
+		defer cbMutex.Unlock()
 
 		if !readStart.IsZero() {
 			event.DeepUpdate(common.MapStr{

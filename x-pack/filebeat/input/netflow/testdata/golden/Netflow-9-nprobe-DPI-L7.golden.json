@@ -1,0 +1,60 @@
+{
+  "test_name": "Netflow 9 nprobe DPI L7",
+  "events": [
+    {
+      "Timestamp": "1970-01-01T00:08:22Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "0.0.0.0",
+          "locality": "private",
+          "port": 0
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "1970-01-01T00:08:22Z"
+        },
+        "flow": {
+          "id": "oFN7CMNpOLQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AAAAUg==",
+          "applicationName": "\u0000\u0000\u0000\u0000\u0000\"\u0000\u0000\u0000\u0000\u0004",
+          "destinationIPv4Address": "0.0.0.0",
+          "destinationTransportPort": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "1970-01-01T00:08:22Z",
+            "uptimeMillis": 91000,
+            "version": 9
+          },
+          "flowEndSysUpTime": 104000,
+          "flowStartSysUpTime": 101000,
+          "octetDeltaCount": 82,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 0,
+          "sourceIPv4Address": "0.0.0.0",
+          "sourceTransportPort": 0,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 82,
+          "direction": "unknown",
+          "packets": 1,
+          "protocol": "unknown (0)"
+        },
+        "source": {
+          "ip": "0.0.0.0",
+          "locality": "private",
+          "port": 0
+        }
+      },
+      "Private": null
+    }
+  ]
+}

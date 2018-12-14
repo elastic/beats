@@ -125,6 +125,7 @@ event:
   * kubernetes.namespace
   * kubernetes.node.name
   * kubernetes.pod.name
+  * kubernetes.pod.uid
 
 If the `include_annotations` config is added to the provider config, then the list of annotations present in the config
 are added to the event.
