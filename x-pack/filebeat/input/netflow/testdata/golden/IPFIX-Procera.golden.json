@@ -10,9 +10,6 @@
           "locality": "public",
           "port": 47838
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -61,6 +58,9 @@
           "iana_number": 6,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "181.214.87.71",
           "locality": "public",
@@ -77,9 +77,6 @@
           "ip": "0.0.0.0",
           "locality": "private",
           "port": 135
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -129,6 +126,9 @@
           "iana_number": 58,
           "transport": "ipv6-icmp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "0.0.0.0",
           "locality": "private",
@@ -145,9 +145,6 @@
           "ip": "138.44.161.14",
           "locality": "public",
           "port": 22252
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -197,6 +194,9 @@
           "iana_number": 6,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "5.188.11.35",
           "locality": "public",
@@ -213,9 +213,6 @@
           "ip": "138.44.161.14",
           "locality": "public",
           "port": 8
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -265,6 +262,9 @@
           "iana_number": 1,
           "transport": "icmp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "206.117.25.89",
           "locality": "public",
@@ -281,9 +281,6 @@
           "ip": "0.0.0.0",
           "locality": "private",
           "port": 135
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -333,6 +330,9 @@
           "iana_number": 58,
           "transport": "ipv6-icmp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "0.0.0.0",
           "locality": "private",
@@ -349,9 +349,6 @@
           "ip": "138.44.161.14",
           "locality": "public",
           "port": 7451
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -401,6 +398,9 @@
           "iana_number": 6,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "185.232.29.199",
           "locality": "public",
@@ -417,9 +417,6 @@
           "ip": "138.44.161.14",
           "locality": "public",
           "port": 2000
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -469,6 +466,9 @@
           "iana_number": 6,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "177.188.228.137",
           "locality": "public",
@@ -485,9 +485,6 @@
           "ip": "138.44.161.13",
           "locality": "public",
           "port": 179
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -536,6 +533,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source": {
           "ip": "138.44.161.14",

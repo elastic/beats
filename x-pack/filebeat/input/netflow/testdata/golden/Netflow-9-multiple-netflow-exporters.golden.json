@@ -5,9 +5,6 @@
       "Timestamp": "2015-10-08T19:06:29Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -30,6 +27,9 @@
             "octet_delta_count": 0
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -42,9 +42,6 @@
           "ip": "172.16.32.248",
           "locality": "private",
           "port": 123
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -90,6 +87,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "172.16.32.100",
           "locality": "private",
@@ -106,9 +106,6 @@
           "ip": "172.16.32.100",
           "locality": "private",
           "port": 123
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -154,6 +151,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "172.16.32.248",
           "locality": "private",
@@ -170,9 +170,6 @@
           "ip": "172.16.32.201",
           "locality": "private",
           "port": 123
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -218,6 +215,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "172.16.32.100",
           "locality": "private",
@@ -234,9 +234,6 @@
           "ip": "172.16.32.100",
           "locality": "private",
           "port": 123
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -282,6 +279,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "172.16.32.201",
           "locality": "private",
@@ -298,9 +298,6 @@
           "ip": "172.16.32.202",
           "locality": "private",
           "port": 123
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -346,6 +343,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "172.16.32.100",
           "locality": "private",
@@ -362,9 +362,6 @@
           "ip": "172.16.32.100",
           "locality": "private",
           "port": 123
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -410,6 +407,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "172.16.32.202",
           "locality": "private",
@@ -424,9 +424,6 @@
       "Fields": {
         "destination": {
           "port": 34304
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -472,6 +469,9 @@
           "packets": 7,
           "transport": "ipv6-icmp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "port": 0
         }
@@ -486,9 +486,6 @@
           "ip": "172.16.32.1",
           "locality": "private",
           "port": 65058
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -537,6 +534,9 @@
           "iana_number": 6,
           "packets": 2,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source": {
           "ip": "172.16.32.201",

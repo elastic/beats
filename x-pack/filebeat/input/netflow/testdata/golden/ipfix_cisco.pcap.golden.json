@@ -5,9 +5,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -62,6 +59,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -70,9 +70,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -127,6 +124,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -135,9 +135,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -192,6 +189,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -200,9 +200,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -257,6 +254,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -265,9 +265,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -322,6 +319,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -330,9 +330,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -387,6 +384,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -395,9 +395,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -452,6 +449,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -460,9 +460,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -517,6 +514,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -525,9 +525,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -582,6 +579,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -590,9 +590,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -647,6 +644,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -655,9 +655,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -712,6 +709,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -720,9 +720,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -777,6 +774,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -785,9 +785,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -842,6 +839,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -850,9 +850,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -907,6 +904,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -915,9 +915,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -972,6 +969,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -980,9 +980,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1037,6 +1034,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1045,9 +1045,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1102,6 +1099,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1110,9 +1110,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1167,6 +1164,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1175,9 +1175,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1232,6 +1229,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1240,9 +1240,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1297,6 +1294,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1305,9 +1305,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1362,6 +1359,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1370,9 +1370,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1427,6 +1424,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1435,9 +1435,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1492,6 +1489,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1500,9 +1500,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1557,6 +1554,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1565,9 +1565,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1622,6 +1619,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1630,9 +1630,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1687,6 +1684,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1695,9 +1695,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1752,6 +1749,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1760,9 +1760,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1817,6 +1814,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1825,9 +1825,6 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -1882,6 +1879,9 @@
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null

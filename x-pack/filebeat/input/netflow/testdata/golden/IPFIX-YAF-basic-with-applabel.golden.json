@@ -12,9 +12,6 @@
           "packets": 2,
           "port": 53
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -62,6 +59,9 @@
           "packets": 6,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "bytes": 132,
           "ip": "172.16.32.201",
@@ -82,9 +82,6 @@
           "locality": "private",
           "packets": 2,
           "port": 9997
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -139,6 +136,9 @@
           "packets": 8,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "bytes": 172,
           "ip": "172.16.32.100",
@@ -153,9 +153,6 @@
       "Timestamp": "2016-12-25T13:03:33Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -189,6 +186,9 @@
             "system_init_time_milliseconds": "2016-12-25T12:58:32Z"
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null

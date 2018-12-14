@@ -10,9 +10,6 @@
           "locality": "public",
           "port": 80
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -63,6 +60,9 @@
           "packets": 6,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.151",
           "locality": "private",
@@ -79,9 +79,6 @@
           "ip": "192.168.100.151",
           "locality": "private",
           "port": 44778
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -133,6 +130,9 @@
           "packets": 10,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "208.100.17.187",
           "locality": "public",
@@ -149,9 +149,6 @@
           "ip": "208.100.17.187",
           "locality": "public",
           "port": 443
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -203,6 +200,9 @@
           "packets": 14,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.151",
           "locality": "private",
@@ -219,9 +219,6 @@
           "ip": "192.168.100.151",
           "locality": "private",
           "port": 50618
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -273,6 +270,9 @@
           "packets": 11,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "208.100.17.189",
           "locality": "public",
@@ -289,9 +289,6 @@
           "ip": "208.100.17.189",
           "locality": "public",
           "port": 443
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -343,6 +340,9 @@
           "packets": 15,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.151",
           "locality": "private",
@@ -359,9 +359,6 @@
           "ip": "192.168.100.151",
           "locality": "private",
           "port": 33660
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -413,6 +410,9 @@
           "packets": 5,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "178.255.83.1",
           "locality": "public",
@@ -429,9 +429,6 @@
           "ip": "178.255.83.1",
           "locality": "public",
           "port": 80
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -483,6 +480,9 @@
           "packets": 5,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.151",
           "locality": "private",
@@ -499,9 +499,6 @@
           "ip": "192.168.100.151",
           "locality": "private",
           "port": 33646
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -553,6 +550,9 @@
           "packets": 5,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "178.255.83.1",
           "locality": "public",
@@ -569,9 +569,6 @@
           "ip": "178.255.83.1",
           "locality": "public",
           "port": 80
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -623,6 +620,9 @@
           "packets": 5,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.151",
           "locality": "private",
@@ -639,9 +639,6 @@
           "ip": "192.168.100.150",
           "locality": "private",
           "port": 52970
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -689,6 +686,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.111",
           "locality": "private",
@@ -705,9 +705,6 @@
           "ip": "192.168.100.111",
           "locality": "private",
           "port": 53
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -755,6 +752,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.150",
           "locality": "private",
@@ -771,9 +771,6 @@
           "ip": "192.168.100.150",
           "locality": "private",
           "port": 49311
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -821,6 +818,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.111",
           "locality": "private",
@@ -837,9 +837,6 @@
           "ip": "192.168.100.111",
           "locality": "private",
           "port": 53
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -887,6 +884,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.150",
           "locality": "private",
@@ -903,9 +903,6 @@
           "ip": "192.168.100.150",
           "locality": "private",
           "port": 51746
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -953,6 +950,9 @@
           "packets": 5,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.111",
           "locality": "private",
@@ -969,9 +969,6 @@
           "ip": "192.168.100.111",
           "locality": "private",
           "port": 80
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -1019,6 +1016,9 @@
           "packets": 6,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.150",
           "locality": "private",
@@ -1035,9 +1035,6 @@
           "ip": "192.168.100.150",
           "locality": "private",
           "port": 51745
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -1085,6 +1082,9 @@
           "packets": 6,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.100.111",
           "locality": "private",
@@ -1101,9 +1101,6 @@
           "ip": "192.168.100.111",
           "locality": "private",
           "port": 80
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -1150,6 +1147,9 @@
           "iana_number": 6,
           "packets": 8,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source": {
           "ip": "192.168.100.150",

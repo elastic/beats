@@ -8,9 +8,6 @@
         "destination": {
           "mac": "00:f6:63:cc:80:60"
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -47,6 +44,9 @@
           "name": "Test-env",
           "packets": 83
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.20.121",
           "locality": "private",
@@ -63,9 +63,6 @@
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -103,6 +100,9 @@
           "name": "Test-env",
           "packets": 83
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "mac": "00:f6:63:cc:80:60"
         }
@@ -115,9 +115,6 @@
       "Fields": {
         "destination": {
           "mac": "00:f6:63:cc:80:60"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -155,6 +152,9 @@
           "name": "Test-env",
           "packets": 69
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.20.121",
           "locality": "private",
@@ -171,9 +171,6 @@
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -211,6 +208,9 @@
           "name": "Test-env",
           "packets": 69
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "mac": "00:f6:63:cc:80:60"
         }
@@ -223,9 +223,6 @@
       "Fields": {
         "destination": {
           "mac": "00:f6:63:cc:80:60"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -263,6 +260,9 @@
           "name": "Test-env",
           "packets": 1
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.20.121",
           "locality": "private",
@@ -277,9 +277,6 @@
       "Fields": {
         "destination": {
           "mac": "00:f6:63:cc:80:60"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -317,6 +314,9 @@
           "name": "Test-env",
           "packets": 225
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.20.121",
           "locality": "private",
@@ -333,9 +333,6 @@
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -373,6 +370,9 @@
           "name": "Test-env",
           "packets": 154
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "mac": "00:f6:63:cc:80:60"
         }
@@ -385,9 +385,6 @@
       "Fields": {
         "destination": {
           "mac": "00:f6:63:cc:80:60"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -425,6 +422,9 @@
           "name": "Test-env",
           "packets": 63
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.20.121",
           "locality": "private",
@@ -441,9 +441,6 @@
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -481,6 +478,9 @@
           "name": "Test-env",
           "packets": 61
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "mac": "00:f6:63:cc:80:60"
         }
@@ -493,9 +493,6 @@
       "Fields": {
         "destination": {
           "mac": "00:f6:63:cc:80:60"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -533,6 +530,9 @@
           "name": "Test-env",
           "packets": 773
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.20.121",
           "locality": "private",
@@ -549,9 +549,6 @@
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -589,6 +586,9 @@
           "name": "Test-env",
           "packets": 1379
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "mac": "00:f6:63:cc:80:60"
         }
@@ -601,9 +601,6 @@
       "Fields": {
         "destination": {
           "mac": "00:f6:63:cc:80:60"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -641,6 +638,9 @@
           "name": "Test-env",
           "packets": 26
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.20.121",
           "locality": "private",
@@ -657,9 +657,6 @@
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -697,6 +694,9 @@
           "name": "Test-env",
           "packets": 26
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "mac": "00:f6:63:cc:80:60"
         }
@@ -709,9 +709,6 @@
       "Fields": {
         "destination": {
           "mac": "00:f6:63:cc:80:60"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -749,6 +746,9 @@
           "name": "Test-env",
           "packets": 20434
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.20.121",
           "locality": "private",
@@ -765,9 +765,6 @@
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -805,6 +802,9 @@
           "name": "Test-env",
           "packets": 40726
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "mac": "00:f6:63:cc:80:60"
         }
@@ -817,9 +817,6 @@
       "Fields": {
         "destination": {
           "mac": "00:f6:63:cc:80:60"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -857,6 +854,9 @@
           "name": "Test-env",
           "packets": 15
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.20.121",
           "locality": "private",
@@ -873,9 +873,6 @@
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -913,6 +910,9 @@
           "name": "Test-env",
           "packets": 14
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "mac": "00:f6:63:cc:80:60"
         }
@@ -925,9 +925,6 @@
       "Fields": {
         "destination": {
           "mac": "00:f6:63:cc:80:60"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -965,6 +962,9 @@
           "name": "Test-env",
           "packets": 16145
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.20.121",
           "locality": "private",
@@ -981,9 +981,6 @@
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -1020,6 +1017,9 @@
           "direction": "outbound",
           "name": "Test-env",
           "packets": 53362
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source": {
           "mac": "00:f6:63:cc:80:60"

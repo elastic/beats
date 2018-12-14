@@ -76,9 +76,9 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 
 	event.Timestamp = flow.Timestamp
 	event.Fields = common.MapStr{
-		"netflow": fieldNameConverter.ToSnakeCase(flow.Fields),
-		"event":   ecsEvent,
-		"device":  ecsDevice,
+		"netflow":  fieldNameConverter.ToSnakeCase(flow.Fields),
+		"event":    ecsEvent,
+		"observer": ecsDevice,
 	}
 	return
 }

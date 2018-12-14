@@ -10,9 +10,6 @@
           "locality": "public",
           "port": 50234
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -60,6 +57,9 @@
           "iana_number": 6,
           "packets": 3,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source": {
           "ip": "134.220.2.6",
