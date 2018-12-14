@@ -55,6 +55,8 @@ https://github.com/elastic/beats/compare/v6.5.3...6.5[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Always include Pod UID as part of Pod metadata. {pull]9517[9517]
+
 *Auditbeat*
 
 *Filebeat*

@@ -156,6 +156,7 @@ func TestEmitEvent(t *testing.T) {
 	namespace := "default"
 	podIP := "127.0.0.1"
 	containerID := "docker://foobar"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	containerImage := "elastic/filebeat:6.3.0"
 	node := "node"
 	tests := []struct {
@@ -170,6 +171,7 @@ func TestEmitEvent(t *testing.T) {
 			Pod: &v1.Pod{
 				Metadata: &metav1.ObjectMeta{
 					Name:        &name,
+					Uid:         &uid,
 					Namespace:   &namespace,
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
@@ -205,6 +207,7 @@ func TestEmitEvent(t *testing.T) {
 					},
 					"pod": common.MapStr{
 						"name": "filebeat",
+						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 					},
 					"node": common.MapStr{
 						"name": "node",
@@ -219,6 +222,7 @@ func TestEmitEvent(t *testing.T) {
 							"name": "filebeat",
 						}, "pod": common.MapStr{
 							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 						}, "node": common.MapStr{
 							"name": "node",
 						},
@@ -233,6 +237,7 @@ func TestEmitEvent(t *testing.T) {
 			Pod: &v1.Pod{
 				Metadata: &metav1.ObjectMeta{
 					Name:        &name,
+					Uid:         &uid,
 					Namespace:   &namespace,
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
