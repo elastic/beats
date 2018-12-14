@@ -137,10 +137,10 @@ func TestCalculateConnStats(t *testing.T) {
 		t.Fail()
 	}
 
-	assert.Equal(t, allConns, 13)
+	assert.Equal(t, allConns, 11)
 	assert.Equal(t, allListens, 2)
 	assert.Equal(t, udpConns, 2)
-	assert.Equal(t, tcpConns, 11)
+	assert.Equal(t, tcpConns, 9)
 	assert.Equal(t, tcpListens, 2)
 	assert.Equal(t, tcpEstablisheds, 2)
 	assert.Equal(t, tcpClosewaits, 3)
