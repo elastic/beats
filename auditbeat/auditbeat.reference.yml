@@ -65,6 +65,7 @@ auditbeat.modules:
     ## Unauthorized access attempts.
     #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
     #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
+
 # The file integrity module sends events when files are changed (created,
 # updated, deleted). The events contain file metadata and hashes.
 - module: file_integrity
@@ -103,6 +104,7 @@ auditbeat.modules:
 
   # Detect changes to files included in subdirectories. Disabled by default.
   recursive: false
+
 
 #================================ General ======================================
 
