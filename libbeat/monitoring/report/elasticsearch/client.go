@@ -177,11 +177,17 @@ func (c *publishClient) bulkToProduction(params map[string]string, event publish
 func (c *publishClient) bulkToMonitoring(event publisher.Event) error {
 	action := common.MapStr{
 		"index": common.MapStr{
-			"_type":    "doc",
 			"_index":   "monitoring-beats-6-1", // FIXME
 			"_routing": nil,
 		},
 	}
+
+	esVersion := c.es.GetVersion()
+	v7 := common.MustNewVersion("7.0.0")
+	if esVersion.LessThan(v7) {
+		action.Put("index._type", "doc")
+	}
+
 	document := report.Event{
 		Timestamp: event.Content.Timestamp,
 		Fields:    event.Content.Fields,
