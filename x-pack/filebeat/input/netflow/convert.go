@@ -55,7 +55,7 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 	// Nest Type into netflow fields
 	switch flow.Type {
 	case record.Flow:
-		flow.Fields["type"] = "netflow"
+		flow.Fields["type"] = "netflow_flow"
 	case record.Options:
 		flow.Fields["type"] = "netflow_options"
 	default:
@@ -64,8 +64,9 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 
 	// ECS Fields -- event
 	ecsEvent := common.MapStr{
-		"created": flow.Timestamp,
-		"action":  flow.Fields["type"],
+		"created":  flow.Timestamp,
+		"category": "network_traffic",
+		"action":   flow.Fields["type"],
 	}
 	// ECS Fields -- device
 	ecsDevice := common.MapStr{}
