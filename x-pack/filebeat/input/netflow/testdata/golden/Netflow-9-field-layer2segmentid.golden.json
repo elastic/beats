@@ -29,9 +29,9 @@
           "destinationTransportPort": 445,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 262144,
+            "source_id": 262144,
             "timestamp": "2018-01-16T09:45:02Z",
-            "uptimeMillis": 5584000,
+            "uptime_millis": 5584000,
             "version": 9
           },
           "flowDirection": 0,

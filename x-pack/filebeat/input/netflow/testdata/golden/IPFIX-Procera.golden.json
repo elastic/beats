@@ -29,9 +29,9 @@
           "destinationTransportPort": 47838,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 2875616939,
+            "source_id": 2875616939,
             "timestamp": "2018-04-15T03:30:00Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowEndSeconds": "2018-04-15T03:29:02Z",
@@ -94,9 +94,9 @@
           "destinationTransportPort": 135,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 2875616939,
+            "source_id": 2875616939,
             "timestamp": "2018-04-15T03:30:00Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowEndSeconds": "2018-04-15T03:29:02Z",
@@ -159,9 +159,9 @@
           "destinationTransportPort": 22252,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 2875616939,
+            "source_id": 2875616939,
             "timestamp": "2018-04-15T03:30:00Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowEndSeconds": "2018-04-15T03:29:06Z",
@@ -224,9 +224,9 @@
           "destinationTransportPort": 8,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 2875616939,
+            "source_id": 2875616939,
             "timestamp": "2018-04-15T03:30:00Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowEndSeconds": "2018-04-15T03:29:46Z",
@@ -289,9 +289,9 @@
           "destinationTransportPort": 135,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 2875616939,
+            "source_id": 2875616939,
             "timestamp": "2018-04-15T03:30:00Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowEndSeconds": "2018-04-15T03:29:46Z",
@@ -354,9 +354,9 @@
           "destinationTransportPort": 7451,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 2875616939,
+            "source_id": 2875616939,
             "timestamp": "2018-04-15T03:30:00Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowEndSeconds": "2018-04-15T03:30:00Z",
@@ -419,9 +419,9 @@
           "destinationTransportPort": 2000,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 2875616939,
+            "source_id": 2875616939,
             "timestamp": "2018-04-15T03:30:00Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowEndSeconds": "2018-04-15T03:30:00Z",
@@ -484,9 +484,9 @@
           "destinationTransportPort": 179,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 2875616939,
+            "source_id": 2875616939,
             "timestamp": "2018-04-15T03:30:00Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowEndSeconds": "2018-04-15T03:30:00Z",

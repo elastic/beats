@@ -15,9 +15,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 524288,
+            "source_id": 524288,
             "timestamp": "2018-06-01T15:11:53Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "options": {

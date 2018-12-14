@@ -27,9 +27,9 @@
           "egressVRFID": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-12-01T17:04:39Z",
-            "uptimeMillis": 591967,
+            "uptime_millis": 591967,
             "version": 9
           },
           "flowDirection": 0,
@@ -87,9 +87,9 @@
           "egressVRFID": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-12-01T17:04:39Z",
-            "uptimeMillis": 591967,
+            "uptime_millis": 591967,
             "version": 9
           },
           "flowDirection": 1,

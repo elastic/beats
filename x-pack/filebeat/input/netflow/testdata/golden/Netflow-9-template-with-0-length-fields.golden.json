@@ -32,9 +32,9 @@
           "engineId": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-23T01:35:31Z",
-            "uptimeMillis": 4175241,
+            "uptime_millis": 4175241,
             "version": 9
           },
           "flowDirection": 1,
@@ -97,9 +97,9 @@
           "engineId": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-23T01:35:31Z",
-            "uptimeMillis": 4175241,
+            "uptime_millis": 4175241,
             "version": 9
           },
           "flowDirection": 1,
@@ -162,9 +162,9 @@
           "engineId": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-23T01:35:31Z",
-            "uptimeMillis": 4175241,
+            "uptime_millis": 4175241,
             "version": 9
           },
           "flowDirection": 0,
@@ -227,9 +227,9 @@
           "engineId": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-23T01:35:31Z",
-            "uptimeMillis": 4175241,
+            "uptime_millis": 4175241,
             "version": 9
           },
           "flowDirection": 0,
@@ -292,9 +292,9 @@
           "engineId": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-23T01:35:31Z",
-            "uptimeMillis": 4175241,
+            "uptime_millis": 4175241,
             "version": 9
           },
           "flowDirection": 1,
@@ -357,9 +357,9 @@
           "engineId": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-23T01:35:31Z",
-            "uptimeMillis": 4175241,
+            "uptime_millis": 4175241,
             "version": 9
           },
           "flowDirection": 1,
@@ -422,9 +422,9 @@
           "engineId": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-23T01:35:31Z",
-            "uptimeMillis": 4175241,
+            "uptime_millis": 4175241,
             "version": 9
           },
           "flowDirection": 0,
@@ -487,9 +487,9 @@
           "engineId": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-23T01:35:31Z",
-            "uptimeMillis": 4175241,
+            "uptime_millis": 4175241,
             "version": 9
           },
           "flowDirection": 0,
@@ -552,9 +552,9 @@
           "engineId": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-23T01:35:31Z",
-            "uptimeMillis": 4175241,
+            "uptime_millis": 4175241,
             "version": 9
           },
           "flowDirection": 1,
@@ -617,9 +617,9 @@
           "engineId": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-23T01:35:31Z",
-            "uptimeMillis": 4175241,
+            "uptime_millis": 4175241,
             "version": 9
           },
           "flowDirection": 1,

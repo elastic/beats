@@ -28,9 +28,9 @@
           "destinationTransportPort": 53,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-25T13:03:38Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowAttributes": 1,
@@ -96,9 +96,9 @@
           "destinationTransportPort": 9997,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-25T12:58:38Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowAttributes": 0,
@@ -157,9 +157,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-12-25T13:03:33Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "options": {

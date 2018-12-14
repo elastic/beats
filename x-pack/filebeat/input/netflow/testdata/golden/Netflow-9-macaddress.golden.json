@@ -15,9 +15,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:46:56Z",
-            "uptimeMillis": 30024,
+            "uptime_millis": 30024,
             "version": 9
           },
           "options": {
@@ -59,9 +59,9 @@
           "destinationTransportPort": 22,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -110,9 +110,9 @@
           "destinationTransportPort": 123,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 17,
@@ -161,9 +161,9 @@
           "destinationTransportPort": 123,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 17,
@@ -212,9 +212,9 @@
           "destinationTransportPort": 80,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -263,9 +263,9 @@
           "destinationTransportPort": 59157,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -314,9 +314,9 @@
           "destinationTransportPort": 443,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -365,9 +365,9 @@
           "destinationTransportPort": 59158,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -416,9 +416,9 @@
           "destinationTransportPort": 139,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -467,9 +467,9 @@
           "destinationTransportPort": 59159,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -518,9 +518,9 @@
           "destinationTransportPort": 23,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -569,9 +569,9 @@
           "destinationTransportPort": 59160,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -620,9 +620,9 @@
           "destinationTransportPort": 995,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -671,9 +671,9 @@
           "destinationTransportPort": 59161,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -722,9 +722,9 @@
           "destinationTransportPort": 443,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -773,9 +773,9 @@
           "destinationTransportPort": 59162,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -824,9 +824,9 @@
           "destinationTransportPort": 135,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -875,9 +875,9 @@
           "destinationTransportPort": 59163,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -926,9 +926,9 @@
           "destinationTransportPort": 110,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -977,9 +977,9 @@
           "destinationTransportPort": 59164,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -1028,9 +1028,9 @@
           "destinationTransportPort": 111,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -1079,9 +1079,9 @@
           "destinationTransportPort": 59165,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -1130,9 +1130,9 @@
           "destinationTransportPort": 143,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -1181,9 +1181,9 @@
           "destinationTransportPort": 59166,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -1232,9 +1232,9 @@
           "destinationTransportPort": 3389,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -1283,9 +1283,9 @@
           "destinationTransportPort": 59167,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -1334,9 +1334,9 @@
           "destinationTransportPort": 80,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -1385,9 +1385,9 @@
           "destinationTransportPort": 59168,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -1436,9 +1436,9 @@
           "destinationTransportPort": 25,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,
@@ -1487,9 +1487,9 @@
           "destinationTransportPort": 59169,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 97,
+            "source_id": 97,
             "timestamp": "2015-10-10T08:47:01Z",
-            "uptimeMillis": 34488,
+            "uptime_millis": 34488,
             "version": 9
           },
           "protocolIdentifier": 6,

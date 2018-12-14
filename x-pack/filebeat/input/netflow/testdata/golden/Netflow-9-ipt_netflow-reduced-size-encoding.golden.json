@@ -34,9 +34,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268388,
@@ -103,9 +103,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268384,
@@ -172,9 +172,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268380,
@@ -241,9 +241,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268384,
@@ -310,9 +310,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268380,
@@ -379,9 +379,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268384,
@@ -448,9 +448,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268384,
@@ -517,9 +517,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268388,
@@ -586,9 +586,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268384,
@@ -655,9 +655,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268380,
@@ -724,9 +724,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268384,
@@ -793,9 +793,9 @@
           "ethernetType": 2048,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-02-18T05:47:09Z",
-            "uptimeMillis": 1289283392,
+            "uptime_millis": 1289283392,
             "version": 9
           },
           "flowEndSysUpTime": 1289268384,

@@ -30,9 +30,9 @@
           "egressInterface": 24,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-11-13T14:39:31Z",
-            "uptimeMillis": 1803238112,
+            "uptime_millis": 1803238112,
             "version": 9
           },
           "firewallEvent": 1,
@@ -95,9 +95,9 @@
           "egressInterface": 23,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-11-13T14:39:31Z",
-            "uptimeMillis": 1803238112,
+            "uptime_millis": 1803238112,
             "version": 9
           },
           "firewallEvent": 5,
@@ -160,9 +160,9 @@
           "egressInterface": 23,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-11-13T14:39:31Z",
-            "uptimeMillis": 1803238112,
+            "uptime_millis": 1803238112,
             "version": 9
           },
           "firewallEvent": 1,
@@ -225,9 +225,9 @@
           "egressInterface": 24,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-11-13T14:39:31Z",
-            "uptimeMillis": 1803238112,
+            "uptime_millis": 1803238112,
             "version": 9
           },
           "firewallEvent": 1,
@@ -290,9 +290,9 @@
           "egressInterface": 24,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-11-13T14:39:31Z",
-            "uptimeMillis": 1803238112,
+            "uptime_millis": 1803238112,
             "version": 9
           },
           "firewallEvent": 1,
@@ -355,9 +355,9 @@
           "egressInterface": 23,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-11-13T14:39:31Z",
-            "uptimeMillis": 1803238112,
+            "uptime_millis": 1803238112,
             "version": 9
           },
           "firewallEvent": 1,
@@ -420,9 +420,9 @@
           "egressInterface": 24,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-11-13T14:39:31Z",
-            "uptimeMillis": 1803238112,
+            "uptime_millis": 1803238112,
             "version": 9
           },
           "firewallEvent": 1,
@@ -485,9 +485,9 @@
           "egressInterface": 23,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-11-13T14:39:31Z",
-            "uptimeMillis": 1803238112,
+            "uptime_millis": 1803238112,
             "version": 9
           },
           "firewallEvent": 1,

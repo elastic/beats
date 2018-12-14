@@ -26,9 +26,9 @@
           "destinationTransportPort": 80,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 2228226,
+            "source_id": 2228226,
             "timestamp": "2017-12-14T07:23:45Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowId": 3389049088,

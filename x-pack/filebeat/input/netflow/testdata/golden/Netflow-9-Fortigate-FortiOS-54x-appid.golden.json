@@ -31,9 +31,9 @@
           "egressInterface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -98,9 +98,9 @@
           "egressInterface": 8,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -165,9 +165,9 @@
           "egressInterface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -232,9 +232,9 @@
           "egressInterface": 8,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -299,9 +299,9 @@
           "egressInterface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -366,9 +366,9 @@
           "egressInterface": 8,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -433,9 +433,9 @@
           "egressInterface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -500,9 +500,9 @@
           "egressInterface": 8,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -567,9 +567,9 @@
           "egressInterface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -634,9 +634,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 0,
@@ -697,9 +697,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 0,
@@ -760,9 +760,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 0,
@@ -823,9 +823,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 0,
@@ -886,9 +886,9 @@
           "egressInterface": 8,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -949,9 +949,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -1012,9 +1012,9 @@
           "egressInterface": 8,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,
@@ -1075,9 +1075,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2018-05-11T00:54:11Z",
-            "uptimeMillis": 2432100,
+            "uptime_millis": 2432100,
             "version": 9
           },
           "flowEndReason": 3,

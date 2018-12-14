@@ -33,9 +33,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:23:30Z",
-            "uptimeMillis": 409360002,
+            "uptime_millis": 409360002,
             "version": 9
           },
           "flowDirection": 0,
@@ -102,9 +102,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:23:30Z",
-            "uptimeMillis": 409360002,
+            "uptime_millis": 409360002,
             "version": 9
           },
           "flowDirection": 0,
@@ -171,9 +171,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:23:30Z",
-            "uptimeMillis": 409360002,
+            "uptime_millis": 409360002,
             "version": 9
           },
           "flowDirection": 0,
@@ -240,9 +240,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:23:30Z",
-            "uptimeMillis": 409360002,
+            "uptime_millis": 409360002,
             "version": 9
           },
           "flowDirection": 0,
@@ -309,9 +309,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:23:30Z",
-            "uptimeMillis": 409360002,
+            "uptime_millis": 409360002,
             "version": 9
           },
           "flowDirection": 0,
@@ -378,9 +378,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:23:30Z",
-            "uptimeMillis": 409360002,
+            "uptime_millis": 409360002,
             "version": 9
           },
           "flowDirection": 0,
@@ -447,9 +447,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:23:30Z",
-            "uptimeMillis": 409360002,
+            "uptime_millis": 409360002,
             "version": 9
           },
           "flowDirection": 0,
@@ -516,9 +516,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:23:30Z",
-            "uptimeMillis": 409360002,
+            "uptime_millis": 409360002,
             "version": 9
           },
           "flowDirection": 0,
@@ -583,9 +583,9 @@
           "egressInterface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:24:08Z",
-            "uptimeMillis": 409398185,
+            "uptime_millis": 409398185,
             "version": 9
           },
           "flowDirection": 1,
@@ -650,9 +650,9 @@
           "egressInterface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:24:08Z",
-            "uptimeMillis": 409398185,
+            "uptime_millis": 409398185,
             "version": 9
           },
           "flowDirection": 1,
@@ -717,9 +717,9 @@
           "egressInterface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:24:08Z",
-            "uptimeMillis": 409398185,
+            "uptime_millis": 409398185,
             "version": 9
           },
           "flowDirection": 1,
@@ -784,9 +784,9 @@
           "egressInterface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:24:08Z",
-            "uptimeMillis": 409398185,
+            "uptime_millis": 409398185,
             "version": 9
           },
           "flowDirection": 1,
@@ -851,9 +851,9 @@
           "egressInterface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:24:08Z",
-            "uptimeMillis": 409398185,
+            "uptime_millis": 409398185,
             "version": 9
           },
           "flowDirection": 1,
@@ -918,9 +918,9 @@
           "egressInterface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:24:08Z",
-            "uptimeMillis": 409398185,
+            "uptime_millis": 409398185,
             "version": 9
           },
           "flowDirection": 1,
@@ -985,9 +985,9 @@
           "egressInterface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:24:08Z",
-            "uptimeMillis": 409398185,
+            "uptime_millis": 409398185,
             "version": 9
           },
           "flowDirection": 1,
@@ -1052,9 +1052,9 @@
           "egressInterface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2016-09-10T16:24:08Z",
-            "uptimeMillis": 409398185,
+            "uptime_millis": 409398185,
             "version": 9
           },
           "flowDirection": 1,

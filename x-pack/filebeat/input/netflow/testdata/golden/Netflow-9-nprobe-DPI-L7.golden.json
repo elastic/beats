@@ -28,9 +28,9 @@
           "destinationTransportPort": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "1970-01-01T00:08:22Z",
-            "uptimeMillis": 91000,
+            "uptime_millis": 91000,
             "version": 9
           },
           "flowEndSysUpTime": 104000,

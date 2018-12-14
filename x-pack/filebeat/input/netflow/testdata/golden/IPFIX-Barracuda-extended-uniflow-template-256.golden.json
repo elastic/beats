@@ -40,9 +40,9 @@
           "egressInterface": 3689,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-04-18T08:16:47Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "firewallEvent": 1,
@@ -114,9 +114,9 @@
           "egressInterface": 35233,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-04-18T08:16:47Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "firewallEvent": 1,

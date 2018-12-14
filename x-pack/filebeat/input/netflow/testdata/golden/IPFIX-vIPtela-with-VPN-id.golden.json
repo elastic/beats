@@ -27,9 +27,9 @@
           "egressInterface": 3,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 2887138561,
+            "source_id": 2887138561,
             "timestamp": "2017-11-21T14:32:15Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "flowEndReason": 3,

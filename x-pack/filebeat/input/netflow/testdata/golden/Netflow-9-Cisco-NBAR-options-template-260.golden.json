@@ -15,9 +15,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -47,9 +47,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -79,9 +79,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -111,9 +111,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -143,9 +143,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -175,9 +175,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -207,9 +207,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -239,9 +239,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -271,9 +271,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -303,9 +303,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -335,9 +335,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -367,9 +367,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -399,9 +399,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -431,9 +431,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
@@ -463,9 +463,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {

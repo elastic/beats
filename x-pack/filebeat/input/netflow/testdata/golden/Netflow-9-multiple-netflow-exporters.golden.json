@@ -15,9 +15,9 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 147,
+            "source_id": 147,
             "timestamp": "2015-10-08T19:06:29Z",
-            "uptimeMillis": 33990,
+            "uptime_millis": 33990,
             "version": 9
           },
           "options": {
@@ -61,9 +61,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2015-10-08T19:04:30Z",
-            "uptimeMillis": 45076,
+            "uptime_millis": 45076,
             "version": 9
           },
           "flowEndSysUpTime": 1217,
@@ -122,9 +122,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2015-10-08T19:04:30Z",
-            "uptimeMillis": 45076,
+            "uptime_millis": 45076,
             "version": 9
           },
           "flowEndSysUpTime": 1217,
@@ -183,9 +183,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2015-10-08T19:04:30Z",
-            "uptimeMillis": 45076,
+            "uptime_millis": 45076,
             "version": 9
           },
           "flowEndSysUpTime": 6890,
@@ -244,9 +244,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2015-10-08T19:04:30Z",
-            "uptimeMillis": 45076,
+            "uptime_millis": 45076,
             "version": 9
           },
           "flowEndSysUpTime": 6890,
@@ -305,9 +305,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2015-10-08T19:04:30Z",
-            "uptimeMillis": 45076,
+            "uptime_millis": 45076,
             "version": 9
           },
           "flowEndSysUpTime": 11034,
@@ -366,9 +366,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2015-10-08T19:04:30Z",
-            "uptimeMillis": 45076,
+            "uptime_millis": 45076,
             "version": 9
           },
           "flowEndSysUpTime": 11034,
@@ -425,9 +425,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2015-10-08T19:04:30Z",
-            "uptimeMillis": 45076,
+            "uptime_millis": 45076,
             "version": 9
           },
           "flowEndSysUpTime": 40976,
@@ -487,9 +487,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 147,
+            "source_id": 147,
             "timestamp": "2015-10-08T19:06:29Z",
-            "uptimeMillis": 33990,
+            "uptime_millis": 33990,
             "version": 9
           },
           "flowEndSysUpTime": 5,

@@ -28,9 +28,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -88,9 +88,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -148,9 +148,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -208,9 +208,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -268,9 +268,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -328,9 +328,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -388,9 +388,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -448,9 +448,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -508,9 +508,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -568,9 +568,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -628,9 +628,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -688,9 +688,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -748,9 +748,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -808,9 +808,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -868,9 +868,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -928,9 +928,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -988,9 +988,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -1048,9 +1048,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -1108,9 +1108,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -1168,9 +1168,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -1228,9 +1228,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -1288,9 +1288,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -1348,9 +1348,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -1408,9 +1408,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -1468,9 +1468,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -1528,9 +1528,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -1588,9 +1588,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,
@@ -1648,9 +1648,9 @@
           "dot1qVlanId": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 1,
@@ -1708,9 +1708,9 @@
           "dot1qVlanId": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
           "flowDirection": 0,

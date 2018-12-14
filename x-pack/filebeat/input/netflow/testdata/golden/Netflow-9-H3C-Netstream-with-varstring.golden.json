@@ -35,9 +35,9 @@
           "egressInterface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2018-07-18T01:35:35Z",
-            "uptimeMillis": 1871244,
+            "uptime_millis": 1871244,
             "version": 9
           },
           "flowDirection": 0,
