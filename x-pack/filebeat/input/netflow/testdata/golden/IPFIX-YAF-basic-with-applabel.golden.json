@@ -163,22 +163,22 @@
             "version": 10
           },
           "options": {
-            "assembledFragmentCount": 0,
-            "droppedPacketTotalCount": 0,
-            "expiredFragmentCount": 0,
-            "exporterIPv4Address": "172.16.32.201",
-            "exportingProcessId": 0,
-            "flowTableFlushEventCount": 39,
-            "flowTablePeakCount": 58,
-            "ignoredPacketTotalCount": 58,
-            "meanFlowRate": 0,
-            "meanPacketRate": 6,
-            "notSentPacketTotalCount": 0,
-            "packetTotalCount": 1960
+            "assembled_fragment_count": 0,
+            "dropped_packet_total_count": 0,
+            "expired_fragment_count": 0,
+            "exporter_ipv4_address": "172.16.32.201",
+            "exporting_process_id": 0,
+            "flow_table_flush_event_count": 39,
+            "flow_table_peak_count": 58,
+            "ignored_packet_total_count": 58,
+            "mean_flow_rate": 0,
+            "mean_packet_rate": 6,
+            "not_sent_packet_total_count": 0,
+            "packet_total_count": 1960
           },
           "scope": {
-            "exportedFlowRecordTotalCount": 31,
-            "systemInitTimeMilliseconds": "2016-12-25T12:58:32Z"
+            "exported_flow_record_total_count": 31,
+            "system_init_time_milliseconds": "2016-12-25T12:58:32Z"
           },
           "type": "netflow_options"
         }

@@ -21,13 +21,13 @@
             "version": 10
           },
           "options": {
-            "samplingPacketInterval": 1,
-            "samplingPacketSpace": 0,
-            "selectorAlgorithm": 1,
-            "systemInitTimeMilliseconds": "2015-05-13T11:20:13.506Z"
+            "sampling_packet_interval": 1,
+            "sampling_packet_space": 0,
+            "selector_algorithm": 1,
+            "system_init_time_milliseconds": "2015-05-13T11:20:13.506Z"
           },
           "scope": {
-            "meteringProcessId": 2679
+            "metering_process_id": 2679
           },
           "type": "netflow_options"
         }

@@ -21,11 +21,11 @@
             "version": 9
           },
           "options": {
-            "exportedFlowRecordTotalCount": 1,
-            "exportedMessageTotalCount": 0
+            "exported_flow_record_total_count": 1,
+            "exported_message_total_count": 0
           },
           "scope": {
-            "octetDeltaCount": 0
+            "octet_delta_count": 0
           },
           "type": "netflow_options"
         }

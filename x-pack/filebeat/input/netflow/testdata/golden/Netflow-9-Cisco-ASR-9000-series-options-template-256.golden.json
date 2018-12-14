@@ -21,11 +21,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 74,
-            "interfaceDescription": "TenGigE0_0_1_0"
+            "ingress_interface": 74,
+            "interface_description": "TenGigE0_0_1_0"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -52,11 +52,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 75,
-            "interfaceDescription": "TenGigE0_0_1_1"
+            "ingress_interface": 75,
+            "interface_description": "TenGigE0_0_1_1"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -83,11 +83,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 76,
-            "interfaceDescription": "TenGigE0_0_1_2"
+            "ingress_interface": 76,
+            "interface_description": "TenGigE0_0_1_2"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -114,11 +114,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 54,
-            "interfaceDescription": "GigabitEthernet0_0_0_0"
+            "ingress_interface": 54,
+            "interface_description": "GigabitEthernet0_0_0_0"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -145,11 +145,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 55,
-            "interfaceDescription": "GigabitEthernet0_0_0_1"
+            "ingress_interface": 55,
+            "interface_description": "GigabitEthernet0_0_0_1"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -176,11 +176,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 56,
-            "interfaceDescription": "GigabitEthernet0_0_0_2"
+            "ingress_interface": 56,
+            "interface_description": "GigabitEthernet0_0_0_2"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -207,11 +207,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 58,
-            "interfaceDescription": "GigabitEthernet0_0_0_4"
+            "ingress_interface": 58,
+            "interface_description": "GigabitEthernet0_0_0_4"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -238,11 +238,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 59,
-            "interfaceDescription": "GigabitEthernet0_0_0_5"
+            "ingress_interface": 59,
+            "interface_description": "GigabitEthernet0_0_0_5"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -269,11 +269,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 60,
-            "interfaceDescription": "GigabitEthernet0_0_0_6"
+            "ingress_interface": 60,
+            "interface_description": "GigabitEthernet0_0_0_6"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -300,11 +300,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 66,
-            "interfaceDescription": "GigabitEthernet0_0_0_12"
+            "ingress_interface": 66,
+            "interface_description": "GigabitEthernet0_0_0_12"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -331,11 +331,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 86,
-            "interfaceDescription": "TenGigE0_1_0_0"
+            "ingress_interface": 86,
+            "interface_description": "TenGigE0_1_0_0"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -362,11 +362,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 87,
-            "interfaceDescription": "TenGigE0_1_0_1"
+            "ingress_interface": 87,
+            "interface_description": "TenGigE0_1_0_1"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -393,11 +393,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 88,
-            "interfaceDescription": "TenGigE0_1_0_2"
+            "ingress_interface": 88,
+            "interface_description": "TenGigE0_1_0_2"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -424,11 +424,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 162,
-            "interfaceDescription": "Bundle-Ether2"
+            "ingress_interface": 162,
+            "interface_description": "Bundle-Ether2"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -455,11 +455,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 110,
-            "interfaceDescription": "TenGigE0_6_1_0"
+            "ingress_interface": 110,
+            "interface_description": "TenGigE0_6_1_0"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -486,11 +486,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 111,
-            "interfaceDescription": "TenGigE0_6_1_1"
+            "ingress_interface": 111,
+            "interface_description": "TenGigE0_6_1_1"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -517,11 +517,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 102,
-            "interfaceDescription": "TenGigE0_6_0_0"
+            "ingress_interface": 102,
+            "interface_description": "TenGigE0_6_0_0"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -548,11 +548,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 103,
-            "interfaceDescription": "TenGigE0_6_0_1"
+            "ingress_interface": 103,
+            "interface_description": "TenGigE0_6_0_1"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }
@@ -579,11 +579,11 @@
             "version": 9
           },
           "options": {
-            "ingressInterface": 104,
-            "interfaceDescription": "TenGigE0_6_0_2"
+            "ingress_interface": 104,
+            "interface_description": "TenGigE0_6_0_2"
           },
           "scope": {
-            "octetDeltaCount": 3250896451
+            "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
         }

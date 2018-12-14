@@ -21,8 +21,8 @@
             "version": 9
           },
           "options": {
-            "samplingAlgorithm": 2,
-            "samplingInterval": 1
+            "sampling_algorithm": 2,
+            "sampling_interval": 1
           },
           "scope": {},
           "type": "netflow_options"

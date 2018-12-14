@@ -95,17 +95,16 @@ func extractIPFromIPPort(address string) string {
 	return address
 }
 
-func optionsToBeatEvent(flow record.Record) (event beat.Event) {
-	event = toBeatEventCommon(flow)
+func optionsToBeatEvent(flow record.Record) beat.Event {
 	for _, key := range []string{"options", "scope"} {
-		if iface, found := event.Fields[key]; found {
+		if iface, found := flow.Fields[key]; found {
 			if opts, ok := iface.(record.Map); ok {
 				fixMacAddresses(opts)
-				event.Fields[key] = fieldNameConverter.ToSnakeCase(opts)
+				flow.Fields[key] = fieldNameConverter.ToSnakeCase(opts)
 			}
 		}
 	}
-	return
+	return toBeatEventCommon(flow)
 }
 
 func flowToBeatEvent(flow record.Record) (event beat.Event) {

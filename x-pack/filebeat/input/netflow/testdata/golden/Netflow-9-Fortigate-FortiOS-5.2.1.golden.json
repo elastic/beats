@@ -21,16 +21,16 @@
             "version": 9
           },
           "options": {
-            "exportedFlowRecordTotalCount": 107864,
-            "exportedMessageTotalCount": 11920854,
-            "exportedOctetTotalCount": 6871319015,
-            "flowActiveTimeout": 1800,
-            "flowIdleTimeout": 15,
-            "samplingAlgorithm": 1,
-            "samplingInterval": 1
+            "exported_flow_record_total_count": 107864,
+            "exported_message_total_count": 11920854,
+            "exported_octet_total_count": 6871319015,
+            "flow_active_timeout": 1800,
+            "flow_idle_timeout": 15,
+            "sampling_algorithm": 1,
+            "sampling_interval": 1
           },
           "scope": {
-            "octetDeltaCount": 1
+            "octet_delta_count": 1
           },
           "type": "netflow_options"
         }
