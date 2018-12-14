@@ -11,7 +11,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -74,7 +75,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -137,7 +139,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -200,7 +203,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -263,7 +267,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -326,7 +331,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -389,7 +395,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -452,7 +459,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -515,7 +523,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -578,7 +587,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -641,7 +651,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -704,7 +715,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -767,7 +779,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -830,7 +843,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -893,7 +907,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -956,7 +971,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1019,7 +1035,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1082,7 +1099,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1145,7 +1163,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1208,7 +1227,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1271,7 +1291,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1334,7 +1355,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1397,7 +1419,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1460,7 +1483,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1523,7 +1547,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1586,7 +1611,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1649,7 +1675,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1712,7 +1739,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1775,7 +1803,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-07-03T10:47:00Z"
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",

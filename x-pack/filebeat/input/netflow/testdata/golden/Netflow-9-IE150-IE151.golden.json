@@ -16,7 +16,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-12-01T17:04:39Z"
+          "created": "2017-12-01T17:04:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "XApOh2nrI60",
@@ -76,7 +77,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-12-01T17:04:39Z"
+          "created": "2017-12-01T17:04:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "eTDK1gD4I9Y",

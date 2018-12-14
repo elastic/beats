@@ -16,7 +16,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-04-15T03:30:00Z"
+          "created": "2018-04-15T03:30:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "q-trxhRGXW0",
@@ -82,7 +83,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-04-15T03:30:00Z"
+          "created": "2018-04-15T03:30:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "GYmhjYyvaAI",
@@ -148,7 +150,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-04-15T03:30:00Z"
+          "created": "2018-04-15T03:30:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "s0UY7AEXtbs",
@@ -214,7 +217,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-04-15T03:30:00Z"
+          "created": "2018-04-15T03:30:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "r-qsT9TbSHw",
@@ -280,7 +284,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-04-15T03:30:00Z"
+          "created": "2018-04-15T03:30:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "GYmhjYyvaAI",
@@ -346,7 +351,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-04-15T03:30:00Z"
+          "created": "2018-04-15T03:30:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "dF2yRC2ldzk",
@@ -412,7 +418,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-04-15T03:30:00Z"
+          "created": "2018-04-15T03:30:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Nv4c6iSK_5U",
@@ -478,7 +485,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2018-04-15T03:30:00Z"
+          "created": "2018-04-15T03:30:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "PhIIQeuDikc",

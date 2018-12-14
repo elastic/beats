@@ -16,7 +16,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "qKMtgI7Ed9s",
@@ -77,7 +78,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "5FNp7ndavXc",
@@ -138,7 +140,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "5dxciNWUCt0",
@@ -199,7 +202,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "TJxuTh4pSgE",
@@ -260,7 +264,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "eVcvPUJANB4",
@@ -321,7 +326,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Dr8WeOCZm_4",
@@ -382,7 +388,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "P7HJmFBUOa8",
@@ -443,7 +450,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "E6FN06gC8JE",
@@ -504,7 +512,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "D9tiVWmcw2o",
@@ -565,7 +574,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "ZNd__DyTXzg",
@@ -626,7 +636,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "r4pPq83nIfU",
@@ -687,7 +698,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "W0ydMavNfpM",
@@ -748,7 +760,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "euOQwbFToDs",
@@ -809,7 +822,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "vtn0fYyiQAs",
@@ -870,7 +884,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "kgBNXXN8ed4",
@@ -931,7 +946,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "kgBNXXN8ed4",
@@ -992,7 +1008,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "AYD5HyisGMY",
@@ -1053,7 +1070,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "AYD5HyisGMY",
@@ -1114,7 +1132,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "he8fZsMllBk",
@@ -1175,7 +1194,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "he8fZsMllBk",
@@ -1236,7 +1256,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "fanKYX35CDM",
@@ -1297,7 +1318,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "fanKYX35CDM",
@@ -1358,7 +1380,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "1I_ey2YYTSM",
@@ -1419,7 +1442,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "1I_ey2YYTSM",
@@ -1480,7 +1504,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "P7bcxAuBWAY",
@@ -1541,7 +1566,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "P7bcxAuBWAY",
@@ -1602,7 +1628,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "rBSLKqUfMAo",
@@ -1663,7 +1690,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "rBSLKqUfMAo",
@@ -1722,7 +1750,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -1777,7 +1806,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -1832,7 +1862,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -1887,7 +1918,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -1942,7 +1974,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -1997,7 +2030,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2052,7 +2086,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2107,7 +2142,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2162,7 +2198,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2217,7 +2254,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2272,7 +2310,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2327,7 +2366,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2382,7 +2422,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2437,7 +2478,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2492,7 +2534,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2547,7 +2590,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2602,7 +2646,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
@@ -2657,7 +2702,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-07-19T16:18:08Z"
+          "created": "2017-07-19T16:18:08Z",
+          "kind": "event"
         },
         "flow": {
           "id": "RlrAo_U1Y14",
