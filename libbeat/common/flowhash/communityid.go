@@ -19,6 +19,7 @@ package flowhash
 
 import (
 	"crypto"
+	// import crypto/sha1 so that the SHA1 algorithm is available.
 	_ "crypto/sha1"
 	"encoding/binary"
 	"net"

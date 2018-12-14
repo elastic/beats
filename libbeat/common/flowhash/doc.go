@@ -15,5 +15,5 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// package flowhash provides the ability to hash flows.
+// Package flowhash provides the ability to hash flows.
 package flowhash
