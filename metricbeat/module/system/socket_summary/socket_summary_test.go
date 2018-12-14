@@ -18,131 +18,131 @@
 package socket_summary
 
 import (
-        "syscall"
-        "testing"
+	"syscall"
+	"testing"
 
-        "github.com/shirou/gopsutil/net"
-        "github.com/stretchr/testify/assert"
+	"github.com/shirou/gopsutil/net"
+	"github.com/stretchr/testify/assert"
 )
 
 func getMockedConns() []net.ConnectionStat {
-        return []net.ConnectionStat{
-                net.ConnectionStat{
-                        Family: syscall.AF_INET,
-                        Type:   syscall.SOCK_DGRAM,
-                        Status: "",
-                },
-                net.ConnectionStat{
-                        Family: syscall.AF_INET,
-                        Type:   syscall.SOCK_DGRAM,
-                        Status: "",
-                },
-                net.ConnectionStat{
-                        Family: syscall.AF_INET,
-                        Type:   syscall.SOCK_STREAM,
-                        Status: "LISTEN",
-                },
-                net.ConnectionStat{
-                        Family: syscall.AF_INET,
-                        Type:   syscall.SOCK_STREAM,
-                        Status: "ESTABLISHED",
-                },
-                net.ConnectionStat{
-                        Family: syscall.AF_INET,
-                        Type:   syscall.SOCK_STREAM,
-                        Status: "ESTABLISHED",
-                },
-                net.ConnectionStat{
-                        Family: syscall.AF_INET,
-                        Type:   syscall.SOCK_STREAM,
-                        Status: "CLOSE_WAIT",
-                },
-                net.ConnectionStat{
-                        Family: syscall.AF_INET,
-                        Type:   syscall.SOCK_STREAM,
-                        Status: "TIME_WAIT",
-                },
-                net.ConnectionStat{
-                        Family: syscall.AF_INET,
-                        Type:   syscall.SOCK_STREAM,
-                        Status: "CLOSE_WAIT",
-                },
-                net.ConnectionStat{
-                        Family: syscall.AF_INET,
-                        Type:   syscall.SOCK_STREAM,
-                        Status: "CLOSE_WAIT",
-                },
-                net.ConnectionStat{
-                        Family: syscall.AF_INET,
-                        Type:   syscall.SOCK_STREAM,
-                        Status: "CLOSE",
-                },
-                net.ConnectionStat{
-                        Family: syscall.AF_INET,
-                        Type:   syscall.SOCK_STREAM,
-                        Status: "LISTEN",
-                },
-        }
+	return []net.ConnectionStat{
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_DGRAM,
+			Status: "",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_DGRAM,
+			Status: "",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "LISTEN",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "ESTABLISHED",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "ESTABLISHED",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "CLOSE_WAIT",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "TIME_WAIT",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "CLOSE_WAIT",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "CLOSE_WAIT",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "CLOSE",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "LISTEN",
+		},
+	}
 }
 
 func TestCalculateConnStats(t *testing.T) {
-        conns := getMockedConns()
-        metrics := calculateConnStats(conns)
+	conns := getMockedConns()
+	metrics := calculateConnStats(conns)
 
-        allConns, err := metrics.GetValue("all.count")
+	allConns, err := metrics.GetValue("all.count")
 
-        if err != nil {
-                t.Fail()
-        }
+	if err != nil {
+		t.Fail()
+	}
 
-        allListens, err := metrics.GetValue("all.listening")
+	allListens, err := metrics.GetValue("all.listening")
 
-        if err != nil {
-                t.Fail()
-        }
+	if err != nil {
+		t.Fail()
+	}
 
-        udpConns, err := metrics.GetValue("udp.all.count")
+	udpConns, err := metrics.GetValue("udp.all.count")
 
-        if err != nil {
-                t.Fail()
-        }
+	if err != nil {
+		t.Fail()
+	}
 
-        tcpConns, err := metrics.GetValue("tcp.all.count")
+	tcpConns, err := metrics.GetValue("tcp.all.count")
 
-        if err != nil {
-                t.Fail()
-        }
+	if err != nil {
+		t.Fail()
+	}
 
-        tcpListens, err := metrics.GetValue("tcp.all.listening")
+	tcpListens, err := metrics.GetValue("tcp.all.listening")
 
-        if err != nil {
-                t.Fail()
-        }
+	if err != nil {
+		t.Fail()
+	}
 
-        tcpEstablisheds, err := metrics.GetValue("tcp.all.established")
+	tcpEstablisheds, err := metrics.GetValue("tcp.all.established")
 
-        if err != nil {
-                t.Fail()
-        }
+	if err != nil {
+		t.Fail()
+	}
 
-        tcpClosewaits, err := metrics.GetValue("tcp.all.close_wait")
+	tcpClosewaits, err := metrics.GetValue("tcp.all.close_wait")
 
-        if err != nil {
-                t.Fail()
-        }
+	if err != nil {
+		t.Fail()
+	}
 
-        tcpTimewaits, err := metrics.GetValue("tcp.all.time_wait")
+	tcpTimewaits, err := metrics.GetValue("tcp.all.time_wait")
 
-        if err != nil {
-                t.Fail()
-        }
+	if err != nil {
+		t.Fail()
+	}
 
-        assert.Equal(t, allConns, 13)
-        assert.Equal(t, allListens, 2)
-        assert.Equal(t, udpConns, 2)
-        assert.Equal(t, tcpConns, 11)
-        assert.Equal(t, tcpListens, 2)
-        assert.Equal(t, tcpEstablisheds, 2)
-        assert.Equal(t, tcpClosewaits, 3)
-        assert.Equal(t, tcpTimewaits, 1)
+	assert.Equal(t, allConns, 13)
+	assert.Equal(t, allListens, 2)
+	assert.Equal(t, udpConns, 2)
+	assert.Equal(t, tcpConns, 11)
+	assert.Equal(t, tcpListens, 2)
+	assert.Equal(t, tcpEstablisheds, 2)
+	assert.Equal(t, tcpClosewaits, 3)
+	assert.Equal(t, tcpTimewaits, 1)
 }
