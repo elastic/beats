@@ -23,7 +23,7 @@
               description: >
                 Exporter's network address in IP:port format.
 
-            - name: sourceId
+            - name: source_id
               type: long
               description: >
                 Observation domain ID to which this record belongs.
@@ -33,7 +33,7 @@
               description: >
                 Time and date of export.
 
-            - name: uptimeMillis
+            - name: uptime_millis
               type: long
               description: >
                 How long the exporter process has been running, in milliseconds.
