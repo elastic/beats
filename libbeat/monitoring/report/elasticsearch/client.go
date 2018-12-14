@@ -84,7 +84,7 @@ func (c *publishClient) Connect() error {
 	}
 
 	debugf("XPack monitoring is enabled")
-	debugf("Publishing to %v cluster", c.params["format"])
+	debugf("Publishing to %v cluster", c.params["_format"])
 
 	return nil
 }
@@ -122,13 +122,13 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 			}
 		}
 
-		switch params["format"] {
+		switch params["_format"] {
 		case "production":
 			err = c.bulkToProduction(params, event, t)
 		case "monitoring":
 			err = c.bulkToMonitoring(event)
 		default:
-			err = fmt.Errorf("unsupported reporting format: %v", params["format"])
+			err = fmt.Errorf("unsupported reporting format: %v", params["_format"])
 		}
 
 		if err != nil {

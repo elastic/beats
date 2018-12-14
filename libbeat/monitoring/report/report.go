@@ -110,11 +110,11 @@ func getReporterConfig(
 			rc = merged
 		}
 
-		format, err := monitoringConfig.String("format", -1)
+		format, err := monitoringConfig.String("_format", -1)
 		if err != nil {
 			return "", nil, err
 		}
-		rc.SetString("parameters.format", -1, format)
+		rc.SetString("parameters._format", -1, format)
 
 		return name, rc, nil
 	}
