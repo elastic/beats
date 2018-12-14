@@ -150,6 +150,40 @@ func TestConfigGeoEnabled(t *testing.T) {
 	}
 }
 
+func TestPartialGeo(t *testing.T) {
+	event := &beat.Event{
+		Fields:    common.MapStr{},
+		Timestamp: time.Now(),
+	}
+
+	config := map[string]interface{}{
+		"geo.name":      "yerevan-am",
+		"geo.city_name": "  ",
+	}
+
+	testConfig, err := common.NewConfigFrom(config)
+	assert.NoError(t, err)
+
+	p, err := newHostMetadataProcessor(testConfig)
+	require.NoError(t, err)
+
+	newEvent, err := p.Run(event)
+	assert.NoError(t, err)
+
+	v, err := newEvent.Fields.GetValue("host.geo.name")
+	assert.NoError(t, err)
+	assert.Equal(t, "yerevan-am", v)
+
+	missing := []string{"continent_name", "country_name", "country_iso_code", "region_name", "region_iso_code", "city_name"}
+
+	for _, k := range missing {
+		path := "host.geo." + k
+		v, err = newEvent.Fields.GetValue(path)
+
+		assert.Equal(t, common.ErrKeyNotFound, err, "din expect to find %v", path)
+	}
+}
+
 func TestGeoLocationValidation(t *testing.T) {
 	locations := []struct {
 		str   string

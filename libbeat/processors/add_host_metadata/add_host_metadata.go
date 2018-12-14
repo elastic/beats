@@ -94,8 +94,10 @@ func newHostMetadataProcessor(cfg *common.Config) (processors.Processor, error) 
 			"city_name":        config.Geo.CityName,
 		}
 		// Delete any empty values
+		blankStringMatch := regexp.MustCompile(`^\s*$`)
 		for k, v := range geoFields {
-			if v == "" {
+			vStr := v.(string)
+			if blankStringMatch.MatchString(vStr) {
 				delete(geoFields, k)
 			}
 		}
