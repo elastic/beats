@@ -46,43 +46,43 @@ type Flow struct {
 }
 
 const (
-	kIPProtoICMPv4 = 1
-	kIPProtoTCP    = 6
-	kIPProtoUDP    = 17
-	kIPProtoICMPv6 = 58
-	kIPProtoSCTP   = 132
+	iPProtoICMPv4 = 1
+	iPProtoTCP    = 6
+	iPProtoUDP    = 17
+	iPProtoICMPv6 = 58
+	iPProtoSCTP   = 132
 )
 
 // From github.com/google/gopacket/layers/icmp4.go
 const (
-	kICMPv4TypeEchoReply           = 0
-	kICMPv4TypeEchoRequest         = 8
-	kICMPv4TypeRouterAdvertisement = 9
-	kICMPv4TypeRouterSolicitation  = 10
-	kICMPv4TypeTimestampRequest    = 13
-	kICMPv4TypeTimestampReply      = 14
-	kICMPv4TypeInfoRequest         = 15
-	kICMPv4TypeInfoReply           = 16
-	kICMPv4TypeAddressMaskRequest  = 17
-	kICMPv4TypeAddressMaskReply    = 18
+	iCMPv4TypeEchoReply           = 0
+	iCMPv4TypeEchoRequest         = 8
+	iCMPv4TypeRouterAdvertisement = 9
+	iCMPv4TypeRouterSolicitation  = 10
+	iCMPv4TypeTimestampRequest    = 13
+	iCMPv4TypeTimestampReply      = 14
+	iCMPv4TypeInfoRequest         = 15
+	iCMPv4TypeInfoReply           = 16
+	iCMPv4TypeAddressMaskRequest  = 17
+	iCMPv4TypeAddressMaskReply    = 18
 )
 
 const (
-	kICMPv6TypeEchoRequest           = 128
-	kICMPv6TypeEchoReply             = 129
-	kICMPv6TypeRouterSolicitation    = 133
-	kICMPv6TypeRouterAdvertisement   = 134
-	kICMPv6TypeNeighborSolicitation  = 135
-	kICMPv6TypeNeighborAdvertisement = 136
+	iCMPv6TypeEchoRequest           = 128
+	iCMPv6TypeEchoReply             = 129
+	iCMPv6TypeRouterSolicitation    = 133
+	iCMPv6TypeRouterAdvertisement   = 134
+	iCMPv6TypeNeighborSolicitation  = 135
+	iCMPv6TypeNeighborAdvertisement = 136
 
 	// The following are from RFC 2710
-	kICMPv6TypeMLDv1MulticastListenerQueryMessage  = 130
-	kICMPv6TypeMLDv1MulticastListenerReportMessage = 131
+	iCMPv6TypeMLDv1MulticastListenerQueryMessage  = 130
+	iCMPv6TypeMLDv1MulticastListenerReportMessage = 131
 
-	kICMPv6TypeWhoAreYouRequest             = 139
-	kICMPv6TypeWhoAreYouReply               = 140
-	kICMPv6TypeHomeAddressDiscoveryRequest  = 144
-	kICMPv6TypeHomeAddressDiscoveryResponse = 145
+	iCMPv6TypeWhoAreYouRequest             = 139
+	iCMPv6TypeWhoAreYouReply               = 140
+	iCMPv6TypeHomeAddressDiscoveryRequest  = 144
+	iCMPv6TypeHomeAddressDiscoveryResponse = 145
 )
 
 func (f Flow) isSorted() bool {

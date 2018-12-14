@@ -48,10 +48,10 @@ func NewCommunityID(seed uint16, encoder Encoding, hash crypto.Hash) Hasher {
 func (h *communityIDHasher) Hash(flow Flow) string {
 	switch flow.Protocol {
 	// For ICMP, populate source and destination port with ICMP data
-	case kIPProtoICMPv4, kIPProtoICMPv6:
+	case iPProtoICMPv4, iPProtoICMPv6:
 		var isOneWay bool
 		table := icmpV4Equiv
-		if flow.Protocol == kIPProtoICMPv6 {
+		if flow.Protocol == iPProtoICMPv6 {
 			table = icmpV6Equiv
 		}
 		flow.SourcePort, flow.DestinationPort, isOneWay = icmpPortEquivalents(flow, table)
@@ -78,7 +78,7 @@ func (h *communityIDHasher) Hash(flow Flow) string {
 	hasher.Write(slice)
 
 	switch flow.Protocol {
-	case kIPProtoTCP, kIPProtoUDP, kIPProtoSCTP, kIPProtoICMPv4, kIPProtoICMPv6:
+	case iPProtoTCP, iPProtoUDP, iPProtoSCTP, iPProtoICMPv4, iPProtoICMPv6:
 		binary.BigEndian.PutUint16(slice, flow.SourcePort)
 		hasher.Write(slice)
 		binary.BigEndian.PutUint16(slice, flow.DestinationPort)
@@ -98,29 +98,29 @@ func getRawIP(ip net.IP) []byte {
 }
 
 var icmpV4Equiv = map[uint8]uint8{
-	kICMPv4TypeEchoRequest:         kICMPv4TypeEchoReply,
-	kICMPv4TypeEchoReply:           kICMPv4TypeEchoRequest,
-	kICMPv4TypeTimestampRequest:    kICMPv4TypeTimestampReply,
-	kICMPv4TypeTimestampReply:      kICMPv4TypeTimestampRequest,
-	kICMPv4TypeInfoRequest:         kICMPv4TypeInfoReply,
-	kICMPv4TypeRouterSolicitation:  kICMPv4TypeRouterAdvertisement,
-	kICMPv4TypeRouterAdvertisement: kICMPv4TypeRouterSolicitation,
-	kICMPv4TypeAddressMaskRequest:  kICMPv4TypeAddressMaskReply,
-	kICMPv4TypeAddressMaskReply:    kICMPv4TypeAddressMaskRequest,
+	iCMPv4TypeEchoRequest:         iCMPv4TypeEchoReply,
+	iCMPv4TypeEchoReply:           iCMPv4TypeEchoRequest,
+	iCMPv4TypeTimestampRequest:    iCMPv4TypeTimestampReply,
+	iCMPv4TypeTimestampReply:      iCMPv4TypeTimestampRequest,
+	iCMPv4TypeInfoRequest:         iCMPv4TypeInfoReply,
+	iCMPv4TypeRouterSolicitation:  iCMPv4TypeRouterAdvertisement,
+	iCMPv4TypeRouterAdvertisement: iCMPv4TypeRouterSolicitation,
+	iCMPv4TypeAddressMaskRequest:  iCMPv4TypeAddressMaskReply,
+	iCMPv4TypeAddressMaskReply:    iCMPv4TypeAddressMaskRequest,
 }
 
 var icmpV6Equiv = map[uint8]uint8{
-	kICMPv6TypeEchoRequest:                        kICMPv6TypeEchoReply,
-	kICMPv6TypeEchoReply:                          kICMPv6TypeEchoRequest,
-	kICMPv6TypeRouterSolicitation:                 kICMPv6TypeRouterAdvertisement,
-	kICMPv6TypeRouterAdvertisement:                kICMPv6TypeRouterSolicitation,
-	kICMPv6TypeNeighborAdvertisement:              kICMPv6TypeNeighborSolicitation,
-	kICMPv6TypeNeighborSolicitation:               kICMPv6TypeNeighborAdvertisement,
-	kICMPv6TypeMLDv1MulticastListenerQueryMessage: kICMPv6TypeMLDv1MulticastListenerReportMessage,
-	kICMPv6TypeWhoAreYouRequest:                   kICMPv6TypeWhoAreYouReply,
-	kICMPv6TypeWhoAreYouReply:                     kICMPv6TypeWhoAreYouRequest,
-	kICMPv6TypeHomeAddressDiscoveryRequest:        kICMPv6TypeHomeAddressDiscoveryResponse,
-	kICMPv6TypeHomeAddressDiscoveryResponse:       kICMPv6TypeHomeAddressDiscoveryRequest,
+	iCMPv6TypeEchoRequest:                        iCMPv6TypeEchoReply,
+	iCMPv6TypeEchoReply:                          iCMPv6TypeEchoRequest,
+	iCMPv6TypeRouterSolicitation:                 iCMPv6TypeRouterAdvertisement,
+	iCMPv6TypeRouterAdvertisement:                iCMPv6TypeRouterSolicitation,
+	iCMPv6TypeNeighborAdvertisement:              iCMPv6TypeNeighborSolicitation,
+	iCMPv6TypeNeighborSolicitation:               iCMPv6TypeNeighborAdvertisement,
+	iCMPv6TypeMLDv1MulticastListenerQueryMessage: iCMPv6TypeMLDv1MulticastListenerReportMessage,
+	iCMPv6TypeWhoAreYouRequest:                   iCMPv6TypeWhoAreYouReply,
+	iCMPv6TypeWhoAreYouReply:                     iCMPv6TypeWhoAreYouRequest,
+	iCMPv6TypeHomeAddressDiscoveryRequest:        iCMPv6TypeHomeAddressDiscoveryResponse,
+	iCMPv6TypeHomeAddressDiscoveryResponse:       iCMPv6TypeHomeAddressDiscoveryRequest,
 }
 
 func icmpPortEquivalents(flow Flow, table map[uint8]uint8) (src uint16, dst uint16, isOneWay bool) {

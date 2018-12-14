@@ -131,35 +131,35 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) []string {
 		flowStr := ""
 		if isIP {
 			switch flow.Protocol {
-			case kIPProtoTCP:
+			case iPProtoTCP:
 				if layer := packet.Layer(layers.LayerTypeTCP); layer != nil {
 					if layer, ok := layer.(*layers.TCP); ok {
 						flow.SourcePort = uint16(layer.SrcPort)
 						flow.DestinationPort = uint16(layer.DstPort)
 					}
 				}
-			case kIPProtoUDP:
+			case iPProtoUDP:
 				if layer := packet.Layer(layers.LayerTypeUDP); layer != nil {
 					if layer, ok := layer.(*layers.UDP); ok {
 						flow.SourcePort = uint16(layer.SrcPort)
 						flow.DestinationPort = uint16(layer.DstPort)
 					}
 				}
-			case kIPProtoSCTP:
+			case iPProtoSCTP:
 				if layer := packet.Layer(layers.LayerTypeSCTP); layer != nil {
 					if layer, ok := layer.(*layers.SCTP); ok {
 						flow.SourcePort = uint16(layer.SrcPort)
 						flow.DestinationPort = uint16(layer.DstPort)
 					}
 				}
-			case kIPProtoICMPv4:
+			case iPProtoICMPv4:
 				if layer := packet.Layer(layers.LayerTypeICMPv4); layer != nil {
 					if layer, ok := layer.(*layers.ICMPv4); ok {
 						flow.ICMP.Type = layer.TypeCode.Type()
 						flow.ICMP.Code = layer.TypeCode.Code()
 					}
 				}
-			case kIPProtoICMPv6:
+			case iPProtoICMPv6:
 				if layer := packet.Layer(layers.LayerTypeICMPv6); layer != nil {
 					if layer, ok := layer.(*layers.ICMPv6); ok {
 						flow.ICMP.Type = layer.TypeCode.Type()
@@ -183,7 +183,7 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) []string {
 
 func flowToString(flow Flow) string {
 	switch flow.Protocol {
-	case kIPProtoICMPv4, kIPProtoICMPv6:
+	case iPProtoICMPv4, iPProtoICMPv6:
 		return fmt.Sprintf("%s %s %d %d %d",
 			ipToStr(flow.SourceIP),
 			ipToStr(flow.DestinationIP),
@@ -191,7 +191,7 @@ func flowToString(flow Flow) string {
 			flow.ICMP.Type,
 			flow.ICMP.Code,
 		)
-	case kIPProtoSCTP, kIPProtoTCP, kIPProtoUDP:
+	case iPProtoSCTP, iPProtoTCP, iPProtoUDP:
 		return fmt.Sprintf("%s %s %d %d %d",
 			ipToStr(flow.SourceIP),
 			ipToStr(flow.DestinationIP),
