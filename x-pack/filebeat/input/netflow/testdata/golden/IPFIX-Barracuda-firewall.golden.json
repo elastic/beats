@@ -17,7 +17,8 @@
           "action": "netflow_flow",
           "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
-          "duration": 20269000000
+          "duration": 20269000000,
+          "kind": "event"
         },
         "flow": {
           "id": "iuHn3GlQ8XA",
@@ -81,7 +82,8 @@
           "action": "netflow_flow",
           "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
-          "duration": 20269000000
+          "duration": 20269000000,
+          "kind": "event"
         },
         "flow": {
           "id": "SJgQadmL3WE",
@@ -145,7 +147,8 @@
           "action": "netflow_flow",
           "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
-          "duration": 20306000000
+          "duration": 20306000000,
+          "kind": "event"
         },
         "flow": {
           "id": "iuHn3GlQ8XA",
@@ -209,7 +212,8 @@
           "action": "netflow_flow",
           "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
-          "duration": 20306000000
+          "duration": 20306000000,
+          "kind": "event"
         },
         "flow": {
           "id": "eIt31cWru0w",
@@ -273,7 +277,8 @@
           "action": "netflow_flow",
           "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
-          "duration": 20317000000
+          "duration": 20317000000,
+          "kind": "event"
         },
         "flow": {
           "id": "MNe2gxAuU4I",
@@ -337,7 +342,8 @@
           "action": "netflow_flow",
           "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
-          "duration": 20317000000
+          "duration": 20317000000,
+          "kind": "event"
         },
         "flow": {
           "id": "Fm5S3cg6Lcw",
@@ -401,7 +407,8 @@
           "action": "netflow_flow",
           "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
-          "duration": 20368000000
+          "duration": 20368000000,
+          "kind": "event"
         },
         "flow": {
           "id": "1srU81eLhhw",
@@ -465,7 +472,8 @@
           "action": "netflow_flow",
           "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
-          "duration": 20368000000
+          "duration": 20368000000,
+          "kind": "event"
         },
         "flow": {
           "id": "b-peOmD4XyI",

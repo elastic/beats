@@ -16,7 +16,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2017-11-21T14:32:15Z"
+          "created": "2017-11-21T14:32:15Z",
+          "kind": "event"
         },
         "flow": {
           "id": "5qh7ipMbBV0",

@@ -11,7 +11,8 @@
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
-          "created": "2016-11-29T00:21:56Z"
+          "created": "2016-11-29T00:21:56Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {

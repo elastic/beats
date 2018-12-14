@@ -16,7 +16,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "1970-01-01T00:08:22Z"
+          "created": "1970-01-01T00:08:22Z",
+          "kind": "event"
         },
         "flow": {
           "id": "oFN7CMNpOLQ",

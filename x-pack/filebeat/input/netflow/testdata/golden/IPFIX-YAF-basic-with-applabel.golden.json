@@ -18,7 +18,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2016-12-25T13:03:38Z"
+          "created": "2016-12-25T13:03:38Z",
+          "kind": "event"
         },
         "flow": {
           "id": "_tbAAnwoAu8",
@@ -88,7 +89,8 @@
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
-          "created": "2016-12-25T12:58:38Z"
+          "created": "2016-12-25T12:58:38Z",
+          "kind": "event"
         },
         "flow": {
           "id": "qznEzwF6uiM",
@@ -157,7 +159,8 @@
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
-          "created": "2016-12-25T13:03:33Z"
+          "created": "2016-12-25T13:03:33Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
