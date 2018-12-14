@@ -54,7 +54,7 @@
           "community_id": "1:Vq90QiM+mzZbbo5vY5GdjE9OrRc=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "100.78.40.201",
@@ -117,7 +117,7 @@
           "community_id": "1:q9x0h1eGokXApDL651a/13CjP74=",
           "direction": "unknown",
           "packets": 4,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.231.128.150",
@@ -180,7 +180,7 @@
           "community_id": "1:2fY1XMUII4NBiXGj6I6Knj1Kg4A=",
           "direction": "unknown",
           "packets": 10,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "100.78.40.201",
@@ -243,7 +243,7 @@
           "community_id": "1:yMe4rLBOcLy4kK6KxECnRMoxH5Y=",
           "direction": "unknown",
           "packets": 11,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.27.8.20",

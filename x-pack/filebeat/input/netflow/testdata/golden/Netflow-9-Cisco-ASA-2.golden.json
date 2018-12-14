@@ -55,7 +55,7 @@
         "network": {
           "community_id": "1:I8h+Rnj88f03jgEHLyfcKOzLI6M=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -119,7 +119,7 @@
         "network": {
           "community_id": "1:mKvuBb1HFV3U0+pj/F7eH/SPOyc=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -183,7 +183,7 @@
         "network": {
           "community_id": "1:mKvuBb1HFV3U0+pj/F7eH/SPOyc=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -247,7 +247,7 @@
         "network": {
           "community_id": "1:i5nSykRXJvquvIuEibM9evNxo8o=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -311,7 +311,7 @@
         "network": {
           "community_id": "1:i5nSykRXJvquvIuEibM9evNxo8o=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -375,7 +375,7 @@
         "network": {
           "community_id": "1:4lrT4glskPfI8xSnnz83yjpF3/8=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -439,7 +439,7 @@
         "network": {
           "community_id": "1:4lrT4glskPfI8xSnnz83yjpF3/8=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -501,7 +501,7 @@
         "network": {
           "community_id": "1:gbcWcUcNt3ZRqBN2uzykEEbA2+U=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -565,7 +565,7 @@
         "network": {
           "community_id": "1:gbcWcUcNt3ZRqBN2uzykEEbA2+U=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -629,7 +629,7 @@
         "network": {
           "community_id": "1:gbcWcUcNt3ZRqBN2uzykEEbA2+U=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -691,7 +691,7 @@
         "network": {
           "community_id": "1:dMCFJEm0lrPr+fKgCpIef5eiFLk=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -755,7 +755,7 @@
         "network": {
           "community_id": "1:dMCFJEm0lrPr+fKgCpIef5eiFLk=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -819,7 +819,7 @@
         "network": {
           "community_id": "1:dMCFJEm0lrPr+fKgCpIef5eiFLk=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -881,7 +881,7 @@
         "network": {
           "community_id": "1:ehXkRqqxuigy8ra+qE/GuJchCA4=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -945,7 +945,7 @@
         "network": {
           "community_id": "1:ehXkRqqxuigy8ra+qE/GuJchCA4=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -1009,7 +1009,7 @@
         "network": {
           "community_id": "1:ehXkRqqxuigy8ra+qE/GuJchCA4=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -1071,7 +1071,7 @@
         "network": {
           "community_id": "1:xKQan2kd1NgxMAX7DUOk/URZAno=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -1135,7 +1135,7 @@
         "network": {
           "community_id": "1:xKQan2kd1NgxMAX7DUOk/URZAno=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -1199,7 +1199,7 @@
         "network": {
           "community_id": "1:xKQan2kd1NgxMAX7DUOk/URZAno=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",

@@ -62,7 +62,7 @@
           "community_id": "1:6bApwXCshD5rqS4P4mVFwtobnBM=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "37.122.1.226",
@@ -134,7 +134,7 @@
           "community_id": "1:nHvXTDLBywv91YMJeWrLeJPdWP4=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "5.141.231.166",
@@ -206,7 +206,7 @@
           "community_id": "1:3gZ5hR1U0fS2hvac/Y9iO8mcFDo=",
           "direction": "unknown",
           "packets": 11,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.233.128.4",
@@ -278,7 +278,7 @@
           "community_id": "1:Uc3mP+7U3dbDz60McoL0jYl+KUQ=",
           "direction": "unknown",
           "packets": 4,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "193.151.192.46",
@@ -350,7 +350,7 @@
           "community_id": "1:Wcok2NJh31VgMyBs70twGHpEg7M=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.235.197.6",
@@ -422,7 +422,7 @@
           "community_id": "1:tfHBMGf05/6z8XXBH1VvTg3Bp4k=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.236.31.7",
@@ -494,7 +494,7 @@
           "community_id": "1:RkpTZIg7FeOitpZbe0ahhlzx90w=",
           "direction": "unknown",
           "packets": 15,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.233.151.8",
@@ -566,7 +566,7 @@
           "community_id": "1:QdyoRIMjHbHZz9RohPLNm74w6QE=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.234.22.4",
@@ -638,7 +638,7 @@
           "community_id": "1:ByBLMidnd0Tua+Vk+59YTRfjE3g=",
           "direction": "unknown",
           "packets": 22,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.233.36.7",
@@ -710,7 +710,7 @@
           "community_id": "1:+8jpPMTlqZM+u9QLxrPyk2/duOY=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.233.200.7",
@@ -782,7 +782,7 @@
           "community_id": "1:hWEp1AGtGX7I3gL6btUapvplzdk=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "23.43.139.27",
@@ -854,7 +854,7 @@
           "community_id": "1:ujpwO/BObx6DD8oop1f63tSyfcw=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "2.17.140.47",

@@ -66,7 +66,7 @@
           "community_id": "1:qzI1p/DraBlY+q0WoDrEVzXNWYQ=",
           "direction": "inbound",
           "packets": 697,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.30",
@@ -141,7 +141,7 @@
           "community_id": "1:GSQ1TrOMr/LW4B81ECw0+kz+2QY=",
           "direction": "inbound",
           "packets": 6,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.12",
@@ -216,7 +216,7 @@
           "community_id": "1:61IryZ4mi1uTBDD5+gOvL97xjLM=",
           "direction": "inbound",
           "packets": 21,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.33",
@@ -291,7 +291,7 @@
           "community_id": "1:NOys+eNAZ2uvD2U8rXFlB0IZQCo=",
           "direction": "inbound",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.35",
@@ -366,7 +366,7 @@
           "community_id": "1:gY528hsPNX6RHS6UXpFnEsjqMY0=",
           "direction": "inbound",
           "packets": 20,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.36",
@@ -441,7 +441,7 @@
           "community_id": "1:gY528hsPNX6RHS6UXpFnEsjqMY0=",
           "direction": "inbound",
           "packets": 16,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.36",
@@ -516,7 +516,7 @@
           "community_id": "1:1l5g2rHaCC2EhYGzWl7jD2jprK8=",
           "direction": "inbound",
           "packets": 37,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.28",
@@ -591,7 +591,7 @@
           "community_id": "1:NOys+eNAZ2uvD2U8rXFlB0IZQCo=",
           "direction": "inbound",
           "packets": 2135,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.35",
@@ -666,7 +666,7 @@
           "community_id": "1:u3U5M2TEOv+5aaIvoxAWpZcCwfc=",
           "direction": "inbound",
           "packets": 20,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.15",
@@ -741,7 +741,7 @@
           "community_id": "1:dsegIlwhvWHFpkKtpDEZ+N3EoXU=",
           "direction": "inbound",
           "packets": 2804,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.2",
@@ -816,7 +816,7 @@
           "community_id": "1:1l5g2rHaCC2EhYGzWl7jD2jprK8=",
           "direction": "inbound",
           "packets": 25,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.28",
@@ -891,7 +891,7 @@
           "community_id": "1:5VIwljy0926c8Js5Wsve5fEmSLo=",
           "direction": "inbound",
           "packets": 68,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.25",
@@ -966,7 +966,7 @@
           "community_id": "1:5VIwljy0926c8Js5Wsve5fEmSLo=",
           "direction": "inbound",
           "packets": 30,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.25",
@@ -1041,7 +1041,7 @@
           "community_id": "1:GSQ1TrOMr/LW4B81ECw0+kz+2QY=",
           "direction": "inbound",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.12",
@@ -1116,7 +1116,7 @@
           "community_id": "1:nSRDOwLgxV6v/8JSi4fU7AKGxd8=",
           "direction": "inbound",
           "packets": 220,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.17",
@@ -1191,7 +1191,7 @@
           "community_id": "1:gY528hsPNX6RHS6UXpFnEsjqMY0=",
           "direction": "inbound",
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.22.166.36",

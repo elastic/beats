@@ -54,7 +54,7 @@
           "community_id": "1:o4guLY2bL+DOHtQO9gHFEbXsEQ0=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.8.197",
@@ -117,7 +117,7 @@
           "community_id": "1:dff66BxOHH2oQ2rp9q6L5XAyxUw=",
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.35.143",
@@ -180,7 +180,7 @@
           "community_id": "1:r27Ws33L+xEVSg9VX0zVJ9MNKwA=",
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.10.6.11",
@@ -243,7 +243,7 @@
           "community_id": "1:vzzwAshWVAvuWES5NyhLy1GLPAY=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.128.17",
@@ -306,7 +306,7 @@
           "community_id": "1:1LnuPKitmhDRXGMc7PEKYVnKHqs=",
           "direction": "unknown",
           "packets": 57,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.10.8.220",
@@ -369,7 +369,7 @@
           "community_id": "1:xCTumK0k/psyvuepNPEIbpQ8Iy4=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.20.4.199",
@@ -432,7 +432,7 @@
           "community_id": "1:z+7+u9s7BqnBecKTeXOc7Esh+mM=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.20.4.1",
@@ -495,7 +495,7 @@
           "community_id": "1:AB9PVU/9h10nCsljEg6e5LXF1dA=",
           "direction": "unknown",
           "packets": 6,
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "172.20.4.30",
@@ -558,7 +558,7 @@
           "community_id": "1:KXMvvH/BLW4/w8E/y+y2Q/SCK98=",
           "direction": "unknown",
           "packets": 6,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.10.8.105",
@@ -621,7 +621,7 @@
           "community_id": "1:Ijd9IXUQpbZAEGLrnnoGfaBS1Ag=",
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.20.4.30",
@@ -684,7 +684,7 @@
           "community_id": "1:CYX4DREl+BdwaoOD2Loh6qciwxU=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.10.7.11",
@@ -747,7 +747,7 @@
           "community_id": "1:18lbeqRsrUgxd8UtlYpuACgLqzY=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.183.199",
@@ -810,7 +810,7 @@
           "community_id": "1:qqXQzadVXO6y385wBBFibOAWjO4=",
           "direction": "unknown",
           "packets": 6,
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "10.10.8.34",
@@ -873,7 +873,7 @@
           "community_id": "1:wac990UkZPCjIeHvh0HL/Xpni2I=",
           "direction": "unknown",
           "packets": 58,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.20.5.191",
@@ -936,7 +936,7 @@
           "community_id": "1:CAn4DeDPy+T2ErchwToc81lqPQU=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.20.4.1",
@@ -999,7 +999,7 @@
           "community_id": "1:CAn4DeDPy+T2ErchwToc81lqPQU=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.20.4.1",
@@ -1062,7 +1062,7 @@
           "community_id": "1:ECc+OoQ/d54eyjdC2O/nZlxXu5U=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.30.0.1",
@@ -1125,7 +1125,7 @@
           "community_id": "1:ECc+OoQ/d54eyjdC2O/nZlxXu5U=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.30.0.1",
@@ -1188,7 +1188,7 @@
           "community_id": "1:7z8BCaKj9NKuV5cTZ/0iho+mq8g=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.6.1",
@@ -1251,7 +1251,7 @@
           "community_id": "1:7z8BCaKj9NKuV5cTZ/0iho+mq8g=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.6.1",
@@ -1314,7 +1314,7 @@
           "community_id": "1:Kkf8y7Ployk+ad0kqHGs5DfAD2I=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.7.1",
@@ -1377,7 +1377,7 @@
           "community_id": "1:Kkf8y7Ployk+ad0kqHGs5DfAD2I=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.7.1",
@@ -1440,7 +1440,7 @@
           "community_id": "1:NSreojKsVnKur/rcYCbfJyvxowQ=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.8.1",
@@ -1503,7 +1503,7 @@
           "community_id": "1:NSreojKsVnKur/rcYCbfJyvxowQ=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.8.1",
@@ -1566,7 +1566,7 @@
           "community_id": "1:U63dC2bH5aZryJEt2eamKMKzoug=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.20.0.1",
@@ -1629,7 +1629,7 @@
           "community_id": "1:U63dC2bH5aZryJEt2eamKMKzoug=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.20.0.1",
@@ -1692,7 +1692,7 @@
           "community_id": "1:zLCNgJ9Rr55+Kd5OAB4CQOgTQBY=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.10.1",
@@ -1755,7 +1755,7 @@
           "community_id": "1:zLCNgJ9Rr55+Kd5OAB4CQOgTQBY=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.10.1",
@@ -1814,7 +1814,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -1871,7 +1871,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -1928,7 +1928,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -1985,7 +1985,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2042,7 +2042,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2099,7 +2099,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2156,7 +2156,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2213,7 +2213,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2270,7 +2270,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2327,7 +2327,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2384,7 +2384,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2441,7 +2441,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2498,7 +2498,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2555,7 +2555,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2612,7 +2612,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2669,7 +2669,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2726,7 +2726,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2783,7 +2783,7 @@
           "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678

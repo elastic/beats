@@ -53,7 +53,7 @@
           "community_id": "1:bRyQGyObIc1D2o7DkHSOKH8tsio=",
           "direction": "inbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.0.111",
@@ -116,7 +116,7 @@
           "community_id": "1:wbdTe6mwksAQ9lGcVDaWyoOTmhk=",
           "direction": "inbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.0.111",
@@ -179,7 +179,7 @@
           "community_id": "1:jP1p/7/u4HsUidwYdywfdEpcPKQ=",
           "direction": "inbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.0.111",
@@ -242,7 +242,7 @@
           "community_id": "1:kKLFvXJJaQi9kI42KQJ2v2corCE=",
           "direction": "inbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.0.111",
@@ -305,7 +305,7 @@
           "community_id": "1:34znV7gBt2utWJHrTSPMwhTz2Eg=",
           "direction": "outbound",
           "packets": 10,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "158.85.58.115",
@@ -368,7 +368,7 @@
           "community_id": "1:iXnrRyr8wo26XN0Ph22X++rTZeo=",
           "direction": "inbound",
           "packets": 8,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.0.88",
@@ -431,7 +431,7 @@
           "community_id": "1:HD2M0NX2rS6y8B3MY+Iwv+XHRRI=",
           "direction": "outbound",
           "packets": 9,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "216.58.212.195",
@@ -494,7 +494,7 @@
           "community_id": "1:uCD3Q6u5DuWp4BBrNuh08puZY6U=",
           "direction": "inbound",
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.1.201",
@@ -557,7 +557,7 @@
           "community_id": "1:pbgT4RHa3Pkj4VUsV2ZuAXb7NJc=",
           "direction": "outbound",
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "216.58.201.106",
@@ -620,7 +620,7 @@
           "community_id": "1:3UJAXfwRkrqnjorLTDfwA2lIK5o=",
           "direction": "outbound",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "52.236.33.163",
@@ -683,7 +683,7 @@
           "community_id": "1:mshcMglow3GUvCItk1pK74FLkzM=",
           "direction": "inbound",
           "packets": 21,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.3.34",
@@ -746,7 +746,7 @@
           "community_id": "1:sCy/9s7UF0Bv1dEJGaPKptRstZA=",
           "direction": "outbound",
           "packets": 30,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "209.197.3.19",
@@ -809,7 +809,7 @@
           "community_id": "1:zoZ7/PcKboOk3QEq0Jc4k12H7AI=",
           "direction": "outbound",
           "packets": 16,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "52.216.130.237",
@@ -872,7 +872,7 @@
           "community_id": "1:m9W66mSxsAZlmvM70NmJT4nlrkk=",
           "direction": "inbound",
           "packets": 13,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.157",
@@ -935,7 +935,7 @@
           "community_id": "1:GIrBDC9vXe7Zm4DMPiPtmJVTls4=",
           "direction": "outbound",
           "packets": 10,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.217.23.232",
@@ -998,7 +998,7 @@
           "community_id": "1:P9h6YFje9lqATAkmHYS9HVVWzFY=",
           "direction": "outbound",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "107.21.232.174",
@@ -1061,7 +1061,7 @@
           "community_id": "1:nJc3Pe5SE+C0yRtf3IBstM2/wf8=",
           "direction": "inbound",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.3.178",
@@ -1124,7 +1124,7 @@
           "community_id": "1:O5rmXSFSnlff9/cA9+155LFPgBM=",
           "direction": "inbound",
           "packets": 72,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.2.118",
@@ -1187,7 +1187,7 @@
           "community_id": "1:nVIdFfXErPGzJhGjTgW3gNk911I=",
           "direction": "outbound",
           "packets": 72,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "95.0.145.242",
@@ -1250,7 +1250,7 @@
           "community_id": "1:90Ag0hFjWyN3t7gH9CqeM/did5s=",
           "direction": "inbound",
           "packets": 16,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.79",
@@ -1313,7 +1313,7 @@
           "community_id": "1:NFDWVYhuGdQEmetBlCYqKsa3FxE=",
           "direction": "inbound",
           "packets": 17,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.79",
@@ -1376,7 +1376,7 @@
           "community_id": "1:e26MIMDFVFBLLY7E0XTRE10o3Kw=",
           "direction": "outbound",
           "packets": 14,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "23.5.100.66",
@@ -1439,7 +1439,7 @@
           "community_id": "1:WFh30fi4saQVTIGUy+aRRPLprpI=",
           "direction": "outbound",
           "packets": 4,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "170.251.180.15",
@@ -1502,7 +1502,7 @@
           "community_id": "1:ZGG4Abe/Pqdj+7pSlunbDP7c/m4=",
           "direction": "inbound",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.61",
@@ -1565,7 +1565,7 @@
           "community_id": "1:baiOQuB0TgMwKAioqCp4nnOKOoQ=",
           "direction": "inbound",
           "packets": 11,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.3.34",
@@ -1628,7 +1628,7 @@
           "community_id": "1:kNqglsjDg0pb/geatAIkiyIYjyE=",
           "direction": "outbound",
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "185.60.218.19",
@@ -1691,7 +1691,7 @@
           "community_id": "1:G9f5HTVvI5bDlLshQnVxCbSm9eE=",
           "direction": "inbound",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.3.200",
@@ -1754,7 +1754,7 @@
           "community_id": "1:F6zH8IWQqM0vi7PdOT+JZyFBYeA=",
           "direction": "outbound",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "185.60.218.15",
@@ -1817,7 +1817,7 @@
           "community_id": "1:+Xmm3JdD6oj+iaOxonwDPgB2lVY=",
           "direction": "inbound",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.95",

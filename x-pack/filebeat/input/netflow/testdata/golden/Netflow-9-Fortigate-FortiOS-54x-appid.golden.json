@@ -61,7 +61,7 @@
           "community_id": "1:k6fnpZvAP2OCIlBK5wf/n7I33FA=",
           "direction": "unknown",
           "packets": 6,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.100.151",
@@ -131,7 +131,7 @@
           "community_id": "1:xE3FUh+IR1gTSuCWTDkzaMAYppc=",
           "direction": "unknown",
           "packets": 10,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "208.100.17.187",
@@ -201,7 +201,7 @@
           "community_id": "1:u8ii7EBbKZETNNHlkdrp9ZdLUKY=",
           "direction": "unknown",
           "packets": 14,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.100.151",
@@ -271,7 +271,7 @@
           "community_id": "1:Yg7TVkDV8wTyFkiw9HGckHvwQk8=",
           "direction": "unknown",
           "packets": 11,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "208.100.17.189",
@@ -341,7 +341,7 @@
           "community_id": "1:3nyHi/TSF/vyWaCKPnvrEkWYi98=",
           "direction": "unknown",
           "packets": 15,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.100.151",
@@ -411,7 +411,7 @@
           "community_id": "1:lDlO+jlvvAqzElOUzFaN0Co6N7o=",
           "direction": "unknown",
           "packets": 5,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "178.255.83.1",
@@ -481,7 +481,7 @@
           "community_id": "1:vMV9tpgckoBsKm14H/aaed9/B6o=",
           "direction": "unknown",
           "packets": 5,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.100.151",
@@ -551,7 +551,7 @@
           "community_id": "1:36J0xlj2SLkuRRDG0iOA1rSo7zs=",
           "direction": "unknown",
           "packets": 5,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "178.255.83.1",
@@ -621,7 +621,7 @@
           "community_id": "1:DlCfunueLMkCou44xfNagrPPzmI=",
           "direction": "unknown",
           "packets": 5,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.100.151",
@@ -687,7 +687,7 @@
           "community_id": "1:pSB9AhXlD5k2Hgt+G8xWPxJVnPY=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.100.111",
@@ -753,7 +753,7 @@
           "community_id": "1:PKa/AyUMS+3x4M4+GxUIgWRcmnw=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.100.150",
@@ -819,7 +819,7 @@
           "community_id": "1:hVNrF7qc5ABcKevdrl3vPBrP5rQ=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.100.111",
@@ -885,7 +885,7 @@
           "community_id": "1:fuwC0soLNJv3on5fRonxy1NehGk=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.100.150",
@@ -951,7 +951,7 @@
           "community_id": "1:hiYqfWLht4N9AUGcmXtgZpFVvQQ=",
           "direction": "unknown",
           "packets": 5,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.100.111",
@@ -1017,7 +1017,7 @@
           "community_id": "1:YAfTDRm1WGwlR9YYWrgtTsf1DMw=",
           "direction": "unknown",
           "packets": 6,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.100.150",
@@ -1083,7 +1083,7 @@
           "community_id": "1:22XTyUF19jbjqUU+rs71qD5wnus=",
           "direction": "unknown",
           "packets": 6,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.100.111",
@@ -1149,7 +1149,7 @@
           "community_id": "1:pfRhf4/ExF5JUU0Tz6ExQQROS+Q=",
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.100.150",

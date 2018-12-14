@@ -53,7 +53,7 @@
           "community_id": "1:exuCftrHyAyRt6vQ7silX0RyM6c=",
           "direction": "inbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.0.3",
@@ -115,7 +115,7 @@
           "community_id": "1:0CGjtxAvSJC5Eo2OErzsmgtb9JE=",
           "direction": "outbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.0.4",

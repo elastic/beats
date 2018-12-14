@@ -60,7 +60,7 @@
           "community_id": "1:gQfwC1pqdEJoyqjxe8la2a1bW6g=",
           "direction": "unknown",
           "packets": 6,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "bytes": 132,
@@ -137,7 +137,7 @@
           "community_id": "1:/MUy9fW9u7vMDGqxcZLVrZX0ARU=",
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "bytes": 172,

@@ -61,7 +61,7 @@
           "community_id": "1:c3a8HfldOuX4/xBvf0sHuy38GTk=",
           "direction": "outbound",
           "packets": 6,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.5.2",
@@ -131,7 +131,7 @@
           "community_id": "1:ZNEMnnkXh6LJsCtYCHWkxVCOl9E=",
           "direction": "outbound",
           "packets": 131,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -201,7 +201,7 @@
           "community_id": "1:XdJd2ziZmmG1mSIxfvlr6ecG4pM=",
           "direction": "outbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.100.4.1",
@@ -271,7 +271,7 @@
           "community_id": "1:+80+CdeOLSths8RQiqHUoqr8qrU=",
           "direction": "outbound",
           "packets": 30,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -341,7 +341,7 @@
           "community_id": "1:3s9tK3Ncm1BXFpA8+hBpk22sg0c=",
           "direction": "outbound",
           "packets": 13,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.80",
@@ -411,7 +411,7 @@
           "community_id": "1:3w94g30M+cTZZskO9dmazwtDHo8=",
           "direction": "outbound",
           "packets": 346,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -481,7 +481,7 @@
           "community_id": "1:XE7UjW9QNWzM1F452q/jPfC4C90=",
           "direction": "outbound",
           "packets": 129,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -551,7 +551,7 @@
           "community_id": "1:CJ9T/03SqwG5Yy7WmXADUqvvgvw=",
           "direction": "outbound",
           "packets": 119,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -621,7 +621,7 @@
           "community_id": "1:3vSrJV3tnfjnzopvPuRQzt2BDS4=",
           "direction": "outbound",
           "packets": 13,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -691,7 +691,7 @@
           "community_id": "1:mjMjtH0BZKCuCmxkZbQyrFDfoI0=",
           "direction": "outbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.1.4",

@@ -61,7 +61,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -126,7 +126,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -191,7 +191,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -256,7 +256,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -321,7 +321,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -386,7 +386,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -451,7 +451,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -516,7 +516,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -581,7 +581,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -646,7 +646,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -711,7 +711,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -776,7 +776,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -841,7 +841,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -906,7 +906,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -971,7 +971,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1036,7 +1036,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1101,7 +1101,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1166,7 +1166,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1231,7 +1231,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1296,7 +1296,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1361,7 +1361,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1426,7 +1426,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1491,7 +1491,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1556,7 +1556,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1621,7 +1621,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1686,7 +1686,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1751,7 +1751,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1816,7 +1816,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null
@@ -1881,7 +1881,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         }
       },
       "Private": null

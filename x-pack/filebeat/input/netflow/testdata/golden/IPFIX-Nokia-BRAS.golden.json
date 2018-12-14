@@ -47,7 +47,7 @@
         "network": {
           "community_id": "1:JOQeKrnZDhP8AqJv8DtyiRwHnek=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.0.1.228",

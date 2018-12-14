@@ -59,7 +59,7 @@
           "community_id": "1:0PLHlww9zxRlvByabAFlUctNy14=",
           "direction": "inbound",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "134.220.2.6",

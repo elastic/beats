@@ -58,7 +58,7 @@
           "community_id": "1:4iAaWV/HzvAcwggo1MJCfjvj8No=",
           "direction": "inbound",
           "packets": 1,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.200.136",

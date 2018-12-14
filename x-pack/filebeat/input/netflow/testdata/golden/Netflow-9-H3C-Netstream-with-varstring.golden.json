@@ -67,7 +67,7 @@
           "community_id": "1:WP3Ss+M/Q16gnXrqnk6fwmPWvWc=",
           "direction": "inbound",
           "packets": 9,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "20.20.20.20",

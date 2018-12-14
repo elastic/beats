@@ -67,7 +67,7 @@
           "community_id": "1:hxVadzb8UUZ5YGGYtqj+E2mpQe8=",
           "direction": "unknown",
           "packets": 0,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.236.5.4",
@@ -144,7 +144,7 @@
           "community_id": "1:4oQU8uYa7F7RE/lIflbJOuU8Vc8=",
           "direction": "unknown",
           "packets": 0,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "64.235.151.76",

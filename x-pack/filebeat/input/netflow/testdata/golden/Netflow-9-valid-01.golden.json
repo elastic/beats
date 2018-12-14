@@ -55,7 +55,7 @@
           "community_id": "1:cRrWVwyu9GLZ+aU7qmwhjSdMrpE=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.16.32.100",
@@ -119,7 +119,7 @@
           "community_id": "1:wNJjbHYcMj4lBiVWbMHK1JcgsJ8=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.16.32.248",
@@ -183,7 +183,7 @@
           "community_id": "1:cRrWVwyu9GLZ+aU7qmwhjSdMrpE=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.16.32.100",
@@ -247,7 +247,7 @@
           "community_id": "1:mYS5cP5hzhSb8JZH9+2v8+RMJ9g=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -311,7 +311,7 @@
           "community_id": "1:cRrWVwyu9GLZ+aU7qmwhjSdMrpE=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.16.32.100",
@@ -375,7 +375,7 @@
           "community_id": "1:Y7cJ9MH0pPXGOYtewjtnB/Xf2Os=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.16.32.202",
@@ -437,7 +437,7 @@
           "community_id": "1:vK+Zeop1Y3GHxfFGVF2/COcNBWw=",
           "direction": "unknown",
           "packets": 7,
-          "protocol": "ipv6-icmp"
+          "transport": "ipv6-icmp"
         },
         "source": {
           "port": 0

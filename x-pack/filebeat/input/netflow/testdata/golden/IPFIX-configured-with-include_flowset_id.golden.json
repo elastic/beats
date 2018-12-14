@@ -77,7 +77,7 @@
           "community_id": "1:VtyB9RHgAkNqVk0mIUunFcpOSfk=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -151,7 +151,7 @@
           "community_id": "1:mUmoe1yk2N8K21TGbG3DxjqkRYg=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.0.0.1",
@@ -237,7 +237,7 @@
           "community_id": "1:VtyB9RHgAkNqVk0mIUunFcpOSfk=",
           "direction": "unknown",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",

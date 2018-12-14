@@ -89,7 +89,7 @@
           "community_id": "1:tYgSz6Xox1AUTy0tyztkJXZmiIQ=",
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.99.7",

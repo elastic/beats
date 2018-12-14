@@ -55,7 +55,7 @@
           "community_id": "1:UAtYiTxp798P/gsK6Pp/IjMZLiU=",
           "direction": "unknown",
           "packets": 0,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.99.130.239",
@@ -120,7 +120,7 @@
           "community_id": "1:Z1aQRJ93TBJeX7YDGHG1zysbYVM=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.99.252.50",
@@ -185,7 +185,7 @@
           "community_id": "1:UAtYiTxp798P/gsK6Pp/IjMZLiU=",
           "direction": "unknown",
           "packets": 0,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.99.130.239",
@@ -250,7 +250,7 @@
           "community_id": "1:Xb8wZBfARygVu6rohygs9ZhX5Og=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.98.243.20",
@@ -315,7 +315,7 @@
           "community_id": "1:ElddGTwZIDATUPp6inGMG4Ii4Xw=",
           "direction": "unknown",
           "packets": 0,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.99.168.140",
@@ -380,7 +380,7 @@
           "community_id": "1:+74AKYSI83q3lzZWoLzV4bxxCfU=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.98.243.20",
@@ -445,7 +445,7 @@
           "community_id": "1:r8af+dFTXsLQoTuHm+3HOu/Gpzc=",
           "direction": "unknown",
           "packets": 0,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.99.168.140",
@@ -510,7 +510,7 @@
           "community_id": "1:yBQpMR0U13RQyD1dOmOn6u8mts0=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.98.243.20",

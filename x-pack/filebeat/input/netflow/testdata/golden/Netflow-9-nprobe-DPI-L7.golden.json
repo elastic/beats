@@ -49,7 +49,7 @@
           "community_id": "1:LFE/FJ5zfsQGP8HTeu6b6rxLS78=",
           "direction": "unknown",
           "packets": 1,
-          "protocol": "unknown (0)"
+          "transport": "unknown (0)"
         },
         "source": {
           "ip": "0.0.0.0",

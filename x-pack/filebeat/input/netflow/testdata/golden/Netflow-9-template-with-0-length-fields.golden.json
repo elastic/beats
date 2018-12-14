@@ -59,7 +59,7 @@
           "community_id": "1:PrM3BB+zl6s0dy/nMB1KOgnPLyM=",
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "239.255.255.250",
@@ -127,7 +127,7 @@
           "community_id": "1:iOW2w0b8tPUYnP8m2LWGTS2Eh7k=",
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "192.168.1.80",
@@ -195,7 +195,7 @@
           "community_id": "1:PrM3BB+zl6s0dy/nMB1KOgnPLyM=",
           "direction": "inbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "239.255.255.250",
@@ -263,7 +263,7 @@
           "community_id": "1:COeL8zADqbleGkd4vi2Pz6V+2rc=",
           "direction": "inbound",
           "packets": 1,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "192.168.1.95",
@@ -331,7 +331,7 @@
           "community_id": "1:PrM3BB+zl6s0dy/nMB1KOgnPLyM=",
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "239.255.255.250",
@@ -399,7 +399,7 @@
           "community_id": "1:COeL8zADqbleGkd4vi2Pz6V+2rc=",
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "192.168.1.95",
@@ -467,7 +467,7 @@
           "community_id": "1:PrM3BB+zl6s0dy/nMB1KOgnPLyM=",
           "direction": "inbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "239.255.255.250",
@@ -535,7 +535,7 @@
           "community_id": "1:1EE7w6YWICk3nCsh+iZkgYDDczE=",
           "direction": "inbound",
           "packets": 1,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "192.168.1.33",
@@ -603,7 +603,7 @@
           "community_id": "1:PrM3BB+zl6s0dy/nMB1KOgnPLyM=",
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "239.255.255.250",
@@ -671,7 +671,7 @@
           "community_id": "1:1EE7w6YWICk3nCsh+iZkgYDDczE=",
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "192.168.1.33",
