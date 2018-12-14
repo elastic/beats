@@ -108,21 +108,32 @@ auditbeat.modules:
 
   # Detect changes to files included in subdirectories. Disabled by default.
   recursive: false
+# The system module collects security related information about a host.
+# All metricsets send both periodic state information (e.g. all currently
+# running processes) and real-time changes (e.g. when a new process starts
+# or stops).
 - module: system
-
   metricsets:
-    - host
-    - process
-    - socket
-    - user
+    - host    # General host information, e.g. uptime, IPs
+    - process # Started and stopped processes
+    - socket  # Opened and closed sockets
+    - user    # User information
 
+  # How often metricsets send state updates with the
+  # current state of the system (e.g. all currently
+  # running processes, all open sockets).
   state.period: 12h
+
+  # The state.period can be overridden for any metricset.
+  # host.state.period: 12h
+  # process.state.period: 12h
+  # socket.state.period: 12h
+  # user.state.period: 12h
 
   # Enabled by default. Auditbeat will read password fields in
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
   user.detect_password_changes: true
-
 
 #================================ General ======================================
 

@@ -1,8 +1,7 @@
-The System `user` metricset provides ... TODO.
+[role="xpack"]
 
-The module is implemented for Linux.
+experimental[]
 
-[float]
-=== Configuration options
+This is the `user` metricset of the system module.
 
-TODO
+It is implemented for Linux only.

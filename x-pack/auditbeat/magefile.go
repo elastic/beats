@@ -108,7 +108,13 @@ func Config() error {
 
 // Update is an alias for running fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
+	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo,
+		Docs)
+}
+
+// Docs collects the documentation.
+func Docs() error {
+	return auditbeat.CollectDocs(mage.OSSBeatDir(), auditbeat.XpackBeatDir())
 }
 
 // Fmt formats source code and adds file headers.

@@ -1,3 +1,8 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[id="{beatname_lc}-module-system"]
 [role="xpack"]
 
 == System Module
@@ -90,3 +95,54 @@ so a longer polling interval can be used.
     - socket
   period: 1s
 ----
+
+
+[float]
+=== Example configuration
+
+The System module supports the common configuration options that are
+described under <<configuration-{beatname_lc},configuring {beatname_uc}>>. Here
+is an example configuration:
+
+[source,yaml]
+----
+auditbeat.modules:
+- module: system
+  metricsets:
+    - host    # General host information, e.g. uptime, IPs
+    - process # Started and stopped processes
+    - socket  # Opened and closed sockets
+    - user    # User information
+
+  # How often metricsets send state updates with the
+  # current state of the system (e.g. all currently
+  # running processes, all open sockets).
+  state.period: 12h
+
+  # Enabled by default. Auditbeat will read password fields in
+  # /etc/passwd and /etc/shadow and store a hash locally to
+  # detect any changes.
+  user.detect_password_changes: true
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<{beatname_lc}-metricset-system-host,host>>
+
+* <<{beatname_lc}-metricset-system-process,process>>
+
+* <<{beatname_lc}-metricset-system-socket,socket>>
+
+* <<{beatname_lc}-metricset-system-user,user>>
+
+include::system/host.asciidoc[]
+
+include::system/process.asciidoc[]
+
+include::system/socket.asciidoc[]
+
+include::system/user.asciidoc[]
+
