@@ -22090,7 +22090,7 @@ All TCP listening ports
 --
 type: integer
 
-TCP established ports
+Number of established TCP connections
 
 
 --
@@ -22100,7 +22100,7 @@ TCP established ports
 --
 type: integer
 
-TCP close_wait ports
+Number of TCP connections in _close_wait_ state
 
 
 --
@@ -22110,7 +22110,7 @@ TCP close_wait ports
 --
 type: integer
 
-TCP time_wait ports
+Number of TCP connections in _time_wait_ state
 
 
 --
