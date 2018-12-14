@@ -735,6 +735,7 @@ metadata based on which Kubernetes pod the event originated from. Each event is
 annotated with:
 
 * Pod Name
+* Pod UID
 * Namespace
 * Labels
 

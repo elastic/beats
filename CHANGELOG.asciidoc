@@ -92,6 +92,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Use _doc as document type of the Elasticsearch major version is 7. {pull}9056[9056]
 - Add cache.ttl to add_host_metadata. {pull}9359[9359]
 - Add support for index lifecycle management (beta). {pull}7963[7963]
+- Always include Pod UID as part of Pod metadata. {pull]9517[9517]
 
 *Auditbeat*
 
