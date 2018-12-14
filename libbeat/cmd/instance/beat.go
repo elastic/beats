@@ -104,9 +104,9 @@ type beatConfig struct {
 	Keystore      *common.Config `config:"keystore"`
 
 	// output/publishing related configurations
-	Pipeline      pipeline.Config `config:",inline"`
-	Monitoring    *common.Config  `config:"xpack.monitoring"`
-	MonitoringNew *common.Config  `config:"monitoring"`
+	Pipeline        pipeline.Config `config:",inline"`
+	XPackMonitoring *common.Config  `config:"xpack.monitoring"`
+	Monitoring      *common.Config  `config:"monitoring"`
 
 	// central management settings
 	Management *common.Config `config:"management"`
@@ -982,17 +982,17 @@ func initPaths(cfg *common.Config) error {
 
 func selectMonitoringConfig(beatCfg beatConfig) (*common.Config, error) {
 	switch {
-	case beatCfg.MonitoringNew.Enabled() && beatCfg.Monitoring.Enabled():
+	case beatCfg.Monitoring.Enabled() && beatCfg.XPackMonitoring.Enabled():
 		const errMonitoringBothConfigEnabled = "both xpack.monitoring.* and monitoring.* cannot be set. Prefer to set monitoring.* and set monitoring.hosts to monitoring cluster hosts"
 		return nil, errors.New(errMonitoringBothConfigEnabled)
-	case beatCfg.Monitoring.Enabled():
+	case beatCfg.XPackMonitoring.Enabled():
 		const warnMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.hosts to monitoring cluster hosts"
 		cfgwarn.Deprecate("7.0", warnMonitoringDeprecatedConfig)
-		monitoringCfg := beatCfg.Monitoring
+		monitoringCfg := beatCfg.XPackMonitoring
 		monitoringCfg.SetString("_format", -1, "production")
 		return monitoringCfg, nil
-	case beatCfg.MonitoringNew.Enabled():
-		monitoringCfg := beatCfg.MonitoringNew
+	case beatCfg.Monitoring.Enabled():
+		monitoringCfg := beatCfg.Monitoring
 		monitoringCfg.SetString("_format", -1, "monitoring")
 		return monitoringCfg, nil
 	default:
