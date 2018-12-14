@@ -10,9 +10,6 @@
           "locality": "private",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -80,6 +77,9 @@
           "packets": 1,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.0.1",
           "locality": "private",
@@ -96,9 +96,6 @@
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 51053
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -155,6 +152,9 @@
           "packets": 2,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "10.0.0.1",
           "locality": "private",
@@ -171,9 +171,6 @@
           "ip": "10.0.0.1",
           "locality": "private",
           "port": 443
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -241,6 +238,9 @@
           "iana_number": 6,
           "packets": 2,
           "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source": {
           "ip": "192.168.0.1",

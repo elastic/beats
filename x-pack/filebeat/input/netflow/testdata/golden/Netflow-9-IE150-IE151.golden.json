@@ -10,9 +10,6 @@
           "locality": "private",
           "port": 137
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -56,6 +53,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "192.168.0.3",
           "locality": "private",
@@ -72,9 +72,6 @@
           "ip": "192.168.0.5",
           "locality": "private",
           "port": 6343
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -118,6 +115,9 @@
           "iana_number": 17,
           "packets": 1,
           "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source": {
           "ip": "192.168.0.4",

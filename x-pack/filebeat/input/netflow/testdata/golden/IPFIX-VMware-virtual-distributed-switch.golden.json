@@ -10,9 +10,6 @@
           "locality": "private",
           "port": 5985
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -62,6 +59,9 @@
           "packets": 2,
           "transport": "tcp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "172.18.65.21",
           "locality": "private",
@@ -78,9 +78,6 @@
           "ip": "172.18.65.255",
           "locality": "private",
           "port": 138
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -131,6 +128,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "172.18.65.91",
           "locality": "private",
@@ -147,9 +147,6 @@
           "ip": "172.18.65.255",
           "locality": "private",
           "port": 138
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -200,6 +197,9 @@
           "packets": 1,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "172.18.65.91",
           "locality": "private",
@@ -216,9 +216,6 @@
           "ip": "224.0.0.252",
           "locality": "private",
           "port": 5355
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -269,6 +266,9 @@
           "packets": 2,
           "transport": "udp"
         },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
         "source": {
           "ip": "172.18.65.21",
           "locality": "private",
@@ -283,9 +283,6 @@
       "Fields": {
         "destination": {
           "port": 5355
-        },
-        "device": {
-          "ip": "192.0.2.1"
         },
         "event": {
           "action": "netflow_flow",
@@ -335,6 +332,9 @@
           "iana_number": 17,
           "packets": 2,
           "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source": {
           "port": 61329

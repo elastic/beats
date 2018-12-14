@@ -5,9 +5,6 @@
       "Timestamp": "2016-11-29T00:21:56Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -28,6 +25,9 @@
           },
           "scope": {},
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null

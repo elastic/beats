@@ -10,9 +10,6 @@
           "locality": "private",
           "port": 0
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -51,6 +48,9 @@
           "iana_number": 0,
           "packets": 1,
           "transport": "unknown (0)"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source": {
           "ip": "0.0.0.0",

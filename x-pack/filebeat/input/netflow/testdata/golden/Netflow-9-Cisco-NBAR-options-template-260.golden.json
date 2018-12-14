@@ -5,9 +5,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -31,6 +28,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -39,9 +39,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -65,6 +62,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -73,9 +73,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -99,6 +96,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -107,9 +107,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -133,6 +130,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -141,9 +141,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -167,6 +164,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -175,9 +175,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -201,6 +198,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -209,9 +209,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -235,6 +232,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -243,9 +243,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -269,6 +266,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -277,9 +277,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -303,6 +300,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -311,9 +311,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -337,6 +334,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -345,9 +345,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -371,6 +368,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -379,9 +379,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -405,6 +402,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -413,9 +413,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -439,6 +436,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -447,9 +447,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -473,6 +470,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -481,9 +481,6 @@
       "Timestamp": "2017-02-14T11:09:59Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
           "category": "network_traffic",
@@ -507,6 +504,9 @@
             "octet_delta_count": 168755571
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null

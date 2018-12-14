@@ -10,9 +10,6 @@
           "locality": "public",
           "port": 137
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_flow",
           "category": "network_traffic",
@@ -69,6 +66,9 @@
           "iana_number": 17,
           "packets": 9,
           "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source": {
           "ip": "20.20.20.20",
