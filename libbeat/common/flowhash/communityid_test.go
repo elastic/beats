@@ -94,6 +94,14 @@ func readGoldenFile(t testing.TB, name string) []string {
 	return flows
 }
 
+func typeCodeType(tc uint16) uint8 {
+	return uint8(tc >> 8)
+}
+
+func typeCodeCode(tc uint16) uint8 {
+	return uint8(tc & 0xff)
+}
+
 func getFlowsFromPCAP(t testing.TB, name, pcapFile string) []string {
 	t.Helper()
 
@@ -155,15 +163,15 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) []string {
 			case iPProtoICMPv4:
 				if layer := packet.Layer(layers.LayerTypeICMPv4); layer != nil {
 					if layer, ok := layer.(*layers.ICMPv4); ok {
-						flow.ICMP.Type = layer.TypeCode.Type()
-						flow.ICMP.Code = layer.TypeCode.Code()
+						flow.ICMP.Type = typeCodeType(uint16(layer.TypeCode))
+						flow.ICMP.Code = typeCodeCode(uint16(layer.TypeCode))
 					}
 				}
 			case iPProtoICMPv6:
 				if layer := packet.Layer(layers.LayerTypeICMPv6); layer != nil {
 					if layer, ok := layer.(*layers.ICMPv6); ok {
-						flow.ICMP.Type = layer.TypeCode.Type()
-						flow.ICMP.Code = layer.TypeCode.Code()
+						flow.ICMP.Type = typeCodeType(uint16(layer.TypeCode))
+						flow.ICMP.Code = typeCodeCode(uint16(layer.TypeCode))
 					}
 				}
 			}
