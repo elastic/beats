@@ -1,0 +1,73 @@
+{
+  "test_name": "IPFIX vIPtela with VPN id",
+  "events": [
+    {
+      "Timestamp": "2017-11-21T14:32:15Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.21.27",
+          "locality": "private",
+          "port": 443
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-11-21T14:32:15Z"
+        },
+        "flow": {
+          "id": "5qh7ipMbBV0",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.16.21.27",
+          "destinationTransportPort": 443,
+          "egressInterface": 3,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 2887138561,
+            "timestamp": "2017-11-21T14:32:15Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowEndReason": 3,
+          "flowEndSeconds": "2017-11-21T14:32:15Z",
+          "flowStartSeconds": "2017-11-21T14:32:15Z",
+          "icmpTypeCodeIPv4": 0,
+          "ingressInterface": 11,
+          "ipClassOfService": 48,
+          "ipDiffServCodePoint": 12,
+          "ipNextHopIPv4Address": "10.0.0.1",
+          "ipPrecedence": 1,
+          "maximumIpTotalLength": 277,
+          "minimumIpTotalLength": 70,
+          "octetDeltaCount": 775,
+          "octetTotalCount": 775,
+          "packetDeltaCount": 8,
+          "packetTotalCount": 8,
+          "paddingOctets": "AAAAAAAAAA==",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.113.7.54",
+          "sourceTransportPort": 41717,
+          "tcpControlBits": 16,
+          "type": "netflow",
+          "viptelaVPNId": 100
+        },
+        "network": {
+          "bytes": 775,
+          "direction": "unknown",
+          "packets": 8,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.113.7.54",
+          "locality": "private",
+          "port": 41717
+        }
+      },
+      "Private": null
+    }
+  ]
+}

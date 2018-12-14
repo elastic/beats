@@ -40,7 +40,9 @@ release: mage
 
 .PHONY: testsuite
 testsuite: mage
-	mage update build unitTest integTest
+	-rm build/TEST-go-integration.out
+	mage update build unitTest integTest || ( cat build/TEST-go-integration.out && false )
+
 
 .PHONY: update
 update: mage

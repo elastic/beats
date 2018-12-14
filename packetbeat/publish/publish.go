@@ -171,54 +171,45 @@ func (p *transProcessor) normalizeTransAddr(event common.MapStr) bool {
 	debugf("normalize address for: %v", event)
 
 	var srcServer, dstServer string
+	var process common.MapStr
 	src, ok := event["src"].(*common.Endpoint)
 	debugf("has src: %v", ok)
 	if ok {
-		// check if it's outgoing transaction (as client)
-		isOutgoing := p.IsPublisherIP(src.IP)
-		if isOutgoing {
+		delete(event, "src")
+
+		// Check if it's outgoing transaction (as client).
+		if p.IsPublisherIP(src.IP) {
 			if p.ignoreOutgoing {
-				// duplicated transaction -> ignore it
+				// Duplicated transaction -> ignore it.
 				debugf("Ignore duplicated transaction on: %s -> %s", srcServer, dstServer)
 				return false
 			}
 
-			//outgoing transaction
-			event["direction"] = "out"
+			event.Put("network.direction", "outgoing")
 		}
 
-		event["client_ip"] = src.IP
-		event["client_port"] = src.Port
-		event["client_proc"] = src.Proc
-		if len(src.Cmdline) > 0 {
-			event["client_cmdline"] = src.Cmdline
-		}
-		if _, exists := event["client_server"]; !exists {
-			event["client_server"] = p.GetServerName(src.IP)
-		}
-		delete(event, "src")
+		var client common.MapStr
+		client, process = makeEndpoint(p.name, src)
+		event.DeepUpdate(common.MapStr{"client": client})
 	}
 
 	dst, ok := event["dst"].(*common.Endpoint)
 	debugf("has dst: %v", ok)
 	if ok {
-		event["ip"] = dst.IP
-		event["port"] = dst.Port
-		event["proc"] = dst.Proc
-		if len(dst.Cmdline) > 0 {
-			event["cmdline"] = dst.Cmdline
-		}
-		if _, exists := event["server"]; !exists {
-			event["server"] = p.GetServerName(dst.IP)
-		}
 		delete(event, "dst")
 
-		//check if it's incoming transaction (as server)
-		if p.IsPublisherIP(dst.IP) {
-			// incoming transaction
-			event["direction"] = "in"
-		}
+		var server common.MapStr
+		server, process = makeEndpoint(p.name, dst)
+		event.DeepUpdate(common.MapStr{"server": server})
 
+		// Check if it's incoming transaction (as server).
+		if p.IsPublisherIP(dst.IP) {
+			event.Put("network.direction", "incoming")
+		}
+	}
+
+	if len(process) > 0 {
+		event.Put("process", process)
 	}
 
 	return true
@@ -233,17 +224,38 @@ func (p *transProcessor) IsPublisherIP(ip string) bool {
 	return false
 }
 
-func (p *transProcessor) GetServerName(ip string) string {
-	// in case the IP is localhost, return current shipper name
-	islocal, err := common.IsLoopback(ip)
-	if err != nil {
-		logp.Err("Parsing IP %s fails with: %s", ip, err)
-		return ""
+// makeEndpoint builds a map containing the endpoint information. As a
+// convenience it returns a reference to the process map that is contained in
+// the endpoint map (for use in populating the top-level process field).
+func makeEndpoint(shipperName string, endpoint *common.Endpoint) (m common.MapStr, process common.MapStr) {
+	// address
+	m = common.MapStr{
+		"ip":   endpoint.IP,
+		"port": endpoint.Port,
+	}
+	if endpoint.Domain != "" {
+		m["domain"] = endpoint.Domain
+	} else if shipperName != "" {
+		if isLocal, err := common.IsLoopback(endpoint.IP); err == nil && isLocal {
+			m["domain"] = shipperName
+		}
 	}
 
-	if islocal {
-		return p.name
+	// process
+	if endpoint.PID > 0 {
+		process := common.MapStr{
+			"pid":        endpoint.PID,
+			"ppid":       endpoint.PPID,
+			"name":       endpoint.Name,
+			"args":       endpoint.Args,
+			"executable": endpoint.Exe,
+			"start":      endpoint.StartTime,
+		}
+		if endpoint.CWD != "" {
+			process["working_directory"] = endpoint.CWD
+		}
+		m["process"] = process
 	}
 
-	return ""
+	return m, process
 }

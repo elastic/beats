@@ -363,6 +363,14 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
+			"checksumSHA1": "TsYe4THK6mTAH52LC3xVkq9VE0Q=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface/",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
 			"checksumSHA1": "wJrdYP7TyFYBwNPprzcA+ZdAjyo=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",

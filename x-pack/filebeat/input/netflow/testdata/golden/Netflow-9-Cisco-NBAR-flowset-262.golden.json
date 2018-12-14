@@ -1,0 +1,375 @@
+{
+  "test_name": "Netflow 9 Cisco NBAR flowset 262",
+  "events": [
+    {
+      "Timestamp": "2017-02-14T11:10:36Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.30.19.180",
+          "locality": "private",
+          "mac": "1c:df:0f:7e:c3:58",
+          "port": 2048
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-02-14T11:10:36Z",
+          "duration": 0,
+          "end": "2017-02-14T11:10:19.368Z",
+          "start": "2017-02-14T11:10:19.368Z"
+        },
+        "flow": {
+          "id": "uz9_zfua5qU",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AQAAAQ==",
+          "bgpDestinationAsNumber": 0,
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "10.30.19.180",
+          "destinationMacAddress": "1c:df:0f:7e:c3:58",
+          "destinationTransportPort": 2048,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2017-02-14T11:10:36Z",
+            "uptimeMillis": 4095650576,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 4095633944,
+          "flowStartSysUpTime": 4095633944,
+          "fragmentIdentification": 0,
+          "ingressInterface": 1,
+          "ipClassOfService": 0,
+          "ipDiffServCodePoint": 0,
+          "ipNextHopIPv4Address": "0.0.0.0",
+          "octetDeltaCount": 44,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "10.30.18.62",
+          "sourceIPv4Prefix": "10.30.18.0",
+          "sourceIPv4PrefixLength": 23,
+          "sourceMacAddress": "00:50:56:91:56:86",
+          "sourceTransportPort": 0,
+          "tcpSourcePort": 0,
+          "type": "netflow",
+          "udpDestinationPort": 0
+        },
+        "network": {
+          "bytes": 44,
+          "direction": "inbound",
+          "packets": 1,
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "10.30.18.62",
+          "locality": "private",
+          "mac": "00:50:56:91:56:86",
+          "port": 0
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-02-14T11:10:36Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.30.19.180",
+          "locality": "private",
+          "mac": "1c:df:0f:7e:c3:58",
+          "port": 161
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-02-14T11:10:36Z",
+          "duration": 0,
+          "end": "2017-02-14T11:10:19.368Z",
+          "start": "2017-02-14T11:10:19.368Z"
+        },
+        "flow": {
+          "id": "1w3FDvLEFgo",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "BQAAJg==",
+          "bgpDestinationAsNumber": 0,
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "10.30.19.180",
+          "destinationMacAddress": "1c:df:0f:7e:c3:58",
+          "destinationTransportPort": 161,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2017-02-14T11:10:36Z",
+            "uptimeMillis": 4095650576,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 4095633944,
+          "flowStartSysUpTime": 4095633944,
+          "fragmentIdentification": 0,
+          "ingressInterface": 1,
+          "ipClassOfService": 0,
+          "ipDiffServCodePoint": 0,
+          "ipNextHopIPv4Address": "0.0.0.0",
+          "octetDeltaCount": 106,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "10.30.18.62",
+          "sourceIPv4Prefix": "10.30.18.0",
+          "sourceIPv4PrefixLength": 23,
+          "sourceMacAddress": "00:50:56:91:56:86",
+          "sourceTransportPort": 34220,
+          "tcpSourcePort": 0,
+          "type": "netflow",
+          "udpDestinationPort": 161
+        },
+        "network": {
+          "bytes": 106,
+          "direction": "inbound",
+          "packets": 1,
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "10.30.18.62",
+          "locality": "private",
+          "mac": "00:50:56:91:56:86",
+          "port": 34220
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-02-14T11:10:36Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.30.19.180",
+          "locality": "private",
+          "mac": "1c:df:0f:7e:c3:58",
+          "port": 2048
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-02-14T11:10:36Z",
+          "duration": 0,
+          "end": "2017-02-14T11:10:19.924Z",
+          "start": "2017-02-14T11:10:19.924Z"
+        },
+        "flow": {
+          "id": "qkbx0XD7pSA",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AQAAAQ==",
+          "bgpDestinationAsNumber": 0,
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "10.30.19.180",
+          "destinationMacAddress": "1c:df:0f:7e:c3:58",
+          "destinationTransportPort": 2048,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2017-02-14T11:10:36Z",
+            "uptimeMillis": 4095650576,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 4095634500,
+          "flowStartSysUpTime": 4095634500,
+          "fragmentIdentification": 0,
+          "ingressInterface": 1,
+          "ipClassOfService": 0,
+          "ipDiffServCodePoint": 0,
+          "ipNextHopIPv4Address": "0.0.0.0",
+          "octetDeltaCount": 44,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 1,
+          "sourceIPv4Address": "10.10.172.60",
+          "sourceIPv4Prefix": "0.0.0.0",
+          "sourceIPv4PrefixLength": 0,
+          "sourceMacAddress": "00:18:19:9e:6c:01",
+          "sourceTransportPort": 0,
+          "tcpSourcePort": 0,
+          "type": "netflow",
+          "udpDestinationPort": 0
+        },
+        "network": {
+          "bytes": 44,
+          "direction": "inbound",
+          "packets": 1,
+          "protocol": "icmp"
+        },
+        "source": {
+          "ip": "10.10.172.60",
+          "locality": "private",
+          "mac": "00:18:19:9e:6c:01",
+          "port": 0
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-02-14T11:10:36Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.30.19.180",
+          "locality": "private",
+          "mac": "1c:df:0f:7e:c3:58",
+          "port": 123
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-02-14T11:10:36Z",
+          "duration": 0,
+          "end": "2017-02-14T11:10:19.996Z",
+          "start": "2017-02-14T11:10:19.996Z"
+        },
+        "flow": {
+          "id": "4c7uUPCsBCk",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "AwAAew==",
+          "bgpDestinationAsNumber": 0,
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "10.30.19.180",
+          "destinationMacAddress": "1c:df:0f:7e:c3:58",
+          "destinationTransportPort": 123,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2017-02-14T11:10:36Z",
+            "uptimeMillis": 4095650576,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 4095634572,
+          "flowStartSysUpTime": 4095634572,
+          "fragmentIdentification": 0,
+          "ingressInterface": 1,
+          "ipClassOfService": 192,
+          "ipDiffServCodePoint": 48,
+          "ipNextHopIPv4Address": "0.0.0.0",
+          "octetDeltaCount": 76,
+          "packetDeltaCount": 1,
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "10.10.172.60",
+          "sourceIPv4Prefix": "0.0.0.0",
+          "sourceIPv4PrefixLength": 0,
+          "sourceMacAddress": "00:18:19:9e:6c:01",
+          "sourceTransportPort": 123,
+          "tcpSourcePort": 0,
+          "type": "netflow",
+          "udpDestinationPort": 123
+        },
+        "network": {
+          "bytes": 76,
+          "direction": "inbound",
+          "packets": 1,
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "10.10.172.60",
+          "locality": "private",
+          "mac": "00:18:19:9e:6c:01",
+          "port": 123
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-02-14T11:10:36Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.30.19.180",
+          "locality": "private",
+          "mac": "1c:df:0f:7e:c3:58",
+          "port": 161
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2017-02-14T11:10:36Z",
+          "duration": 72000000,
+          "end": "2017-02-14T11:10:20.008Z",
+          "start": "2017-02-14T11:10:19.936Z"
+        },
+        "flow": {
+          "id": "f2adL0TDrgs",
+          "locality": "private"
+        },
+        "netflow": {
+          "applicationId": "BQAAJg==",
+          "bgpDestinationAsNumber": 0,
+          "bgpSourceAsNumber": 0,
+          "destinationIPv4Address": "10.30.19.180",
+          "destinationMacAddress": "1c:df:0f:7e:c3:58",
+          "destinationTransportPort": 161,
+          "egressInterface": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2017-02-14T11:10:36Z",
+            "uptimeMillis": 4095650576,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 4095634584,
+          "flowStartSysUpTime": 4095634512,
+          "fragmentIdentification": 0,
+          "ingressInterface": 1,
+          "ipClassOfService": 0,
+          "ipDiffServCodePoint": 0,
+          "ipNextHopIPv4Address": "0.0.0.0",
+          "octetDeltaCount": 2794,
+          "packetDeltaCount": 36,
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "10.10.172.60",
+          "sourceIPv4Prefix": "0.0.0.0",
+          "sourceIPv4PrefixLength": 0,
+          "sourceMacAddress": "00:18:19:9e:6c:01",
+          "sourceTransportPort": 45269,
+          "tcpSourcePort": 0,
+          "type": "netflow",
+          "udpDestinationPort": 161
+        },
+        "network": {
+          "bytes": 2794,
+          "direction": "inbound",
+          "packets": 36,
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "10.10.172.60",
+          "locality": "private",
+          "mac": "00:18:19:9e:6c:01",
+          "port": 45269
+        }
+      },
+      "Private": null
+    }
+  ]
+}

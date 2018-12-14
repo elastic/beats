@@ -1,0 +1,242 @@
+{
+  "test_name": "IPFIX configured with include_flowset_id",
+  "events": [
+    {
+      "Timestamp": "2016-11-11T12:09:19Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.0.1",
+          "locality": "private",
+          "port": 443
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-11-11T12:09:19Z"
+        },
+        "flow": {
+          "id": "urCm_V5Qsz0",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "10.0.0.1",
+          "destinationTransportPort": 443,
+          "egressInterface": 2147483651,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-11-11T12:09:19Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "exportingProcessId": 3,
+          "flowEndMicroseconds": "2016-11-11T12:09:19.000127768Z",
+          "flowId": 14460661,
+          "flowStartMicroseconds": "2016-11-11T12:09:19.000127768Z",
+          "ingressInterface": 8,
+          "ipVersion": 4,
+          "netscalerAaaUsername": "",
+          "netscalerAppNameAppId": 240189440,
+          "netscalerAppUnitNameAppId": 0,
+          "netscalerConnectionChainHopCount": 1,
+          "netscalerConnectionChainID": "AODtHJyoAwDvtCVYhIUGAA==",
+          "netscalerConnectionId": 14460661,
+          "netscalerFlowFlags": 84025344,
+          "netscalerHttpContentType": "",
+          "netscalerHttpDomainName": "",
+          "netscalerHttpReqAuthorization": "",
+          "netscalerHttpReqCookie": "",
+          "netscalerHttpReqHost": "",
+          "netscalerHttpReqMethod": "",
+          "netscalerHttpReqReferer": "",
+          "netscalerHttpReqUrl": "",
+          "netscalerHttpReqUserAgent": "",
+          "netscalerHttpReqVia": "",
+          "netscalerHttpReqXForwardedFor": "",
+          "netscalerHttpResForwFB": 17163184441650,
+          "netscalerHttpResForwLB": 0,
+          "netscalerTransactionId": 1068114973,
+          "netscalerUnknown330": 0,
+          "observationPointId": 167954698,
+          "octetDeltaCount": 40,
+          "packetDeltaCount": 1,
+          "paddingOctets": "AAA=",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 51053,
+          "tcpControlBits": 16,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 40,
+          "direction": "unknown",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 51053
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-11-11T12:09:19Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 51053
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-11-11T12:09:19Z"
+        },
+        "flow": {
+          "id": "1fCxVMA_rD0",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "192.168.0.1",
+          "destinationTransportPort": 51053,
+          "egressInterface": 6,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-11-11T12:09:19Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "exportingProcessId": 3,
+          "flowEndMicroseconds": "2016-11-11T12:09:19.00009951Z",
+          "flowId": 14460662,
+          "flowStartMicroseconds": "2016-11-11T12:09:19.00009951Z",
+          "ingressInterface": 2147483651,
+          "ipVersion": 4,
+          "netscalerAppNameAppId": 240189440,
+          "netscalerConnectionChainHopCount": 1,
+          "netscalerConnectionChainID": "AODtHJyoAwDvtCVYhIUGAA==",
+          "netscalerConnectionId": 14460661,
+          "netscalerFlowFlags": 1157636096,
+          "netscalerRoundTripTime": 83,
+          "netscalerTransactionId": 1068114973,
+          "netscalerUnknown329": 0,
+          "netscalerUnknown331": 0,
+          "netscalerUnknown332": 0,
+          "observationPointId": 167954698,
+          "octetDeltaCount": 1525,
+          "packetDeltaCount": 2,
+          "paddingOctets": "AAA=",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "10.0.0.1",
+          "sourceTransportPort": 443,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 1525,
+          "direction": "unknown",
+          "packets": 2,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "10.0.0.1",
+          "locality": "private",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-11-11T12:09:19Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.0.1",
+          "locality": "private",
+          "port": 443
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-11-11T12:09:19Z"
+        },
+        "flow": {
+          "id": "urCm_V5Qsz0",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "10.0.0.1",
+          "destinationTransportPort": 443,
+          "egressInterface": 2147483651,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-11-11T12:09:19Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "exportingProcessId": 3,
+          "flowEndMicroseconds": "2016-11-11T12:09:19.000128468Z",
+          "flowId": 14460661,
+          "flowStartMicroseconds": "2016-11-11T12:09:19.000128468Z",
+          "ingressInterface": 8,
+          "ipVersion": 4,
+          "netscalerAaaUsername": "",
+          "netscalerAppNameAppId": 240189440,
+          "netscalerAppUnitNameAppId": 239927296,
+          "netscalerConnectionChainHopCount": 1,
+          "netscalerConnectionChainID": "AODtHJyoAwDvtCVYWWsIAA==",
+          "netscalerConnectionId": 14460661,
+          "netscalerFlowFlags": 84025344,
+          "netscalerHttpContentType": "",
+          "netscalerHttpDomainName": "www.kobo.com",
+          "netscalerHttpReqAuthorization": "",
+          "netscalerHttpReqCookie": "beer=123456789abcdefghijklmnopqrstuvw; AnotherCookie=1234567890abcdefghijklmnopqr; Shameless.Plug=Thankyou.Rakuten.Kobo.Inc.For.Allowing.me.time.to.work.on.this.and.contribute.back.to.the.community; Padding=aaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbccccccccccccccddddddddddddddddddddddeeeeeeeeeeeeeeeeeeeeeffffffffffffffffffffffgggggggggggggggggggggggghhhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkkklllllllllllllllmmmmmmmmmm; more=less; GJquote=There.is.no.spoon; GarrySays=Nice!!; LastPadding=aaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbcccccccccccccccccccdddddddddddeeeeeeee",
+          "netscalerHttpReqHost": "www.kobo.com",
+          "netscalerHttpReqMethod": "GET",
+          "netscalerHttpReqReferer": "http://www.kobo.com/is-the-best-ebook-company-in-the-world",
+          "netscalerHttpReqUrl": "/aa/bb/ccccc/ddddddddddddddddddddddddd",
+          "netscalerHttpReqUserAgent": "Mozilla/5.0 (Commodore 64;  kobo.com) Gecko/20100101 Firefox/75.0",
+          "netscalerHttpReqVia": "1.1 akamai.net(ghost) (AkamaiGHost)",
+          "netscalerHttpReqXForwardedFor": "11.222.33.255",
+          "netscalerHttpResForwFB": 0,
+          "netscalerHttpResForwLB": 0,
+          "netscalerTransactionId": 1068114985,
+          "netscalerUnknown330": 0,
+          "observationPointId": 167954698,
+          "octetDeltaCount": 1541,
+          "packetDeltaCount": 2,
+          "paddingOctets": "AAA=",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "192.168.0.1",
+          "sourceTransportPort": 51053,
+          "tcpControlBits": 24,
+          "type": "netflow"
+        },
+        "network": {
+          "bytes": 1541,
+          "direction": "unknown",
+          "packets": 2,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 51053
+        }
+      },
+      "Private": null
+    }
+  ]
+}

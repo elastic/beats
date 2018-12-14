@@ -64,7 +64,7 @@ func ExampleWrapper() {
 	go func() {
 		defer wg.Done()
 		for event := range output {
-			event.Fields.Put("metricset.rtt", 111)
+			event.Fields.Put("event.duration", 111)
 
 			output, err := encodeEvent(event)
 			if err == nil {
@@ -90,15 +90,18 @@ func ExampleWrapper() {
 	//     "version": "1.2.3"
 	//   },
 	//   "@timestamp": "2016-05-10T23:27:58.485Z",
+	//   "event": {
+	//     "dataset": "fake.eventfetcher",
+	//     "duration": 111,
+	//     "module": "fake"
+	//   },
 	//   "fake": {
 	//     "eventfetcher": {
 	//       "metric": 1
 	//     }
 	//   },
 	//   "metricset": {
-	//     "module": "fake",
-	//     "name": "eventfetcher",
-	//     "rtt": 111
+	//     "name": "eventfetcher"
 	//   },
 	//   "service": {
 	//     "type": "fake"
