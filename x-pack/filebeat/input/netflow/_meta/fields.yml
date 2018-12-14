@@ -43,1341 +43,1341 @@
               description: >
                 NetFlow version used.
 
-        - name: octetDeltaCount
+        - name: octet_delta_count
           type: long
 
-        - name: packetDeltaCount
+        - name: packet_delta_count
           type: long
 
-        - name: deltaFlowCount
+        - name: delta_flow_count
           type: long
 
-        - name: protocolIdentifier
+        - name: protocol_identifier
           type: short
 
-        - name: ipClassOfService
+        - name: ip_class_of_service
           type: short
 
-        - name: tcpControlBits
+        - name: tcp_control_bits
           type: integer
 
-        - name: sourceTransportPort
+        - name: source_transport_port
           type: integer
 
-        - name: sourceIPv4Address
+        - name: source_ipv4_address
           type: ip
 
-        - name: sourceIPv4PrefixLength
+        - name: source_ipv4_prefix_length
           type: short
 
-        - name: ingressInterface
+        - name: ingress_interface
           type: long
 
-        - name: destinationTransportPort
+        - name: destination_transport_port
           type: integer
 
-        - name: destinationIPv4Address
+        - name: destination_ipv4_address
           type: ip
 
-        - name: destinationIPv4PrefixLength
+        - name: destination_ipv4_prefix_length
           type: short
 
-        - name: egressInterface
+        - name: egress_interface
           type: long
 
-        - name: ipNextHopIPv4Address
+        - name: ip_next_hop_ipv4_address
           type: ip
 
-        - name: bgpSourceAsNumber
+        - name: bgp_source_as_number
           type: long
 
-        - name: bgpDestinationAsNumber
+        - name: bgp_destination_as_number
           type: long
 
-        - name: bgpNextHopIPv4Address
+        - name: bgp_next_hop_ipv4_address
           type: ip
 
-        - name: postMCastPacketDeltaCount
+        - name: post_mcast_packet_delta_count
           type: long
 
-        - name: postMCastOctetDeltaCount
+        - name: post_mcast_octet_delta_count
           type: long
 
-        - name: flowEndSysUpTime
+        - name: flow_end_sys_up_time
           type: long
 
-        - name: flowStartSysUpTime
+        - name: flow_start_sys_up_time
           type: long
 
-        - name: postOctetDeltaCount
+        - name: post_octet_delta_count
           type: long
 
-        - name: postPacketDeltaCount
+        - name: post_packet_delta_count
           type: long
 
-        - name: minimumIpTotalLength
+        - name: minimum_ip_total_length
           type: long
 
-        - name: maximumIpTotalLength
+        - name: maximum_ip_total_length
           type: long
 
-        - name: sourceIPv6Address
+        - name: source_ipv6_address
           type: ip
 
-        - name: destinationIPv6Address
+        - name: destination_ipv6_address
           type: ip
 
-        - name: sourceIPv6PrefixLength
+        - name: source_ipv6_prefix_length
           type: short
 
-        - name: destinationIPv6PrefixLength
+        - name: destination_ipv6_prefix_length
           type: short
 
-        - name: flowLabelIPv6
+        - name: flow_label_ipv6
           type: long
 
-        - name: icmpTypeCodeIPv4
+        - name: icmp_type_code_ipv4
           type: integer
 
-        - name: igmpType
+        - name: igmp_type
           type: short
 
-        - name: samplingInterval
+        - name: sampling_interval
           type: long
 
-        - name: samplingAlgorithm
+        - name: sampling_algorithm
           type: short
 
-        - name: flowActiveTimeout
+        - name: flow_active_timeout
           type: integer
 
-        - name: flowIdleTimeout
+        - name: flow_idle_timeout
           type: integer
 
-        - name: engineType
+        - name: engine_type
           type: short
 
-        - name: engineId
+        - name: engine_id
           type: short
 
-        - name: exportedOctetTotalCount
+        - name: exported_octet_total_count
           type: long
 
-        - name: exportedMessageTotalCount
+        - name: exported_message_total_count
           type: long
 
-        - name: exportedFlowRecordTotalCount
+        - name: exported_flow_record_total_count
           type: long
 
-        - name: ipv4RouterSc
+        - name: ipv4_router_sc
           type: ip
 
-        - name: sourceIPv4Prefix
+        - name: source_ipv4_prefix
           type: ip
 
-        - name: destinationIPv4Prefix
+        - name: destination_ipv4_prefix
           type: ip
 
-        - name: mplsTopLabelType
+        - name: mpls_top_label_type
           type: short
 
-        - name: mplsTopLabelIPv4Address
+        - name: mpls_top_label_ipv4_address
           type: ip
 
-        - name: samplerId
+        - name: sampler_id
           type: short
 
-        - name: samplerMode
+        - name: sampler_mode
           type: short
 
-        - name: samplerRandomInterval
+        - name: sampler_random_interval
           type: long
 
-        - name: classId
+        - name: class_id
           type: short
 
-        - name: minimumTTL
+        - name: minimum_ttl
           type: short
 
-        - name: maximumTTL
+        - name: maximum_ttl
           type: short
 
-        - name: fragmentIdentification
+        - name: fragment_identification
           type: long
 
-        - name: postIpClassOfService
+        - name: post_ip_class_of_service
           type: short
 
-        - name: sourceMacAddress
+        - name: source_mac_address
           type: keyword
 
-        - name: postDestinationMacAddress
+        - name: post_destination_mac_address
           type: keyword
 
-        - name: vlanId
+        - name: vlan_id
           type: integer
 
-        - name: postVlanId
+        - name: post_vlan_id
           type: integer
 
-        - name: ipVersion
+        - name: ip_version
           type: short
 
-        - name: flowDirection
+        - name: flow_direction
           type: short
 
-        - name: ipNextHopIPv6Address
+        - name: ip_next_hop_ipv6_address
           type: ip
 
-        - name: bgpNextHopIPv6Address
+        - name: bgp_next_hop_ipv6_address
           type: ip
 
-        - name: ipv6ExtensionHeaders
+        - name: ipv6_extension_headers
           type: long
 
-        - name: mplsTopLabelStackSection
+        - name: mpls_top_label_stack_section
           type: short
 
-        - name: mplsLabelStackSection2
+        - name: mpls_label_stack_section2
           type: short
 
-        - name: mplsLabelStackSection3
+        - name: mpls_label_stack_section3
           type: short
 
-        - name: mplsLabelStackSection4
+        - name: mpls_label_stack_section4
           type: short
 
-        - name: mplsLabelStackSection5
+        - name: mpls_label_stack_section5
           type: short
 
-        - name: mplsLabelStackSection6
+        - name: mpls_label_stack_section6
           type: short
 
-        - name: mplsLabelStackSection7
+        - name: mpls_label_stack_section7
           type: short
 
-        - name: mplsLabelStackSection8
+        - name: mpls_label_stack_section8
           type: short
 
-        - name: mplsLabelStackSection9
+        - name: mpls_label_stack_section9
           type: short
 
-        - name: mplsLabelStackSection10
+        - name: mpls_label_stack_section10
           type: short
 
-        - name: destinationMacAddress
+        - name: destination_mac_address
           type: keyword
 
-        - name: postSourceMacAddress
+        - name: post_source_mac_address
           type: keyword
 
-        - name: interfaceName
+        - name: interface_name
           type: keyword
 
-        - name: interfaceDescription
+        - name: interface_description
           type: keyword
 
-        - name: samplerName
+        - name: sampler_name
           type: keyword
 
-        - name: octetTotalCount
+        - name: octet_total_count
           type: long
 
-        - name: packetTotalCount
+        - name: packet_total_count
           type: long
 
-        - name: flagsAndSamplerId
+        - name: flags_and_sampler_id
           type: long
 
-        - name: fragmentOffset
+        - name: fragment_offset
           type: integer
 
-        - name: forwardingStatus
+        - name: forwarding_status
           type: short
 
-        - name: mplsVpnRouteDistinguisher
+        - name: mpls_vpn_route_distinguisher
           type: short
 
-        - name: mplsTopLabelPrefixLength
+        - name: mpls_top_label_prefix_length
           type: short
 
-        - name: srcTrafficIndex
+        - name: src_traffic_index
           type: long
 
-        - name: dstTrafficIndex
+        - name: dst_traffic_index
           type: long
 
-        - name: applicationDescription
+        - name: application_description
           type: keyword
 
-        - name: applicationId
+        - name: application_id
           type: short
 
-        - name: applicationName
+        - name: application_name
           type: keyword
 
-        - name: postIpDiffServCodePoint
+        - name: post_ip_diff_serv_code_point
           type: short
 
-        - name: multicastReplicationFactor
+        - name: multicast_replication_factor
           type: long
 
-        - name: className
+        - name: class_name
           type: keyword
 
-        - name: classificationEngineId
+        - name: classification_engine_id
           type: short
 
-        - name: layer2packetSectionOffset
+        - name: layer2packet_section_offset
           type: integer
 
-        - name: layer2packetSectionSize
+        - name: layer2packet_section_size
           type: integer
 
-        - name: layer2packetSectionData
+        - name: layer2packet_section_data
           type: short
 
-        - name: bgpNextAdjacentAsNumber
+        - name: bgp_next_adjacent_as_number
           type: long
 
-        - name: bgpPrevAdjacentAsNumber
+        - name: bgp_prev_adjacent_as_number
           type: long
 
-        - name: exporterIPv4Address
+        - name: exporter_ipv4_address
           type: ip
 
-        - name: exporterIPv6Address
+        - name: exporter_ipv6_address
           type: ip
 
-        - name: droppedOctetDeltaCount
+        - name: dropped_octet_delta_count
           type: long
 
-        - name: droppedPacketDeltaCount
+        - name: dropped_packet_delta_count
           type: long
 
-        - name: droppedOctetTotalCount
+        - name: dropped_octet_total_count
           type: long
 
-        - name: droppedPacketTotalCount
+        - name: dropped_packet_total_count
           type: long
 
-        - name: flowEndReason
+        - name: flow_end_reason
           type: short
 
-        - name: commonPropertiesId
+        - name: common_properties_id
           type: long
 
-        - name: observationPointId
+        - name: observation_point_id
           type: long
 
-        - name: icmpTypeCodeIPv6
+        - name: icmp_type_code_ipv6
           type: integer
 
-        - name: mplsTopLabelIPv6Address
+        - name: mpls_top_label_ipv6_address
           type: ip
 
-        - name: lineCardId
+        - name: line_card_id
           type: long
 
-        - name: portId
+        - name: port_id
           type: long
 
-        - name: meteringProcessId
+        - name: metering_process_id
           type: long
 
-        - name: exportingProcessId
+        - name: exporting_process_id
           type: long
 
-        - name: templateId
+        - name: template_id
           type: integer
 
-        - name: wlanChannelId
+        - name: wlan_channel_id
           type: short
 
-        - name: wlanSSID
+        - name: wlan_ssid
           type: keyword
 
-        - name: flowId
+        - name: flow_id
           type: long
 
-        - name: observationDomainId
+        - name: observation_domain_id
           type: long
 
-        - name: flowStartSeconds
+        - name: flow_start_seconds
           type: date
 
-        - name: flowEndSeconds
+        - name: flow_end_seconds
           type: date
 
-        - name: flowStartMilliseconds
+        - name: flow_start_milliseconds
           type: date
 
-        - name: flowEndMilliseconds
+        - name: flow_end_milliseconds
           type: date
 
-        - name: flowStartMicroseconds
+        - name: flow_start_microseconds
           type: date
 
-        - name: flowEndMicroseconds
+        - name: flow_end_microseconds
           type: date
 
-        - name: flowStartNanoseconds
+        - name: flow_start_nanoseconds
           type: date
 
-        - name: flowEndNanoseconds
+        - name: flow_end_nanoseconds
           type: date
 
-        - name: flowStartDeltaMicroseconds
+        - name: flow_start_delta_microseconds
           type: long
 
-        - name: flowEndDeltaMicroseconds
+        - name: flow_end_delta_microseconds
           type: long
 
-        - name: systemInitTimeMilliseconds
+        - name: system_init_time_milliseconds
           type: date
 
-        - name: flowDurationMilliseconds
+        - name: flow_duration_milliseconds
           type: long
 
-        - name: flowDurationMicroseconds
+        - name: flow_duration_microseconds
           type: long
 
-        - name: observedFlowTotalCount
+        - name: observed_flow_total_count
           type: long
 
-        - name: ignoredPacketTotalCount
+        - name: ignored_packet_total_count
           type: long
 
-        - name: ignoredOctetTotalCount
+        - name: ignored_octet_total_count
           type: long
 
-        - name: notSentFlowTotalCount
+        - name: not_sent_flow_total_count
           type: long
 
-        - name: notSentPacketTotalCount
+        - name: not_sent_packet_total_count
           type: long
 
-        - name: notSentOctetTotalCount
+        - name: not_sent_octet_total_count
           type: long
 
-        - name: destinationIPv6Prefix
+        - name: destination_ipv6_prefix
           type: ip
 
-        - name: sourceIPv6Prefix
+        - name: source_ipv6_prefix
           type: ip
 
-        - name: postOctetTotalCount
+        - name: post_octet_total_count
           type: long
 
-        - name: postPacketTotalCount
+        - name: post_packet_total_count
           type: long
 
-        - name: flowKeyIndicator
+        - name: flow_key_indicator
           type: long
 
-        - name: postMCastPacketTotalCount
+        - name: post_mcast_packet_total_count
           type: long
 
-        - name: postMCastOctetTotalCount
+        - name: post_mcast_octet_total_count
           type: long
 
-        - name: icmpTypeIPv4
+        - name: icmp_type_ipv4
           type: short
 
-        - name: icmpCodeIPv4
+        - name: icmp_code_ipv4
           type: short
 
-        - name: icmpTypeIPv6
+        - name: icmp_type_ipv6
           type: short
 
-        - name: icmpCodeIPv6
+        - name: icmp_code_ipv6
           type: short
 
-        - name: udpSourcePort
+        - name: udp_source_port
           type: integer
 
-        - name: udpDestinationPort
+        - name: udp_destination_port
           type: integer
 
-        - name: tcpSourcePort
+        - name: tcp_source_port
           type: integer
 
-        - name: tcpDestinationPort
+        - name: tcp_destination_port
           type: integer
 
-        - name: tcpSequenceNumber
+        - name: tcp_sequence_number
           type: long
 
-        - name: tcpAcknowledgementNumber
+        - name: tcp_acknowledgement_number
           type: long
 
-        - name: tcpWindowSize
+        - name: tcp_window_size
           type: integer
 
-        - name: tcpUrgentPointer
+        - name: tcp_urgent_pointer
           type: integer
 
-        - name: tcpHeaderLength
+        - name: tcp_header_length
           type: short
 
-        - name: ipHeaderLength
+        - name: ip_header_length
           type: short
 
-        - name: totalLengthIPv4
+        - name: total_length_ipv4
           type: integer
 
-        - name: payloadLengthIPv6
+        - name: payload_length_ipv6
           type: integer
 
-        - name: ipTTL
+        - name: ip_ttl
           type: short
 
-        - name: nextHeaderIPv6
+        - name: next_header_ipv6
           type: short
 
-        - name: mplsPayloadLength
+        - name: mpls_payload_length
           type: long
 
-        - name: ipDiffServCodePoint
+        - name: ip_diff_serv_code_point
           type: short
 
-        - name: ipPrecedence
+        - name: ip_precedence
           type: short
 
-        - name: fragmentFlags
+        - name: fragment_flags
           type: short
 
-        - name: octetDeltaSumOfSquares
+        - name: octet_delta_sum_of_squares
           type: long
 
-        - name: octetTotalSumOfSquares
+        - name: octet_total_sum_of_squares
           type: long
 
-        - name: mplsTopLabelTTL
+        - name: mpls_top_label_ttl
           type: short
 
-        - name: mplsLabelStackLength
+        - name: mpls_label_stack_length
           type: long
 
-        - name: mplsLabelStackDepth
+        - name: mpls_label_stack_depth
           type: long
 
-        - name: mplsTopLabelExp
+        - name: mpls_top_label_exp
           type: short
 
-        - name: ipPayloadLength
+        - name: ip_payload_length
           type: long
 
-        - name: udpMessageLength
+        - name: udp_message_length
           type: integer
 
-        - name: isMulticast
+        - name: is_multicast
           type: short
 
-        - name: ipv4IHL
+        - name: ipv4_ihl
           type: short
 
-        - name: ipv4Options
+        - name: ipv4_options
           type: long
 
-        - name: tcpOptions
+        - name: tcp_options
           type: long
 
-        - name: paddingOctets
+        - name: padding_octets
           type: short
 
-        - name: collectorIPv4Address
+        - name: collector_ipv4_address
           type: ip
 
-        - name: collectorIPv6Address
+        - name: collector_ipv6_address
           type: ip
 
-        - name: exportInterface
+        - name: export_interface
           type: long
 
-        - name: exportProtocolVersion
+        - name: export_protocol_version
           type: short
 
-        - name: exportTransportProtocol
+        - name: export_transport_protocol
           type: short
 
-        - name: collectorTransportPort
+        - name: collector_transport_port
           type: integer
 
-        - name: exporterTransportPort
+        - name: exporter_transport_port
           type: integer
 
-        - name: tcpSynTotalCount
+        - name: tcp_syn_total_count
           type: long
 
-        - name: tcpFinTotalCount
+        - name: tcp_fin_total_count
           type: long
 
-        - name: tcpRstTotalCount
+        - name: tcp_rst_total_count
           type: long
 
-        - name: tcpPshTotalCount
+        - name: tcp_psh_total_count
           type: long
 
-        - name: tcpAckTotalCount
+        - name: tcp_ack_total_count
           type: long
 
-        - name: tcpUrgTotalCount
+        - name: tcp_urg_total_count
           type: long
 
-        - name: ipTotalLength
+        - name: ip_total_length
           type: long
 
-        - name: postNATSourceIPv4Address
+        - name: post_nast_ource_ipv4_address
           type: ip
 
-        - name: postNATDestinationIPv4Address
+        - name: post_nadt_estination_ipv4_address
           type: ip
 
-        - name: postNAPTSourceTransportPort
+        - name: post_napst_ource_transport_port
           type: integer
 
-        - name: postNAPTDestinationTransportPort
+        - name: post_napdt_estination_transport_port
           type: integer
 
-        - name: natOriginatingAddressRealm
+        - name: nat_originating_address_realm
           type: short
 
-        - name: natEvent
+        - name: nat_event
           type: short
 
-        - name: initiatorOctets
+        - name: initiator_octets
           type: long
 
-        - name: responderOctets
+        - name: responder_octets
           type: long
 
-        - name: firewallEvent
+        - name: firewall_event
           type: short
 
-        - name: ingressVRFID
+        - name: ingress_vrfid
           type: long
 
-        - name: egressVRFID
+        - name: egress_vrfid
           type: long
 
-        - name: VRFname
+        - name: vr_fname
           type: keyword
 
-        - name: postMplsTopLabelExp
+        - name: post_mpls_top_label_exp
           type: short
 
-        - name: tcpWindowScale
+        - name: tcp_window_scale
           type: integer
 
-        - name: biflowDirection
+        - name: biflow_direction
           type: short
 
-        - name: ethernetHeaderLength
+        - name: ethernet_header_length
           type: short
 
-        - name: ethernetPayloadLength
+        - name: ethernet_payload_length
           type: integer
 
-        - name: ethernetTotalLength
+        - name: ethernet_total_length
           type: integer
 
-        - name: dot1qVlanId
+        - name: dot1q_vlan_id
           type: integer
 
-        - name: dot1qPriority
+        - name: dot1q_priority
           type: short
 
-        - name: dot1qCustomerVlanId
+        - name: dot1q_customer_vlan_id
           type: integer
 
-        - name: dot1qCustomerPriority
+        - name: dot1q_customer_priority
           type: short
 
-        - name: metroEvcId
+        - name: metro_evc_id
           type: keyword
 
-        - name: metroEvcType
+        - name: metro_evc_type
           type: short
 
-        - name: pseudoWireId
+        - name: pseudo_wire_id
           type: long
 
-        - name: pseudoWireType
+        - name: pseudo_wire_type
           type: integer
 
-        - name: pseudoWireControlWord
+        - name: pseudo_wire_control_word
           type: long
 
-        - name: ingressPhysicalInterface
+        - name: ingress_physical_interface
           type: long
 
-        - name: egressPhysicalInterface
+        - name: egress_physical_interface
           type: long
 
-        - name: postDot1qVlanId
+        - name: post_dot1q_vlan_id
           type: integer
 
-        - name: postDot1qCustomerVlanId
+        - name: post_dot1q_customer_vlan_id
           type: integer
 
-        - name: ethernetType
+        - name: ethernet_type
           type: integer
 
-        - name: postIpPrecedence
+        - name: post_ip_precedence
           type: short
 
-        - name: collectionTimeMilliseconds
+        - name: collection_time_milliseconds
           type: date
 
-        - name: exportSctpStreamId
+        - name: export_sctp_stream_id
           type: integer
 
-        - name: maxExportSeconds
+        - name: max_export_seconds
           type: date
 
-        - name: maxFlowEndSeconds
+        - name: max_flow_end_seconds
           type: date
 
-        - name: messageMD5Checksum
+        - name: message_md5_checksum
           type: short
 
-        - name: messageScope
+        - name: message_scope
           type: short
 
-        - name: minExportSeconds
+        - name: min_export_seconds
           type: date
 
-        - name: minFlowStartSeconds
+        - name: min_flow_start_seconds
           type: date
 
-        - name: opaqueOctets
+        - name: opaque_octets
           type: short
 
-        - name: sessionScope
+        - name: session_scope
           type: short
 
-        - name: maxFlowEndMicroseconds
+        - name: max_flow_end_microseconds
           type: date
 
-        - name: maxFlowEndMilliseconds
+        - name: max_flow_end_milliseconds
           type: date
 
-        - name: maxFlowEndNanoseconds
+        - name: max_flow_end_nanoseconds
           type: date
 
-        - name: minFlowStartMicroseconds
+        - name: min_flow_start_microseconds
           type: date
 
-        - name: minFlowStartMilliseconds
+        - name: min_flow_start_milliseconds
           type: date
 
-        - name: minFlowStartNanoseconds
+        - name: min_flow_start_nanoseconds
           type: date
 
-        - name: collectorCertificate
+        - name: collector_certificate
           type: short
 
-        - name: exporterCertificate
+        - name: exporter_certificate
           type: short
 
-        - name: dataRecordsReliability
+        - name: data_records_reliability
           type: boolean
 
-        - name: observationPointType
+        - name: observation_point_type
           type: short
 
-        - name: newConnectionDeltaCount
+        - name: new_connection_delta_count
           type: long
 
-        - name: connectionSumDurationSeconds
+        - name: connection_sum_duration_seconds
           type: long
 
-        - name: connectionTransactionId
+        - name: connection_transaction_id
           type: long
 
-        - name: postNATSourceIPv6Address
+        - name: post_nast_ource_ipv6_address
           type: ip
 
-        - name: postNATDestinationIPv6Address
+        - name: post_nadt_estination_ipv6_address
           type: ip
 
-        - name: natPoolId
+        - name: nat_pool_id
           type: long
 
-        - name: natPoolName
+        - name: nat_pool_name
           type: keyword
 
-        - name: anonymizationFlags
+        - name: anonymization_flags
           type: integer
 
-        - name: anonymizationTechnique
+        - name: anonymization_technique
           type: integer
 
-        - name: informationElementIndex
+        - name: information_element_index
           type: integer
 
-        - name: p2pTechnology
+        - name: p2p_technology
           type: keyword
 
-        - name: tunnelTechnology
+        - name: tunnel_technology
           type: keyword
 
-        - name: encryptedTechnology
+        - name: encrypted_technology
           type: keyword
 
-        - name: bgpValidityState
+        - name: bgp_validity_state
           type: short
 
-        - name: IPSecSPI
+        - name: ip_sec_spi
           type: long
 
-        - name: greKey
+        - name: gre_key
           type: long
 
-        - name: natType
+        - name: nat_type
           type: short
 
-        - name: initiatorPackets
+        - name: initiator_packets
           type: long
 
-        - name: responderPackets
+        - name: responder_packets
           type: long
 
-        - name: observationDomainName
+        - name: observation_domain_name
           type: keyword
 
-        - name: selectionSequenceId
+        - name: selection_sequence_id
           type: long
 
-        - name: selectorId
+        - name: selector_id
           type: long
 
-        - name: informationElementId
+        - name: information_element_id
           type: integer
 
-        - name: selectorAlgorithm
+        - name: selector_algorithm
           type: integer
 
-        - name: samplingPacketInterval
+        - name: sampling_packet_interval
           type: long
 
-        - name: samplingPacketSpace
+        - name: sampling_packet_space
           type: long
 
-        - name: samplingTimeInterval
+        - name: sampling_time_interval
           type: long
 
-        - name: samplingTimeSpace
+        - name: sampling_time_space
           type: long
 
-        - name: samplingSize
+        - name: sampling_size
           type: long
 
-        - name: samplingPopulation
+        - name: sampling_population
           type: long
 
-        - name: samplingProbability
+        - name: sampling_probability
           type: double
 
-        - name: dataLinkFrameSize
+        - name: data_link_frame_size
           type: integer
 
-        - name: ipHeaderPacketSection
+        - name: ip_header_packet_section
           type: short
 
-        - name: ipPayloadPacketSection
+        - name: ip_payload_packet_section
           type: short
 
-        - name: dataLinkFrameSection
+        - name: data_link_frame_section
           type: short
 
-        - name: mplsLabelStackSection
+        - name: mpls_label_stack_section
           type: short
 
-        - name: mplsPayloadPacketSection
+        - name: mpls_payload_packet_section
           type: short
 
-        - name: selectorIdTotalPktsObserved
+        - name: selector_id_total_pkts_observed
           type: long
 
-        - name: selectorIdTotalPktsSelected
+        - name: selector_id_total_pkts_selected
           type: long
 
-        - name: absoluteError
+        - name: absolute_error
           type: double
 
-        - name: relativeError
+        - name: relative_error
           type: double
 
-        - name: observationTimeSeconds
+        - name: observation_time_seconds
           type: date
 
-        - name: observationTimeMilliseconds
+        - name: observation_time_milliseconds
           type: date
 
-        - name: observationTimeMicroseconds
+        - name: observation_time_microseconds
           type: date
 
-        - name: observationTimeNanoseconds
+        - name: observation_time_nanoseconds
           type: date
 
-        - name: digestHashValue
+        - name: digest_hash_value
           type: long
 
-        - name: hashIPPayloadOffset
+        - name: hash_ipp_ayload_offset
           type: long
 
-        - name: hashIPPayloadSize
+        - name: hash_ipp_ayload_size
           type: long
 
-        - name: hashOutputRangeMin
+        - name: hash_output_range_min
           type: long
 
-        - name: hashOutputRangeMax
+        - name: hash_output_range_max
           type: long
 
-        - name: hashSelectedRangeMin
+        - name: hash_selected_range_min
           type: long
 
-        - name: hashSelectedRangeMax
+        - name: hash_selected_range_max
           type: long
 
-        - name: hashDigestOutput
+        - name: hash_digest_output
           type: boolean
 
-        - name: hashInitialiserValue
+        - name: hash_initialiser_value
           type: long
 
-        - name: selectorName
+        - name: selector_name
           type: keyword
 
-        - name: upperCILimit
+        - name: upper_cli_imit
           type: double
 
-        - name: lowerCILimit
+        - name: lower_cli_imit
           type: double
 
-        - name: confidenceLevel
+        - name: confidence_level
           type: double
 
-        - name: informationElementDataType
+        - name: information_element_data_type
           type: short
 
-        - name: informationElementDescription
+        - name: information_element_description
           type: keyword
 
-        - name: informationElementName
+        - name: information_element_name
           type: keyword
 
-        - name: informationElementRangeBegin
+        - name: information_element_range_begin
           type: long
 
-        - name: informationElementRangeEnd
+        - name: information_element_range_end
           type: long
 
-        - name: informationElementSemantics
+        - name: information_element_semantics
           type: short
 
-        - name: informationElementUnits
+        - name: information_element_units
           type: integer
 
-        - name: privateEnterpriseNumber
+        - name: private_enterprise_number
           type: long
 
-        - name: virtualStationInterfaceId
+        - name: virtual_station_interface_id
           type: short
 
-        - name: virtualStationInterfaceName
+        - name: virtual_station_interface_name
           type: keyword
 
-        - name: virtualStationUUID
+        - name: virtual_station_uuid
           type: short
 
-        - name: virtualStationName
+        - name: virtual_station_name
           type: keyword
 
-        - name: layer2SegmentId
+        - name: layer2_segment_id
           type: long
 
-        - name: layer2OctetDeltaCount
+        - name: layer2_octet_delta_count
           type: long
 
-        - name: layer2OctetTotalCount
+        - name: layer2_octet_total_count
           type: long
 
-        - name: ingressUnicastPacketTotalCount
+        - name: ingress_unicast_packet_total_count
           type: long
 
-        - name: ingressMulticastPacketTotalCount
+        - name: ingress_multicast_packet_total_count
           type: long
 
-        - name: ingressBroadcastPacketTotalCount
+        - name: ingress_broadcast_packet_total_count
           type: long
 
-        - name: egressUnicastPacketTotalCount
+        - name: egress_unicast_packet_total_count
           type: long
 
-        - name: egressBroadcastPacketTotalCount
+        - name: egress_broadcast_packet_total_count
           type: long
 
-        - name: monitoringIntervalStartMilliSeconds
+        - name: monitoring_interval_start_milli_seconds
           type: date
 
-        - name: monitoringIntervalEndMilliSeconds
+        - name: monitoring_interval_end_milli_seconds
           type: date
 
-        - name: portRangeStart
+        - name: port_range_start
           type: integer
 
-        - name: portRangeEnd
+        - name: port_range_end
           type: integer
 
-        - name: portRangeStepSize
+        - name: port_range_step_size
           type: integer
 
-        - name: portRangeNumPorts
+        - name: port_range_num_ports
           type: integer
 
-        - name: staMacAddress
+        - name: sta_mac_address
           type: keyword
 
-        - name: staIPv4Address
+        - name: sta_ipv4_address
           type: ip
 
-        - name: wtpMacAddress
+        - name: wtp_mac_address
           type: keyword
 
-        - name: ingressInterfaceType
+        - name: ingress_interface_type
           type: long
 
-        - name: egressInterfaceType
+        - name: egress_interface_type
           type: long
 
-        - name: rtpSequenceNumber
+        - name: rtp_sequence_number
           type: integer
 
-        - name: userName
+        - name: user_name
           type: keyword
 
-        - name: applicationCategoryName
+        - name: application_category_name
           type: keyword
 
-        - name: applicationSubCategoryName
+        - name: application_sub_category_name
           type: keyword
 
-        - name: applicationGroupName
+        - name: application_group_name
           type: keyword
 
-        - name: originalFlowsPresent
+        - name: original_flows_present
           type: long
 
-        - name: originalFlowsInitiated
+        - name: original_flows_initiated
           type: long
 
-        - name: originalFlowsCompleted
+        - name: original_flows_completed
           type: long
 
-        - name: distinctCountOfSourceIPAddress
+        - name: distinct_count_of_sourc_eipa_ddress
           type: long
 
-        - name: distinctCountOfDestinationIPAddress
+        - name: distinct_count_of_destinatio_nipa_ddress
           type: long
 
-        - name: distinctCountOfSourceIPv4Address
+        - name: distinct_count_of_source_ipv4_address
           type: long
 
-        - name: distinctCountOfDestinationIPv4Address
+        - name: distinct_count_of_destination_ipv4_address
           type: long
 
-        - name: distinctCountOfSourceIPv6Address
+        - name: distinct_count_of_source_ipv6_address
           type: long
 
-        - name: distinctCountOfDestinationIPv6Address
+        - name: distinct_count_of_destination_ipv6_address
           type: long
 
-        - name: valueDistributionMethod
+        - name: value_distribution_method
           type: short
 
-        - name: rfc3550JitterMilliseconds
+        - name: rfc3550_jitter_milliseconds
           type: long
 
-        - name: rfc3550JitterMicroseconds
+        - name: rfc3550_jitter_microseconds
           type: long
 
-        - name: rfc3550JitterNanoseconds
+        - name: rfc3550_jitter_nanoseconds
           type: long
 
-        - name: dot1qDEI
+        - name: dot1q_dei
           type: boolean
 
-        - name: dot1qCustomerDEI
+        - name: dot1q_customer_dei
           type: boolean
 
-        - name: flowSelectorAlgorithm
+        - name: flow_selector_algorithm
           type: integer
 
-        - name: flowSelectedOctetDeltaCount
+        - name: flow_selected_octet_delta_count
           type: long
 
-        - name: flowSelectedPacketDeltaCount
+        - name: flow_selected_packet_delta_count
           type: long
 
-        - name: flowSelectedFlowDeltaCount
+        - name: flow_selected_flow_delta_count
           type: long
 
-        - name: selectorIDTotalFlowsObserved
+        - name: selector_itd_otal_flows_observed
           type: long
 
-        - name: selectorIDTotalFlowsSelected
+        - name: selector_itd_otal_flows_selected
           type: long
 
-        - name: samplingFlowInterval
+        - name: sampling_flow_interval
           type: long
 
-        - name: samplingFlowSpacing
+        - name: sampling_flow_spacing
           type: long
 
-        - name: flowSamplingTimeInterval
+        - name: flow_sampling_time_interval
           type: long
 
-        - name: flowSamplingTimeSpacing
+        - name: flow_sampling_time_spacing
           type: long
 
-        - name: hashFlowDomain
+        - name: hash_flow_domain
           type: integer
 
-        - name: transportOctetDeltaCount
+        - name: transport_octet_delta_count
           type: long
 
-        - name: transportPacketDeltaCount
+        - name: transport_packet_delta_count
           type: long
 
-        - name: originalExporterIPv4Address
+        - name: original_exporter_ipv4_address
           type: ip
 
-        - name: originalExporterIPv6Address
+        - name: original_exporter_ipv6_address
           type: ip
 
-        - name: originalObservationDomainId
+        - name: original_observation_domain_id
           type: long
 
-        - name: intermediateProcessId
+        - name: intermediate_process_id
           type: long
 
-        - name: ignoredDataRecordTotalCount
+        - name: ignored_data_record_total_count
           type: long
 
-        - name: dataLinkFrameType
+        - name: data_link_frame_type
           type: integer
 
-        - name: sectionOffset
+        - name: section_offset
           type: integer
 
-        - name: sectionExportedOctets
+        - name: section_exported_octets
           type: integer
 
-        - name: dot1qServiceInstanceTag
+        - name: dot1q_service_instance_tag
           type: short
 
-        - name: dot1qServiceInstanceId
+        - name: dot1q_service_instance_id
           type: long
 
-        - name: dot1qServiceInstancePriority
+        - name: dot1q_service_instance_priority
           type: short
 
-        - name: dot1qCustomerSourceMacAddress
+        - name: dot1q_customer_source_mac_address
           type: keyword
 
-        - name: dot1qCustomerDestinationMacAddress
+        - name: dot1q_customer_destination_mac_address
           type: keyword
 
-        - name: postLayer2OctetDeltaCount
+        - name: post_layer2_octet_delta_count
           type: long
 
-        - name: postMCastLayer2OctetDeltaCount
+        - name: post_mcast_layer2_octet_delta_count
           type: long
 
-        - name: postLayer2OctetTotalCount
+        - name: post_layer2_octet_total_count
           type: long
 
-        - name: postMCastLayer2OctetTotalCount
+        - name: post_mcast_layer2_octet_total_count
           type: long
 
-        - name: minimumLayer2TotalLength
+        - name: minimum_layer2_total_length
           type: long
 
-        - name: maximumLayer2TotalLength
+        - name: maximum_layer2_total_length
           type: long
 
-        - name: droppedLayer2OctetDeltaCount
+        - name: dropped_layer2_octet_delta_count
           type: long
 
-        - name: droppedLayer2OctetTotalCount
+        - name: dropped_layer2_octet_total_count
           type: long
 
-        - name: ignoredLayer2OctetTotalCount
+        - name: ignored_layer2_octet_total_count
           type: long
 
-        - name: notSentLayer2OctetTotalCount
+        - name: not_sent_layer2_octet_total_count
           type: long
 
-        - name: layer2OctetDeltaSumOfSquares
+        - name: layer2_octet_delta_sum_of_squares
           type: long
 
-        - name: layer2OctetTotalSumOfSquares
+        - name: layer2_octet_total_sum_of_squares
           type: long
 
-        - name: layer2FrameDeltaCount
+        - name: layer2_frame_delta_count
           type: long
 
-        - name: layer2FrameTotalCount
+        - name: layer2_frame_total_count
           type: long
 
-        - name: pseudoWireDestinationIPv4Address
+        - name: pseudo_wire_destination_ipv4_address
           type: ip
 
-        - name: ignoredLayer2FrameTotalCount
+        - name: ignored_layer2_frame_total_count
           type: long
 
-        - name: mibObjectValueInteger
+        - name: mib_object_value_integer
           type: integer
 
-        - name: mibObjectValueOctetString
+        - name: mib_object_value_octet_string
           type: short
 
-        - name: mibObjectValueOID
+        - name: mib_object_value_oid
           type: short
 
-        - name: mibObjectValueBits
+        - name: mib_object_value_bits
           type: short
 
-        - name: mibObjectValueIPAddress
+        - name: mib_object_valuei_pa_ddress
           type: ip
 
-        - name: mibObjectValueCounter
+        - name: mib_object_value_counter
           type: long
 
-        - name: mibObjectValueGauge
+        - name: mib_object_value_gauge
           type: long
 
-        - name: mibObjectValueTimeTicks
+        - name: mib_object_value_time_ticks
           type: long
 
-        - name: mibObjectValueUnsigned
+        - name: mib_object_value_unsigned
           type: long
 
-        - name: mibObjectIdentifier
+        - name: mib_object_identifier
           type: short
 
-        - name: mibSubIdentifier
+        - name: mib_sub_identifier
           type: long
 
-        - name: mibIndexIndicator
+        - name: mib_index_indicator
           type: long
 
-        - name: mibCaptureTimeSemantics
+        - name: mib_capture_time_semantics
           type: short
 
-        - name: mibContextEngineID
+        - name: mib_context_engine_id
           type: short
 
-        - name: mibContextName
+        - name: mib_context_name
           type: keyword
 
-        - name: mibObjectName
+        - name: mib_object_name
           type: keyword
 
-        - name: mibObjectDescription
+        - name: mib_object_description
           type: keyword
 
-        - name: mibObjectSyntax
+        - name: mib_object_syntax
           type: keyword
 
-        - name: mibModuleName
+        - name: mib_module_name
           type: keyword
 
-        - name: mobileIMSI
+        - name: mobile_imsi
           type: keyword
 
-        - name: mobileMSISDN
+        - name: mobile_msisdn
           type: keyword
 
-        - name: httpStatusCode
+        - name: http_status_code
           type: integer
 
-        - name: sourceTransportPortsLimit
+        - name: source_transport_ports_limit
           type: integer
 
-        - name: httpRequestMethod
+        - name: http_request_method
           type: keyword
 
-        - name: httpRequestHost
+        - name: http_request_host
           type: keyword
 
-        - name: httpRequestTarget
+        - name: http_request_target
           type: keyword
 
-        - name: httpMessageVersion
+        - name: http_message_version
           type: keyword
 
-        - name: natInstanceID
+        - name: nat_instance_id
           type: long
 
-        - name: internalAddressRealm
+        - name: internal_address_realm
           type: short
 
-        - name: externalAddressRealm
+        - name: external_address_realm
           type: short
 
-        - name: natQuotaExceededEvent
+        - name: nat_quota_exceeded_event
           type: long
 
-        - name: natThresholdEvent
+        - name: nat_threshold_event
           type: long
 
-        - name: httpUserAgent
+        - name: http_user_agent
           type: keyword
 
-        - name: httpContentType
+        - name: http_content_type
           type: keyword
 
-        - name: httpReasonPhrase
+        - name: http_reason_phrase
           type: keyword
 
-        - name: maxSessionEntries
+        - name: max_session_entries
           type: long
 
-        - name: maxBIBEntries
+        - name: max_bieb_ntries
           type: long
 
-        - name: maxEntriesPerUser
+        - name: max_entries_per_user
           type: long
 
-        - name: maxSubscribers
+        - name: max_subscribers
           type: long
 
-        - name: maxFragmentsPendingReassembly
+        - name: max_fragments_pending_reassembly
           type: long
 
-        - name: addressPoolHighThreshold
+        - name: address_pool_high_threshold
           type: long
 
-        - name: addressPoolLowThreshold
+        - name: address_pool_low_threshold
           type: long
 
-        - name: addressPortMappingHighThreshold
+        - name: address_port_mapping_high_threshold
           type: long
 
-        - name: addressPortMappingLowThreshold
+        - name: address_port_mapping_low_threshold
           type: long
 
-        - name: addressPortMappingPerUserHighThreshold
+        - name: address_port_mapping_per_user_high_threshold
           type: long
 
-        - name: globalAddressMappingHighThreshold
+        - name: global_address_mapping_high_threshold
           type: long
 
-        - name: vpnIdentifier
+        - name: vpn_identifier
           type: short
 

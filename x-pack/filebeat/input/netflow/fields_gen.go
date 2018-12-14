@@ -16,6 +16,8 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow"
 )
 
 var (
@@ -180,6 +182,6 @@ func main() {
 		write(outHandle, fmt.Sprintf(`        - name: %s
           type: %s
 `,
-			vars["name"], esType))
+			netflow.CamelCaseToSnakeCase(vars["name"]), esType))
 	}
 }
