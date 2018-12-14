@@ -59,7 +59,7 @@
           "bytes": 532,
           "direction": "unknown",
           "packets": 6,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "bytes": 132,
@@ -135,7 +135,7 @@
           "bytes": 356,
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "bytes": 172,

@@ -53,7 +53,7 @@
           "bytes": 128,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "100.78.40.201",
@@ -115,7 +115,7 @@
           "bytes": 172,
           "direction": "unknown",
           "packets": 4,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.231.128.150",
@@ -177,7 +177,7 @@
           "bytes": 3943,
           "direction": "unknown",
           "packets": 10,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "100.78.40.201",
@@ -239,7 +239,7 @@
           "bytes": 3052,
           "direction": "unknown",
           "packets": 11,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.27.8.20",

@@ -49,7 +49,7 @@
           "bytes": 373,
           "direction": "unknown",
           "packets": 7,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -107,7 +107,7 @@
           "bytes": 6634,
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -165,7 +165,7 @@
           "bytes": 453,
           "direction": "unknown",
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -223,7 +223,7 @@
           "bytes": 10893,
           "direction": "unknown",
           "packets": 11,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -281,7 +281,7 @@
           "bytes": 453,
           "direction": "unknown",
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -339,7 +339,7 @@
           "bytes": 10893,
           "direction": "unknown",
           "packets": 11,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -397,7 +397,7 @@
           "bytes": 373,
           "direction": "unknown",
           "packets": 7,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -455,7 +455,7 @@
           "bytes": 6780,
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -513,7 +513,7 @@
           "bytes": 373,
           "direction": "unknown",
           "packets": 7,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -571,7 +571,7 @@
           "bytes": 6780,
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -629,7 +629,7 @@
           "bytes": 373,
           "direction": "unknown",
           "packets": 7,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -687,7 +687,7 @@
           "bytes": 7319,
           "direction": "unknown",
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -745,7 +745,7 @@
           "bytes": 373,
           "direction": "unknown",
           "packets": 7,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -803,7 +803,7 @@
           "bytes": 7319,
           "direction": "unknown",
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -861,7 +861,7 @@
           "bytes": 333,
           "direction": "unknown",
           "packets": 6,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -919,7 +919,7 @@
           "bytes": 1833,
           "direction": "unknown",
           "packets": 5,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -977,7 +977,7 @@
           "bytes": 333,
           "direction": "unknown",
           "packets": 6,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -1035,7 +1035,7 @@
           "bytes": 1833,
           "direction": "unknown",
           "packets": 5,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -1093,7 +1093,7 @@
           "bytes": 453,
           "direction": "unknown",
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -1151,7 +1151,7 @@
           "bytes": 10550,
           "direction": "unknown",
           "packets": 11,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -1209,7 +1209,7 @@
           "bytes": 453,
           "direction": "unknown",
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -1267,7 +1267,7 @@
           "bytes": 10550,
           "direction": "unknown",
           "packets": 11,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -1325,7 +1325,7 @@
           "bytes": 373,
           "direction": "unknown",
           "packets": 7,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -1383,7 +1383,7 @@
           "bytes": 6425,
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -1441,7 +1441,7 @@
           "bytes": 373,
           "direction": "unknown",
           "packets": 7,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.17",
@@ -1499,7 +1499,7 @@
           "bytes": 6425,
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",

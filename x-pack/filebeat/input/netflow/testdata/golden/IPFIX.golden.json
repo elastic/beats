@@ -88,7 +88,7 @@
           "bytes": 260,
           "direction": "unknown",
           "packets": 5,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.253.1",
@@ -150,7 +150,7 @@
           "bytes": 1000,
           "direction": "unknown",
           "packets": 6,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.253.128",
@@ -212,7 +212,7 @@
           "bytes": 601,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.253.2",
@@ -274,7 +274,7 @@
           "bytes": 148,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.253.132",
@@ -336,7 +336,7 @@
           "bytes": 5946,
           "direction": "unknown",
           "packets": 14,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "54.214.9.161",
@@ -398,7 +398,7 @@
           "bytes": 2608,
           "direction": "unknown",
           "packets": 13,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.253.132",
@@ -460,7 +460,7 @@
           "bytes": 60,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.253.130",
@@ -522,7 +522,7 @@
           "bytes": 256,
           "direction": "unknown",
           "packets": 4,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.253.1",
@@ -584,7 +584,7 @@
           "bytes": 1916,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.253.128",
@@ -646,7 +646,7 @@
           "bytes": 168,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.253.1",
@@ -708,7 +708,7 @@
           "bytes": 84,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.253.128",
@@ -770,7 +770,7 @@
           "bytes": 232,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.253.1",

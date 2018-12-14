@@ -48,7 +48,7 @@
           "bytes": 82,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "unknown (0)"
+          "transport": "unknown (0)"
         },
         "source": {
           "ip": "0.0.0.0",

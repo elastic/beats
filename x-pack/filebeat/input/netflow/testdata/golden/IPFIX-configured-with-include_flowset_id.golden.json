@@ -76,7 +76,7 @@
           "bytes": 40,
           "direction": "unknown",
           "packets": 1,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -149,7 +149,7 @@
           "bytes": 1525,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.0.0.1",
@@ -234,7 +234,7 @@
           "bytes": 1541,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",

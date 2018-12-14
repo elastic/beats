@@ -58,7 +58,7 @@
           "bytes": 0,
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "239.255.255.250",
@@ -125,7 +125,7 @@
           "bytes": 0,
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "192.168.1.80",
@@ -192,7 +192,7 @@
           "bytes": 0,
           "direction": "inbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "239.255.255.250",
@@ -259,7 +259,7 @@
           "bytes": 32,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "192.168.1.95",
@@ -326,7 +326,7 @@
           "bytes": 0,
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "239.255.255.250",
@@ -393,7 +393,7 @@
           "bytes": 0,
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "192.168.1.95",
@@ -460,7 +460,7 @@
           "bytes": 0,
           "direction": "inbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "239.255.255.250",
@@ -527,7 +527,7 @@
           "bytes": 32,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "192.168.1.33",
@@ -594,7 +594,7 @@
           "bytes": 0,
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "239.255.255.250",
@@ -661,7 +661,7 @@
           "bytes": 0,
           "direction": "outbound",
           "packets": 0,
-          "protocol": "unknown (2)"
+          "transport": "unknown (2)"
         },
         "source": {
           "ip": "192.168.1.33",

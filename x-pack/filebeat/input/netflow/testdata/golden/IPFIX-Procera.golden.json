@@ -58,7 +58,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "181.214.87.71",
@@ -125,7 +125,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "ipv6-icmp"
+          "transport": "ipv6-icmp"
         },
         "source": {
           "ip": "0.0.0.0",
@@ -192,7 +192,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "5.188.11.35",
@@ -259,7 +259,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "206.117.25.89",
@@ -326,7 +326,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "ipv6-icmp"
+          "transport": "ipv6-icmp"
         },
         "source": {
           "ip": "0.0.0.0",
@@ -393,7 +393,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "185.232.29.199",
@@ -460,7 +460,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "177.188.228.137",
@@ -527,7 +527,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "138.44.161.14",

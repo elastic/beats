@@ -54,7 +54,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -117,7 +117,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -180,7 +180,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -243,7 +243,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -306,7 +306,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -369,7 +369,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -432,7 +432,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -493,7 +493,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -556,7 +556,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -619,7 +619,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -680,7 +680,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -743,7 +743,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -806,7 +806,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.2",
@@ -867,7 +867,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -930,7 +930,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -993,7 +993,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -1054,7 +1054,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -1117,7 +1117,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",
@@ -1180,7 +1180,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.0.1",

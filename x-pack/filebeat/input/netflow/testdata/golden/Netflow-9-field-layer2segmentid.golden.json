@@ -57,7 +57,7 @@
           "bytes": 52,
           "direction": "inbound",
           "packets": 1,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.200.136",

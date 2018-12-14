@@ -49,7 +49,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "192.168.14.1",
@@ -107,7 +107,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "192.168.23.22",
@@ -165,7 +165,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "164.164.37.11",
@@ -223,7 +223,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "192.168.23.20",
@@ -281,7 +281,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "164.164.37.11",
@@ -339,7 +339,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "192.168.14.11",
@@ -397,7 +397,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "2.2.2.11",
@@ -455,7 +455,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "2.2.2.11",
@@ -513,7 +513,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "192.168.14.1",
@@ -571,7 +571,7 @@
         "network": {
           "bytes": 160,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "164.164.37.11",
@@ -629,7 +629,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "192.168.23.22",
@@ -687,7 +687,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "164.164.37.11",
@@ -745,7 +745,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "192.168.23.20",
@@ -803,7 +803,7 @@
         "network": {
           "bytes": 56,
           "direction": "unknown",
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "164.164.37.11",

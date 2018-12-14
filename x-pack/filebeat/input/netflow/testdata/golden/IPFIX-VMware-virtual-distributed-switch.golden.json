@@ -58,7 +58,7 @@
           "bytes": 100,
           "direction": "outbound",
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.18.65.21",
@@ -125,7 +125,7 @@
           "bytes": 229,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.18.65.91",
@@ -192,7 +192,7 @@
           "bytes": 229,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.18.65.91",
@@ -259,7 +259,7 @@
           "bytes": 104,
           "direction": "outbound",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.18.65.21",
@@ -324,7 +324,7 @@
           "bytes": 144,
           "direction": "outbound",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 61329

@@ -53,7 +53,7 @@
           "bytes": 152,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.8.197",
@@ -115,7 +115,7 @@
           "bytes": 502,
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.35.143",
@@ -177,7 +177,7 @@
           "bytes": 2233,
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.10.6.11",
@@ -239,7 +239,7 @@
           "bytes": 152,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.128.17",
@@ -301,7 +301,7 @@
           "bytes": 79724,
           "direction": "unknown",
           "packets": 57,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.10.8.220",
@@ -363,7 +363,7 @@
           "bytes": 161,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.20.4.199",
@@ -425,7 +425,7 @@
           "bytes": 245,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.20.4.1",
@@ -487,7 +487,7 @@
           "bytes": 504,
           "direction": "unknown",
           "packets": 6,
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "172.20.4.30",
@@ -549,7 +549,7 @@
           "bytes": 784,
           "direction": "unknown",
           "packets": 6,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.10.8.105",
@@ -611,7 +611,7 @@
           "bytes": 433,
           "direction": "unknown",
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.20.4.30",
@@ -673,7 +673,7 @@
           "bytes": 196,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.10.7.11",
@@ -735,7 +735,7 @@
           "bytes": 206,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.183.199",
@@ -797,7 +797,7 @@
           "bytes": 504,
           "direction": "unknown",
           "packets": 6,
-          "protocol": "icmp"
+          "transport": "icmp"
         },
         "source": {
           "ip": "10.10.8.34",
@@ -859,7 +859,7 @@
           "bytes": 3539,
           "direction": "unknown",
           "packets": 58,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.20.5.191",
@@ -921,7 +921,7 @@
           "bytes": 495,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.20.4.1",
@@ -983,7 +983,7 @@
           "bytes": 330,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.20.4.1",
@@ -1045,7 +1045,7 @@
           "bytes": 435,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.30.0.1",
@@ -1107,7 +1107,7 @@
           "bytes": 290,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.30.0.1",
@@ -1169,7 +1169,7 @@
           "bytes": 495,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.6.1",
@@ -1231,7 +1231,7 @@
           "bytes": 330,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.6.1",
@@ -1293,7 +1293,7 @@
           "bytes": 495,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.7.1",
@@ -1355,7 +1355,7 @@
           "bytes": 330,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.7.1",
@@ -1417,7 +1417,7 @@
           "bytes": 495,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.8.1",
@@ -1479,7 +1479,7 @@
           "bytes": 330,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.8.1",
@@ -1541,7 +1541,7 @@
           "bytes": 495,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.20.0.1",
@@ -1603,7 +1603,7 @@
           "bytes": 330,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.20.0.1",
@@ -1665,7 +1665,7 @@
           "bytes": 495,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.10.1",
@@ -1727,7 +1727,7 @@
           "bytes": 330,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.10.10.1",
@@ -1785,7 +1785,7 @@
           "bytes": 555,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -1841,7 +1841,7 @@
           "bytes": 370,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -1897,7 +1897,7 @@
           "bytes": 495,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -1953,7 +1953,7 @@
           "bytes": 330,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2009,7 +2009,7 @@
           "bytes": 555,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2065,7 +2065,7 @@
           "bytes": 370,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2121,7 +2121,7 @@
           "bytes": 555,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2177,7 +2177,7 @@
           "bytes": 370,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2233,7 +2233,7 @@
           "bytes": 555,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2289,7 +2289,7 @@
           "bytes": 370,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2345,7 +2345,7 @@
           "bytes": 555,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2401,7 +2401,7 @@
           "bytes": 370,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2457,7 +2457,7 @@
           "bytes": 555,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2513,7 +2513,7 @@
           "bytes": 370,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2569,7 +2569,7 @@
           "bytes": 555,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2625,7 +2625,7 @@
           "bytes": 370,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2681,7 +2681,7 @@
           "bytes": 555,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678
@@ -2737,7 +2737,7 @@
           "bytes": 370,
           "direction": "unknown",
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "port": 5678

@@ -65,7 +65,7 @@
           "bytes": 200,
           "direction": "outbound",
           "packets": 4,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.108.219.53",

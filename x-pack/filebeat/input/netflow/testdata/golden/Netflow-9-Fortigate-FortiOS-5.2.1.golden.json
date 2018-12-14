@@ -88,7 +88,7 @@
           "bytes": 152,
           "direction": "unknown",
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "192.168.99.7",

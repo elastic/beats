@@ -60,7 +60,7 @@
           "bytes": 421,
           "direction": "outbound",
           "packets": 6,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.5.2",
@@ -129,7 +129,7 @@
           "bytes": 7621,
           "direction": "outbound",
           "packets": 131,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -198,7 +198,7 @@
           "bytes": 95,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "10.100.4.1",
@@ -267,7 +267,7 @@
           "bytes": 3162,
           "direction": "outbound",
           "packets": 30,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -336,7 +336,7 @@
           "bytes": 2711,
           "direction": "outbound",
           "packets": 13,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.80",
@@ -405,7 +405,7 @@
           "bytes": 20855,
           "direction": "outbound",
           "packets": 346,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -474,7 +474,7 @@
           "bytes": 7495,
           "direction": "outbound",
           "packets": 129,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -543,7 +543,7 @@
           "bytes": 7049,
           "direction": "outbound",
           "packets": 119,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -612,7 +612,7 @@
           "bytes": 1348,
           "direction": "outbound",
           "packets": 13,
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "10.100.6.93",
@@ -681,7 +681,7 @@
           "bytes": 82,
           "direction": "outbound",
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "192.168.1.4",

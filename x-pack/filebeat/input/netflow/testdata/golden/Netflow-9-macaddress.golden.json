@@ -76,7 +76,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -129,7 +129,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -182,7 +182,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "udp"
+          "transport": "udp"
         },
         "source": {
           "ip": "172.16.32.100",
@@ -235,7 +235,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -288,7 +288,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -341,7 +341,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -394,7 +394,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -447,7 +447,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -500,7 +500,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -553,7 +553,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -606,7 +606,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -659,7 +659,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -712,7 +712,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -765,7 +765,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -818,7 +818,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -871,7 +871,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -924,7 +924,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -977,7 +977,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -1030,7 +1030,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -1083,7 +1083,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -1136,7 +1136,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -1189,7 +1189,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -1242,7 +1242,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -1295,7 +1295,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -1348,7 +1348,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -1401,7 +1401,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -1454,7 +1454,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
@@ -1507,7 +1507,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.1",
@@ -1560,7 +1560,7 @@
         },
         "network": {
           "direction": "unknown",
-          "protocol": "tcp"
+          "transport": "tcp"
         },
         "source": {
           "ip": "172.16.32.201",
