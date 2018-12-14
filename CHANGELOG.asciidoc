@@ -33,6 +33,8 @@ https://github.com/elastic/beats/compare/v6.5.3...6.5[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Update Golang to 1.10.6. {pull}9563[9563]
+
 *Auditbeat*
 
 *Filebeat*
