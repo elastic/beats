@@ -6,6 +6,8 @@ package process
 
 import (
 	"fmt"
+	"os"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -72,6 +74,8 @@ type MetricSet struct {
 	log       *logp.Logger
 	bucket    datastore.Bucket
 	lastState time.Time
+
+	suppressPermissionWarnings bool
 }
 
 // ProcessInfo wraps the process information and implements cache.Cacheable.
@@ -288,6 +292,30 @@ func (ms *MetricSet) getProcessInfos() ([]*ProcessInfo, error) {
 
 		pInfo, err := process.Info()
 		if err != nil {
+			if os.Geteuid() != 0 {
+				if os.IsPermission(err) || runtime.GOOS == "darwin" {
+					/*
+						Running as non-root, permission issues when trying to access other user's private
+						process information are expected.
+
+						Unfortunately, for darwin os.IsPermission() does not
+						work because it is a custom error created using errors.New() in
+						getProcTaskAllInfo() in go-sysinfo/providers/darwin/process_darwin_amd64.go
+
+						TODO: Fix go-sysinfo to have better error for darwin.
+					*/
+					if !ms.suppressPermissionWarnings {
+						ms.log.Warnf("Failed to load process information for PID %d as non-root user. "+
+							"Will suppress further errors of this kind. Error: %v", pid, err)
+
+						// Only warn once at the start of Auditbeat.
+						ms.suppressPermissionWarnings = true
+					}
+
+					continue
+				}
+			}
+
 			return nil, errors.Wrap(err, "failed to load process information")
 		}
 
