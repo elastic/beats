@@ -28,8 +28,6 @@ import (
 )
 
 func TestPodMetadataDeDot(t *testing.T) {
-	withUID, _ := common.NewConfigFrom(map[string]interface{}{"include_pod_uid": true})
-
 	UID := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	Deployment := "Deployment"
 	test := "test"
@@ -53,32 +51,15 @@ func TestPodMetadataDeDot(t *testing.T) {
 				},
 			},
 			meta: common.MapStr{
-				"pod":       common.MapStr{"name": ""},
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
 				"node":      common.MapStr{"name": "test"},
 				"namespace": "test",
 				"labels":    common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
 			},
 			config: common.NewConfig(),
-		},
-		{
-			pod: &Pod{
-				Metadata: &metav1.ObjectMeta{
-					Labels: map[string]string{"a.key": "foo", "a": "bar"},
-					Uid:    &UID,
-				},
-				Spec: &v1.PodSpec{
-					NodeName: &test,
-				},
-			},
-			meta: common.MapStr{
-				"pod": common.MapStr{
-					"name": "",
-					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-				},
-				"node":   common.MapStr{"name": "test"},
-				"labels": common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
-			},
-			config: withUID,
 		},
 		{
 			pod: &Pod{
@@ -103,7 +84,10 @@ func TestPodMetadataDeDot(t *testing.T) {
 				},
 			},
 			meta: common.MapStr{
-				"pod":        common.MapStr{"name": ""},
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
 				"node":       common.MapStr{"name": "test"},
 				"labels":     common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
 				"deployment": common.MapStr{"name": "test"},
