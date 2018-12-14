@@ -18,6 +18,9 @@
 package docker
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
@@ -44,9 +47,17 @@ func defaultConfig() *Config {
 }
 
 // Validate ensures correctness of config
-func (c *Config) Validate() {
+func (c *Config) Validate() error {
 	// Make sure that prefix doesn't ends with a '.'
 	if c.Prefix[len(c.Prefix)-1] == '.' && c.Prefix != "." {
 		c.Prefix = c.Prefix[:len(c.Prefix)-2]
 	}
+	if len(c.Separator) != 1 {
+		return fmt.Errorf("separator '%v' must be a single character", c.Separator)
+	}
+	// Make sure that separator isn't included in prefix
+	if strings.Contains(c.Prefix, c.Separator) {
+		return fmt.Errorf("separator '%v' must not be included in prefix '%v'", c.Prefix, c.Separator)
+	}
+	return nil
 }

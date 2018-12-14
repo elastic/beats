@@ -49,7 +49,6 @@ func TestGenerateHints(t *testing.T) {
 				"co.elastic.metrics.foobar/period":  "15s",
 				"co.elastic.metrics.foobar1/period": "15s",
 				"not.to.include":                    "true",
-				"co.elastic.logs|not.to.include":    "true",
 			},
 			result: common.MapStr{
 				"logs": common.MapStr{
@@ -70,6 +69,38 @@ func TestGenerateHints(t *testing.T) {
 		for k, v := range test.annotations {
 			annMap.Put(k, v)
 		}
-		assert.Equal(t, GenerateHints(annMap, "foobar", "co.elastic", "/"), test.result)
+		assert.Equal(t, test.result, GenerateHints(annMap, "foobar", "co.elastic", "/"))
+	}
+}
+
+func TestGenerateHintsCustomSeparator(t *testing.T) {
+	tests := []struct {
+		annotations map[string]string
+		result      common.MapStr
+	}{
+		// Scenarios being tested:
+		// logs-include must be included under hints.logs
+		// not_to_include must not be part of hints
+		// not.to.include must not be part of hints.metrics
+		{
+			annotations: map[string]string{
+				"co.elastic.logs-include":           "true",
+				"not_to_include":         "false",
+				"co.elastic.metrics/not.to.include": "false",
+			},
+			result: common.MapStr{
+				"logs": common.MapStr{
+					"include": "true",
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		annMap := common.MapStr{}
+		for k, v := range test.annotations {
+			annMap.Put(k, v)
+		}
+		assert.Equal(t, test.result, GenerateHints(annMap, "foobar", "co.elastic", "-"))
 	}
 }
