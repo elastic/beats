@@ -14,7 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -44,7 +45,7 @@
           "source_mac_address": "ec:1f:72:11:9f:c1",
           "source_transport_port": 37301,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 75,
@@ -74,7 +75,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -104,7 +106,7 @@
           "source_mac_address": "ec:1f:72:11:9f:c1",
           "source_transport_port": 58411,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 75,
@@ -134,7 +136,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -164,7 +167,7 @@
           "source_mac_address": "ec:1f:72:11:9f:c1",
           "source_transport_port": 37661,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 75,
@@ -194,7 +197,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -224,7 +228,7 @@
           "source_mac_address": "ec:1f:72:11:9f:c1",
           "source_transport_port": 60212,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 75,
@@ -254,7 +258,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -284,7 +289,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 5222,
           "tcp_control_bits": 29,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 964,
@@ -314,7 +319,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -344,7 +350,7 @@
           "source_mac_address": "a4:d1:8c:e9:30:2c",
           "source_transport_port": 61490,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 2748,
@@ -374,7 +380,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -404,7 +411,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 2023,
@@ -434,7 +441,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -464,7 +472,7 @@
           "source_mac_address": "98:01:a7:9f:8d:5f",
           "source_transport_port": 50299,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 2180,
@@ -494,7 +502,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -524,7 +533,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 700,
@@ -554,7 +563,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -584,7 +594,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 161,
@@ -614,7 +624,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -644,7 +655,7 @@
           "source_mac_address": "1c:5c:f2:07:0f:2a",
           "source_transport_port": 61674,
           "tcp_control_bits": 27,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1764,
@@ -674,7 +685,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -704,7 +716,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 31,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 13811,
@@ -734,7 +746,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -764,7 +777,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 27,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 4717,
@@ -794,7 +807,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -824,7 +838,7 @@
           "source_mac_address": "b0:34:95:0d:d2:5d",
           "source_transport_port": 51209,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 2419,
@@ -854,7 +868,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -884,7 +899,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 5551,
@@ -914,7 +929,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -944,7 +960,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 25,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 187,
@@ -974,7 +990,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1004,7 +1021,7 @@
           "source_mac_address": "dc:ef:ca:4c:da:57",
           "source_transport_port": 45584,
           "tcp_control_bits": 17,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 104,
@@ -1034,7 +1051,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1064,7 +1082,7 @@
           "source_mac_address": "70:18:8b:5c:c9:b5",
           "source_transport_port": 64233,
           "tcp_control_bits": 27,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 4050,
@@ -1094,7 +1112,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1124,7 +1143,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 2222,
           "tcp_control_bits": 27,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 3719,
@@ -1154,7 +1173,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1184,7 +1204,7 @@
           "source_mac_address": "8c:29:37:7a:28:c0",
           "source_transport_port": 54275,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1402,
@@ -1214,7 +1234,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1244,7 +1265,7 @@
           "source_mac_address": "8c:29:37:7a:28:c0",
           "source_transport_port": 54276,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1538,
@@ -1274,7 +1295,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1304,7 +1326,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 13002,
@@ -1334,7 +1356,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1364,7 +1387,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1194,
@@ -1394,7 +1417,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1424,7 +1448,7 @@
           "source_mac_address": "90:61:ae:76:e5:e9",
           "source_transport_port": 57007,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 682,
@@ -1454,7 +1478,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1484,7 +1509,7 @@
           "source_mac_address": "1c:5c:f2:07:0f:2a",
           "source_transport_port": 61694,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1804,
@@ -1514,7 +1539,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1544,7 +1570,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 4774,
@@ -1574,7 +1600,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1604,7 +1631,7 @@
           "source_mac_address": "18:20:32:bb:1d:62",
           "source_transport_port": 64493,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 135,
@@ -1634,7 +1661,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1664,7 +1692,7 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 135,
@@ -1694,7 +1722,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-10-03T17:03:39Z"
         },
         "flow": {
@@ -1724,7 +1753,7 @@
           "source_mac_address": "a0:39:f7:4d:49:d5",
           "source_transport_port": 35053,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 194,

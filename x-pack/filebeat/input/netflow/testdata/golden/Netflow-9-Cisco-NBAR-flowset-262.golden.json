@@ -15,7 +15,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
@@ -57,7 +58,7 @@
           "source_mac_address": "00:50:56:91:56:86",
           "source_transport_port": 0,
           "tcp_source_port": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "udp_destination_port": 0
         },
         "network": {
@@ -89,7 +90,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
@@ -131,7 +133,7 @@
           "source_mac_address": "00:50:56:91:56:86",
           "source_transport_port": 34220,
           "tcp_source_port": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "udp_destination_port": 161
         },
         "network": {
@@ -163,7 +165,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.924Z",
@@ -205,7 +208,7 @@
           "source_mac_address": "00:18:19:9e:6c:01",
           "source_transport_port": 0,
           "tcp_source_port": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "udp_destination_port": 0
         },
         "network": {
@@ -237,7 +240,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.996Z",
@@ -279,7 +283,7 @@
           "source_mac_address": "00:18:19:9e:6c:01",
           "source_transport_port": 123,
           "tcp_source_port": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "udp_destination_port": 123
         },
         "network": {
@@ -311,7 +315,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-02-14T11:10:36Z",
           "duration": 72000000,
           "end": "2017-02-14T11:10:20.008Z",
@@ -353,7 +358,7 @@
           "source_mac_address": "00:18:19:9e:6c:01",
           "source_transport_port": 45269,
           "tcp_source_port": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "udp_destination_port": 161
         },
         "network": {

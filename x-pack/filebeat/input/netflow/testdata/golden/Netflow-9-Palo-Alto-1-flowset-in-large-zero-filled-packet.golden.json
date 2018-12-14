@@ -14,7 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-06-06T13:20:17Z",
           "duration": 0,
           "end": "2018-06-06T13:20:02Z",
@@ -50,7 +51,7 @@
           "source_ipv4_address": "134.220.2.6",
           "source_transport_port": 88,
           "tcp_control_bits": 94,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 363,

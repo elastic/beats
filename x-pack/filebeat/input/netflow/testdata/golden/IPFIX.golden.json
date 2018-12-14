@@ -10,6 +10,7 @@
         },
         "event": {
           "action": "netflow_options",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:26Z"
         },
         "netflow": {
@@ -47,7 +48,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:26Z"
         },
         "flow": {
@@ -77,7 +79,7 @@
           "source_ipv4_address": "192.168.253.1",
           "source_transport_port": 60560,
           "tcp_control_bits": 16,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -107,7 +109,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:26Z"
         },
         "flow": {
@@ -137,7 +140,7 @@
           "source_ipv4_address": "192.168.253.128",
           "source_transport_port": 22,
           "tcp_control_bits": 24,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -167,7 +170,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:26Z"
         },
         "flow": {
@@ -197,7 +201,7 @@
           "source_ipv4_address": "192.168.253.2",
           "source_transport_port": 53,
           "tcp_control_bits": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -227,7 +231,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:26Z"
         },
         "flow": {
@@ -257,7 +262,7 @@
           "source_ipv4_address": "192.168.253.132",
           "source_transport_port": 35262,
           "tcp_control_bits": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -287,7 +292,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:26Z"
         },
         "flow": {
@@ -317,7 +323,7 @@
           "source_ipv4_address": "54.214.9.161",
           "source_transport_port": 443,
           "tcp_control_bits": 26,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -347,7 +353,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:26Z"
         },
         "flow": {
@@ -377,7 +384,7 @@
           "source_ipv4_address": "192.168.253.132",
           "source_transport_port": 49935,
           "tcp_control_bits": 26,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -407,7 +414,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:26Z"
         },
         "flow": {
@@ -437,7 +445,7 @@
           "source_ipv4_address": "192.168.253.130",
           "source_transport_port": 38254,
           "tcp_control_bits": 2,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -467,7 +475,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:28Z"
         },
         "flow": {
@@ -497,7 +506,7 @@
           "source_ipv4_address": "192.168.253.1",
           "source_transport_port": 60560,
           "tcp_control_bits": 24,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -527,7 +536,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:28Z"
         },
         "flow": {
@@ -557,7 +567,7 @@
           "source_ipv4_address": "192.168.253.128",
           "source_transport_port": 22,
           "tcp_control_bits": 24,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -587,7 +597,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:28Z"
         },
         "flow": {
@@ -617,7 +628,7 @@
           "source_ipv4_address": "192.168.253.1",
           "source_transport_port": 65308,
           "tcp_control_bits": 24,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -647,7 +658,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:28Z"
         },
         "flow": {
@@ -677,7 +689,7 @@
           "source_ipv4_address": "192.168.253.128",
           "source_transport_port": 22,
           "tcp_control_bits": 24,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -707,7 +719,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-05-13T11:20:28Z"
         },
         "flow": {
@@ -737,7 +750,7 @@
           "source_ipv4_address": "192.168.253.1",
           "source_transport_port": 5353,
           "tcp_control_bits": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {

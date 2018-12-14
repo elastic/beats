@@ -14,7 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-12-01T17:04:39Z"
         },
         "flow": {
@@ -44,7 +45,7 @@
           "sampler_id": 1,
           "source_ipv4_address": "192.168.0.3",
           "source_transport_port": 137,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 78,
@@ -73,7 +74,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-12-01T17:04:39Z"
         },
         "flow": {
@@ -103,7 +105,7 @@
           "sampler_id": 1,
           "source_ipv4_address": "192.168.0.4",
           "source_transport_port": 58130,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 232,

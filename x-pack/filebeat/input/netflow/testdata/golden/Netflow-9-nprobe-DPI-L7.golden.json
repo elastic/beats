@@ -14,7 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "1970-01-01T00:08:22Z"
         },
         "flow": {
@@ -40,7 +41,7 @@
           "protocol_identifier": 0,
           "source_ipv4_address": "0.0.0.0",
           "source_transport_port": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 82,

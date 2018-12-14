@@ -14,7 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
           "duration": 20269000000
         },
@@ -46,7 +47,7 @@
           "source_ipv4_address": "10.99.130.239",
           "source_mac_address": "00:00:00:00:00:00",
           "source_transport_port": 65105,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 0,
@@ -76,7 +77,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
           "duration": 20269000000
         },
@@ -108,7 +110,7 @@
           "source_ipv4_address": "10.99.252.50",
           "source_mac_address": "00:00:00:00:00:00",
           "source_transport_port": 53,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 81,
@@ -138,7 +140,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
           "duration": 20306000000
         },
@@ -170,7 +173,7 @@
           "source_ipv4_address": "10.99.130.239",
           "source_mac_address": "00:00:00:00:00:00",
           "source_transport_port": 65105,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 0,
@@ -200,7 +203,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
           "duration": 20306000000
         },
@@ -232,7 +236,7 @@
           "source_ipv4_address": "10.98.243.20",
           "source_mac_address": "00:00:00:00:00:00",
           "source_transport_port": 53,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 81,
@@ -262,7 +266,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
           "duration": 20317000000
         },
@@ -294,7 +299,7 @@
           "source_ipv4_address": "10.99.168.140",
           "source_mac_address": "00:00:00:00:00:00",
           "source_transport_port": 52344,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 0,
@@ -324,7 +329,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
           "duration": 20317000000
         },
@@ -356,7 +362,7 @@
           "source_ipv4_address": "10.98.243.20",
           "source_mac_address": "00:00:00:00:00:00",
           "source_transport_port": 53,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 113,
@@ -386,7 +392,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
           "duration": 20368000000
         },
@@ -418,7 +425,7 @@
           "source_ipv4_address": "10.99.168.140",
           "source_mac_address": "00:00:00:00:00:00",
           "source_transport_port": 50294,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 0,
@@ -448,7 +455,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-29T13:58:28Z",
           "duration": 20368000000
         },
@@ -480,7 +488,7 @@
           "source_ipv4_address": "10.98.243.20",
           "source_mac_address": "00:00:00:00:00:00",
           "source_transport_port": 53,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 113,
