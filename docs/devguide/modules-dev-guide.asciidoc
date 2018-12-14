@@ -382,13 +382,13 @@ pipeline.
     },
     {
       "pipeline": {
-        "if": "ctx.first_char == '{'"
+        "if": "ctx.first_char == '{'",
         "name": "{< IngestPipeline "json-log-processing-pipeline" >}" <1>
       }
     },
     {
       "pipeline": {
-        "if": "ctx.first_char != '{'"
+        "if": "ctx.first_char != '{'",
         "name": "{< IngestPipeline "plain-log-processing-pipeline" >}"
       }
     }
