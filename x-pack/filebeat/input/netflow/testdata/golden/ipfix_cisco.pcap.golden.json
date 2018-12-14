@@ -61,6 +61,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -126,6 +127,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -191,6 +193,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -256,6 +259,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -321,6 +325,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -386,6 +391,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -451,6 +457,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -516,6 +523,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -581,6 +589,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -646,6 +655,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -711,6 +721,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -776,6 +787,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -841,6 +853,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -906,6 +919,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -971,6 +985,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1036,6 +1051,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1101,6 +1117,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1166,6 +1183,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1231,6 +1249,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1296,6 +1315,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1361,6 +1381,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1426,6 +1447,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1491,6 +1513,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1556,6 +1579,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1621,6 +1645,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1686,6 +1711,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1751,6 +1777,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1816,6 +1843,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },
@@ -1881,6 +1909,7 @@
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         }
       },

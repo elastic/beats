@@ -60,6 +60,7 @@
           "bytes": 421,
           "community_id": "1:c3a8HfldOuX4/xBvf0sHuy38GTk=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 6,
           "transport": "tcp"
         },
@@ -130,6 +131,7 @@
           "bytes": 7621,
           "community_id": "1:ZNEMnnkXh6LJsCtYCHWkxVCOl9E=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 131,
           "transport": "tcp"
         },
@@ -200,6 +202,7 @@
           "bytes": 95,
           "community_id": "1:XdJd2ziZmmG1mSIxfvlr6ecG4pM=",
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -270,6 +273,7 @@
           "bytes": 3162,
           "community_id": "1:+80+CdeOLSths8RQiqHUoqr8qrU=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 30,
           "transport": "tcp"
         },
@@ -340,6 +344,7 @@
           "bytes": 2711,
           "community_id": "1:3s9tK3Ncm1BXFpA8+hBpk22sg0c=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 13,
           "transport": "tcp"
         },
@@ -410,6 +415,7 @@
           "bytes": 20855,
           "community_id": "1:3w94g30M+cTZZskO9dmazwtDHo8=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 346,
           "transport": "tcp"
         },
@@ -480,6 +486,7 @@
           "bytes": 7495,
           "community_id": "1:XE7UjW9QNWzM1F452q/jPfC4C90=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 129,
           "transport": "tcp"
         },
@@ -550,6 +557,7 @@
           "bytes": 7049,
           "community_id": "1:CJ9T/03SqwG5Yy7WmXADUqvvgvw=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 119,
           "transport": "tcp"
         },
@@ -620,6 +628,7 @@
           "bytes": 1348,
           "community_id": "1:3vSrJV3tnfjnzopvPuRQzt2BDS4=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 13,
           "transport": "tcp"
         },
@@ -690,6 +699,7 @@
           "bytes": 82,
           "community_id": "1:mjMjtH0BZKCuCmxkZbQyrFDfoI0=",
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },

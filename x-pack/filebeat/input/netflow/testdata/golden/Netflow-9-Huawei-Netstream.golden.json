@@ -65,6 +65,7 @@
           "bytes": 200,
           "community_id": "1:UTBimnmI4MzXDTKLW5sOTHaZyKc=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 4,
           "transport": "tcp"
         },

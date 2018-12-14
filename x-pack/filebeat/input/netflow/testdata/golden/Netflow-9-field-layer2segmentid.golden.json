@@ -57,6 +57,7 @@
           "bytes": 52,
           "community_id": "1:4iAaWV/HzvAcwggo1MJCfjvj8No=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 1,
           "transport": "tcp"
         },

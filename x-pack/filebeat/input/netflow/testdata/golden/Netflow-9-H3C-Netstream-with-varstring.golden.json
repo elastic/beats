@@ -66,6 +66,7 @@
           "bytes": 702,
           "community_id": "1:WP3Ss+M/Q16gnXrqnk6fwmPWvWc=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 9,
           "transport": "udp"
         },

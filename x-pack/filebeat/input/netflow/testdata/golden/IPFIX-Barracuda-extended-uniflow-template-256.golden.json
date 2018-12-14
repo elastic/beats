@@ -66,6 +66,7 @@
           "bytes": 0,
           "community_id": "1:hxVadzb8UUZ5YGGYtqj+E2mpQe8=",
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 0,
           "transport": "tcp"
         },
@@ -143,6 +144,7 @@
           "bytes": 0,
           "community_id": "1:4oQU8uYa7F7RE/lIflbJOuU8Vc8=",
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 0,
           "transport": "tcp"
         },

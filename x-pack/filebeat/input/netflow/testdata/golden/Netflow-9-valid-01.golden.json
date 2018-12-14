@@ -54,6 +54,7 @@
           "bytes": 76,
           "community_id": "1:cRrWVwyu9GLZ+aU7qmwhjSdMrpE=",
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -118,6 +119,7 @@
           "bytes": 76,
           "community_id": "1:wNJjbHYcMj4lBiVWbMHK1JcgsJ8=",
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -182,6 +184,7 @@
           "bytes": 76,
           "community_id": "1:cRrWVwyu9GLZ+aU7qmwhjSdMrpE=",
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -246,6 +249,7 @@
           "bytes": 76,
           "community_id": "1:mYS5cP5hzhSb8JZH9+2v8+RMJ9g=",
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -310,6 +314,7 @@
           "bytes": 76,
           "community_id": "1:cRrWVwyu9GLZ+aU7qmwhjSdMrpE=",
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -374,6 +379,7 @@
           "bytes": 76,
           "community_id": "1:Y7cJ9MH0pPXGOYtewjtnB/Xf2Os=",
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -436,6 +442,7 @@
           "bytes": 672,
           "community_id": "1:vK+Zeop1Y3GHxfFGVF2/COcNBWw=",
           "direction": "unknown",
+          "iana_number": 58,
           "packets": 7,
           "transport": "ipv6-icmp"
         },

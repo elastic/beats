@@ -52,6 +52,7 @@
           "bytes": 78,
           "community_id": "1:exuCftrHyAyRt6vQ7silX0RyM6c=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },
@@ -114,6 +115,7 @@
           "bytes": 232,
           "community_id": "1:0CGjtxAvSJC5Eo2OErzsmgtb9JE=",
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 1,
           "transport": "udp"
         },

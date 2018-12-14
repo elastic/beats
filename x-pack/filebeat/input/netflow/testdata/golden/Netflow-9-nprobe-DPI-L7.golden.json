@@ -48,6 +48,7 @@
           "bytes": 82,
           "community_id": "1:LFE/FJ5zfsQGP8HTeu6b6rxLS78=",
           "direction": "unknown",
+          "iana_number": 0,
           "packets": 1,
           "transport": "unknown (0)"
         },

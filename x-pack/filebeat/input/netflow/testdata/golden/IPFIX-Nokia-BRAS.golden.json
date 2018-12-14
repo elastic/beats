@@ -47,6 +47,7 @@
         "network": {
           "community_id": "1:JOQeKrnZDhP8AqJv8DtyiRwHnek=",
           "direction": "unknown",
+          "iana_number": 6,
           "transport": "tcp"
         },
         "source": {
