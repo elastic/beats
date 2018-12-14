@@ -5667,14 +5667,14 @@ The file from which the line was read. This field contains the absolute path to 
 
 --
 
-*`log.source.ip`*::
+*`log.source.address`*::
 +
 --
-type: ip
+type: keyword
 
 required: False
 
-Source IP from which the log event was read / sent from.
+Source address from which the log event was read / sent from.
 
 
 --

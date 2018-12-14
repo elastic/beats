@@ -76,7 +76,7 @@ func NewInput(
 				"message": string(data),
 				"log": common.MapStr{
 					"source": common.MapStr{
-						"ip": metadata.RemoteAddr.String(),
+						"address": metadata.RemoteAddr.String(),
 					},
 				},
 			},
