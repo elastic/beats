@@ -160,6 +160,13 @@ metricbeat.modules:
   hosts: ["localhost:8091"]
   enabled: true
 
+#------------------------------- Couchdb Module -------------------------------
+- module: couchdb
+  metricsets: 
+   - server
+  period: 10s
+  hosts: ["localhost:5984"]
+
 #-------------------------------- Docker Module --------------------------------
 - module: docker
   metricsets:
