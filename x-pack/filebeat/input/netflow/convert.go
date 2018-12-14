@@ -261,6 +261,17 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 		revPkts, hasRevPkts = getKeyUint64(flow.Fields, "reversePacketTotalCount")
 	}
 
+	if biflowDir, isBiflow := getKeyUint64(flow.Fields, "biflowDirection"); isBiflow && len(ecsSource) > 0 && len(ecsDest) > 0 {
+		client, server := ecsSource, ecsDest
+		// swap client and server if biflowDirection is reverse
+		if biflowDir == 2 {
+			client, server = server, client
+		}
+		event.Fields["client"] = client
+		event.Fields["source"] = server
+		ecsEvent["category"] = "network_session"
+	}
+
 	if hasRevBytes || hasRevPkts {
 		if hasBytes {
 			ecsSource["bytes"] = countBytes
