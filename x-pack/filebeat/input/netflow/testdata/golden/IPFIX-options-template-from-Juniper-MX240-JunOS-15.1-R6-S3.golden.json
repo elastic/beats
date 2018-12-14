@@ -10,6 +10,7 @@
         },
         "event": {
           "action": "netflow_options",
+          "category": "network_traffic",
           "created": "2018-06-01T15:11:53Z"
         },
         "netflow": {

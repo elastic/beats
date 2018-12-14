@@ -10,6 +10,7 @@
         },
         "event": {
           "action": "netflow_options",
+          "category": "network_traffic",
           "created": "2015-10-10T08:46:56Z"
         },
         "netflow": {
@@ -46,7 +47,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -68,7 +70,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 65058,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:tzcqIeMhEvkXA/EBAZraJPCnaN8=",
@@ -98,7 +100,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -120,7 +123,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 123,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:mYS5cP5hzhSb8JZH9+2v8+RMJ9g=",
@@ -150,7 +153,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -172,7 +176,7 @@
           "source_ipv4_address": "172.16.32.100",
           "source_mac_address": "00:0c:29:8d:af:c3",
           "source_transport_port": 123,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:cRrWVwyu9GLZ+aU7qmwhjSdMrpE=",
@@ -202,7 +206,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -224,7 +229,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59157,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:fVzE/MKEA1VMNMkCvz5NQinQLUI=",
@@ -254,7 +259,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -276,7 +282,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 80,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:LZj70OIhu6ThMyKy7u70cO67FK4=",
@@ -306,7 +312,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -328,7 +335,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59158,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:DoERidYQAzlwvj5aBo1aEylCHgo=",
@@ -358,7 +365,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -380,7 +388,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 443,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:s0N+K6vD3goIH7jZO1SqG58ztGQ=",
@@ -410,7 +418,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -432,7 +441,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59159,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:q1r5Q5XRCVvpwYqEkfbN8OxKQuI=",
@@ -462,7 +471,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -484,7 +494,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 139,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:5idRNtMRt9YwcfftLSQtC72/n6Y=",
@@ -514,7 +524,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -536,7 +547,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59160,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:O9wqBh6gPhpzxHuWe7MgCX7Xpc4=",
@@ -566,7 +577,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -588,7 +600,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 23,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:odq42pEjA7OgeYPh6amRzomwnoM=",
@@ -618,7 +630,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -640,7 +653,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59161,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:UUC6Ang4BzxgjeDeSNC8v/53zx4=",
@@ -670,7 +683,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -692,7 +706,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 995,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:gYnQndK1J0EfqJ6hcON4iV+sV1I=",
@@ -722,7 +736,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -744,7 +759,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59162,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:zppnN171ys38psn8czlt3R0wxe8=",
@@ -774,7 +789,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -796,7 +812,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 443,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:t1KFW03nxtZ2y4JBNbWu3PyDfk8=",
@@ -826,7 +842,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -848,7 +865,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59163,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:cYbvSlVIg8esJzIq2q4ATrJ7+sY=",
@@ -878,7 +895,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -900,7 +918,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 135,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:xw52kFQxAYrEnkCjkJPN4NUZ8WI=",
@@ -930,7 +948,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -952,7 +971,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59164,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:nOvjuKIb5reZRRHaoCJRGUw2u2o=",
@@ -982,7 +1001,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -1004,7 +1024,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 110,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:iXLOg+5V7xMNbFjb/Fn13WXIwpA=",
@@ -1034,7 +1054,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -1056,7 +1077,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59165,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:hoCpobmQ1SEqktORR12M8ynuDPI=",
@@ -1086,7 +1107,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -1108,7 +1130,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 111,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:nphrDmJfS2JuUpcSM+E36Xh41ck=",
@@ -1138,7 +1160,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -1160,7 +1183,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59166,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:andIv3q3a7gqVMMwg+YVAxxbyf8=",
@@ -1190,7 +1213,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -1212,7 +1236,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 143,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:3Zpznpp5sA+yxgN2vQONTT4Qtlk=",
@@ -1242,7 +1266,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -1264,7 +1289,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59167,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:b/19ZiHUfRjjwT7BRwqUlFnZk30=",
@@ -1294,7 +1319,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -1316,7 +1342,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 3389,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:ThxBiPu4noU7F3HVrTJodqLYprw=",
@@ -1346,7 +1372,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -1368,7 +1395,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59168,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:PtQEU2tjKLZQ3ulraXStL41RrFw=",
@@ -1398,7 +1425,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -1420,7 +1448,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 80,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:c9aRRsQSCI2QgP+soSkmLeg4eME=",
@@ -1450,7 +1478,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -1472,7 +1501,7 @@
           "source_ipv4_address": "172.16.32.1",
           "source_mac_address": "00:50:56:c0:00:01",
           "source_transport_port": 59169,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:pYvqf9IBjYoaWWbRiwE7BvIF0+U=",
@@ -1502,7 +1531,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2015-10-10T08:47:01Z"
         },
         "flow": {
@@ -1524,7 +1554,7 @@
           "source_ipv4_address": "172.16.32.201",
           "source_mac_address": "00:0c:29:70:86:09",
           "source_transport_port": 25,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:khchUIbdprQL3CvkhqiO+LfVtOQ=",

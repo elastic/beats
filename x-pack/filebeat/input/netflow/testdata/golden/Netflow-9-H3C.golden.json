@@ -14,7 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 89519000000,
           "end": "2018-05-21T09:25:03.677Z",
@@ -57,7 +58,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1027087,
@@ -87,7 +88,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 60005000000,
           "end": "2018-05-21T09:25:03.662Z",
@@ -130,7 +132,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 6200,
@@ -160,7 +162,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 60016000000,
           "end": "2018-05-21T09:25:03.656Z",
@@ -203,7 +206,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 11896,
@@ -233,7 +236,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 90011000000,
           "end": "2018-05-21T09:25:03.643Z",
@@ -276,7 +280,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1041,
@@ -306,7 +310,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 30000000000,
           "end": "2018-05-21T09:24:03.629Z",
@@ -349,7 +354,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1740,
@@ -379,7 +384,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 29467000000,
           "end": "2018-05-21T09:24:03.669Z",
@@ -422,7 +428,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 2998,
@@ -452,7 +458,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 29452000000,
           "end": "2018-05-21T09:24:03.67Z",
@@ -495,7 +502,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 55773,
@@ -525,7 +532,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 29449000000,
           "end": "2018-05-21T09:24:03.684Z",
@@ -568,7 +576,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 3239438,
@@ -598,7 +606,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 30000000000,
           "end": "2018-05-21T09:24:03.685Z",
@@ -641,7 +650,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 5701,
@@ -671,7 +680,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 29391000000,
           "end": "2018-05-21T09:24:03.691Z",
@@ -714,7 +724,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 4255012,
@@ -744,7 +754,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 29196000000,
           "end": "2018-05-21T09:24:03.699Z",
@@ -787,7 +798,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 37557,
@@ -817,7 +828,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 30000000000,
           "end": "2018-05-21T09:24:03.753Z",
@@ -860,7 +872,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 23676,
@@ -890,7 +902,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 89282000000,
           "end": "2018-05-21T09:25:03.971Z",
@@ -933,7 +946,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 22821,
@@ -963,7 +976,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 90012000000,
           "end": "2018-05-21T09:25:03.95Z",
@@ -1006,7 +1020,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 526,
@@ -1036,7 +1050,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 60005000000,
           "end": "2018-05-21T09:25:03.938Z",
@@ -1079,7 +1094,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 33129,
@@ -1109,7 +1124,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-21T09:25:04Z",
           "duration": 60006000000,
           "end": "2018-05-21T09:25:03.928Z",
@@ -1152,7 +1168,7 @@
           "source_transport_port": 0,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 5092,

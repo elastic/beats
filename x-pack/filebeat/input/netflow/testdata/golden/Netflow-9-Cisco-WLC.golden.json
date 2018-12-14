@@ -12,7 +12,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -35,7 +36,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -67,7 +68,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -90,7 +92,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -118,7 +120,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -141,7 +144,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -173,7 +176,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -196,7 +200,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -224,7 +228,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -247,7 +252,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -277,7 +282,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -300,7 +306,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -332,7 +338,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -355,7 +362,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -383,7 +390,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -406,7 +414,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -438,7 +446,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -461,7 +470,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -489,7 +498,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -512,7 +522,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -544,7 +554,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -567,7 +578,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -595,7 +606,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -618,7 +630,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -650,7 +662,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -673,7 +686,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -701,7 +714,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -724,7 +738,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -756,7 +770,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -779,7 +794,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -807,7 +822,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -830,7 +846,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -862,7 +878,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -885,7 +902,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -913,7 +930,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -936,7 +954,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },
@@ -968,7 +986,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-06-22T06:31:14Z"
         },
         "flow": {
@@ -991,7 +1010,7 @@
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
           "sta_mac_address": "34:02:86:75:c0:51",
-          "type": "netflow",
+          "type": "netflow_flow",
           "wlan_ssid": "Test-env",
           "wtp_mac_address": "00:f6:63:cc:80:60"
         },

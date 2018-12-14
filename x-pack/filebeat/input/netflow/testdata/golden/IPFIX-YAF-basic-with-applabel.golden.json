@@ -16,7 +16,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2016-12-25T13:03:38Z"
         },
         "flow": {
@@ -50,7 +51,7 @@
           "silk_app_label": 53,
           "source_ipv4_address": "172.16.32.201",
           "source_transport_port": 46086,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
@@ -85,7 +86,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2016-12-25T12:58:38Z"
         },
         "flow": {
@@ -124,7 +126,7 @@
           "source_ipv4_address": "172.16.32.100",
           "source_transport_port": 63499,
           "tcp_sequence_number": 340533701,
-          "type": "netflow",
+          "type": "netflow_flow",
           "union_tcfp_lags": 17,
           "vlan_id": 0
         },
@@ -154,6 +156,7 @@
         },
         "event": {
           "action": "netflow_options",
+          "category": "network_traffic",
           "created": "2016-12-25T13:03:33Z"
         },
         "netflow": {

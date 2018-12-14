@@ -14,7 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 410000000,
           "end": "2018-05-11T00:54:09.99Z",
@@ -52,7 +53,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.100.151",
           "source_transport_port": 45380,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 748,
@@ -82,7 +83,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 1130000000,
           "end": "2018-05-11T00:54:09.74Z",
@@ -120,7 +122,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "208.100.17.187",
           "source_transport_port": 443,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 6948,
@@ -150,7 +152,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 1130000000,
           "end": "2018-05-11T00:54:09.74Z",
@@ -188,7 +191,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.100.151",
           "source_transport_port": 44778,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1584,
@@ -218,7 +221,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 1040000000,
           "end": "2018-05-11T00:54:09.74Z",
@@ -256,7 +260,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "208.100.17.189",
           "source_transport_port": 443,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 8201,
@@ -286,7 +290,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 1040000000,
           "end": "2018-05-11T00:54:09.74Z",
@@ -324,7 +329,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.100.151",
           "source_transport_port": 50618,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1729,
@@ -354,7 +359,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 410000000,
           "end": "2018-05-11T00:54:09.11Z",
@@ -392,7 +398,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "178.255.83.1",
           "source_transport_port": 80,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1122,
@@ -422,7 +428,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 410000000,
           "end": "2018-05-11T00:54:09.11Z",
@@ -460,7 +467,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.100.151",
           "source_transport_port": 33660,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 705,
@@ -490,7 +497,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 370000000,
           "end": "2018-05-11T00:54:08.53Z",
@@ -528,7 +536,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "178.255.83.1",
           "source_transport_port": 80,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1123,
@@ -558,7 +566,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 370000000,
           "end": "2018-05-11T00:54:08.53Z",
@@ -596,7 +605,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.100.151",
           "source_transport_port": 33646,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 706,
@@ -626,7 +635,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 80000000,
           "end": "2018-05-11T00:51:08.63Z",
@@ -660,7 +670,7 @@
           "protocol_identifier": 17,
           "source_ipv4_address": "192.168.100.111",
           "source_transport_port": 53,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 74,
@@ -690,7 +700,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 80000000,
           "end": "2018-05-11T00:51:08.63Z",
@@ -724,7 +735,7 @@
           "protocol_identifier": 17,
           "source_ipv4_address": "192.168.100.150",
           "source_transport_port": 52970,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 58,
@@ -754,7 +765,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 80000000,
           "end": "2018-05-11T00:51:08.63Z",
@@ -788,7 +800,7 @@
           "protocol_identifier": 17,
           "source_ipv4_address": "192.168.100.111",
           "source_transport_port": 53,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 74,
@@ -818,7 +830,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 80000000,
           "end": "2018-05-11T00:51:08.63Z",
@@ -852,7 +865,7 @@
           "protocol_identifier": 17,
           "source_ipv4_address": "192.168.100.150",
           "source_transport_port": 49311,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 58,
@@ -882,7 +895,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 2020000000,
           "end": "2018-05-11T00:54:06.21Z",
@@ -916,7 +930,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.100.111",
           "source_transport_port": 80,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1071,
@@ -946,7 +960,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 2020000000,
           "end": "2018-05-11T00:54:06.21Z",
@@ -980,7 +995,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.100.150",
           "source_transport_port": 51746,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1147,
@@ -1010,7 +1025,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 4000000000,
           "end": "2018-05-11T00:54:00.19Z",
@@ -1044,7 +1060,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.100.111",
           "source_transport_port": 80,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1980,
@@ -1074,7 +1090,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-05-11T00:54:11Z",
           "duration": 4000000000,
           "end": "2018-05-11T00:54:00.19Z",
@@ -1108,7 +1125,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.100.150",
           "source_transport_port": 51745,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 2164,

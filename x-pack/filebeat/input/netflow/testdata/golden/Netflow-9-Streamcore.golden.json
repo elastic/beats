@@ -14,7 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-01-11T11:48:15Z",
           "duration": 6012000000,
           "end": "2017-01-11T11:47:28.879Z",
@@ -45,7 +46,7 @@
           "source_ipv4_address": "100.78.40.201",
           "source_transport_port": 8080,
           "tcp_control_bits": 19,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 128,
@@ -75,7 +76,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-01-11T11:48:15Z",
           "duration": 6020000000,
           "end": "2017-01-11T11:47:28.886Z",
@@ -106,7 +108,7 @@
           "source_ipv4_address": "10.231.128.150",
           "source_transport_port": 50073,
           "tcp_control_bits": 19,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 172,
@@ -136,7 +138,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-01-11T11:23:51Z",
           "duration": 50997000000,
           "end": "2017-01-11T11:23:34.936Z",
@@ -167,7 +170,7 @@
           "source_ipv4_address": "100.78.40.201",
           "source_transport_port": 8080,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 3943,
@@ -197,7 +200,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-01-11T11:23:51Z",
           "duration": 51015000000,
           "end": "2017-01-11T11:23:34.954Z",
@@ -228,7 +232,7 @@
           "source_ipv4_address": "10.27.8.20",
           "source_transport_port": 53483,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 3052,

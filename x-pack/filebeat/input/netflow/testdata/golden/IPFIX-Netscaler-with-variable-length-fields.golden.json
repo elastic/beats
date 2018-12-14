@@ -14,7 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2016-11-11T12:09:19Z"
         },
         "flow": {
@@ -68,7 +69,7 @@
           "source_ipv4_address": "192.168.0.1",
           "source_transport_port": 51053,
           "tcp_control_bits": 16,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 40,
@@ -98,7 +99,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2016-11-11T12:09:19Z"
         },
         "flow": {
@@ -140,7 +142,7 @@
           "source_ipv4_address": "10.0.0.1",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1525,
@@ -170,7 +172,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2016-11-11T12:09:19Z"
         },
         "flow": {
@@ -224,7 +227,7 @@
           "source_ipv4_address": "192.168.0.1",
           "source_transport_port": 51053,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1541,

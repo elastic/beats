@@ -14,7 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-01-29T03:02:20Z",
           "duration": 327060000000,
           "end": "2018-01-29T03:02:19Z",
@@ -56,7 +57,7 @@
           "source_ipv4_prefix_length": 24,
           "source_transport_port": 45587,
           "tcp_control_bits": 24,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {

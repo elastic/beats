@@ -14,7 +14,8 @@
           "ip": "192.0.2.1"
         },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-11-21T14:32:15Z"
         },
         "flow": {
@@ -52,7 +53,7 @@
           "source_ipv4_address": "10.113.7.54",
           "source_transport_port": 41717,
           "tcp_control_bits": 16,
-          "type": "netflow",
+          "type": "netflow_flow",
           "viptela_vpin_d": 100
         },
         "network": {
