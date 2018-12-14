@@ -190,7 +190,7 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "beat.hostname", "beat.name"]
+    host_keys = ["host.name", "beat.hostname", "beat.name", "agent.ephemeral_id", "agent.id"]
     # The create timestamps area always new
     time_keys = ["read_timestamp", "event.created"]
     # source path and beat.version can be different for each run
