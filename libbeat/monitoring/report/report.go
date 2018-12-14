@@ -25,6 +25,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+const (
+	ReportingFormatProduction = "production"
+	ReportingFormatMonitoring = "monitoring"
+)
+
 type config struct {
 	// allow for maximum one reporter being configured
 	Reporter common.ConfigNamespace `config:",inline"`

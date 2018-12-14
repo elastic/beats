@@ -123,9 +123,9 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		}
 
 		switch params["_format"] {
-		case "production":
+		case report.ReportingFormatProduction:
 			err = c.bulkToProduction(params, event, t)
-		case "monitoring":
+		case report.ReportingFormatMonitoring:
 			err = c.bulkToMonitoring(event)
 		default:
 			err = fmt.Errorf("unsupported reporting format: %v", params["_format"])
