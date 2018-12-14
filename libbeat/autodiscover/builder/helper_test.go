@@ -49,6 +49,7 @@ func TestGenerateHints(t *testing.T) {
 				"co.elastic.metrics.foobar/period":  "15s",
 				"co.elastic.metrics.foobar1/period": "15s",
 				"not.to.include":                    "true",
+				"co.elastic.logs|not.to.include":    "true",
 			},
 			result: common.MapStr{
 				"logs": common.MapStr{
@@ -69,6 +70,6 @@ func TestGenerateHints(t *testing.T) {
 		for k, v := range test.annotations {
 			annMap.Put(k, v)
 		}
-		assert.Equal(t, GenerateHints(annMap, "foobar", "co.elastic"), test.result)
+		assert.Equal(t, GenerateHints(annMap, "foobar", "co.elastic", "/"), test.result)
 	}
 }

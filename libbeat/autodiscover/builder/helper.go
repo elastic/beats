@@ -155,14 +155,14 @@ func IsNoOp(hints common.MapStr, key string) bool {
 }
 
 // GenerateHints parses annotations based on a prefix and sets up hints that can be picked up by individual Beats.
-func GenerateHints(annotations common.MapStr, container, prefix string) common.MapStr {
+func GenerateHints(annotations common.MapStr, container, prefix string, separator string) common.MapStr {
 	hints := common.MapStr{}
 	if rawEntries, err := annotations.GetValue(prefix); err == nil {
 		if entries, ok := rawEntries.(common.MapStr); ok {
 			for key, rawValue := range entries {
 				// If there are top level hints like co.elastic.logs/ then just add the values after the /
 				// Only consider namespaced annotations
-				parts := strings.Split(key, "/")
+				parts := strings.Split(key, separator)
 				if len(parts) == 2 {
 					hintKey := fmt.Sprintf("%s.%s", parts[0], parts[1])
 					// Insert only if there is no entry already. container level annotations take
@@ -182,7 +182,7 @@ func GenerateHints(annotations common.MapStr, container, prefix string) common.M
 					for hintKey, rawVal := range builderHints {
 						if strings.HasPrefix(hintKey, container) {
 							// Split the key to get part[1] to be the hint
-							parts := strings.Split(hintKey, "/")
+							parts := strings.Split(hintKey, separator)
 							if len(parts) == 2 {
 								// key will be the hint type
 								hintKey := fmt.Sprintf("%s.%s", key, parts[1])

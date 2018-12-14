@@ -28,6 +28,7 @@ type Config struct {
 	Host         string                  `config:"host"`
 	TLS          *docker.TLSConfig       `config:"ssl"`
 	Prefix       string                  `config:"prefix"`
+	Separator    string                  `config:"separator"`
 	HintsEnabled bool                    `config:"hints.enabled"`
 	Builders     []*common.Config        `config:"builders"`
 	Appenders    []*common.Config        `config:"appenders"`
@@ -36,8 +37,9 @@ type Config struct {
 
 func defaultConfig() *Config {
 	return &Config{
-		Host:   "unix:///var/run/docker.sock",
-		Prefix: "co.elastic",
+		Host:      "unix:///var/run/docker.sock",
+		Prefix:    "co.elastic",
+		Separator: "/",
 	}
 }
 

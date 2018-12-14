@@ -148,3 +148,6 @@ You can label Docker containers with useful info to spin up {beatname_uc} inputs
 
 The above labels configure {beatname_uc} to use the Nginx module to harvest logs for this container.
 Access logs will be retrieved from stdout stream, and error logs from stderr.
+
+To ensure compliance with docker label key recommendations the separator between the prefix and 
+hints config key is configurable via the key `separator`.
