@@ -135,7 +135,7 @@ packetbeat.interfaces.snaplen: 1514
 [float]
 ==== `type`
 
-Packetbeat supports three sniffer types:
+Packetbeat supports two sniffer types:
 
  * `pcap`, which uses the libpcap library and works on most platforms, but
    it's not the fastest option.
