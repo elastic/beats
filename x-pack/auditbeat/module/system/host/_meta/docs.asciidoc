@@ -1,8 +1,7 @@
-The System `host` metricset provides ... TODO.
+[role="xpack"]
 
-The module is implemented for Linux, macOS (Darwin), and Windows.
+experimental[]
 
-[float]
-=== Configuration options
+This is the `host` metricset of the system module.
 
-TODO
+It is implemented for Linux and macOS (Darwin).

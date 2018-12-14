@@ -121,8 +121,23 @@ func Config() error {
 // Update is an alias for running fields, dashboards, config, includes.
 func Update() {
 	mg.SerialDeps(Fields, Dashboards, Config,
-		mage.GenerateModuleIncludeListGo,
-		auditbeat.CollectDocs)
+		mage.GenerateModuleIncludeListGo, Docs)
+}
+
+// Docs collects the documentation.
+func Docs() {
+	mg.SerialDeps(xpackFields, combinedDocs)
+}
+
+// combinedDocs builds combined documentation for both OSS and X-Pack.
+func combinedDocs() error {
+	return auditbeat.CollectDocs(mage.OSSBeatDir(), auditbeat.XpackBeatDir())
+}
+
+// xpackFields creates x-pack/auditbeat/fields.yml - necessary to build
+// a combined documentation.
+func xpackFields() error {
+	return mage.Mage(auditbeat.XpackBeatDir(), "fields")
 }
 
 // Fmt formats source code and adds file headers.

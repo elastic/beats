@@ -1,8 +1,7 @@
-The System `socket` metricset provides ... TODO.
+[role="xpack"]
 
-The module is implemented for Linux only.
+experimental[]
 
-[float]
-=== Configuration options
+This is the `process` metricset of the system module.
 
-TODO
+It is implemented for Linux only.
