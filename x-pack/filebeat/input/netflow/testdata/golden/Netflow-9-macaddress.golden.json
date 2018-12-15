@@ -71,6 +71,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:tzcqIeMhEvkXA/EBAZraJPCnaN8=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -122,6 +123,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:mYS5cP5hzhSb8JZH9+2v8+RMJ9g=",
           "direction": "unknown",
           "protocol": "udp"
         },
@@ -173,6 +175,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:cRrWVwyu9GLZ+aU7qmwhjSdMrpE=",
           "direction": "unknown",
           "protocol": "udp"
         },
@@ -224,6 +227,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:fVzE/MKEA1VMNMkCvz5NQinQLUI=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -275,6 +279,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:LZj70OIhu6ThMyKy7u70cO67FK4=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -326,6 +331,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:DoERidYQAzlwvj5aBo1aEylCHgo=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -377,6 +383,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:s0N+K6vD3goIH7jZO1SqG58ztGQ=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -428,6 +435,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:q1r5Q5XRCVvpwYqEkfbN8OxKQuI=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -479,6 +487,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:5idRNtMRt9YwcfftLSQtC72/n6Y=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -530,6 +539,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:O9wqBh6gPhpzxHuWe7MgCX7Xpc4=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -581,6 +591,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:odq42pEjA7OgeYPh6amRzomwnoM=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -632,6 +643,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:UUC6Ang4BzxgjeDeSNC8v/53zx4=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -683,6 +695,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:gYnQndK1J0EfqJ6hcON4iV+sV1I=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -734,6 +747,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:zppnN171ys38psn8czlt3R0wxe8=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -785,6 +799,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:t1KFW03nxtZ2y4JBNbWu3PyDfk8=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -836,6 +851,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:cYbvSlVIg8esJzIq2q4ATrJ7+sY=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -887,6 +903,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:xw52kFQxAYrEnkCjkJPN4NUZ8WI=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -938,6 +955,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:nOvjuKIb5reZRRHaoCJRGUw2u2o=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -989,6 +1007,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:iXLOg+5V7xMNbFjb/Fn13WXIwpA=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -1040,6 +1059,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:hoCpobmQ1SEqktORR12M8ynuDPI=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -1091,6 +1111,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:nphrDmJfS2JuUpcSM+E36Xh41ck=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -1142,6 +1163,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:andIv3q3a7gqVMMwg+YVAxxbyf8=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -1193,6 +1215,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:3Zpznpp5sA+yxgN2vQONTT4Qtlk=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -1244,6 +1267,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:b/19ZiHUfRjjwT7BRwqUlFnZk30=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -1295,6 +1319,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:ThxBiPu4noU7F3HVrTJodqLYprw=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -1346,6 +1371,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:PtQEU2tjKLZQ3ulraXStL41RrFw=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -1397,6 +1423,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:c9aRRsQSCI2QgP+soSkmLeg4eME=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -1448,6 +1475,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:pYvqf9IBjYoaWWbRiwE7BvIF0+U=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -1499,6 +1527,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:khchUIbdprQL3CvkhqiO+LfVtOQ=",
           "direction": "unknown",
           "protocol": "tcp"
         },

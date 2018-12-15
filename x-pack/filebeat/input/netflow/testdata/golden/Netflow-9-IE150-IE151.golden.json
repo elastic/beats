@@ -48,6 +48,7 @@
         },
         "network": {
           "bytes": 78,
+          "community_id": "1:exuCftrHyAyRt6vQ7silX0RyM6c=",
           "direction": "inbound",
           "packets": 1,
           "protocol": "udp"
@@ -107,6 +108,7 @@
         },
         "network": {
           "bytes": 232,
+          "community_id": "1:0CGjtxAvSJC5Eo2OErzsmgtb9JE=",
           "direction": "outbound",
           "packets": 1,
           "protocol": "udp"

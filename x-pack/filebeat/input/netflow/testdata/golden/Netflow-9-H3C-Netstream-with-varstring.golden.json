@@ -62,6 +62,7 @@
         },
         "network": {
           "bytes": 702,
+          "community_id": "1:WP3Ss+M/Q16gnXrqnk6fwmPWvWc=",
           "direction": "inbound",
           "packets": 9,
           "protocol": "udp"

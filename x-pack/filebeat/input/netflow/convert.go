@@ -16,6 +16,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/flowhash"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
 )
 
@@ -292,6 +293,14 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	if ssid, found := getKeyString(flow.Fields, "wlanSSID"); found {
 		ecsNetwork["name"] = ssid
 	}
+
+	ecsNetwork["community_id"] = flowhash.CommunityID.Hash(flowhash.Flow{
+		SourceIP:        srcIP,
+		SourcePort:      srcPort,
+		DestinationIP:   dstIP,
+		DestinationPort: dstPort,
+		Protocol:        uint8(protocol),
+	})
 
 	if len(ecsFlow) > 0 {
 		event.Fields["flow"] = ecsFlow

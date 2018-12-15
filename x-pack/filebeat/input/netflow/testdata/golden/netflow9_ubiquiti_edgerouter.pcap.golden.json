@@ -56,6 +56,7 @@
         },
         "network": {
           "bytes": 421,
+          "community_id": "1:c3a8HfldOuX4/xBvf0sHuy38GTk=",
           "direction": "outbound",
           "packets": 6,
           "protocol": "tcp"
@@ -123,6 +124,7 @@
         },
         "network": {
           "bytes": 7621,
+          "community_id": "1:ZNEMnnkXh6LJsCtYCHWkxVCOl9E=",
           "direction": "outbound",
           "packets": 131,
           "protocol": "tcp"
@@ -190,6 +192,7 @@
         },
         "network": {
           "bytes": 95,
+          "community_id": "1:XdJd2ziZmmG1mSIxfvlr6ecG4pM=",
           "direction": "outbound",
           "packets": 1,
           "protocol": "udp"
@@ -257,6 +260,7 @@
         },
         "network": {
           "bytes": 3162,
+          "community_id": "1:+80+CdeOLSths8RQiqHUoqr8qrU=",
           "direction": "outbound",
           "packets": 30,
           "protocol": "tcp"
@@ -324,6 +328,7 @@
         },
         "network": {
           "bytes": 2711,
+          "community_id": "1:3s9tK3Ncm1BXFpA8+hBpk22sg0c=",
           "direction": "outbound",
           "packets": 13,
           "protocol": "tcp"
@@ -391,6 +396,7 @@
         },
         "network": {
           "bytes": 20855,
+          "community_id": "1:3w94g30M+cTZZskO9dmazwtDHo8=",
           "direction": "outbound",
           "packets": 346,
           "protocol": "tcp"
@@ -458,6 +464,7 @@
         },
         "network": {
           "bytes": 7495,
+          "community_id": "1:XE7UjW9QNWzM1F452q/jPfC4C90=",
           "direction": "outbound",
           "packets": 129,
           "protocol": "tcp"
@@ -525,6 +532,7 @@
         },
         "network": {
           "bytes": 7049,
+          "community_id": "1:CJ9T/03SqwG5Yy7WmXADUqvvgvw=",
           "direction": "outbound",
           "packets": 119,
           "protocol": "tcp"
@@ -592,6 +600,7 @@
         },
         "network": {
           "bytes": 1348,
+          "community_id": "1:3vSrJV3tnfjnzopvPuRQzt2BDS4=",
           "direction": "outbound",
           "packets": 13,
           "protocol": "tcp"
@@ -659,6 +668,7 @@
         },
         "network": {
           "bytes": 82,
+          "community_id": "1:mjMjtH0BZKCuCmxkZbQyrFDfoI0=",
           "direction": "outbound",
           "packets": 1,
           "protocol": "udp"
