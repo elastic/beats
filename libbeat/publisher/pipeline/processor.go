@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
+	"github.com/elastic/beats/libbeat/processors/timeseries"
 )
 
 type program struct {
@@ -56,14 +57,15 @@ type processorFn struct {
 //  6. (C) client processors list
 //  7. (P) add beats metadata
 //  8. (P) pipeline processors list
-//  9. (P) (if publish/debug enabled) log event
-// 10. (P) (if output disabled) dropEvent
+//  9. (P) timeseries mangling
+//  10. (P) (if publish/debug enabled) log event
+//  11. (P) (if output disabled) dropEvent
 func newProcessorPipeline(
 	info beat.Info,
 	monitors Monitors,
 	global pipelineProcessors,
 	config beat.ClientConfig,
-) beat.Processor {
+) (beat.Processor, error) {
 	var (
 		// pipeline processors
 		processors = &program{
@@ -119,10 +121,10 @@ func newProcessorPipeline(
 		processors.add(makeAddDynMetaProcessor("dynamicFields", config.DynamicFields, checkCopy))
 	}
 
-	// setup 5: client processor list
+	// setup 6: client processor list
 	processors.add(localProcessors)
 
-	// setup 6: add beats and host metadata
+	// setup 7: add beats and host metadata
 	if meta := global.builtinMeta; len(meta) > 0 {
 		processors.add(actions.NewAddFields(meta, needsCopy))
 	}
@@ -141,17 +143,26 @@ func newProcessorPipeline(
 	// setup 8: pipeline processors list
 	processors.add(global.processors)
 
-	// setup 9: debug print final event (P)
+	// setup 9: time series metadata
+	if config.TimeSeries {
+		timeseriesProcessor, err := timeseries.NewTimeSeriesProcessor(info.Beat)
+		if err != nil {
+			return nil, err
+		}
+		processors.add(timeseriesProcessor)
+	}
+
+	// setup 10: debug print final event (P)
 	if logp.IsDebug("publish") {
 		processors.add(debugPrintProcessor(info, monitors))
 	}
 
-	// setup 10: drop all events if outputs are disabled (P)
+	// setup 11: drop all events if outputs are disabled (P)
 	if global.disabled {
 		processors.add(dropDisabledProcessor)
 	}
 
-	return processors
+	return processors, nil
 }
 
 func newProgram(title string, log *logp.Logger) *program {

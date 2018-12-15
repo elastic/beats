@@ -84,6 +84,10 @@ type ClientConfig struct {
 	// To skip adding that host.name set this to true.
 	SkipHostName bool
 
+	// Timeseries id will be calculated for Events with the TimeSeries flag if this
+	// is enabled (disabled by default)
+	TimeSeries bool
+
 	// ACK handler strategies.
 	// Note: ack handlers are run in another go-routine owned by the publisher pipeline.
 	//       They should not block for to long, to not block the internal buffers for

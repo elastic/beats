@@ -347,7 +347,10 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		}
 	}
 
-	processors := newProcessorPipeline(p.beatInfo, p.monitors, p.processors, cfg)
+	processors, err := newProcessorPipeline(p.beatInfo, p.monitors, p.processors, cfg)
+	if err != nil {
+		return nil, err
+	}
 	acker := p.makeACKer(processors != nil, &cfg, waitClose)
 	producerCfg := queue.ProducerConfig{
 		// Cancel events from queue if acker is configured

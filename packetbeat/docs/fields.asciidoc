@@ -502,6 +502,16 @@ alias to: agent.hostname
 
 --
 
+*`timeseries.instance`*::
++
+--
+type: keyword
+
+Time series instance id
+
+
+--
+
 [[exported-fields-cassandra]]
 == Cassandra fields
 

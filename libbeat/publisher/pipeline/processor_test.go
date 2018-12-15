@@ -441,7 +441,7 @@ func TestProcessors(t *testing.T) {
 			for i, local := range test.local {
 				local.config.SkipAgentMetadata = !local.includeAgentMetadata
 				local.config.SkipHostName = !local.includeHostName
-				programs[i] = newProcessorPipeline(info, monitors, test.global, local.config)
+				programs[i], _ = newProcessorPipeline(info, monitors, test.global, local.config)
 			}
 
 			// run processor pipelines in parallel

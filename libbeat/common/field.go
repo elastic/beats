@@ -53,12 +53,12 @@ type Field struct {
 	IgnoreAbove    int         `config:"ignore_above"`
 	AliasPath      string      `config:"path"`
 	MigrationAlias bool        `config:"migration"`
+	Dimension      *bool       `config:"dimension"`
 
 	ObjectType            string          `config:"object_type"`
 	ObjectTypeMappingType string          `config:"object_type_mapping_type"`
 	ScalingFactor         int             `config:"scaling_factor"`
 	ObjectTypeParams      []ObjectTypeCfg `config:"object_type_params"`
-
 	// Kibana specific
 	Analyzed     *bool  `config:"analyzed"`
 	Count        int    `config:"count"`
@@ -312,4 +312,23 @@ func ConcatFields(a, b Fields) (Fields, error) {
 	// all fine, let's concat a+b into new array
 	fields := make(Fields, 0, len(a)+len(b))
 	return append(append(fields, a...), b...), nil
+}
+
+// NewFieldsFromYAML reads the given YAML and parses it into a
+// Fields structure
+func NewFieldsFromYAML(data []byte) (Fields, error) {
+	var keys []Field
+
+	cfg, err := yaml.NewConfig(data)
+	if err != nil {
+		return nil, err
+	}
+	cfg.Unpack(&keys)
+
+	fields := Fields{}
+
+	for _, key := range keys {
+		fields = append(fields, key.Fields...)
+	}
+	return fields, nil
 }

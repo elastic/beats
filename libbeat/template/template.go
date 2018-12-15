@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/go-ucfg/yaml"
 )
 
 var (
@@ -170,7 +169,7 @@ func (t *Template) LoadFile(file string) (common.MapStr, error) {
 
 // LoadBytes loads the the template from the given byte array
 func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
-	fields, err := loadYamlByte(data)
+	fields, err := common.NewFieldsFromYAML(data)
 	if err != nil {
 		return nil, err
 	}
@@ -309,23 +308,4 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 
 	indexSettings.DeepUpdate(userSettings)
 	return indexSettings
-}
-
-func loadYamlByte(data []byte) (common.Fields, error) {
-	cfg, err := yaml.NewConfig(data)
-	if err != nil {
-		return nil, err
-	}
-
-	var keys []common.Field
-	err = cfg.Unpack(&keys)
-	if err != nil {
-		return nil, err
-	}
-
-	fields := common.Fields{}
-	for _, key := range keys {
-		fields = append(fields, key.Fields...)
-	}
-	return fields, nil
 }

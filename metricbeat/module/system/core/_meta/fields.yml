@@ -6,6 +6,7 @@
   fields:
     - name: id
       type: long
+      dimension: true
       description: >
         CPU Core number.
 
