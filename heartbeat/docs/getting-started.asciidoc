@@ -1,7 +1,7 @@
 [[heartbeat-getting-started]]
 == Getting Started With Heartbeat
 
-include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
+include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 
 * <<heartbeat-installation>>
 * <<heartbeat-configuration>>
@@ -22,7 +22,7 @@ monitor are running.
 
 //TODO: Add a separate topic that explores deployment scenarios in more detail (like installing on a sub-network where there's a firewall etc.
 
-include::../../libbeat/docs/shared-download-and-install.asciidoc[]
+include::{libbeat-dir}/docs/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
@@ -149,7 +149,7 @@ options, see <<configuring-howto-heartbeat>>.
 [[heartbeat-configuration]]
 === Step 2: Configure Heartbeat
 
-include::../../libbeat/docs/shared-configuring.asciidoc[]
+include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
 
 Heartbeat provides monitors to check the status of hosts at set intervals.
 You configure each monitor individually. Heartbeat currently provides monitors
@@ -196,25 +196,25 @@ was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 See <<configuring-howto-heartbeat>> for a full description of each
 configuration option.
 
-include::../../libbeat/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
 
-include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
 
-include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
 
-include::../../libbeat/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/docs/step-test-config.asciidoc[]
 
-include::../../libbeat/docs/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 
 [[heartbeat-template]]
 === Step 3: Load the index template in Elasticsearch
 
-include::../../libbeat/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-include::../../libbeat/docs/dashboards.asciidoc[]
+include::{libbeat-dir}/docs/dashboards.asciidoc[]
 
 [[heartbeat-starting]]
 === Step 5: Start Heartbeat
@@ -265,7 +265,7 @@ To make it easier for you to visualize the status of your services, we have
 created example {beatname_uc} dashboards. You loaded the dashboards earlier when
 you ran the `setup` command.
 
-include::../../libbeat/docs/opendashboards.asciidoc[]
+include::{libbeat-dir}/docs/opendashboards.asciidoc[]
 
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.

@@ -1,6 +1,8 @@
 = Packetbeat Reference
 
-include::../../libbeat/docs/version.asciidoc[]
+:libbeat-dir: ../../libbeat
+
+include::{libbeat-dir}/docs/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
@@ -19,13 +21,13 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :docker_platform:
 :win_os:
 
-include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
+include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
-include::../../libbeat/docs/repositories.asciidoc[]
+include::{libbeat-dir}/docs/repositories.asciidoc[]
 
 include::./setting-up-running.asciidoc[]
 
@@ -35,9 +37,9 @@ include::./configuring-howto.asciidoc[]
 
 include::./fields.asciidoc[]
 
-include::../../libbeat/docs/monitoring/monitoring-beats.asciidoc[]
+include::{libbeat-dir}/docs/monitoring/monitoring-beats.asciidoc[]
 
-include::../../libbeat/docs/shared-securing-beat.asciidoc[]
+include::{libbeat-dir}/docs/shared-securing-beat.asciidoc[]
 
 include::./visualizing-data-packetbeat.asciidoc[]
 
@@ -47,4 +49,4 @@ include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
 
-include::../../libbeat/docs/contributing-to-beats.asciidoc[]
+include::{libbeat-dir}/docs/contributing-to-beats.asciidoc[]
