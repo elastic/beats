@@ -55,6 +55,7 @@
         },
         "network": {
           "bytes": 532,
+          "community_id": "1:gQfwC1pqdEJoyqjxe8la2a1bW6g=",
           "direction": "unknown",
           "packets": 6,
           "protocol": "udp"
@@ -129,6 +130,7 @@
         },
         "network": {
           "bytes": 356,
+          "community_id": "1:/MUy9fW9u7vMDGqxcZLVrZX0ARU=",
           "direction": "unknown",
           "packets": 8,
           "protocol": "tcp"

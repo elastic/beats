@@ -54,6 +54,7 @@
         },
         "network": {
           "bytes": 363,
+          "community_id": "1:0PLHlww9zxRlvByabAFlUctNy14=",
           "direction": "inbound",
           "packets": 3,
           "protocol": "tcp"
