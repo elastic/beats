@@ -48,6 +48,7 @@
         },
         "network": {
           "bytes": 965,
+          "community_id": "1:uwFzwI08CvSkNfR/WQPCHwlci6o=",
           "direction": "outbound",
           "packets": 7,
           "protocol": "tcp"
@@ -107,6 +108,7 @@
         },
         "network": {
           "bytes": 284,
+          "community_id": "1:qmozbp1hu1WeZnrgR4YYxZsjeAs=",
           "direction": "inbound",
           "packets": 1,
           "protocol": "udp"
@@ -166,6 +168,7 @@
         },
         "network": {
           "bytes": 670,
+          "community_id": "1:u2/sO7a/O64V2snOv776vhfrdaE=",
           "direction": "inbound",
           "packets": 6,
           "protocol": "tcp"
@@ -225,6 +228,7 @@
         },
         "network": {
           "bytes": 80,
+          "community_id": "1:3hLCiFejfB8o0F+PtLwpKhO8Gvw=",
           "direction": "inbound",
           "packets": 2,
           "protocol": "tcp"
@@ -284,6 +288,7 @@
         },
         "network": {
           "bytes": 80,
+          "community_id": "1:Q4BjTF5X3n7a+Oa2eU4BTat20J0=",
           "direction": "outbound",
           "packets": 2,
           "protocol": "tcp"
@@ -343,6 +348,7 @@
         },
         "network": {
           "bytes": 101,
+          "community_id": "1:K39hVsHP9vJZE3HgkNg6IhdmFDI=",
           "direction": "outbound",
           "packets": 1,
           "protocol": "udp"
@@ -402,6 +408,7 @@
         },
         "network": {
           "bytes": 1134,
+          "community_id": "1:dZjX+9FJFoTQCGnVJYA1D7eCt7E=",
           "direction": "outbound",
           "packets": 14,
           "protocol": "udp"
@@ -461,6 +468,7 @@
         },
         "network": {
           "bytes": 237,
+          "community_id": "1:U+WZT9lvd0sxL1M9hpokk9TXK5w=",
           "direction": "outbound",
           "packets": 4,
           "protocol": "tcp"
@@ -520,6 +528,7 @@
         },
         "network": {
           "bytes": 91,
+          "community_id": "1:wRntrWu6NswQHhEk070T8IeU8Fs=",
           "direction": "inbound",
           "packets": 1,
           "protocol": "udp"
@@ -579,6 +588,7 @@
         },
         "network": {
           "bytes": 41,
+          "community_id": "1:5JEyDFPIh+4ITPosuffRDzSF7Jw=",
           "direction": "inbound",
           "packets": 1,
           "protocol": "tcp"
@@ -638,6 +648,7 @@
         },
         "network": {
           "bytes": 111,
+          "community_id": "1:ARbQv4xDOLQ4HUS3c9oqLlwKGWY=",
           "direction": "outbound",
           "packets": 1,
           "protocol": "udp"
@@ -697,6 +708,7 @@
         },
         "network": {
           "bytes": 1164,
+          "community_id": "1:y/0+lFjviSxqFw5Ud/Cc1yuBn2c=",
           "direction": "inbound",
           "packets": 4,
           "protocol": "udp"
@@ -756,6 +768,7 @@
         },
         "network": {
           "bytes": 80,
+          "community_id": "1:N8K6l0F31HluX8vUd+WbE/6iDfk=",
           "direction": "inbound",
           "packets": 2,
           "protocol": "tcp"
@@ -815,6 +828,7 @@
         },
         "network": {
           "bytes": 52,
+          "community_id": "1:XKmRGfkKextNmjU2O+4ubL+2LI4=",
           "direction": "outbound",
           "packets": 1,
           "protocol": "tcp"
@@ -874,6 +888,7 @@
         },
         "network": {
           "bytes": 80,
+          "community_id": "1:Q4BjTF5X3n7a+Oa2eU4BTat20J0=",
           "direction": "outbound",
           "packets": 2,
           "protocol": "tcp"
@@ -933,6 +948,7 @@
         },
         "network": {
           "bytes": 3088,
+          "community_id": "1:afQ2LcWleivXmSC1cEzrvvoFc4U=",
           "direction": "inbound",
           "packets": 10,
           "protocol": "tcp"
@@ -992,6 +1008,7 @@
         },
         "network": {
           "bytes": 5306,
+          "community_id": "1:+k9rpD1zFTzj1TzClbQz5xxZSkM=",
           "direction": "inbound",
           "packets": 24,
           "protocol": "tcp"
@@ -1051,6 +1068,7 @@
         },
         "network": {
           "bytes": 116,
+          "community_id": "1:SyYPZ96uUcoS7fqJKZzUOfcLHik=",
           "direction": "inbound",
           "packets": 1,
           "protocol": "udp"
@@ -1110,6 +1128,7 @@
         },
         "network": {
           "bytes": 22764,
+          "community_id": "1:dwhTKtbCkX7Na/7SKnulqsYlD40=",
           "direction": "inbound",
           "packets": 30,
           "protocol": "tcp"
@@ -1169,6 +1188,7 @@
         },
         "network": {
           "bytes": 80,
+          "community_id": "1:z67KRlDvetfiNmjA/1mM7UfiB7s=",
           "direction": "inbound",
           "packets": 2,
           "protocol": "tcp"
@@ -1228,6 +1248,7 @@
         },
         "network": {
           "bytes": 75,
+          "community_id": "1:AtJByg1SAIkNhDGqD4XhVNAhwc8=",
           "direction": "outbound",
           "packets": 1,
           "protocol": "udp"
@@ -1287,6 +1308,7 @@
         },
         "network": {
           "bytes": 80,
+          "community_id": "1:YamB1S9bWGFmqfw7U/M0nG1GUz8=",
           "direction": "outbound",
           "packets": 2,
           "protocol": "tcp"
@@ -1346,6 +1368,7 @@
         },
         "network": {
           "bytes": 160,
+          "community_id": "1:X+r9a4yHo+YM8PQ6q04bec166gk=",
           "direction": "outbound",
           "packets": 2,
           "protocol": "udp"
@@ -1405,6 +1428,7 @@
         },
         "network": {
           "bytes": 76,
+          "community_id": "1:hmVHHQG4Si4V475TR3gSOjFY4PQ=",
           "direction": "inbound",
           "packets": 1,
           "protocol": "udp"
@@ -1464,6 +1488,7 @@
         },
         "network": {
           "bytes": 1340,
+          "community_id": "1:XTYkQhjrZQKtKSBX3glwTV1hOBc=",
           "direction": "inbound",
           "packets": 2,
           "protocol": "tcp"
