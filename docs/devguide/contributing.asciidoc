@@ -147,4 +147,4 @@ In most cases `govendor fetch your/dependency@version +out` will get the job don
 
 To keep up to date with changes to the official Beats for community developers,
 follow the developer changelog
-https://github.com/elastic/beats/blob/master/CHANGELOG-developer.md[here].
+https://github.com/elastic/beats/blob/master/CHANGELOG-developer.asciidoc[here].
