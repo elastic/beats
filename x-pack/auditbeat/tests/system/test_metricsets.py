@@ -26,7 +26,7 @@ class Test(AuditbeatXPackTest):
         try:
             self.check_metricset("system", "host", COMMON_FIELDS + fields, warnings_allowed=True)
         except Exception as e:
-            if "event.kind" not in str(e):
+            if "event.kind" not in str(e) and "message" not in str(e):
                 raise
 
     @unittest.skip("Packages metricset is disabled")
