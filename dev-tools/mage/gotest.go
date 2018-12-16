@@ -325,3 +325,16 @@ func (s *GoTestSummary) String() string {
 
 	return strings.TrimRight(b.String(), "\n")
 }
+
+// BuildSystemTestBinary build a binary for testing that is instrumented for
+// testing and measuring code coverage. The binary is only instrumented for
+// coverage when TEST_COVERAGE=true (default is false).
+func BuildSystemTestBinary() error {
+	args := []string{
+		"test", "-c",
+	}
+	if TestCoverage {
+		args = append(args, "-coverpkg", "./...")
+	}
+	return sh.RunV("go", args...)
+}

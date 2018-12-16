@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"bytes"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -88,10 +89,24 @@ func MustUsePackaging(specName, specFile string) {
 	}
 }
 
+// LoadLocalNamedSpec loads the named package spec from the packages.yml in the
+// current directory.
+func LoadLocalNamedSpec(name string) {
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		panic(err)
+	}
+
+	err = LoadNamedSpec(name, filepath.Join(beatsDir, packageSpecFile), "packages.yml")
+	if err != nil {
+		panic(err)
+	}
+}
+
 // LoadNamedSpec loads a packaging specification with the given name from the
 // specified YAML file. name should be a sub-key of 'specs'.
-func LoadNamedSpec(name, file string) error {
-	specs, err := LoadSpecs(file)
+func LoadNamedSpec(name string, files ...string) error {
+	specs, err := LoadSpecs(files...)
 	if err != nil {
 		return errors.Wrap(err, "failed to load spec file")
 	}
@@ -122,7 +137,7 @@ func LoadSpecs(files ...string) (map[string][]OSPackageArgs, error) {
 	}
 
 	var packages PackageYAML
-	if err = yaml.Unmarshal(data, &packages); err != nil {
+	if err := yaml.Unmarshal(bytes.Join(data, []byte{'\n'}), &packages); err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal spec data")
 	}
 
