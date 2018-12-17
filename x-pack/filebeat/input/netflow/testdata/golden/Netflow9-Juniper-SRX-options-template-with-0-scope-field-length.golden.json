@@ -15,14 +15,14 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 142,
+            "source_id": 142,
             "timestamp": "2016-11-29T00:21:56Z",
-            "uptimeMillis": 3566690934,
+            "uptime_millis": 3566690934,
             "version": 9
           },
           "options": {
-            "samplingAlgorithm": 2,
-            "samplingInterval": 1
+            "sampling_algorithm": 2,
+            "sampling_interval": 1
           },
           "scope": {},
           "type": "netflow_options"

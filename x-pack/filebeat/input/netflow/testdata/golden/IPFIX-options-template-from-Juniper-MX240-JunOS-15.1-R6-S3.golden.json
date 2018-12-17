@@ -15,25 +15,25 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 524288,
+            "source_id": 524288,
             "timestamp": "2018-06-01T15:11:53Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
           "options": {
-            "exportProtocolVersion": 10,
-            "exportTransportProtocol": 17,
-            "exportedFlowRecordTotalCount": 76,
-            "exportedMessageTotalCount": 76,
-            "exporterIPv4Address": "10.0.0.1",
-            "exporterIPv6Address": "::",
-            "flowActiveTimeout": 60,
-            "flowIdleTimeout": 60,
-            "samplingInterval": 1000,
-            "systemInitTimeMilliseconds": "2010-01-06T07:06:38Z"
+            "export_protocol_version": 10,
+            "export_transport_protocol": 17,
+            "exported_flow_record_total_count": 76,
+            "exported_message_total_count": 76,
+            "exporter_ipv4_address": "10.0.0.1",
+            "exporter_ipv6_address": "::",
+            "flow_active_timeout": 60,
+            "flow_idle_timeout": 60,
+            "sampling_interval": 1000,
+            "system_init_time_milliseconds": "2010-01-06T07:06:38Z"
           },
           "scope": {
-            "exportingProcessId": 2
+            "exporting_process_id": 2
           },
           "type": "netflow_options"
         }
