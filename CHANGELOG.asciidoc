@@ -55,16 +55,15 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 *Filebeat*
 - Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
-
 - Fix improperly set config for CRI Flag in Docker Input {pull}8899[8899]
 - Just enabling the `elasticsearch` fileset and starting Filebeat no longer causes an error. {pull}8891[8891]
 - Fix macOS default log path for elasticsearch module based on homebrew paths. {pul}8939[8939]
 - Make sure the Filebeat Elastic licensed packages uses the Elastic binary instead of the OSS. {pull}8836[8836]
 - Fix installation of haproxy dashboard. {issue}9307[9307] {pull}9313[9313]
-
 - Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
 - Stop runners disabled by hints after previously being started. {pull}9305[9305]
 - Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
+- Fixed a memory leak when harvesters are closed. {pull}7820[7820]
 
 *Heartbeat*
 
