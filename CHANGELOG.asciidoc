@@ -238,6 +238,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Dissect will now flag event on parsing error. {pull}8751[8751]
 - add_cloud_metadata initialization is performed asynchronously to avoid delays on startup. {pull}8845[8845]
 - Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]
+- Add DeDot method in add_docker_metadata processor in libbeat. {issue}9350[9350] {pull}9505[9505]
 
 *Filebeat*
 

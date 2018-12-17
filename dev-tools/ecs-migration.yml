@@ -364,7 +364,7 @@
   to: user_agent.original
   alias: true
 
- # Note: `http` is not officially in ECS yet
+# Note: `http` is not officially in ECS yet
 
 - from: nginx.access.response_code
   to: http.response.status_code
