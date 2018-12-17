@@ -373,6 +373,9 @@ class Test(metricbeat.BaseTest):
             "extras": {
                 "process.env.whitelist": ["PATH"],
                 "process.include_cpu_ticks": True,
+
+                # Remove 'percpu' prior to checking documented fields because its keys are dynamic.
+                "process.include_per_cpu": False,
             }
         }])
         proc = self.start_beat()
@@ -394,10 +397,6 @@ class Test(metricbeat.BaseTest):
             env = process.pop("env", None)
             if env is not None:
                 found_env = True
-
-            # Remove 'percpu' prior to checking documented fields because its keys are dynamic.
-            if "cgroup" in process and "cpuacct" in process["cgroup"]:
-                del process["cgroup"]["cpuacct"]["percpu"]
 
             self.assert_fields_are_documented(evt)
 

@@ -26,7 +26,7 @@ import (
 
 // cgroupStatsToMap returns a MapStr containing the data from the stats object.
 // If stats is nil then nil is returned.
-func cgroupStatsToMap(stats *cgroup.Stats) common.MapStr {
+func cgroupStatsToMap(stats *cgroup.Stats, perCPU bool) common.MapStr {
 	if stats == nil {
 		return nil
 	}
@@ -44,7 +44,7 @@ func cgroupStatsToMap(stats *cgroup.Stats) common.MapStr {
 	if cpu := cgroupCPUToMapStr(stats.CPU); cpu != nil {
 		cgroup["cpu"] = cpu
 	}
-	if cpuacct := cgroupCPUAccountingToMapStr(stats.CPUAccounting); cpuacct != nil {
+	if cpuacct := cgroupCPUAccountingToMapStr(stats.CPUAccounting, perCPU); cpuacct != nil {
 		cgroup["cpuacct"] = cpuacct
 	}
 	if memory := cgroupMemoryToMapStr(stats.Memory); memory != nil {
@@ -97,23 +97,17 @@ func cgroupCPUToMapStr(cpu *cgroup.CPUSubsystem) common.MapStr {
 // cgroupCPUAccountingToMapStr returns a MapStr containing
 // CPUAccountingSubsystem data. If the cpuacct parameter is nil then nil is
 // returned.
-func cgroupCPUAccountingToMapStr(cpuacct *cgroup.CPUAccountingSubsystem) common.MapStr {
+func cgroupCPUAccountingToMapStr(cpuacct *cgroup.CPUAccountingSubsystem, perCPU bool) common.MapStr {
 	if cpuacct == nil {
 		return nil
 	}
 
-	perCPUUsage := common.MapStr{}
-	for i, usage := range cpuacct.UsagePerCPU {
-		perCPUUsage[strconv.Itoa(i+1)] = usage
-	}
-
-	return common.MapStr{
+	event := common.MapStr{
 		"id":   cpuacct.ID,
 		"path": cpuacct.Path,
 		"total": common.MapStr{
 			"ns": cpuacct.TotalNanos,
 		},
-		"percpu": perCPUUsage,
 		"stats": common.MapStr{
 			"system": common.MapStr{
 				"ns": cpuacct.Stats.SystemNanos,
@@ -123,6 +117,16 @@ func cgroupCPUAccountingToMapStr(cpuacct *cgroup.CPUAccountingSubsystem) common.
 			},
 		},
 	}
+
+	if perCPU {
+		perCPUUsage := common.MapStr{}
+		for i, usage := range cpuacct.UsagePerCPU {
+			perCPUUsage[strconv.Itoa(i+1)] = usage
+		}
+		event["percpu"] = perCPUUsage
+	}
+
+	return event
 }
 
 // cgroupMemoryToMapStr returns a MapStr containing MemorySubsystem data. If the
