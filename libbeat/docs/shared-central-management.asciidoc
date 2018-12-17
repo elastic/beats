@@ -121,10 +121,7 @@ During the enrollment process:
  for configuration polling
  . The enroll command creates a backup of your configuration and then
  **overwrites the current settings** so they can be managed centrally
- 
-IMPORTANT: When a Beat is enrolled in central management, it ignores all
-settings specified in local configuration files.
- 
+
 To enroll {beats}, use either <<token-based-enrollment,token-based>>
 or <<username-password-enrollment,username and password-based>> enrollment.
 
