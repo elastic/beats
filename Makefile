@@ -13,11 +13,15 @@ REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 XPACK_SUFFIX=x-pack/
 
+# PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
+# in the x-pack directory (rather than having the OSS build produce both sets
+# of artifacts). This will be removed once we complete the transition.
+PROJECTS_XPACK_PKG=x-pack/auditbeat
 # PROJECTS_XPACK_MAGE is a list of Beats whose primary build logic is based in
 # Mage. For compatibility with CI testing these projects support a subset of the
 # makefile targets. After all Beats converge to primarily using Mage we can
 # remove this and treat all sub-projects the same.
-PROJECTS_XPACK_MAGE=x-pack/filebeat x-pack/metricbeat
+PROJECTS_XPACK_MAGE=x-pack/filebeat x-pack/metricbeat $(PROJECTS_XPACK_PKG)
 
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
@@ -156,8 +160,8 @@ snapshot:
 # Builds a release.
 .PHONY: release
 release: beats-dashboards
-	@$(foreach var,$(BEATS),$(MAKE) -C $(var) release || exit 1;)
-	@$(foreach var,$(BEATS), \
+	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG),$(MAKE) -C $(var) release || exit 1;)
+	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG), \
       test -d $(var)/build/distributions && test -n "$$(ls $(var)/build/distributions)" || exit 0; \
       mkdir -p build/distributions/$(subst $(XPACK_SUFFIX),'',$(var)) && mv -f $(var)/build/distributions/* build/distributions/$(subst $(XPACK_SUFFIX),'',$(var))/ || exit 1;)
 

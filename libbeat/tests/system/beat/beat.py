@@ -188,13 +188,16 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if output is None:
             output = self.beat_name + ".log"
 
-        args = [cmd,
-                "-systemTest",
+        args = [cmd, "-systemTest"]
+        if os.getenv("TEST_COVERAGE") == "true":
+            args += [
                 "-test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
-                "-path.home", os.path.normpath(self.working_dir),
-                "-c", os.path.join(self.working_dir, config),
-                ]
+            ]
+        args += [
+            "-path.home", os.path.normpath(self.working_dir),
+            "-c", os.path.join(self.working_dir, config),
+        ]
 
         if logging_args:
             args.extend(logging_args)
@@ -492,8 +495,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 if "name" not in field:
                     continue
 
-                # Chain together names
-                if name != "":
+                # Chain together names. Names in group `base` are top-level.
+                if name != "" and name != "base":
                     newName = name + "." + field["name"]
                 else:
                     newName = field["name"]
