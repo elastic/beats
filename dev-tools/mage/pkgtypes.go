@@ -704,14 +704,21 @@ func addUidGidEnvArgs(args []string) ([]string, error) {
 	}
 
 	return append(args,
-		"--env", "EXEC_UID="+strconv.Itoa(uid),
-		"--env", "EXEC_GID="+strconv.Itoa(gid),
+		"-e", "EXEC_UID="+strconv.Itoa(uid),
+		"-e", "EXEC_GID="+strconv.Itoa(gid),
 	), nil
 }
 
 // addFileToZip adds a file (or directory) to a zip archive.
 func addFileToZip(ar *zip.Writer, baseDir string, pkgFile PackageFile) error {
-	return filepath.Walk(pkgFile.Source, func(path string, info os.FileInfo, err error) error {
+	// filepath.Walk() does not resolve symlinks, but pkgFile.Source might be one,
+	// see mage.KibanaDashboards().
+	resolvedSource, err := filepath.EvalSymlinks(pkgFile.Source)
+	if err != nil {
+		return err
+	}
+
+	return filepath.Walk(resolvedSource, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}

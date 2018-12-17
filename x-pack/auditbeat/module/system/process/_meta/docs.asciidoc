@@ -1,0 +1,7 @@
+[role="xpack"]
+
+experimental[]
+
+This is the `process` metricset of the system module.
+
+It is implemented for Linux and macOS (Darwin).

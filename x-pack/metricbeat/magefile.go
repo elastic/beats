@@ -22,7 +22,7 @@ import (
 
 func init() {
 	mage.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
-	mage.BeatLicense = "Elastic"
+	mage.BeatLicense = "Elastic License"
 }
 
 // Build builds the Beat binary.

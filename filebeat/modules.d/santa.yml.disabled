@@ -1,0 +1,9 @@
+# Module: santa
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-santa.html
+
+- module: santa
+  log:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the the default path.
+    #var.paths:
