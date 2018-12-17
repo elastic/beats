@@ -225,6 +225,9 @@ The index name to write events to. The default is
 +"apm-{version}-transaction-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>).
+
+NOTE: `beat.version` is a field managed by Beats that is added to every document.
+It holds the current version of APM Server.
 endif::apm-server[]
 
 ifndef::no_dashboards[]
