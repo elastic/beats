@@ -221,7 +221,7 @@ endif::apm-server[]
 
 ifdef::apm-server[]
 The index name to write events to. The default is
-+"apm-%\{[beat.version]\}-EVENT_TYPE-%\{+yyyy.MM.dd\}"+ (for example,
++"apm-%\{[beat.version]\}-{type\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"apm-{version}-transaction-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>).
