@@ -103,6 +103,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Added `syslog_host` variable to HAProxy module to allow syslog listener to bind to configured host. {pull}9366[9366]
 - Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
 - Add support for multi-core thread_id in postgresql module {issue}9156[9156] {pull}9482[9482]
+- Added module for parsing Google Santa logs. {pull}9540[9540]
 
 *Heartbeat*
 
