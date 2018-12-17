@@ -216,10 +216,14 @@ The index name to write events to. The default is
 +"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>).
+
 ifndef::no_dashboards[]
 If you are using the pre-built Kibana
 dashboards, you also need to set the `setup.dashboards.index` option (see
 <<configuration-dashboards>>).
+ifdef::deprecate_dashboard_loading[]
+deprecated[{deprecate_dashboard_loading}]
+endif::deprecate_dashboard_loading[]
 endif::no_dashboards[]
 
 You can set the index dynamically by using a format string to access any event
@@ -247,12 +251,6 @@ TIP: To learn how to add custom fields to events, see the
 See the <<indices-option-es,`indices`>> setting for other ways to set the index
 dynamically.
 
-
-ifdef::deprecate_dashboard_loading[]
-
-deprecated[{deprecate_dashboard_loading}]
-
-endif::[]
 
 [[indices-option-es]]
 ===== `indices`
