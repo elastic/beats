@@ -9,7 +9,7 @@ more filesets (in the case of Nginx, `access` and `error`). A fileset contains
 the following:
 
 * {beatname_uc} input configurations, which contain the default paths where to
-  look or the log files. These default paths depend on the operating system.
+  look for the log files. These default paths depend on the operating system.
   The {beatname_uc} configuration is also responsible with stitching together
   multiline events when needed.
 
