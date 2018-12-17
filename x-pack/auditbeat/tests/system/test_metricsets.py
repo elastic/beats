@@ -29,17 +29,6 @@ class Test(AuditbeatXPackTest):
             if "event.kind" not in str(e) and "message" not in str(e):
                 raise
 
-    @unittest.skip("Packages metricset is disabled")
-    def test_metricset_packages(self):
-        """
-        packages metricset collects information about installed packages on a system.
-        """
-
-        fields = ["system.audit.packages.package"]
-
-        # Metricset is experimental and that generates a warning, TODO: remove later
-        self.check_metricset("system", "packages", COMMON_FIELDS + fields, warnings_allowed=True)
-
     @unittest.skipIf(sys.platform == "darwin" and os.geteuid != 0, "Requires root on macOS")
     def test_metricset_process(self):
         """

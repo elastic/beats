@@ -9,7 +9,6 @@ package include
 import (
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/host"
-	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/packages"
 	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/process"
 	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/socket"
 	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/user"
