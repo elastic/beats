@@ -275,8 +275,10 @@ to a new name.
 match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[]
 
 The following example sets the index based on whether the `message` field
 contains the specified string:
@@ -380,8 +382,10 @@ it to a new name.
 match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[]
 
 The following example sends events to a specific pipeline based on whether the
 `message` field contains the specified string:
@@ -864,8 +868,10 @@ to a new name.
 match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[] 
 
 
 ===== `key`
@@ -1089,8 +1095,10 @@ a new name.
 *`default`*:: The default string value to use if `mappings` does not find a match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[]
 
 Example `keys` settings:
 
