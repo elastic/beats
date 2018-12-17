@@ -5,7 +5,7 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "\\[%{TIMESTAMP_ISO8601:process.start}\\] I santad: action=%{NOT_SEPARATOR:santa.action}\\|decision=%{NOT_SEPARATOR:santa.decision}\\|reason=%{NOT_SEPARATOR:santa.reason}\\|sha256=%{NOT_SEPARATOR:hash.sha256}\\|path=%{NOT_SEPARATOR:process.executable}(\\|args=%{NOT_SEPARATOR:process.args})?(\\|cert_sha256=%{NOT_SEPARATOR:certificate.sha256})?(\\|cert_cn=%{NOT_SEPARATOR:certificate.common_name})?\\|pid=%{NUMBER:process.pid}\\|ppid=%{NUMBER:process.ppid}\\|uid=%{NUMBER:user.id}\\|user=%{NOT_SEPARATOR:user.name}\\|gid=%{NUMBER:group.id}\\|group=%{NOT_SEPARATOR:group.name}\\|mode=%{WORD:santa.mode}"
+                    "\\[%{TIMESTAMP_ISO8601:process.start}\\] I santad: action=%{NOT_SEPARATOR:santa.action}\\|decision=%{NOT_SEPARATOR:santa.decision}\\|reason=%{NOT_SEPARATOR:santa.reason}\\|sha256=%{NOT_SEPARATOR:hash.sha256}\\|path=%{NOT_SEPARATOR:process.executable}(\\|args=%{NOT_SEPARATOR:process.args})?(\\|cert_sha256=%{NOT_SEPARATOR:certificate.sha256})?(\\|cert_cn=%{NOT_SEPARATOR:certificate.common_name})?\\|pid=%{NUMBER:process.pid:int}\\|ppid=%{NUMBER:process.ppid:int}\\|uid=%{NUMBER:user.id}\\|user=%{NOT_SEPARATOR:user.name}\\|gid=%{NUMBER:group.id}\\|group=%{NOT_SEPARATOR:group.name}\\|mode=%{WORD:santa.mode}"
                 ],
                 "pattern_definitions": {
                     "NOT_SEPARATOR": "[^\\|]+"
@@ -38,18 +38,6 @@
                 "field": "process.args",
                 "separator": " ",
                 "ignore_failure": true
-            }
-        },
-        {
-            "convert": {
-                "field": "process.pid",
-                "type": "long"
-            }
-        },
-        {
-            "convert": {
-                "field": "process.ppid",
-                "type": "long"
             }
         }
     ],
