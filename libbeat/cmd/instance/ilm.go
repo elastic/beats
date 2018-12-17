@@ -118,6 +118,16 @@ func (b *Beat) loadILMPolicy() error {
 		return err
 	}
 
+	err = checkElasticsearchVersionIlm(esClient)
+	if err != nil {
+		return err
+	}
+
+	err = checkILMFeatureEnabled(esClient)
+	if err != nil {
+		return err
+	}
+
 	_, _, err = esClient.Request("PUT", "/_ilm/policy/"+ILMPolicyName, "", nil, ILMPolicy)
 	return err
 }

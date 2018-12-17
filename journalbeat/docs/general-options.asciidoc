@@ -54,5 +54,5 @@ This option is valid as a global setting under the +{beatname_lc}+ namespace
 or under `paths`. For a description of this option, see
 <<{beatname_lc}-include-matches,`include_matches`>>. 
 
-include::../../libbeat/docs/generalconfig.asciidoc[]
+include::{libbeat-dir}/docs/generalconfig.asciidoc[]
 
