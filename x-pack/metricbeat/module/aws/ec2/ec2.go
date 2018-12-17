@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
@@ -107,12 +107,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 
 	//actual fetch function
-	cfg, err := external.LoadDefaultAWSConfig()
-	if err != nil {
-		report.Error(errors.Wrap(err, "Failed to load config"))
-		return
-	}
-
+	cfg := defaults.Config()
 	cfg.Credentials = awssdk.StaticCredentialsProvider{
 		Value: awssdk.Credentials{
 			AccessKeyID:     m.config.AwsAccessKeyID,

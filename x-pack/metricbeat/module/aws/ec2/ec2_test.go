@@ -125,6 +125,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 func TestMockFetch(t *testing.T) {
 	mockCreds := map[string]interface{}{
 		"module":     "aws",
+		"period":     "300s",
 		"metricsets": []string{"ec2"},
 	}
 
@@ -181,7 +182,8 @@ func TestFetch(t *testing.T) {
 		awsMetricSet := mbtest.NewReportingMetricSetV2(t, tempCreds)
 		events, errs := mbtest.ReportingFetchV2(awsMetricSet)
 		if errs != nil {
-			t.Skip("Skipping TestFetch: please check $AWS_ACCESS_KEY_ID, $AWS_SECRET_ACCESS_KEY and $AWS_SESSION_TOKEN in config.yml")
+			t.Skip("Skipping TestFetch: failed to make api calls. Please check $AWS_ACCESS_KEY_ID, " +
+				"$AWS_SECRET_ACCESS_KEY and $AWS_SESSION_TOKEN in config.yml")
 		}
 
 		assert.Empty(t, errs)
