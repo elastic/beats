@@ -83,7 +83,7 @@ func Package() {
 	mage.PackageKibanaDashboardsFromBuildDir()
 	auditbeat.CustomizePackaging()
 
-	mg.SerialDeps(Fields, Dashboards, mage.GenerateModuleIncludeListGo)
+	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
