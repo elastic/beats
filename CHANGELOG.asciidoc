@@ -121,7 +121,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 - Collect custom cluster `display_name` in `elasticsearch/cluster_stats` metricset. {pull}8445[8445]
 - Test etcd module with etcd 3.3. {pull}9068[9068]
-- Add setting to disable docker cpu metrics per core. {pull}9194[9194]
+- Add settings to disable docker and cgroup cpu metrics per core. {issue}9187[9187] {pull}9194[9194] {pull}9589[9589]
 - The `elasticsearch/node` metricset now reports the Elasticsearch cluster UUID. {pull}8771[8771]
 - Support GET requests in Jolokia module. {issue}8566[8566] {pull}9226[9226]
 - Add freebsd support for the uptime metricset. {pull}9413[9413]
