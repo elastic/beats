@@ -1,0 +1,326 @@
+{
+  "test_name": "IPFIX VMware virtual distributed switch",
+  "events": [
+    {
+      "Timestamp": "2016-12-22T12:17:52Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.18.65.211",
+          "locality": "private",
+          "port": 5985
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-22T12:17:52Z"
+        },
+        "flow": {
+          "id": "p2ZChbTH1YU",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.18.65.211",
+          "destinationTransportPort": 5985,
+          "egressInterface": 11,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-12-22T12:17:52Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowDirection": 1,
+          "flowEndMilliseconds": "2016-12-22T12:17:37Z",
+          "flowEndReason": 1,
+          "flowStartMilliseconds": "2016-12-22T12:17:37Z",
+          "ingressInterface": 3,
+          "ipClassOfService": 0,
+          "layer2SegmentId": 0,
+          "maximumTTL": 128,
+          "octetDeltaCount": 100,
+          "packetDeltaCount": 2,
+          "paddingOctets": "AA==",
+          "protocolIdentifier": 6,
+          "sourceIPv4Address": "172.18.65.21",
+          "sourceTransportPort": 61209,
+          "tcpControlBits": 2,
+          "type": "netflow",
+          "vmwareEgressInterfaceAttr": 2,
+          "vmwareIngressInterfaceAttr": 1,
+          "vmwareVxlanExportRole": 0
+        },
+        "network": {
+          "bytes": 100,
+          "direction": "outbound",
+          "packets": 2,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "172.18.65.21",
+          "locality": "private",
+          "port": 61209
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-22T12:17:56Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.18.65.255",
+          "locality": "private",
+          "port": 138
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-22T12:17:56Z"
+        },
+        "flow": {
+          "id": "J4VOqDnsqno",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.18.65.255",
+          "destinationTransportPort": 138,
+          "egressInterface": 10,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-12-22T12:17:56Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowDirection": 1,
+          "flowEndMilliseconds": "2016-12-22T12:17:42Z",
+          "flowEndReason": 1,
+          "flowStartMilliseconds": "2016-12-22T12:17:42Z",
+          "ingressInterface": 2,
+          "ipClassOfService": 0,
+          "layer2SegmentId": 0,
+          "maximumTTL": 128,
+          "octetDeltaCount": 229,
+          "packetDeltaCount": 1,
+          "paddingOctets": "AA==",
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "172.18.65.91",
+          "sourceTransportPort": 138,
+          "tcpControlBits": 0,
+          "type": "netflow",
+          "vmwareEgressInterfaceAttr": 2,
+          "vmwareIngressInterfaceAttr": 1,
+          "vmwareVxlanExportRole": 0
+        },
+        "network": {
+          "bytes": 229,
+          "direction": "outbound",
+          "packets": 1,
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "172.18.65.91",
+          "locality": "private",
+          "port": 138
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-22T12:17:56Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.18.65.255",
+          "locality": "private",
+          "port": 138
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-22T12:17:56Z"
+        },
+        "flow": {
+          "id": "J4VOqDnsqno",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "172.18.65.255",
+          "destinationTransportPort": 138,
+          "egressInterface": 11,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-12-22T12:17:56Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowDirection": 1,
+          "flowEndMilliseconds": "2016-12-22T12:17:42Z",
+          "flowEndReason": 1,
+          "flowStartMilliseconds": "2016-12-22T12:17:42Z",
+          "ingressInterface": 3,
+          "ipClassOfService": 0,
+          "layer2SegmentId": 0,
+          "maximumTTL": 128,
+          "octetDeltaCount": 229,
+          "packetDeltaCount": 1,
+          "paddingOctets": "AA==",
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "172.18.65.91",
+          "sourceTransportPort": 138,
+          "tcpControlBits": 0,
+          "type": "netflow",
+          "vmwareEgressInterfaceAttr": 2,
+          "vmwareIngressInterfaceAttr": 1,
+          "vmwareVxlanExportRole": 0
+        },
+        "network": {
+          "bytes": 229,
+          "direction": "outbound",
+          "packets": 1,
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "172.18.65.91",
+          "locality": "private",
+          "port": 138
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-22T12:26:04Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "224.0.0.252",
+          "locality": "private",
+          "port": 5355
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-22T12:26:04Z"
+        },
+        "flow": {
+          "id": "iPG_hIy8oDM",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "224.0.0.252",
+          "destinationTransportPort": 5355,
+          "egressInterface": 11,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-12-22T12:26:04Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowDirection": 1,
+          "flowEndMilliseconds": "2016-12-22T12:25:49Z",
+          "flowEndReason": 1,
+          "flowStartMilliseconds": "2016-12-22T12:25:49Z",
+          "ingressInterface": 3,
+          "ipClassOfService": 0,
+          "layer2SegmentId": 0,
+          "maximumTTL": 1,
+          "octetDeltaCount": 104,
+          "packetDeltaCount": 2,
+          "paddingOctets": "AA==",
+          "protocolIdentifier": 17,
+          "sourceIPv4Address": "172.18.65.21",
+          "sourceTransportPort": 61329,
+          "tcpControlBits": 0,
+          "type": "netflow",
+          "vmwareEgressInterfaceAttr": 2,
+          "vmwareIngressInterfaceAttr": 1,
+          "vmwareVxlanExportRole": 0
+        },
+        "network": {
+          "bytes": 104,
+          "direction": "outbound",
+          "packets": 2,
+          "protocol": "udp"
+        },
+        "source": {
+          "ip": "172.18.65.21",
+          "locality": "private",
+          "port": 61329
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-12-22T12:26:04Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "port": 5355
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2016-12-22T12:26:04Z"
+        },
+        "flow": {
+          "id": "y_Vml2vPNtw",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv6Address": "ff02::1:3",
+          "destinationTransportPort": 5355,
+          "egressInterface": 11,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 0,
+            "timestamp": "2016-12-22T12:26:04Z",
+            "uptimeMillis": 0,
+            "version": 10
+          },
+          "flowDirection": 1,
+          "flowEndMilliseconds": "2016-12-22T12:25:49Z",
+          "flowEndReason": 1,
+          "flowStartMilliseconds": "2016-12-22T12:25:49Z",
+          "ingressInterface": 3,
+          "ipClassOfService": 0,
+          "layer2SegmentId": 0,
+          "maximumTTL": 1,
+          "octetDeltaCount": 144,
+          "packetDeltaCount": 2,
+          "paddingOctets": "AA==",
+          "protocolIdentifier": 17,
+          "sourceIPv6Address": "fe80::5187:5cd8:d750:cdc9",
+          "sourceTransportPort": 61329,
+          "tcpControlBits": 0,
+          "type": "netflow",
+          "vmwareEgressInterfaceAttr": 2,
+          "vmwareIngressInterfaceAttr": 1,
+          "vmwareVxlanExportRole": 0
+        },
+        "network": {
+          "bytes": 144,
+          "direction": "outbound",
+          "packets": 2,
+          "protocol": "udp"
+        },
+        "source": {
+          "port": 61329
+        }
+      },
+      "Private": null
+    }
+  ]
+}

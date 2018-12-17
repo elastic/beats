@@ -1,0 +1,69 @@
+{
+  "test_name": "Netflow 9 field layer2segmentid",
+  "events": [
+    {
+      "Timestamp": "2018-01-16T09:45:02Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "80.82.237.40",
+          "locality": "public",
+          "port": 445
+        },
+        "device": {
+          "ip": "192.0.2.1"
+        },
+        "event": {
+          "action": "netflow",
+          "created": "2018-01-16T09:45:02Z",
+          "duration": 0,
+          "end": "2018-01-16T09:44:47Z",
+          "start": "2018-01-16T09:44:47Z"
+        },
+        "flow": {
+          "id": "sjsTHOXy2lQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "destinationIPv4Address": "80.82.237.40",
+          "destinationTransportPort": 445,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "sourceId": 262144,
+            "timestamp": "2018-01-16T09:45:02Z",
+            "uptimeMillis": 5584000,
+            "version": 9
+          },
+          "flowDirection": 0,
+          "flowEndSysUpTime": 5569000,
+          "flowStartSysUpTime": 5569000,
+          "ingressInterface": 7,
+          "ingressVRFID": 0,
+          "ipClassOfService": 0,
+          "layer2SegmentId": 0,
+          "octetDeltaCount": 52,
+          "packetDeltaCount": 1,
+          "paddingOctets": "AAA=",
+          "protocolIdentifier": 6,
+          "samplerId": 98,
+          "sourceIPv4Address": "192.168.200.136",
+          "sourceTransportPort": 61926,
+          "type": "netflow",
+          "vlanId": 3174
+        },
+        "network": {
+          "bytes": 52,
+          "direction": "inbound",
+          "packets": 1,
+          "protocol": "tcp"
+        },
+        "source": {
+          "ip": "192.168.200.136",
+          "locality": "private",
+          "port": 61926
+        }
+      },
+      "Private": null
+    }
+  ]
+}

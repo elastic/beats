@@ -142,6 +142,8 @@ func referenceConfig() error {
 	var configParts = []string{
 		mage.OSSBeatDir("_meta/common.reference.p1.yml"),
 		modulesConfigYml,
+		mage.OSSBeatDir("_meta/common.reference.inputs.yml"),
+		"_meta/common.reference.inputs.yml",
 		mage.OSSBeatDir("_meta/common.reference.p2.yml"),
 		"{{ elastic_beats_dir }}/libbeat/_meta/config.reference.yml",
 	}
