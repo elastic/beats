@@ -100,10 +100,23 @@ configuration included.
 
 Download this example configuration file as a starting point:
 
+ifndef::apm-server[]
+
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
 curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/docker/{beatname_lc}.docker.yml
 ------------------------------------------------
+
+endif::apm-server[]
+
+ifdef::apm-server[]
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://raw.githubusercontent.com/elastic/apm-server/{doc-branch}/apm-server.docker.yml
+------------------------------------------------
+
+endif::apm-server[]
 
 ===== Volume-mounted configuration
 
