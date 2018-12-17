@@ -330,6 +330,21 @@ None
 
 
 [float]
+== event fields
+
+Used for context information about the log or metric event itself.
+
+
+*`event.dataset`*::
++
+--
+type: keyword
+
+Name of the dataset.
+
+--
+
+[float]
 == monitor fields
 
 Common monitor fields.

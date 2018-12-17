@@ -2,6 +2,14 @@
   title: "Common heartbeat monitor"
   description:
   fields:
+    - name: event
+      type: group
+      description: Used for context information about the log or metric event itself.
+      fields:
+        - name: dataset
+          type: keyword
+          description: Name of the dataset.
+
     - name: monitor
       type: group
       description: >
