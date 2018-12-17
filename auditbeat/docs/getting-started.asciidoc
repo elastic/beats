@@ -113,9 +113,6 @@ tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
 
 endif::[]
 
-[[docker]]
-*docker:*
-
 See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
 [[win]]
