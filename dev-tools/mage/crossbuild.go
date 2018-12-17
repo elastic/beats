@@ -25,10 +25,13 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common/file"
 )
 
 const defaultCrossBuildTarget = "golangCrossBuild"
@@ -270,6 +273,7 @@ func DockerChown(path string) {
 	uid, _ := strconv.Atoi(EnvOr("EXEC_UID", "-1"))
 	gid, _ := strconv.Atoi(EnvOr("EXEC_GID", "-1"))
 	if uid > 0 && gid > 0 {
+		log.Printf(">>> Fixing file ownership issues from Docker at path=%v", path)
 		if err := chownPaths(uid, gid, path); err != nil {
 			log.Println(err)
 		}
@@ -278,14 +282,30 @@ func DockerChown(path string) {
 
 // chownPaths will chown the file and all of the dirs specified in the path.
 func chownPaths(uid, gid int, path string) error {
-	return filepath.Walk(path, func(name string, _ os.FileInfo, err error) error {
+	start := time.Now()
+	defer log.Printf("chown took: %v", time.Now().Sub(start))
+
+	return filepath.Walk(path, func(name string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		log.Printf("chown line: %s\n", name)
+
+		// Get the file's UID and GID.
+		stat, err := file.Wrap(info)
+		if err != nil {
+			return err
+		}
+		fileUID, _ := stat.UID()
+		fileGID, _ := stat.GID()
+		if uid == fileUID && gid == fileGID {
+			// Skip if UID/GID are already a match.
+			return nil
+		}
+
+		log.Printf("chown file: %v", name)
 		if err := os.Chown(name, uid, gid); err != nil {
 			return errors.Wrapf(err, "failed to chown path=%v", name)
 		}
-		return err
+		return nil
 	})
 }

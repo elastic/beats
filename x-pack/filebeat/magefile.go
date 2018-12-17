@@ -20,7 +20,7 @@ import (
 
 func init() {
 	mage.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
-	mage.BeatLicense = "Elastic"
+	mage.BeatLicense = "Elastic License"
 }
 
 // Build builds the Beat binary.

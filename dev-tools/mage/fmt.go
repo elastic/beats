@@ -94,7 +94,7 @@ func PythonAutopep8() error {
 		return err
 	}
 
-	autopep8, err := lookVirtualenvPath(ve, "autopep8")
+	autopep8, err := LookVirtualenvPath(ve, "autopep8")
 	if err != nil {
 		return err
 	}
@@ -118,10 +118,10 @@ func AddLicenseHeaders() error {
 
 	var license string
 	switch BeatLicense {
-	case "ASL 2.0":
+	case "ASL2", "ASL 2.0":
 		license = "ASL2"
-	case "Elastic":
-		license = BeatLicense
+	case "Elastic", "Elastic License":
+		license = "Elastic"
 	default:
 		return errors.Errorf("unknown license type %v", BeatLicense)
 	}

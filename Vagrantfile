@@ -37,7 +37,7 @@ cmd /c mklink /d C:\\Gopath\\src\\github.com\\elastic\\beats \\\\vboxsvr\\vagran
 
 echo "Installing gvm to manage go version"
 [Net.ServicePointManager]::SecurityProtocol = "tls12"
-Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.0.5/gvm-windows-amd64.exe -Outfile C:\Windows\System32\gvm.exe
+Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.1.0/gvm-windows-amd64.exe -Outfile C:\Windows\System32\gvm.exe
 C:\Windows\System32\gvm.exe --format=powershell #{GO_VERSION} | Invoke-Expression
 go version
 
@@ -72,8 +72,9 @@ SCRIPT
 $linuxGvmProvision = <<SCRIPT
 mkdir -p ~/bin
 if [ ! -e "~/bin/gvm" ]; then
-  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.0.5/gvm-linux-amd64
+  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.1.0/gvm-linux-amd64
   chmod +x ~/bin/gvm
+  ~/bin/gvm $GO_VERSION
   echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
   echo 'export PATH=$HOME/bin:$GOPATH/bin:$PATH' >> ~/.bash_profile
   echo 'eval "$(gvm #{GO_VERSION})"' >> ~/.bash_profile
