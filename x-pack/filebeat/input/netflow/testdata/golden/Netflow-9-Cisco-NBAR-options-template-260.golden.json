@@ -15,18 +15,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "Exterior Gateway Protocol",
-            "applicationId": "AQAACA==",
-            "applicationName": "egp"
+            "application_description": "Exterior Gateway Protocol",
+            "application_id": "AQAACA==",
+            "application_name": "egp"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -47,18 +47,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "General Routing Encapsulation",
-            "applicationId": "AQAALw==",
-            "applicationName": "gre"
+            "application_description": "General Routing Encapsulation",
+            "application_id": "AQAALw==",
+            "application_name": "gre"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -79,18 +79,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "Internet Control Message",
-            "applicationId": "AQAAAQ==",
-            "applicationName": "icmp"
+            "application_description": "Internet Control Message",
+            "application_id": "AQAAAQ==",
+            "application_name": "icmp"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -111,18 +111,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "Enhanced Interior Gateway Routing Protocol",
-            "applicationId": "AQAAWA==",
-            "applicationName": "eigrp"
+            "application_description": "Enhanced Interior Gateway Routing Protocol",
+            "application_id": "AQAAWA==",
+            "application_name": "eigrp"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -143,18 +143,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "IP in IP",
-            "applicationId": "AQAABA==",
-            "applicationName": "ipinip"
+            "application_description": "IP in IP",
+            "application_id": "AQAABA==",
+            "application_name": "ipinip"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -175,18 +175,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "Open Shortest Path First",
-            "applicationId": "AQAAWQ==",
-            "applicationName": "ospf"
+            "application_description": "Open Shortest Path First",
+            "application_id": "AQAAWQ==",
+            "application_name": "ospf"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -207,18 +207,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "IPv6 Hop-by-Hop Option",
-            "applicationId": "AQAAAA==",
-            "applicationName": "hopopt"
+            "application_description": "IPv6 Hop-by-Hop Option",
+            "application_id": "AQAAAA==",
+            "application_name": "hopopt"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -239,18 +239,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "Gateway-to-Gateway",
-            "applicationId": "AQAAAw==",
-            "applicationName": "ggp"
+            "application_description": "Gateway-to-Gateway",
+            "application_id": "AQAAAw==",
+            "application_name": "ggp"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -271,18 +271,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "Stream",
-            "applicationId": "AQAABQ==",
-            "applicationName": "st"
+            "application_description": "Stream",
+            "application_id": "AQAABQ==",
+            "application_name": "st"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -303,18 +303,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "CBT",
-            "applicationId": "AQAABw==",
-            "applicationName": "cbt"
+            "application_description": "CBT",
+            "application_id": "AQAABw==",
+            "application_name": "cbt"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -335,18 +335,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "Cisco interior gateway ",
-            "applicationId": "AQAACQ==",
-            "applicationName": "igrp"
+            "application_description": "Cisco interior gateway ",
+            "application_id": "AQAACQ==",
+            "application_name": "igrp"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -367,18 +367,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "BBN RCC Monitoring",
-            "applicationId": "AQAACg==",
-            "applicationName": "bbnrccmon"
+            "application_description": "BBN RCC Monitoring",
+            "application_id": "AQAACg==",
+            "application_name": "bbnrccmon"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -399,18 +399,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "Network Voice Protocol",
-            "applicationId": "AQAACw==",
-            "applicationName": "nvp-ii"
+            "application_description": "Network Voice Protocol",
+            "application_id": "AQAACw==",
+            "application_name": "nvp-ii"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -431,18 +431,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "PUP",
-            "applicationId": "AQAADA==",
-            "applicationName": "pup"
+            "application_description": "PUP",
+            "application_id": "AQAADA==",
+            "application_name": "pup"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }
@@ -463,18 +463,18 @@
         "netflow": {
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-02-14T11:09:59Z",
-            "uptimeMillis": 1980395436,
+            "uptime_millis": 1980395436,
             "version": 9
           },
           "options": {
-            "applicationDescription": "ARGUS",
-            "applicationId": "AQAADQ==",
-            "applicationName": "argus"
+            "application_description": "ARGUS",
+            "application_id": "AQAADQ==",
+            "application_name": "argus"
           },
           "scope": {
-            "octetDeltaCount": 168755571
+            "octet_delta_count": 168755571
           },
           "type": "netflow_options"
         }

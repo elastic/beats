@@ -45,7 +45,7 @@ func Fields() {
 
 // fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.
 func fieldsYML() error {
-	return mage.GenerateFieldsYAML(mage.OSSBeatDir("module"), "module")
+	return mage.GenerateFieldsYAML(mage.OSSBeatDir("module"), "module", "input")
 }
 
 // Dashboards collects all the dashboards and generates index patterns.

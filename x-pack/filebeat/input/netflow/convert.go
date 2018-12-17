@@ -49,7 +49,7 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 	// replace net.HardwareAddress with its String() representation
 	fixMacAddresses(flow.Fields)
 	// Nest Exporter into netflow fields
-	flow.Fields["exporter"] = common.MapStr(flow.Exporter)
+	flow.Fields["exporter"] = fieldNameConverter.ToSnakeCase(flow.Exporter)
 
 	// Nest Type into netflow fields
 	switch flow.Type {
@@ -74,7 +74,7 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 
 	event.Timestamp = flow.Timestamp
 	event.Fields = common.MapStr{
-		"netflow": common.MapStr(flow.Fields),
+		"netflow": fieldNameConverter.ToSnakeCase(flow.Fields),
 		"event":   ecsEvent,
 		"device":  ecsDevice,
 	}
@@ -95,17 +95,16 @@ func extractIPFromIPPort(address string) string {
 	return address
 }
 
-func optionsToBeatEvent(flow record.Record) (event beat.Event) {
-	event = toBeatEventCommon(flow)
+func optionsToBeatEvent(flow record.Record) beat.Event {
 	for _, key := range []string{"options", "scope"} {
-		if iface, found := event.Fields[key]; found {
+		if iface, found := flow.Fields[key]; found {
 			if opts, ok := iface.(record.Map); ok {
 				fixMacAddresses(opts)
-				event.Fields[key] = common.MapStr(opts)
+				flow.Fields[key] = fieldNameConverter.ToSnakeCase(opts)
 			}
 		}
 	}
-	return
+	return toBeatEventCommon(flow)
 }
 
 func flowToBeatEvent(flow record.Record) (event beat.Event) {
@@ -201,10 +200,10 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	var srcIP, dstIP net.IP
 	var srcPort, dstPort uint16
 	var protocol IPProtocol
-	if ip, found := getKeyIP(ecsSource, "ip"); found {
+	if ip, found := getKeyIP(record.Map(ecsSource), "ip"); found {
 		srcIP = ip
 	}
-	if ip, found := getKeyIP(ecsDest, "ip"); found {
+	if ip, found := getKeyIP(record.Map(ecsDest), "ip"); found {
 		dstIP = ip
 	}
 	if port, found := getKeyUint64(flow.Fields, "sourceTransportPort"); found {
@@ -308,7 +307,7 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	return
 }
 
-func getKeyUint64(dict map[string]interface{}, key string) (value uint64, found bool) {
+func getKeyUint64(dict record.Map, key string) (value uint64, found bool) {
 	iface, found := dict[key]
 	if !found {
 		return
@@ -317,7 +316,7 @@ func getKeyUint64(dict map[string]interface{}, key string) (value uint64, found 
 	return
 }
 
-func getKeyString(dict map[string]interface{}, key string) (value string, found bool) {
+func getKeyString(dict record.Map, key string) (value string, found bool) {
 	iface, found := dict[key]
 	if !found {
 		return
@@ -326,7 +325,7 @@ func getKeyString(dict map[string]interface{}, key string) (value string, found 
 	return
 }
 
-func getKeyIP(dict map[string]interface{}, key string) (value net.IP, found bool) {
+func getKeyIP(dict record.Map, key string) (value net.IP, found bool) {
 	iface, found := dict[key]
 	if !found {
 		return
