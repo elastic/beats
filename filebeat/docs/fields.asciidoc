@@ -6933,6 +6933,67 @@ Operating mode of Santa.
 
 --
 
+[float]
+== disk fields
+
+Fields for DISKAPPEAR actions.
+
+
+*`santa.disk.volume`*::
++
+--
+The volume name.
+
+--
+
+*`santa.disk.bus`*::
++
+--
+The disk bus protocol.
+
+--
+
+*`santa.disk.serial`*::
++
+--
+The disk serial number.
+
+--
+
+*`santa.disk.bsdname`*::
++
+--
+example: disk1s3
+
+The disk BSD name.
+
+--
+
+*`santa.disk.model`*::
++
+--
+example: APPLE SSD SM0512L
+
+The disk model.
+
+--
+
+*`santa.disk.fs`*::
++
+--
+example: apfs
+
+The disk volume kind (filesystem type).
+
+--
+
+*`santa.disk.mount`*::
++
+--
+The disk volume path.
+
+--
+
 *`certificate.common_name`*::
 +
 --
