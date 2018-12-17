@@ -211,11 +211,21 @@ for more information about the environment variables.
 [[index-option-es]]
 ===== `index`
 
+ifndef::apm-server[]
 The index name to write events to. The default is
 +"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>).
+endif::apm-server[]
+
+ifdef::apm-server[]
+The index name to write events to. The default is
++"apm-%\{[beat.version]\}-EVENT_TYPE-%\{+yyyy.MM.dd\}"+ (for example,
++"apm-{version}-transaction-{localdate}"+). If you change this setting, you also
+need to configure the `setup.template.name` and `setup.template.pattern` options
+(see <<configuration-template>>).
+endif::apm-server[]
 
 ifndef::no_dashboards[]
 If you are using the pre-built Kibana
