@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -142,6 +143,10 @@ func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...st
 
 func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars ...string) error {
 	if IsInIntegTestEnv() {
+		// Fix file permissions after test is done writing files as root.
+		if runtime.GOOS != "windows" {
+			defer DockerChown(".")
+		}
 		return test()
 	}
 
@@ -173,6 +178,10 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		// Disable strict.perms because we moust host dirs inside containers
 		// and the UID/GID won't meet the strict requirements.
 		"-e", "BEAT_STRICT_PERMS=false",
+	}
+	args, err = addUidGidEnvArgs(args)
+	if err != nil {
+		return err
 	}
 	for _, envVar := range passThroughEnvVars {
 		args = append(args, "-e", envVar+"="+os.Getenv(envVar))

@@ -34,6 +34,7 @@ grouped in the following categories:
 * <<exported-fields-osquery>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-redis>>
+* <<exported-fields-santa>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
 
@@ -6872,6 +6873,151 @@ type: keyword
 
 The arguments with which the command was called.
 
+
+--
+
+[[exported-fields-santa]]
+== Google Santa fields
+
+Santa Module
+
+
+
+[float]
+== santa fields
+
+
+
+
+*`santa.action`*::
++
+--
+type: keyword
+
+example: EXEC
+
+Action
+
+--
+
+*`santa.decision`*::
++
+--
+type: keyword
+
+example: ALLOW
+
+Decision that santad took.
+
+--
+
+*`santa.reason`*::
++
+--
+type: keyword
+
+example: CERT
+
+Reason for the decsision.
+
+--
+
+*`santa.mode`*::
++
+--
+type: keyword
+
+example: M
+
+Operating mode of Santa.
+
+--
+
+[float]
+== disk fields
+
+Fields for DISKAPPEAR actions.
+
+
+*`santa.disk.volume`*::
++
+--
+The volume name.
+
+--
+
+*`santa.disk.bus`*::
++
+--
+The disk bus protocol.
+
+--
+
+*`santa.disk.serial`*::
++
+--
+The disk serial number.
+
+--
+
+*`santa.disk.bsdname`*::
++
+--
+example: disk1s3
+
+The disk BSD name.
+
+--
+
+*`santa.disk.model`*::
++
+--
+example: APPLE SSD SM0512L
+
+The disk model.
+
+--
+
+*`santa.disk.fs`*::
++
+--
+example: apfs
+
+The disk volume kind (filesystem type).
+
+--
+
+*`santa.disk.mount`*::
++
+--
+The disk volume path.
+
+--
+
+*`certificate.common_name`*::
++
+--
+type: keyword
+
+Common name from code signing certificate.
+
+--
+
+*`certificate.sha256`*::
++
+--
+type: keyword
+
+SHA256 hash of code signing certificate.
+
+--
+
+*`hash.sha256`*::
++
+--
+type: keyword
+
+Hash of process executable.
 
 --
 

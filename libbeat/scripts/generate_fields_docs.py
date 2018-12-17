@@ -147,11 +147,12 @@ if __name__ == "__main__":
     parser.add_argument("path", help="Path to the beat folder")
     parser.add_argument("beattitle", help="The beat title")
     parser.add_argument("es_beats", help="The path to the general beats folder")
+    parser.add_argument("--output_path", default="", dest="output_path", help="Output path, if different from path")
 
     args = parser.parse_args()
 
     beat_path = args.path
-    beat_title = args.beattitle
+    beat_title = args.beattitle.title()
     es_beats = args.es_beats
 
     fields_yml = beat_path + "/fields.yml"
@@ -160,7 +161,10 @@ if __name__ == "__main__":
     with open(fields_yml) as f:
         fields = f.read()
 
-    output = open(beat_path + "/docs/fields.asciidoc", 'w')
+    if args.output_path is not "":
+        output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w')
+    else:
+        output = open(os.path.join(beat_path, "docs/fields.asciidoc"), 'w')
 
     try:
         fields_to_asciidoc(fields, output, beat_title)

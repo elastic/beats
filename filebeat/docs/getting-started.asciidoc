@@ -1,7 +1,7 @@
 [[filebeat-getting-started]]
 == Getting Started With Filebeat
 
-include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
+include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 
 * <<filebeat-installation>>
 * <<filebeat-configuration>>
@@ -16,7 +16,7 @@ include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
 [[filebeat-installation]]
 === Step 1: Install Filebeat
 
-include::../../libbeat/docs/shared-download-and-install.asciidoc[]
+include::{libbeat-dir}/docs/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
@@ -145,7 +145,7 @@ started experience for common log formats. If you want use Filebeat modules,
 skip this section, including the remaining getting started steps, and go
 directly to <<filebeat-modules-quickstart>>.
 
-include::../../libbeat/docs/shared-configuring.asciidoc[]
+include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
 
 Here is a sample of the `filebeat` section of the `filebeat.yml` file. Filebeat uses predefined
 default values for most configuration options.
@@ -184,32 +184,32 @@ To fetch all files from a predefined level of subdirectories, the following patt
 fetch log files from the `/var/log` folder itself. Currently it is not possible to recursively
 fetch all files in all subdirectories of a directory.
 
-include::../../libbeat/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
 
-include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
 
-include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
 
-include::../../libbeat/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/docs/step-test-config.asciidoc[]
 
-include::../../libbeat/docs/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 
 include::../../libbeat/docs/shared-cm-tip.asciidoc[]
 
 [[config-filebeat-logstash]]
 === Step 3: Configure Filebeat to use Logstash
 
-include::../../libbeat/docs/shared-logstash-config.asciidoc[]
+include::{libbeat-dir}/docs/shared-logstash-config.asciidoc[]
 
 [[filebeat-template]]
 === Step 4: Load the index template in Elasticsearch
 
-include::../../libbeat/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 5: Set up the Kibana dashboards
 
-include::../../libbeat/docs/dashboards.asciidoc[]
+include::{libbeat-dir}/docs/dashboards.asciidoc[]
 
 [[filebeat-starting]]
 === Step 6: Start Filebeat
@@ -268,7 +268,7 @@ To make it easier for you to explore Filebeat data in Kibana, we've created
 example {beatname_uc} dashboards. You loaded the dashboards earlier when you
 ran the `setup` command.
 
-include::../../libbeat/docs/opendashboards.asciidoc[]
+include::{libbeat-dir}/docs/opendashboards.asciidoc[]
 
 These dashboards are designed to work out-of-the box when you use
 <<filebeat-modules-overview,Filebeat modules>>. However, you can also use them

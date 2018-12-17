@@ -79,11 +79,10 @@ make update
 
 ### Cleanup
 
-To clean  {Beat} source code, run the following commands:
+To clean  {Beat} source code, run the following command:
 
 ```
 make fmt
-make simplify
 ```
 
 To clean up the build directory and generated artifacts, run:

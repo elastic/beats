@@ -132,9 +132,7 @@ var (
 )
 
 const (
-	defaultEventTypeES6 = "doc"
-	defaultEventTypeES7 = "_doc"
-	defaultEventType    = defaultEventTypeES7
+	defaultEventType = "_doc"
 )
 
 // NewClient instantiates a new client.
@@ -691,12 +689,7 @@ func (client *Client) Connect() error {
 		return err
 	}
 
-	if client.GetVersion().Major < 7 {
-		client.eventType = defaultEventTypeES6
-	} else {
-		client.eventType = defaultEventType
-	}
-
+	client.eventType = defaultEventType
 	return nil
 }
 
