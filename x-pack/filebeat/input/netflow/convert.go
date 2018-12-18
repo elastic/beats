@@ -263,13 +263,10 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	}
 
 	if biflowDir, isBiflow := getKeyUint64(flow.Fields, "biflowDirection"); isBiflow && len(ecsSource) > 0 && len(ecsDest) > 0 {
-		client, server := ecsSource, ecsDest
-		// swap client and server if biflowDirection is reverse
+		// swap source and destination if biflowDirection is reverseInitiator
 		if biflowDir == 2 {
-			client, server = server, client
+			ecsDest, ecsSource = ecsSource, ecsDest
 		}
-		event.Fields["client"] = client
-		event.Fields["source"] = server
 		ecsEvent["category"] = "network_session"
 	}
 
