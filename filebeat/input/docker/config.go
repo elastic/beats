@@ -22,6 +22,7 @@ var defaultConfig = config{
 	Containers: containers{
 		IDs:    []string{},
 		Path:   "/var/lib/docker/containers",
+		Suffix:	"/*.log",
 		Stream: "all",
 	},
 }
@@ -35,13 +36,14 @@ type config struct {
 	// Enable CRI flags parsing (to be switched to default in 7.0)
 	CRIFlags bool `config:"cri.parse_flags"`
 
-	// Fore CRI format (don't perform autodetection)
+	// Force CRI format (don't perform autodetection)
 	CRIForce bool `config:"cri.force"`
 }
 
 type containers struct {
 	IDs  []string `config:"ids"`
 	Path string   `config:"path"`
+	Suffix string `config:"suffix"`
 
 	// Stream can be all, stdout or stderr
 	Stream string `config:"stream"`
