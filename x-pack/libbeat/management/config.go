@@ -84,6 +84,7 @@ type Config struct {
 	Blacklist ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
 }
 
+// Validate validates the fields in the config.
 func (c *Config) Validate() error {
 	if len(c.AccessToken) == 0 {
 		return errEmptyAccessToken
