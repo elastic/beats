@@ -1,0 +1,54 @@
+[
+    {
+        "@timestamp": "2018-04-23T16:40:13,737",
+        "elasticsearch.server.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
+        "event.dataset": "elasticsearch.deprecation",
+        "fileset.module": "elasticsearch",
+        "fileset.name": "deprecation",
+        "input.type": "log",
+        "log.level": "WARN",
+        "offset": 0,
+        "message": "Deprecated field [template] used, replaced by [index_patterns]",
+        "prospector.type": "log",
+        "service.name": "elasticsearch"
+    },
+    {
+        "@timestamp": "2018-04-23T16:40:13,862",
+        "elasticsearch.server.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
+        "event.dataset": "elasticsearch.deprecation",
+        "fileset.module": "elasticsearch",
+        "fileset.name": "deprecation",
+        "input.type": "log",
+        "log.level": "WARN",
+        "offset": 137,
+        "message": "Deprecated field [template] used, replaced by [index_patterns]",
+        "prospector.type": "log",
+        "service.name": "elasticsearch"
+    },
+    {
+        "@timestamp": "2018-04-23T16:40:14,792",
+        "elasticsearch.server.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
+        "event.dataset": "elasticsearch.deprecation",
+        "fileset.module": "elasticsearch",
+        "fileset.name": "deprecation",
+        "input.type": "log",
+        "log.level": "WARN",
+        "offset": 274,
+        "message": "Deprecated field [template] used, replaced by [index_patterns]",
+        "prospector.type": "log",
+        "service.name": "elasticsearch"
+    },
+    {
+        "@timestamp": "2018-04-23T16:40:15,127",
+        "elasticsearch.server.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
+        "event.dataset": "elasticsearch.deprecation",
+        "fileset.module": "elasticsearch",
+        "fileset.name": "deprecation",
+        "input.type": "log",
+        "log.level": "WARN",
+        "offset": 411,
+        "message": "Deprecated field [template] used, replaced by [index_patterns]",
+        "prospector.type": "log",
+        "service.name": "elasticsearch"
+    }
+]
