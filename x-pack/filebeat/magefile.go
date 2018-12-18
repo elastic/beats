@@ -20,7 +20,7 @@ import (
 
 func init() {
 	mage.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
-	mage.BeatLicense = "Elastic"
+	mage.BeatLicense = "Elastic License"
 }
 
 // Build builds the Beat binary.
@@ -51,7 +51,7 @@ func Fields() {
 
 // fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.
 func fieldsYML() error {
-	return mage.GenerateFieldsYAML(mage.OSSBeatDir("module"), "module")
+	return mage.GenerateFieldsYAML(mage.OSSBeatDir("module"), "module", "input")
 }
 
 // Dashboards collects all the dashboards and generates index patterns.

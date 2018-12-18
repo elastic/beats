@@ -60,6 +60,7 @@ type addDockerMetadata struct {
 	pidFields []string      // Field names that contain PIDs.
 	cgroups   *common.Cache // Cache of PID (int) to cgropus (map[string]string).
 	hostFS    string        // Directory where /proc is found
+	dedot     bool          // If set to true, replace dots in labels with `_`.
 }
 
 func newDockerMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
@@ -103,6 +104,7 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 		sourceProcessor: sourceProcessor,
 		pidFields:       config.MatchPIDs,
 		hostFS:          config.HostFS,
+		dedot:           config.DeDot,
 	}, nil
 }
 
@@ -174,7 +176,12 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		if len(container.Labels) > 0 {
 			labels := common.MapStr{}
 			for k, v := range container.Labels {
-				safemapstr.Put(labels, k, v)
+				if d.dedot {
+					label := common.DeDot(k)
+					labels.Put(label, v)
+				} else {
+					safemapstr.Put(labels, k, v)
+				}
 			}
 			meta.Put("container.labels", labels)
 		}

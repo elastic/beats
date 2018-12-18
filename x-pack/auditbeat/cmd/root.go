@@ -7,9 +7,12 @@ package cmd
 import (
 	"github.com/elastic/beats/auditbeat/cmd"
 	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
+
+	// Register Auditbeat x-pack modules.
+	_ "github.com/elastic/beats/x-pack/auditbeat/include"
 )
 
-// RootCmd to handle beats cli
+// RootCmd to handle beats CLI.
 var RootCmd = cmd.RootCmd
 
 func init() {

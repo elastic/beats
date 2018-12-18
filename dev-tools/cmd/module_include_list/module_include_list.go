@@ -143,7 +143,7 @@ var Template = template.Must(template.New("normalizations").Funcs(map[string]int
 package {{ .Package }}
 
 import (
-	// Import modules.
+	// Import packages that need to register themselves.
 {{- range $import := .Imports }}
 	_ "{{ $import }}"
 {{- end }}

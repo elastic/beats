@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Automaticall cap signed integers to 63bits. {pull}8991[8991]
 - Rename beat.timezone to event.timezone. {pull}9458[9458]
 - Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
+- Update to Golang 1.11.3. {pull}9560[9560]
 
 *Auditbeat*
 
@@ -96,12 +97,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Auditbeat*
 
+- Add system module. {pull}9546[9546]
+
 *Filebeat*
 
 - Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]
 - Added `syslog_host` variable to HAProxy module to allow syslog listener to bind to configured host. {pull}9366[9366]
 - Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
 - Add support for multi-core thread_id in postgresql module {issue}9156[9156] {pull}9482[9482]
+- Added module for parsing Google Santa logs. {pull}9540[9540]
 
 *Heartbeat*
 
@@ -111,7 +115,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Metricbeat*
 
-- Add setting to disable docker cpu metrics per core. {pull}9194[9194]
+- Add settings to disable docker and cgroup cpu metrics per core. {issue}9187[9187] {pull}9194[9194] {pull}9589[9589]
 - The `elasticsearch/node` metricset now reports the Elasticsearch cluster UUID. {pull}8771[8771]
 - Add service.type field to Metricbeat. {pull}8965[8965]
 - Support GET requests in Jolokia module. {issue}8566[8566] {pull}9226[9226]
@@ -234,6 +238,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Dissect will now flag event on parsing error. {pull}8751[8751]
 - add_cloud_metadata initialization is performed asynchronously to avoid delays on startup. {pull}8845[8845]
 - Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]
+- Add DeDot method in add_docker_metadata processor in libbeat. {issue}9350[9350] {pull}9505[9505]
 
 *Filebeat*
 
